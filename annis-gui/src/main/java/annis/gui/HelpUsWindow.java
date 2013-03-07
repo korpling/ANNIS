@@ -81,19 +81,29 @@ public class HelpUsWindow extends Window
     final HelpUsWindow finalThis = this;
     
     Button btOK = new Button("OK");
-    btOK.addListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        UI.getCurrent().removeWindow(finalThis);
-      }
-    });
+    btOK.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btOK);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(hLayout, 1.0f);
     
+  }
+
+  private static class OkClickListener implements Button.ClickListener
+  {
+
+    private final HelpUsWindow finalThis;
+
+    public OkClickListener(HelpUsWindow finalThis)
+    {
+      this.finalThis = finalThis;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      UI.getCurrent().removeWindow(finalThis);
+    }
   }
 }

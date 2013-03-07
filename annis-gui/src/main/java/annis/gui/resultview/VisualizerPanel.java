@@ -50,6 +50,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -340,6 +341,10 @@ public class VisualizerPanel extends VerticalLayout
         path(
         documentName).get(SaltProject.class);
     }
+    catch (RuntimeException e)
+    {
+      log.error("General remote service exception", e);
+    }
     catch (Exception e)
     {
       log.error("General remote service exception", e);
@@ -390,7 +395,10 @@ public class VisualizerPanel extends VerticalLayout
                 if (loadableVis.isLoaded())
                 {
                   // direct call callback since the visualizer is already ready
-                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                  if(vis instanceof LoadableVisualizer)
+                  {
+                    callback.visualizerLoaded((LoadableVisualizer) vis);
+                  }
                 }
                 else
                 {
@@ -516,13 +524,13 @@ public class VisualizerPanel extends VerticalLayout
     SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (SNode node : markedAndCovered.keySet())
+    for (Entry<SNode, Long>  entry : markedAndCovered.entrySet())
     {
-      wholeNode = wholeSGraph.getSNode(node.getSId());
-      newMarkedAndCovered.put(wholeNode, markedAndCovered.get(node));
+      wholeNode = wholeSGraph.getSNode(entry.getKey().getSId());
+      newMarkedAndCovered.put(wholeNode, entry.getValue());
 
       // copy the annis features, which are not set by the annis service
-      copyAnnisFeature(node, wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
+      copyAnnisFeature(entry.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
     }
 
     // copy the annis features, which are not set by the annis service

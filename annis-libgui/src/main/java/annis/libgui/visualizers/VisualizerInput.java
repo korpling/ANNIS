@@ -20,6 +20,7 @@ import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
 import annis.utils.LegacyGraphConverter;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -39,9 +40,9 @@ import java.util.Set;
 public class VisualizerInput implements Serializable
 {
 
-  private SDocument document;
+  private transient SDocument document = SaltFactory.eINSTANCE.createSDocument();
   private String namespace = "";
-  private Map<SNode, Long> markedAndCovered;
+  private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
   private Map<String, String> markableMap = new HashMap<String, String>();
   private Map<String, String> markableExactMap = new HashMap<String, String>();
   private String id = "";

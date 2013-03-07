@@ -28,6 +28,7 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.exceptions.AnnisException;
+import java.util.logging.Level;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -129,21 +130,35 @@ public class CorpusAdministration
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
+    BufferedWriter writer = null;
     try
     {
-      BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));
+      writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));
       writer.write("# database configuration\n");
       writer.write("datasource.driver=org.postgresql.Driver\n");
       writer.write("datasource.url=jdbc:postgresql://" + host + ":" + port + "/"
         + database + "\n");
       writer.write("datasource.username=" + user + "\n");
       writer.write("datasource.password=" + password + "\n");
-      writer.close();
     }
     catch (IOException e)
     {
       log.error("Couldn't write database properties file", e);
       throw new FileAccessException(e);
+    }
+    finally
+    {
+      if(writer != null)
+      {
+        try
+        {
+          writer.close();
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }

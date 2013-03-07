@@ -26,6 +26,7 @@ import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphQuery;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -38,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -174,8 +176,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SingleResultPanel panel : newPanels)
     {
       resultPanelList.add(panel);
-      // insert just before the indicator
-      int indicatorIndex = layout.getComponentIndex(indicatorLayout);
       layout.addComponent(panel);
     }
   }
@@ -282,9 +282,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             WebResource res = resResolver.path(corpusName).path(namespace).path(type);
             try
             {
-              tmp = res.get(new GenericType<List<ResolverEntry>>()
-              {
-              });
+              tmp = res.get(new ResolverEntryListType());
               resolverList.addAll(tmp);
             }
             catch (Exception ex)
@@ -294,7 +292,15 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             }
           }
         }
-        catch (Exception ex)
+        catch (UniformInterfaceException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (ClientHandlerException ex)
+        {
+          log.error(null, ex);
+        }
+        catch(UnsupportedEncodingException ex)
         {
           log.error(null, ex);
         }
@@ -303,26 +309,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       cacheResolver.put(resolverRequests, resolverList);
     }
     // sort everything
-    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
-    Arrays.sort(visArray, new Comparator<ResolverEntry>()
-    {
-      @Override
-      public int compare(ResolverEntry o1, ResolverEntry o2)
-      {
-        if (o1.getOrder() < o2.getOrder())
-        {
-          return -1;
-        }
-        else if (o1.getOrder() > o2.getOrder())
-        {
-          return 1;
-        }
-        else
-        {
-          return 0;
-        }
-      }
-    });
+    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[visSet.size()]);
+    Arrays.sort(visArray, new ResolverEntryComparator());
     return visArray;
   }
 
@@ -465,4 +453,37 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
  
   } // end class AllResultsFetcher
+
+  private static class ResolverEntryListType extends GenericType<List<ResolverEntry>>
+  {
+
+    public ResolverEntryListType()
+    {
+    }
+  }
+
+  private static class ResolverEntryComparator implements Comparator<ResolverEntry>
+  {
+
+    public ResolverEntryComparator()
+    {
+    }
+
+    @Override
+    public int compare(ResolverEntry o1, ResolverEntry o2)
+    {
+      if (o1.getOrder() < o2.getOrder())
+      {
+        return -1;
+      }
+      else if (o1.getOrder() > o2.getOrder())
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+  }
 }

@@ -21,7 +21,9 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.gui.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -32,6 +34,7 @@ import com.vaadin.ui.Accordion;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
@@ -87,13 +90,13 @@ public class CorpusBrowserPanel extends Panel
     citationGenerator = new CitationLinkGenerator();
 
     tblNodeAnno = new ExampleTable(citationGenerator, containerNodeAnno);
-    tblNodeAnno.addListener(new ExampleListener());
+    tblNodeAnno.addValueChangeListener(new ExampleListener());
 
     tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
-    tblEdgeTypes.addListener(new ExampleListener());
+    tblEdgeTypes.addValueChangeListener(new ExampleListener());
     
     tblEdgeAnno = new ExampleTable(citationGenerator, containerEdgeAnno);
-    tblEdgeAnno.addListener(new ExampleListener());
+    tblEdgeAnno.addValueChangeListener(new ExampleListener());
 
     accordion.addTab(tblNodeAnno, "Node annotations", null);
     accordion.addTab(tblEdgeTypes, "Edge types", null);
@@ -235,14 +238,28 @@ public class CorpusBrowserPanel extends Panel
           .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true");
-        result = query.get(new GenericType<List<AnnisAttribute>>(){});
+        result = query.get(new AnnisAttributeListType());
       }
     }
-    catch(Exception ex)
+    catch(UniformInterfaceException ex)
     {
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch(ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return new LinkedList<AnnisAttribute>(result);
@@ -328,5 +345,13 @@ public class CorpusBrowserPanel extends Panel
   {
     Iterator<String> it = list.iterator();
     return it.hasNext() ? it.next() : null;
+  }
+
+  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
+  {
+
+    public AnnisAttributeListType()
+    {
+    }
   }
 }

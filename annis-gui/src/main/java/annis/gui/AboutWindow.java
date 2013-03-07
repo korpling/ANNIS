@@ -117,19 +117,29 @@ public class AboutWindow extends Window
     
     Button btOK = new Button("OK");
     final AboutWindow finalThis = this;
-    btOK.addClickListener(new Button.ClickListener() {
-
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        UI.getCurrent().removeWindow(finalThis);
-      }
-    });
+    btOK.addClickListener(new OkClickListener(finalThis));
     layout.addComponent(btOK);
     
     layout.setComponentAlignment(hLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(btOK, Alignment.MIDDLE_CENTER);
     layout.setExpandRatio(txtThirdParty, 1.0f);
     
+  }
+
+  private static class OkClickListener implements Button.ClickListener
+  {
+
+    private final AboutWindow finalThis;
+
+    public OkClickListener(AboutWindow finalThis)
+    {
+      this.finalThis = finalThis;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      UI.getCurrent().removeWindow(finalThis);
+    }
   }
 }

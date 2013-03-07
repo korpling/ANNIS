@@ -145,7 +145,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     // clean up old export
     if(tmpOutputFile != null && tmpOutputFile.exists())
     {
-      tmpOutputFile.delete();
+      if(!tmpOutputFile.delete())
+      {
+        log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
+      }
     }
     tmpOutputFile = null;
 
@@ -312,7 +315,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     super.detach();
     if(tmpOutputFile != null && tmpOutputFile.exists())
     {
-      tmpOutputFile.delete();
+      if(!tmpOutputFile.delete())
+      {
+        log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
+      }
     }
   }
   

@@ -134,30 +134,8 @@ public class PagingComponent extends CustomComponent implements
     txtPage.setDescription("current page");
     txtPage.setHeight("-1px");
     txtPage.setWidth(3.f, UNITS_EM);
-    Validator pageValidator = new AbstractStringValidator(
-      "must be an integer greater than zero")
-    {
-      @Override
-      protected boolean isValidValue(String value)
-      {
-        try
-        {
-          int v = Integer.parseInt(value);
-          if (v > 0)
-          {
-            return true;
-          }
-          else
-          {
-            return false;
-          }
-        }
-        catch (Exception ex)
-        {
-          return false;
-        }
-      }
-    };
+    Validator pageValidator = new PageValidator(
+      "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
     root.addAction(new EnterListener(txtPage));
 
@@ -301,7 +279,7 @@ public class PagingComponent extends CustomComponent implements
   private int sanitizePage(int page)
   {
     int val = Math.max(1, page);
-    val = Math.min(1 + (count.get() / pageSize), page);
+    val = Math.min(1 + (count.get() / pageSize), val);
     return val;
   }
 
@@ -339,5 +317,35 @@ public class PagingComponent extends CustomComponent implements
   public void setInfo(String text)
   {
     lblInfo.setValue(text);
+  }
+
+  private static class PageValidator extends AbstractStringValidator
+  {
+
+    public PageValidator(String errorMessage)
+    {
+      super(errorMessage);
+    }
+
+    @Override
+    protected boolean isValidValue(String value)
+    {
+      try
+      {
+        int v = Integer.parseInt(value);
+        if (v > 0)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+      catch (Exception ex)
+      {
+        return false;
+      }
+    }
   }
 }
