@@ -30,6 +30,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -126,6 +127,16 @@ public class CorefVisualizer extends WriterVisualizer
     {
       println("<html>", w);
       println("<head>", w);
+      
+      LinkedList<String> fonts = new LinkedList<String>();
+      if(input.getFont() != null)
+      {
+        fonts.add(input.getFont().getName());
+        println("<link href=\"" 
+        + input.getFont().getUrl()
+        + "\" rel=\"stylesheet\" type=\"text/css\" >", w);
+      }
+      fonts.add("serif");
 
       println("<link href=\"" 
         + input.getResourcePath("coref/jquery.tooltip.css")
@@ -146,8 +157,9 @@ public class CorefVisualizer extends WriterVisualizer
         + "\"></script>", w);
 
       println("</head>", w);
-      println("<body>", w);
-
+     
+      println("<body style=\"font-family: '" + StringUtils.join(fonts, "', '") + "';\" >", w);
+      
       //get Info
       globalIndex = 0;
       int toolTipMaxLineCount = 1;

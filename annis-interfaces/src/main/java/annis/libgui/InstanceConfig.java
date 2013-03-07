@@ -15,7 +15,10 @@
  */
 package annis.libgui;
 
+import annis.gui.FontConfig;
 import java.io.Serializable;
+import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import javax.xml.bind.annotation.XmlElement;
@@ -41,6 +44,19 @@ public class InstanceConfig implements Serializable
   private List<CorpusSet> corpusSets;
   private String defaultCorpusSet;
   private Map<String,String> corpusMappings;
+  private FontConfig font;
+  private String keyboardLayout;
+  
+  public InstanceConfig()
+  {
+    instanceName = "";
+    instanceDisplayName = "";
+    defaultQueryBuilder = "";
+    corpusSets = new LinkedList<CorpusSet>();
+    defaultCorpusSet = "";
+    corpusMappings = new HashMap<String, String>();
+    
+  }
 
   /**
    * Get the internal short name of this instance.
@@ -139,5 +155,48 @@ public class InstanceConfig implements Serializable
   {
     this.corpusMappings = corpusMappings;
   }  
+
+  /**
+   * Get the special font used by this instance.
+   * @return 
+   */
+  @XmlElement(name="font")
+  public FontConfig getFont()
+  {
+    return font;
+  }
+
+  /**
+   * @see #getFont() 
+   * @param font 
+   */
+  public void setFont(FontConfig font)
+  {
+    this.font = font;
+  }
+
+  /**
+   * Default keyboard layout used for the virtual keyboard. 
+   * 
+   * Do not set {@code null} to disable virtual keyboards.
+   * @return 
+   */
+  @XmlElement(name = "keyboard-layout")
+  public String getKeyboardLayout()
+  {
+    return keyboardLayout;
+  }
+
+  /**
+   * @see #getKeyboardLayout() 
+   * @param keyboardLayout 
+   */
+  public void setKeyboardLayout(String keyboardLayout)
+  {
+    this.keyboardLayout = keyboardLayout;
+  }
+  
+  
+  
   
 }

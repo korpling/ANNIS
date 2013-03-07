@@ -15,6 +15,7 @@
  */
 package annis.libgui.visualizers;
 
+import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
@@ -53,6 +54,7 @@ public class VisualizerInput implements Serializable
   private List<SToken> token;
   private Set<String> tokenAnnos;
   private String segmentationName;
+  private FontConfig font;
 
   public String getAnnisWebServiceURL()
   {
@@ -363,4 +365,22 @@ public class VisualizerInput implements Serializable
   {
     return segmentationName;
   }
+
+  /**
+   * Get the properties of the (web-) font in which this visualizer should render the output.
+   * The visualizer is self-responsible for declaring a backup font that is
+   * used when this font is not available.
+   * @return 
+   */
+  public FontConfig getFont()
+  {
+    return font;
+  }
+
+  public void setFont(FontConfig font)
+  {
+    this.font = font;
+  }
+
+  
 }

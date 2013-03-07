@@ -60,7 +60,7 @@ public class ControlPanel extends Panel
 
     searchOptions = new SearchOptionsPanel();
 
-    queryPanel = new QueryPanel(controller);
+    queryPanel = new QueryPanel(controller, instanceConfig);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
     

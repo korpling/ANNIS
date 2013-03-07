@@ -46,6 +46,11 @@
     padding:0px 10px 0px 10px;
 }
 
+.partitur_table .header {
+  /* always use the default fonts for the header */
+  font-family: arial, tahoma, helvetica, sans-serif;
+}
+
 td.single_event {
     background-color:rgb(200,200,200);
     border-color:rgb(0,0,0);

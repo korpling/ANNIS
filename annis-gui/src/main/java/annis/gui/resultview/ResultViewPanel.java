@@ -19,6 +19,7 @@ import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
+import annis.libgui.InstanceConfig;
 import annis.service.objects.Match;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
@@ -55,14 +56,16 @@ public class ResultViewPanel extends Panel
   private VerticalLayout mainLayout;  
   private QueryController controller;
   private String selectedSegmentationLayer;
+  private InstanceConfig instanceConfig;
 
   public ResultViewPanel(QueryController controller,
-    PluginSystem ps)
+    PluginSystem ps, InstanceConfig instanceConfig)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
     this.ps = ps;
     this.controller = controller;
     this.selectedSegmentationLayer = controller.getQuery().getSegmentation();
+    this.instanceConfig = instanceConfig;
     
 
     setSizeFull();
@@ -135,7 +138,7 @@ public class ResultViewPanel extends Panel
 
       if (result.size() > 0)
       {
-        resultPanel = new ResultSetPanel(result, ps,
+        resultPanel = new ResultSetPanel(result, ps, instanceConfig,
           contextLeft, contextRight,
           segmentationLayer, this, offset);
 
