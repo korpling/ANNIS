@@ -181,7 +181,7 @@ public class AnnotationGraph implements Serializable
 		this.path = Arrays.copyOf(path, path.length);
 	}
 
-  private static class NodeComparator implements Comparator<AnnisNode>
+  private static class NodeComparator implements Comparator<AnnisNode>, Serializable
   {
 
     public NodeComparator()

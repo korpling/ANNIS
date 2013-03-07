@@ -6,5 +6,7 @@
   <Match>
     <Bug category="EXPERIMENTAL" />
   </Match>
-  
+  <Match>
+    <Bug pattern="SE_NO_SERIALVERSIONID" />
+  </Match>
 </FindBugsFilter>

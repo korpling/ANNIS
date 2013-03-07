@@ -39,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -462,7 +463,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  private static class ResolverEntryComparator implements Comparator<ResolverEntry>
+  private static class ResolverEntryComparator implements Comparator<ResolverEntry>, Serializable
   {
 
     public ResolverEntryComparator()

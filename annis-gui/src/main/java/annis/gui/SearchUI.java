@@ -732,8 +732,7 @@ public class SearchUI extends AnnisBaseUI
       w.setResizable(true);
       w.setWidth("500px");
       w.setHeight("500px");
-      //addWindow(w);
-      //w.center();
+      UI.getCurrent().addWindow(w);
     }
   }
 
