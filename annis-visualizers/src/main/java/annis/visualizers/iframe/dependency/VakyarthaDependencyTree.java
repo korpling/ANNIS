@@ -174,15 +174,18 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("<head>", writer);
 
       
-      LinkedList<String> fonts = new LinkedList<String>();
+      LinkedList<String> fontsText = new LinkedList<String>();
+      LinkedList<String> fontsDep = new LinkedList<String>();
       if (input.getFont() != null)
       {
-        fonts.add(input.getFont().getName());
+        fontsText.add(input.getFont().getName());
+        fontsDep.add(input.getFont().getName());
         println("<link href=\""
           + input.getFont().getUrl()
           + "\" rel=\"stylesheet\" type=\"text/css\" >", writer);
       }
-      fonts.add("sans-serif");
+      fontsText.add("sans-serif");
+      fontsDep.add("serif");
       
       println(
         "<script type=\"text/javascript\" src=\""
@@ -261,14 +264,14 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           tokenColor = MatchedNodeColors.values()[colorNumber].getHTMLColor();
         }
         tAttris.put("fill", tokenColor);
-        tAttris.put("font", "11px " + StringUtils.join(fonts, ","));
+        tAttris.put("font", "11px " + StringUtils.join(fontsText, ","));
 
         attris.put("t", tAttris);
         
         JSONObject depAttris = new JSONObject();
         depAttris.put("fill", "#999");
         depAttris.put("font-style", "italic");
-        depAttris.put("font", "12px " + StringUtils.join(fonts, ","));
+        depAttris.put("font", "12px " + StringUtils.join(fontsDep, ","));
         attris.put("deptext", depAttris);
         vakyarthaObject.put("attris", attris);
 
