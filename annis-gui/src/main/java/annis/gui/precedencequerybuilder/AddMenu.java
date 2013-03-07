@@ -34,6 +34,7 @@ public class AddMenu extends Panel
   private MenuBar addMenu = new MenuBar();
   private VerticalNode vn;
   private PrecedenceQueryBuilder sq;
+  
   private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
   
   
@@ -45,32 +46,34 @@ public class AddMenu extends Panel
     for (final String annoname : vn.getAnnonames())
     {      
       if(!annoname.equals(firstLevel))
-      {
+      {        
         add.addItem(annoname, new Command() {
           @Override
           public void menuSelected(MenuItem selectedItem) {         
             vn.createSearchBox(annoname);
-            add.removeChild(selectedItem);
+            //add.removeChild(selectedItem);
+            selectedItem.setVisible(false);
           }
         });
-      }
+      }      
     }
     
     addComponent(addMenu);
   }
   
-  public void reAddItem(final String ebene)
+  public void reActivateItem(final String ebene)
   {
     /*
      * WARNING:
      * this method will cause an exception if you try to add an item that has
      * not been on the list before 
      */
+    
+   
     final VerticalNode vn = this.vn;
     final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
     int p = 0;    
     Iterator<String> items = vn.getAnnonames().iterator();
-    /*find position for "new" Item here AND use insertItem instead of addItem*/
   
     Command com = new Command(){
       @Override

@@ -31,21 +31,25 @@ import java.util.TreeSet;
 import java.util.Set;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractSelect;
 import org.apache.commons.lang3.StringUtils;//levenshtein
+import com.vaadin.ui.AbstractSelect.Filtering;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.event.FieldEvents.TextChangeEvent;
 
 /**
  *
  * @author tom
  */
-public class SearchBox extends Panel implements Button.ClickListener, ValueChangeListener
+public class SearchBox extends Panel implements Button.ClickListener, FieldEvents.TextChangeListener
 {
   
   private int id;
   private Button btClose;
   private VerticalNode vn;
   private String ebene;
-  private ComboBox cb;  
+  private SensitiveComboBox cb;  
   private CheckBox reBox;//by Martin, tick for regular expression
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
   private PrecedenceQueryBuilder sq;
@@ -71,17 +75,19 @@ public class SearchBox extends Panel implements Button.ClickListener, ValueChang
       annonames.add(a.replaceFirst("^[^:]*:", ""));
     }
     this.annonames = annonames;//by Martin
-    ComboBox l = new ComboBox(ebene);
-    this.cb = l;
-    l.setInputPrompt(ebene);
-    l.setWidth(SB_CB_WIDTH);
+    this.cb = new SensitiveComboBox();
+    cb.setCaption(ebene);
+    cb.setInputPrompt(ebene);
+    cb.setWidth(SB_CB_WIDTH);
     // configure & load content
-    l.setImmediate(true);    
+    cb.setImmediate(true);
     for (String annoname : annonames) 
     {
-      l.addItem(annoname);
+      cb.addItem(annoname);
     }
-    sb.addComponent(l);
+    cb.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
+    cb.addListener((FieldEvents.TextChangeListener)this);
+    sb.addComponent(cb);
     
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(true);
@@ -107,8 +113,7 @@ public class SearchBox extends Panel implements Button.ClickListener, ValueChang
  
   @Override
   public void buttonClick(Button.ClickEvent event)
-  {
-
+  {    
     if(event.getButton() == btClose)
     {
       vn.removeSearchBox(this);      
@@ -132,9 +137,24 @@ public class SearchBox extends Panel implements Button.ClickListener, ValueChang
   }
   
   @Override
-  public void valueChange(ValueChangeEvent event)
-  {
-    
+  public void textChange(TextChangeEvent event)
+  {    
+    String txt = event.getText();
+    if (!txt.equals(""))
+    {
+      cb.removeAllItems();
+      for(String s : annonames)
+      {
+        if((StringUtils.getLevenshteinDistance(txt, s)<txt.length()/2+1) | (StringUtils.startsWith(s, txt)))
+        {
+          cb.addItem(s);
+        }
+      }
+    }
+    else
+    {
+      SpanBox.buildBoxValues(cb, ebene, sq);
+    }
   }
   
   public String getAttribute()
