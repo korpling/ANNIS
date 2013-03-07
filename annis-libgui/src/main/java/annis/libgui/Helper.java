@@ -57,7 +57,7 @@ public class Helper
   public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(Helper.class);
-  private static Client anonymousClient;
+  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
   
   
   /**
@@ -135,13 +135,13 @@ public class Helper
     }
     
     // use the anonymous client
-    if(anonymousClient == null)
+    if(anonymousClient.get() == null)
     {
       // anonymous client not created yet
-      anonymousClient = createRESTClient();
+      anonymousClient.set(createRESTClient());
     }
     
-    return anonymousClient.resource(uri);
+    return anonymousClient.get().resource(uri);
   }
 
   /**

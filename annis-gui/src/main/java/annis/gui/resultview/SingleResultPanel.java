@@ -168,6 +168,10 @@ public class SingleResultPanel extends VerticalLayout implements
       }
       
     }
+    catch (RuntimeException ex)
+    {
+      log.error("problems with initializing Visualizer Panel", ex);
+    }
     catch (Exception ex)
     {
       log.error("problems with initializing Visualizer Panel", ex);

@@ -19,7 +19,6 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
-import annis.gui.components.VirtualKeyboard;
 import annis.gui.controlpanel.ControlPanel;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -48,6 +47,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
@@ -132,22 +132,7 @@ public class SearchUI extends AnnisBaseUI
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btAboutAnnis.setIcon(new ThemeResource("info.gif"));
-    btAboutAnnis.addListener(new Button.ClickListener()
-    {
-
-      @Override
-      public void buttonClick(ClickEvent event)
-      {        
-        Window w =  new AboutWindow();
-        w.setCaption("About ANNIS");
-        w.setModal(true);
-        w.setResizable(true);
-        w.setWidth("500px");
-        w.setHeight("500px");
-        //addWindow(w);
-        //w.center();
-      }
-    });
+    btAboutAnnis.addClickListener(new AboutClickListener());
     
     btBugReport = new Button("Report Bug");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -438,7 +423,7 @@ public class SearchUI extends AnnisBaseUI
       WebResource res = Helper.getAnnisWebResource();
       List<AnnisCorpus> userCorpora =
         res.path("query").path("corpora").
-        get(new GenericType<List<AnnisCorpus>>(){});
+        get(new AnnisCorpusListType());
       LinkedList<String> userCorporaStrings = new LinkedList<String>();
       for(AnnisCorpus c : userCorpora)
       {
@@ -729,6 +714,35 @@ public class SearchUI extends AnnisBaseUI
     // reset title
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
+  }
+
+  private static class AboutClickListener implements ClickListener
+  {
+
+    public AboutClickListener()
+    {
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {        
+      Window w =  new AboutWindow();
+      w.setCaption("About ANNIS");
+      w.setModal(true);
+      w.setResizable(true);
+      w.setWidth("500px");
+      w.setHeight("500px");
+      //addWindow(w);
+      //w.center();
+    }
+  }
+
+  private static class AnnisCorpusListType extends GenericType<List<AnnisCorpus>>
+  {
+
+    public AnnisCorpusListType()
+    {
+    }
   }
   
   

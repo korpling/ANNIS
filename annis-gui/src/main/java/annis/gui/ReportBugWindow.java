@@ -25,6 +25,7 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.BaseTheme;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -151,14 +152,7 @@ public class ReportBugWindow extends Window
   private void addScreenshotPreview(Layout layout, final byte[] rawImage, String mimeType)
   {
     StreamResource res = new StreamResource(
-      new StreamResource.StreamSource()
-      {
-        @Override
-        public InputStream getStream()
-        {
-          return new ByteArrayInputStream(rawImage);
-        }
-      }, "screendump_" + UUID.randomUUID().toString() + ".png"
+      new ScreenDumpStreamSource(rawImage), "screendump_" + UUID.randomUUID().toString() + ".png"
     );
     res.setMIMEType(mimeType);
 
@@ -169,22 +163,7 @@ public class ReportBugWindow extends Window
     imgScreenshot.setVisible(false);
     imgScreenshot.setWidth("100%");
     
-    Button btShowScreenshot = new Button("Show attached screenshot", new Button.ClickListener() 
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        imgScreenshot.setVisible(!imgScreenshot.isVisible());
-        if(imgScreenshot.isVisible())
-        {
-          event.getButton().setCaption("Hide attached screenshot");
-        }
-        else
-        {
-          event.getButton().setCaption("Show attached screenshot");
-        }
-      }
-    });
+    Button btShowScreenshot = new Button("Show attached screenshot", new ShowScreenshotClickListener(imgScreenshot));
     btShowScreenshot.addStyleName(BaseTheme.BUTTON_LINK);
     
     layout.addComponent(btShowScreenshot);
@@ -364,6 +343,48 @@ public class ReportBugWindow extends Window
 
     }
 
+  }
+
+  private static class ScreenDumpStreamSource implements StreamResource.StreamSource
+  {
+
+    private final byte[] rawImage;
+
+    public ScreenDumpStreamSource(byte[] rawImage)
+    {
+      this.rawImage = rawImage;
+    }
+
+    @Override
+    public InputStream getStream()
+    {
+      return new ByteArrayInputStream(rawImage);
+    }
+  }
+
+  private static class ShowScreenshotClickListener implements ClickListener
+  {
+
+    private final Image imgScreenshot;
+
+    public ShowScreenshotClickListener(Image imgScreenshot)
+    {
+      this.imgScreenshot = imgScreenshot;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      imgScreenshot.setVisible(!imgScreenshot.isVisible());
+      if(imgScreenshot.isVisible())
+      {
+        event.getButton().setCaption("Hide attached screenshot");
+      }
+      else
+      {
+        event.getButton().setCaption("Show attached screenshot");
+      }
+    }
   }
 
 }

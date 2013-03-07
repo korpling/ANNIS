@@ -24,6 +24,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
+import java.io.Serializable;
 
 /**
  *
@@ -44,33 +45,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
     if(itemId instanceof CitationProvider)
     {
       final CitationProvider citationProvider = (CitationProvider) itemId;
-      btLink.addListener(new Button.ClickListener()
-      {
-
-        @Override
-        public void buttonClick(ClickEvent event)
-        {
-   
-          if(citationProvider != null)
-          {
-            CitationWindow c =
-              new CitationWindow(
-              citationProvider.getQuery(),
-              citationProvider.getCorpora(),
-              citationProvider.getLeftContext(),
-              citationProvider.getRightContext());
-            UI.getCurrent().addWindow(c);
-            c.center();
-          }
-          else
-          {
-            Notification.show("Internal error",
-              "No valid citation link was found",
-              Notification.Type.WARNING_MESSAGE);
-          }
-          
-        }
-      });
+      btLink.addListener(new LinkClickListener(citationProvider));
     }
 
     return btLink;
@@ -79,5 +54,40 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   @Override
   public void buttonClick(ClickEvent event)
   {
+  }
+
+  private static class LinkClickListener implements Button.ClickListener, Serializable
+  {
+
+    private final CitationProvider citationProvider;
+
+    public LinkClickListener(CitationProvider citationProvider)
+    {
+      this.citationProvider = citationProvider;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+
+      if(citationProvider != null)
+      {
+        CitationWindow c =
+          new CitationWindow(
+          citationProvider.getQuery(),
+          citationProvider.getCorpora(),
+          citationProvider.getLeftContext(),
+          citationProvider.getRightContext());
+        UI.getCurrent().addWindow(c);
+        c.center();
+      }
+      else
+      {
+        Notification.show("Internal error",
+          "No valid citation link was found",
+          Notification.Type.WARNING_MESSAGE);
+      }
+      
+    }
   }
 }

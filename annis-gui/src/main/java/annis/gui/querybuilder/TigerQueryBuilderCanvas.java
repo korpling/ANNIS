@@ -22,7 +22,9 @@ import annis.gui.model.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
@@ -125,7 +127,7 @@ public class TigerQueryBuilderCanvas extends Panel
             service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "true")
-              .get(new GenericType<List<AnnisAttribute>>() {})
+              .get(new AnnisAttributeListType())
             );
         }
 
@@ -138,7 +140,11 @@ public class TigerQueryBuilderCanvas extends Panel
         }
 
       }
-      catch (Exception ex)
+      catch(UniformInterfaceException ex)
+      {
+        log.error(null, ex);
+      }
+      catch(ClientHandlerException ex)
       {
         log.error(null, ex);
       }
@@ -459,5 +465,13 @@ public class TigerQueryBuilderCanvas extends Panel
     }
 
     return query.toString();
+  }
+
+  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
+  {
+
+    public AnnisAttributeListType()
+    {
+    }
   }
 }

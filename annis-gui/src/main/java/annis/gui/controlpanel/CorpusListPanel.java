@@ -159,14 +159,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
-    tblCorpora.addListener(new ValueChangeListener() 
-    {
-      @Override
-      public void valueChange(ValueChangeEvent event)
-      { 
-        finalThis.controller.corpusSelectionChanged();
-      }
-    });
+    tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
     
     setExpandRatio(tblCorpora, 1.0f);
 
@@ -232,7 +225,7 @@ public class CorpusListPanel extends VerticalLayout implements
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
       }
-      if(userConfig != null && userConfig.getCorpusSets() != null)
+      if(userConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(userConfig.getCorpusSets());
       }
@@ -291,7 +284,7 @@ public class CorpusListPanel extends VerticalLayout implements
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
       }
-      if(userConfig != null && userConfig.getCorpusSets() != null)
+      if(userConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(userConfig.getCorpusSets());
       }
@@ -331,7 +324,7 @@ public class CorpusListPanel extends VerticalLayout implements
       
       WebResource rootRes = Helper.getAnnisWebResource();
       allCorpora = rootRes.path("query").path("corpora")
-        .get(new GenericType<List<AnnisCorpus>>(){});
+        .get(new AnnisCorpusListType());
 
       return true;
     }
@@ -455,7 +448,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     }
 
-    return result.toArray(new Action[0]);
+    return result.toArray(new Action[result.size()]);
   }
 
   @Override
@@ -623,8 +616,33 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       return corpusSet;
     }
+    
+    
+    
+  }
 
-    
-    
+  private static class CorpusTableChangedListener implements ValueChangeListener
+  {
+
+    private final CorpusListPanel finalThis;
+
+    public CorpusTableChangedListener(CorpusListPanel finalThis)
+    {
+      this.finalThis = finalThis;
+    }
+
+    @Override
+    public void valueChange(ValueChangeEvent event)
+    { 
+      finalThis.controller.corpusSelectionChanged();
+    }
+  }
+
+  private static class AnnisCorpusListType extends GenericType<List<AnnisCorpus>>
+  {
+
+    public AnnisCorpusListType()
+    {
+    }
   }
 }

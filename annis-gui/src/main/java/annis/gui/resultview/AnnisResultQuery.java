@@ -69,7 +69,7 @@ public class AnnisResultQuery implements Serializable
         .queryParam("limit", "" + limit)         
         .queryParam("corpora", StringUtils.join(corpora, ","));
 
-      result = annisResource.get(new GenericType<List<Match>>() {});
+      result = annisResource.get(new MatchListType());
     }
     catch (UniformInterfaceException ex)
     {
@@ -82,6 +82,14 @@ public class AnnisResultQuery implements Serializable
     }
 
     return result;
+  }
+
+  private static class MatchListType extends GenericType<List<Match>>
+  {
+
+    public MatchListType()
+    {
+    }
   }
   
   

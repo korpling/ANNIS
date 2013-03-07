@@ -27,7 +27,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -36,6 +35,7 @@ import com.vaadin.server.ClassResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
@@ -198,14 +198,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
-      btShowKeyboard.addClickListener(new Button.ClickListener() {
-
-        @Override
-        public void buttonClick(ClickEvent event)
-        {
-          virtualKeyboard.show();
-        }
-      });
+      btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
       buttonLayout.addComponent(btShowKeyboard);
     }
     buttonLayout.setExpandRatio(btShowResult, 1.0f);
@@ -306,7 +299,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     btHistory.setPopupVisible(false);
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
-    if(controller != null & e != null)
+    if(controller != null && e != null)
     {
       controller.setQuery(new Query(e.getQuery(), e.getCorpora()));
     }
@@ -343,6 +336,23 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       lblStatus.setValue(status);
       lastPublicStatus = status;
+    }
+  }
+
+  private static class ShowKeyboardClickListener implements ClickListener
+  {
+
+    private final VirtualKeyboard virtualKeyboard;
+
+    public ShowKeyboardClickListener(VirtualKeyboard virtualKeyboard)
+    {
+      this.virtualKeyboard = virtualKeyboard;
+    }
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      virtualKeyboard.show();
     }
   }
 }

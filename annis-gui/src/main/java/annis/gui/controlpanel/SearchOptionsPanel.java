@@ -142,9 +142,7 @@ public class SearchOptionsPanel extends FormLayout
             service.path("query").path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
             .path("annotations").queryParam(
             "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
-            get(new GenericType<List<AnnisAttribute>>()
-          {
-          }));
+            get(new AnnisAttributeListType()));
         }
         catch (UnsupportedEncodingException ex)
         {
@@ -186,8 +184,9 @@ public class SearchOptionsPanel extends FormLayout
     {
       result = Integer.parseInt((String) cbLeftContext.getValue());
     }
-    catch (Exception ex)
+    catch (NumberFormatException ex)
     {
+      log.warn("Invalid integer submitted to search options ComboBox", ex);
     }
 
     return Math.max(0, result);
@@ -200,8 +199,9 @@ public class SearchOptionsPanel extends FormLayout
     {
       result = Integer.parseInt((String) cbRightContext.getValue());
     }
-    catch (Exception ex)
+    catch (NumberFormatException ex)
     {
+      log.warn("Invalid integer submitted to search options ComboBox", ex);
     }
 
     return Math.max(0, result);
@@ -219,8 +219,9 @@ public class SearchOptionsPanel extends FormLayout
     {
       result = Integer.parseInt((String) cbResultsPerPage.getValue());
     }
-    catch (Exception ex)
+    catch (NumberFormatException ex)
     {
+      log.warn("Invalid integer submitted to search options ComboBox", ex);
     }
 
     return Math.max(0, result);
@@ -234,6 +235,14 @@ public class SearchOptionsPanel extends FormLayout
   public void setSegmentationLayer(String layer)
   {
     cbSegmentation.setValue(layer);
+  }
+
+  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
+  {
+
+    public AnnisAttributeListType()
+    {
+    }
   }
   
 }

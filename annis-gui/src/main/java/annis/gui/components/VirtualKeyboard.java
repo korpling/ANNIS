@@ -35,14 +35,7 @@ public class VirtualKeyboard extends AbstractJavaScriptExtension
 {
   public VirtualKeyboard()
   {
-    addFunction("updateLang", new JavaScriptFunction() {
-
-      @Override
-      public void call(JSONArray arguments) throws JSONException
-      {
-        ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
-      }
-    });
+    addFunction("updateLang", new UpdateLangJSFunction());
   }
   
   @Override
@@ -87,6 +80,20 @@ public class VirtualKeyboard extends AbstractJavaScriptExtension
       this.keyboardLayout = keyboardLayout;
     }
     
+  }
+
+  private class UpdateLangJSFunction implements JavaScriptFunction
+  {
+
+    public UpdateLangJSFunction()
+    {
+    }
+
+    @Override
+    public void call(JSONArray arguments) throws JSONException
+    {
+      ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
+    }
   }
   
 }
