@@ -331,7 +331,19 @@ public class SearchUI extends AnnisBaseUI
       FontConfig cfg = instanceConfig.getFont();
       css.setStyles(
         "@import url(" + cfg.getUrl() + ");\n"
-        + ".corpus-font {font-family: '" + cfg.getName() + "', monospace !important;}");
+        + ".corpus-font {font-family: '" + cfg.getName() + "', monospace !important;}\n"
+        // this one is for the virtual keyboard
+        + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+        + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace;"
+        + "}");
+    }
+    else
+    {
+      css.setStyles(
+        // use original font definition from keyboard.css if no font given
+        "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+        + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
+        + "}");
     }
   }
   
