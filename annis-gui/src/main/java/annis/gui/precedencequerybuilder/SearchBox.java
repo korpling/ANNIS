@@ -72,7 +72,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableAnnotationLevels(ebene))
     {
-      annonames.add(a.replaceFirst("^[^:]*:", ""));
+      annonames.add(a);
     }
     this.annonames = annonames;//by Martin
     this.cb = new SensitiveComboBox();

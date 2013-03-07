@@ -62,7 +62,7 @@ class MetaBox extends Panel implements Button.ClickListener
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableMetaLevels(ebene))
     {
-      annonames.add(a.replaceFirst("^[^:]*:", ""));
+      annonames.add(a);
     }
     
     //TODO make it so that if annonames.length()>10 it becomes a twincolselect, and if there is less than 10 it is just optiongroup
