@@ -33,10 +33,12 @@ import java.io.IOException;
 import java.io.Writer;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONException;
@@ -164,12 +166,27 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     {
       node2Int.put(tok, count++);
     }
+    
 
     try
     {
       println("<html>", writer);
       println("<head>", writer);
 
+      
+      LinkedList<String> fontsText = new LinkedList<String>();
+      LinkedList<String> fontsDep = new LinkedList<String>();
+      if (input.getFont() != null)
+      {
+        fontsText.add(input.getFont().getName());
+        fontsDep.add(input.getFont().getName());
+        println("<link href=\""
+          + input.getFont().getUrl()
+          + "\" rel=\"stylesheet\" type=\"text/css\" >", writer);
+      }
+      fontsText.add("sans-serif");
+      fontsDep.add("serif");
+      
       println(
         "<script type=\"text/javascript\" src=\""
         + input.getResourcePath("vakyartha/jquery-1.9.0.min.js") + "\"></script>", 
@@ -247,9 +264,15 @@ public class VakyarthaDependencyTree extends WriterVisualizer
           tokenColor = MatchedNodeColors.values()[colorNumber].getHTMLColor();
         }
         tAttris.put("fill", tokenColor);
-        tAttris.put("font", "11px Arial,Tahoma,Helvetica,Sans-Serif");
+        tAttris.put("font", "11px " + StringUtils.join(fontsText, ","));
 
         attris.put("t", tAttris);
+        
+        JSONObject depAttris = new JSONObject();
+        depAttris.put("fill", "#999");
+        depAttris.put("font-style", "italic");
+        depAttris.put("font", "12px " + StringUtils.join(fontsDep, ","));
+        attris.put("deptext", depAttris);
         vakyarthaObject.put("attris", attris);
 
         writer.append("tokens[").append("" + count++).append("]=");

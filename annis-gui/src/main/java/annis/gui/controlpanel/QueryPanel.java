@@ -19,19 +19,24 @@ import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
+import annis.libgui.InstanceConfig;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.server.ClassResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
 import org.slf4j.LoggerFactory;
@@ -63,7 +68,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
   
-  public QueryPanel(final QueryController controller)
+  public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
     super(2,3);
     this.controller = controller;
@@ -82,14 +87,26 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
+    txtQuery.addStyleName("corpus-font");
+    txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
     
-
     addComponent(txtQuery, 1, 0);
-
+    
+    final VirtualKeyboard virtualKeyboard;
+    if(instanceConfig.getKeyboardLayout() == null)
+    {
+      virtualKeyboard = null;
+    }
+    else
+    {
+      virtualKeyboard = new VirtualKeyboard();
+      virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
+      virtualKeyboard.extend(txtQuery);
+    }
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight(3.5f, Unit.EM);
     panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
@@ -119,8 +136,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
 
     btShowResult = new Button("Show Result");
-    btShowResult.setWidth(100f, UNITS_PERCENTAGE);
-    btShowResult.addListener(new ShowResultClickListener());
+    btShowResult.setWidth("100%");
+    btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
 
@@ -169,12 +186,29 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     historyListLayout.setExpandRatio(btShowMoreHistory, 0.0f);
     
     btHistory = new PopupButton("History");
-    btHistory.setWidth(100f, Unit.PERCENTAGE);
     btHistory.setContent(historyListLayout);
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
     buttonLayout.addComponent(btHistory);
+   
+    if(virtualKeyboard != null)
+    {
+      Button btShowKeyboard = new Button();
+      btShowKeyboard.setDescription("Click to show a virtual keyboard");
+      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+      btShowKeyboard.addClickListener(new Button.ClickListener() {
+
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          virtualKeyboard.show();
+        }
+      });
+      buttonLayout.addComponent(btShowKeyboard);
+    }
+    buttonLayout.setExpandRatio(btShowResult, 1.0f);
     
 
   }

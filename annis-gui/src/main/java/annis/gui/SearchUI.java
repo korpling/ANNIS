@@ -19,6 +19,7 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.VirtualKeyboard;
 import annis.gui.controlpanel.ControlPanel;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -59,6 +60,7 @@ import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
+import org.vaadin.cssinject.CSSInject;
 
 /**
  * GUI for searching in corpora.
@@ -91,6 +93,7 @@ public class SearchUI extends AnnisBaseUI
   private QueryController queryController;
   private String lastQueriedFragment;
   private InstanceConfig instanceConfig;
+  private CSSInject css;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -115,6 +118,8 @@ public class SearchUI extends AnnisBaseUI
  
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
+    
+    css = new CSSInject(this);
 
     HorizontalLayout layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
@@ -132,15 +137,15 @@ public class SearchUI extends AnnisBaseUI
 
       @Override
       public void buttonClick(ClickEvent event)
-      {
+      {        
         Window w =  new AboutWindow();
         w.setCaption("About ANNIS");
         w.setModal(true);
         w.setResizable(true);
         w.setWidth("500px");
         w.setHeight("500px");
-        addWindow(w);
-        w.center();
+        //addWindow(w);
+        //w.center();
       }
     });
     
@@ -313,11 +318,35 @@ public class SearchUI extends AnnisBaseUI
     
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
     
+    loadInstanceFonts();
     checkCitation(request);
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
   }
   
+  private void loadInstanceFonts()
+  {
+    if(instanceConfig != null && css != null && instanceConfig.getFont() != null)
+    {
+      FontConfig cfg = instanceConfig.getFont();
+      css.setStyles(
+        "@import url(" + cfg.getUrl() + ");\n"
+        + ".corpus-font-force {font-family: '" + cfg.getName() + "', monospace !important;}\n"
+        + ".corpus-font {font-family: '" + cfg.getName() + "', monospace;}\n"
+        // this one is for the virtual keyboard
+        + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+        + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace;"
+        + "}");
+    }
+    else
+    {
+      css.setStyles(
+        // use original font definition from keyboard.css if no font given
+        "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+        + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
+        + "}");
+    }
+  }
   
   private InstanceConfig getInstanceConfig(VaadinRequest request)
   {
@@ -515,6 +544,11 @@ public class SearchUI extends AnnisBaseUI
     return controlPanel;
   }
 
+  public InstanceConfig getInstanceConfig()
+  {
+    return instanceConfig;
+  }
+  
   @Override
   public void screenshotReceived(byte[] imageData, String mimeType)
   {
