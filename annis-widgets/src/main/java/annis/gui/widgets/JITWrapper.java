@@ -21,10 +21,13 @@ import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
 <<<<<<< HEAD
 import com.vaadin.ui.ClientWidget;
+<<<<<<< HEAD
 =======
 import com.vaadin.ui.LegacyComponent;
 import java.util.Map;
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
 import java.util.Properties;
 
 /**
@@ -66,6 +69,7 @@ public class JITWrapper extends AbstractComponent implements LegacyComponent
     this.mappings = props;
   }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 
   @Override
@@ -77,3 +81,6 @@ public class JITWrapper extends AbstractComponent implements LegacyComponent
   
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
 }
+=======
+}
+>>>>>>> origin/master

@@ -1,4 +1,7 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
 ANNIS Developer guide {#mainpage}
 =====================
 
@@ -10,6 +13,7 @@ The ANNIS code is hosted at [Github](https://github.com/korpling/ANNIS).
 - \subpage ide
 - \subpage frontend
 - \subpage querybuilder
+<<<<<<< HEAD
 =======
 ANNIS {#mainpage}
 ======
@@ -25,4 +29,6 @@ This documentation is targeted to developers or administrators.
 - \subpage admin
 - \subpage dev
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
 

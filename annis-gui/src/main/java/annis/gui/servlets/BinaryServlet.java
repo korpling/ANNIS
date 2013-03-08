@@ -82,10 +82,14 @@ public class BinaryServlet extends HttpServlet
 
       HttpSession session = request.getSession();
 <<<<<<< HEAD
+<<<<<<< HEAD
       Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
 =======
       Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+      Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
+>>>>>>> origin/master
       
       if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
@@ -95,6 +99,9 @@ public class BinaryServlet extends HttpServlet
       String annisServiceURL = (String) annisServiceURLObject;
       
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
       WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
 =======
       WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 

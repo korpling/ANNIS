@@ -48,10 +48,13 @@
       <!-- A hosted mode browser for client-side widget debugging can be run with the goal gwt:run after uncommenting the
       correct line below. A remote debugger can then be connected to port 8998. Note that e.g. a Jetty server should be running
       with the server side parts - use the goal jetty:run . -->
+<<<<<<< HEAD
 =======
       <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
       <!-- directory is cleaned properly -->
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>2.4.1</version>
@@ -206,6 +209,7 @@
       <scope>compile</scope>
     </dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
     
     <dependency>
@@ -215,6 +219,8 @@
       <scope>compile</scope>
     </dependency>
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
 
     <!-- other widget sets we use -->
     <dependency>
@@ -223,6 +229,9 @@
       <version>2.2.0</version>
     </dependency>
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
 
     <dependency>
       <groupId>org.vaadin.hene.splitbutton</groupId>
@@ -244,14 +253,18 @@
     </dependency>
 
 
+<<<<<<< HEAD
 =======
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
       <version>12.0.1</version>
       <scope>compile</scope>
     </dependency>
+<<<<<<< HEAD
 <<<<<<< HEAD
 =======
   
@@ -261,6 +274,8 @@
       <version>2.0.3</version>
     </dependency>
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
 
   </dependencies>
 

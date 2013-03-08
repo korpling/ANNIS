@@ -657,6 +657,9 @@ WARN_LOGFILE           =
 
 INPUT                  = ../annis-gui/src/main/java \
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> origin/master
                          ../annis-interfaces/src/main/java \
                          ../annis-kickstarter/src/main/java \
                          ../annis-service/src/main/java \
@@ -742,6 +745,7 @@ EXAMPLE_RECURSIVE      = NO
 # the \image command).
 
 IMAGE_PATH             = 
+<<<<<<< HEAD
 =======
                          ../annis-libgui/src/main/java \
                          ../annis-visualizers/src/main/java \
@@ -831,6 +835,8 @@ EXAMPLE_RECURSIVE      = NO
 
 IMAGE_PATH             = images
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+>>>>>>> origin/master
 
 # The INPUT_FILTER tag can be used to specify a program that doxygen should 
 # invoke to filter for each input file. Doxygen will invoke the filter program 
