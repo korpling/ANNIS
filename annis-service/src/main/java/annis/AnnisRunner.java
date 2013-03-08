@@ -76,13 +76,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
 import java.util.logging.Level;
->>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
-=======
->>>>>>> origin/master
 import org.apache.commons.collections.list.SynchronizedList;
 
 // TODO: test AnnisRunner

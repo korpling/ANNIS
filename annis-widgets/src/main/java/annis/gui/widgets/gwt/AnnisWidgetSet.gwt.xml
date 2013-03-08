@@ -37,24 +37,11 @@
    <set-configuration-property name="devModeRedirectEnabled" value="true" />
    
 
-<<<<<<< HEAD
-    <inherits name="com.google.common.collect.Collect" />
+    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
 
-
-    <!-- automatically appended -->
-    <inherits name="org.vaadin.hene.popupbutton.widgetset.PopupbuttonWidgetset" />
     <inherits name="org.vaadin.hene.splitbutton.widgetset.SplitButtonWidgetSet" />
-
-    <inherits name="org.netomi.vaadin.screenshot.gwt.ScreenshotWidgetSet" />
-
 
     <inherits name="org.vaadin.jonatan.contexthelp.widgetset.ContexthelpWidgetset" />
 
     <inherits name="org.vaadin.csstools.CssToolsWidgetset" />
-<<<<<<< HEAD
-=======
-    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
->>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
-=======
->>>>>>> origin/master
 </module>
