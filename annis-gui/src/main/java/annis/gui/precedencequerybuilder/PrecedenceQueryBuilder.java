@@ -16,8 +16,10 @@
  */
 package annis.gui.precedencequerybuilder;
 
-import annis.gui.Helper;
+import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.Query;
+import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.GenericType;
@@ -30,7 +32,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window.Notification;
+
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -51,7 +53,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private Button btInitMeta;
   private Button btGo;
   private Button btClear;
-  private ControlPanel cp;
+  private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout meta;
   private HorizontalLayout option;
@@ -70,12 +72,12 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private static final String NO_CORPORA_WARNING = "No corpora selected";
   private static final String BUTTON_ADD_LABEL = "Add position";
 
-  public PrecedenceQueryBuilder(ControlPanel cp)
+  public PrecedenceQueryBuilder(QueryController cp)
   {
     launch(cp);
   }
 
-  private void launch(ControlPanel cp)
+  private void launch(QueryController cp)
   {
     this.cp = cp;
     mainLayout = new VerticalLayout();
@@ -114,7 +116,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     mainLayout.addComponent(toolbar);
     
     setContent(mainLayout);
-    setScrollable(true);
+//    setScrollable(true);
     getContent().setSizeUndefined();
     setHeight("100%");
     
@@ -240,7 +242,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
 
   public void updateQuery()
   {
-    cp.setQuery(getAQLQuery(), null);
+    cp.setQuery(new Query(getAQLQuery(), null));
   }
 
   @Override
@@ -250,7 +252,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
     final PrecedenceQueryBuilder sq = this;
     
     if (cp.getSelectedCorpora().isEmpty()){
-      getWindow().showNotification(NO_CORPORA_WARNING);
+      getUI().showNotification(NO_CORPORA_WARNING);
     }
     
     else
@@ -312,10 +314,10 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
         language.removeAllComponents();
         meta.removeAllComponents();
         toolbar.removeAllComponents();
-        removeComponent(option);
-        removeComponent(language);
-        removeComponent(meta);
-        removeComponent(toolbar);
+        mainLayout.removeComponent(option);
+        mainLayout.removeComponent(language);
+        mainLayout.removeComponent(meta);
+        mainLayout.removeComponent(toolbar);
         vnodes.clear();
         eboxes.clear();
         mboxes.clear();
@@ -366,7 +368,7 @@ public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -408,7 +410,7 @@ service.path("query").path("corpora").path(corpus).path("annotations")
   {
     Collection<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -465,7 +467,7 @@ service.path("query").path("corpora").path(corpus).path("annotations")
   {
     Set<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -499,7 +501,7 @@ service.path("query").path("corpora").path(corpus).path("docmetadata")
   {
     Set<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();

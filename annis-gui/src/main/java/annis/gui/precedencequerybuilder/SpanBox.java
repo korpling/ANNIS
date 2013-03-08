@@ -16,14 +16,13 @@
 package annis.gui.precedencequerybuilder;
 
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
-import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
-import java.util.TreeSet;
 
 
 /**
@@ -57,7 +56,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     chbWithin = new CheckBox(SPANBOX_LABEL);
     chbWithin.setDescription(ACTIVATOR_DESCRIPTION);
     chbWithin.setImmediate(true);
-    chbWithin.addListener((Button.ClickListener) this);
+//    chbWithin.addListener((Button.ClickListener) this);
     
     cbSpan = new ComboBox();
     cbSpanValue = new ComboBox();
@@ -79,14 +78,14 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     reBox.setDescription(REBOX_DESCRIPTION);
     reBox.setEnabled(false);
     reBox.setImmediate(true);    
-    reBox.addListener((Button.ClickListener) this);    
+//    reBox.addListener((Button.ClickListener) this);    
     
     option.addComponent(chbWithin);
     option.addComponent(cbSpan);
     option.addComponent(cbSpanValue);
     option.addComponent(reBox);
     
-    addComponent(option);
+    setContent(option);
   }
   
   @Override

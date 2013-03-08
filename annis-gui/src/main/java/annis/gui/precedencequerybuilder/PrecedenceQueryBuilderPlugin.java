@@ -15,46 +15,8 @@
  */
 package annis.gui.precedencequerybuilder;
 
-import annis.gui.Helper;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.HorizontalLayout;
-import annis.gui.controlpanel.ControlPanel;
+import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
-import annis.gui.precedencequerybuilder.VerticalNode;
-import annis.gui.precedencequerybuilder.AddMenu;
-import annis.model.Annotation;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.MenuBar.Command;
-import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.HashSet;
-import java.util.TreeSet;
-import org.slf4j.LoggerFactory;
-//the following added by Martin:
-import com.vaadin.ui.Component;
-import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.OptionGroup;
-import java.util.Iterator;
-import java.util.ArrayList;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
@@ -81,7 +43,7 @@ public class PrecedenceQueryBuilderPlugin implements QueryBuilderPlugin<Preceden
   }
 
   @Override
-  public PrecedenceQueryBuilder createComponent(ControlPanel controlPanel)
+  public PrecedenceQueryBuilder createComponent(QueryController controlPanel)
   {
     return new PrecedenceQueryBuilder(controlPanel);
   }

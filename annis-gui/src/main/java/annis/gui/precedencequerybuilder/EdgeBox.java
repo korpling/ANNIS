@@ -49,7 +49,7 @@ public class EdgeBox extends Panel
     edge.setValue(EDGE_OPERATORS[1][0]);
     edge.setWidth(WIDTH);
     edge.setNullSelectionAllowed(false);
-    addComponent(edge);
+    setContent(edge);
   }
   
   public String getValue()

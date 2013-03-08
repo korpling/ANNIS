@@ -15,24 +15,14 @@
  */
 package annis.gui.precedencequerybuilder;
 
-import com.vaadin.event.MouseEvents.ClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
 import java.util.TreeSet;
-import java.util.Set;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.event.FieldEvents;
-import com.vaadin.ui.AbstractSelect;
 import org.apache.commons.lang3.StringUtils;//levenshtein
 import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.event.FieldEvents;
@@ -97,7 +87,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     tb.setDescription(SpanBox.REBOX_DESCRIPTION);
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
-    tb.addListener((Button.ClickListener) this);
+//    tb.addListener((Button.ClickListener) this);
     reBox = tb;
     
     // close the searchbox
@@ -107,7 +97,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     
     sb.addComponent(sbtoolbar);
     
-    addComponent(sb);    
+    setContent(sb);    
 
   } 
  

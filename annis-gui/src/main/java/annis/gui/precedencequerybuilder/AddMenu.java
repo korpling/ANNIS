@@ -58,7 +58,7 @@ public class AddMenu extends Panel
       }      
     }
     
-    addComponent(addMenu);
+    setContent(addMenu);
   }
   
   public void reActivateItem(final String ebene)

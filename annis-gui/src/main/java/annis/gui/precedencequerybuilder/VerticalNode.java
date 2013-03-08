@@ -71,7 +71,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     v.addComponent(vntoolbar);
     v.addComponent(sb);
     setWidth(WIDTH);
-    addComponent(v);
+    setContent(v);
     
   }
   

@@ -84,7 +84,7 @@ class MetaBox extends Panel implements Button.ClickListener
 
     sb.addComponent(tcs);
     sb.addComponent(btClose);
-    addComponent(sb);
+    setContent(sb);
 
   }  
   
