@@ -78,7 +78,14 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private DataSource dataSource;
 
+  // if this is true, the staging area is not deleted
   private boolean temporaryStagingArea;
+
+  /**
+   * If this is true and no example_queries.tab is found, automatic queries are
+   * generated.
+   */
+  private boolean generateExampleQueries;
 
   private String schemaVersion;
 
@@ -370,6 +377,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
 
+    generateExampleQueries();
 
     if (temporaryStagingArea)
     {
@@ -445,7 +453,6 @@ public class DefaultAdministrationDao implements AdministrationDao
         {
           log.info(table + REL_ANNIS_FILE_SUFFIX + " file not found");
           log.info("generate example queries");
-          generateExampleQueries();
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -1158,6 +1165,24 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
 
+  private <T> T querySqlFromScript(String script,
+    ResultSetExtractor<T> resultSetExtractor)
+  {
+    File fScript = new File(scriptPath, script);
+    if (fScript.canRead() && fScript.isFile())
+    {
+      Resource resource = new FileSystemResource(fScript);
+      log.debug("executing SQL script: " + resource.getFilename());
+      String sql = readSqlFromResource(resource, null);
+      return jdbcTemplate.query(sql, resultSetExtractor);
+    }
+    else
+    {
+      log.debug("SQL script " + fScript.getName() + " does not exist");
+      return null;
+    }
+  }
+
   // bulk-loads a table from a resource
   private void bulkloadTableFromResource(String table, Resource resource)
   {
@@ -1474,8 +1499,58 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
 
+
+  /**
+   * Generates example queries if no example queries tab file is defined by the
+   * user.
+   */
   private void generateExampleQueries()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    // set in the annis.properties file.
+    if (!generateExampleQueries)
+    {
+      log.info("skip generating example queries");
+      return;
+    }
+
+    // check if something was already imported
+    int count = querySqlFromScript("count_example_queries.sql",
+      new ResultSetExtractor<Integer>()
+    {
+      @Override
+      public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
+      {
+        while (rs.next())
+        {
+          return (rs.getInt("amount"));
+        }
+
+        return -1;
+      }
+    });
+
+    if (count == 0)
+    {
+      log.info("generate example queries");
+      return;
+    }
+
+    log.error("generating example queries failed");
+  }
+
+  /**
+   * @return the generateExampleQueries
+   */
+  public boolean isGenerateExampleQueries()
+  {
+    return generateExampleQueries;
+  }
+
+  /**
+   * @param generateExampleQueries the generateExampleQueries to set
+   */
+  public void setGenerateExampleQueries(boolean generateExampleQueries)
+  {
+    this.generateExampleQueries = generateExampleQueries;
   }
 }
