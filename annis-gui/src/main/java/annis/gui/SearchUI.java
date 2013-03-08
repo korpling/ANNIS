@@ -25,6 +25,7 @@ import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
+import annis.gui.precedencequerybuilder.PrecedenceQueryBuilderPlugin;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
@@ -368,6 +369,7 @@ public class SearchUI extends AnnisBaseUI
   protected void addCustomUIPlugins(PluginManager pluginManager)
   {
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).toURI());
+    pluginManager.addPluginsFrom(new ClassURI(PrecedenceQueryBuilderPlugin.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
   
