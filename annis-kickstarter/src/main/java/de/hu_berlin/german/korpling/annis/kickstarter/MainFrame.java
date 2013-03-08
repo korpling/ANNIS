@@ -433,7 +433,7 @@ public class MainFrame extends javax.swing.JFrame
       try
       {
         Desktop.getDesktop().browse(new URI(
-          "http://localhost:8080/annis-gui/app/"));
+          "http://localhost:8080/annis-gui/"));
       }
       catch (Exception ex)
       {
