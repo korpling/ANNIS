@@ -1,15 +1,5 @@
 {
   "default-querybuilder": "tigersearch",
-<<<<<<< HEAD
-<<<<<<< HEAD
-  "display-name" : "ANNIS"
-=======
-  "display-name" : "ANNIS",
-  "keyboard-layout" : "en"
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
-}
-=======
   "display-name" : "ANNIS",
   "keyboard-layout" : "en"
 }
->>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
