@@ -833,4 +833,9 @@ public class SearchUI extends AnnisBaseUI
     {
     }
   }
+
+  public TabSheet getTabSheet()
+  {
+    return mainTab;
+  }
 }

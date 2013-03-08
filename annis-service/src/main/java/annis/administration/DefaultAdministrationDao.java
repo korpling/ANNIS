@@ -413,7 +413,7 @@ public class DefaultAdministrationDao implements AdministrationDao
    * additional column for visibility behaviour of visualizers.</li>
    *
    * <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES}: If this file does not
-   * exists, an example file is copied from the resource folder</li>
+   * exists, the example query table is empty</li>
    *
    * </ul>
    *
@@ -444,9 +444,8 @@ public class DefaultAdministrationDao implements AdministrationDao
         else
         {
           log.info(table + REL_ANNIS_FILE_SUFFIX + " file not found");
-          f = new File(getScriptPath(), EXAMPLE_QUERIES + REL_ANNIS_FILE_SUFFIX);
-          bulkloadTableFromResource(tableInStagingArea(table),
-            new FileSystemResource(f));
+          log.info("generate example queries");
+          generateExampleQueries();
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -1473,5 +1472,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       log.error("could not read {}", table, e);
     }
+  }
+
+  private void generateExampleQueries()
+  {
+    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
   }
 }
