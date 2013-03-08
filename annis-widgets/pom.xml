@@ -43,31 +43,12 @@
         </configuration>
       </plugin>
 
-<<<<<<< HEAD
-=======
       <!-- As we are doing "inplace" GWT compilation, ensure the widgetset -->
       <!-- directory is cleaned properly -->
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
       <plugin>
         <artifactId>maven-clean-plugin</artifactId>
         <version>2.4.1</version>
         <configuration>
-<<<<<<< HEAD
-          <!-- if you don't specify any modules, the plugin will find them -->
-          <!-- <modules> <module>annis.gui.widgets.gwt.MyWidgetSet</module> </modules> -->
-          <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets</webappDirectory>
-          <!-- On Mac running Snow Leopard, add "-d32" -->
-          <!-- This causes error messages (but build works) in phase "package": two processes would use the same debug
-          port -->
-          <!--extraJvmArgs>-Xmx512M -Xss1024k -Xdebug -Xrunjdwp:transport=dt_socket,server=y,suspend=n,address=8998</extraJvmArgs -->
-          <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
-          <runTarget>annis-widgets</runTarget>
-          <hostedWebapp>${project.build.directory}/${project.build.finalName}</hostedWebapp>
-          <noServer>true</noServer>
-          <port>8080</port>
-          <compileReport>false</compileReport>
-=======
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
           <filesets>
             <fileset>
               <directory>src/main/webapp/VAADIN/widgetsets</directory>
@@ -82,8 +63,8 @@
         <configuration>
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
           <!-- <runTarget>mobilemail</runTarget> -->
-          <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
-    						way compatible with Vaadin eclipse plugin. -->
+          <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This
+way compatible with Vaadin eclipse plugin. -->
           <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
           </webappDirectory>
           <hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
@@ -101,8 +82,8 @@
           <execution>
             <configuration>
               <!-- if you don't specify any modules, the plugin will find them -->
-              <!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
-      								</modules> -->
+              <!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module>
+</modules> -->
             </configuration>
             <goals>
               <goal>resources</goal>
@@ -200,26 +181,8 @@
       <artifactId>annis-interfaces</artifactId>
       <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
-<<<<<<< HEAD
-    </dependency>
-    <dependency>
-      <groupId>commons-codec</groupId>
-      <artifactId>commons-codec</artifactId>
-      <version>1.7</version>
-      <scope>compile</scope>
-    </dependency>
-
-    <!-- other widget sets we use -->
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>popupbutton</artifactId>
-      <version>2.2.0</version>
-    </dependency>
-
-=======
     </dependency>
     
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
@@ -227,44 +190,25 @@
       <scope>compile</scope>
     </dependency>
 
-<<<<<<< HEAD
-=======
     <!-- other widget sets we use -->
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
     <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>popupbutton</artifactId>
       <version>2.2.0</version>
     </dependency>
-<<<<<<< HEAD
-
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>css-tools</artifactId>
-      <version>0.3</version>
-    </dependency>
-
-=======
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
       <version>12.0.1</version>
       <scope>compile</scope>
     </dependency>
-<<<<<<< HEAD
-=======
   
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
     <dependency>
       <groupId>org.vaadin.addons</groupId>
       <artifactId>cssinject</artifactId>
       <version>2.0.3</version>
     </dependency>
-<<<<<<< HEAD
-=======
 
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
   </dependencies>
 
 </project>
