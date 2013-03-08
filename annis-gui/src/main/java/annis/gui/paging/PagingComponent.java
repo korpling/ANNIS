@@ -20,7 +20,8 @@ import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -87,7 +88,7 @@ public class PagingComponent extends CustomComponent implements
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);
-    layout.setMargin(false, true, false, true);
+    layout.setMargin(new MarginInfo(false, true, false, true));
 
     Panel root = new Panel(layout);
     root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
@@ -104,56 +105,37 @@ public class PagingComponent extends CustomComponent implements
     btFirst = new Button();
     btFirst.setIcon(FIRST);
     btFirst.setDescription("jump to first page");
-    btFirst.addListener((Button.ClickListener) this);
+    btFirst.addClickListener((Button.ClickListener) this);
     btFirst.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btFirst.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btLast = new Button();
     btLast.setIcon(LAST);
     btLast.setDescription("jump to last page");
-    btLast.addListener((Button.ClickListener) this);
+    btLast.addClickListener((Button.ClickListener) this);
     btLast.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btLast.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btNext = new Button();
     btNext.setIcon(RIGHT_ARROW);
     btNext.setDescription("jump to next page");
-    btNext.addListener((Button.ClickListener) this);
+    btNext.addClickListener((Button.ClickListener) this);
     btNext.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btNext.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btPrevious = new Button();
     btPrevious.setIcon(LEFT_ARROW);
     btPrevious.setDescription("jump to previous page");
-    btPrevious.addListener((Button.ClickListener) this);
+    btPrevious.addClickListener((Button.ClickListener) this);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btPrevious.addStyleName(ChameleonTheme.BUTTON_SMALL);
 
     txtPage = new TextField();
     txtPage.setDescription("current page");
     txtPage.setHeight("-1px");
     txtPage.setWidth(3.f, UNITS_EM);
-    Validator pageValidator = new AbstractStringValidator(
-      "must be an integer greater than zero")
-    {
-
-      @Override
-      protected boolean isValidString(String value)
-      {
-        try
-        {
-          int v = Integer.parseInt(value);
-          if (v > 0)
-          {
-            return true;
-          }
-          else
-          {
-            return false;
-          }
-        }
-        catch (Exception ex)
-        {
-          return false;
-        }
-      }
-    };
+    Validator pageValidator = new PageValidator(
+      "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
     root.addAction(new EnterListener(txtPage));
 
@@ -206,7 +188,7 @@ public class PagingComponent extends CustomComponent implements
     {
       for (PagingCallback c : callbacks)
       {
-        c.createPage(getStartNumber(), pageSize);
+        c.switchPage(getStartNumber(), pageSize);
       }
     }
   }
@@ -291,20 +273,13 @@ public class PagingComponent extends CustomComponent implements
     // sanitize
     currentPage = sanitizePage(currentPage);
 
-    // clear list with media player
-    String clearglobalMediaList = "if (window.document.mediaElement)"
-      + "{"
-      + "window.document.mediaElement = undefined;"
-      + "}";
-    getWindow().executeJavaScript(clearglobalMediaList);
-
     update(true);
   }
 
   private int sanitizePage(int page)
   {
     int val = Math.max(1, page);
-    val = Math.min(1 + (count.get() / pageSize), page);
+    val = Math.min(1 + (count.get() / pageSize), val);
     return val;
   }
 
@@ -342,5 +317,35 @@ public class PagingComponent extends CustomComponent implements
   public void setInfo(String text)
   {
     lblInfo.setValue(text);
+  }
+
+  private static class PageValidator extends AbstractStringValidator
+  {
+
+    public PageValidator(String errorMessage)
+    {
+      super(errorMessage);
+    }
+
+    @Override
+    protected boolean isValidValue(String value)
+    {
+      try
+      {
+        int v = Integer.parseInt(value);
+        if (v > 0)
+        {
+          return true;
+        }
+        else
+        {
+          return false;
+        }
+      }
+      catch (Exception ex)
+      {
+        return false;
+      }
+    }
   }
 }

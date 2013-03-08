@@ -15,12 +15,16 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import annis.model.Annotation;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.Table.ColumnGenerator;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
@@ -53,13 +57,6 @@ public class MetaDataPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-
-    super.attach();
 
     // load meta data from service
     BeanItemContainer<Annotation> mData =
@@ -93,7 +90,7 @@ public class MetaDataPanel extends Panel
     String documentName)
   {
     List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource(getApplication());
+    WebResource res = Helper.getAnnisWebResource();
     try
     {
       res = res.path("query").path("corpora")
@@ -104,15 +101,28 @@ public class MetaDataPanel extends Panel
       }
       res = res.path("metadata");
 
-      result = res.get(new GenericType<List<Annotation>>() {});
+      result = res.get(new AnnotationListType());
     }
-    catch (Exception ex)
+    catch(UniformInterfaceException ex)
     {
-      log.error(
-        null, ex);
-      getWindow().showNotification("Remote exception: "
-        + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch(ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch(UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
     }
     return result;
   }
@@ -122,32 +132,8 @@ public class MetaDataPanel extends Panel
     final BeanItemContainer<Annotation> mData = metaData;
     Table tblMeta = new Table();
     tblMeta.setContainerDataSource(mData);
-    tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator()
-    {
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        Annotation anno = mData.getItem(itemId).getBean();
-        String qName = anno.getName();
-        if (anno.getNamespace() != null)
-        {
-          qName = anno.getNamespace() + ":" + qName;
-        }
-        Label l = new Label(qName);
-        l.setSizeUndefined();
-        return l;
-      }
-    });
-    tblMeta.addGeneratedColumn("genvalue", new Table.ColumnGenerator()
-    {
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        Annotation anno = mData.getItem(itemId).getBean();
-        Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
-        return l;
-      }
-    });
+    tblMeta.addGeneratedColumn("genname", new MetaTableNameGenerator(mData));
+    tblMeta.addGeneratedColumn("genvalue", new MetaTableValueGenerator(mData));
 
 
     tblMeta.setVisibleColumns(new String[]
@@ -203,5 +189,59 @@ public class MetaDataPanel extends Panel
     }
 
     return listOfBeanItemCon;
+  }
+
+  private static class AnnotationListType extends GenericType<List<Annotation>>
+  {
+
+    public AnnotationListType()
+    {
+    }
+  }
+
+  private static class MetaTableNameGenerator implements ColumnGenerator
+  {
+
+    private final BeanItemContainer<Annotation> mData;
+
+    public MetaTableNameGenerator(
+      BeanItemContainer<Annotation> mData)
+    {
+      this.mData = mData;
+    }
+
+    @Override
+    public Component generateCell(Table source, Object itemId, Object columnId)
+    {
+      Annotation anno = mData.getItem(itemId).getBean();
+      String qName = anno.getName();
+      if (anno.getNamespace() != null)
+      {
+        qName = anno.getNamespace() + ":" + qName;
+      }
+      Label l = new Label(qName);
+      l.setSizeUndefined();
+      return l;
+    }
+  }
+
+  private static class MetaTableValueGenerator implements ColumnGenerator
+  {
+
+    private final BeanItemContainer<Annotation> mData;
+
+    public MetaTableValueGenerator(
+      BeanItemContainer<Annotation> mData)
+    {
+      this.mData = mData;
+    }
+
+    @Override
+    public Component generateCell(Table source, Object itemId, Object columnId)
+    {
+      Annotation anno = mData.getItem(itemId).getBean();
+      Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
+      return l;
+    }
   }
 }

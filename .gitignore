@@ -9,3 +9,7 @@ target/
 /doc/.settings/
 /doc/html/
 /doc/latex/
+<<<<<<< HEAD
+=======
+/annis-widgets/src/main/webapp/VAADIN/
+>>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git

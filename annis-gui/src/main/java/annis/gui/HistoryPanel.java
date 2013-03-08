@@ -16,7 +16,7 @@
 package annis.gui;
 
 import annis.gui.beans.HistoryEntry;
-import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.Query;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -37,22 +37,25 @@ public class HistoryPanel extends Panel
 
   private Table tblHistory;
   private BeanItemContainer<HistoryEntry> containerHistory;
-  private ControlPanel parent;
+  private QueryController controller;
   private CitationLinkGenerator citationGenerator;
 
-  public HistoryPanel(List<HistoryEntry> history, ControlPanel parent)
+  public HistoryPanel(List<HistoryEntry> history, QueryController controller)
   {
-    this.parent = parent;
+    this.controller = controller;
+    
+    VerticalLayout layout = new VerticalLayout();
+    setContent(layout);
     
     setSizeFull();
-    ((VerticalLayout) getContent()).setSizeFull();
+    layout.setSizeFull();
 
     containerHistory = new BeanItemContainer(HistoryEntry.class);
     containerHistory.addAll(history);
 
     tblHistory = new Table();
 
-    addComponent(tblHistory);
+    layout.addComponent(tblHistory);
     tblHistory.setSizeFull();
     tblHistory.setSelectable(true);
     tblHistory.setMultiSelect(false);
@@ -84,23 +87,13 @@ public class HistoryPanel extends Panel
   }
 
   @Override
-  public void attach()
-  {
-    super.attach();
-    
-    citationGenerator.setMainWindow(getApplication().getMainWindow());
-  }
-  
-  
-
-  @Override
   public void valueChange(ValueChangeEvent event)
   {
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
     
-    if(parent != null)
+    if(controller != null)
     {
-      parent.setQuery(e.getQuery(), new HashSet<String>(e.getCorpora()));
+      controller.setQuery(new Query(e.getQuery(), new HashSet<String>(e.getCorpora())));
     }
   }
 }

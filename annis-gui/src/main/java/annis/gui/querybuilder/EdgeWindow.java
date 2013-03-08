@@ -18,7 +18,7 @@ package annis.gui.querybuilder;
 import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -52,14 +52,20 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     setSizeFull();
     
-    VerticalLayout vLayout = (VerticalLayout) getContent();
+    // HACK: use our own border since the one from chameleon does not really work
+    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    addStyleName("border-layout");
+    addStyleName("solid-white-background");
+    
+    VerticalLayout vLayout = new VerticalLayout();
+    setContent(vLayout);
     vLayout.setMargin(false);
     
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
     toolbar.setWidth("100%");
     toolbar.setHeight("20px");
-    addComponent(toolbar);
+    vLayout.addComponent(toolbar);
         
     btClose = new Button();
     btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
@@ -73,23 +79,13 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     cbOperator.setNewItemsAllowed(true);
     cbOperator.setNewItemHandler(new SimpleNewItemHandler(cbOperator));
     cbOperator.setImmediate(true);
-    addComponent(cbOperator);
+    vLayout.addComponent(cbOperator);
     for(String o : EDGE_OPERATORS)
     {
       cbOperator.addItem(o);
     }
     cbOperator.setValue(EDGE_OPERATORS[0]);
-    cbOperator.addListener(new ValueChangeListener() {
-
-      @Override
-      public void valueChange(ValueChangeEvent event)
-      {
-        if(parent != null)
-        {
-          parent.updateQuery();
-        }
-      }
-    });
+    cbOperator.addValueChangeListener(new OperatorValueChangeListener(parent));
     
     cbOperator.setWidth("100%");
     cbOperator.setHeight("20px");
@@ -120,6 +116,26 @@ public class EdgeWindow extends Panel implements Button.ClickListener
   public String getOperator()
   {
     return (String) cbOperator.getValue();
+  }
+
+  private static class OperatorValueChangeListener implements ValueChangeListener
+  {
+
+    private final TigerQueryBuilderCanvas parent;
+
+    public OperatorValueChangeListener(TigerQueryBuilderCanvas parent)
+    {
+      this.parent = parent;
+    }
+
+    @Override
+    public void valueChange(ValueChangeEvent event)
+    {
+      if(parent != null)
+      {
+        parent.updateQuery();
+      }
+    }
   }
   
   

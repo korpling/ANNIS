@@ -15,8 +15,9 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.MainApp;
-import annis.gui.SearchWindow;
+import annis.libgui.AnnisBaseUI;
+import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.ui.Component;
 import java.io.Serializable;
@@ -24,7 +25,7 @@ import net.xeoh.plugins.base.Plugin;
 
 /**
  * Every query builder must implement this interface. It' s also necessary to to
- * load this plugin by hand in {@link MainApp#initPlugins()}
+ * load this plugin by hand in {@link AnnisBaseUI#initPlugins()}
  *
  * @author Thomas Krause <b.pixeldrama@gmail.com>
  */
@@ -46,6 +47,6 @@ public interface QueryBuilderPlugin<I extends Component> extends Plugin, Seriali
    * Vaadin.
    *
    */
-  public I createComponent(ControlPanel controlPanel);
+  public I createComponent(QueryController controller);
 
 }

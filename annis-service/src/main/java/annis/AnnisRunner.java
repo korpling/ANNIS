@@ -76,6 +76,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+<<<<<<< HEAD
+=======
+import java.util.logging.Level;
+>>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
 import org.apache.commons.collections.list.SynchronizedList;
 
 // TODO: test AnnisRunner
@@ -607,6 +611,7 @@ public class AnnisRunner extends AnnisBaseRunner
     switch (currentOS)
     {
       case linux:
+        Writer w = null;
         try
         {
           log.info("resetting caches");
@@ -616,9 +621,8 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");
+            w = new FileWriterWithEncoding(dropCaches, "UTF-8");
             w.write("3");
-            w.close();
           }
           else
           {
@@ -638,9 +642,27 @@ public class AnnisRunner extends AnnisBaseRunner
           }
 
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
           log.error(null, ex);
+        }
+        catch (InterruptedException ex)
+        {
+          log.error(null, ex);
+        }
+        finally
+        {
+          if(w != null)
+          {
+            try
+            {
+              w.close();
+            }
+            catch (IOException ex1)
+            {
+              log.error(null, ex1);
+            }
+          }
         }
 
         break;

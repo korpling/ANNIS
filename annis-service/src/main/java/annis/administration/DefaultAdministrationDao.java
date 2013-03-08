@@ -379,16 +379,16 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
+        BufferedReader bReader = null;
         try
         {
 
           // count cols for detecting old resolver_vis_map table format
           File resolver_vis_tab = new File(path, table + ".tab");
           
-          BufferedReader bReader = new BufferedReader(
+          bReader = new BufferedReader(
             new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
           String firstLine = bReader.readLine();
-          bReader.close();
           
           int cols = 9; // default number
           if (firstLine != null)
@@ -471,6 +471,20 @@ public class DefaultAdministrationDao implements AdministrationDao
         {
           log.error("could not read {}", table + ".tab", e);
         }
+        finally
+        {
+          if(bReader != null)
+          {
+            try
+            {
+              bReader.close();
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
       }
       else if (table.equalsIgnoreCase("node"))
       {
@@ -486,14 +500,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   
   private void bulkImportNode(String path)
   {
+    BufferedReader reader = null;
     try
     {
       // check column number by reading first line
       File nodeTabFile = new File(path, "node.tab");
-      BufferedReader reader =
+      reader =
         new BufferedReader(new InputStreamReader(new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
-      reader.close();
       
       
       int columnNumber = firstLine == null ? 13 : 
@@ -545,6 +559,20 @@ public class DefaultAdministrationDao implements AdministrationDao
     catch (IOException ex)
     {
       log.error(null, ex);
+    }
+    finally
+    {
+      if(reader != null)
+      {
+        try
+        {
+          reader.close();
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
   }
   

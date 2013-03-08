@@ -15,7 +15,10 @@
  */
 package annis.gui.exporter;
 
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
@@ -64,7 +67,15 @@ public class WekaExporter implements Exporter, Serializable
       
       out.flush();
     }
-    catch (Exception ex)
+    catch(UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+    }
+    catch(ClientHandlerException ex)
+    {
+      log.error(null, ex);
+    }
+    catch (IOException ex)
     {
       log.error(null, ex);
     }

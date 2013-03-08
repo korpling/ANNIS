@@ -15,32 +15,31 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.Helper;
-import annis.gui.PluginSystem;
-import annis.gui.VisualizationToggle;
-import annis.gui.media.MediaPlayer;
-import annis.gui.visualizers.VisualizerInput;
-import annis.gui.visualizers.VisualizerPlugin;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaPlayer;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.Application;
-import com.vaadin.terminal.ApplicationResource;
-import com.vaadin.terminal.StreamResource;
-import com.vaadin.terminal.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CustomLayout;
 import com.vaadin.ui.ProgressIndicator;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SDATATYPE;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -51,6 +50,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
@@ -71,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends CustomLayout
+public class VisualizerPanel extends VerticalLayout
   implements Button.ClickListener, VisualizationToggle
 {
 
@@ -82,8 +82,6 @@ public class VisualizerPanel extends CustomLayout
 
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
-
-  private ApplicationResource resource = null;
 
   private Component vis;
 
@@ -109,7 +107,6 @@ public class VisualizerPanel extends CustomLayout
 
   private String resultID;
 
-  ;
   private transient VisualizerPlugin visPlugin;
 
   private Set<String> visibleTokenAnnos;
@@ -123,12 +120,10 @@ public class VisualizerPanel extends CustomLayout
   private final String HIDDEN = "hidden";
 
   private final String PRELOADED = "preloaded";
+  
+  private ProgressIndicator progress;
 
-  private final static String htmlTemplate =
-    "<div id=\":id\"><div location=\"btEntry\"></div>"
-    + "<div location=\"progress\"></div>"
-    + "<div location=\"iframe\"></div>"
-    + "</div>";
+  private InstanceConfig instanceConfig;
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -147,14 +142,12 @@ public class VisualizerPanel extends CustomLayout
     String resultID,
     SingleResultPanel parent,
     String segmentationName,
-    PluginSystem ps) throws IOException
+    PluginSystem ps,
+    InstanceConfig instanceConfig) throws IOException
   {
-    super(new ByteArrayInputStream(htmlTemplate.replace(":id", htmlID).getBytes(
-      "UTF-8")));
-
-    visPlugin = ps.getVisualizer(entry.getVisType());
-
+    
     this.ps = ps;
+    this.instanceConfig = instanceConfig;
     this.entry = entry;
     this.markersExact = markedExactMap;
     this.markersCovered = markedAndCoveredMap;
@@ -167,24 +160,22 @@ public class VisualizerPanel extends CustomLayout
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
+    
+    this.progress = new ProgressIndicator();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-  }
-
-  @Override
-  public void attach()
-  {
-
-    if (visPlugin == null && ps != null)
+  
+    if(entry != null && ps != null)
     {
-      entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
       visPlugin = ps.getVisualizer(entry.getVisType());
-    }
-
-    if (entry != null && visPlugin != null)
-    {
-
+      if (visPlugin == null)
+      {
+        // fallback to default visualizer if original vis type was not found
+        entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
+        visPlugin = ps.getVisualizer(entry.getVisType());
+      }
+     
       if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
@@ -192,8 +183,8 @@ public class VisualizerPanel extends CustomLayout
         btEntry.setIcon(ICON_EXPAND);
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
-        btEntry.addListener((Button.ClickListener) this);
-        addComponent(btEntry, "btEntry");
+        btEntry.addClickListener((Button.ClickListener) this);
+        addComponent(btEntry);
       }
       else
       {
@@ -206,8 +197,8 @@ public class VisualizerPanel extends CustomLayout
           btEntry.setIcon(ICON_COLLAPSE);
           btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
             + ChameleonTheme.BUTTON_SMALL);
-          btEntry.addListener((Button.ClickListener) this);
-          addComponent(btEntry, "btEntry");
+          btEntry.addClickListener((Button.ClickListener) this);
+          addComponent(btEntry);
         }
 
 
@@ -218,15 +209,15 @@ public class VisualizerPanel extends CustomLayout
           if (vis != null)
           {
             vis.setVisible(true);
-            addComponent(vis, "iframe");
+            addComponent(vis);
           }
         }
         catch (Exception ex)
         {
-          getWindow().showNotification(
+          Notification.show(
             "Could not create visualizer " + visPlugin.getShortName(),
             ex.toString(),
-            Window.Notification.TYPE_TRAY_NOTIFICATION);
+            Notification.Type.TRAY_NOTIFICATION);
           log.error("Could not create visualizer " + visPlugin.getShortName(),
             ex);
         }
@@ -242,8 +233,9 @@ public class VisualizerPanel extends CustomLayout
         }
 
       }
+      
     } // end if entry not null
-
+   
   }
 
   private Component createComponent()
@@ -253,11 +245,11 @@ public class VisualizerPanel extends CustomLayout
       return null;
     }
 
-    final Application application = getApplication();
     final VisualizerInput input = createInput();
 
-    Component c = visPlugin.createComponent(input, application);
+    Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
+    c.addStyleName("corpus-font");
 
     return c;
   }
@@ -265,28 +257,32 @@ public class VisualizerPanel extends CustomLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL(getApplication().getProperty(
+    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().getAttribute(
       "AnnisWebService.URL"));
-    input.setContextPath(Helper.getContext(getApplication()));
-    input.setDotPath(getApplication().getProperty("DotPath"));
+    input.setContextPath(Helper.getContext());
+    input.setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
 
     input.setId(resultID);
 
     input.setMarkableExactMap(markersExact);
     input.setMarkableMap(markersCovered);
     input.setMarkedAndCovered(markedAndCovered);
-    input.setVisPanel(this);
 
     input.setResult(result);
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
+    if(instanceConfig != null && instanceConfig.getFont() != null)
+    {
+      input.setFont(instanceConfig.getFont());
+    }
+     
 
     if (entry != null)
     {
       input.setMappings(entry.getMappings());
       input.setNamespace(entry.getNamespace());
-      String template = Helper.getContext(getApplication())
+      String template = Helper.getContext()
         + "/Resource/" + entry.getVisType() + "/%s";
       input.setResourcePathTemplate(template);
     }
@@ -333,22 +329,6 @@ public class VisualizerPanel extends CustomLayout
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
-
-  public ApplicationResource createResource(
-    ByteArrayOutputStream byteStream,
-    String mimeType)
-  {
-
-    StreamResource r;
-
-    r = new StreamResource(new ByteArrayOutputStreamSource(byteStream),
-      entry.getVisType() + "_" + rand.nextInt(Integer.MAX_VALUE),
-      getApplication());
-    r.setMIMEType(mimeType);
-
-    return r;
-  }
-
   private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
@@ -356,27 +336,20 @@ public class VisualizerPanel extends CustomLayout
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
+      WebResource annisResource = Helper.getAnnisWebResource();
       txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
         path(
         documentName).get(SaltProject.class);
+    }
+    catch (RuntimeException e)
+    {
+      log.error("General remote service exception", e);
     }
     catch (Exception e)
     {
       log.error("General remote service exception", e);
     }
     return txt;
-  }
-
-  @Override
-  public void detach()
-  {
-    super.detach();
-
-    if (resource != null)
-    {
-      getApplication().removeResource(resource);
-    }
   }
 
   @Override
@@ -407,12 +380,14 @@ public class VisualizerPanel extends CustomLayout
         @Override
         public void run()
         {
+          VaadinSession session = VaadinSession.getCurrent();
           try
           {
             super.run();
             // wait maximum 60 seconds
             vis = get(60, TimeUnit.SECONDS);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
               if (callback != null && vis instanceof LoadableVisualizer)
               {
@@ -420,7 +395,10 @@ public class VisualizerPanel extends CustomLayout
                 if (loadableVis.isLoaded())
                 {
                   // direct call callback since the visualizer is already ready
-                  callback.visualizerLoaded((LoadableVisualizer) vis);
+                  if(vis instanceof LoadableVisualizer)
+                  {
+                    callback.visualizerLoaded((LoadableVisualizer) vis);
+                  }
                 }
                 else
                 {
@@ -430,16 +408,20 @@ public class VisualizerPanel extends CustomLayout
                 }
               }
 
-              removeComponent("progress");
-
+              if(getComponentIndex(progress) > -1)
+              {
+                removeComponent(progress);
+              }
+              
               if (vis != null)
               {
                 vis.setVisible(true);
-                if (getComponent("iframe") == null)
-                {
-                  addComponent(vis, "iframe");
-                }
+                addComponent(vis);
               }
+            }
+            finally
+            {
+              session.unlock();
             }
           }
           catch (InterruptedException ex)
@@ -458,12 +440,17 @@ public class VisualizerPanel extends CustomLayout
               error(
               "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
               ex);
-            synchronized (getApplication())
+            session.lock();
+            try
             {
-              getWindow().showNotification(
+              Notification.show(
                 "Could not create visualizer " + visPlugin.getShortName(),
                 ex.toString(),
-                Window.Notification.TYPE_WARNING_MESSAGE);
+                Notification.Type.WARNING_MESSAGE);
+            }
+            finally
+            {
+              session.unlock();
             }
             cancel(true);
           }
@@ -473,13 +460,13 @@ public class VisualizerPanel extends CustomLayout
 
 
       btEntry.setIcon(ICON_COLLAPSE);
-      ProgressIndicator progress = new ProgressIndicator();
+     
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
-      progress.setPollingInterval(100);
+      progress.setPollingInterval(250);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      addComponent(progress, "progress");
+      addComponent(progress);
     }
     // end if create input was needed
 
@@ -537,13 +524,13 @@ public class VisualizerPanel extends CustomLayout
     SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (SNode node : markedAndCovered.keySet())
+    for (Entry<SNode, Long>  entry : markedAndCovered.entrySet())
     {
-      wholeNode = wholeSGraph.getSNode(node.getSId());
-      newMarkedAndCovered.put(wholeNode, markedAndCovered.get(node));
+      wholeNode = wholeSGraph.getSNode(entry.getKey().getSId());
+      newMarkedAndCovered.put(wholeNode, entry.getValue());
 
       // copy the annis features, which are not set by the annis service
-      copyAnnisFeature(node, wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
+      copyAnnisFeature(entry.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
     }
 
     // copy the annis features, which are not set by the annis service

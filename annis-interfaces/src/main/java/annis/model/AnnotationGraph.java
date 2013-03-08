@@ -120,15 +120,7 @@ public class AnnotationGraph implements Serializable
 			if (node.isToken())
 				tokens.add(node);
 		}
-		Collections.sort(tokens, new Comparator<AnnisNode>()
-		{
-
-			public int compare(AnnisNode o1, AnnisNode o2)
-			{
-				return o1.getTokenIndex().compareTo(o2.getTokenIndex());
-			}
-
-		});
+		Collections.sort(tokens, new NodeComparator());
 		return tokens;
 	}
 
@@ -188,5 +180,18 @@ public class AnnotationGraph implements Serializable
 	{
 		this.path = Arrays.copyOf(path, path.length);
 	}
+
+  private static class NodeComparator implements Comparator<AnnisNode>, Serializable
+  {
+
+    public NodeComparator()
+    {
+    }
+
+    public int compare(AnnisNode o1, AnnisNode o2)
+    {
+      return o1.getTokenIndex().compareTo(o2.getTokenIndex());
+    }
+  }
 
 }

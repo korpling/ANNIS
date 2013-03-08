@@ -8,7 +8,7 @@
     <version>3.0.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  
+
   <packaging>jar</packaging>
 
   <distributionManagement>
@@ -48,34 +48,25 @@
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
-      
+
     </plugins>
-
-    <extensions>
-      <extension>
-        <groupId>org.apache.maven.wagon</groupId>
-        <artifactId>wagon-ssh-external</artifactId>
-        <version>1.0</version>
-      </extension>
-    </extensions>
-
   </build>
   <dependencies>
-    
+
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
       <version>1.6.6</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service</artifactId>
       <version>3.0.0-SNAPSHOT</version>
       <scope>compile</scope>
     </dependency>
-    
+
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-service</artifactId>
@@ -84,7 +75,7 @@
       <classifier>distribution-lite</classifier>
       <type>zip</type>
     </dependency>
-    
+
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-gui</artifactId>
@@ -92,7 +83,7 @@
       <type>war</type>
       <scope>compile</scope>
     </dependency>
-   
+
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>

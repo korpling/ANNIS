@@ -68,7 +68,7 @@ public class GeneralTextExporter implements Exporter, Serializable
               .path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "false")
-              .get(new GenericType<List<AnnisAttribute>>() {})
+              .get(new AnnisAttributeListType())
           );
         }
         
@@ -209,6 +209,14 @@ public class GeneralTextExporter implements Exporter, Serializable
 
       }
       out.append("\n");
+    }
+  }
+
+  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
+  {
+
+    public AnnisAttributeListType()
+    {
     }
   }
 }
