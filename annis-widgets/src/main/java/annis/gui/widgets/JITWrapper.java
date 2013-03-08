@@ -19,7 +19,10 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
+<<<<<<< HEAD
 //import com.vaadin.ui.ClientWidget;
+=======
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
 import com.vaadin.ui.LegacyComponent;
 import java.util.Map;
 import java.util.Properties;
@@ -70,4 +73,8 @@ public class JITWrapper extends AbstractComponent implements LegacyComponent
   }
   
   
+<<<<<<< HEAD
 }
+=======
+}
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff

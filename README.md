@@ -9,7 +9,11 @@ Since information structure interacts with linguistic phenomena on many levels, 
 * Code: https://github.com/korpling/ANNIS
 * Bug and issue tracking: https://github.com/korpling/ANNIS/issues
 <<<<<<< HEAD
+<<<<<<< HEAD
 -
 =======
 
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff

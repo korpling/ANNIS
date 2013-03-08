@@ -83,6 +83,7 @@ public class BinaryServlet extends HttpServlet
       HttpSession session = request.getSession();
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
       Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
 =======
       Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
@@ -90,6 +91,9 @@ public class BinaryServlet extends HttpServlet
 =======
       Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
 >>>>>>> origin/master
+=======
+      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
       
       if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
@@ -100,6 +104,7 @@ public class BinaryServlet extends HttpServlet
       
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 >>>>>>> origin/master
       WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
@@ -107,6 +112,10 @@ public class BinaryServlet extends HttpServlet
       WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
         (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
+=======
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
+        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
       
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))

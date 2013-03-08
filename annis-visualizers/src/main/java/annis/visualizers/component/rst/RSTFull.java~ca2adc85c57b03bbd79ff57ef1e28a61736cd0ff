@@ -13,15 +13,18 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.visualizers.component.rst;
+package annis.visualizers.component.rst;
 
-import annis.gui.visualizers.AbstractVisualizer;
-import annis.gui.visualizers.VisualizerInput;
-import com.vaadin.Application;
+import annis.libgui.VisualizationToggle;
+import annis.libgui.visualizers.AbstractVisualizer;
+import annis.libgui.visualizers.VisualizerInput;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- *
+ * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/) 
+ * for a complete document.
+ * 
+ * @see RST
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
@@ -35,8 +38,12 @@ public class RSTFull extends AbstractVisualizer<RSTPanel>
   }
 
   @Override
+<<<<<<< HEAD:annis-gui/src/main/java/annis/gui/visualizers/component/rst/RSTFull.java:annis-gui/src/main/java/annis/gui/visualizers/component/rst/RSTFull.java
   public RSTPanel createComponent(VisualizerInput visInput,
     Application application)
+=======
+  public RSTPanel createComponent(VisualizerInput visInput, VisualizationToggle visToggle)
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff:annis-visualizers/src/main/java/annis/visualizers/component/rst/RSTFull.java:annis-visualizers/src/main/java/annis/visualizers/component/rst/RSTFull.java
   {
     return new RSTPanel(visInput);
   }

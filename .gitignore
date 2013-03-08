@@ -11,8 +11,12 @@ target/
 /doc/latex/
 <<<<<<< HEAD
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 /annis-widgets/src/main/webapp/VAADIN/
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
 =======
 >>>>>>> origin/master
+=======
+/annis-widgets/src/main/webapp/VAADIN/
+>>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
