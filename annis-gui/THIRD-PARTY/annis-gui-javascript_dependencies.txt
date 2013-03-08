@@ -1,1 +1,8 @@
 (MIT License) jQuery (http://jquery.com)
+(MIT License) jQuery Tooltip Plugin (http://bassistance.de/jquery-plugins/jquery-plugin-tooltip/)
+(MIT License) jQuery Noty Plugin (http://needim.github.com/noty/)
+(MIT License) Raphael - JavaScript Vector Library (http://raphaeljs.com)
+(Apache License, Version 2.0) vakyartha dependency script (http://arborator.ilpga.fr/)
+(MIT License) jbar (for jQuery) (http://javan.github.com/jbar/)
+(BSD License) HTML Virtual Keyboard Interface Script (http://www.greywyvern.com/code/javascript/keyboard)
+(MIT License) jbar (for jQuery) (http://javan.github.com/jbar/)

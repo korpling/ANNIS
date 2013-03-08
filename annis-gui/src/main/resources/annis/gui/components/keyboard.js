@@ -4,13 +4,16 @@
  *   Copyright (c) 2011 - GreyWyvern
  *
  *  - Licenced for free distribution under the BSDL
- *          http://www.opensource.org/licenses/bsd-license.php
+ *          http://www.opensource.org/licenses/bsd-license.php   
  *
  * Add a script-driven keyboard interface to text fields, password
  * fields and textareas.
  *
  * See http://www.greywyvern.com/code/javascript/keyboard for examples
  * and usage instructions.
+ *
+ * This version was adjusted to be included in the ANNIS corpus search system.   
+ * https://github.com/korpling/ANNIS  
  *
  * Version 1.49 - November 8, 2011
  *   - Don't display language drop-down if only one keyboard available
