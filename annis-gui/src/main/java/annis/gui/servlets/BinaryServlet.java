@@ -1,18 +1,18 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2009-2011 Collaborative Research Centre SFB 632
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package annis.gui.servlets;
 
 import annis.libgui.Helper;
@@ -24,7 +24,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.terminal.gwt.server.WebApplicationContext;
 import java.io.IOException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
@@ -42,15 +41,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This Servlet provides binary-files with a stream of partial-content. The
- * first GET-request is answered with the status-code 206 Partial Content.
- *
- * TODO: handle more than one byte-range TODO: split rmi-requests TODO: wrote
- * tests TODO:
- *
- * @author benjamin
- *
- */
+* This Servlet provides binary-files with a stream of partial-content. The
+* first GET-request is answered with the status-code 206 Partial Content.
+*
+* TODO: handle more than one byte-range TODO: split rmi-requests TODO: wrote
+* tests TODO:
+*
+* @author benjamin
+*
+*/
 public class BinaryServlet extends HttpServlet
 {
   
@@ -81,19 +80,7 @@ public class BinaryServlet extends HttpServlet
       String range = request.getHeader("Range");
 
       HttpSession session = request.getSession();
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-      Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
-=======
-      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
->>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
-=======
-      Object annisServiceURLObject =  session.getAttribute(MainApp.WEBSERVICEURL_KEY);
->>>>>>> origin/master
-=======
-      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
+      Object annisServiceURLObject = session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
       
       if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
@@ -102,25 +89,13 @@ public class BinaryServlet extends HttpServlet
       
       String annisServiceURL = (String) annisServiceURLObject;
       
-<<<<<<< HEAD
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> origin/master
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
-=======
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL,
         (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
->>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
-=======
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
->>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
       
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary")
-        .queryParam("mime", mimeType); 
+        .queryParam("mime", mimeType);
 
       if (range != null)
       {
@@ -226,14 +201,14 @@ public class BinaryServlet extends HttpServlet
   }
 
   /**
-   * This function get the whole binary-file and put it to responds.out there
-   * must exist at least one byte
-   *
-   *
-   * @param service
-   * @param out
-   * @param corpusId
-   */
+* This function get the whole binary-file and put it to responds.out there
+* must exist at least one byte
+*
+*
+* @param service
+* @param out
+* @param corpusId
+*/
   private void getCompleteFile(WebResource binaryRes, ServletOutputStream out)
     throws RemoteException, IOException
   {
@@ -260,7 +235,7 @@ public class BinaryServlet extends HttpServlet
       out.write(bin.getBytes());
       out.flush();
       
-      offset += stepLength;      
+      offset += stepLength;
       remaining = remaining - stepLength;
     }
   }
