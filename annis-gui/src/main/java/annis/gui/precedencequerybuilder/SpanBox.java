@@ -22,6 +22,7 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import java.awt.image.ImageObserver;
 import java.util.Collection;
 
 
@@ -29,7 +30,7 @@ import java.util.Collection;
  *
  * @author Martin
  */
-public class SpanBox extends Panel implements Button.ClickListener, ComboBox.ValueChangeListener
+public class SpanBox extends Panel implements ComboBox.ValueChangeListener
 {
   private PrecedenceQueryBuilder sq;
   private VerticalLayout option;
@@ -47,7 +48,7 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
   public static final String REBOX_LABEL = "Regex";
   public static final String REBOX_DESCRIPTION = "Tick to allow for a regular expression";
   
-  public SpanBox(PrecedenceQueryBuilder sq)
+  public SpanBox(final PrecedenceQueryBuilder sq)
   {
     this.sq = sq;    
     option = new VerticalLayout();
@@ -56,44 +57,10 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
     chbWithin = new CheckBox(SPANBOX_LABEL);
     chbWithin.setDescription(ACTIVATOR_DESCRIPTION);
     chbWithin.setImmediate(true);
-//    chbWithin.addListener((Button.ClickListener) this);
-    
-    cbSpan = new ComboBox();
-    cbSpanValue = new ComboBox();
-    
-    cbSpan.setCaption(SPANNAME_LABEL);
-    cbSpan.setEnabled(false);
-    cbSpan.setNullSelectionAllowed(false);
-    cbSpan.setImmediate(true);
-    cbSpan.setWidth(CB_WIDTH);
-    cbSpan.addListener((ValueChangeListener) this);   
-    
-    cbSpanValue.setCaption(SPANVALUE_LABEL);
-    cbSpanValue.setEnabled(false);
-    cbSpanValue.setNullSelectionAllowed(false);
-    cbSpanValue.setImmediate(true);    
-    cbSpanValue.setWidth(CB_WIDTH);    
-    
-    reBox = new CheckBox(REBOX_LABEL);
-    reBox.setDescription(REBOX_DESCRIPTION);
-    reBox.setEnabled(false);
-    reBox.setImmediate(true);    
-//    reBox.addListener((Button.ClickListener) this);    
-    
-    option.addComponent(chbWithin);
-    option.addComponent(cbSpan);
-    option.addComponent(cbSpanValue);
-    option.addComponent(reBox);
-    
-    setContent(option);
-  }
-  
-  @Override
-  public void buttonClick(Button.ClickEvent event)
-  {
-    if (event.getComponent() == chbWithin)
-    {
-      if (chbWithin.booleanValue())
+    chbWithin.addListener(new ValueChangeListener() {
+    // TODO make this into a nice subroutine
+    public void valueChange(ValueChangeEvent event) {
+      if (chbWithin.isEnabled())
       {
         cbSpan.setEnabled(true);
         if(cbSpan.size() == 0)//1st time
@@ -115,10 +82,32 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
       }
       
       cbSpan.setEnabled(chbWithin.booleanValue());     
-      
+        
     }
-    else if (event.getComponent() == reBox)
-    {
+});
+    cbSpan = new ComboBox();
+    cbSpanValue = new ComboBox();
+    
+    cbSpan.setCaption(SPANNAME_LABEL);
+    cbSpan.setEnabled(false);
+    cbSpan.setNullSelectionAllowed(false);
+    cbSpan.setImmediate(true);
+    cbSpan.setWidth(CB_WIDTH);
+    cbSpan.addListener((ValueChangeListener) this);   
+    
+    cbSpanValue.setCaption(SPANVALUE_LABEL);
+    cbSpanValue.setEnabled(false);
+    cbSpanValue.setNullSelectionAllowed(false);
+    cbSpanValue.setImmediate(true);    
+    cbSpanValue.setWidth(CB_WIDTH);    
+    
+    reBox = new CheckBox(REBOX_LABEL);
+    reBox.setDescription(REBOX_DESCRIPTION);
+    reBox.setEnabled(false);
+    reBox.setImmediate(true);    
+    reBox.addListener(new ValueChangeListener() {
+    // TODO make this into a nice subroutine
+    public void valueChange(ValueChangeEvent event) {
       boolean r = reBox.booleanValue();
       cbSpanValue.setNewItemsAllowed(r);
       if (!r)
@@ -130,8 +119,16 @@ public class SpanBox extends Panel implements Button.ClickListener, ComboBox.Val
         String escapedItem = sq.escapeRegexCharacters(cbSpanValue.getValue().toString());
         cbSpanValue.addItem(escapedItem);
         cbSpanValue.setValue(escapedItem);    
-      }
+      }  
     }
+});    
+    
+    option.addComponent(chbWithin);
+    option.addComponent(cbSpan);
+    option.addComponent(cbSpanValue);
+    option.addComponent(reBox);
+    
+    setContent(option);
   }
   
   public static void buildBoxValues(ComboBox cb, String level, PrecedenceQueryBuilder sq)

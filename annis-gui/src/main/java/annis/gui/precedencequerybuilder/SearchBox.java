@@ -15,6 +15,9 @@
  */
 package annis.gui.precedencequerybuilder;
 
+import com.vaadin.data.Property;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.VerticalLayout;
@@ -48,7 +51,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   private static final String SB_CB_WIDTH = "140px";
   
 
-  public SearchBox(String ebene, PrecedenceQueryBuilder sq, VerticalNode vn)
+  public SearchBox(final String ebene, final PrecedenceQueryBuilder sq, final VerticalNode vn)
   {
     
     this.vn = vn;
@@ -87,7 +90,23 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     tb.setDescription(SpanBox.REBOX_DESCRIPTION);
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
-//    tb.addListener((Button.ClickListener) this);
+    tb.addListener(new ValueChangeListener() {
+    // TODO make this into a nice subroutine
+    public void valueChange(ValueChangeEvent event) {
+      boolean r = reBox.booleanValue();
+      cb.setNewItemsAllowed(r);
+      if(!r)
+      {         
+        SpanBox.buildBoxValues(cb, ebene, sq);
+      }
+      else if(cb.getValue()!=null)
+      {
+        String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+        cb.addItem(escapedItem);
+        cb.setValue(escapedItem);         
+      }
+    }
+});
     reBox = tb;
     
     // close the searchbox
