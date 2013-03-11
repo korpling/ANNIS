@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,8 +34,7 @@ public class ListDocumentsAnnotationsSqlHelper implements
         "ON docs.pre=meta.corpus_ref \n" +
         "WHERE this.name = :toplevelname \n" +
         "AND docs.pre > this.pre \n" +
-        "AND docs.post < this.post \n" +
-        "AND meta.namespace is not null";
+        "AND docs.post < this.post \n";
     String sql = template.replaceAll(":toplevelname", sqlString(toplevelCorpusName));
     return sql;
   }
@@ -45,8 +44,7 @@ public class ListDocumentsAnnotationsSqlHelper implements
   {
 
     String namespace = rs.getString("namespace");
-    String name = new String();
-    name = rs.getString("name");
+    String name = rs.getString("name");
     return new Annotation(namespace, name);
   }
 }
