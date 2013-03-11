@@ -337,7 +337,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return (List<AnnisCorpus>) getJdbcTemplate().query(
       listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
   }
-  
+
   @Override
   @Transactional(readOnly = true)
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
@@ -369,18 +369,18 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       listCorpusAnnotationsSqlHelper);
     return corpusAnnotations;
   }
-  
+
   @Override
   @Transactional(readOnly = true)
-  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName)
+  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus)
   {
-    final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName);
+    final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, listRootCorpus);
     final List<Annotation> docAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listDocumentsAnnotationsSqlHelper);
     return docAnnotations;
   }
-  
+
   @Override
   @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
@@ -528,16 +528,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       conn = getJdbcTemplate().getDataSource().getConnection();
       DatabaseMetaData meta = conn.getMetaData();
-      
+
       log.debug("database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName() + "]");
-      
+
       if(!"PostgreSQL".equalsIgnoreCase(meta.getDatabaseProductName()))
       {
         throw new AnnisException("You did provide a database connection to a "
           + "database that is not PostgreSQL. Please note that this will "
           + "not work.");
       }
-      if(meta.getDatabaseMajorVersion() < 9 
+      if(meta.getDatabaseMajorVersion() < 9
         || (meta.getDatabaseMajorVersion() == 9 && meta.getDatabaseMinorVersion() < 2))
       {
         throw new AnnisException("Wrong PostgreSQL version installed. Please "
@@ -565,8 +565,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return false;
   }
-  
-  
+
+
 
   public AnnisParser getAqlParser()
   {
@@ -761,11 +761,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
- public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, 
+ public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
  String mimeType,int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset, length), 
+      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset, length),
       ByteHelper.getArgTypes(), byteHelper);
   }
 
@@ -774,11 +774,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     String corpusName)
   {
     return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(MetaByteHelper.SQL,
-      metaByteHelper.getArgs(toplevelCorpusName, corpusName), 
+      metaByteHelper.getArgs(toplevelCorpusName, corpusName),
       MetaByteHelper.getArgTypes(), metaByteHelper);
   }
-  
-  
+
+
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
   {
@@ -810,6 +810,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.metaByteHelper = metaByteHelper;
   }
-  
-  
+
+
 }

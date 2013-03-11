@@ -27,18 +27,25 @@ public class ListDocumentsAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
 {
 
-  public String createSqlQuery(String toplevelCorpusName)
+  public String createSqlQuery(String toplevelCorpusName, boolean listRootCorpus)
   {
     String template = "SELECT DISTINCT docs.name as corpus_name, docs.pre, meta.namespace, meta.name, meta.value, docs.type\n"
       + "from corpus this, corpus docs \n"
       + "FULL JOIN corpus_annotation meta \n"
-      + "ON docs.pre=meta.corpus_ref \n"
+      + "ON docs.id=meta.corpus_ref \n"
       + "WHERE this.name = :toplevelname \n"
-      + "AND docs.pre > this.pre \n"
-      + "AND docs.post < this.post \n";
+      + "AND docs.pre :> this.pre \n"
+      + "AND docs.post :< this.post \n";
     String sql = template.replaceAll(":toplevelname", sqlString(
       toplevelCorpusName));
-    return sql;
+
+    if (listRootCorpus)
+    {
+      return sql.replaceAll(":>", ">=").replaceAll(":<", "<=");
+    }
+    else {
+      return sql.replaceAll(":>", "<").replaceAll(":<", "<=");
+    }
   }
 
   @Override

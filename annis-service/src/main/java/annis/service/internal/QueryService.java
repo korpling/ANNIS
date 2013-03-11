@@ -82,7 +82,7 @@ public class QueryService
   private WekaHelper wekaHelper;
   private int maxContext = 10;
   private int port = 5711;
-  
+
   /**
    * Log the successful initialization of this bean.
    *
@@ -94,7 +94,7 @@ public class QueryService
   {
     // check version of PostgreSQL
     annisDao.checkDatabaseVersion();
-    
+
     // log a message after successful startup
     log.info("ANNIS QueryService loaded.");
   }
@@ -105,7 +105,7 @@ public class QueryService
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
-    
+
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
 
@@ -115,7 +115,7 @@ public class QueryService
     {
       user.checkPermission("query:count:" + c);
     }
-    
+
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     long start = new Date().getTime();
     MatchAndDocumentCount count = annisDao.countMatchesAndDocuments(data);
@@ -145,7 +145,7 @@ public class QueryService
     {
       user.checkPermission("query:annotate:" + c);
     }
-    
+
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
     int left = Math.min(maxContext, Integer.parseInt(leftRaw));
@@ -182,25 +182,25 @@ public class QueryService
     {
       user.checkPermission("query:find:" + c);
     }
-    
-    
+
+
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-    
+
     long start = new Date().getTime();
     List<Match> matches = annisDao.find(data);
     long end = new Date().getTime();
     logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
-    
+
     return matches;
   }
-  
-  
-  
+
+
+
   /**
    * Get result as matrix in WEKA (ARFF) format.
    */
@@ -214,28 +214,28 @@ public class QueryService
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
-    
+
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
     for(String c : corpusNames)
     {
       user.checkPermission("query:matrix:" + c);
     }
-    
+
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    
+
     MatrixQueryData ext = new MatrixQueryData();
     if(rawMetaKeys != null)
     {
       ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
     }
     data.addExtension(ext);
-    
+
     long start = new Date().getTime();
     List<AnnotatedMatch> matches = annisDao.matrix(data);
     long end = new Date().getTime();
     logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
-    
+
     if(matches.isEmpty())
     {
       return "(empty)";
@@ -245,7 +245,7 @@ public class QueryService
       return WekaHelper.exportAsArff(matches);
     }
   }
-    
+
 
   /**
    * Get a graph as {@link SaltProject} of a set of Salt IDs.
@@ -260,7 +260,7 @@ public class QueryService
   @Path("search/subgraph")
   @Produces({"application/xml", "application/xmi+xml" ,"application/xmi+binary"})
   public SaltProject subgraph(final SubgraphQuery query)
-  { 
+  {
      // some robustness stuff
     if (query == null)
     {
@@ -269,13 +269,13 @@ public class QueryService
         MediaType.TEXT_PLAIN).entity(
         "missing required request body").build());
     }
-    
+
     QueryData data = new QueryData();
-   
+
     data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(), query.getSegmentationLayer()));
- 
+
     Set<String> corpusNames = new TreeSet<String>();
-    
+
     for(SaltURIGroup singleMatch : query.getMatches().getGroups().values())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
@@ -285,26 +285,26 @@ public class QueryService
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
-      
+
       data.addAlternative(pseudoNodes);
     }
-    
+
     Subject user = SecurityUtils.getSubject();
     for(String c : corpusNames)
     {
       user.checkPermission("query:subgraph:" + c);
     }
-    
+
     List<String> corpusNamesList = new LinkedList<String>(corpusNames);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
-    
+
     data.setCorpusList(corpusIDs);
     data.addExtension(query.getMatches());
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();
     logQuery("SUBGRAPH", "", corpusNamesList, end - start);
-    
+
     return p;
   }
 
@@ -314,10 +314,10 @@ public class QueryService
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
-    
+
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:subgraph:" + toplevelCorpusName);
-    
+
     try
     {
       long start = new Date().getTime();
@@ -375,7 +375,7 @@ public class QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:config:" + toplevelName);
 
-    
+
     Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
     CorpusConfig result = new CorpusConfig();
     result.setConfig(tmp);
@@ -393,7 +393,7 @@ public class QueryService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:annotations:" + toplevelCorpus);
-    
+
     List<String> list = new LinkedList<String>();
     list.add(toplevelCorpus);
     List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
@@ -402,11 +402,11 @@ public class QueryService
       Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(onlyMostFrequentValues)
     );
   }
-  
+
   /**
    * Return true if this is a valid query or throw exception when invalid
    * @param query Query to check for validity
-   * @return 
+   * @return
    */
   @GET
   @Path("check")
@@ -415,7 +415,7 @@ public class QueryService
     annisDao.parseAQL(query, new LinkedList<Long>());
     return "ok";
   }
-  
+
   @GET
   @Path("corpora/{top}/metadata")
   @Produces("application/xml")
@@ -424,10 +424,10 @@ public class QueryService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + toplevelCorpusName);
-    
+
     return annisDao.listCorpusAnnotations(toplevelCorpusName);
   }
-  
+
   @GET
   @Path("corpora/{top}/{document}/metadata")
   @Produces("application/xml")
@@ -437,12 +437,23 @@ public class QueryService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + toplevelCorpusName);
-    
+
     if(documentName == null)
     {
       documentName = toplevelCorpusName;
     }
     return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
+  }
+
+  @GET
+  @Path("corpora/{top}/allmetadata")
+  @Produces("application/xml")
+  public List<Annotation> getAllMetadata(
+    @PathParam("top") String toplevelCorpusName)
+  {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + toplevelCorpusName);
+    return annisDao.listDocumentsAnnotations(toplevelCorpusName, true);
   }
 
   @GET
@@ -453,12 +464,12 @@ public class QueryService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + toplevelCorpusName);
-    return annisDao.listDocumentsAnnotations(toplevelCorpusName);
-  }  
-  
+    return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
+  }
+
   /**
    * Get an Annis Binary object identified by its id.
-   * 
+   *
    * @param id
    * @param rawOffset the part we want to start from, we start from 0
    * @param rawLength how many bytes we take
@@ -470,16 +481,16 @@ public class QueryService
   public AnnisBinary binary(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
-    @PathParam("offset") String rawOffset, 
+    @PathParam("offset") String rawOffset,
     @PathParam("length") String rawLength,
     @QueryParam("mime") String mimeType)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
-    
+
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
-    
+
     AnnisBinary bin;
     log.debug("fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
       + toplevelCorpusName + "/" + corpusName);
@@ -489,12 +500,12 @@ public class QueryService
     log.debug("fetch successfully");
     return bin;
   }
-  
+
   /**
-   * Get the Metadata of an Annis Binary object identified by its id. This 
-   * function calls getBinary(long id, 1, 1), so this function does not work, 
+   * Get the Metadata of an Annis Binary object identified by its id. This
+   * function calls getBinary(long id, 1, 1), so this function does not work,
    * if the specs of getBinary(long id, int offset,int length) changed.
-   * 
+   *
    * @param id
    * @return AnnisBinaryMetaData
    */
@@ -507,7 +518,7 @@ public class QueryService
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
-    
+
     return annisDao.getBinaryMeta(toplevelCorpusName, documentName);
 
   }
@@ -530,7 +541,7 @@ public class QueryService
     String logParameters = sb.toString();
     return logParameters;
   }
-  
+
 
   private void logQuery(String queryFunction, String toplevelCorpus,
     String documentName, long runtime)
@@ -572,7 +583,7 @@ public class QueryService
     String message = sb.toString();
     queryLog.info(message);
   }
-  
+
   /**
    * Throw an exception if the parameter is missing.
    * @param value Value which is checked for null.
@@ -590,13 +601,13 @@ public class QueryService
         "missing required parameter '" + name + "' (" + description + ")").build());
     }
   }
-  
+
   /**
    * Get the {@link QueryData} from a query and the corpus names
    * @param query The AQL query.
    * @param rawCorpusNames The name of the toplevel corpus names seperated by ",".
    * @return calculated {@link QueryData} for the given parametes.
-   * 
+   *
    * @throws WebApplicationException Thrown if some corpora are unknown to the system.
    */
   private QueryData queryDataFromParameters(String query, String rawCorpusNames)
@@ -614,26 +625,26 @@ public class QueryService
     }
     return annisDao.parseAQL(query, corpusIDs);
   }
-  
+
   /**
    * Splits a list of corpus names into a proper java list.
    * @param rawCorpusNames The corpus names separated by ",".
-   * @return 
+   * @return
    */
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return Arrays.asList(rawCorpusNames.split(","));
   }
-  
+
   /**
    * Splits a list of qualified (meta-) annotation names into a proper java list.
    * @param rawCorpusNames The qualified names separated by ",".
-   * @return 
+   * @return
    */
   private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
   {
     LinkedList<MatrixQueryData.QName> result = new LinkedList<MatrixQueryData.QName>();
-    
+
     String[] split = raw.split(",");
     for(String s : split)
     {
@@ -650,7 +661,7 @@ public class QueryService
       }
       result.add(qname);
     }
-    
+
     return result;
   }
 

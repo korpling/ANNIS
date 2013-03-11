@@ -35,17 +35,21 @@ import org.slf4j.LoggerFactory;
  */
 public class MetaDataPanel extends Panel
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
-  
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    MetaDataPanel.class);
+
   private VerticalLayout layout;
+
   private String toplevelCorpusName;
+
   private String documentName;
 
   public MetaDataPanel(String toplevelCorpusName)
   {
     this(toplevelCorpusName, null);
   }
-  
+
   public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
@@ -65,8 +69,19 @@ public class MetaDataPanel extends Panel
     // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName == null)
     {
-      mData.addAll(getMetaData(toplevelCorpusName, null));
-      layout.addComponent(setupTable(mData));
+      Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
+      List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
+      Accordion accordion = new Accordion();
+      accordion.setSizeFull();
+      layout.addComponent(accordion);
+
+      for (BeanItemContainer<Annotation> item : l)
+      {
+        String corpusName = item.getIdByIndex(0).getCorpusName();
+        accordion.addTab(setupTable(item),
+          (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
+          : "document: " + corpusName);
+      }
     }
     else
     {
@@ -99,29 +114,32 @@ public class MetaDataPanel extends Panel
       {
         res = res.path(documentName);
       }
-      res = res.path("metadata");
-
+      else
+      {
+        res = res.path("allmetadata");
+      }
       result = res.get(new AnnotationListType());
     }
-    catch(UniformInterfaceException ex)
+    catch (UniformInterfaceException ex)
     {
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch(ClientHandlerException ex)
+    catch (ClientHandlerException ex)
     {
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch(UnsupportedEncodingException ex)
+    catch (UnsupportedEncodingException ex)
     {
       log.error(null, ex);
       Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.getLocalizedMessage(),
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return result;
@@ -137,13 +155,13 @@ public class MetaDataPanel extends Panel
 
 
     tblMeta.setVisibleColumns(new String[]
-      {
-        "genname", "genvalue"
-      });
+    {
+      "genname", "genvalue"
+    });
     tblMeta.setColumnHeaders(new String[]
-      {
-        "Name", "Value"
-      });
+    {
+      "Name", "Value"
+    });
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
