@@ -51,8 +51,7 @@ public class AddMenu extends Panel
           @Override
           public void menuSelected(MenuItem selectedItem) {         
             vn.createSearchBox(annoname);
-            //add.removeChild(selectedItem);
-            selectedItem.setVisible(false);
+            add.removeChild(selectedItem);
           }
         });
       }      

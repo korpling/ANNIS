@@ -154,6 +154,13 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
       cb.removeAllItems();
       for(String s : annonames)
       {
+        if(txt.equals(s))
+        {
+          cb.addItem(s);
+        }
+      }
+      for(String s : annonames)
+      {        
         if((StringUtils.getLevenshteinDistance(txt, s)<txt.length()/2+1) | (StringUtils.startsWith(s, txt)))
         {
           cb.addItem(s);
