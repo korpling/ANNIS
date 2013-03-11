@@ -26,16 +26,18 @@ import static annis.sqlgen.SqlConstraints.sqlString;
 public class ListDocumentsAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
 {
+
   public String createSqlQuery(String toplevelCorpusName)
   {
-    String template = "SELECT DISTINCT meta.name, meta.namespace \n" +
-        "from corpus this, corpus docs \n" +
-        "FULL JOIN corpus_annotation meta \n" +
-        "ON docs.pre=meta.corpus_ref \n" +
-        "WHERE this.name = :toplevelname \n" +
-        "AND docs.pre > this.pre \n" +
-        "AND docs.post < this.post \n";
-    String sql = template.replaceAll(":toplevelname", sqlString(toplevelCorpusName));
+    String template = "SELECT DISTINCT docs.name as corpus_name, docs.pre, meta.namespace, meta.name, meta.value, docs.type\n"
+      + "from corpus this, corpus docs \n"
+      + "FULL JOIN corpus_annotation meta \n"
+      + "ON docs.pre=meta.corpus_ref \n"
+      + "WHERE this.name = :toplevelname \n"
+      + "AND docs.pre > this.pre \n"
+      + "AND docs.post < this.post \n";
+    String sql = template.replaceAll(":toplevelname", sqlString(
+      toplevelCorpusName));
     return sql;
   }
 
@@ -43,8 +45,12 @@ public class ListDocumentsAnnotationsSqlHelper implements
   public Annotation mapRow(ResultSet rs, int rowNum) throws SQLException
   {
 
+    Integer pre = rs.getInt("pre");
+    String corpusName = rs.getString("corpus_name");
+    String type = rs.getString("type");
     String namespace = rs.getString("namespace");
     String name = rs.getString("name");
-    return new Annotation(namespace, name);
+    String value = rs.getString("value");
+    return new Annotation(namespace, name, value, type, corpusName, pre);
   }
 }
