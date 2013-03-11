@@ -62,10 +62,6 @@ public class MetaDataPanel extends Panel
     setContent(layout);
     layout.setSizeFull();
 
-    // load meta data from service
-    BeanItemContainer<Annotation> mData =
-      new BeanItemContainer<Annotation>(Annotation.class);
-
     // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName == null)
     {
@@ -172,8 +168,17 @@ public class MetaDataPanel extends Panel
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
-    Map<Integer, List<Annotation>> hashMetaData =
-      new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+
+    Map<Integer, List<Annotation>> hashMetaData;
+    if (documentName != null)
+    {
+      hashMetaData =
+        new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+    }
+    else
+    {
+      hashMetaData = new TreeMap<Integer, List<Annotation>>();
+    }
 
     for (Annotation metaDatum : metadata)
     {
