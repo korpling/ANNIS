@@ -69,11 +69,15 @@ public class QueryController implements PagingCallback
   private AnnisResultQuery resultFetcher;
   private MatchAndDocumentCount lastCount;
   
+  private FutureTask<List<Match>> resultTask;
+  private FutureTask<MatchAndDocumentCount> countTask;
+ 
+  
   public QueryController(SearchUI ui)
   {
     this.ui = ui;    
     this.history = new ListOrderedSet<HistoryEntry>();
-   
+    this.resultTask = null;
   }
   
   public void updateCorpusSetList()
@@ -126,11 +130,28 @@ public class QueryController implements PagingCallback
     executeQuery(true, true);
   }
   
+  public void cancelQueries()
+  {
+    // abort last task if running
+    if (resultTask != null && !resultTask.isDone())
+    {
+      Notification.show("Canceled result query", Notification.Type.TRAY_NOTIFICATION);
+      resultTask.cancel(true);
+    }
+    if(countTask != null && !countTask.isDone())
+    {
+      Notification.show("Canceled count query", Notification.Type.TRAY_NOTIFICATION);
+      countTask.cancel(true);
+    }
+  }
+  
   public void executeQuery(boolean executeCount, boolean executeResult)
   {
 
     Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
 
+    cancelQueries();
+    
     // cleanup resources
     VaadinSession session = VaadinSession.getCurrent();
     session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
@@ -138,6 +159,7 @@ public class QueryController implements PagingCallback
     {
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
+    
     
     ui.updateFragment(lastQuery);
     
@@ -166,6 +188,7 @@ public class QueryController implements PagingCallback
 
     if(executeResult)
     {    
+      
       resultFetcher = new AnnisResultQuery(lastQuery.getCorpora(), lastQuery.getQuery());
 
       // remove old result from view
@@ -177,7 +200,7 @@ public class QueryController implements PagingCallback
       ui.getMainTab().addTab(lastResultView, "Query Result");
       ui.getMainTab().setSelectedTab(lastResultView);
 
-      FutureTask<List<Match>> task = new FutureTask<List<Match>>(new ResultCallable(
+      resultTask = new FutureTask<List<Match>>(new ResultCallable(
         resultFetcher, lastQuery.getOffset(), lastQuery.getLimit(), 
         lastResultView.getPaging()))
       {
@@ -185,39 +208,84 @@ public class QueryController implements PagingCallback
         @Override
         protected void done()
         {
-          VaadinSession session = VaadinSession.getCurrent();
-          session.lock();
-          try
+          if(!isCancelled())
           {
-            lastResultView.setResult(get(), lastQuery.getContextLeft(), 
-              lastQuery.getContextRight(), lastQuery.getSegmentation(),
-              lastQuery.getOffset());
-          }
-          catch(InterruptedException ex)
-          {
-            log.error(null, ex);
-          }
-          catch(ExecutionException ex)
-          {
-            log.error(null, ex);
-          }
-          finally
-          {
-            session.unlock();
+            VaadinSession session = VaadinSession.getCurrent();
+            session.lock();
+            try
+            {
+              lastResultView.setResult(get(), lastQuery.getContextLeft(), 
+                lastQuery.getContextRight(), lastQuery.getSegmentation(),
+                lastQuery.getOffset());
+            }
+            catch(InterruptedException ex)
+            {
+              log.error(null, ex);
+            }
+            catch(ExecutionException ex)
+            {
+              log.error(null, ex);
+            }
+            finally
+            {
+              session.unlock();
+            }
           }
         }
         
       };
+      
       Executor exec = Executors.newSingleThreadExecutor();
-      exec.execute(task);     
+      exec.execute(resultTask);     
     }
     
-     if (executeCount)
+    if (executeCount)
     {
       // start count query
       ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
-      CountThread countThread = new CountThread();
-      countThread.start();
+      countTask =
+        new FutureTask<MatchAndDocumentCount>(new CountCallable())
+      {
+        @Override
+        protected void done()
+        {
+          if(!isCancelled())
+          {
+            VaadinSession session = VaadinSession.getCurrent();
+            session.lock();
+            try
+            { 
+              ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+      
+              lastCount = get();
+              String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
+              String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
+
+              ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
+                getMatchCount() + " " + matchesString
+                + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
+              if (lastResultView != null && lastCount.getMatchCount() > 0)
+              {
+                lastResultView.setCount(lastCount.getMatchCount());
+              }
+            }
+            catch (InterruptedException ex)
+            {
+              log.info(null, ex);
+            }
+            catch (ExecutionException ex)
+            {
+              log.info(null, ex);
+            }
+            finally
+            {
+              session.unlock();
+            }
+          }
+        }
+      }; // end FutureTask
+      Executor exec = Executors.newSingleThreadExecutor();
+      exec.execute(countTask);   
     }
   }
   
@@ -317,13 +385,15 @@ public class QueryController implements PagingCallback
     
   }
   
-  private class CountThread extends Thread
+  private class CountCallable implements Callable<MatchAndDocumentCount>
   {
 
     @Override
-    public void run()
+    public MatchAndDocumentCount call() throws Exception
     {
       WebResource res = null;
+      
+      MatchAndDocumentCount c = null;
 
       res = Helper.getAnnisWebResource();
 
@@ -333,9 +403,10 @@ public class QueryController implements PagingCallback
       {
         try
         {
-          lastCount = res.path("query").path("search").path("count").queryParam(
+          c = res.path("query").path("search").path("count").queryParam(
             "q", lastQuery.getQuery()).queryParam("corpora",
             StringUtils.join(lastQuery.getCorpora(), ",")).get(MatchAndDocumentCount.class);
+          
         }
         catch (UniformInterfaceException ex)
         {
@@ -372,28 +443,7 @@ public class QueryController implements PagingCallback
           }
         }
       }
-
-      session.lock();
-      try
-      {
-        ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-        if(lastCount != null)
-        {
-          String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
-          String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
-          
-          ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.getMatchCount() + " " + matchesString
-            + " <br/>in " + lastCount.getDocumentCount() + " " + documentString );
-          if(lastResultView != null && lastCount.getMatchCount() > 0)
-          {
-            lastResultView.setCount(lastCount.getMatchCount());
-          }
-        }
-      }
-      finally
-      {
-        session.unlock();
-      }
+      return c;
     }
   }
     
