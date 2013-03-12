@@ -30,8 +30,10 @@ import java.util.*;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Provides all corpus annotations for a corpus or for a specific search result.
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class MetaDataPanel extends Panel
 {
@@ -66,17 +68,24 @@ public class MetaDataPanel extends Panel
     if (documentName == null)
     {
       Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
-      List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
-      Accordion accordion = new Accordion();
-      accordion.setSizeFull();
-      layout.addComponent(accordion);
 
-      for (BeanItemContainer<Annotation> item : l)
+      if (hashMData == null)
       {
-        String corpusName = item.getIdByIndex(0).getCorpusName();
-        accordion.addTab(setupTable(item),
-          (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
-          : "document: " + corpusName);
+        super.setCaption("no metadata available");
+      }
+      else
+      {
+        List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
+        Accordion accordion = new Accordion();
+        accordion.setSizeFull();
+        layout.addComponent(accordion);
+
+        for (BeanItemContainer<Annotation> item : l)
+        {
+          String corpusName = item.getIdByIndex(0).getCorpusName();
+          accordion.addTab(setupTable(item), (toplevelCorpusName.equals(
+            corpusName)) ? "corpus: " + corpusName : "document: " + corpusName);
+        }
       }
     }
     else
@@ -154,6 +163,7 @@ public class MetaDataPanel extends Panel
     {
       "genname", "genvalue"
     });
+
     tblMeta.setColumnHeaders(new String[]
     {
       "Name", "Value"
@@ -165,10 +175,19 @@ public class MetaDataPanel extends Panel
     return tblMeta;
   }
 
+  /**
+   * Returns null if no metadata are available.
+   */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
 
+    if (metadata != null && metadata.isEmpty())
+    {
+      return null;
+    }
+
+    // of called from corpus browser sort the other way around.
     Map<Integer, List<Annotation>> hashMetaData;
     if (documentName != null)
     {

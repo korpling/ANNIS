@@ -35,7 +35,8 @@ public class ListDocumentsAnnotationsSqlHelper implements
       + "ON docs.id=meta.corpus_ref \n"
       + "WHERE this.name = :toplevelname \n"
       + "AND docs.pre :> this.pre \n"
-      + "AND docs.post :< this.post \n";
+      + "AND docs.post :< this.post \n"
+      + "AND meta.value is not null";
     String sql = template.replaceAll(":toplevelname", sqlString(
       toplevelCorpusName));
 
