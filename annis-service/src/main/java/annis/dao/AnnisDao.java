@@ -86,7 +86,8 @@ public interface AnnisDao
   List<Match> find(QueryData queryData);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with null
+   * null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -150,4 +151,12 @@ public interface AnnisDao
    */
   public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName,
     boolean withRootCorpus);
+
+  /**
+   * Gets all documents names for a specific corpus
+   *
+   * @param toplevelCorpusName the corpus determines which docs are loaded.
+   * @return Contains name and pre for sorting the documents.
+   */
+  public List<Annotation> listDocuments(String toplevelCorpusName);
 }

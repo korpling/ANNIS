@@ -53,6 +53,9 @@
 	<!-- Helper for listDocumentsAnnotations command -->
   <bean id="listDocumentsAnnotationsSqlHelper" class="annis.sqlgen.ListDocumentsAnnotationsSqlHelper" lazy-init="true"/>
 
+  	<!-- Helper for listDocuments command -->
+  <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
+
   <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
 
@@ -76,7 +79,7 @@
 
   <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
-    
+
     <!-- missing: administrationDao -->
   </bean>
 
@@ -103,8 +106,9 @@
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
-    <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/> 
-    
+    <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
+    <property name="listDocumentsSqlHelper" ref="listDocumentsSqlHelper" />
+
     <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
@@ -115,7 +119,7 @@
     </property>
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-    
+
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
     <property name="metaByteHelper" ref="metaByteHelper" />

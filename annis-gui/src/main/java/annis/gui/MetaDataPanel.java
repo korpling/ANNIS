@@ -47,6 +47,10 @@ public class MetaDataPanel extends Panel
 
   private String documentName;
 
+  private ComboBox corpusSelection;
+
+  private List<Annotation> allCorpora;
+
   public MetaDataPanel(String toplevelCorpusName)
   {
     this(toplevelCorpusName, null);
@@ -63,6 +67,24 @@ public class MetaDataPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
+
+    if (documentName == null)
+    {
+      List<Annotation> docs = getAllSubcorpora(toplevelCorpusName);
+      corpusSelection = new ComboBox("select corpus or document");
+      corpusSelection.addItem(toplevelCorpusName);
+
+      for (Annotation c : docs)
+      {
+        corpusSelection.addItem(c.getName());
+      }
+
+      corpusSelection.select(toplevelCorpusName);
+      corpusSelection.setNullSelectionAllowed(false);
+      corpusSelection.setImmediate(true);
+
+      layout.addComponent(this.corpusSelection);
+    }
 
     // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName == null)
@@ -231,6 +253,43 @@ public class MetaDataPanel extends Panel
     }
 
     return listOfBeanItemCon;
+  }
+
+  private List<Annotation> getAllSubcorpora(String toplevelCorpusName)
+  {
+
+    WebResource res = Helper.getAnnisWebResource();
+    try
+    {
+      res = res.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+      res = res.path("documents");
+      allCorpora = res.get(new AnnotationListType());
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+
+    return allCorpora;
   }
 
   private static class AnnotationListType extends GenericType<List<Annotation>>

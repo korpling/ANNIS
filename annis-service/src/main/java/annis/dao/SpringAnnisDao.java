@@ -57,6 +57,7 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
@@ -81,15 +82,23 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
+
   private CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator;
+
   private CountSqlGenerator countSqlGenerator;
+
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
+
   private SaltAnnotateExtractor saltAnnotateExtractor;
+
   private MatrixSqlGenerator matrixSqlGenerator;
+
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
   // configuration
+
   private int timeout;
   // fn: corpus id -> corpus name
+
   private Map<Long, String> corpusNamesById;
 
   @Override
@@ -124,11 +133,37 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   /**
-   * @param listDocumentsAnnotationsSqlHelper the listDocumentsAnnotationsSqlHelper to set
+   * @param listDocumentsAnnotationsSqlHelper the
+   * listDocumentsAnnotationsSqlHelper to set
    */
-  public void setListDocumentsAnnotationsSqlHelper(ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper)
+  public void setListDocumentsAnnotationsSqlHelper(
+    ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper)
   {
     this.listDocumentsAnnotationsSqlHelper = listDocumentsAnnotationsSqlHelper;
+  }
+
+  @Override
+  public List<Annotation> listDocuments(String toplevelCorpusName)
+  {
+    return (List<Annotation>) getJdbcTemplate().query(getListDocumentsSqlHelper().
+      createSql(toplevelCorpusName), getListDocumentsSqlHelper());
+  }
+
+  /**
+   * @return the listDocumentsSqlHelper
+   */
+  public ListDocumentsSqlHelper getListDocumentsSqlHelper()
+  {
+    return listDocumentsSqlHelper;
+  }
+
+  /**
+   * @param listDocumentsSqlHelper the listDocumentsSqlHelper to set
+   */
+  public void setListDocumentsSqlHelper(
+    ListDocumentsSqlHelper listDocumentsSqlHelper)
+  {
+    this.listDocumentsSqlHelper = listDocumentsSqlHelper;
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -138,6 +173,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
 
     private final boolean analyze;
+
     private final SqlGenerator<QueryData, ?> generator;
 
     private ExplainSqlGenerator(SqlGenerator<QueryData, ?> generator,
@@ -180,24 +216,42 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       return toSql(queryData);
     }
   }
-  private static final Logger log = LoggerFactory.getLogger(SpringAnnisDao.class);
+  private static final Logger log = LoggerFactory.
+    getLogger(SpringAnnisDao.class);
   // / old
+
   private SqlGenerator sqlGenerator;
+
   private ListCorpusSqlHelper listCorpusSqlHelper;
+
   private ListAnnotationsSqlHelper listAnnotationsSqlHelper;
+
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsSqlHelper;
+
   private ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper;
+
+  private ListDocumentsSqlHelper listDocumentsSqlHelper;
   // / new
+
   private List<SqlSessionModifier> sqlSessionModifiers;
 //  private SqlGenerator findSqlGenerator;
+
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
+
   private ListCorpusByNameDaoHelper listCorpusByNameDaoHelper;
+
   private AnnotateSqlGenerator graphExtractor;
+
   private MetaDataFilter metaDataFilter;
+
   private QueryAnalysis queryAnalysis;
+
   private AnnisParser aqlParser;
+
   private HashMap<Long, Properties> corpusConfiguration;
+
   private ByteHelper byteHelper;
+
   private MetaByteHelper metaByteHelper;
 
   public SpringAnnisDao()
@@ -363,7 +417,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName)
   {
-    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, toplevelCorpusName);
+    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(
+      toplevelCorpusName, toplevelCorpusName);
     final List<Annotation> corpusAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
@@ -372,9 +427,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   @Transactional(readOnly = true)
-  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName, boolean listRootCorpus)
+  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName,
+    boolean listRootCorpus)
   {
-    final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(toplevelCorpusName, listRootCorpus);
+    final String sql = listDocumentsAnnotationsSqlHelper.createSqlQuery(
+      toplevelCorpusName, listRootCorpus);
     final List<Annotation> docAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listDocumentsAnnotationsSqlHelper);
@@ -477,7 +534,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           }
           finally
           {
-            if(confStream != null)
+            if (confStream != null)
             {
               try
               {
@@ -516,7 +573,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     catch (org.springframework.jdbc.CannotGetJdbcConnectionException ex)
     {
-      log.warn("No corpus configuration loaded due to missing database connection.");
+      log.warn(
+        "No corpus configuration loaded due to missing database connection.");
     }
   }
 
@@ -529,16 +587,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       conn = getJdbcTemplate().getDataSource().getConnection();
       DatabaseMetaData meta = conn.getMetaData();
 
-      log.debug("database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.getDatabaseMinorVersion() + " complete: " + meta.getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName() + "]");
+      log.debug(
+        "database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.
+        getDatabaseMinorVersion() + " complete: " + meta.
+        getDatabaseProductVersion() + " name: " + meta.getDatabaseProductName() + "]");
 
-      if(!"PostgreSQL".equalsIgnoreCase(meta.getDatabaseProductName()))
+      if (!"PostgreSQL".equalsIgnoreCase(meta.getDatabaseProductName()))
       {
         throw new AnnisException("You did provide a database connection to a "
           + "database that is not PostgreSQL. Please note that this will "
           + "not work.");
       }
-      if(meta.getDatabaseMajorVersion() < 9
-        || (meta.getDatabaseMajorVersion() == 9 && meta.getDatabaseMinorVersion() < 2))
+      if (meta.getDatabaseMajorVersion() < 9
+        || (meta.getDatabaseMajorVersion() == 9 && meta.
+        getDatabaseMinorVersion() < 2))
       {
         throw new AnnisException("Wrong PostgreSQL version installed. Please "
           + "install at least PostgreSQL 9.2 (current installed version is "
@@ -551,7 +613,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     finally
     {
-      if(conn != null)
+      if (conn != null)
       {
         try
         {
@@ -565,8 +627,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return false;
   }
-
-
 
   public AnnisParser getAqlParser()
   {
@@ -699,7 +759,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return countMatchesAndDocumentsSqlGenerator;
   }
 
-  public void setCountMatchesAndDocumentsSqlGenerator(CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
+  public void setCountMatchesAndDocumentsSqlGenerator(
+    CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
   {
     this.countMatchesAndDocumentsSqlGenerator = countSqlGenerator;
   }
@@ -761,11 +822,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
- public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
- String mimeType,int offset, int length)
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
+    String mimeType, int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset, length),
+      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset,
+      length),
       ByteHelper.getArgTypes(), byteHelper);
   }
 
@@ -773,12 +835,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String corpusName)
   {
-    return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(MetaByteHelper.SQL,
+    return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(
+      MetaByteHelper.SQL,
       metaByteHelper.getArgs(toplevelCorpusName, corpusName),
       MetaByteHelper.getArgTypes(), metaByteHelper);
   }
-
-
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
   {
@@ -810,6 +871,4 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.metaByteHelper = metaByteHelper;
   }
-
-
 }
