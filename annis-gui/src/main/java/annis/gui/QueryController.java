@@ -289,13 +289,10 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   
   private boolean checkFutureMatchesFinished()
   {
+    List<Match> result = null;
     try
     {
-      lastResultView.setResult(futureMatches.get(100, TimeUnit.MILLISECONDS),
-        lastQuery.getContextLeft(),
-        lastQuery.getContextRight(), lastQuery.getSegmentation(),
-        lastQuery.getOffset());
-      futureMatches = null;
+      result = futureMatches.get(100, TimeUnit.MILLISECONDS);
     }
     catch (InterruptedException ex)
     {
@@ -307,27 +304,31 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       {
         PagingComponent paging = lastResultView.getPaging();
 
-        Throwable ex = root.getCause();
+        Throwable cause = root.getCause();
 
-        if (ex instanceof AnnisQLSemanticsException)
+        if (cause instanceof UniformInterfaceException)
         {
-          paging.setInfo("Semantic error: " + ex.getLocalizedMessage());
-        }
-        else if (ex instanceof AnnisQLSyntaxException)
-        {
-          paging.setInfo("Syntax error: " + ex.getLocalizedMessage());
-        }
-        else if (ex instanceof AnnisCorpusAccessException)
-        {
-          paging.setInfo("Corpus access error: " + ex.getLocalizedMessage());
+          UniformInterfaceException ex = (UniformInterfaceException) cause;
+
+          if (ex.getResponse().getStatus() == 400)
+          {
+            paging.setInfo("parsing error: " +
+              ex.getResponse().getEntity(String.class));
+          }
+          else if (ex.getResponse().getStatus() == 504) // gateway timeout
+          {
+            paging.setInfo("Timeout: query exeuction took too long");
+          }
+          else
+          {
+            paging.setInfo("unknown error: " + ex );
+          }
         }
         else
         {
-          log.error(
-            "unknown exception in result view", ex);
-          paging.setInfo("unknown exception: " + ex.getLocalizedMessage());
-
+          log.error("Unexcepted ExecutionException cause", root);
         }
+        
       }
     }
     catch (TimeoutException ex)
@@ -335,6 +336,12 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       // we ignore this
       return false;
     }
+    
+    lastResultView.setResult(result,
+      lastQuery.getContextLeft(),
+      lastQuery.getContextRight(), lastQuery.getSegmentation(),
+      lastQuery.getOffset());
+    futureMatches = null;
     
     return true;
   }
@@ -354,9 +361,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       {
         lastResultView.setCount(lastCount.getMatchCount());
       }
-      ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-      futureCount = null;
-      return true;
+
     }
     catch (InterruptedException ex)
     {
@@ -402,7 +407,9 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       // we ignore this
       return false;
     }
-    
+
+    futureCount = null;    
+    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     return true;
   }
     

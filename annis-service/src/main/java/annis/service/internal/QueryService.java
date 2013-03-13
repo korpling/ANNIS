@@ -122,6 +122,7 @@ public class QueryService
     MatchAndDocumentCount count = annisDao.countMatchesAndDocuments(data);
     long end = new Date().getTime();
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+  
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
   }
 
