@@ -96,7 +96,7 @@ public class ResultViewPanel extends Panel
     
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
-    progressResult.setPollingInterval(250);
+    progressResult.setPollingInterval(60000);
     progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     progressResult.setEnabled(true);
     progressResult.setVisible(true);

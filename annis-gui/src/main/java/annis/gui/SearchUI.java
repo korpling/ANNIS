@@ -110,11 +110,12 @@ public class SearchUI extends AnnisBaseUI
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
     queryController = new QueryController(this);
-    
-    
+        
     refresh = new Refresher();
-    refresh.setRefreshInterval(500);
+    // deactivate refresher by default
+    refresh.setRefreshInterval(0);
     refresh.addListener(queryController);
+    addExtension(refresh);
     
     // always get the resize events directly
     setImmediate(true);
@@ -124,7 +125,7 @@ public class SearchUI extends AnnisBaseUI
     
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
- 
+    
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
     
@@ -723,6 +724,21 @@ public class SearchUI extends AnnisBaseUI
     // reset title
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
+  }
+  
+  public void setRefresherEnabled(boolean enabled)
+  {
+    if(refresh != null)
+    {
+      if(enabled)
+      {
+        refresh.setRefreshInterval(500);
+      }
+      else
+      {
+        refresh.setRefreshInterval(0);
+      }
+    }
   }
 
   private static class AboutClickListener implements ClickListener
