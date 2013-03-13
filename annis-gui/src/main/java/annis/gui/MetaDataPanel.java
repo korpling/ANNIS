@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -35,7 +36,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class MetaDataPanel extends Panel
+public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -45,11 +46,19 @@ public class MetaDataPanel extends Panel
 
   private String toplevelCorpusName;
 
+  // this is only set if the metadata panel is called from a specific result.
   private String documentName;
 
   private ComboBox corpusSelection;
 
-  private List<Annotation> allCorpora;
+  // last selected corpus or document of the combobox
+  private String lastSelectedItem;
+
+  // holds all corpus and documents for the combox in the corpus browser panel
+  private List<Annotation> docs;
+
+  // holds the current corpus annotation table, when called from corpus browser
+  private Table corpusAnnoationTable = null;
 
   public MetaDataPanel(String toplevelCorpusName)
   {
@@ -72,43 +81,21 @@ public class MetaDataPanel extends Panel
     {
       List<Annotation> docs = getAllSubcorpora(toplevelCorpusName);
       corpusSelection = new ComboBox("select corpus or document");
-      corpusSelection.addItem(toplevelCorpusName);
+      layout.addComponent(corpusSelection);
 
+      corpusSelection.addItem(toplevelCorpusName);
       for (Annotation c : docs)
       {
         corpusSelection.addItem(c.getName());
       }
 
+      corpusSelection.addValueChangeListener(this);
       corpusSelection.select(toplevelCorpusName);
       corpusSelection.setNullSelectionAllowed(false);
       corpusSelection.setImmediate(true);
+      corpusSelection.setHeight(-1, Unit.PIXELS);
 
-      layout.addComponent(this.corpusSelection);
-    }
-
-    // are we called from the corpusBrowser or there is no subcorpus stay here:
-    if (documentName == null)
-    {
-      Map<Integer, List<Annotation>> hashMData = splitListAnnotations();
-
-      if (hashMData == null)
-      {
-        super.setCaption("no metadata available");
-      }
-      else
-      {
-        List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
-        Accordion accordion = new Accordion();
-        accordion.setSizeFull();
-        layout.addComponent(accordion);
-
-        for (BeanItemContainer<Annotation> item : l)
-        {
-          String corpusName = item.getIdByIndex(0).getCorpusName();
-          accordion.addTab(setupTable(item), (toplevelCorpusName.equals(
-            corpusName)) ? "corpus: " + corpusName : "document: " + corpusName);
-        }
-      }
+      lastSelectedItem = toplevelCorpusName;
     }
     else
     {
@@ -137,15 +124,13 @@ public class MetaDataPanel extends Panel
     {
       res = res.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
       if (documentName != null)
       {
         res = res.path(documentName);
       }
-      else
-      {
-        res = res.path("allmetadata");
-      }
-      result = res.get(new AnnotationListType());
+
+      result = res.path("metadata").get(new AnnotationListType());
     }
     catch (UniformInterfaceException ex)
     {
@@ -264,7 +249,7 @@ public class MetaDataPanel extends Panel
       res = res.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
       res = res.path("documents");
-      allCorpora = res.get(new AnnotationListType());
+      docs = res.get(new AnnotationListType());
     }
     catch (UniformInterfaceException ex)
     {
@@ -289,7 +274,42 @@ public class MetaDataPanel extends Panel
         Notification.Type.WARNING_MESSAGE);
     }
 
-    return allCorpora;
+    return docs;
+  }
+
+  @Override
+  public void valueChange(Property.ValueChangeEvent event)
+  {
+    if (!event.getProperty().equals(lastSelectedItem))
+    {
+      lastSelectedItem = event.getProperty().toString();
+      List<Annotation> metaData = getMetaData(toplevelCorpusName,
+        lastSelectedItem);
+
+      if (metaData == null || metaData.isEmpty())
+      {
+        super.setCaption("no metadata available");
+      }
+      else
+      {
+        loadTable(toplevelCorpusName, metaData);
+      }
+    }
+  }
+
+  public void loadTable(String item, List<Annotation> metaData)
+  {
+    BeanItemContainer<Annotation> metaContainer =
+      new BeanItemContainer<Annotation>(Annotation.class);
+    metaContainer.addAll(metaData);
+
+    if (corpusAnnoationTable != null)
+    {
+      layout.removeComponent(corpusAnnoationTable);
+    }
+
+    corpusAnnoationTable = setupTable(metaContainer);
+    layout.addComponent(corpusAnnoationTable);
   }
 
   private static class AnnotationListType extends GenericType<List<Annotation>>
