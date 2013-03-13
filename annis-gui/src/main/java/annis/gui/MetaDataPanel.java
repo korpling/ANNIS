@@ -79,23 +79,38 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
     if (documentName == null)
     {
-      List<Annotation> docs = getAllSubcorpora(toplevelCorpusName);
-      corpusSelection = new ComboBox("select corpus or document");
-      layout.addComponent(corpusSelection);
+      docs = getAllSubcorpora(toplevelCorpusName);
+
+      HorizontalLayout selectionLayout = new HorizontalLayout();
+      Label selectLabel = new Label("Select corpus/document: ");
+      corpusSelection = new ComboBox();
+      selectionLayout.addComponents(selectLabel, corpusSelection);
+      layout.addComponent(selectionLayout);
+
+      selectLabel.setSizeUndefined();
+
+      corpusSelection.setWidth(100, Unit.PERCENTAGE);
+      corpusSelection.setHeight("-1px");
+      corpusSelection.addValueChangeListener(this);
+
+      selectionLayout.setWidth(100, Unit.PERCENTAGE);
+      selectionLayout.setHeight("-1px");
+      selectionLayout.setSpacing(true);
+      selectionLayout.setComponentAlignment(selectLabel, Alignment.MIDDLE_LEFT);
+      selectionLayout.setComponentAlignment(corpusSelection,
+        Alignment.MIDDLE_LEFT);
+      selectionLayout.setExpandRatio(selectLabel, 0.4f);
+      selectionLayout.setExpandRatio(corpusSelection, 0.6f);
 
       corpusSelection.addItem(toplevelCorpusName);
+      corpusSelection.select(toplevelCorpusName);
+      corpusSelection.setNullSelectionAllowed(false);
+      corpusSelection.setImmediate(true);
+
       for (Annotation c : docs)
       {
         corpusSelection.addItem(c.getName());
       }
-
-      corpusSelection.addValueChangeListener(this);
-      corpusSelection.select(toplevelCorpusName);
-      corpusSelection.setNullSelectionAllowed(false);
-      corpusSelection.setImmediate(true);
-      corpusSelection.setHeight(-1, Unit.PIXELS);
-
-      lastSelectedItem = toplevelCorpusName;
     }
     else
     {
@@ -280,7 +295,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
-    if (!event.getProperty().equals(lastSelectedItem))
+    if (!event.getProperty().equals(lastSelectedItem) || lastSelectedItem == null)
     {
       lastSelectedItem = event.getProperty().toString();
       List<Annotation> metaData = getMetaData(toplevelCorpusName,
@@ -288,16 +303,19 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
       if (metaData == null || metaData.isEmpty())
       {
-        super.setCaption("no metadata available");
+        super.setCaption("No metadata available");
+        if (corpusAnnoationTable != null)
+        corpusAnnoationTable.removeAllItems();
       }
       else
       {
+        super.setCaption("Metadata");
         loadTable(toplevelCorpusName, metaData);
       }
     }
   }
 
-  public void loadTable(String item, List<Annotation> metaData)
+  private void loadTable(String item, List<Annotation> metaData)
   {
     BeanItemContainer<Annotation> metaContainer =
       new BeanItemContainer<Annotation>(Annotation.class);
@@ -309,7 +327,10 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
 
     corpusAnnoationTable = setupTable(metaContainer);
+    corpusAnnoationTable.setHeight(100, Unit.PERCENTAGE);
+    corpusAnnoationTable.setWidth(100, Unit.PERCENTAGE);
     layout.addComponent(corpusAnnoationTable);
+    layout.setExpandRatio(corpusAnnoationTable, 1.0f);
   }
 
   private static class AnnotationListType extends GenericType<List<Annotation>>
