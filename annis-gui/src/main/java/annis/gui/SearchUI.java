@@ -33,6 +33,7 @@ import annis.libgui.visualizers.IFrameResource;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisCorpus;
+import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
@@ -91,12 +92,15 @@ public class SearchUI extends AnnisBaseUI
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private QueryController queryController;
+  private Refresher refresh;
   private String lastQueriedFragment;
   private InstanceConfig instanceConfig;
   private CSSInject css;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  
+  
   @Override
   protected void init(VaadinRequest request)
   {  
@@ -106,6 +110,11 @@ public class SearchUI extends AnnisBaseUI
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
     queryController = new QueryController(this);
+    
+    
+    refresh = new Refresher();
+    refresh.setRefreshInterval(500);
+    refresh.addListener(queryController);
     
     // always get the resize events directly
     setImmediate(true);

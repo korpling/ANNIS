@@ -31,6 +31,8 @@ import annis.libgui.visualizers.IFrameResourceMap;
 import annis.libgui.AnnisUser;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
+import com.github.wolfie.refresher.Refresher;
+import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.VaadinSession;
@@ -57,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController implements PagingCallback
+public class QueryController implements PagingCallback, Refresher.RefreshListener
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
 
@@ -183,9 +185,11 @@ public class QueryController implements PagingCallback
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
-
+    
+    
     resultFetcher = null;
-
+    AsyncWebResource asyncRes = Helper.getAnnisAsyncWebResource();
+      
     if(executeResult)
     {    
       
@@ -200,6 +204,7 @@ public class QueryController implements PagingCallback
       ui.getMainTab().addTab(lastResultView, "Query Result");
       ui.getMainTab().setSelectedTab(lastResultView);
 
+      
       resultTask = new FutureTask<List<Match>>(new ResultCallable(
         resultFetcher, lastQuery.getOffset(), lastQuery.getLimit(), 
         lastResultView.getPaging()))
@@ -322,6 +327,12 @@ public class QueryController implements PagingCallback
       }
     }
   }
+
+  @Override
+  public void refresh(Refresher source)
+  {
+    // TODO
+  }
   
   private static class ResultCallable implements Callable<List<Match>>
   {
@@ -391,11 +402,9 @@ public class QueryController implements PagingCallback
     @Override
     public MatchAndDocumentCount call() throws Exception
     {
-      WebResource res = null;
+      WebResource res = Helper.getAnnisWebResource();
       
       MatchAndDocumentCount c = null;
-
-      res = Helper.getAnnisWebResource();
 
       VaadinSession session = VaadinSession.getCurrent();
       //AnnisService service = Helper.getService(getApplication(), window);

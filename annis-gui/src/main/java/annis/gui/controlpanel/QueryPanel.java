@@ -131,7 +131,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
-    piCount.setPollingInterval(500);
+    piCount.setPollingInterval(3000);
     panelStatusLayout.addComponent(piCount);
 
 

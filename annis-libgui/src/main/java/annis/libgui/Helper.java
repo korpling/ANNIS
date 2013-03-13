@@ -18,6 +18,7 @@ package annis.libgui;
 import annis.libgui.AnnisBaseUI;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
+import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -143,6 +144,31 @@ public class Helper
     
     return anonymousClient.get().resource(uri);
   }
+  
+  /**
+   * Gets or creates an asynchronous web resource to the ANNIS service.
+   *
+   * @param uri The URI where the service can be found
+   * @param user The user object or null (should be of type {@link AnnisUser}).
+   * @return A reference to the ANNIS service root resource.
+   */
+  public static AsyncWebResource getAnnisAsyncWebResource(String uri, AnnisUser user)
+  {
+    
+    if(user != null)
+    {
+      return user.getClient().asyncResource(uri);
+    }
+    
+    // use the anonymous client
+    if(anonymousClient.get() == null)
+    {
+      // anonymous client not created yet
+      anonymousClient.set(createRESTClient());
+    }
+    
+    return anonymousClient.get().asyncResource(uri);
+  }
 
   /**
    * Gets or creates a web resource to the ANNIS service.
@@ -161,6 +187,25 @@ public class Helper
     AnnisUser user  = getUser();
     
     return getAnnisWebResource(uri, user);
+  }
+  
+  /**
+   * Gets or creates an asynchronous web resource to the ANNIS service.
+   *
+   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)  }
+   * that does not need any arguments
+   * 
+   * @return A reference to the ANNIS service root resource.
+   */
+  public static AsyncWebResource getAnnisAsyncWebResource()
+  {
+    // get URI used by the application
+    String uri = (String) VaadinSession.getCurrent().getAttribute(KEY_WEB_SERVICE_URL);
+    
+    // if already authentificated the REST client is set as the "user" property
+    AnnisUser user  = getUser();
+    
+    return getAnnisAsyncWebResource(uri, user);
   }
 
 
