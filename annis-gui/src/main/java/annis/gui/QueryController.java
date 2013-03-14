@@ -130,6 +130,21 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   
   public void cancelQueries()
   {
+    // don't spin forever when canceled
+    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+    
+    if(lastResultView != null && lastQuery != null)
+    {
+      // explicitly show empty result
+      lastResultView.setResult(null,
+        lastQuery.getContextLeft(),
+        lastQuery.getContextRight(), lastQuery.getSegmentation(),
+        lastQuery.getOffset());
+    }
+    
+    // disable the refresher
+    ui.setRefresherEnabled(false);
+
     // abort last tasks if running
     if(futureCount != null && !futureCount.isDone())
     {
@@ -138,13 +153,12 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     if(futureMatches != null && !futureMatches.isDone())
     {
       futureMatches.cancel(true);
+      
     }
     
     futureCount = null;
     futureMatches = null;
     
-    // disable the refresher
-    ui.setRefresherEnabled(false);
   }
   
   public void executeQuery(boolean executeCount, boolean executeResult)
@@ -257,6 +271,14 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         lastResultView.setCount(lastCount.getMatchCount());
       }
     }
+  }
+  
+  /**
+   * Returns true if any query (count or find) is running.
+   */
+  public boolean isQueryRunning()
+  {
+    return futureCount != null || futureMatches != null;
   }
 
   @Override

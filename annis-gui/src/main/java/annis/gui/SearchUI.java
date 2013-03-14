@@ -113,7 +113,7 @@ public class SearchUI extends AnnisBaseUI
         
     refresh = new Refresher();
     // deactivate refresher by default
-    refresh.setRefreshInterval(0);
+    refresh.setRefreshInterval(-1);
     refresh.addListener(queryController);
     addExtension(refresh);
     
@@ -732,11 +732,11 @@ public class SearchUI extends AnnisBaseUI
     {
       if(enabled)
       {
-        refresh.setRefreshInterval(500);
+        refresh.setRefreshInterval(1000);
       }
       else
       {
-        refresh.setRefreshInterval(0);
+        refresh.setRefreshInterval(-1);
       }
     }
   }

@@ -22,9 +22,9 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
 import annis.libgui.InstanceConfig;
+import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
@@ -39,6 +39,12 @@ import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -57,6 +63,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   // the view name
   public static final String NAME = "query";
 
+  
+  private static final String CAPTION_SHOW = "Show Result";
+  private static final String CAPTION_CANCEL = "Cancel Query";
+  
+  
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
@@ -67,6 +78,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
+  private boolean cancelMode;
   
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
@@ -74,6 +86,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
+    this.cancelMode = false;
     
     setSpacing(true);
     setMargin(true);
@@ -135,11 +148,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     panelStatusLayout.addComponent(piCount);
 
 
-    btShowResult = new Button("Show Result");
+    btShowResult = new Button(CAPTION_SHOW);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
+    btShowResult.setImmediate(true);
 
     buttonLayout.addComponent(btShowResult);
 
@@ -259,17 +273,38 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     // validate query
     try
     {
-      WebResource annisResource = Helper.getAnnisWebResource();
-      String result = annisResource.path("query").path("check").queryParam("q", query)
+      AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
+      Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
-      if ("ok".equalsIgnoreCase(result))
+      
+      // wait for maximal one seconds
+      
+      try
       {
-        lblStatus.setValue(lastPublicStatus);
+        String result = future.get(1, TimeUnit.SECONDS);
+        if ("ok".equalsIgnoreCase(result))
+        {
+          lblStatus.setValue(lastPublicStatus);
+        }
+        else
+        {
+          lblStatus.setValue(result);
+        }
       }
-      else
+      catch (InterruptedException ex)
       {
-        lblStatus.setValue(result);
+        log.warn(null, ex);
       }
+      catch (ExecutionException ex)
+      {
+        // ok, there was some serios error
+        log.error(null, ex);
+      }
+      catch (TimeoutException ex)
+      {
+        lblStatus.setValue("Validation of query took too long.");
+      }
+      
     }
     catch(UniformInterfaceException ex)
     {
@@ -313,20 +348,31 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(controller != null)
       {
-        controller.setQuery((txtQuery.getValue()));
-        controller.executeQuery();
+        if(cancelMode)
+        {
+          controller.cancelQueries();
+          Notification.show("Query was cancelled as requested by user.");
+        }
+        else
+        {
+          controller.setQuery((txtQuery.getValue()));
+          controller.executeQuery();
+        }
       }
     }
   }
 
   public void setCountIndicatorEnabled(boolean enabled)
   {
-    if(piCount != null && btShowResult != null)
+    if(piCount != null && btShowResult != null && lblStatus != null)
     {
       lblStatus.setVisible(!enabled);
       piCount.setVisible(enabled);
       piCount.setEnabled(enabled);
-
+      
+      cancelMode = enabled;
+      btShowResult.setCaption(enabled ? CAPTION_CANCEL : CAPTION_SHOW);
+      
     }
   }
 
