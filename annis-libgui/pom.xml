@@ -15,6 +15,7 @@
   <description>Base project for a Vaadin based GUI.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <vaadin.version>7.0.2</vaadin.version>
   </properties>
   
     
@@ -32,17 +33,17 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-server</artifactId>
-      <version>7.0.1</version>
+      <version>${vaadin.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-themes</artifactId>
-      <version>7.0.1</version>
+      <version>${vaadin.version}</version>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-theme-compiler</artifactId>
-      <version>7.0.1</version>
+      <version>${vaadin.version}</version>
     </dependency>
     
     <dependency>
@@ -90,7 +91,7 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <version>1.14</version>
+      <version>1.17.1</version>
       <!-- do not use commons logging -->
       <exclusions>
         <exclusion>

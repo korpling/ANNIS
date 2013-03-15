@@ -18,7 +18,9 @@ package annis.gui.controlpanel;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
+import annis.gui.exporter.GeneralTextExporter;
 import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import com.vaadin.data.Property;
@@ -53,7 +55,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   {
     new WekaExporter(),
     new TextExporter(),
-    new GridExporter()
+    new GridExporter(),
+    new SimpleTextExporter()
   };
   
   private final Map<String,String> help4Exporter = new HashMap<String,String>();

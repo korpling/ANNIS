@@ -17,4 +17,4 @@ added to a jar that is located at one of the following locations:
 - the path defined in the `ANNIS_PLUGINS` environment variable
 
 Please also note that it is possible to configure a default query builder for an
-instance. Further information can be found in the adminstration guide.
+instance. Further information can be found in the [adminstration guide](@ref admin-configure-instance).

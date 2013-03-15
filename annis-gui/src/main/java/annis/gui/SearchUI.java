@@ -34,6 +34,7 @@ import annis.libgui.visualizers.IFrameResource;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisCorpus;
+import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
@@ -92,12 +93,15 @@ public class SearchUI extends AnnisBaseUI
   private QueryBuilderChooser queryBuilder;
   private String bugEMailAddress;
   private QueryController queryController;
+  private Refresher refresh;
   private String lastQueriedFragment;
   private InstanceConfig instanceConfig;
   private CSSInject css;
   
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  
+  
   @Override
   protected void init(VaadinRequest request)
   {  
@@ -107,6 +111,12 @@ public class SearchUI extends AnnisBaseUI
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
     queryController = new QueryController(this);
+        
+    refresh = new Refresher();
+    // deactivate refresher by default
+    refresh.setRefreshInterval(-1);
+    refresh.addListener(queryController);
+    addExtension(refresh);
     
     // always get the resize events directly
     setImmediate(true);
@@ -116,7 +126,7 @@ public class SearchUI extends AnnisBaseUI
     
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
- 
+    
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
     
@@ -716,6 +726,21 @@ public class SearchUI extends AnnisBaseUI
     // reset title
     getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
     
+  }
+  
+  public void setRefresherEnabled(boolean enabled)
+  {
+    if(refresh != null)
+    {
+      if(enabled)
+      {
+        refresh.setRefreshInterval(1000);
+      }
+      else
+      {
+        refresh.setRefreshInterval(-1);
+      }
+    }
   }
 
   private static class AboutClickListener implements ClickListener

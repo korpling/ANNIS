@@ -158,9 +158,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       + " ENCODING = 'UTF8' TEMPLATE template0");
   }
   
-  protected void setupDatabase()
+  protected void setupDatabase(boolean asAdmin)
   {
-    installPlPgSql();
+    if(asAdmin)
+    {
+      installPlPgSql();
+    }
     createFunctionUniqueToplevelCorpusName();
   }
   
@@ -246,31 +249,35 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword)
   {
     log.info("Creating Annis database and user.");
     // connect as super user to the default database to create new user and database
-    setDataSource(createDataSource(host, port,
+    if(superPassword != null)
+    {
+      setDataSource(createDataSource(host, port,
       defaultDatabase, superUser, superPassword));
-
-    dropDatabase(database);
-    dropUser(user);
-    createUser(user, password);
-    createDatabase(database);
-
-
-    // switch to new database, but still as super user to install stored procedure compute_rank_level
-    setDataSource(createDataSource(host, port, database,
-      superUser, superPassword));
-    setupDatabase();
-
+    
+      dropDatabase(database);
+      dropUser(user);
+      createUser(user, password);
+      createDatabase(database);
+      
+      
+      setupDatabase(true);
+    }
+    
     // switch to new database as new user for the rest
     setDataSource(createDataSource(host, port, database,
       user, password));
-
+    if(superPassword == null)
+    {
+      // do setup as normal user
+      setupDatabase(false);
+    }
+    
     createSchema();
     createSchemaIndexes();
     populateSchema();

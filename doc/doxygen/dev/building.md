@@ -9,6 +9,13 @@ download all needed dependencies from central servers on the first build so you
 will need to have a working internet connection. The dependencies are cached
 locally once their are downloaded.
 
+Currently you have to have the `patch` command line tool installed, since the
+AQL parser generation needs this. Linux users can install it using their favourite
+package manager, MacOS X should already include the `patch` command and Windows
+users should install [Cygwin](http://www.cygwin.com/) and use the Cygwin specific packager manager to install
+`patch`. This annoying requirement might be removed
+in the future, when we switch to another parser generator.
+
 When you have downloaded or checked out the source of ANNIS the top-level
 directory of the source code is the parent project for all ANNIS sub-projects. If
 you want to build every project that is part of ANNIS just execute

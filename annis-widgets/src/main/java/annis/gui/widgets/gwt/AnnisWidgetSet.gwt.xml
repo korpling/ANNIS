@@ -38,4 +38,6 @@
    
 
     <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
+
+    <inherits name="com.github.wolfie.refresher.RefresherWidgetset" />
 </module>
