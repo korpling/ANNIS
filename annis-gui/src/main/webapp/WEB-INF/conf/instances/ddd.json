@@ -5,7 +5,7 @@
   "corpus-sets": [
   {
     "name": "Referenzkorpus Altdeutsch - Kleine Althochdeutsche Denkmäler",
-    "corpus": ["AltbairischeBeichte", "AugsburgerGebet", "BaslerRezepte"]
+    "corpus": ["Altbairische_Beichte", "Augsburger_Gebet", "Basler_Rezepte"]
   }
  ]
 }
