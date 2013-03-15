@@ -96,7 +96,7 @@ public class ResultViewPanel extends Panel
     
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
-    progressResult.setPollingInterval(250);
+    progressResult.setPollingInterval(60000);
     progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     progressResult.setEnabled(true);
     progressResult.setVisible(true);
@@ -117,51 +117,35 @@ public class ResultViewPanel extends Panel
   {
     progressResult.setVisible(false);
     progressResult.setEnabled(false);
+
+    if (resultPanel != null)
+    {
+      mainLayout.removeComponent(resultPanel);
+    }
+    resultPanel = null;
+
+    if (result != null && result.size() > 0)
+    {
+      resultPanel = new ResultSetPanel(result, ps, instanceConfig,
+        contextLeft, contextRight,
+        segmentationLayer, this, offset);
+
+      mainLayout.addComponent(resultPanel);
+      mainLayout.setExpandRatio(resultPanel, 1.0f);
+      mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
+
+      resultPanel.setVisible(true);
+    }
+    else
+    {
+      // nothing to show since we have an empty result
+      Label lblNoResult = new Label("No matches found.");
+      lblNoResult.setSizeUndefined();
+      mainLayout.addComponent(lblNoResult);
+      mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
+      mainLayout.setExpandRatio(lblNoResult, 1.0f);
+    }
     
-    if (result == null)
-    {
-      return;
-    }
-
-    VaadinSession session = VaadinSession.getCurrent();
-    session.lock();
-    try
-    {
-      if (resultPanel != null)
-      {
-        mainLayout.removeComponent(resultPanel);
-      }
-      resultPanel = null;
-
-      progressResult.setEnabled(false);
-      progressResult.setVisible(false);
-
-      if (result.size() > 0)
-      {
-        resultPanel = new ResultSetPanel(result, ps, instanceConfig,
-          contextLeft, contextRight,
-          segmentationLayer, this, offset);
-
-        mainLayout.addComponent(resultPanel);
-        mainLayout.setExpandRatio(resultPanel, 1.0f);
-        mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
-
-        resultPanel.setVisible(true);
-      }
-      else
-      {
-        // nothing to show since we have an empty result
-        Label lblNoResult = new Label("No matches found.");
-        lblNoResult.setSizeUndefined();
-        mainLayout.addComponent(lblNoResult);
-        mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
-        mainLayout.setExpandRatio(lblNoResult, 1.0f);
-      }
-    }
-    finally
-    {
-      session.unlock();
-    }
   }
 
   public void setCount(int count)

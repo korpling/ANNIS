@@ -58,7 +58,6 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -122,6 +121,7 @@ public class QueryService
     MatchAndDocumentCount count = annisDao.countMatchesAndDocuments(data);
     long end = new Date().getTime();
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+  
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
   }
 
