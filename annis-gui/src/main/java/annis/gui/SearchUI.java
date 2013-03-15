@@ -167,13 +167,11 @@ public class SearchUI extends AnnisBaseUI
     }
     btBugReport.setVisible(this.bugEMailAddress != null);
     
-    updateUserInformation();
-    
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("-1px");
     lblUserName.setHeight("-1px");
     lblUserName.addStyleName("right-aligned-text");
-
+    
     btLoginLogout = new Button("Login", new Button.ClickListener()
     {
 
@@ -317,6 +315,8 @@ public class SearchUI extends AnnisBaseUI
     checkCitation(request);
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
+    
+    updateUserInformation();
   }
   
   private void loadInstanceFonts()
