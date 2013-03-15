@@ -43,8 +43,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -62,11 +60,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   
   // the view name
   public static final String NAME = "query";
-
-  
-  private static final String CAPTION_SHOW = "Show Result";
-  private static final String CAPTION_CANCEL = "Cancel Query";
-  
   
   private TextArea txtQuery;
   private Label lblStatus;
@@ -78,7 +71,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
-  private boolean cancelMode;
   
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
@@ -86,7 +78,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
-    this.cancelMode = false;
     
     setSpacing(true);
     setMargin(true);
@@ -148,12 +139,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     panelStatusLayout.addComponent(piCount);
 
 
-    btShowResult = new Button(CAPTION_SHOW);
+    btShowResult = new Button("Show Result");
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
-    btShowResult.setImmediate(true);
+    btShowResult.setDisableOnClick(true);
 
     buttonLayout.addComponent(btShowResult);
 
@@ -348,16 +339,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(controller != null)
       {
-        if(cancelMode)
-        {
-          controller.cancelQueries();
-          Notification.show("Query was cancelled as requested by user.");
-        }
-        else
-        {
-          controller.setQuery((txtQuery.getValue()));
-          controller.executeQuery();
-        }
+        controller.setQuery((txtQuery.getValue()));
+        controller.executeQuery();        
       }
     }
   }
@@ -370,9 +353,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       piCount.setVisible(enabled);
       piCount.setEnabled(enabled);
       
-      cancelMode = enabled;
-      btShowResult.setCaption(enabled ? CAPTION_CANCEL : CAPTION_SHOW);
-      
+      btShowResult.setEnabled(!enabled);      
     }
   }
 

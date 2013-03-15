@@ -16,9 +16,6 @@
 package annis.gui;
 
 import annis.libgui.Helper;
-import annis.exceptions.AnnisCorpusAccessException;
-import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
 import annis.gui.beans.HistoryEntry;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
@@ -128,7 +125,13 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     executeQuery(true, true);
   }
   
-  public void cancelQueries()
+  /**
+   * Cancel queries from the client side.
+   * 
+   * Important: This does not magically cancel the query on the server side, 
+   * so don't use this to implement a "real" query cancelation.
+   */
+  private void cancelQueries()
   {
     // don't spin forever when canceled
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
