@@ -158,15 +158,6 @@ public class DefaultAdministrationDao implements AdministrationDao
       + " ENCODING = 'UTF8' TEMPLATE template0");
   }
   
-  protected void setupDatabase(boolean asAdmin)
-  {
-    if(asAdmin)
-    {
-      installPlPgSql();
-    }
-    createFunctionUniqueToplevelCorpusName();
-  }
-  
   protected void installPlPgSql()
   {
     log.info("installing stored procedure language plpgsql");
@@ -265,19 +256,14 @@ public class DefaultAdministrationDao implements AdministrationDao
       createUser(user, password);
       createDatabase(database);
       
-      
-      setupDatabase(true);
+      installPlPgSql();
     }
     
     // switch to new database as new user for the rest
     setDataSource(createDataSource(host, port, database,
       user, password));
-    if(superPassword == null)
-    {
-      // do setup as normal user
-      setupDatabase(false);
-    }
     
+    createFunctionUniqueToplevelCorpusName();
     createSchema();
     createSchemaIndexes();
     populateSchema();
