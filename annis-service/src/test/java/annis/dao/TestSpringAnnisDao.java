@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class TestSpringAnnisDao
 
   @Resource(name="annisDao")
   private AnnisDao annisDao;
-  
+
   // simple SpringDao instance with mocked dependencies
   private SpringAnnisDao simpleAnnisDao;
   @Mock
@@ -191,14 +191,14 @@ public class TestSpringAnnisDao
 
     // stub SQL query
     final String ID = "toplevelcorpus";
-    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString())).thenReturn(SQL);
+    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString(), false)).thenReturn(SQL);
 
     // call and test
     assertThat(simpleAnnisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
-    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID);
+    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, false);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
- 
+
   @SuppressWarnings("unchecked")
   @Test
   public void listNodeAnnotations()
