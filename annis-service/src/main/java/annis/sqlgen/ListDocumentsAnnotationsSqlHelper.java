@@ -23,6 +23,12 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 import annis.model.Annotation;
 import static annis.sqlgen.SqlConstraints.sqlString;
 
+/**
+ * Lists all annotations of all sub documents of a specific corpus. Optionally
+ * includes the annotations of the toplevel corpus.
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ */
 public class ListDocumentsAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
 {
@@ -44,7 +50,8 @@ public class ListDocumentsAnnotationsSqlHelper implements
     {
       return sql.replaceAll(":>", ">=").replaceAll(":<", "<=");
     }
-    else {
+    else
+    {
       return sql.replaceAll(":>", "<").replaceAll(":<", "<=");
     }
   }
