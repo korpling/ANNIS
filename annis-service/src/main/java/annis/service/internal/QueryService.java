@@ -70,7 +70,7 @@ import org.springframework.stereotype.Component;
  * Methods for querying the database.
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
- * @author Benjamin Weißenfels
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @Component
 @Path("annis/query")
@@ -436,6 +436,14 @@ public class QueryService
   }
 
   @GET
+  @Path("corpora/{top}/documents")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<Annotation> getDocNames(@PathParam("top") String topLevelCorpus)
+  {
+    return annisDao.listDocuments(topLevelCorpus);
+  }
+
+  @GET
   @Path("corpora/{top}/metadata")
   @Produces("application/xml")
   public List<Annotation> getMetadata(
@@ -448,19 +456,12 @@ public class QueryService
   }
 
   @GET
-  @Path("corpora/{top}/documents")
-  @Produces(MediaType.APPLICATION_XML)
-  public List<Annotation> getDocNames(@PathParam("top") String topLevelCorpus)
-  {
-    return annisDao.listDocuments(topLevelCorpus);
-  }
-
-  @GET
   @Path("corpora/{top}/{document}/metadata")
   @Produces("application/xml")
   public List<Annotation> getMetadata(
     @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String documentName)
+    @PathParam("document") String documentName,
+    @QueryParam("exclude") @DefaultValue("false") boolean exclude)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + toplevelCorpusName);
@@ -469,7 +470,9 @@ public class QueryService
     {
       documentName = toplevelCorpusName;
     }
-    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName);
+
+    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName,
+      exclude);
   }
 
   @GET

@@ -33,6 +33,8 @@ import org.slf4j.LoggerFactory;
 /**
  * Provides all corpus annotations for a corpus or for a specific search result.
  *
+ * // TODO cleanup the toplevelCorpus side effects.
+ *
  * @author thomas
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -145,7 +147,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         res = res.path(documentName);
       }
 
-      result = res.path("metadata").get(new AnnotationListType());
+      result = res.path("metadata").queryParam("exclude", "true").get(
+        new AnnotationListType());
     }
     catch (UniformInterfaceException ex)
     {
@@ -295,7 +298,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
-    if (!event.getProperty().equals(lastSelectedItem) || lastSelectedItem == null)
+    if (!event.getProperty().equals(lastSelectedItem)
+      || lastSelectedItem == null)
     {
       lastSelectedItem = event.getProperty().toString();
       List<Annotation> metaData = getMetaData(toplevelCorpusName,
@@ -305,7 +309,9 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       {
         super.setCaption("No metadata available");
         if (corpusAnnoationTable != null)
-        corpusAnnoationTable.removeAllItems();
+        {
+          corpusAnnoationTable.removeAllItems();
+        }
       }
       else
       {

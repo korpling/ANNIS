@@ -26,22 +26,46 @@ import static annis.sqlgen.SqlConstraints.sqlString;
 public class ListCorpusAnnotationsSqlHelper implements
   ParameterizedRowMapper<Annotation>
 {
-  public String createSqlQuery(String toplevelCorpusName, String corpusName)
+
+  public String createSqlQuery(String toplevelCorpusName, String corpusName,
+    boolean exclude)
   {
-    String template = "SELECT parent.type, parent.name AS parent_name, parent.pre AS parent_pre, "
-      + "ca.name, ca.value, ca.namespace "
-      + "FROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
-      + "WHERE this.name = :docname \n"
-      + "AND toplevel.name = :toplevelname \n"
-      + "AND toplevel.top_level = true \n"
-      + "AND parent.pre >= toplevel.pre \n"
-      + "AND parent.post <= toplevel.post \n"
-      + "AND this.pre >= parent.pre \n"
-      + "AND this.post <= parent.post \n"
-      + "AND ca.corpus_ref = parent.id \n"
-      + "ORDER BY parent_pre ASC";
-    String sql = template.replaceAll(":docname", sqlString(corpusName)).
-      replaceAll(":toplevelname", sqlString(toplevelCorpusName));
+    String template;
+    String sql;
+
+    if (exclude && !toplevelCorpusName.equals(corpusName))
+    {
+      template = "SELECT "
+        + "doc.type, doc.name as corpus_name, doc.pre AS corpus_pre, ca.name, "
+        + "ca.value, ca.namespace"
+        + "\nFROM corpus_annotation ca, corpus doc, corpus toplevel "
+        + "\nWHERE doc.name = :docname \n"
+        + "\nAND toplevel.name = :toplevelname \n"
+        + "\nAND toplevel.top_level = true \n"
+        + "\nAND doc.pre > toplevel.pre \n"
+        + "\nAND doc.post < toplevel.post \n"
+        + "\nAND ca.corpus_ref = doc.id \n"
+        + "ORDER BY corpus_pre ASC";
+      sql = template.replaceAll(":docname", sqlString(corpusName)).
+        replaceAll(":toplevelname", sqlString(toplevelCorpusName));
+    }
+    else
+    {
+      template = "SELECT parent.type, parent.name AS corpus_name, "
+        + "parent.pre AS corpus_pre, ca.name, ca.value, ca.namespace "
+        + "\nFROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
+        + "\nWHERE this.name = :docname \n"
+        + "\nAND toplevel.name = :toplevelname \n"
+        + "\nAND toplevel.top_level = true \n"
+        + "\nAND parent.pre >= toplevel.pre \n"
+        + "\nAND parent.post <= toplevel.post \n"
+        + "\nAND this.pre >= parent.pre \n"
+        + "\nAND this.post <= parent.post \n"
+        + "\nAND ca.corpus_ref = parent.id \n"
+        + "\nORDER BY corpus_pre ASC";
+      sql = template.replaceAll(":docname", sqlString(corpusName)).
+        replaceAll(":toplevelname", sqlString(toplevelCorpusName));
+    }
     return sql;
   }
 
@@ -53,8 +77,8 @@ public class ListCorpusAnnotationsSqlHelper implements
     String name = rs.getString("name");
     String value = rs.getString("value");
     String type = rs.getString("type");
-    String corpusName = rs.getString("parent_name");
-    int pre = rs.getInt("parent_pre");
+    String corpusName = rs.getString("corpus_name");
+    int pre = rs.getInt("corpus_pre");
     return new Annotation(namespace, name, value, type, corpusName, pre);
   }
 }

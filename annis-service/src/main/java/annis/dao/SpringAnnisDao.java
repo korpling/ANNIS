@@ -145,7 +145,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<Annotation> listDocuments(String toplevelCorpusName)
   {
-    return (List<Annotation>) getJdbcTemplate().query(getListDocumentsSqlHelper().
+    return (List<Annotation>) getJdbcTemplate().query(
+      getListDocumentsSqlHelper().
       createSql(toplevelCorpusName), getListDocumentsSqlHelper());
   }
 
@@ -418,7 +419,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName)
   {
     final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(
-      toplevelCorpusName, toplevelCorpusName);
+      toplevelCorpusName, toplevelCorpusName, true);
     final List<Annotation> corpusAnnotations =
       (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
@@ -441,14 +442,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   @Transactional(readOnly = true)
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
-    String documentName)
+    String documentName, boolean exclude)
   {
-    final String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(
-      toplevelCorpusName, documentName);
-    final List<Annotation> corpusAnnotations =
-      (List<Annotation>) getJdbcTemplate().query(sql,
+    String sql = listCorpusAnnotationsSqlHelper.createSqlQuery(
+      toplevelCorpusName, documentName, exclude);
+    final List<Annotation> cA = (List<Annotation>) getJdbcTemplate().query(sql,
       listCorpusAnnotationsSqlHelper);
-    return corpusAnnotations;
+    return cA;
   }
 
   @Override

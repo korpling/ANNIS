@@ -48,8 +48,19 @@ public interface AnnisDao
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
+  /**
+   * Creates sql for getting annations of corpora.
+   *
+   * @param toplevelCorpusName The toplevel corpus defines the root.
+   * @param corpusName Specifies the document, for which the annoations are
+   * fetched.
+   * @param exclude If set to true, the top level corpus annoations are
+   * excluded. Only has an effect, if corpus name is different from top level
+   * corpus name.
+   * @return Valid sql as string.
+   */
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
-    String documentName);
+    String documentName, boolean exclude);
 
   /**
    * Gets a part of a binary file plus meta data from database.
@@ -87,7 +98,7 @@ public interface AnnisDao
 
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
-   * null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
