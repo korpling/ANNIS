@@ -191,11 +191,11 @@ public class TestSpringAnnisDao
 
     // stub SQL query
     final String ID = "toplevelcorpus";
-    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString(), false)).thenReturn(SQL);
+    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString(), anyBoolean())).thenReturn(SQL);
 
     // call and test
     assertThat(simpleAnnisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
-    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, false);
+    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, true);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
 
