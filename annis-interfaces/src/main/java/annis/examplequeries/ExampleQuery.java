@@ -38,6 +38,8 @@ public class ExampleQuery
 
   private String used_operators;
 
+  private String corpusName;
+
   public String getType()
   {
     return type;
@@ -76,5 +78,21 @@ public class ExampleQuery
   public void setUsedOperators(String used_operators)
   {
     this.used_operators = used_operators;
+  }
+
+  /**
+   * @return the corpusName
+   */
+  public String getCorpusName()
+  {
+    return corpusName;
+  }
+
+  /**
+   * @param corpusName the corpusName to set
+   */
+  public void setCorpusName(String corpusName)
+  {
+    this.corpusName = corpusName;
   }
 }

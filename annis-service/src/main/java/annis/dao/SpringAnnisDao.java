@@ -341,10 +341,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public List<ExampleQuery> getExampleQueries(String[] corpusName)
+  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs)
   {
     return (List<ExampleQuery>) getJdbcTemplate().query(
-      listExampleQueriesHelper.createSQLQuery(corpusName),
+      listExampleQueriesHelper.createSQLQuery(corpusIDs),
       listExampleQueriesHelper);
   }
 

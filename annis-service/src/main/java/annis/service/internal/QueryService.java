@@ -553,7 +553,9 @@ public class QueryService
       if (rawCorpusNames != null)
       {
         String[] corpusNames = rawCorpusNames.split(",");
-        return annisDao.getExampleQueries(corpusNames);
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(Arrays.asList(
+          corpusNames));
+        return annisDao.getExampleQueries(corpusIDs);
       }
       else
       {

@@ -18,7 +18,10 @@ package annis.sqlgen;
 import annis.examplequeries.ExampleQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.Collection;
 import java.util.List;
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
@@ -35,29 +38,24 @@ public class ListExampleQueriesHelper implements
   private static final Logger log = LoggerFactory.
     getLogger(ListExampleQueriesHelper.class);
 
-  public String createSQLQuery(String[] corpusNames)
+  public String createSQLQuery(List<Long> corpusIDs)
   {
-    if (corpusNames == null || corpusNames.length == 0)
+    if (corpusIDs == null || corpusIDs.isEmpty())
     {
-      return "SELECT * from example_queries";
+      return "SELECT example_query, example_queries.\"type\", used_ops, "
+        + "description, c.name as corpus_name "
+        + "\nFROM example_queries, corpus c"
+        + "\nWHERE corpus_ref = c.id";
     }
     else
     {
-      String replaceName = ":corpusName";
-      String select = "\nSELECT * FROM (SELECT id FROM CORPUS WHERE name = \'"
-        + replaceName + "\') AS corpus, example_queries WHERE corpus.id = corpus_ref";
-
-      StringBuilder sb = new StringBuilder();
-      for (int i = 0; i < corpusNames.length; i++)
-      {
-        sb.append(select.replace(replaceName, corpusNames[i]));
-        if (i < corpusNames.length - 1)
-        {
-          sb.append("\nUNION");
-        }
-      }
-      sb.append("\nORDER BY corpus_ref");
-      return sb.toString();
+      String sql = "SELECT example_query, example_queries.\"type\", used_ops, "
+        + "description, c.name as corpus_name  "
+        + "\nFROM example_queries, ("
+        + "\nSELECT * FROM corpus "
+        + "\nWHERE corpus.id in (" + StringUtils.join(corpusIDs, ",") + ")) as c"
+        + "\nWHERE	corpus_ref = c.id";
+      return sql;
     }
   }
 
@@ -70,6 +68,7 @@ public class ListExampleQueriesHelper implements
     exampleQuery.setUsedOperators(rs.getString("used_ops"));
     exampleQuery.setExampleQuery(rs.getString("example_query"));
     exampleQuery.setDescription(rs.getString("description"));
+    exampleQuery.setCorpusName(rs.getString("corpus_name"));
 
     return exampleQuery;
   }

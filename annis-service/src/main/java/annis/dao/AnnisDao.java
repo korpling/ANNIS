@@ -177,9 +177,9 @@ public interface AnnisDao
   /**
    * Fetches a list with auto generated queries.
    *
-   * @param corpusNames determines the corpora, for which the example queries
+   * @param corpusIDs determines the corpora, for which the example queries
    * are defined. If null then all auto generated queries are fetched.
    * @return Is null, if no example queries exists in the database.
    */
-  public List<ExampleQuery> getExampleQueries(String[] corpusNames);
+  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
 }
