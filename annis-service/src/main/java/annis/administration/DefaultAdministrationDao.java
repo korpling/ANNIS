@@ -182,6 +182,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
     
+    // update schema version
+    jdbcTemplate.execute("DELETE FROM repository_metadata WHERE \"name\"='schema-version'");
     jdbcTemplate.execute("INSERT INTO repository_metadata "
       + "VALUES ('schema-version', '"
       + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
