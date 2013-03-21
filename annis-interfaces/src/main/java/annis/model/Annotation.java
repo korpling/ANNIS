@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,7 +36,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
   public Annotation()
   {
   }
-  
+
   public Annotation(String namespace, String name)
   {
     this(namespace, name, null);
@@ -169,8 +169,8 @@ public class Annotation implements Comparable<Annotation>, Serializable
   {
     this.pre = pre;
   }
-  
-  
+
+
 
   public int getPre()
   {
