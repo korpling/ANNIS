@@ -522,6 +522,10 @@ public class CorpusListPanel extends VerticalLayout implements
     if (tblCorpora != null)
     {
       tblCorpora.setValue(corpora);
+      if(!corpora.isEmpty())
+      {
+        tblCorpora.setCurrentPageFirstItemId(corpora.iterator().next());
+      }
     }
   }
 
