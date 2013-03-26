@@ -7,3 +7,6 @@ target/
 /annis-kickstarter/.settings/
 /.settings/
 /doc/.settings/
+/doc/html/
+/doc/latex/
+/annis-widgets/src/main/webapp/VAADIN/

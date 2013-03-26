@@ -8,19 +8,19 @@
   <name>ANNIS corpus search</name>
   <version>3.0.0-SNAPSHOT</version>
   <description>
-    ANNIS is an open source, versatile web browser-based search and 
-    visualization architecture for complex multilevel linguistic corpora with 
-    diverse types of annotation. ANNIS, which stands for ANNotation of Information 
-    Structure, has been designed to provide access to the data of the 
-    SFB 632 - "Information Structure: The Linguistic Means for Structuring 
-    Utterances, Sentences and Texts". Since information structure interacts with 
-    linguistic phenomena on many levels, ANNIS addresses the SFB's need to 
-    concurrently annotate, query and visualize data from such varied areas as 
-    syntax, semantics, morphology, prosody, referentiality, lexis and more. 
-    For projects working with spoken language, support for audio / video 
+    ANNIS is an open source, versatile web browser-based search and
+    visualization architecture for complex multilevel linguistic corpora with
+    diverse types of annotation. ANNIS, which stands for ANNotation of Information
+    Structure, has been designed to provide access to the data of the
+    SFB 632 - "Information Structure: The Linguistic Means for Structuring
+    Utterances, Sentences and Texts". Since information structure interacts with
+    linguistic phenomena on many levels, ANNIS addresses the SFB's need to
+    concurrently annotate, query and visualize data from such varied areas as
+    syntax, semantics, morphology, prosody, referentiality, lexis and more.
+    For projects working with spoken language, support for audio / video
     annotations is also required.
   </description>
-  
+
   <url>http://www.sfb632.uni-potsdam.de/annis/</url>
 
   <scm>
@@ -37,25 +37,25 @@
       <url>http://www.apache.org/licenses/LICENSE-2.0.txt</url>
     </license>
   </licenses>
-  
+
   <distributionManagement>
     <site>
       <id>launchpad</id>
       <url>https://launchpad.net/annis</url>
     </site>
   </distributionManagement>
-  
+
   <repositories>
     <repository>
       <id>korpling</id>
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
-    </repository>  
+    </repository>
   </repositories>
 
   <build>
-    
+
     <plugins>
-           
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
@@ -65,14 +65,14 @@
           <target>1.6</target>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.felix</groupId>
         <artifactId>maven-bundle-plugin</artifactId>
         <version>2.3.7</version>
         <extensions>true</extensions>
       </plugin>
-      
+
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-site-plugin</artifactId>
@@ -87,21 +87,13 @@
                 <dependencyLocationsEnabled>false</dependencyLocationsEnabled>
               </configuration>
               <reports>
-                <report>index</report> 
+                <report>index</report>
                 <report>summary</report>
                 <report>license</report>
               </reports>
             </plugin>
-              
+
             <plugin>
-              <groupId>org.apache.maven.plugins</groupId>
-              <artifactId>maven-javadoc-plugin</artifactId>
-              <version>2.8.1</version>
-              <configuration>
-              </configuration>
-            </plugin>
-            
-             <plugin>
               <groupId>org.codehaus.mojo</groupId>
               <artifactId>findbugs-maven-plugin</artifactId>
               <version>2.5.2</version>
@@ -109,19 +101,19 @@
                 <excludeFilterFile>${basedir}/src/findbugs/excludeFilter.xml</excludeFilterFile>
               </configuration>
             </plugin>
-      
-             
+
+
           </reportPlugins>
         </configuration>
       </plugin>
-      
-      <!-- update this with 
+
+      <!-- update this with
       mvn license:add-third-party license:download-licenses
       -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.2</version>
+        <version>1.4</version>
         <configuration>
           <useMissingFile>true</useMissingFile>
           <missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
@@ -131,7 +123,7 @@
           <licensesOutputDirectory>${basedir}/THIRD-PARTY/licenses</licensesOutputDirectory>
         </configuration>
       </plugin>
-      
+
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>buildnumber-maven-plugin</artifactId>
@@ -149,18 +141,25 @@
           <doUpdate>false</doUpdate>
         </configuration>
       </plugin>
-     
+
     </plugins>
+    <extensions>
+      <extension>
+        <groupId>org.apache.maven.wagon</groupId>
+        <artifactId>wagon-ssh-external</artifactId>
+        <version>1.0</version>
+      </extension>
+    </extensions>
   </build>
-  
-  
+
   <modules>
-    <module>annis-interfaces</module>    
+    <module>annis-interfaces</module>
     <module>annis-service</module>
     <module>annis-kickstarter</module>
     <module>annis-gui</module>
-    <module>doc</module>
     <module>annis-widgets</module>
+    <module>annis-visualizers</module>
+    <module>annis-libgui</module>
   </modules>
-    
+
 </project>

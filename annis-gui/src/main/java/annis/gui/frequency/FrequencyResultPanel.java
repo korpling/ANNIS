@@ -15,8 +15,8 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.Helper;
 import annis.gui.controlpanel.ExportPanel;
+import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
@@ -118,30 +118,27 @@ public class FrequencyResultPanel extends VerticalLayout
   private FrequencyTable loadBeans()
   {
     FrequencyTable result = new FrequencyTable();
-    
-    if (getApplication() != null)
-    {
       
-      WebResource annisResource = Helper.getAnnisWebResource(getApplication());
-      try
-      {
-        annisResource = annisResource.path("query").path("search").path("frequency")
-          .queryParam("q", aql)  
-          .queryParam("corpora", StringUtils.join(corpora, ","))
-          .queryParam("fields", createFieldsString());
+    WebResource annisResource = Helper.getAnnisWebResource();
+    try
+    {
+      annisResource = annisResource.path("query").path("search").path("frequency")
+        .queryParam("q", aql)  
+        .queryParam("corpora", StringUtils.join(corpora, ","))
+        .queryParam("fields", createFieldsString());
 
-        result = annisResource.get(FrequencyTable.class);
-      }
-      catch (UniformInterfaceException ex)
-      {
-        log.error(
-          ex.getResponse().getEntity(String.class), ex);
-      }
-      catch (ClientHandlerException ex)
-      {
-        log.error("could not execute REST call to query matches", ex);
-      }
+      result = annisResource.get(FrequencyTable.class);
     }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(
+        ex.getResponse().getEntity(String.class), ex);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error("could not execute REST call to query matches", ex);
+    }
+
     return result;
   }
   

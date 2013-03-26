@@ -15,7 +15,10 @@
  */
 package annis.gui.exporter;
 
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
@@ -34,11 +37,20 @@ public class WekaExporter implements Exporter, Serializable
     WebResource annisResource, Writer out)
   {
     //this is a full result export
+    
     try
     {
-      InputStream result = annisResource.path("search").path("matrix")
+      WebResource res = annisResource.path("search").path("matrix")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL).get(InputStream.class);
+        .queryParam("q", queryAnnisQL);
+      
+      
+      if(argsAsString.startsWith("metakeys="))
+      {
+        res = res.queryParam("metakeys", argsAsString.substring("metakeys".length()+1));
+      }
+      
+      InputStream result = res.get(InputStream.class);
       
       try
       {
@@ -55,7 +67,15 @@ public class WekaExporter implements Exporter, Serializable
       
       out.flush();
     }
-    catch (Exception ex)
+    catch(UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+    }
+    catch(ClientHandlerException ex)
+    {
+      log.error(null, ex);
+    }
+    catch (IOException ex)
     {
       log.error(null, ex);
     }

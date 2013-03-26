@@ -80,17 +80,8 @@ public abstract class AnnisBaseRunner
     setupLogging(logToConsole);
 
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
-    MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
-    try
-    {
-      sources.addFirst(new ResourcePropertySource("file:" + Utils.getAnnisFile(
-        "conf/annis-service.properties").getAbsolutePath()));
-    }
-    catch (IOException ex)
-    {
-      log.error("Could not load conf/annis-service.properties", ex);
-    }
-
+    AnnisXmlContextHelper.prepareContext(ctx);
+    
     ctx.load(contextLocations);
     ctx.refresh();
     return ctx.getBean(beanName);

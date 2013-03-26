@@ -98,7 +98,7 @@ public class Edge implements Serializable
   public String toString()
   {
     String src = source != null ? "" + source.getId() : "(no source)";
-    String dst = "" + destination.getId();
+    String dst = destination != null ? "" + destination.getId() : "(no destination)";
     String type = edgeType != null ? edgeType.toString() : "(no type)";
     String qname = getQualifiedName() != null ? getQualifiedName() : "(no name)";
     return src + "->" + dst + " " + qname + " " + type;

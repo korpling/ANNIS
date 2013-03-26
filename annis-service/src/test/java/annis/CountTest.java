@@ -53,6 +53,7 @@ public class CountTest
   AnnisDao annisDao;
   
   private List<Long> pcc2CorpusID;
+  private List<Long> tiger2CorpusID;
 
   @Before
   public void setup()
@@ -72,13 +73,19 @@ public class CountTest
     }
     
     // get the id of the "pcc2" corpus 
-    // (and check if it's there, otherwise ignore these tests)
+    pcc2CorpusID = getCorpusIDs("pcc2");
+    
+    // get the id of the "tiger2" corpus 
+    tiger2CorpusID = getCorpusIDs("tiger2");
+  }
+  
+  private List<Long> getCorpusIDs(String corpus)
+  {
+     // (and check if it's there, otherwise ignore these tests)
     List<String> corpusNames = new LinkedList<String>();
-    corpusNames.add("pcc2");
+    corpusNames.add(corpus);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
-    
-    pcc2CorpusID = corpusIDs;
-    
+    return corpusIDs;
   }
 
   @Test
@@ -92,6 +99,24 @@ public class CountTest
     assertEquals(2, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent * #1 & cat=\"NP\" & cat=\"S\" & #4 >[func=\"SB\"] #3 & #3 _i_ #2"));
     assertEquals(3, countPcc2("Inf-Stat=\"new\" & PP & #1 _o_ #2"));
     assertEquals(1, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent #1 & cat=\"NP\" & node & #4 >[func=\"OA\"] #3 & #3 _i_ #2"));
+    
+  }
+  
+  @Test
+  public void testAQLTestSuiteTiger2()
+  {
+    assumeTrue(tiger2CorpusID.size() > 0);
+    
+    assertEquals(11558, countTiger2("cat=\"NP\" & cat=\"NP\" & #1 >[func=\"AG\"] #2"));
+    assertEquals(13500, countTiger2("cat=\"NP\" & node & #1 >[func=\"AG\"] #2"));
+    assertEquals(12328, countTiger2("cat=\"CS\" & cat=\"S\" & #1 > #2"));
+    assertEquals(1029, countTiger2("pos=\"APPR\" & /.*ung/ & #1 . #2"));   
+    assertEquals(21, countTiger2("pos=\"KOUS\" & tok=\"man\" & \"sich\" & #1 . #2 & #2 . #3"));
+    assertEquals(3642, countTiger2("cat=\"S\" & cat=\"PP\" & #1 >[func!=\"MO\"] #2"));
+    assertEquals(22, countTiger2("/[Jj]e/ & \"desto\" & #1 .* #2"));
+    assertEquals(5720, countTiger2("cat=\"S\" & cat=\"NP\" & #1 $ #2"));
+    assertEquals(241, countTiger2("pos=\"VVFIN\" & /[A-ZÖÜÄ].*/ & cat=\"S\" & #3 >@l #1 & #1 _=_ #2"));
+    assertEquals(14806, countTiger2("cat=\"CS\" & cat=\"S\" & #1 >* #2"));
     
   }
   
@@ -135,7 +160,19 @@ public class CountTest
   
   private int countPcc2(String aql)
   {
-    QueryData qd = annisDao.parseAQL(aql, pcc2CorpusID);
+    System.out.println("pcc2 query: " + aql);
+    return count(aql, pcc2CorpusID);
+  }
+  
+  private int countTiger2(String aql)
+  {
+    return count(aql, tiger2CorpusID);
+  }
+  
+  private int count(String aql, List<Long> corpora)
+  {
+    System.out.println("tiger2 query: " + aql);
+    QueryData qd = annisDao.parseAQL(aql, corpora);
     return annisDao.count(qd);
   }
 }

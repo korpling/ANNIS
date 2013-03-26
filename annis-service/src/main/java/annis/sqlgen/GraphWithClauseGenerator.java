@@ -114,9 +114,9 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     {
       sb.append(indent2)
         .append(tas.tableName(NODE_TABLE)).append(" AS ")
-        .append("facts").append(i).append(", ")
+        .append(tas.tableName(NODE_TABLE)).append(i).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
-        .append("corpus").append(i);
+        .append(tas.tableName(CORPUS_TABLE)).append(i);
 
       if (i == numOfNodes)
       {
@@ -137,22 +137,22 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
       // check for corpus/document by it's path
       sb.append(indent2)
-        .append("corpus").append(i).append(".path_name = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".path_name = ")
         .append(generatePathName(uri)).append(" AND\n");
 
       // join the found corpus/document to the facts table
       sb.append(indent2)
-        .append("facts").append(i).append(".corpus_ref = ")
-        .append("corpus").append(i).append(".id AND\n");
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".corpus_ref = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".id AND\n");
 
       // filter the node with the right name
       sb.append(indent2)
-        .append("facts").append(i).append(".node_name = ")
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".node_name = ")
         .append("'").append(uri.getFragment()).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent2)
-        .append("facts").append(i).append(".toplevel_corpus IN ( ")
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".toplevel_corpus IN ( ")
         .append(StringUtils.join(corpusList, ",")).append(") ");
 
       if (i < numOfNodes)

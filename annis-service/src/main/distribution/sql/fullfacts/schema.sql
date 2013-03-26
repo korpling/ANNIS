@@ -8,12 +8,12 @@ CREATE TABLE repository_metadata
 
 CREATE TABLE corpus
 (
-  id         bigint PRIMARY KEY,
+  id         integer PRIMARY KEY,
   name       varchar NOT NULL, -- UNIQUE,
   type       varchar NOT NULL,
   version    varchar,
-  pre        bigint NOT NULL UNIQUE,
-  post       bigint NOT NULL UNIQUE,
+  pre        integer NOT NULL UNIQUE,
+  post       integer NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
   path_name  varchar[]
 );
@@ -25,7 +25,7 @@ COMMENT ON COLUMN corpus.path_name IS 'path of this corpus in the corpus tree (n
 
 CREATE TABLE corpus_annotation
 (
-  corpus_ref  bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  corpus_ref  integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   namespace   varchar,
   name        varchar NOT NULL,
   value       varchar,
@@ -38,10 +38,12 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  id    bigint PRIMARY KEY,
+  corpus_ref integer REFERENCES corpus(id), 
+  id    integer,
   name  varchar,
   text  text,
-  toplevel_corpus bigint REFERENCES corpus(id)
+  toplevel_corpus integer REFERENCES corpus(id),
+  PRIMARY KEY(corpus_ref, id)
 );
 COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
@@ -52,9 +54,9 @@ CREATE TABLE facts
 (
   fid BIGSERIAL PRIMARY KEY,
   id      bigint,
-  text_ref  bigint,
-  corpus_ref  bigint,
-  toplevel_corpus bigint,
+  text_ref  integer,
+  corpus_ref  integer,
+  toplevel_corpus integer,
   node_namespace  varchar,
   node_name    varchar,
   "left"    integer,
@@ -68,12 +70,12 @@ CREATE TABLE facts
   seg_name varchar,
   seg_index integer,
 
-  pre        bigint,
-  post      bigint,
-  parent    bigint,
+  pre        integer,
+  post      integer,
+  parent    integer,
   root      boolean,
-  level      bigint,
-  component_id      bigint,
+  level      integer,
+  component_id      integer,
   edge_type    char(1),
   edge_namespace  varchar,
   edge_name    varchar,
@@ -110,7 +112,7 @@ COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
 CREATE TABLE media_files
 (
   file  bytea NOT NULL,
-  corpus_ref  bigint NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
+  corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
   bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,
@@ -121,14 +123,13 @@ CREATE TABLE media_files
 CREATE TABLE corpus_stats
 (
   name        varchar,
-  id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
-  text        bigint,
+  id          integer NOT NULL REFERENCES corpus ON DELETE CASCADE,
+  text        integer,
   tokens        bigint,
-  max_corpus_id bigint  NULL,
-  max_corpus_pre bigint NULL,
-  max_corpus_post bigint NULL,
-  max_text_id bigint NULL,
-  max_component_id bigint NULL,
+  max_corpus_id integer  NULL,
+  max_corpus_pre integer NULL,
+  max_corpus_post integer NULL,
+  max_component_id integer NULL,
   max_node_id bigint NULL, 
   source_path varchar -- original path to the folder containing the relANNIS sources
 );
@@ -161,7 +162,7 @@ CREATE TABLE resolver_vis_map
   "vis_type"   varchar NOT NULL,
   "display_name"   varchar NOT NULL,
   "visibility"    resolver_visibility NOT NULL DEFAULT 'hidden',
-  "order" bigint default '0',
+  "order" integer default '0',
   "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              
 );
@@ -187,6 +188,6 @@ CREATE TABLE annotations
   "subtype" char(1),
   edge_namespace varchar,
   edge_name varchar,
-  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 );

@@ -20,10 +20,10 @@ import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class AnnisBinary extends AnnisBinaryMetaData implements Serializable
+public class AnnisBinary extends AnnisBinaryMetaData
 {
 
-  private byte[] bytes;
+  private byte[] bytes = new byte[0];
 
   public byte[] getBytes()
   {

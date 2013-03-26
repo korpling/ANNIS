@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,9 +28,14 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import annis.model.AnnisNode;
 import annis.service.objects.AnnisAttribute;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ListAnnotationsSqlHelper implements ResultSetExtractor
 {
+
+  private static Logger log = LoggerFactory.getLogger(
+    ListAnnotationsSqlHelper.class);
 
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
@@ -41,14 +46,12 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + "  FROM\n"
       + "  (\n"
       + "    select distinct\n"
-      + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, occurences, :value AS value\n"
+      + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, "
+      + "    occurences, :value AS value\n"
       + "    FROM annotations\n"
       + "    WHERE\n"
       + "    (value IS NULL OR value <> '--')\n"
-      + (
-        corpusList.isEmpty() ?
-          "\n" : "    AND toplevel_corpus IN (:corpora)\n"
-        )
+      + (corpusList.isEmpty() ? "\n" : "    AND toplevel_corpus IN (:corpora)\n")
       + "    ORDER by namespace, name, edge_namespace, edge_name, occurences desc\n"
       + "  ) as tableAll\n"
       + ") as tableFreq\n";
@@ -57,9 +60,20 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       sql += "where row_num = 1";
     }
 
+    // fetch corpus annotations
+    sql += "UNION"
+      + "\nSELECT distinct"
+      + "\nm.namespace, m.name, :value, 'meta' as \"type\", 'm' as subtype, "
+      + "\n'' as edge_namespace, '' as ege_name"
+      + "\nFROM corpus_annotation as m, corpus c, corpus p"
+      + "\n WHERE p.id IN (:corpora)"
+      + "\nAND c.pre > p.pre"
+      + "\nAND c.post < p.post"
+      + "\nAND m.corpus_ref = c.id"
+      + "\nORDER BY name, edge_namespace, edge_name";
+
     sql = sql.replaceAll(":corpora", StringUtils.join(corpusList, ", "));
     sql = sql.replaceAll(":value", listValues ? "value" : "NULL::varchar");
-
 
     return sql;
   }
@@ -82,10 +96,11 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       String qEdgeName = AnnisNode.qName(edgeNamespace, edgeName);
 
       String key = qName;
-      if(qEdgeName != null)
+      if (qEdgeName != null)
       {
         key += "_" + qEdgeName;
       }
+
       if (!attributesByName.containsKey(key))
       {
         attributesByName.put(key, new AnnisAttribute());
@@ -93,41 +108,37 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
 
       AnnisAttribute attribute = attributesByName.get(key);
       attribute.setName(qName);
-
       attribute.setEdgeName(qEdgeName);
-
       AnnisAttribute.Type t = AnnisAttribute.Type.unknown;
+
       try
       {
         t = AnnisAttribute.Type.valueOf(resultSet.getString("type"));
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        // ignore
+        log.warn("annotation type is unkwon {}", ex);
       }
-      attribute.setType(t);
 
+      attribute.setType(t);
       AnnisAttribute.SubType st = AnnisAttribute.SubType.unknown;
       try
       {
         st = AnnisAttribute.SubType.valueOf(resultSet.getString("subtype"));
       }
-      catch(Exception ex)
+      catch (Exception ex)
       {
-        // ignore
+        log.warn("annotation sub type is unkwon {}", ex);
       }
+
       attribute.setSubtype(st);
-
       String value = resultSet.getString("value");
-
       if (value != null)
       {
         attribute.addValue(value);
       }
-
     }
 
     return new ArrayList<AnnisAttribute>(attributesByName.values());
   }
 }
-

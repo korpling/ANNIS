@@ -1,0 +1,85 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Pointing Relations in
+ANNIS - Search and Visualization in Multilevel Linguistic Corpora</title>
+  <link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="tutorialcontent">
+<h2>Exporting
+Results</h2>
+<p>
+By going to the Export tab at the bottom of the search form on the
+left, you can select one of four exporters: the SimpleTextExporter, the
+TextExporter, the WekaExporter and the GridExporter.
+</p>
+<img src="export.png">
+<p>The
+The SimpleTextExporter simply gives the text for all tokens in each search result, including context, in a one-row-per-hit format. The tokens covered by the match area are marked with square brackets and the results are numbered, as in the following example:</p>
+<tt><small>
+1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große <br>
+2. der 1,62 Meter große Gennadi [Subow] die deutsche Nationalelf vorübergehend in <br>
+3. und Reputation kämpfenden Mannschaft von [Rudi] Völler der Weg zur Weltmeisterschaft <br>
+4. Reputation kämpfenden Mannschaft von Rudi [Völler] der Weg zur Weltmeisterschaft endgültig <br>
+5. die deutschen Nationalkicker einen " [Rudi] Riese " auf der Bank <br>
+</tt></small>
+<p>
+The TextExporter adds all annotations of each token separated by slashes (e.g. dogs/NN/dog for the token dogs annotated with a part-of-speech NN and a lemma dog).
+</p>
+<p>
+The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter numbers=false). The user can specify annotation layers to be exported in the additional 'Parameters' box, using the setting 'keys=' and annotation names separated by comas. If nothing is specified in the parameters box, all available annotations will be exported. Multiple options are separated by a semicolon, e.g. keys=tok,pos,cat;numbers=false. An example output with token numbers looks as follows.
+</p>
+<tt><small>
+<table border="0">
+<tr>
+<td>1.&nbsp;</td><td>tok&nbsp;&nbsp;</td><td>ein Dialog zwischen den Generationen angestoßen . </td></tr>
+<td>&nbsp;&nbsp;&nbsp;</td><td>cat&nbsp;&nbsp;</td><td> NP[1-5] S[1-6] VP[1-6] PP[3-5] </td></tr>
+<td>&nbsp;&nbsp;&nbsp;</td><td>pos&nbsp;&nbsp;</td><td>ART[1-1] NN[2-2] APPR[3-3] ART[4-4] NN[5-5] VVPP[6-6] $.[7-7]</td></tr>
+</table>
+</tt></small>
+<p>
+Meaning that the annotation cat="NP" applied to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name 'tok' is not specified, the tokens themselves will not be exported (annotations only).
+</p>
+<p>The WekaExporter outputs the
+format used by the WEKA machine learning
+tool (http://www.cs.waikato.ac.nz/ml/weka/). Only the attributes
+of the search elements (#1, #2 etc. in AQL) are outputted, and are
+separated by commas. The order and name of the attributes is declared
+in the beginning of the export text, as in this example:
+</p>
+<tt>@relation name
+<br>
+<br>
+<small>
+@attribute #1_id string<br>
+@attribute #1_token string<br>
+@attribute #1_tiger:cat string<br>
+@attribute #2_id string<br>
+@attribute #2_token string<br>
+@attribute #2_tiger:lemma string<br>
+@attribute #2_tiger:morph string<br>
+@attribute #2_tiger:pos string<br>
+<br>
+@data
+<br>
+<br>
+'288662','NULL','NP','288392','ganze','ganz','Pos.Acc.Sg.Fem','ADJA'<br>
+'289175','NULL','NP','288712','geladenen','geladen','Pos.Nom.Pl.*','ADJA'<br>
+'289660','NULL','NP','289409','D&ouml;beritzer','D&ouml;beritzer','Pos.*.*.*','ADJA'<br>
+'288672','NULL','NP','288302','deutschen','deutsch','Pos.Nom.Pl.Masc','ADJA'<br>
+'289614','NULL','NP','289291','deutsche','deutsch','Pos.Nom.Sg.Fem','ADJA'<br>
+'289625','NULL','NP','289245','fulminanter','fulminant','Pos.Nom.Sg.Masc','ADJA'<br>
+</tt>
+</small>
+<p>The export shows the properties
+of an NP node dominating a token with
+the part-of-speech ADJA. Since the token also has other attributes,
+such as the lemma, the token text and morphology, these are also
+retrieved. Note that exporting may be slow in both exporters if the
+result set is very large.
+</p>
+</div>
+</body>
+</html>

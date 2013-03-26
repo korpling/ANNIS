@@ -15,8 +15,9 @@
  */
 package annis.gui.servlets;
 
-import annis.gui.Helper;
-import annis.gui.MainApp;
+import annis.libgui.Helper;
+import annis.libgui.AnnisBaseUI;
+import annis.libgui.AnnisUser;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -55,9 +56,6 @@ public class BinaryServlet extends HttpServlet
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
   private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
-  private String toplevelCorpusName;
-  private String documentName;
-  private String mimeType;
   
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -71,26 +69,28 @@ public class BinaryServlet extends HttpServlet
     throws ServletException
   {
     Map<String, String[]> binaryParameter = request.getParameterMap();
-    toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
-    documentName = binaryParameter.get("documentName")[0];
-    mimeType = binaryParameter.get("mime")[0];
+    String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
+    String documentName = binaryParameter.get("documentName")[0];
+    String mimeType = binaryParameter.get("mime")[0];
     
-    ServletOutputStream out = null;
     try
     {
-      out = response.getOutputStream();
+      ServletOutputStream out = response.getOutputStream();
 
       String range = request.getHeader("Range");
 
-
-      String annisServiceURL = getServletContext().getInitParameter("AnnisWebService.URL");
-      if(annisServiceURL == null)
+      HttpSession session = request.getSession();
+      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
+      
+      if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
         throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
       }
       
-      HttpSession session = request.getSession();
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, session.getAttribute(MainApp.USER_KEY));
+      String annisServiceURL = (String) annisServiceURLObject;
+      
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
+        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
       
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
@@ -128,7 +128,7 @@ public class BinaryServlet extends HttpServlet
     HttpServletResponse response, String range) throws RemoteException, IOException
   {
     List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
-      .get(new GenericType<List<AnnisBinaryMetaData>>() {});
+      .get(new AnnisBinaryMetaDataListType());
 
     if(allMeta.size() > 0 )
     {
@@ -175,7 +175,7 @@ public class BinaryServlet extends HttpServlet
     
     
     List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
-      .get(new GenericType<List<AnnisBinaryMetaData>>() {});
+      .get(new AnnisBinaryMetaDataListType());
 
     if(allMeta.size() > 0 )
     {
@@ -237,6 +237,14 @@ public class BinaryServlet extends HttpServlet
       
       offset += stepLength;      
       remaining = remaining - stepLength;
+    }
+  }
+
+  private static class AnnisBinaryMetaDataListType extends GenericType<List<AnnisBinaryMetaData>>
+  {
+
+    public AnnisBinaryMetaDataListType()
+    {
     }
   }
 }

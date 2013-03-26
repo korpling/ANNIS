@@ -3,13 +3,7 @@
 <!-- False positive Filter for FindBugs -->
 
 <FindBugsFilter>
-  <!-- automatically generated or external code that we can't influence -->
   <Match>
-    <Package name="org.json"/>
+     <Bug pattern="SE_NO_SERIALVERSIONID" />
   </Match>
-  
-  <Match>
-    <Bug category="EXPERIMENTAL" />
-  </Match>
-  
 </FindBugsFilter>

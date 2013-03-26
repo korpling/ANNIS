@@ -15,33 +15,58 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import annis.model.Annotation;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.Table.ColumnGenerator;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Provides all corpus annotations for a corpus or for a specific search result.
+ *
+ * // TODO cleanup the toplevelCorpus side effects.
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class MetaDataPanel extends Panel
+public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
-  
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    MetaDataPanel.class);
+
   private VerticalLayout layout;
+
   private String toplevelCorpusName;
+
+  // this is only set if the metadata panel is called from a specific result.
   private String documentName;
+
+  private ComboBox corpusSelection;
+
+  // last selected corpus or document of the combobox
+  private String lastSelectedItem;
+
+  // holds all corpus and documents for the combox in the corpus browser panel
+  private List<Annotation> docs;
+
+  // holds the current corpus annotation table, when called from corpus browser
+  private Table corpusAnnoationTable = null;
 
   public MetaDataPanel(String toplevelCorpusName)
   {
     this(toplevelCorpusName, null);
   }
-  
+
   public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
@@ -53,23 +78,41 @@ public class MetaDataPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
-  }
 
-  @Override
-  public void attach()
-  {
-
-    super.attach();
-
-    // load meta data from service
-    BeanItemContainer<Annotation> mData =
-      new BeanItemContainer<Annotation>(Annotation.class);
-
-    // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName == null)
     {
-      mData.addAll(getMetaData(toplevelCorpusName, null));
-      layout.addComponent(setupTable(mData));
+      docs = getAllSubcorpora(toplevelCorpusName);
+
+      HorizontalLayout selectionLayout = new HorizontalLayout();
+      Label selectLabel = new Label("Select corpus/document: ");
+      corpusSelection = new ComboBox();
+      selectionLayout.addComponents(selectLabel, corpusSelection);
+      layout.addComponent(selectionLayout);
+
+      selectLabel.setSizeUndefined();
+
+      corpusSelection.setWidth(100, Unit.PERCENTAGE);
+      corpusSelection.setHeight("-1px");
+      corpusSelection.addValueChangeListener(this);
+
+      selectionLayout.setWidth(100, Unit.PERCENTAGE);
+      selectionLayout.setHeight("-1px");
+      selectionLayout.setSpacing(true);
+      selectionLayout.setComponentAlignment(selectLabel, Alignment.MIDDLE_LEFT);
+      selectionLayout.setComponentAlignment(corpusSelection,
+        Alignment.MIDDLE_LEFT);
+      selectionLayout.setExpandRatio(selectLabel, 0.4f);
+      selectionLayout.setExpandRatio(corpusSelection, 0.6f);
+
+      corpusSelection.addItem(toplevelCorpusName);
+      corpusSelection.select(toplevelCorpusName);
+      corpusSelection.setNullSelectionAllowed(false);
+      corpusSelection.setImmediate(true);
+
+      for (Annotation c : docs)
+      {
+        corpusSelection.addItem(c.getName());
+      }
     }
     else
     {
@@ -93,26 +136,41 @@ public class MetaDataPanel extends Panel
     String documentName)
   {
     List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource(getApplication());
+    WebResource res = Helper.getAnnisWebResource();
     try
     {
       res = res.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
       if (documentName != null)
       {
         res = res.path(documentName);
       }
-      res = res.path("metadata");
 
-      result = res.get(new GenericType<List<Annotation>>() {});
+      result = res.path("metadata").queryParam("exclude", "true").get(
+        new AnnotationListType());
     }
-    catch (Exception ex)
+    catch (UniformInterfaceException ex)
     {
-      log.error(
-        null, ex);
-      getWindow().showNotification("Remote exception: "
-        + ex.getLocalizedMessage(),
-        Notification.TYPE_WARNING_MESSAGE);
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
     }
     return result;
   }
@@ -122,53 +180,49 @@ public class MetaDataPanel extends Panel
     final BeanItemContainer<Annotation> mData = metaData;
     Table tblMeta = new Table();
     tblMeta.setContainerDataSource(mData);
-    tblMeta.addGeneratedColumn("genname", new Table.ColumnGenerator()
-    {
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        Annotation anno = mData.getItem(itemId).getBean();
-        String qName = anno.getName();
-        if (anno.getNamespace() != null)
-        {
-          qName = anno.getNamespace() + ":" + qName;
-        }
-        Label l = new Label(qName);
-        l.setSizeUndefined();
-        return l;
-      }
-    });
-    tblMeta.addGeneratedColumn("genvalue", new Table.ColumnGenerator()
-    {
-      @Override
-      public Component generateCell(Table source, Object itemId, Object columnId)
-      {
-        Annotation anno = mData.getItem(itemId).getBean();
-        Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
-        return l;
-      }
-    });
+    tblMeta.addGeneratedColumn("genname", new MetaTableNameGenerator(mData));
+    tblMeta.addGeneratedColumn("genvalue", new MetaTableValueGenerator(mData));
 
 
     tblMeta.setVisibleColumns(new String[]
-      {
-        "genname", "genvalue"
-      });
+    {
+      "genname", "genvalue"
+    });
+
     tblMeta.setColumnHeaders(new String[]
-      {
-        "Name", "Value"
-      });
+    {
+      "Name", "Value"
+    });
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
+    tblMeta.setSortContainerPropertyId("name");
     return tblMeta;
   }
 
+  /**
+   * Returns null if no metadata are available.
+   */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
-    Map<Integer, List<Annotation>> hashMetaData =
-      new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+
+    if (metadata != null && metadata.isEmpty())
+    {
+      return null;
+    }
+
+    // of called from corpus browser sort the other way around.
+    Map<Integer, List<Annotation>> hashMetaData;
+    if (documentName != null)
+    {
+      hashMetaData =
+        new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+    }
+    else
+    {
+      hashMetaData = new TreeMap<Integer, List<Annotation>>();
+    }
 
     for (Annotation metaDatum : metadata)
     {
@@ -202,5 +256,140 @@ public class MetaDataPanel extends Panel
     }
 
     return listOfBeanItemCon;
+  }
+
+  private List<Annotation> getAllSubcorpora(String toplevelCorpusName)
+  {
+
+    WebResource res = Helper.getAnnisWebResource();
+    try
+    {
+      res = res.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+      res = res.path("documents");
+      docs = res.get(new AnnotationListType());
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+
+    return docs;
+  }
+
+  @Override
+  public void valueChange(Property.ValueChangeEvent event)
+  {
+    if (!event.getProperty().equals(lastSelectedItem)
+      || lastSelectedItem == null)
+    {
+      lastSelectedItem = event.getProperty().toString();
+      List<Annotation> metaData = getMetaData(toplevelCorpusName,
+        lastSelectedItem);
+
+      if (metaData == null || metaData.isEmpty())
+      {
+        super.setCaption("No metadata available");
+        if (corpusAnnoationTable != null)
+        {
+          corpusAnnoationTable.removeAllItems();
+        }
+      }
+      else
+      {
+        super.setCaption("Metadata");
+        loadTable(toplevelCorpusName, metaData);
+      }
+    }
+  }
+
+  private void loadTable(String item, List<Annotation> metaData)
+  {
+    BeanItemContainer<Annotation> metaContainer =
+      new BeanItemContainer<Annotation>(Annotation.class);
+    metaContainer.addAll(metaData);
+
+    if (corpusAnnoationTable != null)
+    {
+      layout.removeComponent(corpusAnnoationTable);
+    }
+
+    corpusAnnoationTable = setupTable(metaContainer);
+    corpusAnnoationTable.setHeight(100, Unit.PERCENTAGE);
+    corpusAnnoationTable.setWidth(100, Unit.PERCENTAGE);
+    layout.addComponent(corpusAnnoationTable);
+    layout.setExpandRatio(corpusAnnoationTable, 1.0f);
+  }
+
+  private static class AnnotationListType extends GenericType<List<Annotation>>
+  {
+
+    public AnnotationListType()
+    {
+    }
+  }
+
+  private static class MetaTableNameGenerator implements ColumnGenerator
+  {
+
+    private final BeanItemContainer<Annotation> mData;
+
+    public MetaTableNameGenerator(
+      BeanItemContainer<Annotation> mData)
+    {
+      this.mData = mData;
+    }
+
+    @Override
+    public Component generateCell(Table source, Object itemId, Object columnId)
+    {
+      Annotation anno = mData.getItem(itemId).getBean();
+      String qName = anno.getName();
+      if (anno.getNamespace() != null)
+      {
+        qName = anno.getNamespace() + ":" + qName;
+      }
+      Label l = new Label(qName);
+      l.setSizeUndefined();
+      return l;
+    }
+  }
+
+  private static class MetaTableValueGenerator implements ColumnGenerator
+  {
+
+    private final BeanItemContainer<Annotation> mData;
+
+    public MetaTableValueGenerator(
+      BeanItemContainer<Annotation> mData)
+    {
+      this.mData = mData;
+    }
+
+    @Override
+    public Component generateCell(Table source, Object itemId, Object columnId)
+    {
+      Annotation anno = mData.getItem(itemId).getBean();
+      Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
+      return l;
+    }
   }
 }

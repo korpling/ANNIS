@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -79,7 +79,7 @@ public class TestSpringAnnisDao
 
   @Resource(name="annisDao")
   private AnnisDao annisDao;
-  
+
   // simple SpringDao instance with mocked dependencies
   private SpringAnnisDao simpleAnnisDao;
   @Mock
@@ -163,30 +163,6 @@ public class TestSpringAnnisDao
     assertThat(springManagedDao.getFrequencySqlGenerator(), is(not(nullValue())));
   }
 
-  // retrieve annotation graph for a complete text
-  @Test
-  public void retrieveAnnotationGraphText()
-  {
-    final long TEXT_ID = 23;
-
-    // stub AnnotationGraphHelper to create a dummy SQL query and extract a list with a dummy graph
-    final SaltProject GRAPH = mock(SaltProject.class);
-
-    when(annotateSqlGenerator.queryAnnotationGraph(any(JdbcTemplate.class),
-      anyLong())).thenReturn(GRAPH);
-
-    // call and test
-    assertThat(simpleAnnisDao.retrieveAnnotationGraph(TEXT_ID), is(GRAPH));
-  }
-
-  // return null if text was not found
-  @Test
-  public void retrieveAnnotationGraphNoText()
-  {
-    when(jdbcTemplate.query(anyString(), any(AnnotateSqlGenerator.class))).
-      thenReturn(new ArrayList<AnnotationGraph>());
-    assertThat(simpleAnnisDao.retrieveAnnotationGraph(0), is(nullValue()));
-  }
 
   @SuppressWarnings("unchecked")
   @Test
@@ -216,11 +192,11 @@ public class TestSpringAnnisDao
 
     // stub SQL query
     final String ID = "toplevelcorpus";
-    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString())).thenReturn(SQL);
+    when(listCorpusAnnotationsHelper.createSqlQuery(anyString(), anyString(), anyBoolean())).thenReturn(SQL);
 
     // call and test
     assertThat(simpleAnnisDao.listCorpusAnnotations(ID), is(ANNOTATIONS));
-    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID);
+    verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, true);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
 

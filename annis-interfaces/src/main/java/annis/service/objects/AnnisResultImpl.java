@@ -150,14 +150,6 @@ public class AnnisResultImpl implements AnnisResult
 		return isMarked(Long.parseLong(markerId));
 	}
 
-	private void addNamespace(Set<String> namespaces, String namespace)
-	{
-		if (namespace != null)
-		{
-			namespaces.add(namespace);
-		}
-	}
-
 	private boolean isMarked(Long nodeId)
 	{
 		return graph.getMatchedNodeIds().contains(nodeId);

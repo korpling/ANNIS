@@ -71,28 +71,12 @@ public abstract class AnnotateSqlGenerator<T>
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
 
-  /**
-   *
-   * @param jdbcTemplate
-   * @param textID
-   * @deprecated
-   */
-  @Deprecated
-  public T queryAnnotationGraph(
-    JdbcTemplate jdbcTemplate, long textID)
-  {
-    return (T) jdbcTemplate.query(getTextQuery(textID), this);
-  }
-
   public T queryAnnotationGraph(
     JdbcTemplate jdbcTemplate, String toplevelCorpusName, String documentName)
   {
     return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName,
       documentName), this);
   }
-
-  @Deprecated
-  public abstract String getTextQuery(long textID);
 
   public abstract String getDocumentQuery(String toplevelCorpusName,
     String documentName);
@@ -152,7 +136,7 @@ public abstract class AnnotateSqlGenerator<T>
 
 
     String overlap = CommonAnnotateWithClauseGenerator.overlapForOneRange(indent + TABSTOP,
-      "solutions.\"min\"", "solutions.\"max\"", "solutions.text",
+      "solutions.\"min\"", "solutions.\"max\"", "solutions.text", "solutions.corpus",
       tables);
     sb.append(overlap);
     sb.append("\n");

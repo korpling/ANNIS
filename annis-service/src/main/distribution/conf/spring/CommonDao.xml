@@ -31,11 +31,13 @@
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
 	<!-- DataSource -->
-  <bean id="dataSource" class="org.springframework.jdbc.datasource.DriverManagerDataSource" lazy-init="true">
+  <bean id="dataSource" class="annis.utils.SSLEnabledDataSource" lazy-init="true">
     <property name="driverClassName" value="$dao{datasource.driver}"/>
     <property name="url" value="$dao{datasource.url}"/>
+    
     <property name="username" value="$dao{datasource.username}"/>
     <property name="password" value="$dao{datasource.password}"/>
+    <property name="useSSL" value="$dao{datasource.ssl}" />
   </bean>
 
 	<!-- Helper for weka command -->
@@ -49,6 +51,12 @@
 
 	<!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
+
+	<!-- Helper for listDocumentsAnnotations command -->
+  <bean id="listDocumentsAnnotationsSqlHelper" class="annis.sqlgen.ListDocumentsAnnotationsSqlHelper" lazy-init="true"/>
+
+  	<!-- Helper for listDocuments command -->
+  <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
 
   <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
@@ -73,11 +81,11 @@
 
   <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
-    
+
     <!-- missing: administrationDao -->
   </bean>
 
-   <!-- BEGIN EXPORTS -->
+  <!-- BEGIN EXPORTS -->
 
 	<!-- exported bean: AnnisDao -->
   <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
@@ -101,6 +109,8 @@
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>
     <property name="listAnnotationsSqlHelper" ref="listAnnotationsSqlHelper"/>
     <property name="listCorpusAnnotationsSqlHelper" ref="listCorpusAnnotationsSqlHelper"/>
+    <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
+    <property name="listDocumentsSqlHelper" ref="listDocumentsSqlHelper" />
 
     <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
@@ -112,7 +122,7 @@
     </property>
 
     <property name="listCorpusByNameDaoHelper" ref="listCorpusByNameDaoHelper"/>
-    
+
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="byteHelper" ref="byteHelper" />
     <property name="metaByteHelper" ref="metaByteHelper" />
@@ -133,6 +143,17 @@
         <entry key="wav" value="audio/wav"/>
         <entry key="mp3" value="audio/mpeg"/>
         <entry key="pdf" value="application/pdf"/>
+      </util:map>
+    </property>
+    <property name="tableInsertFrom">
+      <util:map>
+        <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, &quot;order&quot;, mappings" />
+      </util:map>
+    </property>
+    <property name="tableInsertSelect">
+      <util:map>
+        <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility, &quot;order&quot;, mappings" />
+        <entry key="text" value="corpus_ref, id, name, text, toplevel_corpus" />
       </util:map>
     </property>
   </bean>

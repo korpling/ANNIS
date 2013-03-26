@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.QueryController;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
@@ -48,7 +49,7 @@ public class FrequencyQueryPanel extends VerticalLayout
   
   private int counter;
   
-  public FrequencyQueryPanel(final ControlPanel parent)
+  public FrequencyQueryPanel(final QueryController controller)
   {
     
     setWidth("99%");
@@ -158,9 +159,9 @@ public class FrequencyQueryPanel extends VerticalLayout
           freqDefinition.add(entry);
         }
         
-        if(parent != null)
+        if(controller != null)
         {
-          parent.executeFrequencyQuery(freqDefinition);
+          controller.executeFrequencyQuery(freqDefinition);
         }
           
       }

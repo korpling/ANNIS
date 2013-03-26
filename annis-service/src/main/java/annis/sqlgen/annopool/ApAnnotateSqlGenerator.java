@@ -163,36 +163,6 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   }
 
   @Override
-  public String getTextQuery(long textID)
-  {
-    TableAccessStrategy tas = createTableAccessStrategy();    
-    List<String> fields = getSelectFields();
-    
-    String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, " 
-      +  StringUtils.join(fields, ", ") +", "
-      + "c.path_name as path, c.path_name[1] as document_name,"
-      + "node_anno.namespace AS node_annotation_namespace, "
-      + "node_anno.\"name\" AS node_annotation_name, "
-      + "node_anno.val AS node_annotation_value,\n"
-      + "edge_anno.namespace AS edge_annotation_namespace, "
-      + "edge_anno.\"name\" AS edge_annotation_name, "
-      + "edge_anno.val AS edge_annotation_value\n"
-      + "FROM\n"
-      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1) + "\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
-        + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")
-        + " = edge_anno.id AND " + tas.aliasedColumn(RANK_TABLE, "toplevel_corpus") + " = edge_anno.toplevel_corpus),\n"
-      + "\tcorpus AS c\n"
-      + "WHERE\n"
-      + "\t" + tas.aliasedColumn(NODE_TABLE, "text_ref") + " = :text_id AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
-      + "ORDER BY " + tas.aliasedColumn(RANK_TABLE, "pre");
-    String sql = template.replace(":text_id", String.valueOf(textID));
-    return sql;
-  }
-
-  @Override
   public String getDocumentQuery(String toplevelCorpusName, String documentName)
   {
     TableAccessStrategy tas = createTableAccessStrategy();
