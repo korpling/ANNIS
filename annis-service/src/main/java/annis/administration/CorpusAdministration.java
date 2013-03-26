@@ -67,15 +67,15 @@ public class CorpusAdministration
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword)
+    String superPassword, boolean useSSL)
   {
 
     log.info("initializing database");
     administrationDao.initializeDatabase(host, port, database, user, password,
-      defaultDatabase, superUser, superPassword);
+      defaultDatabase, superUser, superPassword, useSSL);
 
     // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password);
+    writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
   }
 
   public void importCorpora(List<String> paths)
@@ -126,7 +126,7 @@ public class CorpusAdministration
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
-    String database, String user, String password)
+    String database, String user, String password, boolean useSSL)
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
@@ -140,6 +140,7 @@ public class CorpusAdministration
         + database + "\n");
       writer.write("datasource.username=" + user + "\n");
       writer.write("datasource.password=" + password + "\n");
+      writer.write("datasource.ssl=" + (useSSL ? "true" : "false") + "\n");
     }
     catch (IOException e)
     {
