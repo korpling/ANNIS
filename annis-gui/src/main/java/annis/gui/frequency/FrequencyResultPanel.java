@@ -16,6 +16,7 @@
 package annis.gui.frequency;
 
 import annis.gui.controlpanel.ExportPanel;
+import annis.gui.controlpanel.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
@@ -51,16 +52,18 @@ public class FrequencyResultPanel extends VerticalLayout
   private String aql;
   private Set<String> corpora;
   private List<FrequencyTableEntry> freqDefinition;
+  private FrequencyQueryPanel queryPanel;
   
   private ProgressIndicator pbQuery;
 
   public FrequencyResultPanel(String aql,
     Set<String> corpora,
-    List<FrequencyTableEntry> freqDefinition)
+    List<FrequencyTableEntry> freqDefinition, FrequencyQueryPanel queryPanel)
   {
     this.aql = aql;
     this.corpora = corpora;
     this.freqDefinition = freqDefinition;
+    this.queryPanel = queryPanel;
     
     setSizeFull();
   }
@@ -97,6 +100,10 @@ public class FrequencyResultPanel extends VerticalLayout
         super.done();
         try
         {
+          if(queryPanel != null)
+          {
+            queryPanel.getBtShowFrequencies().setEnabled(true);
+          }
           FrequencyTable table = get();
           recreateTable(table);
         }
@@ -145,11 +152,9 @@ public class FrequencyResultPanel extends VerticalLayout
       else
       {
         message = "unknown error: " + ex;
+        log.error(ex.getResponse().getEntity(String.class), ex);
       }
-      Notification.show(message, Notification.Type.WARNING_MESSAGE);
-      
-      log.error(
-        ex.getResponse().getEntity(String.class), ex);
+      Notification.show(message, Notification.Type.WARNING_MESSAGE);      
     }
     catch (ClientHandlerException ex)
     {

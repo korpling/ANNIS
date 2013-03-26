@@ -272,7 +272,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         ui.getMainTab().removeComponent(lastFrequencyView);
       }
       lastFrequencyView = new FrequencyResultPanel(lastQuery.getQuery(), lastQuery.getCorpora(),
-        freqDefinition);
+        freqDefinition, ui.getControlPanel().getFrequencyQueryPanel());
       ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
       ui.getMainTab().setSelectedTab(lastFrequencyView);
     }

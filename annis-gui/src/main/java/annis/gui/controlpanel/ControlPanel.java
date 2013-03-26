@@ -33,6 +33,7 @@ public class ControlPanel extends Panel
   
   private static final long serialVersionUID = -2220211539424865671L;
   private QueryPanel queryPanel;
+  private FrequencyQueryPanel frequencyQueryPanel;
   private CorpusListPanel corpusList;
   private SearchOptionsPanel searchOptions;
   private QueryController controller;
@@ -63,10 +64,12 @@ public class ControlPanel extends Panel
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
     
+    frequencyQueryPanel = new FrequencyQueryPanel(controller);
+    
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-    accordion.addTab(new FrequencyQueryPanel(controller), "Frequency analysis", null);
+    accordion.addTab(frequencyQueryPanel, "Frequency analysis", null);
 
     layout.addComponent(queryPanel);
     layout.addComponent(accordion);
@@ -89,4 +92,9 @@ public class ControlPanel extends Panel
     return searchOptions;
   }
 
+  public FrequencyQueryPanel getFrequencyQueryPanel()
+  {
+    return frequencyQueryPanel;
+  }
+  
 }

@@ -58,11 +58,11 @@ public class FrequencyQueryPanel extends VerticalLayout
     
     tblFrequencyDefinition = new Table();
     tblFrequencyDefinition.setImmediate(true);
-    tblFrequencyDefinition.setSortDisabled(true);
+    tblFrequencyDefinition.setSortEnabled(false);
     tblFrequencyDefinition.setSelectable(true);
     tblFrequencyDefinition.setMultiSelect(true);
     tblFrequencyDefinition.setEditable(true);
-    tblFrequencyDefinition.addListener(new Property.ValueChangeListener() 
+    tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() 
     {
       @Override
       public void valueChange(ValueChangeEvent event)
@@ -91,7 +91,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     tblFrequencyDefinition.setColumnHeader("type", "Type");
     tblFrequencyDefinition.setColumnHeader("annotation", "Annotation");
     
-    tblFrequencyDefinition.setRowHeaderMode(Table.ROW_HEADER_MODE_INDEX);
+    tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
     counter = 0;
     tblFrequencyDefinition.addItem(createNewTableRow(1,
@@ -105,7 +105,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     HorizontalLayout layoutButtons = new HorizontalLayout();
     
     btAdd = new Button("Add");
-    btAdd.addListener(new Button.ClickListener() 
+    btAdd.addClickListener(new Button.ClickListener() 
     {
       @Override
       public void buttonClick(ClickEvent event)
@@ -118,7 +118,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     
     btDeleteRow = new Button("Delete selected row(s)");
     btDeleteRow.setEnabled(false);
-    btDeleteRow.addListener(new Button.ClickListener() 
+    btDeleteRow.addClickListener(new Button.ClickListener() 
     {
       @Override
       public void buttonClick(ClickEvent event)
@@ -138,6 +138,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     addComponent(layoutButtons);
     
     btShowFrequencies = new Button("Perform frequency analysis");
+    btShowFrequencies.setDisableOnClick(true);
     btShowFrequencies.addClickListener(new Button.ClickListener() 
     {
       @Override
@@ -219,4 +220,10 @@ public class FrequencyQueryPanel extends VerticalLayout
     
     return new Object[] {txtNode, cbType, txtAnno};
   }
+
+  public Button getBtShowFrequencies()
+  {
+    return btShowFrequencies;
+  }
+  
 }
