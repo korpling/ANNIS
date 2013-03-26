@@ -247,10 +247,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     String user, String password, String defaultDatabase, String superUser,
     String superPassword, boolean useSSL)
   {
-    log.info("Creating Annis database and user.");
     // connect as super user to the default database to create new user and database
     if(superPassword != null)
-    {
+    {      
+      log.info("Creating Annis database and user.");
       setDataSource(createDataSource(host, port,
       defaultDatabase, superUser, superPassword, useSSL));
     
