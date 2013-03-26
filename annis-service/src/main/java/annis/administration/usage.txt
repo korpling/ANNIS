@@ -16,6 +16,7 @@ usage:
   -d, --database    name of the Annis database (REQUIRED)
   -u, --user    name of the Annis user (REQUIRED)
   -p, --password    password of the Annis user (REQUIRED)
+  -s, --ssl     if given use SSL for connecting to the database
 
   NOTE: The database and the user will be dropped if they exist.
 
