@@ -216,6 +216,6 @@ DROP TABLE IF EXISTS user_config CASCADE;
 CREATE TABLE user_config
 (
   id varchar NOT NULL,
-  config json,
+  config varchar, -- (should be json)
   PRIMARY KEY(id)
 );
