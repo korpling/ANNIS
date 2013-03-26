@@ -84,6 +84,11 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     ui.getControlPanel().getCorpusList().updateCorpusSetList();
   }
   
+  public void setQueryFromUI()
+  {
+    setQuery(ui.getControlPanel().getQueryPanel().getQuery());
+  }
+  
   public void setQuery(String query)
   {
     setQuery(new Query(query, ui.getControlPanel().getCorpusList().getSelectedCorpora()));

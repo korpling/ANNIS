@@ -24,6 +24,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -117,7 +118,7 @@ public class FrequencyResultPanel extends VerticalLayout
   
   private FrequencyTable loadBeans()
   {
-    FrequencyTable result = new FrequencyTable();
+  FrequencyTable result = new FrequencyTable();
       
     WebResource annisResource = Helper.getAnnisWebResource();
     try
@@ -131,12 +132,28 @@ public class FrequencyResultPanel extends VerticalLayout
     }
     catch (UniformInterfaceException ex)
     {
+      String message;
+      if (ex.getResponse().getStatus() == 400)
+      {
+        message = "parsing error: "
+          + ex.getResponse().getEntity(String.class);
+      }
+      else if (ex.getResponse().getStatus() == 504) // gateway timeout
+      {
+        message = "Timeout: query exeuction took too long";
+      }
+      else
+      {
+        message = "unknown error: " + ex;
+      }
+      Notification.show(message, Notification.Type.WARNING_MESSAGE);
+      
       log.error(
         ex.getResponse().getEntity(String.class), ex);
     }
     catch (ClientHandlerException ex)
     {
-      log.error("could not execute REST call to query matches", ex);
+      log.error("could not execute REST call to query frequency", ex);
     }
 
     return result;

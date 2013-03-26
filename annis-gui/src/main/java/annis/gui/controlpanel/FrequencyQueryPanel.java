@@ -138,7 +138,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     addComponent(layoutButtons);
     
     btShowFrequencies = new Button("Perform frequency analysis");
-    btShowFrequencies.addListener(new Button.ClickListener() 
+    btShowFrequencies.addClickListener(new Button.ClickListener() 
     {
       @Override
       public void buttonClick(ClickEvent event)
@@ -161,6 +161,7 @@ public class FrequencyQueryPanel extends VerticalLayout
         
         if(controller != null)
         {
+          controller.setQueryFromUI();
           controller.executeFrequencyQuery(freqDefinition);
         }
           
