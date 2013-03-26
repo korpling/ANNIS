@@ -20,5 +20,5 @@ cp $DIST_DIR/conf/annis-service.properties $ANNIS_HOME/conf/
 # replace the port if requested
 if [ ! -z "$ANNIS_PORT" ]; then
     echo "patching annis service port"
-	sed -i 's/^annis\.webservice-port=[0-9]\+\s*$/annis.webservice-port=$ANNIS_PORT/' conf/annis-service.properties
+	sed -i 's/^annis\.webservice-port=[0-9]\+\s*$/annis.webservice-port=$ANNIS_PORT/' $DIST_DIR/conf/annis-service.properties
 fi  
