@@ -979,7 +979,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void storeUserConfig(AnnisUserConfig config)
   {
     String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
-    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?::json)";
+    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
     try
     {
       String jsonVal = jsonMapper.writeValueAsString(config);
