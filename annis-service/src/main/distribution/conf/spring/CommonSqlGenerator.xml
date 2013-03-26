@@ -204,7 +204,6 @@ limitations under the License.
         parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
     <property name="innerQuerySqlGenerator" ref="noCorpusPathFindSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />

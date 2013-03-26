@@ -771,7 +771,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   public void setCountMatchesAndDocumentsSqlGenerator(
-    CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
+    CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator)
   {
     this.countMatchesAndDocumentsSqlGenerator = countMatchesAndDocumentsSqlGenerator;
   }
