@@ -21,14 +21,31 @@ import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import au.com.bytecode.opencsv.CSVWriter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.StreamResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.CharArrayWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -46,32 +63,25 @@ import org.slf4j.LoggerFactory;
  */
 public class FrequencyResultPanel extends VerticalLayout
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(FrequencyResultPanel.class);
   
   private Table tbResult;
+  private Button btDownloadCSV;
   private String aql;
   private Set<String> corpora;
   private List<FrequencyTableEntry> freqDefinition;
-  private FrequencyQueryPanel queryPanel;
   
   private ProgressIndicator pbQuery;
 
   public FrequencyResultPanel(String aql,
     Set<String> corpora,
-    List<FrequencyTableEntry> freqDefinition, FrequencyQueryPanel queryPanel)
+    List<FrequencyTableEntry> freqDefinition, final FrequencyQueryPanel queryPanel)
   {
     this.aql = aql;
     this.corpora = corpora;
     this.freqDefinition = freqDefinition;
-    this.queryPanel = queryPanel;
     
     setSizeFull();
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
     
     pbQuery = new ProgressIndicator();
     pbQuery.setCaption("Please wait, the frequencies analysis can take some time");
@@ -79,9 +89,18 @@ public class FrequencyResultPanel extends VerticalLayout
     pbQuery.setEnabled(true);
     
     addComponent(pbQuery);
-    
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
+    btDownloadCSV = new Button("CSV");
+    btDownloadCSV.setDescription("Download as CSV");
+    addComponent(btDownloadCSV);
+    setComponentAlignment(btDownloadCSV, Alignment.TOP_RIGHT);
+    btDownloadCSV.setSizeUndefined();
+    btDownloadCSV.setVisible(false);
+    btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
+    btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_ICON_ON_RIGHT);
+    
+    
     // actually start query
     Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
     {
@@ -106,6 +125,10 @@ public class FrequencyResultPanel extends VerticalLayout
           }
           FrequencyTable table = get();
           recreateTable(table);
+          
+          btDownloadCSV.setVisible(true);
+          FileDownloader downloader = new FileDownloader(new StreamResource(new CSVResource(table), "frequency.csv"));
+          downloader.extend(btDownloadCSV);
         }
         catch (InterruptedException ex)
         {
@@ -235,9 +258,59 @@ public class FrequencyResultPanel extends VerticalLayout
     tbResult.addContainerProperty(pbQuery, null, table);
     
     addComponent(tbResult);
+    setExpandRatio(tbResult, 1.0f);
     
     pbQuery.setEnabled(true);
     removeComponent(pbQuery);
+  }
+  
+  public static class CSVResource implements StreamResource.StreamSource
+  {
+    private FrequencyTable data;
+    public CSVResource(FrequencyTable data)
+    {
+      this.data = data;
+    }
+
+    @Override
+    public InputStream getStream()
+    {
+      StringWriter writer = new StringWriter();
+      CSVWriter csv = new CSVWriter(writer);
+      
+      // write headers
+      ArrayList<String> header = new ArrayList<String>();
+      if(data.getEntries().size() > 0)
+      {
+        for(int i=0; i < data.getEntries().get(0).getTupel().length; i++)
+        {
+          header.add("feature " + (i+1));
+        }
+      }
+      // add count
+      header.add("count");
+      csv.writeNext(header.toArray(new String[0]));
+      
+      // write entries
+      for (FrequencyTable.Entry e : data.getEntries())
+      {
+        ArrayList<String> d = new ArrayList<String>();
+        d.addAll(Arrays.asList(e.getTupel()));
+        d.add("" + e.getCount());
+        csv.writeNext(d.toArray(new String[0]));
+      }
+      
+      byte[] bytes = new byte[0];
+      try
+      {
+        bytes = writer.toString().getBytes("UTF-8");
+      }
+      catch(UnsupportedEncodingException ex)
+      {
+        log.error(null, ex);
+      }
+      return new ByteArrayInputStream(bytes);
+    }
   }
   
   
