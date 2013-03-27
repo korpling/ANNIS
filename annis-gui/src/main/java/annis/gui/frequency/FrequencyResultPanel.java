@@ -237,7 +237,7 @@ public class FrequencyResultPanel extends VerticalLayout
       for(int i=1; i <= tupelCount; i++)
       {
         tbResult.addContainerProperty("tupel-" + i, String.class, "");
-        tbResult.setColumnHeader("tupel-"+ i, "" + i);
+        tbResult.setColumnHeader("tupel-"+ i, "feat. " + i);
       }
       
       tbResult.addContainerProperty("count", Long.class, -1l);

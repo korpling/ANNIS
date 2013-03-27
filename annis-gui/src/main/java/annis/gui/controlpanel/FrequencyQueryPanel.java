@@ -46,7 +46,6 @@ public class FrequencyQueryPanel extends VerticalLayout
   private Button btAdd;
   private Button btDeleteRow;
   private Button btShowFrequencies;
-  
   private int counter;
   
   public FrequencyQueryPanel(final QueryController controller)
@@ -110,7 +109,16 @@ public class FrequencyQueryPanel extends VerticalLayout
       @Override
       public void buttonClick(ClickEvent event)
       {
-        tblFrequencyDefinition.addItem(createNewTableRow(counter+1,
+        int nr = 1;
+        // get the highest number of values from the existing defitions
+        for(Object id : tblFrequencyDefinition.getItemIds())
+        {
+          AbstractField textNr = (AbstractField) tblFrequencyDefinition.getItem(id)
+            .getItemProperty("nr").getValue();
+          nr = Math.max(nr, Integer.parseInt((String) textNr.getValue()));
+          
+        }
+        tblFrequencyDefinition.addItem(createNewTableRow(nr+1,
           FrequencyTableEntryType.span, ""), counter++);
       }
     });
