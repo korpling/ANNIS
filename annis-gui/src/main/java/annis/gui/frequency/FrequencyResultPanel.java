@@ -15,6 +15,7 @@
  */
 package annis.gui.frequency;
 
+import annis.gui.components.FrequencyChart;
 import annis.gui.controlpanel.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
@@ -40,8 +41,6 @@ import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -52,8 +51,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -67,6 +64,7 @@ public class FrequencyResultPanel extends VerticalLayout
   
   private Table tbResult;
   private Button btDownloadCSV;
+  FrequencyChart chart;
   private String aql;
   private Set<String> corpora;
   private List<FrequencyTableEntry> freqDefinition;
@@ -91,6 +89,10 @@ public class FrequencyResultPanel extends VerticalLayout
     addComponent(pbQuery);
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
+    chart = new FrequencyChart();
+    addComponent(chart);
+    
+    
     btDownloadCSV = new Button("CSV");
     btDownloadCSV.setDescription("Download as CSV");
     addComponent(btDownloadCSV);
@@ -99,7 +101,6 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setVisible(false);
     btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
     btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    
     
     // actually start query
     Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
@@ -129,6 +130,9 @@ public class FrequencyResultPanel extends VerticalLayout
           btDownloadCSV.setVisible(true);
           FileDownloader downloader = new FileDownloader(new StreamResource(new CSVResource(table), "frequency.csv"));
           downloader.extend(btDownloadCSV);
+          
+          chart.setData(table);
+          
         }
         catch (InterruptedException ex)
         {

@@ -17,6 +17,8 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.controlpanel.FrequencyQueryPanel;
+import annis.gui.controlpanel.QueryPanel;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
@@ -255,24 +257,26 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   {
     if (lastQuery != null)
     {
+      FrequencyQueryPanel queryPanel = ui.getControlPanel().getFrequencyQueryPanel();
       
       if (lastQuery.getCorpora()== null || lastQuery.getCorpora().isEmpty())
       {
         Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+        queryPanel.getBtShowFrequencies().setEnabled(true);
         return;
       }
       if ("".equals(lastQuery.getQuery()))
       {
         Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
+        queryPanel.getBtShowFrequencies().setEnabled(true);
         return;
       }
-      // TODO: show result of frequency query (frequency)
       if(lastFrequencyView != null)
       {
         ui.getMainTab().removeComponent(lastFrequencyView);
       }
       lastFrequencyView = new FrequencyResultPanel(lastQuery.getQuery(), lastQuery.getCorpora(),
-        freqDefinition, ui.getControlPanel().getFrequencyQueryPanel());
+        freqDefinition, queryPanel);
       ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
       ui.getMainTab().setSelectedTab(lastFrequencyView);
     }
