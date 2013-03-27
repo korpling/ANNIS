@@ -90,6 +90,7 @@ public class FrequencyResultPanel extends VerticalLayout
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
     chart = new FrequencyChart();
+    chart.setHeight("300px");
     addComponent(chart);
     
     

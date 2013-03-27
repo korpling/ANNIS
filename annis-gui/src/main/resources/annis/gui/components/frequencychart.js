@@ -15,7 +15,7 @@
  */
 
 
-window.annis_gui_components_FrequencyChart = function() {
+window.annis_gui_components_FrequencyWhiteboard = function() {
   var div = this.getElement();
   var canvas = document.createElement('canvas');
   var theThis = this;
@@ -53,7 +53,7 @@ window.annis_gui_components_FrequencyChart = function() {
     };
     
     var ctx = canvas.getContext("2d");
-    var chart = new Chart(ctx).Bar(eval(data));
+    var chart = new Chart(ctx).Bar(data);
     
     lastLabels = labels;
     lastValues = values;

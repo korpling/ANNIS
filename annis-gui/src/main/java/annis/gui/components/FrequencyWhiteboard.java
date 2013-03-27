@@ -16,33 +16,43 @@
 package annis.gui.components;
 
 import annis.service.objects.FrequencyTable;
-import com.vaadin.ui.Panel;
-import org.slf4j.LoggerFactory;
+import com.vaadin.annotations.JavaScript;
+import com.vaadin.ui.AbstractJavaScriptComponent;
+import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyChart extends Panel
+@JavaScript(value =
+{
+  "Chart.min.js", "jquery-1.9.1.min.js", "frequencychart.js"
+})
+public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
 
-  public static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    FrequencyChart.class);
-
-  public static final int MAX_ITEMS = 25;
-
-  private FrequencyWhiteboard whiteboard;
+  public final int PIXEL_PER_VALUE = 45;
   
-  public FrequencyChart()
+  public FrequencyWhiteboard()
   {
-    setSizeFull();
-    whiteboard = new FrequencyWhiteboard();
-    setContent(whiteboard);
-
+    setWidth("99%");
+    setHeight("99%");
+    addStyleName("frequency-chart");
   }
 
   public void setData(FrequencyTable table)
   {
-    whiteboard.setData(table);
+    List<String> labels = new LinkedList<String>();
+    List<Long> values = new LinkedList<Long>();
+    for (FrequencyTable.Entry e : table.getEntries())
+    {
+      labels.add(StringUtils.join(e.getTupel(), " | "));
+      values.add(e.getCount());
+    }
+    setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
+    callFunction("showData", labels, values);
   }
+  
 }
