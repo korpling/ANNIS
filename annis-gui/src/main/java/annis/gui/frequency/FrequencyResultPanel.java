@@ -15,7 +15,6 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.controlpanel.ExportPanel;
 import annis.gui.controlpanel.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
@@ -36,9 +35,8 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.CharArrayWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
@@ -54,6 +52,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -98,7 +98,7 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setSizeUndefined();
     btDownloadCSV.setVisible(false);
     btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
-    btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_ICON_ON_RIGHT);
+    btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
     
     
     // actually start query
@@ -275,41 +275,45 @@ public class FrequencyResultPanel extends VerticalLayout
     @Override
     public InputStream getStream()
     {
-      StringWriter writer = new StringWriter();
-      CSVWriter csv = new CSVWriter(writer);
-      
-      // write headers
-      ArrayList<String> header = new ArrayList<String>();
-      if(data.getEntries().size() > 0)
-      {
-        for(int i=0; i < data.getEntries().get(0).getTupel().length; i++)
-        {
-          header.add("feature " + (i+1));
-        }
-      }
-      // add count
-      header.add("count");
-      csv.writeNext(header.toArray(new String[0]));
-      
-      // write entries
-      for (FrequencyTable.Entry e : data.getEntries())
-      {
-        ArrayList<String> d = new ArrayList<String>();
-        d.addAll(Arrays.asList(e.getTupel()));
-        d.add("" + e.getCount());
-        csv.writeNext(d.toArray(new String[0]));
-      }
-      
-      byte[] bytes = new byte[0];
       try
       {
-        bytes = writer.toString().getBytes("UTF-8");
+        File tmpFile = File.createTempFile("annis-frequency", ".csv");
+        tmpFile.deleteOnExit();
+        FileWriter writer = new FileWriter(tmpFile);
+        
+        CSVWriter csv = new CSVWriter(writer);
+        
+        // write headers
+        ArrayList<String> header = new ArrayList<String>();
+        if(data.getEntries().size() > 0)
+        {
+          for(int i=0; i < data.getEntries().get(0).getTupel().length; i++)
+          {
+            header.add("feature " + (i+1));
+          }
+        }
+        // add count
+        header.add("count");
+        csv.writeNext(header.toArray(new String[0]));
+        
+        // write entries
+        for (FrequencyTable.Entry e : data.getEntries())
+        {
+          ArrayList<String> d = new ArrayList<String>();
+          d.addAll(Arrays.asList(e.getTupel()));
+          d.add("" + e.getCount());
+          csv.writeNext(d.toArray(new String[0]));
+        }
+        writer.close();
+        
+        return new FileInputStream(tmpFile);
+
       }
-      catch(UnsupportedEncodingException ex)
+      catch (IOException ex)
       {
         log.error(null, ex);
       }
-      return new ByteArrayInputStream(bytes);
+      return new ByteArrayInputStream(new byte[0]);
     }
   }
   
