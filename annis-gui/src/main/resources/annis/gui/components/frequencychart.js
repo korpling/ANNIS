@@ -17,9 +17,7 @@
 
 window.annis_gui_components_FrequencyWhiteboard = function() {
   var div = this.getElement();
-  var canvas = document.createElement('canvas');
   var theThis = this;
-  div.appendChild(canvas);
   
   var lastValues = null;
   var lastLabels = null;
@@ -37,23 +35,52 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   
   this.showData = function(labels, values) {
   
-    canvas.width = $(div).width();
-    canvas.height = $(div).height();
-
-  
-    var data = {
-      labels: labels,
-      datasets: [
-        {
-          fillColor: "rgba(220,220,220,0.5)",
-          strokeColor: "rgba(220,220,220,1)",
-          data: values
-        }
-      ]
-    };
+    var d = [];
+    for(var i=0; i < values.length; i++)
+    {
+      d[i] = [i, values[i]];
+    }
     
-    var ctx = canvas.getContext("2d");
-    var chart = new Chart(ctx).Bar(data);
+    var t = [];
+    for(var i=0; i < labels.length; i++)
+    {
+      t[i] = [i];
+    }
+    
+    Flotr.draw(
+    div,
+    [d],
+    {
+      bars : {
+        show: true
+      },
+      xaxis : {
+        ticks: t,
+        labelsAngle: 45,
+        tickFormatter: function(i){
+          
+          console.log("tickformatting for " + i);
+          var l = labels[i];
+          console.log("tick length: " + l.length);
+          if(l.length > 25) {
+            l = l.substring(0,24)+"...";
+            console.log("tick resized: " + l);
+          }
+
+          return l;
+        } 
+      },
+      mouse : {
+        track : true,
+        relative : true,
+        trackFormatter: function(val) {
+          return labels[parseInt(val.x)];
+        }
+      },
+      HtmlText : false,
+      fontSize : 10.0
+    }
+  );
     
     lastLabels = labels;
     lastValues = values;

@@ -28,7 +28,7 @@ import org.apache.commons.lang3.StringUtils;
  */
 @JavaScript(value =
 {
-  "Chart.min.js", "jquery-1.9.1.min.js", "frequencychart.js"
+  "flotr2.js", "jquery-1.9.1.min.js", "frequencychart.js"
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
@@ -46,10 +46,12 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
   {
     List<String> labels = new LinkedList<String>();
     List<Long> values = new LinkedList<Long>();
+    int i=1;
     for (FrequencyTable.Entry e : table.getEntries())
     {
-      labels.add(StringUtils.join(e.getTupel(), " | "));
+      labels.add(StringUtils.join(e.getTupel(), "/"));
       values.add(e.getCount());
+      i++;
     }
     setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
     callFunction("showData", labels, values);
