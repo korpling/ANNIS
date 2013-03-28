@@ -62,7 +62,7 @@ public class FrequencyResultPanel extends VerticalLayout
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(FrequencyResultPanel.class);
   
-  private Table tbResult;
+  private Table tblResult;
   private Button btDownloadCSV;
   FrequencyChart chart;
   private String aql;
@@ -89,7 +89,7 @@ public class FrequencyResultPanel extends VerticalLayout
     addComponent(pbQuery);
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
-    chart = new FrequencyChart();
+    chart = new FrequencyChart(this);
     chart.setHeight("300px");
     addComponent(chart);
     
@@ -223,29 +223,32 @@ public class FrequencyResultPanel extends VerticalLayout
   private void recreateTable(FrequencyTable table)
   {
     
-    if(tbResult != null)
+    if(tblResult != null)
     {
-      removeComponent(tbResult);
+      removeComponent(tblResult);
     }
     
-    tbResult = new Table();
-    tbResult.setSizeFull();
+    tblResult = new Table();
+    tblResult.setSizeFull();
     
-    tbResult.setCaption(table.getEntries().size() + " items with a total sum of " + table.getSum());
+    tblResult.setCaption(table.getEntries().size() + " items with a total sum of " + table.getSum());
+    
+    tblResult.setSelectable(true);
+    tblResult.setMultiSelect(false);
     
     if(!table.getEntries().isEmpty())
     {
       FrequencyTable.Entry firstEntry = table.getEntries().get(0);
       int tupelCount = firstEntry.getTupel().length;
       
-      tbResult.addContainerProperty("pos", Integer.class, -1);
+      tblResult.addContainerProperty("pos", Integer.class, -1);
       for(int i=1; i <= tupelCount; i++)
       {
-        tbResult.addContainerProperty("tupel-" + i, String.class, "");
-        tbResult.setColumnHeader("tupel-"+ i, "feat. " + i);
+        tblResult.addContainerProperty("tupel-" + i, String.class, "");
+        tblResult.setColumnHeader("tupel-"+ i, "feat. " + i);
       }
       
-      tbResult.addContainerProperty("count", Long.class, -1l);
+      tblResult.addContainerProperty("count", Long.class, -1l);
       
       int line=0;
       for(FrequencyTable.Entry e : table.getEntries())
@@ -257,13 +260,13 @@ public class FrequencyResultPanel extends VerticalLayout
         cells[0] = line+1;
         cells[cells.length-1] = e.getCount();
         
-        tbResult.addItem(cells, "entry-" + line++);
+        tblResult.addItem(cells, "entry-" + line++);
       }
     };
-    tbResult.addContainerProperty(pbQuery, null, table);
+    tblResult.addContainerProperty(pbQuery, null, table);
     
-    addComponent(tbResult);
-    setExpandRatio(tbResult, 1.0f);
+    addComponent(tblResult);
+    setExpandRatio(tblResult, 1.0f);
     
     pbQuery.setEnabled(true);
     removeComponent(pbQuery);
@@ -320,6 +323,13 @@ public class FrequencyResultPanel extends VerticalLayout
       }
       return new ByteArrayInputStream(new byte[0]);
     }
+  }
+  
+  
+  public void selectRow(int i)
+  {
+    tblResult.setValue("entry-" + i);
+    tblResult.setCurrentPageFirstItemId("entry-" + i);
   }
   
   

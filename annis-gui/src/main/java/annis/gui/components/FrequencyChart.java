@@ -15,6 +15,7 @@
  */
 package annis.gui.components;
 
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.ui.Panel;
 import org.slf4j.LoggerFactory;
@@ -33,10 +34,10 @@ public class FrequencyChart extends Panel
 
   private FrequencyWhiteboard whiteboard;
   
-  public FrequencyChart()
+  public FrequencyChart(FrequencyResultPanel freqPanel)
   {
     setSizeFull();
-    whiteboard = new FrequencyWhiteboard();
+    whiteboard = new FrequencyWhiteboard(freqPanel);
     setContent(whiteboard);
 
   }

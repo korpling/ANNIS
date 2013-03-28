@@ -47,40 +47,45 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
       t[i] = [i];
     }
     
-    Flotr.draw(
-    div,
-    [d],
-    {
-      bars : {
-        show: true
-      },
-      xaxis : {
-        ticks: t,
-        labelsAngle: 45,
-        tickFormatter: function(i){
-          
-          console.log("tickformatting for " + i);
-          var l = labels[i];
-          console.log("tick length: " + l.length);
-          if(l.length > 25) {
-            l = l.substring(0,24)+"...";
-            console.log("tick resized: " + l);
-          }
+    var graph = Flotr.draw(
+      div,
+      [d],
+      {
+        bars : {
+          show: true
+        },
+        xaxis : {
+          ticks: t,
+          labelsAngle: 45,
+          tickFormatter: function(i){
 
-          return l;
-        } 
-      },
-      mouse : {
-        track : true,
-        relative : true,
-        trackFormatter: function(val) {
-          return labels[parseInt(val.x)];
-        }
-      },
-      HtmlText : false,
-      fontSize : 10.0
-    }
-  );
+            console.log("tickformatting for " + i);
+            var l = labels[i];
+            console.log("tick length: " + l.length);
+            if(l.length > 25) {
+              l = l.substring(0,24)+"...";
+              console.log("tick resized: " + l);
+            }
+
+            return l;
+          } 
+        },
+        mouse : {
+          track : true,
+          relative : true,
+          trackFormatter: function(val) {
+            return labels[parseInt(val.x)];
+          }
+        },
+        HtmlText : false,
+        fontSize : 10.0
+      }
+    );
+    
+    // bind click event
+    graph.observe(div, 'flotr:click', function (position) {
+      theThis.selectRow(position.hit.index);
+    }); 
     
     lastLabels = labels;
     lastValues = values;
