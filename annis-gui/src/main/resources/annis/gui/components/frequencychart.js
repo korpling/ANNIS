@@ -33,7 +33,7 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   this.onStateChange = function() {    
   };
   
-  this.showData = function(labels, values) {
+  this.showData = function(labels, values, scale) {
   
     var d = [];
     for(var i=0; i < values.length; i++)
@@ -54,17 +54,17 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
         bars : {
           show: true
         },
+        yaxis : {
+          scaling: scale
+        },
         xaxis : {
           ticks: t,
           labelsAngle: 45,
           tickFormatter: function(i){
 
-            console.log("tickformatting for " + i);
             var l = labels[i];
-            console.log("tick length: " + l.length);
             if(l.length > 25) {
               l = l.substring(0,24)+"...";
-              console.log("tick resized: " + l);
             }
 
             return l;

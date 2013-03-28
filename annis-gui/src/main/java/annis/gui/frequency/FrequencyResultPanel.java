@@ -90,7 +90,8 @@ public class FrequencyResultPanel extends VerticalLayout
     setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
   
     chart = new FrequencyChart(this);
-    chart.setHeight("300px");
+    chart.setHeight("350px");
+    chart.setVisible(false);
     addComponent(chart);
     
     
@@ -132,7 +133,8 @@ public class FrequencyResultPanel extends VerticalLayout
           FileDownloader downloader = new FileDownloader(new StreamResource(new CSVResource(table), "frequency.csv"));
           downloader.extend(btDownloadCSV);
           
-          chart.setData(table);
+          chart.setVisible(true);
+          chart.setFrequencyData(table);
           
         }
         catch (InterruptedException ex)

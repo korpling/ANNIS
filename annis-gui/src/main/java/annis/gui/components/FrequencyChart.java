@@ -17,14 +17,17 @@ package annis.gui.components;
 
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
+import com.vaadin.data.Property;
+import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyChart extends Panel
+public class FrequencyChart extends VerticalLayout
 {
 
   public static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -33,17 +36,71 @@ public class FrequencyChart extends Panel
   public static final int MAX_ITEMS = 25;
 
   private FrequencyWhiteboard whiteboard;
-  
+  private OptionGroup options;
+  private FrequencyTable lastTable;
+
   public FrequencyChart(FrequencyResultPanel freqPanel)
   {
     setSizeFull();
-    whiteboard = new FrequencyWhiteboard(freqPanel);
-    setContent(whiteboard);
+
+
+    options = new OptionGroup();
+    options.setSizeUndefined();
+    options.addItem(FrequencyWhiteboard.Scale.LINEAR);
+    options.addItem(FrequencyWhiteboard.Scale.LOG10);
+    options.setItemCaption(FrequencyWhiteboard.Scale.LINEAR, "linear scale");
+    options.setItemCaption(FrequencyWhiteboard.Scale.LOG10, "log_10 scale");
+    options.setImmediate(true);
+    options.setValue(FrequencyWhiteboard.Scale.LINEAR);
+    options.addStyleName("horizontal");
+    
+    options.addValueChangeListener(new Property.ValueChangeListener()
+    {
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        // redraw graph with right scale
+        if (lastTable != null)
+        {
+          setFrequencyData(lastTable);
+        }
+      }
+    });
+
+    addComponent(options);
+    InnerPanel panel = new InnerPanel(freqPanel);
+    addComponent(panel);
+
+    setExpandRatio(panel, 1.0f);
 
   }
 
-  public void setData(FrequencyTable table)
+  public void setFrequencyData(FrequencyTable table)
   {
-    whiteboard.setData(table);
+    lastTable = table;
+    whiteboard.setFrequencyData(table, (FrequencyWhiteboard.Scale) options.
+      getValue());
+  }
+
+  /**
+   * This panel allows us to scroll the chart.
+   */
+  private class InnerPanel extends Panel
+  {
+
+    private VerticalLayout layout;
+
+    public InnerPanel(FrequencyResultPanel freqPanel)
+    {
+      setSizeFull();
+      layout = new VerticalLayout();
+      layout.setHeight("90%");
+      layout.setWidth("-1px");
+
+      setContent(layout);
+
+      whiteboard = new FrequencyWhiteboard(freqPanel);
+      layout.addComponent(whiteboard);
+    }
   }
 }

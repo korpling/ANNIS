@@ -36,17 +36,23 @@ import org.json.JSONException;
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
-
   public final int PIXEL_PER_VALUE = 45;
 
-  private FrequencyResultPanel freqPanel;
+  public enum Scale
+  {
+    LINEAR("linear"), LOG10("logarithmic");
+    
+    public final String desc;
+    Scale(String desc)
+    {
+      this.desc = desc;
+    }
+  }
   
   public FrequencyWhiteboard(final FrequencyResultPanel freqPanel)
-  {
-    this.freqPanel = freqPanel;
-    
-    setWidth("99%");
-    setHeight("99%");
+  {  
+    setHeight("100%");
+    setWidth("200px");
     addStyleName("frequency-chart");
     
     addFunction("selectRow", new JavaScriptFunction() {
@@ -59,19 +65,18 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
     });
   }
 
-  public void setData(FrequencyTable table)
+  public void setFrequencyData(FrequencyTable table, Scale scale)
   {
     List<String> labels = new LinkedList<String>();
     List<Long> values = new LinkedList<Long>();
-    int i=1;
+
     for (FrequencyTable.Entry e : table.getEntries())
     {
       labels.add(StringUtils.join(e.getTupel(), "/"));
       values.add(e.getCount());
-      i++;
     }
     setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
-    callFunction("showData", labels, values);
+    callFunction("showData", labels, values, scale.desc);
   }
   
 }
