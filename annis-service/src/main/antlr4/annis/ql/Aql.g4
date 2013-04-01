@@ -54,6 +54,8 @@ TOKEN_ARITY:':tokenarity';
 COMMA:',';
 STAR:'*';
 
+WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
+
 ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_')*
     ;
     
@@ -87,7 +89,7 @@ OCTAL_ESC
     ;
 
 start 
-	: expr
+	: expr EOF
 	;
 
 text_spec 
@@ -166,7 +168,7 @@ term
 	
 
 expr
-	: term 
-  | term (OR term)+
-  | term (AND term)+
+	: term # Single
+  | term (OR term)+ # Or
+  | term (AND term)+ # And
 	;
