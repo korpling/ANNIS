@@ -38,10 +38,9 @@ import annis.exceptions.AnnisException;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.node.Start;
-import org.antlr.runtime.ANTLRStringStream;
-import org.antlr.runtime.CommonTokenStream;
-import org.antlr.runtime.RecognitionException;
-import org.antlr.runtime.tree.CommonTree;
+import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -113,11 +112,13 @@ public class TestAnnisParserExamples {
 			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
 			String annisQuery) 
   {
-    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(annisQuery));
+    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(annisQuery));
     AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
+    aqlParser.setBuildParseTree(true);
     try
     {
-      assertThat(aqlParser.start().getTree(), is(not(nullValue())));
+      AqlParser.StartContext tree = aqlParser.start();
+      assertThat(tree.toStringTree(), is(not(nullValue())));
     }
     catch (Exception ex)
     {
@@ -132,11 +133,12 @@ public class TestAnnisParserExamples {
 			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
 			String annisQuery) {
 		
-    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(annisQuery));
+    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(annisQuery));
     AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
     try
     {
-      CommonTree tree = (CommonTree) aqlParser.start().getTree();
+      ParseTree tree = aqlParser.start();
+      tree.toStringTree(aqlParser);
       
 			fail("bad query passed as good: " + annisQuery);
     }
