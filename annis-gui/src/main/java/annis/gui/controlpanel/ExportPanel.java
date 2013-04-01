@@ -15,26 +15,32 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
+import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
+import annis.gui.exporter.GeneralTextExporter;
 import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
-import com.vaadin.terminal.ExternalResource;
-import com.vaadin.terminal.StreamResource;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FileResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.Notification;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Random;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.FutureTask;
 import org.slf4j.LoggerFactory;
-import org.vaadin.jonatan.contexthelp.ContextHelp;
-import org.vaadin.jonatan.contexthelp.HelpFieldWrapper;
 
 /**
  *
@@ -49,12 +55,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   {
     new WekaExporter(),
     new TextExporter(),
-    new GridExporter()
+    new GridExporter(),
+    new SimpleTextExporter()
   };
   
   private final Map<String,String> help4Exporter = new HashMap<String,String>();
   
-  private ContextHelp help;
   private ComboBox cbExporter;
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
@@ -63,23 +69,20 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private Map<String, Exporter> exporterMap;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusListPanel;
+  private File tmpOutputFile;
+  private ProgressIndicator progressIndicator;
   
-  private final static Random rand = new Random();
-
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
 
     setWidth("99%");
-    setHeight("99%");
+    setHeight("-1px");
     addStyleName("contextsensible-formlayout");
     
     initHelpMessages();
     
-    help = new ContextHelp();
-    addComponent(help);
-
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -93,9 +96,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     }
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
     cbExporter.addListener(new ExporterSelectionHelpListener());
-    help.addHelpForComponent(cbExporter, help4Exporter.get((String) cbExporter.getValue()));
+    cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
     
-    addComponent(new HelpFieldWrapper(cbExporter, help));
+    addComponent(new HelpButton(cbExporter));
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -123,78 +126,144 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbRightContext);
 
     txtParameters = new TextField("Parameters");
-    help.addHelpForComponent(txtParameters, "You can input special parameters "
+    txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
       + "(‘?’ button above) for specific parameter settings.");
-    addComponent(new HelpFieldWrapper(txtParameters, help));
-    
+    addComponent(new HelpButton(txtParameters));
 
     btExport = new Button("Perform Export");
-    btExport.addListener((Button.ClickListener) this);
+    btExport.setDisableOnClick(true);
+    btExport.addClickListener((Button.ClickListener) this);
     addComponent(btExport);
+    
+    progressIndicator = new ProgressIndicator();
+    progressIndicator.setEnabled(false);
+    progressIndicator.setIndeterminate(true);
+    addComponent(progressIndicator);
   }
 
   @Override
   public void buttonClick(ClickEvent event)
   {
-    try
+    // clean up old export
+    if(tmpOutputFile != null && tmpOutputFile.exists())
     {
-      String exporterName = (String) cbExporter.getValue();
-      final Exporter exporter = exporterMap.get(exporterName);
-      if(exporter != null)
+      if(!tmpOutputFile.delete())
       {
-        if(corpusListPanel.getSelectedCorpora().isEmpty())
+        log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
+      }
+    }
+    tmpOutputFile = null;
+
+    String exporterName = (String) cbExporter.getValue();
+    final Exporter exporter = exporterMap.get(exporterName);
+    if(exporter != null)
+    {
+      if(corpusListPanel.getSelectedCorpora().isEmpty())
+      {
+        Notification.show("Please select a corpus",
+          Notification.Type.WARNING_MESSAGE);
+        btExport.setEnabled(true);
+        return;
+      }
+
+      Callable<File> callable = new Callable<File>() 
+      {
+        @Override
+        public File call() throws Exception
         {
-          getWindow().showNotification("Please select a corpus",
-            Notification.TYPE_WARNING_MESSAGE);
-          return;
+          File currentTmpFile = File.createTempFile("annis-export", ".txt");
+          currentTmpFile.deleteOnExit();
+
+          exporter.convertText(queryPanel.getQuery(),
+            Integer.parseInt((String) cbLeftContext.getValue()),
+            Integer.parseInt((String) cbRightContext.getValue()),
+            corpusListPanel.getSelectedCorpora(),
+            null, (String) txtParameters.getValue(),
+            Helper.getAnnisWebResource().path("query"),
+            new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8"));
+
+          return currentTmpFile;
         }
+      };
+      FutureTask<File> task = new FutureTask<File>(callable)
+      {
 
-        final PipedOutputStream out = new PipedOutputStream();
-        final PipedInputStream in = new PipedInputStream(out);
-
-        new Thread(new Runnable()
+        @Override
+        protected void done()
         {
-
-          @Override
-          public void run()
+          VaadinSession session = VaadinSession.getCurrent();
+          session.lock();
+          try
           {
+            btExport.setEnabled(true);
+            progressIndicator.setEnabled(false);
+            
             try
             {
-              exporter.convertText(queryPanel.getQuery(),
-                Integer.parseInt((String) cbLeftContext.getValue()),
-                Integer.parseInt((String) cbRightContext.getValue()),
-                corpusListPanel.getSelectedCorpora(),
-                null, (String) txtParameters.getValue(),
-                Helper.getAnnisWebResource(getApplication()).path("query"),
-                new OutputStreamWriter(out, "UTF-8"));
+              // copy the result to the class member in order to delete if
+              // when not longer needed
+              tmpOutputFile = get();
             }
-            catch (UnsupportedEncodingException ex)
+            catch (InterruptedException ex)
             {
               log.error(null, ex);
             }
+            catch (ExecutionException ex)
+            {
+              log.error(null, ex);
+            }
+
+            if(tmpOutputFile == null)
+            {
+              Notification.show("Could not create the Exporter", 
+                "The server logs might contain more information about this "
+                + "so you should contact the provider of this ANNIS installation "
+                + "for help.", Notification.Type.ERROR_MESSAGE);
+            }
+            else
+            {
+              // show a message with a download link
+              Button btDownload = new Button("Click here to start the download.");
+              btDownload.setStyleName(ChameleonTheme.BUTTON_BIG);
+              
+              final Window w = new Window("Export finished", btDownload);
+              FileDownloader downloader = new FileDownloader(new FileResource(
+                tmpOutputFile));
+              downloader.extend(btDownload);
+              w.setClosable(true);
+              w.setModal(true);
+              w.setResizable(false);
+              
+              UI.getCurrent().addWindow(w);
+              w.center();
+              
+              btDownload.addClickListener(new Button.ClickListener() 
+              {
+                @Override
+                public void buttonClick(ClickEvent event)
+                {
+                  UI.getCurrent().removeWindow(w);
+                  btExport.setEnabled(true);
+                }
+              });
+            }
           }
-        }).start();
-
-        StreamResource resource = new StreamResource(new StreamResource.StreamSource()
-        {
-
-          @Override
-          public InputStream getStream()
+          finally
           {
-            return in;
+            session.unlock();
           }
-        }, exporterName + "_" + rand.nextInt(Integer.MAX_VALUE), getApplication());
+        }
 
-        getWindow().open(
-          new ExternalResource(getApplication().getRelativeLocation(resource),"application/x-unknown"));
+      };
+      
+      progressIndicator.setEnabled(true);
 
-      }
+      ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+      singleExecutor.submit(task);
+      
     }
-    catch(IOException ex)
-    {
-      log.error(null, ex);
-    }
+
   }
   
   private void initHelpMessages()
@@ -205,7 +274,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "around search results. The values for all annotations of each of the "
       + "found nodes is given in a comma-separated table (CSV). At the top of "
       + "the export, the names of the columns are given in order according to "
-      + "the WEKA format.");
+      + "the WEKA format.<br/><br/>"
+      + "Parameters: <br/>"
+      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+      + "<code>metakeys=title,documentname</code>)");
 
     help4Exporter.put(EXPORTER[1].getClass().getSimpleName(),
       "The Text Exporter exports just the plain text of every search result and "
@@ -231,14 +303,28 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       String helpMessage = help4Exporter.get((String) event.getProperty().getValue());
       if(helpMessage != null)
       {
-        help.addHelpForComponent(cbExporter, helpMessage);
+        cbExporter.setDescription(helpMessage);
       }
       else
       {
-        help.addHelpForComponent(cbExporter, "No help available for this exporter");
+        cbExporter.setDescription("No help available for this exporter");
       }
     }
-    
   }
+
+  @Override
+  public void detach()
+  {
+    super.detach();
+    if(tmpOutputFile != null && tmpOutputFile.exists())
+    {
+      if(!tmpOutputFile.delete())
+      {
+        log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
+      }
+    }
+  }
+  
+  
   
 }

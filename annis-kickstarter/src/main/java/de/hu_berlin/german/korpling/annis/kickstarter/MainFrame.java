@@ -229,7 +229,7 @@ public class MainFrame extends javax.swing.JFrame
           lblStatusService.setText("<html>ANNIS started</html>");
           lblStatusService.setIcon(
             new javax.swing.ImageIcon(
-            getClass().getResource(
+            MainFrame.class.getResource(
             "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           btLaunch.setEnabled(true);
           btLaunch.setForeground(Color.blue);
@@ -433,7 +433,7 @@ public class MainFrame extends javax.swing.JFrame
       try
       {
         Desktop.getDesktop().browse(new URI(
-          "http://localhost:8080/annis-gui/app/"));
+          "http://localhost:8080/annis-gui/"));
       }
       catch (Exception ex)
       {

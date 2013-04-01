@@ -1,0 +1,8 @@
+@font-face {
+  font-family: 'Junicode';
+  font-style: normal;
+  font-weight: 400;
+  src: 
+    local('Junicode'), 
+    url(Junicode.woff) format('woff');
+}

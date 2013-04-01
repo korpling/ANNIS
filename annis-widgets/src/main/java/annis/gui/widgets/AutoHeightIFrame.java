@@ -1,53 +1,47 @@
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VAutoHeightIFrame;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
-import com.vaadin.terminal.Sizeable;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
+import com.vaadin.server.Sizeable;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.LegacyComponent;
+import java.net.URI;
 import java.util.Map;
 
 /**
  * Server side component for the VAutoHeightIFrame widget.
  */
-@ClientWidget(VAutoHeightIFrame.class)
-public class AutoHeightIFrame extends AbstractComponent
+public class AutoHeightIFrame extends AbstractComponent implements LegacyComponent
 {
 
-  private String url;
-  private boolean urlUpdated = false;
+  private URI uri;
+  private boolean heightWasSet = false;
   public static final int ADDITIONAL_HEIGHT = 25;
+  
+  public final static String RES_KEY = "iframe-vis-res";
 
-  public AutoHeightIFrame(String url)
+  public AutoHeightIFrame(URI uri)
   {
-    this.url = url;
-    urlUpdated = false;
-    setWidth("100%");
+     this.uri = uri;  
+     setWidth("100%");
   }
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-    super.paintContent(target);
-
-    if (!urlUpdated)
-    {
-      target.addAttribute("url", url);
-      target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
-      urlUpdated = true;
-    }
-
-  }
+    target.addAttribute("url", uri.toASCIIString());
+    target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
+  }  
 
   @Override
   public void changeVariables(Object source, Map<String, Object> variables)
   {
-    if (variables.containsKey("height"))
+    if (!heightWasSet && variables.containsKey("height"))
     {
       int height = (Integer) variables.get("height");
 //      getWindow().showNotification("new height: " + height, Window.Notification.TYPE_TRAY_NOTIFICATION);
       this.setHeight((float) height, Sizeable.UNITS_PIXELS);
+      heightWasSet = true;
     }   
   }
 }

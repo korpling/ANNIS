@@ -37,6 +37,7 @@ import annis.service.objects.SaltURIGroup;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import annis.service.objects.SubgraphQuery;
+import annis.sqlgen.MatrixQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.util.ArrayList;
@@ -120,6 +121,7 @@ public class QueryService
     MatchAndDocumentCount count = annisDao.countMatchesAndDocuments(data);
     long end = new Date().getTime();
     logQuery("COUNT", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+  
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
   }
 
@@ -207,7 +209,8 @@ public class QueryService
   @Produces("text/plain")
   public String matrix(
     @QueryParam("q") String query,
-    @QueryParam("corpora") String rawCorpusNames)
+    @QueryParam("corpora") String rawCorpusNames,
+    @QueryParam("metakeys") String rawMetaKeys)
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
@@ -219,8 +222,14 @@ public class QueryService
       user.checkPermission("query:matrix:" + c);
     }
     
-    
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    
+    MatrixQueryData ext = new MatrixQueryData();
+    if(rawMetaKeys != null)
+    {
+      ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
+    }
+    data.addExtension(ext);
     
     long start = new Date().getTime();
     List<AnnotatedMatch> matches = annisDao.matrix(data);
@@ -603,6 +612,35 @@ public class QueryService
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return Arrays.asList(rawCorpusNames.split(","));
+  }
+  
+  /**
+   * Splits a list of qualified (meta-) annotation names into a proper java list.
+   * @param rawCorpusNames The qualified names separated by ",".
+   * @return 
+   */
+  private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
+  {
+    LinkedList<MatrixQueryData.QName> result = new LinkedList<MatrixQueryData.QName>();
+    
+    String[] split = raw.split(",");
+    for(String s : split)
+    {
+      String[] nameSplit = s.trim().split(":", 2);
+      MatrixQueryData.QName qname = new MatrixQueryData.QName();
+      if(nameSplit.length == 2)
+      {
+        qname.namespace = nameSplit[0].trim();
+        qname.name = nameSplit[1].trim();
+      }
+      else
+      {
+        qname.name = nameSplit[0].trim();
+      }
+      result.add(qname);
+    }
+    
+    return result;
   }
 
   public AnnisDao getAnnisDao()

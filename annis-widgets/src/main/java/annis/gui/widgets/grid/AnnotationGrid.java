@@ -15,13 +15,12 @@
  */
 package annis.gui.widgets.grid;
 
-import annis.gui.MatchedNodeColors;
-import annis.gui.media.MediaController;
-import annis.gui.widgets.gwt.client.VAnnotationGrid;
-import com.vaadin.terminal.PaintException;
-import com.vaadin.terminal.PaintTarget;
+import annis.libgui.MatchedNodeColors;
+import annis.libgui.media.MediaController;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.ui.LegacyComponent;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -31,8 +30,8 @@ import java.util.Map;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VAnnotationGrid.class)
-public class AnnotationGrid extends AbstractComponent
+
+public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {
 
   private Map<String, ArrayList<Row>> rowsByAnnotation;
@@ -73,8 +72,6 @@ public class AnnotationGrid extends AbstractComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
-    super.paintContent(target);
-
     if (rowsByAnnotation != null)
     {
       target.startTag("rows");

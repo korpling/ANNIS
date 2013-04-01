@@ -15,22 +15,21 @@
  */
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.VGripDragComponent;
 import com.vaadin.event.Transferable;
 import com.vaadin.event.TransferableImpl;
 import com.vaadin.event.dd.DragSource;
-import com.vaadin.terminal.gwt.client.MouseEventDetails;
-import com.vaadin.ui.ClientWidget;
+import com.vaadin.server.PaintException;
+import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomComponent;
+import com.vaadin.ui.LegacyComponent;
 import java.util.Map;
 
 /**
  * A draggabe panel where only a specific grip is the starting point for the drag action.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@ClientWidget(VGripDragComponent.class)
-public class GripDragComponent extends CustomComponent implements DragSource
+public class GripDragComponent extends CustomComponent implements DragSource, LegacyComponent
 {
   public GripDragComponent(Component panel)
   {
@@ -38,23 +37,39 @@ public class GripDragComponent extends CustomComponent implements DragSource
     
   }
 
+  @Override
   public Transferable getTransferable(Map<String, Object> rawVariables)
   {
     return new MouseEventTransferable(getCompositionRoot(), rawVariables);
   }
+
+  @Override
+  public void paintContent(PaintTarget target) throws PaintException
+  {
+  }
+
+  @Override
+  public void changeVariables(Object source,
+    Map<String, Object> variables)
+  {
+
+  }
   
   public static class MouseEventTransferable extends TransferableImpl
   {
+    public int getClientX()
+    {
+      return (Integer) getData("clientX");
+    }
+    
+    public int getClientY()
+    {
+      return (Integer) getData("clientY");
+    }
     public MouseEventTransferable(Component sourceComponent, Map<String, Object> rawVariables)
     {
       super(sourceComponent, rawVariables);
     }
-    
-    public MouseEventDetails getMouseDownEvent()
-    {
-      return MouseEventDetails.deSerialize((String) getData("mouseDown"));
-    }
-
     
   }
   

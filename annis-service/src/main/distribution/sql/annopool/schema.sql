@@ -1,19 +1,21 @@
 -- (modified) source tables
 
+DROP TABLE IF EXISTS repository_metadata CASCADE;
 CREATE TABLE repository_metadata
 (
   name varchar NOT NULL PRIMARY KEY,
   "value" varchar NOT NULL
 );
 
+DROP TABLE IF EXISTS corpus CASCADE;
 CREATE TABLE corpus
 (
-  id         bigint PRIMARY KEY,
+  id         integer PRIMARY KEY,
   name       varchar NOT NULL, -- UNIQUE,
   type       varchar NOT NULL,
   version    varchar,
-  pre        bigint NOT NULL UNIQUE,
-  post       bigint NOT NULL UNIQUE,
+  pre        integer NOT NULL UNIQUE,
+  post       integer NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
   path_name  varchar[]
 );
@@ -23,9 +25,10 @@ COMMENT ON COLUMN corpus.pre IS 'pre-order value';
 COMMENT ON COLUMN corpus.post IS 'post-order value';
 COMMENT ON COLUMN corpus.path_name IS 'path of this corpus in the corpus tree (names)';
 
+DROP TABLE IF EXISTS corpus_annotation CASCADE;
 CREATE TABLE corpus_annotation
 (
-  corpus_ref  bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  corpus_ref  integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   namespace   varchar,
   name        varchar NOT NULL,
   value       varchar,
@@ -36,22 +39,27 @@ COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotati
 COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
+DROP TABLE IF EXISTS text CASCADE;
 CREATE TABLE text
 (
-  id    bigint PRIMARY KEY,
+  corpus_ref integer REFERENCES corpus(id), 
+  id    integer,
   name  varchar,
   text  text,
-  toplevel_corpus bigint REFERENCES corpus(id)
+  toplevel_corpus integer REFERENCES corpus(id),
+  PRIMARY KEY(corpus_ref, id)
 );
 COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
+DROP TYPE IF EXISTS annotype CASCADE;
 CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 -- collect all node annotations
+DROP TABLE IF EXISTS annotation_pool CASCADE;
 CREATE TABLE annotation_pool (
   id bigserial,
-  toplevel_corpus bigint REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id),
   namespace varchar,
   "name" varchar,
   val varchar,
@@ -61,12 +69,13 @@ CREATE TABLE annotation_pool (
   UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
 
+DROP TABLE IF EXISTS facts CASCADE;
 CREATE TABLE facts (
   fid bigserial,
   id bigint,
-  text_ref bigint REFERENCES text(id),
-  corpus_ref bigint REFERENCES corpus(id),
-  toplevel_corpus bigint REFERENCES corpus(id),
+  text_ref integer,
+  corpus_ref integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id),
   node_namespace varchar,
   node_name varchar,
   "left" integer,
@@ -79,12 +88,12 @@ CREATE TABLE facts (
   right_token integer,
   seg_name varchar,
   seg_index integer,
-  pre bigint, -- pre-order value
-  post bigint, -- post-order value
-  parent bigint, -- foreign key to rank.pre of the parent node, or NULL for roots
+  pre integer, -- pre-order value
+  post integer, -- post-order value
+  parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots
   root boolean,
-  "level" bigint,
-  component_id bigint, -- component id
+  "level" integer,
+  component_id integer, -- component id
   edge_type character(1), -- edge type of this component
   edge_namespace varchar, -- optional namespace of the edges’ names
   edge_name varchar, -- name of the edges in this component
@@ -113,10 +122,11 @@ COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 
+DROP TABLE IF EXISTS media_files CASCADE;
 CREATE TABLE media_files
 (
   file  bytea NOT NULL,
-  corpus_ref  bigint NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
+  corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
   bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,
@@ -125,22 +135,23 @@ CREATE TABLE media_files
 
 
 -- stats
+DROP TABLE IF EXISTS corpus_stats CASCADE;
 CREATE TABLE corpus_stats
 (
   name        varchar,
-  id          bigint NOT NULL REFERENCES corpus ON DELETE CASCADE,
-  text        bigint,
+  id          integer NOT NULL REFERENCES corpus ON DELETE CASCADE,
+  text        integer,
   tokens        bigint,
-  max_corpus_id bigint  NULL,
-  max_corpus_pre bigint NULL,
-  max_corpus_post bigint NULL,
-  max_text_id bigint NULL,
-  max_component_id bigint NULL,
+  max_corpus_id integer  NULL,
+  max_corpus_pre integer NULL,
+  max_corpus_post integer NULL,
+  max_component_id integer NULL,
   max_node_id bigint NULL, 
   source_path varchar -- original path to the folder containing the relANNIS sources
 );
 
 
+DROP VIEW IF EXISTS corpus_info CASCADE;
 CREATE VIEW corpus_info AS SELECT 
   name,
   id, 
@@ -150,6 +161,7 @@ CREATE VIEW corpus_info AS SELECT
 FROM 
   corpus_stats;
   
+DROP TYPE IF EXISTS resolver_visibility CASCADE;
 CREATE TYPE resolver_visibility AS ENUM (
   'permanent', 
   'visible',
@@ -158,6 +170,7 @@ CREATE TYPE resolver_visibility AS ENUM (
   'preloaded'
 );
 
+DROP TABLE IF EXISTS resolver_vis_map CASCADE;
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
@@ -168,7 +181,7 @@ CREATE TABLE resolver_vis_map
   "vis_type"   varchar NOT NULL,
   "display_name"   varchar NOT NULL,
   "visibility"     resolver_visibility NOT NULL DEFAULT 'hidden',
-  "order" bigint default '0',
+  "order" integer default '0',
   "mappings" varchar,
    UNIQUE (corpus,version,namespace,element,vis_type)              
 );
@@ -183,6 +196,7 @@ COMMENT ON COLUMN resolver_vis_map.visibility IS 'defines the visibility state o
 COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
 COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';
 
+DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations
 (
   id bigserial NOT NULL,
@@ -194,10 +208,11 @@ CREATE TABLE annotations
   "subtype" char(1),
   edge_namespace varchar,
   edge_name varchar,
-  toplevel_corpus bigint NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
+  toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS user_config CASCADE;
 CREATE TABLE user_config
 (
   id varchar NOT NULL,

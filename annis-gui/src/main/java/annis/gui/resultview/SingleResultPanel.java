@@ -16,17 +16,19 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.MatchedNodeColors;
+import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.gui.PluginSystem;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
 import annis.resolver.ResolverEntry;
-import com.vaadin.terminal.ThemeResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -38,7 +40,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -54,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class SingleResultPanel extends CssLayout implements
+public class SingleResultPanel extends VerticalLayout implements
   Button.ClickListener
 {
 
@@ -66,45 +67,34 @@ public class SingleResultPanel extends CssLayout implements
   private transient Map<SNode, Long> markedAndCovered;
   private Map<String, String> markedCoveredMap;
   private Map<String, String> markedExactMap;
-  private ResolverProvider resolverProvider;
   private transient PluginSystem ps;
   private List<VisualizerPanel> visualizers;
   private Button btInfo;
-  private int resultNumber;
   private List<String> path;
-  private Set<String> visibleTokenAnnos;
   private String segmentationName;
   private transient List<SToken> token;
-  private boolean wasAttached;
+  private HorizontalLayout infoBar;
+  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName)
+    Set<String> visibleTokenAnnos, String segmentationName, InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;
-    this.resolverProvider = resolverProvider;
-    this.resultNumber = resultNumber;
-    this.visibleTokenAnnos = visibleTokenAnnos;
     this.segmentationName = segmentationName;
-    
 
     calculateHelperVariables();
 
     setWidth("100%");
     setHeight("-1px");
 
-    setMargin(false);
-    //setSpacing(false);
-
-    HorizontalLayout infoBar = new HorizontalLayout();
+    infoBar = new HorizontalLayout();
     infoBar.addStyleName("docPath");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
-
-    addComponent(infoBar);
 
     Label lblNumber = new Label("" + (resultNumber + 1));
     infoBar.addComponent(lblNumber);
@@ -113,7 +103,7 @@ public class SingleResultPanel extends CssLayout implements
     btInfo = new Button();
     btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
     btInfo.setIcon(ICON_RESOURCE);
-    btInfo.addListener((Button.ClickListener) this);
+    btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
 
     path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),
@@ -126,20 +116,12 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
-  }
+  
+    // THIS WAS in attach()
+    addComponent(infoBar);
 
-  @Override
-  public void attach()
-  {
     try
     {
-
-      if (wasAttached || result == null)
-      {
-        return;
-      }
-      wasAttached = true;
-
       ResolverEntry[] entries =
         resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();
@@ -164,7 +146,7 @@ public class SingleResultPanel extends CssLayout implements
           token, visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap, 
           htmlID, resultID, this,
-          segmentationName, ps);
+          segmentationName, ps, instanceConfig);
 
         visualizers.add(p);
         Properties mappings = entries[i].getMappings();
@@ -185,6 +167,10 @@ public class SingleResultPanel extends CssLayout implements
         p.toggleVisualizer(true, null);
       }
       
+    }
+    catch (RuntimeException ex)
+    {
+      log.error("problems with initializing Visualizer Panel", ex);
     }
     catch (Exception ex)
     {
@@ -272,7 +258,6 @@ public class SingleResultPanel extends CssLayout implements
   private Map<SNode, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Set<String> matchedNodes = new HashSet<String>();
     Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
 
     // add all covered nodes
@@ -284,7 +269,6 @@ public class SingleResultPanel extends CssLayout implements
 
       if (match != null)
       {
-        matchedNodes.add(n.getSId());
         initialCovered.put(n, match);
       }
     }
@@ -349,7 +333,7 @@ public class SingleResultPanel extends CssLayout implements
       infoWindow.setWidth("400px");
       infoWindow.setHeight("400px");
 
-      getWindow().addWindow(infoWindow);
+      UI.getCurrent().addWindow(infoWindow);
     }
   }
 

@@ -76,6 +76,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
+import java.util.logging.Level;
+import org.apache.commons.collections.list.SynchronizedList;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -142,6 +144,7 @@ public class AnnisRunner extends AnnisBaseRunner
     private String plan;
     private int runs;
     private int errors;
+    private final List<Long> values = Collections.synchronizedList(new ArrayList<Long>());
 
     public Benchmark(String functionCall, QueryData queryData)
     {
@@ -149,6 +152,26 @@ public class AnnisRunner extends AnnisBaseRunner
       this.functionCall = functionCall;
       this.queryData = queryData;
     }
+    
+    public long getMedian()
+    {
+      synchronized(values)
+      {        
+        // sort list
+        Collections.sort(values);
+        // get item in the middle
+        int pos = Math.round((float) values.size() / 2.0f);
+        if(pos >= 0 && pos < values.size())
+        {
+          return values.get(pos);
+        }       
+      }
+      
+      // indicate an error
+      return -1;
+    }
+    
+    
   }
   private List<AnnisRunner.Benchmark> benchmarks;
   private static final int SEQUENTIAL_RUNS = 5;
@@ -395,6 +418,7 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           out.print(", ");
         }
+        boolean error = false;
         long start = new Date().getTime();
         try
         {
@@ -402,15 +426,23 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         catch (RuntimeException e)
         {
-          // don't care
+          error = true;
         }
         long end = new Date().getTime();
         long runtime = end - start;
+        benchmark.values.add(runtime);
         benchmark.bestTimeInMilliseconds =
           Math.min(benchmark.bestTimeInMilliseconds, runtime);
         benchmark.worstTimeInMilliseconds =
           Math.max(benchmark.worstTimeInMilliseconds, runtime);
+        ++benchmark.runs;
+        if (error)
+        {
+          ++benchmark.errors;
+        }
+        
         out.print(runtime + " ms");
+       
       }
       out.println();
       out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
@@ -453,6 +485,12 @@ public class AnnisRunner extends AnnisBaseRunner
       long end = new Date().getTime();
       long runtime = end - start;
       benchmark.avgTimeInMilliseconds += runtime;
+      benchmark.values.add(runtime);
+      benchmark.bestTimeInMilliseconds =
+        Math.min(benchmark.bestTimeInMilliseconds, runtime);
+      benchmark.worstTimeInMilliseconds =
+        Math.max(benchmark.worstTimeInMilliseconds, runtime);
+      
       ++benchmark.runs;
       if (error)
       {
@@ -471,7 +509,7 @@ public class AnnisRunner extends AnnisBaseRunner
       benchmark.avgTimeInMilliseconds = Math.round((double) benchmark.avgTimeInMilliseconds
         / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.avgTimeInMilliseconds + " ms (avg for "
+      out.println(benchmark.getMedian() + " ms (median for "
         + benchmark.runs + " runs" + (benchmark.errors > 0 ? ", "
         + benchmark.errors + " errors)" : ")") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
@@ -485,9 +523,9 @@ public class AnnisRunner extends AnnisBaseRunner
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.worstTimeInMilliseconds + " ms ("
-        + (benchmark.errors > 0 ? "?"
-        + benchmark.errors + " errors)" : ")") + " for '"
+      out.println(benchmark.worstTimeInMilliseconds + " ms "
+        + (benchmark.errors > 0 ? "("
+        + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
@@ -498,9 +536,9 @@ public class AnnisRunner extends AnnisBaseRunner
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
       String options = benchmarkOptions(benchmark.queryData);
-      out.println(benchmark.bestTimeInMilliseconds + " ms ("
-        + (benchmark.errors > 0 ? "?"
-        + benchmark.errors + " errors)" : ")") + " for '"
+      out.println(benchmark.bestTimeInMilliseconds + " ms "
+        + (benchmark.errors > 0 ? "("
+        + benchmark.errors + " errors)" : "") + " for '"
         + benchmark.functionCall + ("".equals(options) ? "'" : "' with "
         + options));
     }
@@ -514,19 +552,19 @@ public class AnnisRunner extends AnnisBaseRunner
 
       String[] header = new String[]
       {
-        "corpora", "query", "avg", "diff-best", "diff-worst"
+        "corpora", "query", "median", "diff-best", "diff-worst"
       };
       csv.writeNext(header);
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
+        long median = benchmark.getMedian();
+        
         String[] line = new String[5];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
-        line[2] = "" + benchmark.avgTimeInMilliseconds;
-        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds
-          - benchmark.avgTimeInMilliseconds);
-        line[4] = "" + Math.abs(benchmark.avgTimeInMilliseconds
-          - benchmark.worstTimeInMilliseconds);
+        line[2] = "" + median;
+        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds- median);
+        line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
 
@@ -570,6 +608,7 @@ public class AnnisRunner extends AnnisBaseRunner
     switch (currentOS)
     {
       case linux:
+        Writer w = null;
         try
         {
           log.info("resetting caches");
@@ -579,9 +618,8 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");
+            w = new FileWriterWithEncoding(dropCaches, "UTF-8");
             w.write("3");
-            w.close();
           }
           else
           {
@@ -601,9 +639,27 @@ public class AnnisRunner extends AnnisBaseRunner
           }
 
         }
-        catch (Exception ex)
+        catch (IOException ex)
         {
           log.error(null, ex);
+        }
+        catch (InterruptedException ex)
+        {
+          log.error(null, ex);
+        }
+        finally
+        {
+          if(w != null)
+          {
+            try
+            {
+              w.close();
+            }
+            catch (IOException ex1)
+            {
+              log.error(null, ex1);
+            }
+          }
         }
 
         break;
@@ -971,18 +1027,6 @@ public class AnnisRunner extends AnnisBaseRunner
       System.out.print("not a number: " + corpusId);
     }
 
-  }
-
-  public void doSqlText(String textID)
-  {
-    long l = Long.parseLong(textID);
-    System.out.println(annotateSqlGenerator.getTextQuery(l));
-  }
-
-  public void doText(String textID)
-  {
-    SaltProject p = annisDao.retrieveAnnotationGraph(Long.parseLong(textID));
-    System.out.println(printSaltAsXMI(p));
   }
 
   public void doSqlDoc(String docCall)

@@ -27,22 +27,14 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
  * @author thomas
  */
 public interface AdministrationDao
-{
-  public void setDataSource(DataSource dataSource);
-  
-  public void dropDatabase(String database);
+{ 
   public List<Long> listToplevelCorpora();
   public void deleteCorpora(List<Long> ids);
-  public void dropUser(String username);
-  public void createUser(String username, String password);
-  public void createDatabase(String database);
   
-  public void setupDatabase();
   
-  public void createSchema();
-  public void populateSchema();
-  public void createSchemaIndexes();
-  
+  public void initializeDatabase(String host, String port, String database,
+    String user, String password, String defaultDatabase, String superUser,
+    String superPassword);
   public void importCorpus(String path);
   
   public List<Map<String, Object>> listCorpusStats();

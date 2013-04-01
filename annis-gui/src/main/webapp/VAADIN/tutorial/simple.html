@@ -1,0 +1,73 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Simple Queries in ANNIS
+- Search and Visualization in Multilevel Linguistic Corpora</title>
+  <link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="tutorialcontent">
+<h2>Searching for Word Forms</h2>
+<p>
+To search for word forms in ANNIS, simply select a corpus (in this
+example the small PCC2 demo corpus) and enter a search string between
+double quotation marks, e.g.:</p>
+<tt>"statisch"</tt>
+<p>Note that the search is <strong>case
+sensitive</strong>, so it will not
+find cases of capitalized 'Statisch', for example at the beginning of a
+sentence. In order to find both options, you can either look for one
+form OR the other using the pipe sign ( <tt>|</tt>
+):
+</p>
+<tt>"statisch" | "Statisch"</tt>
+<p>or else you can use <strong>regular
+expressions</strong>, which must be
+surrounded by slashes ( <tt>/</tt>
+) instead of quotation marks:</p>
+<tt>/[Ss]tatisch/</tt>
+<p>To look for a sequence of
+multiple word forms, enter your search terms separated by <tt>&amp;</tt>
+and then specify that the relation between the elements is one of <strong>precedence</strong>,
+as signified by the period ( <strong><tt>.</tt></strong>
+) operator:</p>
+<tt>"so" &amp; "statisch"
+&amp; #1 . #2</tt>
+<p>The expression <tt>#1
+. #2</tt> signifies that the first
+element ("so") precedes the second element ("statisch"). For <strong>indirect
+precedence </strong>(where other
+tokens may stand between the search terms), use the <strong><tt>.*</tt></strong>
+operator:</p>
+<tt>/[Ss]o/ &amp; "statisch"
+&amp; "wie" &amp; #1 . #2 &amp; #2 .* #3 </tt>
+<p>The above query finds sequences
+beginning with either "So" or "so", followed directly by "statisch",
+which must be followed either directly or indirectly (.*) by "wie". A
+range of allowed distances can also be specified numerically as follows:</p>
+<tt>/[Ss]tatisch/ &amp; "wie"
+&amp; #1 .1,5 #2</tt>
+<p>Meaning the two words may
+appear at a distance of 1 to 5 tokens. The operator <tt>.*</tt>
+allows a distance of up to 50 tokens by default, so searching with <tt>.1,50</tt>
+is the same as using <tt>.*</tt>
+instead. Greater distances (e.g. <tt>.1,100</tt>
+for 'within 100 tokens') should always be specified explicitly.</p>
+<p>
+Finally, we can add metadata restrictions to the query, which filter
+out documents not matching our definitions. Metadata attributes must be
+preceded by the prefix meta:: and may not be bound (i.e. they are not
+referred to as #1 etc. and the numbering of other elements ignores
+their existence):
+</p>
+<tt>
+/[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2 &amp; meta::Genre="Sport"
+</tt>
+<p>To view metadata for a search result or for a corpus, press the "i"
+icon next to it in the result window or in the search form
+respectively.
+</p>
+</div>
+</body>
+</html>

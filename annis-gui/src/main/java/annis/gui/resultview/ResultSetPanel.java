@@ -16,10 +16,9 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.gui.Helper;
-import annis.gui.PluginSystem;
-import annis.gui.media.MediaControllerFactory;
-import annis.gui.media.MediaControllerHolder;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.libgui.PluginSystem;
 import annis.resolver.ResolverEntry;
 import annis.resolver.ResolverEntry.ElementType;
 import annis.resolver.SingleResolverRequest;
@@ -27,11 +26,12 @@ import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphQuery;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.*;
-import com.vaadin.ui.Window.ResizeEvent;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -39,6 +39,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
@@ -74,8 +76,9 @@ public class ResultSetPanel extends Panel implements ResolverProvider
   private ProgressIndicator indicator;
   private VerticalLayout indicatorLayout;
   private CssLayout layout;
+  private InstanceConfig instanceConfig;
 
-  public ResultSetPanel(List<Match> matches, PluginSystem ps,
+  public ResultSetPanel(List<Match> matches, PluginSystem ps, InstanceConfig instanceConfig,
     int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent, int firstMatchOffset)
@@ -87,6 +90,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
     this.firstMatchOffset = firstMatchOffset;
+    this.instanceConfig = instanceConfig;
 
     resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
@@ -119,32 +123,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    
-    getWindow().addListener(new Window.ResizeListener() 
-    {
-
-      @Override
-      public void windowResized(ResizeEvent e)
-      {
-        layout.requestRepaintAll();
-      }
-    });
-    
-//    layout.setWidth(getWindow().getBrowserWindowWidth() - SearchWindow.CONTROL_PANEL_WIDTH - 25, UNITS_PIXELS);
-    
-    // reset all registered media players    
-    MediaControllerFactory mcFactory = ps.getPluginManager().getPlugin(MediaControllerFactory.class);
-    if(mcFactory != null && getApplication() instanceof MediaControllerHolder)
-    {
-      mcFactory.getOrCreate((MediaControllerHolder) getApplication()).clearMediaPlayers();
-    }
-    
+       
     // enable indicator in order to get refresh GUI regulary
     indicator.setEnabled(true);
 
@@ -157,11 +136,17 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       @Override
       protected void done()
       {
-        synchronized(getApplication())
+        VaadinSession session = VaadinSession.getCurrent();
+        session.lock();
+        try
         {
           indicator.setEnabled(false);
           indicator.setVisible(false);
           indicatorLayout.setVisible(false);
+        }
+        finally
+        {
+          session.unlock();
         }
       }
     };
@@ -175,8 +160,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       if (p == null)
       {
-        getWindow().showNotification("Could not get subgraphs",
-          Window.Notification.TYPE_TRAY_NOTIFICATION);
+        Notification.show("Could not get subgraphs",
+          Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {
@@ -192,8 +177,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SingleResultPanel panel : newPanels)
     {
       resultPanelList.add(panel);
-      // insert just before the indicator
-      int indicatorIndex = layout.getComponentIndex(indicatorLayout);
       layout.addComponent(panel);
     }
   }
@@ -216,7 +199,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
-        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName);
+        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName, instanceConfig);
       i++;
       
       panel.setWidth("100%");
@@ -284,7 +267,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
 
-      WebResource resResolver = Helper.getAnnisWebResource(getApplication())
+      WebResource resResolver = Helper.getAnnisWebResource()
         .path("query").path("resolver");
 
       for (SingleResolverRequest r : resolverRequests)
@@ -300,9 +283,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             WebResource res = resResolver.path(corpusName).path(namespace).path(type);
             try
             {
-              tmp = res.get(new GenericType<List<ResolverEntry>>()
-              {
-              });
+              tmp = res.get(new ResolverEntryListType());
               resolverList.addAll(tmp);
             }
             catch (Exception ex)
@@ -312,7 +293,15 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             }
           }
         }
-        catch (Exception ex)
+        catch (UniformInterfaceException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (ClientHandlerException ex)
+        {
+          log.error(null, ex);
+        }
+        catch(UnsupportedEncodingException ex)
         {
           log.error(null, ex);
         }
@@ -321,26 +310,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       cacheResolver.put(resolverRequests, resolverList);
     }
     // sort everything
-    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[0]);
-    Arrays.sort(visArray, new Comparator<ResolverEntry>()
-    {
-      @Override
-      public int compare(ResolverEntry o1, ResolverEntry o2)
-      {
-        if (o1.getOrder() < o2.getOrder())
-        {
-          return -1;
-        }
-        else if (o1.getOrder() > o2.getOrder())
-        {
-          return 1;
-        }
-        else
-        {
-          return 0;
-        }
-      }
-    });
+    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[visSet.size()]);
+    Arrays.sort(visArray, new ResolverEntryComparator());
     return visArray;
   }
 
@@ -426,7 +397,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     {
       boolean allSuccessfull = true;
       
-      WebResource res = Helper.getAnnisWebResource(getApplication());
+      WebResource res = Helper.getAnnisWebResource();
       if (res != null)
       {
         res = res.path("query/search/subgraph");
@@ -452,18 +423,28 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             allSuccessfull = false;
           }
           
-          synchronized(getApplication())
+          VaadinSession session = VaadinSession.getCurrent();
+          session.lock();
+          try
           {
             
             if(lastProject != null)
             {
               addQueryResult(lastProject, j+firstMatchOffset);
             }
-            indicator.setValue((double) j++ / (double) matches.size());
+            indicator.setValue((float) j++ / (float) matches.size());
             if(j == matches.size())
             {
               indicator.setValue(1.0f);
             }
+          }
+          catch(Exception ex)
+          {
+            log.error("Exception when adding query result", ex);
+          }
+          finally
+          {
+            session.unlock();
           }
         }
         
@@ -473,4 +454,37 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
  
   } // end class AllResultsFetcher
+
+  private static class ResolverEntryListType extends GenericType<List<ResolverEntry>>
+  {
+
+    public ResolverEntryListType()
+    {
+    }
+  }
+
+  private static class ResolverEntryComparator implements Comparator<ResolverEntry>, Serializable
+  {
+
+    public ResolverEntryComparator()
+    {
+    }
+
+    @Override
+    public int compare(ResolverEntry o1, ResolverEntry o2)
+    {
+      if (o1.getOrder() < o2.getOrder())
+      {
+        return -1;
+      }
+      else if (o1.getOrder() > o2.getOrder())
+      {
+        return 1;
+      }
+      else
+      {
+        return 0;
+      }
+    }
+  }
 }

@@ -15,12 +15,16 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.Helper;
+import annis.libgui.Helper;
+import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.model.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.event.dd.DragAndDropEvent;
 import com.vaadin.event.dd.DropHandler;
@@ -30,11 +34,9 @@ import com.vaadin.ui.AbsoluteLayout;
 import com.vaadin.ui.AbsoluteLayout.ComponentPosition;
 import com.vaadin.ui.DragAndDropWrapper;
 import com.vaadin.ui.DragAndDropWrapper.WrapperTargetDetails;
-import com.vaadin.ui.DragAndDropWrapper.WrapperTransferable;
 import com.vaadin.ui.Layout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.Window.Notification;
 import java.awt.geom.Line2D;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -60,11 +62,11 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private ControlPanel controlPanel;
+  private QueryController controller;
 
-  public TigerQueryBuilderCanvas(ControlPanel controlPanel)
+  public TigerQueryBuilderCanvas(QueryController controller)
   {
-    this.controlPanel = controlPanel;
+    this.controller = controller;
 
     nodes = new HashMap<NodeWindow, GripDragComponent>();
     edges = new ArrayList<EdgeWindow>();
@@ -101,17 +103,17 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void updateQuery()
   {
-    controlPanel.setQuery(getAQLQuery(), null);
+    controller.setQuery(new Query(getAQLQuery(), null));
   }
 
   public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
 
-    WebResource service = Helper.getAnnisWebResource(getApplication());
+    WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controlPanel.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getSelectedCorpora();
 
     if (service != null)
     {
@@ -125,7 +127,7 @@ public class TigerQueryBuilderCanvas extends Panel
             service.path("query").path("corpora").path(corpus).path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "true")
-              .get(new GenericType<List<AnnisAttribute>>() {})
+              .get(new AnnisAttributeListType())
             );
         }
 
@@ -138,7 +140,11 @@ public class TigerQueryBuilderCanvas extends Panel
         }
 
       }
-      catch (Exception ex)
+      catch(UniformInterfaceException ex)
+      {
+        log.error(null, ex);
+      }
+      catch(ClientHandlerException ex)
       {
         log.error(null, ex);
       }
@@ -261,8 +267,8 @@ public class TigerQueryBuilderCanvas extends Panel
       }
       else
       {
-        getWindow().showNotification("There is already such an edge",
-          Notification.TYPE_WARNING_MESSAGE);
+        Notification.show("There is already such an edge",
+          Notification.Type.WARNING_MESSAGE);
       }
     }
   }
@@ -278,17 +284,7 @@ public class TigerQueryBuilderCanvas extends Panel
   public void addNode()
   {
     final NodeWindow n = new NodeWindow(number++, this);
-
-//    DragAndDropWrapper wrapper = new DragAndDropWrapper(n);
-//    nodes.put(n, wrapper);
-//
-//
-//    wrapper.setDragStartMode(DragAndDropWrapper.DragStartMode.WRAPPER);
-//    wrapper.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
-//    wrapper.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
-//    wrapper.addStyleName("tigerquery-builder-overlay");
-//    wrapper.setImmediate(true);
-  
+   
     GripDragComponent panel = new GripDragComponent(n);
     panel.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
     panel.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
@@ -363,9 +359,9 @@ public class TigerQueryBuilderCanvas extends Panel
       }
 
       int xChange = details.getMouseEvent().getClientX()
-        - t.getMouseDownEvent().getClientX();
+        - t.getClientX();
       int yChange = details.getMouseEvent().getClientY()
-        - t.getMouseDownEvent().getClientY();
+        - t.getClientY();
 
       // Move the component in the absolute layout
       ComponentPosition pos =
@@ -418,7 +414,7 @@ public class TigerQueryBuilderCanvas extends Panel
           if (nodeComponentCount++ > 0)
           {
             nodeIdentityOperations.append("\n& #").append(componentCount).append(
-              " = #").append(componentCount + 1);
+              " _=_ #").append(componentCount + 1);
             query.append(" & ");
             componentCount++;
           }
@@ -469,5 +465,13 @@ public class TigerQueryBuilderCanvas extends Panel
     }
 
     return query.toString();
+  }
+
+  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
+  {
+
+    public AnnisAttributeListType()
+    {
+    }
   }
 }

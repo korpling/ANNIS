@@ -15,12 +15,10 @@
  */
 package annis.gui;
 
-import com.vaadin.Application;
+import annis.libgui.Helper;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Set;
 
 
@@ -32,17 +30,18 @@ public class CitationWindow extends Window
   implements Button.ClickListener
 {
   
-  public CitationWindow(Application app, String query, Set<String> corpora, 
+  public CitationWindow( String query, Set<String> corpora, 
     int contextLeft, int contextRight)
   {
     super("Citation");
     
-    VerticalLayout wLayout = (VerticalLayout) getContent();
+    VerticalLayout wLayout = new VerticalLayout();
+    setContent(wLayout);
     wLayout.setSizeFull();
     
-    List<String> corpusNames = new LinkedList<String>(corpora);
-    String url = Helper.generateCitation(app, 
-      query, corpusNames, contextLeft, contextRight);
+    String url = Helper.generateCitation(query, corpora, contextLeft,
+      contextRight, null, 0, 10);
+    
     TextArea txtCitation = new TextArea();
 
     txtCitation.setWidth("100%");
@@ -53,13 +52,13 @@ public class CitationWindow extends Window
     txtCitation.setWordwrap(true);
     txtCitation.setReadOnly(true);
     
-    addComponent(txtCitation);
+    wLayout.addComponent(txtCitation);
     
     Button btOk = new Button("OK");
     btOk.addListener((Button.ClickListener) this);
     btOk.setSizeUndefined();
     
-    addComponent(btOk);
+    wLayout.addComponent(btOk);
     
     wLayout.setExpandRatio(txtCitation, 1.0f);
     wLayout.setComponentAlignment(btOk, Alignment.BOTTOM_CENTER);
@@ -72,6 +71,6 @@ public class CitationWindow extends Window
   @Override
   public void buttonClick(ClickEvent event)
   {
-    this.getParent().removeWindow(this);
+    UI.getCurrent().removeWindow(this);
   }
 }

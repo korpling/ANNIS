@@ -22,7 +22,7 @@ import java.util.HashSet;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class AnnisCorpusSet extends HashSet<AnnisCorpus> implements Serializable
+public class AnnisCorpusSet extends HashSet<AnnisCorpus>
 {
 
   public AnnisCorpusSet()

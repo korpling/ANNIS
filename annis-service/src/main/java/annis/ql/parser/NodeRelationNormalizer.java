@@ -36,7 +36,7 @@ import org.springframework.util.Assert;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class NodeRelationNormalizer extends DepthFirstAdapter
 {

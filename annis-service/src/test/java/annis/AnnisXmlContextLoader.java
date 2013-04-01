@@ -40,6 +40,10 @@ public class AnnisXmlContextLoader extends GenericXmlContextLoader
   {
     super.customizeContext(ctx);
     
+    /* 
+     * Only use the local configuration, 
+     * thus do not use AnnisXmlContextHelper.prepareContext()! 
+     */
     MutablePropertySources sources = ctx.getEnvironment().getPropertySources();
     try
     {

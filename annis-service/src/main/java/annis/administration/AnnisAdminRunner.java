@@ -174,7 +174,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     CommandLine cmdLine = null;
     try
     {
-      cmdLine = parser.parse(options, commandArgs.toArray(new String[] {}));
+      cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
 
     }
     catch (ParseException e)
