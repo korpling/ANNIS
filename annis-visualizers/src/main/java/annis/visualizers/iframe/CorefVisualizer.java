@@ -16,14 +16,19 @@
 package annis.visualizers.iframe;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisNode;
-import annis.model.Edge;
 import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.service.ifaces.AnnisResult;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SStructuredNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -31,6 +36,7 @@ import java.util.List;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -51,9 +57,10 @@ public class CorefVisualizer extends WriterVisualizer
   long globalIndex;
   List<TReferent> ReferentList;
   List<TComponent> Komponent;
-  HashMap<Long, List<Long>> ComponentOfToken, TokensOfNode; //ReferentOfToken
-  HashMap<Long, HashMap<Long, Integer>> ReferentOfToken; // the Long ist the Referend, the Integer means: { 0=incoming P-Edge, 1=outgoing P-Edge, 2=both(not used anymore)}
-  List<Long> visitedNodes;
+  HashMap<String, List<Long>> ComponentOfToken;
+  HashMap<String, List<String>> TokensOfNode; //ReferentOfToken
+  HashMap<String, HashMap<Long, Integer>> ReferentOfToken; // the Long ist the Referend, the Integer means: { 0=incoming P-Edge, 1=outgoing P-Edge, 2=both(not used anymore)}
+  List<String> visitedNodes;
   LinkedList<TComponenttype> Componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which Component
   private HashMap<Integer, Integer> colorlist;
 
@@ -61,28 +68,28 @@ public class CorefVisualizer extends WriterVisualizer
   {
 
     String Type;
-    List<Long> NodeList;
+    List<String> NodeList;
 
     TComponenttype()
     {
       Type = "";
-      NodeList = new LinkedList<Long>();
+      NodeList = new LinkedList<String>();
     }
   }
 
   static class TComponent
   {
 
-    List<Long> TokenList;
+    List<String> TokenList;
     String Type;
 
     TComponent()
     {
-      TokenList = new LinkedList<Long>();
+      TokenList = new LinkedList<String>();
       Type = "";
     }
 
-    TComponent(List<Long> ll, String t)
+    TComponent(List<String> ll, String t)
     {
       TokenList = ll;
       Type = t;
@@ -92,13 +99,13 @@ public class CorefVisualizer extends WriterVisualizer
   static class TReferent
   {
 
-    Set<Annotation> Annotations;
+    Set<SAnnotation> Annotations;
     long Component;
 
     TReferent()
     {
       Component = -1;
-      Annotations = new HashSet<Annotation>();
+      Annotations = new HashSet<SAnnotation>();
     }
   }
 
@@ -163,38 +170,43 @@ public class CorefVisualizer extends WriterVisualizer
       //get Info
       globalIndex = 0;
       int toolTipMaxLineCount = 1;
-      TokensOfNode = new HashMap<Long, List<Long>>();
+      TokensOfNode = new HashMap<String, List<String>>();
       ReferentList = new LinkedList<TReferent>();
       Komponent = new LinkedList<TComponent>();
-      ReferentOfToken = new HashMap<Long, HashMap<Long, Integer>>();
-      ComponentOfToken = new HashMap<Long, List<Long>>();
+      ReferentOfToken = new HashMap<String, HashMap<Long, Integer>>();
+      ComponentOfToken = new HashMap<String, List<Long>>();
       Componenttype = new LinkedList<TComponenttype>();
-      AnnisResult anResult = input.getResult();
-      
-      AnnotationGraph anGraph = anResult.getGraph();
-      if (anGraph == null)
+      SDocument saltDoc = input.getDocument();
+     
+      SDocumentGraph saltGraph = saltDoc.getSDocumentGraph();
+      //AnnotationGraph anGraph = anResult.getGraph();
+      if (saltGraph == null)
       {
         println("An Error occured: Could not get Graph of Result (Graph == null)</body>", w);
         return;
       }
-      List<Edge> edgeList = anGraph.getEdges();
+      List<SRelation> edgeList = saltGraph.getSRelations();
       if (edgeList == null)
       {
         return;
       }
 
-      for (Edge e : edgeList)
+      for (SRelation rawRel : edgeList)
       {
-        if (includeEdge(e, input.getNamespace()))
+        if (includeEdge(rawRel, input.getNamespace()))
         {
-          visitedNodes = new LinkedList<Long>();
+          SPointingRelation rel = (SPointingRelation) rawRel;
+          
+          visitedNodes = new LinkedList<String>();
           //got Type for this?
           boolean gotIt = false;
           int Componentnr;
           for (Componentnr = 0; Componentnr < Componenttype.size(); Componentnr++)
           {
-            if (Componenttype.get(Componentnr) != null && Componenttype.get(Componentnr).Type != null && Componenttype.get(Componentnr).NodeList != null
-              && Componenttype.get(Componentnr).Type.equals(e.getName()) && Componenttype.get(Componentnr).NodeList.contains(e.getSource().getId()))
+            if (Componenttype.get(Componentnr) != null && Componenttype.get(Componentnr).Type != null 
+              && Componenttype.get(Componentnr).NodeList != null
+              && Componenttype.get(Componentnr).Type.equals(rel.getSName()) 
+              && Componenttype.get(Componentnr).NodeList.contains(rel.getSStructuredSource().getSId()))
             {
               gotIt = true;
               break;
@@ -210,31 +222,32 @@ public class CorefVisualizer extends WriterVisualizer
           else
           {
             currentComponenttype = new TComponenttype();
-            currentComponenttype.Type = e.getName();
+            currentComponenttype.Type = rel.getSName();
             Componenttype.add(currentComponenttype);
             Componentnr = Komponent.size();
             currentComponent = new TComponent();
-            currentComponent.Type = e.getName();
-            currentComponent.TokenList = new LinkedList<Long>();
+            currentComponent.Type = rel.getSName();
+            currentComponent.TokenList = new LinkedList<String>();
             Komponent.add(currentComponent);
-            currentComponenttype.NodeList.add(e.getSource().getId());
+            currentComponenttype.NodeList.add(rel.getSStructuredSource().getSId());
           }
           TReferent Ref = new TReferent();
-          Ref.Annotations = e.getAnnotations();
+          Ref.Annotations = new HashSet<SAnnotation>();
+          Ref.Annotations.addAll(rel.getSAnnotations());
           Ref.Component = Componentnr;
           ReferentList.add(Ref);
 
-          List<Long> currentTokens = getAllTokens(e.getSource(), e.getName(), 
+          List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), rel.getSName(), 
             currentComponenttype, Componentnr, input.getNamespace());
 
-          setReferent(e.getDestination(), globalIndex, 0);//neu
-          setReferent(e.getSource(), globalIndex, 1);//neu
+          setReferent(rel.getSStructuredTarget(), globalIndex, 0);//neu
+          setReferent(rel.getSStructuredSource(), globalIndex, 1);//neu
 
-          for (Long l : currentTokens)
+          for (String s : currentTokens)
           {
-            if (!currentComponent.TokenList.contains(l))
+            if (!currentComponent.TokenList.contains(s))
             {
-              currentComponent.TokenList.add(l);
+              currentComponent.TokenList.add(s);
             }
           }
 
@@ -346,7 +359,7 @@ public class CorefVisualizer extends WriterVisualizer
             {
               index++;
               String left = "", right = "";
-              List<Long> pi;
+              List<String> pi;
               TComponent currentWriteComponent = null;// == pir
               String currentType = "";
               if (!currentPositionComponent.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent)
@@ -354,7 +367,7 @@ public class CorefVisualizer extends WriterVisualizer
                 currentWriteComponent = Komponent.get((int) (long) currentPositionComponent);
                 pi = currentWriteComponent.TokenList;
                 currentType = currentWriteComponent.Type;
-                left = ListToString(pi);
+                left = StringUtils.join(pi, ",");
                 right = "" + currentPositionComponent + 1;
               }
               String Annotations = getAnnotations(tok.getId(), currentPositionComponent);
@@ -364,7 +377,7 @@ public class CorefVisualizer extends WriterVisualizer
                 if (currentWriteComponent == null)
                 {
                   String left2 = "", right2 = "";
-                  List<Long> pi2;
+                  List<String> pi2;
                   long pr = 0;
                   TComponent currentWriteComponent2 = null;// == pir
                   String currentType2 = "";
@@ -376,7 +389,7 @@ public class CorefVisualizer extends WriterVisualizer
                       currentWriteComponent2 = Komponent.get((int) (long) currentPositionComponent2);
                       pi2 = currentWriteComponent2.TokenList;
                       currentType2 = currentWriteComponent2.Type;
-                      left2 = ListToString(pi2);
+                      left2 = StringUtils.join(pi2, ",");
                       right2 = "" + currentPositionComponent2 + 1;
                       Annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
                       pr = currentPositionComponent2;
@@ -507,76 +520,93 @@ public class CorefVisualizer extends WriterVisualizer
 
   /**
    * collects all Tokens of the Component
-   * @param a AnnisNode to start with
+   * @param n SStructuredNode to start with
    * @param name String that determines which Component we search for
    * @param c Componenttype, that will include its Tokens
    * @param cnr Number of the Component
    * @return List of Tokens
    */
-  private List<Long> getAllTokens(AnnisNode a, String name, TComponenttype c, long cnr, String namespace)
+  private List<String> getAllTokens(SStructuredNode n, String name, TComponenttype c, long cnr, String namespace)
   {
-    List<Long> result = null;
-    if (!visitedNodes.contains(a.getId()))
+    List<String> result = null;
+    if (!visitedNodes.contains(n.getSId()))
     {
-      result = new LinkedList<Long>();
-      visitedNodes.add(a.getId());
-      if (TokensOfNode.containsKey(a.getId()))
+      result = new LinkedList<String>();
+      visitedNodes.add(n.getSId());
+      if (TokensOfNode.containsKey(n.getSId()))
       {
-        for (Long l : TokensOfNode.get(a.getId()))
+        for (String t : TokensOfNode.get(n.getSId()))
         {
-          result.add(l);
-          if (ComponentOfToken.get(l) == null)
+          result.add(t);
+          if (ComponentOfToken.get(t) == null)
           {
             List<Long> newlist = new LinkedList<Long>();
             newlist.add(cnr);
-            ComponentOfToken.put(l, newlist);
+            ComponentOfToken.put(t, newlist);
           }
           else
           {
-            if (!ComponentOfToken.get(l).contains(cnr))
+            if (!ComponentOfToken.get(t).contains(cnr))
             {
-              ComponentOfToken.get(l).add(cnr);
+              ComponentOfToken.get(t).add(cnr);
             }
           }
         }
       }
       else
       {
-        result = searchTokens(a, cnr);
+        result = searchTokens(n, cnr);
         if (result != null)
         {
-          TokensOfNode.put(a.getId(), result);
+          TokensOfNode.put(n.getSId(), result);
         }
       }
       //get "P"-Edges!
-      for (Edge e : a.getOutgoingEdges())
+      EList<Edge> outEdges = n.getSGraph().getOutEdges(n.getSId());
+      if(outEdges != null)
       {
-        if (includeEdge(e, namespace) && name.equals(e.getName())
-          && !visitedNodes.contains(e.getDestination().getId()))
+        for (Edge e : outEdges)
         {
-          c.NodeList.add(e.getDestination().getId());
-          List<Long> Med = getAllTokens(e.getDestination(), name, c, cnr, namespace);
-          for (Long l : Med)
+          if(includeEdge(e, namespace))
           {
-            if (!result.contains(l))
+            SPointingRelation rel = (SPointingRelation) e;
+            if (name.equals(rel.getSName())
+              && !visitedNodes.contains(rel.getSStructuredTarget().getSId()))
             {
-              result.add(l);
+              c.NodeList.add(rel.getSStructuredTarget().getSId());
+              List<String> Med = getAllTokens(rel.getSStructuredTarget(), 
+                name, c, cnr, namespace);
+              for (String l : Med)
+              {
+                if (result != null && !result.contains(l))
+                {
+                  result.add(l);
+                }
+              }
             }
           }
         }
       }
-      for (Edge e : a.getIncomingEdges())
+      EList<Edge> inEdges = n.getSGraph().getInEdges(n.getSId());
+      if(inEdges != null)
       {
-        if (includeEdge(e, namespace) && name.equals(e.getName())
-          && !visitedNodes.contains(e.getSource().getId()))
+        for (Edge e : inEdges)
         {
-          c.NodeList.add(e.getSource().getId());
-          List<Long> Med = getAllTokens(e.getSource(), name, c, cnr, namespace);
-          for (Long l : Med)
+          if(includeEdge(e, namespace))
           {
-            if (!result.contains(l))
+            SPointingRelation rel = (SPointingRelation) e;
+            if (name.equals(rel.getSName())
+              && !visitedNodes.contains(rel.getSStructuredSource().getSId()))
             {
-              result.add(l);
+              c.NodeList.add(rel.getSStructuredSource().getSId());
+              List<String> Med = getAllTokens(rel.getSStructuredSource(), name, c, cnr, namespace);
+              for (String s : Med)
+              {
+                if (result != null && !result.contains(s))
+                {
+                  result.add(s);
+                }
+              }
             }
           }
         }
@@ -587,32 +617,41 @@ public class CorefVisualizer extends WriterVisualizer
 
   /**
    * adds a Referent for all Nodes dominated or covered by outgoing Edges of AnnisNode a
-   * @param a the AnnisNode
+   * @param n the SStructuredNode
    * @param index index of the Referent
    * @param value determines wheather the refered P-Edge is incoming (1) or outgoing (0)
    */
-  private void setReferent(AnnisNode a, long index, int value)
+  private void setReferent(SStructuredNode n, long index, int value)
   {
-    if (a.isToken())
+    if (n instanceof SToken)
     {
-      if (!ReferentOfToken.containsKey(a.getId()))
+      SToken tok = (SToken) n;
+      if (!ReferentOfToken.containsKey(n.getSId()))
       {
         HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
         newlist.put(index, value);//globalindex?
-        ReferentOfToken.put(a.getId(), newlist);
+        ReferentOfToken.put(tok.getSId(), newlist);
       }
       else
       {
-        ReferentOfToken.get(a.getId()).put(globalIndex, value);
+        ReferentOfToken.get(tok.getSId()).put(globalIndex, value);
       }
     }
     else
     {
-      for (Edge e : a.getOutgoingEdges())
+      EList<Edge> outEdges = n.getSGraph().getOutEdges(n.getSId());
+      if(outEdges != null)
       {
-        if (e.getEdgeType() != Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null)
+        for (Edge rawEdge : outEdges)
         {
-          setReferent(e.getDestination(), index, value);
+          if(rawEdge instanceof SPointingRelation)
+          {
+            SPointingRelation rel = (SPointingRelation) rawEdge;
+            if (rel.getSStructuredSource()!= null && rel.getSStructuredTarget() != null)
+            {
+              setReferent(rel.getSStructuredTarget(), index, value);
+            }
+          }
         }
       }
     }
@@ -620,25 +659,25 @@ public class CorefVisualizer extends WriterVisualizer
 
   /**
    * Collects all Token dominated or covered by all outgoing Edges of AnnisNode a
-   * @param a AnnisNode a
+   * @param n
    * @param cnr ComponentNumber this tokens will be added for
    * @return List of Tokennumbers
    */
-  private List<Long> searchTokens(AnnisNode a, long cnr)
+  private List<String> searchTokens(SNode n, long cnr)
   {
-    List<Long> result = new LinkedList<Long>();
-    if (a.isToken())
+    List<String> result = new LinkedList<String>();
+    if (n instanceof SToken)
     {
-      result.add(a.getId());
-      if (ComponentOfToken.get(a.getId()) == null)
+      result.add(n.getSId());
+      if (ComponentOfToken.get(n.getSId()) == null)
       {
         List<Long> newlist = new LinkedList<Long>();
         newlist.add(cnr);
-        ComponentOfToken.put(a.getId(), newlist);
+        ComponentOfToken.put(n.getSId(), newlist);
       }
       else
       {
-        List<Long> newlist = ComponentOfToken.get(a.getId());
+        List<Long> newlist = ComponentOfToken.get(n.getSId());
         if (!newlist.contains(cnr))
         {
           newlist.add(cnr);
@@ -647,16 +686,20 @@ public class CorefVisualizer extends WriterVisualizer
     }
     else
     {
-      for (Edge e : a.getOutgoingEdges())
+      EList<Edge> outgoing = n.getSGraph().getOutEdges(n.getSId());
+      if(outgoing != null)
       {
-        if (e.getEdgeType() != Edge.EdgeType.POINTING_RELATION && e.getSource() != null && e.getDestination() != null)
+        for (Edge e : outgoing)
         {
-          List<Long> Med = searchTokens(e.getDestination(), cnr);
-          for (Long l : Med)
+          if(!(e instanceof SPointingRelation) && e.getSource() instanceof SNode && e.getTarget() instanceof SNode)
           {
-            if (!result.contains(l))
+            List<String> Med = searchTokens((SNode) e.getTarget(), cnr);
+            for (String s : Med)
             {
-              result.add(l);
+              if (!result.contains(s))
+              {
+                result.add(s);
+              }
             }
           }
         }
@@ -687,7 +730,7 @@ public class CorefVisualizer extends WriterVisualizer
           int num = ReferentOfToken.get(id).get(l);
           if (num == 0 || num == 2)
           {
-            for (Annotation an : ReferentList.get((int) (long) l).Annotations)
+            for (SAnnotation an : ReferentList.get((int) (long) l).Annotations)
             {
               if (nri == 1)
               {
@@ -702,16 +745,16 @@ public class CorefVisualizer extends WriterVisualizer
           }
           if (num == 1 || num == 2)
           {
-            for (Annotation an : ReferentList.get((int) (long) l).Annotations)
+            for (SAnnotation an : ReferentList.get((int) (long) l).Annotations)
             {
               if (nro == 1)
               {
-                outgoing = ", <b>outgoing Annotations</b>: " + an.getName() + "=" + an.getValue();
+                outgoing = ", <b>outgoing Annotations</b>: " + an.getSName() + "=" + an.getValueString();
                 nro--; // remove l+"- "+
               }
               else
               {
-                outgoing += ", " + an.getName() + "=" + an.getValue();
+                outgoing += ", " + an.getSName() + "=" + an.getValueString();
               }
             }
           }
@@ -797,31 +840,6 @@ public class CorefVisualizer extends WriterVisualizer
   }
 
   /**
-   * Creates a proper String out of a List<Long>
-   * @param ll List that should become a String
-   * @return String
-   */
-  private String ListToString(List<Long> ll)
-  {
-    StringBuilder result = new StringBuilder();
-    int i = 1;
-    for (Long l : ll)
-    {
-      if (i == 1)
-      {
-        i = 0;
-        result.append(l);
-      }
-      else
-      {
-        result.append(",");
-        result.append(l);
-      }
-    }
-    return result.toString();
-  }
-
-  /**
    * Returns a unique color-value for a given number
    * @param i identifer of an unique color
    * @return color-value
@@ -873,17 +891,16 @@ public class CorefVisualizer extends WriterVisualizer
 
   private boolean includeEdge(Edge e, String namespace)
   {
-    if (e != null && e.getName() != null
-          && e.getEdgeType() == Edge.EdgeType.POINTING_RELATION && e.getSource() != null
-          && e.getDestination() != null
-          && e.getNamespace() != null 
-          && e.getNamespace().equals(namespace))
+    if(e instanceof SPointingRelation)
     {
-      return true;
+      SPointingRelation rel = (SPointingRelation) e;
+      if(rel.getSName() != null && rel.getSSource() != null && rel.getSTarget() != null
+        && rel.getSLayers() != null && namespace.equals(rel.getSLayers().get(0).getSName()))
+      {
+        return true;
+      }
     }
-    else
-    {
-      return false;
-    }
+    
+    return false;
   }
 }
