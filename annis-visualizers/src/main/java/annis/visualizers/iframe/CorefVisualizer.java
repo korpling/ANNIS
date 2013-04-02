@@ -18,8 +18,10 @@ package annis.visualizers.iframe;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
+import com.hp.gagawa.java.DocumentType;
 import com.hp.gagawa.java.Node;
 import com.hp.gagawa.java.elements.Body;
+import com.hp.gagawa.java.elements.Doctype;
 import com.hp.gagawa.java.elements.Head;
 import com.hp.gagawa.java.elements.Html;
 import com.hp.gagawa.java.elements.Link;
@@ -47,7 +49,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.management.relation.RelationType;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.EList;
@@ -154,6 +155,7 @@ public class CorefVisualizer extends WriterVisualizer
     Head head = new Head();
     Body body = new Body();
     
+    html.removeXmlns();
     html.appendChild(head);
     html.appendChild(body);
     
@@ -331,6 +333,9 @@ public class CorefVisualizer extends WriterVisualizer
         }
       }
       
+      // write HTML4 transitional doctype
+      w.append(new Doctype(DocumentType.HTMLTransitional).write());
+      // append the html tree
       w.append(html.write());
       
     }
@@ -444,6 +449,7 @@ public class CorefVisualizer extends WriterVisualizer
       tableSingleTok.setStyle("float:left; font-size:11px; border-collapse: collapse");
       tableSingleTok.setCellspacing("0");
       tableSingleTok.setCellpadding("0");
+      tableSingleTok.setCSSClass("token");
       
       int currentlinkcount = 0;
       if (underline)

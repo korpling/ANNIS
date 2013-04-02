@@ -15,6 +15,25 @@ body {
   border-width: 1px;
 }
 
+.text tr {
+  padding: 0px;
+  margin: 0px;
+  white-space:nowrap;
+}
+
 .text td {
+  padding: 0px;
+  margin: 0px;
+  white-space:nowrap;
+}
+
+.token tr {
+  padding: 0px;
+  margin: 0px;
+}
+
+.token td {
+  padding: 0px;
+  margin: 0px;
   white-space:nowrap;
 }
