@@ -47,6 +47,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import javax.management.relation.RelationType;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.EList;
@@ -223,6 +224,8 @@ public class CorefVisualizer extends WriterVisualizer
         {
           SPointingRelation rel = (SPointingRelation) rawRel;
           
+          String relType = componentNameForRelation(rel);
+          
           visitedNodes = new LinkedList<String>();
           //got type for this?
           boolean gotIt = false;
@@ -231,7 +234,7 @@ public class CorefVisualizer extends WriterVisualizer
           {
             if (componenttype.get(componentnr) != null && componenttype.get(componentnr).type != null 
               && componenttype.get(componentnr).nodeList != null
-              && componenttype.get(componentnr).type.equals(rel.getSName()) 
+              && componenttype.get(componentnr).type.equals(relType) 
               && componenttype.get(componentnr).nodeList.contains(rel.getSStructuredSource().getSId()))
             {
               gotIt = true;
@@ -248,12 +251,11 @@ public class CorefVisualizer extends WriterVisualizer
           else
           {
             currentComponenttype = new TComponenttype();
-            currentComponenttype.type = rel.getSName();
+            currentComponenttype.type = relType;
             componenttype.add(currentComponenttype);
             componentnr = komponent.size();
             currentComponent = new TComponent();
-            currentComponent.type = (rel.getSTypes() != null && rel.getSTypes().size() > 0)
-              ? rel.getSTypes().get(0) : null;
+            currentComponent.type = relType;
             currentComponent.tokenList = new LinkedList<String>();
             komponent.add(currentComponent);
             currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
@@ -264,7 +266,7 @@ public class CorefVisualizer extends WriterVisualizer
           Ref.component = componentnr;
           referentList.add(Ref);
 
-          List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), rel.getSName(), 
+          List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), componentNameForRelation(rel), 
             currentComponenttype, componentnr, input.getNamespace());
 
           setReferent(rel.getSStructuredTarget(), globalIndex, 0);//neu
@@ -711,7 +713,7 @@ public class CorefVisualizer extends WriterVisualizer
           if(includeEdge(e, namespace))
           {
             SPointingRelation rel = (SPointingRelation) e;
-            if (name.equals(rel.getSName())
+            if (name.equals(componentNameForRelation(rel))
               && !visitedNodes.contains(rel.getSStructuredTarget().getSId()))
             {
               c.nodeList.add(rel.getSStructuredTarget().getSId());
@@ -736,7 +738,7 @@ public class CorefVisualizer extends WriterVisualizer
           if(includeEdge(e, namespace))
           {
             SPointingRelation rel = (SPointingRelation) e;
-            if (name.equals(rel.getSName())
+            if (name.equals(componentNameForRelation(rel))
               && !visitedNodes.contains(rel.getSStructuredSource().getSId()))
             {
               c.nodeList.add(rel.getSStructuredSource().getSId());
@@ -1020,7 +1022,7 @@ public class CorefVisualizer extends WriterVisualizer
     if(e instanceof SPointingRelation)
     {
       SPointingRelation rel = (SPointingRelation) e;
-      if(rel.getSName() != null && rel.getSSource() != null && rel.getSTarget() != null
+      if(componentNameForRelation(rel) != null && rel.getSSource() != null && rel.getSTarget() != null
         && rel.getSLayers() != null && namespace.equals(rel.getSLayers().get(0).getSName()))
       {
         return true;
@@ -1038,5 +1040,11 @@ public class CorefVisualizer extends WriterVisualizer
   private static String prepareID(String orig)
   {
     return orig.replaceAll("#|:|/|\\.", "_");
+  }
+  
+  private static String componentNameForRelation(SRelation rel)
+  {
+    return (rel.getSTypes() != null && rel.getSTypes().size() > 0)
+      ? rel.getSTypes().get(0) : null;
   }
 }
