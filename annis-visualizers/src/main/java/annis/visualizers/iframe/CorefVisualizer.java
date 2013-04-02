@@ -252,7 +252,8 @@ public class CorefVisualizer extends WriterVisualizer
             componenttype.add(currentComponenttype);
             componentnr = komponent.size();
             currentComponent = new TComponent();
-            currentComponent.type = rel.getSName();
+            currentComponent.type = (rel.getSTypes() != null && rel.getSTypes().size() > 0)
+              ? rel.getSTypes().get(0) : null;
             currentComponent.tokenList = new LinkedList<String>();
             komponent.add(currentComponent);
             currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
