@@ -758,16 +758,17 @@ public class CorefVisualizer extends WriterVisualizer
 
   /**
    * adds a Referent for all Nodes dominated or covered by outgoing Edges of AnnisNode a
-   * @param n the SStructuredNode
+   * @param n the Node
    * @param index index of the Referent
    * @param value determines wheather the refered P-Edge is incoming (1) or outgoing (0)
    */
-  private void setReferent(SStructuredNode n, long index, int value)
+  private void setReferent(
+    de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node n, long index, int value)
   {
     if (n instanceof SToken)
     {
       SToken tok = (SToken) n;
-      if (!referentOfToken.containsKey(n.getSId()))
+      if (!referentOfToken.containsKey(tok.getSId()))
       {
         HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
         newlist.put(index, value);//globalindex?
@@ -780,17 +781,16 @@ public class CorefVisualizer extends WriterVisualizer
     }
     else
     {
-      EList<Edge> outEdges = n.getSGraph().getOutEdges(n.getSId());
+      EList<Edge> outEdges = n.getGraph().getOutEdges(n.getId());
       if(outEdges != null)
       {
-        for (Edge rawEdge : outEdges)
+        for (Edge edge : outEdges)
         {
-          if(rawEdge instanceof SPointingRelation)
+          if(!(edge instanceof SPointingRelation))
           {
-            SPointingRelation rel = (SPointingRelation) rawEdge;
-            if (rel.getSStructuredSource()!= null && rel.getSStructuredTarget() != null)
+            if (edge.getSource() != null && edge.getTarget() != null)
             {
-              setReferent(rel.getSStructuredTarget(), index, value);
+              setReferent(edge.getTarget(), index, value);
             }
           }
         }
