@@ -445,10 +445,6 @@ public class CorefVisualizer extends WriterVisualizer
 
       Table tableSingleTok = new Table();
       result.add(tableSingleTok);
-      tableSingleTok.setBorder("0");
-      tableSingleTok.setStyle("float:left; font-size:11px; border-collapse: collapse");
-      tableSingleTok.setCellspacing("0");
-      tableSingleTok.setCellpadding("0");
       tableSingleTok.setCSSClass("token");
       
       int currentlinkcount = 0;
@@ -549,7 +545,7 @@ public class CorefVisualizer extends WriterVisualizer
               Td tdBlank = new Td();
               trBlank.appendChild(tdBlank);
               
-              tdBlank.setHeight("5px");
+              tdBlank.setCSSClass("blank");
             }
             else
             {
@@ -588,9 +584,7 @@ public class CorefVisualizer extends WriterVisualizer
               Table tableLineContainer = new Table();
               tdLineContainer.appendChild(tableLineContainer);
               
-              tableLineContainer.setBorder("0");
-              tableLineContainer.setWidth("100%");
-              tableLineContainer.setStyle("border-collapse: collapse");
+              tableLineContainer.setCSSClass("linecontainer");
               
               Tr trLine = new Tr();
               tableLineContainer.appendChild(trLine);
@@ -598,14 +592,12 @@ public class CorefVisualizer extends WriterVisualizer
               Td tdLine = new Td();
               trLine.appendChild(tdLine);
               
-              tdLine.setHeight("3px");
-              tdLine.setWidth("100%");
-              tdLine.setStyle(style + addition);
+              tdLine.setCSSClass("line");
+              tdLine.setStyle("background-color: #" + Integer.toHexString(color) + "; " + style + addition);
               tdLine.setAttribute("onclick", onclick);
               tdLine.setAttribute("annis:pr_left", prepareID(left));
               tdLine.setAttribute("annis:pr_right", right);
               tdLine.setTitle(tooltip);
-              tdLine.setBgcolor(Integer.toHexString(color));
 
               Tr trSpace = new Tr();
               tableLineContainer.appendChild(trSpace);
@@ -613,7 +605,7 @@ public class CorefVisualizer extends WriterVisualizer
               Td tdSpace = new Td();
               trSpace.appendChild(tdSpace);
               
-              tdSpace.setHeight("2px");
+              tdSpace.setCSSClass("space");
             }
           }
         }
@@ -631,7 +623,7 @@ public class CorefVisualizer extends WriterVisualizer
             Td tdSpace = new Td();
             trSpace.appendChild(tdSpace);
 
-            tdSpace.setHeight("" + (maxlinkcount - currentlinkcount) * 5 + "px");
+            tdSpace.setStyle("height: " + (maxlinkcount - currentlinkcount) * 5 + "px;");
           }
         }
       }
@@ -659,7 +651,7 @@ public class CorefVisualizer extends WriterVisualizer
           Td tdSpace = new Td();
           trSpace.appendChild(tdSpace);
 
-          tdSpace.setHeight("" + maxlinkcount * 5 + "px");
+          tdSpace.setStyle("height: " + maxlinkcount * 5 + "px;");
         }
       }
     } // end for each token

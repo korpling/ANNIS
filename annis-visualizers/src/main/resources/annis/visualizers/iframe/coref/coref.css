@@ -9,6 +9,11 @@ body {
   background-color:yellow;
 }
 
+table {
+  border-style: none;
+  border-width: 0px;
+}
+
 .text {
   border-style: solid;
   border-color: #555555;
@@ -36,4 +41,28 @@ body {
   padding: 0px;
   margin: 0px;
   white-space:nowrap;
+}
+
+.linecontainer {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+td.line {
+  width: 100%;
+  height: 3px;
+}
+
+td.blank {
+  height: 5px;
+}
+
+td.space {
+  height: 2px;
+}
+
+table.token {
+  float:left; 
+  font-size:11px; 
+  border-collapse: collapse;
 }
