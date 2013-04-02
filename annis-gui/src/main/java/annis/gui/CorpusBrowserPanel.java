@@ -17,7 +17,6 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.controlpanel.ControlPanel;
 import annis.gui.model.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
@@ -236,26 +235,30 @@ public class CorpusBrowserPanel extends Panel
         containerEdgeType.addBean(cbeEdgeType);
 
         // the edge annotation entry
-        CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
-        String edgeAnno = stripEdgeAnno
-          ? killNamespace(a.getName()) : a.getName();
-        cbeEdgeAnno.setName(edgeAnno);
-        cbeEdgeAnno.setCorpus(corpus);
-        if (a.getSubtype() == AnnisAttribute.SubType.p)
+        
+        if(!a.getValueSet().isEmpty())
         {
-          cbeEdgeAnno.setExample("node & node & #1 ->"
-            + killNamespace(a.getEdgeName()) + "["
-            + killNamespace(a.getName()) + "=\""
-            + getFirst(a.getValueSet())
-            + "\"] #2");
+          CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
+          String edgeAnno = stripEdgeAnno
+            ? killNamespace(a.getName()) : a.getName();
+          cbeEdgeAnno.setName(edgeAnno);
+          cbeEdgeAnno.setCorpus(corpus);
+          if (a.getSubtype() == AnnisAttribute.SubType.p)
+          {
+            cbeEdgeAnno.setExample("node & node & #1 ->"
+              + killNamespace(a.getEdgeName()) + "["
+              + killNamespace(a.getName()) + "=\""
+              + getFirst(a.getValueSet())
+              + "\"] #2");
+          }
+          else if (a.getSubtype() == AnnisAttribute.SubType.d)
+          {
+            cbeEdgeAnno.setExample("node & node & #1 >["
+              + killNamespace(a.getName()) + "=\""
+              + getFirst(a.getValueSet()) + "\"] #2");
+          }
+          containerEdgeAnno.addBean(cbeEdgeAnno);
         }
-        else if (a.getSubtype() == AnnisAttribute.SubType.d)
-        {
-          cbeEdgeAnno.setExample("node & node & #1 >["
-            + killNamespace(a.getName()) + "=\""
-            + getFirst(a.getValueSet()) + "\"] #2");
-        }
-        containerEdgeAnno.addBean(cbeEdgeAnno);
       }
     }
 

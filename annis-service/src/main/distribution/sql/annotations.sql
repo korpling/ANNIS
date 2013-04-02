@@ -32,11 +32,11 @@ GROUP BY namespace, name, value
 
 UNION ALL
 
-SELECT DISTINCT :id, e.namespace, e.name, e.value, count(e.value) as occurences,
+SELECT DISTINCT :id, e.namespace, e.name, e.value, count(r.id) as occurences,
   'edge', c.type, c.namespace, c.name
-FROM _edge_annotation as e, _rank as r, _component as c
-WHERE e.rank_ref = r.id AND r.component_ref = c.id
-      AND e.name is not null and c.name is not null
+FROM _rank as r JOIN _component as c ON (r.component_ref = c.id) LEFT OUTER JOIN _edge_annotation as e ON (e.rank_ref = r.id)
+WHERE 
+      c.name IS NOT NULL
 GROUP BY e.namespace, e.name, e.value, c.type, c.namespace, c.name
 
 UNION ALL
