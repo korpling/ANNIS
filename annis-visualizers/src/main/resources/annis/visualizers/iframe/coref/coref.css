@@ -8,3 +8,13 @@ body {
 .highlightedToken {
   background-color:yellow;
 }
+
+.text {
+  border-style: solid;
+  border-color: #555555;
+  border-width: 1px;
+}
+
+.text td {
+  white-space:nowrap;
+}
