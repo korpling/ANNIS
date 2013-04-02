@@ -94,7 +94,7 @@ function togglePRWithClassFinal(element, on, className, superEl)
   if(element != null && idAtt != null)
   {
     
-    var id = 1*(idAtt.substring("tok_".length));
+    var id = idAtt.substring("tok_".length);
 
     if(on)
     {

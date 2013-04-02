@@ -404,10 +404,10 @@ public class CorefVisualizer extends WriterVisualizer
                       toolTipMaxLineCount = tooltip.length() / 40 + 1;
                     }
                     println("<tr><td nowrap id=\"tok_"
-                      + tok.getId() + "\" " + tooltip + " style=\""
+                      + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
                       + style + "\" onclick=\""
                       + onclick + "\" annis:pr_left=\""
-                      + left2 + "\" annis:pr_right=\""
+                      + prepareID(left2) + "\" annis:pr_right=\""
                       + right2 + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
                   }
                   else
@@ -418,10 +418,10 @@ public class CorefVisualizer extends WriterVisualizer
                       toolTipMaxLineCount = tooltip.length() / 40 + 1;
                     }
                     println("<tr><td nowrap id=\"tok_"
-                      + tok.getId() + "\" " + tooltip + " style=\""
+                      + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
                       + style + "\" onclick=\""
                       + onclick + "\" annis:pr_left=\""
-                      + left + "\" annis:pr_right=\""
+                      + prepareID(left) + "\" annis:pr_right=\""
                       + right + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
                   }
                 }
@@ -467,7 +467,7 @@ public class CorefVisualizer extends WriterVisualizer
                   println("<tr><td height=\"3px\" width=\"100%\" "
                     + " style=\"" + style + addition + "\" onclick=\""
                     + onclick + "\" annis:pr_left=\""
-                    + left + "\"annis:pr_right=\""
+                    + prepareID(left) + "\"annis:pr_right=\""
                     + right + "\" " + tooltip + "BGCOLOR=\""
                     + Integer.toHexString(color) + "\"></td></tr>", w);
                   println("<tr><td height=\"2px\"></td></tr>", w);
@@ -491,7 +491,7 @@ public class CorefVisualizer extends WriterVisualizer
           else
           {
             println("<tr><td id=\"tok_"
-              + tok.getId() + "\" " + " style=\""
+              + prepareID(tok.getSId()) + "\" " + " style=\""
               + style + "\" onclick=\""
               + onclick + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
             if (maxlinkcount > 0)
@@ -905,5 +905,15 @@ public class CorefVisualizer extends WriterVisualizer
     }
     
     return false;
+  }
+  
+  /**
+   * replaces all unwanted characters from the ID with "_"
+   * @param orig
+   * @return 
+   */
+  private static String prepareID(String orig)
+  {
+    return orig.replaceAll("#|:|/", "_");
   }
 }
