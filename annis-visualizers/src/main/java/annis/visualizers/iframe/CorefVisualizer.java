@@ -16,6 +16,7 @@
 package annis.visualizers.iframe;
 
 import annis.CommonHelper;
+import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import java.io.IOException;
 import java.io.Writer;
@@ -335,9 +336,12 @@ public class CorefVisualizer extends WriterVisualizer
           }
 
           String onclick = "", style = "";
-          if (input.getMarkableMap().containsKey("" + tok.getId()))
+          if (input.getMarkedAndCovered().containsKey(tok))
           {
-            style += "color:red; ";
+            MatchedNodeColors[] vals = MatchedNodeColors.values();
+            long match = Math.min(input.getMarkedAndCovered().get(tok)-1, vals.length-1);
+            
+            style += ("color: " + vals[(int) match].getHTMLColor() + ";");
           }
 
           boolean underline = false;

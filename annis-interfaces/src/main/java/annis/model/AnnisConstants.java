@@ -12,6 +12,7 @@ public class AnnisConstants
 {
   public static final String ANNIS_NS = "annis";
   public static final String FEAT_MATCHEDIDS = "matchedids";
+  /** The number of the query node if matched */
   public static final String FEAT_MATCHEDNODE = "matchednode";
   public static final String FEAT_INTERNALID = "internalid";
   public static final String FEAT_CORPUSREF = "corpusref";
