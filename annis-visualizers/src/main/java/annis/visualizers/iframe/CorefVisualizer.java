@@ -18,6 +18,7 @@ package annis.visualizers.iframe;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
+import com.hp.gagawa.java.Node;
 import com.hp.gagawa.java.elements.Body;
 import com.hp.gagawa.java.elements.Head;
 import com.hp.gagawa.java.elements.Html;
@@ -282,21 +283,23 @@ public class CorefVisualizer extends WriterVisualizer
 
       colorlist = new HashMap<Integer, Integer>();
 
-      
-      // present all texts as columns side by side
-      Table tableTexts = new Table();
-      body.appendChild(tableTexts);
-      
-      Tr trTextRow = new Tr();
-      tableTexts.appendChild(trTextRow);
-      
-      trTextRow.setCSSClass("textRow");
-      
       // write output for each text separatly
       EList<STextualDS> texts = saltGraph.getSTextualDSs();
 
       if(texts != null)
       {
+        // present all texts as columns side by side if using multiple texts
+        Table tableTexts = new Table();
+        Tr trTextRow = new Tr();
+        trTextRow.setCSSClass("textRow");
+
+        // only append wrapper table if we have multiple texts
+        if(texts.size() > 1)
+        {
+          body.appendChild(tableTexts);
+          tableTexts.appendChild(trTextRow);
+        }
+        
         for(STextualDS t : texts)
         {
           SDataSourceSequence sequence= SaltFactory.eINSTANCE.createSDataSourceSequence();
@@ -307,11 +310,20 @@ public class CorefVisualizer extends WriterVisualizer
 
           if(token != null)
           {
-            Td tdSingleText = new Td();
-            trTextRow.appendChild(tdSingleText);
-            tdSingleText.setCSSClass("text");
+            List<Node> nodes = outputSingleText(token, input);
             
-            outputSingleText(token, input, tdSingleText);
+            // multi-text mode?
+            if(texts.size() > 1)
+            {
+              Td tdSingleText = new Td();
+              trTextRow.appendChild(tdSingleText);
+              tdSingleText.setCSSClass("text");
+              tdSingleText.appendChild(nodes);
+            }
+            else
+            {
+              body.appendChild(nodes);
+            }
           }
         }
       }
@@ -325,9 +337,11 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
   
-  private void outputSingleText(EList<SToken> token, VisualizerInput input, Td parentTd)
+  private List<Node> outputSingleText(EList<SToken> token, VisualizerInput input)
     throws IOException
   {
+    List<Node> result = new LinkedList<Node>();
+    
     List<Long> prevpositions, listpositions;
     List<Long> finalpositions = null;
     int maxlinkcount = 0;
@@ -422,7 +436,7 @@ public class CorefVisualizer extends WriterVisualizer
       }
 
       Table tableSingleTok = new Table();
-      parentTd.appendChild(tableSingleTok);
+      result.add(tableSingleTok);
       tableSingleTok.setBorder("0");
       tableSingleTok.setStyle("float:left; font-size:11px; border-collapse: collapse");
       tableSingleTok.setCellspacing("0");
@@ -640,6 +654,8 @@ public class CorefVisualizer extends WriterVisualizer
         }
       }
     } // end for each token
+    
+    return result;
   }
 
   /**
