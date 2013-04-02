@@ -914,6 +914,6 @@ public class CorefVisualizer extends WriterVisualizer
    */
   private static String prepareID(String orig)
   {
-    return orig.replaceAll("#|:|/", "_");
+    return orig.replaceAll("#|:|/|\\.", "_");
   }
 }
