@@ -18,6 +18,7 @@ package annis.visualizers.iframe;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import java.io.IOException;
 import java.io.Writer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -28,6 +29,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,57 +58,57 @@ public class CorefVisualizer extends WriterVisualizer
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorefVisualizer.class);
 
   long globalIndex;
-  List<TReferent> ReferentList;
-  List<TComponent> Komponent;
-  HashMap<String, List<Long>> ComponentOfToken;
-  HashMap<String, List<String>> TokensOfNode; //ReferentOfToken
-  HashMap<String, HashMap<Long, Integer>> ReferentOfToken; // the Long ist the Referend, the Integer means: { 0=incoming P-Edge, 1=outgoing P-Edge, 2=both(not used anymore)}
+  List<TReferent> referentList;
+  List<TComponent> komponent;
+  HashMap<String, List<Long>> componentOfToken;
+  HashMap<String, List<String>> tokensOfNode; //ReferentOfToken
+  HashMap<String, HashMap<Long, Integer>> referentOfToken; // the Long ist the Referend, the Integer means: { 0=incoming P-Edge, 1=outgoing P-Edge, 2=both(not used anymore)}
   List<String> visitedNodes;
-  LinkedList<TComponenttype> Componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which Component
+  LinkedList<TComponenttype> componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which component
   private HashMap<Integer, Integer> colorlist;
 
   static class TComponenttype
   {
 
-    String Type;
-    List<String> NodeList;
+    String type;
+    List<String> nodeList;
 
     TComponenttype()
     {
-      Type = "";
-      NodeList = new LinkedList<String>();
+      type = "";
+      nodeList = new LinkedList<String>();
     }
   }
 
   static class TComponent
   {
 
-    List<String> TokenList;
-    String Type;
+    List<String> tokenList;
+    String type;
 
     TComponent()
     {
-      TokenList = new LinkedList<String>();
-      Type = "";
+      tokenList = new LinkedList<String>();
+      type = "";
     }
 
     TComponent(List<String> ll, String t)
     {
-      TokenList = ll;
-      Type = t;
+      tokenList = ll;
+      type = t;
     }
   }
 
   static class TReferent
   {
 
-    Set<SAnnotation> Annotations;
-    long Component;
+    Set<SAnnotation> annotations;
+    long component;
 
     TReferent()
     {
-      Component = -1;
-      Annotations = new HashSet<SAnnotation>();
+      component = -1;
+      annotations = new HashSet<SAnnotation>();
     }
   }
 
@@ -170,12 +173,12 @@ public class CorefVisualizer extends WriterVisualizer
       //get Info
       globalIndex = 0;
       int toolTipMaxLineCount = 1;
-      TokensOfNode = new HashMap<String, List<String>>();
-      ReferentList = new LinkedList<TReferent>();
-      Komponent = new LinkedList<TComponent>();
-      ReferentOfToken = new HashMap<String, HashMap<Long, Integer>>();
-      ComponentOfToken = new HashMap<String, List<Long>>();
-      Componenttype = new LinkedList<TComponenttype>();
+      tokensOfNode = new HashMap<String, List<String>>();
+      referentList = new LinkedList<TReferent>();
+      komponent = new LinkedList<TComponent>();
+      referentOfToken = new HashMap<String, HashMap<Long, Integer>>();
+      componentOfToken = new HashMap<String, List<Long>>();
+      componenttype = new LinkedList<TComponenttype>();
       SDocument saltDoc = input.getDocument();
      
       SDocumentGraph saltGraph = saltDoc.getSDocumentGraph();
@@ -198,15 +201,15 @@ public class CorefVisualizer extends WriterVisualizer
           SPointingRelation rel = (SPointingRelation) rawRel;
           
           visitedNodes = new LinkedList<String>();
-          //got Type for this?
+          //got type for this?
           boolean gotIt = false;
-          int Componentnr;
-          for (Componentnr = 0; Componentnr < Componenttype.size(); Componentnr++)
+          int componentnr;
+          for (componentnr = 0; componentnr < componenttype.size(); componentnr++)
           {
-            if (Componenttype.get(Componentnr) != null && Componenttype.get(Componentnr).Type != null 
-              && Componenttype.get(Componentnr).NodeList != null
-              && Componenttype.get(Componentnr).Type.equals(rel.getSName()) 
-              && Componenttype.get(Componentnr).NodeList.contains(rel.getSStructuredSource().getSId()))
+            if (componenttype.get(componentnr) != null && componenttype.get(componentnr).type != null 
+              && componenttype.get(componentnr).nodeList != null
+              && componenttype.get(componentnr).type.equals(rel.getSName()) 
+              && componenttype.get(componentnr).nodeList.contains(rel.getSStructuredSource().getSId()))
             {
               gotIt = true;
               break;
@@ -216,38 +219,38 @@ public class CorefVisualizer extends WriterVisualizer
           TComponenttype currentComponenttype;
           if (gotIt)
           {
-            currentComponent = Komponent.get(Componentnr);
-            currentComponenttype = Componenttype.get(Componentnr);
+            currentComponent = komponent.get(componentnr);
+            currentComponenttype = componenttype.get(componentnr);
           }
           else
           {
             currentComponenttype = new TComponenttype();
-            currentComponenttype.Type = rel.getSName();
-            Componenttype.add(currentComponenttype);
-            Componentnr = Komponent.size();
+            currentComponenttype.type = rel.getSName();
+            componenttype.add(currentComponenttype);
+            componentnr = komponent.size();
             currentComponent = new TComponent();
-            currentComponent.Type = rel.getSName();
-            currentComponent.TokenList = new LinkedList<String>();
-            Komponent.add(currentComponent);
-            currentComponenttype.NodeList.add(rel.getSStructuredSource().getSId());
+            currentComponent.type = rel.getSName();
+            currentComponent.tokenList = new LinkedList<String>();
+            komponent.add(currentComponent);
+            currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
           }
           TReferent Ref = new TReferent();
-          Ref.Annotations = new HashSet<SAnnotation>();
-          Ref.Annotations.addAll(rel.getSAnnotations());
-          Ref.Component = Componentnr;
-          ReferentList.add(Ref);
+          Ref.annotations = new HashSet<SAnnotation>();
+          Ref.annotations.addAll(rel.getSAnnotations());
+          Ref.component = componentnr;
+          referentList.add(Ref);
 
           List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), rel.getSName(), 
-            currentComponenttype, Componentnr, input.getNamespace());
+            currentComponenttype, componentnr, input.getNamespace());
 
           setReferent(rel.getSStructuredTarget(), globalIndex, 0);//neu
           setReferent(rel.getSStructuredSource(), globalIndex, 1);//neu
 
           for (String s : currentTokens)
           {
-            if (!currentComponent.TokenList.contains(s))
+            if (!currentComponent.tokenList.contains(s))
             {
-              currentComponent.TokenList.add(s);
+              currentComponent.tokenList.add(s);
             }
           }
 
@@ -256,268 +259,25 @@ public class CorefVisualizer extends WriterVisualizer
       }
 
       colorlist = new HashMap<Integer, Integer>();
-
-      //write Output
-      List<Long> prevpositions, listpositions;
-      List<Long> finalpositions = null;
-      int maxlinkcount = 0;
-      String lastId, currentId = null;
       
-      EList<SToken> token = saltGraph.getSortedSTokenByText();
-      if(token != null)
+      // write output for each text separatly
+      EList<STextualDS> texts = saltGraph.getSTextualDSs();
+      if(texts != null)
       {
-        for (SToken tok : token)
+        for(STextualDS t : texts)
         {
-
-          prevpositions = finalpositions;
-          if (prevpositions != null && prevpositions.size() < 1)
+          SDataSourceSequence sequence= SaltFactory.eINSTANCE.createSDataSourceSequence();
+          sequence.setSSequentialDS(t);
+          sequence.setSStart(0);
+          sequence.setSEnd((t.getSText()!= null) ? t.getSText().length():0);
+          EList<SToken> token = saltGraph.getSTokensBySequence(sequence);
+          if(token != null)
           {
-            prevpositions = null;
+            outputSingleText(token, input, w);
           }
-          lastId = currentId;
-          currentId = tok.getId();
-          listpositions = ComponentOfToken.get(currentId);
-          List<Boolean> checklist = null;
-
-          if (prevpositions == null && listpositions != null)
-          {
-            finalpositions = listpositions;
-          }
-          else if (listpositions == null)
-          {
-            finalpositions = new LinkedList<Long>();
-          }
-          else
-          {
-            checklist = new LinkedList<Boolean>();
-            for (int i = 0; prevpositions != null && i < prevpositions.size(); i++)
-            {
-              if (listpositions.contains(prevpositions.get(i)))
-              {
-                checklist.add(true);
-              }
-              else
-              {
-                checklist.add(false);
-              }
-            }
-            List<Long> remains = new LinkedList<Long>();
-            for (int i = 0; i < listpositions.size(); i++)
-            {
-              if (prevpositions != null && !prevpositions.contains(listpositions.get(i)))
-              {
-                remains.add(listpositions.get(i));
-              }
-            }
-
-            int minsize = checklist.size() + remains.size();
-            int number = 0;
-            finalpositions = new LinkedList<Long>();
-            for (int i = 0; i < minsize; i++)
-            {
-              if (prevpositions != null && checklist.size() > i && checklist.get(i).booleanValue())
-              {
-                finalpositions.add(prevpositions.get(i));
-              }
-              else
-              {
-                if (remains.size() > number)
-                {
-                  Long ll = remains.get(number);
-                  finalpositions.add(ll);
-                  number++;
-                  minsize--;
-                }
-                else
-                {
-                  finalpositions.add(Long.MIN_VALUE);
-                }
-              }
-            }
-          }
-
-          String onclick = "", style = "";
-          if (input.getMarkedAndCovered().containsKey(tok))
-          {
-            MatchedNodeColors[] vals = MatchedNodeColors.values();
-            long match = Math.min(input.getMarkedAndCovered().get(tok)-1, vals.length-1);
-            
-            style += ("color: " + vals[(int) match].getHTMLColor() + ";");
-          }
-
-          boolean underline = false;
-          if (!finalpositions.isEmpty())
-          {
-            style += "cursor:pointer;";
-            underline = true;
-            onclick = "togglePRAuto(this);";
-          }
-
-          println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
-          int currentlinkcount = 0;
-          if (underline)
-          {
-            boolean firstone = true;
-            int index = -1;
-            String tooltip;
-            if (!finalpositions.isEmpty())
-            {
-              for (Long currentPositionComponent : finalpositions)
-              {
-                index++;
-                String left = "", right = "";
-                List<String> pi;
-                TComponent currentWriteComponent = null;// == pir
-                String currentType = "";
-                if (!currentPositionComponent.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent)
-                {
-                  currentWriteComponent = Komponent.get((int) (long) currentPositionComponent);
-                  pi = currentWriteComponent.TokenList;
-                  currentType = currentWriteComponent.Type;
-                  left = StringUtils.join(pi, ",");
-                  right = "" + currentPositionComponent + 1;
-                }
-                String Annotations = getAnnotations(tok.getId(), currentPositionComponent);
-                if (firstone)
-                {
-                  firstone = false;
-                  if (currentWriteComponent == null)
-                  {
-                    String left2 = "", right2 = "";
-                    List<String> pi2;
-                    long pr = 0;
-                    TComponent currentWriteComponent2;// == pir
-                    String currentType2 = "";
-                    String Annotations2 = "";
-                    for (Long currentPositionComponent2 : finalpositions)
-                    {
-                      if (!currentPositionComponent2.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent2)
-                      {
-                        currentWriteComponent2 = Komponent.get((int) (long) currentPositionComponent2);
-                        pi2 = currentWriteComponent2.TokenList;
-                        currentType2 = currentWriteComponent2.Type;
-                        left2 = StringUtils.join(pi2, ",");
-                        right2 = "" + currentPositionComponent2 + 1;
-                        Annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
-                        pr = currentPositionComponent2;
-                        break;
-                      }
-                    }
-                    tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + Annotations2 + "\"";
-                    if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
-                    {
-                      toolTipMaxLineCount = tooltip.length() / 40 + 1;
-                    }
-                    println("<tr><td nowrap id=\"tok_"
-                      + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
-                      + style + "\" onclick=\""
-                      + onclick + "\" annis:pr_left=\""
-                      + prepareID(left2) + "\" annis:pr_right=\""
-                      + right2 + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
-                  }
-                  else
-                  {//easier
-                    tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
-                    if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
-                    {
-                      toolTipMaxLineCount = tooltip.length() / 40 + 1;
-                    }
-                    println("<tr><td nowrap id=\"tok_"
-                      + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
-                      + style + "\" onclick=\""
-                      + onclick + "\" annis:pr_left=\""
-                      + prepareID(left) + "\" annis:pr_right=\""
-                      + right + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
-                  }
-                }
-                currentlinkcount++;
-                //while we've got underlines
-                if (currentPositionComponent.equals(Long.MIN_VALUE))
-                {
-                  println("<tr><td height=\"5px\"></td></tr>", w);
-                }
-                else
-                {
-                  int color;
-                  if (colorlist.containsKey((int) (long) currentPositionComponent))
-                  {
-                    color = colorlist.get((int) (long) currentPositionComponent);
-                  }
-                  else
-                  {
-                    color = getNewColor((int) (long) currentPositionComponent);
-                    colorlist.put((int) (long) currentPositionComponent, color);
-                  }
-                  if (color > 16777215)
-                  {
-                    color = 16777215;
-                  }
-
-                  String addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
-                  if (lastId != null && currentId != null && checklist != null && checklist.size() > index && checklist.get(index).booleanValue() == true)
-                  {
-                    if (connectionOf(lastId, currentId, currentPositionComponent))
-                    {
-                      addition = "";
-                    }
-                  }
-
-                  tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
-                  if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
-                  {
-                    toolTipMaxLineCount = tooltip.length() / 40 + 1;
-                  }
-
-                  println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
-                  println("<tr><td height=\"3px\" width=\"100%\" "
-                    + " style=\"" + style + addition + "\" onclick=\""
-                    + onclick + "\" annis:pr_left=\""
-                    + prepareID(left) + "\"annis:pr_right=\""
-                    + right + "\" " + tooltip + "BGCOLOR=\""
-                    + Integer.toHexString(color) + "\"></td></tr>", w);
-                  println("<tr><td height=\"2px\"></td></tr>", w);
-                  println("</table></td></tr>", w);//
-                }
-              }
-            }
-            if (currentlinkcount > maxlinkcount)
-            {
-              maxlinkcount = currentlinkcount;
-            }
-            else
-            {
-              if (currentlinkcount < maxlinkcount)
-              {
-                println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
-              }
-            }
-            println("</table></td></tr>", w);
-          }
-          else
-          {
-            println("<tr><td id=\"tok_"
-              + prepareID(tok.getSId()) + "\" " + " style=\""
-              + style + "\" onclick=\""
-              + onclick + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
-            if (maxlinkcount > 0)
-            {
-              println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
-              println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
-              println("</table></td></tr>", w);
-            }
-          }
-          println("</table>", w);
-        } // end for each token
+        }
       }
-      println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
-      println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
-      if (toolTipMaxLineCount > 10)
-      {
-        toolTipMaxLineCount = 10;
-      }
-      println("<tr><td height=\"n: " + (toolTipMaxLineCount * 15 + 15) + "px\"></td></tr>", w);
-      println("</table></td></tr>", w);
-
+      
       println("</body></html>", w);
     }
     catch (IOException ex)
@@ -525,13 +285,255 @@ public class CorefVisualizer extends WriterVisualizer
       log.error(null, ex);
     }
   }
+  
+  private void outputSingleText(EList<SToken> token, VisualizerInput input, Writer w)
+    throws IOException
+  {
+    List<Long> prevpositions, listpositions;
+    List<Long> finalpositions = null;
+    int maxlinkcount = 0;
+    String lastId, currentId = null;
+
+    for (SToken tok : token)
+    {
+
+      prevpositions = finalpositions;
+      if (prevpositions != null && prevpositions.size() < 1)
+      {
+        prevpositions = null;
+      }
+      lastId = currentId;
+      currentId = tok.getId();
+      listpositions = componentOfToken.get(currentId);
+      List<Boolean> checklist = null;
+
+      if (prevpositions == null && listpositions != null)
+      {
+        finalpositions = listpositions;
+      }
+      else if (listpositions == null)
+      {
+        finalpositions = new LinkedList<Long>();
+      }
+      else
+      {
+        checklist = new LinkedList<Boolean>();
+        for (int i = 0; prevpositions != null && i < prevpositions.size(); i++)
+        {
+          if (listpositions.contains(prevpositions.get(i)))
+          {
+            checklist.add(true);
+          }
+          else
+          {
+            checklist.add(false);
+          }
+        }
+        List<Long> remains = new LinkedList<Long>();
+        for (int i = 0; i < listpositions.size(); i++)
+        {
+          if (prevpositions != null && !prevpositions.contains(listpositions.get(i)))
+          {
+            remains.add(listpositions.get(i));
+          }
+        }
+
+        int minsize = checklist.size() + remains.size();
+        int number = 0;
+        finalpositions = new LinkedList<Long>();
+        for (int i = 0; i < minsize; i++)
+        {
+          if (prevpositions != null && checklist.size() > i && checklist.get(i).booleanValue())
+          {
+            finalpositions.add(prevpositions.get(i));
+          }
+          else
+          {
+            if (remains.size() > number)
+            {
+              Long ll = remains.get(number);
+              finalpositions.add(ll);
+              number++;
+              minsize--;
+            }
+            else
+            {
+              finalpositions.add(Long.MIN_VALUE);
+            }
+          }
+        }
+      }
+
+      String onclick = "", style = "";
+      if (input.getMarkedAndCovered().containsKey(tok))
+      {
+        MatchedNodeColors[] vals = MatchedNodeColors.values();
+        long match = Math.min(input.getMarkedAndCovered().get(tok)-1, vals.length-1);
+
+        style += ("color: " + vals[(int) match].getHTMLColor() + ";");
+      }
+
+      boolean underline = false;
+      if (!finalpositions.isEmpty())
+      {
+        style += "cursor:pointer;";
+        underline = true;
+        onclick = "togglePRAuto(this);";
+      }
+
+      println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
+      int currentlinkcount = 0;
+      if (underline)
+      {
+        boolean firstone = true;
+        int index = -1;
+        String tooltip;
+        if (!finalpositions.isEmpty())
+        {
+          for (Long currentPositionComponent : finalpositions)
+          {
+            index++;
+            String left = "", right = "";
+            List<String> pi;
+            TComponent currentWriteComponent = null;// == pir
+            String currentType = "";
+            if (!currentPositionComponent.equals(Long.MIN_VALUE) && komponent.size() > currentPositionComponent)
+            {
+              currentWriteComponent = komponent.get((int) (long) currentPositionComponent);
+              pi = currentWriteComponent.tokenList;
+              currentType = currentWriteComponent.type;
+              left = StringUtils.join(pi, ",");
+              right = "" + currentPositionComponent + 1;
+            }
+            String annotations = getAnnotations(tok.getId(), currentPositionComponent);
+            if (firstone)
+            {
+              firstone = false;
+              if (currentWriteComponent == null)
+              {
+                String left2 = "", right2 = "";
+                List<String> pi2;
+                long pr = 0;
+                TComponent currentWriteComponent2;// == pir
+                String currentType2 = "";
+                String annotations2 = "";
+                for (Long currentPositionComponent2 : finalpositions)
+                {
+                  if (!currentPositionComponent2.equals(Long.MIN_VALUE) && komponent.size() > currentPositionComponent2)
+                  {
+                    currentWriteComponent2 = komponent.get((int) (long) currentPositionComponent2);
+                    pi2 = currentWriteComponent2.tokenList;
+                    currentType2 = currentWriteComponent2.type;
+                    left2 = StringUtils.join(pi2, ",");
+                    right2 = "" + currentPositionComponent2 + 1;
+                    annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
+                    pr = currentPositionComponent2;
+                    break;
+                  }
+                }
+                tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + annotations2 + "\"";
+                
+                println("<tr><td nowrap id=\"tok_"
+                  + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
+                  + style + "\" onclick=\""
+                  + onclick + "\" annis:pr_left=\""
+                  + prepareID(left2) + "\" annis:pr_right=\""
+                  + right2 + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+              }
+              else
+              {//easier
+                tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + annotations + "\"";
+                
+                println("<tr><td nowrap id=\"tok_"
+                  + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
+                  + style + "\" onclick=\""
+                  + onclick + "\" annis:pr_left=\""
+                  + prepareID(left) + "\" annis:pr_right=\""
+                  + right + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+              }
+            }
+            currentlinkcount++;
+            //while we've got underlines
+            if (currentPositionComponent.equals(Long.MIN_VALUE))
+            {
+              println("<tr><td height=\"5px\"></td></tr>", w);
+            }
+            else
+            {
+              int color;
+              if (colorlist.containsKey((int) (long) currentPositionComponent))
+              {
+                color = colorlist.get((int) (long) currentPositionComponent);
+              }
+              else
+              {
+                color = getNewColor((int) (long) currentPositionComponent);
+                colorlist.put((int) (long) currentPositionComponent, color);
+              }
+              if (color > 16777215)
+              {
+                color = 16777215;
+              }
+
+              String addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
+              if (lastId != null && currentId != null && checklist != null && checklist.size() > index && checklist.get(index).booleanValue() == true)
+              {
+                if (connectionOf(lastId, currentId, currentPositionComponent))
+                {
+                  addition = "";
+                }
+              }
+
+              tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + annotations + "\"";
+              
+              println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
+              println("<tr><td height=\"3px\" width=\"100%\" "
+                + " style=\"" + style + addition + "\" onclick=\""
+                + onclick + "\" annis:pr_left=\""
+                + prepareID(left) + "\"annis:pr_right=\""
+                + right + "\" " + tooltip + "BGCOLOR=\""
+                + Integer.toHexString(color) + "\"></td></tr>", w);
+              println("<tr><td height=\"2px\"></td></tr>", w);
+              println("</table></td></tr>", w);//
+            }
+          }
+        }
+        if (currentlinkcount > maxlinkcount)
+        {
+          maxlinkcount = currentlinkcount;
+        }
+        else
+        {
+          if (currentlinkcount < maxlinkcount)
+          {
+            println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
+          }
+        }
+        println("</table></td></tr>", w);
+      }
+      else
+      {
+        println("<tr><td id=\"tok_"
+          + prepareID(tok.getSId()) + "\" " + " style=\""
+          + style + "\" onclick=\""
+          + onclick + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+        if (maxlinkcount > 0)
+        {
+          println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
+          println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
+          println("</table></td></tr>", w);
+        }
+      }
+      println("</table>", w);
+    } // end for each token
+  }
 
   /**
-   * collects all Tokens of the Component
+   * collects all Tokens of the component
    * @param n SStructuredNode to start with
-   * @param name String that determines which Component we search for
-   * @param c Componenttype, that will include its Tokens
-   * @param cnr Number of the Component
+   * @param name String that determines which component we search for
+   * @param c componenttype, that will include its Tokens
+   * @param cnr Number of the component
    * @return List of Tokens
    */
   private List<String> getAllTokens(SStructuredNode n, String name, TComponenttype c, long cnr, String namespace)
@@ -541,22 +543,22 @@ public class CorefVisualizer extends WriterVisualizer
     {
       result = new LinkedList<String>();
       visitedNodes.add(n.getSId());
-      if (TokensOfNode.containsKey(n.getSId()))
+      if (tokensOfNode.containsKey(n.getSId()))
       {
-        for (String t : TokensOfNode.get(n.getSId()))
+        for (String t : tokensOfNode.get(n.getSId()))
         {
           result.add(t);
-          if (ComponentOfToken.get(t) == null)
+          if (componentOfToken.get(t) == null)
           {
             List<Long> newlist = new LinkedList<Long>();
             newlist.add(cnr);
-            ComponentOfToken.put(t, newlist);
+            componentOfToken.put(t, newlist);
           }
           else
           {
-            if (!ComponentOfToken.get(t).contains(cnr))
+            if (!componentOfToken.get(t).contains(cnr))
             {
-              ComponentOfToken.get(t).add(cnr);
+              componentOfToken.get(t).add(cnr);
             }
           }
         }
@@ -566,7 +568,7 @@ public class CorefVisualizer extends WriterVisualizer
         result = searchTokens(n, cnr);
         if (result != null)
         {
-          TokensOfNode.put(n.getSId(), result);
+          tokensOfNode.put(n.getSId(), result);
         }
       }
       //get "P"-Edges!
@@ -581,7 +583,7 @@ public class CorefVisualizer extends WriterVisualizer
             if (name.equals(rel.getSName())
               && !visitedNodes.contains(rel.getSStructuredTarget().getSId()))
             {
-              c.NodeList.add(rel.getSStructuredTarget().getSId());
+              c.nodeList.add(rel.getSStructuredTarget().getSId());
               List<String> Med = getAllTokens(rel.getSStructuredTarget(), 
                 name, c, cnr, namespace);
               for (String l : Med)
@@ -606,7 +608,7 @@ public class CorefVisualizer extends WriterVisualizer
             if (name.equals(rel.getSName())
               && !visitedNodes.contains(rel.getSStructuredSource().getSId()))
             {
-              c.NodeList.add(rel.getSStructuredSource().getSId());
+              c.nodeList.add(rel.getSStructuredSource().getSId());
               List<String> Med = getAllTokens(rel.getSStructuredSource(), name, c, cnr, namespace);
               for (String s : Med)
               {
@@ -634,15 +636,15 @@ public class CorefVisualizer extends WriterVisualizer
     if (n instanceof SToken)
     {
       SToken tok = (SToken) n;
-      if (!ReferentOfToken.containsKey(n.getSId()))
+      if (!referentOfToken.containsKey(n.getSId()))
       {
         HashMap<Long, Integer> newlist = new HashMap<Long, Integer>();
         newlist.put(index, value);//globalindex?
-        ReferentOfToken.put(tok.getSId(), newlist);
+        referentOfToken.put(tok.getSId(), newlist);
       }
       else
       {
-        ReferentOfToken.get(tok.getSId()).put(globalIndex, value);
+        referentOfToken.get(tok.getSId()).put(globalIndex, value);
       }
     }
     else
@@ -677,15 +679,15 @@ public class CorefVisualizer extends WriterVisualizer
     if (n instanceof SToken)
     {
       result.add(n.getSId());
-      if (ComponentOfToken.get(n.getSId()) == null)
+      if (componentOfToken.get(n.getSId()) == null)
       {
         List<Long> newlist = new LinkedList<Long>();
         newlist.add(cnr);
-        ComponentOfToken.put(n.getSId(), newlist);
+        componentOfToken.put(n.getSId(), newlist);
       }
       else
       {
-        List<Long> newlist = ComponentOfToken.get(n.getSId());
+        List<Long> newlist = componentOfToken.get(n.getSId());
         if (!newlist.contains(cnr))
         {
           newlist.add(cnr);
@@ -720,7 +722,7 @@ public class CorefVisualizer extends WriterVisualizer
    * Collects fitting annotations of an Token
    * @param id id of the given Token
    * @param component componentnumber of the line we need the annotations of
-   * @return Annotations as a String
+   * @return annotations as a String
    */
   private String getAnnotations(String id, long component)
   {
@@ -728,17 +730,17 @@ public class CorefVisualizer extends WriterVisualizer
     String incoming = "", outgoing = "";
     int nri = 1, nro = 1;
 
-    if(ReferentOfToken.get(id) != null)
+    if(referentOfToken.get(id) != null)
     {
-      for (long l : ReferentOfToken.get(id).keySet())
+      for (long l : referentOfToken.get(id).keySet())
       {
-        if (ReferentList.get((int) (long) l) != null && ReferentList.get((int) (long) l).Component == component
-          && ReferentList.get((int) (long) l).Annotations != null && ReferentList.get((int) (long) l).Annotations.size() > 0)
+        if (referentList.get((int) l) != null && referentList.get((int) l).component == component
+          && referentList.get((int) l).annotations != null && referentList.get((int) l).annotations.size() > 0)
         {
-          int num = ReferentOfToken.get(id).get(l);
+          int num = referentOfToken.get(id).get(l);
           if (num == 0 || num == 2)
           {
-            for (SAnnotation an : ReferentList.get((int) (long) l).Annotations)
+            for (SAnnotation an : referentList.get((int) l).annotations)
             {
               if (nri == 1)
               {
@@ -753,7 +755,7 @@ public class CorefVisualizer extends WriterVisualizer
           }
           if (num == 1 || num == 2)
           {
-            for (SAnnotation an : ReferentList.get((int) (long) l).Annotations)
+            for (SAnnotation an : referentList.get((int) (long) l).annotations)
             {
               if (nro == 1)
               {
@@ -781,29 +783,29 @@ public class CorefVisualizer extends WriterVisualizer
   }
 
   /**
-   * Calculates wheather a line determinded by its Component should be discontinous
+   * Calculates wheather a line determinded by its component should be discontinous
    * @param pre Id of the left token
    * @param now Id of the right token
-   * @param currentComponent Number of the Component, number of variable "Komponent"
+   * @param currentComponent Number of the component, number of variable "komponent"
    * @return Should the line be continued?
    */
   private boolean connectionOf(String pre, String now, long currentComponent)
   {
     List<Long> prel = new LinkedList<Long>(), nowl = new LinkedList<Long>();
-    if (!pre.equals(now) && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
+    if (!pre.equals(now) && referentOfToken.get(pre) != null && referentOfToken.get(now) != null)
     {
-      for (long l : ReferentOfToken.get(pre).keySet())
+      for (long l : referentOfToken.get(pre).keySet())
       {
-        if (ReferentList.get((int) l) != null && ReferentList.get((int) l).Component == currentComponent
-          && ReferentOfToken.get(pre).get(l).equals(0))
+        if (referentList.get((int) l) != null && referentList.get((int) l).component == currentComponent
+          && referentOfToken.get(pre).get(l).equals(0))
         {
           prel.add(l);
         }
       }
-      for (long l : ReferentOfToken.get(now).keySet())
+      for (long l : referentOfToken.get(now).keySet())
       {
-        if (ReferentList.get((int) l) != null && ReferentList.get((int) l).Component == currentComponent
-          && ReferentOfToken.get(now).get(l).equals(0))
+        if (referentList.get((int) l) != null && referentList.get((int) l).component == currentComponent
+          && referentOfToken.get(now).get(l).equals(0))
         {
           nowl.add(l);
         }
@@ -818,20 +820,20 @@ public class CorefVisualizer extends WriterVisualizer
     }
     prel = new LinkedList<Long>();
     nowl = new LinkedList<Long>();
-    if (!pre.equals(now) && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
+    if (!pre.equals(now) && referentOfToken.get(pre) != null && referentOfToken.get(now) != null)
     {
-      for (long l : ReferentOfToken.get(pre).keySet())
+      for (long l : referentOfToken.get(pre).keySet())
       {
-        if (ReferentList.get((int) l) != null && ReferentList.get((int) l).Component == currentComponent
-          && ReferentOfToken.get(pre).get(l).equals(1))
+        if (referentList.get((int) l) != null && referentList.get((int) l).component == currentComponent
+          && referentOfToken.get(pre).get(l).equals(1))
         {
           prel.add(l);
         }
       }
-      for (long l : ReferentOfToken.get(now).keySet())
+      for (long l : referentOfToken.get(now).keySet())
       {
-        if (ReferentList.get((int) l) != null && ReferentList.get((int) l).Component == currentComponent
-          && ReferentOfToken.get(now).get(l).equals(1))
+        if (referentList.get((int) l) != null && referentList.get((int) l).component == currentComponent
+          && referentOfToken.get(now).get(l).equals(1))
         {
           nowl.add(l);
         }
