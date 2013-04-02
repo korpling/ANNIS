@@ -262,7 +262,8 @@ public class CorefVisualizer extends WriterVisualizer
       List<Long> finalpositions = null;
       int maxlinkcount = 0;
       String lastId, currentId = null;
-      EList<SToken> token = saltGraph.getSTokens();
+      
+      EList<SToken> token = saltGraph.getSortedSTokenByText();
       if(token != null)
       {
         for (SToken tok : token)
