@@ -18,6 +18,15 @@ package annis.visualizers.iframe;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
+import com.hp.gagawa.java.elements.Body;
+import com.hp.gagawa.java.elements.Head;
+import com.hp.gagawa.java.elements.Html;
+import com.hp.gagawa.java.elements.Link;
+import com.hp.gagawa.java.elements.Script;
+import com.hp.gagawa.java.elements.Table;
+import com.hp.gagawa.java.elements.Td;
+import com.hp.gagawa.java.elements.Text;
+import com.hp.gagawa.java.elements.Tr;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import java.io.IOException;
 import java.io.Writer;
@@ -45,9 +54,14 @@ import org.slf4j.LoggerFactory;
 /**
  * A view of the entire text of a document, possibly with interactive 
  * coreference links. 
+ * <p>
  * It is possible to use this visualization to view entire texts
  * even if you do not have coreference annotations.
- * 
+ * </p>
+ * <p>
+ * This code relies heavily on HTML-tables and has some logic that is difficult to 
+ * understand. A GWT-based rewrite would be a good alternative.
+ * </p>
  * @author Thomas Krause
  * @author Christian Schulz-Hanke
  */
@@ -133,46 +147,54 @@ public class CorefVisualizer extends WriterVisualizer
   @Override
   public void writeOutput(VisualizerInput input, Writer w)
   {
+    // root html element 
+    Html html = new Html();
+    Head head = new Head();
+    Body body = new Body();
+    
+    html.appendChild(head);
+    html.appendChild(body);
+    
     try
     {
-      println("<html>", w);
-      println("<head>", w);
-      
       LinkedList<String> fonts = new LinkedList<String>();
       if(input.getFont() != null)
       {
+        Link linkFont = new Link();
+        linkFont.setHref(input.getFont().getUrl());
+        head.appendChild(linkFont);
         fonts.add(input.getFont().getName());
-        println("<link href=\"" 
-        + input.getFont().getUrl()
-        + "\" rel=\"stylesheet\" type=\"text/css\" >", w);
       }
       fonts.add("serif");
 
-      println("<link href=\"" 
-        + input.getResourcePath("coref/jquery.tooltip.css")
-        +"\" rel=\"stylesheet\" type=\"text/css\" >", w);
+      Link linkTooltip = new Link();
+      linkTooltip.setHref(input.getResourcePath("coref/jquery.tooltip.css"));
+      linkTooltip.setRel("stylesheet");
+      linkTooltip.setType("text/css");
+      head.appendChild(linkTooltip);
       
-      println("<script type=\"text/javascript\" src=\"" 
-        + input.getResourcePath("coref/jquery-1.6.2.min.js")
-        +"\"></script>", w);
-      println("<script type=\"text/javascript\" src=\"" 
-        + input.getResourcePath("coref/jquery.tooltip.min.js") 
-        +"\"></script>", w);
+      Script scriptJquery = new Script("text/javascript");
+      scriptJquery.setSrc(input.getResourcePath("coref/jquery-1.6.2.min.js"));
+      head.appendChild(scriptJquery);
       
-      println("<link href=\"" 
-        + input.getResourcePath("coref/coref.css")
-        + "\" rel=\"stylesheet\" type=\"text/css\" >", w);
-      println("<script type=\"text/javascript\" src=\"" 
-        + input.getResourcePath("coref/CorefVisualizer.js")
-        + "\"></script>", w);
-
-      println("</head>", w);
+      Script scriptTooltip = new Script("text/javascript");
+      scriptTooltip.setSrc(input.getResourcePath("coref/jquery.tooltip.min.js"));
+      head.appendChild(scriptTooltip);
+      
+      Link linkCoref = new Link();
+      linkCoref.setHref(input.getResourcePath("coref/coref.css"));
+      linkCoref.setRel("stylesheet");
+      linkCoref.setType("text/css");
+      head.appendChild(linkCoref);
+      
+      Script scriptCoref = new Script("text/javascript");
+      scriptCoref.setSrc(input.getResourcePath("coref/CorefVisualizer.js"));
+      head.appendChild(scriptCoref);
      
-      println("<body style=\"font-family: '" + StringUtils.join(fonts, "', '") + "';\" >", w);
+      body.setStyle("font-family: '" + StringUtils.join(fonts, "', '") + "';");
       
       //get Info
       globalIndex = 0;
-      int toolTipMaxLineCount = 1;
       tokensOfNode = new HashMap<String, List<String>>();
       referentList = new LinkedList<TReferent>();
       komponent = new LinkedList<TComponent>();
@@ -185,7 +207,7 @@ public class CorefVisualizer extends WriterVisualizer
       //AnnotationGraph anGraph = anResult.getGraph();
       if (saltGraph == null)
       {
-        println("An Error occured: Could not get Graph of Result (Graph == null)</body>", w);
+        body.setText("An Error occured: Could not get Graph of Result (Graph == null)</body>");
         return;
       }
       List<SRelation> edgeList = saltGraph.getSRelations();
@@ -259,9 +281,20 @@ public class CorefVisualizer extends WriterVisualizer
       }
 
       colorlist = new HashMap<Integer, Integer>();
+
+      
+      // present all texts as columns side by side
+      Table tableTexts = new Table();
+      body.appendChild(tableTexts);
+      
+      Tr trTextRow = new Tr();
+      tableTexts.appendChild(trTextRow);
+      
+      trTextRow.setCSSClass("textRow");
       
       // write output for each text separatly
       EList<STextualDS> texts = saltGraph.getSTextualDSs();
+
       if(texts != null)
       {
         for(STextualDS t : texts)
@@ -271,14 +304,20 @@ public class CorefVisualizer extends WriterVisualizer
           sequence.setSStart(0);
           sequence.setSEnd((t.getSText()!= null) ? t.getSText().length():0);
           EList<SToken> token = saltGraph.getSTokensBySequence(sequence);
+
           if(token != null)
           {
-            outputSingleText(token, input, w);
+            Td tdSingleText = new Td();
+            trTextRow.appendChild(tdSingleText);
+            tdSingleText.setCSSClass("text");
+            
+            outputSingleText(token, input, tdSingleText);
           }
         }
       }
       
-      println("</body></html>", w);
+      w.append(html.write());
+      
     }
     catch (IOException ex)
     {
@@ -286,7 +325,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
   
-  private void outputSingleText(EList<SToken> token, VisualizerInput input, Writer w)
+  private void outputSingleText(EList<SToken> token, VisualizerInput input, Td parentTd)
     throws IOException
   {
     List<Long> prevpositions, listpositions;
@@ -364,7 +403,8 @@ public class CorefVisualizer extends WriterVisualizer
         }
       }
 
-      String onclick = "", style = "";
+      String onclick = "";
+      String style = "";
       if (input.getMarkedAndCovered().containsKey(tok))
       {
         MatchedNodeColors[] vals = MatchedNodeColors.values();
@@ -381,7 +421,13 @@ public class CorefVisualizer extends WriterVisualizer
         onclick = "togglePRAuto(this);";
       }
 
-      println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
+      Table tableSingleTok = new Table();
+      parentTd.appendChild(tableSingleTok);
+      tableSingleTok.setBorder("0");
+      tableSingleTok.setStyle("float:left; font-size:11px; border-collapse: collapse");
+      tableSingleTok.setCellspacing("0");
+      tableSingleTok.setCellpadding("0");
+      
       int currentlinkcount = 0;
       if (underline)
       {
@@ -431,32 +477,56 @@ public class CorefVisualizer extends WriterVisualizer
                     break;
                   }
                 }
-                tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + annotations2 + "\"";
+                tooltip = "&lt;b&gt;Component&lt;/b&gt;: " + (pr + 1) + ", &lt;b&gt;Type&lt;/b&gt;: " + currentType2 + annotations2;
                 
-                println("<tr><td nowrap id=\"tok_"
-                  + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
-                  + style + "\" onclick=\""
-                  + onclick + "\" annis:pr_left=\""
-                  + prepareID(left2) + "\" annis:pr_right=\""
-                  + right2 + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+                Tr trTok = new Tr();
+                tableSingleTok.appendChild(trTok);
+                
+                Td tdTok = new Td();
+                trTok.appendChild(tdTok);
+                
+                tdTok.setId("tok_" + prepareID(tok.getSId()));
+                tdTok.setTitle(tooltip);
+                tdTok.setStyle(style);
+                tdTok.setAttribute("onclick", onclick);
+                tdTok.setAttribute("annis:pr_left", prepareID(left2));
+                tdTok.setAttribute("annis:pr_right", right2);
+                
+                Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+                tdTok.appendChild(textTok);
               }
               else
               {//easier
-                tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + annotations + "\"";
+                tooltip = "&lt;b&gt;Component&lt;/b&gt;: " + (currentPositionComponent + 1) + ", &lt;b&gt;Type&lt;/b&gt; " + currentType + annotations;
                 
-                println("<tr><td nowrap id=\"tok_"
-                  + prepareID(tok.getSId()) + "\" " + tooltip + " style=\""
-                  + style + "\" onclick=\""
-                  + onclick + "\" annis:pr_left=\""
-                  + prepareID(left) + "\" annis:pr_right=\""
-                  + right + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+                Tr trTok = new Tr();
+                tableSingleTok.appendChild(trTok);
+                
+                Td tdTok = new Td();
+                trTok.appendChild(tdTok);
+                tdTok.setId("tok_" + prepareID(tok.getSId()));
+                tdTok.setTitle(tooltip);
+                tdTok.setStyle(style);
+                tdTok.setAttribute("onclick", onclick);
+                tdTok.setAttribute("annis:pr_left", prepareID(left));
+                tdTok.setAttribute("annis:pr_right", right);
+                
+                Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+                tdTok.appendChild(textTok);
+                
               }
             }
             currentlinkcount++;
             //while we've got underlines
             if (currentPositionComponent.equals(Long.MIN_VALUE))
             {
-              println("<tr><td height=\"5px\"></td></tr>", w);
+              Tr trBlank = new Tr();
+              tableSingleTok.appendChild(trBlank);
+              
+              Td tdBlank = new Td();
+              trBlank.appendChild(tdBlank);
+              
+              tdBlank.setHeight("5px");
             }
             else
             {
@@ -484,17 +554,43 @@ public class CorefVisualizer extends WriterVisualizer
                 }
               }
 
-              tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + annotations + "\"";
+              tooltip = "&lt;b&gt;Component&lt;/b&gt;: " + (currentPositionComponent + 1) + ", &lt;b&gt;Type&lt;/b&gt;: " + currentType + annotations;
               
-              println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
-              println("<tr><td height=\"3px\" width=\"100%\" "
-                + " style=\"" + style + addition + "\" onclick=\""
-                + onclick + "\" annis:pr_left=\""
-                + prepareID(left) + "\"annis:pr_right=\""
-                + right + "\" " + tooltip + "BGCOLOR=\""
-                + Integer.toHexString(color) + "\"></td></tr>", w);
-              println("<tr><td height=\"2px\"></td></tr>", w);
-              println("</table></td></tr>", w);//
+              Tr trLineContainer = new Tr();
+              tableSingleTok.appendChild(trLineContainer);
+              
+              Td tdLineContainer = new Td();
+              trLineContainer.appendChild(tdLineContainer);
+              
+              Table tableLineContainer = new Table();
+              tdLineContainer.appendChild(tableLineContainer);
+              
+              tableLineContainer.setBorder("0");
+              tableLineContainer.setWidth("100%");
+              tableLineContainer.setStyle("border-collapse: collapse");
+              
+              Tr trLine = new Tr();
+              tableLineContainer.appendChild(trLine);
+              
+              Td tdLine = new Td();
+              trLine.appendChild(tdLine);
+              
+              tdLine.setHeight("3px");
+              tdLine.setWidth("100%");
+              tdLine.setStyle(style + addition);
+              tdLine.setAttribute("onclick", onclick);
+              tdLine.setAttribute("annis:pr_left", prepareID(left));
+              tdLine.setAttribute("annis:pr_right", right);
+              tdLine.setTitle(tooltip);
+              tdLine.setBgcolor(Integer.toHexString(color));
+
+              Tr trSpace = new Tr();
+              tableLineContainer.appendChild(trSpace);
+              
+              Td tdSpace = new Td();
+              trSpace.appendChild(tdSpace);
+              
+              tdSpace.setHeight("2px");
             }
           }
         }
@@ -506,25 +602,43 @@ public class CorefVisualizer extends WriterVisualizer
         {
           if (currentlinkcount < maxlinkcount)
           {
-            println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
+            Tr trSpace = new Tr();
+            tableSingleTok.appendChild(trSpace);
+
+            Td tdSpace = new Td();
+            trSpace.appendChild(tdSpace);
+
+            tdSpace.setHeight("" + (maxlinkcount - currentlinkcount) * 5 + "px");
           }
         }
-        println("</table></td></tr>", w);
       }
       else
       {
-        println("<tr><td id=\"tok_"
-          + prepareID(tok.getSId()) + "\" " + " style=\""
-          + style + "\" onclick=\""
-          + onclick + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+        
+        // print a token without lines
+        Tr trTok = new Tr();
+        tableSingleTok.appendChild(trTok);
+
+        Td tdTok = new Td();
+        trTok.appendChild(tdTok);
+        
+        tdTok.setId("tok_" + prepareID(tok.getSId()));
+        tdTok.setStyle(style);
+        
+        Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
+        tdTok.appendChild(textTok);
+        
         if (maxlinkcount > 0)
         {
-          println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
-          println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
-          println("</table></td></tr>", w);
+          Tr trSpace = new Tr();
+          tableSingleTok.appendChild(trSpace);
+
+          Td tdSpace = new Td();
+          trSpace.appendChild(tdSpace);
+
+          tdSpace.setHeight("" + maxlinkcount * 5 + "px");
         }
       }
-      println("</table>", w);
     } // end for each token
   }
 
@@ -744,7 +858,7 @@ public class CorefVisualizer extends WriterVisualizer
             {
               if (nri == 1)
               {
-                incoming = ", <b>incoming Annotations</b>: " + an.getName() + "=" + an.getValue();
+                incoming = ", &lt;b&gt;incoming Annotations&lt;/b&gt;: " + an.getName() + "=" + an.getValue();
                 nri--;
               }
               else
@@ -759,7 +873,7 @@ public class CorefVisualizer extends WriterVisualizer
             {
               if (nro == 1)
               {
-                outgoing = ", <b>outgoing Annotations</b>: " + an.getSName() + "=" + an.getValueString();
+                outgoing = ", &lt;b&gt;outgoing Annotations&lt;/b&gt;: " + an.getSName() + "=" + an.getValueString();
                 nro--; // remove l+"- "+
               }
               else
@@ -882,21 +996,6 @@ public class CorefVisualizer extends WriterVisualizer
     }
 
     return (r * 65536 + g * 256 + b);
-  }
-
-  private void println(String s, Writer writer) throws IOException
-  {
-    println(s, 0, writer);
-  }
-
-  private void println(String s, int indent, Writer writer) throws IOException
-  {
-    for(int i=0; i < indent; i++)
-    {
-      writer.append("\t");
-    }
-    writer.append(s);
-    writer.append("\n");
   }
 
   private boolean includeEdge(Edge e, String namespace)
