@@ -15,11 +15,10 @@
  */
 package annis.visualizers.iframe;
 
+import annis.CommonHelper;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.service.ifaces.AnnisToken;
 import java.io.IOException;
 import java.io.Writer;
-import annis.model.Annotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SPointingRelation;
@@ -261,245 +260,249 @@ public class CorefVisualizer extends WriterVisualizer
       List<Long> prevpositions, listpositions;
       List<Long> finalpositions = null;
       int maxlinkcount = 0;
-      Long lastId = null, currentId = null;
-      for (AnnisToken tok : input.getResult().getTokenList())
+      String lastId, currentId = null;
+      EList<SToken> token = saltGraph.getSTokens();
+      if(token != null)
       {
+        for (SToken tok : token)
+        {
 
-        prevpositions = finalpositions;
-        if (prevpositions != null && prevpositions.size() < 1)
-        {
-          prevpositions = null;
-        }
-        lastId = currentId;
-        currentId = tok.getId();
-        listpositions = ComponentOfToken.get(currentId);
-        List<Boolean> checklist = null;
-
-        if (prevpositions == null && listpositions != null)
-        {
-          finalpositions = listpositions;
-        }
-        else if (listpositions == null)
-        {
-          finalpositions = new LinkedList<Long>();
-        }
-        else
-        {
-          checklist = new LinkedList<Boolean>();
-          for (int i = 0; i < prevpositions.size(); i++)
+          prevpositions = finalpositions;
+          if (prevpositions != null && prevpositions.size() < 1)
           {
-            if (listpositions.contains(prevpositions.get(i)))
-            {
-              checklist.add(true);
-            }
-            else
-            {
-              checklist.add(false);
-            }
+            prevpositions = null;
           }
-          List<Long> remains = new LinkedList<Long>();
-          for (int i = 0; i < listpositions.size(); i++)
-          {
-            if (!prevpositions.contains(listpositions.get(i)))
-            {
-              remains.add(listpositions.get(i));
-            }
-          }
+          lastId = currentId;
+          currentId = tok.getId();
+          listpositions = ComponentOfToken.get(currentId);
+          List<Boolean> checklist = null;
 
-          int minsize = checklist.size() + remains.size();
-          int number = 0;
-          finalpositions = new LinkedList<Long>();
-          for (int i = 0; i < minsize; i++)
+          if (prevpositions == null && listpositions != null)
           {
-            if (checklist.size() > i && checklist.get(i).booleanValue())
+            finalpositions = listpositions;
+          }
+          else if (listpositions == null)
+          {
+            finalpositions = new LinkedList<Long>();
+          }
+          else
+          {
+            checklist = new LinkedList<Boolean>();
+            for (int i = 0; prevpositions != null && i < prevpositions.size(); i++)
             {
-              finalpositions.add(prevpositions.get(i));
-            }
-            else
-            {
-              if (remains.size() > number)
+              if (listpositions.contains(prevpositions.get(i)))
               {
-                Long ll = remains.get(number);
-                finalpositions.add(ll);
-                number++;
-                minsize--;
+                checklist.add(true);
               }
               else
               {
-                finalpositions.add(Long.MIN_VALUE);
+                checklist.add(false);
+              }
+            }
+            List<Long> remains = new LinkedList<Long>();
+            for (int i = 0; i < listpositions.size(); i++)
+            {
+              if (prevpositions != null && !prevpositions.contains(listpositions.get(i)))
+              {
+                remains.add(listpositions.get(i));
+              }
+            }
+
+            int minsize = checklist.size() + remains.size();
+            int number = 0;
+            finalpositions = new LinkedList<Long>();
+            for (int i = 0; i < minsize; i++)
+            {
+              if (prevpositions != null && checklist.size() > i && checklist.get(i).booleanValue())
+              {
+                finalpositions.add(prevpositions.get(i));
+              }
+              else
+              {
+                if (remains.size() > number)
+                {
+                  Long ll = remains.get(number);
+                  finalpositions.add(ll);
+                  number++;
+                  minsize--;
+                }
+                else
+                {
+                  finalpositions.add(Long.MIN_VALUE);
+                }
               }
             }
           }
-        }
 
-        String onclick = "", style = "";
-        if (input.getMarkableMap().containsKey("" + tok.getId()))
-        {
-          style += "color:red; ";
-        }
+          String onclick = "", style = "";
+          if (input.getMarkableMap().containsKey("" + tok.getId()))
+          {
+            style += "color:red; ";
+          }
 
-        boolean underline = false;
-        if (!finalpositions.isEmpty())
-        {
-          style += "cursor:pointer;";
-          underline = true;
-          onclick = "togglePRAuto(this);";
-        }
-
-        println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
-        int currentlinkcount = 0;
-        if (underline)
-        {
-          boolean firstone = true;
-          int index = -1;
-          String tooltip = "";
+          boolean underline = false;
           if (!finalpositions.isEmpty())
           {
-            for (Long currentPositionComponent : finalpositions)
+            style += "cursor:pointer;";
+            underline = true;
+            onclick = "togglePRAuto(this);";
+          }
+
+          println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
+          int currentlinkcount = 0;
+          if (underline)
+          {
+            boolean firstone = true;
+            int index = -1;
+            String tooltip;
+            if (!finalpositions.isEmpty())
             {
-              index++;
-              String left = "", right = "";
-              List<String> pi;
-              TComponent currentWriteComponent = null;// == pir
-              String currentType = "";
-              if (!currentPositionComponent.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent)
+              for (Long currentPositionComponent : finalpositions)
               {
-                currentWriteComponent = Komponent.get((int) (long) currentPositionComponent);
-                pi = currentWriteComponent.TokenList;
-                currentType = currentWriteComponent.Type;
-                left = StringUtils.join(pi, ",");
-                right = "" + currentPositionComponent + 1;
-              }
-              String Annotations = getAnnotations(tok.getId(), currentPositionComponent);
-              if (firstone)
-              {
-                firstone = false;
-                if (currentWriteComponent == null)
+                index++;
+                String left = "", right = "";
+                List<String> pi;
+                TComponent currentWriteComponent = null;// == pir
+                String currentType = "";
+                if (!currentPositionComponent.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent)
                 {
-                  String left2 = "", right2 = "";
-                  List<String> pi2;
-                  long pr = 0;
-                  TComponent currentWriteComponent2 = null;// == pir
-                  String currentType2 = "";
-                  String Annotations2 = "";
-                  for (Long currentPositionComponent2 : finalpositions)
+                  currentWriteComponent = Komponent.get((int) (long) currentPositionComponent);
+                  pi = currentWriteComponent.TokenList;
+                  currentType = currentWriteComponent.Type;
+                  left = StringUtils.join(pi, ",");
+                  right = "" + currentPositionComponent + 1;
+                }
+                String Annotations = getAnnotations(tok.getId(), currentPositionComponent);
+                if (firstone)
+                {
+                  firstone = false;
+                  if (currentWriteComponent == null)
                   {
-                    if (!currentPositionComponent2.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent2)
+                    String left2 = "", right2 = "";
+                    List<String> pi2;
+                    long pr = 0;
+                    TComponent currentWriteComponent2;// == pir
+                    String currentType2 = "";
+                    String Annotations2 = "";
+                    for (Long currentPositionComponent2 : finalpositions)
                     {
-                      currentWriteComponent2 = Komponent.get((int) (long) currentPositionComponent2);
-                      pi2 = currentWriteComponent2.TokenList;
-                      currentType2 = currentWriteComponent2.Type;
-                      left2 = StringUtils.join(pi2, ",");
-                      right2 = "" + currentPositionComponent2 + 1;
-                      Annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
-                      pr = currentPositionComponent2;
-                      break;
+                      if (!currentPositionComponent2.equals(Long.MIN_VALUE) && Komponent.size() > currentPositionComponent2)
+                      {
+                        currentWriteComponent2 = Komponent.get((int) (long) currentPositionComponent2);
+                        pi2 = currentWriteComponent2.TokenList;
+                        currentType2 = currentWriteComponent2.Type;
+                        left2 = StringUtils.join(pi2, ",");
+                        right2 = "" + currentPositionComponent2 + 1;
+                        Annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
+                        pr = currentPositionComponent2;
+                        break;
+                      }
                     }
+                    tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + Annotations2 + "\"";
+                    if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
+                    {
+                      toolTipMaxLineCount = tooltip.length() / 40 + 1;
+                    }
+                    println("<tr><td nowrap id=\"tok_"
+                      + tok.getId() + "\" " + tooltip + " style=\""
+                      + style + "\" onclick=\""
+                      + onclick + "\" annis:pr_left=\""
+                      + left2 + "\" annis:pr_right=\""
+                      + right2 + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
                   }
-                  tooltip = "title=\" - <b>Component</b>: " + (pr + 1) + ", <b>Type</b>: " + currentType2 + Annotations2 + "\"";
-                  if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
-                  {
-                    toolTipMaxLineCount = tooltip.length() / 40 + 1;
+                  else
+                  {//easier
+                    tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
+                    if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
+                    {
+                      toolTipMaxLineCount = tooltip.length() / 40 + 1;
+                    }
+                    println("<tr><td nowrap id=\"tok_"
+                      + tok.getId() + "\" " + tooltip + " style=\""
+                      + style + "\" onclick=\""
+                      + onclick + "\" annis:pr_left=\""
+                      + left + "\" annis:pr_right=\""
+                      + right + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
                   }
-                  println("<tr><td nowrap id=\"tok_"
-                    + tok.getId() + "\" " + tooltip + " style=\""
-                    + style + "\" onclick=\""
-                    + onclick + "\" annis:pr_left=\""
-                    + left2 + "\" annis:pr_right=\""
-                    + right2 + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
+                }
+                currentlinkcount++;
+                //while we've got underlines
+                if (currentPositionComponent.equals(Long.MIN_VALUE))
+                {
+                  println("<tr><td height=\"5px\"></td></tr>", w);
                 }
                 else
-                {//easier
+                {
+                  int color;
+                  if (colorlist.containsKey((int) (long) currentPositionComponent))
+                  {
+                    color = colorlist.get((int) (long) currentPositionComponent);
+                  }
+                  else
+                  {
+                    color = getNewColor((int) (long) currentPositionComponent);
+                    colorlist.put((int) (long) currentPositionComponent, color);
+                  }
+                  if (color > 16777215)
+                  {
+                    color = 16777215;
+                  }
+
+                  String addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
+                  if (lastId != null && currentId != null && checklist != null && checklist.size() > index && checklist.get(index).booleanValue() == true)
+                  {
+                    if (connectionOf(lastId, currentId, currentPositionComponent))
+                    {
+                      addition = "";
+                    }
+                  }
+
                   tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
                   if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
                   {
                     toolTipMaxLineCount = tooltip.length() / 40 + 1;
                   }
-                  println("<tr><td nowrap id=\"tok_"
-                    + tok.getId() + "\" " + tooltip + " style=\""
-                    + style + "\" onclick=\""
+
+                  println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
+                  println("<tr><td height=\"3px\" width=\"100%\" "
+                    + " style=\"" + style + addition + "\" onclick=\""
                     + onclick + "\" annis:pr_left=\""
-                    + left + "\" annis:pr_right=\""
-                    + right + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
+                    + left + "\"annis:pr_right=\""
+                    + right + "\" " + tooltip + "BGCOLOR=\""
+                    + Integer.toHexString(color) + "\"></td></tr>", w);
+                  println("<tr><td height=\"2px\"></td></tr>", w);
+                  println("</table></td></tr>", w);//
                 }
-              }
-              currentlinkcount++;
-              //while we've got underlines
-              if (currentPositionComponent.equals(Long.MIN_VALUE))
-              {
-                println("<tr><td height=\"5px\"></td></tr>", w);
-              }
-              else
-              {
-                int color = 0;
-                if (colorlist.containsKey((int) (long) currentPositionComponent))
-                {
-                  color = colorlist.get((int) (long) currentPositionComponent);
-                }
-                else
-                {
-                  color = getNewColor((int) (long) currentPositionComponent);
-                  colorlist.put((int) (long) currentPositionComponent, color);
-                }
-                if (color > 16777215)
-                {
-                  color = 16777215;
-                }
-
-                String addition = ";border-style: solid; border-width: 0px 0px 0px 2px; border-color: white ";
-                if (lastId != null && currentId != null && checklist != null && checklist.size() > index && checklist.get(index).booleanValue() == true)
-                {
-                  if (connectionOf(lastId, currentId, currentPositionComponent))
-                  {
-                    addition = "";
-                  }
-                }
-
-                tooltip = "title=\" - <b>Component</b>: " + (currentPositionComponent + 1) + ", <b>Type</b>: " + currentType + Annotations + "\"";
-                if (tooltip.length() / 40 + 1 > toolTipMaxLineCount)
-                {
-                  toolTipMaxLineCount = tooltip.length() / 40 + 1;
-                }
-
-                println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);//
-                println("<tr><td height=\"3px\" width=\"100%\" "
-                  + " style=\"" + style + addition + "\" onclick=\""
-                  + onclick + "\" annis:pr_left=\""
-                  + left + "\"annis:pr_right=\""
-                  + right + "\" " + tooltip + "BGCOLOR=\""
-                  + Integer.toHexString(color) + "\"></td></tr>", w);
-                println("<tr><td height=\"2px\"></td></tr>", w);
-                println("</table></td></tr>", w);//
               }
             }
-          }
-          if (currentlinkcount > maxlinkcount)
-          {
-            maxlinkcount = currentlinkcount;
+            if (currentlinkcount > maxlinkcount)
+            {
+              maxlinkcount = currentlinkcount;
+            }
+            else
+            {
+              if (currentlinkcount < maxlinkcount)
+              {
+                println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
+              }
+            }
+            println("</table></td></tr>", w);
           }
           else
           {
-            if (currentlinkcount < maxlinkcount)
+            println("<tr><td id=\"tok_"
+              + tok.getId() + "\" " + " style=\""
+              + style + "\" onclick=\""
+              + onclick + "\" > &nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp; </td></tr>", w);
+            if (maxlinkcount > 0)
             {
-              println("<tr><td height=\"" + (maxlinkcount - currentlinkcount) * 5 + "px\"></td></tr>", w);
+              println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
+              println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
+              println("</table></td></tr>", w);
             }
           }
-          println("</table></td></tr>", w);
-        }
-        else
-        {
-          println("<tr><td id=\"tok_"
-            + tok.getId() + "\" " + " style=\""
-            + style + "\" onclick=\""
-            + onclick + "\" > &nbsp;" + tok.getText() + "&nbsp; </td></tr>", w);
-          if (maxlinkcount > 0)
-          {
-            println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
-            println("<tr><td height=\"" + maxlinkcount * 5 + "px\"></td></tr>", w);
-            println("</table></td></tr>", w);
-          }
-        }
-        println("</table>", w);
+          println("</table>", w);
+        } // end for each token
       }
       println("<table border=\"0\" style=\"float:left; font-size:11px; border-collapse: collapse\" cellspacing=\"0\" cellpadding=\"0\">", w);
       println("<tr><td><table border=\"0\" width=\"100%\" style=\"border-collapse: collapse \">", w);
@@ -714,7 +717,7 @@ public class CorefVisualizer extends WriterVisualizer
    * @param component componentnumber of the line we need the annotations of
    * @return Annotations as a String
    */
-  private String getAnnotations(Long id, long component)
+  private String getAnnotations(String id, long component)
   {
     String result = "";
     String incoming = "", outgoing = "";
@@ -779,10 +782,10 @@ public class CorefVisualizer extends WriterVisualizer
    * @param currentComponent Number of the Component, number of variable "Komponent"
    * @return Should the line be continued?
    */
-  private boolean connectionOf(long pre, long now, long currentComponent)
+  private boolean connectionOf(String pre, String now, long currentComponent)
   {
     List<Long> prel = new LinkedList<Long>(), nowl = new LinkedList<Long>();
-    if (pre != now && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
+    if (!pre.equals(now) && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
     {
       for (long l : ReferentOfToken.get(pre).keySet())
       {
@@ -810,7 +813,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
     prel = new LinkedList<Long>();
     nowl = new LinkedList<Long>();
-    if (pre != now && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
+    if (!pre.equals(now) && ReferentOfToken.get(pre) != null && ReferentOfToken.get(now) != null)
     {
       for (long l : ReferentOfToken.get(pre).keySet())
       {
