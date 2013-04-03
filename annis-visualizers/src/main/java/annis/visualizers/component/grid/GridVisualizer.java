@@ -33,8 +33,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -58,7 +56,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -162,6 +159,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           }
         }
         
+        int tokenOffsetForText = -1;
+        
         // add tokens as row
         Row tokenRow = new Row();
         for(SToken t : token)
@@ -186,10 +185,18 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           {
             long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
               - startIndex;
+            
+            if(tokenOffsetForText < 0)
+            {
+              // set the token offset by assuming the first idx must be zero
+              tokenOffsetForText = Math.abs((int) idx);
+            }
+            
             String text = CommonHelper.getSpannedText(t);
 
             GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
-
+            event.setTextID(tokenTextID);
+            
             // check if the token is a matched node
             SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
             Long match = featMatched == null ? null : featMatched.
@@ -209,6 +216,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         }
         
         grid.setRowsByAnnotation(rowsByAnnotation);
+        grid.setTokenIndexOffset(tokenOffsetForText);
       } // end if input not null
     }
     
