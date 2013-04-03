@@ -16,8 +16,6 @@
 package annis.visualizers.iframe;
 
 import annis.CommonHelper;
-import static annis.CommonHelper.getMatchedNodes;
-import annis.CoveredTextsCalculator;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import com.hp.gagawa.java.DocumentType;
@@ -43,27 +41,16 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -75,7 +62,14 @@ import org.slf4j.LoggerFactory;
  * even if you do not have coreference annotations.
  * </p>
  * <p>
- * This code relies heavily on HTML-tables and has some logic that is difficult to 
+ * <strong>Mappings</strong>:<br/>
+ * <ul>
+ *   <li>hide_empty: if set to "true" only texts that have annotations are shown</li>
+ * </ul>
+ * </p>
+ * <p>
+ * <b>Implementation notes</b>: This code relies heavily on HTML-tables and 
+ * has some logic that is difficult to 
  * understand. A GWT-based rewrite would be a good alternative.
  * </p>
  * @author Thomas Krause
@@ -221,10 +215,9 @@ public class CorefVisualizer extends WriterVisualizer
       SDocument saltDoc = input.getDocument();
      
       SDocumentGraph saltGraph = saltDoc.getSDocumentGraph();
-      //AnnotationGraph anGraph = anResult.getGraph();
       if (saltGraph == null)
       {
-        body.setText("An Error occured: Could not get Graph of Result (Graph == null)</body>");
+        body.setText("An Error occured: Could not get Graph of Result (Graph == null).");
         return;
       }
       List<SRelation> edgeList = saltGraph.getSRelations();
@@ -275,11 +268,11 @@ public class CorefVisualizer extends WriterVisualizer
             komponent.add(currentComponent);
             currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
           }
-          TReferent Ref = new TReferent();
-          Ref.annotations = new HashSet<SAnnotation>();
-          Ref.annotations.addAll(rel.getSAnnotations());
-          Ref.component = componentnr;
-          referentList.add(Ref);
+          TReferent ref = new TReferent();
+          ref.annotations = new HashSet<SAnnotation>();
+          ref.annotations.addAll(rel.getSAnnotations());
+          ref.component = componentnr;
+          referentList.add(ref);
 
           List<String> currentTokens = getAllTokens(rel.getSStructuredSource(), componentNameForRelation(rel), 
             currentComponenttype, componentnr, input.getNamespace());
@@ -301,41 +294,14 @@ public class CorefVisualizer extends WriterVisualizer
 
       colorlist = new HashMap<Integer, Integer>();
 
-      // write output for each text separatly
-      List<SNode> startNodes = new LinkedList<SNode>(Arrays.asList(getMatchedNodes(input.getDocument())));
-      // filter start nodes by their namespace/layer
-      ListIterator<SNode> it = startNodes.listIterator();
-      while(it.hasNext())
-      {
-        SNode node = it.next();
-        if(node.getSLayers() != null && node.getSLayers().size() > 0 && node.getSLayers().get(0) != null)
-        {
-          SLayer layer = node.getSLayers().get(0);
-          if(input.getNamespace() != null && !input.getNamespace().equals(layer.getSName()))
-          {
-            it.remove();
-          }
-        }
-      }
-      // use the start nodes to actually compute the coverd STextualDS
-      CoveredTextsCalculator textCalc = new CoveredTextsCalculator(input.getDocument().getSDocumentGraph(),
-        startNodes);
-      EList<STextualDS> texts = new BasicEList<STextualDS>();
-      texts.addAll(textCalc.getCoveredTexts());
+      // A list containing all the generated HTML elements, one list entry
+      // for each text.
+      List<List<Node>> nodesPerText = new LinkedList<List<Node>>();
       
+      // write output for each text separatly
+      EList<STextualDS> texts = saltGraph.getSTextualDSs();
       if(texts != null && !texts.isEmpty())
       {
-        // present all texts as columns side by side if using multiple texts
-        Table tableTexts = new Table();
-        Tr trTextRow = new Tr();
-        trTextRow.setCSSClass("textRow");
-
-        // only append wrapper table if we have multiple texts
-        if(texts.size() > 1)
-        {
-          body.appendChild(tableTexts);
-          tableTexts.appendChild(trTextRow);
-        }
         
         for(STextualDS t : texts)
         {
@@ -347,23 +313,75 @@ public class CorefVisualizer extends WriterVisualizer
 
           if(token != null)
           {
-            List<Node> nodes = outputSingleText(token, input);
-            
-            // multi-text mode?
-            if(texts.size() > 1)
+            boolean validText = true;
+            if(Boolean.parseBoolean(input.getMappings().getProperty("hide_empty", "false")))
             {
-              Td tdSingleText = new Td();
-              trTextRow.appendChild(tdSingleText);
-              tdSingleText.setCSSClass("text");
-              tdSingleText.appendChild(nodes);
+              validText = false;
+              // check if the text contains any matching annotations
+              for(SToken tok : token)
+              {
+                /* 
+                 * The token is only added to this map if an valid edge
+                 * (according to the resolver trigger) conntected to 
+                 * this token was found.
+                 */
+                if(referentOfToken.get(tok.getSId()) != null 
+                  && !referentOfToken.get(tok.getSId()).isEmpty())
+                {
+                  validText = true;
+                  break;
+                }
+              }
             }
-            else
+            
+            if(validText)
             {
-              body.appendChild(nodes);
+              List<Node> nodes = outputSingleText(token, input);
+              nodesPerText.add(nodes);
             }
           }
+        } // end for each STexutalDS
+        
+        /* 
+         * Append the generated output to the body, wrap in table if necessary. 
+         */
+        
+        // present all texts as columns side by side if using multiple texts
+        Table tableTexts = new Table();
+        Tr trTextRow = new Tr();
+        trTextRow.setCSSClass("textRow");
+
+        // only append wrapper table if we have multiple texts
+        if(nodesPerText.size() > 1)
+        {
+          body.appendChild(tableTexts);
+          tableTexts.appendChild(trTextRow);
         }
+        for(List<Node> nodes : nodesPerText)
+        {
+           // multi-text mode?
+          if(nodesPerText.size() > 1)
+          {
+            Td tdSingleText = new Td();
+            trTextRow.appendChild(tdSingleText);
+            tdSingleText.setCSSClass("text");
+            tdSingleText.appendChild(nodes);
+          }
+          else
+          {
+            body.appendChild(nodes);
+          }
+        }
+        
       }
+      else
+      {
+        Text errorTxt = new Text("Could not find any texts for the " 
+          + input.getNamespace() + " node namespace (layer).");
+        body.appendChild(errorTxt);
+      }
+      
+      
       
       // write HTML4 transitional doctype
       w.append(new Doctype(DocumentType.HTMLTransitional).write());
