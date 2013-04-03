@@ -50,6 +50,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -80,7 +81,7 @@ public class CorefVisualizer extends WriterVisualizer
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CorefVisualizer.class);
-
+  
   long globalIndex;
   List<TReferent> referentList;
   List<TComponent> komponent;
@@ -509,15 +510,20 @@ public class CorefVisualizer extends WriterVisualizer
           {
             index++;
             String left = "", right = "";
-            List<String> pi;
+            
             TComponent currentWriteComponent = null;// == pir
             String currentType = "";
             if (!currentPositionComponent.equals(Long.MIN_VALUE) && komponent.size() > currentPositionComponent)
             {
               currentWriteComponent = komponent.get((int) (long) currentPositionComponent);
-              pi = currentWriteComponent.tokenList;
+              List<String> pi = currentWriteComponent.tokenList;
+              List<String> preparedPi = new LinkedList<String>();
+              for(String s : pi)
+              {
+                preparedPi.add(prepareID(s));
+              }
               currentType = currentWriteComponent.type;
-              left = StringUtils.join(pi, ",");
+              left = StringUtils.join(preparedPi, ",");
               right = "" + currentPositionComponent + 1;
             }
             String annotations = getAnnotations(tok.getId(), currentPositionComponent);
@@ -527,7 +533,6 @@ public class CorefVisualizer extends WriterVisualizer
               if (currentWriteComponent == null)
               {
                 String left2 = "", right2 = "";
-                List<String> pi2;
                 long pr = 0;
                 TComponent currentWriteComponent2;// == pir
                 String currentType2 = "";
@@ -537,9 +542,16 @@ public class CorefVisualizer extends WriterVisualizer
                   if (!currentPositionComponent2.equals(Long.MIN_VALUE) && komponent.size() > currentPositionComponent2)
                   {
                     currentWriteComponent2 = komponent.get((int) (long) currentPositionComponent2);
-                    pi2 = currentWriteComponent2.tokenList;
+                    List<String> pi2 = currentWriteComponent2.tokenList;
+                   
+                    // prepare each single ID
+                    List<String> preparedPi2 = new LinkedList<String>();
+                    for(String s : pi2)
+                    {
+                      preparedPi2.add(prepareID(s));
+                    }
                     currentType2 = currentWriteComponent2.type;
-                    left2 = StringUtils.join(pi2, ",");
+                    left2 = StringUtils.join(preparedPi2, ",");
                     right2 = "" + currentPositionComponent2 + 1;
                     annotations2 = getAnnotations(tok.getId(), currentPositionComponent2);
                     pr = currentPositionComponent2;
@@ -558,7 +570,7 @@ public class CorefVisualizer extends WriterVisualizer
                 tdTok.setTitle(tooltip);
                 tdTok.setStyle(style);
                 tdTok.setAttribute("onclick", onclick);
-                tdTok.setAttribute("annis:pr_left", prepareID(left2));
+                tdTok.setAttribute("annis:pr_left", left2);
                 tdTok.setAttribute("annis:pr_right", right2);
                 
                 Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
@@ -577,7 +589,7 @@ public class CorefVisualizer extends WriterVisualizer
                 tdTok.setTitle(tooltip);
                 tdTok.setStyle(style);
                 tdTok.setAttribute("onclick", onclick);
-                tdTok.setAttribute("annis:pr_left", prepareID(left));
+                tdTok.setAttribute("annis:pr_left", left);
                 tdTok.setAttribute("annis:pr_right", right);
                 
                 Text textTok = new Text("&nbsp;" + CommonHelper.getSpannedText(tok) + "&nbsp;");
@@ -645,7 +657,7 @@ public class CorefVisualizer extends WriterVisualizer
               tdLine.setCSSClass("line");
               tdLine.setStyle("background-color: #" + Integer.toHexString(color) + "; " + style + addition);
               tdLine.setAttribute("onclick", onclick);
-              tdLine.setAttribute("annis:pr_left", prepareID(left));
+              tdLine.setAttribute("annis:pr_left", left);
               tdLine.setAttribute("annis:pr_right", right);
               tdLine.setTitle(tooltip);
 
@@ -1085,9 +1097,12 @@ public class CorefVisualizer extends WriterVisualizer
    * @param orig
    * @return 
    */
-  private static String prepareID(String orig)
+  private String prepareID(String orig)
   {
-    return orig.replaceAll("#|:|/|\\.", "_");
+    return DigestUtils.md5Hex(orig);
+//    return StringUtils.replaceChars(orig, "#:/.", "____");
+//    Matcher m = patternIrregualIDChar.matcher(orig);
+//    return m.replaceAll("_");
   }
   
   private static String componentNameForRelation(SRelation rel)
