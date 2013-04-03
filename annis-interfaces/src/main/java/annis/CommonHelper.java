@@ -292,6 +292,35 @@ public class CommonHelper
     return result;
   }
   
+  public static SNode[] getMatchedNodes(SDocument doc)
+  {
+    SNode[] result = new SNode[0];
+    
+    // get the matched node IDs
+    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+    if(feat != null)
+    {
+      String[] ids = feat.getSValueSTEXT().split(",");
+      result = new SNode[ids.length];
+      
+      for(int i=0; i < ids.length; i++)
+      {
+        String id = ids[i].trim();
+        if(!id.isEmpty())
+        {
+          // get the specific node
+          SNode node = doc.getSDocumentGraph().getSNode(id);
+          if(node != null)
+          {
+            result[i] = node;
+          }
+        }
+      }
+    }
+    
+    return result;
+  }
+  
   /**
    * Will return a list of all texts that contain matched nodes.
    * @param doc
@@ -302,33 +331,14 @@ public class CommonHelper
     
     final EList<STextualDS> result = new BasicEList<STextualDS>();
     
-    // get the matched node IDs
-    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
-    if(feat != null)
-    {
+    
+    List<SNode> startNodes = Arrays.asList(getMatchedNodes(doc));
       
-      List<SNode> startNodes = new LinkedList<SNode>();
-      
-      String[] ids = feat.getSValueSTEXT().split(",");
-      for(String s : ids)
-      {
-        String id = s.trim();
-        if(!id.isEmpty())
-        {
-          // get the specific node
-          SNode node = doc.getSDocumentGraph().getSNode(id);
-          if(node != null)
-          {
-            startNodes.add(node);
-          }
-        }
-      }
-      
-      // use the start nodes to actually compute the coverd STextualDS
-      CoveredTextsCalculator textCalc = new CoveredTextsCalculator(doc.getSDocumentGraph(),
-        startNodes);
-      result.addAll(textCalc.getCoveredTexts());
-    }
+    // use the start nodes to actually compute the coverd STextualDS
+    CoveredTextsCalculator textCalc = new CoveredTextsCalculator(doc.getSDocumentGraph(),
+      startNodes);
+    result.addAll(textCalc.getCoveredTexts());
+
     
     return result;
   }

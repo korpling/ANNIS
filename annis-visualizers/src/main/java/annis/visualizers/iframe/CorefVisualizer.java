@@ -16,6 +16,8 @@
 package annis.visualizers.iframe;
 
 import annis.CommonHelper;
+import static annis.CommonHelper.getMatchedNodes;
+import annis.CoveredTextsCalculator;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import com.hp.gagawa.java.DocumentType;
@@ -48,12 +50,15 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -297,9 +302,28 @@ public class CorefVisualizer extends WriterVisualizer
       colorlist = new HashMap<Integer, Integer>();
 
       // write output for each text separatly
-      EList<STextualDS> texts = CommonHelper.getTextsWithMatch(input.getDocument()); //saltGraph.getSTextualDSs();
-
-      if(texts != null)
+      List<SNode> startNodes = Arrays.asList(getMatchedNodes(input.getDocument()));
+      // filter start nodes by their namespace/layer
+      ListIterator<SNode> it = startNodes.listIterator();
+      while(it.hasNext())
+      {
+        SNode node = it.next();
+        if(node.getSLayers() != null && node.getSLayers().size() > 0 && node.getSLayers().get(0) != null)
+        {
+          SLayer layer = node.getSLayers().get(0);
+          if(input.getNamespace() != null && !input.getNamespace().equals(layer.getSName()))
+          {
+            it.remove();
+          }
+        }
+      }
+      // use the start nodes to actually compute the coverd STextualDS
+      CoveredTextsCalculator textCalc = new CoveredTextsCalculator(input.getDocument().getSDocumentGraph(),
+        startNodes);
+      EList<STextualDS> texts = new BasicEList<STextualDS>();
+      texts.addAll(textCalc.getCoveredTexts());
+      
+      if(texts != null && !texts.isEmpty())
       {
         // present all texts as columns side by side if using multiple texts
         Table tableTexts = new Table();
