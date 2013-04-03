@@ -33,7 +33,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
@@ -42,6 +43,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.HashSet;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -54,7 +57,6 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -139,28 +141,77 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         EList<SToken> token = graph.getSortedSTokenByText();
         long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
         long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-
+        
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
           parseSalt(input.getDocument().getSDocumentGraph(), annos, 
             (int) startIndex, (int) endIndex);
 
+        
+        // we will only add tokens of one texts which is mentioned by any 
+        // included annotation.
+        Set<String> validTextIDs = new HashSet<String>();
+        Iterator<ArrayList<Row>> itAllRows = rowsByAnnotation.values().iterator();
+        while(itAllRows.hasNext())
+        {
+          ArrayList<Row> rowsForAnnotation = itAllRows.next();
+          for(Row r : rowsForAnnotation)
+          {
+            validTextIDs.addAll(r.getTextIDs());
+          }
+        }
+        // we want to show all token if no valid text was found and we have only one text
+        EList<STextualDS> allTexts = graph.getSTextualDSs();
+        if(validTextIDs.isEmpty() && allTexts != null && allTexts.size() == 1)
+        {
+          validTextIDs.add(allTexts.get(0).getSId());
+        }
+        
+        int tokenOffsetForText = -1;
+        
         // add tokens as row
         Row tokenRow = new Row();
         for(SToken t : token)
         {
-          long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
-            - startIndex;
-          String text = CommonHelper.getSpannedText(t);
+          // get the Salt ID of the STextualDS of this token
+          String tokenTextID = null;
+          EList<Edge> tokenOutEdges = graph.getOutEdges(t.getSId());
+          if(tokenOutEdges != null)
+          {
+            for(Edge tokEdge : tokenOutEdges)
+            {
+              if(tokEdge instanceof STextualRelation)
+              {
+                tokenTextID = ((STextualRelation) tokEdge).getSTextualDS().getSId();
+                break;
+              }
+            }
+          }
+          
+          // only add token if text ID matches the valid one
+          if(tokenTextID != null && validTextIDs.contains(tokenTextID))
+          {
+            long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC()
+              - startIndex;
+            
+            if(tokenOffsetForText < 0)
+            {
+              // set the token offset by assuming the first idx must be zero
+              tokenOffsetForText = Math.abs((int) idx);
+            }
+            
+            String text = CommonHelper.getSpannedText(t);
 
-          GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
+            GridEvent event = new GridEvent(t.getSId(), (int) idx,(int) idx, text);
+            event.setTextID(tokenTextID);
+            
+            // check if the token is a matched node
+            SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+            Long match = featMatched == null ? null : featMatched.
+              getSValueSNUMERIC();
+            event.setMatch(match);
 
-          // check if the token is a matched node
-          SFeature featMatched = t.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long match = featMatched == null ? null : featMatched.
-            getSValueSNUMERIC();
-          event.setMatch(match);
-
-          tokenRow.addEvent(event);
+            tokenRow.addEvent(event);
+          }
         }
         ArrayList<Row> tokenRowList = new ArrayList<Row>();
         tokenRowList.add(tokenRow);
@@ -170,8 +221,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         {
           rowsByAnnotation.put("tok", tokenRowList);
         }
-
+        
         grid.setRowsByAnnotation(rowsByAnnotation);
+        grid.setTokenIndexOffset(tokenOffsetForText);
       } // end if input not null
     }
     
@@ -318,13 +370,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         rowsByAnnotation.put(anno, new ArrayList<Row>());
       }
       
-      
-      EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
-      types.add(STYPE_NAME.SSPANNING_RELATION);
-      types.add(STYPE_NAME.STEXTUAL_RELATION);
-      types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-      types.add(STYPE_NAME.SSEQUENTIAL_RELATION);
-      
       int eventCounter = 0;
       
       for(SSpan span : graph.getSSpans())
@@ -374,10 +419,27 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                 if(e instanceof SSpanningRelation)
                 {
                   SSpanningRelation spanRel = (SSpanningRelation) e;
-                  event.getCoveredIDs().add(spanRel.getSTarget().getSId());
+                 
+                  SToken tok = spanRel.getSToken();
+                  event.getCoveredIDs().add(tok.getSId());
+  
+                  // get the STextualDS of this token and add it to the event
+                  EList<Edge> tokenOutEdges = graph.getOutEdges(tok.getSId());
+                  if(tokenOutEdges != null)
+                  {
+                    for(Edge tokEdge : tokenOutEdges)
+                    {
+                      if(tokEdge instanceof STextualRelation)
+                      {
+                        event.setTextID(((STextualRelation) tokEdge).getSTextualDS().getSId());
+                        break;
+                      }
+                    }
+                  }
                 }
               }
             }
+            
             
             // try to get time annotations
             double[] startEndTime = TimeHelper.getOverlappedTime(span);
