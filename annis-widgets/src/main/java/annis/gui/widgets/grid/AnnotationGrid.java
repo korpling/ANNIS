@@ -37,11 +37,13 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private Map<String, ArrayList<Row>> rowsByAnnotation;
   private transient MediaController mediaController;
   private String resultID;
+  private int tokenIndexOffset;
 
   public AnnotationGrid(MediaController mediaController, String resultID)
   {
     this.mediaController = mediaController;
     this.resultID = resultID;
+    this.tokenIndexOffset = 0;
   }
 
   @Override
@@ -99,8 +101,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
           {
             target.startTag("event");
             target.addAttribute("id", event.getId());
-            target.addAttribute("left", event.getLeft());
-            target.addAttribute("right", event.getRight());
+            target.addAttribute("left", event.getLeft() - tokenIndexOffset);
+            target.addAttribute("right", event.getRight() - tokenIndexOffset);
             target.addAttribute("value", event.getValue());
             
             if(event.getStartTime() != null)
@@ -173,4 +175,21 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   {
     this.rowsByAnnotation = rowsByAnnotation;
   }
+
+  public int getTokenIndexOffset()
+  {
+    return tokenIndexOffset;
+  }
+
+  /**
+   * Set an offset for the token index. 
+   * It is assumed that firstNodeLeft - offset == 0.
+   * @param tokenIndexOffset 
+   */
+  public void setTokenIndexOffset(int tokenIndexOffset)
+  {
+    this.tokenIndexOffset = tokenIndexOffset;
+  }
+  
+  
 }

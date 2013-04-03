@@ -15,6 +15,7 @@
  */
 package annis.gui.widgets.grid;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,7 @@ public class GridEvent implements Serializable
   private Double startTime;
   private Double endTime;
   private boolean gap;
+  private String textID;
   
   public GridEvent(String id, int left, int right, String value)
   {
@@ -130,6 +132,20 @@ public class GridEvent implements Serializable
     this.gap = gap;
   }
 
+  /**
+   * Salt ID of the text this event belongs to.
+   * @return 
+   */
+  public String getTextID()
+  {
+    return textID;
+  }
+
+  public void setTextID(String textID)
+  {
+    this.textID = textID;
+  }
+  
   @Override
   public String toString()
   {
