@@ -302,7 +302,7 @@ public class CorefVisualizer extends WriterVisualizer
       colorlist = new HashMap<Integer, Integer>();
 
       // write output for each text separatly
-      List<SNode> startNodes = Arrays.asList(getMatchedNodes(input.getDocument()));
+      List<SNode> startNodes = new LinkedList<SNode>(Arrays.asList(getMatchedNodes(input.getDocument())));
       // filter start nodes by their namespace/layer
       ListIterator<SNode> it = startNodes.listIterator();
       while(it.hasNext())
