@@ -22,10 +22,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -320,27 +318,4 @@ public class CommonHelper
     
     return result;
   }
-  
-  /**
-   * Will return a list of all texts that contain matched nodes.
-   * @param doc
-   * @return The list of texts, never null.
-   */
-  public static EList<STextualDS> getTextsWithMatch(SDocument doc)
-  {
-    
-    final EList<STextualDS> result = new BasicEList<STextualDS>();
-    
-    
-    List<SNode> startNodes = Arrays.asList(getMatchedNodes(doc));
-      
-    // use the start nodes to actually compute the coverd STextualDS
-    CoveredTextsCalculator textCalc = new CoveredTextsCalculator(doc.getSDocumentGraph(),
-      startNodes);
-    result.addAll(textCalc.getCoveredTexts());
-
-    
-    return result;
-  }
-  
 }
