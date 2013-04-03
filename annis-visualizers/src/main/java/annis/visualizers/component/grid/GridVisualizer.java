@@ -33,6 +33,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -157,6 +158,12 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           {
             validTextIDs.addAll(r.getTextIDs());
           }
+        }
+        // we want to show all token if no valid text was found and we have only one text
+        EList<STextualDS> allTexts = graph.getSTextualDSs();
+        if(validTextIDs.isEmpty() && allTexts != null && allTexts.size() == 1)
+        {
+          validTextIDs.add(allTexts.get(0).getSId());
         }
         
         int tokenOffsetForText = -1;
