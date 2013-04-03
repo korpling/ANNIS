@@ -22,6 +22,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
+import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
@@ -40,6 +41,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -48,6 +50,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -60,6 +63,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -295,8 +299,10 @@ public class VisualizerPanel extends VerticalLayout
     {
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
+      
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
+      
       input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered, input.
         getDocument(), wholeDocument));
       input.setDocument(wholeDocument);
@@ -351,7 +357,7 @@ public class VisualizerPanel extends VerticalLayout
     }
     return txt;
   }
-
+  
   @Override
   public void buttonClick(ClickEvent event)
   {
@@ -524,17 +530,17 @@ public class VisualizerPanel extends VerticalLayout
     SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (Entry<SNode, Long>  entry : markedAndCovered.entrySet())
+    for (Entry<SNode, Long>  e : markedAndCovered.entrySet())
     {
-      wholeNode = wholeSGraph.getSNode(entry.getKey().getSId());
-      newMarkedAndCovered.put(wholeNode, entry.getValue());
+      wholeNode = wholeSGraph.getSNode(e.getKey().getSId());
+      newMarkedAndCovered.put(wholeNode, e.getValue());
 
       // copy the annis features, which are not set by the annis service
-      copyAnnisFeature(entry.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE);
+      copyAnnisFeature(e.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE, false);
     }
 
     // copy the annis features, which are not set by the annis service
-    copyAnnisFeature(document, wholeDocument, ANNIS_NS, FEAT_MATCHEDIDS);
+    copyAnnisFeature(document, wholeDocument, ANNIS_NS, FEAT_MATCHEDIDS, true);
     return newMarkedAndCovered;
   }
 
@@ -547,21 +553,28 @@ public class VisualizerPanel extends VerticalLayout
    * @param target node which is missing the annis feature
    * @param featureNameSpace namespace of the feature
    * @param featureName name of the feature
+   * @param copyIfExists If true the feature is copied even if it already exists on target node.
    */
   private void copyAnnisFeature(SNode source, SNode target,
-    String featureNameSpace, String featureName)
+    String featureNameSpace, String featureName, boolean copyIfExists)
   {
     SFeature sfeature;
-    SFeature tmp;
 
     if ((sfeature = source.getSFeature(featureNameSpace, featureName)) != null)
     {
-      if ((tmp = target.getSFeature(
-        featureNameSpace, featureName)) == null)
+      if (target.getSFeature(featureNameSpace, featureName) == null)
       {
         target.createSFeature(sfeature.getNamespace(), sfeature.getName(),
           sfeature.getSValueSTEXT());
         log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
+          getValueString());
+      }
+      else if(copyIfExists)
+      {
+        SFeature targetFeature = target.getSFeature(featureNameSpace, featureName);
+        targetFeature.setValue(sfeature.getValue());
+        
+        log.debug("overwriting SFeature {} value {}", sfeature.getQName(), sfeature.
           getValueString());
       }
     }
