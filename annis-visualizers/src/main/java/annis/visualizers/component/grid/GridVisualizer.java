@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Visualizes annotations of a spans.
  * 
+ * 
  * Mappings: <br/>
  * It is possible to specify the order of annotation layers in each grid. 
  * Use <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or

@@ -15,18 +15,22 @@
  */
 package annis;
 
+import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -41,7 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Utilities class for non-gui operations on Salt.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class CommonHelper
@@ -287,4 +291,56 @@ public class CommonHelper
 
     return result;
   }
+  
+  public static SNode[] getMatchedNodes(SDocument doc)
+  {
+    SNode[] result = new SNode[0];
+    
+    // get the matched node IDs
+    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+    if(feat != null)
+    {
+      String[] ids = feat.getSValueSTEXT().split(",");
+      result = new SNode[ids.length];
+      
+      for(int i=0; i < ids.length; i++)
+      {
+        String id = ids[i].trim();
+        if(!id.isEmpty())
+        {
+          // get the specific node
+          SNode node = doc.getSDocumentGraph().getSNode(id);
+          if(node != null)
+          {
+            result[i] = node;
+          }
+        }
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Will return a list of all texts that contain matched nodes.
+   * @param doc
+   * @return The list of texts, never null.
+   */
+  public static EList<STextualDS> getTextsWithMatch(SDocument doc)
+  {
+    
+    final EList<STextualDS> result = new BasicEList<STextualDS>();
+    
+    
+    List<SNode> startNodes = Arrays.asList(getMatchedNodes(doc));
+      
+    // use the start nodes to actually compute the coverd STextualDS
+    CoveredTextsCalculator textCalc = new CoveredTextsCalculator(doc.getSDocumentGraph(),
+      startNodes);
+    result.addAll(textCalc.getCoveredTexts());
+
+    
+    return result;
+  }
+  
 }
