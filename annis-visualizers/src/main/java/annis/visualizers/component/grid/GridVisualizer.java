@@ -175,7 +175,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             {
               if(tokEdge instanceof STextualRelation)
               {
-                tokenTextID = ((STextualRelation) tokEdge).getSId();
+                tokenTextID = ((STextualRelation) tokEdge).getSTextualDS().getSId();
                 break;
               }
             }
@@ -357,10 +357,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
       int eventCounter = 0;
       
-      // we will only use one text, if any text is found this was is choosen
-      // and we will only output tokens from this
-      STextualDS usedText = null;
-      
       for(SSpan span : graph.getSSpans())
       {  
         // calculate the left and right values of a span
@@ -420,7 +416,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                     {
                       if(tokEdge instanceof STextualRelation)
                       {
-                        event.setTextID(((STextualRelation) tokEdge).getSId());
+                        event.setTextID(((STextualRelation) tokEdge).getSTextualDS().getSId());
                         break;
                       }
                     }
