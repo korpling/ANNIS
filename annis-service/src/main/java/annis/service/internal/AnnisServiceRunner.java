@@ -15,7 +15,6 @@
  */
 package annis.service.internal;
 
-import java.io.IOException;
 import annis.AnnisBaseRunner;
 import annis.AnnisXmlContextHelper;
 import annis.exceptions.AnnisException;
@@ -40,8 +39,6 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.io.support.ResourcePropertySource;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {

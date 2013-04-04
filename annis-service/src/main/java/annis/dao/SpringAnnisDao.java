@@ -600,7 +600,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       }
       if (meta.getDatabaseMajorVersion() < 9
         || (meta.getDatabaseMajorVersion() == 9 && meta.
-        getDatabaseMinorVersion() < 2))
+        getDatabaseMinorVersion() < 1)) // we urge people to use 9.2, but 9.1 should be valid as well
       {
         throw new AnnisException("Wrong PostgreSQL version installed. Please "
           + "install at least PostgreSQL 9.2 (current installed version is "
