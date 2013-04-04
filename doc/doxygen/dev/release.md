@@ -23,6 +23,7 @@ mvn license:download-licenses
 mvn release:update-versions -DautoVersionSubmodules=true
 \endcode
   2. The `ANNIS_VERSION` variable in the `buildbot_scripts/copyService.sh` script file.
+  3. The `PROJECT_NUMBER` variable in the `doc/Doxyfile` documentation descriptor file.
 4. Regenerate this documentation.
 \code{.sh}
 cd doc/
