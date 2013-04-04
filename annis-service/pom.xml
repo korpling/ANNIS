@@ -13,14 +13,6 @@
 
   <packaging>jar</packaging>
 
-  <distributionManagement>
-    <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <dependencies>
 
     <dependency>
@@ -392,6 +384,15 @@
         <version>2.4.3</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skip>false</skip>
         </configuration>
       </plugin>
       
