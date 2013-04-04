@@ -9,20 +9,20 @@ but the only real usefull task was the version update and we still needed to do 
 Thus we decided to write down the necessary steps to perform a new ANNIS release instead of
 relaying to a half-working solution with the Maven Release plugin.
 
-1. Make and switch to a new *local* branch for the release in git. Do not push this branch to a remote location since you may want to throw 
+1. Update the licenses in the `THIRD-PARTY` folder and commit/push to master
+\code{.sh}
+mvn license:add-third-party
+mvn license:download-licenses
+\endcode
+2. Make and switch to a new *local* branch for the release in git. Do not push this branch to a remote location since you may want to throw 
    it away when the testing of the temporary release unveils release critical problems.
    Normally commit the changes after each major step.
-2. Update the version information
+3. Update the version information
   1. Internal version information in pom.xml files
 \code{.sh}
 mvn release:update-versions -DautoVersionSubmodules=true
 \endcode
   2. The `ANNIS_VERSION` variable in the `buildbot_scripts/copyService.sh` script file.
-3. Update the licenses in the `THIRD-PARTY` folder
-\code{.sh}
-mvn license:add-third-party
-mvn license:download-licenses
-\endcode
 4. Regenerate this documentation.
 \code{.sh}
 cd doc/
