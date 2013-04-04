@@ -43,6 +43,12 @@
       <id>launchpad</id>
       <url>https://launchpad.net/annis</url>
     </site>
+    
+    <repository>
+      <id>korpling</id>
+      <name>korpling maven repo</name>
+      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
+    </repository>
   </distributionManagement>
 
   <repositories>
@@ -141,7 +147,7 @@
           <doUpdate>false</doUpdate>
         </configuration>
       </plugin>
-
+      
     </plugins>
     <extensions>
       <extension>
