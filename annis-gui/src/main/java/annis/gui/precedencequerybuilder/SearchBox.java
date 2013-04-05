@@ -26,6 +26,11 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.TreeSet;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.ArrayList;//check later
+import java.util.concurrent.ConcurrentSkipListSet;
 import org.apache.commons.lang3.StringUtils;//levenshtein
 import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.event.FieldEvents;
@@ -62,12 +67,20 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     sb.setImmediate(true);
     
     // searchbox values for ebene
-    Collection<String> annonames = new TreeSet<String>();
+    /*Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableAnnotationLevels(ebene))
     {
       annonames.add(a);
+    }*/
+    List<String> annonameList = new ArrayList<String>();
+    for(String a :sq.getAvailableAnnotationLevels(ebene))
+    {
+      annonameList.add(a);
     }
-    this.annonames = annonames;//by Martin
+    ExtendedStringComparator.sort(annonameList);
+    
+    this.annonames = annonameList;//by Martin    
+    
     this.cb = new SensitiveComboBox();
     cb.setCaption(ebene);
     cb.setInputPrompt(ebene);
@@ -79,7 +92,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
       cb.addItem(annoname);
     }
     cb.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
-    cb.addListener((FieldEvents.TextChangeListener)this);
+    cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
     
     HorizontalLayout sbtoolbar = new HorizontalLayout();
@@ -147,7 +160,47 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   
   @Override
   public void textChange(TextChangeEvent event)
-  {    
+  { 
+    //new Code:
+    ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
+    ExtendedStringComparator esc = new ExtendedStringComparator();    
+    String txt = event.getText();
+    if (!txt.equals(""))
+    {
+      cb.removeAllItems();
+      for(String s : annonames)
+      {
+        if(esc.compare(s, txt)==0)
+        {
+          cb.addItem(s);          
+        }
+        else {notInYet.add(s);}
+        
+      }
+      for(String s : notInYet)
+      {        
+        if(esc.startsWith(s, txt))
+        {
+          cb.addItem(s);
+          notInYet.remove(s);
+        }
+      }
+      for(String s : notInYet)
+      {
+        if(esc.contains(s, txt))
+        {
+          cb.addItem(s);
+        }
+      }      
+    }
+    else
+    {
+      //have a look and speed it up
+      SpanBox.buildBoxValues(cb, ebene, sq);
+    }
+    
+    //old Levenshtein code:
+    /*   
     String txt = event.getText();
     if (!txt.equals(""))
     {
@@ -170,7 +223,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     else
     {
       SpanBox.buildBoxValues(cb, ebene, sq);
-    }
+    }*/
   }
   
   public String getAttribute()
