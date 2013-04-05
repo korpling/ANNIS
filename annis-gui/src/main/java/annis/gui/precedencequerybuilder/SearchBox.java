@@ -57,7 +57,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   
 
   public SearchBox(final String ebene, final PrecedenceQueryBuilder sq, final VerticalNode vn)
-  {
+  {    
     
     this.vn = vn;
     this.ebene = ebene;
@@ -72,14 +72,15 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     {
       annonames.add(a);
     }*/
-    List<String> annonameList = new ArrayList<String>();
-    for(String a :sq.getAvailableAnnotationLevels(ebene))
+    ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
+    for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
-      annonameList.add(a);
+      annonames.add(a);
     }
-    ExtendedStringComparator.sort(annonameList);
+    ExtendedStringComparator esc = new ExtendedStringComparator();
+    //esc.sort(annonames);
     
-    this.annonames = annonameList;//by Martin    
+    this.annonames = annonames;//by Martin    
     
     this.cb = new SensitiveComboBox();
     cb.setCaption(ebene);
@@ -87,7 +88,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
-    for (String annoname : annonames) 
+    for (String annoname : this.annonames) 
     {
       cb.addItem(annoname);
     }

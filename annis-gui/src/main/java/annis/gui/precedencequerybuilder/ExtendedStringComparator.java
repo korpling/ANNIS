@@ -18,6 +18,7 @@ package annis.gui.precedencequerybuilder;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Collection;
 /**
  *
  * @author klotzmaz
@@ -255,16 +256,25 @@ public class ExtendedStringComparator implements Comparator
   }
   
   @Override
-  //use only with Strings
+  //use with Strings only
   public int compare(Object a, Object b)
+    /*
+     * <0: a<b
+     * =0: a=b
+     * >0: a>b
+     */
   {
     String s1 = (String)a;
     String s2 = (String)b;
     int l = s1.length();
     
-    if (l!=s2.length())
+    if (l<s2.length())
     {
       return -1;
+    }
+    else if (l>s2.length())
+    {
+      return 1;
     }
     
     for(int i=0; i<l; i++)
@@ -276,14 +286,18 @@ public class ExtendedStringComparator implements Comparator
       
       char rc2 = (ALLOGRAPHS.containsKey(c2)) ? ALLOGRAPHS.get(c2) : c2;
       
-      if(rc1!=rc2)
+      if(rc1<rc2)
       {
         return -1;
+      }
+      else if(rc1>rc2)
+      {
+        return 1;
       }
     }
     
     return 0;
-  }
+  }  
   
   public boolean startsWith(String fullSequence, String subSequence)
   {
@@ -308,7 +322,7 @@ public class ExtendedStringComparator implements Comparator
 
   
   //improve algorithm later
-  public static void sort(List<String> l)
+  public void sort(Collection<String> c)
   {
     
   }
