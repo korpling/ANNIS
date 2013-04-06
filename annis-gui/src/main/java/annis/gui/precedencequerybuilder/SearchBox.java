@@ -169,15 +169,18 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     if (!txt.equals(""))
     {
       cb.removeAllItems();
+      
+      //matching allographs
       for(String s : annonames)
       {
         if(esc.compare(s, txt)==0)
         {
           cb.addItem(s);          
         }
-        else {notInYet.add(s);}
-        
+        else {notInYet.add(s);}        
       }
+      
+      //startsWith
       for(String s : notInYet)
       {        
         if(esc.startsWith(s, txt))
@@ -186,6 +189,8 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
           notInYet.remove(s);
         }
       }
+      
+      //contains
       for(String s : notInYet)
       {
         if(esc.contains(s, txt))

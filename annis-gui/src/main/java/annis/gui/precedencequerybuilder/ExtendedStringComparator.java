@@ -310,7 +310,7 @@ public class ExtendedStringComparator implements Comparator
   public boolean contains(String fullSequence, String subSequence)
   {
     int l = subSequence.length();
-    for (int i=0; i<fullSequence.length()-l; i++)
+    for (int i=0; i<fullSequence.length()-l+1; i++)
     {
       if (compare(fullSequence.substring(i, i+l), subSequence)==0)
       {
