@@ -208,8 +208,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
 
     Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
-      
-    
+
+
     if(metadata != null && !metadata.isEmpty())
     {
       // if called from corpus browser sort the other way around.
@@ -237,7 +237,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         }
       }
     }
-    
+
     return hashMetaData;
   }
 
