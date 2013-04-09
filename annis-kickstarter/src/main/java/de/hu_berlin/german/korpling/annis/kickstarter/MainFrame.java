@@ -17,7 +17,6 @@ package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.AnnisBaseRunner;
 import annis.administration.CorpusAdministration;
-import annis.exceptions.AnnisException;
 import annis.service.internal.AnnisServiceRunner;
 import annis.utils.Utils;
 import java.awt.Color;
@@ -33,14 +32,12 @@ import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.eclipse.jetty.server.Server;
+import org.eclipse.jetty.util.log.Slf4jLog;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.LoggerFactory;
 
@@ -86,6 +83,9 @@ public class MainFrame extends javax.swing.JFrame
 
     private void startJetty() throws Exception
     {
+      // disable jetty logging
+      org.eclipse.jetty.util.log.Log.setLog(new JettyNoLogger());
+      
       Server jetty = new Server(8080);
       // add context for our bundled webapp
       WebAppContext context = new WebAppContext("./webapp/", "/annis-gui");
@@ -96,6 +96,7 @@ public class MainFrame extends javax.swing.JFrame
       List<String> listWebXMLOverride = new LinkedList<String>();
       listWebXMLOverride.add(webxmlOverrride);
       context.setOverrideDescriptors(listWebXMLOverride);
+      
       
       // Exclude some jersey classes explicitly from the web application classpath.
       // If they still exists some automatic dependency resolution of Jersey will

@@ -15,6 +15,7 @@
  */
 package annis;
 
+import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -27,6 +28,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -41,7 +43,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * Utilities class for non-gui operations on Salt.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class CommonHelper
@@ -285,6 +287,35 @@ public class CommonHelper
       }
     }
 
+    return result;
+  }
+  
+  public static SNode[] getMatchedNodes(SDocument doc)
+  {
+    SNode[] result = new SNode[0];
+    
+    // get the matched node IDs
+    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
+    if(feat != null)
+    {
+      String[] ids = feat.getSValueSTEXT().split(",");
+      result = new SNode[ids.length];
+      
+      for(int i=0; i < ids.length; i++)
+      {
+        String id = ids[i].trim();
+        if(!id.isEmpty())
+        {
+          // get the specific node
+          SNode node = doc.getSDocumentGraph().getSNode(id);
+          if(node != null)
+          {
+            result[i] = node;
+          }
+        }
+      }
+    }
+    
     return result;
   }
 }

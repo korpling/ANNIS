@@ -117,18 +117,22 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       }
       catch (Exception ex)
       {
-        log.warn("annotation type is unkwon {}", ex);
+        log.warn("annotation type is unknown {}", ex);
       }
 
       attribute.setType(t);
       AnnisAttribute.SubType st = AnnisAttribute.SubType.unknown;
-      try
+      String subTypeValue = resultSet.getString("subtype");
+      if(subTypeValue != null)
       {
-        st = AnnisAttribute.SubType.valueOf(resultSet.getString("subtype"));
-      }
-      catch (Exception ex)
-      {
-        log.warn("annotation sub type is unkwon {}", ex);
+        try
+        {
+          st = AnnisAttribute.SubType.valueOf(subTypeValue);
+        }
+        catch (Exception ex)
+        {
+          log.warn("annotation sub type is unknown {}", ex);
+        }
       }
 
       attribute.setSubtype(st);

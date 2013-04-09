@@ -52,6 +52,8 @@ import java.util.LinkedList;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * This class can convert the current Salt graph model into the legacy model 
@@ -62,6 +64,9 @@ import org.eclipse.emf.common.util.EList;
  */
 public class LegacyGraphConverter
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(LegacyGraphConverter.class
+    );
 
   public static AnnisResultSet convertToResultSet(SaltProject p)
   {
@@ -100,15 +105,33 @@ public class LegacyGraphConverter
         Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
-    AnnotationGraph result = convertToAnnotationGraph(docGraph, matchedIDs);
+    
+    // get matched node names by using the IDs
+    List<String> matchedNodeNames = new ArrayList<String>();
+    for(String id : matchedIDs)
+    {
+      SNode node = docGraph.getSNode(id);
+      if(node == null)
+      {
+        // that's weird, fallback to the id
+        log.warn("Could not get matched node from id {}", id);
+        matchedNodeNames.add(id);
+      }
+      else
+      {
+        matchedNodeNames.add(node.getSName());
+      }
+    }
+    
+    AnnotationGraph result = convertToAnnotationGraph(docGraph, matchedNodeNames);
 
     return result;
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
-    List<String> matchedIDs)
+    List<String> matchedNodeNames)
   {
-    Set<String> matchSet = new HashSet<String>(matchedIDs);
+    Set<String> matchSet = new HashSet<String>(matchedNodeNames);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
@@ -169,7 +192,7 @@ public class LegacyGraphConverter
           getSValueSNUMERIC());
         if (matchSet.contains(aNode.getName()))
         {
-          aNode.setMatchedNodeInQuery((long) matchedIDs.indexOf(aNode.getName()) + 1);
+          aNode.setMatchedNodeInQuery((long) matchedNodeNames.indexOf(aNode.getName()) + 1);
           annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else

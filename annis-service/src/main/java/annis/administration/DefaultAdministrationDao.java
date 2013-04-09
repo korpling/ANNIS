@@ -28,6 +28,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Properties;
 import java.util.logging.Level;
 import javax.sql.DataSource;
 import org.apache.commons.io.FilenameUtils;
@@ -182,6 +183,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("creating ANNIS database schema (" + dbLayout + ")");
     executeSqlFromScript(dbLayout + "/schema.sql");
     
+    // update schema version
+    jdbcTemplate.execute("DELETE FROM repository_metadata WHERE \"name\"='schema-version'");
     jdbcTemplate.execute("INSERT INTO repository_metadata "
       + "VALUES ('schema-version', '"
       + StringUtils.replace(getSchemaVersion(), "'", "''") + "');");
@@ -242,14 +245,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword)
+    String superPassword, boolean useSSL)
   {
-    log.info("Creating Annis database and user.");
     // connect as super user to the default database to create new user and database
     if(superPassword != null)
-    {
+    {      
+      log.info("Creating Annis database and user.");
       setDataSource(createDataSource(host, port,
-      defaultDatabase, superUser, superPassword));
+      defaultDatabase, superUser, superPassword, useSSL));
     
       dropDatabase(database);
       dropUser(user);
@@ -261,7 +264,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     
     // switch to new database as new user for the rest
     setDataSource(createDataSource(host, port, database,
-      user, password));
+      user, password, useSSL));
     
     createFunctionUniqueToplevelCorpusName();
     createSchema();
@@ -271,16 +274,24 @@ public class DefaultAdministrationDao implements AdministrationDao
   
   private DataSource createDataSource(String host, String port,
     String database,
-    String user, String password)
+    String user, String password, boolean useSSL)
   {
+    Properties props = new Properties();
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
-
+    
+    if(useSSL)
+    {
+      props.put("ssl", "true");
+    }
     // DriverManagerDataSource is deprecated
     // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
 
+    props.put("user", user);
+    props.put("password", password);
+    
     // why is this better?
     // XXX: how to construct the datasource?    
-    return new SimpleDriverDataSource(new Driver(), url, user, password);
+    return new SimpleDriverDataSource(new Driver(), url, props);
   }
 
   
@@ -977,7 +988,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void storeUserConfig(AnnisUserConfig config)
   {
     String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
-    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?::json)";
+    String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
     try
     {
       String jsonVal = jsonMapper.writeValueAsString(config);

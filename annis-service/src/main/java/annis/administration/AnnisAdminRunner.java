@@ -169,6 +169,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       .addParameter("m", "migratecorpora",
         "Try to import the already existing corpora into the database. "
         + "You can set the root directory for corpus sources as an argument.")
+      .addToggle("s", "ssl", false, "if given use SSL for connecting to the database")
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
@@ -190,6 +191,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
     String superUser = cmdLine.getOptionValue("superuser", "postgres");
     String superPassword = cmdLine.getOptionValue("superpassword");
+    boolean useSSL = cmdLine.hasOption("ssl");
 
     boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
     List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
@@ -209,7 +211,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       }
     }
 
-    corpusAdministration.initializeDatabase(host, port, database, user, password, defaultDatabase, superUser, superPassword);
+    corpusAdministration.initializeDatabase(host, port, database, user, password, 
+      defaultDatabase, superUser, superPassword, useSSL);
 
     if (migrateCorpora && existingCorpora.size() > 0)
     {

@@ -201,43 +201,43 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   }
 
   /**
-   * Returns null if no metadata are available.
+   * Returns empty map if no metadata are available.
    */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
 
-    if (metadata != null && metadata.isEmpty())
+    Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
+      
+    
+    if(metadata != null && !metadata.isEmpty())
     {
-      return null;
-    }
-
-    // of called from corpus browser sort the other way around.
-    Map<Integer, List<Annotation>> hashMetaData;
-    if (documentName != null)
-    {
-      hashMetaData =
-        new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
-    }
-    else
-    {
-      hashMetaData = new TreeMap<Integer, List<Annotation>>();
-    }
-
-    for (Annotation metaDatum : metadata)
-    {
-      int pre = metaDatum.getPre();
-      if (!hashMetaData.containsKey(pre))
+      // if called from corpus browser sort the other way around.
+      if (documentName != null)
       {
-        hashMetaData.put(pre, new ArrayList<Annotation>());
-        hashMetaData.get(pre).add(metaDatum);
+        hashMetaData =
+          new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
       }
       else
       {
-        hashMetaData.get(pre).add(metaDatum);
+        hashMetaData = new TreeMap<Integer, List<Annotation>>();
+      }
+
+      for (Annotation metaDatum : metadata)
+      {
+        int pre = metaDatum.getPre();
+        if (!hashMetaData.containsKey(pre))
+        {
+          hashMetaData.put(pre, new ArrayList<Annotation>());
+          hashMetaData.get(pre).add(metaDatum);
+        }
+        else
+        {
+          hashMetaData.get(pre).add(metaDatum);
+        }
       }
     }
-
+    
     return hashMetaData;
   }
 
@@ -298,8 +298,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
-    if (!event.getProperty().equals(lastSelectedItem)
-      || lastSelectedItem == null)
+    if (lastSelectedItem == null
+      || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
       lastSelectedItem = event.getProperty().toString();
       List<Annotation> metaData = getMetaData(toplevelCorpusName,
