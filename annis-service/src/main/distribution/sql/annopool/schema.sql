@@ -1,11 +1,13 @@
 -- (modified) source tables
 
+DROP TABLE IF EXISTS repository_metadata CASCADE;
 CREATE TABLE repository_metadata
 (
   name varchar NOT NULL PRIMARY KEY,
   "value" varchar NOT NULL
 );
 
+DROP TABLE IF EXISTS corpus CASCADE;
 CREATE TABLE corpus
 (
   id         integer PRIMARY KEY,
@@ -23,6 +25,7 @@ COMMENT ON COLUMN corpus.pre IS 'pre-order value';
 COMMENT ON COLUMN corpus.post IS 'post-order value';
 COMMENT ON COLUMN corpus.path_name IS 'path of this corpus in the corpus tree (names)';
 
+DROP TABLE IF EXISTS corpus_annotation CASCADE;
 CREATE TABLE corpus_annotation
 (
   corpus_ref  integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
@@ -36,6 +39,7 @@ COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotati
 COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
+DROP TABLE IF EXISTS text CASCADE;
 CREATE TABLE text
 (
   corpus_ref integer REFERENCES corpus(id), 
@@ -49,8 +53,10 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
+DROP TYPE IF EXISTS annotype CASCADE;
 CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 -- collect all node annotations
+DROP TABLE IF EXISTS annotation_pool CASCADE;
 CREATE TABLE annotation_pool (
   id bigserial,
   toplevel_corpus integer REFERENCES corpus(id),
@@ -63,6 +69,7 @@ CREATE TABLE annotation_pool (
   UNIQUE(namespace, "name", val, "type", toplevel_corpus)
 );
 
+DROP TABLE IF EXISTS facts CASCADE;
 CREATE TABLE facts (
   fid bigserial,
   id bigint,
@@ -115,6 +122,7 @@ COMMENT ON COLUMN facts.edge_type IS 'edge type of this component';
 COMMENT ON COLUMN facts.edge_namespace IS 'optional namespace of the edges’ names';
 COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 
+DROP TABLE IF EXISTS media_files CASCADE;
 CREATE TABLE media_files
 (
   file  bytea NOT NULL,
@@ -127,6 +135,7 @@ CREATE TABLE media_files
 
 
 -- stats
+DROP TABLE IF EXISTS corpus_stats CASCADE;
 CREATE TABLE corpus_stats
 (
   name        varchar,
@@ -142,6 +151,7 @@ CREATE TABLE corpus_stats
 );
 
 
+DROP VIEW IF EXISTS corpus_info CASCADE;
 CREATE VIEW corpus_info AS SELECT 
   name,
   id, 
@@ -151,6 +161,7 @@ CREATE VIEW corpus_info AS SELECT
 FROM 
   corpus_stats;
   
+DROP TYPE IF EXISTS resolver_visibility CASCADE;
 CREATE TYPE resolver_visibility AS ENUM (
   'permanent', 
   'visible',
@@ -159,6 +170,7 @@ CREATE TYPE resolver_visibility AS ENUM (
   'preloaded'
 );
 
+DROP TABLE IF EXISTS resolver_vis_map CASCADE;
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
@@ -184,6 +196,7 @@ COMMENT ON COLUMN resolver_vis_map.visibility IS 'defines the visibility state o
 COMMENT ON COLUMN resolver_vis_map.order IS 'the order of the layers, in which they shall be shown';
 COMMENT ON COLUMN resolver_vis_map.mappings IS 'which annotations in this corpus correspond to fields expected by the visualization, e.g. the tree visualizer expects a node label, which is called "cat" by default but may be changed using this field';
 
+DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations
 (
   id bigserial NOT NULL,
@@ -199,9 +212,10 @@ CREATE TABLE annotations
   PRIMARY KEY (id)
 );
 
+DROP TABLE IF EXISTS user_config CASCADE;
 CREATE TABLE user_config
 (
   id varchar NOT NULL,
-  config json,
+  config varchar, -- (should be json)
   PRIMARY KEY(id)
 );

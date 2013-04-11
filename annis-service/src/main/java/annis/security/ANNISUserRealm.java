@@ -72,32 +72,33 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
       {
         // get the file which corresponds to the user
         File userFile = new File(userDir.getAbsolutePath(), userName);
-        FileInputStream userFileIO = null;
-        try
+        if(userFile.isFile() && userFile.canRead())
         {
-          Properties userProps = new Properties();
-
-          userFileIO = new FileInputStream(userFile);
-          userProps.load(userFileIO);
-          
-          return userProps;
-
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-        finally
-        {
-          if(userFileIO != null)
+          FileInputStream userFileIO = null;
+          try
           {
-            try
+            Properties userProps = new Properties();
+
+            userFileIO = new FileInputStream(userFile);
+            userProps.load(userFileIO);
+            return userProps;
+          }
+          catch (IOException ex)
+          {
+            log.error(null, ex);
+          }
+          finally
+          {
+            if (userFileIO != null)
             {
-              userFileIO.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
+              try
+              {
+                userFileIO.close();
+              }
+              catch (IOException ex)
+              {
+                log.error(null, ex);
+              }
             }
           }
         }

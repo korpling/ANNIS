@@ -145,6 +145,15 @@ textarea.query {
   background-color: rgb(255,255,255);
 }
 
+.v-window-outerheader {
+  background-attachment: scroll;
+  background-clip: border-box;
+  background-color: rgb(204, 216, 231);
+  background-image: url(../chameleon/img/grad-light-top.png);
+  background-origin: padding-box;
+  background-size: auto;
+}
+
 /* matched node colors by match index*/
 .v-table-cell-content-match_1 {
   color: rgb(255,0,0);

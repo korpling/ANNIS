@@ -21,6 +21,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
@@ -30,22 +31,42 @@ import java.util.*;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Provides all corpus annotations for a corpus or for a specific search result.
+ *
+ * // TODO cleanup the toplevelCorpus side effects.
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class MetaDataPanel extends Panel
+public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 {
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MetaDataPanel.class);
-  
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    MetaDataPanel.class);
+
   private VerticalLayout layout;
+
   private String toplevelCorpusName;
+
+  // this is only set if the metadata panel is called from a specific result.
   private String documentName;
+
+  private ComboBox corpusSelection;
+
+  // last selected corpus or document of the combobox
+  private String lastSelectedItem;
+
+  // holds all corpus and documents for the combox in the corpus browser panel
+  private List<Annotation> docs;
+
+  // holds the current corpus annotation table, when called from corpus browser
+  private Table corpusAnnoationTable = null;
 
   public MetaDataPanel(String toplevelCorpusName)
   {
     this(toplevelCorpusName, null);
   }
-  
+
   public MetaDataPanel(String toplevelCorpusName, String documentName)
   {
     super("Metadata");
@@ -58,15 +79,40 @@ public class MetaDataPanel extends Panel
     setContent(layout);
     layout.setSizeFull();
 
-    // load meta data from service
-    BeanItemContainer<Annotation> mData =
-      new BeanItemContainer<Annotation>(Annotation.class);
-
-    // are we called from the corpusBrowser or there is no subcorpus stay here:
     if (documentName == null)
     {
-      mData.addAll(getMetaData(toplevelCorpusName, null));
-      layout.addComponent(setupTable(mData));
+      docs = getAllSubcorpora(toplevelCorpusName);
+
+      HorizontalLayout selectionLayout = new HorizontalLayout();
+      Label selectLabel = new Label("Select corpus/document: ");
+      corpusSelection = new ComboBox();
+      selectionLayout.addComponents(selectLabel, corpusSelection);
+      layout.addComponent(selectionLayout);
+
+      selectLabel.setSizeUndefined();
+
+      corpusSelection.setWidth(100, Unit.PERCENTAGE);
+      corpusSelection.setHeight("-1px");
+      corpusSelection.addValueChangeListener(this);
+
+      selectionLayout.setWidth(100, Unit.PERCENTAGE);
+      selectionLayout.setHeight("-1px");
+      selectionLayout.setSpacing(true);
+      selectionLayout.setComponentAlignment(selectLabel, Alignment.MIDDLE_LEFT);
+      selectionLayout.setComponentAlignment(corpusSelection,
+        Alignment.MIDDLE_LEFT);
+      selectionLayout.setExpandRatio(selectLabel, 0.4f);
+      selectionLayout.setExpandRatio(corpusSelection, 0.6f);
+
+      corpusSelection.addItem(toplevelCorpusName);
+      corpusSelection.select(toplevelCorpusName);
+      corpusSelection.setNullSelectionAllowed(false);
+      corpusSelection.setImmediate(true);
+
+      for (Annotation c : docs)
+      {
+        corpusSelection.addItem(c.getName());
+      }
     }
     else
     {
@@ -95,33 +141,35 @@ public class MetaDataPanel extends Panel
     {
       res = res.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
       if (documentName != null)
       {
         res = res.path(documentName);
       }
-      res = res.path("metadata");
 
-      result = res.get(new AnnotationListType());
+      result = res.path("metadata").queryParam("exclude", "true").get(
+        new AnnotationListType());
     }
-    catch(UniformInterfaceException ex)
+    catch (UniformInterfaceException ex)
     {
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch(ClientHandlerException ex)
+    catch (ClientHandlerException ex)
     {
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch(UnsupportedEncodingException ex)
+    catch (UnsupportedEncodingException ex)
     {
       log.error(null, ex);
       Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.getLocalizedMessage(),
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return result;
@@ -137,13 +185,14 @@ public class MetaDataPanel extends Panel
 
 
     tblMeta.setVisibleColumns(new String[]
-      {
-        "genname", "genvalue"
-      });
+    {
+      "genname", "genvalue"
+    });
+
     tblMeta.setColumnHeaders(new String[]
-      {
-        "Name", "Value"
-      });
+    {
+      "Name", "Value"
+    });
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
@@ -151,26 +200,44 @@ public class MetaDataPanel extends Panel
     return tblMeta;
   }
 
+  /**
+   * Returns empty map if no metadata are available.
+   */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
     List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
-    Map<Integer, List<Annotation>> hashMetaData =
-      new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
 
-    for (Annotation metaDatum : metadata)
+    Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
+      
+    
+    if(metadata != null && !metadata.isEmpty())
     {
-      int pre = metaDatum.getPre();
-      if (!hashMetaData.containsKey(pre))
+      // if called from corpus browser sort the other way around.
+      if (documentName != null)
       {
-        hashMetaData.put(pre, new ArrayList<Annotation>());
-        hashMetaData.get(pre).add(metaDatum);
+        hashMetaData =
+          new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
       }
       else
       {
-        hashMetaData.get(pre).add(metaDatum);
+        hashMetaData = new TreeMap<Integer, List<Annotation>>();
+      }
+
+      for (Annotation metaDatum : metadata)
+      {
+        int pre = metaDatum.getPre();
+        if (!hashMetaData.containsKey(pre))
+        {
+          hashMetaData.put(pre, new ArrayList<Annotation>());
+          hashMetaData.get(pre).add(metaDatum);
+        }
+        else
+        {
+          hashMetaData.get(pre).add(metaDatum);
+        }
       }
     }
-
+    
     return hashMetaData;
   }
 
@@ -189,6 +256,87 @@ public class MetaDataPanel extends Panel
     }
 
     return listOfBeanItemCon;
+  }
+
+  private List<Annotation> getAllSubcorpora(String toplevelCorpusName)
+  {
+
+    WebResource res = Helper.getAnnisWebResource();
+    try
+    {
+      res = res.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+      res = res.path("documents");
+      docs = res.get(new AnnotationListType());
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+
+    return docs;
+  }
+
+  @Override
+  public void valueChange(Property.ValueChangeEvent event)
+  {
+    if (lastSelectedItem == null
+      || !lastSelectedItem.equals(event.getProperty().getValue()))
+    {
+      lastSelectedItem = event.getProperty().toString();
+      List<Annotation> metaData = getMetaData(toplevelCorpusName,
+        lastSelectedItem);
+
+      if (metaData == null || metaData.isEmpty())
+      {
+        super.setCaption("No metadata available");
+        if (corpusAnnoationTable != null)
+        {
+          corpusAnnoationTable.removeAllItems();
+        }
+      }
+      else
+      {
+        super.setCaption("Metadata");
+        loadTable(toplevelCorpusName, metaData);
+      }
+    }
+  }
+
+  private void loadTable(String item, List<Annotation> metaData)
+  {
+    BeanItemContainer<Annotation> metaContainer =
+      new BeanItemContainer<Annotation>(Annotation.class);
+    metaContainer.addAll(metaData);
+
+    if (corpusAnnoationTable != null)
+    {
+      layout.removeComponent(corpusAnnoationTable);
+    }
+
+    corpusAnnoationTable = setupTable(metaContainer);
+    corpusAnnoationTable.setHeight(100, Unit.PERCENTAGE);
+    corpusAnnoationTable.setWidth(100, Unit.PERCENTAGE);
+    layout.addComponent(corpusAnnoationTable);
+    layout.setExpandRatio(corpusAnnoationTable, 1.0f);
   }
 
   private static class AnnotationListType extends GenericType<List<Annotation>>

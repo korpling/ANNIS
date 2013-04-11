@@ -6,11 +6,11 @@ PostgreSQL Server Configuration {#admin-configure-postgresql}
 Performance tuning {#admin-configure-postgresperf}
 ------------------
 
-The default configuration of PostgreSQL uses system resource very sparingly. To improve the performance of the Annis service it is necessary to change a few settings in the PostgreSQL configuration file `postgresql.conf` as shown in the excerpt below.
+The default configuration of PostgreSQL uses system resource very sparingly. To improve the performance of the ANNIS service it is necessary to change a few settings in the PostgreSQL configuration file `postgresql.conf` as shown in the excerpt below.
 
 Most of the options below are commented out in the `postgresql.conf` file. This means that PostgreSQL will use the default value, i.e. the value as it appears in the `postgresql.conf` file, for this option. To make your changes take effect you have to uncomment it.
 
-The values below are for machine with 2 GB RAM that is exclusively dedicated to running PostgreSQL. If you're running Annis on your local machine and don't have large corpora, you should use lower values as explained in the comments.
+The values below are for machine with 2 GB RAM that is exclusively dedicated to running PostgreSQL. If you're running ANNIS on your local machine and don't have large corpora, you should use lower values as explained in the comments.
 
 Changes in `postgresql.conf`:
 
@@ -56,7 +56,7 @@ More information on these settings can be found in the PostgreSQL manual:
 Logging {#admin-configure-logging}
 -------
 
-If you want to log the duration of SQL statements you should also set the following options in @postgresql.conf@:
+If you want to log the duration of SQL statements you should also set the following options in `postgresql.conf`:
 
 \verbatim
 log_min_duration_statement = 0
@@ -79,7 +79,7 @@ Changes in `pg_hba.conf`:
 \verbatim
 host annis_db annis_user 192.168.1.2/0 md5
 \endverbatim
-Where 192.168.1.2 is the machine running the Annis service that is connecting to the remote PostgreSQL server.
+Where 192.168.1.2 is the machine running the ANNIS service that is connecting to the remote PostgreSQL server.
 
 Configuration of System Resources {#admin-configure-res}
 ---------------------------------

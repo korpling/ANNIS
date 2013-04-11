@@ -398,7 +398,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList[matchedNode-1] = node.getSName();
+        keyNameList[matchedNode-1] = node.getSId();
       }
 
       // map layer

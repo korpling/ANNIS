@@ -42,35 +42,49 @@ public interface AnnisDao
     String documentName);
 
   public List<AnnisCorpus> listCorpora();
-  
+
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
+  /**
+   * Creates sql for getting annations of corpora.
+   *
+   * @param toplevelCorpusName The toplevel corpus defines the root.
+   * @param corpusName Specifies the document, for which the annoations are
+   * fetched.
+   * @param exclude If set to true, the top level corpus annoations are
+   * excluded. Only has an effect, if corpus name is different from top level
+   * corpus name.
+   * @return Valid sql as string.
+   */
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName,
-    String documentName);
+    String documentName, boolean exclude);
 
   /**
    * Gets a part of a binary file plus meta data from database.
+   *
    * @param toplevelCorpusName
    * @param corpusName
    * @param offset starts with 1
    * @param length
-   * @return 
+   * @return
    */
-  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName, 
-    String mimeType ,int offset, int length);
-  
+  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
+    String mimeType, int offset, int length);
+
   /**
    * Gets meta data about existing binary files from database.
+   *
    * @param toplevelCorpusName
    * @param corpusName
    * @param offset starts with 1
    * @param length
-   * @return 
+   * @return
    */
-  public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName, String corpusName);
+  public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
+    String corpusName);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
@@ -83,7 +97,8 @@ public interface AnnisDao
   List<Match> find(QueryData queryData);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with    {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with null
+   * null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -131,9 +146,28 @@ public interface AnnisDao
    * @return The corpus configuration is represented as Key-Value-Pairs.
    */
   public Map<String, String> getCorpusConfiguration(String corpusName);
-  
-  /** Called to check if the database management program has the right version */
+
+  /**
+   * Called to check if the database management program has the right version
+   */
   public boolean checkDatabaseVersion() throws AnnisException;
 
-  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName);
+  /**
+   * Retrieves all metadata of a corpus including all subcorpora and documents.
+   *
+   * @param toplevelCorpusName Determines the root corpus.
+   * @param withRootCorpus If true, the annotations of the root corpus are
+   * included.
+   *
+   */
+  public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName,
+    boolean withRootCorpus);
+
+  /**
+   * Gets all documents names for a specific corpus
+   *
+   * @param toplevelCorpusName the corpus determines which docs are loaded.
+   * @return Contains name and pre for sorting the documents.
+   */
+  public List<Annotation> listDocuments(String toplevelCorpusName);
 }

@@ -13,14 +13,6 @@
 
   <packaging>jar</packaging>
 
-  <distributionManagement>
-    <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
-    </repository>
-  </distributionManagement>
-
   <dependencies>
 
     <dependency>
@@ -33,7 +25,7 @@
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-interfaces</artifactId>
-      <version>3.0.0-SNAPSHOT</version>
+      <version>${project.version}</version>
       <scope>compile</scope>
     </dependency>
 
@@ -179,35 +171,35 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>8.1.7.v20120910</version>
+      <version>8.1.9.v20130131</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>8.1.7.v20120910</version>
+      <version>8.1.9.v20130131</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
-      <version>8.1.7.v20120910</version>
+      <version>8.1.9.v20130131</version>
     </dependency>
     
     
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.14</version>
+      <version>1.17.1</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>1.14</version>
+      <version>1.17.1</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-spring</artifactId>
-      <version>1.14</version>
+      <version>1.17.1</version>
       <exclusions>
         <exclusion>  
           <groupId>org.springframework</groupId>  
@@ -392,6 +384,15 @@
         <version>2.4.3</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
+        </configuration>
+      </plugin>
+      
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-deploy-plugin</artifactId>
+        <version>2.7</version>
+        <configuration>
+          <skip>false</skip>
         </configuration>
       </plugin>
       

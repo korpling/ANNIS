@@ -18,6 +18,8 @@ package annis.gui.widgets.grid;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Represents one row in the grid view
@@ -27,7 +29,7 @@ public class Row implements Serializable
 {
   private ArrayList<GridEvent> events;
   private BitSet occupancySet;
-
+  private Set<String> textIDs;
   
   /**
    * Default constructor.
@@ -35,6 +37,7 @@ public class Row implements Serializable
   public Row()
   {
     this.events = new ArrayList<GridEvent>();
+    this.textIDs = new HashSet<String>();
     
     occupancySet = new BitSet();
   }
@@ -56,6 +59,11 @@ public class Row implements Serializable
     // set all bits to true that are covered by the other event
     occupancySet.or(eventOccupance);
     events.add(e);
+    
+    if(e.getTextID() != null && !e.getTextID().isEmpty())
+    {
+      textIDs.add(e.getTextID());
+    }
     
     return true;
   }
@@ -102,5 +110,16 @@ public class Row implements Serializable
   {
     return events;
   }
+
+  /**
+   * Get Salt IDs of all texts used by events of this row.
+   * @return 
+   */
+  public Set<String> getTextIDs()
+  {
+    return new HashSet<String>(textIDs);
+  }
+  
+  
 
 }

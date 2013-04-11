@@ -19,7 +19,6 @@ import annis.exceptions.AnnisException;
 import annis.security.AnnisUserConfig;
 import java.util.List;
 import java.util.Map;
-import javax.sql.DataSource;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -34,7 +33,7 @@ public interface AdministrationDao
   
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword);
+    String superPassword, boolean useSSL);
   public void importCorpus(String path);
   
   public List<Map<String, Object>> listCorpusStats();

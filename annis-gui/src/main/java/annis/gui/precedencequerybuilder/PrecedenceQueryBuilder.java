@@ -22,18 +22,23 @@ import annis.gui.model.Query;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
@@ -358,7 +363,7 @@ public Collection<String> getAnnotationValues(String level)
     
     for(String s : getAvailableAnnotationLevels(level))
     {      
-      values.add(s.replaceFirst("^[^:]*:", ""));
+      values.add(s);
     }
     
     return values;
@@ -476,16 +481,23 @@ service.path("query").path("corpora").path(corpus).path("annotations")
     {
       try
       {
-        List<Annotation> atts = new LinkedList<Annotation>();
+        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-service.path("query").path("corpora").path(corpus).path("docmetadata")
-            .get(new GenericType<List<Annotation>>() {}));
+service.path("query").path("corpora").path(corpus).path("annotations")
+              .get(new GenericType<List<AnnisAttribute>>() {})
+            );
         }
-        for (Annotation a : atts)
+
+        for (AnnisAttribute a : atts)
         {
-          result.add(a.getName());
+          if (a.getType() == AnnisAttribute.Type.meta)
+          {
+            String aa = killNamespace(a.getName());
+            result.add(aa);
+          }
         }
 
       }
@@ -497,8 +509,8 @@ service.path("query").path("corpora").path(corpus).path("docmetadata")
     return result;
   }
 
-  public Set<String> getAvailableMetaLevels(String ebene)
-  {
+  public Set<String> getAvailableMetaLevels(String meta)
+{
     Set<String> result = new TreeSet<String>();
 
     WebResource service = Helper.getAnnisWebResource();
@@ -510,18 +522,27 @@ service.path("query").path("corpora").path(corpus).path("docmetadata")
     {
       try
       {
-        List<Annotation> atts = new LinkedList<Annotation>();
+        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+
         for(String corpus : corpusSelection)
         {
           atts.addAll(
-service.path("query").path("corpora").path(corpus).path("docmetadata")
-            .get(new GenericType<List<Annotation>>() {}));
+service.path("query").path("corpora").path(corpus).path("annotations")
+              .queryParam("fetchvalues", "true")
+              .queryParam("onlymostfrequentvalues", "false")
+              .get(new GenericType<List<AnnisAttribute>>() {})
+            );
         }
-        for (Annotation a : atts)
+
+        for (AnnisAttribute a : atts)
         {
-          if (killNamespace(a.getName()).equals(ebene))
+          if (a.getType() == AnnisAttribute.Type.meta)
           {
-            result.add(a.getValue());
+            String aa = killNamespace(a.getName());
+            if (aa.equals(meta))
+            {
+              result.addAll(a.getValueSet());
+            }
           }
         }
 
@@ -534,4 +555,3 @@ service.path("query").path("corpora").path(corpus).path("docmetadata")
     return result;
   }
 }
-

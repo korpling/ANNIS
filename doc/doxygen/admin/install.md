@@ -40,6 +40,13 @@ export PATH=$PATH:$ANNIS_HOME/bin
 annis-admin.sh init -u <username> -d <dbname> -p
 -P <postgres password>
 \endcode
+You can omit the PostgreSQL administrator password option (`-P`). Then the database and user must already
+exists. E.g. you should execute the following as PostgreSQL administrator:
+\code{.sql}
+CREATE LANGUAGE plpgsql; -- ignore the error if the language is already installed
+CREATE USER myuser PASSWORD 'mypassword';
+CREATE DATABASE mydb OWNER myuser ENCODING 'UTF8';
+\endcode
 7. Now you can import some corpora:
 \code{.sh}
 annis-admin.sh import path/to/corpus1 path/to/corpus2 ...
