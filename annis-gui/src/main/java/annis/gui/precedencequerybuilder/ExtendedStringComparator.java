@@ -44,6 +44,8 @@ public class ExtendedStringComparator implements Comparator
       h.put(Character.toUpperCase(c), c);
     }
     
+    
+    //read from file:
     //A:
     //h.put('a', 'a');
     //h.put('A', 'a');
