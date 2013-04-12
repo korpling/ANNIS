@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,7 +25,6 @@ import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-
 /**
  *
  * @author thomas
@@ -33,60 +32,71 @@ import org.slf4j.LoggerFactory;
 public class QueryAnalysis
 {
   // logging
+
   private final static Logger log = LoggerFactory.getLogger(QueryAnalysis.class);
 
   // use each node in exactly one edge relation
   private boolean normalizeNodesInEdgeRelations;
-  
+
   private DnfTransformer dummyDnfTransformer;
+
   private ClauseAnalysis dummyClauseAnalysis;
+
   private NodeRelationNormalizer nodeRelationNormalizer;
-  
+
   private List<QueryDataTransformer> postProcessors;
 
   public QueryData analyzeQuery(Start statement, List<Long> corpusList)
   {
     QueryData queryData = new QueryData();
-    
-    queryData.setCorpusList(new ArrayList<Long>(corpusList));
-		
-		// split statement into list of clauses
+
+    if (corpusList != null)
+    {
+      queryData.setCorpusList(new ArrayList<Long>(corpusList));
+    }
+
+    // split statement into list of clauses
 
     DnfTransformer dnfTransformer = getDnfTransformer();
     statement.apply(dnfTransformer);
     List<PExpr> clauses = dnfTransformer.listClauses(statement);
 
-		log.debug(clauses.size() + " clause(s) in statement");
-		
-		// analyze each clause independently
-		for (PExpr clause : clauses)
-    {
-		  if (normalizeNodesInEdgeRelations)
-		  {
-		    clause.apply(getNodeRelationNormalizer());
-		  }
+    log.debug(clauses.size() + " clause(s) in statement");
 
-			// get a fresh clause analyzer from Spring
-			ClauseAnalysis clauseAnalysis = getClauseAnalysis();
-			clause.apply(clauseAnalysis);
-			
-			// save nodes and update column width
-			queryData.addAlternative(new LinkedList<QueryNode>(clauseAnalysis.getNodes()));
-			queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), clauseAnalysis.nodesCount()));
-			
-			// collect meta data
-			queryData.addMetaAnnotations(clauseAnalysis.getMetaAnnotations());
-		}
-		log.debug("maximum column width is " + queryData.getMaxWidth());
-		
-    if(postProcessors != null)
+    // analyze each clause independently
+    for (PExpr clause : clauses)
     {
-      for(QueryDataTransformer transformer : postProcessors)
+
+      log.debug("clause {}", clause);
+
+      if (normalizeNodesInEdgeRelations)
+      {
+        clause.apply(getNodeRelationNormalizer());
+      }
+
+      // get a fresh clause analyzer from Spring
+      ClauseAnalysis clauseAnalysis = getClauseAnalysis();
+      clause.apply(clauseAnalysis);
+
+      // save nodes and update column width
+      queryData.addAlternative(new LinkedList<QueryNode>(clauseAnalysis.
+        getNodes()));
+      queryData.setMaxWidth(Math.max(queryData.getMaxWidth(), clauseAnalysis.
+        nodesCount()));
+
+      // collect meta data
+      queryData.addMetaAnnotations(clauseAnalysis.getMetaAnnotations());
+    }
+    log.debug("maximum column width is " + queryData.getMaxWidth());
+
+    if (postProcessors != null)
+    {
+      for (QueryDataTransformer transformer : postProcessors)
       {
         queryData = transformer.transform(queryData);
       }
     }
-    
+
     return queryData;
   }
 
@@ -116,7 +126,7 @@ public class QueryAnalysis
   }
 
   public void setNodeRelationNormalizer(
-      NodeRelationNormalizer nodeRelationNormalizer)
+    NodeRelationNormalizer nodeRelationNormalizer)
   {
     this.nodeRelationNormalizer = nodeRelationNormalizer;
   }
@@ -126,11 +136,12 @@ public class QueryAnalysis
     return normalizeNodesInEdgeRelations;
   }
 
-  public void setNormalizeNodesInEdgeRelations(boolean normalizeNodesInEdgeRelations)
+  public void setNormalizeNodesInEdgeRelations(
+    boolean normalizeNodesInEdgeRelations)
   {
     this.normalizeNodesInEdgeRelations = normalizeNodesInEdgeRelations;
   }
-  
+
   public List<QueryDataTransformer> getPostProcessors()
   {
     return postProcessors;
@@ -140,5 +151,4 @@ public class QueryAnalysis
   {
     this.postProcessors = postProcessors;
   }
-
 }
