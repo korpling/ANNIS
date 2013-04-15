@@ -18,9 +18,7 @@ package annis.sqlgen;
 import annis.examplequeries.ExampleQuery;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.Collection;
 import java.util.List;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,7 +52,9 @@ public class ListExampleQueriesHelper implements
         + "\nFROM example_queries, ("
         + "\nSELECT * FROM corpus "
         + "\nWHERE corpus.id in (" + StringUtils.join(corpusIDs, ",") + ")) as c"
-        + "\nWHERE	corpus_ref = c.id";
+        + "\nWHERE	corpus_ref = c.id"
+        + "\nORDER BY (nodes, used_ops)";
+
       return sql;
     }
   }

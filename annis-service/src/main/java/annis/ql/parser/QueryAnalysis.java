@@ -67,8 +67,6 @@ public class QueryAnalysis
     for (PExpr clause : clauses)
     {
 
-      log.debug("clause {}", clause);
-
       if (normalizeNodesInEdgeRelations)
       {
         clause.apply(getNodeRelationNormalizer());

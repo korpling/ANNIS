@@ -151,7 +151,7 @@ CREATE TABLE corpus_stats
 
 
 DROP VIEW IF EXISTS corpus_info CASCADE;
-CREATE VIEW corpus_info AS SELECT 
+CREATE VIEW corpus_info AS SELECT
   name,
   id,
   text,
@@ -219,13 +219,13 @@ CREATE TABLE user_config
   PRIMARY KEY(id)
 );
 
-CREATE TYPE ops AS ENUM ('.', '>', '->');
+--CREATE TYPE ops AS ENUM ('.','.*','>','->','_i_');
 CREATE TABLE example_queries
 (
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL,
   "type" TEXT NOT NULL,
   "nodes" INTEGER NOT NULL,
-  "used_ops" ops[] NOT NULL,
+  "used_ops" TEXT[] NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

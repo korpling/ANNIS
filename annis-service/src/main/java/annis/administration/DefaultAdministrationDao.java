@@ -18,6 +18,7 @@ package annis.administration;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
+import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
@@ -34,6 +35,8 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.logging.Level;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import javax.sql.DataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
@@ -1581,85 +1584,100 @@ public class DefaultAdministrationDao implements AdministrationDao
       {
         ExampleQuery eQ = new ExampleQuery();
         eQ.setExampleQuery(rs.getString("example_query"));
-        eQ.setUsedOperators("used_ops");
         return eQ;
       }
     });
 
     // count the nodes of the aql Query
-    Map<ExampleQuery, Integer> countExampleQueryNodes = countExampleQueryNodes(
-      exampleQueries);
+    countExampleQueryNodes(exampleQueries);
 
-    writeAmountOfNodesBack(countExampleQueryNodes);
+    // fetch the operators
+    getOperators(exampleQueries, "\\.(\\*)?|\\>|\\>\\*|_i_");
+
+    writeAmountOfNodesBack(exampleQueries);
   }
 
   /**
    * Maps example queries to integer, which represents the amount of nodes of
    * the aql query.
    *
-   * @param exampleQueries the aql query
-   * @return a mapping from queries to amount of nodes.
    */
-  private Map<ExampleQuery, Integer> countExampleQueryNodes(
-    List<ExampleQuery> exampleQueries)
+  private void countExampleQueryNodes(List<ExampleQuery> exampleQueries)
   {
-    Map<ExampleQuery, Integer> eQToNodeAmount = new HashMap<ExampleQuery, Integer>();
 
     for (ExampleQuery eQ : exampleQueries)
     {
-      log.info("map example queries nodes to int {}", eQ.getExampleQuery());
+
       QueryData query = getAnnisDao().parseAQL(eQ.getExampleQuery(), null);
-      List<List<QueryNode>> alternatives = query.getAlternatives();
 
       int count = 0;
-      for (List<QueryNode> qNodes : alternatives)
+      for (List<QueryNode> qNodes : query.getAlternatives())
       {
-
         count += qNodes.size();
-
       }
 
-      log.info("amount nodes {}", count);
-      eQToNodeAmount.put(eQ, count);
+      eQ.setNodes(count);
     }
-
-    return eQToNodeAmount;
   }
 
-  /**
-   * @return the annisDao
-   */
   public AnnisDao getAnnisDao()
   {
     return annisDao;
   }
 
-  /**
-   * @param annisDao the annisDao to set
-   */
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
   }
 
   /**
-   * Writes the counted nodes back to the staging area.
+   * Writes the counted nodes and the used operators back to the staging area.
    *
-   * @param countExampleQueryNodes
    */
-  private void writeAmountOfNodesBack(
-    Map<ExampleQuery, Integer> countExampleQueryNodes)
+  private void writeAmountOfNodesBack(List<ExampleQuery> exampleQueries)
   {
     StringBuilder sb = new StringBuilder();
 
-    for (ExampleQuery eQ : countExampleQueryNodes.keySet())
+    for (ExampleQuery eQ : exampleQueries)
     {
       sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES).append(" SET ");
-      sb.append("nodes=").
-        append(String.valueOf(countExampleQueryNodes.get(eQ)));
-      sb.append(" WHERE example_query='").append(eQ.getExampleQuery()).append("';\n");
+      sb.append("nodes=").append(String.valueOf(eQ.getNodes()));
+      sb.append(" WHERE example_query='");
+      sb.append(eQ.getExampleQuery()).append("';\n");
+
+      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES).append(" SET ");
+      sb.append("used_ops='").append(String.valueOf(eQ.getUsedOperators()));
+      sb.append("' WHERE example_query='");
+      sb.append(eQ.getExampleQuery()).append("';\n");
     }
 
     jdbcTemplate.execute(sb.toString());
+  }
+
+  /**
+   * Fetches operators used in the {@link ExampleQuery#getExampleQuery()} with a
+   * given regex.
+   *
+   * @param exQueries Set the used operators property of each member.
+   * @param regex The regex to search operators.
+   */
+  private void getOperators(List<ExampleQuery> exQueries, String regex)
+  {
+
+    Pattern opsRegex = Pattern.compile(regex);
+    for (ExampleQuery eQ : exQueries)
+    {
+      List<String> ops = new ArrayList<String>();
+      Matcher m = opsRegex.matcher(eQ.getExampleQuery().replaceAll("\\s", ""));
+
+      while (m.find())
+      {
+        ops.add(m.group());
+      }
+
+      eQ.setUsedOperators("{" + StringUtils.join(ops, ",") + "}");
+      log.info("found operators {} in ", eQ.getUsedOperators(), eQ.
+        getExampleQuery());
+    }
   }
 }

@@ -40,6 +40,9 @@ public class ExampleQuery
 
   private String corpusName;
 
+  // the amount of nodes of the example query
+  private int nodes;
+
   public String getType()
   {
     return type;
@@ -94,5 +97,33 @@ public class ExampleQuery
   public void setCorpusName(String corpusName)
   {
     this.corpusName = corpusName;
+  }
+
+  @Override
+  public String toString()
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("example query: ").append(exampleQuery).append("\n");
+    sb.append("example corpusName: ").append(corpusName).append("\n");
+    sb.append("description: ").append(description).append("\n");
+    sb.append("used operators: ").append(used_operators).append("\n");
+    sb.append("nodes: ").append(nodes).append("\n");
+    return sb.toString();
+  }
+
+  /**
+   * @return the nodes
+   */
+  public int getNodes()
+  {
+    return nodes;
+  }
+
+  /**
+   * @param nodes the nodes to set
+   */
+  public void setNodes(int nodes)
+  {
+    this.nodes = nodes;
   }
 }
