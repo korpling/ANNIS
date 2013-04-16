@@ -20,15 +20,16 @@ WS: [ \t]+;
 ID: [a-zA-Z_-*?]+;//[a-zA-Z_\-*?0-9.]*;
 SEMICOLON : ';';
 EQUALS : '=';
-STYLE : 'style';
+STYLE : 'style=';
 QUOTE : '"';
 NEWLINE : '\n';
+TXT : (.)+?;
 
-
-value : QUOTE ~(QUOTE) QUOTE;
+innervalue: ~(QUOTE)+;
+value : QUOTE innervalue QUOTE;
 
 element : ID # elementNoStyle
-        | ID SEMICOLON STYLE EQUALS value # elementWithStyle
+        | ID SEMICOLON STYLE value # elementWithStyle
         ;
 
 condition

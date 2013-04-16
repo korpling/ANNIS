@@ -18,8 +18,6 @@ package annis.visualizers.component.htmlvis;
 import annis.visualizers.htmlvis.HTMLVisConfigBaseListener;
 import annis.visualizers.htmlvis.HTMLVisConfigLexer;
 import annis.visualizers.htmlvis.HTMLVisConfigParser;
-import com.google.common.collect.Collections2;
-import com.google.common.collect.Lists;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -74,7 +72,7 @@ public class Parser extends HTMLVisConfigBaseListener
     HTMLVisConfigParser.ConditionWithValueContext ctx)
   {
     currentDefinition.setMatchingElement(ctx.ID().getText());
-    currentDefinition.setMatchingValue(ctx.VALUE().getText());
+    currentDefinition.setMatchingValue(ctx.value().innervalue().getText());
   }
 
   @Override
@@ -89,7 +87,7 @@ public class Parser extends HTMLVisConfigBaseListener
     HTMLVisConfigParser.ElementWithStyleContext ctx)
   {
     currentDefinition.setOutputElement(ctx.ID().getText());
-    currentDefinition.setStyle(ctx.VALUE().getText());
+    currentDefinition.setStyle(ctx.value().innervalue().getText());
   }
   
   @Override
