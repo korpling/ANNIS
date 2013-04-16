@@ -15,9 +15,6 @@
  */
 package annis.visualizers.htmlvis;
 
-import annis.visualizers.htmlvis.HTMLVisConfigBaseListener;
-import annis.visualizers.htmlvis.HTMLVisConfigLexer;
-import annis.visualizers.htmlvis.HTMLVisConfigParser;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.LinkedList;
@@ -31,13 +28,13 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class Parser extends HTMLVisConfigBaseListener
+public class VisParser extends HTMLVisConfigBaseListener
 {
   private List<VisualizationDefinition> definitions;;
 
   private VisualizationDefinition currentDefinition;
   
-  public Parser(InputStream inStream) throws IOException
+  public VisParser(InputStream inStream) throws IOException
   {
     this.definitions = new LinkedList<VisualizationDefinition>();
     
@@ -46,10 +43,16 @@ public class Parser extends HTMLVisConfigBaseListener
       lexer));
     
     ParseTree tree = parser.start();
-    ParseTreeWalker walker = new ParseTreeWalker();
-    
-    
-    walker.walk((Parser) this, tree);
+    if(parser.getNumberOfSyntaxErrors() == 0)
+    {
+      ParseTreeWalker walker = new ParseTreeWalker();
+      walker.walk((VisParser) this, tree);
+    }
+    else
+    {
+      // provoce an error
+      tree.toStringTree();
+    }
   }
 
   @Override
@@ -57,6 +60,8 @@ public class Parser extends HTMLVisConfigBaseListener
     HTMLVisConfigParser.VisContext ctx)
   {
     currentDefinition = new VisualizationDefinition();
+    // set to nothing by default, otherwise it will be overwritten later
+    currentDefinition.setOutputType(VisualizationDefinition.OutputType.NOTHING);
   }
 
   @Override

@@ -17,27 +17,41 @@
 grammar HTMLVisConfig;
 
 WS: [ \t]+;
-ID: [a-zA-Z_-*?]+;//[a-zA-Z_\-*?0-9.]*;
 SEMICOLON : ';';
 EQUALS : '=';
-STYLE : 'style=';
+VALUE : 'value';
+ANNO : 'anno';
+STYLE : 'style';
 QUOTE : '"';
 NEWLINE : '\n';
+COMMENT : '#' ~('\n')+ -> skip;
+ID: [a-zA-Z\_\-*?]+;// [a-zA-Z_\-*?0-9.]*;
 TXT : (.)+?;
 
 innervalue: ~(QUOTE)+;
 value : QUOTE innervalue QUOTE;
 
-element : ID # elementNoStyle
-        | ID SEMICOLON STYLE value # elementWithStyle
-        ;
+innertype: ~(QUOTE)+;
+type
+  : VALUE # typeValue
+  | ANNO # typeAnno
+  | QUOTE innertype QUOTE # typeConstant
+  ;
+
+element 
+  : ID # elementNoStyle
+  | ID SEMICOLON WS? STYLE EQUALS value # elementWithStyle
+  ;
 
 condition
   : ID # conditionNoValue
   | ID EQUALS value # conditionWithValue
+  | EQUALS value # conditionAnyNameWithValue
   ;
 
-vis : condition WS element NEWLINE*;
+vis 
+  : condition WS element (WS type)? WS? NEWLINE*
+  ;
 
 start
      : NEWLINE* vis (NEWLINE+ vis)* EOF

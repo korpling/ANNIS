@@ -21,10 +21,14 @@ package annis.visualizers.htmlvis;
  */
 public class VisualizationDefinition
 {
+  public enum OutputType {CONSTANT, VALUE, NAME, NOTHING};
+  
   private String matchingElement;
   private String matchingValue;
   
   private String outputElement;
+  private OutputType outputType;
+  private String outputValue;
   
   private String style;
 
@@ -68,43 +72,26 @@ public class VisualizationDefinition
     this.style = style;
   }
 
-  @Override
-  public int hashCode()
+  public OutputType getOutputType()
   {
-    int hash = 7;
-    hash =
-      37 * hash +
-      (this.matchingElement != null ? this.matchingElement.hashCode() : 0);
-    hash =
-      37 * hash +
-      (this.matchingValue != null ? this.matchingValue.hashCode() : 0);
-    return hash;
+    return outputType;
   }
 
-  @Override
-  public boolean equals(Object obj)
+  public void setOutputType(OutputType outputType)
   {
-    if (obj == null)
-    {
-      return false;
-    }
-    if (getClass() != obj.getClass())
-    {
-      return false;
-    }
-    final VisualizationDefinition other = (VisualizationDefinition) obj;
-    if ((this.matchingElement == null) ? (other.matchingElement != null)
-      : !this.matchingElement.equals(other.matchingElement))
-    {
-      return false;
-    }
-    if ((this.matchingValue == null) ? (other.matchingValue != null)
-      : !this.matchingValue.equals(other.matchingValue))
-    {
-      return false;
-    }
-    return true;
+    this.outputType = outputType;
   }
+
+  public String getOutputValue()
+  {
+    return outputValue;
+  }
+
+  public void setOutputValue(String outputValue)
+  {
+    this.outputValue = outputValue;
+  }
+
   
   
 }

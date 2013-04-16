@@ -15,7 +15,7 @@
  */
 package annis.visualizers.component.htmlvis;
 
-import annis.visualizers.htmlvis.Parser;
+import annis.visualizers.htmlvis.VisParser;
 import annis.visualizers.htmlvis.VisualizationDefinition;
 import java.io.IOException;
 import java.io.InputStream;
@@ -67,30 +67,32 @@ public class ParserTest
     try
     {
       InputStream inStream = ParserTest.class.getResourceAsStream("basicexample.config");
-      Parser parser = new Parser(inStream);
+      VisParser parser = new VisParser(inStream);
       VisualizationDefinition[] definitions =  parser.getDefinitions();
       
-      assertEquals("There must be 4 rules from the parsing", 4, definitions.length);
+      assertEquals("There must be 15 rules from the parsing", 15, definitions.length);
       
-      assertEquals(definitions[0].getMatchingElement(), "p");
+      assertEquals(definitions[0].getMatchingElement(), "title");
       assertEquals(definitions[0].getMatchingValue(), null);
-      assertEquals(definitions[0].getOutputElement(), "p");
+      assertEquals(definitions[0].getOutputElement(), "b");
       assertEquals(definitions[0].getStyle(), "");
       
-      assertEquals(definitions[1].getMatchingElement(), "pb");
+      assertEquals(definitions[1].getMatchingElement(), "chapter");
       assertEquals(definitions[1].getMatchingValue(), null);
       assertEquals(definitions[1].getOutputElement(), "p");
       assertEquals(definitions[1].getStyle(), "");
       
-      assertEquals(definitions[2].getMatchingElement(), "lang");
-      assertEquals(definitions[2].getMatchingValue(), "foreign");
+      assertEquals(definitions[2].getMatchingElement(), "chapter");
+      assertEquals(definitions[2].getMatchingValue(), null);
       assertEquals(definitions[2].getOutputElement(), "i");
       assertEquals(definitions[2].getStyle(), "");
       
-      assertEquals(definitions[3].getMatchingElement(), "lang");
-      assertEquals(definitions[3].getMatchingValue(), "foreign");
-      assertEquals(definitions[3].getOutputElement(), "span");
-      assertEquals(definitions[3].getStyle(), "font-style: italic; background-color: red");
+      assertEquals(definitions[3].getMatchingElement(), "chapter");
+      assertEquals(definitions[3].getMatchingValue(), null);
+      assertEquals(definitions[3].getOutputElement(), "i");
+      assertEquals(definitions[3].getStyle(), "");
+      
+      // TODO: test all properties
       
     }
     catch (IOException ex)
