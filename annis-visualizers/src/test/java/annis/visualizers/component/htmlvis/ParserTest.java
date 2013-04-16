@@ -60,7 +60,7 @@ public class ParserTest
   }
 
   @Test
-  public void testSomeMethod()
+  public void testBasicParsing()
   {
     try
     {
@@ -68,10 +68,27 @@ public class ParserTest
       Parser parser = new Parser(inStream);
       VisualizationDefinition[] definitions =  parser.getDefinitions();
       
+      assertEquals("There must be 4 rules from the parsing", 4, definitions.length);
+      
       assertEquals(definitions[0].getMatchingElement(), "p");
       assertEquals(definitions[0].getMatchingValue(), null);
       assertEquals(definitions[0].getOutputElement(), "p");
       assertEquals(definitions[0].getStyle(), "");
+      
+      assertEquals(definitions[1].getMatchingElement(), "pb");
+      assertEquals(definitions[1].getMatchingValue(), null);
+      assertEquals(definitions[1].getOutputElement(), "p");
+      assertEquals(definitions[1].getStyle(), "");
+      
+      assertEquals(definitions[2].getMatchingElement(), "lang");
+      assertEquals(definitions[2].getMatchingValue(), "foreign");
+      assertEquals(definitions[2].getOutputElement(), "i");
+      assertEquals(definitions[2].getStyle(), "");
+      
+      assertEquals(definitions[3].getMatchingElement(), "lang");
+      assertEquals(definitions[3].getMatchingValue(), "foreign");
+      assertEquals(definitions[3].getOutputElement(), "span");
+      assertEquals(definitions[3].getStyle(), "font-style: italic; background-color: red");
       
     }
     catch (IOException ex)
