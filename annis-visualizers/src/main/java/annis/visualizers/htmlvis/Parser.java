@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.visualizers.component.htmlvis;
+package annis.visualizers.htmlvis;
 
 import annis.visualizers.htmlvis.HTMLVisConfigBaseListener;
 import annis.visualizers.htmlvis.HTMLVisConfigLexer;

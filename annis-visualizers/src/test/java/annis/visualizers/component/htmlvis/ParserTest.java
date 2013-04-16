@@ -15,6 +15,8 @@
  */
 package annis.visualizers.component.htmlvis;
 
+import annis.visualizers.htmlvis.Parser;
+import annis.visualizers.htmlvis.VisualizationDefinition;
 import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
