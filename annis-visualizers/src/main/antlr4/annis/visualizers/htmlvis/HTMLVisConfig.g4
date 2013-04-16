@@ -16,20 +16,28 @@
 
 grammar HTMLVisConfig;
 
-WS: [ \t];
-ID: [a-zA-Z_-*?] [a-zA-Z_\-*?0-9.]*;
-VALUE : [^"]+; 
+WS: [ \t]+;
+ID: [a-zA-Z_-*?]+;//[a-zA-Z_\-*?0-9.]*;
+SEMICOLON : ';';
+EQUALS : '=';
+STYLE : 'style';
+QUOTE : '"';
+NEWLINE : '\n';
 
-element : ID
-        | ID ';style="' VALUE + '"'
+
+value : QUOTE ~(QUOTE) QUOTE;
+
+element : ID # elementNoStyle
+        | ID SEMICOLON STYLE EQUALS value # elementWithStyle
         ;
 
 condition
-  :
-  | ID '=' '"' VALUE '"'
+  : ID # conditionNoValue
+  | ID EQUALS value # conditionWithValue
   ;
 
-vis : condition element ;
+vis : condition WS element NEWLINE*;
 
-start: vis ('\n' vis)* '\n'? EOF
+start
+     : NEWLINE* vis (NEWLINE+ vis)* EOF
      ;
