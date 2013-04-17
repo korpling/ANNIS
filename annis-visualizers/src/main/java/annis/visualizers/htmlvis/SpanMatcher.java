@@ -15,34 +15,13 @@
  */
 package annis.visualizers.htmlvis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VisualizationDefinition
+public interface SpanMatcher
 {
-  
-  private SpanMatcher matcher;
-  private SpanHTMLOutputter outputter;
-
-  public SpanMatcher getMatcher()
-  {
-    return matcher;
-  }
-
-  public void setMatcher(SpanMatcher matcher)
-  {
-    this.matcher = matcher;
-  }
-
-  public SpanHTMLOutputter getOutputter()
-  {
-    return outputter;
-  }
-
-  public void setOutputter(SpanHTMLOutputter outputter)
-  {
-    this.outputter = outputter;
-  }
-  
+  public boolean matches(SNode node);
 }

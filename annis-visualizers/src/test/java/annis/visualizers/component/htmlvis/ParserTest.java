@@ -15,6 +15,11 @@
  */
 package annis.visualizers.component.htmlvis;
 
+import annis.visualizers.htmlvis.AnnotationNameMatcher;
+import annis.visualizers.htmlvis.AnnotationNameAndValueMatcher;
+import annis.visualizers.htmlvis.AnnotationValueMatcher;
+import annis.visualizers.htmlvis.SpanHTMLOutputter;
+import annis.visualizers.htmlvis.TokenMatcher;
 import annis.visualizers.htmlvis.VisParser;
 import annis.visualizers.htmlvis.VisualizationDefinition;
 import java.io.IOException;
@@ -72,28 +77,125 @@ public class ParserTest
       
       assertEquals("There must be 15 rules from the parsing", 15, definitions.length);
       
-      assertEquals(definitions[0].getMatchingElement(), "title");
-      assertEquals(definitions[0].getMatchingValue(), null);
-      assertEquals(definitions[0].getOutputElement(), "b");
-      assertEquals(definitions[0].getStyle(), "");
+      VisualizationDefinition def = definitions[0];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("title",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("b", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
       
-      assertEquals(definitions[1].getMatchingElement(), "chapter");
-      assertEquals(definitions[1].getMatchingValue(), null);
-      assertEquals(definitions[1].getOutputElement(), "p");
-      assertEquals(definitions[1].getStyle(), "");
+      def = definitions[1];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("chapter",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("p", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
       
-      assertEquals(definitions[2].getMatchingElement(), "chapter");
-      assertEquals(definitions[2].getMatchingValue(), null);
-      assertEquals(definitions[2].getOutputElement(), "i");
-      assertEquals(definitions[2].getStyle(), "");
+      def = definitions[2];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("chapter",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("i", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.CONSTANT, def.getOutputter().getType());
+      assertEquals("Kapitel: ", def.getOutputter().getConstant());
       
-      assertEquals(definitions[3].getMatchingElement(), "chapter");
-      assertEquals(definitions[3].getMatchingValue(), null);
-      assertEquals(definitions[3].getOutputElement(), "i");
-      assertEquals(definitions[3].getStyle(), "");
+      def = definitions[3];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("chapter",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("i", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
       
-      // TODO: test all properties
+      def = definitions[4];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("pb",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("color: grey", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.CONSTANT, def.getOutputter().getType());
+      assertEquals("page ", def.getOutputter().getConstant());
       
+      def = definitions[5];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("pb_n",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("color: grey", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[6];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("pb",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("table", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[7];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("pb",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("tr", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[8];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("column",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("td", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[9];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("column",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("colStyle", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[10];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("lb",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("p", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[11];
+      assertTrue(def.getMatcher()instanceof AnnotationNameAndValueMatcher);
+      assertEquals("lb_rend",((AnnotationNameAndValueMatcher) def.getMatcher()).getNameMatcher().getAnnotationName());
+      assertEquals("italics",((AnnotationNameAndValueMatcher) def.getMatcher()).getValueMatcher().getAnnotationValue());
+      assertEquals("i", def.getOutputter().getElement());
+      assertEquals("", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[12];
+      assertTrue(def.getMatcher()instanceof AnnotationValueMatcher);
+      assertEquals("Gott",((AnnotationValueMatcher) def.getMatcher()).getAnnotationValue());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("color: red", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[13];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("speaker",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("color: grey", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.ANNO_NAME, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      
+      def = definitions[14];
+      assertTrue(def.getMatcher()instanceof TokenMatcher);
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals("tokStyle", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
     }
     catch (IOException ex)
     {

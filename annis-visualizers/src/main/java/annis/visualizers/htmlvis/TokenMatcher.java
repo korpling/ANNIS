@@ -15,34 +15,30 @@
  */
 package annis.visualizers.htmlvis;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VisualizationDefinition
+public class TokenMatcher implements SpanMatcher
 {
+  public TokenMatcher()
+  {
+  }
   
-  private SpanMatcher matcher;
-  private SpanHTMLOutputter outputter;
-
-  public SpanMatcher getMatcher()
+  @Override
+  public boolean matches(SNode node)
   {
-    return matcher;
-  }
-
-  public void setMatcher(SpanMatcher matcher)
-  {
-    this.matcher = matcher;
-  }
-
-  public SpanHTMLOutputter getOutputter()
-  {
-    return outputter;
-  }
-
-  public void setOutputter(SpanHTMLOutputter outputter)
-  {
-    this.outputter = outputter;
+    if(node instanceof SToken)
+    {
+      return true;
+    }
+    else
+    {
+      return false;
+    }
   }
   
 }

@@ -19,6 +19,7 @@ grammar HTMLVisConfig;
 WS: [ \t]+;
 SEMICOLON : ';';
 EQUALS : '=';
+TOK : 'tok';
 VALUE : 'value';
 ANNO : 'anno';
 STYLE : 'style';
@@ -44,9 +45,10 @@ element
   ;
 
 condition
-  : ID # conditionNoValue
-  | ID EQUALS value # conditionWithValue
-  | EQUALS value # conditionAnyNameWithValue
+  : ID # conditionName
+  | TOK # conditionTok
+  | ID EQUALS value # conditionNameAndValue
+  | EQUALS value # conditionValue
   ;
 
 vis 

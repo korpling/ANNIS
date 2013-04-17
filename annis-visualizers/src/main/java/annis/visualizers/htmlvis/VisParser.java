@@ -32,7 +32,8 @@ public class VisParser extends HTMLVisConfigBaseListener
 {
   private List<VisualizationDefinition> definitions;;
 
-  private VisualizationDefinition currentDefinition;
+  private SpanMatcher currentMatcher;
+  private SpanHTMLOutputter currentOutputter;
   
   public VisParser(InputStream inStream) throws IOException
   {
@@ -59,48 +60,85 @@ public class VisParser extends HTMLVisConfigBaseListener
   public void enterVis(
     HTMLVisConfigParser.VisContext ctx)
   {
-    currentDefinition = new VisualizationDefinition();
-    // set to nothing by default, otherwise it will be overwritten later
-    currentDefinition.setOutputType(VisualizationDefinition.OutputType.NOTHING);
+    currentMatcher = null;
+    currentOutputter = new SpanHTMLOutputter();
+    currentOutputter.setType(SpanHTMLOutputter.Type.EMPTY);
+    currentOutputter.setElement("div");
   }
 
   @Override
-  public void enterConditionNoValue(
-    HTMLVisConfigParser.ConditionNoValueContext ctx)
+  public void enterConditionName(HTMLVisConfigParser.ConditionNameContext ctx)
   {
-    currentDefinition.setMatchingElement(ctx.ID().getText());
-    currentDefinition.setMatchingValue(null);
+    currentMatcher = new AnnotationNameMatcher(ctx.ID().getText());
   }
 
   @Override
-  public void enterConditionWithValue(
-    HTMLVisConfigParser.ConditionWithValueContext ctx)
+  public void enterConditionTok(HTMLVisConfigParser.ConditionTokContext ctx)
   {
-    currentDefinition.setMatchingElement(ctx.ID().getText());
-    currentDefinition.setMatchingValue(ctx.value().innervalue().getText());
+    currentMatcher = new TokenMatcher();
+  }
+
+  @Override
+  public void enterConditionValue(HTMLVisConfigParser.ConditionValueContext ctx)
+  {
+    currentMatcher = new AnnotationValueMatcher(ctx.value().innervalue().getText());
+  }
+
+  @Override
+  public void enterConditionNameAndValue(
+    HTMLVisConfigParser.ConditionNameAndValueContext ctx)
+  {
+    currentMatcher = new AnnotationNameAndValueMatcher(ctx.ID().getText(), 
+      ctx.value().innervalue().getText());
   }
 
   @Override
   public void enterElementNoStyle(HTMLVisConfigParser.ElementNoStyleContext ctx)
   {
-    currentDefinition.setOutputElement(ctx.ID().getText());
-    currentDefinition.setStyle("");
+    currentOutputter.setElement(ctx.ID().getText());
+    currentOutputter.setStyle("");
   }
 
   @Override
   public void enterElementWithStyle(
     HTMLVisConfigParser.ElementWithStyleContext ctx)
   {
-    currentDefinition.setOutputElement(ctx.ID().getText());
-    currentDefinition.setStyle(ctx.value().innervalue().getText());
+    currentOutputter.setElement(ctx.ID().getText());
+    currentOutputter.setStyle(ctx.value().innervalue().getText());
   }
+  
+
+  @Override
+  public void enterTypeAnno(HTMLVisConfigParser.TypeAnnoContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.ANNO_NAME);
+  }
+
+  @Override
+  public void enterTypeConstant(HTMLVisConfigParser.TypeConstantContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.CONSTANT);
+    currentOutputter.setConstant(ctx.innertype().getText());
+  }
+
+  @Override
+  public void enterTypeValue(HTMLVisConfigParser.TypeValueContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.VALUE);
+  }
+  
+  
+
   
   @Override
   public void exitVis(HTMLVisConfigParser.VisContext ctx)
   {
-    if(currentDefinition != null)
+    if(currentMatcher != null && currentOutputter != null)
     {
-      definitions.add(currentDefinition);
+      VisualizationDefinition def = new VisualizationDefinition();
+      def.setMatcher(currentMatcher);
+      def.setOutputter(currentOutputter);
+      definitions.add(def);
     }
   }
 

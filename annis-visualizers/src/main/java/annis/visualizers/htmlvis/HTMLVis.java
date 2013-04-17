@@ -108,7 +108,10 @@ public class HTMLVis extends AbstractVisualizer<Label>
         {
           for (VisualizationDefinition vis : definitions)
           {
-            sb.append(outputForEvent(span, vis));
+            if(vis.getMatcher().matches(span))
+            {
+              sb.append(outputForEvent(span, vis));
+            }
           }
         }
       }
@@ -167,40 +170,8 @@ public class HTMLVis extends AbstractVisualizer<Label>
   {
     StringBuilder sb = new StringBuilder();
     
-    SAnnotation matchedAnno = null;
-    // check if the annotation name is matched
-    EList<SAnnotation> annotationsForSpan = span.getSAnnotations();
-    if(annotationsForSpan != null)
-    {
-      for(SAnnotation a : annotationsForSpan)
-      {
-        if(a.getSName().equals(definition.getMatchingElement()) 
-          || a.getQName().equals(definition.getMatchingElement()))
-        {
-          // do we need to check the annotation value?
-          if(definition.getMatchingValue() == null)
-          {
-            // no, output this annotation
-            matchedAnno = a;
-            break;
-          }
-          else
-          {
-            // perform a check to decide if we output this element
-            if(definition.getMatchingValue().equals(a.getSValueSTEXT()))
-            {
-              matchedAnno = a;
-              break;
-            }
-          }
-        }
-      } // end for each annotation
-      
-      if(matchedAnno != null)
-      {
-        // TODO output something for this annotation
-      }
-    }
+    
+    // TODO: output the matched definition
     
     return sb.toString();
   }
