@@ -19,8 +19,6 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_LEFTTOKEN;
-import static annis.model.AnnisConstants.FEAT_RIGHTTOKEN;
 import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
 import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -28,10 +26,10 @@ import com.vaadin.ui.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import java.io.FileInputStream;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.io.InputStream;
 import java.util.List;
-import java.util.Map;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.eclipse.emf.common.util.EList;
@@ -40,6 +38,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
+ * <p>
+ * <strong>Mappings:</strong><br />
+ * <ul>
+ * <li>visconfigpath - path of the visualization configuration file</li>
+ * </ul>
+ * </p>
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
@@ -47,6 +51,7 @@ public class HTMLVis extends AbstractVisualizer<Label>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
+  
 
   @Override
   public String getShortName()
@@ -61,8 +66,17 @@ public class HTMLVis extends AbstractVisualizer<Label>
     try
     {
       // TODO: use mapping to get the right file
-      VisParser p = new VisParser(HTMLVis.class.getResourceAsStream(
-        "defaultvis.config"));
+      String visConfigPath = vi.getMappings().getProperty("visconfigpath");
+      InputStream inStream;
+      if(visConfigPath == null)
+      {
+        inStream = HTMLVis.class.getResourceAsStream("defaultvis.config");
+      }
+      else
+      {
+        inStream = new FileInputStream(visConfigPath);
+      }
+      VisParser p = new VisParser(inStream);
       VisualizationDefinition[] definitions = p.getDefinitions();
 
       List<String> annos = EventExtractor.computeDisplayAnnotations(vi);
@@ -125,47 +139,5 @@ public class HTMLVis extends AbstractVisualizer<Label>
     }
 
     return sb.toString();
-  }
-
-  private Map<Long, List<SSpan>> groupSpansByLeftToken(SDocumentGraph graph)
-  {
-    Map<Long, List<SSpan>> result = new TreeMap<Long, List<SSpan>>();
-
-    EList<SSpan> allSpans = graph.getSSpans();
-    if (allSpans != null)
-    {
-      for (SSpan span : allSpans)
-      {
-        long startIndex = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-          getSValueSNUMERIC();
-        if (result.get(startIndex) == null)
-        {
-          result.put(startIndex, new ArrayList<SSpan>());
-        }
-        result.get(startIndex).add(span);
-      }
-    }
-    return result;
-  }
-
-  private Map<Long, List<SSpan>> groupSpansByRightToken(SDocumentGraph graph)
-  {
-    Map<Long, List<SSpan>> result = new TreeMap<Long, List<SSpan>>();
-
-    EList<SSpan> allSpans = graph.getSSpans();
-    if (allSpans != null)
-    {
-      for (SSpan span : allSpans)
-      {
-        long endIndex = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-          getSValueSNUMERIC();
-        if (result.get(endIndex) == null)
-        {
-          result.put(endIndex, new ArrayList<SSpan>());
-        }
-        result.get(endIndex).add(span);
-      }
-    }
-    return result;
   }
 }
