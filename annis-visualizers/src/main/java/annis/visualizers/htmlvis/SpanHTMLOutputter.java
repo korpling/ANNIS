@@ -15,6 +15,7 @@
  */
 package annis.visualizers.htmlvis;
 
+import annis.CommonHelper;
 import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -39,9 +40,6 @@ public class SpanHTMLOutputter
   
   public void outputHTML(SNode node, String matchedQName, Map<Long, List<String>> output)
   {
-    // get left and right border
-    long left=0;
-    long right=0;
     if(node instanceof SSpan)
     {
       outputSpan((SSpan) node, matchedQName, output);
@@ -49,9 +47,7 @@ public class SpanHTMLOutputter
     else if(node instanceof SToken)
     {
       SToken tok = (SToken) node;
-      left = right = 
-        tok.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX).
-        getSValueSNUMERIC();
+      outputToken(tok, output);
     }
     else
     {
@@ -102,8 +98,53 @@ public class SpanHTMLOutputter
     {
       output.put(right, new ArrayList<String>());
     }
-    output.get(left).add(startTag + inner);
-    output.get(right).add(0, endTag);
+    if(left == right)
+    {
+      output.get(left).add(startTag + inner);
+      output.get(right).add(endTag);
+    }
+    else
+    {
+      output.get(left).add(startTag + inner);
+      output.get(right).add(0, endTag);
+    }
+  }
+  
+  private void outputToken(SToken tok, Map<Long, List<String>> output)
+  {
+    long index = tok
+        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX)
+        .getSValueSNUMERIC();
+      
+    String startTag = "<" + element;
+    if(!style.isEmpty())
+    {
+      startTag += " style=\"" + style + "\" ";
+    }
+    startTag += ">";
+    String inner = "";
+    String endTag = "</" + element + ">";
+    
+    switch(type)
+    {
+      case CONSTANT:
+        inner = constant;
+        break;
+      case VALUE:
+        inner = CommonHelper.getSpannedText(tok);
+        break;
+      case ANNO_NAME:
+        inner = "tok";
+        break;
+    }
+    
+    // add tags to output
+    if(output.get(index) == null)
+    {
+      output.put(index, new ArrayList<String>());
+    }
+    output.get(index).add(startTag + inner);
+    output.get(index).add(endTag);
     
   }
 

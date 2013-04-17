@@ -82,38 +82,45 @@ public class HTMLVis extends AbstractVisualizer<Label>
   private String createHTML(SDocumentGraph graph, List<String> annos,
     VisualizationDefinition[] definitions)
   {
-
+    TreeMap<Long, List<String>> output = new TreeMap<Long, List<String>>();
     StringBuilder sb = new StringBuilder();
 
     EList<SToken> token = graph.getSortedSTokenByText();
-    Map<Long, List<SSpan>> eventsByLeft = groupSpansByLeftToken(graph);
-    Map<Long, List<SSpan>> eventsByRight = groupSpansByRightToken(graph);
 
+    for (SSpan span : graph.getSSpans())
+    {
+      for (VisualizationDefinition vis : definitions)
+      {
+        String matched = vis.getMatcher().matchedAnnotation(span);
+        if (matched != null)
+        {
+          vis.getOutputter().outputHTML(span, matched, output);
+        }
+      }
+    }
     for (SToken t : token)
     {
       // get token index
       long currentIndex = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
         getSValueSNUMERIC();
-
-      List<SSpan> startingEvents = eventsByLeft.get(currentIndex);
-      List<SSpan> endEvents = eventsByRight.get(currentIndex);
-
-      if (endEvents != null)
+      
+      for (VisualizationDefinition vis : definitions)
       {
-        for (SSpan span : endEvents)
+        String matched = vis.getMatcher().matchedAnnotation(t);
+        if (matched != null)
         {
-          for (VisualizationDefinition vis : definitions)
-          {
-            String matched = vis.getMatcher().matchedAnnotation(span);
-            if(matched != null)
-            {
-              sb.append(outputForEvent(span, vis));
-            }
-          }
+          vis.getOutputter().outputHTML(t, matched, output);
         }
       }
-      if (startingEvents != null)
+      
+      // output all strings belonging to this token position
+      List<String> values = output.get(currentIndex);
+      if(values != null)
       {
+        for(String s : values)
+        {
+          sb.append(s);
+        }
       }
     }
 
@@ -131,7 +138,7 @@ public class HTMLVis extends AbstractVisualizer<Label>
       {
         long startIndex = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
           getSValueSNUMERIC();
-        if(result.get(startIndex) == null)
+        if (result.get(startIndex) == null)
         {
           result.put(startIndex, new ArrayList<SSpan>());
         }
@@ -140,7 +147,7 @@ public class HTMLVis extends AbstractVisualizer<Label>
     }
     return result;
   }
-  
+
   private Map<Long, List<SSpan>> groupSpansByRightToken(SDocumentGraph graph)
   {
     Map<Long, List<SSpan>> result = new TreeMap<Long, List<SSpan>>();
@@ -152,7 +159,7 @@ public class HTMLVis extends AbstractVisualizer<Label>
       {
         long endIndex = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
           getSValueSNUMERIC();
-        if(result.get(endIndex) == null)
+        if (result.get(endIndex) == null)
         {
           result.put(endIndex, new ArrayList<SSpan>());
         }
@@ -160,16 +167,5 @@ public class HTMLVis extends AbstractVisualizer<Label>
       }
     }
     return result;
-  }
-
-  private String outputForEvent(SSpan span,
-    VisualizationDefinition definition)
-  {
-    StringBuilder sb = new StringBuilder();
-    
-    
-    // TODO: output the matched definition
-    
-    return sb.toString();
   }
 }
