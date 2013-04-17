@@ -68,7 +68,15 @@ public class SpanHTMLOutputter
     String startTag = "<" + element;
     if(!style.isEmpty())
     {
-      startTag += " style=\"" + style + "\" ";
+      // is the style in reality a class name?
+      if(style.contains(":") || style.contains(";"))
+      {
+        startTag += " style=\"" + style + "\" ";
+      }
+      else
+      {
+        startTag += " class=\"" + style + "\" ";
+      }
     }
     startTag += ">";
     String inner = "";
@@ -119,7 +127,15 @@ public class SpanHTMLOutputter
     String startTag = "<" + element;
     if(!style.isEmpty())
     {
-      startTag += " style=\"" + style + "\" ";
+      // is the style in reality a class name?
+      if(style.contains(":") || style.contains(";"))
+      {
+        startTag += " style=\"" + style + "\" ";
+      }
+      else
+      {
+        startTag += " class=\"" + style + "\" ";
+      }
     }
     startTag += ">";
     String inner = "";

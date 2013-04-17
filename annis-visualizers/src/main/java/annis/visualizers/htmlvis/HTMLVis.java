@@ -23,18 +23,22 @@ import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
 import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.vaadin.cssinject.CSSInject;
 
 /**
  *
@@ -65,7 +69,7 @@ public class HTMLVis extends AbstractVisualizer<Label>
     Label lblResult = new Label("NOT IMPLEMENTED YET", ContentMode.HTML);
     try
     {
-      // TODO: use mapping to get the right file
+      // TODO: can we load the file from the corpus media files? Or how do we bundle these kind of files with a corpus?
       String visConfigPath = vi.getMappings().getProperty("visconfigpath");
       InputStream inStream;
       if(visConfigPath == null)
@@ -83,6 +87,11 @@ public class HTMLVis extends AbstractVisualizer<Label>
 
       lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(), annos,
         definitions));
+      
+      // TODO: do not add CSSInject multiple times
+      String cssContent = IOUtils.toString(HTMLVis.class.getResourceAsStream("htmlvis.css"));
+      CSSInject cssInject = new CSSInject(UI.getCurrent());
+      cssInject.setStyles(cssContent);
 
     }
     catch (IOException ex)
