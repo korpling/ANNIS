@@ -64,6 +64,14 @@ public class HTMLVis extends AbstractVisualizer<Label>
   }
 
   @Override
+  public boolean isUsingText()
+  {
+    return true;
+  }
+  
+  
+
+  @Override
   public Label createComponent(VisualizerInput vi, VisualizationToggle vt)
   {
     Label lblResult = new Label("NOT IMPLEMENTED YET", ContentMode.HTML);
@@ -149,4 +157,5 @@ public class HTMLVis extends AbstractVisualizer<Label>
 
     return sb.toString();
   }
+  
 }
