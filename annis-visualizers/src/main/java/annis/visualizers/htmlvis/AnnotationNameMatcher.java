@@ -35,7 +35,7 @@ public class AnnotationNameMatcher implements SpanMatcher
   }
   
   @Override
-  public boolean matches(SNode node)
+  public String matchedAnnotation(SNode node)
   {
     if(node instanceof SSpan)
     {
@@ -44,11 +44,11 @@ public class AnnotationNameMatcher implements SpanMatcher
       {
         if(annotationName.equals(anno.getSName()) || annotationName.equals(anno.getQName()))
         {
-          return true;
+          return anno.getQName();
         }
       }
     }
-    return false;
+    return null;
   }
 
   public String getAnnotationName()

@@ -23,5 +23,5 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
  */
 public interface SpanMatcher
 {
-  public boolean matches(SNode node);
+  public String matchedAnnotation(SNode node);
 }

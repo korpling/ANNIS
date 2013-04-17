@@ -16,6 +16,7 @@
 package annis.visualizers.htmlvis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import org.apache.commons.lang3.Validate;
 
@@ -26,7 +27,7 @@ import org.apache.commons.lang3.Validate;
 public class AnnotationNameAndValueMatcher implements SpanMatcher
 {
   private AnnotationNameMatcher nameMatcher;
-  private AnnotationValueMatcher valueMatcher;
+  private String annotationValue;
 
   /**
    * 
@@ -39,21 +40,25 @@ public class AnnotationNameAndValueMatcher implements SpanMatcher
     Validate.notNull(annotationValue, "The annotation value parameter must never be null.");
     
     this.nameMatcher = new AnnotationNameMatcher(annotationName);
-    this.valueMatcher = new AnnotationValueMatcher(annotationValue);
+    this.annotationValue = annotationValue;
   }
   
   @Override
-  public boolean matches(SNode node)
+  public String matchedAnnotation(SNode node)
   {
     if(node instanceof SSpan)
     {
       SSpan span = (SSpan) node;
-      return nameMatcher.matches(span) && valueMatcher.matches(span);
+      String match = nameMatcher.getAnnotationName();
+      SAnnotation anno = span.getSAnnotation(match);
+      if(anno != null && annotationValue.equals(anno.getSValueSTEXT()))
+      {
+        return match;
+      }
     }
-    else
-    {
-      return false;
-    }
+    
+    return null;
+
   }
 
   public AnnotationNameMatcher getNameMatcher()
@@ -66,16 +71,14 @@ public class AnnotationNameAndValueMatcher implements SpanMatcher
     this.nameMatcher = nameMatcher;
   }
 
-  public AnnotationValueMatcher getValueMatcher()
+  public String getAnnotationValue()
   {
-    return valueMatcher;
+    return annotationValue;
   }
 
-  public void setValueMatcher(AnnotationValueMatcher valueMatcher)
+  public void setAnnotationValue(String annotationValue)
   {
-    this.valueMatcher = valueMatcher;
+    this.annotationValue = annotationValue;
   }
-  
-  
   
 }

@@ -104,7 +104,8 @@ public class HTMLVis extends AbstractVisualizer<Label>
         {
           for (VisualizationDefinition vis : definitions)
           {
-            if(vis.getMatcher().matches(span))
+            String matched = vis.getMatcher().matchedAnnotation(span);
+            if(matched != null)
             {
               sb.append(outputForEvent(span, vis));
             }

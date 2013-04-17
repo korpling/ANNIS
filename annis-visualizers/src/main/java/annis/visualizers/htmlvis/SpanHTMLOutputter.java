@@ -37,14 +37,14 @@ public class SpanHTMLOutputter
   private String style = "";
   private String constant;
   
-  public void outputHTML(SNode node, SAnnotation matchedAnnotation, Map<Long, List<String>> output)
+  public void outputHTML(SNode node, String matchedQName, Map<Long, List<String>> output)
   {
     // get left and right border
     long left=0;
     long right=0;
     if(node instanceof SSpan)
     {
-      outputSpan((SSpan) node, matchedAnnotation, output);
+      outputSpan((SSpan) node, matchedQName, output);
     }
     else if(node instanceof SToken)
     {
@@ -59,7 +59,7 @@ public class SpanHTMLOutputter
     }
   }
   
-  private void outputSpan(SSpan span, SAnnotation matchedAnnotation, Map<Long, List<String>> output)
+  private void outputSpan(SSpan span, String matchedQName, Map<Long, List<String>> output)
   {
     long left = span
         .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
@@ -75,22 +75,21 @@ public class SpanHTMLOutputter
       startTag += " style=\"" + style + "\" ";
     }
     startTag += ">";
-    String inner;
+    String inner = "";
     String endTag = "</" + element + ">";
+    
+    SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
     
     switch(type)
     {
-      case EMPTY:
-        inner = "";
-        break;
       case CONSTANT:
         inner = constant;
         break;
       case VALUE:
-        inner = matchedAnnotation.getSValueSTEXT();
+        inner = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
         break;
       case ANNO_NAME:
-        inner = matchedAnnotation.getSName();
+        inner = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
         break;
     }
     
@@ -103,8 +102,8 @@ public class SpanHTMLOutputter
     {
       output.put(right, new ArrayList<String>());
     }
-    
-    // TODO: add to list
+    output.get(left).add(startTag + inner);
+    output.get(right).add(0, endTag);
     
   }
 
@@ -147,5 +146,5 @@ public class SpanHTMLOutputter
   {
     this.constant = constant;
   }
-
+  
 }

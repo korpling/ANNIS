@@ -168,7 +168,7 @@ public class ParserTest
       def = definitions[11];
       assertTrue(def.getMatcher()instanceof AnnotationNameAndValueMatcher);
       assertEquals("lb_rend",((AnnotationNameAndValueMatcher) def.getMatcher()).getNameMatcher().getAnnotationName());
-      assertEquals("italics",((AnnotationNameAndValueMatcher) def.getMatcher()).getValueMatcher().getAnnotationValue());
+      assertEquals("italics",((AnnotationNameAndValueMatcher) def.getMatcher()).getAnnotationValue());
       assertEquals("i", def.getOutputter().getElement());
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());

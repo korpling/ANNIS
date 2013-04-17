@@ -29,15 +29,15 @@ public class TokenMatcher implements SpanMatcher
   }
   
   @Override
-  public boolean matches(SNode node)
+  public String matchedAnnotation(SNode node)
   {
     if(node instanceof SToken)
     {
-      return true;
+      return "tok";
     }
     else
     {
-      return false;
+      return null;
     }
   }
   
