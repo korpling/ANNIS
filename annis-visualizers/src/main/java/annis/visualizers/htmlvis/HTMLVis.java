@@ -23,6 +23,7 @@ import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
 import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
@@ -51,7 +52,7 @@ import org.vaadin.cssinject.CSSInject;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
-public class HTMLVis extends AbstractVisualizer<Label>
+public class HTMLVis extends AbstractVisualizer<Panel>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
@@ -72,9 +73,13 @@ public class HTMLVis extends AbstractVisualizer<Label>
   
 
   @Override
-  public Label createComponent(VisualizerInput vi, VisualizationToggle vt)
+  public Panel createComponent(VisualizerInput vi, VisualizationToggle vt)
   {
-    Label lblResult = new Label("NOT IMPLEMENTED YET", ContentMode.HTML);
+    Panel scrollPanel = new Panel();
+    scrollPanel.setSizeFull();
+    Label lblResult = new Label("ERROR", ContentMode.HTML);
+    lblResult.setSizeUndefined();
+    
     try
     {
       // TODO: can we load the file from the corpus media files? Or how do we bundle these kind of files with a corpus?
@@ -107,7 +112,9 @@ public class HTMLVis extends AbstractVisualizer<Label>
       log.error("Could not parse the HTML visualization configuration file", ex);
     }
 
-    return lblResult;
+    scrollPanel.setContent(lblResult);
+    
+    return scrollPanel;
   }
 
   private String createHTML(SDocumentGraph graph, List<String> annos,
