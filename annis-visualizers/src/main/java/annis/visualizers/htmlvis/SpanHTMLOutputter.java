@@ -15,7 +15,14 @@
  */
 package annis.visualizers.htmlvis;
 
+import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -30,9 +37,75 @@ public class SpanHTMLOutputter
   private String style = "";
   private String constant;
   
-  public String outputHTML(SSpan span)
+  public void outputHTML(SNode node, SAnnotation matchedAnnotation, Map<Long, List<String>> output)
   {
-    return "<p>not implemented yet</p>\n";
+    // get left and right border
+    long left=0;
+    long right=0;
+    if(node instanceof SSpan)
+    {
+      outputSpan((SSpan) node, matchedAnnotation, output);
+    }
+    else if(node instanceof SToken)
+    {
+      SToken tok = (SToken) node;
+      left = right = 
+        tok.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX).
+        getSValueSNUMERIC();
+    }
+    else
+    {
+      throw new IllegalArgumentException("node must be either a SSpan or SToken");
+    }
+  }
+  
+  private void outputSpan(SSpan span, SAnnotation matchedAnnotation, Map<Long, List<String>> output)
+  {
+    long left = span
+        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
+        .getSValueSNUMERIC();
+      
+    long right = span
+        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
+        .getSValueSNUMERIC();
+    
+    String startTag = "<" + element;
+    if(!style.isEmpty())
+    {
+      startTag += " style=\"" + style + "\" ";
+    }
+    startTag += ">";
+    String inner;
+    String endTag = "</" + element + ">";
+    
+    switch(type)
+    {
+      case EMPTY:
+        inner = "";
+        break;
+      case CONSTANT:
+        inner = constant;
+        break;
+      case VALUE:
+        inner = matchedAnnotation.getSValueSTEXT();
+        break;
+      case ANNO_NAME:
+        inner = matchedAnnotation.getSName();
+        break;
+    }
+    
+    // add tags to output
+    if(output.get(left) == null)
+    {
+      output.put(left, new ArrayList<String>());
+    }
+    if(output.get(right) == null)
+    {
+      output.put(right, new ArrayList<String>());
+    }
+    
+    // TODO: add to list
+    
   }
 
   public Type getType()
