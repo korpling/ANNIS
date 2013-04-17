@@ -77,8 +77,6 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     {
       annonames.add(a);
     }
-    ExtendedStringComparator esc = new ExtendedStringComparator();
-    //esc.sort(annonames);
     
     this.annonames = annonames;//by Martin    
     
@@ -164,7 +162,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   { 
     //new Code:
     ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
-    ExtendedStringComparator esc = new ExtendedStringComparator();    
+    reducingStringComparator esc = new reducingStringComparator();    
     String txt = event.getText();
     if (!txt.equals(""))
     {

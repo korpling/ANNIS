@@ -23,11 +23,11 @@ import java.util.Collection;
  *
  * @author klotzmaz
  */
-public class ExtendedStringComparator implements Comparator
+public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
   
-  public ExtendedStringComparator()
+  public reducingStringComparator()
   {
     ALLOGRAPHS = initAlphabet();
   }
@@ -258,9 +258,10 @@ public class ExtendedStringComparator implements Comparator
   }
   
   @Override
-  //use with Strings only
   public int compare(Object a, Object b)
     /*
+     * use with Strings only
+     * 
      * <0: a<b
      * =0: a=b
      * >0: a>b
