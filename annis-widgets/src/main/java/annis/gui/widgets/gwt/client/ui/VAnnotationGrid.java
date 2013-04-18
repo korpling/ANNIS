@@ -40,21 +40,36 @@ import java.util.Map;
 public class VAnnotationGrid extends Composite implements Paintable
 {
 
-  /** Set the CSS class name to allow styling. */
+  /**
+   * Set the CSS class name to allow styling.
+   */
   public static final String CLASSNAME = "v-annotationgrid";
-  /** The client side widget identifier */
+
+  /**
+   * The client side widget identifier
+   */
   protected String paintableId;
-  /** Reference to the server connection object. */
+
+  /**
+   * Reference to the server connection object.
+   */
   ApplicationConnection gClient;
-  
+
   private AnnotationGridTable table;
+
   private FlexTable.FlexCellFormatter formatter;
-  
+
   private BiMap<Position, String> position2id;
+
   private Map<String, String[]> highlighted;
+
   private Map<Position, Double> startTimes;
+
   private Map<Position, Double> endTimes;
-  
+
+  // build maps row and col to a pdf page number
+  private Map<Position, String> pdfPageNumbers;
+
   /**
    * The constructor should first call super() to initialize the component and
    * then handle any initialization relevant to Vaadin.
@@ -64,32 +79,33 @@ public class VAnnotationGrid extends Composite implements Paintable
     super();
 
     table = new AnnotationGridTable();
-    
+
     formatter = table.getFlexCellFormatter();
-    
+
     // we are wrapping the table element
     initWidget(table);
-        
+
     // This method call of the Paintable interface sets the component
     // style name in DOM tree
     setStyleName(CLASSNAME);
-    
+
     highlighted = new HashMap<String, String[]>();
     position2id = HashBiMap.create();
     startTimes = new HashMap<Position, Double>();
     endTimes = new HashMap<Position, Double>();
+    pdfPageNumbers = new HashMap<Position, String>();
   }
-  
+
   /**
-   * Called whenever an update is received from the server 
+   * Called whenever an update is received from the server
    */
   @Override
   public void updateFromUIDL(UIDL uidl, ApplicationConnection client)
   {
 
-    // This call should be made first. 
+    // This call should be made first.
     // It handles sizes, captions, tooltips, etc. automatically.
-    if(client.updateComponent(this, uidl, true))
+    if (client.updateComponent(this, uidl, true))
     {
       // If client.updateComponent returns true there has been no changes and we
       // do not need to update anything.
@@ -102,9 +118,9 @@ public class VAnnotationGrid extends Composite implements Paintable
 
     // Save the client side identifier (paintable id) for the widget
     paintableId = uidl.getId();
-    
+
     try
-    { 
+    {
       UIDL rows = uidl.getChildByTagName("rows");
       if (rows != null)
       {
@@ -122,42 +138,42 @@ public class VAnnotationGrid extends Composite implements Paintable
           }
         }
       }// end if rows not null
-      
+
       // add end events if necessary to have a nicely aligned regular grid
       int maxCellCount = 0;
-      for(int row = 0; row < table.getRowCount(); row++)
+      for (int row = 0; row < table.getRowCount(); row++)
       {
         maxCellCount = Math.max(maxCellCount, getRealColumnCount(row));
       }
 
-      for(int row = 0; row < table.getRowCount(); row++)
+      for (int row = 0; row < table.getRowCount(); row++)
       {
         int isValue = getRealColumnCount(row);
-        
-        if(isValue < maxCellCount)
+
+        if (isValue < maxCellCount)
         {
           int diff = maxCellCount - isValue;
           table.setHTML(row, table.getCellCount(row) + diff - 1, "");
         }
       }
-      
+
     }
     catch (Exception ex)
     {
       VConsole.log(ex);
     }
   }
-  
+
   private int getRealColumnCount(int row)
   {
     int result = 0;
-    for(int i=0; i < table.getCellCount(row); i++)
+    for (int i = 0; i < table.getCellCount(row); i++)
     {
       result += formatter.getColSpan(row, i);
     }
     return result;
   }
-  
+
   private void addRow(UIDL row, int rowNumber)
   {
     String caption = row.getStringAttribute("caption");
@@ -198,14 +214,14 @@ public class VAnnotationGrid extends Composite implements Paintable
       }
 
       addStyleForEvent(event, rowNumber, col);
-      
+
     }
   }
-  
+
   private void addStyleForEvent(UIDL event, int rowNumber, int col)
   {
     String id = event.getStringAttribute("id");
-    
+
     // style given by the server component
     if (event.hasAttribute("style"))
     {
@@ -225,38 +241,61 @@ public class VAnnotationGrid extends Composite implements Paintable
     {
       highlighted.put(id, event.getStringArrayAttribute("highlight"));
     }
-    
-    if(event.hasAttribute("startTime"))
+
+    if (event.hasAttribute("startTime"))
     {
       formatter.addStyleName(rowNumber, col, "speaker");
-      startTimes.put(new Position(rowNumber, col), event.getDoubleAttribute("startTime"));
-      if(event.hasAttribute("endTime"))
+      startTimes.put(new Position(rowNumber, col), event.getDoubleAttribute(
+        "startTime"));
+      if (event.hasAttribute("endTime"))
       {
-        endTimes.put(new Position(rowNumber, col), event.getDoubleAttribute("endTime"));
+        endTimes.put(new Position(rowNumber, col), event.getDoubleAttribute(
+          "endTime"));
       }
+    }
+
+    if (event.hasAttribute("openPDF"))
+    {
+      String number = event.getStringAttribute("openPDF");
+      VConsole.log("put event with openPDF with attribute " + number);
+      formatter.addStyleName(rowNumber, col, "speaker");
+      pdfPageNumbers.put(new Position(rowNumber, col), number);
     }
   }
 
   public void onClick(int row, int col)
   {
+
+    VConsole.log("clicked row " + row + " col " + col);
+    VConsole.log("size of pdfPageNumbers: " + pdfPageNumbers.size());
+
     Position pos = new Position(row, col);
-    if(startTimes.containsKey(pos))
+    if (startTimes.containsKey(pos))
     {
-      if(endTimes.containsKey(pos))
+      if (endTimes.containsKey(pos))
       {
-        gClient.updateVariable(paintableId, "play", "" + startTimes.get(pos) + "-" + endTimes.get(pos)
-          , true);
+        gClient.updateVariable(paintableId, "play",
+          "" + startTimes.get(pos) + "-" + endTimes.get(pos), true);
       }
       else
       {
-        gClient.updateVariable(paintableId, "play", "" + startTimes.get(pos), true);
+        gClient.updateVariable(paintableId, "play", "" + startTimes.get(pos),
+          true);
       }
-       
+
+    }
+
+
+    if (pdfPageNumbers.containsKey(pos))
+    {
+      gClient.updateVariable(paintableId, "openPDF", pdfPageNumbers.get(pos),
+        true);
     }
   }
-  
+
   public static class Position
   {
+
     private int column, row;
 
     public Position(Cell cell)
@@ -264,6 +303,7 @@ public class VAnnotationGrid extends Composite implements Paintable
       this.column = cell.getCellIndex();
       this.row = cell.getRowIndex();
     }
+
     public Position(int row, int column)
     {
       this.column = column;
@@ -322,10 +362,10 @@ public class VAnnotationGrid extends Composite implements Paintable
       return true;
     }
   }
-  
+
   public class AnnotationGridTable extends FlexTable
   {
-    
+
     public AnnotationGridTable()
     {
       sinkEvents(Event.ONMOUSEOVER | Event.ONMOUSEOUT | Event.ONCLICK);
@@ -339,39 +379,41 @@ public class VAnnotationGrid extends Composite implements Paintable
       {
         return;
       }
-      
+
       int row = TableRowElement.as(td.getParentElement()).getSectionRowIndex();
       int column = TableCellElement.as(td).getCellIndex();
-      
+
       String id = position2id.get(new Position(row, column));
       String[] targetIDs = highlighted.get(id);
-      
+
       // only do something if the cell is highlighting other cells
-      if(targetIDs != null && targetIDs.length > 0)
+      if (targetIDs != null && targetIDs.length > 0)
       {
-        switch(event.getTypeInt())
+        switch (event.getTypeInt())
         {
           case Event.ONMOUSEOVER:
             td.addClassName("highlight-source");
-            
-            for(String targetID : targetIDs)
+
+            for (String targetID : targetIDs)
             {
               Position pos = position2id.inverse().get(targetID);
-              if(pos != null)
+              if (pos != null)
               {
-                formatter.addStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+                formatter.addStyleName(pos.getRow(), pos.getColumn(),
+                  "highlight-target");
               }
             }
-            
+
             break;
           case Event.ONMOUSEOUT:
             td.removeClassName("highlight-source");
-            for(String targetID : targetIDs)
+            for (String targetID : targetIDs)
             {
               Position pos = position2id.inverse().get(targetID);
-              if(pos != null)
+              if (pos != null)
               {
-                formatter.removeStyleName(pos.getRow(), pos.getColumn(), "highlight-target");
+                formatter.removeStyleName(pos.getRow(), pos.getColumn(),
+                  "highlight-target");
               }
             }
             break;

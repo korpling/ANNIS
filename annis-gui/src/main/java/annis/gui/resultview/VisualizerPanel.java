@@ -120,7 +120,7 @@ public class VisualizerPanel extends VerticalLayout
   private final String HIDDEN = "hidden";
 
   private final String PRELOADED = "preloaded";
-  
+
   private ProgressIndicator progress;
 
   private InstanceConfig instanceConfig;
@@ -145,7 +145,7 @@ public class VisualizerPanel extends VerticalLayout
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
   {
-    
+
     this.ps = ps;
     this.instanceConfig = instanceConfig;
     this.entry = entry;
@@ -160,12 +160,12 @@ public class VisualizerPanel extends VerticalLayout
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
-    
+
     this.progress = new ProgressIndicator();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-  
+
     if(entry != null && ps != null)
     {
       visPlugin = ps.getVisualizer(entry.getVisType());
@@ -175,7 +175,7 @@ public class VisualizerPanel extends VerticalLayout
         entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
         visPlugin = ps.getVisualizer(entry.getVisType());
       }
-     
+
       if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
@@ -234,9 +234,9 @@ public class VisualizerPanel extends VerticalLayout
         }
 
       }
-      
+
     } // end if entry not null
-   
+
   }
 
   private Component createComponent()
@@ -277,7 +277,7 @@ public class VisualizerPanel extends VerticalLayout
     {
       input.setFont(instanceConfig.getFont());
     }
-     
+
 
     if (entry != null)
     {
@@ -296,10 +296,10 @@ public class VisualizerPanel extends VerticalLayout
     {
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
-      
+
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
-      
+
       input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered, input.
         getDocument(), wholeDocument));
       input.setDocument(wholeDocument);
@@ -354,7 +354,7 @@ public class VisualizerPanel extends VerticalLayout
     }
     return txt;
   }
-  
+
   @Override
   public void buttonClick(ClickEvent event)
   {
@@ -414,7 +414,7 @@ public class VisualizerPanel extends VerticalLayout
               {
                 removeComponent(progress);
               }
-              
+
               if (vis != null)
               {
                 btEntry.setEnabled(true);
@@ -462,7 +462,7 @@ public class VisualizerPanel extends VerticalLayout
       exec.execute(future);
 
       btEntry.setIcon(ICON_COLLAPSE);
-     
+
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
@@ -569,7 +569,7 @@ public class VisualizerPanel extends VerticalLayout
       {
         SFeature targetFeature = target.getSFeature(featureNameSpace, featureName);
         targetFeature.setValue(sfeature.getValue());
-        
+
         log.debug("overwriting SFeature {} value {}", sfeature.getQName(), sfeature.
           getValueString());
       }

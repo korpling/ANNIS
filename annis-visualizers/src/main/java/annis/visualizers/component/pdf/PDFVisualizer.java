@@ -16,17 +16,23 @@
 package annis.visualizers.component.pdf;
 
 import annis.libgui.VisualizationToggle;
+import annis.libgui.media.PDFController;
+import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.apache.http.impl.auth.NegotiateSchemeFactory;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class PDF extends AbstractVisualizer<Panel> {
+public class PDFVisualizer extends AbstractVisualizer<Panel> implements
+        PDFViewer {
 
   @Override
   public String getShortName() {
@@ -37,12 +43,24 @@ public class PDF extends AbstractVisualizer<Panel> {
   public Panel createComponent(VisualizerInput visInput,
           VisualizationToggle visToggle) {
 
-    PDFPanel pdf =  new PDFPanel(visInput, visToggle);
+    PDFPanel pdf = new PDFPanel(visInput, visToggle);
     Panel p = new Panel();
 
     p.setContent(pdf);
     p.setSizeFull();
 
+    if (VaadinSession.getCurrent().getAttribute(PDFController.class) != null) {
+
+      PDFController pdfController = VaadinSession.getCurrent().getAttribute(
+              PDFController.class);
+      pdfController.addPDF(visInput.getId(), this);
+    }
+
     return p;
+  }
+
+  @Override
+  public void openPDF(String pageNumber) {
+    Notification.show("open pageNumber " + pageNumber);
   }
 }
