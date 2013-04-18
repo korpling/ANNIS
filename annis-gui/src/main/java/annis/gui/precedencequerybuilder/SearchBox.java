@@ -195,7 +195,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
         {
           cb.addItem(s);
         }
-      }      
+      }
     }
     else
     {

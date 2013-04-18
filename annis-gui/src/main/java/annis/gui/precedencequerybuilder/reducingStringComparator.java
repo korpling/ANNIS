@@ -252,11 +252,12 @@ public class reducingStringComparator implements Comparator
     //further special characters:
     h.put('ç', 'c');
     h.put('Ç', 'c'); 
-    h.put('ß', 's');
+    h.put('ß', 's');    
+    h.put('ʒ', 'z');
     
     return h;
   }
-  
+    
   private String removeCombiningCharacters(String s)
   {
     String t="";    
@@ -310,13 +311,22 @@ public class reducingStringComparator implements Comparator
      * <0: a<b
      * =0: a=b
      * >0: a>b
+     * 
+     * compare() is split in 2 methods to make contains()
+     * more comfortable (contains() could use compare2(),
+     * so that a multiple application of removeCombiningCharacters() 
+     * on the same string is avoided)
+     * 
      */
   { 
-    //kill combining diacritics:
-    
     String s1 = removeCombiningCharacters((String)a);
     String s2 = removeCombiningCharacters((String)b);
-    
+    //compare without spaces
+    return compare2(s1.replace(" ", ""), s2.replace(" ", ""));    
+  }
+  
+  private int compare2(String s1, String s2)
+  {
     int l = s1.length();
     
     if (l<s2.length())
@@ -348,23 +358,36 @@ public class reducingStringComparator implements Comparator
     }
     
     return 0;
-  }  
+  }
   
   public boolean startsWith(String fullSequence, String subSequence)
   {
-    int l = subSequence.length();
-    if (fullSequence.length()<l) {return false;}
+    //kill diacritics:
+    String subS = removeCombiningCharacters(subSequence);
+    String fullS = removeCombiningCharacters(fullSequence);
+    //remove spaces:
+    subS = subS.replace(" ", "");
+    fullS = fullS.replace(" ", "");
     
-    return (compare(fullSequence.substring(0, l), subSequence)==0);
+    int l = subS.length();
+    if (fullS.length()<l) {return false;}
+    
+    return (compare2(fullS.substring(0, l), subS)==0);
   }
   
   public boolean contains(String fullSequence, String subSequence)
   {
+    //kill diacritics:    
     String subS = removeCombiningCharacters(subSequence);
+    String fullS = removeCombiningCharacters(fullSequence);
+    //remove spaces:
+    subS = subS.replace(" ", "");
+    fullS = fullS.replace(" ", "");
+    
     int l = subS.length();
-    for (int i=0; i<fullSequence.length()-l+1; i++)
+    for (int i=0; i<fullS.length()-l+1; i++)
     {
-      if (compare(fullSequence.substring(i, i+l), subS)==0)
+      if (compare2(fullS.substring(i, i+l), subS)==0)
       {
         return true;
       }
