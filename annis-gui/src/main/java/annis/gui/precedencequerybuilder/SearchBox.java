@@ -35,6 +35,7 @@ import org.apache.commons.lang3.StringUtils;//levenshtein
 import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
+import com.vaadin.ui.Notification;
 
 /**
  *
@@ -57,8 +58,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   
 
   public SearchBox(final String ebene, final PrecedenceQueryBuilder sq, final VerticalNode vn)
-  {    
-    
+  {
     this.vn = vn;
     this.ebene = ebene;
     this.sq = sq;

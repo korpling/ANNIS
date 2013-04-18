@@ -257,6 +257,51 @@ public class reducingStringComparator implements Comparator
     return h;
   }
   
+  private String removeCombiningCharacters(String s)
+  {
+    String t="";    
+    
+    for (int i=0; i<s.length(); i++)
+    {
+      char c = s.charAt(i);
+      int cp = (int)c;
+      //improve later with IntRanges
+      if(!(
+        ((cp>767) & (cp<880)) |
+        ((cp>1154) & (cp<1162)) |
+        (cp==1619) |
+        ((cp>2026) & (cp<2036)) |
+        (cp==4352) |
+        ((cp>4956) & (cp<4960)) |
+        (cp==6783) |
+        ((cp>7018) & (cp<7028)) |
+        ((cp>7615) & (cp<7655)) |
+        ((cp>7675) & (cp<7680)) |
+        ((cp>8399) & (cp<8433)) |
+        ((cp>11502) & (cp<11506)) |
+        ((cp>11743) & (cp<11776)) |
+        ((cp>12440) & (cp<12443)) |
+        ((cp>42606) & (cp<42611)) |
+        ((cp>42611) & (cp<42622)) |
+        ((cp>42654) & (cp<42738)) |
+        ((cp>43231) & (cp<43250)) |
+        ((cp>65055) & (cp<65063)) |
+        (cp==66045) |
+        ((cp>119140) & (cp<119146)) |
+        ((cp>119148) & (cp<119155)) |
+        ((cp>119162) & (cp<119171)) |
+        ((cp>119172) & (cp<119180)) |
+        ((cp>119209) & (cp<119214)) |
+        ((cp>119361) & (cp<119365))
+        ))
+      {
+        t = t + c;
+      }     
+    }
+    
+    return t;
+  }
+  
   @Override
   public int compare(Object a, Object b)
     /*
@@ -266,9 +311,12 @@ public class reducingStringComparator implements Comparator
      * =0: a=b
      * >0: a>b
      */
-  {
-    String s1 = (String)a;
-    String s2 = (String)b;
+  { 
+    //kill combining diacritics:
+    
+    String s1 = removeCombiningCharacters((String)a);
+    String s2 = removeCombiningCharacters((String)b);
+    
     int l = s1.length();
     
     if (l<s2.length())
@@ -312,10 +360,11 @@ public class reducingStringComparator implements Comparator
   
   public boolean contains(String fullSequence, String subSequence)
   {
-    int l = subSequence.length();
+    String subS = removeCombiningCharacters(subSequence);
+    int l = subS.length();
     for (int i=0; i<fullSequence.length()-l+1; i++)
     {
-      if (compare(fullSequence.substring(i, i+l), subSequence)==0)
+      if (compare(fullSequence.substring(i, i+l), subS)==0)
       {
         return true;
       }
