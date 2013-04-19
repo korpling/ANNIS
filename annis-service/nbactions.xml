@@ -51,9 +51,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -Dannis.home=src/main/distribution/ -classpath %classpath annis.AnnisRunner debug</exec.args>
+                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.AnnisRunner debug</exec.args>
                 <profiler.action>profile</profiler.action>
-                <exec.executable>${profiler.java}</exec.executable>
+                <exec.executable>java</exec.executable>
             </properties>
         </action>
         <action>
