@@ -33,13 +33,13 @@ public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuild
   @Override
   public String getShortName()
   {
-    return "precedencequerybuilder";
+    return "flatquerybuilder";
   }
 
   @Override
   public String getCaption()
   {
-    return "Precedence (Word sequences)";
+    return "Word sequences and meta information";
   }
 
   @Override
