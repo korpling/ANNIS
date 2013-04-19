@@ -189,6 +189,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
+      // enable gzip compression
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
       
