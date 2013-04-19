@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
@@ -38,7 +38,7 @@ public class EdgeBox extends Panel
   
   
   
-  public EdgeBox (PrecedenceQueryBuilder sq)
+  public EdgeBox (FlatQueryBuilder sq)
   {
     edge = new ComboBox();
     for(String o : EDGE_OPERATORS[1])

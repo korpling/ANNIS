@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
@@ -52,7 +52,7 @@ import java.util.TreeSet;
  *
  * @author tom
  */
-public class PrecedenceQueryBuilder extends Panel implements Button.ClickListener
+public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
   private Button btInitLanguage;
   private Button btInitMeta;
@@ -77,7 +77,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   private static final String NO_CORPORA_WARNING = "No corpora selected";
   private static final String BUTTON_ADD_LABEL = "Add position";
 
-  public PrecedenceQueryBuilder(QueryController cp)
+  public FlatQueryBuilder(QueryController cp)
   {
     launch(cp);
   }
@@ -254,7 +254,7 @@ public class PrecedenceQueryBuilder extends Panel implements Button.ClickListene
   public void buttonClick(Button.ClickEvent event)
   {
 
-    final PrecedenceQueryBuilder sq = this;
+    final FlatQueryBuilder sq = this;
     
     if (cp.getSelectedCorpora().isEmpty()){
       getUI().showNotification(NO_CORPORA_WARNING);

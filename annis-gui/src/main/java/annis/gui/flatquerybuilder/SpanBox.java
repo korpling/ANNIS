@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -32,7 +32,7 @@ import java.util.Collection;
  */
 public class SpanBox extends Panel implements ComboBox.ValueChangeListener
 {
-  private PrecedenceQueryBuilder sq;
+  private FlatQueryBuilder sq;
   private VerticalLayout option;
   private CheckBox chbWithin;
   private ComboBox cbSpan;
@@ -48,7 +48,7 @@ public class SpanBox extends Panel implements ComboBox.ValueChangeListener
   public static final String REBOX_LABEL = "Regex";
   public static final String REBOX_DESCRIPTION = "Tick to allow for a regular expression";
   
-  public SpanBox(final PrecedenceQueryBuilder sq)
+  public SpanBox(final FlatQueryBuilder sq)
   {
     this.sq = sq;    
     option = new VerticalLayout();
@@ -131,7 +131,7 @@ public class SpanBox extends Panel implements ComboBox.ValueChangeListener
     setContent(option);
   }
   
-  public static void buildBoxValues(ComboBox cb, String level, PrecedenceQueryBuilder sq)
+  public static void buildBoxValues(ComboBox cb, String level, FlatQueryBuilder sq)
   {
     /*
      * this method deletes the user's regular expressions

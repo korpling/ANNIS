@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.Button;
 import java.util.Collection;
@@ -33,12 +33,12 @@ public class AddMenu extends Panel
   
   private MenuBar addMenu = new MenuBar();
   private VerticalNode vn;
-  private PrecedenceQueryBuilder sq;
+  private FlatQueryBuilder sq;
   
   private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
   
   
-  public AddMenu(final PrecedenceQueryBuilder sq, final VerticalNode vn, String firstLevel)
+  public AddMenu(final FlatQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
     this.vn = vn;
     this.sq = sq;

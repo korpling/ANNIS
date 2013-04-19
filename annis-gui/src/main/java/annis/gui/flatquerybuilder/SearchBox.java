@@ -13,7 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
+
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
 
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
@@ -36,6 +39,10 @@ import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.ui.Notification;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+import java.util.SortedSet;
 
 /**
  *
@@ -51,13 +58,13 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   private SensitiveComboBox cb;  
   private CheckBox reBox;//by Martin, tick for regular expression
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
-  private PrecedenceQueryBuilder sq;
+  private FlatQueryBuilder sq;
   
   public static final String BUTTON_CLOSE_LABEL = "Close";
   private static final String SB_CB_WIDTH = "140px";
   
 
-  public SearchBox(final String ebene, final PrecedenceQueryBuilder sq, final VerticalNode vn)
+  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
   {
     this.vn = vn;
     this.ebene = ebene;
@@ -161,7 +168,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   public void textChange(TextChangeEvent event)
   { 
     //new Code:
-    ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
+/*    ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
     reducingStringComparator esc = new reducingStringComparator();    
     String txt = event.getText();
     if (!txt.equals(""))
@@ -201,33 +208,40 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     {
       //have a look and speed it up
       SpanBox.buildBoxValues(cb, ebene, sq);
-    }
+    }*/
     
     //old Levenshtein code:
-    /*   
+       
     String txt = event.getText();
-    if (!txt.equals(""))
+    HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
+    if (txt.length() > 1)
     {
       cb.removeAllItems();
       for(String s : annonames)
       {
-        if(txt.equals(s))
-        {
-          cb.addItem(s);
+        Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt), removeAccents(s));
+        if (levdistvals.containsKey(d)){
+          levdistvals.get(d).add(s);
+        }
+        if (!levdistvals.containsKey(d)){
+          Set<String> newc = new TreeSet<String>();
+          newc.add(s);
+          levdistvals.put(d, newc);
         }
       }
-      for(String s : annonames)
-      {        
-        if((StringUtils.getLevenshteinDistance(txt, s)<txt.length()/2+1) | (StringUtils.startsWith(s, txt)))
-        {
-          cb.addItem(s);
+      SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
+      for(Integer k : keys.subSet(0, 5)){
+        List<String> values = new ArrayList(levdistvals.get(k));
+        Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
+        for(String v : values){
+          cb.addItem(v);
         }
       }
     }
     else
     {
       SpanBox.buildBoxValues(cb, ebene, sq);
-    }*/
+    }
   }
   
   public String getAttribute()
@@ -245,5 +259,10 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     return reBox.booleanValue();
   }
   
+  public static String removeAccents(String text) {
+    return text == null ? null
+        : Normalizer.normalize(text, Form.NFD)
+            .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+}
   
 }

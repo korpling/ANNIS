@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
@@ -39,14 +39,14 @@ class MetaBox extends Panel implements Button.ClickListener
   //private TwinColSelect tcs;
   private OptionGroup tcs;
   private VerticalLayout sb;
-  private PrecedenceQueryBuilder sq;
+  private FlatQueryBuilder sq;
   private final String datum;
   
   private static final String LEFT_COLUMN_LABEL = "Available levels";
   private static final String RIGHT_COLUMN_LABEL = "Selected levels";
   private static final String TWIN_COL_WIDTH = "40px";
   
-  public MetaBox(String ebene, PrecedenceQueryBuilder sq)
+  public MetaBox(String ebene, FlatQueryBuilder sq)
   {
     this.sq = sq;
     sb = new VerticalLayout();

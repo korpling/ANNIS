@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.MenuBar;
 import java.util.Collection;
 import java.util.Set;
 import com.vaadin.ui.VerticalLayout;
-import annis.gui.precedencequerybuilder.SearchBox;
-import annis.gui.precedencequerybuilder.AddMenu;
+import annis.gui.flatquerybuilder.SearchBox;
+import annis.gui.flatquerybuilder.AddMenu;
 import com.vaadin.ui.Panel;
-import annis.gui.precedencequerybuilder.PrecedenceQueryBuilder;
+import annis.gui.flatquerybuilder.FlatQueryBuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -37,7 +37,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
 {
   
   private Set<String> annonames;
-  private PrecedenceQueryBuilder sq;
+  private FlatQueryBuilder sq;
   private Button btClose;
   private VerticalLayout v;
   private Collection<SearchBox> sboxes;
@@ -45,7 +45,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   
   private static final String WIDTH = "200px";
   
-  public VerticalNode(String ebene, PrecedenceQueryBuilder sq)
+  public VerticalNode(String ebene, FlatQueryBuilder sq)
   {
         
     this.sq = sq;

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -149,6 +149,7 @@ public class reducingStringComparator implements Comparator
     h.put('Ȋ', 'i');
     h.put('ȋ', 'i');
     h.put('ɨ', 'i');
+    h.put('ī', 'i');
     
     //O:
     

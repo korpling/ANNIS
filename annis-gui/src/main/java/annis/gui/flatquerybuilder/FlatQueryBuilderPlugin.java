@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.precedencequerybuilder;
+package annis.gui.flatquerybuilder;
 
 import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
@@ -27,7 +27,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  */
 
 @PluginImplementation
-public class PrecedenceQueryBuilderPlugin implements QueryBuilderPlugin<PrecedenceQueryBuilder>
+public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder>
 {
 
   @Override
@@ -43,8 +43,8 @@ public class PrecedenceQueryBuilderPlugin implements QueryBuilderPlugin<Preceden
   }
 
   @Override
-  public PrecedenceQueryBuilder createComponent(QueryController controlPanel)
+  public FlatQueryBuilder createComponent(QueryController controlPanel)
   {
-    return new PrecedenceQueryBuilder(controlPanel);
+    return new FlatQueryBuilder(controlPanel);
   }
 }
