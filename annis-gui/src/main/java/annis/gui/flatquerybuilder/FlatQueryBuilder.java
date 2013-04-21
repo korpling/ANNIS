@@ -17,35 +17,23 @@
 package annis.gui.flatquerybuilder;
 
 import annis.gui.QueryController;
-import annis.gui.controlpanel.ControlPanel;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
-import annis.model.Annotation;
 import annis.service.objects.AnnisAttribute;
-import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.HashSet;
 import java.util.TreeSet;
 
 /**
@@ -55,13 +43,14 @@ import java.util.TreeSet;
 public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
   private Button btInitLanguage;
+  private Button btInitSpan;
   private Button btInitMeta;
   private Button btGo;
   private Button btClear;
   private QueryController cp;
   private HorizontalLayout language;
+  private HorizontalLayout span;
   private HorizontalLayout meta;
-  private HorizontalLayout option;
   private HorizontalLayout toolbar;
   private VerticalLayout mainLayout;
   private SpanBox spb;
@@ -70,12 +59,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Collection<MetaBox> mboxes;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", "^","$", "|", "?", "(", ")"};
-  private static final String BUTTON_LANGUAGE_LABEL = "Start with linguistic search";
-  private static final String BUTTON_META_LABEL = "Start with meta search";
+  private static final String BUTTON_LANGUAGE_LABEL = "Initialize linguistic search";
+  private static final String BUTTON_SPAN_LABEL = "Initialize span constraint";
+  private static final String BUTTON_META_LABEL = "Initialize meta search";
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
   private static final String NO_CORPORA_WARNING = "No corpora selected";
-  private static final String BUTTON_ADD_LABEL = "Add position";
 
   public FlatQueryBuilder(QueryController cp)
   {
@@ -93,6 +82,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
     btInitLanguage = new Button(BUTTON_LANGUAGE_LABEL, (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    
+    btInitSpan = new Button(BUTTON_SPAN_LABEL, (Button.ClickListener) this);
+    btInitSpan.setStyleName(ChameleonTheme.BUTTON_SMALL);
 
     btInitMeta = new Button(BUTTON_META_LABEL, (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -102,26 +94,31 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
-
-    spb = new SpanBox(this);
     
     language = new HorizontalLayout();
+    language.setSpacing(true);
     language.addComponent(btInitLanguage);
+    
+    span = new HorizontalLayout();
+    span.setSpacing(true);
+    span.addComponent(btInitSpan);
+    
     meta = new HorizontalLayout();
+    meta.setSpacing(true);
     meta.addComponent(btInitMeta);
-    option = new HorizontalLayout();
-    option.addComponent(spb);
+    
     toolbar = new HorizontalLayout();
+    toolbar.setSpacing(true);
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
     
+    mainLayout.setSpacing(true);
     mainLayout.addComponent(language);
+    mainLayout.addComponent(span);
     mainLayout.addComponent(meta);
-    mainLayout.addComponent(option);
     mainLayout.addComponent(toolbar);
     
     setContent(mainLayout);
-//    setScrollable(true);
     getContent().setSizeUndefined();
     setHeight("100%");
     
@@ -207,22 +204,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       edgeQuery += edgeQueryAdds;
     }    
     
-    //search within span?
-    if(spb.searchWithinSpan())
+    if(!spb.getValue().isEmpty())
     {
       String addQuery;
       
-      if ((!spb.isRegEx())&&(!spb.getSpanValue().equals("")))
+      if ((!spb.isRegEx())&&(!spb.getValue().isEmpty()))
       {
-        addQuery = "\n& "+ spb.getSpanName() + " = \"" + spb.getSpanValue() + "\"";        
+        addQuery = "\n& "+ spb.getAttribute() + " = \"" + spb.getValue() + "\"";        
       }
-      else if (spb.getSpanValue().equals(""))
+      else if (spb.getValue().equals(""))
       {        
-        addQuery = "\n& "+ spb.getSpanName() + " = /.*/";
+        addQuery = "\n& "+ spb.getAttribute() + " = /.*/";
       }
       else
       {
-        addQuery = "\n& "+ spb.getSpanName() + " = /" + spb.getSpanValue() + "/";
+        addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue() + "/";
       }
       query += addQuery;
       for(Integer i : sentenceVars)
@@ -231,7 +227,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
     }
     
-    //metaquery:
     String metaQuery = "";
     Iterator<MetaBox> itMetaBoxes = mboxes.iterator();
     while(itMetaBoxes.hasNext())
@@ -267,7 +262,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         language.removeComponent(btInitLanguage);
         MenuBar addMenu = new MenuBar();
         Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADD_LABEL, null);
+        final MenuBar.MenuItem add = addMenu.addItem("Add linguistic parameter", null);
         for (final String annoname : annonames)
         {
           add.addItem(annoname, new MenuBar.Command() {
@@ -289,12 +284,30 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         }
         language.addComponent(addMenu);
       }
+      if(event.getButton() == btInitSpan)
+      {
+        span.removeComponent(btInitSpan);
+        MenuBar addMenu = new MenuBar();
+        Collection<String> annonames = getAvailableAnnotationNames();
+        final MenuBar.MenuItem add = addMenu.addItem("Add span parameter", null);
+        for (final String annoname : annonames)
+        {
+          add.addItem(annoname, new MenuBar.Command() {
+            @Override
+            public void menuSelected(MenuBar.MenuItem selectedItem) {
+              spb = new SpanBox(annoname, sq);
+              span.addComponent(spb);
+            }
+          });
+        }
+        span.addComponent(addMenu);
+      }
       if(event.getButton() == btInitMeta)
       {
         meta.removeComponent(btInitMeta);
         MenuBar addMenu = new MenuBar();
         Collection<String> annonames = getAvailableMetaNames();
-        final MenuBar.MenuItem add = addMenu.addItem("Add position", null);
+        final MenuBar.MenuItem add = addMenu.addItem("Add meta constraint", null);
         for (final String annoname : annonames)
         {
           add.addItem(annoname, new MenuBar.Command() {
@@ -315,12 +328,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
       if (event.getButton() == btClear)
       {
-        option.removeAllComponents();
         language.removeAllComponents();
+        span.removeAllComponents();
         meta.removeAllComponents();
         toolbar.removeAllComponents();
-        mainLayout.removeComponent(option);
         mainLayout.removeComponent(language);
+        mainLayout.removeComponent(span);
         mainLayout.removeComponent(meta);
         mainLayout.removeComponent(toolbar);
         vnodes.clear();
@@ -347,6 +360,12 @@ public void removeVerticalNode(VerticalNode v)
       }
     }
     vnodes.remove(v);
+    updateQuery();
+  }
+
+public void removeSpanBox(SpanBox v)
+  {
+    span.removeComponent(v);
     updateQuery();
   }
 
