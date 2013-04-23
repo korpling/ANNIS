@@ -17,7 +17,6 @@ package annis.visualizers.component.pdf;
 
 import annis.CommonHelper;
 import annis.libgui.Helper;
-import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
@@ -44,8 +43,6 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private int page;
 
-  private static int count;
-
   private final String PDF_ID;
 
   public PDFPanel(VisualizerInput input, int page) {
@@ -55,11 +52,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     this.page = page;
 
     // generate an unique id and set it
-    PDF_ID = "pdf-" + String.valueOf(count);
-    setCaption("PDF panel " + (count));
-    setId(PDF_ID);
-
-    count++;
+    PDF_ID = "pdf-" + input.getId();
  }
 
   @Override

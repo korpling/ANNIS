@@ -15,7 +15,6 @@
  */
 package annis.libgui.media;
 
-import annis.libgui.VisualizationToggle;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,8 +34,6 @@ public class PDFControllerImpl implements PDFController, Serializable
 
   private Map<String, PDFViewer> registeredPDFViewer;
 
-  private Map<String, VisualizationToggle> registeredVisToggles;
-
   /**
    * Since everone can call us asynchronously we need a locking mechanism
    */
@@ -52,11 +49,6 @@ public class PDFControllerImpl implements PDFController, Serializable
       if (registeredPDFViewer == null)
       {
         registeredPDFViewer = new HashMap<String, PDFViewer>();
-      }
-
-      if (registeredVisToggles == null)
-      {
-        registeredVisToggles = new HashMap<String, VisualizationToggle>();
       }
 
       log.info("registered pdf viewer for result {} -> {}", resultID, pdfViewer);
