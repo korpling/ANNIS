@@ -349,7 +349,7 @@ public class SearchUI extends AnnisBaseUI
           + "  font-size: " + cfg.getSize() + ";\n"
           + "}\n"
           + ".corpus-font .v-table-table {\n" +
-            "    font-size: 18pt;\n" +
+            "    font-size: " + cfg.getSize() + ";\n" +
             "}"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
