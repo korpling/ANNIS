@@ -107,7 +107,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     
     this.instanceConfig = getInstanceConfig(request);
-    getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
+    getPage().setTitle(instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
     
     queryController = new QueryController(this);
         
@@ -324,14 +324,38 @@ public class SearchUI extends AnnisBaseUI
     if(instanceConfig != null && css != null && instanceConfig.getFont() != null)
     {
       FontConfig cfg = instanceConfig.getFont();
-      css.setStyles(
-        "@import url(" + cfg.getUrl() + ");\n"
-        + ".corpus-font-force {font-family: '" + cfg.getName() + "', monospace !important;}\n"
-        + ".corpus-font {font-family: '" + cfg.getName() + "', monospace;}\n"
-        // this one is for the virtual keyboard
-        + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-        + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace;"
-        + "}");
+      
+      if(cfg.getSize() == null || cfg.getSize().isEmpty())
+      {
+        css.setStyles(
+          "@import url(" + cfg.getUrl() + ");\n"
+          + ".corpus-font-force {font-family: '" + cfg.getName() + "', monospace !important; }\n"
+          + ".corpus-font {font-family: '" + cfg.getName() + "', monospace; }\n"
+          // this one is for the virtual keyboard
+          + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
+          + "}");
+      }
+      else
+      {
+        css.setStyles(
+          "@import url(" + cfg.getUrl() + ");\n"
+          + ".corpus-font-force {\n"
+          + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
+          + "  font-size: " + cfg.getSize() + " !important;\n"
+          + "}\n"
+          + ".corpus-font {\n"
+          + "  font-family: '" + cfg.getName() + "', monospace;\n"
+          + "  font-size: " + cfg.getSize() + ";\n"
+          + "}\n"
+          + ".corpus-font .v-table-table {\n" +
+            "    font-size: 18pt;\n" +
+            "}"
+          // this one is for the virtual keyboard
+          + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
+          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
+          + "}");
+      }
     }
     else
     {

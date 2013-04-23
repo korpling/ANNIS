@@ -28,6 +28,7 @@ public class FontConfig implements Serializable
 {
   private String name;
   private String url;
+  private String size;
 
   public FontConfig()
   {
@@ -55,6 +56,17 @@ public class FontConfig implements Serializable
   public void setUrl(String url)
   {
     this.url = url;
+  }
+  
+  @XmlElement(name="size")
+  public String getSize()
+  {
+    return size;
+  }
+
+  public void setSize(String size)
+  {
+    this.size = size;
   }
   
 }
