@@ -53,6 +53,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     // generate an unique id and set it
     PDF_ID = "pdf-" + input.getId();
+    setId(PDF_ID);
  }
 
   @Override
