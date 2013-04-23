@@ -51,7 +51,7 @@ public class VisParser extends HTMLVisConfigBaseListener
     }
     else
     {
-      // provoce an error
+      // provoke an error
       tree.toStringTree();
     }
   }

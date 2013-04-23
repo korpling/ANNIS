@@ -16,7 +16,8 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
   
   private static final int[] ARG_TYPES = new int [] {
     Types.INTEGER, Types.INTEGER,
-    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
+    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, 
+    Types.VARCHAR, Types.VARCHAR
   };
   
 
