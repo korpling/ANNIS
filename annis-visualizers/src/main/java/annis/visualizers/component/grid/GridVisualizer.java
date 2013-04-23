@@ -131,7 +131,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       
         grid = new AnnotationGrid(mediaController, resultID);
         grid.addStyleName("partitur_table");
-        grid.addStyleName("corpus-font");
+        grid.addStyleName("corpus-font-force");
         layout.addComponent(grid);
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();

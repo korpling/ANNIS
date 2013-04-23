@@ -198,6 +198,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       this.markedAndCovered = markedAndCovered;
       this.addListener((ItemClickEvent.ItemClickListener) this);
       this.addStyleName("kwic");
+      this.addStyleName("corpus-font");
       setSizeFull();
       setHeight("-1px");
 
