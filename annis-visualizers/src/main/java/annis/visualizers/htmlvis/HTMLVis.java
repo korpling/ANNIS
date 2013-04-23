@@ -75,7 +75,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   @Override
   public boolean isUsingText()
   {
-    return true;
+    return false;
   }
   
   
@@ -212,22 +212,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
     EList<SToken> token = graph.getSortedSTokenByText();
 
-    for (SSpan span : graph.getSSpans())
-    {
-      for (VisualizationDefinition vis : definitions)
-      {
-        String matched = vis.getMatcher().matchedAnnotation(span);
-        if (matched != null)
-        {
-          vis.getOutputter().outputHTML(span, matched, output);
-        }
-      }
-    }
+    
     for (SToken t : token)
     {
-      // get token index
-      long currentIndex = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-        getSValueSNUMERIC();
       
       for (VisualizationDefinition vis : definitions)
       {
@@ -237,12 +224,30 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           vis.getOutputter().outputHTML(t, matched, output);
         }
       }
-      
+    }
+    
+    for(VisualizationDefinition vis : definitions)
+    {
+      for (SSpan span : graph.getSSpans())
+      {
+        String matched = vis.getMatcher().matchedAnnotation(span);
+        if (matched != null)
+        {
+          vis.getOutputter().outputHTML(span, matched, output);
+        }
+      }
+    }
+    
+    for (SToken t : token)
+    {
+      // get token index
+      long currentIndex = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
+        getSValueSNUMERIC();
       // output all strings belonging to this token position
       List<String> values = output.get(currentIndex);
-      if(values != null)
+      if (values != null)
       {
-        for(String s : values)
+        for (String s : values)
         {
           sb.append(s);
         }

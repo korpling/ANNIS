@@ -106,16 +106,15 @@ public class SpanHTMLOutputter
     {
       output.put(right, new ArrayList<String>());
     }
-    if(left == right)
+    
+    // <tag>|inner| ... | </tag>
+    if(!inner.isEmpty())
     {
-      output.get(left).add(startTag + inner);
-      output.get(right).add(endTag);
+      output.get(left).add(0, inner);
     }
-    else
-    {
-      output.get(left).add(startTag + inner);
-      output.get(right).add(0, endTag);
-    }
+    output.get(left).add(0, startTag);
+    output.get(right).add(endTag + "\n");
+
   }
   
   private void outputToken(SToken tok, Map<Long, List<String>> output)
@@ -159,8 +158,14 @@ public class SpanHTMLOutputter
     {
       output.put(index, new ArrayList<String>());
     }
-    output.get(index).add(startTag + inner);
-    output.get(index).add(endTag);
+    
+    // <tag>|inner| ... | </tag>
+    if(!inner.isEmpty())
+    {
+      output.get(index).add(0, inner);
+    }
+    output.get(index).add(0, startTag);
+    output.get(index).add(endTag + "\n");
     
   }
 
