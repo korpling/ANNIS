@@ -123,7 +123,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
       else
       {
-        String title = visConfigName + ".html";
+        String title = visConfigName + ".config";
         for(AnnisBinaryMetaData m : binaryMeta)
         {
           if(title.equals(m.getFileName()))
@@ -142,7 +142,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       
       if(inStreamConfig == null)
       {
-        Notification.show("ERROR: configuration not found in database",Notification.Type.ERROR_MESSAGE);
+        Notification.show("ERROR: html visualization configuration \"" 
+          + visConfigName 
+          +  "\" not found in database",Notification.Type.ERROR_MESSAGE);
       }
       else
       {

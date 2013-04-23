@@ -1,6 +1,5 @@
 package annis.sqlgen;
 
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -24,7 +23,7 @@ public class MetaByteHelper implements ResultSetExtractor<List<AnnisBinaryMetaDa
 
   public static final String SQL =
         "SELECT\n"
-      + "  bytes, title, mime_type, sub.name as corpus_name\n"
+      + "  length(file) AS bytes, title, mime_type, sub.name as corpus_name\n"
       + "FROM media_files, corpus AS sub, corpus AS top \n"
       + "WHERE\n"
       + "  top.top_level = true AND\n"
