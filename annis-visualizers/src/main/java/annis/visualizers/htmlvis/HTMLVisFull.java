@@ -15,10 +15,13 @@
  */
 package annis.visualizers.htmlvis;
 
+import net.xeoh.plugins.base.annotations.PluginImplementation;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@PluginImplementation
 public class HTMLVisFull extends HTMLVis
 {
 

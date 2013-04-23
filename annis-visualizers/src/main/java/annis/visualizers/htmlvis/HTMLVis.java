@@ -112,7 +112,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     try
     {
       // TODO: can we load the file from the corpus media files? Or how do we bundle these kind of files with a corpus?
-      String visConfigName = vi.getMappings().getProperty("visconfig");
+      String visConfigName = vi.getMappings().getProperty("config");
       InputStream inStreamConfig = null;
       if(visConfigName == null)
       {
@@ -154,6 +154,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(), annos,
           definitions));
 
+        String labelClass = vi.getMappings().getProperty("class", "htmlvis");
+        lblResult.addStyleName(labelClass);
+        
         // TODO: do not add CSSInject multiple times
         InputStream inStreamCSS = null;
         if(visConfigName == null)
