@@ -58,7 +58,7 @@ public class VisParser extends HTMLVisConfigBaseListener
         Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
         int charPositionInLine, String msg, RecognitionException e)
       {
-        errors.add("line" + line + ":" + charPositionInLine + " " + msg);
+        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
       }
       
     });
@@ -121,14 +121,33 @@ public class VisParser extends HTMLVisConfigBaseListener
   }
 
   @Override
+  public void enterElementNoStyleAttribute(
+    HTMLVisConfigParser.ElementNoStyleAttributeContext ctx)
+  {
+    currentOutputter.setElement(ctx.ID(0).getText());
+    currentOutputter.setStyle("");
+    currentOutputter.setAttribute(ctx.ID(1).getText());
+  }
+  
+  
+
+  @Override
   public void enterElementWithStyle(
     HTMLVisConfigParser.ElementWithStyleContext ctx)
   {
     currentOutputter.setElement(ctx.ID().getText());
     currentOutputter.setStyle(ctx.value().innervalue().getText());
   }
-  
 
+  @Override
+  public void enterElementWithStyleAttribute(
+    HTMLVisConfigParser.ElementWithStyleAttributeContext ctx)
+  {
+    currentOutputter.setElement(ctx.ID(0).getText());
+    currentOutputter.setStyle(ctx.value().innervalue().getText());
+    currentOutputter.setAttribute(ctx.ID(1).getText());
+  }
+  
   @Override
   public void enterTypeAnno(HTMLVisConfigParser.TypeAnnoContext ctx)
   {

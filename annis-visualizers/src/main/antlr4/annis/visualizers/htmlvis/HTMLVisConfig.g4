@@ -23,6 +23,7 @@ TOK : 'tok';
 VALUE : 'value';
 ANNO : 'anno';
 STYLE : 'style';
+COLON : ':';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
@@ -41,7 +42,9 @@ type
 
 element 
   : ID # elementNoStyle
+  | ID COLON ID # elementNoStyleAttribute
   | ID SEMICOLON WS? STYLE EQUALS value # elementWithStyle
+  | ID COLON ID SEMICOLON WS? STYLE EQUALS value # elementWithStyleAttribute
   ;
 
 condition

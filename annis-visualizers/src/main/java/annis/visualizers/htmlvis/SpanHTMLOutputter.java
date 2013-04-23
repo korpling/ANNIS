@@ -35,6 +35,7 @@ public class SpanHTMLOutputter
   
   private Type type = Type.EMPTY;
   private String element = "div";
+  private String attribute;
   private String style = "";
   private String constant;
   
@@ -65,6 +66,51 @@ public class SpanHTMLOutputter
         .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
         .getSValueSNUMERIC();
     
+    SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
+    
+    String value = "";
+    // output to an inner text node
+    switch(type)
+    {
+      case CONSTANT:
+        value = constant;
+        break;
+      case VALUE:
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
+        break;
+      case ANNO_NAME:
+        value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        break;
+    }
+    outputAny(left, right, value, output);
+  }
+  
+  private void outputToken(SToken tok, Map<Long, List<String>> output)
+  {
+    long index = tok
+        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX)
+        .getSValueSNUMERIC();
+    
+    String value = "";
+    
+    switch(type)
+    {
+      case CONSTANT:
+        value = constant;
+        break;
+      case VALUE:
+        value = CommonHelper.getSpannedText(tok);
+        break;
+      case ANNO_NAME:
+        value = "tok";
+        break;
+    }
+    outputAny(index, index, value, output);    
+  }
+  
+  private void outputAny(long left, long right, String value, Map<Long, List<String>> output)
+  {
+    
     String startTag = "<" + element;
     if(!style.isEmpty())
     {
@@ -78,24 +124,20 @@ public class SpanHTMLOutputter
         startTag += " class=\"" + style + "\" ";
       }
     }
-    startTag += ">";
     String inner = "";
     String endTag = "</" + element + ">";
     
-    SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
-    
-    switch(type)
+    if(attribute == null || attribute.isEmpty())
     {
-      case CONSTANT:
-        inner = constant;
-        break;
-      case VALUE:
-        inner = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
-        break;
-      case ANNO_NAME:
-        inner = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
-        break;
+      inner = value;
     }
+    else
+    {
+      // output to an attribute
+      startTag += " " + attribute + "=\"" + value + "\"";
+    }
+    
+    startTag += ">";
     
     // add tags to output
     if(output.get(left) == null)
@@ -115,58 +157,6 @@ public class SpanHTMLOutputter
     output.get(left).add(0, startTag);
     output.get(right).add(endTag + "\n");
 
-  }
-  
-  private void outputToken(SToken tok, Map<Long, List<String>> output)
-  {
-    long index = tok
-        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX)
-        .getSValueSNUMERIC();
-      
-    String startTag = "<" + element;
-    if(!style.isEmpty())
-    {
-      // is the style in reality a class name?
-      if(style.contains(":") || style.contains(";"))
-      {
-        startTag += " style=\"" + style + "\" ";
-      }
-      else
-      {
-        startTag += " class=\"" + style + "\" ";
-      }
-    }
-    startTag += ">";
-    String inner = "";
-    String endTag = "</" + element + ">";
-    
-    switch(type)
-    {
-      case CONSTANT:
-        inner = constant;
-        break;
-      case VALUE:
-        inner = CommonHelper.getSpannedText(tok);
-        break;
-      case ANNO_NAME:
-        inner = "tok";
-        break;
-    }
-    
-    // add tags to output
-    if(output.get(index) == null)
-    {
-      output.put(index, new ArrayList<String>());
-    }
-    
-    // <tag>|inner| ... | </tag>
-    if(!inner.isEmpty())
-    {
-      output.get(index).add(0, inner);
-    }
-    output.get(index).add(0, startTag);
-    output.get(index).add(endTag + "\n");
-    
   }
 
   public Type getType()
@@ -207,6 +197,16 @@ public class SpanHTMLOutputter
   public void setConstant(String constant)
   {
     this.constant = constant;
+  }
+
+  public String getAttribute()
+  {
+    return attribute;
+  }
+
+  public void setAttribute(String attribute)
+  {
+    this.attribute = attribute;
   }
   
 }

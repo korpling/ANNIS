@@ -21,6 +21,7 @@ import annis.visualizers.htmlvis.AnnotationValueMatcher;
 import annis.visualizers.htmlvis.SpanHTMLOutputter;
 import annis.visualizers.htmlvis.TokenMatcher;
 import annis.visualizers.htmlvis.VisParser;
+import annis.visualizers.htmlvis.VisParserException;
 import annis.visualizers.htmlvis.VisualizationDefinition;
 import java.io.IOException;
 import java.io.InputStream;
@@ -75,7 +76,7 @@ public class ParserTest
       VisParser parser = new VisParser(inStream);
       VisualizationDefinition[] definitions =  parser.getDefinitions();
       
-      assertEquals("There must be 15 rules from the parsing", 15, definitions.length);
+      assertEquals("There must be 15 rules from the parsing", 16, definitions.length);
       
       VisualizationDefinition def = definitions[0];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -84,6 +85,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[1];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -92,6 +94,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[2];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -100,6 +103,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.CONSTANT, def.getOutputter().getType());
       assertEquals("Kapitel: ", def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[3];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -108,6 +112,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[4];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -116,6 +121,7 @@ public class ParserTest
       assertEquals("color: grey", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.CONSTANT, def.getOutputter().getType());
       assertEquals("page ", def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[5];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -124,6 +130,7 @@ public class ParserTest
       assertEquals("color: grey", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[6];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -132,6 +139,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[7];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -140,6 +148,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[8];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -148,6 +157,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[9];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -156,6 +166,7 @@ public class ParserTest
       assertEquals("colStyle", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[10];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -164,6 +175,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[11];
       assertTrue(def.getMatcher()instanceof AnnotationNameAndValueMatcher);
@@ -173,6 +185,7 @@ public class ParserTest
       assertEquals("", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[12];
       assertTrue(def.getMatcher()instanceof AnnotationValueMatcher);
@@ -181,6 +194,7 @@ public class ParserTest
       assertEquals("color: red", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[13];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -189,6 +203,7 @@ public class ParserTest
       assertEquals("color: grey", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.ANNO_NAME, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
       
       def = definitions[14];
       assertTrue(def.getMatcher()instanceof TokenMatcher);
@@ -196,8 +211,23 @@ public class ParserTest
       assertEquals("tokStyle", def.getOutputter().getStyle());
       assertEquals(SpanHTMLOutputter.Type.EMPTY, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
+      
+      def = definitions[15];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("test",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("p", def.getOutputter().getElement());
+      assertEquals("tokStyle", def.getOutputter().getStyle());
+      assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      assertEquals("title", def.getOutputter().getAttribute());
     }
     catch (IOException ex)
+    {
+      log.error(null, ex);
+      fail(ex.getLocalizedMessage());
+    }
+    catch (VisParserException ex)
     {
       log.error(null, ex);
       fail(ex.getLocalizedMessage());
