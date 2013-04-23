@@ -44,6 +44,7 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
     canvas.style.height = wrapperElem.style.height + "px";
     canvas.setAttribute("width", wrapperElem.style.width);
     canvas.setAttribute("height", wrapperElem.style.height);
+    canvas.setAttribute("id", "canvas-" + id);
     canvas.style.position = "relative";
 
     return canvas;
@@ -69,19 +70,19 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
   {
     var url = this.getState().binaryURL;
     var id = this.getState().pdfID;
-    var pageNumber = this.stringToInt(id.split("-")[1]);
+    var page = this.getState().page;
 
     // do not initialize twice
-    if (document.getElementById(id).getElementsByTagName("canvas")[0])
+    if (document.getElementById("canvas-" + id))
     {
       return;
     }
 
     if (url !== undefined)
     {
-      this.openPDF(url, this.initCanvas(id), pageNumber + 1);
+      this.openPDF(url, this.initCanvas(id), page);
     }
 
-    console.log(url + ", " + id, pageNumber);
+    console.log(url + ", " + id, page);
   };
 };

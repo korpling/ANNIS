@@ -158,7 +158,7 @@ public class GridEvent implements Serializable
     return pageNumber;
   }
 
-  public void setPageNumber(String pageNumber)
+  public void setPage(String pageNumber)
   {
     this.pageNumber = pageNumber;
   }

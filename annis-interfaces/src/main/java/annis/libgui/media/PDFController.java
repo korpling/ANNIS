@@ -24,6 +24,7 @@ import net.xeoh.plugins.base.Plugin;
  */
 public interface PDFController extends Plugin, Serializable
 {
+
   public void addPDF(String resultID, PDFViewer pdfViewer);
 
   public void openPDF(String resultID, String pageNumber);

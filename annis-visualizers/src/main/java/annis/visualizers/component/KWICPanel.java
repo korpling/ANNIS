@@ -563,20 +563,20 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
         startMediaVisualizers(time);
       } // end checkbuttonName
 
-      if (buttonName.matches("(annis::)?pageNumber") && pdfController != null) {
+      if (buttonName.matches("(annis::)?page") && pdfController != null) {
 
-        String pageNumber = null;
+        String page = null;
         String tokenID = (String) event.getPropertyId();
         SNode token = result.getSDocumentGraph().getSNode(tokenID);
 
         for (SAnnotation anno : token.getSAnnotations()) {
-          if ("pageNumber".equals(anno.getName())) {
-            pageNumber = anno.getValueString();
+          if ("page".equals(anno.getName())) {
+            page = anno.getValueString();
           }
         }
 
-        pdfController.openPDF(visInput.getId(), pageNumber);
-        Notification.show("call pdf page " + pageNumber);
+        pdfController.openPDF(visInput.getId(), page);
+        Notification.show("call pdf page " + page);
       }
     }
 

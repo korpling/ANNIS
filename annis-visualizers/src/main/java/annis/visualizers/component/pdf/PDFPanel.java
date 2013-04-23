@@ -42,19 +42,25 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private VisualizerInput input;
 
+  private int page;
+
   private static int count;
 
   private final String PDF_ID;
 
-  public PDFPanel(VisualizerInput input, VisualizationToggle toggle) {
+  public PDFPanel(VisualizerInput input, int page) {
 
     this.input = input;
 
+    this.page = page;
+
     // generate an unique id and set it
-    PDF_ID = "pdf-" + String.valueOf(count++);
-    setCaption("PDF panel " + (count - 1));
+    PDF_ID = "pdf-" + String.valueOf(count);
+    setCaption("PDF panel " + (count));
     setId(PDF_ID);
-  }
+
+    count++;
+ }
 
   @Override
   protected PDFState getState() {
@@ -66,10 +72,11 @@ public class PDFPanel extends AbstractJavaScriptComponent {
   {
     super.attach();
     setSizeUndefined();
-    
+
     // set the state
     getState().binaryURL = getBinaryPath();
-    getState().pdfID = PDF_ID;
+    getState().pdfID = getPDF_ID();
+    getState().page = page;
   }
 
   private String getBinaryPath() {
@@ -118,5 +125,9 @@ public class PDFPanel extends AbstractJavaScriptComponent {
             + "documentName=" + documentName
             + "&toplevelCorpusName=" + corpusName
             + "&mime=" + mimeTypeEncoded;
+  }
+
+  public String getPDF_ID() {
+    return PDF_ID;
   }
 }

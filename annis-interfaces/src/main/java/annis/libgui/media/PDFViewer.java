@@ -21,5 +21,5 @@ package annis.libgui.media;
  */
 public interface PDFViewer
 {
-  public void openPDF(String pageNumber);
+  public void openPDF(String page);
 }

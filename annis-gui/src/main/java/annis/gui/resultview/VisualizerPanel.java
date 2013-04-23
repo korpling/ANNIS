@@ -166,7 +166,7 @@ public class VisualizerPanel extends VerticalLayout
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
 
-    if(entry != null && ps != null)
+    if (entry != null && ps != null)
     {
       visPlugin = ps.getVisualizer(entry.getVisType());
       if (visPlugin == null)
@@ -201,7 +201,6 @@ public class VisualizerPanel extends VerticalLayout
           btEntry.addClickListener((Button.ClickListener) this);
           addComponent(btEntry);
         }
-
 
         // create the visualizer and calc input
         try
@@ -258,10 +257,12 @@ public class VisualizerPanel extends VerticalLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().getAttribute(
+    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
+      getAttribute(
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
-    input.setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
+    input.
+      setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
 
     input.setId(resultID);
 
@@ -273,7 +274,7 @@ public class VisualizerPanel extends VerticalLayout
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
-    if(instanceConfig != null && instanceConfig.getFont() != null)
+    if (instanceConfig != null && instanceConfig.getFont() != null)
     {
       input.setFont(instanceConfig.getFont());
     }
@@ -300,7 +301,8 @@ public class VisualizerPanel extends VerticalLayout
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
 
-      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered, input.
+      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
+        input.
         getDocument(), wholeDocument));
       input.setDocument(wholeDocument);
     }
@@ -332,6 +334,7 @@ public class VisualizerPanel extends VerticalLayout
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
+
   private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
@@ -375,6 +378,8 @@ public class VisualizerPanel extends VerticalLayout
   {
     if (visPlugin != null)
     {
+
+
       Executor exec = Executors.newSingleThreadExecutor();
       FutureTask<Component> future = new FutureTask<Component>(
         new LoadComponentTask())
@@ -397,7 +402,7 @@ public class VisualizerPanel extends VerticalLayout
                 if (loadableVis.isLoaded())
                 {
                   // direct call callback since the visualizer is already ready
-                  if(vis instanceof LoadableVisualizer)
+                  if (vis instanceof LoadableVisualizer)
                   {
                     callback.visualizerLoaded((LoadableVisualizer) vis);
                   }
@@ -410,7 +415,7 @@ public class VisualizerPanel extends VerticalLayout
                 }
               }
 
-              if(getComponentIndex(progress) > -1)
+              if (getComponentIndex(progress) > -1)
               {
                 removeComponent(progress);
               }
@@ -462,7 +467,6 @@ public class VisualizerPanel extends VerticalLayout
       exec.execute(future);
 
       btEntry.setIcon(ICON_COLLAPSE);
-
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
@@ -526,7 +530,7 @@ public class VisualizerPanel extends VerticalLayout
     SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (Entry<SNode, Long>  e : markedAndCovered.entrySet())
+    for (Entry<SNode, Long> e : markedAndCovered.entrySet())
     {
       wholeNode = wholeSGraph.getSNode(e.getKey().getSId());
       newMarkedAndCovered.put(wholeNode, e.getValue());
@@ -549,7 +553,8 @@ public class VisualizerPanel extends VerticalLayout
    * @param target node which is missing the annis feature
    * @param featureNameSpace namespace of the feature
    * @param featureName name of the feature
-   * @param copyIfExists If true the feature is copied even if it already exists on target node.
+   * @param copyIfExists If true the feature is copied even if it already exists
+   * on target node.
    */
   private void copyAnnisFeature(SNode source, SNode target,
     String featureNameSpace, String featureName, boolean copyIfExists)
@@ -565,12 +570,14 @@ public class VisualizerPanel extends VerticalLayout
         log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
           getValueString());
       }
-      else if(copyIfExists)
+      else if (copyIfExists)
       {
-        SFeature targetFeature = target.getSFeature(featureNameSpace, featureName);
+        SFeature targetFeature = target.getSFeature(featureNameSpace,
+          featureName);
         targetFeature.setValue(sfeature.getValue());
 
-        log.debug("overwriting SFeature {} value {}", sfeature.getQName(), sfeature.
+        log.debug("overwriting SFeature {} value {}", sfeature.getQName(),
+          sfeature.
           getValueString());
       }
     }

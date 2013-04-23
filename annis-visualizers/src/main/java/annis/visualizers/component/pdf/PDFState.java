@@ -25,5 +25,6 @@ public class PDFState extends JavaScriptComponentState {
 
   public String binaryURL;
   public String pdfID;
+  public Integer page;
 
 }

@@ -21,18 +21,23 @@ import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.apache.http.impl.auth.NegotiateSchemeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class PDFVisualizer extends AbstractVisualizer<Panel> implements
-        PDFViewer {
+public class PDFVisualizer extends AbstractVisualizer<Layout> {
+
+  private final Logger log = LoggerFactory.getLogger(PDFVisualizer.class);
 
   @Override
   public String getShortName() {
@@ -40,27 +45,53 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> implements
   }
 
   @Override
-  public Panel createComponent(VisualizerInput visInput,
+  public Layout createComponent(VisualizerInput input,
           VisualizationToggle visToggle) {
 
-    PDFPanel pdf = new PDFPanel(visInput, visToggle);
-    Panel p = new Panel();
+    Layout wrapper = new VerticalLayout();
 
-    p.setContent(pdf);
-    p.setSizeFull();
+    try {
 
-    if (VaadinSession.getCurrent().getAttribute(PDFController.class) != null) {
+      if (VaadinSession.getCurrent().getAttribute(PDFController.class) != null) {
 
-      PDFController pdfController = VaadinSession.getCurrent().getAttribute(
-              PDFController.class);
-      pdfController.addPDF(visInput.getId(), this);
+        VaadinSession session = VaadinSession.getCurrent();
+        PDFController pdfController = session.getAttribute(PDFController.class);
+
+        PDFViewer pdfViewer = new PDFViewerImpl(wrapper, input, visToggle);
+
+        pdfController.addPDF(input.getId(), pdfViewer);
+      }
+
+    } catch (Exception ex) {
+      log.error("could not create pdf vis", ex);
     }
 
-    return p;
+    return wrapper;
   }
 
-  @Override
-  public void openPDF(String pageNumber) {
-    Notification.show("open pageNumber " + pageNumber);
+  private class PDFViewerImpl implements PDFViewer {
+
+    Layout wrapper;
+
+    VisualizerInput input;
+
+    VisualizationToggle visToggle;
+
+    public PDFViewerImpl(Layout wrapper, VisualizerInput input,
+            VisualizationToggle visToggle) {
+      this.wrapper = wrapper;
+      this.visToggle = visToggle;
+      this.input = input;
+    }
+
+    @Override
+    public void openPDF(String page) {
+
+      PDFPanel pdf = new PDFPanel(this.input, Integer.parseInt(page));
+      visToggle.toggleVisualizer(true, null);
+      wrapper.addComponent(pdf);
+
+      Notification.show("open page " + page);
+    }
   }
 }

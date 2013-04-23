@@ -15,9 +15,12 @@
  */
 package annis.libgui.media;
 
+import annis.libgui.VisualizationToggle;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.locks.ReadWriteLock;
+import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,27 +35,62 @@ public class PDFControllerImpl implements PDFController, Serializable
 
   private Map<String, PDFViewer> registeredPDFViewer;
 
-  @Override
-  public void addPDF(String resultID, PDFViewer panel)
-  {
-    if (registeredPDFViewer == null)
-    {
-      registeredPDFViewer = new HashMap<String, PDFViewer>();
-    }
+  private Map<String, VisualizationToggle> registeredVisToggles;
 
-    registeredPDFViewer.put(resultID, panel);
+  /**
+   * Since everone can call us asynchronously we need a locking mechanism
+   */
+  private final ReadWriteLock lock = new ReentrantReadWriteLock();
+
+  @Override
+  public void addPDF(String resultID, PDFViewer pdfViewer)
+  {
+
+    lock.writeLock().lock();
+    try
+    {
+      if (registeredPDFViewer == null)
+      {
+        registeredPDFViewer = new HashMap<String, PDFViewer>();
+      }
+
+      if (registeredVisToggles == null)
+      {
+        registeredVisToggles = new HashMap<String, VisualizationToggle>();
+      }
+
+      log.info("registered pdf viewer for result {} -> {}", resultID, pdfViewer);
+      registeredPDFViewer.put(resultID, pdfViewer);
+
+    }
+    finally
+    {
+      lock.writeLock().unlock();
+    }
   }
 
   @Override
-  public void openPDF(String resultID, String pageNumber)
+  public void openPDF(String resultID, String page)
   {
-    if(registeredPDFViewer != null && registeredPDFViewer.containsKey(resultID))
-    {
-      registeredPDFViewer.get(resultID).openPDF(pageNumber);
-    }
 
-    else {
-      log.error("no pdf viewer registered for {}", resultID);
+    lock.readLock().lock();
+
+    try
+    {
+      if (registeredPDFViewer != null && registeredPDFViewer.containsKey(
+        resultID))
+      {
+        PDFViewer pdfViewer = registeredPDFViewer.get(resultID);
+        pdfViewer.openPDF(page);
+      }
+      else
+      {
+        log.error("no pdf viewer registered for {}", resultID);
+      }
+    }
+    finally
+    {
+      lock.readLock().unlock();
     }
   }
 }

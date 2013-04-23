@@ -22,13 +22,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class PageNumberHelper
+public class PageHelper
 {
   public static final String PAGE_NUMBER_ANNOATION_NAMESPACE = "annis";
 
-  public static final String PAGE_NUMBER_ANNOATATION_NAME = "pageNumber";
+  public static final String PAGE_NUMBER_ANNOATATION_NAME = "page";
 
-  public static String getPageNumberFromAnnotation(SSpan node)
+  public static String getPageFromAnnotation(SSpan node)
   {
     for (SAnnotation anno : node.getSAnnotations())
     {
