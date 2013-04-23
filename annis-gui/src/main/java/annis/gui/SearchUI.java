@@ -107,7 +107,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     
     this.instanceConfig = getInstanceConfig(request);
-    getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.getInstanceDisplayName());
+    getPage().setTitle(instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
     
     queryController = new QueryController(this);
         
