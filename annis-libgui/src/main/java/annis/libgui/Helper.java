@@ -17,6 +17,7 @@ package annis.libgui;
 
 import annis.libgui.AnnisBaseUI;
 import annis.provider.SaltProjectProvider;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -389,4 +390,5 @@ public class Helper
     }
     return result;
   }
+  
 }

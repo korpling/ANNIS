@@ -15,25 +15,36 @@
  */
 package annis.visualizers.htmlvis;
 
+import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
+import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
 import annis.visualizers.component.grid.EventExtractor;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import java.util.TreeMap;
+import javax.print.attribute.standard.DocumentName;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
@@ -80,32 +91,101 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     Label lblResult = new Label("ERROR", ContentMode.HTML);
     lblResult.setSizeUndefined();
     
+    List<String> corpusPath =
+      CommonHelper.getCorpusPath(vi.getDocument().getSCorpusGraph(), vi.getDocument());
+    String corpusName = corpusPath.get(corpusPath.size() - 1);
+    String documentName = corpusPath.get(0);
+    try
+    {
+      corpusName = URLEncoder.encode(corpusName, "UTF-8");
+      documentName = URLEncoder.encode(documentName, "UTF-8");
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
+    }
+    
+    
+    WebResource resMeta = Helper.getAnnisWebResource().path(
+      "query/corpora/").path(corpusName).path(documentName)
+      .path("binary/meta");
+     List<AnnisBinaryMetaData> binaryMeta = 
+       resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
+    
     try
     {
       // TODO: can we load the file from the corpus media files? Or how do we bundle these kind of files with a corpus?
-      String visConfigPath = vi.getMappings().getProperty("visconfigpath");
-      InputStream inStream;
-      if(visConfigPath == null)
+      String visConfigName = vi.getMappings().getProperty("visconfig");
+      InputStream inStreamConfig = null;
+      if(visConfigName == null)
       {
-        inStream = HTMLVis.class.getResourceAsStream("defaultvis.config");
+        inStreamConfig = HTMLVis.class.getResourceAsStream("defaultvis.config");
       }
       else
       {
-        inStream = new FileInputStream(visConfigPath);
+        String title = visConfigName + ".html";
+        for(AnnisBinaryMetaData m : binaryMeta)
+        {
+          if(title.equals(m.getFileName()))
+          {            
+            WebResource resBinary = Helper.getAnnisWebResource().path(
+              "query/corpora/").path(corpusName).path(documentName)
+              .path("binary").path("0").path("" + m.getLength())
+              .queryParam("title", m.getFileName());
+            AnnisBinary binary = resBinary.get(AnnisBinary.class);
+            
+            inStreamConfig = new ByteArrayInputStream(binary.getBytes());
+            break;
+          }
+        }
       }
-      VisParser p = new VisParser(inStream);
-      VisualizationDefinition[] definitions = p.getDefinitions();
-
-      List<String> annos = EventExtractor.computeDisplayAnnotations(vi);
-
-      lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(), annos,
-        definitions));
       
-      // TODO: do not add CSSInject multiple times
-      String cssContent = IOUtils.toString(HTMLVis.class.getResourceAsStream("htmlvis.css"));
-      CSSInject cssInject = new CSSInject(UI.getCurrent());
-      cssInject.setStyles(cssContent);
+      if(inStreamConfig == null)
+      {
+        Notification.show("ERROR: configuration not found in database",Notification.Type.ERROR_MESSAGE);
+      }
+      else
+      {
+      
+        VisParser p = new VisParser(inStreamConfig);
+        VisualizationDefinition[] definitions = p.getDefinitions();
 
+        List<String> annos = EventExtractor.computeDisplayAnnotations(vi);
+
+        lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(), annos,
+          definitions));
+
+        // TODO: do not add CSSInject multiple times
+        InputStream inStreamCSS = null;
+        if(visConfigName == null)
+        {
+           inStreamCSS = HTMLVis.class.getResourceAsStream("htmlvis.css");
+        }
+        else
+        {
+          String title = visConfigName + ".css";
+          for (AnnisBinaryMetaData m : binaryMeta)
+          {
+            if (title.equals(m.getFileName()))
+            {
+              WebResource resBinary = Helper.getAnnisWebResource().path(
+                "query/corpora/").path(corpusName).path(documentName)
+                .path("binary").path("0").path("" + m.getLength())
+                .queryParam("title", m.getFileName());
+              AnnisBinary binary = resBinary.get(AnnisBinary.class);
+
+              inStreamCSS = new ByteArrayInputStream(binary.getBytes());
+              break;
+            }
+          }
+        }
+        if(inStreamCSS != null)
+        {
+          String cssContent = IOUtils.toString(inStreamCSS);
+          CSSInject cssInject = new CSSInject(UI.getCurrent());
+          cssInject.setStyles(cssContent);
+        }
+      }
     }
     catch (IOException ex)
     {

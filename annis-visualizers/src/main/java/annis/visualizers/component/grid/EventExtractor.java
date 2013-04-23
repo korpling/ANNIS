@@ -310,7 +310,7 @@ public class EventExtractor
       {
         for (SLayer layer : n.getSLayers())
         {
-          if (namespace.equals(layer.getSName()))
+          if (namespace == null || namespace.equals(layer.getSName()))
           {
             for (SAnnotation anno : n.getSAnnotations())
             {

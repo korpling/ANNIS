@@ -142,6 +142,7 @@
         <entry key="wav" value="audio/wav"/>
         <entry key="mp3" value="audio/mpeg"/>
         <entry key="pdf" value="application/pdf"/>
+        <entry key="css" value="text/css"/>
       </util:map>
     </property>
     <property name="tableInsertFrom">

@@ -74,9 +74,8 @@ public class MediaImportPreparedStatementCallbackImpl implements
     // this method is not implemented for long as file-lenght, so we need to cast to int
     ps.setBinaryStream(1, fileStream, (int) file.length());
     ps.setLong(2, this.corpusRef);
-    ps.setLong(3, file.length());
-    ps.setString(4, this.mimeType);
-    ps.setString(5, file.getName());
+    ps.setString(3, this.mimeType);
+    ps.setString(4, file.getName());
     ps.executeUpdate();
     try
     {

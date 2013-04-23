@@ -823,10 +823,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
-    String mimeType, int offset, int length)
+    String mimeType, String title, int offset, int length)
   {
     return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset,
+      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
       length),
       ByteHelper.getArgTypes(), byteHelper);
   }

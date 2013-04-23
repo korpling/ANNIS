@@ -120,7 +120,6 @@ CREATE TABLE media_files
 (
   file  bytea NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
-  bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,
   UNIQUE (corpus_ref, title)

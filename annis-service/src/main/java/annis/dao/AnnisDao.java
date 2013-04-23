@@ -67,12 +67,14 @@ public interface AnnisDao
    *
    * @param toplevelCorpusName
    * @param corpusName
+   * @param mimeType The mime type of the binary to fetch.
+   * @param title The title of the binary to fetch or null if any with correct mime type.
    * @param offset starts with 1
    * @param length
    * @return
    */
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
-    String mimeType, int offset, int length);
+    String mimeType, String title, int offset, int length);
 
   /**
    * Gets meta data about existing binary files from database.

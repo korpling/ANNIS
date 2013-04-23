@@ -597,7 +597,36 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("importing all binary data from ExtData");
     File extData = new File(path + "/ExtData");
     if (extData.canRead() && extData.isDirectory())
-    {
+    { 
+      // import toplevel corpus media files
+      File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
+      for(File data : topFiles)
+      {
+        String extension = FilenameUtils.getExtension(data.getName());
+        try
+        {
+          if (mimeTypeMapping.containsKey(extension))
+          {
+            log.info("import " + data.getCanonicalPath() + " to staging area");
+
+            // search for corpus_ref
+            String sqlScript =
+              "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
+            long corpusID = jdbcTemplate.queryForLong(sqlScript);
+
+            importSingleFile(data.getCanonicalPath(), corpusID);
+          }
+          else
+          {
+            log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+          }
+        }
+        catch (IOException ex)
+        {
+          log.error("no canonical path given", ex);
+        }
+      }
+      
       // get each subdirectory (which corresponds to an document name)
       File[] documents = extData.listFiles((FileFilter) DirectoryFileFilter.DIRECTORY);
       for (File doc : documents)
@@ -640,7 +669,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     MediaImportPreparedStatementCallbackImpl preStat = new MediaImportPreparedStatementCallbackImpl(path, 
       corpusRef, mimeTypeMapping);
-    String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?, ?)";
+    String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?)";
 
     jdbcTemplate.execute(sqlScript, preStat);
 
