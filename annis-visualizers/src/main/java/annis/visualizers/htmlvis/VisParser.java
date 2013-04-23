@@ -20,9 +20,13 @@ import java.io.InputStream;
 import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
+import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.RecognitionException;
+import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
@@ -35,7 +39,7 @@ public class VisParser extends HTMLVisConfigBaseListener
   private SpanMatcher currentMatcher;
   private SpanHTMLOutputter currentOutputter;
   
-  public VisParser(InputStream inStream) throws IOException
+  public VisParser(InputStream inStream) throws IOException, VisParserException
   {
     this.definitions = new LinkedList<VisualizationDefinition>();
     
@@ -43,16 +47,33 @@ public class VisParser extends HTMLVisConfigBaseListener
     HTMLVisConfigParser parser = new HTMLVisConfigParser(new CommonTokenStream(
       lexer));
     
+    final List<String> errors = new LinkedList<String>();
+    
+    parser.removeErrorListeners();
+    parser.addErrorListener(new BaseErrorListener()
+    {
+
+      @Override
+      public void syntaxError(
+        Recognizer<?, ?> recognizer, Object offendingSymbol, int line,
+        int charPositionInLine, String msg, RecognitionException e)
+      {
+        errors.add("line" + line + ":" + charPositionInLine + " " + msg);
+      }
+      
+    });
+    
     ParseTree tree = parser.start();
-    if(parser.getNumberOfSyntaxErrors() == 0)
+    if(errors.isEmpty())
     {
       ParseTreeWalker walker = new ParseTreeWalker();
       walker.walk((VisParser) this, tree);
     }
     else
     {
-      // provoke an error
-      tree.toStringTree();
+      throw new VisParserException(
+        "Parser error:\n" 
+        + StringUtils.join(errors, "\n"));
     }
   }
 

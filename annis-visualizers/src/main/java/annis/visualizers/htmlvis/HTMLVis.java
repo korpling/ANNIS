@@ -189,6 +189,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     catch (IOException ex)
     {
       log.error("Could not parse the HTML visualization configuration file", ex);
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
+        Notification.Type.ERROR_MESSAGE);
+    }
+    catch (VisParserException ex)
+    {
+      log.error("Could not parse the HTML visualization configuration file", ex);
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
+        Notification.Type.ERROR_MESSAGE);
     }
 
     scrollPanel.setContent(lblResult);
