@@ -15,7 +15,6 @@
  */
 package annis.gui.widgets.grid;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.List;

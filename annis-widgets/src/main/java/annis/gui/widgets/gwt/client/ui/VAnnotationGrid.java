@@ -257,8 +257,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     if (event.hasAttribute("openPDF"))
     {
       String number = event.getStringAttribute("openPDF");
-      VConsole.log("put event with openPDF with attribute " + number);
-      formatter.addStyleName(rowNumber, col, "speaker");
+      formatter.addStyleName(rowNumber, col, "pdf");
       pdfPageNumbers.put(new Position(rowNumber, col), number);
     }
   }
