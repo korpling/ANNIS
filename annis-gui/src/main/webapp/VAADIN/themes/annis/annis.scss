@@ -9,14 +9,6 @@ $font-size: 10pt;
   @include annis-base;
   @include partitur;
   
-  body .v-app-loading {
-    background-image: url(annisloading.gif);
-    background-repeat: no-repeat;
-    background-position: 50%;
-    width: 100%;
-    height: 100%;
-  }
-  
   .hidden {
     display: none;
   }
