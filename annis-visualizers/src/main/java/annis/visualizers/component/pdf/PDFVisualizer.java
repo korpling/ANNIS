@@ -46,7 +46,7 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
   public Layout createComponent(VisualizerInput input,
           VisualizationToggle visToggle) {
 
-    Layout wrapper = new VerticalLayout();
+    PDFViewer pdfViewer = null;
 
     try {
 
@@ -55,7 +55,7 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
         VaadinSession session = VaadinSession.getCurrent();
         PDFController pdfController = session.getAttribute(PDFController.class);
 
-        PDFViewer pdfViewer = new PDFViewerImpl(wrapper, input, visToggle);
+        pdfViewer = new PDFViewerImpl(input, visToggle);
 
         pdfController.addPDF(input.getId(), pdfViewer);
       }
@@ -64,20 +64,18 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
       log.error("could not create pdf vis", ex);
     }
 
-    return wrapper;
+    return (Layout) pdfViewer;
   }
 
-  private class PDFViewerImpl implements PDFViewer {
-
-    Layout wrapper;
+  private class PDFViewerImpl extends VerticalLayout implements PDFViewer {
 
     VisualizerInput input;
 
     VisualizationToggle visToggle;
 
-    public PDFViewerImpl(Layout wrapper, VisualizerInput input,
-            VisualizationToggle visToggle) {
-      this.wrapper = wrapper;
+    PDFPanel pdfPanel;
+
+    public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
       this.visToggle = visToggle;
       this.input = input;
     }
@@ -85,10 +83,14 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
     @Override
     public void openPDF(String page) {
 
-      PDFPanel pdf = new PDFPanel(this.input, Integer.parseInt(page));
-      visToggle.toggleVisualizer(true, null);
-      wrapper.addComponent(pdf);
+      if (pdfPanel == null) {
+        pdfPanel = new PDFPanel(this.input, Integer.parseInt(page));
+        this.addComponent(pdfPanel);
+      }
 
+      if (!this.isVisible()) {
+        visToggle.toggleVisualizer(true, null);
+      }
       Notification.show("open page " + page);
     }
   }

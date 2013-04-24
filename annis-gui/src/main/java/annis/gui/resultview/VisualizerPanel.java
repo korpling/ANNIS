@@ -20,6 +20,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
@@ -484,12 +485,22 @@ public class VisualizerPanel extends VerticalLayout
   {
     if (visible)
     {
-      loadVisualizer(callback);
+      if (vis != null && vis instanceof PDFViewer)
+      {
+        vis.setVisible(true);
+        ((PDFViewer) vis).openPDF("1");
+        btEntry.setIcon(ICON_EXPAND);
+      }
+      else
+      {
+        loadVisualizer(callback);
+      }
     }
     else
     {
       // hide
       btEntry.setEnabled(true);
+      
       if (vis != null)
       {
         vis.setVisible(false);
@@ -497,6 +508,7 @@ public class VisualizerPanel extends VerticalLayout
         {
           removeComponent(vis);
         }
+
       }
 
       btEntry.setIcon(ICON_EXPAND);
