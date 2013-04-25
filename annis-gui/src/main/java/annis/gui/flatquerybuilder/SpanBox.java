@@ -23,7 +23,9 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.text.Normalizer;
@@ -63,6 +65,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     
     HorizontalLayout sb = new HorizontalLayout();
     sb.setImmediate(true);
+    sb.setSpacing(true);
     
     ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
@@ -72,8 +75,11 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     
     this.annonames = annonames;//by Martin    
     
+    Label tf = new Label(ebene);
+    sb.addComponent(tf);
+    
     this.cb = new SensitiveComboBox();
-    cb.setCaption(ebene);
+//    cb.setCaption(ebene);
     cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
@@ -90,7 +96,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     sbtoolbar.setSpacing(true);
      
     // searchbox tickbox for regex
-    CheckBox tb = new CheckBox();
+    CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
     tb.addListener(new ValueChangeListener() {

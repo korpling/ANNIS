@@ -72,6 +72,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
+    sb.setSpacing(true);
     
     // searchbox values for ebene
     /*Collection<String> annonames = new TreeSet<String>();
@@ -105,7 +106,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     sbtoolbar.setSpacing(true);
      
     // searchbox tickbox for regex
-    CheckBox tb = new CheckBox();
+    CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
     tb.addListener(new ValueChangeListener() {
