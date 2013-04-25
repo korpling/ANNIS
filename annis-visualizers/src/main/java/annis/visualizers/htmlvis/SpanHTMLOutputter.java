@@ -24,6 +24,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
@@ -39,16 +43,18 @@ public class SpanHTMLOutputter
   private String style = "";
   private String constant;
   
-  public void outputHTML(SNode node, String matchedQName, Map<Long, List<String>> output)
+  public void outputHTML(SNode node, String matchedQName,
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     if(node instanceof SSpan)
     {
-      outputSpan((SSpan) node, matchedQName, output);
+      outputSpan((SSpan) node, matchedQName, outputStartTags, outputEndTags);
     }
     else if(node instanceof SToken)
     {
       SToken tok = (SToken) node;
-      outputToken(tok, output);
+      outputToken(tok, outputStartTags, outputEndTags);
     }
     else
     {
@@ -56,7 +62,9 @@ public class SpanHTMLOutputter
     }
   }
   
-  private void outputSpan(SSpan span, String matchedQName, Map<Long, List<String>> output)
+  private void outputSpan(SSpan span, String matchedQName, 
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     long left = span
         .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
@@ -82,10 +90,12 @@ public class SpanHTMLOutputter
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
         break;
     }
-    outputAny(left, right, value, output);
+    outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags);
   }
   
-  private void outputToken(SToken tok, Map<Long, List<String>> output)
+  private void outputToken(SToken tok,
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     long index = tok
         .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX)
@@ -105,10 +115,13 @@ public class SpanHTMLOutputter
         value = "tok";
         break;
     }
-    outputAny(index, index, value, output);    
+    outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
   }
   
-  private void outputAny(long left, long right, String value, Map<Long, List<String>> output)
+  private void outputAny(long left, long right, String matchedQName,
+    String value, 
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     
     String startTag = "<" + element;
@@ -140,22 +153,33 @@ public class SpanHTMLOutputter
     startTag += ">";
     
     // add tags to output
-    if(output.get(left) == null)
+    if(outputStartTags.get(left) == null)
     {
-      output.put(left, new ArrayList<String>());
+      outputStartTags.put(left, new TreeSet<OutputItem>());
     }
-    if(output.get(right) == null)
+    if(outputEndTags.get(right) == null)
     {
-      output.put(right, new ArrayList<String>());
+      outputEndTags.put(right, new TreeSet<OutputItem>());
     }
     
     // <tag>|inner| ... | </tag>
     if(!inner.isEmpty())
     {
-      output.get(left).add(0, inner);
+      startTag += inner;
     }
-    output.get(left).add(0, startTag);
-    output.get(right).add(endTag + " <!-- end of \"" + style + "\" -->\n");
+    
+    OutputItem itemStart = new OutputItem();
+    itemStart.setOutputString(startTag);
+    itemStart.setLength(right-left);
+    itemStart.setqName(matchedQName);
+    
+    OutputItem itemEnd = new OutputItem();
+    itemEnd.setOutputString(endTag + " <!-- end of \"" + style + "\" -->\n");
+    itemEnd.setLength(right-left);
+    itemEnd.setqName(matchedQName);
+    
+    outputStartTags.get(left).add(itemStart);
+    outputEndTags.get(right).add(itemEnd);
 
   }
 

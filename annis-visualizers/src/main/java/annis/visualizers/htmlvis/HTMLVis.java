@@ -20,9 +20,6 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.model.AnnisConstants;
-import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.visualizers.component.grid.EventExtractor;
@@ -42,10 +39,13 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
@@ -210,54 +210,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     
     return scrollPanel;
   }
-  
-  private List<SSpan> getSortedSpans(SDocumentGraph graph)
-  {
-    List<SSpan> result = new LinkedList<SSpan>(graph.getSSpans());
-    
-    Collections.sort(result, new Comparator<SSpan>() 
-    {
-      @Override
-      public int compare(SSpan o1, SSpan o2)
-      {
-        // compare by span start
-        Long left1 = o1
-          .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
-          .getSValueSNUMERIC();
-        Long left2 = o2
-          .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
-          .getSValueSNUMERIC();
-        
-        int c = left1.compareTo(left2);
-        if(c == 0)
-        {
-          // compare by the lenght of the spans, shorter spans come first
-          long right1 = o1
-            .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
-            .getSValueSNUMERIC();
-          
-          long right2 = o2
-            .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
-            .getSValueSNUMERIC();
-          
-          Long length1 = right1 - left1;
-          Long length2 = right2 - left2;
-          
-          c = length1.compareTo(length2);
-        }
-        
-        return c;
-
-      }
-    });
-    
-    return result;
-  }
-
+ 
   private String createHTML(SDocumentGraph graph, List<String> annos,
     VisualizationDefinition[] definitions)
   {
-    TreeMap<Long, List<String>> output = new TreeMap<Long, List<String>>();
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags = new TreeMap<Long, SortedSet<OutputItem>>();
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags = new TreeMap<Long, SortedSet<OutputItem>>();
     StringBuilder sb = new StringBuilder();
 
     EList<SToken> token = graph.getSortedSTokenByText();
@@ -271,31 +229,52 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         String matched = vis.getMatcher().matchedAnnotation(t);
         if (matched != null)
         {
-          vis.getOutputter().outputHTML(t, matched, output);
+          vis.getOutputter().outputHTML(t, matched, outputStartTags, outputEndTags);
         }
       }
     }
     
-    List<SSpan> sortedSpans = getSortedSpans(graph);
+    List<SSpan> spans = graph.getSSpans();
     for(VisualizationDefinition vis : definitions)
     {
-      for (SSpan span : sortedSpans)
+      for (SSpan span : spans)
       {
         String matched = vis.getMatcher().matchedAnnotation(span);
         if (matched != null)
         {
-          vis.getOutputter().outputHTML(span, matched, output);
+          vis.getOutputter().outputHTML(span, matched, outputStartTags, outputEndTags);
         }
       }
     }
     
-    for(List<String> values : output.values())
+    // get all used indexes
+    Set<Long> indexes = new TreeSet<Long>();
+    indexes.addAll(outputStartTags.keySet());
+    indexes.addAll(outputEndTags.keySet());
+    
+    for(Long i : indexes)
     {
       // output all strings belonging to this token position
       
-      for (String s : values)
+      // first the start tags for this position
+      SortedSet<OutputItem> itemsStart = outputStartTags.get(i);
+      if(itemsStart != null)
       {
-        sb.append(s);
+        for (OutputItem s : itemsStart)
+        {
+          sb.append(s.getOutputString());
+        }
+      }
+      // then the end tags for this position, but inverse their order
+      SortedSet<OutputItem> itemsEnd = outputEndTags.get(i);
+      if(itemsEnd != null)
+      {
+        List<OutputItem> itemsEndReverse = new LinkedList<OutputItem>(itemsEnd);
+        Collections.reverse(itemsEndReverse);
+        for (OutputItem s : itemsEndReverse)
+        {
+          sb.append(s.getOutputString());
+        }
       }
 
     }
