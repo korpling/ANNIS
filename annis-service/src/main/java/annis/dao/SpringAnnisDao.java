@@ -831,29 +831,32 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
     String mimeType, String title, int offset, int length)
   {
-    AnnisBinary binary =      
-        (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-        byteHelper.
-        getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
-        length),
-        ByteHelper.getArgTypes(), byteHelper);
-    
+    // correct the API inconsistency
+    offset = offset - 1;
+
+    AnnisBinary binary =
+      (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
+      byteHelper.
+      getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
+      length),
+      ByteHelper.getArgTypes(), byteHelper);
+
     FileInputStream fInput = null;
     try
     {
       // retrieve the requested part of the file from the data directory
       File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
-      
+
       long fileSize = FileUtils.sizeOf(dataFile);
-      
+
       // limit the maximum retrieved file size
       length = Math.min(length, maxFileBufferSize);
       // do not make the array bigger as necessary
-      length = (int) Math.min(fileSize-(long) offset, (long) length);
-      
+      length = (int) Math.min(fileSize - (long) offset, (long) length);
+
       fInput = new FileInputStream(dataFile);
-      fInput.skip(offset-1);
-      
+      fInput.skip(offset);
+
       // the the number of requested bytes
       byte[] bytes = new byte[length];
       fInput.read(bytes);
@@ -871,7 +874,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       try
       {
-        if(fInput != null)
+        if (fInput != null)
         {
           fInput.close();
         }

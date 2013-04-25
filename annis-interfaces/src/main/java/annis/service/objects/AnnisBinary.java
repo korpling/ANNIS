@@ -27,6 +27,12 @@ public class AnnisBinary extends AnnisBinaryMetaData
   {
     return Arrays.copyOf(bytes, bytes.length);
   }
+  
+  @Override
+  public int getLength()
+  {
+    return bytes.length;
+  }
 
   public void setBytes(byte[] bytes)
   {
