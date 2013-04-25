@@ -44,8 +44,7 @@ import org.slf4j.LoggerFactory;
  * This Servlet provides binary-files with a stream of partial-content. The
  * first GET-request is answered with the status-code 206 Partial Content.
  *
- * TODO: handle more than one byte-range TODO: split rmi-requests TODO: wrote
- * tests TODO:
+ * TODO: handle more than one byte-range TODO: 
  *
  * @author benjamin
  *
@@ -55,7 +54,7 @@ public class BinaryServlet extends HttpServlet
   
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 5*1024; // max portion which is transfered over REST at once
+  private static final int MAX_LENGTH = 5*1024; // max portion which is transfered over REST at once: 5MB
   
   @Override
   public void init(ServletConfig config) throws ServletException
