@@ -153,9 +153,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         VisParser p = new VisParser(inStreamConfig);
         VisualizationDefinition[] definitions = p.getDefinitions();
 
-        List<String> annos = EventExtractor.computeDisplayAnnotations(vi);
-
-        lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(), annos,
+        lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
           definitions));
 
         String labelClass = vi.getMappings().getProperty("class", "htmlvis");
@@ -211,7 +209,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     return scrollPanel;
   }
  
-  private String createHTML(SDocumentGraph graph, List<String> annos,
+  private String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
   {
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags = new TreeMap<Long, SortedSet<OutputItem>>();
