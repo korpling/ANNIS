@@ -175,10 +175,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
         }
       }
     }
-    else
-    {
-      SpanBox.buildBoxValues(cb, ebene, sq);
-    }
   }
   
   public String getAttribute()
