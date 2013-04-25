@@ -16,13 +16,16 @@
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
+import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
-import annis.visualizers.component.grid.EventExtractor;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.HashCodes;
+import com.google.common.hash.Hashing;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -39,6 +42,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -81,8 +85,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   {
     return false;
   }
-  
-  
 
   @Override
   public Panel createComponent(VisualizerInput vi, VisualizationToggle vt)
@@ -95,11 +97,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     List<String> corpusPath =
       CommonHelper.getCorpusPath(vi.getDocument().getSCorpusGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
-    String documentName = corpusPath.get(0);
     try
     {
       corpusName = URLEncoder.encode(corpusName, "UTF-8");
-      documentName = URLEncoder.encode(documentName, "UTF-8");
     }
     catch (UnsupportedEncodingException ex)
     {
@@ -108,14 +108,13 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     
     
     WebResource resMeta = Helper.getAnnisWebResource().path(
-      "query/corpora/").path(corpusName).path(documentName)
+      "query/corpora/").path(corpusName).path(corpusName) // HACK: use the corpus name as document name
       .path("binary/meta");
      List<AnnisBinaryMetaData> binaryMeta = 
        resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
     
     try
     {
-      // TODO: can we load the file from the corpus media files? Or how do we bundle these kind of files with a corpus?
       String visConfigName = vi.getMappings().getProperty("config");
       InputStream inStreamConfig = null;
       if(visConfigName == null)
@@ -130,7 +129,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           if(title.equals(m.getFileName()))
           {            
             WebResource resBinary = Helper.getAnnisWebResource().path(
-              "query/corpora/").path(corpusName).path(documentName)
+              "query/corpora/").path(corpusName).path(corpusName)
               .path("binary").path("0").path("" + m.getLength())
               .queryParam("title", m.getFileName());
             AnnisBinary binary = resBinary.get(AnnisBinary.class);
@@ -173,7 +172,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
             if (title.equals(m.getFileName()))
             {
               WebResource resBinary = Helper.getAnnisWebResource().path(
-                "query/corpora/").path(corpusName).path(documentName)
+                "query/corpora/").path(corpusName).path(corpusName)
                 .path("binary").path("0").path("" + m.getLength())
                 .queryParam("title", m.getFileName());
               AnnisBinary binary = resBinary.get(AnnisBinary.class);
@@ -186,8 +185,13 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         if(inStreamCSS != null)
         {
           String cssContent = IOUtils.toString(inStreamCSS);
-          CSSInject cssInject = new CSSInject(UI.getCurrent());
-          cssInject.setStyles(cssContent);
+          UI currentUI = UI.getCurrent();
+          if(currentUI instanceof AnnisBaseUI)
+          {
+            // do not add identical CSS files
+            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent);
+          }
+          
         }
       }
     }
