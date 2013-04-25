@@ -155,7 +155,7 @@ public class SpanHTMLOutputter
       output.get(left).add(0, inner);
     }
     output.get(left).add(0, startTag);
-    output.get(right).add(endTag + "\n");
+    output.get(right).add(endTag + " <!-- end of \"" + style + "\" -->\n");
 
   }
 

@@ -20,6 +20,7 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
 import annis.service.objects.AnnisBinary;
@@ -40,6 +41,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
@@ -206,6 +210,49 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     
     return scrollPanel;
   }
+  
+  private List<SSpan> getSortedSpans(SDocumentGraph graph)
+  {
+    List<SSpan> result = new LinkedList<SSpan>(graph.getSSpans());
+    
+    Collections.sort(result, new Comparator<SSpan>() 
+    {
+      @Override
+      public int compare(SSpan o1, SSpan o2)
+      {
+        // compare by span start
+        Long left1 = o1
+          .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
+          .getSValueSNUMERIC();
+        Long left2 = o2
+          .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
+          .getSValueSNUMERIC();
+        
+        int c = left1.compareTo(left2);
+        if(c == 0)
+        {
+          // compare by the lenght of the spans, shorter spans come first
+          long right1 = o1
+            .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
+            .getSValueSNUMERIC();
+          
+          long right2 = o2
+            .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
+            .getSValueSNUMERIC();
+          
+          Long length1 = right1 - left1;
+          Long length2 = right2 - left2;
+          
+          c = length1.compareTo(length2);
+        }
+        
+        return c;
+
+      }
+    });
+    
+    return result;
+  }
 
   private String createHTML(SDocumentGraph graph, List<String> annos,
     VisualizationDefinition[] definitions)
@@ -229,9 +276,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
     
+    List<SSpan> sortedSpans = getSortedSpans(graph);
     for(VisualizationDefinition vis : definitions)
     {
-      for (SSpan span : graph.getSSpans())
+      for (SSpan span : sortedSpans)
       {
         String matched = vis.getMatcher().matchedAnnotation(span);
         if (matched != null)
@@ -241,20 +289,15 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
     
-    for (SToken t : token)
+    for(List<String> values : output.values())
     {
-      // get token index
-      long currentIndex = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-        getSValueSNUMERIC();
       // output all strings belonging to this token position
-      List<String> values = output.get(currentIndex);
-      if (values != null)
+      
+      for (String s : values)
       {
-        for (String s : values)
-        {
-          sb.append(s);
-        }
+        sb.append(s);
       }
+
     }
 
     return sb.toString();
