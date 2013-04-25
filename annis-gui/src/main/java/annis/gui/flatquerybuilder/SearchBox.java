@@ -237,10 +237,6 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
         }
       }
     }
-    else
-    {
-      SpanBox.buildBoxValues(cb, ebene, sq);
-    }
   }
   
   public String getAttribute()
