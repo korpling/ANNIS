@@ -204,7 +204,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       edgeQuery += edgeQueryAdds;
     }    
     
-    if(!spb.getValue().isEmpty())
+    if(spb != null)
     {
       String addQuery;
       
