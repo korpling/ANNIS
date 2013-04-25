@@ -22,7 +22,6 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
-import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.visualizers.LoadableVisualizer;
 import com.sun.jersey.api.client.WebResource;
@@ -41,7 +40,6 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -50,7 +48,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -63,7 +60,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -188,6 +184,7 @@ public class VisualizerPanel extends VerticalLayout
         btEntry.setStyleName(ChameleonTheme.BUTTON_BORDERLESS + " "
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addClickListener((Button.ClickListener) this);
+        btEntry.setDisableOnClick(true);
         addComponent(btEntry);
       }
       else
@@ -376,7 +373,6 @@ public class VisualizerPanel extends VerticalLayout
 
   private void loadVisualizer(final LoadableVisualizer.Callback callback)
   {
-    // check if it's necessary to create input
     if (visPlugin != null)
     {
       Executor exec = Executors.newSingleThreadExecutor();
@@ -421,6 +417,7 @@ public class VisualizerPanel extends VerticalLayout
               
               if (vis != null)
               {
+                btEntry.setEnabled(true);
                 vis.setVisible(true);
                 addComponent(vis);
               }
@@ -464,7 +461,6 @@ public class VisualizerPanel extends VerticalLayout
       };
       exec.execute(future);
 
-
       btEntry.setIcon(ICON_COLLAPSE);
      
       progress.setIndeterminate(true);
@@ -489,7 +485,7 @@ public class VisualizerPanel extends VerticalLayout
     else
     {
       // hide
-
+      btEntry.setEnabled(true);
       if (vis != null)
       {
         vis.setVisible(false);

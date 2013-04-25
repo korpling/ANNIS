@@ -371,12 +371,17 @@ public class SearchUI extends AnnisBaseUI
   {
     String instance = null;
     String pathInfo = request.getPathInfo();
-    if(pathInfo != null && pathInfo.startsWith("/instance-"))
+    if(pathInfo != null && pathInfo.startsWith("/"))
     {
-      instance = pathInfo.substring("/instance-".length());
+      pathInfo = pathInfo.substring(1);
+    }
+    Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
+   
+    if(pathInfo != null && !pathInfo.isEmpty())
+    {
+      instance = pathInfo;
     }
     
-    Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
     if(instance != null && allConfigs.containsKey(instance))
     {
       // return the config that matches the parsed name

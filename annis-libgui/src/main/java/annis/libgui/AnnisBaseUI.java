@@ -258,9 +258,28 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     try
     {
-      ClassResource res = new ClassResource(AnnisBaseUI.class, "logback.xml");
-
-      if (res != null)
+      
+      List<File> logbackFiles = getAllConfigLocations("gui-logback.xml");
+      
+      InputStream inStream = null;
+      if(!logbackFiles.isEmpty())
+      {
+        try
+        {
+          inStream = new FileInputStream(logbackFiles.get(logbackFiles.size()-1));
+        }
+        catch(FileNotFoundException ex)
+        {
+          // well no logging no error...
+        }
+      }
+      if(inStream == null)
+      {
+        ClassResource res = new ClassResource(AnnisBaseUI.class, "logback.xml");
+        inStream = res.getStream().getStream();
+      }
+      
+      if (inStream != null)
       {
         LoggerContext context = (LoggerContext) LoggerFactory.
           getILoggerFactory();
@@ -272,7 +291,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
           VaadinService.getCurrent().getBaseDirectory().getAbsolutePath());
 
         // load config file
-        jc.doConfigure(res.getStream().getStream());
+        jc.doConfigure(inStream);
       }
     }
     catch (JoranException ex)
