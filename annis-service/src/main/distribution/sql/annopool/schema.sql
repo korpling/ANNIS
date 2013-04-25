@@ -125,7 +125,7 @@ COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 DROP TABLE IF EXISTS media_files CASCADE;
 CREATE TABLE media_files
 (
-  file  bytea NOT NULL,
+  filename  text NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,

@@ -69,8 +69,11 @@ import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.util.ListIterator;
+import org.apache.commons.io.FileUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
@@ -79,6 +82,7 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
 {
+  private int maxFileBufferSize;
 
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
@@ -94,6 +98,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private MatrixSqlGenerator matrixSqlGenerator;
 
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
+  
+  private String externalFilesPath;
   // configuration
 
   private int timeout;
@@ -825,20 +831,78 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
     String mimeType, String title, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
-      length),
-      ByteHelper.getArgTypes(), byteHelper);
+    AnnisBinary binary =      
+        (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
+        byteHelper.
+        getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
+        length),
+        ByteHelper.getArgTypes(), byteHelper);
+    
+    FileInputStream fInput = null;
+    try
+    {
+      // retrieve the requested part of the file from the data directory
+      File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
+      
+      long fileSize = FileUtils.sizeOf(dataFile);
+      
+      // limit the maximum retrieved file size
+      length = Math.min(length, maxFileBufferSize);
+      // do not make the array bigger as necessary
+      length = (int) Math.min(fileSize-(long) offset, (long) length);
+      
+      fInput = new FileInputStream(dataFile);
+      fInput.skip(offset-1);
+      
+      // the the number of requested bytes
+      byte[] bytes = new byte[length];
+      fInput.read(bytes);
+      binary.setBytes(bytes);
+    }
+    catch (FileNotFoundException ex)
+    {
+      log.warn("Media file from database not found in data directory", ex);
+    }
+    catch (IOException ex)
+    {
+      log.warn("Error when readin media file from the data directory", ex);
+    }
+    finally
+    {
+      try
+      {
+        if(fInput != null)
+        {
+          fInput.close();
+        }
+      }
+      catch (IOException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+
+    return binary;
   }
 
   @Override
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String corpusName)
   {
-    return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(
+    List<AnnisBinaryMetaData> metaData =  getJdbcTemplate().query(
       MetaByteHelper.SQL,
       metaByteHelper.getArgs(toplevelCorpusName, corpusName),
       MetaByteHelper.getArgTypes(), metaByteHelper);
+    
+    // get the file size from the real file
+    ListIterator<AnnisBinaryMetaData> it = metaData.listIterator();
+    while(it.hasNext())
+    {
+      AnnisBinaryMetaData singleEntry = it.next();
+      File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
+      singleEntry.setLength((int) FileUtils.sizeOf(f));
+    }
+    return metaData;
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
@@ -871,4 +935,40 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.metaByteHelper = metaByteHelper;
   }
+
+  public String getExternalFilesPath()
+  {
+    return externalFilesPath;
+  }
+  
+  public File getRealDataDir()
+  {
+    File dataDir;
+    if(getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    {
+      // use the default directory
+      dataDir = new File(System.getProperty("user.home"), ".annis/data/");
+    }
+    else
+    {
+      dataDir = new File(getExternalFilesPath());
+    }
+    return dataDir;
+  }
+
+  public void setExternalFilesPath(String externalFilesPath)
+  {
+    this.externalFilesPath = externalFilesPath;
+  }
+
+  public int getMaxFileBufferSize()
+  {
+    return maxFileBufferSize;
+  }
+
+  public void setMaxFileBufferSize(int maxFileBufferSize)
+  {
+    this.maxFileBufferSize = maxFileBufferSize;
+  }
+  
 }

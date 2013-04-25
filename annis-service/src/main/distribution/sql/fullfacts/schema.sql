@@ -111,7 +111,7 @@ COMMENT ON COLUMN facts.edge_annotation_value IS 'annotation value';
 
 CREATE TABLE media_files
 (
-  file  bytea NOT NULL,
+  filename  text NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,

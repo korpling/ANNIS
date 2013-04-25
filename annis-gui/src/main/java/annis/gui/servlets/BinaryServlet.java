@@ -55,7 +55,7 @@ public class BinaryServlet extends HttpServlet
   
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
+  private static final int MAX_LENGTH = 10*1024; // max portion which is transfered over REST at once
   
   @Override
   public void init(ServletConfig config) throws ServletException

@@ -23,7 +23,7 @@ public class MetaByteHelper implements ResultSetExtractor<List<AnnisBinaryMetaDa
 
   public static final String SQL =
         "SELECT\n"
-      + "  length(file) AS bytes, title, mime_type, sub.name as corpus_name\n"
+      + "  filename, title, mime_type, sub.name as corpus_name\n"
       + "FROM media_files, corpus AS sub, corpus AS top \n"
       + "WHERE\n"
       + "  top.top_level = true AND\n"
@@ -57,10 +57,10 @@ public class MetaByteHelper implements ResultSetExtractor<List<AnnisBinaryMetaDa
       while (rs.next())
       {
         AnnisBinaryMetaData ab = new AnnisBinaryMetaData();
+        ab.setLocalFileName(rs.getString("filename"));
         ab.setFileName(rs.getString("title"));
         ab.setCorpusName(rs.getString("corpus_name"));
         ab.setMimeType(rs.getString("mime_type"));
-        ab.setLength(rs.getInt("bytes"));
         
         result.add(ab);
       }

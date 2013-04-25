@@ -667,11 +667,10 @@ public class DefaultAdministrationDao implements AdministrationDao
   
   private void importSingleFile(String path, long corpusRef)
   {
-    MediaImportPreparedStatementCallbackImpl preStat = new MediaImportPreparedStatementCallbackImpl(path, 
+    MediaImportHelper preStat = new MediaImportHelper(path, getRealDataDir(),
       corpusRef, mimeTypeMapping);
-    String sqlScript = "INSERT INTO _media_files VALUES (?, ?, ?, ?)";
-
-    jdbcTemplate.execute(sqlScript, preStat);
+   
+    jdbcTemplate.execute(MediaImportHelper.SQL, preStat);
 
   }
   
@@ -938,8 +937,29 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void deleteCorpora(List<Long> ids)
   {
+    File dataDir = getRealDataDir();
+    
     for (long l : ids)
     {
+      log.info("deleting external data files");
+      
+      List<String> filesToDelete = jdbcTemplate.queryForList(
+        "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n" +
+        "WHERE\n" +
+        "  m.corpus_ref = child.id AND\n" +
+        "  top.id = ? AND\n" +
+        "  child.pre >= top.pre AND child.post <= top.post", String.class, l);
+      for(String fileName : filesToDelete)
+      {
+        File f = new File(dataDir, fileName);
+        if(f.exists())
+        {
+          f.delete();
+        }
+      }
+      
+      log.info("dropping tables");
+      
       log.debug("dropping facts table for corpus " + l);
       jdbcTemplate.execute("DROP TABLE IF EXISTS facts_" + l);
       jdbcTemplate.execute("DROP TABLE IF EXISTS facts_edge_" + l);
@@ -950,7 +970,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       jdbcTemplate.execute("DROP TABLE IF EXISTS annotations_" + l);
     }
     
-    log.debug("recursivly deleting corpora: " + ids);
+    log.info("recursivly deleting corpora: " + ids);
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
     
@@ -1282,6 +1302,21 @@ public class DefaultAdministrationDao implements AdministrationDao
   public String getExternalFilesPath()
   {
     return externalFilesPath;
+  }
+  
+  public File getRealDataDir()
+  {
+    File dataDir;
+    if(getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    {
+      // use the default directory
+      dataDir = new File(System.getProperty("user.home"), ".annis/data/");
+    }
+    else
+    {
+      dataDir = new File(getExternalFilesPath());
+    }
+    return dataDir;
   }
   
   public void setExternalFilesPath(String externalFilesPath)
