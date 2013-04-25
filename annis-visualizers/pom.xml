@@ -16,13 +16,33 @@
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
 
-   <distributionManagement>
-      <repository>
-        <id>korpling</id>
-        <name>korpling maven repo</name>
-        <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
-      </repository>
-    </distributionManagement>
+  <distributionManagement>
+    <repository>
+      <id>korpling</id>
+      <name>korpling maven repo</name>
+      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
+    </repository>
+  </distributionManagement>
+    
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.antlr</groupId>
+        <artifactId>antlr4-maven-plugin</artifactId>
+        <version>4.0</version>
+        <configuration>
+          <sourceDirectory>src/main/antlr4</sourceDirectory>
+        </configuration>
+        <executions>
+          <execution>
+            <goals>
+              <goal>antlr4</goal>
+            </goals>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 
   <dependencies>
     <dependency>
@@ -31,7 +51,7 @@
       <version>${project.version}</version>
       <scope>provided</scope>
     </dependency>
-
+    
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
@@ -60,6 +80,13 @@
       <groupId>com.hp.gagawa</groupId>
       <artifactId>gagawa</artifactId>
       <version>1.0.1</version>
+      <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>org.antlr</groupId>
+      <artifactId>antlr4</artifactId>
+      <version>4.0</version>
       <scope>compile</scope>
     </dependency>
     

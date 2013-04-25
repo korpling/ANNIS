@@ -2,6 +2,7 @@
 <actions>
         <action>
             <actionName>run</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>package</goal>
             </goals>
@@ -12,6 +13,7 @@
         </action>
         <action>
             <actionName>debug</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>package</goal>
             </goals>

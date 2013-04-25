@@ -2,6 +2,7 @@ package annis.service.objects;
 
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * This Class provides the Metadata of a BinaryFile.
@@ -10,7 +11,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class AnnisBinaryMetaData implements Serializable
 {
-
+  
+  private String localFileName;
   private String corpusName;
   private String mimeType;
   private String fileName;
@@ -56,8 +58,14 @@ public class AnnisBinaryMetaData implements Serializable
     this.length = length;
   }
 
-  
-  
+  @XmlTransient
+  public String getLocalFileName()
+  {
+    return localFileName;
+  }
 
-  
+  public void setLocalFileName(String localFileName)
+  {
+    this.localFileName = localFileName;
+  }
 }

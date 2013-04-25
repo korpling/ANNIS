@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,32 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.visualizers.htmlvis;
+
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 /**
- * Audio player that implements the functions needed by ANNIS.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VideoPlayer extends MediaPlayerBase
+public class TokenMatcher implements SpanMatcher
 {
-  public VideoPlayer(String resourceURL, String mimeType)
+  public TokenMatcher()
   {
-    super(resourceURL, mimeType);
   }
+  
+  @Override
+  public String matchedAnnotation(SNode node)
+  {
+    if(node instanceof SToken)
+    {
+      return "tok";
+    }
+    else
+    {
+      return null;
+    }
+  }
+  
 }

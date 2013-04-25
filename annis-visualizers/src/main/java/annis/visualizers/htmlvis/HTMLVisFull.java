@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,30 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets;
+package annis.visualizers.htmlvis;
+
+import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * Audio player that implements the functions needed by ANNIS.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class VideoPlayer extends MediaPlayerBase
+@PluginImplementation
+public class HTMLVisFull extends HTMLVis
 {
-  public VideoPlayer(String resourceURL, String mimeType)
+
+  @Override
+  public String getShortName()
   {
-    super(resourceURL, mimeType);
+    return "htmldoc";
   }
+
+  @Override
+  public boolean isUsingText()
+  {
+    return true;
+  }
+  
+  
+  
 }

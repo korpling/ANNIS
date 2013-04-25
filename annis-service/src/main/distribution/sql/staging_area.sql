@@ -129,9 +129,8 @@ CREATE :tmp TABLE _resolver_vis_map
 
 CREATE :tmp TABLE _media_files
 (
-  file  bytea NOT NULL,
+  filename  text NOT NULL,
   corpus_ref  bigint NOT NULL,
-  bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL  
 );

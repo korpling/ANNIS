@@ -513,7 +513,8 @@ public class QueryService
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset,
     @PathParam("length") String rawLength,
-    @QueryParam("mime") String mimeType)
+    @QueryParam("mime") String mimeType,
+    @QueryParam("title") String title)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
@@ -524,9 +525,10 @@ public class QueryService
     AnnisBinary bin;
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName);
+      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
+      + (mimeType == null ? "" : mimeType));
 
-    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType,
+    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
       offset + 1, length);
 
     log.debug("fetch successfully");
