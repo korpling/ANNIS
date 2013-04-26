@@ -75,13 +75,42 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
 
     PDFPanel pdfPanel;
 
+    private boolean openedPage = false;
+
     public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
       this.visToggle = visToggle;
       this.input = input;
     }
 
     @Override
-    public void openPDF(String page) {
+    public void openPDFPage(String page) {
+
+      openedPage = true;
+
+      initPDFPanel(page);
+
+      if (!this.isVisible()) {
+        // set visible status
+        this.setVisible(true);
+        visToggle.toggleVisualizer(true, null);
+      }
+
+      Notification.show("opening page " + page);
+    }
+
+    @Override
+    public void openPDFViewer() {
+
+      if (!openedPage) {
+        initPDFPanel("-1");
+        Notification.show("opening pdf");
+      } else {
+        openedPage = false;
+      }
+    }
+
+    private void initPDFPanel(String page) {
+
 
       if (pdfPanel != null) {
         removeComponent(pdfPanel);
@@ -89,14 +118,6 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
 
       pdfPanel = new PDFPanel(this.input, Integer.parseInt(page));
       this.addComponent(pdfPanel);
-
-      if (!this.isVisible()) {
-        // set visible status
-        this.setVisible(true);
-        visToggle.toggleVisualizer(true, null);
-      }
-      Notification.show(
-              "-1".equals(page) ? "opening pdf" : "opening page " + page);
     }
   }
 }

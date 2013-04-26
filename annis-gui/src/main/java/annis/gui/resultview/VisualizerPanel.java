@@ -486,8 +486,7 @@ public class VisualizerPanel extends VerticalLayout
       if (vis != null && vis instanceof PDFViewer)
       {
         vis.setVisible(true);
-        //TODO this is dangerous, because openPDF ist calling toggleVisualizer again
-        ((PDFViewer) vis).openPDF("-1");
+        ((PDFViewer) vis).openPDFViewer();
         btEntry.setIcon(ICON_COLLAPSE);
       }
       else

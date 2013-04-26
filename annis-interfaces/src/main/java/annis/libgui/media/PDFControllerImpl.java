@@ -73,7 +73,7 @@ public class PDFControllerImpl implements PDFController, Serializable
         resultID))
       {
         PDFViewer pdfViewer = registeredPDFViewer.get(resultID);
-        pdfViewer.openPDF(page);
+        pdfViewer.openPDFPage(page);
       }
       else
       {

@@ -33,7 +33,6 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
 
     return canvas;
   }
-  ;
 
   function renderPage(pdf, pageNumber, canvas) {
     pdf.getPage(pageNumber).then(function getPageHelloWorld(page) {
