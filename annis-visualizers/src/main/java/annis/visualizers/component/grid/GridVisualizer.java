@@ -97,6 +97,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
     private VerticalLayout layout;
 
+    private PageHelper pageNumberHelper;
+
     public enum ElementType {
 
       begin,
@@ -129,15 +131,21 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-        List<String> annos = EventExtractor.computeDisplayAnnotations(input, SSpan.class);
+
+        List<String> annos = EventExtractor.computeDisplayAnnotations(input,
+                SSpan.class);
+        pageNumberHelper = new PageHelper(graph);
 
         EList<SToken> token = graph.getSortedSTokenByText();
-        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
-        long endIndex = token.get(token.size()-1).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).getSValueSNUMERIC();
+        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
+                getSValueSNUMERIC();
+        long endIndex = token.get(token.size() - 1).getSFeature(ANNIS_NS,
+                FEAT_TOKENINDEX).getSValueSNUMERIC();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-          EventExtractor.parseSalt(input.getDocument().getSDocumentGraph(), annos,
-            (int) startIndex, (int) endIndex);
+                EventExtractor.
+                parseSalt(input.getDocument().getSDocumentGraph(), annos,
+                (int) startIndex, (int) endIndex);
 
 
         // we will only add tokens of one texts which is mentioned by any
