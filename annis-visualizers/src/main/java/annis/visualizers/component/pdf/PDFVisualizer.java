@@ -83,15 +83,20 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
     @Override
     public void openPDF(String page) {
 
-      if (pdfPanel == null) {
-        pdfPanel = new PDFPanel(this.input, Integer.parseInt(page));
-        this.addComponent(pdfPanel);
+      if (pdfPanel != null) {
+        removeComponent(pdfPanel);
       }
 
+      pdfPanel = new PDFPanel(this.input, Integer.parseInt(page));
+      this.addComponent(pdfPanel);
+
       if (!this.isVisible()) {
+        // set visible status
+        this.setVisible(true);
         visToggle.toggleVisualizer(true, null);
       }
-      Notification.show("open page " + page);
+      Notification.show(
+              "-1".equals(page) ? "opening pdf" : "opening page " + page);
     }
   }
 }

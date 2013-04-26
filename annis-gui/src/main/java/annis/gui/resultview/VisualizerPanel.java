@@ -379,8 +379,6 @@ public class VisualizerPanel extends VerticalLayout
   {
     if (visPlugin != null)
     {
-
-
       Executor exec = Executors.newSingleThreadExecutor();
       FutureTask<Component> future = new FutureTask<Component>(
         new LoadComponentTask())
@@ -488,7 +486,8 @@ public class VisualizerPanel extends VerticalLayout
       if (vis != null && vis instanceof PDFViewer)
       {
         vis.setVisible(true);
-        ((PDFViewer) vis).openPDF("1");
+        //TODO this is dangerous, because openPDF ist calling toggleVisualizer again
+        ((PDFViewer) vis).openPDF("-1");
         btEntry.setIcon(ICON_COLLAPSE);
       }
       else

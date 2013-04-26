@@ -1,42 +1,26 @@
 window.annis_visualizers_component_pdf_PDFPanel = function() {
 
-  this.openPDF = function(url, canvas, pageNumber)
+  function openPDF(url, id, pageNumber)
   {
-    //
-    // Disable workers to avoid yet another cross-origin issue (workers need the URL of
-    // the script to be loaded, and dynamically loading a cross-origin script does
-    // not work)
-    //
     PDFJS.disableWorker = true;
+    PDFJS.getDocument(url).then(function(pdf) {
 
-    //
-    // Asynchronous download PDF as an ArrayBuffer
-    //
-    PDFJS.getDocument(url).then(function getPdfHelloWorld(pdf) {
-      //
-      // Fetch the first page
-      //
-      pdf.getPage(pageNumber).then(function getPageHelloWorld(page) {
-        var scale = 1.5;
-        var viewport = page.getViewport(scale);
+      if (pageNumber === -1) {
+        var pages = pdf.numPages;
+        for (i = 0; i < pages; i++)
+        {
+          var canvas = initCanvas(id, i + 1);
+          renderPage(pdf, i + 1, canvas);
+        }
 
-        //
-        // Render PDF page into canvas context
-        //
-
-
-        canvas.height = viewport.height;
-        canvas.width = viewport.width;
-
-
-        page.render({
-          canvasContext: canvas.getContext("2d"),
-          viewport: viewport});
-      });
+      } else {
+        var canvas = initCanvas(id, pageNumber);
+        renderPage(pdf, pageNumber, canvas);
+      }
     });
-  };
+  }
 
-  this.initCanvas = function(id) {
+  function initCanvas(id, pageNumber) {
     var wrapperElem = document.getElementById(id);
     canvas = document.createElement('canvas');
     wrapperElem.appendChild(canvas);
@@ -44,27 +28,27 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
     canvas.style.height = wrapperElem.style.height + "px";
     canvas.setAttribute("width", wrapperElem.style.width);
     canvas.setAttribute("height", wrapperElem.style.height);
-    canvas.setAttribute("id", "canvas-" + id);
+    canvas.setAttribute("id", "canvas-" + id + "-page-" + pageNumber);
     canvas.style.position = "relative";
 
     return canvas;
-  };
+  }
+  ;
 
-  /**
-   * Converts a string to an int.
-   *
-   * @param value
-   *            if it is already an int it returns simply the value, otherwise
-   *            the value is parsed to int.
-   */
-  this.stringToInt = function(value) {
+  function renderPage(pdf, pageNumber, canvas) {
+    pdf.getPage(pageNumber).then(function getPageHelloWorld(page) {
+      var scale = 1.5;
+      var viewport = page.getViewport(scale);
 
-    if ((typeof value) === "string") {
-      return parseInt(value);
-    } else {
-      return value;
-    }
-  };
+      canvas.height = viewport.height;
+      canvas.width = viewport.width;
+
+      page.render({
+        canvasContext: canvas.getContext("2d"),
+        viewport: viewport});
+    });
+  }
+
 
   this.onStateChange = function()
   {
@@ -72,15 +56,19 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
     var id = this.getState().pdfID;
     var page = this.getState().page;
 
-    // do not initialize twice
-    if (document.getElementById("canvas-" + id))
+    // cleanup old canvas elements
+    if (document.getElementById("canvas-" + id) !== undefined)
     {
-      return;
+      var wrapper = document.getElementById(id);
+      while (wrapper.hasChildNodes())
+      {
+        wrapper.removeChild(wrapper.lastChild);
+      }
     }
 
     if (url !== undefined)
     {
-      this.openPDF(url, this.initCanvas(id), page);
+      openPDF(url, id, page);
     }
 
     console.log(url + ", " + id, page);
