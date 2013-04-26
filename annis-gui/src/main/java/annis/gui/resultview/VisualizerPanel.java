@@ -489,7 +489,7 @@ public class VisualizerPanel extends VerticalLayout
       {
         vis.setVisible(true);
         ((PDFViewer) vis).openPDF("1");
-        btEntry.setIcon(ICON_EXPAND);
+        btEntry.setIcon(ICON_COLLAPSE);
       }
       else
       {
