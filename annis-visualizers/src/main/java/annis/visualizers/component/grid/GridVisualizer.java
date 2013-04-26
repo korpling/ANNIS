@@ -106,8 +106,6 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
     private VerticalLayout layout;
 
-    private PageHelper pageNumberHelper;
-
     public enum ElementType {
 
       begin,
@@ -139,6 +137,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         layout.addComponent(grid);
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+
 
 
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
