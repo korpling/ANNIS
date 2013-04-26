@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -63,6 +64,9 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent> {
 
+
+  private static final Logger log = LoggerFactory.getLogger(GridVisualizer.class);
+
   @Override
   public String getShortName() {
     return "grid";
@@ -75,8 +79,13 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
             MediaController.class);
     PDFController pdfController = VaadinSession.getCurrent().getAttribute(
             PDFController.class);
-    GridVisualizerComponent component = new GridVisualizerComponent(visInput,
-            mediaController, pdfController);
+    GridVisualizerComponent component = null;
+    try {
+      component = new GridVisualizerComponent(visInput,
+              mediaController, pdfController);
+    } catch (Exception ex) {
+      log.error("create {} failed", GridVisualizerComponent.class.getName(), ex);
+    }
     return component;
   }
 
