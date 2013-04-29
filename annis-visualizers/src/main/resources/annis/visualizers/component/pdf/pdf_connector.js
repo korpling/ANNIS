@@ -29,10 +29,6 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
     var wrapperElem = document.getElementById(id);
     canvas = document.createElement('canvas');
     wrapperElem.appendChild(canvas);
-    canvas.style.width = wrapperElem.style.width + "px";
-    canvas.style.height = wrapperElem.style.height + "px";
-    canvas.setAttribute("width", wrapperElem.style.width);
-    canvas.setAttribute("height", wrapperElem.style.height);
     canvas.setAttribute("id", "canvas-" + id + "-page-" + pageNumber);
     canvas.style.position = "relative";
 

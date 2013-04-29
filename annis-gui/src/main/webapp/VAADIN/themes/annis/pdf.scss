@@ -6,9 +6,19 @@
         layouts the pdf visualizer
 */
 
+.pdf-panel, .pdf-wrapper {
+  background: #ECF0F6;
+}
+
+.pdf-panel {
+  display: block !important;
+  margin: 0px auto;
+  padding: 15px 0;
+}
+
 .pdf-panel canvas {
-  display: block;
-  margin: 20px auto;
+  display: block ;
+  margin: 15px auto;
   padding: 2px;
   border: 1px dotted grey;
 }

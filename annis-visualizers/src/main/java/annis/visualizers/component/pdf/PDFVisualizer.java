@@ -21,23 +21,37 @@ import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.visualizers.component.grid.GridVisualizer;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import com.vaadin.ui.Panel;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Creates a pdf visualizer based on pdf.js. Talking with pdf.js is done in
+ * {@link PDFPanel}.
+ *
+ * <p>There are mappings available:
+ * <ul>
+ * <li>
+ * For the page annotation:
+ * <code>page:&lt;annotation_name&gt;</code>
+ * </li>
+ * <li> Setting a fixed height (recommended for the
+ * {@link PDFFullVisualizer}):height:&lt;height in px&gt;</li>
+ * </ul></p>
+ *
+ * <p>Since the pdf visualizer could be opened by clicking annotations in
+ * {@link GridVisualizer}, this visualizer should set to the value "preloaded"
+ * in the resolver_vis_map.tab file.</p>
+ *
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class PDFVisualizer extends AbstractVisualizer<Layout> {
+public class PDFVisualizer extends AbstractVisualizer<Panel> {
 
   private final Logger log = LoggerFactory.getLogger(PDFVisualizer.class);
 
@@ -47,7 +61,7 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
   }
 
   @Override
-  public Layout createComponent(VisualizerInput input,
+  public Panel createComponent(VisualizerInput input,
           VisualizationToggle visToggle) {
 
     PDFViewer pdfViewer = null;
@@ -66,10 +80,10 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
       log.error("could not create pdf vis", ex);
     }
 
-    return (Layout) pdfViewer;
+    return (Panel) pdfViewer;
   }
 
-  private class PDFViewerImpl extends VerticalLayout implements PDFViewer {
+  private class PDFViewerImpl extends Panel implements PDFViewer {
 
     VisualizerInput input;
 
@@ -122,11 +136,12 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
     private void initPDFPanel(String page) {
 
       if (pdfPanel != null) {
-        removeComponent(pdfPanel);
+        pdfPanel = null;
       }
 
       pdfPanel = new PDFPanel(this.input, page);
-      this.addComponent(pdfPanel);
+      this.setContent(pdfPanel);
+      this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
     }
   }
 }

@@ -18,7 +18,7 @@ package annis.visualizers.component.pdf;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import com.vaadin.ui.Component;
+import com.vaadin.ui.Panel;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
@@ -26,7 +26,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class PDFFullVisualizer extends AbstractVisualizer<PDFPanel>{
+public class PDFFullVisualizer extends AbstractVisualizer<Panel>{
 
   @Override
   public String getShortName() {
@@ -34,9 +34,12 @@ public class PDFFullVisualizer extends AbstractVisualizer<PDFPanel>{
   }
 
   @Override
-  public PDFPanel createComponent(VisualizerInput input,
+  public Panel createComponent(VisualizerInput input,
           VisualizationToggle visToggle) {
-    return new PDFPanel(input, "-1");
+    Panel p = new Panel();
+    p.setHeight(input.getMappings().getProperty("height", "-1") + "px");
+    p.setContent(new PDFPanel(input, "-1"));
+    return p;
   }
 
 }
