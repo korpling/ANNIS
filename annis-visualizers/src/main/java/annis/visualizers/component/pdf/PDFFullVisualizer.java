@@ -22,11 +22,18 @@ import com.vaadin.ui.Panel;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
+ * Renders pdf documents with pdf.js. Fetches the whole pdf document, could be
+ * slow since the underlying pdf.js do not support lazy loading yet.
+ *
+ * <p>For large pdfs it might be convenient, to set inner scrollbars with via
+ * the mappings in the resolver_vis_tab file: {@code height:<Integer>}
+ * </p>
+ *
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class PDFFullVisualizer extends AbstractVisualizer<Panel>{
+public class PDFFullVisualizer extends AbstractVisualizer<Panel> {
 
   @Override
   public String getShortName() {
@@ -41,5 +48,4 @@ public class PDFFullVisualizer extends AbstractVisualizer<Panel>{
     p.setContent(new PDFPanel(input, "-1"));
     return p;
   }
-
 }
