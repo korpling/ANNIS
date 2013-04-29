@@ -17,6 +17,7 @@ package annis.visualizers.component.pdf;
 
 import annis.CommonHelper;
 import annis.libgui.Helper;
+import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
@@ -41,21 +42,30 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private VisualizerInput input;
 
-  private int page;
+  private int firstPage;
+
+  private int lastPage;
 
   private final String PDF_ID;
 
-  public PDFPanel(VisualizerInput input, int page) {
+  public PDFPanel(VisualizerInput input, String page) {
 
     this.input = input;
 
-    this.page = page;
+    firstPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[0]);
+
+    // if the last page is not defined, set it to the first page.
+    if (page.split(PAGE_NUMBER_SEPERATOR).length > 1) {
+      lastPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[1]);
+    } else {
+      lastPage = firstPage;
+    }
 
     // generate an unique id and set it
     PDF_ID = "pdf-" + input.getId();
     setId(PDF_ID);
     addStyleName("pdf-panel");
- }
+  }
 
   @Override
   protected PDFState getState() {
@@ -63,15 +73,15 @@ public class PDFPanel extends AbstractJavaScriptComponent {
   }
 
   @Override
-  public void attach()
-  {
+  public void attach() {
     super.attach();
     setSizeUndefined();
 
     // set the state
     getState().binaryURL = getBinaryPath();
     getState().pdfID = getPDF_ID();
-    getState().page = page;
+    getState().firstPage = firstPage;
+    getState().lastPage = lastPage;
   }
 
   private String getBinaryPath() {

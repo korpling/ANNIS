@@ -1,21 +1,26 @@
 window.annis_visualizers_component_pdf_PDFPanel = function() {
 
-  function openPDF(url, id, pageNumber)
+  function openPDF(url, id, firstPage, lastPage)
   {
     PDFJS.disableWorker = true;
     PDFJS.getDocument(url).then(function(pdf) {
 
-      if (pageNumber === -1) {
+
+      // get complete pdf document
+      if (firstPage === -1) {
         var pages = pdf.numPages;
-        for (i = 0; i < pages; i++)
+        for (var i = 0; i < pages; i++)
         {
           var canvas = initCanvas(id, i + 1);
           renderPage(pdf, i + 1, canvas);
         }
-
-      } else {
-        var canvas = initCanvas(id, pageNumber);
-        renderPage(pdf, pageNumber, canvas);
+      }
+      else {
+        for (var i = firstPage - 1; i <= lastPage - 1; i++)
+        {
+          var canvas = initCanvas(id, i + 1);
+          renderPage(pdf, i + 1, canvas);
+        }
       }
     });
   }
@@ -35,7 +40,7 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
   }
 
   function renderPage(pdf, pageNumber, canvas) {
-    pdf.getPage(pageNumber).then(function getPageHelloWorld(page) {
+    pdf.getPage(pageNumber).then(function(page) {
       var scale = 1.5;
       var viewport = page.getViewport(scale);
 
@@ -53,7 +58,8 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
   {
     var url = this.getState().binaryURL;
     var id = this.getState().pdfID;
-    var page = this.getState().page;
+    var firstPage = this.getState().firstPage;
+    var lastPage = this.getState().lastPage;
 
     // cleanup old canvas elements
     if (document.getElementById("canvas-" + id) !== undefined)
@@ -67,9 +73,7 @@ window.annis_visualizers_component_pdf_PDFPanel = function() {
 
     if (url !== undefined)
     {
-      openPDF(url, id, page);
+      openPDF(url, id, firstPage, lastPage);
     }
-
-    console.log(url + ", " + id, page);
   };
 };

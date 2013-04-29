@@ -15,6 +15,7 @@
  */
 package annis.visualizers.component.pdf;
 
+import annis.libgui.PDFPageHelper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFViewer;
@@ -24,7 +25,10 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,9 +58,7 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
 
         VaadinSession session = VaadinSession.getCurrent();
         PDFController pdfController = session.getAttribute(PDFController.class);
-
         pdfViewer = new PDFViewerImpl(input, visToggle);
-
         pdfController.addPDF(input.getId(), pdfViewer);
       }
 
@@ -102,8 +104,16 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
     public void openPDFViewer() {
 
       if (!openedPage) {
-        initPDFPanel("-1");
-        Notification.show("opening pdf");
+
+        String page = new PDFPageHelper(input).getMostLeftAndMostRightPageAnno();
+
+        if (page == null) {
+          initPDFPanel("-1");
+          Notification.show("opening pdf");
+        } else {
+          initPDFPanel(page);
+          Notification.show("opening pdf pages " + page);
+        }
       } else {
         openedPage = false;
       }
@@ -111,12 +121,11 @@ public class PDFVisualizer extends AbstractVisualizer<Layout> {
 
     private void initPDFPanel(String page) {
 
-
       if (pdfPanel != null) {
         removeComponent(pdfPanel);
       }
 
-      pdfPanel = new PDFPanel(this.input, Integer.parseInt(page));
+      pdfPanel = new PDFPanel(this.input, page);
       this.addComponent(pdfPanel);
     }
   }

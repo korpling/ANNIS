@@ -17,7 +17,7 @@ package annis.visualizers.component.grid;
 
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
-import annis.libgui.media.PageHelper;
+import annis.libgui.PDFPageHelper;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
@@ -75,8 +75,12 @@ public class EventExtractor {
    * @return
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
-          SDocumentGraph graph,
-          List<String> annotationNames, long startTokenIndex, long endTokenIndex) {
+    VisualizerInput input,
+    List<String> annotationNames, long startTokenIndex, long endTokenIndex)
+  {
+    
+    SDocumentGraph graph = input.getDocument().getSDocumentGraph();
+
     // only look at annotations which were defined by the user
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
             new LinkedHashMap<String, ArrayList<Row>>();
@@ -87,7 +91,7 @@ public class EventExtractor {
 
     int eventCounter = 0;
 
-    PageHelper pageNumberHelper = new PageHelper(graph);
+    PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
     for (SSpan span : graph.getSSpans()) {
       // calculate the left and right values of a span

@@ -24,7 +24,7 @@ import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.media.PDFController;
-import annis.libgui.media.PageHelper;
+import annis.libgui.PDFPageHelper;
 import static annis.model.AnnisConstants.*;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;
@@ -64,8 +64,8 @@ import org.slf4j.LoggerFactory;
 @PluginImplementation
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent> {
 
-
-  private static final Logger log = LoggerFactory.getLogger(GridVisualizer.class);
+  private static final Logger log = LoggerFactory.
+          getLogger(GridVisualizer.class);
 
   @Override
   public String getShortName() {
@@ -151,10 +151,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                 FEAT_TOKENINDEX).getSValueSNUMERIC();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-                EventExtractor.
-                parseSalt(input.getDocument().getSDocumentGraph(), annos,
-                (int) startIndex, (int) endIndex);
-
+                EventExtractor.parseSalt(input, annos, (int) startIndex,
+                (int) endIndex);
 
         // we will only add tokens of one texts which is mentioned by any
         // included annotation.
