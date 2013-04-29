@@ -23,9 +23,8 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
-import com.google.common.hash.HashCode;
-import com.google.common.hash.HashCodes;
-import com.google.common.hash.Hashing;
+import com.hp.gagawa.java.Document;
+import com.hp.gagawa.java.elements.Div;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -33,6 +32,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -42,7 +42,6 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -55,7 +54,6 @@ import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.vaadin.cssinject.CSSInject;
 
 /**
  *
@@ -154,6 +152,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
         lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
           definitions));
+        
 
         String labelClass = vi.getMappings().getProperty("class", "htmlvis");
         lblResult.addStyleName(labelClass);
@@ -208,7 +207,18 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         Notification.Type.ERROR_MESSAGE);
     }
 
-    scrollPanel.setContent(lblResult);
+    
+    if(vi.getMappings().containsKey("debug"))
+    {
+      Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
+      Label sep = new Label("<hr/>", ContentMode.HTML);
+      VerticalLayout layout = new VerticalLayout(lblDebug, sep, lblResult);
+      scrollPanel.setContent(layout);
+    }
+    else
+    {
+      scrollPanel.setContent(lblResult);
+    }
     
     return scrollPanel;
   }
