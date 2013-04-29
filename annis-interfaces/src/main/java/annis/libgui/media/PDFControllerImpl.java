@@ -16,7 +16,9 @@
 package annis.libgui.media;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
@@ -32,7 +34,7 @@ public class PDFControllerImpl implements PDFController, Serializable
 
   private final Logger log = LoggerFactory.getLogger(PDFControllerImpl.class);
 
-  private Map<String, PDFViewer> registeredPDFViewer;
+  private Map<String, List<PDFViewer>> registeredPDFViewer;
 
   /**
    * Since everone can call us asynchronously we need a locking mechanism
@@ -48,11 +50,18 @@ public class PDFControllerImpl implements PDFController, Serializable
     {
       if (registeredPDFViewer == null)
       {
-        registeredPDFViewer = new HashMap<String, PDFViewer>();
+        registeredPDFViewer = new HashMap<String, List<PDFViewer>>();
       }
 
-      log.info("registered pdf viewer for result {} -> {}", resultID, pdfViewer);
-      registeredPDFViewer.put(resultID, pdfViewer);
+      if (!registeredPDFViewer.containsKey(resultID))
+      {
+        List<PDFViewer> pdfViewers = new ArrayList<PDFViewer>();
+        registeredPDFViewer.put(resultID, pdfViewers);
+      }
+
+      registeredPDFViewer.get(resultID).add(pdfViewer);
+      log.info("registered pdf viewer for result {} -> {}", resultID,
+        pdfViewer);
 
     }
     finally
@@ -72,8 +81,10 @@ public class PDFControllerImpl implements PDFController, Serializable
       if (registeredPDFViewer != null && registeredPDFViewer.containsKey(
         resultID))
       {
-        PDFViewer pdfViewer = registeredPDFViewer.get(resultID);
-        pdfViewer.openPDFPage(page);
+        for (PDFViewer pdfViewer : registeredPDFViewer.get(resultID))
+        {
+          pdfViewer.openPDFPage(page);
+        }
       }
       else
       {

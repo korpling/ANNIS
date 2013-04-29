@@ -27,6 +27,7 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
+import java.util.UUID;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +63,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     }
 
     // generate an unique id and set it
-    PDF_ID = "pdf-" + input.getId();
+    PDF_ID = "pdf-" + UUID.randomUUID();
     setId(PDF_ID);
     addStyleName("pdf-panel");
   }

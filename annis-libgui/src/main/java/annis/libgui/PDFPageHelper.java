@@ -148,7 +148,7 @@ public class PDFPageHelper {
         if (sAnnotations != null) {
           for (SAnnotation anno : sAnnotations) {
             // TODO support mappings of resolver vis map
-            if (PAGE_NUMBER_ANNOATATION_NAME.equals(anno.getName())) {
+            if (getPDFPageAnnotationName().equals(anno.getName())) {
               int leftIdx = getLeftIndexFromSNode(s);
               int rightIdx = getRightIndexFromSNode(s);
 
@@ -210,7 +210,6 @@ public class PDFPageHelper {
     TreeMap<Integer, SSpan> rightTokIdxToSSpan = sspans.get(sspans.firstKey());
     SSpan leftSpan = rightTokIdxToSSpan.get(rightTokIdxToSSpan.firstKey());
     SSpan rightSpan = null;
-
     Integer rightIdx = null;
 
     for (Integer leftIdxKey : sspans.keySet()) {
