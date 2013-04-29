@@ -18,6 +18,7 @@ package annis.visualizers.component.pdf;
 import annis.CommonHelper;
 import annis.libgui.Helper;
 import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
+import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
@@ -53,7 +54,12 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     this.input = input;
 
-    firstPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[0]);
+
+    if (!PAGE_NO_VALID_NUMBER.equals(page)) {
+      firstPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[0]);
+    } else {
+      firstPage = Integer.parseInt(PAGE_NO_VALID_NUMBER);
+    }
 
     // if the last page is not defined, set it to the first page.
     if (page.split(PAGE_NUMBER_SEPERATOR).length > 1) {
