@@ -22,6 +22,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinSession;
@@ -160,6 +161,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     private transient SDocument result;
     private static final String DUMMY_COLUMN = "dummyColumn";
     private BeanItemContainer<String> containerAnnos;
+    private List<String> baseAnnoSet;
     private transient Map<SNode, Long> markedAndCovered;
     private transient MediaController mediaController;
     
@@ -182,6 +184,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 
       if (visInput != null)
       {
+        
+        baseAnnoSet =  EventExtractor.computeDisplayAnnotations(visInput, SToken.class);
         initKWICPanel(visInput.getSResult(),
             visInput.getVisibleTokenAnnos(),
             visInput.getMarkedAndCovered(),
@@ -203,7 +207,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       setHeight("-1px");
 
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
+      
       containerAnnos = new BeanItemContainer<String>(String.class);
 
       containerAnnos.addItem("tok");
@@ -303,7 +307,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       setColumnWidth(DUMMY_COLUMN, 0);
       setColumnExpandRatio(DUMMY_COLUMN, 1.0f);
       visible.add(DUMMY_COLUMN);
-      containerAnnos.addAll(tokenAnnos);
+      
+      Set<String> filteredTokenAnnos = new TreeSet<String>(tokenAnnos);
+      filteredTokenAnnos.retainAll(baseAnnoSet);
+      
+      containerAnnos.addAll(filteredTokenAnnos);
 
       setContainerDataSource(containerAnnos);
       setVisibleColumns(visible.toArray());
@@ -321,7 +329,10 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       {
         containerAnnos.removeAllItems();
         containerAnnos.addItem("tok");
-        containerAnnos.addAll(annos);
+
+        Set<String> filteredTokenAnnos = new TreeSet<String>(annos);
+        filteredTokenAnnos.retainAll(baseAnnoSet);
+        containerAnnos.addAll(filteredTokenAnnos);
       }
     }
     

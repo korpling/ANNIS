@@ -209,12 +209,15 @@ public class EventExtractor
    * Returns the annotations to display according to the mappings configuration.
    *
    * This will check the "annos" and "annos_regex" paramters for determining.
-   * the annotations to display. It also iterates over all spans of the graph.
+   * the annotations to display. It also iterates over all nodes of the graph 
+   * matching the type.
    *
    * @param input The input for the visualizer.
+   * @param type Which type of nodes to include
    * @return
    */
-  public static List<String> computeDisplayAnnotations(VisualizerInput input)
+  public static List<String> computeDisplayAnnotations(VisualizerInput input, 
+    Class<? extends SNode> type)
   {
     if (input == null)
     {
@@ -223,7 +226,7 @@ public class EventExtractor
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-    Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace());
+    Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace(), type);
     List<String> annos = new LinkedList<String>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
@@ -294,38 +297,59 @@ public class EventExtractor
   
 
   /**
-   * Get the qualified name of all annotations belonging to a node with a specific namespace.
+   * Get the qualified name of all annotations belonging to spans having a specific namespace.
    * @param graph The graph.
    * @param namespace The namespace of the node (not the annotation) to search for.
+   * @param type Which type of nodes to include
    * @return 
    */
   private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
-    String namespace)
+    String namespace, Class<? extends SNode> type)
   {
     Set<String> result = new TreeSet<String>();
 
     if (graph != null)
     {
-      for (SSpan n : graph.getSSpans())
+      EList<? extends SNode> nodes;
+      // catch most common cases directly
+      if(SSpan.class == type)
       {
-        for (SLayer layer : n.getSLayers())
+        nodes = graph.getSSpans();
+      }
+      else if(SToken.class == type)
+      {
+        nodes = graph.getSTokens();
+      }
+      else
+      {
+        nodes = graph.getSNodes();
+      }
+      if(nodes != null)
+      {
+        for (SNode n : nodes)
         {
-          if (namespace == null || namespace.equals(layer.getSName()))
+          if(type.isAssignableFrom(n.getClass()))
           {
-            for (SAnnotation anno : n.getSAnnotations())
+            for (SLayer layer : n.getSLayers())
             {
-              result.add(anno.getQName());
-            }
-            // we got all annotations of this node, jump to next span
-            break;
-          } // end if namespace equals layer name
-        } // end for each layer
-      } // end for each span
+              if (namespace == null || namespace.equals(layer.getSName()))
+              {
+                for (SAnnotation anno : n.getSAnnotations())
+                {
+                  result.add(anno.getQName());
+                }
+                // we got all annotations of this node, jump to next node
+                break;
+              } // end if namespace equals layer name
+            } // end for each layer
+          }
+        } // end for each node
+      }
     }
 
     return result;
   }
-
+  
   /**
    * Merges the rows. This function uses a heuristical approach that guarantiess
    * to merge all rows into one if there is no conflict at all. If there are
