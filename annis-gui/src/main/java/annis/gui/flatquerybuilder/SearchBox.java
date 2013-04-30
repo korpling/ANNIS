@@ -15,47 +15,44 @@
  */
 package annis.gui.flatquerybuilder;
 
-import java.text.Normalizer;
-import java.text.Normalizer.Form;
-
-import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.ui.Button;
-import com.vaadin.ui.CheckBox;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.Collection;
-import java.util.TreeSet;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.ArrayList;//check later
-import java.util.concurrent.ConcurrentSkipListSet;
-import org.apache.commons.lang3.StringUtils;//levenshtein
-import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.ui.Notification;
-import java.util.Arrays;
+import com.vaadin.ui.AbstractSelect.Filtering;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
+import java.text.Normalizer;
+import java.text.Normalizer.Form;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
 import java.util.SortedSet;
+import java.util.TreeSet;
+import java.util.concurrent.ConcurrentSkipListSet;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  *
  * @author tom
  */
-public class SearchBox extends Panel implements Button.ClickListener, FieldEvents.TextChangeListener
+public class SearchBox extends Panel implements Button.ClickListener, 
+  FieldEvents.TextChangeListener
 {
   private Button btClose;
   private VerticalNode vn;
   private String ebene;
   private SensitiveComboBox cb;  
-  private CheckBox reBox;//by Martin, tick for regular expression
-  private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
+  private CheckBox reBox;
+  private Collection<String> annonames;
   private FlatQueryBuilder sq;
   public static final String BUTTON_CLOSE_LABEL = "Close";
   private static final String SB_CB_WIDTH = "145px";
@@ -68,12 +65,12 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
     sb.setSpacing(true);
-    ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
+    ConcurrentSkipListSet<String> annos = new ConcurrentSkipListSet<String>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
-      annonames.add(a);
+      annos.add(a);
     }
-    this.annonames = annonames;//by Martin    
+    this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
     cb.setCaption(ebene);
     cb.setInputPrompt(ebene);
@@ -95,6 +92,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     sbtoolbar.addComponent(tb);
     tb.addListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
+      @Override
       public void valueChange(ValueChangeEvent event) {
         boolean r = reBox.booleanValue();
         cb.setNewItemsAllowed(r);
@@ -147,7 +145,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   @Override
   public void textChange(TextChangeEvent event)
   {
-    if (sq.getFilterMechanism() == "specific")
+    if ("specific".equals(sq.getFilterMechanism()))
     {
       ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
       reducingStringComparator esc = new reducingStringComparator();    
@@ -155,9 +153,9 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
       if (!txt.equals(""))
       {
         cb.removeAllItems();
-        //matching allographs
-        for(String s : annonames)
+        for (Iterator<String> it = annonames.iterator(); it.hasNext();)
         {
+          String s = it.next();
           if(esc.compare(s, txt)==0)
           {
             cb.addItem(s);          
@@ -189,7 +187,7 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
       }
     }
     
-    if (sq.getFilterMechanism() == "levenshtein")       
+    if ("levenshtein".equals(sq.getFilterMechanism()))       
     {
       String txt = event.getText();
       HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
@@ -239,6 +237,5 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     return text == null ? null
         : Normalizer.normalize(text, Form.NFD)
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-}
-  
+  } 
 }

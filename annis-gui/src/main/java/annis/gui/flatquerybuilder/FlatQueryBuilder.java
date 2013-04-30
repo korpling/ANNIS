@@ -71,9 +71,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String BUTTON_META_LABEL = "Initialize meta search";
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
-  private static final String NO_CORPORA_WARNING = "No corpora selected, please select at least one corpus.";
+  private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
+    + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a constraint.";
+  private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a "
+    + "constraint.";
   private static final String ADD_LING_PARAM = "Add linguistic constraint";
   private static final String ADD_SPAN_PARAM = "Add span constraint";
   private static final String ADD_META_PARAM = "Add meta constraint";
@@ -82,8 +84,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String INFO_INIT_LANG = "In this part of the Query Builder, "
     + "blocks of the linguistic query can be constructed from left to right.";
   private static final String INFO_INIT_SPAN = "This part of the Query Builder "
-    + "allows you to define a span annotation within which the above query blocks are confined.";
-  private static final String INFO_INIT_META = "Here, you can constrain the linguistic query by selecting meta levels.";
+    + "allows you to define a span annotation within which the above query blocks "
+    + "are confined.";
+  private static final String INFO_INIT_META = "Here, you can constrain the linguistic "
+    + "query by selecting meta levels.";
   private String TOOLBAR_CAPTION = "Toolbar";
   private String META_CAPTION = "Meta constraints";
   private String SPAN_CAPTION = "Span constraints";
@@ -234,7 +238,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         edgeQuery += addQuery;
       }
       count++;
-      String edgeQueryAdds = (itEboxes.hasNext()) ? "\n& #"+(count-1)+" "+itEboxes.next().getValue()+" #"+count : "";
+      String edgeQueryAdds = (itEboxes.hasNext()) ? "\n& #"+(count-1)+" "
+        +itEboxes.next().getValue()+" #"+count : "";
       edgeQuery += edgeQueryAdds;
     }
     if(span.getComponentCount() > 1)
@@ -472,7 +477,8 @@ public Set<String> getAvailableAnnotationNames()
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
         for(String corpus : corpusSelection)
         {
-          atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
+          atts.addAll(service.path("query").path("corpora").path(corpus)
+              .path("annotations")
               .queryParam("fetchvalues", "true")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})
@@ -522,7 +528,8 @@ public Set<String> getAvailableAnnotationNames()
 
         for(String corpus : corpusSelection)
         {
-          atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
+          atts.addAll(service.path("query").path("corpora").path(corpus)
+              .path("annotations")
               .get(new GenericType<List<AnnisAttribute>>() {})
             );
         }
@@ -555,7 +562,8 @@ public Set<String> getAvailableAnnotationNames()
         List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
         for(String corpus : corpusSelection)
         {
-          atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
+          atts.addAll(service.path("query").path("corpora").path(corpus)
+              .path("annotations")
               .queryParam("fetchvalues", "true")
               .queryParam("onlymostfrequentvalues", "false")
               .get(new GenericType<List<AnnisAttribute>>() {})

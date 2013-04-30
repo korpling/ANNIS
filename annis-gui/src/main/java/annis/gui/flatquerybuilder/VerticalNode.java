@@ -15,20 +15,14 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.ui.MenuBar;
-import java.util.Collection;
-import java.util.Set;
-import com.vaadin.ui.VerticalLayout;
-import annis.gui.flatquerybuilder.SearchBox;
-import annis.gui.flatquerybuilder.AddMenu;
-import com.vaadin.ui.Panel;
-import annis.gui.flatquerybuilder.FlatQueryBuilder;
-import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.TextField;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * @author Martin
@@ -56,8 +50,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     SearchBox sb = new SearchBox(ebene, sq, this);
     sboxes.add(sb);   
     annonames = sq.getAvailableAnnotationNames();
-    AddMenu am = new AddMenu(sq, this, ebene);
-    this.am = am;
+    am = new AddMenu(sq, this, ebene);
     HorizontalLayout vntoolbar = new HorizontalLayout();
     vntoolbar.addComponent(this.am);
     vntoolbar.addComponent(btClose);

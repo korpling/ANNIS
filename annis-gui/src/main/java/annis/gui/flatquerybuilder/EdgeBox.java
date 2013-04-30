@@ -52,7 +52,8 @@ public class EdgeBox extends Panel
   public String getValue()
   {
     int i=0;
-    while((i<EDGE_OPERATORS[1].length)&&(!EDGE_OPERATORS[1][i].equals(edge.getValue().toString())))
+    while((i<EDGE_OPERATORS[1].length)&&(!EDGE_OPERATORS[1][i]
+      .equals(edge.getValue().toString())))
     {
       i++;
     }

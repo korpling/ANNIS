@@ -25,8 +25,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.text.Normalizer;
 import java.util.ArrayList;
@@ -64,16 +62,15 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     this.ebene = ebene;
     this.sq = sq;
     sb = new HorizontalLayout();
-    this.sb = sb;
     sb.setImmediate(true);
     sb.setSpacing(true);
     sb.setMargin(true);
-    ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
+    ConcurrentSkipListSet<String> annos = new ConcurrentSkipListSet<String>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
-      annonames.add(a);
+      annos.add(a);
     }
-    this.annonames = annonames;//by Martin    
+    this.annonames = annos; 
     Label tf = new Label(ebene);
     sb.addComponent(tf);
     this.cb = new SensitiveComboBox();

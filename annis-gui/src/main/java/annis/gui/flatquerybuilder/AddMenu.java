@@ -15,9 +15,6 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.ui.Button;
-import java.util.Collection;
-import java.util.Set;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -59,7 +56,6 @@ public class AddMenu extends Panel
   
   public void reActivateItem(final String ebene)
   {
-    final VerticalNode vn = this.vn;
     final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
     int p = 0;    
     Iterator<String> items = vn.getAnnonames().iterator();  

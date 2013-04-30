@@ -27,7 +27,7 @@ import java.util.TreeSet;
  * @author martin
  * @author tom
  */
-class MetaBox extends Panel implements Button.ClickListener
+public class MetaBox extends Panel implements Button.ClickListener
 {
   private Button btClose;
   private OptionGroup tcs;
