@@ -112,7 +112,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       virtualKeyboard.extend(txtQuery);
     }
     VerticalLayout panelStatusLayout = new VerticalLayout();
-    panelStatusLayout.setHeight(3.5f, Unit.EM);
+    panelStatusLayout.setHeight("-1px");
     panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
     
     
