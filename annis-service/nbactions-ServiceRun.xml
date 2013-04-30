@@ -33,9 +33,9 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version}/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version}/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <profiler.action>profile</profiler.action>
-                <exec.executable>${profiler.java}</exec.executable>
+                <exec.executable>java</exec.executable>
             </properties>
         </action>
         <action>
