@@ -847,7 +847,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       // retrieve the requested part of the file from the data directory
       File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
 
-      long fileSize = FileUtils.sizeOf(dataFile);
+      long fileSize = dataFile.length();
 
       // limit the maximum retrieved file size
       length = Math.min(length, maxFileBufferSize);
@@ -903,7 +903,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       AnnisBinaryMetaData singleEntry = it.next();
       File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
-      singleEntry.setLength((int) FileUtils.sizeOf(f));
+      singleEntry.setLength((int) f.length());
     }
     return metaData;
   }
