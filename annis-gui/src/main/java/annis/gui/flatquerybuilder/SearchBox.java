@@ -50,8 +50,6 @@ import java.util.SortedSet;
  */
 public class SearchBox extends Panel implements Button.ClickListener, FieldEvents.TextChangeListener
 {
-  
-  private int id;
   private Button btClose;
   private VerticalNode vn;
   private String ebene;
@@ -59,35 +57,23 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   private CheckBox reBox;//by Martin, tick for regular expression
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
   private FlatQueryBuilder sq;
-  
   public static final String BUTTON_CLOSE_LABEL = "Close";
-  private static final String SB_CB_WIDTH = "140px";
+  private static final String SB_CB_WIDTH = "145px";
   
-
   public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
   {
     this.vn = vn;
     this.ebene = ebene;
     this.sq = sq;
-    
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
     sb.setSpacing(true);
-    
-    // searchbox values for ebene
-    /*Collection<String> annonames = new TreeSet<String>();
-    for(String a :sq.getAvailableAnnotationLevels(ebene))
-    {
-      annonames.add(a);
-    }*/
     ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
       annonames.add(a);
     }
-    
     this.annonames = annonames;//by Martin    
-    
     this.cb = new SensitiveComboBox();
     cb.setCaption(ebene);
     cb.setInputPrompt(ebene);
@@ -101,42 +87,37 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     cb.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
     cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
-    
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(true);
-     
     // searchbox tickbox for regex
     CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
     tb.addListener(new ValueChangeListener() {
-    // TODO make this into a nice subroutine
-    public void valueChange(ValueChangeEvent event) {
-      boolean r = reBox.booleanValue();
-      cb.setNewItemsAllowed(r);
-      if(!r)
-      {         
-        SpanBox.buildBoxValues(cb, ebene, sq);
+      // TODO make this into a nice subroutine
+      public void valueChange(ValueChangeEvent event) {
+        boolean r = reBox.booleanValue();
+        cb.setNewItemsAllowed(r);
+        if(!r)
+        {         
+          SpanBox.buildBoxValues(cb, ebene, sq);
+        }
+        else if(cb.getValue()!=null)
+        {
+          String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          cb.addItem(escapedItem);
+          cb.setValue(escapedItem);         
+        }
       }
-      else if(cb.getValue()!=null)
-      {
-        String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-        cb.addItem(escapedItem);
-        cb.setValue(escapedItem);         
-      }
-    }
-});
+    });
     reBox = tb;
-    
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     sbtoolbar.addComponent(btClose);
-    
     sb.addComponent(sbtoolbar);
-    
+    sb.setSpacing(true);
     setContent(sb);    
-
   } 
  
   @Override
@@ -146,7 +127,6 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
     {
       vn.removeSearchBox(this);      
     }
-    
     else if(event.getComponent()==reBox)
     {
       boolean r = reBox.booleanValue();
@@ -166,75 +146,75 @@ public class SearchBox extends Panel implements Button.ClickListener, FieldEvent
   
   @Override
   public void textChange(TextChangeEvent event)
-  { 
-    //new Code:
-/*    ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
-    reducingStringComparator esc = new reducingStringComparator();    
-    String txt = event.getText();
-    if (!txt.equals(""))
+  {
+    if (sq.getFilterMechanism() == "specific")
     {
-      cb.removeAllItems();
-      
-      //matching allographs
-      for(String s : annonames)
+      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
+      reducingStringComparator esc = new reducingStringComparator();    
+      String txt = event.getText();
+      if (!txt.equals(""))
       {
-        if(esc.compare(s, txt)==0)
+        cb.removeAllItems();
+        //matching allographs
+        for(String s : annonames)
         {
-          cb.addItem(s);          
+          if(esc.compare(s, txt)==0)
+          {
+            cb.addItem(s);          
+          }
+          else {notInYet.add(s);}        
         }
-        else {notInYet.add(s);}        
-      }
-      
-      //startsWith
-      for(String s : notInYet)
-      {        
-        if(esc.startsWith(s, txt))
+        //startsWith
+        for(String s : notInYet)
+        {        
+          if(esc.startsWith(s, txt))
+          {
+            cb.addItem(s);
+            notInYet.remove(s);
+          }
+        }
+        //contains
+        for(String s : notInYet)
         {
-          cb.addItem(s);
-          notInYet.remove(s);
+          if(esc.contains(s, txt))
+          {
+            cb.addItem(s);
+          }
         }
       }
-      
-      //contains
-      for(String s : notInYet)
+      else
       {
-        if(esc.contains(s, txt))
-        {
-          cb.addItem(s);
-        }
+        //have a look and speed it up
+        SpanBox.buildBoxValues(cb, ebene, sq);
       }
     }
-    else
-    {
-      //have a look and speed it up
-      SpanBox.buildBoxValues(cb, ebene, sq);
-    }*/
     
-    //old Levenshtein code:
-       
-    String txt = event.getText();
-    HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
-    if (txt.length() > 1)
+    if (sq.getFilterMechanism() == "levenshtein")       
     {
-      cb.removeAllItems();
-      for(String s : annonames)
+      String txt = event.getText();
+      HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
+      if (txt.length() > 1)
       {
-        Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt), removeAccents(s));
-        if (levdistvals.containsKey(d)){
-          levdistvals.get(d).add(s);
+        cb.removeAllItems();
+        for(String s : annonames)
+        {
+          Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt), removeAccents(s));
+          if (levdistvals.containsKey(d)){
+            levdistvals.get(d).add(s);
+          }
+          if (!levdistvals.containsKey(d)){
+            Set<String> newc = new TreeSet<String>();
+            newc.add(s);
+            levdistvals.put(d, newc);
+          }
         }
-        if (!levdistvals.containsKey(d)){
-          Set<String> newc = new TreeSet<String>();
-          newc.add(s);
-          levdistvals.put(d, newc);
-        }
-      }
-      SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
-      for(Integer k : keys.subSet(0, 5)){
-        List<String> values = new ArrayList(levdistvals.get(k));
-        Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
-        for(String v : values){
-          cb.addItem(v);
+        SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
+        for(Integer k : keys.subSet(0, 5)){
+          List<String> values = new ArrayList(levdistvals.get(k));
+          Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
+          for(String v : values){
+            cb.addItem(v);
+          }
         }
       }
     }

@@ -25,18 +25,16 @@ import com.vaadin.ui.Panel;
 import java.util.Iterator;
 
 /**
- *
+ * @author martin
  * @author tom
  */
 public class AddMenu extends Panel
 {
-  
   private MenuBar addMenu = new MenuBar();
   private VerticalNode vn;
   private FlatQueryBuilder sq;
   
-  private static final String BUTTON_ADDLEVEL_LABEL = "Add level";
-  
+  private static final String BUTTON_ADDLEVEL_LABEL = "Add level"; 
   
   public AddMenu(final FlatQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
@@ -56,24 +54,15 @@ public class AddMenu extends Panel
         });
       }      
     }
-    
     setContent(addMenu);
   }
   
   public void reActivateItem(final String ebene)
   {
-    /*
-     * WARNING:
-     * this method will cause an exception if you try to add an item that has
-     * not been on the list before 
-     */
-    
-   
     final VerticalNode vn = this.vn;
     final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
     int p = 0;    
-    Iterator<String> items = vn.getAnnonames().iterator();
-  
+    Iterator<String> items = vn.getAnnonames().iterator();  
     Command com = new Command(){
       @Override
       public void menuSelected(MenuItem selectedItem)
@@ -82,12 +71,10 @@ public class AddMenu extends Panel
         root.removeChild(selectedItem);
       }
     };
-    
     while(!items.next().equals(ebene))
     {
       p++;
     }
-    
     if(items.hasNext())
     {
       root.addItemBefore(ebene, null, com, root.getChildren().get(p));
@@ -97,5 +84,4 @@ public class AddMenu extends Panel
       root.addItem(ebene, com);
     }
   }
-  
 }

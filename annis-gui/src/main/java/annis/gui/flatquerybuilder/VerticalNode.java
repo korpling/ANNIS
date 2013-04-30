@@ -23,6 +23,7 @@ import annis.gui.flatquerybuilder.SearchBox;
 import annis.gui.flatquerybuilder.AddMenu;
 import com.vaadin.ui.Panel;
 import annis.gui.flatquerybuilder.FlatQueryBuilder;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.TextField;
@@ -30,7 +31,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 
 /**
- *
+ * @author Martin
  * @author tom
  */
 public class VerticalNode extends Panel implements Button.ClickListener
@@ -43,42 +44,33 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private Collection<SearchBox> sboxes;
   private AddMenu am;
   
-  private static final String WIDTH = "200px";
+  private static final String WIDTH = "150px";
   
   public VerticalNode(String ebene, FlatQueryBuilder sq)
-  {
-        
+  {      
     this.sq = sq;
     v = new VerticalLayout();
-    sboxes = new ArrayList<SearchBox>();
-    
+    sboxes = new ArrayList<SearchBox>(); 
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-        
-    SearchBox sb = new SearchBox(ebene, sq, this); //SearchBox has takes an argument to 
-      // tell it for which annotation level it should search
+    SearchBox sb = new SearchBox(ebene, sq, this);
     sboxes.add(sb);   
-    
     annonames = sq.getAvailableAnnotationNames();
-    
-    AddMenu am = new AddMenu(sq, this, ebene); //AddMenu creates a menubar from 
-      // which users can pick the annotation level they are interested in
+    AddMenu am = new AddMenu(sq, this, ebene);
     this.am = am;
-    
-    VerticalLayout vntoolbar = new VerticalLayout();
+    HorizontalLayout vntoolbar = new HorizontalLayout();
+    vntoolbar.addComponent(this.am);
     vntoolbar.addComponent(btClose);
-    vntoolbar.addComponent(am);
     v.addComponent(vntoolbar);
     v.addComponent(sb);
+    v.setSpacing(true);
     setWidth(WIDTH);
     setContent(v);
-    
   }
   
 @Override
   public void buttonClick(Button.ClickEvent event)
   {
-
     if(event.getButton() == btClose)
     {
       sq.removeVerticalNode(this);
@@ -99,6 +91,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     this.sboxes.add(sb);
     v.addComponent(sb);
   }
+  
   public Collection<SearchBox> getSearchBoxes()
   {
     return this.sboxes;

@@ -19,13 +19,12 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Panel;
 
 /**
- *
- * @author tom und martin
+ * @author martin
+ * @author tom
  */
 public class EdgeBox extends Panel
 {
   private ComboBox edge;
-  private int id;
   private static final String[][] EDGE_OPERATORS = new String[][]
   {
     {".",".2",".1,2",".*"},
@@ -35,8 +34,6 @@ public class EdgeBox extends Panel
       ".*      [is indirectly preceding]"}
   };
   private static final String WIDTH = "45px";
-  
-  
   
   public EdgeBox (FlatQueryBuilder sq)
   {
@@ -61,5 +58,4 @@ public class EdgeBox extends Panel
     }
     return EDGE_OPERATORS[0][i];
   }
-  
 }

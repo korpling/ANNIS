@@ -15,13 +15,13 @@
  */
 package annis.gui.flatquerybuilder;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.List;
-import java.util.Collection;
+
 /**
- *
  * @author klotzmaz
+ * @author tom
  */
 public class reducingStringComparator implements Comparator
 {
@@ -43,8 +43,7 @@ public class reducingStringComparator implements Comparator
       h.put(c, c);
       h.put(Character.toUpperCase(c), c);
     }
-    
-    
+       
     //read from file:
     //A:
     //h.put('a', 'a');
@@ -248,7 +247,6 @@ public class reducingStringComparator implements Comparator
     h.put('Ʉ', 'u');
     h.put('ʉ', 'u');
     h.put('ʊ', 'u');
-
     
     //further special characters:
     h.put('ç', 'c');
@@ -356,8 +354,7 @@ public class reducingStringComparator implements Comparator
       {
         return 1;
       }
-    }
-    
+    }  
     return 0;
   }
   
@@ -369,10 +366,8 @@ public class reducingStringComparator implements Comparator
     //remove spaces:
     subS = subS.replace(" ", "");
     fullS = fullS.replace(" ", "");
-    
     int l = subS.length();
     if (fullS.length()<l) {return false;}
-    
     return (compare2(fullS.substring(0, l), subS)==0);
   }
   
@@ -384,7 +379,6 @@ public class reducingStringComparator implements Comparator
     //remove spaces:
     subS = subS.replace(" ", "");
     fullS = fullS.replace(" ", "");
-    
     int l = subS.length();
     for (int i=0; i<fullS.length()-l+1; i++)
     {
@@ -396,7 +390,6 @@ public class reducingStringComparator implements Comparator
     return false;
   }
 
-  
   //improve algorithm later
   public void sort(Collection<String> c)
   {

@@ -22,14 +22,13 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 
 /**
- *
+ * @author martin
  * @author tom
  */
 
 @PluginImplementation
 public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder>
 {
-
   @Override
   public String getShortName()
   {

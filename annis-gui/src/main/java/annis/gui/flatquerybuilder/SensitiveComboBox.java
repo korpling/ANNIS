@@ -15,11 +15,10 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.ui.ComboBox;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
+import com.vaadin.ui.ComboBox;
 import java.util.Map;
-
 
 /**
  *
@@ -31,18 +30,15 @@ public class SensitiveComboBox extends ComboBox
    * Source Code found on: http://dev.vaadin.com/ticket/7436
    * (On 2013-03-07)
    */
-  
    @Override
     public void changeVariables(Object source, Map<String, Object> variables) {
         if (variables.containsKey("filter")) {
             final String text = variables.get("filter").toString();
             fireEvent(new TextChangeEvent(this) {
-
                 @Override
                 public String getText() {
                     return text;
                 }
-
                 @Override
                 public int getCursorPosition() {
                     return text.length();
@@ -59,7 +55,6 @@ public class SensitiveComboBox extends ComboBox
 
     public void removeListener(TextChangeListener listener) {
         removeListener(TextChangeListener.EVENT_ID, TextChangeEvent.class,
-                listener);
-  
+                listener); 
     }
 }

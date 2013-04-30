@@ -18,74 +18,51 @@ package annis.gui.flatquerybuilder;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TextField;
-import com.vaadin.ui.TwinColSelect;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
-import java.util.Arrays;
-import java.util.List;
 import java.util.TreeSet;
 
 /**
- *
+ * @author martin
  * @author tom
  */
 class MetaBox extends Panel implements Button.ClickListener
 {
-
   private Button btClose;
-  private String selection;
-  //private TwinColSelect tcs;
   private OptionGroup tcs;
   private VerticalLayout sb;
   private FlatQueryBuilder sq;
   private final String datum;
-  
-  private static final String LEFT_COLUMN_LABEL = "Available levels";
-  private static final String RIGHT_COLUMN_LABEL = "Selected levels";
-  private static final String TWIN_COL_WIDTH = "40px";
   
   public MetaBox(String ebene, FlatQueryBuilder sq)
   {
     this.sq = sq;
     sb = new VerticalLayout();
     sb.setImmediate(true);
-    
     datum = ebene;
-    
     // close
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    
     // metabox values for ebene
     Collection<String> annonames = new TreeSet<String>();
     for(String a :sq.getAvailableMetaLevels(ebene))
     {
       annonames.add(a);
     }
-    
-    //TODO make it so that if annonames.length()>10 it becomes a twincolselect, and if there is less than 10 it is just optiongroup
-    //TwinColSelect l = new TwinColSelect(ebene);
     OptionGroup l = new OptionGroup(ebene);
     for (String annoname : annonames) {
       if (!annoname.isEmpty()){
         l.addItem(annoname);
       }
     }
-    //l.setRows(10);
     l.setNullSelectionAllowed(true);
     l.setMultiSelect(true);
     l.setImmediate(true);
-    //l.setLeftColumnCaption(LEFT_COLUMN_LABEL);
-    //l.setRightColumnCaption(RIGHT_COLUMN_LABEL);
-    //l.setWidth(TWIN_COL_WIDTH);
     tcs = l;
-
     sb.addComponent(tcs);
     sb.addComponent(btClose);
     setContent(sb);
-
   }  
   
   public String getMetaDatum()
@@ -102,7 +79,6 @@ class MetaBox extends Panel implements Button.ClickListener
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
-
     if(event.getButton() == btClose)
     {
       sq.removeMetaBox(this);

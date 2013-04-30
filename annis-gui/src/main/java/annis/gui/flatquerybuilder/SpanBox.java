@@ -50,6 +50,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
 {  
   private Button btClose;
   private String ebene;
+  private HorizontalLayout sb;
   private SensitiveComboBox cb;  
   private CheckBox reBox;//by Martin, tick for regular expression
   private Collection<String> annonames;//added by Martin, necessary for rebuilding the list of cb-Items
@@ -62,24 +63,20 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   {
     this.ebene = ebene;
     this.sq = sq;
-    
-    HorizontalLayout sb = new HorizontalLayout();
+    sb = new HorizontalLayout();
+    this.sb = sb;
     sb.setImmediate(true);
     sb.setSpacing(true);
-    
+    sb.setMargin(true);
     ConcurrentSkipListSet<String> annonames = new ConcurrentSkipListSet<String>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
       annonames.add(a);
     }
-    
     this.annonames = annonames;//by Martin    
-    
     Label tf = new Label(ebene);
     sb.addComponent(tf);
-    
     this.cb = new SensitiveComboBox();
-//    cb.setCaption(ebene);
     cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
@@ -91,50 +88,51 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     cb.setFilteringMode(AbstractSelect.Filtering.FILTERINGMODE_OFF);
     cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
-    
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(true);
-     
     // searchbox tickbox for regex
     CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
     tb.addListener(new ValueChangeListener() {
-    // TODO make this into a nice subroutine
-    public void valueChange(ValueChangeEvent event) {
-      boolean r = reBox.booleanValue();
-      cb.setNewItemsAllowed(r);
-      if(!r)
-      {         
-        SpanBox.buildBoxValues(cb, ebene, sq);
+      // TODO make this into a nice subroutine
+      @Override
+      public void valueChange(ValueChangeEvent event) {
+        boolean r = reBox.booleanValue();
+        cb.setNewItemsAllowed(r);
+        if(!r)
+        {         
+          SpanBox.buildBoxValues(cb, ebene, sq);
+        }
+        else if(cb.getValue()!=null)
+        {
+          String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          cb.addItem(escapedItem);
+          cb.setValue(escapedItem);         
+        }
       }
-      else if(cb.getValue()!=null)
-      {
-        String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-        cb.addItem(escapedItem);
-        cb.setValue(escapedItem);         
-      }
-    }
-});
+    });
     reBox = tb;
-    
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     sbtoolbar.addComponent(btClose);
-    
+    // make visable
     sb.addComponent(sbtoolbar);
     setContent(sb);    
   } 
  
   @Override
   public void buttonClick(Button.ClickEvent event)
-  {    
+  {  
+    // close functionality
     if(event.getButton() == btClose)
     {
+      sb.removeComponent(cb); 
+      cb.setValue("");
       sq.removeSpanBox(this);      
     }
-    
+    // regex box functionality
     else if(event.getComponent()==reBox)
     {
       boolean r = reBox.booleanValue();
@@ -205,14 +203,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   }
   
   public static void buildBoxValues(ComboBox cb, String level, FlatQueryBuilder sq)
-  {
-    /*
-     * this method deletes the user's regular expressions
-     * from the ComboBox
-     * (actually it simply refills the box)
-     * ---
-     * SearchBox uses this method, too
-     */    
+  {  
     String value = (cb.getValue()!=null) ? cb.getValue().toString() : "";
     Collection<String> annovals = sq.getAnnotationValues(level);    
     cb.removeAllItems();
