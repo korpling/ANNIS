@@ -17,7 +17,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.0.3</vaadin.version>
+    <vaadin.version>7.0.5</vaadin.version>
   </properties>
 
   <build>
@@ -199,7 +199,7 @@ way compatible with Vaadin eclipse plugin. -->
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
-      <version>12.0.1</version>
+      <version>14.0.1</version>
       <scope>compile</scope>
     </dependency>
   
