@@ -15,19 +15,23 @@
  */
 package annis.service.objects;
 
-import java.io.Serializable;
 import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class AnnisBinary extends AnnisBinaryMetaData
 {
-
   private byte[] bytes = new byte[0];
 
   public byte[] getBytes()
   {
     return Arrays.copyOf(bytes, bytes.length);
+  }
+  
+  @Override
+  public int getLength()
+  {
+    return bytes.length;
   }
 
   public void setBytes(byte[] bytes)
@@ -38,4 +42,5 @@ public class AnnisBinary extends AnnisBinaryMetaData
     }
     this.bytes = Arrays.copyOf(bytes, bytes.length);
   }
+  
 }
