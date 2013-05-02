@@ -138,11 +138,8 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-
-
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
                 SSpan.class);
-        pageNumberHelper = new PageHelper(graph);
 
         EList<SToken> token = graph.getSortedSTokenByText();
         long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
