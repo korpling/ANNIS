@@ -34,6 +34,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Inits the wrapper for the pdf visualization. Neccesary steps for this are:
+ * <ul>
+ * <li>get the link for the pdf file</li>
+ * <li>set the start and end page</li>
+ * <li>get a unique id for the wrapper, so pdf.js knows where to create the
+ * canvas to.</li>
+ * </ul>
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */

@@ -19,13 +19,32 @@ import java.io.Serializable;
 import net.xeoh.plugins.base.Plugin;
 
 /**
+ * Offers a annis-gui wide interface for controlling pdf viewer.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public interface PDFController extends Plugin, Serializable
 {
 
+  /**
+   * Registers a pdf viewer to the controller.
+   *
+   * @param resultID The result id is an arbitrary String and does not have to
+   * be unique for every pdf viewer. If already a pdf viewer is registered for a
+   * specific result id, the new pdf viewer is appended.
+   * @param pdfViewer The registered pdf viewer.
+   */
   public void addPDF(String resultID, PDFViewer pdfViewer);
 
+  /**
+   * Opens a pdf viewer for a specific result id.
+   *
+   * @param resultID Is an arbitrary String. If no pdf viewer is registered an
+   * {@link IllegalArgumentException} is thrown.
+   *
+   * @param pageNumber Determines the pages of the pdf to render. The String
+   * could specify a range (eg. [1-12]) or a singe page (eg. 3).
+   *
+   */
   public void openPDF(String resultID, String pageNumber);
 }

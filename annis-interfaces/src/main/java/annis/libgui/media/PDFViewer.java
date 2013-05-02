@@ -16,12 +16,21 @@
 package annis.libgui.media;
 
 /**
+ * Provides a pdf viewer for the annis gui and makes it controllable for all
+ * components of the gui.
+ *
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public interface PDFViewer
 {
-  public void openPDFPage(String page);
 
-  public void openPDFViewer();
+  /**
+   * Opens a pdf visualizer and renders a specific page range
+   *
+   * @param page Determines the pages of the pdf to render. The String could
+   * specify a range (eg. [1-12]) or a singe page (eg. 3).
+   *
+   */
+  public void openPDFPage(String page);
 }

@@ -88,7 +88,8 @@ public class PDFControllerImpl implements PDFController, Serializable
       }
       else
       {
-        log.error("no pdf viewer registered for {}", resultID);
+        throw new IllegalArgumentException(
+          "no pdf registered for this id: " + resultID);
       }
     }
     finally

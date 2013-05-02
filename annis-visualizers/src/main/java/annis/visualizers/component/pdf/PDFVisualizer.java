@@ -22,6 +22,7 @@ import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridVisualizer;
+import com.vaadin.server.ClientConnector.AttachListener;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
@@ -83,7 +84,7 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
     return (Panel) pdfViewer;
   }
 
-  private class PDFViewerImpl extends Panel implements PDFViewer {
+  private class PDFViewerImpl extends Panel implements PDFViewer, AttachListener {
 
     VisualizerInput input;
 
@@ -91,17 +92,18 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
 
     PDFPanel pdfPanel;
 
-    private boolean openedPage = false;
+    String page;
 
     public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
       this.visToggle = visToggle;
       this.input = input;
+      addAttachListener(this);
     }
 
     @Override
     public void openPDFPage(String page) {
 
-      openedPage = true;
+      this.page = page;
 
       initPDFPanel(page);
 
@@ -114,23 +116,19 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
       Notification.show("opening page " + page);
     }
 
-    @Override
     public void openPDFViewer() {
 
-      if (!openedPage) {
+      page = new PDFPageHelper(input).getMostLeftAndMostRightPageAnno();
 
-        String page = new PDFPageHelper(input).getMostLeftAndMostRightPageAnno();
-
-        if (page == null) {
-          initPDFPanel("-1");
-          Notification.show("opening pdf");
-        } else {
-          initPDFPanel(page);
-          Notification.show("opening pdf pages " + page);
-        }
+      if (page == null) {
+        // opens the whole document
+        initPDFPanel("-1");
+        Notification.show("opening pdf");
       } else {
-        openedPage = false;
+        initPDFPanel(page);
+        Notification.show("opening pdf pages " + page);
       }
+
     }
 
     private void initPDFPanel(String page) {
@@ -142,6 +140,13 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
       pdfPanel = new PDFPanel(this.input, page);
       this.setContent(pdfPanel);
       this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
+    }
+
+    @Override
+    public void attach(AttachEvent event) {
+      if (page == null && ((Panel) this).isVisible()) {
+        openPDFViewer();
+      }
     }
   }
 }

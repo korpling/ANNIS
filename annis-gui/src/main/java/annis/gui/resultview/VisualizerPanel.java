@@ -483,22 +483,13 @@ public class VisualizerPanel extends VerticalLayout
   {
     if (visible)
     {
-      if (vis != null && vis instanceof PDFViewer)
-      {
-        vis.setVisible(true);
-        ((PDFViewer) vis).openPDFViewer();
-        btEntry.setIcon(ICON_COLLAPSE);
-      }
-      else
-      {
-        loadVisualizer(callback);
-      }
+      loadVisualizer(callback);
     }
     else
     {
       // hide
       btEntry.setEnabled(true);
-      
+
       if (vis != null)
       {
         vis.setVisible(false);
