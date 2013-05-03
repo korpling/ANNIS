@@ -288,7 +288,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       catch (ExecutionException ex)
       {
-        // ok, there was some serios error
+       // ok, there was some serios error
         log.error(null, ex);
       }
       catch (TimeoutException ex)
