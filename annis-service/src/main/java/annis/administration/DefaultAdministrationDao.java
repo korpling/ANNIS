@@ -448,7 +448,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       if (table.equalsIgnoreCase(FILE_RESOLVER_VIS_MAP))
       {
-        importResolverVisMapTable(path, table + REL_ANNIS_FILE_SUFFIX);
+        importResolverVisMapTable(path, table);
       }
       // check if example query exists. If not copy it from the resource folder.
       else if (table.equalsIgnoreCase(EXAMPLE_QUERIES))
@@ -580,7 +580,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       // import toplevel corpus media files
       File[] topFiles = extData.listFiles((FileFilter) FileFileFilter.FILE);
-      for(File data : topFiles)
+      for (File data : topFiles)
       {
         String extension = FilenameUtils.getExtension(data.getName());
         try
@@ -598,7 +598,8 @@ public class DefaultAdministrationDao implements AdministrationDao
           }
           else
           {
-            log.warn("not importing " + data.getCanonicalPath() + " since file type is unknown");
+            log.warn(
+              "not importing " + data.getCanonicalPath() + " since file type is unknown");
           }
         }
         catch (IOException ex)
@@ -946,15 +947,15 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.info("deleting external data files");
 
       List<String> filesToDelete = jdbcTemplate.queryForList(
-        "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n" +
-        "WHERE\n" +
-        "  m.corpus_ref = child.id AND\n" +
-        "  top.id = ? AND\n" +
-        "  child.pre >= top.pre AND child.post <= top.post", String.class, l);
-      for(String fileName : filesToDelete)
+        "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n"
+        + "WHERE\n"
+        + "  m.corpus_ref = child.id AND\n"
+        + "  top.id = ? AND\n"
+        + "  child.pre >= top.pre AND child.post <= top.post", String.class, l);
+      for (String fileName : filesToDelete)
       {
         File f = new File(dataDir, fileName);
-        if(f.exists())
+        if (f.exists())
         {
           f.delete();
         }
@@ -973,7 +974,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
 
     log.info("recursivly deleting corpora: " + ids);
-    
+
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
   }
@@ -1331,12 +1332,11 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     return externalFilesPath;
   }
-<<<<<<< HEAD
 
   public File getRealDataDir()
   {
     File dataDir;
-    if(getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
     {
       // use the default directory
       dataDir = new File(System.getProperty("user.home"), ".annis/data/");
@@ -1464,13 +1464,21 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate.execute("DROP TABLE tmp_resolver_vis_map;");
   }
 
+  /**
+   * Imported the old and the new version of the resolver_vis_map.tab. The new
+   * version has an additional column for visibility status of the
+   * visualization.
+   *
+   * @param path The path to the relAnnis file.
+   * @param table The final table in the database of the resolver_vis_map table.
+   */
   private void importResolverVisMapTable(String path, String table)
   {
     try
     {
 
       // count cols for detecting old resolver_vis_map table format
-      File resolver_vis_tab = new File(path, table);
+      File resolver_vis_tab = new File(path, table + REL_ANNIS_FILE_SUFFIX);
 
       BufferedReader bReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
@@ -1494,7 +1502,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         // new format
         case 9:
           bulkloadTableFromResource(tableInStagingArea(table),
-            new FileSystemResource(new File(path, table)));
+            new FileSystemResource(new File(path, table + REL_ANNIS_FILE_SUFFIX)));
           break;
         default:
           log.error("invalid amount of cols");
