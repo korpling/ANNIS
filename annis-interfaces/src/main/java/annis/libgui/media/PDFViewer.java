@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.visualizers;
-
-import java.io.Serializable;
+package annis.libgui.media;
 
 /**
- * A visualizer that can callback their owners when they are loaded.
+ * Provides a pdf viewer for the annis gui and makes it controllable for all
+ * components of the gui.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface LoadableVisualizer
+public interface PDFViewer
 {
-  public void addOnLoadCallBack(Callback callback);
 
-  public void clearCallbacks();
-
-  /** Return true if visualizer is ready. */
-  public boolean isLoaded();
-
-  public interface Callback extends Serializable
-  {
-    public void visualizerLoaded(LoadableVisualizer origin);
-  }
+  /**
+   * Opens a pdf visualizer and renders a specific page range
+   *
+   * @param page Determines the pages of the pdf to render. The String could
+   * specify a range (eg. [1-12]) or a singe page (eg. 3).
+   *
+   */
+  public void openPDFPage(String page);
 }

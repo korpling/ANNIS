@@ -21,6 +21,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
+import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
@@ -533,6 +534,38 @@ public class QueryService
 
     log.debug("fetch successfully");
     return bin;
+  }
+
+  /**
+   * Fetches the example queries for a specific corpus.
+   *
+   * @param rawCorpusNames specifies the corpora the examples are fetched from.
+   *
+   */
+  @GET
+  @Path("corpora/example-queries/")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<ExampleQuery> getExampleQueries(
+    @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
+  {
+    try
+    {
+      if (rawCorpusNames != null)
+      {
+        String[] corpusNames = rawCorpusNames.split(",");
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(Arrays.asList(
+          corpusNames));
+        return annisDao.getExampleQueries(corpusIDs);
+      }
+      else
+      {
+        return annisDao.getExampleQueries(null);
+      }
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(400);
+    }
   }
 
   /**

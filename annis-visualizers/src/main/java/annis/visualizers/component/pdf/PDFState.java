@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,26 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.visualizers;
+package annis.visualizers.component.pdf;
 
-import java.io.Serializable;
+import com.vaadin.shared.ui.JavaScriptComponentState;
 
 /**
- * A visualizer that can callback their owners when they are loaded.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface LoadableVisualizer
-{
-  public void addOnLoadCallBack(Callback callback);
+public class PDFState extends JavaScriptComponentState {
 
-  public void clearCallbacks();
+  public String binaryURL;
+  public String pdfID;
+  public Integer firstPage;
+  public Integer lastPage;
 
-  /** Return true if visualizer is ready. */
-  public boolean isLoaded();
-
-  public interface Callback extends Serializable
-  {
-    public void visualizerLoaded(LoadableVisualizer origin);
-  }
 }

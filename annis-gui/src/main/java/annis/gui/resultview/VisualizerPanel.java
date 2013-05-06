@@ -20,6 +20,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
@@ -120,7 +121,7 @@ public class VisualizerPanel extends VerticalLayout
   private final String HIDDEN = "hidden";
 
   private final String PRELOADED = "preloaded";
-  
+
   private ProgressIndicator progress;
 
   private InstanceConfig instanceConfig;
@@ -145,7 +146,7 @@ public class VisualizerPanel extends VerticalLayout
     PluginSystem ps,
     InstanceConfig instanceConfig) throws IOException
   {
-    
+
     this.ps = ps;
     this.instanceConfig = instanceConfig;
     this.entry = entry;
@@ -160,13 +161,13 @@ public class VisualizerPanel extends VerticalLayout
     this.segmentationName = segmentationName;
     this.htmlID = htmlID;
     this.resultID = resultID;
-    
+
     this.progress = new ProgressIndicator();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
-  
-    if(entry != null && ps != null)
+
+    if (entry != null && ps != null)
     {
       visPlugin = ps.getVisualizer(entry.getVisType());
       if (visPlugin == null)
@@ -175,7 +176,7 @@ public class VisualizerPanel extends VerticalLayout
         entry.setVisType(PluginSystem.DEFAULT_VISUALIZER);
         visPlugin = ps.getVisualizer(entry.getVisType());
       }
-     
+
       if (HIDDEN.equalsIgnoreCase(entry.getVisibility()))
       {
         // build button for visualizer
@@ -201,7 +202,6 @@ public class VisualizerPanel extends VerticalLayout
           btEntry.addClickListener((Button.ClickListener) this);
           addComponent(btEntry);
         }
-
 
         // create the visualizer and calc input
         try
@@ -234,9 +234,9 @@ public class VisualizerPanel extends VerticalLayout
         }
 
       }
-      
+
     } // end if entry not null
-   
+
   }
 
   private Component createComponent()
@@ -258,10 +258,12 @@ public class VisualizerPanel extends VerticalLayout
   private VisualizerInput createInput()
   {
     VisualizerInput input = new VisualizerInput();
-    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().getAttribute(
+    input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
+      getAttribute(
       "AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
-    input.setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
+    input.
+      setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
 
     input.setId(resultID);
 
@@ -273,11 +275,11 @@ public class VisualizerPanel extends VerticalLayout
     input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
-    if(instanceConfig != null && instanceConfig.getFont() != null)
+    if (instanceConfig != null && instanceConfig.getFont() != null)
     {
       input.setFont(instanceConfig.getFont());
     }
-     
+
 
     if (entry != null)
     {
@@ -296,11 +298,12 @@ public class VisualizerPanel extends VerticalLayout
     {
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
-      
+
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).
         getSDocuments().get(0);
-      
-      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered, input.
+
+      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
+        input.
         getDocument(), wholeDocument));
       input.setDocument(wholeDocument);
     }
@@ -332,6 +335,7 @@ public class VisualizerPanel extends VerticalLayout
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
     }
   }
+
   private SaltProject getDocument(String toplevelCorpusName, String documentName)
   {
     SaltProject txt = null;
@@ -354,7 +358,7 @@ public class VisualizerPanel extends VerticalLayout
     }
     return txt;
   }
-  
+
   @Override
   public void buttonClick(ClickEvent event)
   {
@@ -397,7 +401,7 @@ public class VisualizerPanel extends VerticalLayout
                 if (loadableVis.isLoaded())
                 {
                   // direct call callback since the visualizer is already ready
-                  if(vis instanceof LoadableVisualizer)
+                  if (vis instanceof LoadableVisualizer)
                   {
                     callback.visualizerLoaded((LoadableVisualizer) vis);
                   }
@@ -410,11 +414,11 @@ public class VisualizerPanel extends VerticalLayout
                 }
               }
 
-              if(getComponentIndex(progress) > -1)
+              if (getComponentIndex(progress) > -1)
               {
                 removeComponent(progress);
               }
-              
+
               if (vis != null)
               {
                 btEntry.setEnabled(true);
@@ -462,7 +466,6 @@ public class VisualizerPanel extends VerticalLayout
       exec.execute(future);
 
       btEntry.setIcon(ICON_COLLAPSE);
-     
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
@@ -486,6 +489,7 @@ public class VisualizerPanel extends VerticalLayout
     {
       // hide
       btEntry.setEnabled(true);
+
       if (vis != null)
       {
         vis.setVisible(false);
@@ -493,6 +497,7 @@ public class VisualizerPanel extends VerticalLayout
         {
           removeComponent(vis);
         }
+
       }
 
       btEntry.setIcon(ICON_EXPAND);
@@ -526,7 +531,7 @@ public class VisualizerPanel extends VerticalLayout
     SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
     SNode wholeNode;
 
-    for (Entry<SNode, Long>  e : markedAndCovered.entrySet())
+    for (Entry<SNode, Long> e : markedAndCovered.entrySet())
     {
       wholeNode = wholeSGraph.getSNode(e.getKey().getSId());
       newMarkedAndCovered.put(wholeNode, e.getValue());
@@ -549,7 +554,8 @@ public class VisualizerPanel extends VerticalLayout
    * @param target node which is missing the annis feature
    * @param featureNameSpace namespace of the feature
    * @param featureName name of the feature
-   * @param copyIfExists If true the feature is copied even if it already exists on target node.
+   * @param copyIfExists If true the feature is copied even if it already exists
+   * on target node.
    */
   private void copyAnnisFeature(SNode source, SNode target,
     String featureNameSpace, String featureName, boolean copyIfExists)
@@ -565,12 +571,14 @@ public class VisualizerPanel extends VerticalLayout
         log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
           getValueString());
       }
-      else if(copyIfExists)
+      else if (copyIfExists)
       {
-        SFeature targetFeature = target.getSFeature(featureNameSpace, featureName);
+        SFeature targetFeature = target.getSFeature(featureNameSpace,
+          featureName);
         targetFeature.setValue(sfeature.getValue());
-        
-        log.debug("overwriting SFeature {} value {}", sfeature.getQName(), sfeature.
+
+        log.debug("overwriting SFeature {} value {}", sfeature.getQName(),
+          sfeature.
           getValueString());
       }
     }
