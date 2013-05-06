@@ -75,7 +75,7 @@ public class OutputItem implements Comparable<OutputItem>
   @Override
   public boolean equals(Object obj)
   {
-    if(obj != null && obj instanceof ComparisonChain)
+    if(obj != null && obj instanceof OutputItem)
     {
       return compareTo((OutputItem) obj) == 0;
     }
