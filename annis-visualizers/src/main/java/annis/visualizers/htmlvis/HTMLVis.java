@@ -23,8 +23,6 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
-import com.hp.gagawa.java.Document;
-import com.hp.gagawa.java.elements.Div;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -42,6 +40,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -272,9 +271,21 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       SortedSet<OutputItem> itemsStart = outputStartTags.get(i);
       if(itemsStart != null)
       {
-        for (OutputItem s : itemsStart)
+        Iterator<OutputItem> it = itemsStart.iterator();
+        boolean first=true;
+        while(it.hasNext())
         {
+          OutputItem s = it.next();
+          if(!first)
+          {
+            sb.append("-->");
+          }
+          first = false;
           sb.append(s.getOutputString());
+          if(it.hasNext())
+          {
+            sb.append("<!--\n");
+          }
         }
       }
       // then the end tags for this position, but inverse their order

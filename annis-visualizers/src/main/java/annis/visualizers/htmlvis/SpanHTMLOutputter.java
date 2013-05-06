@@ -174,7 +174,7 @@ public class SpanHTMLOutputter
     itemStart.setqName(matchedQName);
     
     OutputItem itemEnd = new OutputItem();
-    itemEnd.setOutputString(endTag + " <!-- end of \"" + style + "\" -->\n");
+    itemEnd.setOutputString(endTag + " <!-- end of \"" + style + "\" -->");
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
     
