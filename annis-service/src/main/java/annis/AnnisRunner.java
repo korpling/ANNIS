@@ -74,8 +74,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import org.apache.commons.collections.list.SynchronizedList;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -884,7 +882,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMatrix(String annisQuery)
   {
-//	    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
     List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
       "matrix"));
     if (matches.isEmpty())

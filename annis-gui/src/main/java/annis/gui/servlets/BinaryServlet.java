@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,26 +44,29 @@ import org.slf4j.LoggerFactory;
  * This Servlet provides binary-files with a stream of partial-content. The
  * first GET-request is answered with the status-code 206 Partial Content.
  *
- * TODO: handle more than one byte-range TODO: split rmi-requests TODO: wrote
- * tests TODO:
+<<<<<<< HEAD
+ * TODO: handle more than one byte-range TODO:
+=======
+ * TODO: handle more than one byte-range
+ *
+>>>>>>> Add basic pdf support based on pdfjs. If you check in a new version of pdfjs,
  *
  * @author benjamin
  *
  */
 public class BinaryServlet extends HttpServlet
 {
-  
+
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 50*1024; // max portion which is transfered over REST at once
-  
+  private static final int MAX_LENGTH = 5*1024; // max portion which is transfered over REST at once: 5MB
+
   @Override
   public void init(ServletConfig config) throws ServletException
   {
     super.init(config);
   }
 
-  
   @Override
   public void doGet(HttpServletRequest request, HttpServletResponse response)
     throws ServletException
@@ -72,7 +75,7 @@ public class BinaryServlet extends HttpServlet
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     String documentName = binaryParameter.get("documentName")[0];
     String mimeType = binaryParameter.get("mime")[0];
-    
+
     try
     {
       ServletOutputStream out = response.getOutputStream();
@@ -80,22 +83,24 @@ public class BinaryServlet extends HttpServlet
       String range = request.getHeader("Range");
 
       HttpSession session = request.getSession();
-      Object annisServiceURLObject =  session.getAttribute(AnnisBaseUI.WEBSERVICEURL_KEY);
-      
-      if(annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
+      Object annisServiceURLObject = session.getAttribute(
+        AnnisBaseUI.WEBSERVICEURL_KEY);
+
+      if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
-        throw new ServletException("AnnisWebService.URL was not set as init parameter in web.xml");
+        throw new ServletException(
+          "AnnisWebService.URL was not set as init parameter in web.xml");
       }
-      
+
       String annisServiceURL = (String) annisServiceURLObject;
-      
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL, 
+
+      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL,
         (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
-      
+
       WebResource binaryRes = annisRes.path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary")
-        .queryParam("mime", mimeType); 
+        .queryParam("mime", mimeType);
 
       if (range != null)
       {
@@ -105,37 +110,38 @@ public class BinaryServlet extends HttpServlet
       {
         responseStatus200(binaryRes, mimeType, out, response);
       }
-      
+
       out.flush();
     }
-    catch(IOException ex)
+    catch (IOException ex)
     {
       log.debug("IOException in BinaryServlet", ex);
     }
-    catch(ClientHandlerException ex)
+    catch (ClientHandlerException ex)
     {
       log.error(null, ex);
       response.setStatus(500);
     }
-    catch(UniformInterfaceException ex)
+    catch (UniformInterfaceException ex)
     {
       log.error(null, ex);
       response.setStatus(500);
     }
   }
 
-  private void responseStatus206(WebResource binaryRes, String mimeType, ServletOutputStream out,
+  private void responseStatus206(WebResource binaryRes, String mimeType,
+    ServletOutputStream out,
     HttpServletResponse response, String range) throws RemoteException, IOException
   {
     List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
       .get(new AnnisBinaryMetaDataListType());
 
-    if(allMeta.size() > 0 )
+    if (allMeta.size() > 0)
     {
       AnnisBinaryMetaData bm = allMeta.get(0);
-      for(AnnisBinaryMetaData m : allMeta)
+      for (AnnisBinaryMetaData m : allMeta)
       {
-        if(mimeType.equals(m.getMimeType()))
+        if (mimeType.equals(m.getMimeType()))
         {
           bm = m;
           break;
@@ -169,20 +175,21 @@ public class BinaryServlet extends HttpServlet
     }
   }
 
-  private void responseStatus200(WebResource binaryRes, String mimeType, ServletOutputStream out,
+  private void responseStatus200(WebResource binaryRes, String mimeType,
+    ServletOutputStream out,
     HttpServletResponse response) throws RemoteException, IOException
   {
-    
-    
+
+
     List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
       .get(new AnnisBinaryMetaDataListType());
 
-    if(allMeta.size() > 0 )
+    if (allMeta.size() > 0)
     {
       AnnisBinaryMetaData binaryMeta = allMeta.get(0);
-      for(AnnisBinaryMetaData m : allMeta)
+      for (AnnisBinaryMetaData m : allMeta)
       {
-        if(mimeType.equals(m.getMimeType()))
+        if (mimeType.equals(m.getMimeType()))
         {
           binaryMeta = m;
           break;
@@ -192,50 +199,58 @@ public class BinaryServlet extends HttpServlet
       response.setStatus(200);
       response.setHeader("Accept-Ranges", "bytes");
       response.setContentType(binaryMeta.getMimeType());
-      response.setHeader("Content-Range", "bytes 0-" + (binaryMeta.getLength() - 1)
+      response.setHeader("Content-Range",
+        "bytes 0-" + (binaryMeta.getLength() - 1)
         + "/" + binaryMeta.getLength());
       response.setContentLength(binaryMeta.getLength());
 
-      getCompleteFile(binaryRes, out);
+      getCompleteFile(binaryRes, mimeType, out);
     }
   }
 
-  /**
-   * This function get the whole binary-file and put it to responds.out there
-   * must exist at least one byte
-   *
-   *
-   * @param service
-   * @param out
-   * @param corpusId
-   */
-  private void getCompleteFile(WebResource binaryRes, ServletOutputStream out)
+  private void getCompleteFile(WebResource binaryRes, String mimeType,
+    ServletOutputStream out)
     throws RemoteException, IOException
   {
 
-    AnnisBinaryMetaData annisBinary = binaryRes.path("meta")
-      .get(AnnisBinary.class);
-    
-    int offset = 0;
-    int length = annisBinary.getLength();
-    
-    writeStepByStep(offset, length, binaryRes, out);
+    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
+      .get(new AnnisBinaryMetaDataListType());
 
+    if (allMeta.size() > 0)
+    {
+      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
+      for (AnnisBinaryMetaData m : allMeta)
+      {
+        if (mimeType.equals(m.getMimeType()))
+        {
+          binaryMeta = m;
+          break;
+        }
+      }
+
+      int offset = 0;
+      int length = binaryMeta.getLength();
+
+      writeStepByStep(offset, length, binaryRes, out);
+
+    }
   }
-  
-  private void writeStepByStep(int offset, int completeLength, WebResource binaryRes, ServletOutputStream out) throws IOException
+
+  private void writeStepByStep(int offset, int completeLength,
+    WebResource binaryRes, ServletOutputStream out) throws IOException
   {
     int remaining = completeLength;
-    while(remaining > 0)
+    while (remaining > 0)
     {
       int stepLength = Math.min(MAX_LENGTH, remaining);
-      
+
       AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
-      Validate.isTrue(bin.getBytes().length == stepLength);
+      Validate.isTrue(bin.getLength() == stepLength);
+
       out.write(bin.getBytes());
       out.flush();
-      
-      offset += stepLength;      
+
+      offset += stepLength;
       remaining = remaining - stepLength;
     }
   }

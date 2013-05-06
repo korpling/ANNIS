@@ -53,11 +53,14 @@
       <outputDirectory>lib/</outputDirectory>
       <fileMode>0644</fileMode>
       <unpack>false</unpack>
+      <excludes>
+        <exclude>de.hu-berlin.german.korpling.annis:annis-gui:war:*</exclude>
+      </excludes>
     </dependencySet>
     <!-- service -->
     <dependencySet>
       <includes>
-        <include>annis-service*:zip</include> 
+        <include>de.hu-berlin.german.korpling.annis:annis-service*:zip</include> 
       </includes>
       <outputDirectory>/</outputDirectory>
       <unpack>true</unpack>

@@ -16,32 +16,9 @@
 package annis.dao;
 
 import annis.dao.objects.AnnotatedMatch;
+import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
-import annis.service.objects.Match;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
-
 import annis.model.Annotation;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
@@ -49,10 +26,11 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
@@ -65,23 +43,50 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.File;
 import java.io.FileInputStream;
+
+import java.io.FileNotFoundException;
+import java.util.ListIterator;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
 {
+
+  private int maxFileBufferSize;
 
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
@@ -96,8 +101,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private MatrixSqlGenerator matrixSqlGenerator;
 
+  // generated sql for example queries and fetches the result
+  private ListExampleQueriesHelper listExampleQueriesHelper;
+
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
+
   private FrequencySqlGenerator frequencySqlGenerator;
+
+
+  private String externalFilesPath;
+
   // configuration
 
   private int timeout;
@@ -332,6 +345,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       jdbcTemplate.update("SET statement_timeout TO " + timeout);
     }
+  }
+
+  @Override
+  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs)
+  {
+    return (List<ExampleQuery>) getJdbcTemplate().query(
+      listExampleQueriesHelper.createSQLQuery(corpusIDs),
+      listExampleQueriesHelper);
   }
 
   @Transactional(readOnly = true)
@@ -598,6 +619,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       conn = getJdbcTemplate().getDataSource().getConnection();
       DatabaseMetaData meta = conn.getMetaData();
 
+
       log.debug(
         "database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.
         getDatabaseMinorVersion() + " complete: " + meta.
@@ -611,7 +633,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       }
       if (meta.getDatabaseMajorVersion() < 9
         || (meta.getDatabaseMajorVersion() == 9 && meta.
-        getDatabaseMinorVersion() < 2))
+        getDatabaseMinorVersion() < 1)) // we urge people to use 9.2, but 9.1 should be valid as well
       {
         throw new AnnisException("Wrong PostgreSQL version installed. Please "
           + "install at least PostgreSQL 9.2 (current installed version is "
@@ -846,22 +868,83 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Override
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
-    String mimeType, int offset, int length)
+    String mimeType, String title, int offset, int length)
   {
-    return (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
-      byteHelper.getArgs(toplevelCorpusName, corpusName, mimeType, offset,
+    // correct the API inconsistency
+    offset = offset - 1;
+
+    AnnisBinary binary =
+      (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
+      byteHelper.
+      getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
       length),
       ByteHelper.getArgTypes(), byteHelper);
+
+    FileInputStream fInput = null;
+    try
+    {
+      // retrieve the requested part of the file from the data directory
+      File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
+
+      long fileSize = dataFile.length();
+
+      // limit the maximum retrieved file size
+      length = Math.min(length, maxFileBufferSize);
+      // do not make the array bigger as necessary
+      length = (int) Math.min(fileSize - (long) offset, (long) length);
+
+      fInput = new FileInputStream(dataFile);
+      fInput.skip(offset);
+
+      // the the number of requested bytes
+      byte[] bytes = new byte[length];
+      fInput.read(bytes);
+      binary.setBytes(bytes);
+    }
+    catch (FileNotFoundException ex)
+    {
+      log.warn("Media file from database not found in data directory", ex);
+    }
+    catch (IOException ex)
+    {
+      log.warn("Error when readin media file from the data directory", ex);
+    }
+    finally
+    {
+      try
+      {
+        if (fInput != null)
+        {
+          fInput.close();
+        }
+      }
+      catch (IOException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+
+    return binary;
   }
 
   @Override
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String corpusName)
   {
-    return (List<AnnisBinaryMetaData>) getJdbcTemplate().query(
+    List<AnnisBinaryMetaData> metaData = getJdbcTemplate().query(
       MetaByteHelper.SQL,
       metaByteHelper.getArgs(toplevelCorpusName, corpusName),
       MetaByteHelper.getArgTypes(), metaByteHelper);
+
+    // get the file size from the real file
+    ListIterator<AnnisBinaryMetaData> it = metaData.listIterator();
+    while (it.hasNext())
+    {
+      AnnisBinaryMetaData singleEntry = it.next();
+      File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
+      singleEntry.setLength((int) f.length());
+    }
+    return metaData;
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
@@ -893,5 +976,51 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public void setMetaByteHelper(MetaByteHelper metaByteHelper)
   {
     this.metaByteHelper = metaByteHelper;
+  }
+
+  public String getExternalFilesPath()
+  {
+    return externalFilesPath;
+  }
+
+  public File getRealDataDir()
+  {
+    File dataDir;
+    if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    {
+      // use the default directory
+      dataDir = new File(System.getProperty("user.home"), ".annis/data/");
+    }
+    else
+    {
+      dataDir = new File(getExternalFilesPath());
+    }
+    return dataDir;
+  }
+
+  public void setExternalFilesPath(String externalFilesPath)
+  {
+    this.externalFilesPath = externalFilesPath;
+  }
+
+  public int getMaxFileBufferSize()
+  {
+    return maxFileBufferSize;
+  }
+
+  public void setMaxFileBufferSize(int maxFileBufferSize)
+  {
+    this.maxFileBufferSize = maxFileBufferSize;
+  }
+
+  public ListExampleQueriesHelper getListExampleQueriesHelper()
+  {
+    return listExampleQueriesHelper;
+  }
+
+  public void setListExampleQueriesHelper(
+    ListExampleQueriesHelper listExampleQueriesHelper)
+  {
+    this.listExampleQueriesHelper = listExampleQueriesHelper;
   }
 }

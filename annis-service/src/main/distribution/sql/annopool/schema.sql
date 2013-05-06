@@ -42,7 +42,7 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 DROP TABLE IF EXISTS text CASCADE;
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id), 
+  corpus_ref integer REFERENCES corpus(id),
   id    integer,
   name  varchar,
   text  text,
@@ -125,9 +125,8 @@ COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 DROP TABLE IF EXISTS media_files CASCADE;
 CREATE TABLE media_files
 (
-  file  bytea NOT NULL,
+  filename  text NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
-  bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
   title varchar NOT NULL,
   UNIQUE (corpus_ref, title)
@@ -146,24 +145,24 @@ CREATE TABLE corpus_stats
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
   max_component_id integer NULL,
-  max_node_id bigint NULL, 
+  max_node_id bigint NULL,
   source_path varchar -- original path to the folder containing the relANNIS sources
 );
 
 
 DROP VIEW IF EXISTS corpus_info CASCADE;
-CREATE VIEW corpus_info AS SELECT 
+CREATE VIEW corpus_info AS SELECT
   name,
-  id, 
+  id,
   text,
   tokens,
   source_path
-FROM 
+FROM
   corpus_stats;
-  
+
 DROP TYPE IF EXISTS resolver_visibility CASCADE;
 CREATE TYPE resolver_visibility AS ENUM (
-  'permanent', 
+  'permanent',
   'visible',
   'hidden',
   'removed',
@@ -183,7 +182,7 @@ CREATE TABLE resolver_vis_map
   "visibility"     resolver_visibility NOT NULL DEFAULT 'hidden',
   "order" integer default '0',
   "mappings" varchar,
-   UNIQUE (corpus,version,namespace,element,vis_type)              
+   UNIQUE (corpus,version,namespace,element,vis_type)
 );
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
 COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
@@ -218,4 +217,15 @@ CREATE TABLE user_config
   id varchar NOT NULL,
   config varchar, -- (should be json)
   PRIMARY KEY(id)
+);
+
+--CREATE TYPE ops AS ENUM ('.','.*','>','->','_i_');
+CREATE TABLE example_queries
+(
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "nodes" INTEGER NOT NULL,
+  "used_ops" TEXT[] NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

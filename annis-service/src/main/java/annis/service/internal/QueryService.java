@@ -21,7 +21,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.objects.AnnotatedMatch;
-import annis.service.objects.FrequencyTable;
+import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
@@ -33,6 +33,7 @@ import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.MatchAndDocumentCount;
@@ -580,7 +581,8 @@ public class QueryService
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset,
     @PathParam("length") String rawLength,
-    @QueryParam("mime") String mimeType)
+    @QueryParam("mime") String mimeType,
+    @QueryParam("title") String title)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
@@ -591,13 +593,46 @@ public class QueryService
     AnnisBinary bin;
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName);
+      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
+      + (mimeType == null ? "" : mimeType));
 
-    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType,
+    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
       offset + 1, length);
 
     log.debug("fetch successfully");
     return bin;
+  }
+
+  /**
+   * Fetches the example queries for a specific corpus.
+   *
+   * @param rawCorpusNames specifies the corpora the examples are fetched from.
+   *
+   */
+  @GET
+  @Path("corpora/example-queries/")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<ExampleQuery> getExampleQueries(
+    @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
+  {
+    try
+    {
+      if (rawCorpusNames != null)
+      {
+        String[] corpusNames = rawCorpusNames.split(",");
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(Arrays.asList(
+          corpusNames));
+        return annisDao.getExampleQueries(corpusIDs);
+      }
+      else
+      {
+        return annisDao.getExampleQueries(null);
+      }
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(400);
+    }
   }
 
   /**

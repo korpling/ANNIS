@@ -34,14 +34,16 @@ public class GridEvent implements Serializable
   private Double startTime;
   private Double endTime;
   private boolean gap;
-  
+  private String textID;
+  private String pageNumber;
+
   public GridEvent(String id, int left, int right, String value)
   {
     this.id = id;
     this.left = left;
     this.right = right;
     this.value = value;
-    
+
     this.coveredIDs = new LinkedList<String>();
   }
 
@@ -54,7 +56,7 @@ public class GridEvent implements Serializable
   {
     this.id = id;
   }
-  
+
   public int getLeft()
   {
     return left;
@@ -114,7 +116,7 @@ public class GridEvent implements Serializable
   {
     return endTime;
   }
-  
+
   public void setEndTime(Double endTime)
   {
     this.endTime = endTime;
@@ -130,12 +132,33 @@ public class GridEvent implements Serializable
     this.gap = gap;
   }
 
+  /**
+   * Salt ID of the text this event belongs to.
+   * @return
+   */
+  public String getTextID()
+  {
+    return textID;
+  }
+
+  public void setTextID(String textID)
+  {
+    this.textID = textID;
+  }
+
   @Override
   public String toString()
   {
-    return "" + id +  " -> " + value + " (" + left + "-" + right +")"; 
+    return "" + id +  " -> " + value + " (" + left + "-" + right +")";
   }
-  
-  
-  
+
+  public String getPageNumber()
+  {
+    return pageNumber;
+  }
+
+  public void setPage(String pageNumber)
+  {
+    this.pageNumber = pageNumber;
+  }
 }

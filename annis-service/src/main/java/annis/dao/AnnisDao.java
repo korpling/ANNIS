@@ -16,7 +16,7 @@
 package annis.dao;
 
 import annis.dao.objects.AnnotatedMatch;
-import annis.service.objects.FrequencyTable;
+import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
 import java.util.HashMap;
@@ -31,6 +31,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -69,12 +70,14 @@ public interface AnnisDao
    *
    * @param toplevelCorpusName
    * @param corpusName
+   * @param mimeType The mime type of the binary to fetch.
+   * @param title The title of the binary to fetch or null if any with correct mime type.
    * @param offset starts with 1
    * @param length
    * @return
    */
   public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
-    String mimeType, int offset, int length);
+    String mimeType, String title, int offset, int length);
 
   /**
    * Gets meta data about existing binary files from database.
@@ -174,4 +177,13 @@ public interface AnnisDao
    * @return Contains name and pre for sorting the documents.
    */
   public List<Annotation> listDocuments(String toplevelCorpusName);
+
+  /**
+   * Fetches a list with auto generated queries.
+   *
+   * @param corpusIDs determines the corpora, for which the example queries
+   * are defined. If null then all auto generated queries are fetched.
+   * @return Is null, if no example queries exists in the database.
+   */
+  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
 }

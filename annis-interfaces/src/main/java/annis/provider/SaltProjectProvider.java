@@ -181,8 +181,14 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     resourceSet.getResources().add(resource);
 
 
-    resource.load(entityStream, null);
-    
+    try
+    {
+      resource.load(entityStream, null);
+    }
+    catch(IOException ex)
+    {
+      log.error("Salt binary deserialization failed", ex);
+    }
     return resource;
   }
   
@@ -200,7 +206,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     options.put(XMIResource.OPTION_USE_PARSER_POOL, xmlParserPool);
     options.put(XMIResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
 
-    resource.load(entityStream, null);
+    resource.load(entityStream, options);
     
     return resource;
   }

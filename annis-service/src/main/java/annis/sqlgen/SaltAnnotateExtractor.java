@@ -45,6 +45,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
@@ -92,14 +93,20 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SDocument document = null;
 
       String[] keyNameList = new String[0];
-
+      
+      AtomicInteger numberOfEdges = new AtomicInteger();
       int match_index = 0;
-
+      
       SolutionKey<?> key = createSolutionKey();
 
+      int counter = 0;
       while (resultSet.next())
       {
-
+        if(counter % 1000 == 0)
+        {
+          log.debug("handling resultset row {}", counter);
+        }
+        counter++;
         //List<String> annotationGraphKey = 
         key.retrieveKey(resultSet);
 
@@ -165,7 +172,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         if (!resultSet.wasNull())
         {
           nodeByPre.put(new RankID(componentID, pre), node);
-          createRelation(resultSet, graph, nodeByPre, node);
+          createRelation(resultSet, graph, nodeByPre, node, numberOfEdges);
         }
       } // end while new result row
 
@@ -372,8 +379,22 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       }
       else
       {
-        SStructure struct = SaltFactory.eINSTANCE.createSStructure();
-        node = struct;
+        // check if we have span, early detection of spans will spare
+        // us calls to recreateNode() which is quite costly since it
+        // removes nodes/edges and this is something Salt does not handle
+        // efficiently
+        String edgeType = stringValue(resultSet, COMPONENT_TABLE, "type");
+        if("c".equals(edgeType))
+        {
+          SSpan span = SaltFactory.eINSTANCE.createSSpan();
+          node = span;
+        }
+        else
+        {
+          // default fallback is a SStructure
+          SStructure struct = SaltFactory.eINSTANCE.createSStructure();
+          node = struct;
+        }
       }
 
       node.setSName(name);
@@ -398,7 +419,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList[matchedNode-1] = node.getSName();
+        keyNameList[matchedNode-1] = node.getSId();
       }
 
       // map layer
@@ -498,7 +519,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       return oldNode;
     }
-
+    
     SStructuredNode node = oldNode;
 
     if (clazz == SSpan.class)
@@ -564,28 +585,24 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     graph.addNode(to);
     
     // fix old edges
-    if(inEdges != null)
+    for(Edge e : inEdges)
     {
-      for(Edge e : inEdges)
+      if(e instanceof SRelation)
       {
-        if(e instanceof SRelation)
-        {
-          ((SRelation) e).setSTarget(to);
-          graph.addSRelation((SRelation) e);
-        }
+        ((SRelation) e).setSTarget(to);
+        graph.addSRelation((SRelation) e);
       }
     }
-    if(outEdges != null)
+    
+    for(Edge e : outEdges)
     {
-      for(Edge e : outEdges)
+      if(e instanceof SRelation)
       {
-        if(e instanceof SRelation)
-        {
-          ((SRelation) e).setSSource(to);
-          graph.addSRelation((SRelation) e);
-        }
+        ((SRelation) e).setSSource(to);
+        graph.addSRelation((SRelation) e);
       }
     }
+
 
     for (SAnnotation anno : from.getSAnnotations())
     {
@@ -647,17 +664,21 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private SRelation createNewRelation(SDocumentGraph graph, SStructuredNode sourceNode, 
     SNode targetNode, String edgeName, String type, long componentID, 
     SLayer layer, long parent, long pre,
-    FastInverseMap<RankID, SNode> nodeByPre)
+    FastInverseMap<RankID, SNode> nodeByPre, AtomicInteger numberOfEdges)
   {
     SRelation rel = null;
     // create new relation
     if ("d".equals(type))
     {
       SDominanceRelation domrel = SaltFactory.eINSTANCE.createSDominanceRelation();
+      // always set a name by ourself since the SDocumentGraph#basicAddEdge() 
+      // functions otherwise real slow
+      domrel.setSName("sDomRel"+numberOfEdges.incrementAndGet());
       rel = domrel;
 
       if (sourceNode != null && !(sourceNode instanceof SStructure))
       {
+        log.debug("Mismatched source type: should be SStructure");
         SNode oldNode = sourceNode;
         sourceNode = recreateNode(SStructure.class, sourceNode);
         updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
@@ -666,10 +687,14 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     else if ("c".equals(type))
     {
       SSpanningRelation spanrel = SaltFactory.eINSTANCE.createSSpanningRelation();
+      // always set a name by ourself since the SDocumentGraph#basicAddEdge() 
+      // functions otherwise real slow
+      spanrel.setSName("sSpanRel"+numberOfEdges.incrementAndGet());
       rel = spanrel;
 
       if (sourceNode != null && !(sourceNode instanceof SSpan))
       {
+        log.debug("Mismatched source type: should be SSpan");
         SNode oldNode = sourceNode;
         sourceNode = recreateNode(SSpan.class, sourceNode);
         updateMapAfterRecreatingNode(oldNode,  sourceNode, nodeByPre);
@@ -678,6 +703,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     else if ("p".equals(type))
     {
       SPointingRelation pointingrel = SaltFactory.eINSTANCE.createSPointingRelation();
+      pointingrel.setSName("sPointingRel"+numberOfEdges.incrementAndGet());
       rel = pointingrel;
     }
     else
@@ -755,7 +781,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
 
   private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
-    FastInverseMap<RankID, SNode> nodeByPre, SNode targetNode) throws
+    FastInverseMap<RankID, SNode> nodeByPre, SNode targetNode, AtomicInteger numberOfEdges) throws
     SQLException
   {
     long parent = longValue(resultSet, RANK_TABLE, "parent");
@@ -798,7 +824,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (rel == null)
       {
         rel = createNewRelation(graph, sourceNode, targetNode, edgeName, type, 
-          componentID, layer, parent, pre, nodeByPre);
+          componentID, layer, parent, pre, nodeByPre, numberOfEdges);
       } // end if no existing relation
 
       // add edge annotations

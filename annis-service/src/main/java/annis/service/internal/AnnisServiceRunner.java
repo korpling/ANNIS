@@ -15,7 +15,6 @@
  */
 package annis.service.internal;
 
-import java.io.IOException;
 import annis.AnnisBaseRunner;
 import annis.AnnisXmlContextHelper;
 import annis.exceptions.AnnisException;
@@ -40,8 +39,6 @@ import org.eclipse.jetty.util.thread.ExecutorThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.io.support.ResourcePropertySource;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -192,6 +189,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
+      // enable gzip compression
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
       

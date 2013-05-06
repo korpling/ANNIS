@@ -17,6 +17,7 @@ package annis.gui.widgets.grid;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
 import com.vaadin.server.PaintException;
 import com.vaadin.server.PaintTarget;
 import com.vaadin.ui.AbstractComponent;
@@ -30,44 +31,60 @@ import java.util.Map;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-
 public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {
 
   private Map<String, ArrayList<Row>> rowsByAnnotation;
+
   private transient MediaController mediaController;
+
+  private transient PDFController pdfController;
+
   private String resultID;
 
-  public AnnotationGrid(MediaController mediaController, String resultID)
+  private int tokenIndexOffset;
+
+  public AnnotationGrid(MediaController mediaController,
+    PDFController pdfController, String resultID)
   {
     this.mediaController = mediaController;
+    this.pdfController = pdfController;
     this.resultID = resultID;
+    this.tokenIndexOffset = 0;
   }
 
   @Override
   public void changeVariables(Object source,
     Map<String, Object> variables)
   {
-    
-    if(variables.containsKey("play"))
+
+    if (variables.containsKey("play"))
     {
-      if(mediaController != null && resultID != null)
+      if (mediaController != null && resultID != null)
       {
         String playString = (String) variables.get("play");
         String[] split = playString.split("-");
-        if(split.length == 1)
+
+        if (split.length == 1)
         {
           mediaController.play(resultID, Double.parseDouble(split[0]));
         }
-        else if(split.length == 2)
+        else if (split.length == 2)
         {
-          mediaController.play(resultID, 
+          mediaController.play(resultID,
             Double.parseDouble(split[0]), Double.parseDouble(split[1]));
         }
       }
     }
+
+    if (variables.containsKey("openPDF"))
+    {
+      if (pdfController != null && resultID != null)
+      {
+        pdfController.openPDF(resultID, (String) variables.get("openPDF"));
+      }
+    }
   }
-  
 
   @Override
   public void paintContent(PaintTarget target) throws PaintException
@@ -85,7 +102,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order
-          Collections.sort(rowEvents, new Comparator<GridEvent>() 
+          Collections.sort(rowEvents, new Comparator<GridEvent>()
           {
             @Override
             public int compare(GridEvent o1, GridEvent o2)
@@ -93,23 +110,28 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
               return ((Integer) o1.getLeft()).compareTo(o2.getLeft());
             }
           });
-          
+
           target.startTag("events");
           for (GridEvent event : rowEvents)
           {
             target.startTag("event");
             target.addAttribute("id", event.getId());
-            target.addAttribute("left", event.getLeft());
-            target.addAttribute("right", event.getRight());
+            target.addAttribute("left", event.getLeft() - tokenIndexOffset);
+            target.addAttribute("right", event.getRight() - tokenIndexOffset);
             target.addAttribute("value", event.getValue());
-            
-            if(event.getStartTime() != null)
+
+            if (event.getStartTime() != null)
             {
               target.addAttribute("startTime", event.getStartTime());
-              if(event.getEndTime() != null)
+              if (event.getEndTime() != null)
               {
                 target.addAttribute("endTime", event.getEndTime());
               }
+            }
+
+            if (event.getPageNumber() != null)
+            {
+              target.addAttribute("openPDF", event.getPageNumber());
             }
 
             ArrayList<String> styles = getStyles(event, anno.getKey());
@@ -142,7 +164,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("token");
     }
-    else if(event.isGap())
+    else if (event.isGap())
     {
       styles.add("gap");
     }
@@ -150,19 +172,18 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("single_event");
     }
-    
+
     if (event.getMatch() != null)
     {
       // re-use the style from KWIC, which means we have to add a vaadin-specific
       // prefix
-      styles.add("v-table-cell-content-" 
+      styles.add("v-table-cell-content-"
         + MatchedNodeColors.colorClassByMatch(event.getMatch()));
     }
 
 
     return styles;
   }
-  
 
   public Map<String, ArrayList<Row>> getRowsByAnnotation()
   {
@@ -172,5 +193,21 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   public void setRowsByAnnotation(Map<String, ArrayList<Row>> rowsByAnnotation)
   {
     this.rowsByAnnotation = rowsByAnnotation;
+  }
+
+  public int getTokenIndexOffset()
+  {
+    return tokenIndexOffset;
+  }
+
+  /**
+   * Set an offset for the token index. It is assumed that firstNodeLeft -
+   * offset == 0.
+   *
+   * @param tokenIndexOffset
+   */
+  public void setTokenIndexOffset(int tokenIndexOffset)
+  {
+    this.tokenIndexOffset = tokenIndexOffset;
   }
 }

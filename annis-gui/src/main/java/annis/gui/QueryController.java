@@ -51,12 +51,12 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Manages all the query related actions.
- * 
+ *
  * <strong>This class is not reentrant.</strong>
  * It is expected that you call the functions from the Vaadin session lock context,
  * either implicitly (e.g. from a component constructor or a handler callback)
  * or explicitly with {@link VaadinSession#lock() }.
- * 
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class QueryController implements PagingCallback, Refresher.RefreshListener
@@ -64,23 +64,23 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   private static final Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
 
   private SearchUI ui;
-  
+
   private PagedResultQuery lastQuery;
   private ListOrderedSet<HistoryEntry> history;
   private ResultViewPanel lastResultView;
   private FrequencyResultPanel lastFrequencyView;
   private MatchAndDocumentCount lastCount;
-  
+
   private Future<MatchAndDocumentCount> futureCount;
   private Future<List<Match>> futureMatches;
- 
-  
+
+
   public QueryController(SearchUI ui)
   {
-    this.ui = ui;    
+    this.ui = ui;
     this.history = new ListOrderedSet<HistoryEntry>();
   }
-  
+
   public void updateCorpusSetList()
   {
     ui.getControlPanel().getCorpusList().updateCorpusSetList();
@@ -95,7 +95,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   {
     setQuery(new Query(query, ui.getControlPanel().getCorpusList().getSelectedCorpora()));
   }
-  
+
   public void setQuery(Query query)
   {
     PagedResultQuery paged = new PagedResultQuery(
@@ -108,15 +108,15 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     );
     setQuery(paged);
   }
-  
+
   public void setQuery(PagedResultQuery query)
   {
     // only allow offset at multiples of the limit size
     query.setOffset(query.getOffset() - (query.getOffset() % query.getLimit()));
-    
+
     lastQuery = query;
-    
-    
+
+
     ui.getControlPanel().getQueryPanel().setQuery(query.getQuery());
     ui.getControlPanel().getSearchOptions().setLeftContext(query.
       getContextLeft());
@@ -130,23 +130,23 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
     }
   }
-  
+
   public void executeQuery()
   {
     executeQuery(true, true);
   }
-  
+
   /**
    * Cancel queries from the client side.
-   * 
-   * Important: This does not magically cancel the query on the server side, 
+   *
+   * Important: This does not magically cancel the query on the server side,
    * so don't use this to implement a "real" query cancelation.
    */
   private void cancelQueries()
   {
     // don't spin forever when canceled
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-    
+
     if(lastResultView != null && lastQuery != null)
     {
       // explicitly show empty result
@@ -155,7 +155,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         lastQuery.getContextRight(), lastQuery.getSegmentation(),
         lastQuery.getOffset());
     }
-    
+
     // disable the refresher
     ui.setRefresherEnabled(false);
 
@@ -167,21 +167,21 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     if(futureMatches != null && !futureMatches.isDone())
     {
       futureMatches.cancel(true);
-      
+
     }
-    
+
     futureCount = null;
     futureMatches = null;
-    
+
   }
-  
+
   public void executeQuery(boolean executeCount, boolean executeResult)
   {
 
     Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
 
     cancelQueries();
-    
+
     // cleanup resources
     VaadinSession session = VaadinSession.getCurrent();
     session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
@@ -189,10 +189,9 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     {
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
-    
-    
+
     ui.updateFragment(lastQuery);
-    
+
     HistoryEntry e = new HistoryEntry();
     e.setCorpora(lastQuery.getCorpora());
     e.setQuery(lastQuery.getQuery());
@@ -213,11 +212,11 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
       return;
     }
-    
+
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
-      
+
     if(executeResult)
-    { 
+    {
       // remove old result from view
       if (lastResultView != null)
       {
@@ -226,29 +225,29 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       lastResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
       ui.getMainTab().addTab(lastResultView, "Query Result");
       ui.getMainTab().setSelectedTab(lastResultView);
-      
+
        futureMatches = res.path("query").path("search").path("find")
         .queryParam("q", lastQuery.getQuery())
         .queryParam("offset", "" + lastQuery.getOffset())
-        .queryParam("limit", "" + lastQuery.getLimit())         
+        .queryParam("limit", "" + lastQuery.getLimit())
         .queryParam("corpora", StringUtils.join(lastQuery.getCorpora(), ","))
         .get(new MatchListType());
-       
+
        ui.setRefresherEnabled(true);
 
     }
-    
+
     if (executeCount)
     {
       // start count query
       ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
-      
+
       futureCount = res.path("query").path("search").path("count").
         queryParam(
         "q", lastQuery.getQuery()).queryParam("corpora",
         StringUtils.join(lastQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
-      
+
       ui.setRefresherEnabled(true);
     }
   }
@@ -286,14 +285,15 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   {
     ui.getControlPanel().getSearchOptions()
       .updateSegmentationList(ui.getControlPanel().getCorpusList().getSelectedCorpora());
+    
   }
-  
-  
+
+
   public Set<String> getSelectedCorpora()
   {
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
   }
-  
+
   public PagedResultQuery getQuery()
   {
     return lastQuery;
@@ -306,7 +306,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     {
       lastQuery.setOffset(offset);
       lastQuery.setLimit(limit);
-      
+
       // execute the result query again
       executeQuery(false, true);
       if(lastResultView != null && lastCount != null)
@@ -315,7 +315,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       }
     }
   }
-  
+
   /**
    * Returns true if any query (count or find) is running.
    */
@@ -337,21 +337,21 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     {
       matchFinished = checkFutureMatchesFinished();
     }
-    
+
     // initialize to true value in case futureCount is null
     boolean countFinished = true;
     if(futureCount != null)
     {
       countFinished = checkFutureCount();
     }
-    
+
     if(matchFinished && countFinished)
     {
       // we are finished loading the results, do not refresh any longer
       ui.setRefresherEnabled(false);
     }
   }
-  
+
   private boolean checkFutureMatchesFinished()
   {
     List<Match> result = null;
@@ -393,7 +393,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         {
           log.error("Unexcepted ExecutionException cause", root);
         }
-        
+
       }
     }
     catch (TimeoutException ex)
@@ -401,20 +401,20 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       // we ignore this
       return false;
     }
-    
+
     lastResultView.setResult(result,
       lastQuery.getContextLeft(),
       lastQuery.getContextRight(), lastQuery.getSegmentation(),
       lastQuery.getOffset());
     futureMatches = null;
-    
+
     return true;
   }
-  
+
   private boolean checkFutureCount()
   {
     try
-    {   
+    {
       lastCount = futureCount.get(100, TimeUnit.MILLISECONDS);
       String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
       String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
@@ -435,7 +435,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     catch (ExecutionException root)
     {
       Throwable cause = root.getCause();
-      
+
       if(cause instanceof UniformInterfaceException)
       {
         UniformInterfaceException ex = (UniformInterfaceException) cause;
@@ -473,11 +473,11 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       return false;
     }
 
-    futureCount = null;    
+    futureCount = null;
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     return true;
   }
-    
+
   private static class MatchListType extends GenericType<List<Match>>
   {
 
@@ -485,6 +485,4 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     {
     }
   }
-  
-  
 }

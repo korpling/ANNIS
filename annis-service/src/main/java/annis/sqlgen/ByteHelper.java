@@ -15,23 +15,23 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
   
   private static final int[] ARG_TYPES = new int [] {
-    Types.INTEGER, Types.INTEGER,
+    Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, 
     Types.VARCHAR, Types.VARCHAR, Types.VARCHAR
   };
   
 
   public static final String SQL =
-        "SELECT\n"
-      + "  substring(file from ? for ?) AS partfile,\n"
-      + "  bytes, title, mime_type, sub.name as corpus_name\n"
-      + "FROM media_files, corpus AS sub, corpus AS top \n"
-      + "WHERE\n"
-      + "  top.top_level = true AND\n"
-      + "  top.name = ? AND\n"
-      + "  sub.name = ? AND\n"
-      + "  sub.pre >= top.pre AND sub.post <= top.post AND\n"
-      + "  sub.id = corpus_ref AND\n"
-      + "  mime_type = ?";
+      "SELECT\n"
+    + "filename, title, mime_type, sub.name as corpus_name\n"
+    + "FROM media_files, corpus AS sub, corpus AS top \n"
+    + "WHERE\n"
+    + "  top.top_level = true AND\n"
+    + "  top.name = ? AND\n"
+    + "  sub.name = ? AND\n"
+    + "  sub.pre >= top.pre AND sub.post <= top.post AND\n"
+    + "  sub.id = corpus_ref AND\n"
+    + "  (? IS NULL OR mime_type = ?) AND \n"
+    + "  (? IS NULL OR title = ?)";
   ;
   
   public static int[] getArgTypes()
@@ -40,11 +40,11 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
   }
   
   public Object[] getArgs(String toplevelCorpusName, String corpusName, 
-    String mimeType, int offset, int length)
+    String mimeType, String title, int offset, int length)
   {
     return new Object[] 
     {
-      offset, length, toplevelCorpusName, corpusName, mimeType
+      toplevelCorpusName, corpusName, mimeType, mimeType, title, title
     }; 
 
   }
@@ -58,11 +58,10 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
     {
       while (rs.next())
       {
-        ab.setBytes(rs.getBytes("partfile"));
+        ab.setLocalFileName(rs.getString("filename"));
         ab.setFileName(rs.getString("title"));
         ab.setCorpusName(rs.getString("corpus_name"));
         ab.setMimeType(rs.getString("mime_type"));
-        ab.setLength(rs.getInt("bytes"));
         // we only give one matching result back
         break;
       }
