@@ -661,7 +661,12 @@
     border-collapse: collapse;
     border-spacing: 0;
     overflow-x: hidden;
- }
+  }
+
+  .example-queries-table tr.v-selected {
+    background : grey;
+    color : #ECF0F6;
+  }
 
   .example-queries-table .v-table-body td {
     border: 1px solid #ECF0F6;
