@@ -18,7 +18,6 @@ package annis.gui.controlpanel;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
-import annis.gui.exporter.GeneralTextExporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
@@ -28,6 +27,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -65,12 +65,14 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private ComboBox cbLeftContext;
   private ComboBox cbRightContext;
   private TextField txtParameters;
+  private Button btDownload;
   private Button btExport;
   private Map<String, Exporter> exporterMap;
   private QueryPanel queryPanel;
   private CorpusListPanel corpusListPanel;
   private File tmpOutputFile;
   private ProgressIndicator progressIndicator;
+  private FileDownloader downloader;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
@@ -131,10 +133,20 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "(‘?’ button above) for specific parameter settings.");
     addComponent(new HelpButton(txtParameters));
 
+    
     btExport = new Button("Perform Export");
+    btExport.setIcon(new ThemeResource("tango-icons/16x16/media-playback-start.png"));
     btExport.setDisableOnClick(true);
     btExport.addClickListener((Button.ClickListener) this);
-    addComponent(btExport);
+    
+    btDownload = new Button("Download");
+    btDownload.setDescription("Click here to start the actual download.");
+    btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+    btDownload.setDisableOnClick(true);
+    btDownload.setEnabled(false);
+    
+    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btDownload);
+    addComponent(layoutExportButtons);
     
     progressIndicator = new ProgressIndicator();
     progressIndicator.setEnabled(false);
@@ -223,30 +235,18 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             }
             else
             {
-              // show a message with a download link
-              Button btDownload = new Button("Click here to start the download.");
-              btDownload.setStyleName(ChameleonTheme.BUTTON_BIG);
-              
-              final Window w = new Window("Export finished", btDownload);
-              FileDownloader downloader = new FileDownloader(new FileResource(
-                tmpOutputFile));
-              downloader.extend(btDownload);
-              w.setClosable(true);
-              w.setModal(true);
-              w.setResizable(false);
-              
-              UI.getCurrent().addWindow(w);
-              w.center();
-              
-              btDownload.addClickListener(new Button.ClickListener() 
+              if(downloader != null && btDownload.getExtensions().contains(downloader))
               {
-                @Override
-                public void buttonClick(ClickEvent event)
-                {
-                  UI.getCurrent().removeWindow(w);
-                  btExport.setEnabled(true);
-                }
-              });
+                btDownload.removeExtension(downloader);
+              }
+              downloader = new FileDownloader(new FileResource(
+                tmpOutputFile));
+             
+              downloader.extend(btDownload);
+              btDownload.setEnabled(true);
+              
+              Notification.show("Export finished", "Click on the button right to the export button to actually download the file.",
+                Notification.Type.HUMANIZED_MESSAGE);
             }
           }
           finally
