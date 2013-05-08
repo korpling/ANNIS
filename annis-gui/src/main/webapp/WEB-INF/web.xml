@@ -8,7 +8,7 @@
   </context-param>
   <servlet>
     <servlet-name>Search</servlet-name>
-    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
+    <servlet-class>annis.gui.AnnisServlet</servlet-class>
     <init-param>
       <param-name>UI</param-name>
       <param-value>annis.gui.SearchUI</param-value>
