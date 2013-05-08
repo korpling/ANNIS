@@ -60,25 +60,9 @@ public class AnnisServlet extends VaadinServlet
     public void modifyBootstrapFragment(BootstrapFragmentResponse response)
     {
       List<Node> fragments = response.getFragmentNodes();
-      ListIterator<Node> it = response.getFragmentNodes().listIterator();
-      while(it.hasNext())
-      {
-        Node n = it.next();
-        if(n instanceof Element)
-        {
-          Element e = (Element) n;
-          if("div".equals(e.tag().getName()) && e.hasAttr("class") && e.attr(
-            "class").equals("v-app"))
-          {
-            // remove this div
-            it.remove();
-            Element newDiv = new Element(Tag.valueOf("div"), "");
-            newDiv.append("ANNIS is being to be loaded");
-            
-            it.add(newDiv);
-          }
-        }
-      }
+      Element newDiv = new Element(Tag.valueOf("div"), "");
+      newDiv.append("ANNIS is being to be loaded");
+      fragments.add(newDiv);
     }
 
     @Override
