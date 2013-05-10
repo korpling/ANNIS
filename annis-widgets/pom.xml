@@ -64,7 +64,7 @@
           <extraJvmArgs>-Xmx512M -Xss1024k</extraJvmArgs>
           <!-- <runTarget>mobilemail</runTarget> -->
           <!-- We are doing "inplace" but into subdir VAADIN/widgetsets. This 
-    						way compatible with Vaadin eclipse plugin. -->
+          way compatible with Vaadin eclipse plugin. -->
           <webappDirectory>${project.build.outputDirectory}/VAADIN/widgetsets
           </webappDirectory>
           <hostedWebapp>${project.build.outputDirectory}/VAADIN/widgetsets
@@ -83,7 +83,7 @@
             <configuration>
               <!-- if you don't specify any modules, the plugin will find them -->
               <!-- <modules> <module>com.vaadin.demo.mobilemail.gwt.ColorPickerWidgetSet</module> 
-      								</modules> -->
+              </modules> -->
             </configuration>
             <goals>
               <goal>resources</goal>
@@ -93,6 +93,7 @@
           </execution>
         </executions>
       </plugin>
+      
     </plugins>
 
     <!-- This is needed for the sources required by the GWT compiler to be included in the produced JARs -->
@@ -155,6 +156,11 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+    <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client-compiler</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
     <dependency>
