@@ -162,6 +162,32 @@
           
         </configuration>
       </plugin>
+      
+      <!-- workaround for automatically compile SCSS file in maven
+      http://dev.vaadin.com/ticket/10291
+      -->
+      <plugin>
+        <groupId>org.codehaus.mojo</groupId>
+        <artifactId>exec-maven-plugin</artifactId>
+        <version>1.2.1</version>
+        <executions>
+          <execution>
+            <phase>generate-sources</phase>
+            <goals>
+              <goal>java</goal>
+            </goals>
+            <configuration>
+              <classpathScope>compile</classpathScope>
+              <mainClass>com.vaadin.sass.SassCompiler</mainClass>
+              <arguments>
+                <argument>${project.baseUri}/src/main/webapp/VAADIN/themes/annis/styles.scss</argument>
+                <argument>${project.baseUri}/src/main/webapp/VAADIN/themes/annis/styles.css</argument>
+              </arguments>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+      
     </plugins>
   </build>
 
