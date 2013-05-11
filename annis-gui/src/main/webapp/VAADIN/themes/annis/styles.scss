@@ -1,6 +1,19 @@
 @import "annis.scss";
 
+.v-app {
+  width: 100%;
+  height: 100%;
+}
+
+.v-app-loading {
+  background-image: url(annisloading.gif);
+  background-repeat: no-repeat;
+  background-position: 50%;
+  width: 100%;
+  height: 100%;
+}
+
 .annis {
- @include annis;
+  @include annis;
 }
 
