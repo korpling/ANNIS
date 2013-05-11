@@ -423,7 +423,11 @@ public class VisualizerPanel extends VerticalLayout
               {
                 btEntry.setEnabled(true);
                 vis.setVisible(true);
-                addComponent(vis);
+                // add if not already added
+                if(getComponentIndex(vis) < 0)
+                {
+                  addComponent(vis);
+                }
               }
             }
             finally
