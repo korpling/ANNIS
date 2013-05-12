@@ -50,6 +50,7 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
+import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.vaadin.cssinject.CSSInject;
 
 /**
@@ -61,6 +62,13 @@ import org.vaadin.cssinject.CSSInject;
 @Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 {
+  
+  static
+  {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisBaseUI.class);
 
