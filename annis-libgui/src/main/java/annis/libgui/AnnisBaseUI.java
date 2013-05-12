@@ -88,11 +88,16 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private transient TreeSet<String> alreadyAddedCSS;
 
-  @Override
-  protected void init(VaadinRequest request)
+  public AnnisBaseUI()
   {
     initLogging();
-    
+  }
+
+  
+  
+  @Override
+  protected void init(VaadinRequest request)
+  {  
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
@@ -256,7 +261,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
 
-  protected void initLogging()
+  protected final void initLogging()
   {
     SLF4JBridgeHandler.removeHandlersForRootLogger();
     SLF4JBridgeHandler.install();
