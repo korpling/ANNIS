@@ -50,7 +50,6 @@ import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
-import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.vaadin.cssinject.CSSInject;
 
 /**
@@ -62,7 +61,6 @@ import org.vaadin.cssinject.CSSInject;
 @Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 {
-
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisBaseUI.class);
 
@@ -87,17 +85,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
-
-  public AnnisBaseUI()
-  {
-    initLogging();
-  }
-
-  
   
   @Override
   protected void init(VaadinRequest request)
   {  
+    initLogging();
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
@@ -263,9 +255,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   protected final void initLogging()
   {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-
     try
     {
       

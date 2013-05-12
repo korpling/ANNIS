@@ -124,13 +124,6 @@
       <scope>compile</scope>
     </dependency>
     
-    <!-- redirect all java util logging to slfj4 -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jul-to-slf4j</artifactId>
-      <version>1.7.5</version>
-      <scope>compile</scope>
-    </dependency>
     
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
