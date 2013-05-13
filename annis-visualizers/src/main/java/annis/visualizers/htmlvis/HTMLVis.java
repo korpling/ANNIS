@@ -21,8 +21,8 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -48,6 +48,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
@@ -110,10 +111,12 @@ public class HTMLVis extends AbstractVisualizer<Panel>
      List<AnnisBinaryMetaData> binaryMeta = 
        resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
     
+    InputStream inStreamConfig = null;
+    InputStream inStreamCSS = null;
     try
     {
       String visConfigName = vi.getMappings().getProperty("config");
-      InputStream inStreamConfig = null;
+      
       if(visConfigName == null)
       {
         inStreamConfig = HTMLVis.class.getResourceAsStream("defaultvis.config");
@@ -129,9 +132,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
               "query/corpora/").path(corpusName).path(corpusName)
               .path("binary").path("0").path("" + m.getLength())
               .queryParam("title", m.getFileName());
-            AnnisBinary binary = resBinary.get(AnnisBinary.class);
-            
-            inStreamConfig = new ByteArrayInputStream(binary.getBytes());
+            ClientResponse response = resBinary.get(ClientResponse.class);
+            inStreamConfig = response.getEntityInputStream();
             break;
           }
         }
@@ -157,7 +159,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         lblResult.addStyleName(labelClass);
         
         // TODO: do not add CSSInject multiple times
-        InputStream inStreamCSS = null;
         if(visConfigName == null)
         {
            inStreamCSS = HTMLVis.class.getResourceAsStream("htmlvis.css");
@@ -173,9 +174,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
                 "query/corpora/").path(corpusName).path(corpusName)
                 .path("binary").path("0").path("" + m.getLength())
                 .queryParam("title", m.getFileName());
-              AnnisBinary binary = resBinary.get(AnnisBinary.class);
-
-              inStreamCSS = new ByteArrayInputStream(binary.getBytes());
+              ClientResponse response = resBinary.get(ClientResponse.class);
+              inStreamCSS = response.getEntityInputStream();
               break;
             }
           }
@@ -204,6 +204,29 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       log.error("Could not parse the HTML visualization configuration file", ex);
       Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
         Notification.Type.ERROR_MESSAGE);
+    }
+    finally
+    {
+      if(inStreamConfig != null)
+      {
+        try
+        {
+          inStreamConfig.close();
+        }
+        catch (IOException ex)
+        {
+        }
+      }
+      if(inStreamCSS != null)
+      {
+        try
+        {
+          inStreamCSS.close();
+        }
+        catch (IOException ex)
+        {
+        }
+      }
     }
 
     

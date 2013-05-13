@@ -18,9 +18,9 @@ package annis.gui.servlets;
 import annis.libgui.Helper;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -36,6 +36,7 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -244,10 +245,9 @@ public class BinaryServlet extends HttpServlet
     {
       int stepLength = Math.min(MAX_LENGTH, remaining);
 
-      AnnisBinary bin = binaryRes.path("" + offset).path("" + stepLength).get(AnnisBinary.class);
-      Validate.isTrue(bin.getLength() == stepLength);
-
-      out.write(bin.getBytes());
+      ClientResponse response = binaryRes.path("" + offset).path("" + stepLength).get(ClientResponse.class);
+      int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
+      Validate.isTrue(copiedBytes == stepLength);
       out.flush();
 
       offset += stepLength;

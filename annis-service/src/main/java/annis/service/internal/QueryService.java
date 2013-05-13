@@ -547,6 +547,7 @@ public class QueryService
           {
             output.write(c);
           }
+          output.flush();
           output.close();
         }
         finally
