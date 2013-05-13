@@ -61,6 +61,7 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import org.apache.commons.io.IOUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -542,11 +543,7 @@ public class QueryService
       {
         try
         {
-          int c;
-          while((c = stream.read()) > -1)
-          {
-            output.write(c);
-          }
+          IOUtils.copy(stream, output);
           output.flush();
           output.close();
         }
