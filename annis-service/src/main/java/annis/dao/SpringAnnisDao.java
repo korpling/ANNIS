@@ -844,9 +844,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public InputStream getBinary(String toplevelCorpusName, String corpusName,
     String mimeType, String title, int offset, int length)
   {
-    // correct the API inconsistency
-    offset = offset - 1;
-
     AnnisBinaryMetaData binary =
       (AnnisBinaryMetaData) getJdbcTemplate().query(ByteHelper.SQL,
       byteHelper.

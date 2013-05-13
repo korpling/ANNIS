@@ -511,7 +511,6 @@ public class QueryService
    */
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
-  @Produces("application/octet-stream")
   public Response binary(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
@@ -526,6 +525,21 @@ public class QueryService
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
 
+    // if mime type was not set query it
+    if(mimeType == null)
+    {
+      List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
+        corpusName);
+      if(meta.size() > 0)
+      {
+        mimeType = meta.get(0).getMimeType();
+      }
+      else
+      {
+        mimeType = "application/octet-stream";
+      }
+    }
+    
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
       + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
@@ -533,7 +547,7 @@ public class QueryService
 
     final InputStream stream = annisDao.
       getBinary(toplevelCorpusName, corpusName, mimeType, title,
-      offset + 1, length);
+      offset, length);
 
     log.debug("fetch successfully");
     StreamingOutput result = new StreamingOutput()
@@ -545,7 +559,6 @@ public class QueryService
         {
           IOUtils.copy(stream, output);
           output.flush();
-          output.close();
         }
         finally
         {
@@ -554,7 +567,7 @@ public class QueryService
       }
     };
     
-    return Response.ok(result).build();
+    return Response.ok(result, mimeType).build();
   }
 
   /**
