@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -375,6 +376,7 @@ public class QueryService
   {
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
     List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+
     // filter by which corpora the user is allowed to access
     Subject user = SecurityUtils.getSubject();
     for (AnnisCorpus c : allCorpora)
@@ -384,6 +386,7 @@ public class QueryService
         allowedCorpora.add(c);
       }
     }
+
     return allowedCorpora;
   }
 
@@ -526,7 +529,7 @@ public class QueryService
     AnnisBinary bin;
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
+      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " "
       + (mimeType == null ? "" : mimeType));
 
     bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
@@ -548,19 +551,38 @@ public class QueryService
   public List<ExampleQuery> getExampleQueries(
     @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
   {
+
     try
     {
+      String[] corpusNames;
       if (rawCorpusNames != null)
       {
-        String[] corpusNames = rawCorpusNames.split(",");
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(Arrays.asList(
-          corpusNames));
-        return annisDao.getExampleQueries(corpusIDs);
+        corpusNames = rawCorpusNames.split(",");
       }
       else
       {
-        return annisDao.getExampleQueries(null);
+        List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+        corpusNames = new String[allCorpora.size()];
+        for (int i = 0; i < corpusNames.length; i++)
+        {
+          corpusNames[i] = allCorpora.get(i).getName();
+        }
       }
+
+      List<String> allowedCorpora = new ArrayList<String>();
+
+      // filter by which corpora the user is allowed to access
+      Subject user = SecurityUtils.getSubject();
+      for (String c : corpusNames)
+      {
+        if (user.isPermitted("query:*:" + c))
+        {
+          allowedCorpora.add(c);
+        }
+      }
+
+      List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(allowedCorpora);
+      return annisDao.getExampleQueries(corpusIDs);
     }
     catch (Exception ex)
     {
