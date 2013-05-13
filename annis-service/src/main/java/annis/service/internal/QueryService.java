@@ -29,7 +29,6 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
@@ -41,6 +40,8 @@ import annis.service.objects.SubgraphQuery;
 import annis.sqlgen.MatrixQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -59,6 +60,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -509,7 +511,7 @@ public class QueryService
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   @Produces("application/xml")
-  public AnnisBinary binary(
+  public StreamingOutput binary(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset,
@@ -523,17 +525,36 @@ public class QueryService
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
 
-    AnnisBinary bin;
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
       + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
       + (mimeType == null ? "" : mimeType));
 
-    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
+    final InputStream stream = annisDao.
+      getBinary(toplevelCorpusName, corpusName, mimeType, title,
       offset + 1, length);
 
     log.debug("fetch successfully");
-    return bin;
+    return new StreamingOutput()
+    {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        try
+        {
+          int c;
+          while((c = stream.read()) > -1)
+          {
+            output.write(c);
+          }
+          output.close();
+        }
+        finally
+        {
+          stream.close();
+        }
+      }
+    };
   }
 
   /**

@@ -1,6 +1,6 @@
 package annis.sqlgen;
 
-import annis.service.objects.AnnisBinary;
+import annis.service.objects.AnnisBinaryMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
@@ -9,7 +9,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-public class ByteHelper implements ResultSetExtractor<AnnisBinary>
+public class ByteHelper implements ResultSetExtractor<AnnisBinaryMetaData>
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ByteHelper.class);
@@ -50,10 +50,10 @@ public class ByteHelper implements ResultSetExtractor<AnnisBinary>
   }
 
   @Override
-  public AnnisBinary extractData(ResultSet rs) throws
+  public AnnisBinaryMetaData extractData(ResultSet rs) throws
     DataAccessException
   {
-    AnnisBinary ab = new AnnisBinary();
+    AnnisBinaryMetaData ab = new AnnisBinaryMetaData();
     try
     {
       while (rs.next())

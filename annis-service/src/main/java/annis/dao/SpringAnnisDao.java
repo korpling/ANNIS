@@ -25,7 +25,6 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
@@ -47,6 +46,7 @@ import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
@@ -54,6 +54,7 @@ import java.io.FileNotFoundException;
 import java.util.ListIterator;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -68,6 +69,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import org.apache.commons.io.input.BoundedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -82,9 +84,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
 {
-
-  private int maxFileBufferSize;
-
+  
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
 
@@ -841,20 +841,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
+  public InputStream getBinary(String toplevelCorpusName, String corpusName,
     String mimeType, String title, int offset, int length)
   {
     // correct the API inconsistency
     offset = offset - 1;
 
-    AnnisBinary binary =
-      (AnnisBinary) getJdbcTemplate().query(ByteHelper.SQL,
+    AnnisBinaryMetaData binary =
+      (AnnisBinaryMetaData) getJdbcTemplate().query(ByteHelper.SQL,
       byteHelper.
       getArgs(toplevelCorpusName, corpusName, mimeType, title, offset,
       length),
       ByteHelper.getArgTypes(), byteHelper);
 
-    FileInputStream fInput = null;
     try
     {
       // retrieve the requested part of the file from the data directory
@@ -862,18 +861,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
       long fileSize = dataFile.length();
 
-      // limit the maximum retrieved file size
-      length = Math.min(length, maxFileBufferSize);
       // do not make the array bigger as necessary
       length = (int) Math.min(fileSize - (long) offset, (long) length);
 
-      fInput = new FileInputStream(dataFile);
+      FileInputStream fInput = new FileInputStream(dataFile);
       fInput.skip(offset);
+      
+      BoundedInputStream boundedStream = new BoundedInputStream(fInput, offset+length);
 
-      // the the number of requested bytes
-      byte[] bytes = new byte[length];
-      fInput.read(bytes);
-      binary.setBytes(bytes);
+      return boundedStream;
     }
     catch (FileNotFoundException ex)
     {
@@ -883,22 +879,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       log.warn("Error when readin media file from the data directory", ex);
     }
-    finally
-    {
-      try
-      {
-        if (fInput != null)
-        {
-          fInput.close();
-        }
-      }
-      catch (IOException ex)
-      {
-        log.error(null, ex);
-      }
-    }
 
-    return binary;
+    return new ByteArrayInputStream(new byte[0]);
   }
 
   @Override
@@ -977,15 +959,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.externalFilesPath = externalFilesPath;
   }
 
-  public int getMaxFileBufferSize()
-  {
-    return maxFileBufferSize;
-  }
-
-  public void setMaxFileBufferSize(int maxFileBufferSize)
-  {
-    this.maxFileBufferSize = maxFileBufferSize;
-  }
 
   public ListExampleQueriesHelper getListExampleQueriesHelper()
   {
