@@ -24,7 +24,6 @@ import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.media.PDFController;
-import annis.libgui.PDFPageHelper;
 import static annis.model.AnnisConstants.*;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;

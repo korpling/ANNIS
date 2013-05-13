@@ -510,8 +510,8 @@ public class QueryService
    */
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
-  @Produces("application/xml")
-  public StreamingOutput binary(
+  @Produces("application/octet-stream")
+  public Response binary(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset,
@@ -535,7 +535,7 @@ public class QueryService
       offset + 1, length);
 
     log.debug("fetch successfully");
-    return new StreamingOutput()
+    StreamingOutput result = new StreamingOutput()
     {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException
@@ -556,6 +556,8 @@ public class QueryService
         }
       }
     };
+    
+    return Response.ok(result).build();
   }
 
   /**
