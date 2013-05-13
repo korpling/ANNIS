@@ -429,6 +429,10 @@ public class SearchUI extends AnnisBaseUI
     {
       pathInfo = pathInfo.substring(1);
     }
+    if(pathInfo != null && pathInfo.endsWith("/"))
+    {
+      pathInfo = pathInfo.substring(0, pathInfo.length()-1);
+    }
 
     Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
 
