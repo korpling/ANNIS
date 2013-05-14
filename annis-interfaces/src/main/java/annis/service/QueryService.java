@@ -45,15 +45,12 @@ public interface QueryService
    * chunks containing only a subset of the binary data.
    * </div>
    * 
-   * <h3>Method</h3>
-   * <div>GET</div>
-   * 
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{offset}</b>/<b>{length}</b></li>
-   * <li>annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary</li>
-   * <li>annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{file}</b>/<b>{offset}</b>/<b>{length}</b></li>
-   * <li>annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{file}</b></li>
+   * <li>GET annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{offset}</b>/<b>{length}</b></li>
+   * <li>GET annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary</li>
+   * <li>GET annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{file}</b>/<b>{offset}</b>/<b>{length}</b></li>
+   * <li>GET annis/query/corpora/<b>{top}</b>/<b>{document}</b>/binary/<b>{file}</b></li>
    * </ol>
    * 
    * <h3>MIME</h3>

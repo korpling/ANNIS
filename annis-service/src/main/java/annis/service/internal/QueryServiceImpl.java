@@ -48,7 +48,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -513,6 +515,45 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:meta:" + toplevelCorpusName);
     return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
   }
+  
+  @GET
+  @Path("corpora/{top}/{document}/binary/{offset}/{length}")
+  public Response binary1(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("offset") String rawOffset,
+    @PathParam("length") String rawLength)
+  {
+    return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, null);
+  }
+  @GET
+  @Path("corpora/{top}/{document}/binary")
+  public Response binary2(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName)
+  {
+    return binary(toplevelCorpusName, corpusName, null, null, null);
+  }
+  @GET
+  @Path("corpora/{top}/{document}/binary/{file}/{offset}/{length}")
+  public Response binary3(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("file") String file,
+    @PathParam("offset") String rawOffset,
+    @PathParam("length") String rawLength)
+  {
+    return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, file);
+  }
+  @GET
+  @Path("corpora/{top}/{document}/binary{file}")
+  public Response binary4(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("file") String file)
+  {
+    return binary(toplevelCorpusName, corpusName, null, null, file);
+  }
 
   /**
    * Get an Annis Binary object identified by its id.
@@ -522,21 +563,16 @@ public class QueryServiceImpl implements QueryService
    * @param rawLength how many bytes we take
    * @return AnnisBinary
    */
-  @GET
-  @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   @Override
   public Response binary(
-    @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String corpusName,
-    @PathParam("offset") String rawOffset,
-    @PathParam("length") String rawLength,
-    @QueryParam("title") String fileName)
+    String toplevelCorpusName,
+    String corpusName,
+    String rawOffset,
+    String rawLength,
+    String fileName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
-
-    int offset = Integer.parseInt(rawOffset);
-    int length = Integer.parseInt(rawLength);
 
     String acceptHeader = request.getHeader("Accept");
     if(acceptHeader == null || acceptHeader.isEmpty())
@@ -545,26 +581,29 @@ public class QueryServiceImpl implements QueryService
     }
     
     List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName, corpusName);
-    Set<String> mediaTypesFromSelectedBinaries = new LinkedHashSet<String>();
+    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<String, AnnisBinaryMetaData>();
     
     for(AnnisBinaryMetaData m : meta)
     {
       if(fileName == null)
       {
         // just add all available media types
-        mediaTypesFromSelectedBinaries.add(m.getMimeType());
+        if(!matchedMetaByType.containsKey(m.getMimeType()))
+        {
+          matchedMetaByType.put(m.getMimeType(), m);
+        }
       }
       else
       {
         // check if this binary has the right title/file name
         if(fileName.equals(m.getFileName()))
         {
-          mediaTypesFromSelectedBinaries.add(m.getMimeType());
+          matchedMetaByType.put(m.getMimeType(), m);
         }
       }
     }
     
-    if(mediaTypesFromSelectedBinaries.isEmpty())
+    if(matchedMetaByType.isEmpty())
     {
       return Response.status(Response.Status.NOT_FOUND)
         .entity("Requested binary not found")
@@ -573,16 +612,34 @@ public class QueryServiceImpl implements QueryService
 
     // find the best matching mime type
     String bestMediaTypeMatch =
-      MIMEParse.bestMatch(mediaTypesFromSelectedBinaries, acceptHeader);
+      MIMEParse.bestMatch(matchedMetaByType.keySet(), acceptHeader);
     if(bestMediaTypeMatch.isEmpty())
     {
       return Response.status(Response.Status.NOT_ACCEPTABLE)
         .entity("Client must accept one of the following media types: " 
-        + StringUtils.join(mediaTypesFromSelectedBinaries, ", "))
+        + StringUtils.join(matchedMetaByType.keySet(), ", "))
         .build();
     }
     MediaType mediaType = MediaType.valueOf(bestMediaTypeMatch);
 
+    int offset = 0;
+    int length = 0;
+    
+    if(rawLength == null || rawOffset == null)
+    {
+      // use matched binary meta data to get the complete file size
+      AnnisBinaryMetaData matchedBinary = matchedMetaByType.get(mediaType.toString());
+      if(matchedBinary != null)
+      {
+        length = matchedBinary.getLength();
+      }
+    }
+    else
+    {
+      // use the provided information
+      offset = Integer.parseInt(rawOffset);
+      length = Integer.parseInt(rawLength);
+    }
     
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
