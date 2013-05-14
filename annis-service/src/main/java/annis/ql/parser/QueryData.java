@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -30,7 +30,7 @@ import org.slf4j.LoggerFactory;
 
 public class QueryData implements Cloneable
 {
-  
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryData.class);
 	private List<List<QueryNode>> alternatives;
 	private List<Long> corpusList;
@@ -53,6 +53,7 @@ public class QueryData implements Cloneable
   {
     StringBuilder sb = new StringBuilder();
     Iterator<List<QueryNode>> itOr = getAlternatives().iterator();
+
     while(itOr.hasNext())
     {
       List<QueryNode> nextNodes = itOr.next();
@@ -159,7 +160,7 @@ public Set<Object> getExtensions() {
 public<T> List<T> getExtensions(Class<T> clazz)
 {
   List<T> result = new LinkedList<T>();
-  
+
   for(Object o : extensions)
   {
     if(clazz.isInstance(o))
@@ -167,7 +168,7 @@ public<T> List<T> getExtensions(Class<T> clazz)
       result.add((T) o);
     }
   }
-  
+
   return result;
 }
 

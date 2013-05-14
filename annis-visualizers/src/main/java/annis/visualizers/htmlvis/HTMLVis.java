@@ -1,18 +1,18 @@
 /*
- * Copyright 2013 SFB 632.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2013 SFB 632.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
@@ -23,8 +23,6 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
-import com.hp.gagawa.java.Document;
-import com.hp.gagawa.java.elements.Div;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -42,6 +40,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -56,15 +55,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * <p>
- * <strong>Mappings:</strong><br />
- * <ul>
- * <li>visconfigpath - path of the visualization configuration file</li>
- * </ul>
- * </p>
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
- */
+*
+* <p>
+* <strong>Mappings:</strong><br />
+* <ul>
+* <li>visconfigpath - path of the visualization configuration file</li>
+* </ul>
+* </p>
+* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+*/
 @PluginImplementation
 public class HTMLVis extends AbstractVisualizer<Panel>
 {
@@ -108,7 +107,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     WebResource resMeta = Helper.getAnnisWebResource().path(
       "query/corpora/").path(corpusName).path(corpusName) // HACK: use the corpus name as document name
       .path("binary/meta");
-     List<AnnisBinaryMetaData> binaryMeta = 
+     List<AnnisBinaryMetaData> binaryMeta =
        resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
     
     try
@@ -125,7 +124,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         for(AnnisBinaryMetaData m : binaryMeta)
         {
           if(title.equals(m.getFileName()))
-          {            
+          {
             WebResource resBinary = Helper.getAnnisWebResource().path(
               "query/corpora/").path(corpusName).path(corpusName)
               .path("binary").path("0").path("" + m.getLength())
@@ -140,9 +139,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       
       if(inStreamConfig == null)
       {
-        Notification.show("ERROR: html visualization configuration \"" 
-          + visConfigName 
-          +  "\" not found in database",Notification.Type.ERROR_MESSAGE);
+        Notification.show("ERROR: html visualization configuration \""
+          + visConfigName
+          + "\" not found in database",Notification.Type.ERROR_MESSAGE);
       }
       else
       {
@@ -197,13 +196,13 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     catch (IOException ex)
     {
       log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(),
         Notification.Type.ERROR_MESSAGE);
     }
     catch (VisParserException ex)
     {
       log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(),
         Notification.Type.ERROR_MESSAGE);
     }
 
@@ -272,9 +271,21 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       SortedSet<OutputItem> itemsStart = outputStartTags.get(i);
       if(itemsStart != null)
       {
-        for (OutputItem s : itemsStart)
+        Iterator<OutputItem> it = itemsStart.iterator();
+        boolean first=true;
+        while(it.hasNext())
         {
+          OutputItem s = it.next();
+          if(!first)
+          {
+            sb.append("-->");
+          }
+          first = false;
           sb.append(s.getOutputString());
+          if(it.hasNext())
+          {
+            sb.append("<!--\n");
+          }
         }
       }
       // then the end tags for this position, but inverse their order

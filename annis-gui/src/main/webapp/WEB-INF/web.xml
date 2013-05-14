@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <web-app id="WebApp_ID" version="2.5" xmlns="http://java.sun.com/xml/ns/javaee" xmlns:web="http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd">
   <display-name>Annis corpus Search gui</display-name>
+  <session-config>
+    <session-timeout>4</session-timeout>
+  </session-config>
+  <context-param>
+   <param-name>heartbeatInterval</param-name>
+   <param-value>60</param-value>
+  </context-param>
   <context-param>
     <description>Vaadin production mode</description>
     <param-name>productionMode</param-name>

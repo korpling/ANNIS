@@ -109,18 +109,10 @@
       </exclusions>
     </dependency>
     
-       <dependency>
+    <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>
-      <version>1.0.6</version>
-      <scope>compile</scope>
-    </dependency>
-    
-    <!-- provide a binary replacement for commons-logging based on slf4j -->
-    <dependency>
-      <groupId>org.slf4j</groupId>
-      <artifactId>jcl-over-slf4j</artifactId>
-      <version>1.6.6</version>
+      <version>1.0.12</version>
       <scope>compile</scope>
     </dependency>
     
@@ -128,9 +120,18 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>jul-to-slf4j</artifactId>
-      <version>1.6.6</version>
+      <version>1.7.5</version>
       <scope>compile</scope>
     </dependency>
+    
+    <!-- provide a binary replacement for commons-logging based on slf4j -->
+    <dependency>
+      <groupId>org.slf4j</groupId>
+      <artifactId>jcl-over-slf4j</artifactId>
+      <version>1.7.5</version>
+      <scope>compile</scope>
+    </dependency>
+    
     
     <dependency>
       <groupId>org.codehaus.jackson</groupId>
@@ -143,7 +144,7 @@
     <dependency>
       <groupId>org.slf4j</groupId>
       <artifactId>slf4j-api</artifactId>
-      <version>1.6.6</version>
+      <version>1.7.5</version>
       <scope>compile</scope>
     </dependency>
     

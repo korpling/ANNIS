@@ -1,19 +1,18 @@
-
 /*
- * Copyright 2012 SFB 632.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *      http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2012 SFB 632.
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package annis.service.internal;
 
 import annis.CommonHelper;
@@ -21,6 +20,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.dao.AnnotatedMatch;
+import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
 import annis.model.QueryNode;
@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -67,11 +68,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 /**
- * Methods for querying the database.
- *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
- * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
- */
+* Methods for querying the database.
+*
+* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+* @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+*/
 @Component
 @Path("annis/query")
 public class QueryService
@@ -90,12 +91,12 @@ public class QueryService
   private int port = 5711;
 
   /**
-   * Log the successful initialization of this bean.
-   *
-   * <p> XXX: This should be a private method annotated with
-   * <tt>@PostConstruct</tt>, but that doesn't seem to work. As a work-around,
-   * the method is called by Spring as an init-method.
-   */
+* Log the successful initialization of this bean.
+*
+* <p> XXX: This should be a private method annotated with
+* <tt>@PostConstruct</tt>, but that doesn't seem to work. As a work-around,
+* the method is called by Spring as an init-method.
+*/
   public void init()
   {
     // check version of PostgreSQL
@@ -212,8 +213,8 @@ public class QueryService
   }
 
   /**
-   * Get result as matrix in WEKA (ARFF) format.
-   */
+* Get result as matrix in WEKA (ARFF) format.
+*/
   @GET
   @Path("search/matrix")
   @Produces("text/plain")
@@ -259,14 +260,14 @@ public class QueryService
   }
 
   /**
-   * Get a graph as {@link SaltProject} of a set of Salt IDs.
-   *
-   * @param saltIDs saltIDs must have at least one saltId, more than one id are
-   * separated by + or space
-   * @param leftRaw left context parameter
-   * @param rightRaw right context parameter
-   * @return the graph of this hit.
-   */
+* Get a graph as {@link SaltProject} of a set of Salt IDs.
+*
+* @param saltIDs saltIDs must have at least one saltId, more than one id are
+* separated by + or space
+* @param leftRaw left context parameter
+* @param rightRaw right context parameter
+* @return the graph of this hit.
+*/
   @POST
   @Path("search/subgraph")
   @Produces(
@@ -374,6 +375,7 @@ public class QueryService
   {
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
     List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+
     // filter by which corpora the user is allowed to access
     Subject user = SecurityUtils.getSubject();
     for (AnnisCorpus c : allCorpora)
@@ -383,6 +385,7 @@ public class QueryService
         allowedCorpora.add(c);
       }
     }
+
     return allowedCorpora;
   }
 
@@ -422,11 +425,11 @@ public class QueryService
   }
 
   /**
-   * Return true if this is a valid query or throw exception when invalid
-   *
-   * @param query Query to check for validity
-   * @return
-   */
+* Return true if this is a valid query or throw exception when invalid
+*
+* @param query Query to check for validity
+* @return
+*/
   @GET
   @Path("check")
   public String check(@QueryParam("q") String query)
@@ -498,13 +501,13 @@ public class QueryService
   }
 
   /**
-   * Get an Annis Binary object identified by its id.
-   *
-   * @param id
-   * @param rawOffset the part we want to start from, we start from 0
-   * @param rawLength how many bytes we take
-   * @return AnnisBinary
-   */
+* Get an Annis Binary object identified by its id.
+*
+* @param id
+* @param rawOffset the part we want to start from, we start from 0
+* @param rawLength how many bytes we take
+* @return AnnisBinary
+*/
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   @Produces("application/xml")
@@ -524,8 +527,8 @@ public class QueryService
 
     AnnisBinary bin;
     log.debug(
-      "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
+      "fetching " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
+      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " "
       + (mimeType == null ? "" : mimeType));
 
     bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
@@ -536,13 +539,64 @@ public class QueryService
   }
 
   /**
-   * Get the Metadata of an Annis Binary object identified by its id. This
-   * function calls getBinary(long id, 1, 1), so this function does not work, if
-   * the specs of getBinary(long id, int offset,int length) changed.
-   *
-   * @param id
-   * @return AnnisBinaryMetaData
-   */
+* Fetches the example queries for a specific corpus.
+*
+* @param rawCorpusNames specifies the corpora the examples are fetched from.
+*
+*/
+  @GET
+  @Path("corpora/example-queries/")
+  @Produces(MediaType.APPLICATION_XML)
+  public List<ExampleQuery> getExampleQueries(
+    @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
+  {
+
+    try
+    {
+      String[] corpusNames;
+      if (rawCorpusNames != null)
+      {
+        corpusNames = rawCorpusNames.split(",");
+      }
+      else
+      {
+        List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+        corpusNames = new String[allCorpora.size()];
+        for (int i = 0; i < corpusNames.length; i++)
+        {
+          corpusNames[i] = allCorpora.get(i).getName();
+        }
+      }
+
+      List<String> allowedCorpora = new ArrayList<String>();
+
+      // filter by which corpora the user is allowed to access
+      Subject user = SecurityUtils.getSubject();
+      for (String c : corpusNames)
+      {
+        if (user.isPermitted("query:*:" + c))
+        {
+          allowedCorpora.add(c);
+        }
+      }
+
+      List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(allowedCorpora);
+      return annisDao.getExampleQueries(corpusIDs);
+    }
+    catch (Exception ex)
+    {
+      throw new WebApplicationException(400);
+    }
+  }
+
+  /**
+* Get the Metadata of an Annis Binary object identified by its id. This
+* function calls getBinary(long id, 1, 1), so this function does not work, if
+* the specs of getBinary(long id, int offset,int length) changed.
+*
+* @param id
+* @return AnnisBinaryMetaData
+*/
   @GET
   @Path("corpora/{top}/{document}/binary/meta")
   @Produces("application/xml")
@@ -618,12 +672,12 @@ public class QueryService
   }
 
   /**
-   * Throw an exception if the parameter is missing.
-   *
-   * @param value Value which is checked for null.
-   * @param name The short name of parameter.
-   * @param description A one line description of the meaing of the parameter.
-   */
+* Throw an exception if the parameter is missing.
+*
+* @param value Value which is checked for null.
+* @param name The short name of parameter.
+* @param description A one line description of the meaing of the parameter.
+*/
   private void requiredParameter(String value, String name, String description)
     throws WebApplicationException
   {
@@ -638,16 +692,16 @@ public class QueryService
   }
 
   /**
-   * Get the {@link QueryData} from a query and the corpus names
-   *
-   * @param query The AQL query.
-   * @param rawCorpusNames The name of the toplevel corpus names seperated by
-   * ",".
-   * @return calculated {@link QueryData} for the given parametes.
-   *
-   * @throws WebApplicationException Thrown if some corpora are unknown to the
-   * system.
-   */
+* Get the {@link QueryData} from a query and the corpus names
+*
+* @param query The AQL query.
+* @param rawCorpusNames The name of the toplevel corpus names seperated by
+* ",".
+* @return calculated {@link QueryData} for the given parametes.
+*
+* @throws WebApplicationException Thrown if some corpora are unknown to the
+* system.
+*/
   private QueryData queryDataFromParameters(String query, String rawCorpusNames)
     throws WebApplicationException
   {
@@ -665,23 +719,23 @@ public class QueryService
   }
 
   /**
-   * Splits a list of corpus names into a proper java list.
-   *
-   * @param rawCorpusNames The corpus names separated by ",".
-   * @return
-   */
+* Splits a list of corpus names into a proper java list.
+*
+* @param rawCorpusNames The corpus names separated by ",".
+* @return
+*/
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
     return Arrays.asList(rawCorpusNames.split(","));
   }
 
   /**
-   * Splits a list of qualified (meta-) annotation names into a proper java
-   * list.
-   *
-   * @param rawCorpusNames The qualified names separated by ",".
-   * @return
-   */
+* Splits a list of qualified (meta-) annotation names into a proper java
+* list.
+*
+* @param rawCorpusNames The qualified names separated by ",".
+* @return
+*/
   private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
   {
     LinkedList<MatrixQueryData.QName> result = new LinkedList<MatrixQueryData.QName>();

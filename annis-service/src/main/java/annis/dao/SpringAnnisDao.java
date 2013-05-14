@@ -1,45 +1,22 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2009-2011 Collaborative Research Centre SFB 632
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package annis.dao;
 
+import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
-import annis.service.objects.Match;
-import java.io.File;
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.TreeMap;
-
-
-
-import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
-import org.springframework.transaction.annotation.Transactional;
-
 import annis.model.Annotation;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
@@ -47,10 +24,11 @@ import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.ByteHelper;
@@ -62,26 +40,49 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListDocumentsAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.File;
 import java.io.FileInputStream;
+
 import java.io.FileNotFoundException;
+import java.util.ListIterator;
+
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
-import java.util.ListIterator;
-import org.apache.commons.io.FileUtils;
+import java.sql.PreparedStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Properties;
+import java.util.TreeMap;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
 {
+
   private int maxFileBufferSize;
 
   // SQL generators for the different query functions
@@ -97,8 +98,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private MatrixSqlGenerator matrixSqlGenerator;
 
+  // generated sql for example queries and fetches the result
+  private ListExampleQueriesHelper listExampleQueriesHelper;
+
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
-  
+
   private String externalFilesPath;
   // configuration
 
@@ -115,33 +119,33 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   /**
-   * @return the graphSqlGenerator
-   */
+* @return the graphSqlGenerator
+*/
   public AnnotateSqlGenerator getGraphSqlGenerator()
   {
     return graphSqlGenerator;
   }
 
   /**
-   * @param graphSqlGenerator the graphSqlGenerator to set
-   */
+* @param graphSqlGenerator the graphSqlGenerator to set
+*/
   public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
 
   /**
-   * @return the listDocumentsAnnotationsSqlHelper
-   */
+* @return the listDocumentsAnnotationsSqlHelper
+*/
   public ListDocumentsAnnotationsSqlHelper getListDocumentsAnnotationsSqlHelper()
   {
     return listDocumentsAnnotationsSqlHelper;
   }
 
   /**
-   * @param listDocumentsAnnotationsSqlHelper the
-   * listDocumentsAnnotationsSqlHelper to set
-   */
+* @param listDocumentsAnnotationsSqlHelper the
+* listDocumentsAnnotationsSqlHelper to set
+*/
   public void setListDocumentsAnnotationsSqlHelper(
     ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper)
   {
@@ -157,23 +161,23 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   /**
-   * @return the listDocumentsSqlHelper
-   */
+* @return the listDocumentsSqlHelper
+*/
   public ListDocumentsSqlHelper getListDocumentsSqlHelper()
   {
     return listDocumentsSqlHelper;
   }
 
   /**
-   * @param listDocumentsSqlHelper the listDocumentsSqlHelper to set
-   */
+* @param listDocumentsSqlHelper the listDocumentsSqlHelper to set
+*/
   public void setListDocumentsSqlHelper(
     ListDocumentsSqlHelper listDocumentsSqlHelper)
   {
     this.listDocumentsSqlHelper = listDocumentsSqlHelper;
   }
 
-//	private MatrixSqlGenerator matrixSqlGenerator;
+// private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
     SqlGenerator<QueryData, String>
@@ -241,7 +245,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // / new
 
   private List<SqlSessionModifier> sqlSessionModifiers;
-//  private SqlGenerator findSqlGenerator;
+// private SqlGenerator findSqlGenerator;
 
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 
@@ -334,6 +338,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       jdbcTemplate.update("SET statement_timeout TO " + timeout);
     }
+  }
+
+  @Override
+  public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs)
+  {
+    return (List<ExampleQuery>) getJdbcTemplate().query(
+      listExampleQueriesHelper.createSQLQuery(corpusIDs),
+      listExampleQueriesHelper);
   }
 
   @Transactional(readOnly = true)
@@ -502,7 +514,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         File conf = null;
         try
         {
-          // try  hash of corpus name first
+          // try hash of corpus name first
           conf = new File(confFolder, Utils.calculateSHAHash(corpusName));
         }
         catch (NoSuchAlgorithmException ex)
@@ -592,6 +604,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       conn = getJdbcTemplate().getDataSource().getConnection();
       DatabaseMetaData meta = conn.getMetaData();
+
 
       log.debug(
         "database info [major: " + meta.getDatabaseMajorVersion() + " minor: " + meta.
@@ -892,14 +905,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String corpusName)
   {
-    List<AnnisBinaryMetaData> metaData =  getJdbcTemplate().query(
+    List<AnnisBinaryMetaData> metaData = getJdbcTemplate().query(
       MetaByteHelper.SQL,
       metaByteHelper.getArgs(toplevelCorpusName, corpusName),
       MetaByteHelper.getArgTypes(), metaByteHelper);
-    
+
     // get the file size from the real file
     ListIterator<AnnisBinaryMetaData> it = metaData.listIterator();
-    while(it.hasNext())
+    while (it.hasNext())
     {
       AnnisBinaryMetaData singleEntry = it.next();
       File f = new File(getRealDataDir(), singleEntry.getLocalFileName());
@@ -943,11 +956,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     return externalFilesPath;
   }
-  
+
   public File getRealDataDir()
   {
     File dataDir;
-    if(getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
+    if (getExternalFilesPath() == null || getExternalFilesPath().isEmpty())
     {
       // use the default directory
       dataDir = new File(System.getProperty("user.home"), ".annis/data/");
@@ -973,5 +986,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.maxFileBufferSize = maxFileBufferSize;
   }
-  
+
+  public ListExampleQueriesHelper getListExampleQueriesHelper()
+  {
+    return listExampleQueriesHelper;
+  }
+
+  public void setListExampleQueriesHelper(
+    ListExampleQueriesHelper listExampleQueriesHelper)
+  {
+    this.listExampleQueriesHelper = listExampleQueriesHelper;
+  }
 }

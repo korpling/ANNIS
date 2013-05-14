@@ -1,14 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
 
-	xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:util="http://www.springframework.org/schema/util"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xmlns:tx="http://www.springframework.org/schema/tx"
-   xmlns:aop="http://www.springframework.org/schema/aop"
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:context="http://www.springframework.org/schema/context"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  xmlns:aop="http://www.springframework.org/schema/aop"
 
-	xsi:schemaLocation="
+  xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
@@ -16,10 +16,10 @@
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 	">
 
-	<!-- Enable bean autowiring -->
+  <!-- Enable bean autowiring -->
   <context:annotation-config/>
 
-	<!-- Transaction management -->
+  <!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource"/>
@@ -34,22 +34,22 @@
   <bean id="dataSource" class="annis.utils.SSLEnabledDataSource" lazy-init="true">
     <property name="driverClassName" value="$dao{datasource.driver}"/>
     <property name="url" value="$dao{datasource.url}"/>
-    
+
     <property name="username" value="$dao{datasource.username}"/>
     <property name="password" value="$dao{datasource.password}"/>
     <property name="useSSL" value="$dao{datasource.ssl}" />
   </bean>
 
-	<!-- Helper for weka command -->
+  <!-- Helper for weka command -->
   <bean id="wekaHelper" class="annis.WekaHelper" lazy-init="true"/>
 
-	<!-- Helper for list command -->
+  <!-- Helper for list command -->
   <bean id="listCorpusSqlHelper" class="annis.sqlgen.ListCorpusSqlHelper" lazy-init="true"/>
 
-	<!-- Helper for nodeAnnotations command -->
+  <!-- Helper for nodeAnnotations command -->
   <bean id="listAnnotationsSqlHelper" class="annis.sqlgen.ListAnnotationsSqlHelper" lazy-init="true"/>
 
-	<!-- Helper for listCorpusAnnotations command -->
+  <!-- Helper for listCorpusAnnotations command -->
   <bean id="listCorpusAnnotationsSqlHelper" class="annis.sqlgen.ListCorpusAnnotationsSqlHelper" lazy-init="true"/>
 
 	<!-- Helper for listDocumentsAnnotations command -->
@@ -57,6 +57,9 @@
 
   	<!-- Helper for listDocuments command -->
   <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
+
+  <!-- Helper for list example queries -->
+  <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
   <!-- Annis parser -->
   <import resource="classpath:annis/ql/parser/AnnisParser-context.xml"/>
@@ -72,7 +75,7 @@
 
   <bean id="metaDataFilter" class="annis.dao.MetaDataFilter" lazy-init="true">
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
-		<!--<property name="dataSource" ref="dataSource"/>-->
+    <!--<property name="dataSource" ref="dataSource"/>-->
     <property name="subQueryCorpusSelectionStrategy" ref="subQueryCorpusSelectionStrategy" />
   </bean>
 
@@ -87,7 +90,7 @@
 
   <!-- BEGIN EXPORTS -->
 
-	<!-- exported bean: AnnisDao -->
+  <!-- exported bean: AnnisDao -->
   <bean id="annisDao" class="annis.dao.SpringAnnisDao" init-method="init" lazy-init="true">
 
     <!-- configuration -->
@@ -113,6 +116,8 @@
     <property name="listDocumentsAnnotationsSqlHelper" ref="listDocumentsAnnotationsSqlHelper"/>
     <property name="listDocumentsSqlHelper" ref="listDocumentsSqlHelper" />
 
+    <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
+
     <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
@@ -130,11 +135,13 @@
 
   </bean>
 
-	<!-- base bean for exported Database API for administration tasks -->
+  <!-- base bean for exported Database API for administration tasks -->
   <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" init-method="init" lazy-init="true">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
+    <property name="generateExampleQueries" value="${annis.import.example-queries}" />
+    <property name="annisDao" ref="annisDao" />
     <property name="dbLayout" value="${annis.mode}" />
     <property name="dataSource" ref="dataSource" />
     <property name="mimeTypeMapping">
@@ -151,12 +158,14 @@
     <property name="tableInsertFrom">
       <util:map>
         <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility::resolver_visibility, &quot;order&quot;, mappings" />
+        <entry key="example_queries" value="example_query, description, &quot;type&quot;, nodes, used_ops, corpus_ref" />
       </util:map>
     </property>
     <property name="tableInsertSelect">
       <util:map>
         <entry key="resolver_vis_map" value="corpus, version, namespace, element, vis_type, display_name, visibility, &quot;order&quot;, mappings" />
         <entry key="text" value="corpus_ref, id, name, text, toplevel_corpus" />
+        <entry key="example_queries" value="example_query, description, &quot;type&quot;, nodes, used_ops, corpus_ref" />
       </util:map>
     </property>
   </bean>

@@ -14,9 +14,13 @@ target/
 <<<<<<< HEAD
 =======
 /annis-widgets/src/main/webapp/VAADIN/
+<<<<<<< HEAD
 >>>>>>> branch 'master' of https://github.com/korpling/ANNIS.git
 =======
 >>>>>>> origin/master
 =======
 /annis-widgets/src/main/webapp/VAADIN/
 >>>>>>> ca2adc85c57b03bbd79ff57ef1e28a61736cd0ff
+=======
+/annis-gui/src/main/webapp/VAADIN/themes/annis/styles.css
+>>>>>>> dda15d046cf8dba505672f8affb09bff5502110c

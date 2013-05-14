@@ -5,19 +5,19 @@
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
-	
+
 	xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
 	">
-     
+
   <import resource="Common.xml" />
 
 	<!-- Enable bean autowiring -->
   <context:annotation-config/>
-	
+
 	<!-- Public API for corpus administration -->
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
@@ -27,5 +27,5 @@
   <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner" lazy-init="true">
     <property name="corpusAdministration" ref="corpusAdministration" />
   </bean>
-	
+
 </beans>

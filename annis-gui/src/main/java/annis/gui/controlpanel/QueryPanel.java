@@ -53,14 +53,14 @@ import org.vaadin.hene.popupbutton.PopupButton;
 public class QueryPanel extends GridLayout implements TextChangeListener,
   ValueChangeListener
 {
-  
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(QueryPanel.class);
-  
+
   public static final int MAX_HISTORY_MENU_ITEMS = 5;
-  
+
   // the view name
   public static final String NAME = "query";
-  
+
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
@@ -71,14 +71,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
-  
+
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
     super(2,3);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
-    
+
     setSpacing(true);
     setMargin(true);
 
@@ -97,9 +97,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
-    
+
     addComponent(txtQuery, 1, 0);
-    
+
     final VirtualKeyboard virtualKeyboard;
     if(instanceConfig.getKeyboardLayout() == null)
     {
@@ -114,8 +114,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     VerticalLayout panelStatusLayout = new VerticalLayout();
     panelStatusLayout.setHeight("-1px");
     panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
-    
-    
+
+
     lblStatus = new Label();
     lblStatus.setContentMode(ContentMode.HTML);
     lblStatus.setValue(this.lastPublicStatus);
@@ -150,15 +150,15 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     VerticalLayout historyListLayout = new VerticalLayout();
     historyListLayout.setSizeUndefined();
-    
+
     lstHistory = new ListSelect();
     lstHistory.setWidth("200px");
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
     lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
-    
-    Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener() 
+
+    Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener()
     {
       @Override
       public void buttonClick(ClickEvent event)
@@ -171,32 +171,32 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           historyWindow.setHeight("250px");
         }
         historyWindow.setContent(new HistoryPanel(history, controller));
-        
+
         if(UI.getCurrent().getWindows().contains(historyWindow))
         {
           historyWindow.bringToFront();
         }
         else
-        {          
+        {
           UI.getCurrent().addWindow(historyWindow);
         }
       }
     });
     btShowMoreHistory.setWidth("100%");
-    
+
     historyListLayout.addComponent(lstHistory);
     historyListLayout.addComponent(btShowMoreHistory);
-    
+
     historyListLayout.setExpandRatio(lstHistory, 1.0f);
     historyListLayout.setExpandRatio(btShowMoreHistory, 0.0f);
-    
+
     btHistory = new PopupButton("History");
     btHistory.setContent(historyListLayout);
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
     buttonLayout.addComponent(btHistory);
-   
+
     if(virtualKeyboard != null)
     {
       Button btShowKeyboard = new Button();
@@ -207,18 +207,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       buttonLayout.addComponent(btShowKeyboard);
     }
     buttonLayout.setExpandRatio(btShowResult, 1.0f);
-    
+
 
   }
-  
+
   public void updateShortHistory(List<HistoryEntry> history)
   {
     this.history = history;
-    
+
     lstHistory.removeAllItems();
-    
+
     int counter = 0;
-    
+
     for(HistoryEntry e : history)
     {
       if(counter >= MAX_HISTORY_MENU_ITEMS)
@@ -239,7 +239,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       txtQuery.setValue(query);
     }
-    
+
     validateQuery(query);
   }
 
@@ -258,7 +258,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     validateQuery(event.getText());
   }
 
-  
+
   private void validateQuery(String query)
   {
     // validate query
@@ -267,9 +267,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
       Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
         .get(String.class);
-      
+
       // wait for maximal one seconds
-      
+
       try
       {
         String result = future.get(1, TimeUnit.SECONDS);
@@ -288,14 +288,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       catch (ExecutionException ex)
       {
-        // ok, there was some serios error
+       // ok, there was some serios error
         log.error(null, ex);
       }
       catch (TimeoutException ex)
       {
         lblStatus.setValue("Validation of query took too long.");
       }
-      
+
     }
     catch(UniformInterfaceException ex)
     {
@@ -319,7 +319,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           Notification.Type.TRAY_NOTIFICATION);
     }
   }
-  
+
   @Override
   public void valueChange(ValueChangeEvent event)
   {
@@ -340,7 +340,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(controller != null)
       {
         controller.setQuery((txtQuery.getValue()));
-        controller.executeQuery();        
+        controller.executeQuery();
       }
     }
   }
@@ -352,8 +352,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       lblStatus.setVisible(!enabled);
       piCount.setVisible(enabled);
       piCount.setEnabled(enabled);
-      
-      btShowResult.setEnabled(!enabled);      
+
+      btShowResult.setEnabled(!enabled);
     }
   }
 
@@ -381,5 +381,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       virtualKeyboard.show();
     }
+  }
+
+  public QueryController getQueryController()
+  {
+    return this.controller;
   }
 }

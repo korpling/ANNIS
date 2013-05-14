@@ -93,6 +93,7 @@ way compatible with Vaadin eclipse plugin. -->
           </execution>
         </executions>
       </plugin>
+      
     </plugins>
 
     <!-- This is needed for the sources required by the GWT compiler to be included in the produced JARs -->

@@ -1,18 +1,18 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *    http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- */
+* Copyright 2011 Corpuslinguistic working group Humboldt University Berlin
+*
+* Licensed under the Apache License, Version 2.0 (the "License");
+* you may not use this file except in compliance with the License.
+* You may obtain a copy of the License at
+*
+* http://www.apache.org/licenses/LICENSE-2.0
+*
+* Unless required by applicable law or agreed to in writing, software
+* distributed under the License is distributed on an "AS IS" BASIS,
+* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+* See the License for the specific language governing permissions and
+* limitations under the License.
+*/
 package annis.libgui;
 
 import annis.libgui.media.MediaController;
@@ -54,15 +54,21 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.vaadin.cssinject.CSSInject;
 
 /**
- * Basic UI functionality.
- * 
- * This class allows to out source some common tasks like initialization of 
- * the logging framework or the plugin loading to this base class.
- */
+* Basic UI functionality.
+*
+* This class allows to out source some common tasks like initialization of
+* the logging framework or the plugin loading to this base class.
+*/
 @Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 {
-
+  
+  static
+  {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisBaseUI.class);
 
@@ -87,18 +93,17 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
-
+  
   @Override
   protected void init(VaadinRequest request)
   {
     initLogging();
-    
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
-    // store the webservice URL property explicitly in the session in order to 
+    // store the webservice URL property explicitly in the session in order to
     // access it from the "external" servlets
-    getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
+    getSession().getSession().setAttribute(WEBSERVICEURL_KEY,
       getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
@@ -123,24 +128,24 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
 
   /**
-   * Given an configuration file name (might include directory) this function
-   * returns all locations for this file in the "ANNIS configuration system".
-   *
-   * The files in the result list do not necessarily exist.
-   *
-   * These locations are the
-   * - base installation: WEB-INF/conf/ folder of the deployment.
-   * - global configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
-   * - user configuration: ~/.annis/
-   * @param configFile The file path of the configuration file relative to the base config folder.
-   * @return list of files or directories in the order in which they should be processed (most important is last)
-   */
+* Given an configuration file name (might include directory) this function
+* returns all locations for this file in the "ANNIS configuration system".
+*
+* The files in the result list do not necessarily exist.
+*
+* These locations are the
+* - base installation: WEB-INF/conf/ folder of the deployment.
+* - global configuration: $ANNIS_CFG environment variable value or /etc/annis/ if not set
+* - user configuration: ~/.annis/
+* @param configFile The file path of the configuration file relative to the base config folder.
+* @return list of files or directories in the order in which they should be processed (most important is last)
+*/
   protected List<File> getAllConfigLocations(String configFile)
   {
     LinkedList<File> locations = new LinkedList<File>();
 
     // first load everything from the base application
-    locations.add(new File(VaadinService.getCurrent().getBaseDirectory(), 
+    locations.add(new File(VaadinService.getCurrent().getBaseDirectory(),
       "/WEB-INF/conf/" + configFile));
 
     // next everything from the global config
@@ -256,11 +261,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
 
-  protected void initLogging()
+  protected final void initLogging()
   {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-
     try
     {
       
@@ -366,12 +368,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   }
   
   /**
-   * Override this method to append additional plugins to the internal {@link PluginManager}.
-   * 
-   * The default implementation is empty 
-   * (thus you don't need to call {@code super.addCustomUIPlugins(...)}).
-   * @param pluginManager 
-   */
+* Override this method to append additional plugins to the internal {@link PluginManager}.
+*
+* The default implementation is empty
+* (thus you don't need to call {@code super.addCustomUIPlugins(...)}).
+* @param pluginManager
+*/
   protected void addCustomUIPlugins(PluginManager pluginManager)
   {
     // default: do nothing
@@ -387,7 +389,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
-    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
+    File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-"
       + getVersionNumber() + ".jar");
     pluginManager.addPluginsFrom(builtin.toURI());
     log.info("added plugins from {}", builtin.getPath());
@@ -437,11 +439,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   }
   
   /**
-   * Inject CSS into the UI. 
-   * This function will not add multiple style-elements if the
-   * exact CSS string was already added.
-   * @param cssContent 
-   */
+* Inject CSS into the UI.
+* This function will not add multiple style-elements if the
+* exact CSS string was already added.
+* @param cssContent
+*/
   public void injectUniqueCSS(String cssContent)
   {
     if(alreadyAddedCSS == null)

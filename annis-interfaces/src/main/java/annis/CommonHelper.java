@@ -53,23 +53,26 @@ public class CommonHelper
 
   public static boolean containsRTLText(String str)
   {
-    for (int i = 0; i < str.length(); i++)
+    if(str != null)
     {
-      char cc = str.charAt(i);
-      // hebrew extended and basic, arabic basic and extendend
-      if (cc >= 1425 && cc <= 1785)
+      for (int i = 0; i < str.length(); i++)
       {
-        return true;
-      }
-      // alphabetic presentations forms (hebrwew) to arabic presentation forms A
-      else if (cc >= 64286 && cc <= 65019)
-      {
-        return true;
-      }
-      // arabic presentation forms B
-      else if (cc >= 65136 && cc <= 65276)
-      {
-        return true;
+        char cc = str.charAt(i);
+        // hebrew extended and basic, arabic basic and extendend
+        if (cc >= 1425 && cc <= 1785)
+        {
+          return true;
+        }
+        // alphabetic presentations forms (hebrwew) to arabic presentation forms A
+        else if (cc >= 64286 && cc <= 65019)
+        {
+          return true;
+        }
+        // arabic presentation forms B
+        else if (cc >= 65136 && cc <= 65276)
+        {
+          return true;
+        }
       }
     }
     return false;
@@ -93,7 +96,7 @@ public class CommonHelper
         new HashMap<SNode, SOrderRelation>();
       for (SOrderRelation rel : graph.getSOrderRelations())
       {
-        if (rel.getSTypes().contains(segName))
+        if (rel.getSTypes() != null && rel.getSTypes().contains(segName))
         {
           SNode node = rel.getSSource();
           outRelationForNode.put(node, rel);
@@ -190,7 +193,10 @@ public class CommonHelper
           {
             for (SOrderRelation rel : orderRelations)
             {
-              result.addAll(rel.getSTypes());
+              if(rel.getSTypes() != null)
+              {
+                result.addAll(rel.getSTypes());
+              }
             }
           }
         }

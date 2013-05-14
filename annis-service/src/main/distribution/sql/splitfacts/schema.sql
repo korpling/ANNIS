@@ -33,13 +33,21 @@ CREATE TABLE corpus_annotation
   UNIQUE (corpus_ref, namespace, name)
 );
 COMMENT ON COLUMN corpus_annotation.corpus_ref IS 'foreign key to corpus.id';
-COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotation key';
+COMMENT ON COLUMN corpus_annotation.namespace IS 'optional namespace of annotation key';CREATE TYPE operator AS ENUM ('.', '>', '->');
+CREATE TABLE example_queries
+(
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "used_operators" operator[] NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
+);
 COMMENT ON COLUMN corpus_annotation.name IS 'annotation key';
 COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id), 
+  corpus_ref integer REFERENCES corpus(id),
   id    integer,
   name  varchar,
   text  text,
@@ -137,23 +145,23 @@ CREATE TABLE corpus_stats
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
   max_component_id integer NULL,
-  max_node_id bigint NULL, 
+  max_node_id bigint NULL,
   source_path varchar -- original path to the folder containing the relANNIS sources
 );
 
 
-CREATE VIEW corpus_info AS SELECT 
+CREATE VIEW corpus_info AS SELECT
   name,
-  id, 
+  id,
   text,
   tokens,
   source_path
-FROM 
+FROM
   corpus_stats;
-  
-  
+
+
 CREATE TYPE resolver_visibility AS ENUM (
-  'permanent', 
+  'permanent',
   'visible',
   'hidden',
   'removed',
@@ -172,7 +180,7 @@ CREATE TABLE resolver_vis_map
   "visibility"    resolver_visibility NOT NULL DEFAULT 'hidden',
   "order" integer default '0',
   "mappings" varchar,
-   UNIQUE (corpus,version,namespace,element,vis_type)              
+   UNIQUE (corpus,version,namespace,element,vis_type)
 );
 COMMENT ON COLUMN resolver_vis_map.id IS 'primary key';
 COMMENT ON COLUMN resolver_vis_map.corpus IS 'the name of the supercorpus, part of foreign key to corpus.name,corpus.version';
@@ -198,4 +206,15 @@ CREATE TABLE annotations
   edge_name varchar,
   toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
+);
+
+CREATE TYPE ops AS ENUM ('.', '>', '->');
+CREATE TABLE example_queries
+(
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL,
+  "type" TEXT NOT NULL,
+  "nodes" INTEGER NOT NULL,
+  "used_ops" ops[] NOT NULL,
+  "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );
