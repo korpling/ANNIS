@@ -28,6 +28,7 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.service.QueryService;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
@@ -38,6 +39,8 @@ import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import annis.service.objects.SubgraphQuery;
 import annis.sqlgen.MatrixQueryData;
+import com.google.mimeparse.MIMEParse;
+import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
@@ -45,11 +48,14 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -58,10 +64,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -78,10 +87,10 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("annis/query")
-public class QueryService
+public class QueryServiceImpl implements QueryService
 {
 
-  private final static Logger log = LoggerFactory.getLogger(QueryService.class);
+  private final static Logger log = LoggerFactory.getLogger(QueryServiceImpl.class);
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
@@ -92,6 +101,10 @@ public class QueryService
   private int maxContext = 10;
 
   private int port = 5711;
+  
+  @Context private UriInfo uriInfo;
+  @Context private HttpServletRequest request;
+  @Context private ResourceConfig rc; 
 
   /**
    * Log the successful initialization of this bean.
@@ -511,13 +524,13 @@ public class QueryService
    */
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
+  @Override
   public Response binary(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,
     @PathParam("offset") String rawOffset,
     @PathParam("length") String rawLength,
-    @QueryParam("mime") String mimeType,
-    @QueryParam("title") String title)
+    @QueryParam("title") String fileName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
@@ -525,28 +538,59 @@ public class QueryService
     int offset = Integer.parseInt(rawOffset);
     int length = Integer.parseInt(rawLength);
 
-    // if mime type was not set query it
-    if(mimeType == null)
+    String acceptHeader = request.getHeader("Accept");
+    if(acceptHeader == null || acceptHeader.isEmpty())
     {
-      List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
-        corpusName);
-      if(meta.size() > 0)
+      acceptHeader = "*/*";
+    }
+    
+    List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName, corpusName);
+    Set<String> mediaTypesFromSelectedBinaries = new LinkedHashSet<String>();
+    
+    for(AnnisBinaryMetaData m : meta)
+    {
+      if(fileName == null)
       {
-        mimeType = meta.get(0).getMimeType();
+        // just add all available media types
+        mediaTypesFromSelectedBinaries.add(m.getMimeType());
       }
       else
       {
-        mimeType = "application/octet-stream";
+        // check if this binary has the right title/file name
+        if(fileName.equals(m.getFileName()))
+        {
+          mediaTypesFromSelectedBinaries.add(m.getMimeType());
+        }
       }
     }
     
+    if(mediaTypesFromSelectedBinaries.isEmpty())
+    {
+      return Response.status(Response.Status.NOT_FOUND)
+        .entity("Requested binary not found")
+        .build();
+    }
+
+    // find the best matching mime type
+    String bestMediaTypeMatch =
+      MIMEParse.bestMatch(mediaTypesFromSelectedBinaries, acceptHeader);
+    if(bestMediaTypeMatch.isEmpty())
+    {
+      return Response.status(Response.Status.NOT_ACCEPTABLE)
+        .entity("Client must accept one of the following media types: " 
+        + StringUtils.join(mediaTypesFromSelectedBinaries, ", "))
+        .build();
+    }
+    MediaType mediaType = MediaType.valueOf(bestMediaTypeMatch);
+
+    
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
-      + (mimeType == null ? "" : mimeType));
+      + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " " 
+      + mediaType.toString());
 
     final InputStream stream = annisDao.
-      getBinary(toplevelCorpusName, corpusName, mimeType, title,
+      getBinary(toplevelCorpusName, corpusName, mediaType.toString(), fileName,
       offset, length);
 
     log.debug("fetch successfully");
@@ -567,7 +611,7 @@ public class QueryService
       }
     };
     
-    return Response.ok(result, mimeType).build();
+    return Response.ok(result, mediaType).build();
   }
 
   /**
