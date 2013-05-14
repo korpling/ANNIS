@@ -242,9 +242,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         +itEboxes.next().getValue()+" #"+count : "";
       edgeQuery += edgeQueryAdds;
     }
-    if(span.getComponentCount() > 1)
+    String addQuery = "";
+    try
     {
-      String addQuery = "";
       SpanBox spb = (SpanBox) span.getComponent(1);
       if ((!spb.isRegEx())&&(!spb.getValue().isEmpty()))
       {
@@ -259,6 +259,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
       }
+    } catch (Exception ex){
+      ex = null;
     }
     String metaQuery = "";
     Iterator<MetaBox> itMetaBoxes = mboxes.iterator();

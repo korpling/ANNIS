@@ -33,6 +33,10 @@
       </TimeBasedFileNamingAndTriggeringPolicy>
 
     </rollingPolicy>
+    
+    <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+      <level>INFO</level>
+    </filter>
   </appender>
   
   <logger name="org.apache" level="WARN"/>

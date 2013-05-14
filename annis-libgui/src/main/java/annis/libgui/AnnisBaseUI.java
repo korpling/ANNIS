@@ -20,6 +20,7 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import com.google.common.hash.Hashing;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.VaadinRequest;
@@ -37,6 +38,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -49,6 +51,7 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
+import org.vaadin.cssinject.CSSInject;
 
 /**
  * Basic UI functionality.
@@ -82,6 +85,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
+  
+  private transient TreeSet<String> alreadyAddedCSS;
 
   @Override
   protected void init(VaadinRequest request)
@@ -258,9 +263,28 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
     try
     {
-      ClassResource res = new ClassResource(AnnisBaseUI.class, "logback.xml");
-
-      if (res != null)
+      
+      List<File> logbackFiles = getAllConfigLocations("gui-logback.xml");
+      
+      InputStream inStream = null;
+      if(!logbackFiles.isEmpty())
+      {
+        try
+        {
+          inStream = new FileInputStream(logbackFiles.get(logbackFiles.size()-1));
+        }
+        catch(FileNotFoundException ex)
+        {
+          // well no logging no error...
+        }
+      }
+      if(inStream == null)
+      {
+        ClassResource res = new ClassResource(AnnisBaseUI.class, "logback.xml");
+        inStream = res.getStream().getStream();
+      }
+      
+      if (inStream != null)
       {
         LoggerContext context = (LoggerContext) LoggerFactory.
           getILoggerFactory();
@@ -272,7 +296,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
           VaadinService.getCurrent().getBaseDirectory().getAbsolutePath());
 
         // load config file
-        jc.doConfigure(res.getStream().getStream());
+        jc.doConfigure(inStream);
       }
     }
     catch (JoranException ex)
@@ -410,6 +434,27 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
 
     super.close();
+  }
+  
+  /**
+   * Inject CSS into the UI. 
+   * This function will not add multiple style-elements if the
+   * exact CSS string was already added.
+   * @param cssContent 
+   */
+  public void injectUniqueCSS(String cssContent)
+  {
+    if(alreadyAddedCSS == null)
+    {
+      alreadyAddedCSS = new TreeSet<String>();
+    }
+    String hashForCssContent = Hashing.md5().hashString(cssContent).toString();
+    if(!alreadyAddedCSS.contains(hashForCssContent))
+    {
+      CSSInject cssInject = new CSSInject(UI.getCurrent());
+      cssInject.setStyles(cssContent);
+      alreadyAddedCSS.add(hashForCssContent);
+    }
   }
 
 
