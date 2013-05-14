@@ -546,7 +546,7 @@ public class QueryServiceImpl implements QueryService
     return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, file);
   }
   @GET
-  @Path("corpora/{top}/{document}/binary{file}")
+  @Path("corpora/{top}/{document}/binary/{file}")
   public Response binary4(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String corpusName,

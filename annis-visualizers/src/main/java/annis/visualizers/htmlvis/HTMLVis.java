@@ -34,7 +34,6 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -48,7 +47,6 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.apache.commons.io.IOUtils;
 import org.eclipse.emf.common.util.EList;
@@ -105,12 +103,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     
     
-    WebResource resMeta = Helper.getAnnisWebResource().path(
-      "query/corpora/").path(corpusName).path(corpusName) // HACK: use the corpus name as document name
-      .path("binary/meta");
-     List<AnnisBinaryMetaData> binaryMeta = 
-       resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
-    
     InputStream inStreamConfig = null;
     InputStream inStreamCSS = null;
     try
@@ -123,19 +115,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
       else
       {
-        String title = visConfigName + ".config";
-        for(AnnisBinaryMetaData m : binaryMeta)
+        WebResource resBinary = Helper.getAnnisWebResource().path(
+          "query/corpora/").path(corpusName).path(corpusName)
+          .path("binary").path(visConfigName + ".config");
+        
+        ClientResponse response = resBinary.get(ClientResponse.class);
+        if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
         {
-          if(title.equals(m.getFileName()))
-          {            
-            WebResource resBinary = Helper.getAnnisWebResource().path(
-              "query/corpora/").path(corpusName).path(corpusName)
-              .path("binary").path("0").path("" + m.getLength())
-              .queryParam("title", m.getFileName());
-            ClientResponse response = resBinary.get(ClientResponse.class);
-            inStreamConfig = response.getEntityInputStream();
-            break;
-          }
+          inStreamConfig = response.getEntityInputStream();
         }
       }
       
@@ -165,19 +152,14 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
         else
         {
-          String title = visConfigName + ".css";
-          for (AnnisBinaryMetaData m : binaryMeta)
+          WebResource resBinary = Helper.getAnnisWebResource().path(
+            "query/corpora/").path(corpusName).path(corpusName)
+            .path("binary").path(visConfigName + ".css");
+          
+          ClientResponse response = resBinary.get(ClientResponse.class);
+          if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
           {
-            if (title.equals(m.getFileName()))
-            {
-              WebResource resBinary = Helper.getAnnisWebResource().path(
-                "query/corpora/").path(corpusName).path(corpusName)
-                .path("binary").path("0").path("" + m.getLength())
-                .queryParam("title", m.getFileName());
-              ClientResponse response = resBinary.get(ClientResponse.class);
-              inStreamCSS = response.getEntityInputStream();
-              break;
-            }
+            inStreamCSS = response.getEntityInputStream();
           }
         }
         if(inStreamCSS != null)
