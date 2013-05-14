@@ -704,16 +704,14 @@ public class QueryServiceImpl implements QueryService
   }
 
   /**
-   * Get the Metadata of an Annis Binary object identified by its id. This
-   * function calls getBinary(long id, 1, 1), so this function does not work, if
-   * the specs of getBinary(long id, int offset,int length) changed.
-   *
+   * Get the Metadata of an Annis Binary object identified by its id.
    * @param id
    * @return AnnisBinaryMetaData
    */
   @GET
   @Path("corpora/{top}/{document}/binary/meta")
   @Produces("application/xml")
+  @Override
   public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)

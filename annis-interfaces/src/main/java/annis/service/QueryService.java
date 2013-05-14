@@ -58,6 +58,7 @@ public interface QueryService
    * Accepts any mime type. The mime type is used as implicit argument to filter 
    * the files that match a given query.
    * </div>
+   * 
    * @param top The toplevel corpus name.
    * @param document The name of the document that has the file. If you want the
    * files for the toplevel corpus itself, use the name of the toplevel corpus
@@ -74,5 +75,25 @@ public interface QueryService
    */
   public Response binary(String top, String document, String offset, String length, String file);
   
+  /**
+   * Get the metadata of all ANNIS binary objects for a specific document.
+   * 
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET corpora/<b>{top}</b>/<b>{document}</b>/binary/meta</li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * <div>
+   * Accepts application/xml
+   * </div>
+   * 
+   * @param top The toplevel corpus name.
+   * @param document The name of the document that has the file. If you want the
+   * files for the toplevel corpus itself, use the name of the toplevel corpus
+   * as document name.
+   * @return A XML representation containing a list of all 
+   *  matching {@link annis.service.objects.AnnisBinaryMetaData} objects.
+   */
   public List<AnnisBinaryMetaData> binaryMeta(String toplevelCorpusName, String documentName);
 }
