@@ -177,7 +177,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
-    int port = ctx.getBean(QueryService.class).getPort();
+    int port = ctx.getBean(QueryServiceImpl.class).getPort();
     try
     {
       // only allow connections from localhost

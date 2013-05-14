@@ -103,7 +103,6 @@
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
     <property name="graphSqlGenerator" ref="graphSqlGenerator" />
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
-    <property name="maxFileBufferSize" value="10240" /> <!-- 10 MB -->
 
     <property name="dataSource" ref="dataSource"/>
 

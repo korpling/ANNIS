@@ -21,8 +21,8 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
+import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -34,7 +34,6 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -104,36 +103,26 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     
     
-    WebResource resMeta = Helper.getAnnisWebResource().path(
-      "query/corpora/").path(corpusName).path(corpusName) // HACK: use the corpus name as document name
-      .path("binary/meta");
-     List<AnnisBinaryMetaData> binaryMeta = 
-       resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
-    
+    InputStream inStreamConfig = null;
+    InputStream inStreamCSS = null;
     try
     {
       String visConfigName = vi.getMappings().getProperty("config");
-      InputStream inStreamConfig = null;
+      
       if(visConfigName == null)
       {
         inStreamConfig = HTMLVis.class.getResourceAsStream("defaultvis.config");
       }
       else
       {
-        String title = visConfigName + ".config";
-        for(AnnisBinaryMetaData m : binaryMeta)
+        WebResource resBinary = Helper.getAnnisWebResource().path(
+          "query/corpora/").path(corpusName).path(corpusName)
+          .path("binary").path(visConfigName + ".config");
+        
+        ClientResponse response = resBinary.get(ClientResponse.class);
+        if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
         {
-          if(title.equals(m.getFileName()))
-          {            
-            WebResource resBinary = Helper.getAnnisWebResource().path(
-              "query/corpora/").path(corpusName).path(corpusName)
-              .path("binary").path("0").path("" + m.getLength())
-              .queryParam("title", m.getFileName());
-            AnnisBinary binary = resBinary.get(AnnisBinary.class);
-            
-            inStreamConfig = new ByteArrayInputStream(binary.getBytes());
-            break;
-          }
+          inStreamConfig = response.getEntityInputStream();
         }
       }
       
@@ -157,27 +146,20 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         lblResult.addStyleName(labelClass);
         
         // TODO: do not add CSSInject multiple times
-        InputStream inStreamCSS = null;
         if(visConfigName == null)
         {
            inStreamCSS = HTMLVis.class.getResourceAsStream("htmlvis.css");
         }
         else
         {
-          String title = visConfigName + ".css";
-          for (AnnisBinaryMetaData m : binaryMeta)
+          WebResource resBinary = Helper.getAnnisWebResource().path(
+            "query/corpora/").path(corpusName).path(corpusName)
+            .path("binary").path(visConfigName + ".css");
+          
+          ClientResponse response = resBinary.get(ClientResponse.class);
+          if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
           {
-            if (title.equals(m.getFileName()))
-            {
-              WebResource resBinary = Helper.getAnnisWebResource().path(
-                "query/corpora/").path(corpusName).path(corpusName)
-                .path("binary").path("0").path("" + m.getLength())
-                .queryParam("title", m.getFileName());
-              AnnisBinary binary = resBinary.get(AnnisBinary.class);
-
-              inStreamCSS = new ByteArrayInputStream(binary.getBytes());
-              break;
-            }
+            inStreamCSS = response.getEntityInputStream();
           }
         }
         if(inStreamCSS != null)
@@ -204,6 +186,29 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       log.error("Could not parse the HTML visualization configuration file", ex);
       Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
         Notification.Type.ERROR_MESSAGE);
+    }
+    finally
+    {
+      if(inStreamConfig != null)
+      {
+        try
+        {
+          inStreamConfig.close();
+        }
+        catch (IOException ex)
+        {
+        }
+      }
+      if(inStreamCSS != null)
+      {
+        try
+        {
+          inStreamCSS.close();
+        }
+        catch (IOException ex)
+        {
+        }
+      }
     }
 
     

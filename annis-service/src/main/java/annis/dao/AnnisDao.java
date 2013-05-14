@@ -27,12 +27,12 @@ import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.InputStream;
 import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -74,7 +74,7 @@ public interface AnnisDao
    * @param length
    * @return
    */
-  public AnnisBinary getBinary(String toplevelCorpusName, String corpusName,
+  public InputStream getBinary(String toplevelCorpusName, String corpusName,
     String mimeType, String title, int offset, int length);
 
   /**
