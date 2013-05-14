@@ -864,7 +864,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       FileInputStream fInput = new FileInputStream(dataFile);
       fInput.skip(offset);
       
-      BoundedInputStream boundedStream = new BoundedInputStream(fInput, offset+length);
+      BoundedInputStream boundedStream = new BoundedInputStream(fInput, length);
 
       return boundedStream;
     }
