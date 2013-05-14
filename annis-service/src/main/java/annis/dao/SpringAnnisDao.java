@@ -874,7 +874,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     catch (IOException ex)
     {
-      log.warn("Error when readin media file from the data directory", ex);
+      log.warn("Error when reading media file from the data directory", ex);
     }
 
     return new ByteArrayInputStream(new byte[0]);
