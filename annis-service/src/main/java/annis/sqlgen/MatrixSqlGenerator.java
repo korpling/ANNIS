@@ -32,7 +32,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 
@@ -41,10 +40,7 @@ import org.springframework.dao.DataAccessException;
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import annis.model.QueryNode;
-import annis.model.Annotation;
-import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
-import java.io.UnsupportedEncodingException;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -67,6 +63,7 @@ public class MatrixSqlGenerator
   private String matchedNodesViewName;
   private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
   private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
+  private AnnotatedSpanExtractor spanExtractor;
 
   /**
    * Create a solution key to be used inside a single call to
@@ -89,16 +86,10 @@ public class MatrixSqlGenerator
     Map<List<Long>, AnnotatedSpan[]> matchesByGroup =
       new HashMap<List<Long>, AnnotatedSpan[]>();
 
+    int rowNum = 0;
     while (resultSet.next())
     {
       long id = resultSet.getLong("id");
-      String coveredText = resultSet.getString("span");
-
-      Array arrayAnnotation = resultSet.getArray("annotations");
-      Array arrayMeta = resultSet.getArray("metadata");
-
-      List<Annotation> annotations = extractAnnotations(arrayAnnotation);
-      List<Annotation> metaData = extractAnnotations(arrayMeta);
 
       // create key
       Array sqlKey = resultSet.getArray("key");
@@ -112,10 +103,12 @@ public class MatrixSqlGenerator
       int matchWidth = keyArray.length;
       List<Long> key = Arrays.asList(keyArray);
 
+      
       if (!matchesByGroup.containsKey(key))
       {
         matchesByGroup.put(key, new AnnotatedSpan[matchWidth]);
       }
+      AnnotatedSpan span = spanExtractor.mapRow(resultSet, rowNum);
 
       // set annotation spans for *all* positions of the id
       // (node could have matched several times)
@@ -123,11 +116,11 @@ public class MatrixSqlGenerator
       {
         if (key.get(posInMatch) == id)
         {
-          matchesByGroup.get(key)[posInMatch] =
-            new AnnotatedSpan(id, coveredText, annotations, metaData);
+          matchesByGroup.get(key)[posInMatch] = span;
         }
       }
-    }
+      rowNum++;
+    } // end for each row
 
     for (AnnotatedSpan[] match : matchesByGroup.values())
     {
@@ -135,9 +128,8 @@ public class MatrixSqlGenerator
     }
 
     return matches;
-
   }
-
+  
   @Override
   public String selectClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
@@ -395,59 +387,6 @@ public class MatrixSqlGenerator
       + tas.aliasedColumn(NODE_TABLE, "id");
   }
 
-  private List<Annotation> extractAnnotations(Array array) throws SQLException
-  {
-    List<Annotation> result = new ArrayList<Annotation>();
-
-    if (array != null)
-    {
-      String[] arrayLines = (String[]) array.getArray();
-
-      for (String line : arrayLines)
-      {
-        if (line != null)
-        {
-          String namespace = null;
-          String name = null;
-          String value = null;
-
-          String[] split = line.split(":");
-          if (split.length > 2)
-          {
-            namespace = split[0];
-            name = split[1];
-            value = split[2];
-          }
-          else if (split.length > 1)
-          {
-            name = split[0];
-            value = split[1];
-          }
-          else
-          {
-            name = split[0];
-          }
-
-          if (value != null)
-          {
-            try
-            {
-              value = new String(Base64.decodeBase64(value), "UTF-8");
-            }
-            catch (UnsupportedEncodingException ex)
-            {
-              log.error(null, ex);
-            }
-          }
-
-          result.add(new annis.model.Annotation(namespace, name, value));
-        } // if line not null
-      }
-    }
-
-    return result;
-  }
-
   public String getMatchedNodesViewName()
   {
     return matchedNodesViewName;
@@ -478,6 +417,16 @@ public class MatrixSqlGenerator
     TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
   {
     this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
+  }
+
+  public AnnotatedSpanExtractor getSpanExtractor()
+  {
+    return spanExtractor;
+  }
+
+  public void setSpanExtractor(AnnotatedSpanExtractor spanExtractor)
+  {
+    this.spanExtractor = spanExtractor;
   }
 
 }

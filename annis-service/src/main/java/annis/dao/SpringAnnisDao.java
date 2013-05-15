@@ -55,6 +55,7 @@ import java.util.ListIterator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -382,6 +383,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<AnnotatedMatch> matrix(QueryData queryData)
   {
     return executeQueryFunction(queryData, matrixSqlGenerator);
+  }
+  
+  @Transactional(readOnly = true)
+  public void matrix(QueryData queryData, OutputStream out)
+  {
+    // TODO: implement a non memory version of the matrix query
   }
 
   @Override
