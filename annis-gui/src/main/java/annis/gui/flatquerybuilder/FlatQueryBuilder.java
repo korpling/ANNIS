@@ -172,7 +172,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     String result, value=sb.getValue(), level=sb.getAttribute();
     if (sb.isRegEx())
     {
-      result = (value==null) ? level+"=/.*/" : level+"=/"+value+"/";
+      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace(
+        "/", "\\x2F") +"/";
     }
     else
     {
@@ -210,7 +211,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     {
       result = result.replace(REGEX_CHARACTERS[i], "\\"+REGEX_CHARACTERS[i]);
     }
-    return result;
+    
+    return result.replace("/", "\\x2F");
   }
 
   private String getAQLQuery()
@@ -252,7 +254,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       if (spb.isRegEx())
       {
-        addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue() + "/";
+        addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
       }
       query += addQuery;
       for(Integer i : sentenceVars)
@@ -600,5 +602,17 @@ public Set<String> getAvailableAnnotationNames()
       out = "specific";
     }
     return out;
+  }
+  
+  public void adjustBuilderToQuery()
+    /*
+     * this method is called, when the
+     * query is changed in the textfield,
+     * so that the query represented by 
+     * the query builder is not equal to
+     * the one delivered by the text field
+     */
+  {
+    
   }
 }
