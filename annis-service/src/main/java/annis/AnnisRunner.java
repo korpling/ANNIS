@@ -890,7 +890,8 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     else
     {
-      out.println(WekaHelper.exportAsArff(matches));
+      WekaHelper.exportAsArff(matches, out);
+      out.println();
     }
   }
 

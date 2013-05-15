@@ -234,7 +234,7 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("search/matrix")
   @Produces("text/plain")
-  public String matrix(
+  public StreamingOutput matrix(
     @QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @QueryParam("metakeys") String rawMetaKeys)
@@ -260,19 +260,21 @@ public class QueryServiceImpl implements QueryService
     data.addExtension(ext);
 
     long start = new Date().getTime();
-    List<AnnotatedMatch> matches = annisDao.matrix(data);
+    final List<AnnotatedMatch> matches = annisDao.matrix(data);
     long end = new Date().getTime();
     logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
       end - start);
 
-    if (matches.isEmpty())
-    {
-      return "(empty)";
-    }
-    else
-    {
-      return WekaHelper.exportAsArff(matches);
-    }
+    StreamingOutput result = new StreamingOutput() {
+
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        WekaHelper.exportAsArff(matches, output);
+      }
+    };
+    
+    return result;
   }
 
   /**

@@ -18,6 +18,12 @@ package annis;
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import annis.model.Annotation;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +33,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,113 +42,121 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class WekaHelper
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
 
-  public static String exportAsArff(List<AnnotatedMatch> annotatedMatches)
+  public static void exportAsArff(List<AnnotatedMatch> annotatedMatches, OutputStream out)
   {
-    StringBuilder sb = new StringBuilder();
-
-    // header: relation name (unused)
-    sb.append("@relation name\n");
-    sb.append("\n");
-
-    // figure out what annotations are used at each match position
-    SortedMap<Integer, SortedSet<String>> columnsByNodePos = new TreeMap<Integer, SortedSet<String>>();
-        
-    for(int i = 0; i < annotatedMatches.size(); ++i)
+    PrintWriter w = null;
+    try
     {
-      AnnotatedMatch match = annotatedMatches.get(i);
-      for(int j = 0; j < match.size(); ++j)
+      w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+      // header: relation name (unused)
+      w.append("@relation name\n");
+      w.append("\n");
+      // figure out what annotations are used at each match position
+      SortedMap<Integer, SortedSet<String>> columnsByNodePos = new TreeMap<Integer, SortedSet<String>>();
+      for(int i = 0; i < annotatedMatches.size(); ++i)
       {
-        AnnotatedSpan span = match.get(j);
-        if(columnsByNodePos.get(j) == null)
+        AnnotatedMatch match = annotatedMatches.get(i);
+        for(int j = 0; j < match.size(); ++j)
         {
-          columnsByNodePos.put(j, new TreeSet<String>());
-        }
-        for(Annotation annotation : span.getAnnotations())
-        {
-          columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
-        }
-        
-        for(Annotation meta : span.getMetadata())
-        {
-          columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
-        }
-        
-      }
-    }
-
-
-    // print column names and data types
-    int count = columnsByNodePos.keySet().size();
-    
-    for(int j = 0; j < count; ++j)
-    {
-      sb.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
-      sb.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
-      SortedSet<String> annotationNames = columnsByNodePos.get(j);
-      for(String name : annotationNames)
-      {
-        sb.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
-      }
-    }
-    sb.append("\n@data\n\n");
-
-    // print values
-    for(AnnotatedMatch match : annotatedMatches)
-    {
-      List<String> line = new ArrayList<String>();
-      int k = 0;
-      for(; k < match.size(); ++k)
-      {
-        AnnotatedSpan span = match.get(k);
-        Map<String, String> valueByName = new HashMap<String, String>();
-
-        if(span != null)
-        {
-          if(span.getAnnotations() != null)
+          AnnotatedSpan span = match.get(j);
+          if(columnsByNodePos.get(j) == null)
           {
-            for(Annotation annotation : span.getAnnotations())
+            columnsByNodePos.put(j, new TreeSet<String>());
+          }
+          for(Annotation annotation : span.getAnnotations())
+          {
+            columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
+          }
+          
+          for(Annotation meta : span.getMetadata())
+          {
+            columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+          }
+          
+        }
+      }
+      // print column names and data types
+      int count = columnsByNodePos.keySet().size();
+      for(int j = 0; j < count; ++j)
+      {
+        w.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
+        w.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
+        SortedSet<String> annotationNames = columnsByNodePos.get(j);
+        for(String name : annotationNames)
+        {
+          w.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
+        }
+      }
+      w.append("\n@data\n\n");
+      // print values
+      for(AnnotatedMatch match : annotatedMatches)
+      {
+        List<String> line = new ArrayList<String>();
+        int k = 0;
+        for(; k < match.size(); ++k)
+        {
+          AnnotatedSpan span = match.get(k);
+          Map<String, String> valueByName = new HashMap<String, String>();
+
+          if(span != null)
+          {
+            if(span.getAnnotations() != null)
             {
-              valueByName.put("anno_" + annotation.getQualifiedName(), annotation.getValue());
+              for(Annotation annotation : span.getAnnotations())
+              {
+                valueByName.put("anno_" + annotation.getQualifiedName(), annotation.getValue());
+              }
+            }
+            if(span.getMetadata() != null)
+            {
+              for(Annotation meta : span.getMetadata())
+              {
+                valueByName.put("meta_" + meta.getQualifiedName(), meta.getValue());
+              }
+            }
+
+            line.add("'" + span.getId() + "'");
+            line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
+          }
+
+          for(String name : columnsByNodePos.get(k))
+          {
+            if(valueByName.containsKey(name))
+            {
+              line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
+            }
+            else
+            {
+              line.add("'NULL'");
             }
           }
-          if(span.getMetadata() != null)
-          {
-            for(Annotation meta : span.getMetadata())
-            {
-              valueByName.put("meta_" + meta.getQualifiedName(), meta.getValue());
-            }
-          }
-
-          line.add("'" + span.getId() + "'");
-          line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
         }
-
-        for(String name : columnsByNodePos.get(k))
+        for(int l = k; l < count; ++l)
         {
-          if(valueByName.containsKey(name))
-          {
-            line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
-          }
-          else
+          line.add("'NULL'");
+          for(int m = 0; m <= columnsByNodePos.get(l).size(); ++m)
           {
             line.add("'NULL'");
           }
         }
+        w.append(StringUtils.join(line, ","));
+        w.append("\n");
       }
-      for(int l = k; l < count; ++l)
-      {
-        line.add("'NULL'");
-        for(int m = 0; m <= columnsByNodePos.get(l).size(); ++m)
-        {
-          line.add("'NULL'");
-        }
-      }
-      sb.append(StringUtils.join(line, ","));
-      sb.append("\n");
     }
-
-    return sb.toString();
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+    }
+    finally
+    {
+      if(w != null)
+      {
+        w.flush();
+      }
+    }
   }
 
   private static String fullColumnName(int i, String name)
