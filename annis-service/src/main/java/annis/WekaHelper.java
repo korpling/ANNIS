@@ -18,14 +18,15 @@ package annis;
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import annis.model.Annotation;
-import java.io.InputStream;
+import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.charset.Charset;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -45,51 +46,63 @@ public class WekaHelper
   
   private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
 
+  public static SortedMap<Integer, SortedSet<String>> exportArffHeader(Iterator<AnnotatedMatch> matches, PrintWriter w)
+  {
+    // header: relation name (unused)
+    w.append("@relation name\n");
+    w.append("\n");
+    // figure out what annotations are used at each match position
+    SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+      new TreeMap<Integer, SortedSet<String>>();
+    while(matches.hasNext())
+    {
+      AnnotatedMatch match = matches.next();
+      for(int j = 0; j < match.size(); ++j)
+      {
+        AnnotatedSpan span = match.get(j);
+        if(columnsByNodePos.get(j) == null)
+        {
+          columnsByNodePos.put(j, new TreeSet<String>());
+        }
+        for(Annotation annotation : span.getAnnotations())
+        {
+          columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
+        }
+
+        for(Annotation meta : span.getMetadata())
+        {
+          columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
+        }
+
+      }
+    }
+    // print column names and data types
+    int count = columnsByNodePos.keySet().size();
+    for(int j = 0; j < count; ++j)
+    {
+      w.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
+      w.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
+      SortedSet<String> annotationNames = columnsByNodePos.get(j);
+      for(String name : annotationNames)
+      {
+        w.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
+      }
+    }
+    
+    return columnsByNodePos;
+  }
+  
   public static void exportAsArff(List<AnnotatedMatch> annotatedMatches, OutputStream out)
   {
     PrintWriter w = null;
     try
     {
       w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-      // header: relation name (unused)
-      w.append("@relation name\n");
-      w.append("\n");
-      // figure out what annotations are used at each match position
-      SortedMap<Integer, SortedSet<String>> columnsByNodePos = new TreeMap<Integer, SortedSet<String>>();
-      for(int i = 0; i < annotatedMatches.size(); ++i)
-      {
-        AnnotatedMatch match = annotatedMatches.get(i);
-        for(int j = 0; j < match.size(); ++j)
-        {
-          AnnotatedSpan span = match.get(j);
-          if(columnsByNodePos.get(j) == null)
-          {
-            columnsByNodePos.put(j, new TreeSet<String>());
-          }
-          for(Annotation annotation : span.getAnnotations())
-          {
-            columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
-          }
-          
-          for(Annotation meta : span.getMetadata())
-          {
-            columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
-          }
-          
-        }
-      }
-      // print column names and data types
-      int count = columnsByNodePos.keySet().size();
-      for(int j = 0; j < count; ++j)
-      {
-        w.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
-        w.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
-        SortedSet<String> annotationNames = columnsByNodePos.get(j);
-        for(String name : annotationNames)
-        {
-          w.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
-        }
-      }
+     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+       exportArffHeader(annotatedMatches.iterator(), w);
+     
+     int count = columnsByNodePos.keySet().size();
+      
       w.append("\n@data\n\n");
       // print values
       for(AnnotatedMatch match : annotatedMatches)

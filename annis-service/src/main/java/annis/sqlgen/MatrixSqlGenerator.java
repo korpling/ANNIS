@@ -76,7 +76,7 @@ public class MatrixSqlGenerator
     throw new UnsupportedOperationException(
       "BUG: This method needs to be overwritten by ancestors or through Spring");
   }
-
+  
   @Override
   public List<AnnotatedMatch> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException

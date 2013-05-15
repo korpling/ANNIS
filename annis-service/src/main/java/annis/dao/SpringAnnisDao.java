@@ -58,12 +58,15 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
+import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -71,12 +74,14 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import org.apache.commons.io.input.BoundedInputStream;
+import org.apache.commons.lang3.Validate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
+import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
 import org.springframework.transaction.annotation.Transactional;
@@ -303,15 +308,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return names;
   }
-
-  // query functions
-  @Transactional
-  @Override
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
-    final ResultSetExtractor<T> extractor)
+  
+  private void prepareTransaction(QueryData queryData)
   {
-
     JdbcTemplate jdbcTemplate = getJdbcTemplate();
 
     // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
@@ -327,9 +326,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
     }
+  }
+  
+  // query functions
+  @Transactional
+  @Override
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGenerator<QueryData, T> generator,
+    final ResultSetExtractor<T> extractor)
+  {
+
+    prepareTransaction(queryData);
 
     // execute query and return result
-    return jdbcTemplate.query(generator.toSql(queryData), extractor);
+    return getJdbcTemplate().query(generator.toSql(queryData), extractor);
   }
 
   @Override
@@ -386,9 +396,37 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
   
   @Transactional(readOnly = true)
-  public void matrix(QueryData queryData, OutputStream out)
+  public void matrix(QueryData queryData, final OutputStream out)
   {
+    prepareTransaction(queryData);
+    
+    getJdbcTemplate().query(matrixSqlGenerator.toSql(queryData),  new RowCountCallbackHandler()
+    {
+
+      @Override
+      protected void processRow(ResultSet rs, int rowNum) throws SQLException
+      {
+        AnnotatedSpan span = matrixSqlGenerator.getSpanExtractor().mapRow(rs,
+          rowNum);
+        long id = rs.getLong("id");
+
+        // create key
+        Array sqlKey = rs.getArray("key");
+        Validate.isTrue(!rs.wasNull(),
+          "Match group identifier must not be null");
+        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
+          "Key in database must be from the type \"bigint\" but was \"" + sqlKey.
+          getBaseTypeName() + "\"");
+
+        Long[] keyArray = (Long[]) sqlKey.getArray();
+        int matchWidth = keyArray.length;
+        List<Long> key = Arrays.asList(keyArray);
+      }
+      
+    });
+    
     // TODO: implement a non memory version of the matrix query
+    
   }
 
   @Override
