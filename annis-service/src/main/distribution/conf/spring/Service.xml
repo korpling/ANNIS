@@ -14,7 +14,7 @@
   </bean> 
   
   <!-- QueryService -->
-  <bean id="queryService" class="annis.service.internal.QueryService" init-method="init" lazy-init="true">
+  <bean id="queryService" class="annis.service.internal.QueryServiceImpl" init-method="init" lazy-init="true">
     <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
     <property name="maxContext" value="${annis.max-context}" />

@@ -1,18 +1,18 @@
 /*
-* Copyright 2013 SFB 632.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2013 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
@@ -55,15 +55,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-*
-* <p>
-* <strong>Mappings:</strong><br />
-* <ul>
-* <li>visconfigpath - path of the visualization configuration file</li>
-* </ul>
-* </p>
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-*/
+ *
+ * <p>
+ * <strong>Mappings:</strong><br />
+ * <ul>
+ * <li>visconfigpath - path of the visualization configuration file</li>
+ * </ul>
+ * </p>
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
 @PluginImplementation
 public class HTMLVis extends AbstractVisualizer<Panel>
 {
@@ -107,7 +107,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     WebResource resMeta = Helper.getAnnisWebResource().path(
       "query/corpora/").path(corpusName).path(corpusName) // HACK: use the corpus name as document name
       .path("binary/meta");
-     List<AnnisBinaryMetaData> binaryMeta =
+     List<AnnisBinaryMetaData> binaryMeta = 
        resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
     
     try
@@ -124,7 +124,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         for(AnnisBinaryMetaData m : binaryMeta)
         {
           if(title.equals(m.getFileName()))
-          {
+          {            
             WebResource resBinary = Helper.getAnnisWebResource().path(
               "query/corpora/").path(corpusName).path(corpusName)
               .path("binary").path("0").path("" + m.getLength())
@@ -139,9 +139,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       
       if(inStreamConfig == null)
       {
-        Notification.show("ERROR: html visualization configuration \""
-          + visConfigName
-          + "\" not found in database",Notification.Type.ERROR_MESSAGE);
+        Notification.show("ERROR: html visualization configuration \"" 
+          + visConfigName 
+          +  "\" not found in database",Notification.Type.ERROR_MESSAGE);
       }
       else
       {
@@ -196,13 +196,13 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     catch (IOException ex)
     {
       log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(),
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
         Notification.Type.ERROR_MESSAGE);
     }
     catch (VisParserException ex)
     {
       log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(),
+      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
         Notification.Type.ERROR_MESSAGE);
     }
 
