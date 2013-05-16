@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
@@ -30,6 +31,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
@@ -55,6 +57,9 @@ import java.util.ListIterator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
@@ -62,18 +67,22 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import org.apache.commons.io.input.BoundedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
@@ -302,15 +311,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return names;
   }
-
-  // query functions
-  @Transactional
-  @Override
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
-    final ResultSetExtractor<T> extractor)
+  
+  private void prepareTransaction(QueryData queryData)
   {
-
     JdbcTemplate jdbcTemplate = getJdbcTemplate();
 
     // FIXME: muss corpusConfiguration an jeden Query angehangen werden?
@@ -326,9 +329,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
     }
+  }
+  
+  // query functions
+  @Transactional
+  @Override
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGenerator<QueryData, T> generator,
+    final ResultSetExtractor<T> extractor)
+  {
+
+    prepareTransaction(queryData);
 
     // execute query and return result
-    return jdbcTemplate.query(generator.toSql(queryData), extractor);
+    return getJdbcTemplate().query(generator.toSql(queryData), extractor);
   }
 
   @Override
@@ -376,12 +390,48 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return executeQueryFunction(queryData, annotateSqlGenerator,
       saltAnnotateExtractor);
   }
-
+  
   @Transactional(readOnly = true)
   @Override
-  public List<AnnotatedMatch> matrix(QueryData queryData)
+  public void matrix(final QueryData queryData, final OutputStream out)
   {
-    return executeQueryFunction(queryData, matrixSqlGenerator);
+    prepareTransaction(queryData);
+    
+    getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
+    {
+      @Override
+      public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
+      {
+        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
+          ResultSet.CONCUR_READ_ONLY);
+        try
+        {
+          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));
+          AnnotatedMatchIterator itMatches  = 
+            new AnnotatedMatchIterator(rs, matrixSqlGenerator.getSpanExtractor());
+          
+          // write the header to the output stream
+          PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+          SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+            WekaHelper.exportArffHeader(itMatches, w);
+          w.flush();
+          
+          // go back to the beginning and print the actual data
+          itMatches.reset();
+          WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+          w.flush();
+        }
+        catch(UnsupportedEncodingException ex)
+        {
+          log.error("Your system is not able to handle UTF-8 but ANNIS really needs this charset", ex);
+        }
+        finally
+        {
+          stmt.close();
+        }
+        return true;
+      }
+    });
   }
 
   @Override
