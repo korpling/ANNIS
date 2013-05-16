@@ -58,13 +58,16 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   @Override
   public AnnotatedMatch next()
   {
-    List<AnnotatedSpan> matchedSpans = new LinkedList<AnnotatedSpan>();
     List<Long> key = new ArrayList<Long>();
+    AnnotatedSpan[] matchedSpans = new AnnotatedSpan[0];
     
     if(lastSpan != null)
     {
       key = lastSpan.getKey();
-      matchedSpans.add(lastSpan);
+      matchedSpans = new AnnotatedSpan[key.size()];
+     
+      setSpanForAllMatchedPositions(key, matchedSpans, lastSpan);
+      
       lastSpan = null;
     }
     
@@ -72,9 +75,16 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     {
       AnnotatedSpan span = itSpan.next();
       List<Long> newKey = span.getKey();
+      
+      if(matchedSpans.length == 0)
+      {
+        matchedSpans = new AnnotatedSpan[newKey.size()];
+      }
+      
       if(key.isEmpty() || newKey.equals(key))
       {
-        matchedSpans.add(span);
+        setSpanForAllMatchedPositions(newKey, matchedSpans, span);
+        
         key = newKey;
         lastSpan = null;
       }
@@ -86,7 +96,6 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
         break;
       }
     }
-
     return new AnnotatedMatch(matchedSpans);    
   }
 
@@ -94,6 +103,22 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   public void remove()
   {
     throw new UnsupportedOperationException("Not supported yet.");
+  }
+
+  private void setSpanForAllMatchedPositions(List<Long> key, 
+    AnnotatedSpan[] matchedSpans, AnnotatedSpan span)
+  {
+    // set annotation spans for *all* positions of the id
+    // (node could have matched several times)
+    int i=0;
+    for(long l : key)
+    {
+      if(l == span.getId())
+      {
+        matchedSpans[i] = span;
+      }
+      i++;
+    }
   }
   
 }
