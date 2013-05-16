@@ -72,6 +72,11 @@
     <property name="jdbcTemplate" ref="defaultJdbcTemplate" />
     <property name="annisDao" ref="annisDao" />
     <property name="tableInsertSelect" ref="tableInsertSelect" />
+    <property name="queryBuilder">
+      <util:set>
+        <bean class="annis.dao.autogenqueries.AutoTokQuery"/>
+      </util:set>
+    </property>
   </bean>
 
   <util:map id="tableInsertSelect">

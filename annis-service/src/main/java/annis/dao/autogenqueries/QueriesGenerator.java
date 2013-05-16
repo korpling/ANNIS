@@ -22,8 +22,10 @@ import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
@@ -49,6 +51,8 @@ public class QueriesGenerator
   // defines which cols of the tmp table are selected
   private Map<String, String> tableInsertSelect;
 
+  private Set<QueryBuilder> queryBuilder;
+
   // to execute some sql commands directtly
   private JdbcTemplate jdbcTemplate;
 
@@ -59,7 +63,13 @@ public class QueriesGenerator
     List<String> corpusNames = getAnnisDao().mapCorpusIdsToNames(corpusIds);
     corpusName = corpusNames.get(0);
 
-    generateQuery(new AutoTokQuery());
+    if (queryBuilder != null)
+    {
+      for (QueryBuilder qB : queryBuilder)
+      {
+        generateQuery(qB);
+      }
+    }
   }
 
   public void generateQuery(QueryBuilder queryBuilder)
@@ -159,6 +169,23 @@ public class QueriesGenerator
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
+  }
+
+  /**
+   * @return the queryBuilder
+   */
+  public Set<QueryBuilder> getQueryBuilder()
+  {
+    return queryBuilder;
+  }
+
+  /**
+   * @param queryBuilder the queryBuilder to set
+   */
+  public void setQueryBuilder(
+    Set<QueryBuilder> queryBuilder)
+  {
+    this.queryBuilder = queryBuilder;
   }
 
   public interface QueryBuilder
