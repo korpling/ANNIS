@@ -151,6 +151,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private ObjectMapper jsonMapper = new ObjectMapper();
 
+  private QueriesGenerator queriesGenerator;
+
   /**
    * Called when Spring configuration finished
    */
@@ -1533,37 +1535,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     // set in the annis.properties file.
     if (generateExampleQueries)
     {
-      QueriesGenerator queryGen = new QueriesGenerator(annisDao, corpusID);
-      ExampleQuery eQ = queryGen.generateQuery(new AutoTokQuery());
-
-      if (!"".equals(eQ.getExampleQuery()))
-      {
-        if (tableInsertSelect.containsKey("example_queries"))
-        {
-          StringBuilder sql = new StringBuilder();
-          sql.append("INSERT INTO example_queries (");
-          sql.append(tableInsertSelect.get("example_queries")).append(") ");
-          sql.append("VALUES (\n");
-          sql.append("'").append(eQ.getExampleQuery()).append("', ");
-          sql.append("'").append(eQ.getDescription()).append("', ");
-          sql.append("'").append(eQ.getType()).append("', ");
-          sql.append("'").append(eQ.getNodes()).append("', ");
-          sql.append("'").append("{}").append("', ");
-          sql.append("'").append(corpusID).append("'");
-          sql.append("\n)");
-
-          getJdbcTemplate().execute(sql.toString());
-          log.info("generated example query: {}", eQ.getExampleQuery());
-        }
-      }
-      else
-      {
-        log.warn("could not generating queries");
-      }
-    }
-    else
-    {
-      log.info("skip generating example queries");
+      queriesGenerator.generateQueries(corpusID);
     }
   }
 
@@ -1696,5 +1668,22 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.info("found operators {} in ", eQ.getUsedOperators(), eQ.
         getExampleQuery());
     }
+  }
+
+  /**
+   * @return the queriesGenerator
+   */
+  public QueriesGenerator getQueriesGenerator()
+  {
+    return queriesGenerator;
+  }
+
+  /**
+   * @param queriesGenerator the queriesGenerator to set
+   */
+  public void setQueriesGenerator(
+    QueriesGenerator queriesGenerator)
+  {
+    this.queriesGenerator = queriesGenerator;
   }
 }
