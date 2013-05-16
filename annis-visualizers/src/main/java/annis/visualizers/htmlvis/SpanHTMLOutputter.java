@@ -1,18 +1,18 @@
 /*
-* Copyright 2013 SFB 632.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2013 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
@@ -30,9 +30,9 @@ import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
-*
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-*/
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
 public class SpanHTMLOutputter
 {
   public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT};
@@ -44,7 +44,7 @@ public class SpanHTMLOutputter
   private String constant;
   
   public void outputHTML(SNode node, String matchedQName,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags,
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     if(node instanceof SSpan)
@@ -62,8 +62,8 @@ public class SpanHTMLOutputter
     }
   }
   
-  private void outputSpan(SSpan span, String matchedQName,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags,
+  private void outputSpan(SSpan span, String matchedQName, 
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     long left = span
@@ -94,7 +94,7 @@ public class SpanHTMLOutputter
   }
   
   private void outputToken(SToken tok,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags,
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     long index = tok
@@ -115,12 +115,12 @@ public class SpanHTMLOutputter
         value = "tok";
         break;
     }
-    outputAny(index, index, "tok", value, outputStartTags, outputEndTags);
+    outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
   }
   
   private void outputAny(long left, long right, String matchedQName,
-    String value,
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags,
+    String value, 
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
     

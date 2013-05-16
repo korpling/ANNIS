@@ -1,18 +1,18 @@
 /*
-* Copyright 2009-2011 Collaborative Research Centre SFB 632
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.gui.servlets;
 
 import annis.libgui.Helper;
@@ -42,19 +42,19 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-* This Servlet provides binary-files with a stream of partial-content. The
-* first GET-request is answered with the status-code 206 Partial Content.
-*
+ * This Servlet provides binary-files with a stream of partial-content. The
+ * first GET-request is answered with the status-code 206 Partial Content.
+ *
 <<<<<<< HEAD
-* TODO: handle more than one byte-range TODO:
+ * TODO: handle more than one byte-range TODO:
 =======
-* TODO: handle more than one byte-range
-*
+ * TODO: handle more than one byte-range
+ *
 >>>>>>> Add basic pdf support based on pdfjs. If you check in a new version of pdfjs,
-*
-* @author benjamin
-*
-*/
+ *
+ * @author benjamin
+ *
+ */
 public class BinaryServlet extends HttpServlet
 {
 

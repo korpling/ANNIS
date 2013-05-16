@@ -1,18 +1,18 @@
 /*
-* Copyright 2013 SFB 632.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2013 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.visualizers.component.grid;
 
 import annis.gui.widgets.grid.GridEvent;
@@ -58,22 +58,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-*
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-*/
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
 public class EventExtractor {
 
   private static Logger log = LoggerFactory.getLogger(EventExtractor.class);
 
   /**
-* Converts Salt document graph to rows.
-*
-* @param graph
-* @param annotationNames
-* @param startTokenIndex token index of the first token in the match
-* @param endTokenIndex token index of the last token in the match
-* @return
-*/
+   * Converts Salt document graph to rows.
+   *
+   * @param graph
+   * @param annotationNames
+   * @param startTokenIndex token index of the first token in the match
+   * @param endTokenIndex token index of the last token in the match
+   * @return
+   */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
     VisualizerInput input,
     List<String> annotationNames, long startTokenIndex, long endTokenIndex)
@@ -197,16 +197,16 @@ public class EventExtractor {
   }
 
   /**
-* Returns the annotations to display according to the mappings configuration.
-*
-* This will check the "annos" and "annos_regex" paramters for determining.
-* the annotations to display. It also iterates over all nodes of the graph
-* matching the type.
-*
-* @param input The input for the visualizer.
-* @param type Which type of nodes to include
-* @return
-*/
+   * Returns the annotations to display according to the mappings configuration.
+   *
+   * This will check the "annos" and "annos_regex" paramters for determining.
+   * the annotations to display. It also iterates over all nodes of the graph
+   * matching the type.
+   *
+   * @param input The input for the visualizer.
+   * @param type Which type of nodes to include
+   * @return
+   */
   public static List<String> computeDisplayAnnotations(VisualizerInput input,
           Class<? extends SNode> type) {
     if (input == null) {
@@ -274,16 +274,16 @@ public class EventExtractor {
   }
 
   /**
-* Get the qualified name of all annotations belonging to spans having a
-* specific namespace.
-*
-* @param graph The graph.
-* @param namespace The namespace of the node (not the annotation) to search
-* for.
-* @param type Which type of nodes to include
-* @return
-*
-*/
+   * Get the qualified name of all annotations belonging to spans having a
+   * specific namespace.
+   *
+   * @param graph The graph.
+   * @param namespace The namespace of the node (not the annotation) to search
+   * for.
+   * @param type Which type of nodes to include
+   * @return
+   *
+   */
   private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
           String namespace, Class<? extends SNode> type) {
     Set<String> result = new TreeSet<String>();
@@ -319,14 +319,14 @@ public class EventExtractor {
   }
 
   /**
-* Merges the rows. This function uses a heuristical approach that guarantiess
-* to merge all rows into one if there is no conflict at all. If there are
-* conflicts the heuristic will be best-efford but with linear runtime (given
-* a a number of rows).
-*
-* @param rows Will be altered, if no conflicts occcured this wil have only
-* one element.
-*/
+   * Merges the rows. This function uses a heuristical approach that guarantiess
+   * to merge all rows into one if there is no conflict at all. If there are
+   * conflicts the heuristic will be best-efford but with linear runtime (given
+   * a a number of rows).
+   *
+   * @param rows Will be altered, if no conflicts occcured this wil have only
+   * one element.
+   */
   private static void mergeAllRowsIfPossible(ArrayList<Row> rows) {
     // use fixed seed in order to get consistent results (with random properties)
     Random rand = new Random(5711l);
@@ -363,11 +363,11 @@ public class EventExtractor {
   }
 
   /**
-* Sort events of a row. The sorting is depending on the left value of the
-* event
-*
-* @param row
-*/
+   * Sort events of a row. The sorting is depending on the left value of the
+   * event
+   *
+   * @param row
+   */
   private static void sortEventsByTokenIndex(Row row) {
     Collections.sort(row.getEvents(), new Comparator<GridEvent>() {
       @Override
@@ -388,15 +388,15 @@ public class EventExtractor {
   }
 
   /**
-* Splits events of a row if they contain a gap. Gaps are found using the
-* token index (provided as ANNIS specific {@link SFeature}. Inserted events
-* have a special style to mark them as gaps.
-*
-* @param row
-* @param graph
-* @param startTokenIndex token index of the first token in the match
-* @param endTokenIndex token index of the last token in the match
-*/
+   * Splits events of a row if they contain a gap. Gaps are found using the
+   * token index (provided as ANNIS specific {@link SFeature}. Inserted events
+   * have a special style to mark them as gaps.
+   *
+   * @param row
+   * @param graph
+   * @param startTokenIndex token index of the first token in the match
+   * @param endTokenIndex token index of the last token in the match
+   */
   private static void splitRowsOnGaps(Row row, final SDocumentGraph graph,
           long startTokenIndex, long endTokenIndex) {
     ListIterator<GridEvent> itEvents = row.getEvents().listIterator();

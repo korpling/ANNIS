@@ -1,18 +1,18 @@
 /*
-* Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.gui.resultview;
 
 import annis.libgui.Helper;
@@ -65,13 +65,13 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-* Controls the visibility of visualizer plugins and provides some control
-* methods for the media visualizers.
-*
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-* @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
-*
-*/
+ * Controls the visibility of visualizer plugins and provides some control
+ * methods for the media visualizers.
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ *
+ */
 public class VisualizerPanel extends VerticalLayout
   implements Button.ClickListener, VisualizationToggle
 {
@@ -127,10 +127,10 @@ public class VisualizerPanel extends VerticalLayout
   private InstanceConfig instanceConfig;
 
   /**
-* This Constructor should be used for {@link ComponentVisualizerPlugin}
-* Visualizer.
-*
-*/
+   * This Constructor should be used for {@link ComponentVisualizerPlugin}
+   * Visualizer.
+   *
+   */
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
@@ -515,18 +515,18 @@ public class VisualizerPanel extends VerticalLayout
   }
 
   /**
-* Rebuild the map of marked and covered matches with new object references.
-* If a visualizer uses the whole document, the {@link VisualizerInput} gets a
-* new result object, with new SNode objects, so we have to update these
-* references.
-*
-* @param markedAndCovered the original map calculated with the partial
-* document graph
-* @param document the partial document or subgraph
-* @param wholeDocucment the new complete document
-* @return a new map, with updated object/node references. The salt ids of the
-* node objects remains the same.
-*/
+   * Rebuild the map of marked and covered matches with new object references.
+   * If a visualizer uses the whole document, the {@link VisualizerInput} gets a
+   * new result object, with new SNode objects, so we have to update these
+   * references.
+   *
+   * @param markedAndCovered the original map calculated with the partial
+   * document graph
+   * @param document the partial document or subgraph
+   * @param wholeDocucment the new complete document
+   * @return a new map, with updated object/node references. The salt ids of the
+   * node objects remains the same.
+   */
   private Map<SNode, Long> rebuildMarkedAndConvered(
     Map<SNode, Long> markedAndCovered,
     SDocument document, SDocument wholeDocument)
@@ -550,17 +550,17 @@ public class VisualizerPanel extends VerticalLayout
   }
 
   /**
-* Since there is a bug in the annis-service some ANNIS Features are not set
-* when the whole document is requested, we have to copy it manually from the
-* old nodes
-*
-* @param source orignal node
-* @param target node which is missing the annis feature
-* @param featureNameSpace namespace of the feature
-* @param featureName name of the feature
-* @param copyIfExists If true the feature is copied even if it already exists
-* on target node.
-*/
+   * Since there is a bug in the annis-service some ANNIS Features are not set
+   * when the whole document is requested, we have to copy it manually from the
+   * old nodes
+   *
+   * @param source orignal node
+   * @param target node which is missing the annis feature
+   * @param featureNameSpace namespace of the feature
+   * @param featureName name of the feature
+   * @param copyIfExists If true the feature is copied even if it already exists
+   * on target node.
+   */
   private void copyAnnisFeature(SNode source, SNode target,
     String featureNameSpace, String featureName, boolean copyIfExists)
   {

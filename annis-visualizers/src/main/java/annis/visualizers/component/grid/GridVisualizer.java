@@ -1,18 +1,18 @@
 /*
-* Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2012 Corpuslinguistic working group Humboldt University Berlin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.visualizers.component.grid;
 
 import annis.CommonHelper;
@@ -48,18 +48,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
-* Visualizes annotations of a spans.
-*
-*
-* Mappings: <br/>
-* It is possible to specify the order of annotation layers in each grid. Use
-* <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
-* annotation layers. If <b>anno:</b> is used, additional annotation layers not
-* present in the list will not be visualized. If mappings is left empty, layers
-* will be ordered alphabetically
-*
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-*/
+ * Visualizes annotations of a spans.
+ *
+ *
+ * Mappings: <br/>
+ * It is possible to specify the order of annotation layers in each grid. Use
+ * <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
+ * annotation layers. If <b>anno:</b> is used, additional annotation layers not
+ * present in the list will not be visualized. If mappings is left empty, layers
+ * will be ordered alphabetically
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
 @PluginImplementation
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent> {
 

@@ -1,18 +1,18 @@
 /*
-* Copyright 2009-2011 Collaborative Research Centre SFB 632
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.administration;
 
 import annis.dao.AnnisDao;
@@ -63,9 +63,9 @@ import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
-* - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
-* Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts
-*/
+ * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
+ * Reihenfolge der Aufrufe - Skripte in $ANNIS_HOME/scripts
+ */
 // FIXME: nothing in SpringAnnisAdministrationDao is tested
 public class DefaultAdministrationDao implements AdministrationDao
 {
@@ -90,9 +90,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   private boolean temporaryStagingArea;
 
   /**
-* If this is true and no example_queries.tab is found, automatic queries are
-* generated.
-*/
+   * If this is true and no example_queries.tab is found, automatic queries are
+   * generated.
+   */
   private boolean generateExampleQueries;
 
   private String schemaVersion;
@@ -107,17 +107,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   private final String REL_ANNIS_FILE_SUFFIX = ".tab";
 
   /**
-* Optional tab for example queries. If this tab not exist, a dummy file from
-* the resource folder is used.
-*/
+   * Optional tab for example queries. If this tab not exist, a dummy file from
+   * the resource folder is used.
+   */
   private final String EXAMPLE_QUERIES = "example_queries";
 
   /**
-* The name of the file and the relation containing the resolver information.
-*/
+   * The name of the file and the relation containing the resolver information.
+   */
   private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
   // tables imported from bulk files
-  // DO NOT CHANGE THE ORDER OF THIS LIST! Doing so may cause foreign key failures during import.
+  // DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
 
   private String[] importedTables =
   {
@@ -151,8 +151,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   private ObjectMapper jsonMapper = new ObjectMapper();
 
   /**
-* Called when Spring configuration finished
-*/
+   * Called when Spring configuration finished
+   */
   public void init()
   {
 
@@ -359,7 +359,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     computeLeftTokenRightToken();
 
-// if (true) return;
+//    if (true) return;
 
     adjustRankPrePost();
     adjustTextId();
@@ -418,27 +418,27 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Reads tab seperated files from the filesystem, but it takes only files into
-* account with the {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
-* suffix. Further it is straight forward except for the
-* {@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP} and the
-* {@link DefaultAdministrationDao#EXAMPLE_QUERIES}. This is done by this
-* method automatically.
-*
-* <ul>
-*
-* <li>{@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP}: For backwards
-* compatibility, the columns must be counted, since there exists one
-* additional column for visibility behaviour of visualizers.</li>
-*
-* <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES}: If this file does not
-* exists, the example query table is empty</li>
-*
-* </ul>
-*
-* @param path The path to the relANNIS. The files have to have this suffix
-* {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
-*/
+   * Reads tab seperated files from the filesystem, but it takes only files into
+   * account with the {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+   * suffix. Further it is straight forward except for the
+   * {@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP} and the
+   * {@link DefaultAdministrationDao#EXAMPLE_QUERIES}. This is done by this
+   * method automatically.
+   *
+   * <ul>
+   *
+   * <li>{@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP}: For backwards
+   * compatibility, the columns must be counted, since there exists one
+   * additional column for visibility behaviour of visualizers.</li>
+   *
+   * <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES}: If this file does not
+   * exists, the example query table is empty</li>
+   *
+   * </ul>
+   *
+   * @param path The path to the relANNIS. The files have to have this suffix
+   * {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+   */
   void bulkImport(String path)
   {
     log.info("bulk-loading data");
@@ -506,7 +506,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       else if (columnNumber == 10)
       {
         // old node table without segmentations
-        // create temporary table for bulk import
+        // create temporary table for  bulk import
         jdbcTemplate.execute(
           "CREATE TEMPORARY TABLE _tmpnode"
           + "\n(\n"
@@ -528,7 +528,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         log.info("copying nodes from temporary helper table into staging area");
         jdbcTemplate.execute(
           "INSERT INTO " + tableInStagingArea("node") + "\n"
-          + " SELECT id, text_ref, corpus_ref, namespace, name, \"left\", "
+          + "  SELECT id, text_ref, corpus_ref, namespace, name, \"left\", "
           + "\"right\", token_index, "
           + "NULL AS seg_name, NULL AS seg_left, NULL AS seg_right, "
           + "continuous, span\n"
@@ -662,12 +662,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Updates the example queries table in the staging area. The final toplevel
-* corpus must already be computed.
-*
-* @param toplevelID The final top level corpus id.
-*
-*/
+   * Updates the example queries table in the staging area. The final toplevel
+   * corpus must already be computed.
+   *
+   * @param toplevelID The final top level corpus id.
+   *
+   */
   void extendStagingExampleQueries(long toplevelID)
   {
     log.info("extending _example_queries");
@@ -756,9 +756,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-*
-* @return the new corpus ID
-*/
+   *
+   * @return the new corpus ID
+   */
   long updateIds()
   {
     log.info("updating IDs in staging area");
@@ -949,9 +949,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       List<String> filesToDelete = jdbcTemplate.queryForList(
         "SELECT filename FROM media_files AS m, corpus AS top, corpus AS child\n"
         + "WHERE\n"
-        + " m.corpus_ref = child.id AND\n"
-        + " top.id = ? AND\n"
-        + " child.pre >= top.pre AND child.post <= top.post", String.class, l);
+        + "  m.corpus_ref = child.id AND\n"
+        + "  top.id = ? AND\n"
+        + "  child.pre >= top.pre AND child.post <= top.post", String.class, l);
       for (String fileName : filesToDelete)
       {
         File f = new File(dataDir, fileName);
@@ -1238,7 +1238,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "FROM pg_indexes "
       + "WHERE tablename IN (" + StringUtils.repeat("?", ",", tables.size()) + ") "
       + "AND lower(indexname) NOT IN "
-      + " (SELECT lower(conname) FROM pg_constraint WHERE contype in ('p', 'u'))";
+      + "	(SELECT lower(conname) FROM pg_constraint WHERE contype in ('p', 'u'))";
 
     return jdbcTemplate.query(sql, tables.toArray(), stringRowMapper());
   }
@@ -1249,13 +1249,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /*
-* Returns the CREATE INDEX statement for all indexes on the Annis tables,
-* that are not auto-created by PostgreSQL (primary keys and unique
-* constraints).
-*
-* @param used If True, return used indexes. If False, return unused indexes
-* (scan count is 0).
-*/
+   * Returns the CREATE INDEX statement for all indexes on the Annis tables,
+   * that are not auto-created by PostgreSQL (primary keys and unique
+   * constraints).
+   *
+   * @param used	If True, return used indexes. If False, return unused indexes
+   * (scan count is 0).
+   */
   public List<String> listIndexDefinitions(boolean used, List<String> tables)
   {
     String scansOp = used ? "!=" : "=";
@@ -1418,12 +1418,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     StringBuilder sb = new StringBuilder();
     sb.append("CREATE TABLE tmp_resolver_vis_map ");
     sb.append("( ");
-    sb.append("\"corpus\" varchar, ");
-    sb.append("\"version\" varchar, ");
-    sb.append("\"namespace\" varchar, ");
-    sb.append("\"element\" varchar, ");
-    sb.append("\"vis_type\" varchar NOT NULL, ");
-    sb.append("\"display_name\" varchar NOT NULL, ");
+    sb.append("\"corpus\"   varchar, ");
+    sb.append("\"version\" 	varchar, ");
+    sb.append("\"namespace\"	varchar, ");
+    sb.append("\"element\"    varchar, ");
+    sb.append("\"vis_type\"   varchar NOT NULL, ");
+    sb.append("\"display_name\"   varchar NOT NULL, ");
     sb.append("\"order\" integer default '0', ");
     sb.append("\"mappings\" varchar");
     sb.append(");");
@@ -1465,13 +1465,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Imported the old and the new version of the resolver_vis_map.tab. The new
-* version has an additional column for visibility status of the
-* visualization.
-*
-* @param path The path to the relAnnis file.
-* @param table The final table in the database of the resolver_vis_map table.
-*/
+   * Imported the old and the new version of the resolver_vis_map.tab. The new
+   * version has an additional column for visibility status of the
+   * visualization.
+   *
+   * @param path The path to the relAnnis file.
+   * @param table The final table in the database of the resolver_vis_map table.
+   */
   private void importResolverVisMapTable(String path, String table)
   {
     try
@@ -1521,9 +1521,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Generates example queries if no example queries tab file is defined by the
-* user.
-*/
+   * Generates example queries if no example queries tab file is defined by the
+   * user.
+   */
   private void generateExampleQueries()
   {
     // set in the annis.properties file.
@@ -1559,28 +1559,28 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* @return the generateExampleQueries
-*/
+   * @return the generateExampleQueries
+   */
   public boolean isGenerateExampleQueries()
   {
     return generateExampleQueries;
   }
 
   /**
-* @param generateExampleQueries the generateExampleQueries to set
-*/
+   * @param generateExampleQueries the generateExampleQueries to set
+   */
   public void setGenerateExampleQueries(boolean generateExampleQueries)
   {
     this.generateExampleQueries = generateExampleQueries;
   }
 
   /**
-* Counts nodes and operators of the AQL example query and writes it back to
-* the staging area.
-*
-* @param corpusID specifies the corpus, the analyze things.
-*
-*/
+   * Counts nodes and operators of the AQL example query and writes it back to
+   * the staging area.
+   *
+   * @param corpusID specifies the corpus, the analyze things.
+   *
+   */
   private void analyzeAutoGeneratedQueries(long corpusID)
   {
     // read the example queries from the staging area
@@ -1606,10 +1606,10 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Maps example queries to integer, which represents the amount of nodes of
-* the aql query.
-*
-*/
+   * Maps example queries to integer, which represents the amount of nodes of
+   * the aql query.
+   *
+   */
   private void countExampleQueryNodes(List<ExampleQuery> exampleQueries)
   {
 
@@ -1639,9 +1639,9 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Writes the counted nodes and the used operators back to the staging area.
-*
-*/
+   * Writes the counted nodes and the used operators back to the staging area.
+   *
+   */
   private void writeAmountOfNodesBack(List<ExampleQuery> exampleQueries)
   {
     StringBuilder sb = new StringBuilder();
@@ -1663,12 +1663,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   /**
-* Fetches operators used in the {@link ExampleQuery#getExampleQuery()} with a
-* given regex.
-*
-* @param exQueries Set the used operators property of each member.
-* @param regex The regex to search operators.
-*/
+   * Fetches operators used in the {@link ExampleQuery#getExampleQuery()} with a
+   * given regex.
+   *
+   * @param exQueries Set the used operators property of each member.
+   * @param regex The regex to search operators.
+   */
   private void getOperators(List<ExampleQuery> exQueries, String regex)
   {
 

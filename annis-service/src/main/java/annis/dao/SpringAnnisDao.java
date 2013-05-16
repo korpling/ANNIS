@@ -1,18 +1,18 @@
 /*
-* Copyright 2009-2011 Collaborative Research Centre SFB 632
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the License is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *    http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.dao;
 
 import annis.examplequeries.ExampleQuery;
@@ -119,33 +119,33 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   /**
-* @return the graphSqlGenerator
-*/
+   * @return the graphSqlGenerator
+   */
   public AnnotateSqlGenerator getGraphSqlGenerator()
   {
     return graphSqlGenerator;
   }
 
   /**
-* @param graphSqlGenerator the graphSqlGenerator to set
-*/
+   * @param graphSqlGenerator the graphSqlGenerator to set
+   */
   public void setGraphSqlGenerator(AnnotateSqlGenerator graphSqlGenerator)
   {
     this.graphSqlGenerator = graphSqlGenerator;
   }
 
   /**
-* @return the listDocumentsAnnotationsSqlHelper
-*/
+   * @return the listDocumentsAnnotationsSqlHelper
+   */
   public ListDocumentsAnnotationsSqlHelper getListDocumentsAnnotationsSqlHelper()
   {
     return listDocumentsAnnotationsSqlHelper;
   }
 
   /**
-* @param listDocumentsAnnotationsSqlHelper the
-* listDocumentsAnnotationsSqlHelper to set
-*/
+   * @param listDocumentsAnnotationsSqlHelper the
+   * listDocumentsAnnotationsSqlHelper to set
+   */
   public void setListDocumentsAnnotationsSqlHelper(
     ListDocumentsAnnotationsSqlHelper listDocumentsAnnotationsSqlHelper)
   {
@@ -161,23 +161,23 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   /**
-* @return the listDocumentsSqlHelper
-*/
+   * @return the listDocumentsSqlHelper
+   */
   public ListDocumentsSqlHelper getListDocumentsSqlHelper()
   {
     return listDocumentsSqlHelper;
   }
 
   /**
-* @param listDocumentsSqlHelper the listDocumentsSqlHelper to set
-*/
+   * @param listDocumentsSqlHelper the listDocumentsSqlHelper to set
+   */
   public void setListDocumentsSqlHelper(
     ListDocumentsSqlHelper listDocumentsSqlHelper)
   {
     this.listDocumentsSqlHelper = listDocumentsSqlHelper;
   }
 
-// private MatrixSqlGenerator matrixSqlGenerator;
+//	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
     SqlGenerator<QueryData, String>
@@ -245,7 +245,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // / new
 
   private List<SqlSessionModifier> sqlSessionModifiers;
-// private SqlGenerator findSqlGenerator;
+//  private SqlGenerator findSqlGenerator;
 
   private ParameterizedSingleColumnRowMapper<String> planRowMapper;
 
@@ -514,7 +514,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         File conf = null;
         try
         {
-          // try hash of corpus name first
+          // try  hash of corpus name first
           conf = new File(confFolder, Utils.calculateSHAHash(corpusName));
         }
         catch (NoSuchAlgorithmException ex)

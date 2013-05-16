@@ -16,14 +16,9 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Comparator;
+import java.util.LinkedHashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.SortedSet;
-import java.util.TreeMap;
-import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 
@@ -38,86 +33,41 @@ public class AnnisAttribute implements Serializable
 
   public enum Type
   {
-
     node,
     edge,
     segmentation,
     meta,
     unknown
-
   };
 
   public enum SubType
   {
-
     n,
     d,
     p,
     c,
     m,
     unknown
-
   };
+
+
   private String name = "";
-
   private String edgeName = null;
-
-  private class ValueComparator implements Comparator<String>
-  {
-
-    @Override
-    public int compare(String t, String t1)
-    {
-      if (t.equalsIgnoreCase(t1))
-      {
-        return -1;
-      }
-
-      return t.compareTo(t1);
-    }
-  }
-  private List<String> distinctValues = new ArrayList<String>();
-
+  private LinkedHashSet<String> distinctValues = new LinkedHashSet<String>();
   private Type type;
-
   private SubType subtype;
 
-  @XmlElementWrapper(name = "value-set")
-  @XmlElement(name = "value")
+
+  @XmlElementWrapper(name="value-set")
+  @XmlElement(name="value")
   public Collection<String> getValueSet()
   {
-
-    Map<String, SortedSet<String>> sortedMap = new TreeMap<String, SortedSet<String>>();
-
-    for (String v : distinctValues)
-    {
-      if (sortedMap.containsKey(v.toLowerCase()))
-      {
-        sortedMap.get(v.toLowerCase()).add(v);
-      }
-
-      else {
-        sortedMap.put(v.toLowerCase(), new TreeSet<String>());
-        sortedMap.get(v.toLowerCase()).add(v);
-      }
-    }
-
-    distinctValues.clear();
-
-    for(String k : sortedMap.keySet())
-    {
-      for (String s : sortedMap.get(k))
-      {
-        distinctValues.add(s);
-      }
-    }
-
     return distinctValues;
   }
 
   public void setValueSet(Collection<String> values)
   {
-    distinctValues.addAll(values);
+    this.distinctValues = new LinkedHashSet<String>(values);
   }
 
   public String getName()
@@ -139,6 +89,7 @@ public class AnnisAttribute implements Serializable
   {
     this.edgeName = edgeName;
   }
+
 
   public Type getType()
   {
@@ -186,14 +137,12 @@ public class AnnisAttribute implements Serializable
 
     AnnisAttribute other = (AnnisAttribute) obj;
 
-    return new EqualsBuilder().append(this.name, other.name).append(
-      this.distinctValues, other.distinctValues).isEquals();
+    return new EqualsBuilder().append(this.name, other.name).append(this.distinctValues, other.distinctValues).isEquals();
   }
 
   @Override
   public int hashCode()
   {
-    return new HashCodeBuilder().append(name).append(distinctValues).
-      toHashCode();
+    return new HashCodeBuilder().append(name).append(distinctValues).toHashCode();
   }
 }

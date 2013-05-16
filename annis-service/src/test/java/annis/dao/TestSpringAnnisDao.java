@@ -198,7 +198,7 @@ public class TestSpringAnnisDao
     verify(listCorpusAnnotationsHelper).createSqlQuery(ID, ID, true);
     verify(jdbcTemplate).query(SQL, listCorpusAnnotationsHelper);
   }
- 
+
   @SuppressWarnings("unchecked")
   @Test
   public void listNodeAnnotations()

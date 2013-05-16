@@ -1,18 +1,18 @@
 /*
-* Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
-*
-* Licensed under the Apache License, Version 2.0 (the "License");
-* you may not use this file except in compliance with the License.
-* You may obtain a copy of the License at
-*
-* http://www.apache.org/licenses/LICENSE-2.0
-*
-* Unless required by applicable law or agreed to in writing, software
-* distributed under the Licsense is distributed on an "AS IS" BASIS,
-* WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-* See the License for the specific language governing permissions and
-* limitations under the License.
-*/
+ * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the Licsense is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package annis.gui;
 
 import annis.libgui.AnnisBaseUI;
@@ -66,10 +66,10 @@ import org.slf4j.LoggerFactory;
 import org.vaadin.cssinject.CSSInject;
 
 /**
-* GUI for searching in corpora.
-*
-* @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
-*/
+ * GUI for searching in corpora.
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   LoginWindow.LoginListener,
@@ -279,7 +279,7 @@ public class SearchUI extends AnnisBaseUI
 
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
-    hSplit.addSplitterClickListener(new AbstractSplitPanel.SplitterClickListener()
+    hSplit.addSplitterClickListener(new AbstractSplitPanel.SplitterClickListener() 
     {
       @Override
       public void splitterClick(AbstractSplitPanel.SplitterClickEvent event)
@@ -299,7 +299,7 @@ public class SearchUI extends AnnisBaseUI
         }
       }
     });
-// hLayout.setExpandRatio(mainTab, 1.0f);
+//    hLayout.setExpandRatio(mainTab, 1.0f);
 
     addAction(new ShortcutListener("^Query builder")
     {
@@ -386,7 +386,7 @@ public class SearchUI extends AnnisBaseUI
           + ".corpus-font {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-          + " font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
+          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
           + "}");
       }
       else
@@ -394,19 +394,19 @@ public class SearchUI extends AnnisBaseUI
         css.setStyles(
           "@import url(" + cfg.getUrl() + ");\n"
           + ".corpus-font-force {\n"
-          + " font-family: '" + cfg.getName() + "', monospace !important;\n"
-          + " font-size: " + cfg.getSize() + " !important;\n"
+          + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
+          + "  font-size: " + cfg.getSize() + " !important;\n"
           + "}\n"
           + ".corpus-font {\n"
-          + " font-family: '" + cfg.getName() + "', monospace;\n"
-          + " font-size: " + cfg.getSize() + ";\n"
+          + "  font-family: '" + cfg.getName() + "', monospace;\n"
+          + "  font-size: " + cfg.getSize() + ";\n"
           + "}\n"
           + ".corpus-font .v-table-table {\n"
-          + " font-size: " + cfg.getSize() + ";\n"
+          + "    font-size: " + cfg.getSize() + ";\n"
           + "}"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-          + " font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
+          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
           + "}");
       }
     }
@@ -415,7 +415,7 @@ public class SearchUI extends AnnisBaseUI
       css.setStyles(
         // use original font definition from keyboard.css if no font given
         "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-        + " font-family: 'Lucida Console','Arial Unicode MS',monospace;"
+        + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
         + "}");
     }
   }
@@ -723,19 +723,19 @@ public class SearchUI extends AnnisBaseUI
   public void notifyMightNotPlayMimeType(String mimeType)
   {
     /*
-if(!warnedAboutPossibleMediaFormatProblem)
-{
-Notification notify = new Notification("Media file type \"" + mimeType + "\" might be unsupported by your browser!",
-"This means you might get errors playing this file.<br/><br /> "
-+ "<em>If you have problems with this media file:</em><br /> Try to check your browsers "
-+ "documentation how to enable "
-+ "support for the media type or inform the corpus creator about this problem.",
-Notification.Type.TRAY_NOTIFICATION, true);
-notify.setDelayMsec(15000);
-showNotification(notify);
-warnedAboutPossibleMediaFormatProblem = true;
-}
-*/
+     if(!warnedAboutPossibleMediaFormatProblem)
+     {
+     Notification notify = new Notification("Media file type \"" + mimeType  + "\" might be unsupported by your browser!",
+     "This means you might get errors playing this file.<br/><br /> "
+     + "<em>If you have problems with this media file:</em><br /> Try to check your browsers "
+     + "documentation how to enable "
+     + "support for the media type or inform the corpus creator about this problem.",
+     Notification.Type.TRAY_NOTIFICATION, true);
+     notify.setDelayMsec(15000);
+     showNotification(notify);
+     warnedAboutPossibleMediaFormatProblem = true;
+     }
+     */
   }
 
   @Override
