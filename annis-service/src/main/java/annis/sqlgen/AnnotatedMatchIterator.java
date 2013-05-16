@@ -73,9 +73,10 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     {
       AnnotatedSpan span = itSpan.next();
       List<Long> newKey = span.getKey();
-      if(newKey.equals(key))
+      if(key.isEmpty() || newKey.equals(key))
       {
         matchedSpans.add(span);
+        key = newKey;
         lastSpan = null;
       }
       else
