@@ -27,6 +27,7 @@ import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
+import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
 import annis.gui.tutorial.TutorialPanel;
 import annis.libgui.visualizers.IFrameResource;
@@ -470,6 +471,7 @@ public class SearchUI extends AnnisBaseUI
   {
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
       toURI());
+    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
 
