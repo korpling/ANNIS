@@ -16,9 +16,10 @@
 package annis.administration;
 
 import annis.dao.AnnisDao;
+import annis.dao.autogenqueries.AutoTokQuery;
+import annis.dao.autogenqueries.QueriesGenerator;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
-import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
@@ -387,17 +388,18 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     // create the new facts table partition
     createFacts(corpusID);
+
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
-
-    generateExampleQueries();
 
     if (temporaryStagingArea)
     {
       dropStagingArea();
     }
+
     analyzeFacts(corpusID);
 
+    generateExampleQueries(corpusID);
   }
 
   ///// Subtasks of importing a corpus
@@ -679,7 +681,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   void extendStagingText(long toplevelID)
   {
-    log.info("extending _text");;
+    log.info("extending _text");
     executeSqlFromScript("extend_staging_text.sql", makeArgs().addValue(":id",
       toplevelID));
   }
@@ -1526,16 +1528,43 @@ public class DefaultAdministrationDao implements AdministrationDao
    * Generates example queries if no example queries tab file is defined by the
    * user.
    */
-  private void generateExampleQueries()
+  private void generateExampleQueries(long corpusID)
   {
     // set in the annis.properties file.
     if (generateExampleQueries)
     {
-      log.info("generate example queries");
-      return;
-    }
+      QueriesGenerator queryGen = new QueriesGenerator(annisDao, corpusID);
+      ExampleQuery eQ = queryGen.generateQuery(new AutoTokQuery());
 
-    log.info("skip generating example queries");
+      if (!"".equals(eQ.getExampleQuery()))
+      {
+        if (tableInsertSelect.containsKey("example_queries"))
+        {
+          StringBuilder sql = new StringBuilder();
+          sql.append("INSERT INTO example_queries (");
+          sql.append(tableInsertSelect.get("example_queries")).append(") ");
+          sql.append("VALUES (\n");
+          sql.append("'").append(eQ.getExampleQuery()).append("', ");
+          sql.append("'").append(eQ.getDescription()).append("', ");
+          sql.append("'").append(eQ.getType()).append("', ");
+          sql.append("'").append(eQ.getNodes()).append("', ");
+          sql.append("'").append("{}").append("', ");
+          sql.append("'").append(corpusID).append("'");
+          sql.append("\n)");
+
+          getJdbcTemplate().execute(sql.toString());
+          log.info("generated example query: {}", eQ.getExampleQuery());
+        }
+      }
+      else
+      {
+        log.warn("could not generating queries");
+      }
+    }
+    else
+    {
+      log.info("skip generating example queries");
+    }
   }
 
   /**

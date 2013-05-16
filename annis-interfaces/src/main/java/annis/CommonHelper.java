@@ -44,6 +44,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Utilities class for non-gui operations on Salt.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class CommonHelper
@@ -53,7 +54,7 @@ public class CommonHelper
 
   public static boolean containsRTLText(String str)
   {
-    if(str != null)
+    if (str != null)
     {
       for (int i = 0; i < str.length(); i++)
       {
@@ -78,7 +79,8 @@ public class CommonHelper
     return false;
   }
 
-  public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph)
+  public static List<SNode> getSortedSegmentationNodes(String segName,
+    SDocumentGraph graph)
   {
     List<SNode> token = new ArrayList<SNode>();
 
@@ -193,7 +195,7 @@ public class CommonHelper
           {
             for (SOrderRelation rel : orderRelations)
             {
-              if(rel.getSTypes() != null)
+              if (rel.getSTypes() != null)
               {
                 result.addAll(rel.getSTypes());
               }
@@ -212,20 +214,22 @@ public class CommonHelper
    * {@link SDocumentGraph} and calculates the appropiate substring from the
    * {@link STextualDS}.
    *
-   * @param tok
-   * @return
+   * @param tok The {@link SToken} which is overlapping the text sequence.
+   * @return An empty {@link String} object, if there is no
+   * {@link STextualRelation}
    */
   public static String getSpannedText(SToken tok)
   {
     SDocumentGraph graph = tok.getSDocumentGraph();
 
     EList<Edge> edges = graph.getOutEdges(tok.getSId());
-    for(Edge e : edges)
+    for (Edge e : edges)
     {
-      if(e instanceof STextualRelation)
+      if (e instanceof STextualRelation)
       {
         STextualRelation textRel = (STextualRelation) e;
-        return  textRel.getSTextualDS().getSText().substring(textRel.getSStart(), textRel.getSEnd());
+        return textRel.getSTextualDS().getSText().substring(textRel.getSStart(),
+          textRel.getSEnd());
       }
     }
     return "";
@@ -243,29 +247,29 @@ public class CommonHelper
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
       "getRootCorpora",
       new SGraphTraverseHandler()
+    {
+      @Override
+      public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+        long order)
       {
-        @Override
-        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-          long order)
-        {
-          result.add(currNode.getSName());
-        }
+        result.add(currNode.getSName());
+      }
 
-        @Override
-        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId,
-          SNode currNode, SRelation edge, SNode fromNode, long order)
-        {
-        }
+      @Override
+      public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId,
+        SNode currNode, SRelation edge, SNode fromNode, long order)
+      {
+      }
 
-        @Override
-        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SRelation edge, SNode currNode, long order)
-        {
-          return true;
-        }
-      });
+      @Override
+      public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SRelation edge, SNode currNode, long order)
+      {
+        return true;
+      }
+    });
     return result;
   }
 
@@ -295,33 +299,34 @@ public class CommonHelper
 
     return result;
   }
-  
+
   public static SNode[] getMatchedNodes(SDocument doc)
   {
     SNode[] result = new SNode[0];
-    
+
     // get the matched node IDs
-    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_MATCHEDIDS);
-    if(feat != null)
+    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDIDS);
+    if (feat != null)
     {
       String[] ids = feat.getSValueSTEXT().split(",");
       result = new SNode[ids.length];
-      
-      for(int i=0; i < ids.length; i++)
+
+      for (int i = 0; i < ids.length; i++)
       {
         String id = ids[i].trim();
-        if(!id.isEmpty())
+        if (!id.isEmpty())
         {
           // get the specific node
           SNode node = doc.getSDocumentGraph().getSNode(id);
-          if(node != null)
+          if (node != null)
           {
             result[i] = node;
           }
         }
       }
     }
-    
+
     return result;
   }
 }
