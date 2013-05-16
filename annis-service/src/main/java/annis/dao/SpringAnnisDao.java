@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
@@ -30,6 +31,7 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
@@ -56,6 +58,8 @@ import java.util.ListIterator;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
 import java.sql.Array;
@@ -64,10 +68,12 @@ import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -79,11 +85,13 @@ import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
@@ -396,33 +404,39 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
   
   @Transactional(readOnly = true)
-  public void matrix(QueryData queryData, final OutputStream out)
+  @Override
+  public void matrix(final QueryData queryData, final OutputStream out)
   {
     prepareTransaction(queryData);
     
-    getJdbcTemplate().query(matrixSqlGenerator.toSql(queryData),  new RowCountCallbackHandler()
+    getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
     {
-
       @Override
-      protected void processRow(ResultSet rs, int rowNum) throws SQLException
+      public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
       {
-        AnnotatedSpan span = matrixSqlGenerator.getSpanExtractor().mapRow(rs,
-          rowNum);
-        long id = rs.getLong("id");
-
-        // create key
-        Array sqlKey = rs.getArray("key");
-        Validate.isTrue(!rs.wasNull(),
-          "Match group identifier must not be null");
-        Validate.isTrue(sqlKey.getBaseType() == Types.BIGINT,
-          "Key in database must be from the type \"bigint\" but was \"" + sqlKey.
-          getBaseTypeName() + "\"");
-
-        Long[] keyArray = (Long[]) sqlKey.getArray();
-        int matchWidth = keyArray.length;
-        List<Long> key = Arrays.asList(keyArray);
+        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
+          ResultSet.CONCUR_READ_ONLY);
+        try
+        {
+          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));
+          AnnotatedMatchIterator itMatches  = 
+            new AnnotatedMatchIterator(rs, matrixSqlGenerator.getSpanExtractor());
+          
+          // write the header to the output stream
+          PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+          WekaHelper.exportArffHeader(itMatches, w);
+          w.flush();
+        }
+        catch(UnsupportedEncodingException ex)
+        {
+          log.error("Your system is not able to handle UTF-8 but ANNIS really needs this charset", ex);
+        }
+        finally
+        {
+          stmt.close();
+        }
+        return true;
       }
-      
     });
     
     // TODO: implement a non memory version of the matrix query

@@ -268,7 +268,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doSql("subgraph salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2");
+    doCorpus("pcc2");
+    doMatrix("tok & pos & #1 . #2");
   }
 
   public void doParse(String annisQuery)
@@ -881,18 +882,18 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMatrix(String annisQuery)
   {
-//	    List<AnnotatedMatch> matches = annisDao.matrix(getCorpusList(), parse(annisQuery));
-    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
-      "matrix"));
-    if (matches.isEmpty())
-    {
-      out.println("(empty");
-    }
-    else
-    {
-      WekaHelper.exportAsArff(matches, out);
-      out.println();
-    }
+//    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
+//      "matrix"));
+    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), System.out);
+//    if (matches.isEmpty())
+//    {
+//      out.println("(empty");
+//    }
+//    else
+//    {
+//      WekaHelper.exportAsArff(matches, out);
+//      out.println();
+//    }
   }
 
   public void doFind(String annisQuery)

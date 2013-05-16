@@ -23,6 +23,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Validate;
@@ -31,7 +32,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
- *
+ * Maps a {@link ResultSet} row to an {@link AnnotatedSpan}
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
@@ -111,6 +112,8 @@ public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
       "Key in database must be from the type \"bigint\" but was \"" + sqlKey.
       getBaseTypeName() + "\"");
     
-    return new AnnotatedSpan(id, coveredText, annotations, metaData);
+    List<Long> key = Arrays.asList((Long[]) sqlKey.getArray());
+    
+    return new AnnotatedSpan(id, coveredText, annotations, metaData, key);
   }
 }

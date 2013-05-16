@@ -71,7 +71,20 @@ public class ResultSetTypedIterator<T> implements Iterator<T>
     
   }
   
-  
+  /**
+   * Returns to the beginning of the iteration.
+   */
+  public void reset()
+  {
+    try
+    {
+      hasNext = rs.first();
+    }
+    catch (SQLException ex)
+    {
+      log.error(null, ex);
+    }
+  }
   
   @Override
   public boolean hasNext()

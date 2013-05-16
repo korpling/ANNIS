@@ -45,7 +45,7 @@ public class WekaHelper
 {
   
   private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
-
+  
   public static SortedMap<Integer, SortedSet<String>> exportArffHeader(Iterator<AnnotatedMatch> matches, PrintWriter w)
   {
     // header: relation name (unused)
