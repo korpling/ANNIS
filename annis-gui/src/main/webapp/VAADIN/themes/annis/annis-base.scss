@@ -2,10 +2,10 @@
 @mixin annis-base {
 
   /**
-* "optional-" prefix means that the style is not necessarily used, it can be left blank
-* "generated-" prefix means that the style is calculated from some other color, and not directly selected by the editor user
-*
-**/
+    * "optional-" prefix means that the style is not necessarily used, it can be left blank
+    * "generated-" prefix means that the style is calculated from some other color, and not directly selected by the editor user
+    *
+  **/
 
   /* Application background */
   .v-app {
@@ -330,10 +330,10 @@
   }
 
   /**
-* "optional-" prefix means that the style is not necessarily used, it can be left blank
-* "generated-" prefix means that the style is calculated from some other color, and not directly selected by the editor user
-*
-**/
+    * "optional-" prefix means that the style is not necessarily used, it can be left blank
+    * "generated-" prefix means that the style is calculated from some other color, and not directly selected by the editor user
+    *
+  **/
 
   /* Application background */
   .v-app {
@@ -672,5 +672,5 @@
   .example-queries-table .v-table-body td {
     border: 1px solid #ECF0F6;
     padding: 5px;
-}
+	}
 }
