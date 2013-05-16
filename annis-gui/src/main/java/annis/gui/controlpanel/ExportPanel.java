@@ -187,14 +187,19 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           File currentTmpFile = File.createTempFile("annis-export", ".txt");
           currentTmpFile.deleteOnExit();
 
+          OutputStreamWriter outWriter = 
+            new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+          
           exporter.convertText(queryPanel.getQuery(),
             Integer.parseInt((String) cbLeftContext.getValue()),
             Integer.parseInt((String) cbRightContext.getValue()),
             corpusListPanel.getSelectedCorpora(),
             null, (String) txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
-            new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8"));
+            outWriter);
 
+            outWriter.close();
+            
           return currentTmpFile;
         }
       };

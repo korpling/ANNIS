@@ -18,6 +18,8 @@ package annis.gui.exporter;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.Page;
+import com.vaadin.ui.Notification;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
@@ -66,6 +68,9 @@ public class WekaExporter implements Exporter, Serializable
     catch(UniformInterfaceException ex)
     {
       log.error(null, ex);
+      Notification n = new Notification("Service exception", ex.getResponse().getEntity(String.class),
+        Notification.Type.WARNING_MESSAGE, true);
+      n.show(Page.getCurrent());
     }
     catch(ClientHandlerException ex)
     {
