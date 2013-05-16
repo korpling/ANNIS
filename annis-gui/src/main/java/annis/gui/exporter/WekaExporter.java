@@ -23,6 +23,7 @@ import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.Set;
+import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -51,14 +52,9 @@ public class WekaExporter implements Exporter, Serializable
       }
       
       InputStream result = res.get(InputStream.class);
-      
       try
       {
-        int c;
-        while( (c = result.read()) > -1)
-        {
-          out.write(c);
-        }
+        IOUtils.copy(result, out);
       }
       finally
       {
