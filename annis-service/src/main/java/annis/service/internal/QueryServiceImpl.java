@@ -235,8 +235,8 @@ public class QueryServiceImpl implements QueryService
   @Path("search/matrix")
   @Produces("text/plain")
   public StreamingOutput matrix(
-    @QueryParam("q") String query,
-    @QueryParam("corpora") String rawCorpusNames,
+    final @QueryParam("q") String query,
+    final @QueryParam("corpora") String rawCorpusNames,
     @QueryParam("metakeys") String rawMetaKeys)
   {
     requiredParameter(query, "q", "AnnisQL query");
@@ -250,7 +250,7 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:matrix:" + c);
     }
 
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
 
     MatrixQueryData ext = new MatrixQueryData();
     if (rawMetaKeys != null)
@@ -259,18 +259,16 @@ public class QueryServiceImpl implements QueryService
     }
     data.addExtension(ext);
 
-    long start = new Date().getTime();
-    final List<AnnotatedMatch> matches = annisDao.matrix(data);
-    long end = new Date().getTime();
-    logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
-      end - start);
-
     StreamingOutput result = new StreamingOutput() {
 
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
-        WekaHelper.exportAsArff(matches, output);
+        long start = new Date().getTime();
+        annisDao.matrix(data, output);
+        long end = new Date().getTime();
+        logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
+          end - start);
       }
     };
     

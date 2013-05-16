@@ -62,25 +62,22 @@ import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Array;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import org.apache.commons.io.input.BoundedInputStream;
-import org.apache.commons.lang3.Validate;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -88,10 +85,8 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
-import org.springframework.jdbc.core.RowCountCallbackHandler;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
@@ -395,13 +390,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return executeQueryFunction(queryData, annotateSqlGenerator,
       saltAnnotateExtractor);
   }
-
-  @Transactional(readOnly = true)
-  @Override
-  public List<AnnotatedMatch> matrix(QueryData queryData)
-  {
-    return executeQueryFunction(queryData, matrixSqlGenerator);
-  }
   
   @Transactional(readOnly = true)
   @Override
@@ -424,7 +412,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           
           // write the header to the output stream
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-          WekaHelper.exportArffHeader(itMatches, w);
+          SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+            WekaHelper.exportArffHeader(itMatches, w);
+          w.flush();
+          
+          // go back to the beginning and print the actual data
+          itMatches.reset();
+          WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
           w.flush();
         }
         catch(UnsupportedEncodingException ex)
@@ -438,9 +432,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         return true;
       }
     });
-    
-    // TODO: implement a non memory version of the matrix query
-    
   }
 
   @Override

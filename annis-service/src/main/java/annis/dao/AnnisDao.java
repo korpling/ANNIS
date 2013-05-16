@@ -115,7 +115,6 @@ public interface AnnisDao
   String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
     final boolean analyze);
 
-  List<AnnotatedMatch> matrix(QueryData queryData);
   public void matrix(final QueryData queryData, final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,

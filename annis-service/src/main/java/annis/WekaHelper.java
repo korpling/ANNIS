@@ -46,7 +46,8 @@ public class WekaHelper
   
   private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
   
-  public static SortedMap<Integer, SortedSet<String>> exportArffHeader(Iterator<AnnotatedMatch> matches, PrintWriter w)
+  public static SortedMap<Integer, SortedSet<String>> exportArffHeader(
+    Iterator<AnnotatedMatch> matches, PrintWriter w)
   {
     // header: relation name (unused)
     w.append("@relation name\n");
@@ -92,72 +93,81 @@ public class WekaHelper
     return columnsByNodePos;
   }
   
+  public static void exportArffData(Iterator<AnnotatedMatch> matches,
+    SortedMap<Integer, SortedSet<String>> columnsByNodePos, PrintWriter w)
+  {
+    int count = columnsByNodePos.keySet().size();
+      
+    w.append("\n@data\n\n");
+    // print values
+    while(matches.hasNext())
+    {
+      AnnotatedMatch match = matches.next();
+      
+      List<String> line = new ArrayList<String>();
+      int k = 0;
+      for(; k < match.size(); ++k)
+      {
+        AnnotatedSpan span = match.get(k);
+        Map<String, String> valueByName = new HashMap<String, String>();
+
+        if(span != null)
+        {
+          if(span.getAnnotations() != null)
+          {
+            for(Annotation annotation : span.getAnnotations())
+            {
+              valueByName.put("anno_" + annotation.getQualifiedName(), annotation.getValue());
+            }
+          }
+          if(span.getMetadata() != null)
+          {
+            for(Annotation meta : span.getMetadata())
+            {
+              valueByName.put("meta_" + meta.getQualifiedName(), meta.getValue());
+            }
+          }
+
+          line.add("'" + span.getId() + "'");
+          line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
+        }
+
+        for(String name : columnsByNodePos.get(k))
+        {
+          if(valueByName.containsKey(name))
+          {
+            line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
+          }
+          else
+          {
+            line.add("'NULL'");
+          }
+        }
+      }
+      for(int l = k; l < count; ++l)
+      {
+        line.add("'NULL'");
+        for(int m = 0; m <= columnsByNodePos.get(l).size(); ++m)
+        {
+          line.add("'NULL'");
+        }
+      }
+      w.append(StringUtils.join(line, ","));
+      w.append("\n");
+    }
+  }
+  
   public static void exportAsArff(List<AnnotatedMatch> annotatedMatches, OutputStream out)
   {
     PrintWriter w = null;
     try
     {
       w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
-       exportArffHeader(annotatedMatches.iterator(), w);
-     
-     int count = columnsByNodePos.keySet().size();
-      
-      w.append("\n@data\n\n");
-      // print values
-      for(AnnotatedMatch match : annotatedMatches)
-      {
-        List<String> line = new ArrayList<String>();
-        int k = 0;
-        for(; k < match.size(); ++k)
-        {
-          AnnotatedSpan span = match.get(k);
-          Map<String, String> valueByName = new HashMap<String, String>();
+      SortedMap<Integer, SortedSet<String>> columnsByNodePos =
+        exportArffHeader(annotatedMatches.iterator(), w);
 
-          if(span != null)
-          {
-            if(span.getAnnotations() != null)
-            {
-              for(Annotation annotation : span.getAnnotations())
-              {
-                valueByName.put("anno_" + annotation.getQualifiedName(), annotation.getValue());
-              }
-            }
-            if(span.getMetadata() != null)
-            {
-              for(Annotation meta : span.getMetadata())
-              {
-                valueByName.put("meta_" + meta.getQualifiedName(), meta.getValue());
-              }
-            }
+      exportArffData(annotatedMatches.iterator(), columnsByNodePos, w);
 
-            line.add("'" + span.getId() + "'");
-            line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
-          }
-
-          for(String name : columnsByNodePos.get(k))
-          {
-            if(valueByName.containsKey(name))
-            {
-              line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
-            }
-            else
-            {
-              line.add("'NULL'");
-            }
-          }
-        }
-        for(int l = k; l < count; ++l)
-        {
-          line.add("'NULL'");
-          for(int m = 0; m <= columnsByNodePos.get(l).size(); ++m)
-          {
-            line.add("'NULL'");
-          }
-        }
-        w.append(StringUtils.join(line, ","));
-        w.append("\n");
-      }
     }
     catch (UnsupportedEncodingException ex)
     {

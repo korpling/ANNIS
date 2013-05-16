@@ -18,7 +18,6 @@ package annis.sqlgen;
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
 import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
