@@ -74,9 +74,24 @@ public class AutoTokQuery implements QueriesGenerator.QueryBuilder
             }
 
             // select one random token from the result
+            int tries = 10;
             int r = new Random().nextInt(tokens.size() - 1);
             String text = CommonHelper.getSpannedText(tokens.get(r));
-            finalAql = "\"" + (("".equals(text)) ? null : text) + "\"";
+            while ("".equals(text) && tries > 0)
+            {
+              r = new Random().nextInt(tokens.size() - 1);
+              text = CommonHelper.getSpannedText(tokens.get(r));
+              tries--;
+            }
+
+            if ("".equals(text))
+            {
+              finalAql = null;
+            }
+            else
+            {
+              finalAql = "\"" + text + "\"";
+            }
           }
         }
       }
