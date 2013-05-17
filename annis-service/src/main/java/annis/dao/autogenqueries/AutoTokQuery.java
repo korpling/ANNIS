@@ -16,7 +16,6 @@
 package annis.dao.autogenqueries;
 
 import annis.CommonHelper;
-import annis.examplequeries.ExampleQuery;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -27,21 +26,25 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.eclipse.emf.common.util.EList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
+ * Generates a simple query for a specific tok.
+ *
+ * <p>The Structure of the query is like this:</p>
+ *
+ * <p>Query:
+ * <code>"der"</code></p>
+ * <p>Description:
+ * <code>search for the word "der"</code></p>
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class AutoTokQuery implements QueriesGenerator.QueryBuilder
+public class AutoTokQuery extends AbstractAutoQuery
 {
 
   String aql = "tok";
 
   String finalAql = "default";
-
-  private static final Logger log = LoggerFactory.getLogger(AutoTokQuery.class);
 
   @Override
   public String getAQL()
@@ -52,7 +55,6 @@ public class AutoTokQuery implements QueriesGenerator.QueryBuilder
   @Override
   public void analyzingQuery(SaltProject saltProject)
   {
-
     for (SCorpusGraph g : saltProject.getSCorpusGraphs())
     {
       if (g != null)
@@ -99,12 +101,20 @@ public class AutoTokQuery implements QueriesGenerator.QueryBuilder
   }
 
   @Override
-  public ExampleQuery getExampleQuery()
+  public int getNodes()
   {
-    ExampleQuery eQ = new ExampleQuery();
-    eQ.setExampleQuery(finalAql);
-    eQ.setDescription("search for the word " + finalAql + "");
+    return 1;
+  }
 
-    return eQ;
+  @Override
+  public String getFinalAQLQuery()
+  {
+    return finalAql;
+  }
+
+  @Override
+  public String getDescription()
+  {
+    return "search for the word " + finalAql;
   }
 }

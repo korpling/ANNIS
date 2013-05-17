@@ -75,6 +75,7 @@
     <property name="queryBuilder">
       <util:set>
         <bean class="annis.dao.autogenqueries.AutoTokQuery"/>
+        <bean class="annis.dao.autogenqueries.AutoSimpleRegexQuery"/>
       </util:set>
     </property>
   </bean>

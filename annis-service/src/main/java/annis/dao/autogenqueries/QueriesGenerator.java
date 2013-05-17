@@ -22,7 +22,6 @@ import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -31,6 +30,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
+ * Controlls the generating of automatic generated queries.
+ *
+ * For creating automatic generated queries, you have to implement the
+ * {@link QueryBuilder} interface and register the new class in the
+ * CommonDAO.xml file.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -42,7 +46,7 @@ public class QueriesGenerator
   // for executing AQL queries
   private AnnisDao annisDao;
 
-  // only contains an element: the top level corpus id of the imported corpus
+  // only contains one element: the top level corpus id of the imported corpus
   private List<Long> corpusIds;
 
   // the name of the imported top level corpus
@@ -51,11 +55,69 @@ public class QueriesGenerator
   // defines which cols of the tmp table are selected
   private Map<String, String> tableInsertSelect;
 
+  // a set of query builder, which generate the example queries.
   private Set<QueryBuilder> queryBuilder;
 
-  // to execute some sql commands directtly
+  // to execute some sql commands directly
   private JdbcTemplate jdbcTemplate;
 
+  /**
+   * All automatic generated queries must implement this interface.
+   *
+   */
+  public interface QueryBuilder
+  {
+
+    /**
+     * Getter for a trial query, which is not put into the database. This is
+     * used for retrieving a {@link SaltProject}, which could be analyzed with
+     * {@link #analyzingQuery(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject)}.
+     *
+     * @return The final AQL query.
+     */
+    public String getAQL();
+
+    /**
+     * Specifies the size of the result set.
+     *
+     * @return Returns a {@link LimitOffsetQueryData}. May not be null. The
+     * {@link AbstractAutoQuery} class provides a good default.
+     */
+    public LimitOffsetQueryData getLimitOffsetQueryData();
+
+    /**
+     * Specifies the left and right context of the query from {@link #getAQL()}.
+     * Further you could set the segmentation layer.
+     *
+     * @return Returns a {@link AnnotateQueryData}. May not be null. The
+     * {@link AbstractAutoQuery} class provides a good default.
+     */
+    public AnnotateQueryData getAnnotateQueryData();
+
+    /**
+     * Analyzes the resut of the {@link #getAQL()}.
+     *
+     * @param saltProject Is the result of the query, which is getting from
+     * {@link #getAQL()}.
+     */
+    public void analyzingQuery(SaltProject saltProject);
+
+    /**
+     * Provides the final example query. The {@link AbstractAutoQuery} class
+     * provides a good default.
+     *
+     * @return The final {@link ExampleQuery}, which is written to the database.
+     */
+    public ExampleQuery getExampleQuery();
+  }
+
+  /**
+   * Iterates over all registered {@link QueryBuilder} and generate example
+   * queries.
+   *
+   * @param corpusId Determines the corpus, for which the example queries are
+   * generated for. It must be the final relAnnis id of the corpus.
+   */
   public void generateQueries(long corpusId)
   {
     corpusIds = new ArrayList<Long>();
@@ -72,18 +134,17 @@ public class QueriesGenerator
     }
   }
 
-  public void generateQuery(QueryBuilder queryBuilder)
+  private void generateQuery(QueryBuilder queryBuilder)
   {
     log.info("generate auto query for {}", corpusName);
 
     // retrieve the aql query for analyzing purposes
     String aql = queryBuilder.getAQL();
 
-
     // set some necessary extensions for generating complete sql
     QueryData queryData = getAnnisDao().parseAQL(aql, this.corpusIds);
-    queryData.addExtension(new LimitOffsetQueryData(5, 5));
-    queryData.addExtension(new AnnotateQueryData(5, 5, null));
+    queryData.addExtension(queryBuilder.getLimitOffsetQueryData());
+    queryData.addExtension(queryBuilder.getAnnotateQueryData());
 
 
     // retrieve the salt project to analyze
@@ -95,7 +156,8 @@ public class QueriesGenerator
     exampleQuery.setCorpusName(corpusName);
 
     // copy the example query to the database
-    if (!"".equals(exampleQuery.getExampleQuery()))
+    if (exampleQuery.getExampleQuery() != null
+      && !"".equals(exampleQuery.getExampleQuery()))
     {
       if (getTableInsertSelect().containsKey("example_queries"))
       {
@@ -117,12 +179,17 @@ public class QueriesGenerator
     }
     else
     {
-      log.warn("could not generating queries");
+      log.warn("could not generating auto query with {}", queryBuilder.
+        getClass().getName());
     }
   }
 
   /**
-   * @return the tableInsertSelect
+   * Defines the table columns of the temporary example query table are copied
+   * to the final table. The important table name for example queries is
+   * "example_queries".
+   *
+   * @return Returns a map of table names to column names.
    */
   public Map<String, String> getTableInsertSelect()
   {
@@ -130,15 +197,18 @@ public class QueriesGenerator
   }
 
   /**
+   * Defines the table columns of the temporary example query table are copied
+   * to the final table. This field is set by using spring beans.
+   *
    * @param tableInsertSelect the tableInsertSelect to set
    */
-  public void setTableInsertSelect(
-    Map<String, String> tableInsertSelect)
+  public void setTableInsertSelect(Map<String, String> tableInsertSelect)
   {
     this.tableInsertSelect = tableInsertSelect;
   }
 
   /**
+   *
    * @return the jdbcTemplate
    */
   public JdbcTemplate getJdbcTemplate()
@@ -182,19 +252,8 @@ public class QueriesGenerator
   /**
    * @param queryBuilder the queryBuilder to set
    */
-  public void setQueryBuilder(
-    Set<QueryBuilder> queryBuilder)
+  public void setQueryBuilder(Set<QueryBuilder> queryBuilder)
   {
     this.queryBuilder = queryBuilder;
-  }
-
-  public interface QueryBuilder
-  {
-
-    public String getAQL();
-
-    public void analyzingQuery(SaltProject saltProject);
-
-    public ExampleQuery getExampleQuery();
   }
 }

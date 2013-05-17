@@ -20,8 +20,9 @@ import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
 /**
+ *  Specifies a segmentation layer.
  *
- * @author benjamin
+ * Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class AnnotateQueryData
 {
@@ -34,7 +35,7 @@ public class AnnotateQueryData
   {
     this(left, right, null);
   }
-  
+
   public AnnotateQueryData(int left, int right, String segmentationLayer)
   {
     super();
@@ -57,8 +58,8 @@ public class AnnotateQueryData
   {
     return segmentationLayer;
   }
-  
-  
+
+
 
   @Override
   public String toString()
