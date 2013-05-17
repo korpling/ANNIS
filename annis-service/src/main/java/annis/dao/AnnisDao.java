@@ -33,6 +33,7 @@ import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.util.Map;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -114,7 +115,7 @@ public interface AnnisDao
   String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
     final boolean analyze);
 
-  List<AnnotatedMatch> matrix(QueryData queryData);
+  public void matrix(final QueryData queryData, final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
