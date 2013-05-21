@@ -337,31 +337,31 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   /**
+   * Clears all example queries.
+   *
+   */
+  public void doClearExampleQueries(String unused)
+  {
+    for (Long corpusId : corpusList)
+    {
+      System.out.println("delete example queries for " + corpusId);
+      queriesGenerator.delExampleQueries(corpusId);
+    }
+  }
+
+  /**
    * Enables the auto generating of example queries for the annis shell.
    *
    * @param args If args is not set the new example queries are added to the old
-   * ones. Supported values are:
-   * <ul>
-   * <li><code>overwrite</code>: Generates new example queries and delete the
-   * old one.</li>
-   * <li><code>clear</code>: Deletes existing example queries</li>
-   * </ul>
+   * ones. Supported value is <code>overwrite</code>, wich generates new example
+   * queries and delete the old ones.
+   *
+   *
    */
   public void doGenerateExampleQueries(String args)
   {
-    if (args != null && "clear".equals(args))
-    {
-      for (Long corpusId : corpusList)
-      {
-        System.out.println("delete example queries for " + corpusId);
-        queriesGenerator.delExampleQueries(corpusId);
-      }
-
-      return;
-    }
-
     Boolean del = false;
-    if (args != null && "delete".equals(args))
+    if (args != null && "overwrite".equals(args))
     {
       del = true;
     }

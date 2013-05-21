@@ -18,6 +18,7 @@ package annis.dao.autogenqueries;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
+import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -118,8 +119,33 @@ public class QueriesGenerator
    */
   public void delExampleQueries(long corpusId)
   {
+    log.info("delete example queries of {}", corpusId);
     jdbcTemplate.execute(
       "DELETE FROM example_queries WHERE corpus_ref = " + corpusId);
+  }
+
+  /**
+   * Deletes all example queries for a given corpus list.
+   *
+   * @param corpusNames Determines the example queries to delete. If null the
+   * example_querie tab is truncated.
+   */
+  public void delExampleQueries(List<String> corpusNames)
+  {
+
+    if (corpusNames == null || corpusNames.isEmpty())
+    {
+      log.info("delete all example queries");
+      jdbcTemplate.execute("TRUNCATE example_queries");
+    }
+    else
+    {
+      List<Long> ids = annisDao.mapCorpusNamesToIds(corpusNames);
+      for (Long id : ids)
+      {
+        delExampleQueries(id);
+      }
+    }
   }
 
   /**
@@ -164,9 +190,44 @@ public class QueriesGenerator
     }
   }
 
+  /**
+   * Iterates over all registered {@link QueryBuilder} and generate example
+   * queries.
+   *
+   * @param name Determines the corpus, for which the example queries are
+   * generated for. It must be the final relAnnis id of the corpus.
+   */
+  public void generateQueries(String name, boolean delete)
+  {
+    List<String> names = new ArrayList<String>();
+    names.add(name);
+    List<Long> ids = annisDao.mapCorpusNamesToIds(names);
+    if (!ids.isEmpty())
+    {
+      generateQueries(ids.get(0), delete);
+    }
+    else
+    {
+      log.error("{} is unknown to the system", name);
+    }
+  }
+
+  /**
+   * Generates example queries for all imported corpora.
+   *
+   * @param overwrite Deletes already exisiting example queries.
+   */
+  public void generateQueries(Boolean overwrite)
+  {
+    List<AnnisCorpus> corpora = annisDao.listCorpora();
+    for (AnnisCorpus annisCorpus : corpora)
+    {
+      generateQueries(annisCorpus.getId(), overwrite);
+    }
+  }
+
   private void generateQuery(QueryBuilder queryBuilder)
   {
-    log.info("generate auto query for {}", corpusName);
 
     // retrieve the aql query for analyzing purposes
     String aql = queryBuilder.getAQL();

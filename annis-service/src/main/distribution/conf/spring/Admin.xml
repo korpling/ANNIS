@@ -1,12 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
        xmlns:util="http://www.springframework.org/schema/util"
        xmlns:context="http://www.springframework.org/schema/context"
        xmlns:tx="http://www.springframework.org/schema/tx"
 
-	xsi:schemaLocation="
+       xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
@@ -15,17 +15,18 @@
 
   <import resource="Common.xml" />
 
-	<!-- Enable bean autowiring -->
+  <!-- Enable bean autowiring -->
   <context:annotation-config/>
 
-	<!-- Public API for corpus administration -->
+  <!-- Public API for corpus administration -->
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
   </bean>
 
-      <!-- AnnisAdminRunner -->
+  <!-- AnnisAdminRunner -->
   <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner" lazy-init="true">
     <property name="corpusAdministration" ref="corpusAdministration" />
+    <property name="queriesGenerator" ref="queriesGenerator"/>
   </bean>
 
 </beans>
