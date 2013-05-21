@@ -18,8 +18,6 @@ package annis;
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.IOException;
 import java.io.Writer;
 import java.net.URISyntaxException;
@@ -57,7 +55,6 @@ import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.parser.AnnisParser;
-import annis.ql.parser.ParserException;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
@@ -76,8 +73,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
-import java.util.logging.Level;
-import org.apache.commons.collections.list.SynchronizedList;
+import annis.dao.autogenqueries.QueriesGenerator;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -86,26 +82,47 @@ public class AnnisRunner extends AnnisBaseRunner
   // logging
   private static final Logger log = LoggerFactory.getLogger(AnnisRunner.class);
   // SQL generators for query functions
+
   private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
+
   private SqlGenerator<QueryData, Integer> countSqlGenerator;
+
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
+
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
+
   private AnnotateSqlGenerator<?> graphSqlGenerator;
   // dependencies
+
   private AnnisDao annisDao;
+
   private AnnisParser annisParser;
+
   private QueryAnalysis aqlAnalysis;
+
   private int context;
+
   private int matchLimit;
+
   private QueryAnalysis queryAnalysis;
+
+  private QueriesGenerator queriesGenerator;
   // settings
+
   private int limit = 10;
+
   private int offset;
+
   private int left = 5;
+
   private int right = 5;
+
   private String segmentationLayer = null;
+
   private List<Long> corpusList;
+
   private boolean clearCaches;
+
   private MetaDataFilter metaDataFilter;
 
   /**
@@ -124,11 +141,29 @@ public class AnnisRunner extends AnnisBaseRunner
     this.graphSqlGenerator = graphSqlGenerator;
   }
 
+  /**
+   * @return the queriesGenerator
+   */
+  public QueriesGenerator getQueriesGenerator()
+  {
+    return queriesGenerator;
+  }
+
+  /**
+   * @param queriesGenerator the queriesGenerator to set
+   */
+  public void setQueriesGenerator(
+    QueriesGenerator queriesGenerator)
+  {
+    this.queriesGenerator = queriesGenerator;
+  }
+
   public enum OS
   {
 
     linux,
     other
+
   }
 
   // benchmarking
@@ -136,15 +171,25 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 
     private String functionCall;
+
     private QueryData queryData;
+
     private long avgTimeInMilliseconds;
+
     private long bestTimeInMilliseconds;
+
     private long worstTimeInMilliseconds;
+
     private String sql;
+
     private String plan;
+
     private int runs;
+
     private int errors;
-    private final List<Long> values = Collections.synchronizedList(new ArrayList<Long>());
+
+    private final List<Long> values = Collections.synchronizedList(
+      new ArrayList<Long>());
 
     public Benchmark(String functionCall, QueryData queryData)
     {
@@ -152,28 +197,27 @@ public class AnnisRunner extends AnnisBaseRunner
       this.functionCall = functionCall;
       this.queryData = queryData;
     }
-    
+
     public long getMedian()
     {
-      synchronized(values)
-      {        
+      synchronized (values)
+      {
         // sort list
         Collections.sort(values);
         // get item in the middle
         int pos = Math.round((float) values.size() / 2.0f);
-        if(pos >= 0 && pos < values.size())
+        if (pos >= 0 && pos < values.size())
         {
           return values.get(pos);
-        }       
+        }
       }
-      
+
       // indicate an error
       return -1;
     }
-    
-    
   }
   private List<AnnisRunner.Benchmark> benchmarks;
+
   private static final int SEQUENTIAL_RUNS = 5;
 
   public static void main(String[] args)
@@ -191,27 +235,29 @@ public class AnnisRunner extends AnnisBaseRunner
   }
 
   ///// Commands
-  public void doBenchmarkFile(String filename) 
+  public void doBenchmarkFile(String filename)
   {
-    try 
+    try
     {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(filename), "UTF-8"));
+      BufferedReader reader = new BufferedReader(new InputStreamReader(
+        new FileInputStream(filename), "UTF-8"));
       try
       {
         Map<String, Integer> queryRun = new HashMap<String, Integer>();
         Map<String, Integer> queryId = new HashMap<String, Integer>();
         int maxId = 0;
-        for (String line = reader.readLine(); line != null; line = reader.readLine()) 
+        for (String line = reader.readLine(); line != null; line = reader.
+          readLine())
         {
           // get the id of this query
-          if ( ! queryId.containsKey(line) )
+          if (!queryId.containsKey(line))
           {
             ++maxId;
             queryId.put(line, maxId);
           }
           int id = queryId.get(line);
           // get the repetition of this query
-          if ( ! queryRun.containsKey(line) )
+          if (!queryRun.containsKey(line))
           {
             queryRun.put(line, 0);
           }
@@ -222,9 +268,11 @@ public class AnnisRunner extends AnnisBaseRunner
           String annisQuery = split[1];
           boolean error = false;
           QueryData queryData = null;
-          try {
+          try
+          {
             queryData = analyzeQuery(annisQuery, queryFunction);
-          } catch (RuntimeException e)
+          }
+          catch (RuntimeException e)
           {
             error = true;
           }
@@ -233,13 +281,19 @@ public class AnnisRunner extends AnnisBaseRunner
             long start = new Date().getTime();
             if (!error)
             {
-              try {
+              try
+              {
                 int result = annisDao.count(queryData);
                 long end = new Date().getTime();
                 long runtime = end - start;
-                Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+                Object[] output =
+                {
+                  queryFunction, annisQuery, result, runtime, id, run
+                };
                 System.out.println(StringUtils.join(output, "\t"));
-              } catch (RuntimeException e) {
+              }
+              catch (RuntimeException e)
+              {
                 error = true;
               }
             }
@@ -248,22 +302,27 @@ public class AnnisRunner extends AnnisBaseRunner
               String result = "ERROR";
               long end = new Date().getTime();
               long runtime = end - start;
-              Object[] output = { queryFunction, annisQuery, result, runtime, id, run };
+              Object[] output =
+              {
+                queryFunction, annisQuery, result, runtime, id, run
+              };
               System.out.println(StringUtils.join(output, "\t"));
             }
           }
         }
-      } finally
+      }
+      finally
       {
         if (reader != null)
         {
-           reader.close();
+          reader.close();
         }
       }
-      } catch (IOException e)
-      {
-        error(e);
-      }
+    }
+    catch (IOException e)
+    {
+      error(e);
+    }
   }
 
   public void doDebug(String ignore)
@@ -275,6 +334,46 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doParse(String annisQuery)
   {
     out.println(annisParser.dumpTree(annisQuery));
+  }
+
+  /**
+   * Enables the auto generating of example queries for the annis shell.
+   *
+   * @param args If args is not set the new example queries are added to the old
+   * ones. Supported values are:
+   * <ul>
+   * <li><code>overwrite</code>: Generates new example queries and delete the
+   * old one.</li>
+   * <li><code>clear</code>: Deletes existing example queries</li>
+   * </ul>
+   */
+  public void doGenerateExampleQueries(String args)
+  {
+    if (args != null && "clear".equals(args))
+    {
+      for (Long corpusId : corpusList)
+      {
+        System.out.println("delete example queries for " + corpusId);
+        queriesGenerator.delExampleQueries(corpusId);
+      }
+
+      return;
+    }
+
+    Boolean del = false;
+    if (args != null && "delete".equals(args))
+    {
+      del = true;
+    }
+
+    if (corpusList != null)
+    {
+      for (Long corpusId : corpusList)
+      {
+        System.out.println("generate example queries " + corpusId);
+        queriesGenerator.generateQueries(corpusId, del);
+      }
+    }
   }
 
   // FIXME: missing tests
@@ -345,7 +444,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = getGraphSqlGenerator();
     }
-    
+
     Validate.notNull(generator, "don't now query function: " + function);
 
     return generator;
@@ -394,7 +493,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
       SqlGenerator<QueryData, ?> generator =
         getGeneratorForQueryFunction(benchmark.functionCall);
-      benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).toSql(
+      benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).
+        toSql(
         benchmark.queryData);
       out.println("---> SQL query for: " + benchmark.functionCall);
       out.println(benchmark.sql);
@@ -441,9 +541,9 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           ++benchmark.errors;
         }
-        
+
         out.print(runtime + " ms");
-       
+
       }
       out.println();
       out.println(benchmark.bestTimeInMilliseconds + " ms best time for '"
@@ -491,7 +591,7 @@ public class AnnisRunner extends AnnisBaseRunner
         Math.min(benchmark.bestTimeInMilliseconds, runtime);
       benchmark.worstTimeInMilliseconds =
         Math.max(benchmark.worstTimeInMilliseconds, runtime);
-      
+
       ++benchmark.runs;
       if (error)
       {
@@ -507,7 +607,8 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println("---> benchmark complete");
     for (AnnisRunner.Benchmark benchmark : benchmarks)
     {
-      benchmark.avgTimeInMilliseconds = Math.round((double) benchmark.avgTimeInMilliseconds
+      benchmark.avgTimeInMilliseconds = Math.round(
+        (double) benchmark.avgTimeInMilliseconds
         / (double) benchmark.runs);
       String options = benchmarkOptions(benchmark.queryData);
       out.println(benchmark.getMedian() + " ms (median for "
@@ -559,12 +660,12 @@ public class AnnisRunner extends AnnisBaseRunner
       for (AnnisRunner.Benchmark benchmark : benchmarks)
       {
         long median = benchmark.getMedian();
-        
+
         String[] line = new String[5];
         line[0] = StringUtils.join(benchmark.queryData.getCorpusList(), ",");
         line[1] = benchmark.functionCall;
         line[2] = "" + median;
-        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds- median);
+        line[3] = "" + Math.abs(benchmark.bestTimeInMilliseconds - median);
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
@@ -650,7 +751,7 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         finally
         {
-          if(w != null)
+          if (w != null)
           {
             try
             {
@@ -684,7 +785,8 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     else
     {
-      Validate.isTrue(split.length == 3 && "TO".toLowerCase().equals(split[1]), "syntax error: set "
+      Validate.isTrue(split.length == 3 && "TO".toLowerCase().equals(split[1]),
+        "syntax error: set "
         + callToSet);
       value = split[2];
     }
@@ -816,10 +918,9 @@ public class AnnisRunner extends AnnisBaseRunner
    *
    * If the query function is "subgraph" or "sql_subgraph" the annisQuery string
    * should contain space separated salt ids. In this case the annisQuery is not
-   * parsed and the {@link QueryData#getAlternatives()} method should return a 
-   * List with dummy QueryNode entries. 
-   * Instead of parsing the annisQuery it extracts the salt ids and
-   * put it into the extension's of {@link QueryData}.
+   * parsed and the {@link QueryData#getAlternatives()} method should return a
+   * List with dummy QueryNode entries. Instead of parsing the annisQuery it
+   * extracts the salt ids and put it into the extension's of {@link QueryData}.
    *
    * @param annisQuery should include a valid annis query
    * @param queryFunction should include a method name of {@link AnnisRunner}
@@ -999,7 +1100,8 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       ObjectMapper om = new ObjectMapper();
       AnnotationIntrospector ai = new JaxbAnnotationIntrospector();
-      DeserializationConfig config = om.getDeserializationConfig().withAnnotationIntrospector(ai);
+      DeserializationConfig config = om.getDeserializationConfig().
+        withAnnotationIntrospector(ai);
       om.setDeserializationConfig(config);
       om.configure(SerializationConfig.Feature.INDENT_OUTPUT, true);
 
@@ -1019,7 +1121,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       corpusIdAsList.add(Long.parseLong(corpusId));
       List<String> toplevelNames = annisDao.mapCorpusIdsToNames(corpusIdAsList);
-      
+
       List<Annotation> corpusAnnotations =
         annisDao.listCorpusAnnotations(toplevelNames.get(0));
       printAsTable(corpusAnnotations, "namespace", "name", "value");
@@ -1221,14 +1323,14 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     QueryData queryData = new QueryData();
     SaltURIGroupSet saltIDs = new SaltURIGroupSet();
-    
+
     Set<String> corpusNames = new TreeSet<String>();
-   
+
     int i = 0;
-    for(String group : param.split("\\s*;\\s*"))
+    for (String group : param.split("\\s*;\\s*"))
     {
       SaltURIGroup urisForGroup = new SaltURIGroup();
-    
+
       for (String id : group.split("[,\\s]+"))
       {
         java.net.URI uri;
@@ -1248,9 +1350,10 @@ public class AnnisRunner extends AnnisBaseRunner
         }
         urisForGroup.getUris().add(uri);
       }
-      
+
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.getUris().size());
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.
+        getUris().size());
       for (java.net.URI u : urisForGroup.getUris())
       {
         pseudoNodes.add(new QueryNode());
@@ -1259,8 +1362,9 @@ public class AnnisRunner extends AnnisBaseRunner
       queryData.addAlternative(pseudoNodes);
       saltIDs.getGroups().put(++i, urisForGroup);
     }
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(corpusNames));
-    
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(
+      corpusNames));
+
     queryData.setCorpusList(corpusIDs);
 
     log.debug(saltIDs.toString());

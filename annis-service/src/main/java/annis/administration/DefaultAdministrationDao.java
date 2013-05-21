@@ -16,7 +16,6 @@
 package annis.administration;
 
 import annis.dao.AnnisDao;
-import annis.dao.autogenqueries.AutoTokQuery;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;

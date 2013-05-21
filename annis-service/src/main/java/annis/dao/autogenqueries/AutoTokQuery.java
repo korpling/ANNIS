@@ -26,6 +26,8 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Generates a simple query for a specific tok.
@@ -55,6 +57,7 @@ public class AutoTokQuery extends AbstractAutoQuery
   @Override
   public void analyzingQuery(SaltProject saltProject)
   {
+    List<SToken> tokens = new ArrayList<SToken>();
     for (SCorpusGraph g : saltProject.getSCorpusGraphs())
     {
       if (g != null)
@@ -66,7 +69,7 @@ public class AutoTokQuery extends AbstractAutoQuery
 
           if (sNodes != null)
           {
-            List<SToken> tokens = new ArrayList<SToken>();
+
             for (SNode n : sNodes)
             {
               if (n instanceof SToken)
@@ -74,28 +77,31 @@ public class AutoTokQuery extends AbstractAutoQuery
                 tokens.add((SToken) n);
               }
             }
-
-            // select one random token from the result
-            int tries = 10;
-            int r = new Random().nextInt(tokens.size() - 1);
-            String text = CommonHelper.getSpannedText(tokens.get(r));
-            while ("".equals(text) && tries > 0)
-            {
-              r = new Random().nextInt(tokens.size() - 1);
-              text = CommonHelper.getSpannedText(tokens.get(r));
-              tries--;
-            }
-
-            if ("".equals(text))
-            {
-              finalAql = null;
-            }
-            else
-            {
-              finalAql = "\"" + text + "\"";
-            }
           }
         }
+      }
+    }
+
+    // select one random token from the result
+    if (!tokens.isEmpty())
+    {
+      int tries = 10;
+      int r = new Random().nextInt(tokens.size() - 1);
+      String text = CommonHelper.getSpannedText(tokens.get(r));
+      while ("".equals(text) && tries > 0)
+      {
+        r = new Random().nextInt(tokens.size() - 1);
+        text = CommonHelper.getSpannedText(tokens.get(r));
+        tries--;
+      }
+
+      if ("".equals(text))
+      {
+        finalAql = null;
+      }
+      else
+      {
+        finalAql = "\"" + text + "\"";
       }
     }
   }

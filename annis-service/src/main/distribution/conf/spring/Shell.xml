@@ -46,6 +46,7 @@ limitations under the License.
     <property name="aqlAnalysis" ref="aqlAnalysis" />
     <property name="matchLimit" value="10"/>
     <property name="metaDataFilter" ref="metaDataFilter" />
+    <property name="queriesGenerator" ref="queriesGenerator" />
   </bean>
 
 </beans>

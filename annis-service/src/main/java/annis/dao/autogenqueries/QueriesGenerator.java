@@ -112,6 +112,36 @@ public class QueriesGenerator
   }
 
   /**
+   * Deletes all example queries for a specific corpus.
+   *
+   * @param corpusId References the corpus of the example queries.
+   */
+  public void delExampleQueries(long corpusId)
+  {
+    jdbcTemplate.execute(
+      "DELETE FROM example_queries WHERE corpus_ref = " + corpusId);
+  }
+
+  /**
+   * Iterates over all registered {@link QueryBuilder} and generate example
+   * queries.
+   *
+   * @param corpusId Determines the corpus, for which the example queries are
+   * generated for. It must be the final relAnnis id of the corpus.
+   *
+   * @param delete Deletes the already existing example queries in the database.
+   */
+  public void generateQueries(long corpusId, boolean delete)
+  {
+    if (delete)
+    {
+      delExampleQueries(corpusId);
+    }
+
+    generateQueries(corpusId);
+  }
+
+  /**
    * Iterates over all registered {@link QueryBuilder} and generate example
    * queries.
    *
