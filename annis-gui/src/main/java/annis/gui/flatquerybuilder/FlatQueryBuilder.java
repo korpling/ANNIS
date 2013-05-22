@@ -91,7 +91,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String TOOLBAR_CAPTION = "Toolbar";
   private String META_CAPTION = "Meta constraints";
   private String SPAN_CAPTION = "Span constraints";
-  private String LANG_CAPTION = "Predence constraints";
+  private String LANG_CAPTION = "Precedence constraints";
 
   public FlatQueryBuilder(QueryController cp)
   {
