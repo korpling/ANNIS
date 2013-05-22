@@ -464,9 +464,6 @@ public class DefaultAdministrationDao implements AdministrationDao
           log.info(table + REL_ANNIS_FILE_SUFFIX + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
-
-          // turn off auto generating example queries.
-          generateExampleQueries = false;
         }
         else
         {
