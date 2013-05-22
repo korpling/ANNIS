@@ -1,0 +1,15 @@
+{
+  "default-querybuilder": "precedencequerybuilder",
+  "display-name" : "Deutsch Diachron Digital (beta)",
+  "default-corpusset": "Deutsch Diachron Digital",
+  "corpus-sets": [
+  {
+    "name": "Referenzkorpus Altdeutsch",
+    "corpus": ["DDD-KleinereAlthochdeutscheDenkmaeler", "DDD-Monsee", "DDD-TatianLatein", "DDD-Isidor", "DDD-IsidorLatein"]
+  },
+  {
+    "name": "Deutsch Diachron Digital",
+    "corpus": ["DDD-KleinereAlthochdeutscheDenkmaeler", "DDD-Monsee", "DDD-TatianLatein", "DDD-Isidor", "DDD-IsidorLatein"]
+  }
+ ]
+}
