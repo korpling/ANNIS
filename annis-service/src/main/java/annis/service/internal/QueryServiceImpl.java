@@ -20,7 +20,6 @@ import annis.CommonHelper;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
@@ -45,6 +44,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -426,18 +426,29 @@ public class QueryServiceImpl implements QueryService
   public List<AnnisAttribute> annotations(
     @PathParam("top") String toplevelCorpus,
     @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
-    @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues)
+    @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues) throws WebApplicationException
   {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:annotations:" + toplevelCorpus);
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    List<String> list = new LinkedList<String>();
-    list.add(toplevelCorpus);
-    List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
 
-    return annisDao.listAnnotations(corpusList,
-      Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
-      onlyMostFrequentValues));
+      List<String> list = new LinkedList<String>();
+      String decode = URLDecoder.decode(toplevelCorpus, "UTF-8");
+      log.info("corpus annotations for {}", decode);
+      list.add(decode);
+      List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
+
+      return annisDao.listAnnotations(corpusList,
+        Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
+        onlyMostFrequentValues));
+    }
+    catch (Exception ex)
+    {
+      log.error("could not get annotations for {}", toplevelCorpus, ex);
+      throw new WebApplicationException(400);
+    }
   }
 
   /**
