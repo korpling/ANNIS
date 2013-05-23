@@ -25,7 +25,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
@@ -46,11 +45,8 @@ import java.util.TreeSet;
 public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
   private Button btInitLanguage;
-  private Label infoInitLanguage;
   private Button btInitSpan;
-  private Label infoInitSpan;
   private Button btInitMeta;
-  private Label infoInitMeta;
   private Button btGo;
   private Button btClear;
   private QueryController cp;
@@ -109,22 +105,22 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     // buttons and checks
     btInitLanguage = new Button(BUTTON_LANGUAGE_LABEL, (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    infoInitLanguage = new Label(INFO_INIT_LANG);
+    btInitLanguage.setDescription(INFO_INIT_LANG);
     btInitSpan = new Button(BUTTON_SPAN_LABEL, (Button.ClickListener) this);
-    infoInitSpan = new Label(INFO_INIT_SPAN);
     btInitSpan.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btInitSpan.setDescription(INFO_INIT_SPAN);
     btInitMeta = new Button(BUTTON_META_LABEL, (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    infoInitMeta = new Label(INFO_INIT_META);
+    btInitMeta.setDescription(INFO_INIT_META);
     btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    filtering = new OptionGroup("Filtering mechanism");
+    filtering = new OptionGroup("Filtering mechanisms");
     filtering.addItem(1);
-    filtering.setItemCaption(1, "Generic (Levenshtein)");
+    filtering.setItemCaption(1, "Generic");
     filtering.addItem(2);
-    filtering.setItemCaption(2, "Specified (pre-defined mapping)");
+    filtering.setItemCaption(2, "Ignore diacritics");
     filtering.select(2);
     filtering.setNullSelectionAllowed(false);
     filtering.setImmediate(true);
@@ -132,21 +128,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     language = new HorizontalLayout();
     language.setSpacing(true);
     language.addComponent(btInitLanguage);
-    language.addComponent(infoInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
     span.addComponent(btInitSpan);
-    span.addComponent(infoInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
     meta.addComponent(btInitMeta);
-    meta.addComponent(infoInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
     // toolbar layout
@@ -297,10 +290,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitLanguage)
       {
         language.removeComponent(btInitLanguage);
-        language.removeComponent(infoInitLanguage);
         MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
-        addMenu.setDescription(LING_MENU_DESC);
+        addMenu.setDescription(INFO_INIT_LANG);
         Collection<String> annonames = getAvailableAnnotationNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
         for (final String annoname : annonames)
@@ -327,9 +319,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitSpan)
       {
         span.removeComponent(btInitSpan);
-        span.removeComponent(infoInitSpan);
         MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
+        addMenu.setDescription(INFO_INIT_SPAN);
         Collection<String> annonames = getAvailableAnnotationNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_SPAN_PARAM, null);
         for (final String annoname : annonames)
@@ -353,9 +345,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitMeta)
       {
         meta.removeComponent(btInitMeta);
-        meta.removeComponent(infoInitMeta);
         MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
+        addMenu.setDescription(INFO_INIT_META);
         Collection<String> annonames = getAvailableMetaNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_META_PARAM, null);
         for (final String annoname : annonames)
