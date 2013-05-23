@@ -66,9 +66,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
-  private static final String BUTTON_LANGUAGE_LABEL = "Initialize linguistic search";
-  private static final String BUTTON_SPAN_LABEL = "Initialize span constraint";
-  private static final String BUTTON_META_LABEL = "Initialize meta search";
+  private static final String BUTTON_LANGUAGE_LABEL = "Add to right";
+  private static final String BUTTON_SPAN_LABEL = "Add";
+  private static final String BUTTON_META_LABEL = "Add";
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
@@ -76,9 +76,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
   private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a "
     + "constraint.";
-  private static final String ADD_LING_PARAM = "Add linguistic constraint";
-  private static final String ADD_SPAN_PARAM = "Add span constraint";
-  private static final String ADD_META_PARAM = "Add meta constraint";
+  private static final String ADD_LING_PARAM = "Add to right";
+  private static final String ADD_SPAN_PARAM = "Add";
+  private static final String ADD_META_PARAM = "Add";
   private static final String LING_MENU_DESC = "Choose an annotation level to "
     + "expand the query to the right";
   private static final String INFO_INIT_LANG = "In this part of the Query Builder, "
@@ -89,9 +89,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String INFO_INIT_META = "Here, you can constrain the linguistic "
     + "query by selecting meta levels.";
   private String TOOLBAR_CAPTION = "Toolbar";
-  private String META_CAPTION = "Meta constraints";
-  private String SPAN_CAPTION = "Span constraints";
-  private String LANG_CAPTION = "Precedence constraints";
+  private String META_CAPTION = "Restrict the search by means of meta information";
+  private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
+  private String LANG_CAPTION = "Create a linguistic sequence";
 
   public FlatQueryBuilder(QueryController cp)
   {
@@ -299,8 +299,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         language.removeComponent(btInitLanguage);
         language.removeComponent(infoInitLanguage);
         MenuBar addMenu = new MenuBar();
+        addMenu.setAutoOpen(true);
         addMenu.setDescription(LING_MENU_DESC);
-        addMenu.setWidth("150px");
         Collection<String> annonames = getAvailableAnnotationNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
         for (final String annoname : annonames)
@@ -329,6 +329,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         span.removeComponent(btInitSpan);
         span.removeComponent(infoInitSpan);
         MenuBar addMenu = new MenuBar();
+        addMenu.setAutoOpen(true);
         Collection<String> annonames = getAvailableAnnotationNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_SPAN_PARAM, null);
         for (final String annoname : annonames)
@@ -354,6 +355,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         meta.removeComponent(btInitMeta);
         meta.removeComponent(infoInitMeta);
         MenuBar addMenu = new MenuBar();
+        addMenu.setAutoOpen(true);
         Collection<String> annonames = getAvailableMetaNames();
         final MenuBar.MenuItem add = addMenu.addItem(ADD_META_PARAM, null);
         for (final String annoname : annonames)
