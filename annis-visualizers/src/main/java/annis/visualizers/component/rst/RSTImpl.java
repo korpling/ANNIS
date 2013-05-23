@@ -34,7 +34,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -44,6 +43,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Stack;
 import java.util.TreeSet;
 import org.eclipse.emf.common.util.BasicEList;
@@ -122,6 +122,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   // sType for the rst relation
   private final String RST_RELATION = "rst";
 
+  private final String RST_LAYER = "rst";
+
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
@@ -143,6 +145,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
+
+  // holds the mapping defined in the resolver vis map
+  private Properties mappings;
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
@@ -192,6 +197,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     markedAndCovered = visInput.getMarkedAndCovered();
 
+    mappings = visInput.getMappings();
+
     /**
      * build id and increase count for every instance, so we receive an unique
      * id
@@ -227,20 +234,24 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
 
     for (SNode sNode : rootSNodes) {
-      if (CommonHelper.checkSLayer("rst", sNode)) {
+      if (CommonHelper.checkSLayer(getRSTTLayer(), sNode)) {
         rstRoots.add(sNode);
       }
     }
 
 
     if (rootSNodes.size() > 0) {
+
+      // collect all sentence and sort them.
       graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "getSentences", new SGraphTraverseHandler() {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
-          if (currNode instanceof SStructure && isSegment(currNode)) {
+          if (currNode instanceof SStructure
+                  && isSegment(currNode)
+                  && CommonHelper.checkSLayer(getRSTTLayer(), fromNode)) {
             sentences.add((SStructure) currNode);
           }
         }
@@ -273,12 +284,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
         i++;
       }
 
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "jsonBuild", this);
     } else {
       log.debug("does not find an annotation which matched {}",
               ANNOTATION_KEY);
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(
+              rstRoots,
+              GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "jsonBuild", this);
     }
 
@@ -427,7 +440,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
           SNode currNode, SRelation sRelation, SNode fromNode, long order) {
-    st.push(createJsonEntry(currNode));
+    if (CommonHelper.checkSLayer("rst", currNode)) {
+      st.push(createJsonEntry(currNode));
+    }
   }
 
   @Override
@@ -712,6 +727,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   }
 
   private String getRSTType() {
-    return RST_RELATION;
+    return mappings.getProperty("edge", RST_RELATION);
+  }
+
+  private String getRSTTLayer() {
+    return mappings.getProperty("node", RST_LAYER);
   }
 }
