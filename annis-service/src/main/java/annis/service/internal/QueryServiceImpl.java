@@ -192,11 +192,52 @@ public class QueryServiceImpl implements QueryService
     return p;
 
   }
+  
+  @GET
+  @Path("search/find")
+  @Produces("text/plain")
+  public StreamingOutput findRaw(@QueryParam("q") final String query,
+    @QueryParam("corpora") final String rawCorpusNames,
+    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
+    @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException
+  {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora",
+      "comma separated list of corpus names");
+
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for (String c : corpusNames)
+    {
+      user.checkPermission("query:find:" + c);
+    }
+
+    int offset = Integer.parseInt(offsetRaw);
+    int limit = Integer.parseInt(limitRaw);
+
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
+    data.addExtension(new LimitOffsetQueryData(offset, limit));
+
+    return new StreamingOutput() 
+    {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        long start = new Date().getTime();
+        annisDao.find(data, output);
+        long end = new Date().getTime();
+        logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
+          end - start);
+      }
+    };
+    
+  }
 
   @GET
   @Path("search/find")
   @Produces("application/xml")
-  public List<Match> find(@QueryParam("q") String query,
+  public List<Match> findXml(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException

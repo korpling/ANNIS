@@ -371,9 +371,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
   
   @Transactional(readOnly = true)
+  @Override
   public boolean find(final QueryData queryData, final OutputStream out)
-  {
-    
+  { 
     prepareTransaction(queryData);
     Boolean finished = getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
     {
@@ -390,7 +390,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
             stmt.executeQuery(sql), findSqlGenerator);
           
-          int i=0;
+          int i=1;
           while(itMatches.hasNext())
           {
             // write single match to output stream
