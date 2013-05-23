@@ -26,8 +26,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  *
  * <h3>Mappings</h3>
  * <ul>
- * <li>node:&lt;layer name&gt; - defines the layer, which is traversed for rst
- * relations.</li>
+ *
  * <li>edge:&lt;edge name&gt; - defines the rst edges, which should be
  * visualized as pointing relations.</li>
  *

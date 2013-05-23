@@ -146,8 +146,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
 
-  // holds the mapping defined in the resolver vis map
   private Properties mappings;
+
+  private String namespace;
 
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
@@ -199,6 +200,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     mappings = visInput.getMappings();
 
+    namespace = visInput.getNamespace();
+
     /**
      * build id and increase count for every instance, so we receive an unique
      * id
@@ -234,7 +237,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
 
     for (SNode sNode : rootSNodes) {
-      if (CommonHelper.checkSLayer(getRSTTLayer(), sNode)) {
+      if (CommonHelper.checkSLayer(namespace, sNode)) {
         rstRoots.add(sNode);
       }
     }
@@ -251,7 +254,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
                 SNode fromNode, long order) {
           if (currNode instanceof SStructure
                   && isSegment(currNode)
-                  && CommonHelper.checkSLayer(getRSTTLayer(), fromNode)) {
+                  && CommonHelper.checkSLayer(namespace, fromNode)) {
             sentences.add((SStructure) currNode);
           }
         }
@@ -440,7 +443,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
           SNode currNode, SRelation sRelation, SNode fromNode, long order) {
-    if (CommonHelper.checkSLayer("rst", currNode)) {
+    if (CommonHelper.checkSLayer(namespace, currNode)) {
       st.push(createJsonEntry(currNode));
     }
   }
@@ -728,9 +731,5 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
   private String getRSTType() {
     return mappings.getProperty("edge", RST_RELATION);
-  }
-
-  private String getRSTTLayer() {
-    return mappings.getProperty("node", RST_LAYER);
   }
 }
