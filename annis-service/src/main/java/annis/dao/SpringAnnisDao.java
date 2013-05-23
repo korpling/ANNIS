@@ -395,7 +395,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           {
             // write single match to output stream
             Match m = itMatches.next();
-            w.println(m.toString());
+            w.print(m.toString());
+            w.print("\n");
             
             // flush after every 10th item
             if(i % 10 == 0)

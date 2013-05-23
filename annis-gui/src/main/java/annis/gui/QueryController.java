@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.ws.rs.core.MediaType;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -220,6 +221,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         .queryParam("offset", "" + lastQuery.getOffset())
         .queryParam("limit", "" + lastQuery.getLimit())
         .queryParam("corpora", StringUtils.join(lastQuery.getCorpora(), ","))
+        .accept(MediaType.APPLICATION_XML_TYPE)
         .get(new MatchListType());
 
        ui.setRefresherEnabled(true);
