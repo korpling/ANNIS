@@ -199,7 +199,7 @@ public class QueryServiceImpl implements QueryService
   public StreamingOutput findRaw(@QueryParam("q") final String query,
     @QueryParam("corpora") final String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException
+    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
@@ -240,7 +240,7 @@ public class QueryServiceImpl implements QueryService
   public List<Match> findXml(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException
+    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
