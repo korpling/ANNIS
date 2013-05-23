@@ -44,6 +44,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
+import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import annis.utils.Utils;
@@ -367,6 +368,61 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<Match> find(QueryData queryData)
   {
     return executeQueryFunction(queryData, findSqlGenerator);
+  }
+  
+  @Transactional(readOnly = true)
+  @Override
+  public boolean find(final QueryData queryData, final OutputStream out)
+  { 
+    prepareTransaction(queryData);
+    Boolean finished = getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
+    {
+      @Override
+      public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
+      {
+        Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+          ResultSet.CONCUR_READ_ONLY);
+        try
+        {
+          String sql = findSqlGenerator.toSql(queryData);
+          
+          PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+          ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
+            stmt.executeQuery(sql), findSqlGenerator);
+          
+          int i=1;
+          while(itMatches.hasNext())
+          {
+            // write single match to output stream
+            Match m = itMatches.next();
+            w.print(m.toString());
+            w.print("\n");
+            
+            // flush after every 10th item
+            if(i % 10 == 0)
+            {
+              w.flush();
+            }
+            
+            i++;
+          } // end for each match
+          
+          w.flush();
+          return true;
+        }
+        catch(UnsupportedEncodingException ex)
+        {
+          log.error("Your system is not able to handle UTF-8 but ANNIS really needs this charset", ex);
+        }
+        finally
+        {
+          stmt.close();
+        }
+        return false;
+      }
+    });
+    
+    return finished;
   }
 
   @Transactional(readOnly = true)

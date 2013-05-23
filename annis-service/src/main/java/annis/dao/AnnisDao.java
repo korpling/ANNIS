@@ -99,6 +99,7 @@ public interface AnnisDao
   MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData);
 
   List<Match> find(QueryData queryData);
+  public boolean find(final QueryData queryData, final OutputStream out);
 
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
