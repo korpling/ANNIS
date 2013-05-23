@@ -15,6 +15,7 @@
  */
 package annis.visualizers.component.rst;
 
+import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.components.CssRenderInfo;
 import annis.libgui.visualizers.VisualizerInput;
@@ -33,6 +34,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
@@ -149,40 +151,40 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    */
   private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
           new Comparator<SStructure>() {
-            private int getStartPosition(SStructure s) {
-              EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
+    private int getStartPosition(SStructure s) {
+      EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
 
-              for (Edge e : out) {
-                if (e instanceof SRelation
-                        && ((SRelation) e).getTarget() instanceof SToken) {
-                  SToken tok = ((SToken) ((SRelation) e).getTarget());
-                  SFeature sf = tok.getSFeature(
-                          ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-                  return Integer.parseInt(sf.getSValueSTEXT());
-                }
-              }
+      for (Edge e : out) {
+        if (e instanceof SRelation
+                && ((SRelation) e).getTarget() instanceof SToken) {
+          SToken tok = ((SToken) ((SRelation) e).getTarget());
+          SFeature sf = tok.getSFeature(
+                  ANNIS_NS + "::" + FEAT_LEFTTOKEN);
+          return Integer.parseInt(sf.getSValueSTEXT());
+        }
+      }
 
-              SFeature sf = s.getSFeature(
-                      ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-              return Integer.parseInt(sf.getSValueSTEXT());
-            }
+      SFeature sf = s.getSFeature(
+              ANNIS_NS + "::" + FEAT_LEFTTOKEN);
+      return Integer.parseInt(sf.getSValueSTEXT());
+    }
 
-            @Override
-            public int compare(SStructure t1, SStructure t2) {
-              int t1Idx = getStartPosition(t1);
-              int t2Idx = getStartPosition(t2);
+    @Override
+    public int compare(SStructure t1, SStructure t2) {
+      int t1Idx = getStartPosition(t1);
+      int t2Idx = getStartPosition(t2);
 
-              if (t1Idx < t2Idx) {
-                return -1;
-              }
+      if (t1Idx < t2Idx) {
+        return -1;
+      }
 
-              if (t1Idx == t2Idx) {
-                return 0;
-              } else {
-                return 1;
-              }
-            }
-          });
+      if (t1Idx == t2Idx) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+  });
 
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
@@ -221,10 +223,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private String transformSaltToJSON(VisualizerInput visInput) {
     graph = visInput.getSResult().getSDocumentGraph();
     EList<SNode> rootSNodes = graph.getSRoots();
+    EList<SNode> rstRoots = new BasicEList<SNode>();
+
+
+    for (SNode sNode : rootSNodes) {
+      if (CommonHelper.checkSLayer("rst", sNode)) {
+        rstRoots.add(sNode);
+      }
+    }
 
 
     if (rootSNodes.size() > 0) {
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "getSentences", new SGraphTraverseHandler() {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
