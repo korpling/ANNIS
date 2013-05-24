@@ -20,6 +20,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
@@ -64,6 +65,7 @@ import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 import org.vaadin.cssinject.CSSInject;
+
 
 /**
 * GUI for searching in corpora.
@@ -469,6 +471,8 @@ public class SearchUI extends AnnisBaseUI
   protected void addCustomUIPlugins(PluginManager pluginManager)
   {
     pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
+      toURI());
+    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
       toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }

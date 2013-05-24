@@ -38,6 +38,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.HashMap;
+import java.util.HashSet;
 
 /**
  * @author martin
@@ -63,6 +65,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
+  private String query;
+  private Button btReverse;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -92,6 +96,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String META_CAPTION = "Meta constraints";
   private String SPAN_CAPTION = "Span constraints";
   private String LANG_CAPTION = "Predence constraints";
+  private static final String REVERSE_BUTTON_CAPTION = "Adjust Builder to Query";
 
   public FlatQueryBuilder(QueryController cp)
   {
@@ -101,6 +106,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private void launch(QueryController cp)
   {
     this.cp = cp;
+    query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
     vnodes = new ArrayList<VerticalNode>();
@@ -120,6 +126,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btReverse = new Button(REVERSE_BUTTON_CAPTION, (Button.ClickListener) this);
+    btReverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
     filtering = new OptionGroup("Filtering mechanism");
     filtering.addItem(1);
     filtering.setItemCaption(1, "Generic (Levenshtein)");
@@ -127,7 +135,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     filtering.setItemCaption(2, "Specified (pre-defined mapping)");
     filtering.select(2);
     filtering.setNullSelectionAllowed(false);
-    filtering.setImmediate(true);
+    filtering.setImmediate(true);    
     // language layout
     language = new HorizontalLayout();
     language.setSpacing(true);
@@ -148,13 +156,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     meta.addComponent(btInitMeta);
     meta.addComponent(infoInitMeta);
     meta.setMargin(true);
-    meta.setCaption(META_CAPTION);
+    meta.setCaption(META_CAPTION);        
     // toolbar layout
     toolbar = new HorizontalLayout();
     toolbar.setSpacing(true);
     toolbar.addComponent(filtering);
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
+    toolbar.addComponent(btReverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
     // put everything on the layout
@@ -273,6 +282,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     String fullQuery = (query+edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "    
+    this.query = fullQuery; //necessary for inverted building
     return fullQuery;
   }
 
@@ -389,6 +399,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         mboxes.clear();
         updateQuery();
         launch(cp);
+      }
+      if (event.getButton() == btReverse)
+      {
+        adjustBuilderToQuery();
       }
     }
   }
@@ -613,6 +627,81 @@ public Set<String> getAvailableAnnotationNames()
      * the one delivered by the text field
      */
   {
-    
-  }
+    String tq;
+    try
+    {
+      tq = cp.getQuery().getQuery();
+    } catch (NullPointerException e)
+    {
+      tq = "";
+    }
+    if(!query.equals(tq))
+    {      
+      //2Do: Catch case tq==null
+      HashMap<Integer, String> constraints = new HashMap<Integer, String>();
+      TreeSet<String> relations = new TreeSet<String>();
+      TreeSet<String> meta = new TreeSet<String>();
+      
+      //parse typed Query
+      //Step 1: get indices of tq-chars, where constraints are separated (&)
+      String tempCon="";
+      int count = 1;
+      for(int i=0; i<tq.length(); i++)
+      {
+        char c = tq.charAt(i);
+        if(c!='&')
+        {
+          if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
+          {
+            tempCon += c;
+          }
+        }
+        else
+        {
+          if(tempCon.charAt(i-1)==' ')
+          {
+            tempCon = tempCon.substring(0, tempCon.length()-1);
+          }
+          
+          if(tempCon.startsWith("meta::"))
+          {
+            meta.add(tempCon);
+          }
+          else if(tempCon.startsWith("#"))
+          {
+            relations.add(tempCon);
+          }         
+          else 
+          {
+            constraints.put(count++, tempCon);
+          }
+          
+          tempCon = "";
+        }
+      }
+      
+      /*to get the number of VerticalNodes / EdgeBoxes we have to count the
+      * relations containing '.'
+      * #(eboxes) = #(vnodes) - 1
+       
+      
+      int ebs = 0;
+      for(String s : relations)
+      {
+        if(s.contains("."))
+        {
+          ebs++;
+        }
+      }
+      */
+      //now we go through the relations and build...
+      for(String s : relations)
+      {
+        if(s.contains("."))
+        {
+          //create VN & EB
+        }
+      }
+    }
+  } 
 }
