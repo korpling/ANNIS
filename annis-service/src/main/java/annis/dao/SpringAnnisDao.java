@@ -386,9 +386,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         {
           String sql = findSqlGenerator.toSql(queryData);
           
+          ResultSet rs = stmt.executeQuery(sql);
+          
+          
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
           ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
-            stmt.executeQuery(sql), findSqlGenerator);
+            rs, findSqlGenerator);
           
           int i=1;
           while(itMatches.hasNext())
@@ -407,6 +410,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
             i++;
           } // end for each match
           
+          rs.close();
           w.flush();
           return true;
         }
@@ -476,6 +480,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           itMatches.reset();
           WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
           w.flush();
+          
+          rs.close();
         }
         catch(UnsupportedEncodingException ex)
         {

@@ -123,6 +123,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     {
       log.error("exception when serializing SaltProject", ex);
     }
+    entityStream.close();
   }
 
   @Override
