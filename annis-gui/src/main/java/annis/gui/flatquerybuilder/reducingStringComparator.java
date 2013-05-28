@@ -15,9 +15,16 @@
  */
 package annis.gui.flatquerybuilder;
 
-import java.util.Collection;
+import com.vaadin.ui.Notification;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.io.File;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.w3c.dom.Element;
+
 
 /**
  * @author klotzmaz
@@ -26,13 +33,16 @@ import java.util.HashMap;
 public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
+  private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
+  private static String MAPPING_FILE_LOCATION = "./mapfile.fqb";
   
   public reducingStringComparator()
   {
-    ALLOGRAPHS = initAlphabet();
+    initAlphabet();
+    readMappings();
   }
   
-  private HashMap<Character, Character> initAlphabet()
+  private void initAlphabet()
   {
     HashMap<Character, Character> h = new HashMap<Character, Character>();
     
@@ -43,218 +53,38 @@ public class reducingStringComparator implements Comparator
       h.put(c, c);
       h.put(Character.toUpperCase(c), c);
     }
-       
-    //read from file:
-    //A:
-    //h.put('a', 'a');
-    //h.put('A', 'a');
-    h.put('À', 'a');
-    h.put('Á', 'a');
-    h.put('Â', 'a');
-    h.put('Ã', 'a');
-    h.put('Ä', 'a');
-    h.put('Å', 'a');
-    h.put('Æ', 'a');
-    h.put('à', 'a');
-    h.put('á', 'a');
-    h.put('â', 'a');
-    h.put('ã', 'a');
-    h.put('ä', 'a');
-    h.put('å', 'a');
-    h.put('æ', 'a');
-    h.put('Ā', 'a');
-    h.put('ā', 'a');
-    h.put('Ă', 'a');
-    h.put('ă', 'a');
-    h.put('Ą', 'a');
-    h.put('ą', 'a');
-    h.put('Ǎ', 'a');
-    h.put('ǎ', 'a');
-    h.put('Ǟ', 'a');
-    h.put('ǟ', 'a');
-    h.put('Ǡ', 'a');
-    h.put('ǡ', 'a');
-    h.put('Ǣ', 'a');
-    h.put('ǣ', 'a');
-    h.put('Ǻ', 'a');
-    h.put('ǻ', 'a');
-    h.put('Ǽ', 'a');
-    h.put('ǽ', 'a');
-    h.put('Ȁ', 'a');
-    h.put('ȁ', 'a');
-    h.put('Ȃ', 'a');
-    h.put('ȃ', 'a');
-    h.put('Ȧ', 'a');
-    h.put('ȧ', 'a');
-    h.put('Ⱥ', 'a');
-    h.put('ɐ', 'a');
-    h.put('ɑ', 'a');
-    h.put('ɒ', 'a');
-
-    //E:
-    //h.put('e', 'e');
-    //h.put('E', 'e');
-    h.put('È', 'e');
-    h.put('É', 'e');
-    h.put('Ê', 'e');
-    h.put('Ë', 'e');
-    h.put('è', 'e');
-    h.put('é', 'e');
-    h.put('ê', 'e');
-    h.put('ë', 'e');
-    h.put('Ē', 'e');
-    h.put('ē', 'e');
-    h.put('Ĕ', 'e');
-    h.put('ĕ', 'e');
-    h.put('Ė', 'e');
-    h.put('ė', 'e');
-    h.put('Ę', 'e');
-    h.put('ę', 'e');
-    h.put('Ě', 'e');
-    h.put('ě', 'e');
-    h.put('Ǝ', 'e');
-    h.put('Ə', 'e');
-    h.put('Ɛ', 'e');
-    h.put('ǝ', 'e');
-    h.put('Ȅ', 'e');
-    h.put('ȅ', 'e');
-    h.put('Ȇ', 'e');
-    h.put('ȇ', 'e');
-    h.put('Ȩ', 'e');
-    h.put('ȩ', 'e');
-    h.put('Ɇ', 'e');
-    h.put('ɇ', 'e');
-
-    //I:
-    //h.put('i', 'i');
-    //h.put('I', 'i');
-    h.put('Ì', 'i');
-    h.put('Í', 'i');
-    h.put('Î', 'i');
-    h.put('Ï', 'i');
-    h.put('ì', 'i');
-    h.put('í', 'i');
-    h.put('î', 'i');
-    h.put('ï', 'i');
-    h.put('Ĩ', 'i');
-    h.put('ĩ', 'i');
-    h.put('İ', 'i');
-    h.put('ı', 'i');
-    h.put('Ɨ', 'i');
-    h.put('Ǐ', 'i');
-    h.put('ǐ', 'i');
-    h.put('Ȉ', 'i');
-    h.put('ȉ', 'i');
-    h.put('Ȋ', 'i');
-    h.put('ȋ', 'i');
-    h.put('ɨ', 'i');
-    h.put('ī', 'i');
     
-    //O:
-    
-    //h.put('o', 'o');
-    //h.put('O', 'o');
-    h.put('Ò', 'o');
-    h.put('Ó', 'o');
-    h.put('Ô', 'o');
-    h.put('Õ', 'o');
-    h.put('Ö', 'o');
-    h.put('Ø', 'o');
-    h.put('ò', 'o');
-    h.put('ó', 'o');
-    h.put('ô', 'o');
-    h.put('õ', 'o');
-    h.put('ö', 'o');
-    h.put('ø', 'o');
-    h.put('Ō', 'o');
-    h.put('ō', 'o');
-    h.put('Ŏ', 'o');
-    h.put('ŏ', 'o');
-    h.put('Ő', 'o');
-    h.put('ő', 'o');
-    h.put('Œ', 'o');
-    h.put('œ', 'o');
-    h.put('Ɔ', 'o');
-    h.put('Ɵ', 'o');
-    h.put('Ơ', 'o');
-    h.put('ơ', 'o');
-    h.put('Ƣ', 'o');
-    h.put('ƣ', 'o');
-    h.put('Ǒ', 'o');
-    h.put('ǒ', 'o');
-    h.put('Ǫ', 'o');
-    h.put('ǫ', 'o');
-    h.put('Ǭ', 'o');
-    h.put('ǭ', 'o');
-    h.put('Ǿ', 'o');
-    h.put('ǿ', 'o');
-    h.put('Ȍ', 'o');
-    h.put('ȍ', 'o');
-    h.put('Ȏ', 'o');
-    h.put('ȏ', 'o');
-    h.put('Ȣ', 'o');
-    h.put('ȣ', 'o');
-    h.put('Ȫ', 'o');
-    h.put('ȫ', 'o');
-    h.put('Ȭ', 'o');
-    h.put('ȭ', 'o');
-    h.put('Ȯ', 'o');
-    h.put('ȯ', 'o');
-    h.put('Ȱ', 'o');
-    h.put('ȱ', 'o');
-    h.put('ɔ', 'o');
-
-    //U:
-    //h.put('u', 'u');
-    //h.put('U', 'u');
-    h.put('Ù', 'u');
-    h.put('Ú', 'u');
-    h.put('Û', 'u');
-    h.put('Ü', 'u');
-    h.put('ù', 'u');
-    h.put('ú', 'u');
-    h.put('û', 'u');
-    h.put('ü', 'u');
-    h.put('Ũ', 'u');
-    h.put('ũ', 'u');
-    h.put('Ū', 'u');
-    h.put('ū', 'u');
-    h.put('Ŭ', 'u');
-    h.put('ŭ', 'u');
-    h.put('Ů', 'u');
-    h.put('ů', 'u');
-    h.put('Ű', 'u');
-    h.put('ű', 'u');
-    h.put('Ų', 'u');
-    h.put('ų', 'u');
-    h.put('Ư', 'u');
-    h.put('ư', 'u');
-    h.put('Ʊ', 'u');
-    h.put('Ǔ', 'u');
-    h.put('ǔ', 'u');
-    h.put('Ǖ', 'u');
-    h.put('ǖ', 'u');
-    h.put('Ǘ', 'u');
-    h.put('ǘ', 'u');
-    h.put('Ǚ', 'u');
-    h.put('ǚ', 'u');
-    h.put('Ǜ', 'u');
-    h.put('ǜ', 'u');
-    h.put('Ȕ', 'u');
-    h.put('ȕ', 'u');
-    h.put('Ȗ', 'u');
-    h.put('ȗ', 'u');
-    h.put('Ʉ', 'u');
-    h.put('ʉ', 'u');
-    h.put('ʊ', 'u');
-    
-    //further special characters:
-    h.put('ç', 'c');
-    h.put('Ç', 'c'); 
-    h.put('ß', 's');    
-    h.put('ʒ', 'z');
-    
-    return h;
+    ALLOGRAPHS = h;
+  }
+  
+  private void readMappings()
+  {	  
+    try
+    {
+      File mf = new File(MAPPING_FILE_LOCATION);
+      HashMap<Character, Character> h = new HashMap<Character, Character>();
+      
+      DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+      DocumentBuilder db = dbf.newDocumentBuilder();
+      
+      Document mappingD = db.parse(mf);
+      
+      //document is now loaded ... we can start parsing
+      NodeList variants = mappingD.getElementsByTagName("variant");
+      for(int i=0; i<variants.getLength(); i++)
+      {
+    	Element var = (Element)variants.item(i);        
+        h.put(var.getAttribute("value").charAt(0), ((Element)var.getParentNode()).getAttribute("value").charAt(0));        
+      }
+      
+      ALLOGRAPHS.putAll(h);
+      
+    } catch(Exception e)
+    {
+      Notification.show(e.getMessage());
+      e = null;
+      //Notification.show(READING_ERROR_MESSAGE);
+    }    
   }
     
   private String removeCombiningCharacters(String s)
@@ -388,11 +218,5 @@ public class reducingStringComparator implements Comparator
       }
     }
     return false;
-  }
-
-  //improve algorithm later
-  public void sort(Collection<String> c)
-  {
-    
-  }
+  }  
 }
