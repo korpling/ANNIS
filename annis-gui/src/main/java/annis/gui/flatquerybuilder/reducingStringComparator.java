@@ -19,6 +19,8 @@ import com.vaadin.ui.Notification;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.io.File;
+import java.net.URI;
+import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
@@ -34,7 +36,7 @@ public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
-  private static String MAPPING_FILE_LOCATION = "./mapfile.fqb";
+  private static String MAPPING_FILE_LOCATION = "../mapfile.fqb";
   
   public reducingStringComparator()
   {
@@ -61,7 +63,11 @@ public class reducingStringComparator implements Comparator
   {	  
     try
     {
-      File mf = new File(MAPPING_FILE_LOCATION);
+      Class me = getClass();   
+      URL u = me.getResource(MAPPING_FILE_LOCATION);
+      URI ui = u.toURI();
+      
+      File mf = new File(ui);
       HashMap<Character, Character> h = new HashMap<Character, Character>();
       
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
@@ -81,9 +87,8 @@ public class reducingStringComparator implements Comparator
       
     } catch(Exception e)
     {
-      Notification.show(e.getMessage());
       e = null;
-      //Notification.show(READING_ERROR_MESSAGE);
+      Notification.show(READING_ERROR_MESSAGE);
     }    
   }
     
