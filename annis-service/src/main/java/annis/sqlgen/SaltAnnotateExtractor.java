@@ -20,7 +20,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
 
@@ -46,7 +45,6 @@ import java.util.LinkedList;
 import java.util.ListIterator;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -211,7 +209,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       
       boolean allNull = true;
-      EList<String> types = rel.getSTypes();
+      List<String> types = rel.getSTypes();
       if(types != null)
       {
         for(String s : types)
@@ -225,7 +223,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       } // end if types not null
       if (allNull)
       {
-        EList<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
+        List<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
           getSTarget().getSId());
         if (mirrorEdges != null && mirrorEdges.size() > 1)
         {
@@ -255,7 +253,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     // actually remove the edges
     for(SDominanceRelation rel : edgesToRemove)
     {
-      EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
+      List<SLayer> layersOfRel = rel.getSLayers();
       for(SLayer layer : layersOfRel)
       {
         layer.getSRelations().remove(rel);
@@ -424,7 +422,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       // map layer
       String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
-      EList<SLayer> layerList = graph.getSLayerByName(namespace);
+      List<SLayer> layerList = graph.getSLayerByName(namespace);
       SLayer layer = (layerList != null && layerList.size() > 0)
         ? layerList.get(0) : null;
       if (layer == null)
@@ -564,7 +562,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     from.getSLayers().clear();
  
-    EList<Edge> inEdges =  new BasicEList<Edge>(graph.getInEdges(from.getSId()));
+    List<Edge> inEdges =  graph.getInEdges(from.getSId());
     for(Edge e : inEdges)
     {
       if(e instanceof SRelation)
@@ -572,7 +570,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         Validate.isTrue(graph.removeEdge(e));
       }
     }
-    EList<Edge> outEdges = new BasicEList<Edge>(graph.getOutEdges(from.getSId()));
+    List<Edge> outEdges = graph.getOutEdges(from.getSId());
     for(Edge e : outEdges)
     {
       if(e instanceof SRelation)
@@ -634,7 +632,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   {
     SRelation rel = null;
     
-    EList<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
+    List<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
       targetNode.getSId());
     if (existingEdges != null)
     {
@@ -805,7 +803,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       return null;
     }
 
-    EList<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
+    List<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
     SLayer layer = (layerList != null && layerList.size() > 0)
       ? layerList.get(0) : null;
     if (layer == null)
