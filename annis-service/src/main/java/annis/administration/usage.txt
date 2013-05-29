@@ -7,6 +7,8 @@ usage:
   annis-admin delete CORPUS_ID [CORPUS_ID ...]
   annis-admin list
   annis-admin indexes
+  annis-admin delexamples [CORPUS_NAME ...]
+  annis-admin genexamples [CORPUS_NAME ...]
 
 * init:    Initialize a PostgreSQL database for Annis and
     update conf/database.properties
@@ -44,14 +46,14 @@ usage:
 * indexes:  Show definitions of used and unused indexes.
 
 * genexamples:  Generate example queries for corpora.
-    Specify to one or more corpora names as arguments.
+    Specify to one or more corpus names as arguments.
 
   Options:
-    -o, --overwrite overwrites old example queries, if exists.
+    -o, --overwrite overwrites old example queries, if they exist.
 
   NOTE: if no corpus is specified, it will generate example queries
   for all corpora
 
 * delexamples: Delete example queries.
-    Specify a corpus name as argument, otherwise all example queries
+    Specify a corpus name as an argument, otherwise all example queries
     will be deleted.
