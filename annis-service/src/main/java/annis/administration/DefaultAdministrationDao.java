@@ -119,6 +119,11 @@ public class DefaultAdministrationDao implements AdministrationDao
   // tables imported from bulk files
   // DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
 
+  /**
+   * The corpus configuration is saved in the media files table.
+   */
+  private final String CORPUS_CONFIG_FILE = "corpus.properties";
+
   private String[] importedTables =
   {
     "corpus", "corpus_annotation",
@@ -368,6 +373,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     long corpusID = updateIds();
 
     importBinaryData(path);
+    importCorpusConfig(corpusID, path);
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
 
@@ -392,6 +398,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
+
 
     if (temporaryStagingArea)
     {
@@ -653,13 +660,31 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
 
-  private void importSingleFile(String path, long corpusRef)
+  /**
+   * Imports a single binary file.
+   *
+   * @param file Specifies the file to be imported.
+   * @param corpusRef Assigns the file this corpus.
+   */
+  private void importSingleFile(File file, long corpusRef)
+  {
+    BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
+      corpusRef, mimeTypeMapping);
+    jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
+  }
+
+  /**
+   * Imports a single binary file.
+   *
+   * @param file Specifies the file to be imported.
+   * @param corpusRef Assigns the file this corpus.
+   */
+  private void importSingleFile(String file, long corpusRef)
   {
 
-    MediaImportHelper preStat = new MediaImportHelper(path, getRealDataDir(),
+    BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
       corpusRef, mimeTypeMapping);
-
-    jdbcTemplate.execute(MediaImportHelper.SQL, preStat);
+    jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
 
   }
 
@@ -1681,5 +1706,24 @@ public class DefaultAdministrationDao implements AdministrationDao
     QueriesGenerator queriesGenerator)
   {
     this.queriesGenerator = queriesGenerator;
+  }
+
+  /**
+   * Stores the corpus config in the media file as it is.
+   *
+   * @param corpusID Assigns the config to a corpus.
+   * @param path Specifies the path to the config file.
+   */
+  private void importCorpusConfig(long corpusID, String path)
+  {
+    File corpusConfig = new File(path + CORPUS_CONFIG_FILE);
+
+    if (corpusConfig.exists())
+    {
+      log.info("import the corpus config");
+      importSingleFile(corpusConfig, corpusID);
+    }else {
+      log.info("corpus config not found");
+    }
   }
 }
