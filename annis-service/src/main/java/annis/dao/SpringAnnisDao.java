@@ -666,6 +666,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     Map<String, String> result = new TreeMap<String, String>();
     InputStream binary = getBinaryComplete(corpusName,
       "application/octet-stream", "corpus.properties");
+
+    if (binary == null)
+    {
+      return result;
+    }
+
     Properties props = new Properties();
 
     try

@@ -94,7 +94,8 @@ public interface AnnisDao
    * @param title The title of the binary to fetch or null if any with correct
    * mime type.
    *
-   * @return Returns an {@link InputStream} of the file.
+   * @return Returns an {@link InputStream} of the file. Returns null, when the
+   * binary file does not exist.
    */
   public InputStream getBinaryComplete(String toplevelCorpusName,
     String mimeType, String title);
@@ -136,7 +137,7 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
    * null null null null null null null null null null null null null null null
-   * null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
