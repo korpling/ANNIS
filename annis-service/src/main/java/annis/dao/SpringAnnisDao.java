@@ -195,7 +195,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     if (binaryMeta != null && !binaryMeta.isEmpty())
     {
 
-      String filePath = getRealDataDir().getPath() + binaryMeta.get(0).
+      String filePath = getRealDataDir().getPath() + "/" + binaryMeta.get(0).
         getLocalFileName();
 
       try
@@ -213,6 +213,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           if (input != null)
           {
             input.close();
+            input = null;
           }
         }
         catch (IOException ex)
