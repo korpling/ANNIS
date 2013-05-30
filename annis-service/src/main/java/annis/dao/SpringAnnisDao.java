@@ -189,36 +189,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public InputStream getBinaryComplete(String toplevelCorpusName,
     String mimeType, String title)
   {
-    List<AnnisBinaryMetaData> binaryMeta = getBinaryMeta(toplevelCorpusName);
+    List<AnnisBinaryMetaData> binaryMetas = getBinaryMeta(toplevelCorpusName);
     InputStream input = null;
 
-    if (binaryMeta != null && !binaryMeta.isEmpty())
+    if (binaryMetas != null)
     {
-
-      String filePath = getRealDataDir().getPath() + "/" + binaryMeta.get(0).
-        getLocalFileName();
-
-      try
+      for (AnnisBinaryMetaData metaData : binaryMetas)
       {
-        input = new FileInputStream(filePath);
-      }
-      catch (FileNotFoundException ex)
-      {
-        log.error("could not found binary file {}", filePath, ex);
-      }
-      finally
-      {
-        try
+        if (mimeType.equals(metaData.getMimeType()) && title.equals(metaData.
+          getFileName()))
         {
-          if (input != null)
+          String filePath = getRealDataDir().getPath() + "/" + metaData.
+            getLocalFileName();
+          try
           {
-            input.close();
-            input = null;
+            input = new FileInputStream(filePath);
+            return input;
           }
-        }
-        catch (IOException ex)
-        {
-          log.error("could not close file {}", filePath, ex);
+          catch (FileNotFoundException ex)
+          {
+            log.error("could not found binary file {}", filePath, ex);
+          }
         }
       }
     }
@@ -666,7 +657,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
     Map<String, String> result = new TreeMap<String, String>();
     InputStream binary = getBinaryComplete(corpusName,
-      "application/octet-stream", "corpus.properties");
+      "application/text+plain", "corpus.properties");
 
     if (binary == null)
     {
