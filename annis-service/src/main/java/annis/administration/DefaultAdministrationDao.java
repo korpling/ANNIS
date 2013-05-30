@@ -72,18 +72,20 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private static final Logger log = LoggerFactory.getLogger(
     AdministrationDao.class);
+
   // external files path
-
   private String externalFilesPath;
+
   // script path
-
   private String scriptPath;
+
   // use Spring's JDBC support
-
   private JdbcTemplate jdbcTemplate;
-  //private JdbcOperations jdbcOperations;
-  // save the datasource to manually retrieve connections (needed for bulk-import)
 
+  /**
+   * Private JdbcOperations jdbcOperations; save the datasource to manually
+   * retrieve connections (needed for bulk-import).
+   */
   private DataSource dataSource;
 
   // if this is true, the staging area is not deleted
@@ -122,7 +124,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   /**
    * The corpus configuration is saved in the media files table.
    */
-  private final String CORPUS_CONFIG_FILE = "corpus.properties";
+  public final String CORPUS_CONFIG_FILE = "corpus.properties";
 
   private String[] importedTables =
   {
@@ -1722,7 +1724,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       log.info("import the corpus config");
       importSingleFile(corpusConfig, corpusID);
-    }else {
+    }
+    else
+    {
       log.info("corpus config not found");
     }
   }

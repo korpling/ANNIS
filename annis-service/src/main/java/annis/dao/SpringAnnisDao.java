@@ -47,7 +47,6 @@ import annis.sqlgen.MetaByteHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
-import annis.utils.Utils;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -62,7 +61,6 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.security.NoSuchAlgorithmException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -94,7 +92,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   SqlSessionModifier
 {
-  
+
   // SQL generators for the different query functions
   private FindSqlGenerator findSqlGenerator;
 
@@ -185,6 +183,52 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     ListDocumentsSqlHelper listDocumentsSqlHelper)
   {
     this.listDocumentsSqlHelper = listDocumentsSqlHelper;
+  }
+
+  @Override
+  public InputStream getBinaryComplete(String toplevelCorpusName,
+    String mimeType, String title)
+  {
+    List<AnnisBinaryMetaData> binaryMeta = getBinaryMeta(toplevelCorpusName);
+    InputStream input = null;
+
+    if (binaryMeta != null && !binaryMeta.isEmpty())
+    {
+
+      String filePath = getRealDataDir().getPath() + binaryMeta.get(0).
+        getLocalFileName();
+
+      try
+      {
+        input = new FileInputStream(filePath);
+      }
+      catch (FileNotFoundException ex)
+      {
+        log.error("could not found binary file {}", filePath, ex);
+      }
+      finally
+      {
+        try
+        {
+          if (input != null)
+          {
+            input.close();
+          }
+        }
+        catch (IOException ex)
+        {
+          log.error("could not close file {}", filePath, ex);
+        }
+      }
+    }
+
+    return input;
+  }
+
+  @Override
+  public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName)
+  {
+    return getBinaryMeta(toplevelCorpusName, toplevelCorpusName);
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -312,7 +356,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     return names;
   }
-  
+
   private void prepareTransaction(QueryData queryData)
   {
     JdbcTemplate jdbcTemplate = getJdbcTemplate();
@@ -331,7 +375,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       sqlSessionModifier.modifySqlSession(jdbcTemplate, queryData);
     }
   }
-  
+
   // query functions
   @Transactional
   @Override
@@ -369,13 +413,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     return executeQueryFunction(queryData, findSqlGenerator);
   }
-  
+
   @Transactional(readOnly = true)
   @Override
   public boolean find(final QueryData queryData, final OutputStream out)
-  { 
+  {
     prepareTransaction(queryData);
-    Boolean finished = getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
+    Boolean finished = getJdbcTemplate().execute(
+      new ConnectionCallback<Boolean>()
     {
       @Override
       public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
@@ -385,38 +430,40 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         try
         {
           String sql = findSqlGenerator.toSql(queryData);
-          
+
           ResultSet rs = stmt.executeQuery(sql);
-          
-          
+
+
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
           ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
             rs, findSqlGenerator);
-          
-          int i=1;
-          while(itMatches.hasNext())
+
+          int i = 1;
+          while (itMatches.hasNext())
           {
             // write single match to output stream
             Match m = itMatches.next();
             w.print(m.toString());
             w.print("\n");
-            
+
             // flush after every 10th item
-            if(i % 10 == 0)
+            if (i % 10 == 0)
             {
               w.flush();
             }
-            
+
             i++;
           } // end for each match
-          
+
           rs.close();
           w.flush();
           return true;
         }
-        catch(UnsupportedEncodingException ex)
+        catch (UnsupportedEncodingException ex)
         {
-          log.error("Your system is not able to handle UTF-8 but ANNIS really needs this charset", ex);
+          log.error(
+            "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
+            ex);
         }
         finally
         {
@@ -425,7 +472,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         return false;
       }
     });
-    
+
     return finished;
   }
 
@@ -450,42 +497,44 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return executeQueryFunction(queryData, annotateSqlGenerator,
       saltAnnotateExtractor);
   }
-  
+
   @Transactional(readOnly = true)
   @Override
   public void matrix(final QueryData queryData, final OutputStream out)
   {
     prepareTransaction(queryData);
-    
-    getJdbcTemplate().execute(new ConnectionCallback<Boolean>() 
+
+    getJdbcTemplate().execute(new ConnectionCallback<Boolean>()
     {
       @Override
       public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
       {
-        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE, 
+        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
           ResultSet.CONCUR_READ_ONLY);
         try
         {
           ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));
-          AnnotatedMatchIterator itMatches  = 
+          AnnotatedMatchIterator itMatches =
             new AnnotatedMatchIterator(rs, matrixSqlGenerator.getSpanExtractor());
-          
+
           // write the header to the output stream
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-          SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+          SortedMap<Integer, SortedSet<String>> columnsByNodePos =
             WekaHelper.exportArffHeader(itMatches, w);
           w.flush();
-          
+
           // go back to the beginning and print the actual data
           itMatches.reset();
           WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
           w.flush();
-          
+
           rs.close();
         }
-        catch(UnsupportedEncodingException ex)
+        catch (UnsupportedEncodingException ex)
         {
-          log.error("Your system is not able to handle UTF-8 but ANNIS really needs this charset", ex);
+          log.error(
+            "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
+            ex);
         }
         finally
         {
@@ -613,72 +662,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public Map<String, String> getCorpusConfiguration(String corpusName)
   {
+
     Map<String, String> result = new TreeMap<String, String>();
+    InputStream binary = getBinaryComplete(corpusName,
+      "application/octet-stream", "corpus.properties");
+    Properties props = new Properties();
 
-    // parse from configuration folder
-    if (System.getProperty("annis.home") != null)
+    try
     {
-      File confFolder = new File(System.getProperty("annis.home")
-        + "/conf/corpora");
-      if (confFolder.isDirectory())
-      {
+      props.load(binary);
+    }
+    catch (IOException ex)
+    {
+      log.error("could not read corpus config of {}", corpusName, ex);
+    }
 
-        File conf = null;
-        try
-        {
-          // try  hash of corpus name first
-          conf = new File(confFolder, Utils.calculateSHAHash(corpusName));
-        }
-        catch (NoSuchAlgorithmException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (UnsupportedEncodingException ex)
-        {
-          log.warn(null, ex);
-        }
+    for (Map.Entry<Object, Object> e : props.entrySet())
+    {
+      result.put(e.getKey().toString(), e.getValue().toString());
+    }
 
-        if (conf == null || !conf.isFile())
-        {
-          // try corpus name next
-          conf = new File(confFolder, corpusName + ".properties");
-        }
-        // parse property file if found
-        if (conf.isFile())
-        {
-          Properties p = new Properties();
-          FileInputStream confStream = null;
-          try
-          {
-            confStream = new FileInputStream(conf);
-            p.load(confStream);
-            for (Map.Entry<Object, Object> e : p.entrySet())
-            {
-              result.put(e.getKey().toString(), e.getValue().toString());
-            }
-          }
-          catch (IOException ex)
-          {
-            log.warn("could not load corpus configuration file "
-              + conf.getAbsolutePath(), ex);
-          }
-          finally
-          {
-            if (confStream != null)
-            {
-              try
-              {
-                confStream.close();
-              }
-              catch (IOException ex)
-              {
-                log.warn(null, ex);
-              }
-            }
-          }
-        }
-      } // end if conf is a directory
-    } // end if annis.home was set
     return result;
   }
 
@@ -975,7 +978,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
       FileInputStream fInput = new FileInputStream(dataFile);
       fInput.skip(offset);
-      
+
       BoundedInputStream boundedStream = new BoundedInputStream(fInput, length);
 
       return boundedStream;
@@ -1067,7 +1070,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.externalFilesPath = externalFilesPath;
   }
-
 
   public ListExampleQueriesHelper getListExampleQueriesHelper()
   {
