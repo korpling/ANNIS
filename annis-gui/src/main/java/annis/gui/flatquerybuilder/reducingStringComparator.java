@@ -15,10 +15,13 @@
  */
 package annis.gui.flatquerybuilder;
 
+import com.vaadin.server.ClassResource;
 import com.vaadin.ui.Notification;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.io.File;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URI;
 import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
@@ -36,7 +39,7 @@ public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
-  private static String MAPPING_FILE_LOCATION = "../mapfile.fqb";
+  private static String MAPPING_FILE_LOCATION = "mapfile.fqb";
   
   public reducingStringComparator()
   {
@@ -63,11 +66,12 @@ public class reducingStringComparator implements Comparator
   {	  
     try
     {
-      Class me = getClass();   
-      URL u = me.getResource(MAPPING_FILE_LOCATION);
-      URI ui = u.toURI();
+      ClassLoader cl = Thread.currentThread().getContextClassLoader();      
       
-      File mf = new File(ui);
+      ClassResource mfl = new ClassResource(MAPPING_FILE_LOCATION);
+      String filename = mfl.getFilename();
+            
+      File mf = new File(mfl.getFilename());
       HashMap<Character, Character> h = new HashMap<Character, Character>();
       
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
