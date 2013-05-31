@@ -1688,8 +1688,6 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
 
       eQ.setUsedOperators("{" + StringUtils.join(ops, ",") + "}");
-      log.info("found operators {} in ", eQ.getUsedOperators(), eQ.
-        getExampleQuery());
     }
   }
 
