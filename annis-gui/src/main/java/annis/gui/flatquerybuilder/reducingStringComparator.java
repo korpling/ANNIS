@@ -44,7 +44,7 @@ public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
-  private static String MAPPING_FILE = "/home/klotzmaz/Documents/ANNIS/annis-gui/src/main/resources/annis/gui/components/mapfile.fqb";
+  private static String MAPPING_FILE = "mapfile.fqb";
   
   public reducingStringComparator()
   {
@@ -72,18 +72,16 @@ public class reducingStringComparator implements Comparator
     try
     {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();      
-      URL u = cl.getResource(MAPPING_FILE);
-      String whereAmI = Window.Location.getPath();
-      
+      ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE);              
       File mf = new File(MAPPING_FILE);
       
       HashMap<Character, Character> h = new HashMap<Character, Character>();
       
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
-      ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE);
       
-      Document mappingD = db.parse(mf);      
+      
+      Document mappingD = db.parse(cr.getStream().getStream());      
       
       NodeList variants = mappingD.getElementsByTagName("variant");
       for(int i=0; i<variants.getLength(); i++)
