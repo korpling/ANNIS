@@ -15,25 +15,15 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.google.gwt.user.client.Window;
-import com.google.gwt.user.client.Window.Location;
 import com.vaadin.server.ClassResource;
-import com.vaadin.server.DownloadStream;
-import com.vaadin.server.Resource;
 import com.vaadin.ui.Notification;
-import java.io.BufferedReader;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.io.File;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.URI;
-import java.net.URL;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import org.w3c.dom.Document;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Element;
+import org.w3c.dom.NodeList;
 
 
 /**
@@ -70,16 +60,12 @@ public class reducingStringComparator implements Comparator
   private void readMappings()
   {	  
     try
-    {
-      ClassLoader cl = Thread.currentThread().getContextClassLoader();      
-      ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE);              
-      File mf = new File(MAPPING_FILE);
-      
+    { 
+      ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE); 
       HashMap<Character, Character> h = new HashMap<Character, Character>();
       
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-      DocumentBuilder db = dbf.newDocumentBuilder();
-      
+      DocumentBuilder db = dbf.newDocumentBuilder();      
       
       Document mappingD = db.parse(cr.getStream().getStream());      
       
