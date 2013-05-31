@@ -15,8 +15,13 @@
  */
 package annis.gui.flatquerybuilder;
 
+import com.google.gwt.user.client.Window;
+import com.google.gwt.user.client.Window.Location;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.DownloadStream;
+import com.vaadin.server.Resource;
 import com.vaadin.ui.Notification;
+import java.io.BufferedReader;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.io.File;
@@ -39,7 +44,7 @@ public class reducingStringComparator implements Comparator
 {
   private static HashMap<Character, Character> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
-  private static String MAPPING_FILE_LOCATION = "mapfile.fqb";
+  private static String MAPPING_FILE = "/home/klotzmaz/Documents/ANNIS/annis-gui/src/main/resources/annis/gui/components/mapfile.fqb";
   
   public reducingStringComparator()
   {
@@ -67,23 +72,23 @@ public class reducingStringComparator implements Comparator
     try
     {
       ClassLoader cl = Thread.currentThread().getContextClassLoader();      
+      URL u = cl.getResource(MAPPING_FILE);
+      String whereAmI = Window.Location.getPath();
       
-      ClassResource mfl = new ClassResource(MAPPING_FILE_LOCATION);
-      String filename = mfl.getFilename();
-            
-      File mf = new File(mfl.getFilename());
+      File mf = new File(MAPPING_FILE);
+      
       HashMap<Character, Character> h = new HashMap<Character, Character>();
       
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();
+      ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE);
       
-      Document mappingD = db.parse(mf);
+      Document mappingD = db.parse(mf);      
       
-      //document is now loaded ... we can start parsing
       NodeList variants = mappingD.getElementsByTagName("variant");
       for(int i=0; i<variants.getLength(); i++)
       {
-    	Element var = (Element)variants.item(i);        
+        Element var = (Element)variants.item(i);        
         h.put(var.getAttribute("value").charAt(0), ((Element)var.getParentNode()).getAttribute("value").charAt(0));        
       }
       
@@ -104,7 +109,6 @@ public class reducingStringComparator implements Comparator
     {
       char c = s.charAt(i);
       int cp = (int)c;
-      //improve later with IntRanges
       if(!(
         ((cp>767) & (cp<880)) |
         ((cp>1154) & (cp<1162)) |
