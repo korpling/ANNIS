@@ -91,11 +91,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   // if this is true, the staging area is not deleted
   private boolean temporaryStagingArea;
 
+  public enum EXAMPLE_QUERIES_CONFIG
+  {
+
+    IF_MISSING, TRUE, FALSE
+
+  }
   /**
    * If this is true and no example_queries.tab is found, automatic queries are
    * generated.
    */
-  private boolean generateExampleQueries;
+  private EXAMPLE_QUERIES_CONFIG generateExampleQueries;
 
   private String schemaVersion;
 
@@ -112,7 +118,7 @@ public class DefaultAdministrationDao implements AdministrationDao
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
    */
-  private final String EXAMPLE_QUERIES = "example_queries";
+  private final String EXAMPLE_QUERIES_TAB = "example_queries";
 
   /**
    * The name of the file and the relation containing the resolver information.
@@ -131,7 +137,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     "corpus", "corpus_annotation",
     "text", "node", "node_annotation",
     "component", "rank", "edge_annotation",
-    FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES
+    FILE_RESOLVER_VIS_MAP, EXAMPLE_QUERIES_TAB
   };
 
   private String[] tablesToCopyManually =
@@ -139,7 +145,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     "corpus", "corpus_annotation",
     "text",
     FILE_RESOLVER_VIS_MAP,
-    EXAMPLE_QUERIES,
+    EXAMPLE_QUERIES_TAB,
     "corpus_stats",
     "media_files"
   };
@@ -436,7 +442,7 @@ public class DefaultAdministrationDao implements AdministrationDao
    * account with the {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
    * suffix. Further it is straight forward except for the
    * {@link DefaultAdministrationDao#FILE_RESOLVER_VIS_MAP} and the
-   * {@link DefaultAdministrationDao#EXAMPLE_QUERIES}. This is done by this
+   * {@link DefaultAdministrationDao#EXAMPLE_QUERIES_TAB}. This is done by this
    * method automatically.
    *
    * <ul>
@@ -445,8 +451,8 @@ public class DefaultAdministrationDao implements AdministrationDao
    * compatibility, the columns must be counted, since there exists one
    * additional column for visibility behaviour of visualizers.</li>
    *
-   * <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES}: If this file does not
-   * exists, the example query table is empty</li>
+   * <li>{@link DefaultAdministrationDao#EXAMPLE_QUERIES_TAB}: Takes into
+   * account the state of {@link #generateExampleQueries}.</li>
    *
    * </ul>
    *
@@ -465,7 +471,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         importResolverVisMapTable(path, table);
       }
       // check if example query exists. If not copy it from the resource folder.
-      else if (table.equalsIgnoreCase(EXAMPLE_QUERIES))
+      else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
         File f = new File(path, table + REL_ANNIS_FILE_SUFFIX);
         if (f.exists())
@@ -473,9 +479,19 @@ public class DefaultAdministrationDao implements AdministrationDao
           log.info(table + REL_ANNIS_FILE_SUFFIX + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
+
+          if (generateExampleQueries == (EXAMPLE_QUERIES_CONFIG.IF_MISSING))
+          {
+            generateExampleQueries = EXAMPLE_QUERIES_CONFIG.FALSE;
+          }
         }
         else
         {
+          if (generateExampleQueries == EXAMPLE_QUERIES_CONFIG.IF_MISSING)
+          {
+            generateExampleQueries = EXAMPLE_QUERIES_CONFIG.TRUE;
+          }
+
           log.info(table + REL_ANNIS_FILE_SUFFIX + " file not found");
         }
       }
@@ -1556,7 +1572,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private void generateExampleQueries(long corpusID)
   {
     // set in the annis.properties file.
-    if (generateExampleQueries)
+    if (generateExampleQueries == EXAMPLE_QUERIES_CONFIG.TRUE)
     {
       queriesGenerator.generateQueries(corpusID);
     }
@@ -1565,7 +1581,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   /**
    * @return the generateExampleQueries
    */
-  public boolean isGenerateExampleQueries()
+  public EXAMPLE_QUERIES_CONFIG isGenerateExampleQueries()
   {
     return generateExampleQueries;
   }
@@ -1573,7 +1589,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   /**
    * @param generateExampleQueries the generateExampleQueries to set
    */
-  public void setGenerateExampleQueries(boolean generateExampleQueries)
+  public void setGenerateExampleQueries(
+    EXAMPLE_QUERIES_CONFIG generateExampleQueries)
   {
     this.generateExampleQueries = generateExampleQueries;
   }
@@ -1589,7 +1606,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // read the example queries from the staging area
     List<ExampleQuery> exampleQueries = jdbcTemplate.query(
-      "SELECT * FROM _" + EXAMPLE_QUERIES, new RowMapper<ExampleQuery>()
+      "SELECT * FROM _" + EXAMPLE_QUERIES_TAB, new RowMapper<ExampleQuery>()
     {
       @Override
       public ExampleQuery mapRow(ResultSet rs, int i) throws SQLException
@@ -1652,12 +1669,14 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     for (ExampleQuery eQ : exampleQueries)
     {
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES).append(" SET ");
+      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
+        " SET ");
       sb.append("nodes=").append(String.valueOf(eQ.getNodes()));
       sb.append(" WHERE example_query='");
       sb.append(eQ.getExampleQuery()).append("';\n");
 
-      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES).append(" SET ");
+      sb.append("UPDATE ").append("_").append(EXAMPLE_QUERIES_TAB).append(
+        " SET ");
       sb.append("used_ops='").append(String.valueOf(eQ.getUsedOperators()));
       sb.append("' WHERE example_query='");
       sb.append(eQ.getExampleQuery()).append("';\n");
