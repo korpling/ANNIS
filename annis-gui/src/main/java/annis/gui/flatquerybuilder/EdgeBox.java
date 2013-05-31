@@ -28,10 +28,10 @@ public class EdgeBox extends Panel
   private static final String[][] EDGE_OPERATORS = new String[][]
   {
     {".",".2",".1,2",".*"},
-    { ".       [is directly preceding]",
-      ".2      [is preceding with one token in between]",
-      ".1,2    [is directly preceding or with one token in between]",
-      ".*      [is indirectly preceding]"}
+    { ".\t[is directly preceding]",
+      ".2\t[is preceding with one token in between]",
+      ".1,2\t[is directly preceding or with one token in between]",
+      ".*\t[is indirectly preceding]"}
   };
   private static final String WIDTH = "45px";
   
