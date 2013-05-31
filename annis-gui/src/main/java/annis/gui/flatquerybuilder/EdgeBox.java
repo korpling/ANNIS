@@ -59,4 +59,9 @@ public class EdgeBox extends Panel
     }
     return EDGE_OPERATORS[0][i];
   }
+  
+  public void setValue(String value)
+  {
+    edge.setValue(value);
+  }
 }
