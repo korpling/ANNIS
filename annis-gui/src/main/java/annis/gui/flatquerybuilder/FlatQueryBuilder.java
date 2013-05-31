@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.HashMap;
 
 /**
  * @author martin
@@ -49,6 +50,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Button btInitMeta;
   private Button btGo;
   private Button btClear;
+  private Button btInverse;
   private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout span;
@@ -59,6 +61,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
+  private String query;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -67,6 +70,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String BUTTON_META_LABEL = "Add";
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
+  private static final String BUTTON_INV_LABEL = "Adjust Builder to Query";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
@@ -116,6 +120,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
+    btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
     filtering = new OptionGroup("Filtering mechanisms");
     filtering.addItem(1);
     filtering.setItemCaption(1, "Generic");
@@ -148,6 +154,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     toolbar.addComponent(filtering);
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
+    toolbar.addComponent(btInverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
     // put everything on the layout
@@ -265,7 +272,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     }
     String fullQuery = (query+edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
-    fullQuery = fullQuery.substring(3);//deletes leading " & "    
+    fullQuery = fullQuery.substring(3);//deletes leading " & "
+    this.query = fullQuery;
     return fullQuery;
   }
 
@@ -370,19 +378,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
       if (event.getButton() == btClear)
       {
-        language.removeAllComponents();
-        span.removeAllComponents();
-        meta.removeAllComponents();
-        toolbar.removeAllComponents();
-        mainLayout.removeComponent(language);
-        mainLayout.removeComponent(span);
-        mainLayout.removeComponent(meta);
-        mainLayout.removeComponent(toolbar);
-        vnodes.clear();
-        eboxes.clear();
-        mboxes.clear();
+        clear();
         updateQuery();
         launch(cp);
+      }
+      if (event.getComponent() == btInverse)
+      {
+        adjustBuilderToQuery();
       }
     }
   }
@@ -598,6 +600,21 @@ public Set<String> getAvailableAnnotationNames()
     return out;
   }
   
+  private void clear()
+  {
+    language.removeAllComponents();
+    span.removeAllComponents();
+    meta.removeAllComponents();
+    toolbar.removeAllComponents();
+    mainLayout.removeComponent(language);
+    mainLayout.removeComponent(span);
+    mainLayout.removeComponent(meta);
+    mainLayout.removeComponent(toolbar);
+    vnodes.clear();
+    eboxes.clear();
+    mboxes.clear();
+  }
+  
   public void adjustBuilderToQuery()
     /*
      * this method is called, when the
@@ -608,5 +625,178 @@ public Set<String> getAvailableAnnotationNames()
      */
   {
     
+    String tq="";//typed-in query
+    
+    try
+    {
+      //doesn't work (typed text not yet saved as query I guess)
+      tq = cp.getQuery().getQuery();
+    } catch (NullPointerException e)
+    {
+      tq = "";
+    }
+    if(!query.equals(tq))
+    {
+      HashMap<Integer, String> constraints = new HashMap<Integer, String>();
+      TreeSet<Relation> relations = new TreeSet<Relation>();
+      TreeSet<String> meta = new TreeSet<String>();
+      
+      //parse typed-in Query
+      //Step 1: get indices of tq-chars, where constraints are separated (&)
+      String tempCon="";
+      int count = 1;
+      for(int i=0; i<tq.length(); i++)
+      {
+        char c = tq.charAt(i);
+        if(c!='&')
+        {
+          if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
+          {
+            tempCon += c;
+          }
+        }
+        else
+        {
+          if(tempCon.charAt(i-1)==' ')
+          {
+            tempCon = tempCon.substring(0, tempCon.length()-1);
+          }
+          
+          if(tempCon.startsWith("meta::"))
+          {
+            meta.add(tempCon);
+          }
+          else if(tempCon.startsWith("#"))
+          {            
+            relations.add(new Relation(tempCon));
+          }         
+          else 
+          {
+            constraints.put(count++, tempCon);
+          }
+          
+          tempCon = "";
+        }
+      }
+      
+      /*to get the number of VerticalNodes / EdgeBoxes we have to count the
+      * relations containing '.'
+      * #(eboxes) = #(vnodes) - 1
+       
+      
+      int ebs = 0;
+      for(String s : relations)
+      {
+        if(s.contains("."))
+        {
+          ebs++;
+        }
+      }
+      */     
+      
+      //clean query builder surface
+      for(VerticalNode vn : vnodes)
+      {
+        language.removeComponent(vn);        
+      }
+      vnodes = null;
+      
+      for(EdgeBox eb : eboxes)
+      {
+        language.removeComponent(eb);
+      }
+      eboxes = null;
+      
+      //2be continued for meta and span
+      
+      //now we go through the relations and build...
+      for(Relation rel : relations)
+      {
+        if(rel.expressesPrecedence())
+        {
+          //create EB:
+          EdgeBox eb = new EdgeBox(this);
+          eb.setValue(rel.getOperator());
+          eboxes.add(eb);
+          language.addComponent(eb);
+          
+          //create VN:
+          VerticalNode vn = new VerticalNode(constraints.get(rel.getSecond()), this);
+          vnodes.add(vn);
+          language.addComponent(vn);
+          
+        }
+      }
+    }
+  }  
+  
+  private static class Relation
+  /*
+   * Problems:
+   * if an operator is used, which is not in the EdgeBoxe's list
+   * the programm will crash. Right now. I'm gonna fix this.
+   * 
+   */
+  {
+    //operands without '#'
+    private int o1, o2;
+    private String operator;
+    private boolean precedence;
+    
+    public Relation(String in)
+    {
+      
+      String op = "", o1 = "", o2 = ""; 
+      
+      int i=1;
+      char c = in.charAt(1);
+      in = in.replace(" ", "");
+      
+      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$'))
+      {
+        o1+=c;
+        i++;
+        c = in.charAt(i);
+      }     
+      while(c!='#')
+      {
+        op+=c;
+        i++;
+        c = in.charAt(i);
+      }
+      i++;
+      while((i<in.length()))
+      {
+        c = in.charAt(i);
+        o2+=c;
+        i++;
+      }
+      
+      operator = op;
+      this.o1 = Integer.parseInt(o1);
+      this.o2 = Integer.parseInt(o2);
+      
+      precedence = op.startsWith(".");
+    }
+    
+    public boolean expressesPrecedence()
+    {
+      return precedence;
+    }
+    
+    public int getFirst()
+    {
+      return o1;
+    }
+    
+    public int getSecond()
+    {
+      return o2;
+    }
+    
+    public String getOperator()
+    {
+      return operator;
+    }    
   }
 }
