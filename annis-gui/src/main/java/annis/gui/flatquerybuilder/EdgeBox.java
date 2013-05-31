@@ -43,10 +43,11 @@ public class EdgeBox extends Panel
       edge.addItem(o);
     }
     edge.setNewItemsAllowed(true);
+    edge.setTextInputAllowed(true);
     edge.setValue(EDGE_OPERATORS[1][0]);
     edge.setWidth(WIDTH);
     edge.setNullSelectionAllowed(false);
-    setContent(edge);
+    setContent(edge);    
   }
   
   public String getValue()
