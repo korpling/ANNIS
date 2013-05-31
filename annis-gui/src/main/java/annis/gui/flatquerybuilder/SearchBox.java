@@ -56,12 +56,14 @@ public class SearchBox extends Panel implements Button.ClickListener,
   private FlatQueryBuilder sq;
   public static final String BUTTON_CLOSE_LABEL = "Close";
   private static final String SB_CB_WIDTH = "145px";
+  private static reducingStringComparator rsc;
   
   public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
   {
     this.vn = vn;
     this.ebene = ebene;
     this.sq = sq;
+    rsc = new reducingStringComparator();
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
     sb.setSpacing(true);
@@ -147,8 +149,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
   {
     if ("specific".equals(sq.getFilterMechanism()))
     {
-      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
-      reducingStringComparator esc = new reducingStringComparator();    
+      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();       
       String txt = event.getText();
       if (!txt.equals(""))
       {
@@ -156,7 +157,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         for (Iterator<String> it = annonames.iterator(); it.hasNext();)
         {
           String s = it.next();
-          if(esc.compare(s, txt)==0)
+          if(rsc.compare(s, txt)==0)
           {
             cb.addItem(s);          
           }
@@ -165,7 +166,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //startsWith
         for(String s : notInYet)
         {        
-          if(esc.startsWith(s, txt))
+          if(rsc.startsWith(s, txt))
           {
             cb.addItem(s);
             notInYet.remove(s);
@@ -174,7 +175,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //contains
         for(String s : notInYet)
         {
-          if(esc.contains(s, txt))
+          if(rsc.contains(s, txt))
           {
             cb.addItem(s);
           }
