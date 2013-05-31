@@ -381,7 +381,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     long corpusID = updateIds();
 
     importBinaryData(path);
-    importCorpusConfig(corpusID, path);
+
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
 
@@ -1725,26 +1725,5 @@ public class DefaultAdministrationDao implements AdministrationDao
     QueriesGenerator queriesGenerator)
   {
     this.queriesGenerator = queriesGenerator;
-  }
-
-  /**
-   * Stores the corpus config in the media file as it is.
-   *
-   * @param corpusID Assigns the config to a corpus.
-   * @param path Specifies the path to the config file.
-   */
-  private void importCorpusConfig(long corpusID, String path)
-  {
-    File corpusConfig = new File(path + CORPUS_CONFIG_FILE);
-
-    if (corpusConfig.exists())
-    {
-      log.info("import the corpus config");
-      importSingleFile(corpusConfig, corpusID);
-    }
-    else
-    {
-      log.info("corpus config not found");
-    }
   }
 }
