@@ -20,6 +20,7 @@ import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
+import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
@@ -39,7 +40,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import java.util.HashMap;
 
-/**
+/*
  * @author martin
  * @author tom
  */
