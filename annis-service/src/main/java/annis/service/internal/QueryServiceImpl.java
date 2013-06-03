@@ -477,9 +477,17 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
+  @Path("corpora/default-config")
+  @Produces("application/xml")
+  public CorpusConfig corpusDefaultConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")
-  public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
+  public CorpusConfig corpusConfig(@PathParam("top") String toplevelName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:config:" + toplevelName);
