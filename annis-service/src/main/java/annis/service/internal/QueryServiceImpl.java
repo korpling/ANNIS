@@ -53,7 +53,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -101,9 +100,9 @@ public class QueryServiceImpl implements QueryService
 
   private WekaHelper wekaHelper;
 
-  private int maxContext = 10;
-
   private int port = 5711;
+
+  private CorpusConfig defaultCorpusConfig;
 
   @Context
   private UriInfo uriInfo;
@@ -183,8 +182,8 @@ public class QueryServiceImpl implements QueryService
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-    int left = Math.min(maxContext, Integer.parseInt(leftRaw));
-    int right = Math.min(maxContext, Integer.parseInt(rightRaw));
+    int left = Math.min(getContextLeft(), Integer.parseInt(leftRaw));
+    int right = Math.min(getContextRight(), Integer.parseInt(rightRaw));
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     String logParameters = createAnnotateLogParameters(left, right, offset,
@@ -469,7 +468,7 @@ public class QueryServiceImpl implements QueryService
       {
         if (user.isPermitted("query:*:" + c))
         {
-         result.put(c, corpusConfigs.get(c));
+          result.put(c, corpusConfigs.get(c));
         }
       }
     }
@@ -989,14 +988,48 @@ public class QueryServiceImpl implements QueryService
     this.annisDao = annisDao;
   }
 
-  public int getMaxContext()
+  /**
+   * Retrieves the max right context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextRight()
   {
-    return maxContext;
+    return getCorpusConfigIntValues("max-context-right");
   }
 
-  public void setMaxContext(int maxContext)
+  /**
+   * Retrieves the max left context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextLeft()
   {
-    this.maxContext = maxContext;
+    return getCorpusConfigIntValues("max-context-left");
+  }
+
+  /**
+   * Extract corpus configurations values with numeric values.
+   *
+   * @param context Must be a valid key of the corpus configuration section in
+   * the annis-service.properties file.
+   * @return Parses the String representation of the value to int and returns
+   * it.
+   *
+   */
+  private int getCorpusConfigIntValues(String context)
+  {
+    int value = Integer.parseInt(defaultCorpusConfig.getConfig().getProperty(
+      context));
+
+    if (value < 0)
+    {
+      throw new IllegalStateException("the value must be > 0");
+    }
+
+    return value;
   }
 
   public WekaHelper getWekaHelper()
@@ -1017,5 +1050,22 @@ public class QueryServiceImpl implements QueryService
   public void setPort(int port)
   {
     this.port = port;
+  }
+
+  /**
+   * @return the defaultCorpusConfig
+   */
+  public CorpusConfig getDefaultCorpusConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  /**
+   * @param defaultCorpusConfig the defaultCorpusConfig to set
+   */
+  public void setDefaultCorpusConfig(
+    CorpusConfig defaultCorpusConfig)
+  {
+    this.defaultCorpusConfig = defaultCorpusConfig;
   }
 }
