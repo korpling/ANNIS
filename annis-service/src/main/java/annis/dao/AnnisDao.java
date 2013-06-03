@@ -30,12 +30,12 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.util.Map;
 import java.util.UUID;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -137,7 +137,7 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
    * null null null null null null null null null null null null null null null
-   * null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -163,8 +163,16 @@ public interface AnnisDao
    * Gets the corpus configuration from all imported corpora.
    *
    * @return The return value is the Key of corpus table entry.
+   * @deprecated Use {@link #getCorpusConfigurations()} instead.
    */
   public HashMap<Long, Properties> getCorpusConfiguration();
+
+  /**
+   * Gets the corpus configuration from all imported corpora.
+   *
+   * @return The return value is the Key of corpus table entry.
+   */
+  public CorpusConfigMap getCorpusConfigurations();
 
   public void setCorpusConfiguration(
     HashMap<Long, Properties> corpusConfiguration);
@@ -191,7 +199,7 @@ public interface AnnisDao
    * @see BinaryImportHelper
    *
    */
-  public Map<String, String> getCorpusConfiguration(String corpusName);
+  public Properties getCorpusConfiguration(String corpusName);
 
   /**
    * Called to check if the database management program has the right version

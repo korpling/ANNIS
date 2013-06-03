@@ -28,6 +28,8 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
@@ -221,6 +223,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName)
   {
     return getBinaryMeta(toplevelCorpusName, toplevelCorpusName);
+  }
+
+  @Override
+  public HashMap<Long, Properties> getCorpusConfiguration()
+  {
+    return corpusConfiguration;
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -652,19 +660,17 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public Map<String, String> getCorpusConfiguration(String corpusName)
+  public Properties getCorpusConfiguration(String corpusName)
   {
 
-    Map<String, String> result = new TreeMap<String, String>();
+    Properties props = new Properties();
     InputStream binary = getBinaryComplete(corpusName,
       "application/text+plain", "corpus.properties");
 
     if (binary == null)
     {
-      return result;
+      return props;
     }
-
-    Properties props = new Properties();
 
     try
     {
@@ -675,12 +681,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       log.error("could not read corpus config of {}", corpusName, ex);
     }
 
-    for (Map.Entry<Object, Object> e : props.entrySet())
-    {
-      result.put(e.getKey().toString(), e.getValue().toString());
-    }
-
-    return result;
+    return props;
   }
 
   private void parseCorpusConfiguration()
@@ -693,12 +694,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       for (AnnisCorpus c : corpora)
       {
         // copy properties from map
-        Properties p = new Properties();
-        Map<String, String> map = getCorpusConfiguration(c.getName());
-        for (Map.Entry<String, String> e : map.entrySet())
-        {
-          p.setProperty(e.getKey(), e.getValue());
-        }
+        Properties p = getCorpusConfiguration(c.getName());
         corpusConfiguration.put(c.getId(), p);
       }
     }
@@ -898,9 +894,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public HashMap<Long, Properties> getCorpusConfiguration()
+  public CorpusConfigMap getCorpusConfigurations()
   {
-    return corpusConfiguration;
+    List<AnnisCorpus> annisCorpora = listCorpora();
+    CorpusConfigMap cConfigs = new CorpusConfigMap();
+
+    if (annisCorpora != null)
+    {
+      for (AnnisCorpus c : annisCorpora)
+      {
+        Properties p = getCorpusConfiguration(c.getName());
+        if (p != null)
+        {
+          CorpusConfig corpusConfig = new CorpusConfig();
+          corpusConfig.setConfig(p);
+          cConfigs.put(c.getName(), corpusConfig);
+        }
+      }
+    }
+
+    return cConfigs;
   }
 
   @Override
