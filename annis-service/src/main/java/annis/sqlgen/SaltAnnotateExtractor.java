@@ -307,11 +307,13 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     TreeMap<Long, String> tokenTexts,  TreeMap<Long, SToken> tokenByIndex)
   {
     STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
+    textDataSource.setSName("sText" + textID);
     graph.addSNode(textDataSource);
     
     StringBuilder sbText = new StringBuilder();
     Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
       iterator();
+    long index = 0;
     while (itToken.hasNext())
     {
       Map.Entry<Long, String> e = itToken.next();
@@ -324,6 +326,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         textRel.setSTarget(textDataSource);
         textRel.setSStart(sbText.length());
         textRel.setSEnd(sbText.length() + e.getValue().length());
+        
+        textRel.setSName("sTextRel" + textID + "_" + (index++));
 
         textRel.setSTextualDS(textDataSource);
         graph.addSRelation(textRel);
