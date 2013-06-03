@@ -266,6 +266,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private void addOrderingRelations(SDocumentGraph graph,
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath)
   {
+    AtomicInteger numberOfSOrderRels = new AtomicInteger();
+    
     for(Map.Entry<String, TreeMap<Long, String>> e : nodeBySegmentationPath.entrySet())
     {
       TreeMap<Long, String> nodeBySegIndex = e.getValue();
@@ -281,6 +283,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           orderRel.setSSource(lastNode);
           orderRel.setSTarget(n);
           orderRel.addSType(e.getKey());
+          orderRel.setSName("sOrderRel" + numberOfSOrderRels.getAndIncrement());
           graph.addSRelation(orderRel);
         }
         lastNode = n;
