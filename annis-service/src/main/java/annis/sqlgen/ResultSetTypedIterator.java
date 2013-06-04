@@ -62,7 +62,14 @@ public class ResultSetTypedIterator<T> implements Iterator<T>
     }
     try
     {
-      hasNext = rs.first();
+      if(rs.getType() == ResultSet.TYPE_FORWARD_ONLY)
+      {
+        hasNext = rs.next();
+      }
+      else
+      {
+        hasNext = rs.first();
+      }
     }
     catch (SQLException ex)
     {
@@ -78,6 +85,10 @@ public class ResultSetTypedIterator<T> implements Iterator<T>
   {
     try
     {
+      if(rs.getType() == ResultSet.TYPE_FORWARD_ONLY)
+      {
+        throw new UnsupportedOperationException("Can not reset iterator for a ResultSet that is of type \"forward only\"");
+      }
       hasNext = rs.first();
     }
     catch (SQLException ex)

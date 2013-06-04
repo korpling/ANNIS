@@ -323,7 +323,6 @@ public class Helper
   public static CorpusConfig getCorpusConfig(String corpus)
   {
     CorpusConfig corpusConfig = new CorpusConfig();
-    corpusConfig.setConfig(new TreeMap<String, String>());
     
     try
     {

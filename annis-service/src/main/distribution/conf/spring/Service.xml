@@ -1,24 +1,42 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	xmlns:util="http://www.springframework.org/schema/util"
-	xsi:schemaLocation="
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:util="http://www.springframework.org/schema/util"
+       xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
   <import resource="Common.xml" />
-  
+
   <!-- AdminService -->
   <bean id="adminService" class="annis.service.internal.AdminService" lazy-init="true">
     <property name="adminDao" ref="administrationDao"/>
-  </bean> 
-  
+  </bean>
+
+  <!-- Default Corpus Config -->
+  <bean id="defaultCorpusConfig" class="annis.service.objects.CorpusConfig">
+    <property name="config" ref="corpusProperties" />
+  </bean>
+
+  <bean id="corpusProperties" class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+    <property name="properties">
+      <props>
+        <prop key="max-context-left">${max-context-left}</prop>
+        <prop key="max-context-right">${max-context-right}</prop>
+        <prop key="default-context">${default-context}</prop>
+        <prop key="context-steps">${context-steps}</prop>
+        <prop key="results-per-page">${results-per-page}</prop>
+        <prop key="default-text-segmentation">${default-text-segmentation}</prop>
+        <prop key="default-base-text-segmentation">${default-base-text-segmentation}</prop>
+      </props>
+    </property>
+  </bean>
+
   <!-- QueryService -->
   <bean id="queryService" class="annis.service.internal.QueryServiceImpl" init-method="init" lazy-init="true">
     <property name="annisDao" ref="annisDao"/>
     <property name="wekaHelper" ref="wekaHelper"/>
-    <property name="maxContext" value="${annis.max-context}" />
+    <property name="defaultCorpusConfig" ref="defaultCorpusConfig" />
     <property name="port" value="${annis.webservice-port}" />
   </bean>
-
 </beans>

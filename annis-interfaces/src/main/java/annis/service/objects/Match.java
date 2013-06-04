@@ -22,6 +22,7 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
+import org.apache.commons.lang3.StringUtils;
 
 @SuppressWarnings("serial")
 @XmlRootElement
@@ -56,5 +57,17 @@ public class Match implements Serializable
   {
     this.saltIDs = saltIDs;
   }
+
+  /**
+   * Returns a comma seperated list of all Salt IDs.
+   * @return 
+   */
+  @Override
+  public String toString()
+  {
+    return StringUtils.join(saltIDs, ",");
+  }
+  
+  
   
 }
