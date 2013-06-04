@@ -707,7 +707,30 @@ public Set<String> getAvailableAnnotationNames()
       //second try:
       //first step: build families
       
-      //find a good algorithm
+      ArrayList<Integer> used = new ArrayList<Integer>();
+      VerticalNode vn=null;
+      for(int i : constraints.keySet())
+      {
+        Constraint con = constraints.get(i);
+        vn = (used.contains(i)) ? vn : new VerticalNode(con.getLevel(), con.getValue(), this);
+        used.add(i);
+        for(Relation rel : relations)
+        {
+          if((rel.contains(i)) & (rel.getType()==RelationType.EQUALITY))
+          {
+            int b = rel.whosMyFriend(i);
+            used.add(b);
+            SearchBox sb = new SearchBox(constraints.get(b).getLevel(), this, vn);
+            sb.setValue(constraints.get(b).getValue());            
+          }          
+        }
+        vnodes.add(vn);
+      }
+      
+      for(VerticalNode v : vnodes)
+      {
+        
+      }
       
       
       /*
@@ -871,7 +894,19 @@ public Set<String> getAvailableAnnotationNames()
     public String getOperator()
     {
       return operator;
-    }    
+    }
+    
+    public boolean contains(int a)
+    {      
+      return ((o1==a)|(o2==a));
+    }
+    
+    public int whosMyFriend(int a)
+    {
+      if(a==o1) return o2;
+      if(a==o2) return o1;
+      return 0;
+    }
   }
   
   private static enum RelationType
