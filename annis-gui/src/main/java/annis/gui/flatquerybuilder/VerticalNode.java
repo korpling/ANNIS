@@ -15,6 +15,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
@@ -35,6 +36,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private FlatQueryBuilder sq;
   private Button btClose;
   private VerticalLayout v;
+  private VerticalLayout vframe;
   private Collection<SearchBox> sboxes;
   private AddMenu am;
   
@@ -44,6 +46,8 @@ public class VerticalNode extends Panel implements Button.ClickListener
   {      
     this.sq = sq;
     v = new VerticalLayout();
+    vframe = new VerticalLayout();
+    vframe.setSpacing(true);
     sboxes = new ArrayList<SearchBox>(); 
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -52,13 +56,13 @@ public class VerticalNode extends Panel implements Button.ClickListener
     annonames = sq.getAvailableAnnotationNames();
     am = new AddMenu(sq, this, ebene);
     HorizontalLayout vntoolbar = new HorizontalLayout();
-    vntoolbar.addComponent(this.am);
-    vntoolbar.addComponent(btClose);
-    v.addComponent(vntoolbar);
+    vframe.addComponent(btClose);
+    vframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
     v.addComponent(sb);
-    v.setSpacing(true);
+    vframe.addComponent(v);
+    vframe.addComponent(am);
     setWidth(WIDTH);
-    setContent(v);
+    setContent(vframe);
   }
   
   public VerticalNode(String ebene, String value, FlatQueryBuilder sq)
