@@ -102,6 +102,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private void launch(QueryController cp)
   {
     this.cp = cp;
+    this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
     vnodes = new ArrayList<VerticalNode>();
@@ -602,6 +603,7 @@ public Set<String> getAvailableAnnotationNames()
   }
   
   private void clear()
+    //check whether it is necessary to do this in a method
   {
     language.removeAllComponents();
     span.removeAllComponents();
@@ -626,19 +628,25 @@ public Set<String> getAvailableAnnotationNames()
      */
   {
     
-    String tq="";//typed-in query
+    String tq;//typed-in query
     
     try
     {
       //doesn't work (typed text not yet saved as query I guess)
-      tq = cp.getQuery().getQuery();
+      tq = cp.getQueryDraft();
     } catch (NullPointerException e)
     {
       tq = "";
     }
-    if(!query.equals(tq))
+    tq = tq.replace("\n", " ");
+    //2do: VALIDATE QUERY:
+    boolean valid = true;
+    if(!(query.equals(tq)) & valid)
     {
-      HashMap<Integer, String> constraints = new HashMap<Integer, String>();
+      //PROBLEM: LINE BREAKS
+      //the dot marks the end of the string - it is not read, it's just a place holder
+      tq += ".";
+      HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
       TreeSet<Relation> relations = new TreeSet<Relation>();
       TreeSet<String> meta = new TreeSet<String>();
       
@@ -648,8 +656,9 @@ public Set<String> getAvailableAnnotationNames()
       int count = 1;
       for(int i=0; i<tq.length(); i++)
       {
+        //improve this Algorithm (compare to constraint)
         char c = tq.charAt(i);
-        if(c!='&')
+        if((c!='&') & (i!=tq.length()-1))
         {
           if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
           {
@@ -658,7 +667,7 @@ public Set<String> getAvailableAnnotationNames()
         }
         else
         {
-          if(tempCon.charAt(i-1)==' ')
+          while(tempCon.charAt(tempCon.length()-1)==' ')
           {
             tempCon = tempCon.substring(0, tempCon.length()-1);
           }
@@ -673,63 +682,116 @@ public Set<String> getAvailableAnnotationNames()
           }         
           else 
           {
-            constraints.put(count++, tempCon);
+            constraints.put(count++, new Constraint(tempCon));
           }
           
           tempCon = "";
         }
-      }
-      
-      /*to get the number of VerticalNodes / EdgeBoxes we have to count the
-      * relations containing '.'
-      * #(eboxes) = #(vnodes) - 1
-       
-      
-      int ebs = 0;
-      for(String s : relations)
-      {
-        if(s.contains("."))
-        {
-          ebs++;
-        }
-      }
-      */     
+      }    
       
       //clean query builder surface
       for(VerticalNode vn : vnodes)
       {
         language.removeComponent(vn);        
       }
-      vnodes = null;
+      vnodes.clear();
       
       for(EdgeBox eb : eboxes)
       {
         language.removeComponent(eb);
       }
-      eboxes = null;
+      eboxes.clear();
       
       //2be continued for meta and span
       
+      //second try:
+      //first step: build families
+      
+      //find a good algorithm
+      
+      
+      /*
       //now we go through the relations and build...
-      for(Relation rel : relations)
+      Iterator<Relation> itRel = relations.iterator();
+      if(itRel.hasNext())
       {
-        if(rel.expressesPrecedence())
+        Relation rel = itRel.next();        
+        //create first VN:
+        Constraint first = constraints.get(rel.getFirst());
+        VerticalNode vnl = new VerticalNode(first.getLevel(), first.getValue(), this);
+        vnodes.add(vnl);
+        language.addComponent(vnl);        
+        
+        while(itRel.hasNext())
         {
-          //create EB:
-          EdgeBox eb = new EdgeBox(this);
-          eb.setValue(rel.getOperator());
-          eboxes.add(eb);
-          language.addComponent(eb);
-          
-          //create VN:
-          VerticalNode vn = new VerticalNode(constraints.get(rel.getSecond()), this);
-          vnodes.add(vn);
-          language.addComponent(vn);
-          
+          if(rel.getType()==RelationType.PRECEDENCE)
+          {
+            //create EB:
+            EdgeBox eb = new EdgeBox(this);
+            eb.setValue(rel.getOperator());
+            eboxes.add(eb);
+            language.addComponent(eb);
+
+            //create VN:
+            Constraint con = constraints.get(rel.getSecond());
+            VerticalNode vnr = new VerticalNode(con.getLevel(), con.getValue(), this);
+            vnodes.add(vnr);
+            language.addComponent(vnr);
+
+          }*//*
+          if(rel.getType()==RelationType.EQUALITY)
+          {
+            int i=1;
+            VerticalNode vn;
+            while(i!=rel.getFirst())
+            {
+              i++;
+              vn = (VerticalNode)(vnodes.toArray()[i]);
+            }
+            SearchBox sb = new SearchBox(rel);
+          }
         }
-      }
+      }*/
     }
-  }  
+  }
+  
+  private static class Constraint
+  {
+    private String level;
+    private String value;
+    
+    public Constraint(String s)
+    {
+      int e=0;
+      while(s.charAt(e)!='=')
+      {
+        e++;
+      }
+      String l = s.substring(0, e);
+      l = l.replace(" ", "");
+      
+      String v = s.substring(e+1);
+      while(v.startsWith(" "))
+      {
+        v = v.substring(1);
+      }
+      //remove " or / :
+      v = v.substring(1, v.length()-1);
+      
+      level = l;
+      value = v;
+    }
+    
+    public String getLevel()
+    {
+      return level;
+    }
+    
+    public String getValue()
+    {
+      return value;
+    }
+  }
   
   private static class Relation
   /*
@@ -742,7 +804,7 @@ public Set<String> getAvailableAnnotationNames()
     //operands without '#'
     private int o1, o2;
     private String operator;
-    private boolean precedence;
+    private RelationType type;
     
     public Relation(String in)
     {
@@ -777,12 +839,23 @@ public Set<String> getAvailableAnnotationNames()
       this.o1 = Integer.parseInt(o1);
       this.o2 = Integer.parseInt(o2);
       
-      precedence = op.startsWith(".");
+      if(op.startsWith("."))
+      {
+       type = RelationType.PRECEDENCE; 
+      }
+      else if((op.equals("=")) | (op.equals("_=_")))
+      {
+        type = RelationType.EQUALITY;
+      }
+      else if(op.equals("_i_"))
+      {
+        type = RelationType.INCLUSION;
+      }
     }
     
-    public boolean expressesPrecedence()
+    public RelationType getType()
     {
-      return precedence;
+      return type;
     }
     
     public int getFirst()
@@ -799,5 +872,10 @@ public Set<String> getAvailableAnnotationNames()
     {
       return operator;
     }    
+  }
+  
+  private static enum RelationType
+  {
+    PRECEDENCE, DOMINANCE, INCLUSION, EQUALITY
   }
 }
