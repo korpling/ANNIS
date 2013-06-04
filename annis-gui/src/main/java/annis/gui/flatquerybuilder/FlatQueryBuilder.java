@@ -20,7 +20,6 @@ import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
-import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
@@ -33,12 +32,12 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.HashMap;
 
 /*
  * @author martin
@@ -171,13 +170,22 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private String getAQLFragment(SearchBox sb)
   {
-    String result, value=sb.getValue(), level=sb.getAttribute();
-    if (sb.isRegEx())
+    String result = ""; 
+    String value = sb.getValue();
+    String level=sb.getAttribute();
+    if (sb.isRegEx() && !sb.isNegativeSearch())
     {
-      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace(
-        "/", "\\x2F") +"/";
+      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
     }
-    else
+    if (sb.isRegEx() && sb.isNegativeSearch())
+    {
+      result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
+    }
+    if (!sb.isRegEx() && sb.isNegativeSearch())
+    {
+      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value+"\"";            
+    }
+    if (!sb.isRegEx() && !sb.isNegativeSearch())
     {
       result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";      
     }
