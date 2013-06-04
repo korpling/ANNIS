@@ -23,6 +23,7 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
+import annis.model.RelannisNodeFeature;
 import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
@@ -259,17 +260,23 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
           }
         }
 
-        SFeature featTokenIndex = t.getSFeature(AnnisConstants.ANNIS_NS,
-                segmentationName == null ? AnnisConstants.FEAT_TOKENINDEX
-                : AnnisConstants.FEAT_SEGINDEX);
-
+        Long tokenIndex = null;
+        RelannisNodeFeature featRelannis = 
+          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS).getValue();
+        
+        if(featRelannis != null)
+        {
+           tokenIndex = segmentationName == null ? featRelannis.getTokenIndex() : 
+            featRelannis.getSegIndex();
+        }
+        
         if (tokenText == text) {
           // TODO: howto nativly detect gaps in Salt?
-          if (lastTokenIndex != null && featTokenIndex != null
-                  && featTokenIndex.getSValueSNUMERIC().longValue() > (lastTokenIndex.
+          if (lastTokenIndex != null && tokenIndex != null
+                  && tokenIndex > (lastTokenIndex.
                   longValue() + 1)) {
             // add "(...)"
-            Long gapColumnID = featTokenIndex.getSValueSNUMERIC();
+            Long gapColumnID = tokenIndex;
             addGeneratedColumn(gapColumnID,
                     new KWICPanelImpl.GapColumnGenerator());
             generatedColumns.add(gapColumnID);
@@ -289,8 +296,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
           visible.add(t.getSId());
 
 
-          if (featTokenIndex != null) {
-            lastTokenIndex = featTokenIndex.getSValueSNUMERIC();
+          if (tokenIndex != null) {
+            lastTokenIndex = tokenIndex;
           }
         } // end if token belongs to text
       }

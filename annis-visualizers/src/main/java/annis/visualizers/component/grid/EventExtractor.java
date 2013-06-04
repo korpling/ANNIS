@@ -21,10 +21,9 @@ import annis.libgui.PDFPageHelper;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_LEFTTOKEN;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RIGHTTOKEN;
-import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
+import static annis.model.AnnisConstants.FEAT_RELANNIS;
+import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNO_REGEX_KEY;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -96,10 +95,11 @@ public class EventExtractor {
     for (SSpan span : graph.getSSpans()) {
       // calculate the left and right values of a span
       // TODO: howto get these numbers with Salt?
-      long leftLong = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-              getSValueSNUMERIC();
-      long rightLong = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-              getSValueSNUMERIC();
+      RelannisNodeFeature feat = (RelannisNodeFeature) 
+        span.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+      
+      long leftLong = feat.getLeftToken();
+      long rightLong = feat.getRightToken();
 
       leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
       rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
@@ -423,11 +423,14 @@ public class EventExtractor {
           if (node2 == null) {
             return +1;
           }
+          
+          RelannisNodeFeature feat1 = 
+            (RelannisNodeFeature) node1.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          RelannisNodeFeature feat2 = 
+            (RelannisNodeFeature) node2.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
 
-          long tokenIndex1 = node1.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                  getSValueSNUMERIC();
-          long tokenIndex2 = node2.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                  getSValueSNUMERIC();
+          long tokenIndex1 = feat1.getTokenIndex();
+          long tokenIndex2 = feat2.getTokenIndex();
 
           return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
         }
@@ -438,8 +441,9 @@ public class EventExtractor {
       for (String id : sortedCoveredToken) {
 
         SNode node = graph.getSNode(id);
-        long tokenIndexRaw = node.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                getSValueSNUMERIC();
+        RelannisNodeFeature feat = 
+            (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        long tokenIndexRaw = feat.getTokenIndex();
 
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
 

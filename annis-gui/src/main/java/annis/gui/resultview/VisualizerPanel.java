@@ -345,8 +345,7 @@ public class VisualizerPanel extends VerticalLayout
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource();
       txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
-        path(
-        documentName).get(SaltProject.class);
+        path(documentName).get(SaltProject.class);
     }
     catch (RuntimeException e)
     {

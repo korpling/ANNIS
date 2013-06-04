@@ -19,6 +19,7 @@ import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -107,15 +108,17 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       {
         private int getIdx(SNode snode)
         {
+          
+          RelannisNodeFeature feat = 
+            (RelannisNodeFeature) snode.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          
           if (snode instanceof SToken)
           {
-            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
-            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+            return feat != null ? (int) feat.getTokenIndex(): -1;
           }
           else
           {
-            SFeature sF = snode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN);
-            return sF != null ? (int) (long) sF.getSValueSNUMERIC() : -1;
+            return feat != null ? (int) feat.getLeftToken() : -1;
           }
         }
 
@@ -153,9 +156,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
     {
       if (selectNode(n))
       {
-        SFeature sFeature = n.getSFeature(ANNIS_NS, FEAT_TOKENINDEX);
-        int tokenIdx = sFeature != null ? (int) (long) sFeature.
-          getSValueSNUMERIC() : -1;
+        RelannisNodeFeature feat = 
+          (RelannisNodeFeature) n.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        
+        int tokenIdx = feat != null ? (int) feat.getTokenIndex() : -1;
         selectedNodes.put(n, tokenIdx);
       }
     }

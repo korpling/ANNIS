@@ -1,0 +1,134 @@
+/*
+ * Copyright 2013 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package annis.model;
+
+import java.io.Serializable;
+
+/**
+ * Common Features included in the Salt graph that are available
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
+public class RelannisNodeFeature implements Serializable
+{
+  private long corpusRef;
+
+  private long textRef;
+
+  private long left;
+
+  private long leftToken;
+
+  private long right;
+
+  private long rightToken;
+
+  private long tokenIndex;
+
+  private long segIndex;
+
+  private String segName;
+
+  public long getCorpusRef()
+  {
+    return corpusRef;
+  }
+
+  public void setCorpusRef(long corpusRef)
+  {
+    this.corpusRef = corpusRef;
+  }
+
+  public long getTextRef()
+  {
+    return textRef;
+  }
+
+  public void setTextRef(long textRef)
+  {
+    this.textRef = textRef;
+  }
+
+  public long getLeft()
+  {
+    return left;
+  }
+
+  public void setLeft(long left)
+  {
+    this.left = left;
+  }
+
+  public long getLeftToken()
+  {
+    return leftToken;
+  }
+
+  public void setLeftToken(long leftToken)
+  {
+    this.leftToken = leftToken;
+  }
+
+  public long getRight()
+  {
+    return right;
+  }
+
+  public void setRight(long right)
+  {
+    this.right = right;
+  }
+
+  public long getRightToken()
+  {
+    return rightToken;
+  }
+
+  public void setRightToken(long rightToken)
+  {
+    this.rightToken = rightToken;
+  }
+
+  public long getTokenIndex()
+  {
+    return tokenIndex;
+  }
+
+  public void setTokenIndex(long tokenIndex)
+  {
+    this.tokenIndex = tokenIndex;
+  }
+
+  public long getSegIndex()
+  {
+    return segIndex;
+  }
+
+  public void setSegIndex(long seg_index)
+  {
+    this.segIndex = seg_index;
+  }
+
+  public String getSegName()
+  {
+    return segName;
+  }
+
+  public void setSegName(String segName)
+  {
+    this.segName = segName;
+  }
+  
+}

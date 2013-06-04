@@ -17,14 +17,13 @@ package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
 import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS;
+import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -66,13 +65,12 @@ public class SpanHTMLOutputter
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
-    long left = span
-        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_LEFTTOKEN)
-        .getSValueSNUMERIC();
-      
-    long right = span
-        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RIGHTTOKEN)
-        .getSValueSNUMERIC();
+    
+    RelannisNodeFeature feat = 
+      (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+    
+    long left = feat.getLeftToken();
+    long right = feat.getRightToken();
     
     SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
     
@@ -97,9 +95,11 @@ public class SpanHTMLOutputter
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
-    long index = tok
-        .getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_TOKENINDEX)
-        .getSValueSNUMERIC();
+
+    RelannisNodeFeature feat = 
+      (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+    
+    long index = feat.getTokenIndex();
     
     String value = "";
     

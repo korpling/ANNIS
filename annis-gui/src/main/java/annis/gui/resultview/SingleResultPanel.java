@@ -21,6 +21,7 @@ import annis.gui.MetaDataPanel;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -293,18 +294,18 @@ public class SingleResultPanel extends VerticalLayout implements
 
       for (SNode segNode : segNodes)
       {
+        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        
         if (segNode != null && !covered.containsKey(segNode))
         {
-          long leftTok =
-            segNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
-          long rightTok =
-            segNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
+          long leftTok = featSegNode.getLeftToken();
+          long rightTok = featSegNode.getRightToken();
 
           // check for each covered token if this segment is covering it
           for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
           {
-            long entryTokenIndex = e.getKey().getSFeature(ANNIS_NS,
-              FEAT_TOKENINDEX).getSValueSNUMERIC();
+            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            long entryTokenIndex = featTok.getTokenIndex();
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set

@@ -22,6 +22,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -163,15 +164,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
         if (e instanceof SRelation
                 && ((SRelation) e).getTarget() instanceof SToken) {
           SToken tok = ((SToken) ((SRelation) e).getTarget());
-          SFeature sf = tok.getSFeature(
-                  ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-          return Integer.parseInt(sf.getSValueSTEXT());
+          
+          RelannisNodeFeature feat = 
+            (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          
+          return (int) feat.getLeftToken();
         }
       }
-
-      SFeature sf = s.getSFeature(
-              ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-      return Integer.parseInt(sf.getSValueSTEXT());
+      
+      RelannisNodeFeature feat = 
+        (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+     
+      return (int) feat.getLeftToken();
     }
 
     @Override
