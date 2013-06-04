@@ -91,6 +91,12 @@ public class VerticalNode extends Panel implements Button.ClickListener
     v.addComponent(sb);
   }
   
+  public void addSearchBox(SearchBox sb)
+  {
+    this.sboxes.add(sb);
+    v.addComponent(sb);
+  }
+  
   public Collection<SearchBox> getSearchBoxes()
   {
     return this.sboxes;
@@ -99,5 +105,5 @@ public class VerticalNode extends Panel implements Button.ClickListener
   public Collection<String> getAnnonames()
   {
     return annonames;
-  }
+  }  
 }
