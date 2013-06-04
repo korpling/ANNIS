@@ -80,7 +80,6 @@ public class SearchBox extends Panel implements Button.ClickListener,
     this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
     cb.setCaption(ebene);
-    cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
