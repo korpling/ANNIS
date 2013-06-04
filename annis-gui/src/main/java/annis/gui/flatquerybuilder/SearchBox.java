@@ -22,6 +22,7 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.ui.AbstractSelect.Filtering;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -52,9 +53,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
   private String ebene;
   private SensitiveComboBox cb;  
   private CheckBox reBox;
+  private CheckBox negSearchBox;
   private Collection<String> annonames;
   private FlatQueryBuilder sq;
-  public static final String BUTTON_CLOSE_LABEL = "Close";
+  public static final String BUTTON_CLOSE_LABEL = "X";
   private static final String SB_CB_WIDTH = "145px";
   private static reducingStringComparator rsc;
   
@@ -86,13 +88,13 @@ public class SearchBox extends Panel implements Button.ClickListener,
     cb.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
     cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
-    HorizontalLayout sbtoolbar = new HorizontalLayout();
-    sbtoolbar.setSpacing(true);
+    VerticalLayout sbtoolbar = new VerticalLayout();
+    sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
-    CheckBox tb = new CheckBox("Regex");
-    tb.setImmediate(true);
-    sbtoolbar.addComponent(tb);
-    tb.addListener(new ValueChangeListener() {
+    reBox = new CheckBox("Regex");
+    reBox.setImmediate(true);
+    sbtoolbar.addComponent(reBox);
+    reBox.addListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
@@ -110,7 +112,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
         }
       }
     });
-    reBox = tb;
+    // searchbox tickbox for negative search
+    negSearchBox = new CheckBox("Neg. search");
+    negSearchBox.setImmediate(true);
+    sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -238,6 +243,11 @@ public class SearchBox extends Panel implements Button.ClickListener,
     return text == null ? null
         : Normalizer.normalize(text, Form.NFD)
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
+  }
+  
+  public boolean isNegativeSearch()
+  {
+    return negSearchBox.booleanValue();
   }
   
   public void setValue(String value)
