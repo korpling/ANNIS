@@ -5,14 +5,13 @@ import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
 /**
- * Provides the meta data of a binary file.
- *
- * @author Benjamin Weißenfels <p.pixeldrama@gmail.com>
+ * This Class provides the Metadata of a BinaryFile.
+ * @author benjamin
  */
 @XmlRootElement
 public class AnnisBinaryMetaData implements Serializable
 {
-
+  
   private String localFileName;
   private String corpusName;
   private String mimeType;

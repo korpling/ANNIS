@@ -37,7 +37,6 @@ import java.net.URLEncoder;
 import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Generates identifers for salt which are needed for the
@@ -47,7 +46,7 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   implements SelectClauseSqlGenerator<QueryData>, 
-  OrderByClauseSqlGenerator<QueryData>, RowMapper<Match>
+  OrderByClauseSqlGenerator<QueryData>
 {  
   
   private static final Logger log = LoggerFactory.getLogger(FindSqlGenerator.class);
@@ -149,7 +148,6 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     return matches;
   }
 
-  @Override
   public Match mapRow(ResultSet rs, int rowNum) throws SQLException
   {
     Match match = new Match();

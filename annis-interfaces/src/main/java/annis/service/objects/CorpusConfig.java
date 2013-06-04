@@ -16,7 +16,8 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.Properties;
+import java.util.Map;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -26,16 +27,18 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class CorpusConfig implements Serializable
 {
+  private Map<String,String> config;
 
-  private Properties config;
-
-  public Properties getConfig()
+  @XmlElementWrapper
+  public Map<String, String> getConfig()
   {
     return config;
   }
 
-  public void setConfig(Properties config)
+  public void setConfig(Map<String, String> config)
   {
     this.config = config;
   }
+  
+  
 }

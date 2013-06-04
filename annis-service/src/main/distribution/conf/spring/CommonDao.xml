@@ -170,7 +170,6 @@
         <entry key="pdf" value="application/pdf"/>
         <entry key="css" value="text/css"/>
         <entry key="config" value="application/x-config+text"/>
-        <entry key="properties" value="application/text+plain"/>
       </util:map>
     </property>
     <property name="tableInsertFrom">

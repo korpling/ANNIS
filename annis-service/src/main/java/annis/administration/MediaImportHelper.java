@@ -29,48 +29,39 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 
 /**
- * Imports binary files.
  *
- * <p>Therefore the meta data of the files are stored in the database, while the
- * real data are store in a simple file directory.</p>
- *
- *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
- * @author Benjamin Weißenfels <p.pixeldrama@gmail.com>
+ * @author benjamin
  */
-public class BinaryImportHelper implements
+public class MediaImportHelper implements
   PreparedStatementCallback<Boolean>
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    BinaryImportHelper.class);
-
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(MediaImportHelper.class);
+  
   public static final String SQL = "INSERT INTO _media_files VALUES (?, ?, ?, ?)";
-
+  
   private File fileSource;
-
   private File fileDestination;
-
   private String mimeType;
-
   private long corpusRef;
 
-  public BinaryImportHelper(File f, File dataDir, long corpusRef,
-    Map<String, String> mimeTypeMapping)
+  public MediaImportHelper(String absolutePath, File dataDir,
+    long corpusRef, Map<String,String> mimeTypeMapping)
   {
-    this.fileSource = f;
 
+    this.fileSource = new File(absolutePath);
+    
     // create a file-name in the form of "filename-UUID.ending", thus we
     // need to split the file name into its components
     String baseName = FilenameUtils.getBaseName(fileSource.getName());
     String extension = FilenameUtils.getExtension(fileSource.getName());
-    UUID uuid = UUID.randomUUID();
-    fileDestination = new File(dataDir, baseName + "_" + uuid.toString()
+    UUID uuid = UUID.randomUUID();    
+    fileDestination = new File(dataDir, baseName + "_" + uuid.toString() 
       + (extension.isEmpty() ? "" : "." + extension));
+    
 
-
-    String fileEnding = FilenameUtils.getExtension(f.getName());
-    if (mimeTypeMapping.containsKey(fileEnding))
+    String fileEnding = FilenameUtils.getExtension(absolutePath);
+    if(mimeTypeMapping.containsKey(fileEnding))
     {
       this.mimeType = mimeTypeMapping.get(fileEnding);
     }
@@ -79,20 +70,7 @@ public class BinaryImportHelper implements
       this.mimeType = new MimetypesFileTypeMap().getContentType(fileSource);
     }
     this.corpusRef = corpusRef;
-  }
 
-  /**
-   * Imports binary files.
-   *
-   * @param file Specifies path to the file, including the filename.
-   * @param dataDir Specifies the directory, where the file is copied to.
-   * @param corpusRef Assigns the file to a specific corpus in the database.
-   * @param mimeTypeMapping A map of default mime types.
-   */
-  public BinaryImportHelper(String file, File dataDir,
-    long corpusRef, Map<String, String> mimeTypeMapping)
-  {
-    this(new File(file), dataDir, corpusRef, mimeTypeMapping);
   }
 
   @Override
@@ -113,7 +91,7 @@ public class BinaryImportHelper implements
       log.error("Could not copy file " + fileSource.getPath(), ex);
       return false;
     }
-
+    
     return true;
   }
 }

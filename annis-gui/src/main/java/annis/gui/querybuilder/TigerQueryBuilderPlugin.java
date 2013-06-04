@@ -44,7 +44,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   @Override
   public String getCaption()
   {
-    return "General (TigerSearch like)";
+    return "General (TigerSearch alike)";
   }
 
   @Override
@@ -52,7 +52,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   {
     return new TigerQueryBuilder(controller);
   }
-
+  
   public static class TigerQueryBuilder extends Panel implements Button.ClickListener
   {
 
@@ -63,14 +63,14 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     public TigerQueryBuilder(QueryController controller)
     {
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
+      
       VerticalLayout layout = new VerticalLayout();
       setContent(layout);
       layout.setSizeFull();
       setSizeFull();
-
+      
       layout.setMargin(false);
-
+      
 
       HorizontalLayout toolbar = new HorizontalLayout();
       //toolbar.addStyleName("toolbar");
@@ -88,7 +88,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
         + "Click here to delete all node specification windows and reset the query builder.");
       toolbar.addComponent(btClearAll);
 
-
+      
       final Button btHelp = new Button();
       btHelp.setStyleName(ChameleonTheme.BUTTON_LINK);
       btHelp.setIcon(new ThemeResource("../runo/icons/16/help.png"));
@@ -131,7 +131,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
       @Override
       public void buttonClick(ClickEvent event)
       {
-        String message =
+        String message = 
           "Click “Add node” to add a search term. "
       + "You can move nodes freely by dragging\n"
       + "them for your convenience. Click “add” to insert some annotation criteria for the\n"
@@ -145,7 +145,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
       + "operator from the list on the line connecting the edges to determine e.g. if one\n"
       + "node should occur before the other, etc. For details on the meaning and usage of\n"
       + "each operator, see the tutorial tab above.";
-
+        
         Notification notify = new Notification("Help for query builder",
           Notification.Type.HUMANIZED_MESSAGE);
         notify.setHtmlContentAllowed(true);

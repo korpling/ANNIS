@@ -82,18 +82,15 @@ public class LegacyGraphConverter
   public static List<AnnotationGraph> convertToAOM(SaltProject p)
   {
     List<AnnotationGraph> result = new ArrayList<AnnotationGraph>();
-    
-    if(p != null)
+
+    for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
+      for (SDocument doc : corpusGraph.getSDocuments())
       {
-        for (SDocument doc : corpusGraph.getSDocuments())
-        {
-          result.add(convertToAnnotationGraph(doc));
-        }
+        result.add(convertToAnnotationGraph(doc));
       }
     }
-    
+
     return result;
   }
 

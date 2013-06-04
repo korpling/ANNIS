@@ -21,7 +21,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import java.io.UnsupportedEncodingException;
@@ -37,42 +37,34 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class SearchOptionsPanel extends FormLayout
-{
-
+{  
   public static final String KEY_DEFAULT_SEGMENTATION = "default-segmentation";
-
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
-  private static final Logger log = LoggerFactory.getLogger(
-    SearchOptionsPanel.class);
-
+  private static final Logger log = LoggerFactory.getLogger(SearchOptionsPanel.class);
+  
   private ComboBox cbLeftContext;
-
   private ComboBox cbRightContext;
-
   private ComboBox cbResultsPerPage;
-
   private ComboBox cbSegmentation;
   // TODO: make this configurable
-
-  private static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
+  private static final String[] PREDEFINED_PAGE_SIZES = new String[]
   {
-    1, 2, 5, 10, 20, 25
+    "1", "2", "5", "10", "15", "20", "25"
   };
-
-  static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
+  static final String[] PREDEFINED_CONTEXTS = new String[]
   {
-    1, 2, 5, 10, 20
+    "0", "1", "2", "5", "10"
   };
 
   public SearchOptionsPanel()
   {
     setWidth("99%");
     setHeight("-1px");
-
+    
     addStyleName("contextsensible-formlayout");
 
-
+    
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
     cbResultsPerPage = new ComboBox("Results Per Page");
@@ -85,30 +77,19 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext.setNewItemsAllowed(true);
     cbResultsPerPage.setNewItemsAllowed(true);
 
-    cbLeftContext.setTextInputAllowed(true);
-    cbRightContext.setTextInputAllowed(true);
-    cbResultsPerPage.setTextInputAllowed(true);
+    cbLeftContext.addValidator(new IntegerValidator("must be a number"));
+    cbRightContext.addValidator(new IntegerValidator("must be a number"));
+    cbResultsPerPage.addValidator(new IntegerValidator("must be a number"));
 
-    cbLeftContext.setImmediate(true);
-    cbRightContext.setImmediate(true);
-    cbResultsPerPage.setImmediate(true);
-
-//    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
-//    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
-//    cbResultsPerPage.addValidator(new IntegerRangeValidator("must be a number",
-//      Integer.MIN_VALUE, Integer.MAX_VALUE));
-
-    for (Integer i : PREDEFINED_CONTEXTS)
+    for (String s : PREDEFINED_CONTEXTS)
     {
-      cbLeftContext.addItem(i);
-      cbRightContext.addItem(i);
+      cbLeftContext.addItem(s);
+      cbRightContext.addItem(s);
     }
 
-    for (Integer i : PREDEFINED_PAGE_SIZES)
+    for (String s : PREDEFINED_PAGE_SIZES)
     {
-      cbResultsPerPage.addItem(i);
+      cbResultsPerPage.addItem(s);
     }
 
     cbSegmentation = new ComboBox("Show context in");
@@ -125,17 +106,18 @@ public class SearchOptionsPanel extends FormLayout
       + "Some corpora might offer further context definitions, e.g. in "
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
+    
+    cbLeftContext.setValue("5");
+    cbRightContext.setValue("5");
+    cbResultsPerPage.setValue("10");
 
-    cbLeftContext.setValue(5);
-    cbRightContext.setValue(5);
-    cbResultsPerPage.setValue(10);
-
-
+    
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
     addComponent(new HelpButton(cbSegmentation));
-
+    
     addComponent(cbResultsPerPage);
+
   }
 
   public void updateSegmentationList(Set<String> corpora)
@@ -146,19 +128,18 @@ public class SearchOptionsPanel extends FormLayout
     {
 
       List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
-
+      
       String lastSelection = (String) cbSegmentation.getValue();
       cbSegmentation.removeAllItems();
-
+      
       cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
-
+      
       for (String corpus : corpora)
       {
         try
         {
           attributes.addAll(
-            service.path("query").path("corpora").path(URLEncoder.encode(corpus,
-            "UTF-8"))
+            service.path("query").path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
             .path("annotations").queryParam(
             "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
             get(new AnnisAttributeListType()));
@@ -167,12 +148,12 @@ public class SearchOptionsPanel extends FormLayout
         {
           log.error(null, ex);
         }
-
+        
         CorpusConfig config = Helper.getCorpusConfig(corpus);
-
-        if (config.getConfig().containsKey(KEY_DEFAULT_SEGMENTATION))
+        
+        if(config.getConfig().containsKey(KEY_DEFAULT_SEGMENTATION))
         {
-          lastSelection = config.getConfig().getProperty(KEY_DEFAULT_SEGMENTATION);
+          lastSelection = config.getConfig().get(KEY_DEFAULT_SEGMENTATION);
         }
       }
 
@@ -185,9 +166,9 @@ public class SearchOptionsPanel extends FormLayout
           cbSegmentation.addItem(att.getName());
         }
       }
-
+      
       cbSegmentation.setValue(lastSelection);
-
+      
     }
   }
 
@@ -201,7 +182,7 @@ public class SearchOptionsPanel extends FormLayout
     int result = 5;
     try
     {
-      result = (Integer) cbLeftContext.getValue();
+      result = Integer.parseInt((String) cbLeftContext.getValue());
     }
     catch (NumberFormatException ex)
     {
@@ -216,7 +197,7 @@ public class SearchOptionsPanel extends FormLayout
     int result = 5;
     try
     {
-      result = (Integer) cbRightContext.getValue();
+      result = Integer.parseInt((String) cbRightContext.getValue());
     }
     catch (NumberFormatException ex)
     {
@@ -236,7 +217,7 @@ public class SearchOptionsPanel extends FormLayout
     int result = 10;
     try
     {
-      result = (Integer) cbResultsPerPage.getValue();
+      result = Integer.parseInt((String) cbResultsPerPage.getValue());
     }
     catch (NumberFormatException ex)
     {
@@ -245,12 +226,12 @@ public class SearchOptionsPanel extends FormLayout
 
     return Math.max(0, result);
   }
-
+  
   public String getSegmentationLayer()
   {
     return (String) cbSegmentation.getValue();
   }
-
+  
   public void setSegmentationLayer(String layer)
   {
     cbSegmentation.setValue(layer);
@@ -263,4 +244,5 @@ public class SearchOptionsPanel extends FormLayout
     {
     }
   }
+  
 }
