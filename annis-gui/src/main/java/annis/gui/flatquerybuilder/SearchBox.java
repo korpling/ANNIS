@@ -118,7 +118,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
     sb.addComponent(sbtoolbar);
     sb.setSpacing(true);
     setContent(sb);    
-  } 
+  }
+ 
+  
+  
  
   @Override
   public void buttonClick(Button.ClickEvent event)
