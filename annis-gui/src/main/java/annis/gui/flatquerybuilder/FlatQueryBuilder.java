@@ -123,6 +123,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btInverse.setEnabled(false);
     filtering = new OptionGroup("Filtering mechanisms");
     filtering.addItem(1);
     filtering.setItemCaption(1, "Generic");
@@ -308,6 +309,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitLanguage)
       {
         language.removeComponent(btInitLanguage);
+        btInverse.setEnabled(true);
         MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
         addMenu.setDescription(INFO_INIT_LANG);
@@ -402,18 +404,26 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 public void removeVerticalNode(VerticalNode v)
   {
     language.removeComponent(v);
-    for (VerticalNode vnode : vnodes)
+    int i=-1;
+    Iterator<VerticalNode> itVnodes = vnodes.iterator();
+    VerticalNode vn = itVnodes.next();
+    
+    while(!vn.equals(v))
     {
-      Iterator<EdgeBox> ebIterator = eboxes.iterator();
-      if((ebIterator.hasNext()) && (v.equals(vnode)))
-      {
-        EdgeBox eb = eboxes.iterator().next();
-        eboxes.remove(eb);
-        language.removeComponent(eb);
-        break;
-      }
+      i++;
+      vn = itVnodes.next();
     }
+    
+    if(i==-1)
+    {
+      i++;
+    }
+    EdgeBox eb = (EdgeBox)(eboxes.toArray()[i]);
+    
     vnodes.remove(v);
+    eboxes.remove(eb);
+    language.removeComponent(v);
+    language.removeComponent(eb);
     updateQuery();
   }
 
@@ -655,8 +665,9 @@ public Set<String> getAvailableAnnotationNames()
       //the dot marks the end of the string - it is not read, it's just a place holder
       tq += ".";
       HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
-      TreeSet<Relation> relations = new TreeSet<Relation>();
-      TreeSet<String> meta = new TreeSet<String>();
+      ArrayList<Relation> pRelations = new ArrayList<Relation>();
+      ArrayList<Relation> eRelations = new ArrayList<Relation>();
+      ArrayList<String> meta = new ArrayList<String>();
       
       //parse typed-in Query
       //Step 1: get indices of tq-chars, where constraints are separated (&)
@@ -684,9 +695,17 @@ public Set<String> getAvailableAnnotationNames()
           {
             meta.add(tempCon);
           }
-          else if(tempCon.startsWith("#"))
-          {            
-            relations.add(new Relation(tempCon));
+          else if(tempCon.startsWith("#"))          
+          {
+            Relation r = new Relation(tempCon);
+            if(r.getType()==RelationType.EQUALITY)
+            {
+              eRelations.add(r);
+            }
+            else if(r.getType()==RelationType.PRECEDENCE)
+            {
+              pRelations.add(r);
+            }
           }         
           else 
           {
@@ -711,79 +730,52 @@ public Set<String> getAvailableAnnotationNames()
       eboxes.clear();
       
       //2be continued for meta and span
-      
-      //second try:
-      //first step: build families
-      
-      ArrayList<Integer> used = new ArrayList<Integer>();
+            
+      HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
       VerticalNode vn=null;
       for(int i : constraints.keySet())
       {
         Constraint con = constraints.get(i);
-        vn = (used.contains(i)) ? vn : new VerticalNode(con.getLevel(), con.getValue(), this);
-        used.add(i);
-        for(Relation rel : relations)
+        if(!indexedVnodes.containsKey(i))
         {
-          if((rel.contains(i)) & (rel.getType()==RelationType.EQUALITY))
+          vn = new VerticalNode(con.getLevel(), con.getValue(), this);
+          indexedVnodes.put(i, vn);
+        }
+        
+        for(Relation rel : eRelations)
+        {
+          if(rel.contains(i))
           {
             int b = rel.whosMyFriend(i);
-            used.add(b);
-            SearchBox sb = new SearchBox(constraints.get(b).getLevel(), this, vn);
-            sb.setValue(constraints.get(b).getValue());            
+            if(!indexedVnodes.containsKey(b))
+            {
+              indexedVnodes.put(b, null);            
+              SearchBox sb = new SearchBox(constraints.get(b).getLevel(), this, vn);
+              sb.setValue(constraints.get(b).getValue());
+              vn.addSearchBox(sb);
+            }
           }          
         }
-        vnodes.add(vn);
       }
       
-      for(VerticalNode v : vnodes)
-      {
-        
-      }
+      VerticalNode first = indexedVnodes.get(Math.min(pRelations.iterator().next().getFirst(), eRelations.iterator().next().getFirst()));      
+      vnodes.add(first);
+      language.addComponent(first);
       
-      
-      /*
-      //now we go through the relations and build...
-      Iterator<Relation> itRel = relations.iterator();
-      if(itRel.hasNext())
+      for(Relation rel : pRelations)
       {
-        Relation rel = itRel.next();        
-        //create first VN:
-        Constraint first = constraints.get(rel.getFirst());
-        VerticalNode vnl = new VerticalNode(first.getLevel(), first.getValue(), this);
-        vnodes.add(vnl);
-        language.addComponent(vnl);        
+        EdgeBox eb = new EdgeBox(this);
+        eb.setValue(rel.getOperator());
+        eboxes.add(eb);
+        VerticalNode v = indexedVnodes.get(rel.getSecond());
+        vnodes.add(v);
         
-        while(itRel.hasNext())
-        {
-          if(rel.getType()==RelationType.PRECEDENCE)
-          {
-            //create EB:
-            EdgeBox eb = new EdgeBox(this);
-            eb.setValue(rel.getOperator());
-            eboxes.add(eb);
-            language.addComponent(eb);
-
-            //create VN:
-            Constraint con = constraints.get(rel.getSecond());
-            VerticalNode vnr = new VerticalNode(con.getLevel(), con.getValue(), this);
-            vnodes.add(vnr);
-            language.addComponent(vnr);
-
-          }*//*
-          if(rel.getType()==RelationType.EQUALITY)
-          {
-            int i=1;
-            VerticalNode vn;
-            while(i!=rel.getFirst())
-            {
-              i++;
-              vn = (VerticalNode)(vnodes.toArray()[i]);
-            }
-            SearchBox sb = new SearchBox(rel);
-          }
-        }
-      }*/
+        language.addComponent(eb);
+        language.addComponent(v);  
+      }           
     }
+    
+    query = tq.substring(0, tq.length()-1);
   }
   
   private static class Constraint
