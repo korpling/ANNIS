@@ -38,7 +38,6 @@ public class AddMenu extends Panel
     this.vn = vn;
     this.sq = sq;
     final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
-    addMenu.setAutoOpen(true);
     for (final String annoname : vn.getAnnonames())
     {      
       if(!annoname.equals(firstLevel))
