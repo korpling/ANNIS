@@ -238,5 +238,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
     return text == null ? null
         : Normalizer.normalize(text, Form.NFD)
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-  } 
+  }
+  
+  public void setValue(String value)
+  {
+    cb.setValue(value);
+  }
 }
