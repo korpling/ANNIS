@@ -61,6 +61,12 @@ public class VerticalNode extends Panel implements Button.ClickListener
     setContent(v);
   }
   
+  public VerticalNode(String ebene, String value, FlatQueryBuilder sq)
+  {
+    this(ebene, sq);
+    sboxes.iterator().next().setValue(value);
+  }
+  
 @Override
   public void buttonClick(Button.ClickEvent event)
   {
