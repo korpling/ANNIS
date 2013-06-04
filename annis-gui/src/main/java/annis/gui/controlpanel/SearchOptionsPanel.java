@@ -172,7 +172,7 @@ public class SearchOptionsPanel extends FormLayout
 
         if (config.getConfig().containsKey(KEY_DEFAULT_SEGMENTATION))
         {
-          lastSelection = config.getConfig().get(KEY_DEFAULT_SEGMENTATION);
+          lastSelection = config.getConfig().getProperty(KEY_DEFAULT_SEGMENTATION);
         }
       }
 
