@@ -199,7 +199,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
    */
   private void removeArtificialDominancesEdges(SDocumentGraph graph)
   {
-    ListIterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().listIterator();
+    Iterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().iterator();
     List<SDominanceRelation> edgesToRemove = new LinkedList<SDominanceRelation>();
     while(itDomReal.hasNext())
     {
