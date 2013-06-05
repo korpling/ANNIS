@@ -1,0 +1,192 @@
+/*
+ * Copyright 2012 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package annis;
+
+import annis.dao.AnnisDao;
+import annis.dao.SpringAnnisDao;
+import annis.provider.SaltProjectProvider;
+import annis.test.TestHelper;
+import com.carrotsearch.junitbenchmarks.BenchmarkOptions;
+import com.carrotsearch.junitbenchmarks.BenchmarkRule;
+import com.carrotsearch.junitbenchmarks.annotation.AxisRange;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkHistoryChart;
+import com.carrotsearch.junitbenchmarks.annotation.BenchmarkMethodChart;
+import com.carrotsearch.junitbenchmarks.annotation.LabelType;
+import com.google.common.io.ByteStreams;
+import com.sun.jersey.core.util.StringKeyIgnoreCaseMultivaluedMap;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.lang.annotation.Annotation;
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Resource;
+import javax.ws.rs.core.MediaType;
+import static org.junit.Assert.*;
+import static org.junit.Assume.assumeNoException;
+import static org.junit.Assume.assumeNotNull;
+import static org.junit.Assume.assumeTrue;
+import org.junit.Before;
+import org.junit.Rule;
+import org.junit.Test;
+import org.junit.rules.TestRule;
+import org.junit.runner.RunWith;
+import org.springframework.dao.DataAccessException;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+
+;
+
+/**
+ * This will execute tests on a real database and check if the counts are OK.
+ *
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ */
+@RunWith(SpringJUnit4ClassRunner.class)
+// TODO: do not test context only for annopool
+@ContextConfiguration(locations =
+{
+  "file:src/main/distribution/conf/spring/Common.xml"
+}, loader = AnnisXmlContextLoader.class)
+@BenchmarkOptions(callgc = false, benchmarkRounds = 3, warmupRounds = 3)
+@BenchmarkMethodChart(filePrefix = "annis-benchmark")
+@BenchmarkHistoryChart(labelWith = LabelType.RUN_ID, maxRuns = 20)
+@AxisRange(min = 0.0)
+public class BenchmarkTest
+{
+
+  @Rule
+  public TestRule benchmarkRun = new BenchmarkRule();
+
+  @Resource(name = "annisDao")
+  AnnisDao annisDao;
+
+  private List<Long> pcc2CorpusID;
+  
+  private List<Long> ridgesCorpusID;
+
+  private SaltProjectProvider provider;
+  
+  @Before
+  public void setup()
+  {
+    SpringAnnisDao springAnnisDao = (SpringAnnisDao) TestHelper.proxyTarget(
+      annisDao);
+
+    try
+    {
+      assumeNotNull(springAnnisDao.getSimpleJdbcTemplate());
+
+      springAnnisDao.getSimpleJdbcTemplate().queryForInt("SELECT 1");
+
+    }
+    catch (DataAccessException ex)
+    {
+      assumeNoException(ex);
+    }
+    
+    provider = new SaltProjectProvider();
+
+    // get the id of the "pcc2" corpus 
+    pcc2CorpusID = getCorpusIDs("pcc2");
+
+    // get the id of the "Ridges_Herbology_Version_2.0" corpus 
+    ridgesCorpusID = getCorpusIDs("Ridges_Herbology_Version_2.0");
+  }
+
+  private List<Long> getCorpusIDs(String corpus)
+  {
+    // (and check if it's there, otherwise ignore these tests)
+    List<String> corpusNames = new LinkedList<String>();
+    corpusNames.add(corpus);
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
+    return corpusIDs;
+  }
+  
+  @Test
+  public void mapSalt_Pcc4282()
+  {
+    assumeTrue(pcc2CorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
+        "4282");
+    
+    assertEquals(1, p.getSCorpusGraphs().size());
+  }
+  
+  @Test
+  public void mapSaltAndSaveXMI_Pcc4282() throws IOException
+  {
+    assumeTrue(ridgesCorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
+        "4282");
+    OutputStream out = ByteStreams.nullOutputStream();
+    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
+      new MediaType("application", "xmi+xml"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      out);
+  }
+  
+  @Test
+  public void mapSaltAndSaveBinary_Pcc4282() throws IOException
+  {
+    assumeTrue(ridgesCorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
+        "4282");
+    OutputStream out = ByteStreams.nullOutputStream();
+    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
+      new MediaType("application", "xmi+binary"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      out);
+  }
+
+  @Test
+  public void mapSalt_SonderbaresKraeuterBuch()
+  {
+    assumeTrue(ridgesCorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
+        "sonderbares.kraeuterbuch.16175.11-21");
+    
+    assertEquals(1, p.getSCorpusGraphs().size());
+  }
+  
+  @Test
+  public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException
+  {
+    assumeTrue(ridgesCorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
+        "sonderbares.kraeuterbuch.16175.11-21");
+    OutputStream out = ByteStreams.nullOutputStream();
+    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
+      new MediaType("application", "xmi+xml"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      out);
+  }
+  
+  @Test
+  public void mapSaltAndSaveBinary_SonderbaresKraeuterBuch() throws IOException
+  {
+    assumeTrue(ridgesCorpusID.size() > 0);
+
+    SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
+        "sonderbares.kraeuterbuch.16175.11-21");
+    OutputStream out = ByteStreams.nullOutputStream();
+    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
+      new MediaType("application", "xmi+binary"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      out);
+  }
+}
