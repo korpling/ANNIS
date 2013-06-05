@@ -20,6 +20,7 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.ui.AbstractSelect.Filtering;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.GridLayout;
@@ -50,6 +51,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
 {
   private Button btClose;
   private VerticalNode vn;
+  private VerticalLayout vnframe;
   private String ebene;
   private SensitiveComboBox cb;  
   private CheckBox reBox;
@@ -66,6 +68,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     this.ebene = ebene;
     this.sq = sq;
     rsc = new reducingStringComparator();
+    vnframe = new VerticalLayout();
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
     sb.setSpacing(true);
@@ -76,8 +79,8 @@ public class SearchBox extends Panel implements Button.ClickListener,
     }
     this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
+    cb.setNewItemsAllowed(true);
     cb.setCaption(ebene);
-    cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
@@ -119,10 +122,11 @@ public class SearchBox extends Panel implements Button.ClickListener,
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    sbtoolbar.addComponent(btClose);
-    sb.addComponent(sbtoolbar);
-    sb.setSpacing(true);
-    setContent(sb);    
+    vnframe.addComponent(btClose);
+    vnframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
+    vnframe.addComponent(sb);
+    vnframe.addComponent(sbtoolbar);
+    setContent(vnframe);    
   }
  
   
