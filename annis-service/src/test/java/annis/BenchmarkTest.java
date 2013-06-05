@@ -61,7 +61,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 {
   "file:src/main/distribution/conf/spring/Common.xml"
 }, loader = AnnisXmlContextLoader.class)
-@BenchmarkOptions(callgc = false, benchmarkRounds = 3, warmupRounds = 3)
+@BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
 @BenchmarkHistoryChart(labelWith = LabelType.RUN_ID, maxRuns = 20)
 @AxisRange(min = 0.0)
@@ -78,7 +78,11 @@ public class BenchmarkTest
   
   private List<Long> ridgesCorpusID;
 
-  private SaltProjectProvider provider;
+  private final SaltProjectProvider provider = new SaltProjectProvider();
+  
+  private final OutputStream nullStream = ByteStreams.nullOutputStream();
+  private final MediaType typeXMI = new MediaType("application", "xmi+xml");
+  private final MediaType typeBinary = new MediaType("application", "xmi+binary");
   
   @Before
   public void setup()
@@ -98,13 +102,13 @@ public class BenchmarkTest
       assumeNoException(ex);
     }
     
-    provider = new SaltProjectProvider();
-
     // get the id of the "pcc2" corpus 
     pcc2CorpusID = getCorpusIDs("pcc2");
 
     // get the id of the "Ridges_Herbology_Version_2.0" corpus 
     ridgesCorpusID = getCorpusIDs("Ridges_Herbology_Version_2.0");
+    
+    
   }
 
   private List<Long> getCorpusIDs(String corpus)
@@ -134,10 +138,9 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
-    OutputStream out = ByteStreams.nullOutputStream();
-    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
-      new MediaType("application", "xmi+xml"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
-      out);
+    provider.writeTo(p, SaltProject.class, null, null, 
+      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      nullStream);
   }
   
   @Test
@@ -147,10 +150,9 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
-    OutputStream out = ByteStreams.nullOutputStream();
-    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
-      new MediaType("application", "xmi+binary"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
-      out);
+    provider.writeTo(p, SaltProject.class, null, null, 
+      typeBinary, null,
+      nullStream);
   }
 
   @Test
@@ -171,10 +173,9 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21");
-    OutputStream out = ByteStreams.nullOutputStream();
-    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
-      new MediaType("application", "xmi+xml"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
-      out);
+    provider.writeTo(p, SaltProject.class, null, null, 
+      typeXMI, null,
+      nullStream);
   }
   
   @Test
@@ -184,9 +185,8 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21");
-    OutputStream out = ByteStreams.nullOutputStream();
-    provider.writeTo(p, SaltProject.class, null, new Annotation[0], 
-      new MediaType("application", "xmi+binary"), new StringKeyIgnoreCaseMultivaluedMap<Object>(),
-      out);
+    provider.writeTo(p, SaltProject.class, null, null, 
+      new MediaType("application", "xmi+binary"), null,
+      nullStream);
   }
 }
