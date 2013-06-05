@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <mappingfile>
-	<mapping name="standard-ext" author="Martin" date="2013-04-01">
+	<mapping name="diacritics" author="Martin" date="2013-04-01">
 		<character value="u">
 			<variant value="ǜ"/>
 			<variant value="ǚ"/>
