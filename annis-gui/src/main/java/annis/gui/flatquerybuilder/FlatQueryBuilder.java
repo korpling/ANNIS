@@ -53,6 +53,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Button btInverse;
   private QueryController cp;
   private HorizontalLayout language;
+  private HorizontalLayout languagenodes;
   private HorizontalLayout span;
   private HorizontalLayout meta;
   private HorizontalLayout toolbar;
@@ -65,9 +66,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
-  private static final String BUTTON_LANGUAGE_LABEL = "Add to right";
-  private static final String BUTTON_SPAN_LABEL = "Add";
-  private static final String BUTTON_META_LABEL = "Add";
+
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
   private static final String BUTTON_INV_LABEL = "Adjust Builder to Query";
@@ -76,7 +75,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
   private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a "
     + "constraint.";
-  private static final String ADD_LING_PARAM = "Add to right";
+  private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
   private static final String ADD_META_PARAM = "Add";
   private static final String LING_MENU_DESC = "Choose an annotation level to "
@@ -108,13 +107,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
     // buttons and checks
-    btInitLanguage = new Button(BUTTON_LANGUAGE_LABEL, (Button.ClickListener) this);
+    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
     btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInitLanguage.setDescription(INFO_INIT_LANG);
-    btInitSpan = new Button(BUTTON_SPAN_LABEL, (Button.ClickListener) this);
+    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
     btInitSpan.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInitSpan.setDescription(INFO_INIT_SPAN);
-    btInitMeta = new Button(BUTTON_META_LABEL, (Button.ClickListener) this);
+    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
     btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInitMeta.setDescription(INFO_INIT_META);
     btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
@@ -134,7 +133,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     filtering.setImmediate(true);
     // language layout
     language = new HorizontalLayout();
+    languagenodes = new HorizontalLayout();
     language.setSpacing(true);
+    language.addComponent(languagenodes);
     language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
@@ -310,7 +311,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
         language.removeComponent(btInitLanguage);
         btInverse.setEnabled(true);
-        MenuBar addMenu = new MenuBar();
+        final MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
         addMenu.setDescription(INFO_INIT_LANG);
         Collection<String> annonames = getAvailableAnnotationNames();
@@ -323,14 +324,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
               if (!vnodes.isEmpty())
               {
                 EdgeBox eb = new EdgeBox(sq);
-                language.addComponent(eb);
+                languagenodes.addComponent(eb);
                 eboxes.add(eb);
               }
-
               VerticalNode vn = new VerticalNode(annoname, sq);
-              language.addComponent(vn);
+              languagenodes.addComponent(vn);
               vnodes.add(vn);
-
+              addMenu.setAutoOpen(false);
             }
           });
         }
@@ -403,7 +403,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
 public void removeVerticalNode(VerticalNode v)
   {
-    language.removeComponent(v);
+    languagenodes.removeComponent(v);
     int i=-1;
     Iterator<VerticalNode> itVnodes = vnodes.iterator();
     VerticalNode vn = itVnodes.next();
@@ -422,8 +422,8 @@ public void removeVerticalNode(VerticalNode v)
     
     vnodes.remove(v);
     eboxes.remove(eb);
-    language.removeComponent(v);
-    language.removeComponent(eb);
+    languagenodes.removeComponent(v);
+    languagenodes.removeComponent(eb);
     updateQuery();
   }
 
