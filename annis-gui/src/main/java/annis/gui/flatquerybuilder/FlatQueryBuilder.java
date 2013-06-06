@@ -87,11 +87,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     + "are confined.";
   private static final String INFO_INIT_META = "Here, you can constrain the linguistic "
     + "query by selecting meta levels.";
+  private static final String INFO_FILTER = "When searching in the fields, the "
+    + "hits are sorted and filtered according to different mechanisms. Please "
+    + "choose a filtering mechanism here.";
+  
   private String TOOLBAR_CAPTION = "Toolbar";
   private String META_CAPTION = "Restrict the search by means of meta information";
   private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
   private String LANG_CAPTION = "Create a linguistic sequence";
-  private String ADVANCED_CAPTION = "Advanced settings can be configured here";
+  private String ADVANCED_CAPTION = "Advanced settings";
 
   public FlatQueryBuilder(QueryController cp)
   {
@@ -125,6 +129,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse.setEnabled(false);
     filtering = new NativeSelect("Filtering mechanisms");
+    filtering.setDescription(INFO_FILTER);
     reducingStringComparator rdc = new reducingStringComparator();
     Set mappings = rdc.getMappings().keySet();
     int i;
