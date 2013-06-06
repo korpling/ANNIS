@@ -57,6 +57,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private HorizontalLayout span;
   private HorizontalLayout meta;
   private HorizontalLayout toolbar;
+  private HorizontalLayout advanced;
   private VerticalLayout mainLayout;
   private NativeSelect filtering;
   private Collection<VerticalNode> vnodes;
@@ -91,6 +92,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String META_CAPTION = "Restrict the search by means of meta information";
   private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
   private String LANG_CAPTION = "Create a linguistic sequence";
+  private String ADVANCED_CAPTION = "Advanced settings can be configured here";
 
   public FlatQueryBuilder(QueryController cp)
   {
@@ -160,18 +162,24 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     // toolbar layout
     toolbar = new HorizontalLayout();
     toolbar.setSpacing(true);
-    toolbar.addComponent(filtering);
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
     toolbar.addComponent(btInverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
+    // advanced
+    advanced = new HorizontalLayout();
+    advanced.setSpacing(true);
+    advanced.addComponent(filtering);
+    advanced.setMargin(true);
+    advanced.setCaption(ADVANCED_CAPTION);
     // put everything on the layout
     mainLayout.setSpacing(true);
     mainLayout.addComponent(language);
     mainLayout.addComponent(span);
     mainLayout.addComponent(meta);
     mainLayout.addComponent(toolbar);
+    mainLayout.addComponent(advanced);
     setContent(mainLayout);
     getContent().setSizeFull();
   }
