@@ -26,6 +26,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.NativeSelect;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -58,7 +59,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private HorizontalLayout meta;
   private HorizontalLayout toolbar;
   private VerticalLayout mainLayout;
-  private OptionGroup filtering;
+  private NativeSelect filtering;
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
@@ -123,12 +124,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse.setEnabled(false);
-    filtering = new OptionGroup("Filtering mechanisms");
-    filtering.addItem(1);
-    filtering.setItemCaption(1, "Generic");
-    filtering.addItem(2);
-    filtering.setItemCaption(2, "Ignore diacritics");
-    filtering.select(2);
+    filtering = new NativeSelect("Filtering mechanisms");
+    reducingStringComparator rdc = new reducingStringComparator();
+    Set mappings = rdc.getMappings().keySet();
+    int i = 0;
+    for (i=0; i<mappings.size(); i++){
+      String mapname = (String) mappings.toArray()[i];
+      filtering.addItem(i);
+      filtering.setItemCaption(i, mapname);
+    }
+    filtering.addItem(i+1);
+    filtering.setItemCaption(i+1, "generic");
+    filtering.select(i+1);
     filtering.setNullSelectionAllowed(false);
     filtering.setImmediate(true);
     // language layout
@@ -611,13 +618,7 @@ public Set<String> getAvailableAnnotationNames()
   public String getFilterMechanism()
   {
     String out = "";
-    if (filtering.getValue().equals(1)){
-      out = "levenshtein";
-    }
-    if (filtering.getValue().equals(2)){
-      out = "diacritics";
-    }
-    return out;
+    return filtering.getItemCaption(filtering.getValue());
   }
   
   private void clear()

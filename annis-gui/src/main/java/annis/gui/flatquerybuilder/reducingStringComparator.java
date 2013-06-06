@@ -41,6 +41,10 @@ public class reducingStringComparator
     readMappings();
   }
   
+  public HashMap<String, HashMap> getMappings(){
+    return ALLOGRAPHS;
+  }
+  
   private HashMap initAlphabet()
   {
     HashMap<Character, Character> h = new HashMap<Character, Character>();

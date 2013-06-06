@@ -160,7 +160,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
   public void textChange(TextChangeEvent event)
   {
     String fm = sq.getFilterMechanism();
-    if (!"levenshtein".equals(fm))
+    if (!"generic".equals(fm))
     {
       ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();       
       String txt = event.getText();
@@ -201,7 +201,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
       }
     }
     
-    if ("levenshtein".equals(sq.getFilterMechanism()))       
+    if ("generic".equals(sq.getFilterMechanism()))       
     {
       String txt = event.getText();
       HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
