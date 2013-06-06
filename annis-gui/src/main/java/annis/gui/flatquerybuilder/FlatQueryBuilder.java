@@ -244,7 +244,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String getAQLQuery()
   {
     int count = 1;    
-    String query = "", edgeQuery = "", sentenceQuery = "";
+    String ql = "", edgeQuery = "", sentenceQuery = "";
     Collection<Integer> sentenceVars = new ArrayList<Integer>();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
     for (VerticalNode v : vnodes)
@@ -252,12 +252,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       Collection<SearchBox> sboxes = v.getSearchBoxes();
       for (SearchBox s : sboxes)
       {
-        query += " & " + getAQLFragment(s);
+        ql += " & " + getAQLFragment(s);
       }
       if (sboxes.isEmpty())
       {
         //not sure we want to do it this way:
-        query += "\n& /.*/";
+        ql += "\n& /.*/";
       }
       sentenceVars.add(new Integer(count));
       for(int i=1; i < sboxes.size(); i++)
@@ -282,7 +282,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
         addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
       }
-      query += addQuery;
+      ql += addQuery;
       for(Integer i : sentenceVars)
       {
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
@@ -296,7 +296,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     {
       metaQuery += getMetaQueryFragment(itMetaBoxes.next());
     }
-    String fullQuery = (query+edgeQuery+sentenceQuery+metaQuery);
+    String fullQuery = (ql+edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
     this.query = fullQuery;
