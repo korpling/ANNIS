@@ -615,7 +615,7 @@ public Set<String> getAvailableAnnotationNames()
       out = "levenshtein";
     }
     if (filtering.getValue().equals(2)){
-      out = "specific";
+      out = "diacritics";
     }
     return out;
   }

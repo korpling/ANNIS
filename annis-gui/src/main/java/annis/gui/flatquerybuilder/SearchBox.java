@@ -159,7 +159,8 @@ public class SearchBox extends Panel implements Button.ClickListener,
   @Override
   public void textChange(TextChangeEvent event)
   {
-    if ("specific".equals(sq.getFilterMechanism()))
+    String fm = sq.getFilterMechanism();
+    if (!"levenshtein".equals(fm))
     {
       ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();       
       String txt = event.getText();
@@ -169,7 +170,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         for (Iterator<String> it = annonames.iterator(); it.hasNext();)
         {
           String s = it.next();
-          if(rsc.compare(s, txt)==0)
+          if(rsc.compare(s, txt, fm)==0)
           {
             cb.addItem(s);          
           }
@@ -178,7 +179,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //startsWith
         for(String s : notInYet)
         {        
-          if(rsc.startsWith(s, txt))
+          if(rsc.startsWith(s, txt, fm))
           {
             cb.addItem(s);
             notInYet.remove(s);
@@ -187,7 +188,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //contains
         for(String s : notInYet)
         {
-          if(rsc.contains(s, txt))
+          if(rsc.contains(s, txt, fm))
           {
             cb.addItem(s);
           }

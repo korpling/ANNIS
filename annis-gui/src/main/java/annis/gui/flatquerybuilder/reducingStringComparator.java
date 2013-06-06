@@ -30,9 +30,9 @@ import org.w3c.dom.NodeList;
  * @author klotzmaz
  * @author tom
  */
-public class reducingStringComparator implements Comparator
+public class reducingStringComparator
 {
-  private static HashMap<Character, Character> ALLOGRAPHS;
+  private static HashMap<String, HashMap> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
   private static String MAPPING_FILE = "mapfile.fqb";
   
@@ -42,7 +42,7 @@ public class reducingStringComparator implements Comparator
     readMappings();
   }
   
-  private void initAlphabet()
+  private HashMap initAlphabet()
   {
     HashMap<Character, Character> h = new HashMap<Character, Character>();
     
@@ -54,11 +54,12 @@ public class reducingStringComparator implements Comparator
       h.put(Character.toUpperCase(c), c);
     }
     
-    ALLOGRAPHS = h;
+    return h;
   }
   
   private void readMappings()
   {	  
+    ALLOGRAPHS = new HashMap<String, HashMap>();
     try
     { 
       ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE); 
@@ -67,16 +68,24 @@ public class reducingStringComparator implements Comparator
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();      
       
-      Document mappingD = db.parse(cr.getStream().getStream());      
+      Document mappingD = db.parse(cr.getStream().getStream());
       
-      NodeList variants = mappingD.getElementsByTagName("variant");
-      for(int i=0; i<variants.getLength(); i++)
-      {
-        Element var = (Element)variants.item(i);        
-        h.put(var.getAttribute("value").charAt(0), ((Element)var.getParentNode()).getAttribute("value").charAt(0));        
+      NodeList mappings = mappingD.getElementsByTagName("mapping");
+      for (int i=0; i<mappings.getLength(); i++){
+        Element mapping = (Element) mappings.item(i);
+        String mappingName = mapping.getAttribute("name");
+        HashMap mappingMap = initAlphabet();
+        NodeList variants = mapping.getElementsByTagName("variant");
+        for(int j=0; i<variants.getLength(); j++)
+        {
+          Element var = (Element) variants.item(j);
+          char varvalue = var.getAttribute("value").charAt(0);
+          Element character = (Element) var.getParentNode();
+          char charactervalue = character.getAttribute("value").charAt(0);
+          h.put(varvalue, charactervalue);        
+        }
+        ALLOGRAPHS.put(mappingName, mappingMap);
       }
-      
-      ALLOGRAPHS.putAll(h);
       
     } catch(Exception e)
     {
@@ -129,8 +138,7 @@ public class reducingStringComparator implements Comparator
     return t;
   }
   
-  @Override
-  public int compare(Object a, Object b)
+  public int compare(Object a, Object b, String mapname)
     /*
      * use with Strings only
      * 
@@ -148,10 +156,10 @@ public class reducingStringComparator implements Comparator
     String s1 = removeCombiningCharacters((String)a);
     String s2 = removeCombiningCharacters((String)b);
     //compare without spaces
-    return compare2(s1.replace(" ", ""), s2.replace(" ", ""));    
+    return compare2(s1.replace(" ", ""), s2.replace(" ", ""), mapname);    
   }
   
-  private int compare2(String s1, String s2)
+  private int compare2(String s1, String s2, String mapname)
   {
     int l = s1.length();
     
@@ -167,11 +175,11 @@ public class reducingStringComparator implements Comparator
     for(int i=0; i<l; i++)
     {
       char c1 = s1.charAt(i);
-      char c2 = s2.charAt(i);      
+      char c2 = s2.charAt(i); 
+      HashMap<Character, Character> curMap = ALLOGRAPHS.get(mapname);
+      char rc1 = curMap.containsKey(c1) ? curMap.get(c1) : c1;
       
-      char rc1 = (ALLOGRAPHS.containsKey(c1)) ? ALLOGRAPHS.get(c1) : c1;
-      
-      char rc2 = (ALLOGRAPHS.containsKey(c2)) ? ALLOGRAPHS.get(c2) : c2;
+      char rc2 = (curMap.containsKey(c2)) ? curMap.get(c2) : c2;
       
       if(rc1<rc2)
       {
@@ -185,7 +193,7 @@ public class reducingStringComparator implements Comparator
     return 0;
   }
   
-  public boolean startsWith(String fullSequence, String subSequence)
+  public boolean startsWith(String fullSequence, String subSequence, String mapname)
   {
     //kill diacritics:
     String subS = removeCombiningCharacters(subSequence);
@@ -195,10 +203,10 @@ public class reducingStringComparator implements Comparator
     fullS = fullS.replace(" ", "");
     int l = subS.length();
     if (fullS.length()<l) {return false;}
-    return (compare2(fullS.substring(0, l), subS)==0);
+    return (compare2(fullS.substring(0, l), subS, mapname)==0);
   }
   
-  public boolean contains(String fullSequence, String subSequence)
+  public boolean contains(String fullSequence, String subSequence, String mapname)
   {
     //kill diacritics:    
     String subS = removeCombiningCharacters(subSequence);
@@ -209,7 +217,7 @@ public class reducingStringComparator implements Comparator
     int l = subS.length();
     for (int i=0; i<fullS.length()-l+1; i++)
     {
-      if (compare2(fullS.substring(i, i+l), subS)==0)
+      if (compare2(fullS.substring(i, i+l), subS, mapname)==0)
       {
         return true;
       }
