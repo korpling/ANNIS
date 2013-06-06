@@ -203,5 +203,9 @@
 			<variant value="ĩ"/>
 			<variant value="ī"/>
 		</character>
+    <character value="d">
+      <variant value="đ"/>
+      <variant value="Đ"/>
+    </character>
 	</mapping>
 </mappingfile>
