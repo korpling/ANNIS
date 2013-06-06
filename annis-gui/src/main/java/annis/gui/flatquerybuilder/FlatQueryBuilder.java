@@ -727,13 +727,13 @@ public Set<String> getAvailableAnnotationNames()
       //clean query builder surface
       for(VerticalNode vn : vnodes)
       {
-        language.removeComponent(vn);        
+        languagenodes.removeComponent(vn);        
       }
       vnodes.clear();
       
       for(EdgeBox eb : eboxes)
       {
-        language.removeComponent(eb);
+        languagenodes.removeComponent(eb);
       }
       eboxes.clear();
       
@@ -768,7 +768,7 @@ public Set<String> getAvailableAnnotationNames()
       
       VerticalNode first = indexedVnodes.get(Math.min(pRelations.iterator().next().getFirst(), eRelations.iterator().next().getFirst()));      
       vnodes.add(first);
-      language.addComponent(first);
+      languagenodes.addComponent(first);
       
       for(Relation rel : pRelations)
       {
@@ -778,8 +778,8 @@ public Set<String> getAvailableAnnotationNames()
         VerticalNode v = indexedVnodes.get(rel.getSecond());
         vnodes.add(v);
         
-        language.addComponent(eb);
-        language.addComponent(v);  
+        languagenodes.addComponent(eb);
+        languagenodes.addComponent(v);  
       }           
     }
     
