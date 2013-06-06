@@ -24,6 +24,42 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/)
  * for a single match.
  *
+ * <h3>Mappings</h3>
+ * <ul>
+ *
+ * <li>edge:&lt;edge name&gt; - defines the rst edges, which should be
+ * visualized as pointing relations.</li>
+ *
+ * <li> Layout settings:
+ *
+ * <ul>
+ * <li>
+ * siblingOffet:&lt;Integer&gt; - defines the distance beetween sibling nodes.
+ * </li>
+ * <li>
+ * subTreeOffset:&lt;Integer&gt; - defines the distance beetween node and parent
+ * node.
+ * </li>
+ * <li>
+ * nodeWidth:&lt;Integer&gt; - defines the width of a node.
+ *
+ * </li>
+ * <li>
+ * labelSize:&lt;Integer&gt; - defines the font size of a node label
+ * </li>
+ * <li>
+ * edgeLabelColor:&lt;HTML Color&gt; - sets the font color of a edge label.
+ * </li>
+ * <li>
+ * nodeLabelColor:&lt;HTML Color&gt; - sets the font color of a node label.
+ * </li>
+ * </ul>
+ * </li>
+ *
+ * </ul>
+ *
+ *
+ *
  * Note, that the rst-xml-format models edges beetwen nucleus and satellite the
  * other way around, than in the common visualization of rst-graphs. So the
  * dominance relation between nodes must be defined in AQL like that:

@@ -22,18 +22,28 @@ import annis.model.AnnisNode;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
+import annis.service.objects.SaltURIGroup;
+import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.SubgraphQuery;
 import annis.utils.LegacyGraphConverter;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
+import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -50,8 +60,7 @@ public class GeneralTextExporter implements Exporter, Serializable
     try
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
-      SaltProject queryResult = null;
-
+      
       LinkedList<String> keys = new LinkedList<String>();
 
       if (keysAsString == null)
@@ -112,37 +121,70 @@ public class GeneralTextExporter implements Exporter, Serializable
       }
 
       final int stepSize = 10;
-      int offset = 0;
-      while (offset == 0 || (queryResult != null
-        && queryResult.getSCorpusGraphs().size() > 0))
+      
+      // 1. Get all the matches as Salt ID
+      InputStream matchStream = annisResource.path("search/find/")
+        .queryParam("q", queryAnnisQL)
+        .queryParam("corpora", StringUtils.join(corpora, ","))
+        .accept(MediaType.TEXT_PLAIN_TYPE)
+        .get(InputStream.class);
+      
+      BufferedReader inReader = new BufferedReader(new InputStreamReader(
+        matchStream, "UTF-8"));
+      
+      WebResource subgraphRes = annisResource.path("search/subgraph");
+      SaltURIGroupSet saltURIs = new SaltURIGroupSet();
+      String currentLine;
+      int offset=0;
+      // 2. iterate over all matches and get the sub-graph for a group of matches
+      while((currentLine = inReader.readLine()) != null)
       {
-
-        try
+        SaltURIGroup urisForMatch = new SaltURIGroup();
+        
+        for(String uri : currentLine.split(","))
         {
-          queryResult = annisResource.path("search").path("annotate")
-            .queryParam("q", queryAnnisQL)
-            .queryParam("limit", "" + stepSize)
-            .queryParam("offset", "" + offset)
-            .queryParam("left", "" + contextLeft)
-            .queryParam("right", "" + contextRight)
-            .queryParam("corpora", StringUtils.join(corpora, ","))
-            .get(SaltProject.class);
+          try
+          {
+            urisForMatch.getUris().add(new URI(uri));
+          }
+          catch (URISyntaxException ex)
+          {
+            log.error(null, ex);
+          }
         }
-        catch (UniformInterfaceException ex)
+        saltURIs.getGroups().put(offset, urisForMatch);
+        
+        if(saltURIs.getGroups().size() >= stepSize)
         {
-          log.error(
-            ex.getResponse().getEntity(String.class), ex);
+          SubgraphQuery subQuery = new SubgraphQuery();
+          subQuery.setLeft(contextLeft);
+          subQuery.setRight(contextRight);
+          subQuery.setMatches(saltURIs);
+          // TODO: segmentation?
+          
+          SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
+          convertText(LegacyGraphConverter.convertToResultSet(p), 
+            keys, args, out, offset-saltURIs.getGroups().size());
+          
+          saltURIs.getGroups().clear();
         }
-
-
-        convertText(LegacyGraphConverter.convertToResultSet(queryResult), keys,
-          args, out, offset);
-
-        out.flush();
-        offset += stepSize;
-
+        offset++;
       }
-
+      
+      if(!saltURIs.getGroups().isEmpty())
+      {
+        SubgraphQuery subQuery = new SubgraphQuery();
+          subQuery.setLeft(contextLeft);
+          subQuery.setRight(contextRight);
+          subQuery.setMatches(saltURIs);
+          // TODO: segmentation?
+          
+        SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
+          convertText(LegacyGraphConverter.convertToResultSet(p), 
+            keys, args, out, offset-saltURIs.getGroups().size()-1);
+      }
+      offset = 0;
+      
       out.append("\n");
       out.append("\n");
       out.append("finished");

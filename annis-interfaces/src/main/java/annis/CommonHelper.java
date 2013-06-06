@@ -18,6 +18,7 @@ package annis;
 import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -30,6 +31,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.UnsupportedEncodingException;
@@ -233,6 +235,44 @@ public class CommonHelper
       }
     }
     return "";
+  }
+
+  /**
+   * Checks a {@link SNode} if it is member of a specific {@link SLayer}.
+   *
+   * @param layerName Specifies the layername to check.
+   * @param node Specifies the node to check.
+   * @return true - it is true when the name of layername corresponds to the
+   * name of any label of the SNode.
+   */
+  public static boolean checkSLayer(String layerName, SNode node)
+  {
+    //robustness
+    if (layerName == null || node == null)
+    {
+      return false;
+    }
+
+    EList<SLayer> sLayers = node.getSLayers();
+    if (sLayers != null)
+    {
+      for (SLayer l : sLayers)
+      {
+        EList<Label> labels = l.getLabels();
+        if (labels != null)
+        {
+          for (Label label : labels)
+          {
+            if (layerName.equals(label.getValue()))
+            {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
