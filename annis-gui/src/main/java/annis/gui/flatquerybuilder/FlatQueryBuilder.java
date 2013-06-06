@@ -74,13 +74,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a "
-    + "constraint.";
+
   private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
+  private static final String CHANGE_SPAN_PARAM = "Change";
   private static final String ADD_META_PARAM = "Add";
-  private static final String LING_MENU_DESC = "Choose an annotation level to "
-    + "expand the query to the right";
+  
   private static final String INFO_INIT_LANG = "In this part of the Query Builder, "
     + "blocks of the linguistic query can be constructed from left to right.";
   private static final String INFO_INIT_SPAN = "This part of the Query Builder "
@@ -353,7 +352,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitSpan)
       {
         span.removeComponent(btInitSpan);
-        MenuBar addMenu = new MenuBar();
+        final MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
         addMenu.setDescription(INFO_INIT_SPAN);
         Collection<String> annonames = getAvailableAnnotationNames();
@@ -364,13 +363,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             @Override
             public void menuSelected(MenuBar.MenuItem selectedItem) {
               SpanBox spb = new SpanBox(annoname, sq);
-              if (span.getComponentCount() < 2){
-                span.addComponent(spb);
-                span.setComponentAlignment(spb, Alignment.MIDDLE_LEFT);
-              }
               if (span.getComponentCount() > 1){
-                getUI().showNotification(NO_MULTIPLE_SPANS);
+                span.removeComponent(span.getComponent(1));
               }
+              span.addComponent(spb);
+              span.setComponentAlignment(spb, Alignment.MIDDLE_LEFT);
+              addMenu.setAutoOpen(false);
+              add.setText(CHANGE_SPAN_PARAM);
             }
           });
         }
@@ -379,7 +378,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if(event.getButton() == btInitMeta)
       {
         meta.removeComponent(btInitMeta);
-        MenuBar addMenu = new MenuBar();
+        final MenuBar addMenu = new MenuBar();
         addMenu.setAutoOpen(true);
         addMenu.setDescription(INFO_INIT_META);
         Collection<String> annonames = getAvailableMetaNames();
@@ -392,6 +391,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
               MetaBox mb = new MetaBox(annoname, sq);
               meta.addComponent(mb);
               mboxes.add(mb);
+              addMenu.setAutoOpen(false);
             }
           });
         }
