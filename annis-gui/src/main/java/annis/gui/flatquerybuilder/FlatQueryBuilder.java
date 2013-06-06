@@ -70,7 +70,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
-  private static final String BUTTON_INV_LABEL = "Adjust Builder to Query";
+  private static final String BUTTON_INV_LABEL = "AQL to Query Builder";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
