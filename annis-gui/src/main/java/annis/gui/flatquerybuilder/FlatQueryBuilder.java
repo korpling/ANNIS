@@ -126,7 +126,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     filtering = new NativeSelect("Filtering mechanisms");
     reducingStringComparator rdc = new reducingStringComparator();
     Set mappings = rdc.getMappings().keySet();
-    int i = 0;
+    int i;
     for (i=0; i<mappings.size(); i++){
       String mapname = (String) mappings.toArray()[i];
       filtering.addItem(i);
