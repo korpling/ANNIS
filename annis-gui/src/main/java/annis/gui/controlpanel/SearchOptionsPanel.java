@@ -57,6 +57,8 @@ public class SearchOptionsPanel extends FormLayout
 
   public static final String KEY_DEFAULT_CONTEXT = "default-context";
 
+  public static final String KEY_RESULT_PER_PAGE = "results-per-page";
+
   public static final String DEFAULT_CONFIG = "default-config";
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -191,6 +193,10 @@ public class SearchOptionsPanel extends FormLayout
     Integer ctxSteps = Integer.parseInt(lastSelection.get(key).getConfig(
       KEY_CONTEXT_STEPS));
 
+    Integer resultsPerPage = Integer.parseInt(lastSelection.get(key).getConfig(
+      KEY_RESULT_PER_PAGE));
+
+    // update left and right context
     cbLeftContext.removeAllItems();
     cbRightContext.removeAllItems();
 
@@ -228,6 +234,29 @@ public class SearchOptionsPanel extends FormLayout
 
     cbLeftContext.addItem(leftCtx);
     cbRightContext.addItem(rightCtx);
+
+    // /update the left and right context
+
+    // update result per page
+    cbResultsPerPage.removeAllItems();
+    Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
+    for (Integer i : PREDEFINED_PAGE_SIZES)
+    {
+      if (i < resultsPerPage)
+      {
+        tmpResultsPerPage.add(i);
+      }
+    }
+
+    tmpResultsPerPage.add(resultsPerPage);
+
+    for (Integer i : tmpResultsPerPage)
+    {
+      cbResultsPerPage.addItem(i);
+    }
+
+    cbResultsPerPage.setValue(resultsPerPage);
+    // /update result per page
 
     updateSegmentations(corpora);
   }
@@ -424,6 +453,9 @@ public class SearchOptionsPanel extends FormLayout
     corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, theGreatestCommonDenominator(
       KEY_DEFAULT_CONTEXT, corpora));
 
+    // get the results per page
+    corpusConfig.setConfig(KEY_RESULT_PER_PAGE, theGreatestCommonDenominator(
+      KEY_RESULT_PER_PAGE, corpora));
 
     return corpusConfig;
   }
