@@ -21,10 +21,8 @@ import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import com.google.gwt.dom.client.Style;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Item;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import java.io.UnsupportedEncodingException;
@@ -42,6 +40,7 @@ import org.slf4j.LoggerFactory;
 /**
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class SearchOptionsPanel extends FormLayout
 {
@@ -49,6 +48,16 @@ public class SearchOptionsPanel extends FormLayout
   public static final String KEY_DEFAULT_SEGMENTATION = "default-segmentation";
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
+
+  public static final String KEY_MAX_CONTEXT_LEFT = "max-context-left";
+
+  public static final String KEY_MAX_CONTEXT_RIGHT = "max-context-right";
+
+  public static final String KEY_CONTEXT_STEPS = "context-steps";
+
+  public static final String KEY_DEFAULT_CONTEXT = "default-context";
+
+  public static final String DEFAULT_CONFIG = "default-config";
 
   private static final Logger log = LoggerFactory.getLogger(
     SearchOptionsPanel.class);
@@ -102,9 +111,9 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext = new ComboBox("Right Context");
     cbResultsPerPage = new ComboBox("Results Per Page");
 
-//    cbLeftContext.setNullSelectionAllowed(false);
-//    cbRightContext.setNullSelectionAllowed(false);
-//    cbResultsPerPage.setNullSelectionAllowed(false);
+    cbLeftContext.setNullSelectionAllowed(false);
+    cbRightContext.setNullSelectionAllowed(false);
+    cbResultsPerPage.setNullSelectionAllowed(false);
 //
 //    cbLeftContext.setNewItemsAllowed(true);
 //    cbRightContext.setNewItemsAllowed(true);
@@ -174,18 +183,51 @@ public class SearchOptionsPanel extends FormLayout
 
 
     Integer leftCtx = Integer.parseInt(lastSelection.get(key).getConfig(
-      "max-context-left"));
+      KEY_MAX_CONTEXT_LEFT));
     Integer rightCtx = Integer.parseInt(lastSelection.get(key).getConfig(
-      "max-context-right"));
+      KEY_MAX_CONTEXT_RIGHT));
+    Integer defaultCtx = Integer.parseInt(lastSelection.get(key).getConfig(
+      KEY_DEFAULT_CONTEXT));
+    Integer ctxSteps = Integer.parseInt(lastSelection.get(key).getConfig(
+      KEY_CONTEXT_STEPS));
 
     cbLeftContext.removeAllItems();
     cbRightContext.removeAllItems();
 
-    cbLeftContext.addItem(leftCtx);
-    cbRightContext.setValue(cbRightContext.addItem(rightCtx));
+    /**
+     * The sorting via index container is much to complex for me, so I sort the
+     * items first and put them afterwards into the combo boxes.
+     */
+    SortedSet<Integer> stepsLeft = new TreeSet<Integer>();
+    SortedSet<Integer> stepsRight = new TreeSet<Integer>();
+    for (int step = ctxSteps; step < leftCtx; step += ctxSteps)
+    {
+      stepsLeft.add(step);
+    }
 
-    cbLeftContext.setValue(leftCtx);
-    cbRightContext.setValue(rightCtx);
+    for (int step = ctxSteps; step < rightCtx; step += ctxSteps)
+    {
+      stepsRight.add(step);
+    }
+
+    stepsLeft.add(defaultCtx);
+    stepsRight.add(defaultCtx);
+
+    for (Integer i : stepsLeft)
+    {
+      cbLeftContext.addItem(i);
+    }
+
+    for (Integer i : stepsRight)
+    {
+      cbRightContext.addItem(i);
+    }
+
+    cbLeftContext.setValue(defaultCtx);
+    cbRightContext.setValue(defaultCtx);
+
+    cbLeftContext.addItem(leftCtx);
+    cbRightContext.addItem(rightCtx);
 
     updateSegmentations(corpora);
   }
@@ -369,10 +411,19 @@ public class SearchOptionsPanel extends FormLayout
     corpusConfigurations = Helper.getCorpusConfigs();
     CorpusConfig corpusConfig = new CorpusConfig();
 
-    corpusConfig.setConfig("max-context-left", theGreatestCommonDenominator(
-      "max-context-left", corpora));
-    corpusConfig.setConfig("max-context-right", theGreatestCommonDenominator(
-      "max-context-right", corpora));
+    // calculate the left and right context.
+    String leftCtx = theGreatestCommonDenominator(KEY_MAX_CONTEXT_LEFT, corpora);
+    String rightCtx = theGreatestCommonDenominator(KEY_MAX_CONTEXT_RIGHT,
+      corpora);
+    corpusConfig.setConfig(KEY_MAX_CONTEXT_LEFT, leftCtx);
+    corpusConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, rightCtx);
+
+    // calculate the default-context
+    corpusConfig.setConfig(KEY_CONTEXT_STEPS, theGreatestCommonDenominator(
+      KEY_CONTEXT_STEPS, corpora));
+    corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, theGreatestCommonDenominator(
+      KEY_DEFAULT_CONTEXT, corpora));
+
 
     return corpusConfig;
   }
