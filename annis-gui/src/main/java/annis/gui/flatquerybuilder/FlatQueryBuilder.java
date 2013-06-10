@@ -439,9 +439,12 @@ public void removeVerticalNode(VerticalNode v)
     }
     
     vnodes.remove(v);
-    if(eb!=null) {eboxes.remove(eb);}
+    if(eb!=null)
+    {
+      eboxes.remove(eb);
+      languagenodes.removeComponent(eb);
+    }
     languagenodes.removeComponent(v);
-    languagenodes.removeComponent(eb);
     updateQuery();
   }
 
