@@ -70,7 +70,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
-  private static final String BUTTON_INV_LABEL = "AQL to Query Builder";
+  private static final String BUTTON_INV_LABEL = "Load Query";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
@@ -422,25 +422,24 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
 public void removeVerticalNode(VerticalNode v)
   {
-    languagenodes.removeComponent(v);
-    int i=-1;
     Iterator<VerticalNode> itVnodes = vnodes.iterator();
+    Iterator<EdgeBox> itEboxes = eboxes.iterator();
     VerticalNode vn = itVnodes.next();
+    EdgeBox eb=null;
     
     while(!vn.equals(v))
     {
-      i++;
       vn = itVnodes.next();
+      eb = itEboxes.next();
     }
     
-    if(i==-1)
+    if((eb==null) & (itEboxes.hasNext()))
     {
-      i++;
+      eb = itEboxes.next();
     }
-    EdgeBox eb = (EdgeBox)(eboxes.toArray()[i]);
     
     vnodes.remove(v);
-    eboxes.remove(eb);
+    if(eb!=null) {eboxes.remove(eb);}
     languagenodes.removeComponent(v);
     languagenodes.removeComponent(eb);
     updateQuery();
@@ -680,12 +679,16 @@ public Set<String> getAvailableAnnotationNames()
       HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
       ArrayList<Relation> pRelations = new ArrayList<Relation>();
       ArrayList<Relation> eRelations = new ArrayList<Relation>();
-      ArrayList<String> meta = new ArrayList<String>();
+      Relation inclusion=null;
+      Constraint conInclusion=null;
+      ArrayList<Constraint> metaConstraints = new ArrayList<Constraint>();
       
       //parse typed-in Query
       //Step 1: get indices of tq-chars, where constraints are separated (&)
       String tempCon="";
       int count = 1;
+      boolean inclusionCheck=false;
+      
       for(int i=0; i<tq.length(); i++)
       {
         //improve this Algorithm (compare to constraint)
@@ -706,7 +709,7 @@ public Set<String> getAvailableAnnotationNames()
           
           if(tempCon.startsWith("meta::"))
           {
-            meta.add(tempCon);
+            metaConstraints.add(new Constraint(tempCon));
           }
           else if(tempCon.startsWith("#"))          
           {
@@ -718,6 +721,16 @@ public Set<String> getAvailableAnnotationNames()
             else if(r.getType()==RelationType.PRECEDENCE)
             {
               pRelations.add(r);
+            }
+            else if((r.getType()==RelationType.INCLUSION)&(!inclusionCheck))
+            {
+              inclusion = r;
+              if(constraints.containsKey(r.getFirst()))
+              {
+                conInclusion = constraints.get(r.getFirst());
+                constraints.remove(r.getFirst());
+              }
+              inclusionCheck=true;
             }
           }         
           else 
@@ -742,13 +755,21 @@ public Set<String> getAvailableAnnotationNames()
       }
       eboxes.clear();
       
-      //2be continued for meta and span
+      for(MetaBox mb : mboxes)
+      {
+        meta.removeComponent(mb);          
+      }
+      mboxes.clear();
+      
+      //too hacky?!
+      span.removeAllComponents();
+      span.addComponent(btInitSpan);
             
       HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
       VerticalNode vn=null;
       for(int i : constraints.keySet())
-      {
-        Constraint con = constraints.get(i);
+      {        
+        Constraint con = constraints.get(i);        
         if(!indexedVnodes.containsKey(i))
         {
           vn = new VerticalNode(con.getLevel(), con.getValue(), this);
@@ -771,7 +792,23 @@ public Set<String> getAvailableAnnotationNames()
         }
       }
       
-      VerticalNode first = indexedVnodes.get(Math.min(pRelations.iterator().next().getFirst(), eRelations.iterator().next().getFirst()));      
+      VerticalNode first = null;
+      int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
+      int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
+      if((smP+smE)==0)
+      {
+        first = indexedVnodes.values().iterator().next();
+      }
+      else if((smP!=0) & (smE!=0))
+      {
+        first = indexedVnodes.get(Math.min(smE, smP));
+      }
+      else
+      {
+        //one value is zero
+        first = indexedVnodes.get(smE+smP);
+      }
+            
       vnodes.add(first);
       languagenodes.addComponent(first);
       
@@ -785,7 +822,23 @@ public Set<String> getAvailableAnnotationNames()
         
         languagenodes.addComponent(eb);
         languagenodes.addComponent(v);  
-      }           
+      }
+      
+      //build SpanBox
+      if(inclusion!=null)
+      {
+        String level = conInclusion.getLevel();
+        String value = conInclusion.getValue();
+        SpanBox spb = new SpanBox(level, this);
+        spb.setValue(value);
+        span.addComponent(spb);
+      }
+      
+      //build MetaBoxes
+      for(Constraint mc : metaConstraints)
+      {
+        
+      }
     }
     
     query = tq.substring(0, tq.length()-1);
@@ -845,7 +898,9 @@ public Set<String> getAvailableAnnotationNames()
     public Relation(String in)
     {
       
-      String op = "", o1 = "", o2 = ""; 
+      String op = "";
+      String o1str = "";
+      String o2str = "";
       
       int i=1;
       char c = in.charAt(1);
@@ -853,7 +908,7 @@ public Set<String> getAvailableAnnotationNames()
       
       while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$'))
       {
-        o1+=c;
+        o1str+=c;
         i++;
         c = in.charAt(i);
       }     
@@ -867,13 +922,13 @@ public Set<String> getAvailableAnnotationNames()
       while((i<in.length()))
       {
         c = in.charAt(i);
-        o2+=c;
+        o2str+=c;
         i++;
       }
       
       operator = op;
-      this.o1 = Integer.parseInt(o1);
-      this.o2 = Integer.parseInt(o2);
+      o1 = Integer.parseInt(o1str);
+      o2 = Integer.parseInt(o2str);
       
       if(op.startsWith("."))
       {
@@ -916,8 +971,14 @@ public Set<String> getAvailableAnnotationNames()
     
     public int whosMyFriend(int a)
     {
-      if(a==o1) return o2;
-      if(a==o2) return o1;
+      if(a==o1)
+      {
+        return o2;
+      }
+      if(a==o2)
+      {
+        return o1;
+      }
       return 0;
     }
   }
