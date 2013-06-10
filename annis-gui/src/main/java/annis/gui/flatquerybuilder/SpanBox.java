@@ -185,12 +185,17 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   
   public String getValue()
   {
-    return cb.toString();
+    return cb.getValue().toString();
+  }
+  
+  public void setValue(String value)
+  {
+    cb.setValue(value);
   }
   
   public boolean isRegEx()
   {
-    return reBox.booleanValue();
+    return reBox.getValue();
   }
   
   public static String removeAccents(String text) {
