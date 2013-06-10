@@ -314,7 +314,7 @@ public class SearchOptionsPanel extends FormLayout
         {
           value = Integer.parseInt(
             corpusConfigurations.get(Helper.DEFAULT_CONFIG).getConfig().
-            getProperty("default-context"));
+            getProperty(key));
           break;
         }
 
