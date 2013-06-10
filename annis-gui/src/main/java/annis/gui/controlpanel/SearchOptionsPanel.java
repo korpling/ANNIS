@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class SearchOptionsPanel extends FormLayout
 {
 
-  public static final String KEY_DEFAULT_SEGMENTATION = "default-segmentation";
+  public static final String KEY_DEFAULT_SEGMENTATION = "default-text-segmentation";
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
@@ -117,13 +117,13 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext.setNullSelectionAllowed(false);
     cbResultsPerPage.setNullSelectionAllowed(false);
 //
-//    cbLeftContext.setNewItemsAllowed(true);
-//    cbRightContext.setNewItemsAllowed(true);
-//    cbResultsPerPage.setNewItemsAllowed(true);
+    cbLeftContext.setNewItemsAllowed(true);
+    cbRightContext.setNewItemsAllowed(true);
+    cbResultsPerPage.setNewItemsAllowed(true);
 //
-//    cbLeftContext.setTextInputAllowed(true);
-//    cbRightContext.setTextInputAllowed(true);
-//    cbResultsPerPage.setTextInputAllowed(true);
+    cbLeftContext.setTextInputAllowed(true);
+    cbRightContext.setTextInputAllowed(true);
+    cbResultsPerPage.setTextInputAllowed(true);
 
 //    cbLeftContext.setImmediate(true);
 //    cbRightContext.setImmediate(true);
@@ -136,23 +136,10 @@ public class SearchOptionsPanel extends FormLayout
 //    cbResultsPerPage.addValidator(new IntegerRangeValidator("must be a number",
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
 
-    for (Integer i : PREDEFINED_CONTEXTS)
-    {
-      cbLeftContext.addItem(i);
-      cbRightContext.addItem(i);
-    }
-
-    for (Integer i : PREDEFINED_PAGE_SIZES)
-    {
-      cbResultsPerPage.addItem(i);
-    }
-
     cbSegmentation = new ComboBox("Show context in");
     cbSegmentation.setTextInputAllowed(false);
     cbSegmentation.setNullSelectionAllowed(true);
-    cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
-    cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
-    cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
+
     cbSegmentation.
       setDescription("If corpora with multiple "
       + "context definitions are selected, a list of available context units will be "
@@ -162,16 +149,32 @@ public class SearchOptionsPanel extends FormLayout
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
 
-    cbLeftContext.setValue(5);
-    cbRightContext.setValue(5);
-    cbResultsPerPage.setValue(10);
-
-
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
     addComponent(new HelpButton(cbSegmentation));
 
     addComponent(cbResultsPerPage);
+
+    corpusConfigurations = Helper.getCorpusConfigs();
+
+    Integer resultsPerPage = Integer.parseInt(corpusConfigurations.get(
+      DEFAULT_CONFIG).getConfig(KEY_RESULT_PER_PAGE));
+    Integer leftCtx = Integer.parseInt(corpusConfigurations.get(DEFAULT_CONFIG).
+      getConfig(KEY_MAX_CONTEXT_LEFT));
+    Integer rightCtx = Integer.parseInt(
+      corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_MAX_CONTEXT_RIGHT));
+    Integer defaultCtx = Integer.parseInt(corpusConfigurations.get(
+      DEFAULT_CONFIG).getConfig(KEY_DEFAULT_CONTEXT));
+    Integer ctxSteps = Integer.parseInt(
+      corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_CONTEXT_STEPS));
+    String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
+      KEY_DEFAULT_SEGMENTATION);
+
+    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx);
+    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx);
+    updateSegmentations(null, segment);
+
+    updateResultsPerPage(resultsPerPage);
   }
 
   public void updateSearchPanelConfiguration(Set<String> corpora)
@@ -192,118 +195,76 @@ public class SearchOptionsPanel extends FormLayout
       KEY_DEFAULT_CONTEXT));
     Integer ctxSteps = Integer.parseInt(lastSelection.get(key).getConfig(
       KEY_CONTEXT_STEPS));
-
     Integer resultsPerPage = Integer.parseInt(lastSelection.get(key).getConfig(
       KEY_RESULT_PER_PAGE));
+    String segment = lastSelection.get(key).getConfig(KEY_DEFAULT_SEGMENTATION);
 
-    // update left and right context
-    cbLeftContext.removeAllItems();
-    cbRightContext.removeAllItems();
+    // update the left and right context
+    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx);
+    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx);
+    updateResultsPerPage(resultsPerPage);
 
-    /**
-     * The sorting via index container is much to complex for me, so I sort the
-     * items first and put them afterwards into the combo boxes.
-     */
-    SortedSet<Integer> stepsLeft = new TreeSet<Integer>();
-    SortedSet<Integer> stepsRight = new TreeSet<Integer>();
-    for (int step = ctxSteps; step < leftCtx; step += ctxSteps)
-    {
-      stepsLeft.add(step);
-    }
+    updateSegmentations(corpora, segment);
 
-    for (int step = ctxSteps; step < rightCtx; step += ctxSteps)
-    {
-      stepsRight.add(step);
-    }
-
-    stepsLeft.add(defaultCtx);
-    stepsRight.add(defaultCtx);
-
-    for (Integer i : stepsLeft)
-    {
-      cbLeftContext.addItem(i);
-    }
-
-    for (Integer i : stepsRight)
-    {
-      cbRightContext.addItem(i);
-    }
-
-    cbLeftContext.setValue(defaultCtx);
-    cbRightContext.setValue(defaultCtx);
-
-    cbLeftContext.addItem(leftCtx);
-    cbRightContext.addItem(rightCtx);
-
-    // /update the left and right context
-
-    // update result per page
-    cbResultsPerPage.removeAllItems();
-    Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
-    for (Integer i : PREDEFINED_PAGE_SIZES)
-    {
-      if (i < resultsPerPage)
-      {
-        tmpResultsPerPage.add(i);
-      }
-    }
-
-    tmpResultsPerPage.add(resultsPerPage);
-
-    for (Integer i : tmpResultsPerPage)
-    {
-      cbResultsPerPage.addItem(i);
-    }
-
-    cbResultsPerPage.setValue(resultsPerPage);
-    // /update result per page
-
-    updateSegmentations(corpora);
   }
 
-  private void updateSegmentations(Set<String> corpora)
+  private void updateSegmentations(Set<String> corpora, String segment)
   {
-    // get all segmentation paths
-    WebResource service = Helper.getAnnisWebResource();
-    if (service != null)
+
+    cbSegmentation.removeAllItems();
+    cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
+    cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
+
+    if (segment.equalsIgnoreCase("tok"))
     {
+      cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
+    }
+    else
+    {
+      cbSegmentation.addItem(segment);
+      cbSegmentation.setValue(segment);
+    }
 
-      List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
-
-      String lastSelection = (String) cbSegmentation.getValue();
-      cbSegmentation.removeAllItems();
-
-      cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
-
-      for (String corpus : corpora)
+    if (corpora != null && !corpora.isEmpty())
+    {
+      // get all segmentation paths
+      WebResource service = Helper.getAnnisWebResource();
+      if (service != null)
       {
-        try
+
+        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+
+        for (String corpus : corpora)
         {
-          attributes.addAll(
-            service.path("query").path("corpora").path(URLEncoder.encode(corpus,
-            "UTF-8"))
-            .path("annotations").queryParam(
-            "fetchvalues", "true").queryParam("onlymostfrequentvalues", "true").
-            get(new AnnisAttributeListType()));
+          try
+          {
+            attributes.addAll(
+              service.path("query").path("corpora").path(URLEncoder.encode(
+              corpus,
+              "UTF-8"))
+              .path("annotations").queryParam(
+              "fetchvalues", "true").
+              queryParam("onlymostfrequentvalues", "true").
+              get(new AnnisAttributeListType()));
+          }
+          catch (UnsupportedEncodingException ex)
+          {
+            log.error(null, ex);
+          }
         }
-        catch (UnsupportedEncodingException ex)
-        {
-          log.error(null, ex);
-        }
-      }
 
 
-      for (AnnisAttribute att : attributes)
-      {
-        if (AnnisAttribute.Type.segmentation == att.getType()
-          && att.getName() != null)
+        for (AnnisAttribute att : attributes)
         {
-          cbSegmentation.addItem(att.getName());
+          if (AnnisAttribute.Type.segmentation == att.getType()
+            && att.getName() != null
+            && !att.getName().equalsIgnoreCase(segment))
+          {
+            cbSegmentation.addItem(att.getName());
+          }
         }
       }
     }
-
-    cbSegmentation.setValue(lastSelection);
   }
 
   /**
@@ -457,7 +418,100 @@ public class SearchOptionsPanel extends FormLayout
     corpusConfig.setConfig(KEY_RESULT_PER_PAGE, theGreatestCommonDenominator(
       KEY_RESULT_PER_PAGE, corpora));
 
+    corpusConfig.setConfig(KEY_DEFAULT_SEGMENTATION, checkSegments(corpora));
+
     return corpusConfig;
+  }
+
+  /**
+   * Checks, if all selected corpora have the same default segmentation layer.
+   * If not the tok layer is taken, because every corpus has this one.
+   *
+   * @param corpora the corpora which has to be checked.
+   * @return "tok" or a segment which is defined in all corpora.
+   */
+  private String checkSegments(Set<String> corpora)
+  {
+    String segmentation = null;
+    for (String corpus : corpora)
+    {
+      String tmpSegment = corpusConfigurations.get(corpus).getConfig(
+        KEY_DEFAULT_SEGMENTATION);
+      if (segmentation == null)
+      {
+        segmentation = tmpSegment;
+        continue;
+      }
+
+      if (!segmentation.equals(tmpSegment)) // return the default config
+      {
+        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
+          KEY_DEFAULT_SEGMENTATION);
+      }
+    }
+
+    return segmentation;
+  }
+
+  private void updateResultsPerPage(Integer resultsPerPage)
+  {
+    // update result per page
+    cbResultsPerPage.removeAllItems();
+
+    Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
+    for (Integer i : PREDEFINED_PAGE_SIZES)
+    {
+      tmpResultsPerPage.add(i);
+    }
+
+    tmpResultsPerPage.add(resultsPerPage);
+
+    for (Integer i : tmpResultsPerPage)
+    {
+      cbResultsPerPage.addItem(i);
+    }
+
+    cbResultsPerPage.setValue(resultsPerPage);
+    // /update result per page
+  }
+
+
+  private void updateContext(ComboBox c, int maxCtx, int ctxSteps,
+    int defaultCtx)
+  {
+    // update left and right context
+    c.removeAllItems();
+
+
+
+    /**
+     * The sorting via index container is much to complex for me, so I sort the
+     * items first and put them afterwards into the combo boxes.
+     */
+    SortedSet<Integer> steps = new TreeSet<Integer>();
+
+    for (Integer i : PREDEFINED_CONTEXTS)
+    {
+      if (i < maxCtx)
+      {
+        steps.add(i);
+      }
+    }
+
+    for (int step = ctxSteps; step < maxCtx; step += ctxSteps)
+    {
+      steps.add(step);
+    }
+
+    steps.add(maxCtx);
+    steps.add(defaultCtx);
+
+    for (Integer i : steps)
+    {
+      c.addItem(i);
+    }
+
+    c.setValue(defaultCtx);
   }
 
   private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
