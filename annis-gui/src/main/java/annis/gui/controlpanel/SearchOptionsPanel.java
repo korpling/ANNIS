@@ -23,14 +23,15 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -185,16 +186,17 @@ public class SearchOptionsPanel extends FormLayout
     String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
       KEY_DEFAULT_SEGMENTATION);
 
-    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx);
-    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx);
+    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
+    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
+    updateResultsPerPage(resultsPerPage, false);
+    updateSegmentations(null, segment);
 
-    cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext, leftCtx, ctxSteps));
-    cbRightContext.setNewItemHandler(new CustomContext(cbRightContext, leftCtx, ctxSteps));
-
-    updateSegmentations(
-      null, segment);
-
-    updateResultsPerPage(resultsPerPage);
+    cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext, leftCtx,
+      ctxSteps));
+    cbRightContext.setNewItemHandler(new CustomContext(cbRightContext, leftCtx,
+      ctxSteps));
+    cbResultsPerPage.setNewItemHandler(new CustomResultSize(cbResultsPerPage,
+      resultsPerPage));
   }
 
   public void updateSearchPanelConfiguration(Set<String> corpora)
@@ -220,9 +222,9 @@ public class SearchOptionsPanel extends FormLayout
     String segment = lastSelection.get(key).getConfig(KEY_DEFAULT_SEGMENTATION);
 
     // update the left and right context
-    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx);
-    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx);
-    updateResultsPerPage(resultsPerPage);
+    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
+    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
+    updateResultsPerPage(resultsPerPage, false);
 
     updateSegmentations(corpora, segment);
 
@@ -483,18 +485,41 @@ public class SearchOptionsPanel extends FormLayout
     return segmentation;
   }
 
-  private void updateResultsPerPage(Integer resultsPerPage)
+  /**
+   * Updates the results per page combobox.
+   *
+   * @param resultsPerPage The value, which is added to the combobox.
+   * @param keepCustomValues If this flag is true, custom values are kept.
+   * Custom in a sense, that the values are not calculated with
+   * {@link #generateConfig(java.util.Set)}
+   *
+   */
+  private void updateResultsPerPage(Integer resultsPerPage,
+    boolean keepCustomValues)
   {
-    // update result per page
-    cbResultsPerPage.removeAllItems();
 
     Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
-    for (Integer i : PREDEFINED_PAGE_SIZES)
+    if (keepCustomValues)
     {
-      tmpResultsPerPage.add(i);
+      Collection<?> itemIds = cbResultsPerPage.getItemIds();
+      Iterator<?> iterator = itemIds.iterator();
+
+      while (iterator.hasNext())
+      {
+        Object next = iterator.next();
+        tmpResultsPerPage.add((Integer) next);
+      }
+    }
+    else
+    {
+      for (Integer i : PREDEFINED_PAGE_SIZES)
+      {
+        tmpResultsPerPage.add(i);
+      }
     }
 
     tmpResultsPerPage.add(resultsPerPage);
+    cbResultsPerPage.removeAllItems();
 
     for (Integer i : tmpResultsPerPage)
     {
@@ -505,12 +530,18 @@ public class SearchOptionsPanel extends FormLayout
     // /update result per page
   }
 
+  /**
+   * Updates context combo boxes.
+   *
+   * @param c the combo box, which is updated.
+   * @param maxCtx the larges context values until context steps are calculated.
+   * @param ctxSteps the step range.
+   * @param defaultCtx the value the combobox is set to.
+   * @param keepCustomValues If this is true all custom values are kept.
+   */
   private void updateContext(ComboBox c, int maxCtx, int ctxSteps,
-    int defaultCtx)
+    int defaultCtx, boolean keepCustomValues)
   {
-    // update left and right context
-    c.removeAllItems();
-
 
     /**
      * The sorting via index container is much to complex for me, so I sort the
@@ -518,22 +549,39 @@ public class SearchOptionsPanel extends FormLayout
      */
     SortedSet<Integer> steps = new TreeSet<Integer>();
 
-    for (Integer i : PREDEFINED_CONTEXTS)
+    if (keepCustomValues)
     {
-      if (i < maxCtx)
+      Collection<?> itemIds = c.getItemIds();
+      Iterator<?> iterator = itemIds.iterator();
+
+      while (iterator.hasNext())
       {
-        steps.add(i);
+        Object next = iterator.next();
+        steps.add((Integer) next);
+      }
+    }
+    else
+    {
+
+      for (Integer i : PREDEFINED_CONTEXTS)
+      {
+        if (i < maxCtx)
+        {
+          steps.add(i);
+        }
+      }
+
+      for (int step = ctxSteps; step < maxCtx; step += ctxSteps)
+      {
+        steps.add(step);
       }
     }
 
-    for (int step = ctxSteps; step < maxCtx; step += ctxSteps)
-    {
-      steps.add(step);
-    }
 
     steps.add(maxCtx);
     steps.add(defaultCtx);
 
+    c.removeAllItems();
     for (Integer i : steps)
     {
       c.addItem(i);
@@ -570,11 +618,58 @@ public class SearchOptionsPanel extends FormLayout
     return key.toString();
   }
 
+  private class CustomResultSize implements AbstractSelect.NewItemHandler
+  {
+
+    ComboBox c;
+
+    int resultPerPage;
+
+    CustomResultSize(ComboBox c, int resultPerPage)
+    {
+      this.c = c;
+      this.resultPerPage = resultPerPage;
+    }
+
+    @Override
+    public void addNewItem(String resultPerPage)
+    {
+      if (!c.containsId(resultPerPage))
+      {
+        try
+        {
+          int i = Integer.parseInt((String) resultPerPage);
+
+          if (i < 0)
+          {
+            throw new IllegalArgumentException(
+              "result number has to be a positive number or 0");
+          }
+
+          updateResultsPerPage(i, true);
+        }
+        catch (NumberFormatException ex)
+        {
+          Notification.show("invalid result per page input",
+            "Please enter valid numbers [0-9]",
+            Notification.Type.WARNING_MESSAGE);
+        }
+        catch (IllegalArgumentException ex)
+        {
+          Notification.show("invalid result per page input",
+            ex.getMessage(), Notification.Type.WARNING_MESSAGE);
+        }
+      }
+    }
+  }
+
   private class CustomContext implements AbstractSelect.NewItemHandler
   {
 
     ComboBox c;
+
     int leftCtx;
+
     int ctxSteps;
 
     CustomContext(ComboBox c, int leftCtx, int ctxSteps)
@@ -599,8 +694,13 @@ public class SearchOptionsPanel extends FormLayout
               "context has to be a positive number or 0");
           }
 
-          updateContext(c, leftCtx, ctxSteps, i);
+          if (i > leftCtx)
+          {
+            throw new IllegalArgumentException(
+              "The context is greater than, than the max value defined in the corpus property file.");
+          }
 
+          updateContext(c, leftCtx, ctxSteps, i, true);
         }
         catch (NumberFormatException ex)
         {
@@ -611,7 +711,7 @@ public class SearchOptionsPanel extends FormLayout
         catch (IllegalArgumentException ex)
         {
           Notification.show("invalid context input",
-            "Context has to be a positive number or 0!",
+            ex.getMessage(),
             Notification.Type.WARNING_MESSAGE);
         }
       }
