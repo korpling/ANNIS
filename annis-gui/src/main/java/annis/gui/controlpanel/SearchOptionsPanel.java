@@ -437,6 +437,16 @@ public class SearchOptionsPanel extends FormLayout
     {
       String tmpSegment = corpusConfigurations.get(corpus).getConfig(
         KEY_DEFAULT_SEGMENTATION);
+
+      /**
+       * If no segment is set in the corpus config use always the tok segment.
+       */
+      if (tmpSegment == null)
+      {
+        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
+          KEY_DEFAULT_SEGMENTATION);
+      }
+
       if (segmentation == null)
       {
         segmentation = tmpSegment;
@@ -474,7 +484,6 @@ public class SearchOptionsPanel extends FormLayout
     cbResultsPerPage.setValue(resultsPerPage);
     // /update result per page
   }
-
 
   private void updateContext(ComboBox c, int maxCtx, int ctxSteps,
     int defaultCtx)
