@@ -23,8 +23,11 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.Notification;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
@@ -88,7 +91,7 @@ public class SearchOptionsPanel extends FormLayout
 
   static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
   {
-    1, 2, 5, 10, 20
+    0, 1, 2, 5, 10, 20
   };
 
   /**
@@ -125,9 +128,9 @@ public class SearchOptionsPanel extends FormLayout
     cbRightContext.setTextInputAllowed(true);
     cbResultsPerPage.setTextInputAllowed(true);
 
-//    cbLeftContext.setImmediate(true);
-//    cbRightContext.setImmediate(true);
-//    cbResultsPerPage.setImmediate(true);
+    cbLeftContext.setImmediate(true);
+    cbRightContext.setImmediate(true);
+    cbResultsPerPage.setImmediate(true);
 
 //    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
@@ -137,11 +140,14 @@ public class SearchOptionsPanel extends FormLayout
 //      Integer.MIN_VALUE, Integer.MAX_VALUE));
 
     cbSegmentation = new ComboBox("Show context in");
-    cbSegmentation.setTextInputAllowed(false);
-    cbSegmentation.setNullSelectionAllowed(true);
 
-    cbSegmentation.
-      setDescription("If corpora with multiple "
+    cbSegmentation.setTextInputAllowed(
+      false);
+    cbSegmentation.setNullSelectionAllowed(
+      true);
+
+    cbSegmentation.setDescription(
+      "If corpora with multiple "
       + "context definitions are selected, a list of available context units will be "
       + "displayed. By default context is calculated in ‘tokens’ "
       + "(e.g. 5 minimal units to the left and right of a search result). "
@@ -150,29 +156,43 @@ public class SearchOptionsPanel extends FormLayout
       + "diplomatic segmentations of a manuscript, etc.");
 
     addComponent(cbLeftContext);
+
     addComponent(cbRightContext);
-    addComponent(new HelpButton(cbSegmentation));
+
+    addComponent(
+      new HelpButton(cbSegmentation));
 
     addComponent(cbResultsPerPage);
-
     corpusConfigurations = Helper.getCorpusConfigs();
 
     Integer resultsPerPage = Integer.parseInt(corpusConfigurations.get(
       DEFAULT_CONFIG).getConfig(KEY_RESULT_PER_PAGE));
-    Integer leftCtx = Integer.parseInt(corpusConfigurations.get(DEFAULT_CONFIG).
+
+    Integer leftCtx = Integer.parseInt(corpusConfigurations.
+      get(DEFAULT_CONFIG).
       getConfig(KEY_MAX_CONTEXT_LEFT));
+
     Integer rightCtx = Integer.parseInt(
-      corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_MAX_CONTEXT_RIGHT));
+      corpusConfigurations.get(DEFAULT_CONFIG).
+      getConfig(KEY_MAX_CONTEXT_RIGHT));
+
     Integer defaultCtx = Integer.parseInt(corpusConfigurations.get(
       DEFAULT_CONFIG).getConfig(KEY_DEFAULT_CONTEXT));
+
     Integer ctxSteps = Integer.parseInt(
       corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_CONTEXT_STEPS));
+
     String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
       KEY_DEFAULT_SEGMENTATION);
 
     updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx);
     updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx);
-    updateSegmentations(null, segment);
+
+    cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext, leftCtx, ctxSteps));
+    cbRightContext.setNewItemHandler(new CustomContext(cbRightContext, leftCtx, ctxSteps));
+
+    updateSegmentations(
+      null, segment);
 
     updateResultsPerPage(resultsPerPage);
   }
@@ -492,7 +512,6 @@ public class SearchOptionsPanel extends FormLayout
     c.removeAllItems();
 
 
-
     /**
      * The sorting via index container is much to complex for me, so I sort the
      * items first and put them afterwards into the combo boxes.
@@ -549,5 +568,53 @@ public class SearchOptionsPanel extends FormLayout
     }
 
     return key.toString();
+  }
+
+  private class CustomContext implements AbstractSelect.NewItemHandler
+  {
+
+    ComboBox c;
+    int leftCtx;
+    int ctxSteps;
+
+    CustomContext(ComboBox c, int leftCtx, int ctxSteps)
+    {
+      this.c = c;
+      this.leftCtx = leftCtx;
+      this.ctxSteps = ctxSteps;
+    }
+
+    @Override
+    public void addNewItem(String context)
+    {
+      if (!c.containsId(context))
+      {
+        try
+        {
+          int i = Integer.parseInt((String) context);
+
+          if (i < 0)
+          {
+            throw new IllegalArgumentException(
+              "context has to be a positive number or 0");
+          }
+
+          updateContext(c, leftCtx, ctxSteps, i);
+
+        }
+        catch (NumberFormatException ex)
+        {
+          Notification.show("invalid context input",
+            "Please enter valid numbers [0-9]",
+            Notification.Type.WARNING_MESSAGE);
+        }
+        catch (IllegalArgumentException ex)
+        {
+          Notification.show("invalid context input",
+            "Context has to be a positive number or 0!",
+            Notification.Type.WARNING_MESSAGE);
+        }
+      }
+    }
   }
 }
