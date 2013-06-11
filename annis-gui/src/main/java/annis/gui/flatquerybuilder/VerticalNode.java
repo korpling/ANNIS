@@ -44,10 +44,10 @@ public class VerticalNode extends Panel implements Button.ClickListener
   
   public VerticalNode(String level, FlatQueryBuilder sq)
   {
-    this(level, sq, false, false);
+    this(level, null, sq, false, false);
   }
   
-  public VerticalNode(String ebene, FlatQueryBuilder sq, boolean isRegex, boolean negativeSearch)
+  public VerticalNode(String ebene, String value, FlatQueryBuilder sq, boolean isRegex, boolean negativeSearch)
   {      
     this.sq = sq;
     v = new VerticalLayout();
@@ -57,6 +57,10 @@ public class VerticalNode extends Panel implements Button.ClickListener
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     SearchBox sb = new SearchBox(ebene, sq, this, isRegex, negativeSearch);
+    if(value!=null)
+    {
+      sb.setValue(value);
+    }
     sboxes.add(sb);   
     annonames = sq.getAvailableAnnotationNames();
     am = new AddMenu(sq, this, ebene);
@@ -68,12 +72,6 @@ public class VerticalNode extends Panel implements Button.ClickListener
     vframe.addComponent(am);
     setWidth(WIDTH);
     setContent(vframe);
-  }
-  
-  public VerticalNode(String ebene, String value, FlatQueryBuilder sq)
-  {
-    this(ebene, sq);
-    sboxes.iterator().next().setValue(value);
   }
   
 @Override
