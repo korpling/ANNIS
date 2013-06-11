@@ -17,6 +17,7 @@ package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
+import com.vaadin.data.Item;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -35,35 +36,48 @@ public class MetaBox extends Panel implements Button.ClickListener
   private FlatQueryBuilder sq;
   private final String datum;
   
-  public MetaBox(String ebene, FlatQueryBuilder sq)
+  public MetaBox(String level, FlatQueryBuilder sq, TreeSet<String> setValues)
   {
     this.sq = sq;
     sb = new VerticalLayout();
     sb.setImmediate(true);
-    datum = ebene;
+    datum = level;
     // close
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     // metabox values for ebene
     Collection<String> annonames = new TreeSet<String>();
-    for(String a :sq.getAvailableMetaLevels(ebene))
+    for(String a :sq.getAvailableMetaLevels(level))
     {
       annonames.add(a);
     }
-    OptionGroup l = new OptionGroup(ebene);
+    OptionGroup l = new OptionGroup(level);
+    
     for (String annoname : annonames) {
-      if (!annoname.isEmpty()){
-        l.addItem(annoname);
+      if (!annoname.isEmpty()){        
+        l.addItem(annoname);               
+        /*if(setValues.contains(annoname))
+        {
+          l.setValue(annoname);
+        }*/
       }
     }
-    l.setNullSelectionAllowed(true);
+    
     l.setMultiSelect(true);
+    l.setNullSelectionAllowed(true);    
     l.setImmediate(true);
+    l.setValue(setValues);
+    
     tcs = l;
     sb.addComponent(tcs);
     sb.addComponent(btClose);
     setContent(sb);
-  }  
+  }
+  
+  public MetaBox(String ebene, FlatQueryBuilder sq)
+  {
+    this(ebene, sq, new TreeSet<String>());
+  }
   
   public String getMetaDatum()
   {
@@ -74,7 +88,7 @@ public class MetaBox extends Panel implements Button.ClickListener
   {
     Collection<String> result = (Collection)tcs.getValue();
     return result;
-  }
+  } 
   
   @Override
   public void buttonClick(Button.ClickEvent event)
