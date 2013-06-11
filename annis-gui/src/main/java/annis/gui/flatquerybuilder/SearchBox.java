@@ -60,9 +60,15 @@ public class SearchBox extends Panel implements Button.ClickListener,
   private FlatQueryBuilder sq;
   public static final String BUTTON_CLOSE_LABEL = "X";
   private static final String SB_CB_WIDTH = "145px";
+  private static final String CAPTION_REBOX = "Regex";
   private static reducingStringComparator rsc;
   
-  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
+  public SearchBox(final String level, final FlatQueryBuilder sq, final VerticalNode vn)
+  {
+    this(level, sq, vn, false, false);
+  }
+  
+  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn, boolean isRegex, boolean negativeSearch)
   {
     this.vn = vn;
     this.ebene = ebene;
@@ -94,10 +100,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
     VerticalLayout sbtoolbar = new VerticalLayout();
     sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
-    reBox = new CheckBox("Regex");
+    reBox = new CheckBox(CAPTION_REBOX);
     reBox.setImmediate(true);
     sbtoolbar.addComponent(reBox);
-    reBox.addListener(new ValueChangeListener() {
+    reBox.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
@@ -115,9 +121,11 @@ public class SearchBox extends Panel implements Button.ClickListener,
         }
       }
     });
+    reBox.setValidationVisible(isRegex);
     // searchbox tickbox for negative search
     negSearchBox = new CheckBox("Neg. search");
     negSearchBox.setImmediate(true);
+    negSearchBox.setValue(negativeSearch);
     sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
