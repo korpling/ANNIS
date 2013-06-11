@@ -100,7 +100,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
-        boolean r = reBox.booleanValue();
+        boolean r = reBox.getValue();
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
