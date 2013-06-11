@@ -21,7 +21,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Layer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -49,7 +51,7 @@ public class PDFPageHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
-  public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "node_key";
+  public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";
 
   public static final String PAGE_NUMBER_SEPERATOR = "-";
 
@@ -114,8 +116,21 @@ public class PDFPageHelper {
    */
   public String getPageFromAnnotation(SSpan node) {
     if (node != null && node.getSAnnotations() != null) {
+
+      EList<SLayer> layers = node.getSLayers();
+      String nodeNamespace = null;
+
+      for (SLayer l : layers) {
+        nodeNamespace = l.getSName();
+      }
+
       for (SAnnotation anno : node.getSAnnotations()) {
-        if (getPDFPageAnnotationName().equals(anno.getQName())) {
+
+        if ((nodeNamespace == null || input.getNamespace() == null)
+                && getPDFPageAnnotationName().equals(anno.getName())) {
+          return anno.getSValueSTEXT();
+        } else if (nodeNamespace.equals(input.getNamespace())
+                && getPDFPageAnnotationName().equals(anno.getName())) {
           return anno.getSValueSTEXT();
         }
       }
@@ -187,7 +202,8 @@ public class PDFPageHelper {
     Properties mappings = input.getMappings();
 
     if (mappings != null) {
-      return mappings.getProperty("page", DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
+      return mappings.getProperty("node_key",
+              DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
     }
 
     return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
