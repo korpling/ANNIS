@@ -244,6 +244,32 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     return result.replace("/", "\\x2F");
   }
+  
+  private String unescape(String s)
+	{
+		int i=1;
+		while(i<s.length())
+		{
+			char c0 = s.charAt(i-1);
+			char c1 = s.charAt(i);
+			for(int j=0; j<REGEX_CHARACTERS.length; j++)
+			{
+				if( (c1==REGEX_CHARACTERS[j].charAt(0)) & (c0=='\\') )
+				{
+					s = s.substring(0, i-1) + s.substring(i);
+					break;
+				}
+				if(j==REGEX_CHARACTERS.length-1)
+				{
+					i++;
+				}
+			}			
+		}
+		//additionaly unescape slashes:
+		
+		return s.replace("\\2xF", "/");
+
+	}
 
   private String getAQLQuery()
   {
@@ -415,7 +441,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       if (event.getComponent() == btInverse)
       {
-        adjustBuilderToQuery();
+        loadQuery();
       }
     }
   }
@@ -651,7 +677,39 @@ public Set<String> getAvailableAnnotationNames()
     mboxes.clear();
   }
   
-  public void adjustBuilderToQuery()
+  public TreeSet<String> parseMetaExpression(String expression)
+	/*
+	 * only for complex regex expressions
+	 */
+	{		
+		TreeSet<String> values = new TreeSet<String>();
+		int i=0;
+		
+		while(expression.length()>0)
+		{
+			if((expression.charAt(i)=='|')|(i==expression.length()-1))
+			{
+				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
+				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
+				{
+					value = value.substring(1, value.length()-1);
+				}
+				values.add(value);
+				expression = expression.substring(i+1);
+				i=0;
+				
+				value = unescape(value);
+			}
+			else
+			{
+				i++;
+			}
+		}
+		
+		return values;
+	}
+  
+  public void loadQuery()
     /*
      * this method is called, when the
      * query is changed in the textfield,
@@ -794,13 +852,16 @@ public Set<String> getAvailableAnnotationNames()
           }          
         }
       }
-      
+            
       VerticalNode first = null;
       int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
       int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
       if((smP+smE)==0)
       {
-        first = indexedVnodes.values().iterator().next();
+        if(!indexedVnodes.isEmpty())
+        {
+          first = indexedVnodes.values().iterator().next(); 
+        }        
       }
       else if((smP!=0) & (smE!=0))
       {
@@ -811,20 +872,23 @@ public Set<String> getAvailableAnnotationNames()
         //one value is zero
         first = indexedVnodes.get(smE+smP);
       }
-            
-      vnodes.add(first);
-      languagenodes.addComponent(first);
       
-      for(Relation rel : pRelations)
+      if(first!=null)
       {
-        EdgeBox eb = new EdgeBox(this);
-        eb.setValue(rel.getOperator());
-        eboxes.add(eb);
-        VerticalNode v = indexedVnodes.get(rel.getSecond());
-        vnodes.add(v);
-        
-        languagenodes.addComponent(eb);
-        languagenodes.addComponent(v);  
+        vnodes.add(first);
+        languagenodes.addComponent(first);
+
+        for(Relation rel : pRelations)
+        {
+          EdgeBox eb = new EdgeBox(this);
+          eb.setValue(rel.getOperator());
+          eboxes.add(eb);
+          VerticalNode v = indexedVnodes.get(rel.getSecond());
+          vnodes.add(v);
+
+          languagenodes.addComponent(eb);
+          languagenodes.addComponent(v);  
+        }
       }
       
       //build SpanBox
@@ -840,7 +904,13 @@ public Set<String> getAvailableAnnotationNames()
       //build MetaBoxes
       for(Constraint mc : metaConstraints)
       {
-        
+        if(mc.isRegEx())
+        {
+          TreeSet<String> values = parseMetaExpression(mc.getValue());
+          MetaBox mb = new MetaBox(mc.getLevel(), this, values);
+          mboxes.add(mb);
+          meta.addComponent(mb);
+        }
       }
     }
     
@@ -851,6 +921,8 @@ public Set<String> getAvailableAnnotationNames()
   {
     private String level;
     private String value;
+    private boolean regEx;
+    private boolean equality;
     
     public Constraint(String s)
     {
@@ -859,13 +931,32 @@ public Set<String> getAvailableAnnotationNames()
       {
         e++;
       }
-      String l = s.substring(0, e);
-      l = l.replace(" ", "");
+      
+      String l="";
+      
+      if(s.charAt(e-1)=='!')
+      {
+        l = s.substring(0, e-1).replace(" ", "");
+        equality = false;
+      }
+      else
+      {
+        l = s.substring(0, e).replace(" ", "").replace("meta::", "");
+        equality = true;
+      }
       
       String v = s.substring(e+1);
       while(v.startsWith(" "))
       {
         v = v.substring(1);
+      }
+      if(v.startsWith("\""))
+      {
+        regEx = false;
+      }
+      else
+      {
+        regEx = true;
       }
       //remove " or / :
       v = v.substring(1, v.length()-1);
@@ -882,6 +973,16 @@ public Set<String> getAvailableAnnotationNames()
     public String getValue()
     {
       return value;
+    }
+    
+    public boolean isRegEx()
+    {
+      return regEx;
+    }
+    
+    public boolean equality()
+    {
+      return equality;
     }
   }
   
