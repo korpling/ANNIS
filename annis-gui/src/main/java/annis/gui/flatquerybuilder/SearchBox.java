@@ -110,6 +110,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         else if(cb.getValue()!=null)
         {
           String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          escapedItem = cb.getValue().toString();
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
@@ -150,6 +151,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
       else if(cb.getValue()!=null)
       {
         String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+        escapedItem = cb.getValue().toString();
         cb.addItem(escapedItem);
         cb.setValue(escapedItem);         
       }
