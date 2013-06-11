@@ -36,7 +36,7 @@ public class MetaBox extends Panel implements Button.ClickListener
   private FlatQueryBuilder sq;
   private final String datum;
   
-  public MetaBox(String level, FlatQueryBuilder sq, TreeSet<String> setValues)
+  public MetaBox(String level, FlatQueryBuilder sq)
   {
     this.sq = sq;
     sb = new VerticalLayout();
@@ -55,28 +55,18 @@ public class MetaBox extends Panel implements Button.ClickListener
     
     for (String annoname : annonames) {
       if (!annoname.isEmpty()){        
-        l.addItem(annoname);               
-        /*if(setValues.contains(annoname))
-        {
-          l.setValue(annoname);
-        }*/
+        l.addItem(annoname);
       }
     }
     
     l.setMultiSelect(true);
     l.setNullSelectionAllowed(true);    
     l.setImmediate(true);
-    l.setValue(setValues);
     
     tcs = l;
     sb.addComponent(tcs);
     sb.addComponent(btClose);
     setContent(sb);
-  }
-  
-  public MetaBox(String ebene, FlatQueryBuilder sq)
-  {
-    this(ebene, sq, new TreeSet<String>());
   }
   
   public String getMetaDatum()
@@ -89,6 +79,16 @@ public class MetaBox extends Panel implements Button.ClickListener
     Collection<String> result = (Collection)tcs.getValue();
     return result;
   } 
+  
+  public void setValue(Collection<String> values)
+  {
+    tcs.setValue(values);
+  }
+  
+  public void setValue(String value)
+  {
+    tcs.setValue(value);
+  }
   
   @Override
   public void buttonClick(Button.ClickEvent event)
