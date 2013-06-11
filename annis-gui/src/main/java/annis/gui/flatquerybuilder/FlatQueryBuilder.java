@@ -215,22 +215,26 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String getMetaQueryFragment(MetaBox mb)
   {    
     Collection<String> values = mb.getValues();
-    String result = "\n& meta::"+mb.getMetaDatum()+" = ";
-    if(values.size()==1)
+    if(!values.isEmpty())
     {
-      result += "\""+values.iterator().next()+"\"";
-    }
-    else
-    {      
-      Iterator<String> itValues = values.iterator();
-      result += "/(" + escapeRegexCharacters(itValues.next())+")";
-      while(itValues.hasNext())
+      String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+      if(values.size()==1)
       {
-        result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        result += "\""+values.iterator().next()+"\"";
       }
-      result += "/";
-    }   
-    return result;
+      else
+      {      
+        Iterator<String> itValues = values.iterator();
+        result += "/(" + escapeRegexCharacters(itValues.next())+")";
+        while(itValues.hasNext())
+        {
+          result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        }
+        result += "/";
+      }   
+      return result;
+    }
+    return "";
   }
   
   public String escapeRegexCharacters(String tok)
@@ -677,12 +681,12 @@ public Set<String> getAvailableAnnotationNames()
     mboxes.clear();
   }
   
-  public TreeSet<String> parseMetaExpression(String expression)
+  public Collection<String> parseMetaExpression(String expression)
 	/*
 	 * only for complex regex expressions
 	 */
 	{		
-		TreeSet<String> values = new TreeSet<String>();
+		Collection<String> values = new TreeSet<String>();
 		int i=0;
 		
 		while(expression.length()>0)
@@ -694,11 +698,10 @@ public Set<String> getAvailableAnnotationNames()
 				{
 					value = value.substring(1, value.length()-1);
 				}
-				values.add(value);
-				expression = expression.substring(i+1);
-				i=0;
-				
 				value = unescape(value);
+        values.add(value);
+				expression = expression.substring(i+1);
+				i=0;				
 			}
 			else
 			{
@@ -833,7 +836,8 @@ public Set<String> getAvailableAnnotationNames()
         Constraint con = constraints.get(i);        
         if(!indexedVnodes.containsKey(i))
         {
-          vn = new VerticalNode(con.getLevel(), con.getValue(), this);
+          String value = (con.isRegEx()) ? unescape(con.getValue()) : con.getValue();
+          vn = new VerticalNode(con.getLevel(), value, this, con.isRegEx(), con.isNegative());
           indexedVnodes.put(i, vn);
         }
         
@@ -844,9 +848,11 @@ public Set<String> getAvailableAnnotationNames()
             int b = rel.whosMyFriend(i);
             if(!indexedVnodes.containsKey(b))
             {
-              indexedVnodes.put(b, null);            
-              SearchBox sb = new SearchBox(constraints.get(b).getLevel(), this, vn);
-              sb.setValue(constraints.get(b).getValue());
+              indexedVnodes.put(b, null);
+              Constraint bcon = constraints.get(b);
+              SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());
+              String bvalue = (bcon.isRegEx()) ? unescape(bcon.getValue()) : bcon.getValue();
+              sb.setValue(bvalue);
               vn.addSearchBox(sb);
             }
           }          
@@ -893,10 +899,10 @@ public Set<String> getAvailableAnnotationNames()
       
       //build SpanBox
       if(inclusion!=null)
-      {
+      {        
         String level = conInclusion.getLevel();
-        String value = conInclusion.getValue();
-        SpanBox spb = new SpanBox(level, this);
+        String value = (conInclusion.isRegEx()) ? unescape(conInclusion.getValue()) : conInclusion.getValue();
+        SpanBox spb = new SpanBox(level, this, conInclusion.isRegEx());
         spb.setValue(value);
         span.addComponent(spb);
       }
@@ -906,8 +912,20 @@ public Set<String> getAvailableAnnotationNames()
       {
         if(mc.isRegEx())
         {
-          TreeSet<String> values = parseMetaExpression(mc.getValue());
-          MetaBox mb = new MetaBox(mc.getLevel(), this, values);
+          Collection<String> values = parseMetaExpression(mc.getValue());
+          MetaBox mb = new MetaBox(mc.getLevel(), this);
+          mb.setValue(values);
+          mboxes.add(mb);
+          meta.addComponent(mb);
+        }
+        else
+        {
+          MetaBox mb = new MetaBox(mc.getLevel(), this);
+          //for a particular reason (unknown) setValue with a String parameter
+          //is not accepted by OptionGroup
+          Collection<String> values = new TreeSet<String>();
+          values.add(mc.getValue());
+          mb.setValue(values);
           mboxes.add(mb);
           meta.addComponent(mb);
         }
@@ -922,7 +940,7 @@ public Set<String> getAvailableAnnotationNames()
     private String level;
     private String value;
     private boolean regEx;
-    private boolean equality;
+    private boolean negative;
     
     public Constraint(String s)
     {
@@ -932,17 +950,17 @@ public Set<String> getAvailableAnnotationNames()
         e++;
       }
       
-      String l="";
+      String l;
       
       if(s.charAt(e-1)=='!')
       {
         l = s.substring(0, e-1).replace(" ", "");
-        equality = false;
+        negative = true;
       }
       else
       {
         l = s.substring(0, e).replace(" ", "").replace("meta::", "");
-        equality = true;
+        negative = false;
       }
       
       String v = s.substring(e+1);
@@ -980,9 +998,9 @@ public Set<String> getAvailableAnnotationNames()
       return regEx;
     }
     
-    public boolean equality()
+    public boolean isNegative()
     {
-      return equality;
+      return negative;
     }
   }
   
