@@ -74,7 +74,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     Label tf = new Label(ebene);
     sb.addComponent(tf);
     this.cb = new SensitiveComboBox();
-    cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
@@ -125,9 +124,9 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     // close functionality
     if(event.getButton() == btClose)
     {
-      sb.removeComponent(cb); 
+      sb.removeComponent(cb);
       cb.setValue("");
-      sq.removeSpanBox(this);      
+      sq.removeSpanBox(this);
     }
     // regex box functionality
     else if(event.getComponent()==reBox)
