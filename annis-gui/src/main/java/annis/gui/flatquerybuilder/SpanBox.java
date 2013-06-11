@@ -59,6 +59,11 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   
   public SpanBox(final String ebene, final FlatQueryBuilder sq)
   {
+    this(ebene, sq, false);
+  }
+  
+  public SpanBox(final String ebene, final FlatQueryBuilder sq, boolean isRegex)
+  {
     this.ebene = ebene;
     this.sq = sq;
     sb = new HorizontalLayout();
@@ -91,7 +96,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
     sbtoolbar.addComponent(tb);
-    tb.addListener(new ValueChangeListener() {
+    tb.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
@@ -108,6 +113,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
         }
       }
     });
+    tb.setValue(isRegex);
     reBox = tb;
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
