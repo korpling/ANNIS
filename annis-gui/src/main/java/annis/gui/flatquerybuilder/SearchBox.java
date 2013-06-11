@@ -121,7 +121,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         }
       }
     });
-    reBox.setValidationVisible(isRegex);
+    reBox.setValue(isRegex);
     // searchbox tickbox for negative search
     negSearchBox = new CheckBox("Neg. search");
     negSearchBox.setImmediate(true);
