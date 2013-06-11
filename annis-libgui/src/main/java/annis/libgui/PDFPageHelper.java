@@ -21,6 +21,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Layer;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -48,9 +49,7 @@ public class PDFPageHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
-  public static final String PAGE_NUMBER_ANNOATION_NAMESPACE = "annis";
-
-  public static final String PAGE_NUMBER_ANNOATATION_NAME = "page";
+  public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "node_key";
 
   public static final String PAGE_NUMBER_SEPERATOR = "-";
 
@@ -116,21 +115,13 @@ public class PDFPageHelper {
   public String getPageFromAnnotation(SSpan node) {
     if (node != null && node.getSAnnotations() != null) {
       for (SAnnotation anno : node.getSAnnotations()) {
-        if (getQualifiedPageNumberAnnotationName().equals(anno.getQName())) {
+        if (getPDFPageAnnotationName().equals(anno.getQName())) {
           return anno.getSValueSTEXT();
         }
       }
     }
 
     return null;
-  }
-
-  /**
-   * Gets the complete name of the page annotation, including the seperator. *
-   *
-   */
-  public String getQualifiedPageNumberAnnotationName() {
-    return PAGE_NUMBER_ANNOATION_NAMESPACE + "::" + getPDFPageAnnotationName();
   }
 
   private void getAllSSpanWithPageNumber(
@@ -196,10 +187,10 @@ public class PDFPageHelper {
     Properties mappings = input.getMappings();
 
     if (mappings != null) {
-      return mappings.getProperty("page", PAGE_NUMBER_ANNOATATION_NAME);
+      return mappings.getProperty("page", DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
     }
 
-    return PAGE_NUMBER_ANNOATATION_NAME;
+    return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
   }
 
   public String getMostLeftAndMostRightPageAnno() {
