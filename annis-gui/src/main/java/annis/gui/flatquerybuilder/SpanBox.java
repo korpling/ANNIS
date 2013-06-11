@@ -83,7 +83,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     // configure & load content
     cb.setImmediate(true);
     cb.setNewItemsAllowed(true);
-    cb.setTextInputAllowed(isRegex);
+    cb.setTextInputAllowed(true);
     for (String annoname : this.annonames) 
     {
       cb.addItem(annoname);
@@ -113,7 +113,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
-        cb.setTextInputAllowed(r);
       }
     });    
     reBox = tb;

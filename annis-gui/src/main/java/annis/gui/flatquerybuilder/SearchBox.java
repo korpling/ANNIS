@@ -86,6 +86,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
     cb.setNewItemsAllowed(true);
+    cb.setTextInputAllowed(true);
     cb.setCaption(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
@@ -114,12 +115,11 @@ public class SearchBox extends Panel implements Button.ClickListener,
         }
         else if(cb.getValue()!=null)
         {
-          // String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-          String escapedItem = cb.getValue().toString();
+          String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          //String escapedItem = cb.getValue().toString();
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
-        cb.setTextInputAllowed(r);
       }
     });
     reBox.setValue(isRegex);
