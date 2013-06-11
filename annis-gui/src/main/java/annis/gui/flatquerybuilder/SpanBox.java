@@ -77,6 +77,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
+    cb.setNewItemsAllowed(true);
     for (String annoname : this.annonames) 
     {
       cb.addItem(annoname);
@@ -95,7 +96,6 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
       @Override
       public void valueChange(ValueChangeEvent event) {
         boolean r = reBox.booleanValue();
-        cb.setNewItemsAllowed(r);
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);

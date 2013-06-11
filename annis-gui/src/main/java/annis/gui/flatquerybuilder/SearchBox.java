@@ -102,7 +102,6 @@ public class SearchBox extends Panel implements Button.ClickListener,
       @Override
       public void valueChange(ValueChangeEvent event) {
         boolean r = reBox.booleanValue();
-        cb.setNewItemsAllowed(r);
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
