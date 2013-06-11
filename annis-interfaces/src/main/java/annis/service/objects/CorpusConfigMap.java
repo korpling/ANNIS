@@ -57,4 +57,19 @@ public class CorpusConfigMap implements Serializable
   {
     return corpusConfigs.get(k);
   }
+
+  /**
+   * Checks if a corpus configuration is defined for a specific corpus name.
+   *
+   * @param corpusName The corpus name, for which the config is lookup.
+   */
+  public boolean containsConfig(String corpusName)
+  {
+    if (corpusConfigs != null)
+    {
+      return corpusConfigs.containsKey(corpusName);
+    }
+
+    return false;
+  }
 }

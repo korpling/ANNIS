@@ -246,7 +246,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   public void corpusSelectionChanged()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSegmentationList(ui.getControlPanel().getCorpusList().getSelectedCorpora());
+      .updateSearchPanelConfiguration(ui.getControlPanel().getCorpusList().getSelectedCorpora());
     
   }
 
