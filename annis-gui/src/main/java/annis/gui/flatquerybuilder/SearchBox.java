@@ -107,18 +107,19 @@ public class SearchBox extends Panel implements Button.ClickListener,
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
-        boolean r = reBox.booleanValue();
+        boolean r = reBox.getValue();
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
         }
         else if(cb.getValue()!=null)
         {
-          String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-          escapedItem = cb.getValue().toString();
+          // String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          String escapedItem = cb.getValue().toString();
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
+        cb.setTextInputAllowed(r);
       }
     });
     reBox.setValue(isRegex);
@@ -248,12 +249,12 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public String getValue()
   {
-    return cb.toString();
+    return cb.getValue().toString();
   }
   
   public boolean isRegEx()
   {
-    return reBox.booleanValue();
+    return reBox.getValue();
   }
   
   public static String removeAccents(String text) {
@@ -264,11 +265,15 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public boolean isNegativeSearch()
   {
-    return negSearchBox.booleanValue();
+    return negSearchBox.getValue();
   }
   
   public void setValue(String value)
   {
+    if(reBox.getValue())
+    {
+      cb.addItem(value);
+    }
     cb.setValue(value);
   }
 }
