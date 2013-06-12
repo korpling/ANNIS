@@ -22,6 +22,9 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerRangeValidator;
@@ -39,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -82,14 +86,22 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private File tmpOutputFile;
 
   private ProgressIndicator progressIndicator;
+  private Label progressLabel;
 
   private FileDownloader downloader;
 
+  private EventBus eventBus;
+  
+  private Stopwatch exportTime = new Stopwatch();
+  
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
 
+    this.eventBus = new EventBus();
+    this.eventBus.register(this);
+    
     setWidth("99%");
     setHeight("-1px");
     addStyleName("contextsensible-formlayout");
@@ -163,10 +175,16 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       btDownload);
     addComponent(layoutExportButtons);
 
+    VerticalLayout vLayout = new VerticalLayout();
+    addComponent(vLayout);
+    
     progressIndicator = new ProgressIndicator();
     progressIndicator.setEnabled(false);
     progressIndicator.setIndeterminate(true);
-    addComponent(progressIndicator);
+    vLayout.addComponent(progressIndicator);
+    
+    progressLabel = new Label();
+    vLayout.addComponent(progressLabel);
   }
 
   @Override
@@ -211,7 +229,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             corpusListPanel.getSelectedCorpora(),
             null, (String) txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
-            outWriter);
+            outWriter, eventBus);
 
           outWriter.close();
 
@@ -229,6 +247,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           {
             btExport.setEnabled(true);
             progressIndicator.setEnabled(false);
+            progressLabel.setValue("");
 
             try
             {
@@ -278,10 +297,13 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       };
 
       progressIndicator.setEnabled(true);
+      progressLabel.setValue("");
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
       singleExecutor.submit(task);
-
+      exportTime.reset();
+      exportTime.start();
+      
     }
 
   }
@@ -331,6 +353,28 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       {
         cbExporter.setDescription("No help available for this exporter");
       }
+    }
+  }
+  
+  @Subscribe
+  public void handleExportProgress(Integer exports)
+  {
+    VaadinSession session = VaadinSession.getCurrent();
+    session.lock();
+    try
+    {
+      if(exportTime.isRunning())
+      {
+        progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
+      }
+      else
+      {
+        progressLabel.setValue("exported " + exports + " items");
+      }
+    }
+    finally
+    {
+      session.unlock();
     }
   }
 

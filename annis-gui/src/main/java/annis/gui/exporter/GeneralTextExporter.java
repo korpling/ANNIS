@@ -27,6 +27,8 @@ import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphFilter;
 import annis.service.objects.SubgraphQuery;
 import annis.utils.LegacyGraphConverter;
+import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -41,6 +43,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -53,7 +56,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, String keysAsString, String argsAsString,
-    WebResource annisResource, Writer out)
+    WebResource annisResource, Writer out, EventBus eventBus)
   {
     try
     {
@@ -118,7 +121,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         args.put(key, val);
       }
 
-      final int stepSize = 10;
+      int stepSize = 10;
       
       // 1. Get all the matches as Salt ID
       InputStream matchStream = annisResource.path("search/find/")
@@ -161,11 +164,24 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           subQuery.setFilter(getSubgraphFilter());
           // TODO: segmentation?
           
+          Stopwatch stopwatch = new Stopwatch();
+          stopwatch.start();
           SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
+          stopwatch.stop();
+          
+          // dynamically adjust the number of items to fetch single subgraph
+          // export was fast enough
+          if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500)
+          {
+            stepSize += 10;
+          }
+          
           convertText(LegacyGraphConverter.convertToResultSet(p), 
             keys, args, out, offset-saltURIs.getGroups().size());
           
           saltURIs.getGroups().clear();
+          
+          eventBus.post(new Integer(offset+1));
         }
         offset++;
       }

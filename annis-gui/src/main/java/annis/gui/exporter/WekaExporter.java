@@ -15,6 +15,7 @@
  */
 package annis.gui.exporter;
 
+import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -37,7 +38,7 @@ public class WekaExporter implements Exporter, Serializable
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, String keysAsString, String argsAsString,
-    WebResource annisResource, Writer out)
+    WebResource annisResource, Writer out, EventBus eventBus)
   {
     //this is a full result export
     
