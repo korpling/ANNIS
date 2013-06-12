@@ -171,7 +171,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           
           // dynamically adjust the number of items to fetch single subgraph
           // export was fast enough
-          if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500)
+          if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
           {
             stepSize += 10;
           }
