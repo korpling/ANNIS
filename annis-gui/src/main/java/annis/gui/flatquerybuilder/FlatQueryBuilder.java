@@ -251,6 +251,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private String unescape(String s)
 	{
+    //first unescape slashes:
+		
+		s = s.replace("\\x2F", "/");
+    
+    
+    //unescape regex characters:
 		int i=1;
 		while(i<s.length())
 		{
@@ -268,11 +274,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 					i++;
 				}
 			}			
-		}
-		//additionaly unescape slashes:
-		
-		return s.replace("\\2xF", "/");
-
+		}		
+    
+    return s;
 	}
 
   private String getAQLQuery()
@@ -733,8 +737,8 @@ public Set<String> getAvailableAnnotationNames()
       tq = "";
     }
     tq = tq.replace("\n", " ");
-    //2do: VALIDATE QUERY:
-    boolean valid = true;
+    //2do: VALIDATE QUERY: (NOT SUFFICIENT YET)
+    boolean valid = (tq!=null);
     if(!(query.equals(tq)) & valid)
     {
       //PROBLEM: LINE BREAKS
