@@ -74,6 +74,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
+import annis.service.objects.SubgraphFilter;
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -118,6 +119,8 @@ public class AnnisRunner extends AnnisBaseRunner
   private int right = 5;
 
   private String segmentationLayer = null;
+  
+  private SubgraphFilter filter = SubgraphFilter.All;
 
   private List<Long> corpusList;
 
@@ -900,6 +903,17 @@ public class AnnisRunner extends AnnisBaseRunner
         segmentationLayer = value;
       }
     }
+    else if("filter".equals(setting))
+    {
+      if(show)
+      {
+        value = filter.name();
+      }
+      else
+      {
+        filter = SubgraphFilter.valueOf(value);
+      }
+    }
     else
     {
       out.println("ERROR: unknown option: " + setting);
@@ -955,13 +969,13 @@ public class AnnisRunner extends AnnisBaseRunner
     if (queryFunction != null && queryFunction.matches("(sql_)?(annotate|find)"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
-        segmentationLayer));
+        segmentationLayer, filter));
       queryData.addExtension(new LimitOffsetQueryData(offset, limit));
     }
     else if (queryFunction != null && queryFunction.matches("(sql_)?subgraph"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
-        segmentationLayer));
+        segmentationLayer, filter));
     }
 
 
@@ -1033,7 +1047,7 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData = analyzeQuery(saltIds, "subgraph");
 
     out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
-      + limit + "; offset = " + offset);
+      + limit + "; offset = " + offset + "; filter = " + filter.name());
 
     SaltProject result = annisDao.graph(queryData);
 

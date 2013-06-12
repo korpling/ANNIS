@@ -12,6 +12,7 @@ import static annis.test.TestUtils.uniqueInt;
 import static java.util.Arrays.asList;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Matchers.anyInt;
 import static org.mockito.Matchers.eq;
@@ -31,6 +32,8 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.SubgraphFilter;
+import java.util.Set;
 import org.junit.Ignore;
 public class TestAnnotateSqlGenerator
 {
@@ -393,7 +396,19 @@ public class TestAnnotateSqlGenerator
     String expected = "solutions.n, " + idAlias + ", " + preAlias;
     assertThat(actual, is(expected));
   }
-
+  
+  @Test
+  public void shouldAddIsTokenOnFilter()
+  {
+    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.Token);
+    
+    String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
+    
+    String expected = isTokenAlias + " IS TRUE";
+    
+    Set<String> actualConditions = generator.whereConditions(queryData, alternative, "");
+    assertTrue("WHERE conditions must include \"" + expected + "\"", actualConditions.contains(expected));
+  }
   // set up a column alias of the form "table.column" 
   private String createColumnAlias(String table, String column)
   {

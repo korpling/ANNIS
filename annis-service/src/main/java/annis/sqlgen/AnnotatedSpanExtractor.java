@@ -20,10 +20,12 @@ import annis.model.Annotation;
 import java.io.UnsupportedEncodingException;
 import java.sql.Array;
 import java.sql.ResultSet;
+import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Validate;
@@ -99,10 +101,20 @@ public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
     String coveredText = resultSet.getString("span");
 
     Array arrayAnnotation = resultSet.getArray("annotations");
-    Array arrayMeta = resultSet.getArray("metadata");
-
+    ResultSetMetaData rsMeta = resultSet.getMetaData();
+    Array arrayMeta = null;
+    for(int i=1; i <= rsMeta.getColumnCount(); i++)
+    {
+      if("metadata".equals(rsMeta.getColumnName(i)))
+      {
+        arrayMeta = resultSet.getArray(i);
+        break;
+      }
+    }
+   
     List<Annotation> annotations = extractAnnotations(arrayAnnotation);
-    List<Annotation> metaData = extractAnnotations(arrayMeta);
+    List<Annotation> metaData = arrayMeta == null ? new LinkedList<Annotation>() 
+      : extractAnnotations(arrayMeta);
 
     // create key
     Array sqlKey = resultSet.getArray("key");

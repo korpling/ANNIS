@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.service.objects.SubgraphFilter;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -30,7 +31,8 @@ public class AnnotateQueryData
   private int left;
   private int right;
   private String segmentationLayer;
-
+  private SubgraphFilter filter;
+  
   public AnnotateQueryData(int left, int right)
   {
     this(left, right, null);
@@ -38,10 +40,16 @@ public class AnnotateQueryData
 
   public AnnotateQueryData(int left, int right, String segmentationLayer)
   {
+    this(left, right, segmentationLayer, SubgraphFilter.All);
+  }
+  
+  public AnnotateQueryData(int left, int right, String segmentationLayer, SubgraphFilter filter)
+  {
     super();
     this.left = left;
     this.right = right;
     this.segmentationLayer = segmentationLayer;
+    this.filter = filter;
   }
 
   public int getLeft()
@@ -59,7 +67,17 @@ public class AnnotateQueryData
     return segmentationLayer;
   }
 
+  public SubgraphFilter getFilter()
+  {
+    return filter;
+  }
 
+  public void setFilter(SubgraphFilter filter)
+  {
+    this.filter = filter;
+  }
+  
+  
 
   @Override
   public String toString()
@@ -77,6 +95,10 @@ public class AnnotateQueryData
     if(segmentationLayer != null)
     {
       fields.add("segLayer = " + segmentationLayer);
+    }
+    if(filter != null)
+    {
+      fields.add("filter = " + filter.name());
     }
     return StringUtils.join(fields, ", ");
   }
