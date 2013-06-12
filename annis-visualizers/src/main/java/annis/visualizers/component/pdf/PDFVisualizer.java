@@ -38,7 +38,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>
  * For the page annotation:
- * <code>page:&lt;annotation_name&gt;</code>
+ * <code>node_key:&lt;annotation_name&gt;</code>
  * </li>
  * <li> Setting a fixed height (recommended for the
  * {@link PDFFullVisualizer}):height:&lt;height in px&gt;</li>
