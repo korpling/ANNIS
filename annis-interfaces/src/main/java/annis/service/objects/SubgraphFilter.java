@@ -15,10 +15,13 @@
  */
 package annis.service.objects;
 
+import javax.xml.bind.annotation.XmlEnum;
+
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@XmlEnum(String.class)
 public enum SubgraphFilter
 {
   All,

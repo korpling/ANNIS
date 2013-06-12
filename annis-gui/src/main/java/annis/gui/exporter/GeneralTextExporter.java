@@ -22,20 +22,18 @@ import annis.model.AnnisNode;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.SubgraphFilter;
 import annis.service.objects.SubgraphQuery;
 import annis.utils.LegacyGraphConverter;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.Reader;
 import java.io.Serializable;
 import java.io.Writer;
 import java.net.URI;
@@ -47,7 +45,7 @@ import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
-public class GeneralTextExporter implements Exporter, Serializable
+public abstract class GeneralTextExporter implements Exporter, Serializable
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
@@ -160,6 +158,7 @@ public class GeneralTextExporter implements Exporter, Serializable
           subQuery.setLeft(contextLeft);
           subQuery.setRight(contextRight);
           subQuery.setMatches(saltURIs);
+          subQuery.setFilter(getSubgraphFilter());
           // TODO: segmentation?
           
           SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
@@ -177,6 +176,7 @@ public class GeneralTextExporter implements Exporter, Serializable
           subQuery.setLeft(contextLeft);
           subQuery.setRight(contextRight);
           subQuery.setMatches(saltURIs);
+          subQuery.setFilter(getSubgraphFilter());
           // TODO: segmentation?
           
         SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
@@ -253,6 +253,8 @@ public class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
     }
   }
+  
+  public abstract SubgraphFilter getSubgraphFilter();
 
   private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
   {
