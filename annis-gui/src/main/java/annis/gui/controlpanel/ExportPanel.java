@@ -206,8 +206,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
 
           exporter.convertText(queryPanel.getQuery(),
-            Integer.parseInt((String) cbLeftContext.getValue()),
-            Integer.parseInt((String) cbRightContext.getValue()),
+            (Integer) cbLeftContext.getValue(),
+            (Integer) cbRightContext.getValue(),
             corpusListPanel.getSelectedCorpora(),
             null, (String) txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
