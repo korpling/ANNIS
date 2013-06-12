@@ -181,7 +181,10 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           
           saltURIs.getGroups().clear();
           
-          eventBus.post(new Integer(offset+1));
+          if(eventBus != null)
+          {
+            eventBus.post(new Integer(offset+1));
+          }
         }
         offset++;
       }

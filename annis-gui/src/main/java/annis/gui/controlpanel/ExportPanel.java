@@ -90,7 +90,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private FileDownloader downloader;
 
-  private EventBus eventBus;
+  private transient EventBus eventBus;
   
   private Stopwatch exportTime = new Stopwatch();
   
