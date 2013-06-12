@@ -64,6 +64,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
   private String query;
+  private MenuBar.MenuItem spanMenu;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -412,6 +413,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             }
           });
         }
+        spanMenu = add;
         span.addComponent(addMenu);
       }
       if(event.getButton() == btInitMeta)
@@ -485,6 +487,7 @@ public void removeVerticalNode(VerticalNode v)
 public void removeSpanBox(SpanBox v)
   {
     span.removeComponent(v);
+    spanMenu.setText(ADD_SPAN_PARAM);
     updateQuery();
   }
 
