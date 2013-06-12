@@ -49,7 +49,7 @@ import org.slf4j.LoggerFactory;
 public class SearchOptionsPanel extends FormLayout
 {
 
-  public static final String KEY_DEFAULT_SEGMENTATION = "default-text-segmentation";
+  public static final String KEY_DEFAULT_SEGMENTATION = "default-context-segmentation";
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
 
@@ -237,7 +237,7 @@ public class SearchOptionsPanel extends FormLayout
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
 
-    if (segment.equalsIgnoreCase("tok"))
+    if ("tok".equalsIgnoreCase(segment))
     {
       cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
     }
