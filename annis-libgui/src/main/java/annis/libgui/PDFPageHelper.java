@@ -21,8 +21,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Layer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.Properties;
 import java.util.SortedMap;
