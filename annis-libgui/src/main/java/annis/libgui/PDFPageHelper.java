@@ -68,7 +68,7 @@ public class PDFPageHelper {
 
   /**
    * Returns a page annotation for a span, if the span is overlapped by a page
-   * annoation.
+   * annotation.
    */
   public String getPageAnnoForGridEvent(SSpan span) {
     int left = getLeftIndexFromSNode(span);
@@ -209,6 +209,17 @@ public class PDFPageHelper {
     return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
   }
 
+  /**
+   * Creates a String (eg. <b>3-9</b> or <b>3</b>), based on the most left and
+   * most right page annotation.
+   *
+   * <p>The page annotation is detected with
+   * {@link #getPageFromAnnotation(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan)}</p>
+   *
+   * @return A String which represents the start and the end page of a pdf,
+   * seperated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page, or
+   * exactly one page annotation, only a String with one number is returned.
+   */
   public String getMostLeftAndMostRightPageAnno() {
 
     if (sspans == null || sspans.isEmpty()) {
