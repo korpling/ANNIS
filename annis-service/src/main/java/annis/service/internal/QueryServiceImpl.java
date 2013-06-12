@@ -352,7 +352,7 @@ public class QueryServiceImpl implements QueryService
     QueryData data = new QueryData();
 
     data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer()));
+      query.getSegmentationLayer(), query.getFilter()));
 
     Set<String> corpusNames = new TreeSet<String>();
 
