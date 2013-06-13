@@ -92,7 +92,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private transient EventBus eventBus;
   
-  private Stopwatch exportTime = new Stopwatch();
+  private transient Stopwatch exportTime = new Stopwatch();
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
@@ -301,6 +301,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
       singleExecutor.submit(task);
+      if(exportTime == null)
+      {
+        exportTime = new Stopwatch();
+      }
       exportTime.reset();
       exportTime.start();
       
@@ -363,7 +367,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     session.lock();
     try
     {
-      if(exportTime.isRunning())
+      if(exportTime != null &&  exportTime.isRunning())
       {
         progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
       }
