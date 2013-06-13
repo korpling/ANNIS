@@ -18,7 +18,7 @@ package annis.visualizers.htmlvis;
 import annis.CommonHelper;
 import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_RELANNIS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -67,7 +67,7 @@ public class SpanHTMLOutputter
   {
     
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+      (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     
     long left = feat.getLeftToken();
     long right = feat.getRightToken();
@@ -97,7 +97,7 @@ public class SpanHTMLOutputter
   {
 
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+      (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     
     long index = feat.getTokenIndex();
     

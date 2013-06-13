@@ -110,7 +110,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         {
           
           RelannisNodeFeature feat = 
-            (RelannisNodeFeature) snode.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) snode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
           
           if (snode instanceof SToken)
           {
@@ -157,7 +157,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       if (selectNode(n))
       {
         RelannisNodeFeature feat = 
-          (RelannisNodeFeature) n.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          (RelannisNodeFeature) n.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         
         int tokenIdx = feat != null ? (int) feat.getTokenIndex() : -1;
         selectedNodes.put(n, tokenIdx);

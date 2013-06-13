@@ -22,7 +22,7 @@ import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RELANNIS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNO_REGEX_KEY;
@@ -96,7 +96,7 @@ public class EventExtractor {
       // calculate the left and right values of a span
       // TODO: howto get these numbers with Salt?
       RelannisNodeFeature feat = (RelannisNodeFeature) 
-        span.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
       
       long leftLong = feat.getLeftToken();
       long rightLong = feat.getRightToken();
@@ -425,9 +425,9 @@ public class EventExtractor {
           }
           
           RelannisNodeFeature feat1 = 
-            (RelannisNodeFeature) node1.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) node1.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
           RelannisNodeFeature feat2 = 
-            (RelannisNodeFeature) node2.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) node2.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
           long tokenIndex1 = feat1.getTokenIndex();
           long tokenIndex2 = feat2.getTokenIndex();
@@ -442,7 +442,7 @@ public class EventExtractor {
 
         SNode node = graph.getSNode(id);
         RelannisNodeFeature feat = 
-            (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         long tokenIndexRaw = feat.getTokenIndex();
 
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);

@@ -45,6 +45,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
@@ -144,11 +145,11 @@ public class LegacyGraphConverter
 
     for (SNode sNode : docGraph.getSNodes())
     {
-      SFeature featInternalID =
-        sNode.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      if (featInternalID != null)
+      SFeature featNodeRaw = sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+      if (featNodeRaw != null)
       {
-        long internalID = featInternalID.getSValueSNUMERIC();
+        RelannisNodeFeature featNode = (RelannisNodeFeature) featNodeRaw.getValue();
+        long internalID = featNode.getInternalID();
         AnnisNode aNode = new AnnisNode(internalID);
 
         for (SAnnotation sAnno : sNode.getSAnnotations())
@@ -160,7 +161,7 @@ public class LegacyGraphConverter
         aNode.setName(sNode.getSName());
         aNode.setNamespace(sNode.getSLayers().get(0).getSName());
 
-        RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         
         if (sNode instanceof SToken)
         {
@@ -207,12 +208,10 @@ public class LegacyGraphConverter
 
     for (SRelation rel : docGraph.getSRelations())
     {
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      SFeature featComponentID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
-
-      if (featPre != null)
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
+      if (featEdge != null)
       {
-        addEdge(rel, featPre.getSValueSNUMERIC(), featComponentID.getSValueSNUMERIC(),
+        addEdge(rel, featEdge.getPre(), featEdge.getComponentID(),
           allNodes, annoGraph);
       }
     }
@@ -220,9 +219,10 @@ public class LegacyGraphConverter
     // add edges with empty edge name for every dominance edge
     for(SDominanceRelation rel : docGraph.getSDominanceRelations())
     {
-      SFeature featComp = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT);
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE);
-      if(featComp != null && featPre != null)
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
+      if(featEdge != null 
+        && featEdge.getArtificialDominanceComponent() != null 
+        && featEdge.getArtificialDominancePre() != null)
       {
         SDominanceRelation newRel = SaltFactory.eINSTANCE.createSDominanceRelation();
         newRel.setSSource(rel.getSSource());
@@ -235,7 +235,9 @@ public class LegacyGraphConverter
         {
           newRel.addSAnnotation(anno);
         }
-        addEdge(newRel, featPre.getSValueSNUMERIC(), featComp.getSValueSNUMERIC(), allNodes, annoGraph);
+        
+        addEdge(newRel, featEdge.getArtificialDominancePre(), featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
+
       }
     }
 

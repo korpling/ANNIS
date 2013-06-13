@@ -6,6 +6,7 @@ package annis.sqlgen;
 
 import annis.model.RelannisNodeFeature;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisEdgeFeature;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -43,9 +44,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotat
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -205,8 +207,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       SDominanceRelation rel = itDomReal.next();
       
-      SFeature featCompID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
       
       boolean allNull = true;
       List<String> types = rel.getSTypes();
@@ -229,18 +230,18 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         {
           for (Edge mirror : mirrorEdges)
           {
-            if (mirror != rel && featCompID != null && featPre != null)
+            if (mirror != rel && featEdge != null )
             {
               SRelation mirrorRel = (SRelation) mirror;
               
-              if(mirrorRel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT) == null)
+              RelannisEdgeFeature mirrorFeat = RelannisEdgeFeature.extract(mirrorRel);
+              if(mirrorFeat != null && mirrorFeat.getArtificialDominanceComponent() == null)
               {
-                mirrorRel.createSFeature(
-                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
-                  featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
-                mirrorRel.createSFeature(
-                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
-                  featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+                mirrorFeat.setArtificialDominanceComponent(featEdge.getComponentID());
+                mirrorFeat.setArtificialDominancePre(featEdge.getPre());
+                // reset
+                mirrorRel.removeLabel(ANNIS_NS, FEAT_RELANNIS_EDGE);
+                mirrorRel.createSFeature(ANNIS_NS, FEAT_RELANNIS_EDGE, mirrorFeat, SDATATYPE.SOBJECT);
               }
             }
           }
@@ -253,7 +254,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     // actually remove the edges
     for(SDominanceRelation rel : edgesToRemove)
     {
-      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );;
+      // remove edge from layer (removing it from graph does not remove it from layer...)
+      EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
+      for(SLayer layer : layersOfRel)
+      {
+        layer.getSRelations().remove(rel);
+      }
+      
+      // remove edge from graph
+      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );
+      
     }
     
   }
@@ -314,7 +324,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       Map.Entry<Long, String> e = itToken.next();
       SToken tok = tokenByIndex.get(e.getKey());
       
-      RelannisNodeFeature feat = (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS).getSValue();
+      RelannisNodeFeature feat = (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getSValue();
       
       if(feat.getTextRef() == textID)
       {
@@ -389,7 +399,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList[matchedNode-1] = node.getSId();
+        keyNameList[matchedNode-1] = node.getSName();
       }
 
       graph.addNode(node);
@@ -477,9 +487,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     
     SFeature feat = SaltFactory.eINSTANCE.createSFeature();
     feat.setSNS(ANNIS_NS);
-    feat.setSName(FEAT_RELANNIS);
+    feat.setSName(FEAT_RELANNIS_NODE);
     
     RelannisNodeFeature val = new RelannisNodeFeature();
+    val.setInternalID(longValue(resultSet, "node", "id"));
     val.setCorpusRef(longValue(resultSet, "node", "corpus_ref"));
     val.setTextRef(longValue(resultSet, "node", "text_ref"));
     val.setLeft(longValue(resultSet, "node", "left"));
@@ -747,17 +758,15 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       rel.addSType(edgeName);
 
 
-      SFeature featInternalID = SaltFactory.eINSTANCE.createSFeature();
-      featInternalID.setSNS(ANNIS_NS);
-      featInternalID.setSName(FEAT_INTERNALID);
-      featInternalID.setSValue(Long.valueOf(pre));
-      rel.addSFeature(featInternalID);
+      RelannisEdgeFeature featEdge = new RelannisEdgeFeature();
+      featEdge.setPre(Long.valueOf(pre));
+      featEdge.setComponentID(Long.valueOf(componentID));
 
-      SFeature featComponentID = SaltFactory.eINSTANCE.createSFeature();
-      featComponentID.setSNS(ANNIS_NS);
-      featComponentID.setSName(FEAT_COMPONENTID);
-      featComponentID.setSValue(Long.valueOf(componentID));
-      rel.addSFeature(featComponentID);
+      SFeature sfeatEdge = SaltFactory.eINSTANCE.createSFeature();
+      sfeatEdge.setSNS(ANNIS_NS);
+      sfeatEdge.setSName(FEAT_RELANNIS_EDGE);
+      sfeatEdge.setValue(featEdge);
+      rel.addSFeature(sfeatEdge);
 
       rel.setSSource((SNode) nodeByPre.get(new RankID(componentID, parent)));
       if ("c".equals(type) && !(targetNode instanceof SToken))
@@ -863,6 +872,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     return rel;
   }
+  
   
   protected SolutionKey<?> createSolutionKey()
   {

@@ -15,6 +15,10 @@
  */
 package annis.model;
 
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;
 
 /**
@@ -23,6 +27,10 @@ import java.io.Serializable;
  */
 public class RelannisNodeFeature implements Serializable
 {
+  static final long serialVersionUID = 0L;
+  
+  private long internalID;
+  
   private long corpusRef;
 
   private long textRef;
@@ -40,7 +48,21 @@ public class RelannisNodeFeature implements Serializable
   private long segIndex;
 
   private String segName;
+  
+  private Long matchedNode;
 
+  public long getInternalID()
+  {
+    return internalID;
+  }
+
+  public void setInternalID(long internalID)
+  {
+    this.internalID = internalID;
+  }
+
+  
+  
   public long getCorpusRef()
   {
     return corpusRef;
@@ -130,5 +152,54 @@ public class RelannisNodeFeature implements Serializable
   {
     this.segName = segName;
   }
+
+  /**
+   * Returns the number of the query node if matched or null if otherwise.
+   * @return 
+   */
+  public Long getMatchedNode()
+  {
+    return matchedNode;
+  }
+
+  public void setMatchedNode(Long matchedNode)
+  {
+    this.matchedNode = matchedNode;
+  }
+  
+  
+
+  @Override
+  public String toString()
+  {
+    return "[" +
+      "internalID=" + internalID + "," +
+      "corpusRef=" + corpusRef + "," +
+      "textRef=" + textRef + "," +
+      "left=" + left +  "," +
+      "leftToken=" + leftToken + "," +
+      "right=" + right + "," +
+      "rightToken=" + rightToken + "," +
+      "tokenIndex=" + tokenIndex + "," +
+      "segIndex=" + segIndex + "," +
+      "segName=" + segName + ", " +
+      "matchedNode=" + (matchedNode == null ? "[none]" : matchedNode) +
+      "]"
+      ;
+    
+  }
+  
+  public static RelannisNodeFeature extract(SNode node)
+  {
+    RelannisNodeFeature featNode = null;
+    SFeature sfeatNode = node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+    if(sfeatNode != null)
+    {
+      featNode = (RelannisNodeFeature) sfeatNode.getValue();
+    }
+    return featNode;
+  }
+  
+  
   
 }

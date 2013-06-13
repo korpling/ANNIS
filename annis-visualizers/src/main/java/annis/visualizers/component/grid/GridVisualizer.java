@@ -144,11 +144,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         EList<SToken> token = graph.getSortedSTokenByText();
         
         RelannisNodeFeature featTokStart = 
-          (RelannisNodeFeature) token.get(0).getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          (RelannisNodeFeature) token.get(0).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         long startIndex = featTokStart.getTokenIndex();
         
         RelannisNodeFeature featTokEnd = 
-            (RelannisNodeFeature) token.get(token.size() - 1).getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) token.get(token.size() - 1).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
@@ -194,7 +194,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           if (tokenTextID != null && validTextIDs.contains(tokenTextID)) 
           {
             RelannisNodeFeature feat = 
-              (RelannisNodeFeature) t.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+              (RelannisNodeFeature) t.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
             long idx = feat.getTokenIndex() - startIndex;
 
             if (tokenOffsetForText < 0) {

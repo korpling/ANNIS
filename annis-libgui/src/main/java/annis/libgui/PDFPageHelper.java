@@ -181,7 +181,7 @@ public class PDFPageHelper {
   {
     
     RelannisNodeFeature feat = 
-      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     return (int) feat.getLeftToken();
   }
 
@@ -193,7 +193,7 @@ public class PDFPageHelper {
   {
     
     RelannisNodeFeature feat =
-      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
     return (int) feat.getRightToken();
   }
 

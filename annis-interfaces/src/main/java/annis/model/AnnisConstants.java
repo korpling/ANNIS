@@ -39,14 +39,14 @@ public class AnnisConstants
    */
   public static final String FEAT_MATCHEDNODE = "matchednode";
 
-  public static final String FEAT_RELANNIS = "relannis";
-
-  public static final String FEAT_INTERNALID = "internalid";
-
-  public static final String FEAT_COMPONENTID = "componentid";
-
-  public static final String FEAT_ARTIFICIAL_DOMINANCE_COMPONENT = "artificialdominancecomponent";
-
-  public static final String FEAT_ARTIFICIAL_DOMINANCE_PRE = "artificialdominancepre";
+  /**
+   * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.   * 
+   */
+  public static final String FEAT_RELANNIS_NODE = "relannis_node";
+  
+  /**
+   * A number of relANNIS specific edge values encoded as {@link RelannisEdgeFeature}.   * 
+   */
+  public static final String FEAT_RELANNIS_EDGE = "relannis_edge";
 
 }

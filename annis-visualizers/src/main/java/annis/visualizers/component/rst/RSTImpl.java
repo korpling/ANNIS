@@ -167,14 +167,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
           SToken tok = ((SToken) ((SRelation) e).getTarget());
           
           RelannisNodeFeature feat = 
-            (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+            (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
           
           return (int) feat.getLeftToken();
         }
       }
       
       RelannisNodeFeature feat = 
-        (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+        (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
      
       return (int) feat.getLeftToken();
     }

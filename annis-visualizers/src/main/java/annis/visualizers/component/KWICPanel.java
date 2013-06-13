@@ -262,7 +262,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
         Long tokenIndex = null;
         RelannisNodeFeature featRelannis = 
-          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS).getValue();
+          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).getValue();
         
         if(featRelannis != null)
         {
