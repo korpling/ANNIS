@@ -160,7 +160,7 @@ public class QueryServiceImpl implements QueryService
 
   @GET
   @Path("search/annotate")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml", "application/xmi+binary"})
   public SaltProject annotate(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,

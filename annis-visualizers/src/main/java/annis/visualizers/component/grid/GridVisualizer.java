@@ -25,6 +25,7 @@ import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.media.PDFController;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -141,10 +142,14 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                 SSpan.class);
 
         EList<SToken> token = graph.getSortedSTokenByText();
-        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                getSValueSNUMERIC();
-        long endIndex = token.get(token.size() - 1).getSFeature(ANNIS_NS,
-                FEAT_TOKENINDEX).getSValueSNUMERIC();
+        
+        RelannisNodeFeature featTokStart = 
+          (RelannisNodeFeature) token.get(0).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        long startIndex = featTokStart.getTokenIndex();
+        
+        RelannisNodeFeature featTokEnd = 
+            (RelannisNodeFeature) token.get(token.size() - 1).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
                 EventExtractor.parseSalt(input, annos, (int) startIndex,
@@ -186,10 +191,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           }
 
           // only add token if text ID matches the valid one
-          if (tokenTextID != null && validTextIDs.contains(tokenTextID)) {
-            long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                    getSValueSNUMERIC()
-                    - startIndex;
+          if (tokenTextID != null && validTextIDs.contains(tokenTextID)) 
+          {
+            RelannisNodeFeature feat = 
+              (RelannisNodeFeature) t.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            long idx = feat.getTokenIndex() - startIndex;
 
             if (tokenOffsetForText < 0) {
               // set the token offset by assuming the first idx must be zero

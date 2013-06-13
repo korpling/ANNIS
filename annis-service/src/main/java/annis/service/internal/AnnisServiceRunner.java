@@ -28,6 +28,7 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.DispatcherType;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
@@ -36,6 +37,7 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -197,6 +199,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
+      
       
       ServletContainer jerseyContainer = new ServletContainer(rc)
       {

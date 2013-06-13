@@ -21,6 +21,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.Properties;
 import java.util.SortedMap;
@@ -176,18 +177,24 @@ public class PDFPageHelper {
    * Get the most left token index of a SSpan.
    *
    */
-  public int getLeftIndexFromSNode(SSpan s) {
-    return (int) (long) s.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-            getSValueSNUMERIC();
+  public int getLeftIndexFromSNode(SSpan s) 
+  {
+    
+    RelannisNodeFeature feat = 
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+    return (int) feat.getLeftToken();
   }
 
   /**
    * Get the most right token index of a SSpan.
    *
    */
-  public int getRightIndexFromSNode(SSpan s) {
-    return (int) (long) s.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-            getSValueSNUMERIC();
+  public int getRightIndexFromSNode(SSpan s) 
+  {
+    
+    RelannisNodeFeature feat =
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+    return (int) feat.getRightToken();
   }
 
   /**
