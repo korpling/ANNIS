@@ -15,8 +15,18 @@
  */
 package annis.gui.flatquerybuilder;
 
+import com.vaadin.data.Item;
+import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.event.FieldEvents;
+import com.vaadin.event.FieldEvents.FocusListener;
+import com.vaadin.ui.AbstractSelect;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import java.util.HashMap;
 
 /**
  * @author martin
@@ -25,7 +35,7 @@ import com.vaadin.ui.Panel;
 public class EdgeBox extends Panel
 {
   private ComboBox edge;
-  private static final String[][] EDGE_OPERATORS = new String[][]
+  private static final String[][] BASIS_OPERATORS = new String[][]
   {
     {".",".2",".1,2",".*"},
     { ".\t[is directly preceding]",
@@ -33,36 +43,76 @@ public class EdgeBox extends Panel
       ".1,2\t[is directly preceding or with one token in between]",
       ".*\t[is indirectly preceding]"}
   };
+  /*BASIS_OPERATORS + userdefined Operators (with Description):*/
+  private static HashMap<String, String> EO;
+  private static final String UD_EO_DESCRIPTION = "\t(user defined)";
   private static final String WIDTH = "45px";
   
   public EdgeBox (FlatQueryBuilder sq)
   {
+    initEOs();
     edge = new ComboBox();
-    for(String o : EDGE_OPERATORS[1])
+    edge.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT);
+    for(String o : EO.keySet())
     {
       edge.addItem(o);
+      edge.setItemCaption(o, EO.get(o));
     }
     edge.setNewItemsAllowed(true);
     edge.setTextInputAllowed(true);
-    edge.setValue(EDGE_OPERATORS[1][0]);
+    edge.setValue(BASIS_OPERATORS[1][0]);
     edge.setWidth(WIDTH);
     edge.setNullSelectionAllowed(false);
+    edge.setImmediate(true);
+    edge.addFocusListener(new FieldEvents.FocusListener(){
+      @Override
+      public void focus(FieldEvents.FocusEvent e)
+      {
+        //this prevents the creation of an invalid entry
+        edge.select(null);
+      }
+    });
+    edge.addValueChangeListener(new ValueChangeListener(){
+      @Override
+      public void valueChange(ValueChangeEvent e)
+      {
+         String value = edge.getValue().toString();
+         if(!value.equals(""))
+         {
+          if(!EO.containsKey(value))
+          {          
+            String caption = value+UD_EO_DESCRIPTION;
+            EO.put(value, caption);            
+            edge.setItemCaption(value, caption);
+          }
+         }
+      }
+    });    
     setContent(edge);    
   }
   
+  private void initEOs()
+  {
+    EO = new HashMap<String, String>();
+    for(int i=0; i<BASIS_OPERATORS[0].length; i++)
+    {
+      EO.put(BASIS_OPERATORS[0][i], BASIS_OPERATORS[1][i]);
+    }
+  }
+      
   public String getValue()
   {
-    int i=0;
-    while((i<EDGE_OPERATORS[1].length)&&(!EDGE_OPERATORS[1][i]
-      .equals(edge.getValue().toString())))
-    {
-      i++;
-    }
-    return EDGE_OPERATORS[0][i];
+    return edge.getValue().toString();
   }
   
   public void setValue(String value)
   {
     edge.setValue(value);
+    if(!EO.containsKey(value))
+    {
+      String caption = value+UD_EO_DESCRIPTION;
+      EO.put(value, caption);
+      edge.setItemCaption(value, caption);
+    }
   }
 }
