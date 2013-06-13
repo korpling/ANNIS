@@ -21,6 +21,7 @@ import annis.gui.MetaDataPanel;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -241,10 +242,10 @@ public class SingleResultPanel extends VerticalLayout implements
           {
             int color = Math.max(0, Math.min((int) match.longValue() - 1,
               MatchedNodeColors.values().length - 1));
-            SFeature feat = n.getSFeature(ANNIS_NS, FEAT_INTERNALID);
+            RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
             if (feat != null)
             {
-              markedExactMap.put("" + feat.getSValueSNUMERIC(),
+              markedExactMap.put("" + feat.getInternalID(),
                 MatchedNodeColors.values()[color].name());
             }
           }
@@ -264,11 +265,11 @@ public class SingleResultPanel extends VerticalLayout implements
           longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS,
-          FEAT_INTERNALID);
+        RelannisNodeFeature feat = RelannisNodeFeature.extract(markedEntry.getKey());
+        
         if (feat != null)
         {
-          markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
+          markedCoveredMap.put("" + feat.getInternalID(),
             MatchedNodeColors.values()[color].name());
         }
       } // end for each entry in markedAndCoverd
@@ -314,18 +315,18 @@ public class SingleResultPanel extends VerticalLayout implements
 
       for (SNode segNode : segNodes)
       {
+        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        
         if (segNode != null && !covered.containsKey(segNode))
         {
-          long leftTok =
-            segNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).getSValueSNUMERIC();
-          long rightTok =
-            segNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).getSValueSNUMERIC();
+          long leftTok = featSegNode.getLeftToken();
+          long rightTok = featSegNode.getRightToken();
 
           // check for each covered token if this segment is covering it
           for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
           {
-            long entryTokenIndex = e.getKey().getSFeature(ANNIS_NS,
-              FEAT_TOKENINDEX).getSValueSNUMERIC();
+            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            long entryTokenIndex = featTok.getTokenIndex();
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
@@ -391,14 +392,13 @@ public class SingleResultPanel extends VerticalLayout implements
         @Override
         public int compare(SNode o1, SNode o2)
         {
-          long leftTokIdxO1 = o1.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-            getSValueSNUMERIC();
-          long rightTokIdxO1 = o1.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-            getSValueSNUMERIC();
-          long leftTokIdxO2 = o2.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-            getSValueSNUMERIC();
-          long rightTokIdxO2 = o2.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-            getSValueSNUMERIC();
+          RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          
+          long leftTokIdxO1 = feat1.getLeftToken();
+          long rightTokIdxO1 = feat1.getRightToken();
+          long leftTokIdxO2 = feat2.getLeftToken();
+          long rightTokIdxO2 = feat2.getRightToken();
 
           int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
           int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);

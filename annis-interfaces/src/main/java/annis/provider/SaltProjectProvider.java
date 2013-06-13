@@ -20,11 +20,16 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonPackag
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -91,6 +96,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 
     
     Resource resource;
+    Map<Object,Object> options = new HashMap<Object, Object>();
     if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
     {
       resource = new BinaryResourceImpl();
@@ -98,6 +104,13 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     else
     {
       resource = new XMIResourceImpl();
+      options.putAll(((XMIResourceImpl) resource).getDefaultSaveOptions());
+      
+      options.put(XMIResource.OPTION_ENCODING, "UTF-8");
+      options.put(XMIResource.OPTION_CONFIGURATION_CACHE, Boolean.TRUE);
+      options.put(XMIResource.OPTION_USE_CACHED_LOOKUP_TABLE, new ArrayList());
+      options.put(XMIResource.OPTION_FORMATTED, Boolean.TRUE);
+      options.put(XMIResource.OPTION_PROCESS_DANGLING_HREF, "DISCARD");
     }
     
     // add the project itself
@@ -115,15 +128,17 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       }
     }
     
+    long startTime = System.currentTimeMillis();
     try
     {
-      resource.save(entityStream, null);
+      resource.save(new BufferedOutputStream(entityStream, 512*1024), options); 
     }
     catch(Exception ex)
     {
       log.error("exception when serializing SaltProject", ex);
     }
-    entityStream.close();
+    long endTime = System.currentTimeMillis();
+    log.info("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
   }
 
   @Override
@@ -146,6 +161,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
   {
    
     Resource resource;
+    long startTime = System.currentTimeMillis();
     if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
     {
       resource = loadBinary(entityStream);
@@ -154,6 +170,8 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     {
       resource = loadXMI(entityStream);
     }
+    long endTime = System.currentTimeMillis();
+    log.info("Loading XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
     
     SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
     
@@ -206,7 +224,9 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     Map<Object,Object> options = resource.getDefaultLoadOptions();
     options.put(XMIResource.OPTION_USE_PARSER_POOL, xmlParserPool);
     options.put(XMIResource.OPTION_DEFER_IDREF_RESOLUTION, Boolean.TRUE);
-
+    options.put(XMIResource.OPTION_DISABLE_NOTIFY, Boolean.FALSE);
+    options.put(XMIResource.OPTION_USE_DEPRECATED_METHODS, Boolean.FALSE);
+    
     resource.load(entityStream, options);
     
     return resource;
