@@ -116,19 +116,19 @@
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCommon</artifactId>
-                  <version>1.1.7-SNAPSHOT</version>
+                  <version>1.1.6</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-graph</artifactId>
-                  <version>1.1.7-SNAPSHOT</version>
+                  <version>1.1.6</version>
                   <type>bundle</type>
                 </artifactItem>
                 <artifactItem>
                   <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
                   <artifactId>salt-saltCore</artifactId>
-                  <version>1.1.7-SNAPSHOT</version>
+                  <version>1.1.6</version>
                   <type>bundle</type>
                 </artifactItem>
               </artifactItems>
