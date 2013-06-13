@@ -16,6 +16,7 @@
 package annis.visualizers.component.pdf;
 
 import annis.libgui.PDFPageHelper;
+import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFViewer;
@@ -38,7 +39,7 @@ import org.slf4j.LoggerFactory;
  * <ul>
  * <li>
  * For the page annotation:
- * <code>page:&lt;annotation_name&gt;</code>
+ * <code>node_key:&lt;annotation_name&gt;</code>
  * </li>
  * <li> Setting a fixed height (recommended for the
  * {@link PDFFullVisualizer}):height:&lt;height in px&gt;</li>
@@ -84,7 +85,7 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
     return (Panel) pdfViewer;
   }
 
-  private class PDFViewerImpl extends Panel implements PDFViewer, AttachListener {
+  private class PDFViewerImpl extends Panel implements PDFViewer {
 
     VisualizerInput input;
 
@@ -92,18 +93,19 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
 
     PDFPanel pdfPanel;
 
-    String page;
-
     public PDFViewerImpl(VisualizerInput input, VisualizationToggle visToggle) {
       this.visToggle = visToggle;
       this.input = input;
-      addAttachListener(this);
     }
 
     @Override
     public void openPDFPage(String page) {
 
-      this.page = page;
+      if (PAGE_NO_VALID_NUMBER.equals(page)) {
+        page = new PDFPageHelper(input).getMostLeftAndMostRightPageAnno();
+      }
+
+      page = (page == null) ? PAGE_NO_VALID_NUMBER : page;
 
       initPDFPanel(page);
 
@@ -113,22 +115,8 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
         visToggle.toggleVisualizer(true, null);
       }
 
-      Notification.show("opening page " + page);
-    }
-
-    public void openPDFViewer() {
-
-      page = new PDFPageHelper(input).getMostLeftAndMostRightPageAnno();
-
-      if (page == null) {
-        // opens the whole document
-        initPDFPanel("-1");
-        Notification.show("opening pdf");
-      } else {
-        initPDFPanel(page);
-        Notification.show("opening pdf pages " + page);
-      }
-
+      Notification.show(
+              PAGE_NO_VALID_NUMBER.equals(page) ? "opening full pdf" : "opening page " + page);
     }
 
     private void initPDFPanel(String page) {
@@ -140,13 +128,6 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
       pdfPanel = new PDFPanel(this.input, page);
       this.setContent(pdfPanel);
       this.setHeight(input.getMappings().getProperty("height", "-1") + "px");
-    }
-
-    @Override
-    public void attach(AttachEvent event) {
-      if (page == null && ((Panel) this).isVisible()) {
-        openPDFViewer();
-      }
     }
   }
 }

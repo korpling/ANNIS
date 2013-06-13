@@ -19,6 +19,7 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.SubgraphFilter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.LinkedList;
@@ -67,4 +68,12 @@ public class TextExporter extends GeneralTextExporter
       out.append("\n");
     }
   }
+
+  @Override
+  public SubgraphFilter getSubgraphFilter()
+  {
+    return SubgraphFilter.Token;
+  }
+  
+  
 }

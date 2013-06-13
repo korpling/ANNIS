@@ -241,24 +241,19 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-ehcache</artifactId>
-      <version>1.2.1</version>
+      <version>1.2.2</version>
     </dependency>
-<!--    <dependency>
-      <groupId>org.apache.shiro</groupId>
-      <artifactId></artifactId>
-      <version>1.2.1</version>
-    </dependency>
--->
+
     <dependency>
       <groupId>ch.qos.logback</groupId>
       <artifactId>logback-classic</artifactId>

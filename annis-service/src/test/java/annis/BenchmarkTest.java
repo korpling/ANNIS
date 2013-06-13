@@ -42,6 +42,7 @@ import static org.junit.Assume.assumeTrue;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.junit.rules.TestRule;
 import org.junit.runner.RunWith;
 import org.springframework.dao.DataAccessException;
@@ -65,6 +66,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
 @BenchmarkHistoryChart(labelWith = LabelType.RUN_ID, maxRuns = 20)
 @AxisRange(min = 0.0)
+@Ignore
 public class BenchmarkTest
 {
 
@@ -75,15 +77,15 @@ public class BenchmarkTest
   AnnisDao annisDao;
 
   private List<Long> pcc2CorpusID;
-  
+
   private List<Long> ridgesCorpusID;
 
   private final SaltProjectProvider provider = new SaltProjectProvider();
-  
+
   private final OutputStream nullStream = ByteStreams.nullOutputStream();
   private final MediaType typeXMI = new MediaType("application", "xmi+xml");
   private final MediaType typeBinary = new MediaType("application", "xmi+binary");
-  
+
   @Before
   public void setup()
   {
@@ -101,14 +103,14 @@ public class BenchmarkTest
     {
       assumeNoException(ex);
     }
-    
-    // get the id of the "pcc2" corpus 
+
+    // get the id of the "pcc2" corpus
     pcc2CorpusID = getCorpusIDs("pcc2");
 
-    // get the id of the "Ridges_Herbology_Version_2.0" corpus 
+    // get the id of the "Ridges_Herbology_Version_2.0" corpus
     ridgesCorpusID = getCorpusIDs("Ridges_Herbology_Version_2.0");
-    
-    
+
+
   }
 
   private List<Long> getCorpusIDs(String corpus)
@@ -119,7 +121,7 @@ public class BenchmarkTest
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
     return corpusIDs;
   }
-  
+
   @Test
   public void mapSalt_Pcc4282()
   {
@@ -127,10 +129,10 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
-    
+
     assertEquals(1, p.getSCorpusGraphs().size());
   }
-  
+
   @Test
   public void mapSaltAndSaveXMI_Pcc4282() throws IOException
   {
@@ -138,11 +140,11 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
-    provider.writeTo(p, SaltProject.class, null, null, 
+    provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, new StringKeyIgnoreCaseMultivaluedMap<Object>(),
       nullStream);
   }
-  
+
   @Test
   public void mapSaltAndSaveBinary_Pcc4282() throws IOException
   {
@@ -150,7 +152,7 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
-    provider.writeTo(p, SaltProject.class, null, null, 
+    provider.writeTo(p, SaltProject.class, null, null,
       typeBinary, null,
       nullStream);
   }
@@ -162,10 +164,10 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21");
-    
+
     assertEquals(1, p.getSCorpusGraphs().size());
   }
-  
+
   @Test
   public void mapSaltAndSaveXMI_SonderbaresKraeuterBuch() throws IOException
   {
@@ -173,11 +175,11 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21");
-    provider.writeTo(p, SaltProject.class, null, null, 
+    provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, null,
       nullStream);
   }
-  
+
   @Test
   public void mapSaltAndSaveBinary_SonderbaresKraeuterBuch() throws IOException
   {
@@ -185,7 +187,7 @@ public class BenchmarkTest
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
         "sonderbares.kraeuterbuch.16175.11-21");
-    provider.writeTo(p, SaltProject.class, null, null, 
+    provider.writeTo(p, SaltProject.class, null, null,
       new MediaType("application", "xmi+binary"), null,
       nullStream);
   }

@@ -40,6 +40,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHand
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +49,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.slf4j.LoggerFactory;
@@ -61,27 +63,41 @@ public class SingleResultPanel extends VerticalLayout implements
 {
 
   private static final String HIDE_KWIC = "hide_kwic";
+
   private static final String INITIAL_OPEN = "initial_open";
+
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
+
   private transient SDocument result;
+
   private transient Map<SNode, Long> markedAndCovered;
+
   private Map<String, String> markedCoveredMap;
+
   private Map<String, String> markedExactMap;
+
   private transient PluginSystem ps;
+
   private List<VisualizerPanel> visualizers;
+
   private Button btInfo;
+
   private List<String> path;
+
   private String segmentationName;
+
   private transient List<SToken> token;
+
   private HorizontalLayout infoBar;
-  
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName, InstanceConfig instanceConfig)
+    Set<String> visibleTokenAnnos, String segmentationName,
+    InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;
@@ -117,7 +133,7 @@ public class SingleResultPanel extends VerticalLayout implements
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
-  
+
     // THIS WAS in attach()
     addComponent(infoBar);
 
@@ -127,25 +143,26 @@ public class SingleResultPanel extends VerticalLayout implements
         resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-            
+
       token = result.getSDocumentGraph().getSortedSTokenByText();
 
-      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
+        segmentationName,
         result.getSDocumentGraph());
-      
+
       markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       calulcateColorsForMarkedAndCoverd();
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
-      
+
       for (int i = 0; i < entries.length; i++)
       {
-        String htmlID = "resolver-" + resultNumber + "_" +  i;
+        String htmlID = "resolver-" + resultNumber + "_" + i;
 
         VisualizerPanel p = new VisualizerPanel(
           entries[i], result,
           token, visibleTokenAnnos, markedAndCovered,
-          markedCoveredMap, markedExactMap, 
+          markedCoveredMap, markedExactMap,
           htmlID, resultID, this,
           segmentationName, ps, instanceConfig);
 
@@ -157,7 +174,7 @@ public class SingleResultPanel extends VerticalLayout implements
         }
 
       } // for each resolver entry
-      
+
       for (VisualizerPanel p : visualizers)
       {
         addComponent(p);
@@ -167,7 +184,7 @@ public class SingleResultPanel extends VerticalLayout implements
       {
         p.toggleVisualizer(true, null);
       }
-      
+
     }
     catch (RuntimeException ex)
     {
@@ -183,10 +200,11 @@ public class SingleResultPanel extends VerticalLayout implements
   {
     this.segmentationName = segmentationName;
 
-    if(result != null)
+    if (result != null)
     {
-      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(segmentationName, 
-          result.getSDocumentGraph());
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
+        segmentationName,
+        result.getSDocumentGraph());
       markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       for (VisualizerPanel p : visualizers)
       {
@@ -197,10 +215,10 @@ public class SingleResultPanel extends VerticalLayout implements
 
   public void setVisibleTokenAnnosVisible(Set<String> annos)
   {
-     for (VisualizerPanel p : visualizers)
-     {
-       p.setVisibleTokenAnnosVisible(annos);
-     }
+    for (VisualizerPanel p : visualizers)
+    {
+      p.setVisibleTokenAnnosVisible(annos);
+    }
   }
 
   private void calculateHelperVariables()
@@ -208,7 +226,7 @@ public class SingleResultPanel extends VerticalLayout implements
     markedExactMap = new HashMap<String, String>();
     markedCoveredMap = new HashMap<String, String>();
 
-    if(result != null)
+    if (result != null)
     {
       SDocumentGraph g = result.getSDocumentGraph();
       if (g != null)
@@ -239,14 +257,16 @@ public class SingleResultPanel extends VerticalLayout implements
 
   private void calulcateColorsForMarkedAndCoverd()
   {
-    if(markedAndCovered != null)
+    if (markedAndCovered != null)
     {
       for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
       {
-        int color = Math.max(0, Math.min((int) markedEntry.getValue().longValue()
+        int color = Math.max(0, Math.min((int) markedEntry.getValue().
+          longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS, FEAT_INTERNALID);
+        SFeature feat = markedEntry.getKey().getSFeature(ANNIS_NS,
+          FEAT_INTERNALID);
         if (feat != null)
         {
           markedCoveredMap.put("" + feat.getSValueSNUMERIC(),
@@ -275,7 +295,8 @@ public class SingleResultPanel extends VerticalLayout implements
     }
 
     // calculate covered nodes
-    SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(doc.
+    SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(
+      doc.
       getSDocumentGraph(), initialCovered);
     Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
@@ -338,10 +359,26 @@ public class SingleResultPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Marks all nodes which are dominated by already marked nodes.
+   *
+   * 1. Sort ascending all initial marked nodes by the size of the intervall
+   * between left and right token index.
+   *
+   * 2. Traverse the salt document graph with the sorted list of step 1. as root
+   * nodes and mark all children with the same match position. Already marked
+   * nodes are omitted.
+   *
+   * Note: The algorithm prevents nested marked nodes to be overwritten. Nested
+   * nodes must have a smaller intervall from left to right by default, so this
+   * should always work.
+   *
+   */
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
 
     private Map<SNode, Long> matchedAndCovered;
+
     private long currentMatchPos;
 
     public CoveredMatchesCalculator(SDocumentGraph graph,
@@ -349,10 +386,36 @@ public class SingleResultPanel extends VerticalLayout implements
     {
       this.matchedAndCovered = initialMatches;
 
+      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<SNode, Long>(
+        new Comparator<SNode>()
+      {
+        @Override
+        public int compare(SNode o1, SNode o2)
+        {
+          RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(ANNIS_NS, FEAT_RELANNIS).getValue();
+          
+          long leftTokIdxO1 = feat1.getLeftToken();
+          long rightTokIdxO1 = feat1.getRightToken();
+          long leftTokIdxO2 = feat2.getLeftToken();
+          long rightTokIdxO2 = feat2.getRightToken();
+
+          int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
+          int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
+          return intervallO1 - intervallO2;
+        }
+      });
+
+      for (SNode n : initialMatches.keySet())
+      {
+        sortedByOverlappedTokenIntervall.put(n, initialMatches.get(n));
+      }
+
       currentMatchPos = 1;
       if (initialMatches.size() > 0)
       {
-        graph.traverse(new BasicEList<SNode>(initialMatches.keySet()),
+        graph.traverse(new BasicEList<SNode>(sortedByOverlappedTokenIntervall.
+          keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
           (SGraphTraverseHandler) this, true);
       }
@@ -398,5 +461,4 @@ public class SingleResultPanel extends VerticalLayout implements
       return matchedAndCovered;
     }
   }
-
 }

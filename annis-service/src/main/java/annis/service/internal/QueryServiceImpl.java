@@ -32,6 +32,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
 import annis.sqlgen.AnnotateQueryData;
@@ -52,7 +53,7 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
@@ -90,7 +91,8 @@ import org.springframework.stereotype.Component;
 public class QueryServiceImpl implements QueryService
 {
 
-  private final static Logger log = LoggerFactory.getLogger(QueryServiceImpl.class);
+  private final static Logger log = LoggerFactory.getLogger(
+    QueryServiceImpl.class);
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
@@ -98,13 +100,18 @@ public class QueryServiceImpl implements QueryService
 
   private WekaHelper wekaHelper;
 
-  private int maxContext = 10;
-
   private int port = 5711;
-  
-  @Context private UriInfo uriInfo;
-  @Context private HttpServletRequest request;
-  @Context private ResourceConfig rc; 
+
+  private CorpusConfig defaultCorpusConfig;
+
+  @Context
+  private UriInfo uriInfo;
+
+  @Context
+  private HttpServletRequest request;
+
+  @Context
+  private ResourceConfig rc;
 
   /**
    * Log the successful initialization of this bean.
@@ -175,8 +182,8 @@ public class QueryServiceImpl implements QueryService
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-    int left = Math.min(maxContext, Integer.parseInt(leftRaw));
-    int right = Math.min(maxContext, Integer.parseInt(rightRaw));
+    int left = Math.min(getContextLeft(), Integer.parseInt(leftRaw));
+    int right = Math.min(getContextRight(), Integer.parseInt(rightRaw));
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     String logParameters = createAnnotateLogParameters(left, right, offset,
@@ -192,7 +199,7 @@ public class QueryServiceImpl implements QueryService
     return p;
 
   }
-  
+
   @GET
   @Path("search/find")
   @Produces("text/plain")
@@ -219,7 +226,7 @@ public class QueryServiceImpl implements QueryService
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
 
-    return new StreamingOutput() 
+    return new StreamingOutput()
     {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException
@@ -231,7 +238,7 @@ public class QueryServiceImpl implements QueryService
           end - start);
       }
     };
-    
+
   }
 
   @GET
@@ -294,14 +301,19 @@ public class QueryServiceImpl implements QueryService
     final QueryData data = queryDataFromParameters(query, rawCorpusNames);
 
     MatrixQueryData ext = new MatrixQueryData();
-    if (rawMetaKeys != null)
+    if(rawMetaKeys != null)
     {
       ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
     }
+    if(ext.getMetaKeys() != null && ext.getMetaKeys().isEmpty())
+    {
+      ext.setMetaKeys(null);
+    }
+    
     data.addExtension(ext);
 
-    StreamingOutput result = new StreamingOutput() {
-
+    StreamingOutput result = new StreamingOutput()
+    {
       @Override
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
@@ -312,7 +324,7 @@ public class QueryServiceImpl implements QueryService
           end - start);
       }
     };
-    
+
     return result;
   }
 
@@ -345,7 +357,7 @@ public class QueryServiceImpl implements QueryService
     QueryData data = new QueryData();
 
     data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer()));
+      query.getSegmentationLayer(), query.getFilter()));
 
     Set<String> corpusNames = new TreeSet<String>();
 
@@ -447,18 +459,48 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
+  @Path("corpora/config")
+  @Produces("application/xml")
+  public CorpusConfigMap corpusConfigs()
+  {
+    CorpusConfigMap corpusConfigs = annisDao.getCorpusConfigurations();
+    CorpusConfigMap result = new CorpusConfigMap();
+    Subject user = SecurityUtils.getSubject();
+
+    if (corpusConfigs != null)
+    {
+      for (String c : corpusConfigs.getCorpusConfigs().keySet())
+      {
+        if (user.isPermitted("query:*:" + c))
+        {
+          result.put(c, corpusConfigs.get(c));
+        }
+      }
+    }
+
+    return result;
+  }
+
+  @GET
+  @Path("corpora/default-config")
+  @Produces("application/xml")
+  public CorpusConfig corpusDefaultConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")
-  public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
+  public CorpusConfig corpusConfig(@PathParam("top") String toplevelName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:config:" + toplevelName);
+    Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
+    CorpusConfig corpusConfig = new CorpusConfig();
+    corpusConfig.setConfig(tmp);
 
-
-    Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
-    CorpusConfig result = new CorpusConfig();
-    result.setConfig(tmp);
-    return result;
+    return corpusConfig;
   }
 
   @GET
@@ -567,7 +609,7 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:meta:" + toplevelCorpusName);
     return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
   }
-  
+
   @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   public Response binary1(
@@ -578,6 +620,7 @@ public class QueryServiceImpl implements QueryService
   {
     return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, null);
   }
+
   @GET
   @Path("corpora/{top}/{document}/binary")
   public Response binary2(
@@ -586,6 +629,7 @@ public class QueryServiceImpl implements QueryService
   {
     return binary(toplevelCorpusName, corpusName, null, null, null);
   }
+
   @GET
   @Path("corpora/{top}/{document}/binary/{file}/{offset}/{length}")
   public Response binary3(
@@ -597,6 +641,7 @@ public class QueryServiceImpl implements QueryService
   {
     return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, file);
   }
+
   @GET
   @Path("corpora/{top}/{document}/binary/{file}")
   public Response binary4(
@@ -627,20 +672,21 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
     String acceptHeader = request.getHeader("Accept");
-    if(acceptHeader == null || acceptHeader.isEmpty())
+    if (acceptHeader == null || acceptHeader.isEmpty())
     {
       acceptHeader = "*/*";
     }
-    
-    List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName, corpusName);
+
+    List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
+      corpusName);
     HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<String, AnnisBinaryMetaData>();
-    
-    for(AnnisBinaryMetaData m : meta)
+
+    for (AnnisBinaryMetaData m : meta)
     {
-      if(fileName == null)
+      if (fileName == null)
       {
         // just add all available media types
-        if(!matchedMetaByType.containsKey(m.getMimeType()))
+        if (!matchedMetaByType.containsKey(m.getMimeType()))
         {
           matchedMetaByType.put(m.getMimeType(), m);
         }
@@ -648,14 +694,14 @@ public class QueryServiceImpl implements QueryService
       else
       {
         // check if this binary has the right title/file name
-        if(fileName.equals(m.getFileName()))
+        if (fileName.equals(m.getFileName()))
         {
           matchedMetaByType.put(m.getMimeType(), m);
         }
       }
     }
-    
-    if(matchedMetaByType.isEmpty())
+
+    if (matchedMetaByType.isEmpty())
     {
       return Response.status(Response.Status.NOT_FOUND)
         .entity("Requested binary not found")
@@ -665,10 +711,10 @@ public class QueryServiceImpl implements QueryService
     // find the best matching mime type
     String bestMediaTypeMatch =
       MIMEParse.bestMatch(matchedMetaByType.keySet(), acceptHeader);
-    if(bestMediaTypeMatch.isEmpty())
+    if (bestMediaTypeMatch.isEmpty())
     {
       return Response.status(Response.Status.NOT_ACCEPTABLE)
-        .entity("Client must accept one of the following media types: " 
+        .entity("Client must accept one of the following media types: "
         + StringUtils.join(matchedMetaByType.keySet(), ", "))
         .build();
     }
@@ -676,12 +722,13 @@ public class QueryServiceImpl implements QueryService
 
     int offset = 0;
     int length = 0;
-    
-    if(rawLength == null || rawOffset == null)
+
+    if (rawLength == null || rawOffset == null)
     {
       // use matched binary meta data to get the complete file size
-      AnnisBinaryMetaData matchedBinary = matchedMetaByType.get(mediaType.toString());
-      if(matchedBinary != null)
+      AnnisBinaryMetaData matchedBinary = matchedMetaByType.get(mediaType.
+        toString());
+      if (matchedBinary != null)
       {
         length = matchedBinary.getLength();
       }
@@ -692,10 +739,10 @@ public class QueryServiceImpl implements QueryService
       offset = Integer.parseInt(rawOffset);
       length = Integer.parseInt(rawLength);
     }
-    
+
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " " 
+      + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " "
       + mediaType.toString());
 
     final InputStream stream = annisDao.
@@ -719,7 +766,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
     };
-    
+
     return Response.ok(result, mediaType).build();
   }
 
@@ -776,6 +823,7 @@ public class QueryServiceImpl implements QueryService
 
   /**
    * Get the Metadata of an Annis Binary object identified by its id.
+   *
    * @param id
    * @return AnnisBinaryMetaData
    */
@@ -953,14 +1001,48 @@ public class QueryServiceImpl implements QueryService
     this.annisDao = annisDao;
   }
 
-  public int getMaxContext()
+  /**
+   * Retrieves the max right context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextRight()
   {
-    return maxContext;
+    return getCorpusConfigIntValues("max-context-right");
   }
 
-  public void setMaxContext(int maxContext)
+  /**
+   * Retrieves the max left context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextLeft()
   {
-    this.maxContext = maxContext;
+    return getCorpusConfigIntValues("max-context-left");
+  }
+
+  /**
+   * Extract corpus configurations values with numeric values.
+   *
+   * @param context Must be a valid key of the corpus configuration section in
+   * the annis-service.properties file.
+   * @return Parses the String representation of the value to int and returns
+   * it.
+   *
+   */
+  private int getCorpusConfigIntValues(String context)
+  {
+    int value = Integer.parseInt(defaultCorpusConfig.getConfig().getProperty(
+      context));
+
+    if (value < 0)
+    {
+      throw new IllegalStateException("the value must be > 0");
+    }
+
+    return value;
   }
 
   public WekaHelper getWekaHelper()
@@ -981,5 +1063,22 @@ public class QueryServiceImpl implements QueryService
   public void setPort(int port)
   {
     this.port = port;
+  }
+
+  /**
+   * @return the defaultCorpusConfig
+   */
+  public CorpusConfig getDefaultCorpusConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  /**
+   * @param defaultCorpusConfig the defaultCorpusConfig to set
+   */
+  public void setDefaultCorpusConfig(
+    CorpusConfig defaultCorpusConfig)
+  {
+    this.defaultCorpusConfig = defaultCorpusConfig;
   }
 }

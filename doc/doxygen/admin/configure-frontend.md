@@ -88,7 +88,7 @@ corpus sets for the whole instance. Each corpus set is an JSON-object with a
 name and a list of corpora that belong to the corpus set.
 
 Any defined instance is assigned a special URL at which it can be accessed:
-`http://<server>/annis-gui/app/instance-<name>`. The default instance is
+`http://<server>/annis-gui/<instance-name>`. The default instance is
 additionally accessible by not specifying any instance name in the URL. You can
 configure your web server (e.g. Apache) to rewrite the URLs if you need a more
 project specific and less "technical" URL (e.g. `http://<server>/falko`).

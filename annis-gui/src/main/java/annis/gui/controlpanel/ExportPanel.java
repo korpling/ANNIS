@@ -22,16 +22,18 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
@@ -40,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -48,8 +51,9 @@ import org.slf4j.LoggerFactory;
  */
 public class ExportPanel extends FormLayout implements Button.ClickListener
 {
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ExportPanel.class);
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    ExportPanel.class);
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -58,39 +62,58 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     new GridExporter(),
     new SimpleTextExporter()
   };
-  
-  private final Map<String,String> help4Exporter = new HashMap<String,String>();
-  
+
+  private final Map<String, String> help4Exporter = new HashMap<String, String>();
+
   private ComboBox cbExporter;
+
   private ComboBox cbLeftContext;
+
   private ComboBox cbRightContext;
+
   private TextField txtParameters;
+
   private Button btDownload;
+
   private Button btExport;
+
   private Map<String, Exporter> exporterMap;
+
   private QueryPanel queryPanel;
+
   private CorpusListPanel corpusListPanel;
+
   private File tmpOutputFile;
+
   private ProgressIndicator progressIndicator;
+  private Label progressLabel;
+
   private FileDownloader downloader;
+
+  private transient EventBus eventBus;
+  
+  private Stopwatch exportTime = new Stopwatch();
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
 
+    this.eventBus = new EventBus();
+    this.eventBus.register(this);
+    
     setWidth("99%");
     setHeight("-1px");
     addStyleName("contextsensible-formlayout");
-    
+
     initHelpMessages();
-    
+
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
     exporterMap = new HashMap<String, Exporter>();
-    for(Exporter e : EXPORTER)
+    for (Exporter e : EXPORTER)
     {
       String name = e.getClass().getSimpleName();
       exporterMap.put(name, e);
@@ -99,7 +122,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
     cbExporter.addListener(new ExporterSelectionHelpListener());
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
-    
+
     addComponent(new HelpButton(cbExporter));
 
     cbLeftContext = new ComboBox("Left Context");
@@ -111,18 +134,20 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     cbLeftContext.setNewItemsAllowed(true);
     cbRightContext.setNewItemsAllowed(true);
 
-    cbLeftContext.addValidator(new IntegerValidator("must be a number"));
-    cbRightContext.addValidator(new IntegerValidator("must be a number"));
+    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
+      Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
+      Integer.MIN_VALUE, Integer.MAX_VALUE));
 
-    for(String s : SearchOptionsPanel.PREDEFINED_CONTEXTS)
+    for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
     {
-      cbLeftContext.addItem(s);
-      cbRightContext.addItem(s);
+      cbLeftContext.addItem(i);
+      cbRightContext.addItem(i);
     }
 
 
-    cbLeftContext.setValue("5");
-    cbRightContext.setValue("5");
+    cbLeftContext.setValue(5);
+    cbRightContext.setValue(5);
 
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
@@ -133,34 +158,42 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "(‘?’ button above) for specific parameter settings.");
     addComponent(new HelpButton(txtParameters));
 
-    
+
     btExport = new Button("Perform Export");
-    btExport.setIcon(new ThemeResource("tango-icons/16x16/media-playback-start.png"));
+    btExport.setIcon(new ThemeResource(
+      "tango-icons/16x16/media-playback-start.png"));
     btExport.setDisableOnClick(true);
     btExport.addClickListener((Button.ClickListener) this);
-    
+
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
     btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
-    
-    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport, btDownload);
+
+    HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
+      btDownload);
     addComponent(layoutExportButtons);
+
+    VerticalLayout vLayout = new VerticalLayout();
+    addComponent(vLayout);
     
     progressIndicator = new ProgressIndicator();
     progressIndicator.setEnabled(false);
     progressIndicator.setIndeterminate(true);
-    addComponent(progressIndicator);
+    vLayout.addComponent(progressIndicator);
+    
+    progressLabel = new Label();
+    vLayout.addComponent(progressLabel);
   }
 
   @Override
   public void buttonClick(ClickEvent event)
   {
     // clean up old export
-    if(tmpOutputFile != null && tmpOutputFile.exists())
+    if (tmpOutputFile != null && tmpOutputFile.exists())
     {
-      if(!tmpOutputFile.delete())
+      if (!tmpOutputFile.delete())
       {
         log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
       }
@@ -169,9 +202,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
     String exporterName = (String) cbExporter.getValue();
     final Exporter exporter = exporterMap.get(exporterName);
-    if(exporter != null)
+    if (exporter != null)
     {
-      if(corpusListPanel.getSelectedCorpora().isEmpty())
+      if (corpusListPanel.getSelectedCorpora().isEmpty())
       {
         Notification.show("Please select a corpus",
           Notification.Type.WARNING_MESSAGE);
@@ -179,7 +212,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         return;
       }
 
-      Callable<File> callable = new Callable<File>() 
+      Callable<File> callable = new Callable<File>()
       {
         @Override
         public File call() throws Exception
@@ -187,25 +220,24 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           File currentTmpFile = File.createTempFile("annis-export", ".txt");
           currentTmpFile.deleteOnExit();
 
-          OutputStreamWriter outWriter = 
+          OutputStreamWriter outWriter =
             new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
-          
+
           exporter.convertText(queryPanel.getQuery(),
-            Integer.parseInt((String) cbLeftContext.getValue()),
-            Integer.parseInt((String) cbRightContext.getValue()),
+            (Integer) cbLeftContext.getValue(),
+            (Integer) cbRightContext.getValue(),
             corpusListPanel.getSelectedCorpora(),
             null, (String) txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
-            outWriter);
+            outWriter, eventBus);
 
-            outWriter.close();
-            
+          outWriter.close();
+
           return currentTmpFile;
         }
       };
       FutureTask<File> task = new FutureTask<File>(callable)
       {
-
         @Override
         protected void done()
         {
@@ -215,7 +247,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           {
             btExport.setEnabled(true);
             progressIndicator.setEnabled(false);
-            
+            progressLabel.setValue("");
+
             try
             {
               // copy the result to the class member in order to delete if
@@ -231,26 +264,28 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
               log.error(null, ex);
             }
 
-            if(tmpOutputFile == null)
+            if (tmpOutputFile == null)
             {
-              Notification.show("Could not create the Exporter", 
+              Notification.show("Could not create the Exporter",
                 "The server logs might contain more information about this "
                 + "so you should contact the provider of this ANNIS installation "
                 + "for help.", Notification.Type.ERROR_MESSAGE);
             }
             else
             {
-              if(downloader != null && btDownload.getExtensions().contains(downloader))
+              if (downloader != null && btDownload.getExtensions().contains(
+                downloader))
               {
                 btDownload.removeExtension(downloader);
               }
               downloader = new FileDownloader(new FileResource(
                 tmpOutputFile));
-             
+
               downloader.extend(btDownload);
               btDownload.setEnabled(true);
-              
-              Notification.show("Export finished", "Click on the button right to the export button to actually download the file.",
+
+              Notification.show("Export finished",
+                "Click on the button right to the export button to actually download the file.",
                 Notification.Type.HUMANIZED_MESSAGE);
             }
           }
@@ -259,18 +294,20 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             session.unlock();
           }
         }
-
       };
-      
+
       progressIndicator.setEnabled(true);
+      progressLabel.setValue("");
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
       singleExecutor.submit(task);
+      exportTime.reset();
+      exportTime.start();
       
     }
 
   }
-  
+
   private void initHelpMessages()
   {
     help4Exporter.put(EXPORTER[0].getClass().getSimpleName(),
@@ -298,15 +335,17 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "annotations pos and cat. Combine both parameters like this:<br />"
       + "keys=tok,pos;numbers=false.");
   }
-  
-  public class ExporterSelectionHelpListener implements Property.ValueChangeListener
+
+  public class ExporterSelectionHelpListener implements
+    Property.ValueChangeListener
   {
-    
+
     @Override
     public void valueChange(ValueChangeEvent event)
     {
-      String helpMessage = help4Exporter.get((String) event.getProperty().getValue());
-      if(helpMessage != null)
+      String helpMessage = help4Exporter.get((String) event.getProperty().
+        getValue());
+      if (helpMessage != null)
       {
         cbExporter.setDescription(helpMessage);
       }
@@ -316,20 +355,39 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       }
     }
   }
+  
+  @Subscribe
+  public void handleExportProgress(Integer exports)
+  {
+    VaadinSession session = VaadinSession.getCurrent();
+    session.lock();
+    try
+    {
+      if(exportTime.isRunning())
+      {
+        progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
+      }
+      else
+      {
+        progressLabel.setValue("exported " + exports + " items");
+      }
+    }
+    finally
+    {
+      session.unlock();
+    }
+  }
 
   @Override
   public void detach()
   {
     super.detach();
-    if(tmpOutputFile != null && tmpOutputFile.exists())
+    if (tmpOutputFile != null && tmpOutputFile.exists())
     {
-      if(!tmpOutputFile.delete())
+      if (!tmpOutputFile.delete())
       {
         log.warn("Could not delete {}", tmpOutputFile.getAbsolutePath());
       }
     }
   }
-  
-  
-  
 }

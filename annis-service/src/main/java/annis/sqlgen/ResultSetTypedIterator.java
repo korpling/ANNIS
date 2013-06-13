@@ -119,6 +119,7 @@ public class ResultSetTypedIterator<T> implements Iterator<T>
       }
       catch (SQLException ex)
       {
+        log.warn("Cannot read next result set item", ex);
       }
     }
     

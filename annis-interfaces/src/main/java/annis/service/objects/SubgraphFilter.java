@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,21 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.exporter;
+package annis.service.objects;
 
-import annis.service.objects.SubgraphFilter;
+import javax.xml.bind.annotation.XmlEnum;
 
 /**
- * Simple text exporter.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class SimpleTextExporter extends GeneralTextExporter
+@XmlEnum(String.class)
+public enum SubgraphFilter
 {
-
-  @Override
-  public SubgraphFilter getSubgraphFilter()
-  {
-    return SubgraphFilter.Token;
-  }
-  
+  All,
+  Token
 }

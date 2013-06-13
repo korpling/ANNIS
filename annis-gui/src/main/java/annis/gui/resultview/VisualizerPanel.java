@@ -422,6 +422,10 @@ public class VisualizerPanel extends VerticalLayout
               {
                 btEntry.setEnabled(true);
                 vis.setVisible(true);
+                if (vis instanceof PDFViewer)
+                {
+                  ((PDFViewer)vis).openPDFPage("-1");
+                }
                 // add if not already added
                 if(getComponentIndex(vis) < 0)
                 {

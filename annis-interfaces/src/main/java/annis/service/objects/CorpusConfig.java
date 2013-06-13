@@ -16,29 +16,74 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.Map;
-import javax.xml.bind.annotation.XmlElementWrapper;
+import java.util.Properties;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
+ * Holds the config of a corpus.
+ *
+ * <p>A {@link CorpusConfig} object wraps a {@link Properties} object. This
+ * Properties object stores the corpus configuration as simple key-value
+ * pairs.</p>
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
 public class CorpusConfig implements Serializable
 {
-  private Map<String,String> config;
 
-  @XmlElementWrapper
-  public Map<String, String> getConfig()
+  private Properties config;
+
+  /**
+   * Returns the underlying {@link Properties} object.
+   *
+   * @return {@link Properties} in case, their was never set a configuration
+   * with {@link #setConfig(java.util.Properties)} or {@link #setConfig(java.lang.String, java.lang.String)
+   * }
+   */
+  public Properties getConfig()
   {
     return config;
   }
 
-  public void setConfig(Map<String, String> config)
+  public void setConfig(Properties config)
   {
     this.config = config;
   }
-  
-  
+
+  /**
+   * Add a new configuration. If the config name already exists, the config
+   * value is overwritten.
+   *
+   * @param configName The key of the config.
+   * @param configValue The value of the new config.
+   */
+  public void setConfig(String configName, String configValue)
+  {
+    if (config == null)
+    {
+      config = new Properties();
+    }
+
+    config.setProperty(configName, configValue);
+  }
+
+  /**
+   * Returns a configuration from the underlying property object.
+   *
+   * @param configName The name of the configuration.
+   * @return Can be null if the config name does not exists.
+   */
+  public String getConfig(String configName)
+  {
+    if (config != null)
+    {
+      return config.getProperty(configName);
+    }
+    else
+    {
+      return null;
+    }
+  }
 }
