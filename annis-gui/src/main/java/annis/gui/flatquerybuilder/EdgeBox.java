@@ -106,13 +106,14 @@ public class EdgeBox extends Panel
   }
   
   public void setValue(String value)
-  {
-    edge.setValue(value);
+  {    
     if(!EO.containsKey(value))
     {
       String caption = value+UD_EO_DESCRIPTION;
       EO.put(value, caption);
+      edge.addItem(value);
       edge.setItemCaption(value, caption);
     }
+    edge.setValue(value);
   }
 }
