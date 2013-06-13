@@ -64,7 +64,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       LinkedList<String> keys = new LinkedList<String>();
 
-      if (keysAsString == null)
+      if (keysAsString == null || keysAsString.isEmpty())
       {
         // auto set
         keys.add("tok");

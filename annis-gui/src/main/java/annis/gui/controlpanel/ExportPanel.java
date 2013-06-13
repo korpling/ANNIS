@@ -71,6 +71,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private ComboBox cbRightContext;
 
+  private TextField txtAnnotationKeys;
+  
   private TextField txtParameters;
 
   private Button btDownload;
@@ -152,6 +154,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
 
+    txtAnnotationKeys = new TextField("Annotation Keys");
+    txtAnnotationKeys.setDescription("Some exporters will use this comma "
+      + "seperated list of annotation keys to limit the exported data to these "
+      + "annotations.");
+    addComponent(new HelpButton(txtAnnotationKeys));
+    
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
@@ -227,7 +235,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             (Integer) cbLeftContext.getValue(),
             (Integer) cbRightContext.getValue(),
             corpusListPanel.getSelectedCorpora(),
-            null, (String) txtParameters.getValue(),
+            txtAnnotationKeys.getValue(), 
+            txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
             outWriter, eventBus);
 
@@ -335,9 +344,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "tokens covered by each annotation are given as number ranges after each "
       + "annotation in brackets. To suppress token numbers, input numbers=false "
       + "into the parameters box below. To display only a subset of annotations "
-      + "in any order, input e.g. keys=tok,pos,cat to show tokens and the "
-      + "annotations pos and cat. Combine both parameters like this:<br />"
-      + "keys=tok,pos;numbers=false.");
+      + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
+      + "to show tokens and the "
+      + "annotations pos and cat.");
   }
 
   public class ExporterSelectionHelpListener implements
