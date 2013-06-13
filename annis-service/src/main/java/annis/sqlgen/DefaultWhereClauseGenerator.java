@@ -275,6 +275,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       conditions.add(join("=",  
         tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
         sqlString(join.getSegmentationName()))); 
+      
+      conditions.add(join("=",  
+        tables(target).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
     }
     
     
