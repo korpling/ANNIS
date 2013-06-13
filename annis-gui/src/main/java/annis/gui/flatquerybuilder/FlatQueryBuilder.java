@@ -71,7 +71,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
-  private static final String BUTTON_INV_LABEL = "Load Query";
+  private static final String BUTTON_INV_LABEL = "Refresh";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
@@ -100,7 +100,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
   public FlatQueryBuilder(QueryController cp)
   {
-    launch(cp);
+    launch(cp);    
   }
 
   private void launch(QueryController cp)
@@ -186,7 +186,88 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mainLayout.addComponent(toolbar);
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
-    getContent().setSizeFull();
+    getContent().setSizeFull();   
+    initialize();
+  }
+  
+  private void initialize()
+  {
+    //init variables:
+    final FlatQueryBuilder sq = this;
+    Collection<String> annonames = getAvailableAnnotationNames();
+    Collection<String> metanames = getAvailableMetaNames();
+    
+    //Code from btInitLanguage:
+    language.removeComponent(btInitLanguage);
+    btInverse.setEnabled(true);
+    final MenuBar addMenu = new MenuBar();
+    addMenu.setAutoOpen(true);
+    addMenu.setDescription(INFO_INIT_LANG);    
+    final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      add.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          if (!vnodes.isEmpty())
+          {
+            EdgeBox eb = new EdgeBox(sq);
+            languagenodes.addComponent(eb);
+            eboxes.add(eb);
+          }
+          VerticalNode vn = new VerticalNode(annoname, sq);
+          languagenodes.addComponent(vn);
+          vnodes.add(vn);
+          addMenu.setAutoOpen(false);
+        }
+      });
+    }
+    language.addComponent(addMenu);
+    
+    //Code from btInitSpan:
+    span.removeComponent(btInitSpan);
+    final MenuBar addMenuSpan = new MenuBar();
+    addMenuSpan.setAutoOpen(true);
+    addMenuSpan.setDescription(INFO_INIT_SPAN);    
+    final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      addSpan.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          SpanBox spb = new SpanBox(annoname, sq);
+          if (span.getComponentCount() > 1){
+            span.removeComponent(span.getComponent(1));
+          }
+          span.addComponent(spb);
+          span.setComponentAlignment(spb, Alignment.MIDDLE_LEFT);
+          addMenuSpan.setAutoOpen(false);
+          addSpan.setText(CHANGE_SPAN_PARAM);
+        }
+      });
+    }
+    spanMenu = addSpan;
+    span.addComponent(addMenuSpan);
+    
+    //Code from btInitMeta:
+    meta.removeComponent(btInitMeta);
+    final MenuBar addMenuMeta = new MenuBar();
+    addMenuMeta.setAutoOpen(true);
+    addMenuMeta.setDescription(INFO_INIT_META);    
+    final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
+    for (final String annoname : metanames)
+    {
+      addMeta.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          MetaBox mb = new MetaBox(annoname, sq);
+          meta.addComponent(mb);
+          mboxes.add(mb);
+          addMenuMeta.setAutoOpen(false);
+        }
+      });
+    }
+    meta.addComponent(addMenuMeta);    
   }
   
   private String getAQLFragment(SearchBox sb)
