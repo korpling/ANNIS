@@ -27,9 +27,7 @@ import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -138,7 +136,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       log.error("exception when serializing SaltProject", ex);
     }
     long endTime = System.currentTimeMillis();
-    log.info("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
+    log.debug("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
   }
 
   @Override
