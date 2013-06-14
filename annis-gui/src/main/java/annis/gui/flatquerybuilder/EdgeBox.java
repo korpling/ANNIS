@@ -45,7 +45,7 @@ public class EdgeBox extends Panel
   };
   /*BASIS_OPERATORS + userdefined Operators (with Description):*/
   private static HashMap<String, String> EO;
-  private static final String UD_EO_DESCRIPTION = "\t(user defined)";
+  private static final String UD_EO_DESCRIPTION = "\t(user defined)";  
   private static final String WIDTH = "45px";
   
   public EdgeBox (FlatQueryBuilder sq)
@@ -59,8 +59,7 @@ public class EdgeBox extends Panel
       edge.setItemCaption(o, EO.get(o));
     }
     edge.setNewItemsAllowed(true);
-    edge.setTextInputAllowed(true);
-    edge.setValue(BASIS_OPERATORS[1][0]);
+    edge.setTextInputAllowed(true);    
     edge.setWidth(WIDTH);
     edge.setNullSelectionAllowed(false);
     edge.setImmediate(true);
@@ -82,13 +81,15 @@ public class EdgeBox extends Panel
           if(!EO.containsKey(value))
           {          
             String caption = value+UD_EO_DESCRIPTION;
-            EO.put(value, caption);            
+            EO.put(value, caption);
+            edge.addItem(value);
             edge.setItemCaption(value, caption);
           }
          }
       }
     });    
     setContent(edge);    
+    edge.select(BASIS_OPERATORS[0][0]);
   }
   
   private void initEOs()
