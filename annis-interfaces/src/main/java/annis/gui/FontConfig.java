@@ -21,6 +21,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * A configuration for an external web-font.
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @XmlRootElement
@@ -35,7 +36,7 @@ public class FontConfig implements Serializable
     name = "";
     url = "";
   }
-  
+
   @XmlElement(name="name")
   public String getName()
   {
@@ -57,7 +58,7 @@ public class FontConfig implements Serializable
   {
     this.url = url;
   }
-  
+
   @XmlElement(name="size")
   public String getSize()
   {
@@ -68,5 +69,5 @@ public class FontConfig implements Serializable
   {
     this.size = size;
   }
-  
+
 }
