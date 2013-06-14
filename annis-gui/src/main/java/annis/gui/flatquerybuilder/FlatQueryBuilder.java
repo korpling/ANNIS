@@ -465,7 +465,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   public void addSpanBox(String level)
   {
     spbox = new SpanBox(level, this);
-    span.addComponent(this);
+    span.addComponent(spbox);
     span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
     spanMenu.setText(CHANGE_SPAN_PARAM);
     updateQuery();
@@ -730,16 +730,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     String tq;//typed-in query
     
-    try
-    {
-      tq = cp.getQueryDraft();
-    } catch (NullPointerException e)
-    {
-      tq = "";
-    }
-    tq = tq.replace("\n", " ");
+    tq = cp.getQueryDraft().replace("\n", " ");
     //2do: VALIDATE QUERY: (NOT SUFFICIENT YET)
-    boolean valid = (tq!=null);
+    boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
     {
       //PROBLEM: LINE BREAKS
@@ -929,9 +922,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           meta.addComponent(mb);
         }
       }
-    }
-    
-    query = tq.substring(0, tq.length()-1);
+      query = tq.substring(0, tq.length()-1);
+    }    
   }
   
   private static class Constraint
