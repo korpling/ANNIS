@@ -19,6 +19,7 @@ import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.event.FieldEvents.BlurListener;
 import com.vaadin.event.FieldEvents.FocusListener;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
@@ -71,23 +72,22 @@ public class EdgeBox extends Panel
         edge.select(null);
       }
     });
-    edge.addValueChangeListener(new ValueChangeListener(){
+    edge.addBlurListener(new BlurListener(){
       @Override
-      public void valueChange(ValueChangeEvent e)
-      {
-         String value = edge.getValue().toString();
-         if(!value.equals(""))
-         {
-          if(!EO.containsKey(value))
-          {          
-            String caption = value+UD_EO_DESCRIPTION;
-            EO.put(value, caption);
-            edge.addItem(value);
-            edge.setItemCaption(value, caption);
-          }
+      public void blur(FieldEvents.BlurEvent e)
+      {        
+        String value = edge.getValue().toString();
+        if(!value.equals(""))
+        {
+         if(!EO.containsKey(value))
+         {          
+           String caption = value+UD_EO_DESCRIPTION;
+           EO.put(value, caption);
+           edge.setItemCaption(value, caption);
          }
+        }
       }
-    });    
+    });
     setContent(edge);    
     edge.select(BASIS_OPERATORS[0][0]);
   }
