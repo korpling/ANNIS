@@ -46,14 +46,14 @@ public class SpanHTMLOutputter
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
-    if(node instanceof SSpan)
-    {
-      outputSpan((SSpan) node, matchedQName, outputStartTags, outputEndTags);
-    }
-    else if(node instanceof SToken)
+    if(node instanceof SToken && "tok".equals(matchedQName))
     {
       SToken tok = (SToken) node;
       outputToken(tok, outputStartTags, outputEndTags);
+    }
+    else if(node instanceof SSpan || node instanceof SToken)
+    {
+      outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
     }
     else
     {
@@ -61,7 +61,7 @@ public class SpanHTMLOutputter
     }
   }
   
-  private void outputSpan(SSpan span, String matchedQName, 
+  private void outputAnnotation(SNode span, String matchedQName, 
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
