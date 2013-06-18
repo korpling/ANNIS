@@ -27,6 +27,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -45,9 +47,6 @@ import java.util.TreeSet;
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
-  private Button btInitLanguage;
-  private Button btInitSpan;
-  private Button btInitMeta;
   private Button btGo;
   private Button btClear;
   private Button btInverse;
@@ -63,14 +62,16 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
+  private SpanBox spbox;
   private String query;
+  private MenuBar.MenuItem spanMenu;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
 
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
-  private static final String BUTTON_INV_LABEL = "Load Query";
+  private static final String BUTTON_INV_LABEL = "Refresh Query Builder";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
@@ -99,7 +100,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
   public FlatQueryBuilder(QueryController cp)
   {
-    launch(cp);
+    launch(cp);    
   }
 
   private void launch(QueryController cp)
@@ -111,23 +112,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     vnodes = new ArrayList<VerticalNode>();
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
-    // buttons and checks
-    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
-    btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitLanguage.setDescription(INFO_INIT_LANG);
-    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
-    btInitSpan.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitSpan.setDescription(INFO_INIT_SPAN);
-    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
-    btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitMeta.setDescription(INFO_INIT_META);
+    spbox = null;
+    // buttons and checks    
     btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInverse.setEnabled(false);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
     reducingStringComparator rdc = new reducingStringComparator();
@@ -148,19 +140,19 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     languagenodes = new HorizontalLayout();
     language.setSpacing(true);
     language.addComponent(languagenodes);
-    language.addComponent(btInitLanguage);
+    //language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
-    span.addComponent(btInitSpan);
+    //span.addComponent(btInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
-    meta.addComponent(btInitMeta);
+    //meta.addComponent(btInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
     // toolbar layout
@@ -185,7 +177,73 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mainLayout.addComponent(toolbar);
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
-    getContent().setSizeFull();
+    getContent().setSizeFull();   
+    initialize();
+  }
+  
+  private void initialize()
+  {
+    //init variables:
+    final FlatQueryBuilder sq = this;
+    Collection<String> annonames = getAvailableAnnotationNames();
+    Collection<String> metanames = getAvailableMetaNames();
+    
+    //Code from btInitLanguage:    
+    final MenuBar addMenu = new MenuBar();
+    addMenu.setDescription(INFO_INIT_LANG);    
+    final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      add.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          if (!vnodes.isEmpty())
+          {
+            EdgeBox eb = new EdgeBox(sq);
+            languagenodes.addComponent(eb);
+            eboxes.add(eb);
+          }
+          VerticalNode vn = new VerticalNode(annoname, sq);
+          languagenodes.addComponent(vn);
+          vnodes.add(vn);
+        }
+      });
+    }
+    language.addComponent(addMenu);
+    
+    //Code from btInitSpan:    
+    final MenuBar addMenuSpan = new MenuBar();
+    addMenuSpan.setDescription(INFO_INIT_SPAN);    
+    final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      addSpan.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {          
+          sq.removeSpanBox();
+          sq.addSpanBox(annoname);                              
+        }
+      });
+    }
+    spanMenu = addSpan;
+    span.addComponent(addMenuSpan);
+    
+    //Code from btInitMeta:    
+    final MenuBar addMenuMeta = new MenuBar();
+    addMenuMeta.setDescription(INFO_INIT_META);    
+    final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
+    for (final String annoname : metanames)
+    {
+      addMeta.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          MetaBox mb = new MetaBox(annoname, sq);
+          meta.addComponent(mb);
+          mboxes.add(mb);
+        }
+      });
+    }
+    meta.addComponent(addMenuMeta);    
   }
   
   private String getAQLFragment(SearchBox sb)
@@ -203,11 +261,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     }
     if (!sb.isRegEx() && sb.isNegativeSearch())
     {
-      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value+"\"";            
+      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
     }
     if (!sb.isRegEx() && !sb.isNegativeSearch())
     {
-      result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";      
+      result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
     }
     return result;
   }
@@ -215,22 +273,26 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String getMetaQueryFragment(MetaBox mb)
   {    
     Collection<String> values = mb.getValues();
-    String result = "\n& meta::"+mb.getMetaDatum()+" = ";
-    if(values.size()==1)
+    if(!values.isEmpty())
     {
-      result += "\""+values.iterator().next()+"\"";
-    }
-    else
-    {      
-      Iterator<String> itValues = values.iterator();
-      result += "/(" + escapeRegexCharacters(itValues.next())+")";
-      while(itValues.hasNext())
+      String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+      if(values.size()==1)
       {
-        result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        result += "\""+values.iterator().next()+"\"";
       }
-      result += "/";
-    }   
-    return result;
+      else
+      {      
+        Iterator<String> itValues = values.iterator();
+        result += "/(" + escapeRegexCharacters(itValues.next())+")";
+        while(itValues.hasNext())
+        {
+          result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        }
+        result += "/";
+      }   
+      return result;
+    }
+    return "";
   }
   
   public String escapeRegexCharacters(String tok)
@@ -244,6 +306,35 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     return result.replace("/", "\\x2F");
   }
+  
+  private String unescape(String s)
+	{
+    //first unescape slashes and quotes:
+		
+		s = s.replace("\\x2F", "/").replace("\\x22", "\"");       
+    
+    //unescape regex characters:
+		int i=1;
+		while(i<s.length())
+		{
+			char c0 = s.charAt(i-1);
+			char c1 = s.charAt(i);
+			for(int j=0; j<REGEX_CHARACTERS.length; j++)
+			{
+				if( (c1==REGEX_CHARACTERS[j].charAt(0)) & (c0=='\\') )
+				{
+					s = s.substring(0, i-1) + s.substring(i);
+					break;
+				}
+				if(j==REGEX_CHARACTERS.length-1)
+				{
+					i++;
+				}
+			}			
+		}		
+    
+    return s;
+	}
 
   private String getAQLQuery()
   {
@@ -312,7 +403,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     try{
       cp.setQuery(new Query(getAQLQuery(), null));
     } catch (java.lang.NullPointerException ex) {
-      getUI().showNotification(INCOMPLETE_QUERY_WARNING);
+      Notification.show(INCOMPLETE_QUERY_WARNING);      
     }
   }
 
@@ -321,87 +412,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
     final FlatQueryBuilder sq = this; 
     if (cp.getSelectedCorpora().isEmpty()){
-      getUI().showNotification(NO_CORPORA_WARNING);
+      Notification.show(NO_CORPORA_WARNING);
     }
     else
     {
-      if(event.getButton() == btInitLanguage)
-      {
-        language.removeComponent(btInitLanguage);
-        btInverse.setEnabled(true);
-        final MenuBar addMenu = new MenuBar();
-        addMenu.setAutoOpen(true);
-        addMenu.setDescription(INFO_INIT_LANG);
-        Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              if (!vnodes.isEmpty())
-              {
-                EdgeBox eb = new EdgeBox(sq);
-                languagenodes.addComponent(eb);
-                eboxes.add(eb);
-              }
-              VerticalNode vn = new VerticalNode(annoname, sq);
-              languagenodes.addComponent(vn);
-              vnodes.add(vn);
-              addMenu.setAutoOpen(false);
-            }
-          });
-        }
-        language.addComponent(addMenu);
-      }
-      if(event.getButton() == btInitSpan)
-      {
-        span.removeComponent(btInitSpan);
-        final MenuBar addMenu = new MenuBar();
-        addMenu.setAutoOpen(true);
-        addMenu.setDescription(INFO_INIT_SPAN);
-        Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_SPAN_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              SpanBox spb = new SpanBox(annoname, sq);
-              if (span.getComponentCount() > 1){
-                span.removeComponent(span.getComponent(1));
-              }
-              span.addComponent(spb);
-              span.setComponentAlignment(spb, Alignment.MIDDLE_LEFT);
-              addMenu.setAutoOpen(false);
-              add.setText(CHANGE_SPAN_PARAM);
-            }
-          });
-        }
-        span.addComponent(addMenu);
-      }
-      if(event.getButton() == btInitMeta)
-      {
-        meta.removeComponent(btInitMeta);
-        final MenuBar addMenu = new MenuBar();
-        addMenu.setAutoOpen(true);
-        addMenu.setDescription(INFO_INIT_META);
-        Collection<String> annonames = getAvailableMetaNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_META_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              MetaBox mb = new MetaBox(annoname, sq);
-              meta.addComponent(mb);
-              mboxes.add(mb);
-              addMenu.setAutoOpen(false);
-            }
-          });
-        }
-        meta.addComponent(addMenu);
-      }
       if (event.getButton() == btGo)
       {
         updateQuery();
@@ -415,12 +429,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       if (event.getComponent() == btInverse)
       {
-        adjustBuilderToQuery();
+        loadQuery();
       }
     }
   }
 
-public void removeVerticalNode(VerticalNode v)
+  public void removeVerticalNode(VerticalNode v)
   {
     Iterator<VerticalNode> itVnodes = vnodes.iterator();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
@@ -447,21 +461,43 @@ public void removeVerticalNode(VerticalNode v)
     languagenodes.removeComponent(v);
     updateQuery();
   }
-
-public void removeSpanBox(SpanBox v)
+  
+  public void addSpanBox(String level)
   {
-    span.removeComponent(v);
+    spbox = new SpanBox(level, this);
+    span.addComponent(spbox);
+    span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
+    spanMenu.setText(CHANGE_SPAN_PARAM);
     updateQuery();
   }
 
-public void removeMetaBox(MetaBox v)
+  public void removeSpanBox()
+  {
+    if(spbox!=null)
+    {
+      span.removeComponent(spbox);
+      spbox=null;
+      spanMenu.setText(ADD_SPAN_PARAM);
+      updateQuery();
+    }
+  }
+  
+  public void removeSpanBox(SpanBox spb)
+  {
+    if(spb.equals(spbox))
+    {
+      removeSpanBox();
+    }
+  }
+
+  public void removeMetaBox(MetaBox v)
   {
     meta.removeComponent(v);
     mboxes.remove(v);
     updateQuery();
   }
 
-public Collection<String> getAnnotationValues(String level)
+  public Collection<String> getAnnotationValues(String level)
   {
     Collection<String> values = new TreeSet<String>();
     for(String s : getAvailableAnnotationLevels(level))
@@ -471,7 +507,7 @@ public Collection<String> getAnnotationValues(String level)
     return values;
   }
 
-public Set<String> getAvailableAnnotationNames()
+  public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
     WebResource service = Helper.getAnnisWebResource();
@@ -651,11 +687,42 @@ public Set<String> getAvailableAnnotationNames()
     mboxes.clear();
   }
   
-  public void adjustBuilderToQuery()
+  public Collection<String> parseMetaExpression(String expression)
+	/*
+	 * only for complex regex expressions
+	 */
+	{		
+		Collection<String> values = new TreeSet<String>();
+		int i=0;
+		
+		while(expression.length()>0)
+		{
+			if((expression.charAt(i)=='|')|(i==expression.length()-1))
+			{
+				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
+				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
+				{
+					value = value.substring(1, value.length()-1);
+				}
+				value = unescape(value);
+        values.add(value);
+				expression = expression.substring(i+1);
+				i=0;				
+			}
+			else
+			{
+				i++;
+			}
+		}
+		
+		return values;
+	}
+  
+  public void loadQuery()
     /*
-     * this method is called, when the
-     * query is changed in the textfield,
-     * so that the query represented by 
+     * this method is called by btInverse
+     * When the query has changed in the
+     * textfield, the query represented by 
      * the query builder is not equal to
      * the one delivered by the text field
      */
@@ -663,17 +730,9 @@ public Set<String> getAvailableAnnotationNames()
     
     String tq;//typed-in query
     
-    try
-    {
-      //doesn't work (typed text not yet saved as query I guess)
-      tq = cp.getQueryDraft();
-    } catch (NullPointerException e)
-    {
-      tq = "";
-    }
-    tq = tq.replace("\n", " ");
-    //2do: VALIDATE QUERY:
-    boolean valid = true;
+    tq = cp.getQueryDraft().replace("\n", " ");
+    //2do: VALIDATE QUERY: (NOT SUFFICIENT YET)
+    boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
     {
       //PROBLEM: LINE BREAKS
@@ -764,9 +823,8 @@ public Set<String> getAvailableAnnotationNames()
       }
       mboxes.clear();
       
-      //too hacky?!
-      span.removeAllComponents();
-      span.addComponent(btInitSpan);
+      //remove SpanBox
+      removeSpanBox();
             
       HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
       VerticalNode vn=null;
@@ -774,8 +832,8 @@ public Set<String> getAvailableAnnotationNames()
       {        
         Constraint con = constraints.get(i);        
         if(!indexedVnodes.containsKey(i))
-        {
-          vn = new VerticalNode(con.getLevel(), con.getValue(), this);
+        {          
+          vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
           indexedVnodes.put(i, vn);
         }
         
@@ -786,21 +844,25 @@ public Set<String> getAvailableAnnotationNames()
             int b = rel.whosMyFriend(i);
             if(!indexedVnodes.containsKey(b))
             {
-              indexedVnodes.put(b, null);            
-              SearchBox sb = new SearchBox(constraints.get(b).getLevel(), this, vn);
-              sb.setValue(constraints.get(b).getValue());
+              indexedVnodes.put(b, null);
+              Constraint bcon = constraints.get(b);
+              SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
+              sb.setValue(bcon.getValue());
               vn.addSearchBox(sb);
             }
           }          
         }
       }
-      
+            
       VerticalNode first = null;
       int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
       int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
       if((smP+smE)==0)
       {
-        first = indexedVnodes.values().iterator().next();
+        if(!indexedVnodes.isEmpty())
+        {
+          first = indexedVnodes.values().iterator().next(); 
+        }        
       }
       else if((smP!=0) & (smE!=0))
       {
@@ -811,46 +873,65 @@ public Set<String> getAvailableAnnotationNames()
         //one value is zero
         first = indexedVnodes.get(smE+smP);
       }
-            
-      vnodes.add(first);
-      languagenodes.addComponent(first);
       
-      for(Relation rel : pRelations)
+      if(first!=null)
       {
-        EdgeBox eb = new EdgeBox(this);
-        eb.setValue(rel.getOperator());
-        eboxes.add(eb);
-        VerticalNode v = indexedVnodes.get(rel.getSecond());
-        vnodes.add(v);
-        
-        languagenodes.addComponent(eb);
-        languagenodes.addComponent(v);  
+        vnodes.add(first);
+        languagenodes.addComponent(first);
+
+        for(Relation rel : pRelations)
+        {
+          EdgeBox eb = new EdgeBox(this);
+          eb.setValue(rel.getOperator());
+          eboxes.add(eb);
+          VerticalNode v = indexedVnodes.get(rel.getSecond());
+          vnodes.add(v);
+
+          languagenodes.addComponent(eb);
+          languagenodes.addComponent(v);  
+        }
       }
       
       //build SpanBox
       if(inclusion!=null)
-      {
-        String level = conInclusion.getLevel();
-        String value = conInclusion.getValue();
-        SpanBox spb = new SpanBox(level, this);
-        spb.setValue(value);
-        span.addComponent(spb);
+      {       
+        addSpanBox(conInclusion.getLevel());
+        spbox.setValue(conInclusion.getValue());
       }
       
       //build MetaBoxes
       for(Constraint mc : metaConstraints)
       {
-        
+        if(mc.isRegEx())
+        {
+          Collection<String> values = parseMetaExpression(mc.getValue());
+          MetaBox mb = new MetaBox(mc.getLevel(), this);
+          mb.setValue(values);
+          mboxes.add(mb);
+          meta.addComponent(mb);
+        }
+        else
+        {
+          MetaBox mb = new MetaBox(mc.getLevel(), this);
+          //for a particular reason (unknown) setValue with a String parameter
+          //is not accepted by OptionGroup
+          Collection<String> values = new TreeSet<String>();
+          values.add(mc.getValue());
+          mb.setValue(values);
+          mboxes.add(mb);
+          meta.addComponent(mb);
+        }
       }
-    }
-    
-    query = tq.substring(0, tq.length()-1);
+      query = tq.substring(0, tq.length()-1);
+    }    
   }
   
   private static class Constraint
   {
     private String level;
     private String value;
+    private boolean regEx;
+    private boolean negative;
     
     public Constraint(String s)
     {
@@ -859,13 +940,32 @@ public Set<String> getAvailableAnnotationNames()
       {
         e++;
       }
-      String l = s.substring(0, e);
-      l = l.replace(" ", "");
+      
+      String l;
+      
+      if(s.charAt(e-1)=='!')
+      {
+        l = s.substring(0, e-1).replace(" ", "");
+        negative = true;
+      }
+      else
+      {
+        l = s.substring(0, e).replace(" ", "").replace("meta::", "");
+        negative = false;
+      }
       
       String v = s.substring(e+1);
       while(v.startsWith(" "))
       {
         v = v.substring(1);
+      }
+      if(v.startsWith("\""))
+      {
+        regEx = false;
+      }
+      else
+      {
+        regEx = true;
       }
       //remove " or / :
       v = v.substring(1, v.length()-1);
@@ -882,6 +982,16 @@ public Set<String> getAvailableAnnotationNames()
     public String getValue()
     {
       return value;
+    }
+    
+    public boolean isRegEx()
+    {
+      return regEx;
+    }
+    
+    public boolean isNegative()
+    {
+      return negative;
     }
   }
   

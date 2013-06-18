@@ -60,9 +60,15 @@ public class SearchBox extends Panel implements Button.ClickListener,
   private FlatQueryBuilder sq;
   public static final String BUTTON_CLOSE_LABEL = "X";
   private static final String SB_CB_WIDTH = "145px";
+  private static final String CAPTION_REBOX = "Regex";
   private static reducingStringComparator rsc;
   
-  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
+  public SearchBox(final String level, final FlatQueryBuilder sq, final VerticalNode vn)
+  {
+    this(level, sq, vn, false, false);
+  }
+  
+  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn, boolean isRegex, boolean negativeSearch)
   {
     this.vn = vn;
     this.ebene = ebene;
@@ -80,6 +86,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
     cb.setNewItemsAllowed(true);
+    cb.setTextInputAllowed(true);
     cb.setCaption(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
@@ -94,14 +101,14 @@ public class SearchBox extends Panel implements Button.ClickListener,
     VerticalLayout sbtoolbar = new VerticalLayout();
     sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
-    reBox = new CheckBox("Regex");
+    reBox = new CheckBox(CAPTION_REBOX);
     reBox.setImmediate(true);
     sbtoolbar.addComponent(reBox);
-    reBox.addListener(new ValueChangeListener() {
+    reBox.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
-        boolean r = reBox.booleanValue();
+        boolean r = reBox.getValue();
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
@@ -109,15 +116,17 @@ public class SearchBox extends Panel implements Button.ClickListener,
         else if(cb.getValue()!=null)
         {
           String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-          escapedItem = cb.getValue().toString();
+          //String escapedItem = cb.getValue().toString();
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
       }
     });
+    reBox.setValue(isRegex);
     // searchbox tickbox for negative search
     negSearchBox = new CheckBox("Neg. search");
     negSearchBox.setImmediate(true);
+    negSearchBox.setValue(negativeSearch);
     sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
@@ -150,7 +159,6 @@ public class SearchBox extends Panel implements Button.ClickListener,
       else if(cb.getValue()!=null)
       {
         String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
-        escapedItem = cb.getValue().toString();
         cb.addItem(escapedItem);
         cb.setValue(escapedItem);         
       }
@@ -240,12 +248,12 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public String getValue()
   {
-    return cb.toString();
+    return cb.getValue().toString();
   }
   
   public boolean isRegEx()
   {
-    return reBox.booleanValue();
+    return reBox.getValue();
   }
   
   public static String removeAccents(String text) {
@@ -256,11 +264,15 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public boolean isNegativeSearch()
   {
-    return negSearchBox.booleanValue();
+    return negSearchBox.getValue();
   }
   
   public void setValue(String value)
   {
+    if(reBox.getValue())
+    {
+      cb.addItem(value);
+    }
     cb.setValue(value);
   }
 }
