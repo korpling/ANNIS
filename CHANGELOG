@@ -1,3 +1,42 @@
+Version 3.0.0-rc.1
+==================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?milestone=7&state=closed
+
+[Bugs]
+ #138 Bug in arity operator
+ #135 Example query table of the annis-gui should respect the instance config
+ #130 Unable to invoke method click in com.vaadin.shared.ui.button.ButtonServerRpc
+ #129 PDF-Vis should listen to namespaces and node_key
+ #125 Segmentation precedence operator not working correctly
+ #122 Context size and query result page size are no longer configurable in ANNIS3
+ #121 GridExporter keys parameter does nothing
+ #120 HTML visualization doesn't trigger on token annotations
+ #118 font-size in discourse visualization is small (11px) --> change to definition in points? (pt)
+ #115 Highlighting of matched tokens within matched tokens in a second color doesn't always work
+ #114 Instruction anno="value" in HTML vis configuration does not work
+ #112 Prefer query results to example queries.
+ #110 Behavior of default segmentation setting for multiple selected corpora can lead to wrong results
+ #108 UTF-8 encoding not working in Exporters
+ #106 Embedded fonts don't work in corpus explorer and example queries tab
+
+[Enhancements]
+ #133 default-text-segmentation -> default-context-segmentation
+ #124 Allow if-missing argument for example queries.
+ #109 Default segmentation for KWIC, search context and context size in relANNIS
+ #80 HTML visualization
+ #57 Corpus specific example queries
+
+[Other]
+ #134 use Salt in a faster way
+ #132 metakeys argument should be empty by default
+ #123 Mysterious gap in grid visualizer 
+ #111 FlatQueryBuilder
+ #103 More efficient binary data streaming
+ #76 export metadata only once per match
+
+
 Version 3.0.0-alpha.3
 =====================
 
