@@ -466,7 +466,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       languagenodes.removeComponent(eb);
     }
     languagenodes.removeComponent(v);
-    updateQuery();
   }
   
   public void addSpanBox(String level)
@@ -475,7 +474,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     span.addComponent(spbox);
     span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
     spanMenu.setText(CHANGE_SPAN_PARAM);
-    updateQuery();
   }
   
   public void addSpanBox(SpanBox spb)
@@ -491,8 +489,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     spbox = spb;
     span.addComponent(spbox);
     span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
-    
-    updateQuery();
   }
 
   public void removeSpanBox()
@@ -502,7 +498,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       span.removeComponent(spbox);
       spbox=null;
       spanMenu.setText(ADD_SPAN_PARAM);
-      updateQuery();
     }
   }
   
@@ -518,7 +513,6 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
     meta.removeComponent(v);
     mboxes.remove(v);
-    updateQuery();
   }
 
   public Collection<String> getAnnotationValues(String level)
@@ -755,7 +749,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     String tq;//typed-in query
     
     tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
-    //2do: VALIDATE QUERY: (NOT SUFFICIENT YET)
+    //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
     {
