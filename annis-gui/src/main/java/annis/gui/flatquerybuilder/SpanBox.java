@@ -59,6 +59,11 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   
   public SpanBox(final String ebene, final FlatQueryBuilder sq)
   {
+    this(ebene, sq, false);
+  }
+  
+  public SpanBox(final String ebene, final FlatQueryBuilder sq, boolean isRegex)
+  {
     this.ebene = ebene;
     this.sq = sq;
     sb = new HorizontalLayout();
@@ -74,10 +79,11 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     Label tf = new Label(ebene);
     sb.addComponent(tf);
     this.cb = new SensitiveComboBox();
-    cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
+    cb.setNewItemsAllowed(true);
+    cb.setTextInputAllowed(true);
     for (String annoname : this.annonames) 
     {
       cb.addItem(annoname);
@@ -90,13 +96,13 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     // searchbox tickbox for regex
     CheckBox tb = new CheckBox("Regex");
     tb.setImmediate(true);
+    tb.setValue(isRegex);
     sbtoolbar.addComponent(tb);
-    tb.addListener(new ValueChangeListener() {
+    tb.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
-        boolean r = reBox.booleanValue();
-        cb.setNewItemsAllowed(r);
+        boolean r = reBox.getValue();        
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
@@ -108,7 +114,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
           cb.setValue(escapedItem);         
         }
       }
-    });
+    });    
     reBox = tb;
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
@@ -125,9 +131,9 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     // close functionality
     if(event.getButton() == btClose)
     {
-      sb.removeComponent(cb); 
+      sb.removeComponent(cb);
       cb.setValue("");
-      sq.removeSpanBox(this);      
+      sq.removeSpanBox(this);
     }
     // regex box functionality
     else if(event.getComponent()==reBox)
@@ -185,12 +191,21 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   
   public String getValue()
   {
-    return cb.toString();
+    return cb.getValue().toString();
+  }
+  
+  public void setValue(String value)
+  {
+    if(reBox.getValue())
+    {
+      cb.addItem(value);      
+    }
+    cb.setValue(value);
   }
   
   public boolean isRegEx()
   {
-    return reBox.booleanValue();
+    return reBox.getValue();
   }
   
   public static String removeAccents(String text) {
