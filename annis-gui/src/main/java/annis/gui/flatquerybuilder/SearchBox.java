@@ -211,7 +211,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         cb.removeAllItems();
         for(String s : annonames)
         {
-          Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt), removeAccents(s));
+          Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt).toLowerCase(), removeAccents(s).toLowerCase());
           if (levdistvals.containsKey(d)){
             levdistvals.get(d).add(s);
           }
