@@ -75,6 +75,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
+  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your Query.";
 
   private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
@@ -429,7 +430,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       if (event.getComponent() == btInverse)
       {
-        loadQuery();
+        try
+        {
+          loadQuery();
+        }
+        catch(Exception e)
+        {          
+        }
       }
     }
   }
@@ -468,6 +475,23 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     span.addComponent(spbox);
     span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
     spanMenu.setText(CHANGE_SPAN_PARAM);
+    updateQuery();
+  }
+  
+  public void addSpanBox(SpanBox spb)
+  {
+    if(spbox==null)
+    {
+      spanMenu.setText(CHANGE_SPAN_PARAM);
+    }
+    else
+    {
+      span.removeComponent(spbox);
+    }
+    spbox = spb;
+    span.addComponent(spbox);
+    span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
+    
     updateQuery();
   }
 
@@ -718,7 +742,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 		return values;
 	}
   
-  public void loadQuery()
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -730,203 +754,227 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     String tq;//typed-in query
     
-    tq = cp.getQueryDraft().replace("\n", " ");
+    tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
     //2do: VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
     {
-      //PROBLEM: LINE BREAKS
-      //the dot marks the end of the string - it is not read, it's just a place holder
-      tq += ".";
-      HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
-      ArrayList<Relation> pRelations = new ArrayList<Relation>();
-      ArrayList<Relation> eRelations = new ArrayList<Relation>();
-      Relation inclusion=null;
-      Constraint conInclusion=null;
-      ArrayList<Constraint> metaConstraints = new ArrayList<Constraint>();
-      
-      //parse typed-in Query
-      //Step 1: get indices of tq-chars, where constraints are separated (&)
-      String tempCon="";
-      int count = 1;
-      boolean inclusionCheck=false;
-      
-      for(int i=0; i<tq.length(); i++)
+      //PROBLEM: LINE BREAKS (simple without anything else)
+      try
       {
-        //improve this Algorithm (compare to constraint)
-        char c = tq.charAt(i);
-        if((c!='&') & (i!=tq.length()-1))
+      
+        //the dot marks the end of the string - it is not read, it's just a place holder
+        tq += ".";
+        HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
+        ArrayList<Relation> pRelations = new ArrayList<Relation>();
+        ArrayList<Relation> eRelations = new ArrayList<Relation>();
+        Relation inclusion=null;
+        Constraint conInclusion=null;
+        ArrayList<Constraint> metaConstraints = new ArrayList<Constraint>();
+
+        //parse typed-in Query
+        //Step 1: get indices of tq-chars, where constraints are separated (&)
+        String tempCon="";
+        int count = 1;
+        boolean inclusionCheck=false;
+
+        for(int i=0; i<tq.length(); i++)
         {
-          if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
+          //improve this Algorithm (compare to constraint)
+          char c = tq.charAt(i);
+          if((c!='&') & (i!=tq.length()-1))
           {
-            tempCon += c;
-          }
-        }
-        else
-        {
-          while(tempCon.charAt(tempCon.length()-1)==' ')
-          {
-            tempCon = tempCon.substring(0, tempCon.length()-1);
-          }
-          
-          if(tempCon.startsWith("meta::"))
-          {
-            metaConstraints.add(new Constraint(tempCon));
-          }
-          else if(tempCon.startsWith("#"))          
-          {
-            Relation r = new Relation(tempCon);
-            if(r.getType()==RelationType.EQUALITY)
+            if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
             {
-              eRelations.add(r);
+              tempCon += c;
             }
-            else if(r.getType()==RelationType.PRECEDENCE)
+          }
+          else
+          {
+            while(tempCon.charAt(tempCon.length()-1)==' ')
             {
-              pRelations.add(r);
+              tempCon = tempCon.substring(0, tempCon.length()-1);
             }
-            else if((r.getType()==RelationType.INCLUSION)&(!inclusionCheck))
+
+            if(tempCon.startsWith("meta::"))
             {
-              inclusion = r;
-              if(constraints.containsKey(r.getFirst()))
+              metaConstraints.add(new Constraint(tempCon));
+            }
+            else if(tempCon.startsWith("#"))          
+            {
+              Relation r = new Relation(tempCon);
+              if(r.getType()==RelationType.EQUALITY)
               {
-                conInclusion = constraints.get(r.getFirst());
-                constraints.remove(r.getFirst());
+                eRelations.add(r);
               }
-              inclusionCheck=true;
+              else if(r.getType()==RelationType.PRECEDENCE)
+              {
+                pRelations.add(r);
+              }
+              else if((r.getType()==RelationType.INCLUSION)&(!inclusionCheck))
+              {
+                inclusion = r;
+                if(constraints.containsKey(r.getFirst()))
+                {
+                  conInclusion = constraints.get(r.getFirst());
+                  constraints.remove(r.getFirst());
+                }
+                inclusionCheck=true;
+              }
+            }         
+            else 
+            {
+              constraints.put(count++, new Constraint(tempCon));
             }
-          }         
-          else 
+
+            tempCon = "";
+          }
+        }        
+        
+        //create Vertical Nodes
+        HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
+        VerticalNode vn=null;
+        Collection<String> annonames = getAvailableAnnotationNames();        
+        for(int i : constraints.keySet())
+        {          
+          Constraint con = constraints.get(i);                    
+          if(!annonames.contains(con.getLevel()))
           {
-            constraints.put(count++, new Constraint(tempCon));
+            throw new UnknownLevelException(con.getLevel());
+            //is that a good idea?
+          }
+          if(!indexedVnodes.containsKey(i))
+          {          
+            vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
+            indexedVnodes.put(i, vn);
+          }
+
+          for(Relation rel : eRelations)
+          {
+            if(rel.contains(i))
+            {
+              int b = rel.whosMyFriend(i);
+              if(!indexedVnodes.containsKey(b))
+              {
+                indexedVnodes.put(b, null);
+                Constraint bcon = constraints.get(b);
+                SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
+                sb.setValue(bcon.getValue());
+                vn.addSearchBox(sb);
+              }
+            }          
           }
           
-          tempCon = "";
-        }
-      }    
-      
-      //clean query builder surface
-      for(VerticalNode vn : vnodes)
-      {
-        languagenodes.removeComponent(vn);        
-      }
-      vnodes.clear();
-      
-      for(EdgeBox eb : eboxes)
-      {
-        languagenodes.removeComponent(eb);
-      }
-      eboxes.clear();
-      
-      for(MetaBox mb : mboxes)
-      {
-        meta.removeComponent(mb);          
-      }
-      mboxes.clear();
-      
-      //remove SpanBox
-      removeSpanBox();
-            
-      HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
-      VerticalNode vn=null;
-      for(int i : constraints.keySet())
-      {        
-        Constraint con = constraints.get(i);        
-        if(!indexedVnodes.containsKey(i))
-        {          
-          vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
-          indexedVnodes.put(i, vn);
         }
         
-        for(Relation rel : eRelations)
+        //clean query builder surface
+        for(VerticalNode v : vnodes)
         {
-          if(rel.contains(i))
+          languagenodes.removeComponent(v);        
+        }
+        vnodes.clear();
+
+        for(EdgeBox eb : eboxes)
+        {
+          languagenodes.removeComponent(eb);
+        }
+        eboxes.clear();
+
+        for(MetaBox mb : mboxes)
+        {
+          meta.removeComponent(mb);          
+        }
+        mboxes.clear();
+
+        //remove SpanBox
+        removeSpanBox();
+
+        VerticalNode first = null;
+        int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
+        int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
+        if((smP+smE)==0)
+        {
+          if(!indexedVnodes.isEmpty())
           {
-            int b = rel.whosMyFriend(i);
-            if(!indexedVnodes.containsKey(b))
-            {
-              indexedVnodes.put(b, null);
-              Constraint bcon = constraints.get(b);
-              SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
-              sb.setValue(bcon.getValue());
-              vn.addSearchBox(sb);
-            }
-          }          
+            first = indexedVnodes.values().iterator().next(); 
+          }        
         }
-      }
-            
-      VerticalNode first = null;
-      int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
-      int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
-      if((smP+smE)==0)
-      {
-        if(!indexedVnodes.isEmpty())
+        else if((smP!=0) & (smE!=0))
         {
-          first = indexedVnodes.values().iterator().next(); 
-        }        
-      }
-      else if((smP!=0) & (smE!=0))
-      {
-        first = indexedVnodes.get(Math.min(smE, smP));
-      }
-      else
-      {
-        //one value is zero
-        first = indexedVnodes.get(smE+smP);
-      }
-      
-      if(first!=null)
-      {
-        vnodes.add(first);
-        languagenodes.addComponent(first);
-
-        for(Relation rel : pRelations)
-        {
-          EdgeBox eb = new EdgeBox(this);
-          eb.setValue(rel.getOperator());
-          eboxes.add(eb);
-          VerticalNode v = indexedVnodes.get(rel.getSecond());
-          vnodes.add(v);
-
-          languagenodes.addComponent(eb);
-          languagenodes.addComponent(v);  
-        }
-      }
-      
-      //build SpanBox
-      if(inclusion!=null)
-      {       
-        addSpanBox(conInclusion.getLevel());
-        spbox.setValue(conInclusion.getValue());
-      }
-      
-      //build MetaBoxes
-      for(Constraint mc : metaConstraints)
-      {
-        if(mc.isRegEx())
-        {
-          Collection<String> values = parseMetaExpression(mc.getValue());
-          MetaBox mb = new MetaBox(mc.getLevel(), this);
-          mb.setValue(values);
-          mboxes.add(mb);
-          meta.addComponent(mb);
+          first = indexedVnodes.get(Math.min(smE, smP));
         }
         else
         {
-          MetaBox mb = new MetaBox(mc.getLevel(), this);
-          //for a particular reason (unknown) setValue with a String parameter
-          //is not accepted by OptionGroup
-          Collection<String> values = new TreeSet<String>();
-          values.add(mc.getValue());
-          mb.setValue(values);
-          mboxes.add(mb);
-          meta.addComponent(mb);
+          //one value is zero
+          first = indexedVnodes.get(smE+smP);
         }
+
+        if(first!=null)
+        {
+          vnodes.add(first);
+          languagenodes.addComponent(first);
+
+          for(Relation rel : pRelations)
+          {
+            EdgeBox eb = new EdgeBox(this);
+            eb.setValue(rel.getOperator());
+            eboxes.add(eb);
+            VerticalNode v = indexedVnodes.get(rel.getSecond());
+            vnodes.add(v);
+
+            languagenodes.addComponent(eb);
+            languagenodes.addComponent(v);  
+          }
+        }
+
+        //build SpanBox
+        if(inclusion!=null)
+        {       
+          addSpanBox(new SpanBox(conInclusion.getLevel(), this, conInclusion.isRegEx()));
+          spbox.setValue(conInclusion.getValue());
+        }
+
+        //build MetaBoxes
+        for(Constraint mc : metaConstraints)
+        {
+          if(mc.isRegEx())
+          {
+            Collection<String> values = parseMetaExpression(mc.getValue());
+            MetaBox mb = new MetaBox(mc.getLevel(), this);
+            mb.setValue(values);
+            mboxes.add(mb);
+            meta.addComponent(mb);
+          }
+          else
+          {
+            MetaBox mb = new MetaBox(mc.getLevel(), this);
+            //for a particular reason (unknown) setValue() with a String parameter
+            //is not accepted by OptionGroup
+            Collection<String> values = new TreeSet<String>();
+            values.add(mc.getValue());
+            mb.setValue(values);
+            mboxes.add(mb);
+            meta.addComponent(mb);
+          }
+        }
+        query = tq.substring(0, tq.length()-1);
       }
-      query = tq.substring(0, tq.length()-1);
+      catch(Exception e)
+      {
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException))
+        {
+          Notification.show(e.getMessage());
+          //maybe highlight the critical character sequence          
+        }
+        else
+        {
+          Notification.show(QUERY_ERROR_WARNING);
+        }    
+      }
     }    
   }
   
-  private static class Constraint
+  private class Constraint
   {
     private String level;
     private String value;
@@ -995,7 +1043,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     }
   }
   
-  private static class Relation
+  private class Relation
   /*
    * Problems:
    * if an operator is used, which is not in the EdgeBoxe's list
@@ -1008,7 +1056,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     private String operator;
     private RelationType type;
     
-    public Relation(String in)
+    public Relation(String in) throws EqualityConstraintException
     {
       
       String op = "";
@@ -1050,6 +1098,16 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       else if((op.equals("=")) | (op.equals("_=_")))
       {
         type = RelationType.EQUALITY;
+        if(o1>o2)
+        {
+          int tmp = o1;
+          o1 = o2;
+          o2 = tmp;
+        }
+        else if(o1==o2)
+        {
+          throw new EqualityConstraintException(in);
+        }
       }
       else if(op.equals("_i_"))
       {
@@ -1096,8 +1154,42 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     }
   }
   
-  private static enum RelationType
+  private enum RelationType
   {
     PRECEDENCE, DOMINANCE, INCLUSION, EQUALITY
+  }
+  
+  private class UnknownLevelException extends Exception
+  {
+    private static final String ERROR_MESSAGE = "Unknown annotation level: ";
+    private String level;
+    
+    public UnknownLevelException(String level)
+    {
+      this.level = level;
+    }
+    
+    @Override
+    public String getMessage()
+    {
+      return ERROR_MESSAGE+level;
+    }
+  }
+  
+  private class EqualityConstraintException extends Exception
+  {
+    private static final String ERROR_MESSAGE = "Redundant use of equality operator: ";
+    private final String critical;
+    
+    public EqualityConstraintException(String s)
+    {
+      critical = s;
+    }
+    
+    @Override
+    public String getMessage()
+    {
+      return ERROR_MESSAGE+critical;
+    }
   }
 }
