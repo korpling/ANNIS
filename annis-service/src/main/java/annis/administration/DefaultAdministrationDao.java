@@ -170,7 +170,6 @@ public class DefaultAdministrationDao implements AdministrationDao
    */
   public void init()
   {
-
     AnnotationIntrospector introspector = new JaxbAnnotationIntrospector();
     jsonMapper.setAnnotationIntrospector(introspector);
     // the json should be as compact as possible in the database
@@ -366,6 +365,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
+
+    checkTopLevelCorpus();
 
     createStagingAreaIndexes();
 
@@ -941,7 +942,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
     jdbcTemplate.execute("ANALYZE facts_" + corpusID);
-    
+
     log.info("analyzing parent facts table");
     jdbcTemplate.execute("ANALYZE facts");
   }
@@ -1728,5 +1729,93 @@ public class DefaultAdministrationDao implements AdministrationDao
     QueriesGenerator queriesGenerator)
   {
     this.queriesGenerator = queriesGenerator;
+  }
+
+  /**
+   * Retrieves the name of the top level corpus in the corpus.tab file.
+   *
+   * <p>At this point, the tab files must be in the staging area.</p>
+   *
+   * @return The name of the toplevel corpus or an empty String if no top level
+   * corpus is found.
+   */
+  private String getTopLevelCorpusFromTmpArea()
+  {
+    String sql = "SELECT name FROM " + tableInStagingArea("corpus")
+      + " WHERE type='CORPUS'";
+    return jdbcTemplate.query(sql, new ResultSetExtractor<String>()
+    {
+      @Override
+      public String extractData(ResultSet rs) throws SQLException,
+        DataAccessException
+      {
+        if (rs.next())
+        {
+          return rs.getString("name");
+        }
+        else
+        {
+          return null;
+        }
+      }
+    });
+  }
+
+  /**
+   * Checks, if a already exists a corpus with the same name of the top level
+   * corpus in the corpus.tab file. If this is the case an Exception is thrown
+   * and the import is aborted.
+   *
+   * @throws
+   * annis.administration.DefaultAdministrationDao.ConflictingCorpusException
+   */
+  private void checkTopLevelCorpus() throws ConflictingCorpusException
+  {
+    String corpusName = getTopLevelCorpusFromTmpArea();
+    if (existConflictingTopLevelCorpus(corpusName))
+    {
+      String msg =
+        "There already exists a top level corpus with the name: " + corpusName;
+      throw new ConflictingCorpusException(msg);
+    }
+  }
+
+  /**
+   * Checks, if there already exists a top level corpus.
+   *
+   * @param topLevelCorpusName The name of the corpus, which is checked.
+   * @return Is false, if the no top level coprpus exists.
+   */
+  private boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
+  {
+    String sql = "SELECT count(name) as amount FROM corpus WHERE name='"
+      + topLevelCorpusName + "'";
+    Integer numberOfCorpora = getJdbcTemplate().query(sql,
+      new ResultSetExtractor<Integer>()
+    {
+      @Override
+      public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
+      {
+        if (rs.next())
+        {
+          return rs.getInt("amount");
+        }
+        else
+        {
+          return 0;
+        }
+      }
+    });
+
+    return numberOfCorpora > 0;
+  }
+
+  public class ConflictingCorpusException extends AnnisException
+  {
+
+    public ConflictingCorpusException(String msg)
+    {
+      super(msg);
+    }
   }
 }
