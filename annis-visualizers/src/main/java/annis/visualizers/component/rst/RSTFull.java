@@ -21,9 +21,9 @@ import annis.libgui.visualizers.VisualizerInput;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/) 
+ * Imitates the RST-diagrams from the RST-Tool (http://www.wagsoft.com/RSTTool/)
  * for a complete document.
- * 
+ *
  * @see RST
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -34,7 +34,7 @@ public class RSTFull extends AbstractVisualizer<RSTPanel>
   @Override
   public String getShortName()
   {
-    return "rst_full";
+    return "rstdoc";
   }
 
   @Override
