@@ -31,7 +31,7 @@ import org.w3c.dom.NodeList;
  */
 public class reducingStringComparator
 {
-  private static HashMap<String, HashMap> ALLOGRAPHS;
+  private HashMap<String, HashMap> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
   private static String MAPPING_FILE = "mapfile.fqb";
   
