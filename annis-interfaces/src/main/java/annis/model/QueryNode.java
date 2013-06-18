@@ -32,6 +32,7 @@ import annis.sqlgen.model.RankTableJoin;
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
 {
+  public enum Type {NODE, AND, OR};
 
   // this class is send to the front end
   // node object in database
@@ -63,6 +64,9 @@ public class QueryNode implements Serializable
   private String marker;
   private Long matchedNodeInQuery;
 
+  private List<QueryNode> alternatives;
+  private Type type = Type.NODE;
+  
   public enum TextMatching
   {
 
@@ -141,6 +145,13 @@ public class QueryNode implements Serializable
     nodeAnnotations = new TreeSet<QueryAnnotation>();
     edgeAnnotations = new TreeSet<QueryAnnotation>();
     joins = new ArrayList<Join>();
+    alternatives = new ArrayList<QueryNode>();
+  }
+  
+  public QueryNode(Type type)
+  {
+    this();
+    this.type = type;
   }
 
   public QueryNode(long id)
@@ -655,4 +666,25 @@ public class QueryNode implements Serializable
     this.matchedNodeInQuery = matchedNodeInQuery;
   }
 
+  public List<QueryNode> getAlternatives()
+  {
+    return alternatives;
+  }
+
+  public void setAlternatives(
+    List<QueryNode> alternatives)
+  {
+    this.alternatives = alternatives;
+  }
+
+  public Type getType()
+  {
+    return type;
+  }
+
+  public void setType(Type type)
+  {
+    this.type = type;
+  }
+  
 }

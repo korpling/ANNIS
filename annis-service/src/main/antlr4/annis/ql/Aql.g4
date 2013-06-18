@@ -53,6 +53,10 @@ ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
 COMMA:',';
 STAR:'*';
+BRACE_OPEN:'(';
+BRACE_CLOSE:')';
+BRACKET_OPEN:'[';
+BRACKET_CLOSE:']';
 
 WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
 
@@ -89,7 +93,7 @@ OCTAL_ESC
     ;
 
 start 
-	: expr EOF
+	: exprTop EOF
 	;
 
 text_spec 
@@ -108,7 +112,7 @@ edge_anno
 	;
 
 edge_spec
-	: '[' edge_anno+ ']'
+	: BRACKET_OPEN edge_anno+ BRACKET_CLOSE
 	;
 
 
@@ -156,19 +160,20 @@ unary_linguistic_term
 	|	REF TOKEN_ARITY EQ DIGITS
 	;
 
-term
-	:	qName
-	|	text_spec // shortcut for tok="..."
-	|	qName EQ text_spec
-	|	qName NEQ text_spec
-	|	'(' expr ')'
-	|	unary_linguistic_term
-	|	binary_linguistic_term
-	;
-	
 
 expr
-	: term # Single
-  | term (OR term)+ # Or
-  | term (AND term)+ # And
+	:	qName # QualifiedName
+	|	text_spec # Text_only // shortcut for tok="..."
+	|	qName EQ text_spec # Anno_eq_text
+	|	qName NEQ text_spec # Anno_neq_text
+	|	unary_linguistic_term # UnaryTerm
+	|	binary_linguistic_term #  BinaryTerm
+  | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # Or
+  | BRACE_OPEN expr (AND expr)+ BRACE_CLOSE # And
+  ;
+
+exprTop
+	:	expr #SingleExprTop
+  | expr (OR expr)+ # OrTop
+  | expr (AND expr)+ # AndTop
 	;
