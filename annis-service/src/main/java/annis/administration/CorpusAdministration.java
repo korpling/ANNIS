@@ -85,7 +85,7 @@ public class CorpusAdministration
       log.info("Finished import from: " + path);
       }catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
-        log.info(ex.getMessage());
+        log.error(ex.getMessage());
       }
 
     }
