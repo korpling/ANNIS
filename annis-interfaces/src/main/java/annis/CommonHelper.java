@@ -15,8 +15,10 @@
  */
 package annis;
 
+import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -27,7 +29,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.UnsupportedEncodingException;
@@ -41,6 +45,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Utilities class for non-gui operations on Salt.
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
@@ -51,29 +56,33 @@ public class CommonHelper
 
   public static boolean containsRTLText(String str)
   {
-    for (int i = 0; i < str.length(); i++)
+    if (str != null)
     {
-      char cc = str.charAt(i);
-      // hebrew extended and basic, arabic basic and extendend
-      if (cc >= 1425 && cc <= 1785)
+      for (int i = 0; i < str.length(); i++)
       {
-        return true;
-      }
-      // alphabetic presentations forms (hebrwew) to arabic presentation forms A
-      else if (cc >= 64286 && cc <= 65019)
-      {
-        return true;
-      }
-      // arabic presentation forms B
-      else if (cc >= 65136 && cc <= 65276)
-      {
-        return true;
+        char cc = str.charAt(i);
+        // hebrew extended and basic, arabic basic and extendend
+        if (cc >= 1425 && cc <= 1785)
+        {
+          return true;
+        }
+        // alphabetic presentations forms (hebrwew) to arabic presentation forms A
+        else if (cc >= 64286 && cc <= 65019)
+        {
+          return true;
+        }
+        // arabic presentation forms B
+        else if (cc >= 65136 && cc <= 65276)
+        {
+          return true;
+        }
       }
     }
     return false;
   }
 
-  public static List<SNode> getSortedSegmentationNodes(String segName, SDocumentGraph graph)
+  public static List<SNode> getSortedSegmentationNodes(String segName,
+    SDocumentGraph graph)
   {
     List<SNode> token = new ArrayList<SNode>();
 
@@ -91,7 +100,7 @@ public class CommonHelper
         new HashMap<SNode, SOrderRelation>();
       for (SOrderRelation rel : graph.getSOrderRelations())
       {
-        if (rel.getSTypes().contains(segName))
+        if (rel.getSTypes() != null && rel.getSTypes().contains(segName))
         {
           SNode node = rel.getSSource();
           outRelationForNode.put(node, rel);
@@ -188,7 +197,10 @@ public class CommonHelper
           {
             for (SOrderRelation rel : orderRelations)
             {
-              result.addAll(rel.getSTypes());
+              if (rel.getSTypes() != null)
+              {
+                result.addAll(rel.getSTypes());
+              }
             }
           }
         }
@@ -204,23 +216,63 @@ public class CommonHelper
    * {@link SDocumentGraph} and calculates the appropiate substring from the
    * {@link STextualDS}.
    *
-   * @param tok
-   * @return
+   * @param tok The {@link SToken} which is overlapping the text sequence.
+   * @return An empty {@link String} object, if there is no
+   * {@link STextualRelation}
    */
   public static String getSpannedText(SToken tok)
   {
     SDocumentGraph graph = tok.getSDocumentGraph();
 
     EList<Edge> edges = graph.getOutEdges(tok.getSId());
-    for(Edge e : edges)
+    for (Edge e : edges)
     {
-      if(e instanceof STextualRelation)
+      if (e instanceof STextualRelation)
       {
         STextualRelation textRel = (STextualRelation) e;
-        return  textRel.getSTextualDS().getSText().substring(textRel.getSStart(), textRel.getSEnd());
+        return textRel.getSTextualDS().getSText().substring(textRel.getSStart(),
+          textRel.getSEnd());
       }
     }
     return "";
+  }
+
+  /**
+   * Checks a {@link SNode} if it is member of a specific {@link SLayer}.
+   *
+   * @param layerName Specifies the layername to check.
+   * @param node Specifies the node to check.
+   * @return true - it is true when the name of layername corresponds to the
+   * name of any label of the SNode.
+   */
+  public static boolean checkSLayer(String layerName, SNode node)
+  {
+    //robustness
+    if (layerName == null || node == null)
+    {
+      return false;
+    }
+
+    EList<SLayer> sLayers = node.getSLayers();
+    if (sLayers != null)
+    {
+      for (SLayer l : sLayers)
+      {
+        EList<Label> labels = l.getLabels();
+        if (labels != null)
+        {
+          for (Label label : labels)
+          {
+            if (layerName.equals(label.getValue()))
+            {
+              return true;
+            }
+          }
+        }
+      }
+    }
+
+    return false;
   }
 
   public static List<String> getCorpusPath(SCorpusGraph corpusGraph,
@@ -235,29 +287,29 @@ public class CommonHelper
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
       "getRootCorpora",
       new SGraphTraverseHandler()
+    {
+      @Override
+      public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+        long order)
       {
-        @Override
-        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-          long order)
-        {
-          result.add(currNode.getSName());
-        }
+        result.add(currNode.getSName());
+      }
 
-        @Override
-        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId,
-          SNode currNode, SRelation edge, SNode fromNode, long order)
-        {
-        }
+      @Override
+      public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId,
+        SNode currNode, SRelation edge, SNode fromNode, long order)
+      {
+      }
 
-        @Override
-        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-          String traversalId, SRelation edge, SNode currNode, long order)
-        {
-          return true;
-        }
-      });
+      @Override
+      public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+        String traversalId, SRelation edge, SNode currNode, long order)
+      {
+        return true;
+      }
+    });
     return result;
   }
 
@@ -282,6 +334,36 @@ public class CommonHelper
         log.error(null, ex);
         // fallback
         result.add(path[i]);
+      }
+    }
+
+    return result;
+  }
+
+  public static SNode[] getMatchedNodes(SDocument doc)
+  {
+    SNode[] result = new SNode[0];
+
+    // get the matched node IDs
+    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDIDS);
+    if (feat != null)
+    {
+      String[] ids = feat.getSValueSTEXT().split(",");
+      result = new SNode[ids.length];
+
+      for (int i = 0; i < ids.length; i++)
+      {
+        String id = ids[i].trim();
+        if (!id.isEmpty())
+        {
+          // get the specific node
+          SNode node = doc.getSDocumentGraph().getSNode(id);
+          if (node != null)
+          {
+            result[i] = node;
+          }
+        }
       }
     }
 

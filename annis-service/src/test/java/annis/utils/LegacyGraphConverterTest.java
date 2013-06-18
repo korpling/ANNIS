@@ -160,18 +160,18 @@ public class LegacyGraphConverterTest
     checkAnnotationSetEqual(n1.getNodeAnnotations(), n2.getNodeAnnotations());
     checkAnnotationSetEqual(n1.getEdgeAnnotations(), n2.getEdgeAnnotations());
 
-    assertEquals(n1.getCorpus(), n2.getCorpus());
-    assertEquals(n1.getId(), n2.getId());
-    assertEquals(n1.getLeft(), n2.getLeft());    
-    assertEquals(n1.getLeftToken(), n2.getLeftToken());
-    assertEquals(n1.getMatchedNodeInQuery(), n2.getMatchedNodeInQuery());
-    assertEquals(n1.getName(), n2.getName());
-    assertEquals(n1.getNamespace(), n2.getNamespace());
-    assertEquals(n1.getRight(), n2.getRight());
-    assertEquals(n1.getRightToken(), n2.getRightToken());
-    assertEquals(n1.getSpannedText(), n2.getSpannedText());
-    assertEquals(n1.getTextId(), n2.getTextId());
-    assertEquals(n1.getTokenIndex(), n2.getTokenIndex());
+    assertEquals("corpus number must be equal", n1.getCorpus(), n2.getCorpus());
+    assertEquals("node ID must be equal", n1.getId(), n2.getId());
+    assertEquals("left must be equal", n1.getLeft(), n2.getLeft());    
+    assertEquals("left token must be equal", n1.getLeftToken(), n2.getLeftToken());
+    assertEquals("matched node in query must be equal", n1.getMatchedNodeInQuery(), n2.getMatchedNodeInQuery());
+    assertEquals("node name must be equal", n1.getName(), n2.getName());
+    assertEquals("node namespace must be equal", n1.getNamespace(), n2.getNamespace());
+    assertEquals("right must be equal", n1.getRight(), n2.getRight());
+    assertEquals("right token must be equal", n1.getRightToken(), n2.getRightToken());
+    assertEquals("spanned text of node must be equal", n1.getSpannedText(), n2.getSpannedText());
+    assertEquals("text ID of node must be equal", n1.getTextId(), n2.getTextId());
+    assertEquals("token index must be equal", n1.getTokenIndex(), n2.getTokenIndex());
 
     Set<Edge> out1 = n1.getOutgoingEdges();
     Set<Edge> out2 = n2.getOutgoingEdges();
@@ -179,7 +179,7 @@ public class LegacyGraphConverterTest
     assertEquals("number of outgoing edges must be equal for [" + n1.toString() + "]", out1.size(), out2.size());
     for (Edge e1 : out1)
     {
-      assertTrue("edge [" + e1 +"] must be contained in outgoing edges",out2.contains(e1));
+      assertTrue("edge [" + e1 +"] must be contained in outgoing edges " + out2.toString(),out2.contains(e1));
       for (Edge e2 : out2)
       {
         if (e1.getPre() == e2.getPre())
@@ -193,10 +193,12 @@ public class LegacyGraphConverterTest
     Set<Edge> in1 = n1.getIncomingEdges();
     Set<Edge> in2 = n2.getIncomingEdges();
 
-    assertEquals(in1.size(), in2.size());
+    assertEquals("number of incoming edges must be the same for node " + n1.getName(), 
+      in1.size(), in2.size());
     for (Edge e1 : in1)
     {
-      assertTrue(in2.contains(e1));
+      assertTrue("edge " + e1.getPre() + " must be included", 
+        in2.contains(e1));
       for (Edge e2 : in2)
       {
         if (e1.getPre() == e2.getPre() && e1.getComponentID() == e2.getComponentID())
@@ -213,8 +215,10 @@ public class LegacyGraphConverterTest
   {
     checkAnnotationSetEqual(e1.getAnnotations(), e1.getAnnotations());
 
-    assertEquals(e1.getSource().getId(), e2.getSource().getId());
-    assertEquals(e1.getDestination().getId(), e2.getDestination().getId());
+    assertEquals("source IDs of edges must be equal", 
+      e1.getSource().getId(), e2.getSource().getId());
+    assertEquals("destiniation IDs of edges must be equal", 
+      e1.getDestination().getId(), e2.getDestination().getId());
   }
 
   private void checkAnnotationSetEqual(Set<Annotation> annos1,

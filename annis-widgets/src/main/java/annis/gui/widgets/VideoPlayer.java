@@ -15,8 +15,6 @@
  */
 package annis.gui.widgets;
 
-import com.vaadin.ui.LegacyComponent;
-
 /**
  * Audio player that implements the functions needed by ANNIS.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>

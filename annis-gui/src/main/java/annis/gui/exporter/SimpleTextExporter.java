@@ -15,11 +15,19 @@
  */
 package annis.gui.exporter;
 
+import annis.service.objects.SubgraphFilter;
+
 /**
  * Simple text exporter.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class SimpleTextExporter extends GeneralTextExporter
 {
+
+  @Override
+  public SubgraphFilter getSubgraphFilter()
+  {
+    return SubgraphFilter.Token;
+  }
   
 }

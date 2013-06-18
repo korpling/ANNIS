@@ -11,3 +11,4 @@ target/
 /doc/html/
 /doc/latex/
 /annis-widgets/src/main/webapp/VAADIN/
+/annis-gui/src/main/webapp/VAADIN/themes/annis/styles.css

@@ -15,7 +15,6 @@
  */
 package annis.service.internal;
 
-import java.io.IOException;
 import annis.AnnisBaseRunner;
 import annis.AnnisXmlContextHelper;
 import annis.exceptions.AnnisException;
@@ -29,6 +28,7 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
+import java.util.concurrent.TimeUnit;
 import javax.servlet.DispatcherType;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
@@ -37,11 +37,10 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
+import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.io.support.ResourcePropertySource;
 
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
@@ -180,7 +179,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
       ctx);
 
-    int port = ctx.getBean(QueryService.class).getPort();
+    int port = ctx.getBean(QueryServiceImpl.class).getPort();
     try
     {
       // only allow connections from localhost
@@ -192,8 +191,15 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       ServletContextHandler context = 
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
+      // enable gzip compression
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
+      
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
+      
       
       ServletContainer jerseyContainer = new ServletContainer(rc)
       {

@@ -9,33 +9,35 @@
             <preAction>build-with-dependencies</preAction>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-3.0.0-SNAPSHOT-distribution/annis-service-3.0.0-SNAPSHOT/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version}/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
         <action>
             <actionName>debug</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-3.0.0-SNAPSHOT-distribution/annis-service-3.0.0-SNAPSHOT/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version}/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
         <action>
             <actionName>profile</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-3.0.0-SNAPSHOT-distribution/annis-service-3.0.0-SNAPSHOT/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Dannisservice.pid_file=annis.pid -Dannis.nosecurity=true -Dannis.home=target/annis-service-${project.version}-distribution/annis-service-${project.version}/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <profiler.action>profile</profiler.action>
-                <exec.executable>${profiler.java}</exec.executable>
+                <exec.executable>java</exec.executable>
             </properties>
         </action>
         <action>
@@ -45,6 +47,28 @@
             </goals>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </action>
+        <action>
+            <actionName>test</actionName>
+            <goals>
+                <goal>test</goal>
+            </goals>
+            <properties>
+                <jub.consumers>CONSOLE,H2</jub.consumers>
+                <jub.db.file>.benchmarks.db</jub.db.file>
+            </properties>
+        </action>
+        <action>
+            <actionName>test.single</actionName>
+            <goals>
+                <goal>test-compile</goal>
+                <goal>surefire:test</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <jub.consumers>CONSOLE,H2</jub.consumers>
+                <jub.db.file>.benchmarks.db</jub.db.file>
             </properties>
         </action>
     </actions>

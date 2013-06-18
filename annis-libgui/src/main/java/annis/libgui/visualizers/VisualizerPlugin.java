@@ -42,8 +42,8 @@ import net.xeoh.plugins.base.Plugin;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface VisualizerPlugin<I extends Component> extends Plugin, Serializable
-{
+public interface VisualizerPlugin<I extends Component> extends Plugin,
+        Serializable {
 
   /**
    * Get the shorted name of the linguistic type of this visualizer ("partitur",
@@ -58,25 +58,27 @@ public interface VisualizerPlugin<I extends Component> extends Plugin, Serializa
    * vaadin.
    *
    */
-  public I createComponent(VisualizerInput visInput, VisualizationToggle visToggle);
+  public I createComponent(VisualizerInput visInput,
+          VisualizationToggle visToggle);
 
   /**
    * Checks if the Plugin needs the primary text source.
    */
   public boolean isUsingText();
-  
+
   /**
    * If applicable change the visible token annotations.
    *
    * @param annos Which token annotations (qualified name) to show.
    */
-  public void setVisibleTokenAnnosVisible(I visualizerImplementation, Set<String> annos);
-  
+  public void setVisibleTokenAnnosVisible(I visualizerImplementation,
+          Set<String> annos);
+
   /**
    * If applicable change the displayed segmentation.
-   * 
-   * @param segmentationName 
+   *
+   * @param segmentationName
    */
-  public void setSegmentationLayer(I visualizerImplementation, 
-    String segmentationName, Map<SNode, Long> markedAndCovered);
+  public void setSegmentationLayer(I visualizerImplementation,
+          String segmentationName, Map<SNode, Long> markedAndCovered);
 }

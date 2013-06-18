@@ -10,6 +10,7 @@ DROP TABLE IF EXISTS _node_annotation;
 DROP TABLE IF EXISTS _node;
 DROP TABLE IF EXISTS _corpus;
 DROP TABLE IF EXISTS _text;
+DROP TABLE IF EXISTS _example_queries;
 
 
 -- corpora
@@ -62,7 +63,7 @@ CREATE :tmp TABLE _node
 	"right" 		integer NOT NULL,		-- end of covered substring in _text.text (inclusive)
 	token_index		integer,				-- token number in _text.text, NULL if node is not a token
 	seg_name    varchar,      -- segmentation name
-	seg_left     integer,        -- most left segmentation index of covered token 
+	seg_left     integer,        -- most left segmentation index of covered token
 	seg_right    integer,        -- most right segmentation index of covered token
 	continuous		boolean,				-- true if spanned text in _text.text is continuous (not used)
 	span			varchar			-- for tokens: substring in _text.text (indexed for text search), else: NULL
@@ -124,14 +125,19 @@ CREATE :tmp TABLE _resolver_vis_map
   "display_name"   varchar NOT NULL, -- the name of the layer which shall be shown for display
   "visibility"  varchar default 'hidden' NOT NULL,
   "order" integer default '0', -- the order of the layers, in which they shall be shown
-  "mappings" varchar			    
+  "mappings" varchar
 );
 
 CREATE :tmp TABLE _media_files
 (
-  file  bytea NOT NULL,
+  filename  text NOT NULL,
   corpus_ref  bigint NOT NULL,
-  bytes bigint NOT NULL,
   mime_type varchar NOT NULL,
-  title varchar NOT NULL  
+  title varchar NOT NULL
+);
+
+CREATE :tmp TABLE _example_queries
+(
+  "example_query" TEXT NOT NULL,
+  "description" TEXT NOT NULL
 );

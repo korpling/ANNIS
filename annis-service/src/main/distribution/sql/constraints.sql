@@ -32,3 +32,5 @@ ALTER TABLE _edge_annotation ADD CONSTRAINT "__FK_edge_annotation__rank" FOREIGN
 
 ALTER TABLE _media_files ADD CONSTRAINT "__UNIQUE_corpus_ref_title" UNIQUE (corpus_ref, title);
 ALTER TABLE _media_files ADD CONSTRAINT "__corpus_ref" FOREIGN KEY (corpus_ref) REFERENCES _corpus (id);
+
+ALTER TABLE _example_queries ADD CONSTRAINT "__UNIQUE_corpusname" UNIQUE (example_query);

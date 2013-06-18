@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,6 +36,7 @@ public class AnnisAttribute implements Serializable
     node,
     edge,
     segmentation,
+    meta,
     unknown
   };
 
@@ -45,24 +46,25 @@ public class AnnisAttribute implements Serializable
     d,
     p,
     c,
+    m,
     unknown
   };
 
-  
+
   private String name = "";
   private String edgeName = null;
   private LinkedHashSet<String> distinctValues = new LinkedHashSet<String>();
   private Type type;
   private SubType subtype;
 
-  
+
   @XmlElementWrapper(name="value-set")
   @XmlElement(name="value")
   public Collection<String> getValueSet()
   {
     return distinctValues;
   }
-  
+
   public void setValueSet(Collection<String> values)
   {
     this.distinctValues = new LinkedHashSet<String>(values);

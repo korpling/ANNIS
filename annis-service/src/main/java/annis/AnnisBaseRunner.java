@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -35,11 +35,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.support.GenericXmlApplicationContext;
-import org.springframework.core.env.MutablePropertySources;
-import org.springframework.core.io.support.ResourcePropertySource;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.utils.Utils;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.filter.ThresholdFilter;
@@ -81,7 +78,7 @@ public abstract class AnnisBaseRunner
 
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
     AnnisXmlContextHelper.prepareContext(ctx);
-    
+
     ctx.load(contextLocations);
     ctx.refresh();
     return ctx.getBean(beanName);
@@ -333,10 +330,10 @@ public abstract class AnnisBaseRunner
 
 
     ch.qos.logback.classic.Logger logbackLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
-    
-    
+
+
     logbackLogger.addAppender(consoleAppender);
-    
+
     SLF4JBridgeHandler.removeHandlersForRootLogger();;
     SLF4JBridgeHandler.install();
   }

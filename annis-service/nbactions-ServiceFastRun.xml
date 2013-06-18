@@ -8,7 +8,7 @@
             </goals>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
-                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Dannis.home=src/main/distribution/ -Dannis.nosecurity=true -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
             </properties>
@@ -20,7 +20,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannis.home=src/main/distribution/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannis.home=src/main/distribution/ -Dannis.nosecurity=true -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>java</exec.executable>
                 <exec.classpathScope>runtime</exec.classpathScope>
                 <jpda.listen>true</jpda.listen>
@@ -33,7 +33,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
             </goals>
             <properties>
-                <exec.args>${profiler.args} -Dannis.home=src/main/distribution/ -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
+                <exec.args>${profiler.args} -Dannis.home=src/main/distribution/ -Dannis.nosecurity=true -classpath %classpath annis.service.internal.AnnisServiceRunner</exec.args>
                 <exec.executable>${profiler.java}</exec.executable>
                 <profiler.action>profile</profiler.action>
             </properties>
