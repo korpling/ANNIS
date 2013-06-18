@@ -1,3 +1,38 @@
+Version 3.0.0-alpha.3
+=====================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?milestone=6&state=closed
+
+[Bugs]
+ #99 Corpus explorer does not output alignment edges with no annotations
+ #98 Grid is broken in parallel corpora
+ #97 Discourse vis displays multiple texts continuously in parallel corpora
+ #58 Simple text exporter is missing
+
+[Enhancements]
+ #93 allow empty PostgreSQL administration password on initialization
+ #91 A list of all metadata available in a corpus
+ #86 Kickstarter Start Script for Mac
+ #66 Arch dependencies based on annotations
+ #63 Administrator-defined embedded fonts
+ #34 Plug-able query builder
+ #9 WEKA: export metadata
+
+[Other]
+ #96 Allow to connect to remote databases that use SSL
+ #94 Use asynchronous REST client
+ #90 allow administrator-defined embedded fonts
+ #88 allow to select corpus by URL
+ #85 porting ANNIS to Vaadin7
+ #74 Replace citation with a fragment based approach that allows bookmarking
+ #73 Allow to define corpus sets per instance
+ #72 fix #34 (plugable query builder) and introducing instance configuration
+ #71 restrict metadata selection in WekaExporter
+ #70 replace bigint with integer on most columns
+ #69 Query optimizing: transitive precedence
+ #68 The text id should not be globally unique (only relative to document id
+
 Version 3.0.0-alpha.2
 =====================
 
