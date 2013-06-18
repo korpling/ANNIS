@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+
+<licenseSummary xmlns="http://mojo.codehaus.org/"
+                xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                xsi:schemaLocation="http://mojo.codehaus.org/ licenses.xsd">
+  <dependencies>
+    
+    <dependency>
+      <groupId>org.knallgrau</groupId>
+      <artifactId>textcat</artifactId>
+      <licenses>
+        <license>
+          <name>GNU Lesser General Public License (LGPL), Version 2.1</name>
+          <url>http://www.fsf.org/licensing/licenses/lgpl.txt</url>
+        </license>
+      </licenses>
+    </dependency>
+
+  </dependencies>
+</licenseSummary>
