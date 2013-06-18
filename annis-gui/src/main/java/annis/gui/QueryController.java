@@ -439,6 +439,11 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     return true;
   }
+  
+  public String getQueryDraft()
+  {
+    return ui.getControlPanel().getQueryPanel().getQuery();    
+  }
 
   private static class MatchListType extends GenericType<List<Match>>
   {

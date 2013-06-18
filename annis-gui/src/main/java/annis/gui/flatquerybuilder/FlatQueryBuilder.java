@@ -25,62 +25,63 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
-import com.vaadin.ui.OptionGroup;
+import com.vaadin.ui.NativeSelect;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 
-/**
+/*
  * @author martin
  * @author tom
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
-  private Button btInitLanguage;
-  private Label infoInitLanguage;
-  private Button btInitSpan;
-  private Label infoInitSpan;
-  private Button btInitMeta;
-  private Label infoInitMeta;
   private Button btGo;
   private Button btClear;
+  private Button btInverse;
   private QueryController cp;
   private HorizontalLayout language;
+  private HorizontalLayout languagenodes;
   private HorizontalLayout span;
   private HorizontalLayout meta;
   private HorizontalLayout toolbar;
+  private HorizontalLayout advanced;
   private VerticalLayout mainLayout;
-  private OptionGroup filtering;
+  private NativeSelect filtering;
   private Collection<VerticalNode> vnodes;
   private Collection<EdgeBox> eboxes;
   private Collection<MetaBox> mboxes;
+  private SpanBox spbox;
+  private String query;
+  private MenuBar.MenuItem spanMenu;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
-  private static final String BUTTON_LANGUAGE_LABEL = "Initialize linguistic search";
-  private static final String BUTTON_SPAN_LABEL = "Initialize span constraint";
-  private static final String BUTTON_META_LABEL = "Initialize meta search";
+
   private static final String BUTTON_GO_LABEL = "Create AQL Query";
   private static final String BUTTON_CLEAR_LABEL = "Clear the Query Builder";
+  private static final String BUTTON_INV_LABEL = "Refresh Query Builder";
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String NO_MULTIPLE_SPANS = "Only one span can be added as a "
-    + "constraint.";
-  private static final String ADD_LING_PARAM = "Add linguistic constraint";
-  private static final String ADD_SPAN_PARAM = "Add span constraint";
-  private static final String ADD_META_PARAM = "Add meta constraint";
-  private static final String LING_MENU_DESC = "Choose an annotation level to "
-    + "expand the query to the right";
+  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your Query.";
+
+  private static final String ADD_LING_PARAM = "Add";
+  private static final String ADD_SPAN_PARAM = "Add";
+  private static final String CHANGE_SPAN_PARAM = "Change";
+  private static final String ADD_META_PARAM = "Add";
+  
   private static final String INFO_INIT_LANG = "In this part of the Query Builder, "
     + "blocks of the linguistic query can be constructed from left to right.";
   private static final String INFO_INIT_SPAN = "This part of the Query Builder "
@@ -88,96 +89,184 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     + "are confined.";
   private static final String INFO_INIT_META = "Here, you can constrain the linguistic "
     + "query by selecting meta levels.";
+  private static final String INFO_FILTER = "When searching in the fields, the "
+    + "hits are sorted and filtered according to different mechanisms. Please "
+    + "choose a filtering mechanism here.";
+  
   private String TOOLBAR_CAPTION = "Toolbar";
-  private String META_CAPTION = "Meta constraints";
-  private String SPAN_CAPTION = "Span constraints";
-  private String LANG_CAPTION = "Precedence constraints";
+  private String META_CAPTION = "Restrict the search by means of meta information";
+  private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
+  private String LANG_CAPTION = "Create a linguistic sequence";
+  private String ADVANCED_CAPTION = "Advanced settings";
 
   public FlatQueryBuilder(QueryController cp)
   {
-    launch(cp);
+    launch(cp);    
   }
 
   private void launch(QueryController cp)
   {
     this.cp = cp;
+    this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
     vnodes = new ArrayList<VerticalNode>();
     eboxes = new ArrayList<EdgeBox>();
     mboxes = new ArrayList<MetaBox>();
-    // buttons and checks
-    btInitLanguage = new Button(BUTTON_LANGUAGE_LABEL, (Button.ClickListener) this);
-    btInitLanguage.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    infoInitLanguage = new Label(INFO_INIT_LANG);
-    btInitSpan = new Button(BUTTON_SPAN_LABEL, (Button.ClickListener) this);
-    infoInitSpan = new Label(INFO_INIT_SPAN);
-    btInitSpan.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitMeta = new Button(BUTTON_META_LABEL, (Button.ClickListener) this);
-    btInitMeta.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    infoInitMeta = new Label(INFO_INIT_META);
+    spbox = null;
+    // buttons and checks    
     btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    filtering = new OptionGroup("Filtering mechanism");
-    filtering.addItem(1);
-    filtering.setItemCaption(1, "Generic (Levenshtein)");
-    filtering.addItem(2);
-    filtering.setItemCaption(2, "Specified (pre-defined mapping)");
-    filtering.select(2);
+    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
+    btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    filtering = new NativeSelect("Filtering mechanisms");
+    filtering.setDescription(INFO_FILTER);
+    reducingStringComparator rdc = new reducingStringComparator();
+    Set mappings = rdc.getMappings().keySet();
+    int i;
+    for (i=0; i<mappings.size(); i++){
+      String mapname = (String) mappings.toArray()[i];
+      filtering.addItem(i);
+      filtering.setItemCaption(i, mapname);
+    }
+    filtering.addItem(i+1);
+    filtering.setItemCaption(i+1, "generic");
+    filtering.select(i+1);
     filtering.setNullSelectionAllowed(false);
     filtering.setImmediate(true);
     // language layout
     language = new HorizontalLayout();
+    languagenodes = new HorizontalLayout();
     language.setSpacing(true);
-    language.addComponent(btInitLanguage);
-    language.addComponent(infoInitLanguage);
+    language.addComponent(languagenodes);
+    //language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
-    span.addComponent(btInitSpan);
-    span.addComponent(infoInitSpan);
+    //span.addComponent(btInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
-    meta.addComponent(btInitMeta);
-    meta.addComponent(infoInitMeta);
+    //meta.addComponent(btInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
     // toolbar layout
     toolbar = new HorizontalLayout();
     toolbar.setSpacing(true);
-    toolbar.addComponent(filtering);
     toolbar.addComponent(btGo);
     toolbar.addComponent(btClear);
+    toolbar.addComponent(btInverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
+    // advanced
+    advanced = new HorizontalLayout();
+    advanced.setSpacing(true);
+    advanced.addComponent(filtering);
+    advanced.setMargin(true);
+    advanced.setCaption(ADVANCED_CAPTION);
     // put everything on the layout
     mainLayout.setSpacing(true);
     mainLayout.addComponent(language);
     mainLayout.addComponent(span);
     mainLayout.addComponent(meta);
     mainLayout.addComponent(toolbar);
+    mainLayout.addComponent(advanced);
     setContent(mainLayout);
-    getContent().setSizeFull();
+    getContent().setSizeFull();   
+    initialize();
+  }
+  
+  private void initialize()
+  {
+    //init variables:
+    final FlatQueryBuilder sq = this;
+    Collection<String> annonames = getAvailableAnnotationNames();
+    Collection<String> metanames = getAvailableMetaNames();
+    
+    //Code from btInitLanguage:    
+    final MenuBar addMenu = new MenuBar();
+    addMenu.setDescription(INFO_INIT_LANG);    
+    final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      add.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          if (!vnodes.isEmpty())
+          {
+            EdgeBox eb = new EdgeBox(sq);
+            languagenodes.addComponent(eb);
+            eboxes.add(eb);
+          }
+          VerticalNode vn = new VerticalNode(annoname, sq);
+          languagenodes.addComponent(vn);
+          vnodes.add(vn);
+        }
+      });
+    }
+    language.addComponent(addMenu);
+    
+    //Code from btInitSpan:    
+    final MenuBar addMenuSpan = new MenuBar();
+    addMenuSpan.setDescription(INFO_INIT_SPAN);    
+    final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
+    for (final String annoname : annonames)
+    {
+      addSpan.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {          
+          sq.removeSpanBox();
+          sq.addSpanBox(annoname);                              
+        }
+      });
+    }
+    spanMenu = addSpan;
+    span.addComponent(addMenuSpan);
+    
+    //Code from btInitMeta:    
+    final MenuBar addMenuMeta = new MenuBar();
+    addMenuMeta.setDescription(INFO_INIT_META);    
+    final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
+    for (final String annoname : metanames)
+    {
+      addMeta.addItem(annoname, new MenuBar.Command() {
+        @Override
+        public void menuSelected(MenuBar.MenuItem selectedItem) {
+          MetaBox mb = new MetaBox(annoname, sq);
+          meta.addComponent(mb);
+          mboxes.add(mb);
+        }
+      });
+    }
+    meta.addComponent(addMenuMeta);    
   }
   
   private String getAQLFragment(SearchBox sb)
   {
-    String result, value=sb.getValue(), level=sb.getAttribute();
-    if (sb.isRegEx())
+    String result = ""; 
+    String value = sb.getValue();
+    String level=sb.getAttribute();
+    if (sb.isRegEx() && !sb.isNegativeSearch())
     {
-      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace(
-        "/", "\\x2F") +"/";
+      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
     }
-    else
+    if (sb.isRegEx() && sb.isNegativeSearch())
     {
-      result = (value==null) ? level+"=/.*/" : level+"=\""+value+"\"";      
+      result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
+    }
+    if (!sb.isRegEx() && sb.isNegativeSearch())
+    {
+      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
+    }
+    if (!sb.isRegEx() && !sb.isNegativeSearch())
+    {
+      result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
     }
     return result;
   }
@@ -185,22 +274,26 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String getMetaQueryFragment(MetaBox mb)
   {    
     Collection<String> values = mb.getValues();
-    String result = "\n& meta::"+mb.getMetaDatum()+" = ";
-    if(values.size()==1)
+    if(!values.isEmpty())
     {
-      result += "\""+values.iterator().next()+"\"";
-    }
-    else
-    {      
-      Iterator<String> itValues = values.iterator();
-      result += "/(" + escapeRegexCharacters(itValues.next())+")";
-      while(itValues.hasNext())
+      String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+      if(values.size()==1)
       {
-        result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        result += "\""+values.iterator().next()+"\"";
       }
-      result += "/";
-    }   
-    return result;
+      else
+      {      
+        Iterator<String> itValues = values.iterator();
+        result += "/(" + escapeRegexCharacters(itValues.next())+")";
+        while(itValues.hasNext())
+        {
+          result+= "|("+escapeRegexCharacters(itValues.next())+")";
+        }
+        result += "/";
+      }   
+      return result;
+    }
+    return "";
   }
   
   public String escapeRegexCharacters(String tok)
@@ -214,11 +307,40 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     return result.replace("/", "\\x2F");
   }
+  
+  private String unescape(String s)
+	{
+    //first unescape slashes and quotes:
+		
+		s = s.replace("\\x2F", "/").replace("\\x22", "\"");       
+    
+    //unescape regex characters:
+		int i=1;
+		while(i<s.length())
+		{
+			char c0 = s.charAt(i-1);
+			char c1 = s.charAt(i);
+			for(int j=0; j<REGEX_CHARACTERS.length; j++)
+			{
+				if( (c1==REGEX_CHARACTERS[j].charAt(0)) & (c0=='\\') )
+				{
+					s = s.substring(0, i-1) + s.substring(i);
+					break;
+				}
+				if(j==REGEX_CHARACTERS.length-1)
+				{
+					i++;
+				}
+			}			
+		}		
+    
+    return s;
+	}
 
   private String getAQLQuery()
   {
     int count = 1;    
-    String query = "", edgeQuery = "", sentenceQuery = "";
+    String ql = "", edgeQuery = "", sentenceQuery = "";
     Collection<Integer> sentenceVars = new ArrayList<Integer>();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
     for (VerticalNode v : vnodes)
@@ -226,12 +348,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       Collection<SearchBox> sboxes = v.getSearchBoxes();
       for (SearchBox s : sboxes)
       {
-        query += " & " + getAQLFragment(s);
+        ql += " & " + getAQLFragment(s);
       }
       if (sboxes.isEmpty())
       {
         //not sure we want to do it this way:
-        query += "\n& /.*/";
+        ql += "\n& /.*/";
       }
       sentenceVars.add(new Integer(count));
       for(int i=1; i < sboxes.size(); i++)
@@ -256,7 +378,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
         addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
       }
-      query += addQuery;
+      ql += addQuery;
       for(Integer i : sentenceVars)
       {
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
@@ -270,9 +392,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     {
       metaQuery += getMetaQueryFragment(itMetaBoxes.next());
     }
-    String fullQuery = (query+edgeQuery+sentenceQuery+metaQuery);
+    String fullQuery = (ql+edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
-    fullQuery = fullQuery.substring(3);//deletes leading " & "    
+    fullQuery = fullQuery.substring(3);//deletes leading " & "
+    this.query = fullQuery;
     return fullQuery;
   }
 
@@ -281,7 +404,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     try{
       cp.setQuery(new Query(getAQLQuery(), null));
     } catch (java.lang.NullPointerException ex) {
-      getUI().showNotification(INCOMPLETE_QUERY_WARNING);
+      Notification.show(INCOMPLETE_QUERY_WARNING);      
     }
   }
 
@@ -290,85 +413,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   {
     final FlatQueryBuilder sq = this; 
     if (cp.getSelectedCorpora().isEmpty()){
-      getUI().showNotification(NO_CORPORA_WARNING);
+      Notification.show(NO_CORPORA_WARNING);
     }
     else
     {
-      if(event.getButton() == btInitLanguage)
-      {
-        language.removeComponent(btInitLanguage);
-        language.removeComponent(infoInitLanguage);
-        MenuBar addMenu = new MenuBar();
-        addMenu.setDescription(LING_MENU_DESC);
-        addMenu.setWidth("150px");
-        Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              if (!vnodes.isEmpty())
-              {
-                EdgeBox eb = new EdgeBox(sq);
-                language.addComponent(eb);
-                eboxes.add(eb);
-              }
-
-              VerticalNode vn = new VerticalNode(annoname, sq);
-              language.addComponent(vn);
-              vnodes.add(vn);
-
-            }
-          });
-        }
-        language.addComponent(addMenu);
-      }
-      if(event.getButton() == btInitSpan)
-      {
-        span.removeComponent(btInitSpan);
-        span.removeComponent(infoInitSpan);
-        MenuBar addMenu = new MenuBar();
-        Collection<String> annonames = getAvailableAnnotationNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_SPAN_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              SpanBox spb = new SpanBox(annoname, sq);
-              if (span.getComponentCount() < 2){
-                span.addComponent(spb);
-                span.setComponentAlignment(spb, Alignment.MIDDLE_LEFT);
-              }
-              if (span.getComponentCount() > 1){
-                getUI().showNotification(NO_MULTIPLE_SPANS);
-              }
-            }
-          });
-        }
-        span.addComponent(addMenu);
-      }
-      if(event.getButton() == btInitMeta)
-      {
-        meta.removeComponent(btInitMeta);
-        meta.removeComponent(infoInitMeta);
-        MenuBar addMenu = new MenuBar();
-        Collection<String> annonames = getAvailableMetaNames();
-        final MenuBar.MenuItem add = addMenu.addItem(ADD_META_PARAM, null);
-        for (final String annoname : annonames)
-        {
-          add.addItem(annoname, new MenuBar.Command() {
-            @Override
-            public void menuSelected(MenuBar.MenuItem selectedItem) {
-              MetaBox mb = new MetaBox(annoname, sq);
-              meta.addComponent(mb);
-              mboxes.add(mb);
-            }
-          });
-        }
-        meta.addComponent(addMenu);
-      }
       if (event.getButton() == btGo)
       {
         updateQuery();
@@ -376,55 +424,98 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
       if (event.getButton() == btClear)
       {
-        language.removeAllComponents();
-        span.removeAllComponents();
-        meta.removeAllComponents();
-        toolbar.removeAllComponents();
-        mainLayout.removeComponent(language);
-        mainLayout.removeComponent(span);
-        mainLayout.removeComponent(meta);
-        mainLayout.removeComponent(toolbar);
-        vnodes.clear();
-        eboxes.clear();
-        mboxes.clear();
+        clear();
         updateQuery();
         launch(cp);
       }
-    }
-  }
-
-public void removeVerticalNode(VerticalNode v)
-  {
-    language.removeComponent(v);
-    for (VerticalNode vnode : vnodes)
-    {
-      Iterator<EdgeBox> ebIterator = eboxes.iterator();
-      if((ebIterator.hasNext()) && (v.equals(vnode)))
+      if (event.getComponent() == btInverse)
       {
-        EdgeBox eb = eboxes.iterator().next();
-        eboxes.remove(eb);
-        language.removeComponent(eb);
-        break;
+        try
+        {
+          loadQuery();
+        }
+        catch(Exception e)
+        {          
+        }
       }
     }
-    vnodes.remove(v);
-    updateQuery();
   }
 
-public void removeSpanBox(SpanBox v)
+  public void removeVerticalNode(VerticalNode v)
   {
-    span.removeComponent(v);
-    updateQuery();
+    Iterator<VerticalNode> itVnodes = vnodes.iterator();
+    Iterator<EdgeBox> itEboxes = eboxes.iterator();
+    VerticalNode vn = itVnodes.next();
+    EdgeBox eb=null;
+    
+    while(!vn.equals(v))
+    {
+      vn = itVnodes.next();
+      eb = itEboxes.next();
+    }
+    
+    if((eb==null) & (itEboxes.hasNext()))
+    {
+      eb = itEboxes.next();
+    }
+    
+    vnodes.remove(v);
+    if(eb!=null)
+    {
+      eboxes.remove(eb);
+      languagenodes.removeComponent(eb);
+    }
+    languagenodes.removeComponent(v);
+  }
+  
+  public void addSpanBox(String level)
+  {
+    spbox = new SpanBox(level, this);
+    span.addComponent(spbox);
+    span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
+    spanMenu.setText(CHANGE_SPAN_PARAM);
+  }
+  
+  public void addSpanBox(SpanBox spb)
+  {
+    if(spbox==null)
+    {
+      spanMenu.setText(CHANGE_SPAN_PARAM);
+    }
+    else
+    {
+      span.removeComponent(spbox);
+    }
+    spbox = spb;
+    span.addComponent(spbox);
+    span.setComponentAlignment(spbox, Alignment.MIDDLE_LEFT);
   }
 
-public void removeMetaBox(MetaBox v)
+  public void removeSpanBox()
+  {
+    if(spbox!=null)
+    {
+      span.removeComponent(spbox);
+      spbox=null;
+      spanMenu.setText(ADD_SPAN_PARAM);
+    }
+  }
+  
+  public void removeSpanBox(SpanBox spb)
+  {
+    if(spb.equals(spbox))
+    {
+      removeSpanBox();
+    }
+  }
+
+  public void removeMetaBox(MetaBox v)
   {
     meta.removeComponent(v);
     mboxes.remove(v);
-    updateQuery();
   }
 
-public Collection<String> getAnnotationValues(String level)
+  public Collection<String> getAnnotationValues(String level)
   {
     Collection<String> values = new TreeSet<String>();
     for(String s : getAvailableAnnotationLevels(level))
@@ -434,7 +525,7 @@ public Collection<String> getAnnotationValues(String level)
     return values;
   }
 
-public Set<String> getAvailableAnnotationNames()
+  public Set<String> getAvailableAnnotationNames()
   {
     Set<String> result = new TreeSet<String>();
     WebResource service = Helper.getAnnisWebResource();
@@ -595,24 +686,504 @@ public Set<String> getAvailableAnnotationNames()
   public String getFilterMechanism()
   {
     String out = "";
-    if (filtering.getValue().equals(1)){
-      out = "levenshtein";
-    }
-    if (filtering.getValue().equals(2)){
-      out = "specific";
-    }
-    return out;
+    return filtering.getItemCaption(filtering.getValue());
   }
   
-  public void adjustBuilderToQuery()
+  private void clear()
+    //check whether it is necessary to do this in a method
+  {
+    language.removeAllComponents();
+    span.removeAllComponents();
+    meta.removeAllComponents();
+    toolbar.removeAllComponents();
+    mainLayout.removeComponent(language);
+    mainLayout.removeComponent(span);
+    mainLayout.removeComponent(meta);
+    mainLayout.removeComponent(toolbar);
+    vnodes.clear();
+    eboxes.clear();
+    mboxes.clear();
+  }
+  
+  public Collection<String> parseMetaExpression(String expression)
+	/*
+	 * only for complex regex expressions
+	 */
+	{		
+		Collection<String> values = new TreeSet<String>();
+		int i=0;
+		
+		while(expression.length()>0)
+		{
+			if((expression.charAt(i)=='|')|(i==expression.length()-1))
+			{
+				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
+				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
+				{
+					value = value.substring(1, value.length()-1);
+				}
+				value = unescape(value);
+        values.add(value);
+				expression = expression.substring(i+1);
+				i=0;				
+			}
+			else
+			{
+				i++;
+			}
+		}
+		
+		return values;
+	}
+  
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException
     /*
-     * this method is called, when the
-     * query is changed in the textfield,
-     * so that the query represented by 
+     * this method is called by btInverse
+     * When the query has changed in the
+     * textfield, the query represented by 
      * the query builder is not equal to
      * the one delivered by the text field
      */
   {
     
+    String tq;//typed-in query
+    
+    tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
+    //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
+    boolean valid = (!tq.equals(""));
+    if(!(query.equals(tq)) & valid)
+    {
+      //PROBLEM: LINE BREAKS (simple without anything else)
+      try
+      {
+      
+        //the dot marks the end of the string - it is not read, it's just a place holder
+        tq += ".";
+        HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
+        ArrayList<Relation> pRelations = new ArrayList<Relation>();
+        ArrayList<Relation> eRelations = new ArrayList<Relation>();
+        Relation inclusion=null;
+        Constraint conInclusion=null;
+        ArrayList<Constraint> metaConstraints = new ArrayList<Constraint>();
+
+        //parse typed-in Query
+        //Step 1: get indices of tq-chars, where constraints are separated (&)
+        String tempCon="";
+        int count = 1;
+        boolean inclusionCheck=false;
+
+        for(int i=0; i<tq.length(); i++)
+        {
+          //improve this Algorithm (compare to constraint)
+          char c = tq.charAt(i);
+          if((c!='&') & (i!=tq.length()-1))
+          {
+            if(!((tempCon.length()==0) & (c==' '))) //avoids, that a constraint starts with a space
+            {
+              tempCon += c;
+            }
+          }
+          else
+          {
+            while(tempCon.charAt(tempCon.length()-1)==' ')
+            {
+              tempCon = tempCon.substring(0, tempCon.length()-1);
+            }
+
+            if(tempCon.startsWith("meta::"))
+            {
+              metaConstraints.add(new Constraint(tempCon));
+            }
+            else if(tempCon.startsWith("#"))          
+            {
+              Relation r = new Relation(tempCon);
+              if(r.getType()==RelationType.EQUALITY)
+              {
+                eRelations.add(r);
+              }
+              else if(r.getType()==RelationType.PRECEDENCE)
+              {
+                pRelations.add(r);
+              }
+              else if((r.getType()==RelationType.INCLUSION)&(!inclusionCheck))
+              {
+                inclusion = r;
+                if(constraints.containsKey(r.getFirst()))
+                {
+                  conInclusion = constraints.get(r.getFirst());
+                  constraints.remove(r.getFirst());
+                }
+                inclusionCheck=true;
+              }
+            }         
+            else 
+            {
+              constraints.put(count++, new Constraint(tempCon));
+            }
+
+            tempCon = "";
+          }
+        }        
+        
+        //create Vertical Nodes
+        HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
+        VerticalNode vn=null;
+        Collection<String> annonames = getAvailableAnnotationNames();        
+        for(int i : constraints.keySet())
+        {          
+          Constraint con = constraints.get(i);                    
+          if(!annonames.contains(con.getLevel()))
+          {
+            throw new UnknownLevelException(con.getLevel());
+            //is that a good idea?
+          }
+          if(!indexedVnodes.containsKey(i))
+          {          
+            vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
+            indexedVnodes.put(i, vn);
+          }
+
+          for(Relation rel : eRelations)
+          {
+            if(rel.contains(i))
+            {
+              int b = rel.whosMyFriend(i);
+              if(!indexedVnodes.containsKey(b))
+              {
+                indexedVnodes.put(b, null);
+                Constraint bcon = constraints.get(b);
+                SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
+                sb.setValue(bcon.getValue());
+                vn.addSearchBox(sb);
+              }
+            }          
+          }
+          
+        }
+        
+        //clean query builder surface
+        for(VerticalNode v : vnodes)
+        {
+          languagenodes.removeComponent(v);        
+        }
+        vnodes.clear();
+
+        for(EdgeBox eb : eboxes)
+        {
+          languagenodes.removeComponent(eb);
+        }
+        eboxes.clear();
+
+        for(MetaBox mb : mboxes)
+        {
+          meta.removeComponent(mb);          
+        }
+        mboxes.clear();
+
+        //remove SpanBox
+        removeSpanBox();
+
+        VerticalNode first = null;
+        int smP = (!pRelations.isEmpty()) ? pRelations.iterator().next().getFirst() : 0;
+        int smE = (!eRelations.isEmpty()) ? eRelations.iterator().next().getFirst() : 0;
+        if((smP+smE)==0)
+        {
+          if(!indexedVnodes.isEmpty())
+          {
+            first = indexedVnodes.values().iterator().next(); 
+          }        
+        }
+        else if((smP!=0) & (smE!=0))
+        {
+          first = indexedVnodes.get(Math.min(smE, smP));
+        }
+        else
+        {
+          //one value is zero
+          first = indexedVnodes.get(smE+smP);
+        }
+
+        if(first!=null)
+        {
+          vnodes.add(first);
+          languagenodes.addComponent(first);
+
+          for(Relation rel : pRelations)
+          {
+            EdgeBox eb = new EdgeBox(this);
+            eb.setValue(rel.getOperator());
+            eboxes.add(eb);
+            VerticalNode v = indexedVnodes.get(rel.getSecond());
+            vnodes.add(v);
+
+            languagenodes.addComponent(eb);
+            languagenodes.addComponent(v);  
+          }
+        }
+
+        //build SpanBox
+        if(inclusion!=null)
+        {       
+          addSpanBox(new SpanBox(conInclusion.getLevel(), this, conInclusion.isRegEx()));
+          spbox.setValue(conInclusion.getValue());
+        }
+
+        //build MetaBoxes
+        for(Constraint mc : metaConstraints)
+        {
+          if(mc.isRegEx())
+          {
+            Collection<String> values = parseMetaExpression(mc.getValue());
+            MetaBox mb = new MetaBox(mc.getLevel(), this);
+            mb.setValue(values);
+            mboxes.add(mb);
+            meta.addComponent(mb);
+          }
+          else
+          {
+            MetaBox mb = new MetaBox(mc.getLevel(), this);
+            //for a particular reason (unknown) setValue() with a String parameter
+            //is not accepted by OptionGroup
+            Collection<String> values = new TreeSet<String>();
+            values.add(mc.getValue());
+            mb.setValue(values);
+            mboxes.add(mb);
+            meta.addComponent(mb);
+          }
+        }
+        query = tq.substring(0, tq.length()-1);
+      }
+      catch(Exception e)
+      {
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException))
+        {
+          Notification.show(e.getMessage());
+          //maybe highlight the critical character sequence          
+        }
+        else
+        {
+          Notification.show(QUERY_ERROR_WARNING);
+        }    
+      }
+    }    
+  }
+  
+  private class Constraint
+  {
+    private String level;
+    private String value;
+    private boolean regEx;
+    private boolean negative;
+    
+    public Constraint(String s)
+    {
+      int e=0;
+      while(s.charAt(e)!='=')
+      {
+        e++;
+      }
+      
+      String l;
+      
+      if(s.charAt(e-1)=='!')
+      {
+        l = s.substring(0, e-1).replace(" ", "");
+        negative = true;
+      }
+      else
+      {
+        l = s.substring(0, e).replace(" ", "").replace("meta::", "");
+        negative = false;
+      }
+      
+      String v = s.substring(e+1);
+      while(v.startsWith(" "))
+      {
+        v = v.substring(1);
+      }
+      if(v.startsWith("\""))
+      {
+        regEx = false;
+      }
+      else
+      {
+        regEx = true;
+      }
+      //remove " or / :
+      v = v.substring(1, v.length()-1);
+      
+      level = l;
+      value = v;
+    }
+    
+    public String getLevel()
+    {
+      return level;
+    }
+    
+    public String getValue()
+    {
+      return value;
+    }
+    
+    public boolean isRegEx()
+    {
+      return regEx;
+    }
+    
+    public boolean isNegative()
+    {
+      return negative;
+    }
+  }
+  
+  private class Relation
+  /*
+   * Problems:
+   * if an operator is used, which is not in the EdgeBoxe's list
+   * the programm will crash. Right now. I'm gonna fix this.
+   * 
+   */
+  {
+    //operands without '#'
+    private int o1, o2;
+    private String operator;
+    private RelationType type;
+    
+    public Relation(String in) throws EqualityConstraintException
+    {
+      
+      String op = "";
+      String o1str = "";
+      String o2str = "";
+      
+      int i=1;
+      char c = in.charAt(1);
+      in = in.replace(" ", "");
+      
+      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$'))
+      {
+        o1str+=c;
+        i++;
+        c = in.charAt(i);
+      }     
+      while(c!='#')
+      {
+        op+=c;
+        i++;
+        c = in.charAt(i);
+      }
+      i++;
+      while((i<in.length()))
+      {
+        c = in.charAt(i);
+        o2str+=c;
+        i++;
+      }
+      
+      operator = op;
+      o1 = Integer.parseInt(o1str);
+      o2 = Integer.parseInt(o2str);
+      
+      if(op.startsWith("."))
+      {
+       type = RelationType.PRECEDENCE; 
+      }
+      else if((op.equals("=")) | (op.equals("_=_")))
+      {
+        type = RelationType.EQUALITY;
+        if(o1>o2)
+        {
+          int tmp = o1;
+          o1 = o2;
+          o2 = tmp;
+        }
+        else if(o1==o2)
+        {
+          throw new EqualityConstraintException(in);
+        }
+      }
+      else if(op.equals("_i_"))
+      {
+        type = RelationType.INCLUSION;
+      }
+    }
+    
+    public RelationType getType()
+    {
+      return type;
+    }
+    
+    public int getFirst()
+    {
+      return o1;
+    }
+    
+    public int getSecond()
+    {
+      return o2;
+    }
+    
+    public String getOperator()
+    {
+      return operator;
+    }
+    
+    public boolean contains(int a)
+    {      
+      return ((o1==a)|(o2==a));
+    }
+    
+    public int whosMyFriend(int a)
+    {
+      if(a==o1)
+      {
+        return o2;
+      }
+      if(a==o2)
+      {
+        return o1;
+      }
+      return 0;
+    }
+  }
+  
+  private enum RelationType
+  {
+    PRECEDENCE, DOMINANCE, INCLUSION, EQUALITY
+  }
+  
+  private class UnknownLevelException extends Exception
+  {
+    private static final String ERROR_MESSAGE = "Unknown annotation level: ";
+    private String level;
+    
+    public UnknownLevelException(String level)
+    {
+      this.level = level;
+    }
+    
+    @Override
+    public String getMessage()
+    {
+      return ERROR_MESSAGE+level;
+    }
+  }
+  
+  private class EqualityConstraintException extends Exception
+  {
+    private static final String ERROR_MESSAGE = "Redundant use of equality operator: ";
+    private final String critical;
+    
+    public EqualityConstraintException(String s)
+    {
+      critical = s;
+    }
+    
+    @Override
+    public String getMessage()
+    {
+      return ERROR_MESSAGE+critical;
+    }
   }
 }

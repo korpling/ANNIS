@@ -20,8 +20,10 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.ui.AbstractSelect.Filtering;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -49,19 +51,30 @@ public class SearchBox extends Panel implements Button.ClickListener,
 {
   private Button btClose;
   private VerticalNode vn;
+  private VerticalLayout vnframe;
   private String ebene;
   private SensitiveComboBox cb;  
   private CheckBox reBox;
+  private CheckBox negSearchBox;
   private Collection<String> annonames;
   private FlatQueryBuilder sq;
-  public static final String BUTTON_CLOSE_LABEL = "Close";
+  public static final String BUTTON_CLOSE_LABEL = "X";
   private static final String SB_CB_WIDTH = "145px";
+  private static final String CAPTION_REBOX = "Regex";
+  private static reducingStringComparator rsc;
   
-  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn)
+  public SearchBox(final String level, final FlatQueryBuilder sq, final VerticalNode vn)
+  {
+    this(level, sq, vn, false, false);
+  }
+  
+  public SearchBox(final String ebene, final FlatQueryBuilder sq, final VerticalNode vn, boolean isRegex, boolean negativeSearch)
   {
     this.vn = vn;
     this.ebene = ebene;
     this.sq = sq;
+    rsc = new reducingStringComparator();
+    vnframe = new VerticalLayout();
     VerticalLayout sb = new VerticalLayout();
     sb.setImmediate(true);
     sb.setSpacing(true);
@@ -72,8 +85,9 @@ public class SearchBox extends Panel implements Button.ClickListener,
     }
     this.annonames = annos;//by Martin    
     this.cb = new SensitiveComboBox();
+    cb.setNewItemsAllowed(true);
+    cb.setTextInputAllowed(true);
     cb.setCaption(ebene);
-    cb.setInputPrompt(ebene);
     cb.setWidth(SB_CB_WIDTH);
     // configure & load content
     cb.setImmediate(true);
@@ -84,18 +98,17 @@ public class SearchBox extends Panel implements Button.ClickListener,
     cb.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
     cb.addListener((FieldEvents.TextChangeListener)this);    
     sb.addComponent(cb);
-    HorizontalLayout sbtoolbar = new HorizontalLayout();
-    sbtoolbar.setSpacing(true);
+    VerticalLayout sbtoolbar = new VerticalLayout();
+    sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
-    CheckBox tb = new CheckBox("Regex");
-    tb.setImmediate(true);
-    sbtoolbar.addComponent(tb);
-    tb.addListener(new ValueChangeListener() {
+    reBox = new CheckBox(CAPTION_REBOX);
+    reBox.setImmediate(true);
+    sbtoolbar.addComponent(reBox);
+    reBox.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
       public void valueChange(ValueChangeEvent event) {
-        boolean r = reBox.booleanValue();
-        cb.setNewItemsAllowed(r);
+        boolean r = reBox.getValue();
         if(!r)
         {         
           SpanBox.buildBoxValues(cb, ebene, sq);
@@ -103,21 +116,28 @@ public class SearchBox extends Panel implements Button.ClickListener,
         else if(cb.getValue()!=null)
         {
           String escapedItem = sq.escapeRegexCharacters(cb.getValue().toString());
+          //String escapedItem = cb.getValue().toString();
           cb.addItem(escapedItem);
           cb.setValue(escapedItem);         
         }
       }
     });
-    reBox = tb;
+    reBox.setValue(isRegex);
+    // searchbox tickbox for negative search
+    negSearchBox = new CheckBox("Neg. search");
+    negSearchBox.setImmediate(true);
+    negSearchBox.setValue(negativeSearch);
+    sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    sbtoolbar.addComponent(btClose);
-    sb.addComponent(sbtoolbar);
-    sb.setSpacing(true);
-    setContent(sb);    
-  } 
- 
+    vnframe.addComponent(btClose);
+    vnframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
+    vnframe.addComponent(sb);
+    vnframe.addComponent(sbtoolbar);
+    setContent(vnframe);    
+  }
+  
   @Override
   public void buttonClick(Button.ClickEvent event)
   {    
@@ -145,10 +165,10 @@ public class SearchBox extends Panel implements Button.ClickListener,
   @Override
   public void textChange(TextChangeEvent event)
   {
-    if ("specific".equals(sq.getFilterMechanism()))
+    String fm = sq.getFilterMechanism();
+    if (!"generic".equals(fm))
     {
-      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();
-      reducingStringComparator esc = new reducingStringComparator();    
+      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();       
       String txt = event.getText();
       if (!txt.equals(""))
       {
@@ -156,7 +176,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         for (Iterator<String> it = annonames.iterator(); it.hasNext();)
         {
           String s = it.next();
-          if(esc.compare(s, txt)==0)
+          if(rsc.compare(s, txt, fm)==0)
           {
             cb.addItem(s);          
           }
@@ -165,7 +185,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //startsWith
         for(String s : notInYet)
         {        
-          if(esc.startsWith(s, txt))
+          if(rsc.startsWith(s, txt, fm))
           {
             cb.addItem(s);
             notInYet.remove(s);
@@ -174,7 +194,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         //contains
         for(String s : notInYet)
         {
-          if(esc.contains(s, txt))
+          if(rsc.contains(s, txt, fm))
           {
             cb.addItem(s);
           }
@@ -187,7 +207,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
       }
     }
     
-    if ("levenshtein".equals(sq.getFilterMechanism()))       
+    if ("generic".equals(sq.getFilterMechanism()))       
     {
       String txt = event.getText();
       HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
@@ -196,7 +216,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
         cb.removeAllItems();
         for(String s : annonames)
         {
-          Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt), removeAccents(s));
+          Integer d = StringUtils.getLevenshteinDistance(removeAccents(txt).toLowerCase(), removeAccents(s).toLowerCase());
           if (levdistvals.containsKey(d)){
             levdistvals.get(d).add(s);
           }
@@ -225,17 +245,31 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public String getValue()
   {
-    return cb.toString();
+    return cb.getValue().toString();
   }
   
   public boolean isRegEx()
   {
-    return reBox.booleanValue();
+    return reBox.getValue();
   }
   
   public static String removeAccents(String text) {
     return text == null ? null
         : Normalizer.normalize(text, Form.NFD)
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
-  } 
+  }
+  
+  public boolean isNegativeSearch()
+  {
+    return negSearchBox.getValue();
+  }
+  
+  public void setValue(String value)
+  {
+    if(reBox.getValue())
+    {
+      cb.addItem(value);
+    }
+    cb.setValue(value);
+  }
 }
