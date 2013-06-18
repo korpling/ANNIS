@@ -137,10 +137,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     vnframe.addComponent(sbtoolbar);
     setContent(vnframe);    
   }
- 
   
-  
- 
   @Override
   public void buttonClick(Button.ClickEvent event)
   {    
