@@ -37,25 +37,34 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.joran.spi.JoranException;
+import ch.qos.logback.core.spi.FilterReply;
 
 public abstract class AnnisBaseRunner
 {
 
-  private static final Logger log = LoggerFactory.getLogger(AnnisBaseRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(
+    AnnisBaseRunner.class);
   // the root of the Annis installation
+
   private static String annisHomePath;
   // console output for easier testing, normally set to System.out
+
   protected PrintStream out = System.out;
+
   private FileHistory history;
   // for the interactive shell
+
   private String helloMessage;
+
   private String prompt;
 
   public static AnnisBaseRunner getInstance(String beanName,
@@ -133,16 +142,19 @@ public abstract class AnnisBaseRunner
     if (!annisDir.exists())
     {
       log.info("Creating directory: " + annisDirPath);
-      if(!annisDir.mkdirs())
+      if (!annisDir.mkdirs())
       {
         log.warn("Could not create directory: " + annisDirPath);
       }
-    } else if (!annisDir.isDirectory())
+    }
+    else if (!annisDir.isDirectory())
     {
-      log.warn("Could not create directory because a file with the same name already exists: " + annisDirPath);
+      log.warn(
+        "Could not create directory because a file with the same name already exists: " + annisDirPath);
     }
 
-    history = new FileHistory(new File(System.getProperty("user.home") + "/.annis/shellhistory.txt"));
+    history = new FileHistory(new File(
+      System.getProperty("user.home") + "/.annis/shellhistory.txt"));
     console.setHistory(history);
     console.setHistoryEnabled(true);
     console.setBellEnabled(true);
@@ -207,7 +219,8 @@ public abstract class AnnisBaseRunner
         String commandName = m.getName().substring("do".length());
         if (commandName.length() > 1)
         {
-          commandName = commandName.substring(0, 1).toLowerCase() + commandName.substring(1);
+          commandName = commandName.substring(0, 1).toLowerCase() + commandName.
+            substring(1);
           result.add(commandName);
         }
       }
@@ -217,7 +230,8 @@ public abstract class AnnisBaseRunner
 
   protected void runCommand(String command, String args)
   {
-    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.substring(1);
+    String methodName = "do" + command.substring(0, 1).toUpperCase() + command.
+      substring(1);
     log.debug("looking for: " + methodName);
 
     try
@@ -293,7 +307,8 @@ public abstract class AnnisBaseRunner
   // configure logging
   public static void setupLogging(boolean console)
   {
-    LoggerContext loggerContext = (LoggerContext) LoggerFactory.getILoggerFactory();
+    LoggerContext loggerContext = (LoggerContext) LoggerFactory.
+      getILoggerFactory();
 
     JoranConfigurator jc = new JoranConfigurator();
     jc.setContext(loggerContext);
@@ -314,7 +329,7 @@ public abstract class AnnisBaseRunner
 
     PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
     consoleEncoder.setContext(loggerContext);
-    consoleEncoder.setPattern("%level - %msg [%C{1} - %d, %r ms] %n");
+    consoleEncoder.setPattern("%p\t - %msg - %r ms %n");
     consoleEncoder.start();
 
     ThresholdFilter consoleFilter = new ThresholdFilter();
@@ -329,8 +344,9 @@ public abstract class AnnisBaseRunner
     consoleAppender.start();
 
 
-    ch.qos.logback.classic.Logger logbackLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
 
+    ch.qos.logback.classic.Logger logbackLogger = loggerContext.getLogger(
+      Logger.ROOT_LOGGER_NAME);
 
     logbackLogger.addAppender(consoleAppender);
 
