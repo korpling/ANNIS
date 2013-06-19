@@ -711,7 +711,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mboxes.clear();
   }
   
-  public Collection<String> parseMetaExpression(String expression)
+  public Collection<String> parseMultipleValueExpression(String expression)
 	/*
 	 * only for complex regex expressions
 	 */
@@ -844,7 +844,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             //is that a good idea?
           }
           if(!indexedVnodes.containsKey(i))
-          {          
+          {            
             vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
             indexedVnodes.put(i, vn);
           }
@@ -939,7 +939,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         {
           if(mc.isRegEx())
           {
-            Collection<String> values = parseMetaExpression(mc.getValue());
+            Collection<String> values = parseMultipleValueExpression(mc.getValue());
             MetaBox mb = new MetaBox(mc.getLevel(), this);
             mb.setValue(values);
             mboxes.add(mb);
