@@ -278,7 +278,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
   {
     StringBuilder stringbuild = new StringBuilder();
     for (SensitiveComboBox cbi: cbs){
-      stringbuild.append(cbi.getValue().toString());
+      stringbuild.append("(" + cbi.getValue().toString() + ")");
       stringbuild.append("|");
     }
     if (cbs.size() > 1){
@@ -305,10 +305,13 @@ public class SearchBox extends Panel implements Button.ClickListener,
   
   public void setValue(String value)
   {
+    cbs.removeAllElements();
+    SensitiveComboBox cbi = new SensitiveComboBox();
     if(reBox.getValue())
     {
-      cb.addItem(value);
+      cbi.addItem(value);
     }
-    cb.setValue(value);
+    cbi.setValue(value);
+    cbs.add(cbi);
   }
 }
