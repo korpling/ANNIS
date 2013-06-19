@@ -3,7 +3,7 @@ Annis Administration Utility
 
 usage:
   annis-admin init DATABASE OPTIONS
-  annis-admin import PATH [PATH ...]
+  annis-admin import OPTIONS PATH [PATH ...]
   annis-admin delete CORPUS_ID [CORPUS_ID ...]
   annis-admin list
   annis-admin indexes
@@ -37,6 +37,11 @@ usage:
 
 * import:  Import a list of corpora.
     Specify the path to one or more corpora as arguments.
+
+  Option:
+    -o, --overwrite overwrites all corpora which have conflicting top
+                    level corpus names.
+
 
 * delete:   Delete a list of corpora.
     Specify the IDs of one or more corpora as arguments.
