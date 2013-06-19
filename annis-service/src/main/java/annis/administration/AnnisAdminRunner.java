@@ -193,8 +193,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private void doInit(List<String> commandArgs)
   {
+
     Options options = new OptionBuilder()
-      .addParameter("h", "host", "database server host (defaults to localhost)")
+      .addParameter("h", "host",
+      "database server host (defaults to localhost)")
       .addLongParameter("port", "database server port")
       .addRequiredParameter("d", "database",
       "name of the ANNIS database (REQUIRED)")
@@ -205,7 +207,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       "name of the PostgreSQL default database (defaults to \"postgres\")")
       .addParameter("U", "superuser",
       "name of a PostgreSQL super user (defaults to \"postgres\")")
-      .addParameter("P", "superpassword", "password of a PostgreSQL super user")
+      .addParameter("P", "superpassword",
+      "password of a PostgreSQL super user")
       .addParameter("m", "migratecorpora",
       "Try to import the already existing corpora into the database. "
       + "You can set the root directory for corpus sources as an argument.")
@@ -214,10 +217,116 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
+
     try
     {
       cmdLine = parser.parse(options, commandArgs.toArray(
         new String[commandArgs.size()]));
+
+      // check for required flags
+      if (!cmdLine.hasOption("user") || !cmdLine.hasOption("database") || !cmdLine.
+        hasOption("password"))
+      {
+        throw new ParseException("required option is missing");
+      }
+
+      String host = cmdLine.getOptionValue("host", "localhost");
+      String port = cmdLine.getOptionValue("port", "5432");
+      String database = cmdLine.getOptionValue("database");
+      String user = cmdLine.getOptionValue("user");
+      String password = cmdLine.getOptionValue("password");
+      String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
+      String superUser = cmdLine.getOptionValue("superuser", "postgres");
+      String superPassword = cmdLine.getOptionValue("superpassword");
+      boolean useSSL = cmdLine.hasOption("ssl");
+
+      boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
+      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
+
+      if (migrateCorpora)
+      {
+        // get corpus list
+        try
+        {
+          existingCorpora = corpusAdministration.listCorpusStats();
+        }
+        catch (Exception ex)
+        {
+          log.warn(
+            "Could not get existing corpus list for migration, migrating "
+            + "the corpora will be disabled.", ex);
+          migrateCorpora = false;
+        }
+      }
+
+      corpusAdministration.
+        initializeDatabase(host, port, database, user, password,
+        defaultDatabase, superUser, superPassword, useSSL);
+
+      if (migrateCorpora && existingCorpora.size() > 0)
+      {
+        String corpusRoot = cmdLine.getOptionValue("migratecorpora");
+
+        Search search = null;
+        if (corpusRoot != null && !"".equals(corpusRoot))
+        {
+          File rootCorpusPath = new File(corpusRoot);
+          if (rootCorpusPath.isDirectory())
+          {
+            LinkedList<File> l = new LinkedList<File>();
+            l.add(rootCorpusPath);
+
+            search = new Search(l);
+          }
+        }
+
+        for (Map<String, Object> corpusStat : existingCorpora)
+        {
+          String corpusName = (String) corpusStat.get("name");
+          String migratePath = (String) corpusStat.get("source_path");
+
+          if (migratePath == null)
+          {
+
+            if (search == null)
+            {
+              log.error(
+                "You have to give a valid corpus root directory as argument to migratecorpora");
+              search = new Search(new LinkedList<File>());
+            }
+            else if (!search.isWasSearched())
+            {
+              log.info("Searching for corpora at given directory, "
+                + "this can take some minutes");
+              search.startSearch();
+            }
+
+            // used the searched corpus path of corpus path was not part of the
+            // corpus description in the database
+            if (search.getCorpusPaths().containsKey(corpusName))
+            {
+              migratePath = search.getCorpusPaths().get(corpusName).
+                getParentFile().getAbsolutePath();
+            }
+
+          } // end if migratePath == null
+
+
+          if (migratePath == null || !(new File(migratePath).isDirectory()))
+          {
+            log.warn(
+              "Unable to migrate \"" + corpusName + "\" because the system "
+              + "can not find a valid source directory where it is located.");
+          }
+          else
+          {
+            log.info("migrating corpus " + corpusName);
+            corpusAdministration.importCorpora(migratePath);
+          }
+        }
+
+
+      }
 
     }
     catch (ParseException e)
@@ -225,103 +334,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("annis-admin.sh init", options);
       return;
-    }
-
-    String host = cmdLine.getOptionValue("host", "localhost");
-    String port = cmdLine.getOptionValue("port", "5432");
-    String database = cmdLine.getOptionValue("database");
-    String user = cmdLine.getOptionValue("user");
-    String password = cmdLine.getOptionValue("password");
-    String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
-    String superUser = cmdLine.getOptionValue("superuser", "postgres");
-    String superPassword = cmdLine.getOptionValue("superpassword");
-    boolean useSSL = cmdLine.hasOption("ssl");
-
-    boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-    List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
-
-    if (migrateCorpora)
-    {
-      // get corpus list
-      try
-      {
-        existingCorpora = corpusAdministration.listCorpusStats();
-      }
-      catch (Exception ex)
-      {
-        log.warn("Could not get existing corpus list for migration, migrating "
-          + "the corpora will be disabled.", ex);
-        migrateCorpora = false;
-      }
-    }
-
-    corpusAdministration.
-      initializeDatabase(host, port, database, user, password,
-      defaultDatabase, superUser, superPassword, useSSL);
-
-    if (migrateCorpora && existingCorpora.size() > 0)
-    {
-      String corpusRoot = cmdLine.getOptionValue("migratecorpora");
-
-      Search search = null;
-      if (corpusRoot != null && !"".equals(corpusRoot))
-      {
-        File rootCorpusPath = new File(corpusRoot);
-        if (rootCorpusPath.isDirectory())
-        {
-          LinkedList<File> l = new LinkedList<File>();
-          l.add(rootCorpusPath);
-
-          search = new Search(l);
-        }
-      }
-
-      for (Map<String, Object> corpusStat : existingCorpora)
-      {
-        String corpusName = (String) corpusStat.get("name");
-        String migratePath = (String) corpusStat.get("source_path");
-
-        if (migratePath == null)
-        {
-
-          if (search == null)
-          {
-            log.error(
-              "You have to give a valid corpus root directory as argument to migratecorpora");
-            search = new Search(new LinkedList<File>());
-          }
-          else if (!search.isWasSearched())
-          {
-            log.info("Searching for corpora at given directory, "
-              + "this can take some minutes");
-            search.startSearch();
-          }
-
-          // used the searched corpus path of corpus path was not part of the
-          // corpus description in the database
-          if (search.getCorpusPaths().containsKey(corpusName))
-          {
-            migratePath = search.getCorpusPaths().get(corpusName).
-              getParentFile().getAbsolutePath();
-          }
-
-        } // end if migratePath == null
-
-
-        if (migratePath == null || !(new File(migratePath).isDirectory()))
-        {
-          log.warn(
-            "Unable to migrate \"" + corpusName + "\" because the system "
-            + "can not find a valid source directory where it is located.");
-        }
-        else
-        {
-          log.info("migrating corpus " + corpusName);
-          corpusAdministration.importCorpora(migratePath);
-        }
-      }
-
-
     }
   }
 
