@@ -40,7 +40,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private Collection<SearchBox> sboxes;
   private AddMenu am;
   
-  private static final String WIDTH = "150px";
+  private static final String WIDTH = "180px";
   
   public VerticalNode(String level, FlatQueryBuilder sq)
   {
@@ -51,6 +51,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   {      
     this.sq = sq;
     v = new VerticalLayout();
+    v.setSpacing(true);
     vframe = new VerticalLayout();
     vframe.setSpacing(true);
     sboxes = new ArrayList<SearchBox>(); 
