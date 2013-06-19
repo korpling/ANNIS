@@ -52,7 +52,8 @@ public class SearchBox extends Panel implements Button.ClickListener,
   FieldEvents.TextChangeListener
 {
   private Button btClose;
-  private Button or;
+  private Collection<Button> ors;
+  private Collection<Button> nors;
   private VerticalNode vn;
   private VerticalLayout vnframe;
   private String ebene;
@@ -94,8 +95,9 @@ public class SearchBox extends Panel implements Button.ClickListener,
     cbi.setFilteringMode(Filtering.FILTERINGMODE_OFF);//necessary?
     cbi.addListener((FieldEvents.TextChangeListener)this);
     // the or operator
-    this.or = new Button("+", (Button.ClickListener) this);
+    Button or = new Button("+", (Button.ClickListener) this);
     or.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    ors.add(or);
     cbframe.addComponent(cbi);
     cbframe.addComponent(or);
     cbframe.setComponentAlignment(or, Alignment.BOTTOM_RIGHT);
@@ -109,6 +111,8 @@ public class SearchBox extends Panel implements Button.ClickListener,
     this.ebene = ebene;
     this.sq = sq;
     this.cbs = new Vector<SensitiveComboBox>();
+    this.ors = new ArrayList<Button>();
+    this.nors = new ArrayList<Button>();
     vnframe = new VerticalLayout();
     this.sb = new VerticalLayout();
     sb.setImmediate(true);
@@ -122,7 +126,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     SensitiveComboBox scb = newInputField();
     scb.addStyleName("corpus-font-force");
     cbs.add(scb);
-    VerticalLayout sbtoolbar = new VerticalLayout();
+    HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
     reBox = new CheckBox(CAPTION_REBOX);
@@ -186,9 +190,28 @@ public class SearchBox extends Panel implements Button.ClickListener,
         }
       }
     }
-    if (event.getButton() == or){
+    if (ors.contains(event.getButton())){
+      reBox.setValue(true);
+      Button or = event.getButton();
+      HorizontalLayout cbframe = (HorizontalLayout) or.getParent();
+      cbframe.removeComponent(or);
+      Button nor = new Button("-", (Button.ClickListener) this);
+      nor.setStyleName(ChameleonTheme.BUTTON_SMALL);
+      nors.add(nor);
+      cbframe.addComponent(nor);
+      cbframe.setComponentAlignment(nor, Alignment.BOTTOM_RIGHT);
       SensitiveComboBox scb = newInputField();
       cbs.add(scb);
+    }
+    
+    if (nors.contains(event.getButton())){
+      Button nor = event.getButton();
+      HorizontalLayout cbframe = (HorizontalLayout) nor.getParent();
+      sb.removeComponent(cbframe);
+      cbs.remove((SensitiveComboBox) cbframe.getComponent(0));
+      if (cbs.size() == 1){
+        cbs.get(0).setCaption(ebene);
+      }
     }
   }
   
@@ -278,7 +301,13 @@ public class SearchBox extends Panel implements Button.ClickListener,
   {
     StringBuilder stringbuild = new StringBuilder();
     for (SensitiveComboBox cbi: cbs){
-      stringbuild.append("(" + cbi.getValue().toString() + ")");
+      if (cbs.size() > 1){
+        stringbuild.append("(");
+      }
+      stringbuild.append(cbi.getValue().toString());
+      if (cbs.size() > 1){
+        stringbuild.append(")");
+      }
       stringbuild.append("|");
     }
     if (cbs.size() > 1){
