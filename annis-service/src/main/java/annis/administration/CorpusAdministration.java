@@ -73,15 +73,14 @@ public class CorpusAdministration
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
   }
 
-  public void importCorpora(List<String> paths)
+  public void importCorpora(List<String> paths, boolean overwrite)
   {
-
     // import each corpus
     for (String path : paths)
     {
       try{
       log.info("Importing corpus from: " + path);
-      administrationDao.importCorpus(path);
+      administrationDao.importCorpus(path, overwrite);
       log.info("Finished import from: " + path);
       }catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
@@ -106,7 +105,7 @@ public class CorpusAdministration
 
   public void importCorpora(String... paths)
   {
-    importCorpora(Arrays.asList(paths));
+    importCorpora(Arrays.asList(paths), false);
   }
 
   public List<Map<String, Object>> listCorpusStats()

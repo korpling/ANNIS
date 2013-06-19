@@ -30,6 +30,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -357,7 +358,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false)
-  public void importCorpus(String path)
+  public void importCorpus(String path, boolean override)
   {
 
     // check schema version first
@@ -366,7 +367,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
 
-    checkTopLevelCorpus();
+    // remove conflicting top level corpora, when override is set to true.
+    if (override)
+    {
+      checkAndRemoveTopLevelCorpus();
+    }
+    else
+    {
+      checkTopLevelCorpus();
+    }
 
     createStagingAreaIndexes();
 
@@ -1816,6 +1825,21 @@ public class DefaultAdministrationDao implements AdministrationDao
     public ConflictingCorpusException(String msg)
     {
       super(msg);
+    }
+  }
+
+  /**
+   * Deletes a top level corpus, when it is already exists.
+   */
+  private void checkAndRemoveTopLevelCorpus()
+  {
+    String corpusName = getTopLevelCorpusFromTmpArea();
+    if (existConflictingTopLevelCorpus(corpusName))
+    {
+      log.info("delete conflicting corpus: {}", corpusName);
+      List<String> corpusNames = new LinkedList<String>();
+      corpusNames.add(corpusName);
+      deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames));
     }
   }
 }
