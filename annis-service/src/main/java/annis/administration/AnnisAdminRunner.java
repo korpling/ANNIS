@@ -42,6 +42,7 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.LinkedList;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -221,7 +222,9 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
     catch (ParseException e)
     {
-      throw new UsageException(e.getMessage());
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh init", options);
+      return;
     }
 
     String host = cmdLine.getOptionValue("host", "localhost");
