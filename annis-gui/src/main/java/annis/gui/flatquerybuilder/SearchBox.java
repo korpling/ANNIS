@@ -120,6 +120,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
     }
     this.annonames = annos;//by Martin
     SensitiveComboBox scb = newInputField();
+    scb.addStyleName("corpus-font-force");
     cbs.add(scb);
     VerticalLayout sbtoolbar = new VerticalLayout();
     sbtoolbar.setSpacing(false);
