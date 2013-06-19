@@ -31,7 +31,7 @@ public class AddMenu extends Panel
   private VerticalNode vn;
   private FlatQueryBuilder sq;
   
-  private static final String BUTTON_ADDLEVEL_LABEL = "Add level"; 
+  private static final String BUTTON_ADDLEVEL_LABEL = "+"; 
   
   public AddMenu(final FlatQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
