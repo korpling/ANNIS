@@ -69,6 +69,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     v.addComponent(sb);
     vframe.addComponent(v);
     vframe.addComponent(am);
+    vframe.setComponentAlignment(am, Alignment.BOTTOM_RIGHT);
     setWidth(WIDTH);
     setContent(vframe);
   }

@@ -51,6 +51,7 @@ public class AddMenu extends Panel
         });
       }      
     }
+    addMenu.setSizeUndefined();
     setContent(addMenu);
   }
   
