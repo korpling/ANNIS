@@ -15,19 +15,13 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.BlurListener;
-import com.vaadin.event.FieldEvents.FocusListener;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
  * @author martin
@@ -48,6 +42,7 @@ public class EdgeBox extends Panel
   private static HashMap<String, String> EO;
   private static final String UD_EO_DESCRIPTION = "\t(user defined)";  
   private static final String WIDTH = "45px";
+  private static final String REGEX_PATTERN = "\\.[1-9]+[0-9]*,[1-9]+[0-9]*";
   
   public EdgeBox (FlatQueryBuilder sq)
   {
@@ -79,11 +74,17 @@ public class EdgeBox extends Panel
         String value = edge.getValue().toString();
         if(!value.equals(""))
         {
-         if(!EO.containsKey(value))
+         boolean valid = validOperator(value);
+         if(!EO.containsKey(value) & valid)
          {          
            String caption = value+UD_EO_DESCRIPTION;
            EO.put(value, caption);
            edge.setItemCaption(value, caption);
+         }
+         if(!valid)
+         {
+           edge.removeItem(value);
+           edge.select(null);
          }
         }
       }
@@ -108,13 +109,35 @@ public class EdgeBox extends Panel
   
   public void setValue(String value)
   {    
-    if(!EO.containsKey(value))
+    boolean valid = validOperator(value);
+    if(!EO.containsKey(value) & valid)
     {
       String caption = value+UD_EO_DESCRIPTION;
       EO.put(value, caption);
       edge.addItem(value);
       edge.setItemCaption(value, caption);
     }
-    edge.setValue(value);
+    if(valid)
+    {
+      edge.setValue(value);
+    }
+    else
+    {
+      edge.select(null);
+    }
+  }
+  
+  private boolean validOperator(String o)
+  {
+    String s = o.replace(" ", "");
+    boolean a = Pattern.matches(REGEX_PATTERN, s);
+    if(a)
+    {
+      int split = s.indexOf(",");
+      String s1 = s.substring(1, split);
+      String s2 = s.substring(split+1);
+      return (Integer.parseInt(s1)<=Integer.parseInt(s2));
+    }    
+    return false;  
   }
 }
