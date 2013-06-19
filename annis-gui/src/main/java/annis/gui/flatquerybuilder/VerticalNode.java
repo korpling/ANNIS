@@ -64,7 +64,6 @@ public class VerticalNode extends Panel implements Button.ClickListener
     sboxes.add(sb);   
     annonames = sq.getAvailableAnnotationNames();
     am = new AddMenu(sq, this, ebene);
-    HorizontalLayout vntoolbar = new HorizontalLayout();
     vframe.addComponent(btClose);
     vframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
     v.addComponent(sb);
