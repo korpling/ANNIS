@@ -150,15 +150,19 @@ pointing
 	| REF POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec REF
 	;
 
+spanrelation
+  : left=REF IDENT_COV right=REF # IdenticalCoverage
+	|	left=REF LEFT_ALIGN right=REF # LeftAlign
+	|	left=REF RIGHT_ALIGN right=REF # RightAlign
+	|	left=REF INCLUSION right=REF # Inclusion
+	|	left=REF OVERLAP right=REF # Overlap
+	|	left=REF RIGHT_OVERLAP right=REF # RightOverlap
+	| left=REF LEFT_OVERLAP right=REF # LeftOverlap
+; 
+
 binary_linguistic_term
 	:	precedence
-	|	REF IDENT_COV REF
-	|	REF LEFT_ALIGN REF
-	|	REF RIGHT_ALIGN REF
-	|	REF INCLUSION REF
-	|	REF OVERLAP REF
-	|	REF RIGHT_OVERLAP REF
-	| REF LEFT_OVERLAP REF
+	|	spanrelation
 	|	dominance
 	|	REF LEFT_CHILD REF
 	|	REF RIGHT_CHILD REF

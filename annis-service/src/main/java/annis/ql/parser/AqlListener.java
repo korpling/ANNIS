@@ -20,13 +20,27 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlParser;
+import annis.ql.node.PLingOp;
+import annis.sqlgen.model.Identical;
+import annis.sqlgen.model.Inclusion;
+import annis.sqlgen.model.Join;
+import annis.sqlgen.model.LeftAlignment;
+import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.Precedence;
+import annis.sqlgen.model.RightAlignment;
+import annis.sqlgen.model.RightOverlap;
 import com.google.common.base.Preconditions;
+import java.lang.reflect.Constructor;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.apache.commons.lang3.Validate;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,6 +48,8 @@ import org.antlr.v4.runtime.Token;
  */
 public class AqlListener extends AqlBaseListener
 {
+  private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
+  
   private QueryNode topNode = new QueryNode();
 
   private List<List<QueryNode>> alternativeStack = new LinkedList<List<QueryNode>>();
@@ -248,6 +264,49 @@ public class AqlListener extends AqlBaseListener
         new Precedence(right, range.getMin(), range.getMax(), segmentationName));
     }
   }
+
+  @Override
+  public void enterIdenticalCoverage(AqlParser.IdenticalCoverageContext ctx)
+  {
+    join(ctx, Identical.class);
+  }
+
+  @Override
+  public void enterLeftAlign(AqlParser.LeftAlignContext ctx)
+  {
+    join(ctx, LeftAlignment.class);
+  }
+
+  @Override
+  public void enterRightAlign(AqlParser.RightAlignContext ctx)
+  {
+    join(ctx, RightAlignment.class);
+  }
+
+  @Override
+  public void enterInclusion(AqlParser.InclusionContext ctx)
+  {
+    join(ctx, Inclusion.class);
+  }
+
+  @Override
+  public void enterOverlap(AqlParser.OverlapContext ctx)
+  {
+    join(ctx, Overlap.class);
+  }
+
+  @Override
+  public void enterRightOverlap(AqlParser.RightOverlapContext ctx)
+  {
+    join(ctx, RightOverlap.class);
+  }
+
+  @Override
+  public void enterLeftOverlap(AqlParser.LeftOverlapContext ctx)
+  {
+    join(ctx, LeftOverlap.class);
+  }
+  
   
 
   private String textFromSpec(AqlParser.TextSpecContext txtCtx)
@@ -301,6 +360,34 @@ public class AqlListener extends AqlBaseListener
     return nodes.get("n" + ref.getText().substring(1));
   }
 
+  /**
+   * Automatically create a join from a node and a join class.
+   *
+   * This will automatically get the left and right hand refs
+   * and will construct a new join specified by the type using reflection.
+   *
+   * @node
+   * @type
+   */
+  private void join(ParserRuleContext<Token> ctx, Class<? extends Join> type)
+  {
+    QueryNode left = nodeByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
+    QueryNode right = nodeByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());
+
+    Preconditions.checkNotNull(left, errorLHS(type.getSimpleName()));
+    Preconditions.checkNotNull(right, errorRHS(type.getSimpleName()));
+    try
+    {
+      Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
+      Join newJoin = c.newInstance(right);
+      left.addJoin(newJoin);
+    }
+    catch (Exception ex)
+    {
+      log.error(null, ex);
+    }
+  }
+  
   private QueryNode newNode()
   {
     QueryNode n = new QueryNode(++aliasCount);
