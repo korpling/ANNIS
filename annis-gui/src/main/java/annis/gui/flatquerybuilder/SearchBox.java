@@ -65,7 +65,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
   private FlatQueryBuilder sq;
   private VerticalLayout sb;
   public static final String BUTTON_CLOSE_LABEL = "X";
-  private static final String SB_CB_WIDTH = "140px";
+  private static final String SB_CB_WIDTH = "145px";
   private static final String CAPTION_REBOX = "Regex";
   private static reducingStringComparator rsc;
   
@@ -281,7 +281,7 @@ public class SearchBox extends Panel implements Button.ClickListener,
           }
         }
         SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
-        for(Integer k : keys.subSet(0, 5)){
+        for(Integer k : keys.subSet(0, 10)){
           List<String> values = new ArrayList(levdistvals.get(k));
           Collections.sort(values, String.CASE_INSENSITIVE_ORDER);
           for(String v : values){

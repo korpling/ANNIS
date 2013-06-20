@@ -94,9 +94,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     + "choose a filtering mechanism here.";
   
   private String TOOLBAR_CAPTION = "Toolbar";
-  private String META_CAPTION = "Restrict the search by means of meta information";
-  private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
-  private String LANG_CAPTION = "Create a linguistic sequence";
+  private String META_CAPTION = "Meta information";
+  private String SPAN_CAPTION = "Scope";
+  private String LANG_CAPTION = "Linguistic sequence";
   private String ADVANCED_CAPTION = "Advanced settings";
 
   public FlatQueryBuilder(QueryController cp)
@@ -139,23 +139,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     // language layout
     language = new HorizontalLayout();
     languagenodes = new HorizontalLayout();
-    language.setSpacing(true);
     language.addComponent(languagenodes);
     //language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
+    language.addStyleName("linguistics-panel");
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
     //span.addComponent(btInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
+    span.addStyleName("span-panel");
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
     //meta.addComponent(btInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
+    meta.addStyleName("meta-panel");
     // toolbar layout
     toolbar = new HorizontalLayout();
     toolbar.setSpacing(true);
@@ -164,12 +166,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     toolbar.addComponent(btInverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
+    toolbar.addStyleName("toolbar-panel");
     // advanced
     advanced = new HorizontalLayout();
     advanced.setSpacing(true);
     advanced.addComponent(filtering);
     advanced.setMargin(true);
     advanced.setCaption(ADVANCED_CAPTION);
+    advanced.addStyleName("advanced-panel");
     // put everything on the layout
     mainLayout.setSpacing(true);
     mainLayout.addComponent(language);
