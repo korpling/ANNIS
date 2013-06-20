@@ -21,7 +21,7 @@ import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
-import annis.ql.node.ARangeSpec;
+import annis.sqlgen.model.Precedence;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import java.util.HashMap;
@@ -43,267 +43,50 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  */
 public class AnnisParserAntlr
 {
+  private int precedenceBound;
+
   public QueryData parse(String aql, List<Long> corpusList)
   {
     AqlLexer lexer = new AqlLexer(new ANTLRInputStream(aql));
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
-    
+
     final List<String> errors = new LinkedList<String>();
-    
+
     parser.removeErrorListeners();
     parser.addErrorListener(new BaseErrorListener()
     {
-
       @Override
       public void syntaxError(Recognizer recognizer, Token offendingSymbol,
         int line, int charPositionInLine, String msg, RecognitionException e)
       {
         errors.add("line " + line + ":" + charPositionInLine + " " + msg);
       }
-      
     });
-    
+
     ParseTree tree = parser.start();
-    if(errors.isEmpty())
+    if (errors.isEmpty())
     {
       ParseTreeWalker walker = new ParseTreeWalker();
-      AqlListener listener = new AqlListener();
+      AqlListener listener = new AqlListener(precedenceBound);
       walker.walk(listener, tree);
     }
     else
     {
-      throw new AnnisQLSyntaxException("Parser error:\n" 
+      throw new AnnisQLSyntaxException("Parser error:\n"
         + Joiner.on("\n").join(errors));
     }
-    
+
     return null;
   }
-  
-  public static class AqlListener extends AqlBaseListener
+
+  public int getPrecedenceBound()
   {
-    private QueryNode topNode = new QueryNode();
-    private List<List<QueryNode>> alternativeStack = new LinkedList<List<QueryNode>>();
-    private int aliasCount = 0;
-    private Map<String, QueryNode> nodes = new HashMap<String, QueryNode>();
-    
-    public QueryNode getTopNode()
-    {
-      return topNode;
-    }
-
-    @Override
-    public void enterAndTop(AqlParser.AndTopContext ctx)
-    {
-      topNode.setType(QueryNode.Type.AND);
-      alternativeStack.add(0, topNode.getAlternatives());
-    }
-
-    @Override
-    public void enterOrTop(AqlParser.OrTopContext ctx)
-    {
-      topNode.setType(QueryNode.Type.OR);
-      alternativeStack.add(0, topNode.getAlternatives());
-    }
-
-    @Override
-    public void exitAndTop(AqlParser.AndTopContext ctx)
-    {
-      alternativeStack.remove(0);
-    }
-
-    @Override
-    public void exitOrTop(AqlParser.OrTopContext ctx)
-    {
-      alternativeStack.remove(0);
-    }
-
-    @Override
-    public void enterAndExpr(AqlParser.AndExprContext ctx)
-    {
-      QueryNode exprNode = new QueryNode(QueryNode.Type.AND);
-      alternativeStack.get(0).add(exprNode);
-      alternativeStack.add(0, exprNode.getAlternatives());
-    }
-
-    @Override
-    public void enterOrExpr(AqlParser.OrExprContext ctx)
-    {
-      QueryNode exprNode = new QueryNode(QueryNode.Type.OR);
-      alternativeStack.get(0).add(exprNode);
-      alternativeStack.add(0, exprNode.getAlternatives());
-    }
-
-    @Override
-    public void exitAndExpr(AqlParser.AndExprContext ctx)
-    {
-      alternativeStack.remove(0);
-    }
-    
-    @Override
-    public void exitOrExpr(AqlParser.OrExprContext ctx)
-    {
-      alternativeStack.remove(0);
-    }
-
-    @Override
-    public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
-    {
-      QueryNode target = newNode();
-      target.setToken(true);
-    }
-    
-    
-
-    @Override
-    public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
-    {
-      QueryNode target = newNode();
-      target.setToken(true);
-      
-      QueryNode.TextMatching txtMatch = textMatchingFromSpec(ctx.textSpec(), 
-        ctx.NEQ() != null);
-      String content = textFromSpec(ctx.textSpec());
-      target.setSpannedText(content, txtMatch);
-    }
-
-    @Override
-    public void enterTextOnly(AqlParser.TextOnlyContext ctx)
-    {
-      QueryNode target = newNode();
-      target.setSpannedText(textFromSpec(ctx.txt), 
-        textMatchingFromSpec(ctx.txt, false));
-    }
-
-    @Override
-    public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
-    {
-      QueryNode target = newNode();
-
-      String namespace = ctx.qName().namespace == null ? null : 
-        ctx.qName().namespace.getText();
-      
-      QueryAnnotation anno = new QueryAnnotation(namespace, 
-        ctx.qName().name.getText());
-      target.addNodeAnnotation(anno);
-    }
-    
-    @Override
-    public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
-    {
-      QueryNode target = newNode();
-
-      String namespace = ctx.qName().namespace == null ? null : 
-        ctx.qName().namespace.getText();
-      String name = ctx.qName().name.getText();
-      String value = textFromSpec(ctx.txt);
-      
-      QueryNode.TextMatching matching = 
-        textMatchingFromSpec(ctx.txt, ctx.NEQ() != null);
-      
-      QueryAnnotation anno = 
-        new QueryAnnotation(namespace, name, value, matching);
-      target.addNodeAnnotation(anno);
-    }
-
-    @Override
-    public void enterRootTerm(AqlParser.RootTermContext ctx)
-    {
-      QueryNode target = 
-        nodes.get("n" + ctx.REF().getText().substring(1));
-      Preconditions.checkNotNull(target, errorLHS("root"));
-      target.setRoot(true);
-    }
-
-    @Override
-    public void enterArityTerm(AqlParser.ArityTermContext ctx)
-    {
-      QueryNode target = 
-        nodes.get("n" + ctx.REF().getText().substring(1));
-      Preconditions.checkNotNull(target, errorLHS("arity"));
-      target.setArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
-    }
-
-    @Override
-    public void enterTokenArityTerm(AqlParser.TokenArityTermContext ctx)
-    {
-      QueryNode target = 
-        nodes.get("n" + ctx.REF().getText().substring(1));
-      Preconditions.checkNotNull(target, errorLHS("token-arity"));
-      target.setTokenArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
-    }
-    
-    
-    
-    private String textFromSpec(AqlParser.TextSpecContext txtCtx)
-    {
-      if(txtCtx instanceof AqlParser.EmptyExactTextSpecContext || txtCtx instanceof AqlParser.EmptyRegexTextSpecContext)
-      {
-        return "";
-      }
-      else if(txtCtx instanceof AqlParser.ExactTextSpecContext)
-      {
-        return ((AqlParser.ExactTextSpecContext) txtCtx).content.getText();
-      }
-      else if(txtCtx instanceof AqlParser.RegexTextSpecContext)
-      {
-        return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
-      }
-      return null;
-    }
-
-    private QueryNode.TextMatching textMatchingFromSpec(
-      AqlParser.TextSpecContext txt, boolean not)
-    {
-      if(txt instanceof AqlParser.ExactTextSpecContext)
-      {
-          return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL 
-            : QueryNode.TextMatching.EXACT_EQUAL;
-      }
-      else if(txt instanceof AqlParser.RegexTextSpecContext)
-      {
-          QueryNode.TextMatching matching = not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL 
-            : QueryNode.TextMatching.REGEXP_EQUAL;
-      }
-      return null;
-    }
-    
-    private QueryNode.Range annisRangeFromARangeSpec(
-      AqlParser.RangeSpecContext spec)
-  {
-    String min = spec.min.getText();
-    String max = spec.max != null ? spec.max.getText() : null;
-
-    if (max == null)
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
-    }
-    else
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
-    }
+    return precedenceBound;
   }
-    
-    private QueryNode newNode()
-    {
-      QueryNode n = new QueryNode(++aliasCount);
-      n.setVariable("n" + n.getId());
-      n.setMarker(n.getVariable());
 
-      alternativeStack.get(0).add(n);
-      
-      return n;
-    }
-   
-    private String errorLHS(String function)
-    {
-      return function + " operator needs a left-hand-side";
-    }
-
-    private String errorRHS(String function)
-    {
-      return function + " operator needs a right-hand-side";
-    }
-    
+  public void setPrecedenceBound(int precedenceBound)
+  {
+    this.precedenceBound = precedenceBound;
   }
 }

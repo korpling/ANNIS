@@ -133,12 +133,9 @@ edgeSpec
 
 
 precedence
-	: REF PRECEDENCE REF
-	| REF PRECEDENCE STAR REF
-	| REF PRECEDENCE rangeSpec REF
-	| REF PRECEDENCE layer=ID REF
-	| REF PRECEDENCE layer=ID STAR REF
-	| REF PRECEDENCE layer=ID COMMA? rangeSpec REF
+	: left=REF PRECEDENCE (layer=ID)? right=REF # DirectPrecedence
+	| left=REF PRECEDENCE (layer=ID)? STAR right=REF # IndirectPrecedence
+	| left=REF PRECEDENCE (layer=ID COMMA?)? rangeSpec right=REF   #RangePrecedence
 	;
 
 dominance
@@ -171,9 +168,9 @@ binary_linguistic_term
 	;
 	
 unary_linguistic_term
-	:	REF ROOT # RootTerm
-	|	REF ARITY EQ rangeSpec # ArityTerm
-	|	REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
+	:	left=REF ROOT # RootTerm
+	|	left=REF ARITY EQ rangeSpec # ArityTerm
+	|	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
 	;
 
 
