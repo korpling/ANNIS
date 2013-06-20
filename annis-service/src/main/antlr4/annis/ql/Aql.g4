@@ -99,19 +99,19 @@ start
 	: exprTop EOF
 	;
 
-exact_text
+exactText
   : ( ESC_SEQ | ~(DOUBLE_QUOTE) )+
   ;
 
-regex_text
+regexText
   : ( ESC_SEQ | ~(SLASH) )+
   ;
 
-text_spec 
+textSpec 
 	:	DOUBLE_QUOTE  DOUBLE_QUOTE # EmptyExactTextSpec
-  | DOUBLE_QUOTE exact_text DOUBLE_QUOTE # ExactTextSpec
+  | DOUBLE_QUOTE content=exactText DOUBLE_QUOTE # ExactTextSpec
   | SLASH SLASH #EmptyRegexTextSpec
-  | SLASH regex_text SLASH # RegexTextSpec
+  | SLASH content=regexText SLASH # RegexTextSpec
 	;
 
 qName
@@ -119,12 +119,12 @@ qName
 	|	name=ID
 	;
 
-edge_anno
-	:	 name=qName EQ value=text_spec
+edgeAnno
+	:	 name=qName EQ value=textSpec
 	;
 
-edge_spec
-	: BRACKET_OPEN edge_anno+ BRACKET_CLOSE
+edgeSpec
+	: BRACKET_OPEN edgeAnno+ BRACKET_CLOSE
 	;
 
 
@@ -138,15 +138,15 @@ precedence
 	;
 
 dominance
-	: REF DOMINANCE (anno=edge_spec)? REF
-	| REF DOMINANCE (anno=edge_spec)? STAR REF
-	| REF DOMINANCE (anno=edge_spec)? min=DIGITS (COMMA max=DIGITS)? REF
+	: REF DOMINANCE (anno=edgeSpec)? REF
+	| REF DOMINANCE (anno=edgeSpec)? STAR REF
+	| REF DOMINANCE (anno=edgeSpec)? min=DIGITS (COMMA max=DIGITS)? REF
 	;
 	
 pointing
-	: REF POINTING label=ID (anno=edge_spec)? REF
-	| REF POINTING label=ID (anno=edge_spec)? STAR REF
-	| REF POINTING label=ID (anno=edge_spec)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF
+	: REF POINTING label=ID (anno=edgeSpec)? REF
+	| REF POINTING label=ID (anno=edgeSpec)? STAR REF
+	| REF POINTING label=ID (anno=edgeSpec)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF
 	;
 
 binary_linguistic_term
@@ -174,11 +174,11 @@ unary_linguistic_term
 
 
 expr
-	: TOK (EQ text_spec)? # TokExpr	
+	: TOK # TokOnlyExpr 
+  | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
   | qName # AnnoOnlyExpr
-	|	text_spec # Text_only // shortcut for tok="..."
-	|	qName EQ text_spec # AnnoEqTextExpr
-	|	qName NEQ text_spec # AnnoNeqTextExpr
+	|	txt=textSpec # Text_only // shortcut for tok="..."
+	|	qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
   | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # OrExpr

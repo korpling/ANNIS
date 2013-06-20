@@ -16,13 +16,11 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import com.google.common.base.Joiner;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -143,19 +141,57 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public void enterTokExpr(AqlParser.TokExprContext ctx)
+    public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
     {
       QueryNode target = newNode();
-      
       target.setToken(true);
-      if(ctx.text_spec() != null)
-      {
-        // TODO: get text spec content
-      }
+    }
+    
+    
+
+    @Override
+    public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
+    {
+      QueryNode target = newNode();
+      target.setToken(true);
       
+      QueryNode.TextMatching txtMatch = textMatchingTextSpec(ctx.textSpec(), ctx.NEQ() != null);
+      String content = textFromSpec(ctx.textSpec());
+      target.setSpannedText(content, txtMatch);
+    }
+    
+    private String textFromSpec(AqlParser.TextSpecContext txtCtx)
+    {
+      if(txtCtx instanceof AqlParser.EmptyExactTextSpecContext || txtCtx instanceof AqlParser.EmptyRegexTextSpecContext)
+      {
+        return "";
+      }
+      else if(txtCtx instanceof AqlParser.ExactTextSpecContext)
+      {
+        return ((AqlParser.ExactTextSpecContext) txtCtx).content.getText();
+      }
+      else if(txtCtx instanceof AqlParser.RegexTextSpecContext)
+      {
+        return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
+      }
+      return null;
     }
 
-    
+    private QueryNode.TextMatching textMatchingTextSpec(
+      AqlParser.TextSpecContext txt, boolean not)
+    {
+      if(txt instanceof AqlParser.ExactTextSpecContext)
+      {
+          return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL 
+            : QueryNode.TextMatching.EXACT_EQUAL;
+      }
+      else if(txt instanceof AqlParser.RegexTextSpecContext)
+      {
+          QueryNode.TextMatching matching = not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL 
+            : QueryNode.TextMatching.REGEXP_EQUAL;
+      }
+      return null;
+    }
     
     private QueryNode newNode()
     {
