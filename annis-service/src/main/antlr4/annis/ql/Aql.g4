@@ -176,8 +176,8 @@ unary_linguistic_term
 expr
 	: TOK # TokOnlyExpr 
   | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
+	|	txt=textSpec # TextOnly // shortcut for tok="..."
   | qName # AnnoOnlyExpr
-	|	txt=textSpec # Text_only // shortcut for tok="..."
 	|	qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr

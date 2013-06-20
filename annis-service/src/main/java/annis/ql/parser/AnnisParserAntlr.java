@@ -16,6 +16,7 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
@@ -155,10 +156,33 @@ public class AnnisParserAntlr
       QueryNode target = newNode();
       target.setToken(true);
       
-      QueryNode.TextMatching txtMatch = textMatchingTextSpec(ctx.textSpec(), ctx.NEQ() != null);
+      QueryNode.TextMatching txtMatch = textMatchingTextSpec(ctx.textSpec(), 
+        ctx.NEQ() != null);
       String content = textFromSpec(ctx.textSpec());
       target.setSpannedText(content, txtMatch);
     }
+
+    @Override
+    public void enterTextOnly(AqlParser.TextOnlyContext ctx)
+    {
+      // TODO
+    }
+    
+
+    @Override
+    public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
+    {
+      QueryNode target = newNode();
+
+      String namespace = ctx.qName().namespace == null ? null : 
+        ctx.qName().namespace.getText();
+      
+      QueryAnnotation anno = new QueryAnnotation(namespace, 
+        ctx.qName().name.getText());
+      target.addNodeAnnotation(anno);
+    }
+    
+    
     
     private String textFromSpec(AqlParser.TextSpecContext txtCtx)
     {
