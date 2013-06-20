@@ -88,6 +88,13 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
 
   public void setQuery(Query query)
   {
+    // Check if a corpus is selected.
+    if (ui.getControlPanel().getCorpusList().getSelectedCorpora().isEmpty()
+      && query.getCorpora() != null)
+    {
+      ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
+    }
+
     PagedResultQuery paged = new PagedResultQuery(
       ui.getControlPanel().getSearchOptions().getLeftContext(),
       ui.getControlPanel().getSearchOptions().getRightContext(),
@@ -247,7 +254,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   {
     ui.getControlPanel().getSearchOptions()
       .updateSearchPanelConfiguration(ui.getControlPanel().getCorpusList().getSelectedCorpora());
-    
+
   }
 
 
@@ -439,10 +446,10 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     return true;
   }
-  
+
   public String getQueryDraft()
   {
-    return ui.getControlPanel().getQueryPanel().getQuery();    
+    return ui.getControlPanel().getQueryPanel().getQuery();
   }
 
   private static class MatchListType extends GenericType<List<Match>>
