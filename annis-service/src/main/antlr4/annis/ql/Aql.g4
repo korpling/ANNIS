@@ -57,6 +57,10 @@ BRACE_OPEN:'(';
 BRACE_CLOSE:')';
 BRACKET_OPEN:'[';
 BRACKET_CLOSE:']';
+SLASH:'/';
+DOUBLE_QUOTE:'"';
+COLON:':';
+
 
 WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
 
@@ -79,32 +83,40 @@ UNICODE_ESC
     ;
 
 fragment
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\'|'/')
-    |   UNICODE_ESC
-    |   OCTAL_ESC
-    ;
-
-fragment
 OCTAL_ESC
     :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7') ('0'..'7')
     |   '\\' ('0'..'7')
     ;
 
+ESC_SEQ
+    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\'|'/')
+    |   UNICODE_ESC
+    |   OCTAL_ESC
+    ;
+
 start 
 	: exprTop EOF
 	;
 
+exact_text
+  : ( ESC_SEQ | ~(DOUBLE_QUOTE) )+
+  ;
+
+regex_text
+  : ( ESC_SEQ | ~(SLASH) )+
+  ;
+
 text_spec 
-	:	'"' ( ESC_SEQ | ~('"') )* '"'
-	|	'/' ( ESC_SEQ | ~('/') )* '/'
+	:	DOUBLE_QUOTE  DOUBLE_QUOTE # EmptyExactTextSpec
+  | DOUBLE_QUOTE exact_text DOUBLE_QUOTE # ExactTextSpec
+  | SLASH SLASH #EmptyRegexTextSpec
+  | SLASH regex_text SLASH # RegexTextSpec
 	;
 
 qName
-	:	namespace=ID ':' name=ID
-	|	TOK
-	|	ID
+	:	namespace=ID COLON name=ID
+	|	name=ID
 	;
 
 edge_anno
@@ -162,18 +174,18 @@ unary_linguistic_term
 
 
 expr
-	:	qName # QualifiedName
+	: TOK (EQ text_spec)? # TokExpr	
+  | qName # AnnoOnlyExpr
 	|	text_spec # Text_only // shortcut for tok="..."
-	|	qName EQ text_spec # Anno_eq_text
-	|	qName NEQ text_spec # Anno_neq_text
-	|	unary_linguistic_term # UnaryTerm
-	|	binary_linguistic_term #  BinaryTerm
-  | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # Or
-  | BRACE_OPEN expr (AND expr)+ BRACE_CLOSE # And
+	|	qName EQ text_spec # AnnoEqTextExpr
+	|	qName NEQ text_spec # AnnoNeqTextExpr
+	|	unary_linguistic_term # UnaryTermExpr
+	|	binary_linguistic_term #  BinaryTermExpr
+  | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # OrExpr
+  | BRACE_OPEN expr (AND expr)+ BRACE_CLOSE # AndExpr
   ;
 
 exprTop
-	:	expr #SingleExprTop
+  : expr (AND expr)* # AndTop
   | expr (OR expr)+ # OrTop
-  | expr (AND expr)+ # AndTop
 	;

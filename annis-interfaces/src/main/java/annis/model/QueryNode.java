@@ -28,6 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
+import com.google.common.base.Joiner;
 
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
@@ -210,72 +211,84 @@ public class QueryNode implements Serializable
   @Override
   public String toString()
   {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
-    sb.append("node ");
-    sb.append(id);
-
-    if (marker != null)
+    if(type == Type.NODE)
     {
-      sb.append("; marked '");
-      sb.append(marker);
-      sb.append("'");
-    }
+      sb.append("node ");
+      sb.append(id);
 
-    if (variable != null)
-    {
-      sb.append("; bound to '");
-      sb.append(variable);
-      sb.append("'");
-    }
+      if (marker != null)
+      {
+        sb.append("; marked '");
+        sb.append(marker);
+        sb.append("'");
+      }
 
-    if (name != null)
-    {
-      sb.append("; named '");
-      sb.append(qName(namespace, name));
-      sb.append("'");
-    }
+      if (variable != null)
+      {
+        sb.append("; bound to '");
+        sb.append(variable);
+        sb.append("'");
+      }
 
-    if (token)
-    {
-      sb.append("; is a token");
-    }
+      if (name != null)
+      {
+        sb.append("; named '");
+        sb.append(qName(namespace, name));
+        sb.append("'");
+      }
 
-    if (spannedText != null)
-    {
-      sb.append("; spans");
-      String op = spanTextMatching != null ? spanTextMatching.sqlOperator()
-        : " ";
-      String quote = spanTextMatching != null ? spanTextMatching.quote()
-        : "?";
-      sb.append(op);
-      sb.append(quote);
-      sb.append(spannedText);
-      sb.append(quote);
-    }
+      if (token)
+      {
+        sb.append("; is a token");
+      }
 
-    if (isRoot())
-    {
-      sb.append("; root node");
-    }
+      if (spannedText != null)
+      {
+        sb.append("; spans");
+        String op = spanTextMatching != null ? spanTextMatching.sqlOperator()
+          : " ";
+        String quote = spanTextMatching != null ? spanTextMatching.quote()
+          : "?";
+        sb.append(op);
+        sb.append(quote);
+        sb.append(spannedText);
+        sb.append(quote);
+      }
 
-    if (!nodeAnnotations.isEmpty())
-    {
-      sb.append("; node labels: ");
-      sb.append(nodeAnnotations);
-    }
+      if (isRoot())
+      {
+        sb.append("; root node");
+      }
 
-    if (!edgeAnnotations.isEmpty())
-    {
-      sb.append("; edge labes: ");
-      sb.append(edgeAnnotations);
-    }
+      if (!nodeAnnotations.isEmpty())
+      {
+        sb.append("; node labels: ");
+        sb.append(nodeAnnotations);
+      }
 
-    for (Join join : joins)
-    {
-      sb.append("; ");
-      sb.append(join);
+      if (!edgeAnnotations.isEmpty())
+      {
+        sb.append("; edge labes: ");
+        sb.append(edgeAnnotations);
+      }
+
+      for (Join join : joins)
+      {
+        sb.append("; ");
+        sb.append(join);
+      }
     }
+    else if(type == Type.AND)
+    {
+      Joiner.on(" AND ").join(alternatives);
+    }
+    else if(type == Type.OR)
+    {
+      Joiner.on(" OR ").join(alternatives);
+    }
+    
 
     return sb.toString();
   }

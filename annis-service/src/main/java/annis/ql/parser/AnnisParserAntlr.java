@@ -16,6 +16,7 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
@@ -80,6 +81,7 @@ public class AnnisParserAntlr
   {
     private QueryNode topNode = new QueryNode();
     private List<List<QueryNode>> alternativeStack = new LinkedList<List<QueryNode>>();
+    private int aliasCount = 0;
     
     public QueryNode getTopNode()
     {
@@ -113,7 +115,7 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public void enterAnd(AqlParser.AndContext ctx)
+    public void enterAndExpr(AqlParser.AndExprContext ctx)
     {
       QueryNode exprNode = new QueryNode(QueryNode.Type.AND);
       alternativeStack.get(0).add(exprNode);
@@ -121,7 +123,7 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public void enterOr(AqlParser.OrContext ctx)
+    public void enterOrExpr(AqlParser.OrExprContext ctx)
     {
       QueryNode exprNode = new QueryNode(QueryNode.Type.OR);
       alternativeStack.get(0).add(exprNode);
@@ -129,17 +131,42 @@ public class AnnisParserAntlr
     }
 
     @Override
-    public void exitAnd(AqlParser.AndContext ctx)
+    public void exitAndExpr(AqlParser.AndExprContext ctx)
+    {
+      alternativeStack.remove(0);
+    }
+    
+    @Override
+    public void exitOrExpr(AqlParser.OrExprContext ctx)
     {
       alternativeStack.remove(0);
     }
 
     @Override
-    public void exitOr(AqlParser.OrContext ctx)
+    public void enterTokExpr(AqlParser.TokExprContext ctx)
     {
-      alternativeStack.remove(0);
+      QueryNode target = newNode();
+      
+      target.setToken(true);
+      if(ctx.text_spec() != null)
+      {
+        // TODO: get text spec content
+      }
+      
     }
+
     
+    
+    private QueryNode newNode()
+    {
+      QueryNode n = new QueryNode(++aliasCount);
+      n.setVariable("n" + n.getId());
+      n.setMarker(n.getVariable());
+
+      alternativeStack.get(0).add(n);
+      
+      return n;
+    }
     
   }
 }
