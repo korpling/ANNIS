@@ -114,6 +114,10 @@ textSpec
   | SLASH content=regexText SLASH # RegexTextSpec
 	;
 
+rangeSpec
+  : min=DIGITS (COMMA max=DIGITS)?
+  ;
+
 qName
 	:	namespace=ID COLON name=ID
 	|	name=ID
@@ -131,22 +135,22 @@ edgeSpec
 precedence
 	: REF PRECEDENCE REF
 	| REF PRECEDENCE STAR REF
-	| REF PRECEDENCE min=DIGITS (COMMA max=DIGITS)? REF
+	| REF PRECEDENCE rangeSpec REF
 	| REF PRECEDENCE layer=ID REF
 	| REF PRECEDENCE layer=ID STAR REF
-	| REF PRECEDENCE layer=ID COMMA? min=DIGITS (COMMA max=DIGITS)? REF
+	| REF PRECEDENCE layer=ID COMMA? rangeSpec REF
 	;
 
 dominance
 	: REF DOMINANCE (anno=edgeSpec)? REF
 	| REF DOMINANCE (anno=edgeSpec)? STAR REF
-	| REF DOMINANCE (anno=edgeSpec)? min=DIGITS (COMMA max=DIGITS)? REF
+	| REF DOMINANCE (anno=edgeSpec)? rangeSpec REF
 	;
 	
 pointing
 	: REF POINTING label=ID (anno=edgeSpec)? REF
 	| REF POINTING label=ID (anno=edgeSpec)? STAR REF
-	| REF POINTING label=ID (anno=edgeSpec)? COMMA? min=DIGITS (COMMA max=DIGITS)? REF
+	| REF POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec REF
 	;
 
 binary_linguistic_term
@@ -168,8 +172,8 @@ binary_linguistic_term
 	
 unary_linguistic_term
 	:	REF ROOT # RootTerm
-	|	REF ARITY EQ DIGITS # ArityTerm
-	|	REF TOKEN_ARITY EQ DIGITS # TokenArityTerm
+	|	REF ARITY EQ rangeSpec # ArityTerm
+	|	REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
 	;
 
 

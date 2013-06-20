@@ -21,9 +21,13 @@ import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
+import annis.ql.node.ARangeSpec;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -81,6 +85,7 @@ public class AnnisParserAntlr
     private QueryNode topNode = new QueryNode();
     private List<List<QueryNode>> alternativeStack = new LinkedList<List<QueryNode>>();
     private int aliasCount = 0;
+    private Map<String, QueryNode> nodes = new HashMap<String, QueryNode>();
     
     public QueryNode getTopNode()
     {
@@ -200,7 +205,33 @@ public class AnnisParserAntlr
         new QueryAnnotation(namespace, name, value, matching);
       target.addNodeAnnotation(anno);
     }
-    
+
+    @Override
+    public void enterRootTerm(AqlParser.RootTermContext ctx)
+    {
+      QueryNode target = 
+        nodes.get("n" + ctx.REF().getText().substring(1));
+      Preconditions.checkNotNull(target, errorLHS("root"));
+      target.setRoot(true);
+    }
+
+    @Override
+    public void enterArityTerm(AqlParser.ArityTermContext ctx)
+    {
+      QueryNode target = 
+        nodes.get("n" + ctx.REF().getText().substring(1));
+      Preconditions.checkNotNull(target, errorLHS("arity"));
+      target.setArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    }
+
+    @Override
+    public void enterTokenArityTerm(AqlParser.TokenArityTermContext ctx)
+    {
+      QueryNode target = 
+        nodes.get("n" + ctx.REF().getText().substring(1));
+      Preconditions.checkNotNull(target, errorLHS("token-arity"));
+      target.setTokenArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    }
     
     
     
@@ -237,6 +268,22 @@ public class AnnisParserAntlr
       return null;
     }
     
+    private QueryNode.Range annisRangeFromARangeSpec(
+      AqlParser.RangeSpecContext spec)
+  {
+    String min = spec.min.getText();
+    String max = spec.max != null ? spec.max.getText() : null;
+
+    if (max == null)
+    {
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
+    }
+    else
+    {
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
+    }
+  }
+    
     private QueryNode newNode()
     {
       QueryNode n = new QueryNode(++aliasCount);
@@ -246,6 +293,16 @@ public class AnnisParserAntlr
       alternativeStack.get(0).add(n);
       
       return n;
+    }
+   
+    private String errorLHS(String function)
+    {
+      return function + " operator needs a left-hand-side";
+    }
+
+    private String errorRHS(String function)
+    {
+      return function + " operator needs a right-hand-side";
     }
     
   }
