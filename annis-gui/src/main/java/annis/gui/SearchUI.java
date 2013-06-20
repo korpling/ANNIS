@@ -815,8 +815,7 @@ public class SearchUI extends AnnisBaseUI
     UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
 
     // reset title
-    getPage().setTitle("ANNIS Corpus Search: " + instanceConfig.
-      getInstanceDisplayName());
+    getPage().setTitle(instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
   }
 
   public void setRefresherEnabled(boolean enabled)
