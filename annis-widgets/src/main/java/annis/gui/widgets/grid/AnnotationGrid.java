@@ -129,7 +129,9 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
               }
             }
 
-            if (event.getPageNumber() != null)
+            if (event.getPageNumber() != null
+              && pdfController != null // also check if a pdf viewer is available.
+              && pdfController.sizeOfRegisterdPDFViewer() > 0)
             {
               target.addAttribute("openPDF", event.getPageNumber());
             }
