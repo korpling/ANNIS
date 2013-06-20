@@ -167,9 +167,9 @@ binary_linguistic_term
 	;
 	
 unary_linguistic_term
-	:	REF ROOT
-	|	REF ARITY EQ DIGITS
-	|	REF TOKEN_ARITY EQ DIGITS
+	:	REF ROOT # RootTerm
+	|	REF ARITY EQ DIGITS # ArityTerm
+	|	REF TOKEN_ARITY EQ DIGITS # TokenArityTerm
 	;
 
 

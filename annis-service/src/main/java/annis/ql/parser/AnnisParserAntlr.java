@@ -156,7 +156,7 @@ public class AnnisParserAntlr
       QueryNode target = newNode();
       target.setToken(true);
       
-      QueryNode.TextMatching txtMatch = textMatchingTextSpec(ctx.textSpec(), 
+      QueryNode.TextMatching txtMatch = textMatchingFromSpec(ctx.textSpec(), 
         ctx.NEQ() != null);
       String content = textFromSpec(ctx.textSpec());
       target.setSpannedText(content, txtMatch);
@@ -165,9 +165,10 @@ public class AnnisParserAntlr
     @Override
     public void enterTextOnly(AqlParser.TextOnlyContext ctx)
     {
-      // TODO
+      QueryNode target = newNode();
+      target.setSpannedText(textFromSpec(ctx.txt), 
+        textMatchingFromSpec(ctx.txt, false));
     }
-    
 
     @Override
     public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
@@ -181,6 +182,25 @@ public class AnnisParserAntlr
         ctx.qName().name.getText());
       target.addNodeAnnotation(anno);
     }
+    
+    @Override
+    public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
+    {
+      QueryNode target = newNode();
+
+      String namespace = ctx.qName().namespace == null ? null : 
+        ctx.qName().namespace.getText();
+      String name = ctx.qName().name.getText();
+      String value = textFromSpec(ctx.txt);
+      
+      QueryNode.TextMatching matching = 
+        textMatchingFromSpec(ctx.txt, ctx.NEQ() != null);
+      
+      QueryAnnotation anno = 
+        new QueryAnnotation(namespace, name, value, matching);
+      target.addNodeAnnotation(anno);
+    }
+    
     
     
     
@@ -201,7 +221,7 @@ public class AnnisParserAntlr
       return null;
     }
 
-    private QueryNode.TextMatching textMatchingTextSpec(
+    private QueryNode.TextMatching textMatchingFromSpec(
       AqlParser.TextSpecContext txt, boolean not)
     {
       if(txt instanceof AqlParser.ExactTextSpecContext)
