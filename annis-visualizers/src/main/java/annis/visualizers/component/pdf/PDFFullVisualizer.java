@@ -37,7 +37,7 @@ public class PDFFullVisualizer extends AbstractVisualizer<Panel> {
 
   @Override
   public String getShortName() {
-    return "pdf_full";
+    return "pdfdoc";
   }
 
   @Override

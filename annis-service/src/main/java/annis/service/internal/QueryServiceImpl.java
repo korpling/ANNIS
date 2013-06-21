@@ -160,7 +160,7 @@ public class QueryServiceImpl implements QueryService
 
   @GET
   @Path("search/annotate")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml", "application/xmi+binary"})
   public SaltProject annotate(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
@@ -301,10 +301,15 @@ public class QueryServiceImpl implements QueryService
     final QueryData data = queryDataFromParameters(query, rawCorpusNames);
 
     MatrixQueryData ext = new MatrixQueryData();
-    if (rawMetaKeys != null)
+    if(rawMetaKeys != null)
     {
       ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
     }
+    if(ext.getMetaKeys() != null && ext.getMetaKeys().isEmpty())
+    {
+      ext.setMetaKeys(null);
+    }
+    
     data.addExtension(ext);
 
     StreamingOutput result = new StreamingOutput()
@@ -352,7 +357,7 @@ public class QueryServiceImpl implements QueryService
     QueryData data = new QueryData();
 
     data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer()));
+      query.getSegmentationLayer(), query.getFilter()));
 
     Set<String> corpusNames = new TreeSet<String>();
 

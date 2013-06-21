@@ -17,6 +17,7 @@ package annis.sqlgen;
 
 import annis.dao.AnnotatedMatch;
 import annis.dao.AnnotatedSpan;
+import annis.model.Annotation;
 import java.sql.ResultSet;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -96,6 +97,13 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
         break;
       }
     }
+    
+    // HACK: delete metadata spans for non-first nodes 
+    for(int i=1; i < matchedSpans.length; i++)
+    {
+      matchedSpans[i].setMetadata(new LinkedList<Annotation>());
+    }
+    
     return new AnnotatedMatch(matchedSpans);    
   }
 

@@ -60,7 +60,8 @@ public class MetaBox extends Panel implements Button.ClickListener
     }
     
     l.setMultiSelect(true);
-    l.setNullSelectionAllowed(true);    
+    l.setNullSelectionAllowed(true); 
+    l.addStyleName("corpus-font-force");
     l.setImmediate(true);
     
     tcs = l;

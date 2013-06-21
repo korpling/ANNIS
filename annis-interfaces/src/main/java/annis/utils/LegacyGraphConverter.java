@@ -45,6 +45,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisEdgeFeature;
+import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
@@ -143,11 +145,11 @@ public class LegacyGraphConverter
 
     for (SNode sNode : docGraph.getSNodes())
     {
-      SFeature featInternalID =
-        sNode.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      if (featInternalID != null)
+      SFeature featNodeRaw = sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+      if (featNodeRaw != null)
       {
-        long internalID = featInternalID.getSValueSNUMERIC();
+        RelannisNodeFeature featNode = (RelannisNodeFeature) featNodeRaw.getValue();
+        long internalID = featNode.getInternalID();
         AnnisNode aNode = new AnnisNode(internalID);
 
         for (SAnnotation sAnno : sNode.getSAnnotations())
@@ -159,6 +161,8 @@ public class LegacyGraphConverter
         aNode.setName(sNode.getSName());
         aNode.setNamespace(sNode.getSLayers().get(0).getSName());
 
+        RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        
         if (sNode instanceof SToken)
         {
           BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
@@ -172,8 +176,7 @@ public class LegacyGraphConverter
             aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
               substring(seq.getSStart(), seq.getSEnd()));
             aNode.setToken(true);
-            aNode.setTokenIndex(sNode.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-              getSValueSNUMERIC());
+            aNode.setTokenIndex(feat.getTokenIndex());
           }
         }
         else
@@ -182,17 +185,12 @@ public class LegacyGraphConverter
           aNode.setTokenIndex(null);
         }
 
-        aNode.setCorpus(sNode.getSFeature(ANNIS_NS, FEAT_CORPUSREF).
-          getSValueSNUMERIC());
-        aNode.setTextId(sNode.getSFeature(ANNIS_NS, FEAT_TEXTREF)
-          .getSValueSNUMERIC());
-        aNode.setLeft(sNode.getSFeature(ANNIS_NS, FEAT_LEFT).getSValueSNUMERIC());
-        aNode.setLeftToken(sNode.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-          getSValueSNUMERIC());
-        aNode.setRight(
-          sNode.getSFeature(ANNIS_NS, FEAT_RIGHT).getSValueSNUMERIC());
-        aNode.setRightToken(sNode.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-          getSValueSNUMERIC());
+        aNode.setCorpus(feat.getCorpusRef());
+        aNode.setTextId(feat.getTextRef());
+        aNode.setLeft(feat.getLeft());
+        aNode.setLeftToken(feat.getLeftToken());
+        aNode.setRight(feat.getRight());
+        aNode.setRightToken(feat.getRightToken());
         if (matchSet.contains(aNode.getName()))
         {
           aNode.setMatchedNodeInQuery((long) matchedNodeNames.indexOf(aNode.getName()) + 1);
@@ -210,12 +208,10 @@ public class LegacyGraphConverter
 
     for (SRelation rel : docGraph.getSRelations())
     {
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-      SFeature featComponentID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
-
-      if (featPre != null)
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
+      if (featEdge != null)
       {
-        addEdge(rel, featPre.getSValueSNUMERIC(), featComponentID.getSValueSNUMERIC(),
+        addEdge(rel, featEdge.getPre(), featEdge.getComponentID(),
           allNodes, annoGraph);
       }
     }
@@ -223,9 +219,10 @@ public class LegacyGraphConverter
     // add edges with empty edge name for every dominance edge
     for(SDominanceRelation rel : docGraph.getSDominanceRelations())
     {
-      SFeature featComp = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT);
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE);
-      if(featComp != null && featPre != null)
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
+      if(featEdge != null 
+        && featEdge.getArtificialDominanceComponent() != null 
+        && featEdge.getArtificialDominancePre() != null)
       {
         SDominanceRelation newRel = SaltFactory.eINSTANCE.createSDominanceRelation();
         newRel.setSSource(rel.getSSource());
@@ -238,7 +235,9 @@ public class LegacyGraphConverter
         {
           newRel.addSAnnotation(anno);
         }
-        addEdge(newRel, featPre.getSValueSNUMERIC(), featComp.getSValueSNUMERIC(), allNodes, annoGraph);
+        
+        addEdge(newRel, featEdge.getArtificialDominancePre(), featEdge.getArtificialDominanceComponent(), allNodes, annoGraph);
+
       }
     }
 

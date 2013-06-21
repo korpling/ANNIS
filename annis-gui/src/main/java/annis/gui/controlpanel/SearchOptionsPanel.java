@@ -49,9 +49,11 @@ import org.slf4j.LoggerFactory;
 public class SearchOptionsPanel extends FormLayout
 {
 
-  public static final String KEY_DEFAULT_SEGMENTATION = "default-text-segmentation";
-
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
+
+  public static final String KEY_DEFAULT_CONTEXT_SEGMENTATION = "default-context-segmentation";
+
+  public static final String KEY_DEFAULT_BASE_TEXT_SEGMENTATION = "default-base-text-segmentation";
 
   public static final String KEY_MAX_CONTEXT_LEFT = "max-context-left";
 
@@ -184,7 +186,7 @@ public class SearchOptionsPanel extends FormLayout
       corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_CONTEXT_STEPS));
 
     String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
-      KEY_DEFAULT_SEGMENTATION);
+      KEY_DEFAULT_CONTEXT_SEGMENTATION);
 
     updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
     updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
@@ -219,7 +221,8 @@ public class SearchOptionsPanel extends FormLayout
       KEY_CONTEXT_STEPS));
     Integer resultsPerPage = Integer.parseInt(lastSelection.get(key).getConfig(
       KEY_RESULT_PER_PAGE));
-    String segment = lastSelection.get(key).getConfig(KEY_DEFAULT_SEGMENTATION);
+    String segment = lastSelection.get(key).getConfig(
+      KEY_DEFAULT_CONTEXT_SEGMENTATION);
 
     // update the left and right context
     updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
@@ -237,7 +240,7 @@ public class SearchOptionsPanel extends FormLayout
     cbSegmentation.setNullSelectionItemId(NULL_SEGMENTATION_VALUE);
     cbSegmentation.addItem(NULL_SEGMENTATION_VALUE);
 
-    if (segment.equalsIgnoreCase("tok"))
+    if ("tok".equalsIgnoreCase(segment))
     {
       cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
     }
@@ -440,7 +443,11 @@ public class SearchOptionsPanel extends FormLayout
     corpusConfig.setConfig(KEY_RESULT_PER_PAGE, theGreatestCommonDenominator(
       KEY_RESULT_PER_PAGE, corpora));
 
-    corpusConfig.setConfig(KEY_DEFAULT_SEGMENTATION, checkSegments(corpora));
+    corpusConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, checkSegments(
+      KEY_DEFAULT_CONTEXT_SEGMENTATION, corpora));
+
+    corpusConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, checkSegments(
+      KEY_DEFAULT_BASE_TEXT_SEGMENTATION, corpora));
 
     return corpusConfig;
   }
@@ -449,24 +456,25 @@ public class SearchOptionsPanel extends FormLayout
    * Checks, if all selected corpora have the same default segmentation layer.
    * If not the tok layer is taken, because every corpus has this one.
    *
+   * @param key the key for the segementation config, must be
+   * {@link #KEY_DEFAULT_BASE_TEXT_SEGMENTATION} or
+   * {@link #KEY_DEFAULT_CONTEXT_SEGMENTATION}.
    * @param corpora the corpora which has to be checked.
    * @return "tok" or a segment which is defined in all corpora.
    */
-  private String checkSegments(Set<String> corpora)
+  private String checkSegments(String key, Set<String> corpora)
   {
     String segmentation = null;
     for (String corpus : corpora)
     {
-      String tmpSegment = corpusConfigurations.get(corpus).getConfig(
-        KEY_DEFAULT_SEGMENTATION);
+      String tmpSegment = corpusConfigurations.get(corpus).getConfig(key);
 
       /**
        * If no segment is set in the corpus config use always the tok segment.
        */
       if (tmpSegment == null)
       {
-        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
-          KEY_DEFAULT_SEGMENTATION);
+        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(key);
       }
 
       if (segmentation == null)
@@ -477,8 +485,7 @@ public class SearchOptionsPanel extends FormLayout
 
       if (!segmentation.equals(tmpSegment)) // return the default config
       {
-        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
-          KEY_DEFAULT_SEGMENTATION);
+        return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(key);
       }
     }
 

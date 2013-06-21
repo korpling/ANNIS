@@ -21,6 +21,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -48,9 +50,7 @@ public class PDFPageHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
-  public static final String PAGE_NUMBER_ANNOATION_NAMESPACE = "annis";
-
-  public static final String PAGE_NUMBER_ANNOATATION_NAME = "page";
+  public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";
 
   public static final String PAGE_NUMBER_SEPERATOR = "-";
 
@@ -67,7 +67,7 @@ public class PDFPageHelper {
 
   /**
    * Returns a page annotation for a span, if the span is overlapped by a page
-   * annoation.
+   * annotation.
    */
   public String getPageAnnoForGridEvent(SSpan span) {
     int left = getLeftIndexFromSNode(span);
@@ -115,22 +115,27 @@ public class PDFPageHelper {
    */
   public String getPageFromAnnotation(SSpan node) {
     if (node != null && node.getSAnnotations() != null) {
+
+      EList<SLayer> layers = node.getSLayers();
+      String nodeNamespace = null;
+
+      for (SLayer l : layers) {
+        nodeNamespace = l.getSName();
+      }
+
       for (SAnnotation anno : node.getSAnnotations()) {
-        if (getQualifiedPageNumberAnnotationName().equals(anno.getQName())) {
+
+        if ((nodeNamespace == null || input.getNamespace() == null)
+                && getPDFPageAnnotationName().equals(anno.getName())) {
+          return anno.getSValueSTEXT();
+        } else if (nodeNamespace.equals(input.getNamespace())
+                && getPDFPageAnnotationName().equals(anno.getName())) {
           return anno.getSValueSTEXT();
         }
       }
     }
 
     return null;
-  }
-
-  /**
-   * Gets the complete name of the page annotation, including the seperator. *
-   *
-   */
-  public String getQualifiedPageNumberAnnotationName() {
-    return PAGE_NUMBER_ANNOATION_NAMESPACE + "::" + getPDFPageAnnotationName();
   }
 
   private void getAllSSpanWithPageNumber(
@@ -172,18 +177,24 @@ public class PDFPageHelper {
    * Get the most left token index of a SSpan.
    *
    */
-  public int getLeftIndexFromSNode(SSpan s) {
-    return (int) (long) s.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-            getSValueSNUMERIC();
+  public int getLeftIndexFromSNode(SSpan s) 
+  {
+    
+    RelannisNodeFeature feat = 
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+    return (int) feat.getLeftToken();
   }
 
   /**
    * Get the most right token index of a SSpan.
    *
    */
-  public int getRightIndexFromSNode(SSpan s) {
-    return (int) (long) s.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-            getSValueSNUMERIC();
+  public int getRightIndexFromSNode(SSpan s) 
+  {
+    
+    RelannisNodeFeature feat =
+      (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+    return (int) feat.getRightToken();
   }
 
   /**
@@ -196,12 +207,24 @@ public class PDFPageHelper {
     Properties mappings = input.getMappings();
 
     if (mappings != null) {
-      return mappings.getProperty("page", PAGE_NUMBER_ANNOATATION_NAME);
+      return mappings.getProperty("node_key",
+              DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
     }
 
-    return PAGE_NUMBER_ANNOATATION_NAME;
+    return DEFAULT_PAGE_NUMBER_ANNOTATION_NAME;
   }
 
+  /**
+   * Creates a String (eg. <b>3-9</b> or <b>3</b>), based on the most left and
+   * most right page annotation.
+   *
+   * <p>The page annotation is detected with
+   * {@link #getPageFromAnnotation(de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan)}</p>
+   *
+   * @return A String which represents the start and the end page of a pdf,
+   * seperated by {@link #PAGE_NUMBER_SEPERATOR}. If there is no end page, or
+   * exactly one page annotation, only a String with one number is returned.
+   */
   public String getMostLeftAndMostRightPageAnno() {
 
     if (sspans == null || sspans.isEmpty()) {

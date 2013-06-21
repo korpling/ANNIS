@@ -16,6 +16,7 @@
 package annis.visualizers.htmlvis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import org.apache.commons.lang3.Validate;
@@ -37,10 +38,9 @@ public class AnnotationValueMatcher implements SpanMatcher
   @Override
   public String matchedAnnotation(SNode node)
   {
-    if(node instanceof SSpan)
+    if(node instanceof SSpan || node instanceof SToken)
     {
-      SSpan span = (SSpan) node;
-      for(SAnnotation anno : span.getSAnnotations())
+      for(SAnnotation anno : node.getSAnnotations())
       {
         if(annotationValue.equals(anno.getSValueSTEXT()))
         {

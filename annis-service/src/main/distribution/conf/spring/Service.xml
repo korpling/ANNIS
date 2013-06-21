@@ -26,7 +26,7 @@
         <prop key="default-context">${default-context}</prop>
         <prop key="context-steps">${context-steps}</prop>
         <prop key="results-per-page">${results-per-page}</prop>
-        <prop key="default-text-segmentation">${default-text-segmentation}</prop>
+        <prop key="default-context-segmentation">${default-context-segmentation}</prop>
         <prop key="default-base-text-segmentation">${default-base-text-segmentation}</prop>
       </props>
     </property>

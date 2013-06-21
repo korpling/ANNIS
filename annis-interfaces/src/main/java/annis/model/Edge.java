@@ -19,8 +19,6 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 public class Edge implements Serializable
 {
@@ -101,7 +99,13 @@ public class Edge implements Serializable
     String dst = destination != null ? "" + destination.getId() : "(no destination)";
     String type = edgeType != null ? edgeType.toString() : "(no type)";
     String qname = getQualifiedName() != null ? getQualifiedName() : "(no name)";
-    return src + "->" + dst + " " + qname + " " + type;
+    
+    String strcomponent = "component-id " + componentID;
+    String strpre = "pre-order " + pre;
+    
+    
+    return src + "->" + dst + " " + qname + " " + type + "(" 
+      + strcomponent + ", " + strpre + ")";
   }
 
   public String getQualifiedName()

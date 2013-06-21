@@ -66,9 +66,9 @@ public class PDFPanel extends AbstractJavaScriptComponent {
       firstPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[0]);
     } else {
       firstPage = Integer.parseInt(PAGE_NO_VALID_NUMBER);
+      lastPage = -1;
     }
-
-    // if the last page is not defined, set it to the first page.
+     // if the last page is not defined, set it to the first page.
     if (page.split(PAGE_NUMBER_SEPERATOR).length > 1) {
       lastPage = Integer.parseInt(page.split(PAGE_NUMBER_SEPERATOR)[1]);
     } else {

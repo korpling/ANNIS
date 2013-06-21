@@ -22,6 +22,9 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import com.google.common.base.Stopwatch;
+import com.google.common.eventbus.EventBus;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerRangeValidator;
@@ -39,6 +42,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -67,6 +71,8 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private ComboBox cbRightContext;
 
+  private TextField txtAnnotationKeys;
+  
   private TextField txtParameters;
 
   private Button btDownload;
@@ -82,14 +88,22 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private File tmpOutputFile;
 
   private ProgressIndicator progressIndicator;
+  private Label progressLabel;
 
   private FileDownloader downloader;
 
+  private transient EventBus eventBus;
+  
+  private transient Stopwatch exportTime = new Stopwatch();
+  
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
 
+    this.eventBus = new EventBus();
+    this.eventBus.register(this);
+    
     setWidth("99%");
     setHeight("-1px");
     addStyleName("contextsensible-formlayout");
@@ -140,6 +154,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
 
+    txtAnnotationKeys = new TextField("Annotation Keys");
+    txtAnnotationKeys.setDescription("Some exporters will use this comma "
+      + "seperated list of annotation keys to limit the exported data to these "
+      + "annotations.");
+    addComponent(new HelpButton(txtAnnotationKeys));
+    
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
@@ -163,10 +183,16 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       btDownload);
     addComponent(layoutExportButtons);
 
+    VerticalLayout vLayout = new VerticalLayout();
+    addComponent(vLayout);
+    
     progressIndicator = new ProgressIndicator();
     progressIndicator.setEnabled(false);
     progressIndicator.setIndeterminate(true);
-    addComponent(progressIndicator);
+    vLayout.addComponent(progressIndicator);
+    
+    progressLabel = new Label();
+    vLayout.addComponent(progressLabel);
   }
 
   @Override
@@ -206,12 +232,13 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
 
           exporter.convertText(queryPanel.getQuery(),
-            Integer.parseInt((String) cbLeftContext.getValue()),
-            Integer.parseInt((String) cbRightContext.getValue()),
+            (Integer) cbLeftContext.getValue(),
+            (Integer) cbRightContext.getValue(),
             corpusListPanel.getSelectedCorpora(),
-            null, (String) txtParameters.getValue(),
+            txtAnnotationKeys.getValue(), 
+            txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
-            outWriter);
+            outWriter, eventBus);
 
           outWriter.close();
 
@@ -229,6 +256,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           {
             btExport.setEnabled(true);
             progressIndicator.setEnabled(false);
+            progressLabel.setValue("");
 
             try
             {
@@ -278,10 +306,17 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       };
 
       progressIndicator.setEnabled(true);
+      progressLabel.setValue("");
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
       singleExecutor.submit(task);
-
+      if(exportTime == null)
+      {
+        exportTime = new Stopwatch();
+      }
+      exportTime.reset();
+      exportTime.start();
+      
     }
 
   }
@@ -309,9 +344,9 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "tokens covered by each annotation are given as number ranges after each "
       + "annotation in brackets. To suppress token numbers, input numbers=false "
       + "into the parameters box below. To display only a subset of annotations "
-      + "in any order, input e.g. keys=tok,pos,cat to show tokens and the "
-      + "annotations pos and cat. Combine both parameters like this:<br />"
-      + "keys=tok,pos;numbers=false.");
+      + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
+      + "to show tokens and the "
+      + "annotations pos and cat.");
   }
 
   public class ExporterSelectionHelpListener implements
@@ -331,6 +366,28 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       {
         cbExporter.setDescription("No help available for this exporter");
       }
+    }
+  }
+  
+  @Subscribe
+  public void handleExportProgress(Integer exports)
+  {
+    VaadinSession session = VaadinSession.getCurrent();
+    session.lock();
+    try
+    {
+      if(exportTime != null &&  exportTime.isRunning())
+      {
+        progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
+      }
+      else
+      {
+        progressLabel.setValue("exported " + exports + " items");
+      }
+    }
+    finally
+    {
+      session.unlock();
     }
   }
 
