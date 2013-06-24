@@ -18,6 +18,7 @@ package annis.visualizers.component.grid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.PDFPageHelper;
+import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
@@ -71,13 +72,15 @@ public class EventExtractor {
    * @param annotationNames
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
+   * @param pdfController makes status of all pdfviewer available for the
+   * events.
    * @return
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
-    VisualizerInput input,
-    List<String> annotationNames, long startTokenIndex, long endTokenIndex)
-  {
-    
+          VisualizerInput input,
+          List<String> annotationNames, long startTokenIndex, long endTokenIndex,
+          PDFController pdfController) {
+
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
     // only look at annotations which were defined by the user
@@ -95,9 +98,9 @@ public class EventExtractor {
     for (SSpan span : graph.getSSpans()) {
       // calculate the left and right values of a span
       // TODO: howto get these numbers with Salt?
-      RelannisNodeFeature feat = (RelannisNodeFeature) 
-        span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-      
+      RelannisNodeFeature feat = (RelannisNodeFeature) span.
+              getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
       long leftLong = feat.getLeftToken();
       long rightLong = feat.getRightToken();
 
@@ -167,9 +170,11 @@ public class EventExtractor {
           r.addEvent(event);
           rows.add(r);
 
-          String page = pageNumberHelper.getPageFromAnnotation(span);
-          if (page != null) {
-            event.setPage(page);
+          if (pdfController != null && pdfController.sizeOfRegisterdPDFViewer() > 0) {
+            String page = pageNumberHelper.getPageFromAnnotation(span);
+            if (page != null) {
+              event.setPage(page);
+            }
           }
         }
       } // end for each annotation of span
@@ -423,11 +428,13 @@ public class EventExtractor {
           if (node2 == null) {
             return +1;
           }
-          
-          RelannisNodeFeature feat1 = 
-            (RelannisNodeFeature) node1.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 = 
-            (RelannisNodeFeature) node2.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+          RelannisNodeFeature feat1 =
+                  (RelannisNodeFeature) node1.getSFeature(ANNIS_NS,
+                  FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat2 =
+                  (RelannisNodeFeature) node2.getSFeature(ANNIS_NS,
+                  FEAT_RELANNIS_NODE).getValue();
 
           long tokenIndex1 = feat1.getTokenIndex();
           long tokenIndex2 = feat2.getTokenIndex();
@@ -441,8 +448,9 @@ public class EventExtractor {
       for (String id : sortedCoveredToken) {
 
         SNode node = graph.getSNode(id);
-        RelannisNodeFeature feat = 
-            (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        RelannisNodeFeature feat =
+                (RelannisNodeFeature) node.getSFeature(ANNIS_NS,
+                FEAT_RELANNIS_NODE).getValue();
         long tokenIndexRaw = feat.getTokenIndex();
 
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);

@@ -48,6 +48,7 @@ import org.slf4j.LoggerFactory;
  * Utilities class for non-gui operations on Salt.
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class CommonHelper
 {
@@ -81,6 +82,19 @@ public class CommonHelper
     return false;
   }
 
+  /**
+   * Calculates a {@link SOrderRelation} node chain of a {@link SDocumentGraph}.
+   *
+   * <p>If no segmentation name is set, a list of sorted {@link SToken} will be
+   * returned.<p>
+   *
+   * @param segName The segmentation name, for which the chain is computed.
+   * @param graph The salt document graph, which is traversed for the
+   * segmentation.
+   *
+   * @return Returns a List of {@link SNode}, which is sorted by the
+   * {@link SOrderRelation}.
+   */
   public static List<SNode> getSortedSegmentationNodes(String segName,
     SDocumentGraph graph)
   {
@@ -105,8 +119,7 @@ public class CommonHelper
           SNode node = rel.getSSource();
           outRelationForNode.put(node, rel);
 
-          EList<Edge> inEdgesForSource =
-            graph.getInEdges(node.getSId());
+          EList<Edge> inEdgesForSource = graph.getInEdges(node.getSId());
           boolean hasInOrderEdge = false;
           for (Edge e : inEdgesForSource)
           {

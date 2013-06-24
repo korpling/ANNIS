@@ -97,4 +97,10 @@ public class PDFControllerImpl implements PDFController, Serializable
       lock.readLock().unlock();
     }
   }
+
+  @Override
+  public int sizeOfRegisterdPDFViewer()
+  {
+    return registeredPDFViewer != null ? registeredPDFViewer.size() : 0;
+  }
 }

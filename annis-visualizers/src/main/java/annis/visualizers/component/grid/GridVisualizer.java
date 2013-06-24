@@ -142,18 +142,18 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                 SSpan.class);
 
         EList<SToken> token = graph.getSortedSTokenByText();
-        
-        RelannisNodeFeature featTokStart = 
+
+        RelannisNodeFeature featTokStart =
           (RelannisNodeFeature) token.get(0).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         long startIndex = featTokStart.getTokenIndex();
-        
-        RelannisNodeFeature featTokEnd = 
+
+        RelannisNodeFeature featTokEnd =
             (RelannisNodeFeature) token.get(token.size() - 1).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
         long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
                 EventExtractor.parseSalt(input, annos, (int) startIndex,
-                (int) endIndex);
+                (int) endIndex, pdfController);
 
         // we will only add tokens of one texts which is mentioned by any
         // included annotation.
@@ -191,9 +191,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           }
 
           // only add token if text ID matches the valid one
-          if (tokenTextID != null && validTextIDs.contains(tokenTextID)) 
+          if (tokenTextID != null && validTextIDs.contains(tokenTextID))
           {
-            RelannisNodeFeature feat = 
+            RelannisNodeFeature feat =
               (RelannisNodeFeature) t.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
             long idx = feat.getTokenIndex() - startIndex;
 

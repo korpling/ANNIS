@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -25,10 +25,10 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 
 public class TestAnnisAdminRunner {
-	
+
 	@Mock private CorpusAdministration administration;
 	private AnnisAdminRunner main;
-	
+
 	@Before
 	public void setup() {
 		initMocks(this);
@@ -43,15 +43,15 @@ public class TestAnnisAdminRunner {
 		run("import data/corpus1 data/corpus2 data/corpus3");
 
 		List<String> expected = Arrays.asList("data/corpus1 data/corpus2 data/corpus3".split(" "));
-		verify(administration).importCorpora(expected);
+		verify(administration).importCorpora(expected, true);
 	}
-	
+
 	@Test
 	public void initializeDatabase() {
 		run("init -h host --port 5432 -d database -u user -p password");
 		verify(administration).initializeDatabase("host", "5432", "database", "user", "password", "postgres", "postgres", null, false);
 	}
-	
+
 	@Test
 	public void indexes() {
 		run("indexes");
@@ -62,5 +62,5 @@ public class TestAnnisAdminRunner {
 	private void run(String cmdline) {
 		main.run(cmdline.split(" "));
 	}
-	
+
 }
