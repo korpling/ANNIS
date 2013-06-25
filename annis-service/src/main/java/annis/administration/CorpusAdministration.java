@@ -17,18 +17,13 @@ package annis.administration;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileWriter;
 import java.io.IOException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
-import javax.sql.DataSource;
-import org.postgresql.Driver;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.exceptions.AnnisException;
-import java.util.logging.Level;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,15 +73,19 @@ public class CorpusAdministration
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
   }
 
-  public void importCorpora(List<String> paths)
+  public void importCorpora(List<String> paths, boolean overwrite)
   {
-
     // import each corpus
     for (String path : paths)
     {
+      try{
       log.info("Importing corpus from: " + path);
-      administrationDao.importCorpus(path);
+      administrationDao.importCorpus(path, overwrite);
       log.info("Finished import from: " + path);
+      }catch (DefaultAdministrationDao.ConflictingCorpusException ex)
+      {
+        log.error(ex.getMessage());
+      }
 
     }
   }
@@ -106,7 +105,7 @@ public class CorpusAdministration
 
   public void importCorpora(String... paths)
   {
-    importCorpora(Arrays.asList(paths));
+    importCorpora(Arrays.asList(paths), false);
   }
 
   public List<Map<String, Object>> listCorpusStats()
