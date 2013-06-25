@@ -99,7 +99,7 @@ public class TestCorpusAdministration
   // a correct import requires this order
   private void verifyImport(InOrder inOrder, String path)
   {
-    inOrder.verify(administrationDao).importCorpus(path, true);
+    inOrder.verify(administrationDao).importCorpus(path, false);
 //    // create the staging area
 //    inOrder.verify(administrationDao).createStagingArea(true);
 //
