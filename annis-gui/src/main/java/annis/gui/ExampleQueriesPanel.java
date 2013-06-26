@@ -211,17 +211,13 @@ public class ExampleQueriesPanel extends Table
     {
       tab = mainTab.getTab(this);
       tab.getComponent().addStyleName("example-queries-tab");
+      tab.setEnabled(true);
 
-
-      if (tab != null)
+      if (!(mainTab.getSelectedTab() instanceof ResultViewPanel))
       {
-        tab.setEnabled(true);
-
-        if (!(mainTab.getSelectedTab() instanceof ResultViewPanel))
-        {
-          mainTab.setSelectedTab(tab);
-        }
+        mainTab.setSelectedTab(tab);
       }
+
     }
   }
 
