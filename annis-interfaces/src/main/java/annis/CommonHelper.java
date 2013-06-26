@@ -55,6 +55,18 @@ public class CommonHelper
 
   private final static Logger log = LoggerFactory.getLogger(CommonHelper.class);
 
+  /**
+   * Detects arabic characters in a string.
+   *
+   * <p>
+   * Every character is checked, if its bit representation lies between:
+   * <code>[1425, 1785] | [64286, 65019] | [65136, 65276]</code>
+   *
+   * </p>
+   *
+   * @param str The string to be checked.
+   * @return returns true, if arabic characters are detected.
+   */
   public static boolean containsRTLText(String str)
   {
     if (str != null)

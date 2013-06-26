@@ -265,8 +265,9 @@ public class SingleResultPanel extends VerticalLayout implements
           longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        RelannisNodeFeature feat = RelannisNodeFeature.extract(markedEntry.getKey());
-        
+        RelannisNodeFeature feat = RelannisNodeFeature.extract(markedEntry.
+          getKey());
+
         if (feat != null)
         {
           markedCoveredMap.put("" + feat.getInternalID(),
@@ -315,8 +316,9 @@ public class SingleResultPanel extends VerticalLayout implements
 
       for (SNode segNode : segNodes)
       {
-        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-        
+        RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
+          getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
         if (segNode != null && !covered.containsKey(segNode))
         {
           long leftTok = featSegNode.getLeftToken();
@@ -325,7 +327,8 @@ public class SingleResultPanel extends VerticalLayout implements
           // check for each covered token if this segment is covering it
           for (Map.Entry<SToken, Long> e : coveredToken.entrySet())
           {
-            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            RelannisNodeFeature featTok = (RelannisNodeFeature) e.getKey().
+              getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
             long entryTokenIndex = featTok.getTokenIndex();
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
@@ -392,9 +395,11 @@ public class SingleResultPanel extends VerticalLayout implements
         @Override
         public int compare(SNode o1, SNode o2)
         {
-          RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          
+          RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(
+            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(
+            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
           long leftTokIdxO1 = feat1.getLeftToken();
           long rightTokIdxO1 = feat1.getRightToken();
           long leftTokIdxO2 = feat2.getLeftToken();
@@ -402,7 +407,18 @@ public class SingleResultPanel extends VerticalLayout implements
 
           int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
           int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
-          return intervallO1 - intervallO2;
+
+          if (intervallO1 - intervallO2 != 0)
+          {
+            return intervallO1 - intervallO2;
+          } else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
+          {
+            return (int) (feat1.getLeftToken() - feat2.getRightToken());
+          } else if (feat1.getRightToken() - feat2.getRightToken()!= 0)
+          {
+            return (int)(feat1.getRightToken() - feat2.getRightToken());
+          } else
+            return (int)(feat1.getInternalID() - feat2.getInternalID());
         }
       });
 

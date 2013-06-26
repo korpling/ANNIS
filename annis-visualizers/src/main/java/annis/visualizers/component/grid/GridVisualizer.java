@@ -128,6 +128,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       layout.setSizeUndefined();
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
+      EList<STextualDS> texts = input.getDocument().getSDocumentGraph().
+                getSTextualDSs();
+
+      if (texts != null && texts.size() > 0)
+      {
+        if (CommonHelper.containsRTLText(texts.get(0).getSText()))
+        {
+          addStyleName("rtl");
+        }
+      }
+
       if (input != null) {
         String resultID = input.getId();
 
