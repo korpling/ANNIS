@@ -422,9 +422,9 @@ public class SingleResultPanel extends VerticalLayout implements
         }
       });
 
-      for (SNode n : initialMatches.keySet())
+      for (Map.Entry<SNode, Long> entry : initialMatches.entrySet())
       {
-        sortedByOverlappedTokenIntervall.put(n, initialMatches.get(n));
+        sortedByOverlappedTokenIntervall.put(entry.getKey(), entry.getValue());
       }
 
       currentMatchPos = 1;
