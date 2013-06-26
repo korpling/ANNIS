@@ -319,7 +319,7 @@ public class SingleResultPanel extends VerticalLayout implements
         RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
           getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        if (segNode != null && !covered.containsKey(segNode))
+        if (!covered.containsKey(segNode))
         {
           long leftTok = featSegNode.getLeftToken();
           long rightTok = featSegNode.getRightToken();
