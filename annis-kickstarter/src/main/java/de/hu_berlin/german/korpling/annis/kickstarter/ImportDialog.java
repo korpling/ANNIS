@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -43,7 +43,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   private static final org.slf4j.Logger log =
     LoggerFactory.getLogger(ImportDialog.class);
-  
+
   private File confFile;
   private Properties confProps;
 
@@ -52,7 +52,7 @@ public class ImportDialog extends javax.swing.JDialog
     public boolean ok = true;
     public Exception ex = new Exception();
   }
-  
+
   private class ImportDialogWorker extends SwingWorker<Status, Void> implements
     Serializable
   {
@@ -62,7 +62,7 @@ public class ImportDialog extends javax.swing.JDialog
     {
       Status status = new Status();
       StringBuilder errorMessages = new StringBuilder();
-      
+
       if(corpora == null)
       {
         try
@@ -100,7 +100,7 @@ public class ImportDialog extends javax.swing.JDialog
             pbCorpus.setValue(0);
           }
         });
-        
+
         int i=0;
         for(Map<String, Object> corpus : corpora)
         {
@@ -109,25 +109,25 @@ public class ImportDialog extends javax.swing.JDialog
             status.ok = true;
             return status;
           }
-          
+
           if(corpus.containsKey("source_path"))
           {
             final String path = (String) corpus.get("source_path");
-           
+
             final int finalI = i;
             SwingUtilities.invokeLater(new Runnable() {
 
               @Override
               public void run()
               {
-                lblCurrentCorpus.setText("import " 
+                lblCurrentCorpus.setText("import "
                   + StringUtils.abbreviateMiddle(path, "...", 40)
                   + " [" + (finalI+1) + "/" + corpora.size() + "]");
                 pbCorpus.setValue(finalI);
               }
             });
-            
-            
+
+
             try
             {
               corpusAdministration.importCorpora(path);
@@ -142,16 +142,16 @@ public class ImportDialog extends javax.swing.JDialog
           i++;
         }
       }
-      
+
       if(errorMessages.length() > 0)
       {
         status.ok = false;
         return status;
       }
-      
+
       return status;
     }
-    
+
     @Override
     protected void done()
     {
@@ -162,7 +162,7 @@ public class ImportDialog extends javax.swing.JDialog
       lblCurrentCorpus.setText("");
       pbCorpus.setValue(pbCorpus.getMaximum());
       pbImport.setIndeterminate(false);
-      
+
       try
       {
         if(!isCancelled())
@@ -171,7 +171,7 @@ public class ImportDialog extends javax.swing.JDialog
           if (status.ok)
           {
             JOptionPane.showMessageDialog(null,
-              "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);          
+              "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);
             setVisible(false);
           }
           else
@@ -210,7 +210,7 @@ public class ImportDialog extends javax.swing.JDialog
     this.corpora = corpora;
 
     confProps = new Properties();
-    confFile = new File(System.getProperty("user.home") 
+    confFile = new File(System.getProperty("user.home")
       + "/.annis/kickstart.properties");
     try
     {
@@ -230,18 +230,18 @@ public class ImportDialog extends javax.swing.JDialog
     {
       log.error(null, ex);
     }
-    
+
     initComponents();
 
     loadProperties();
-    
+
     getRootPane().setDefaultButton(btOk);
 
     isImporting = false;
     worker = new ImportDialogWorker();
 
     addAppender();
-    
+
     // directly start import if we were called from outside
     if(this.corpora != null)
     {
@@ -278,7 +278,7 @@ public class ImportDialog extends javax.swing.JDialog
       }
     }
   }
-  
+
   private void loadProperties()
   {
     FileInputStream iStream = null;
@@ -291,7 +291,7 @@ public class ImportDialog extends javax.swing.JDialog
       {
         txtInputDir.setText(lastDirectory);
       }
-    
+
     }
     catch (IOException ex)
     {
@@ -311,9 +311,9 @@ public class ImportDialog extends javax.swing.JDialog
         }
       }
     }
-    
+
   }
-  
+
   private void addAppender()
   {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
