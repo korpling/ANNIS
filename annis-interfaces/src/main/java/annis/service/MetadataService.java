@@ -32,7 +32,7 @@ public interface MetadataService
 {
 
   /**
-   * Retrieves the meta data for a top level corpus.
+   * Fetches the meta data for a top level corpus.
    *
    * <p>If the <b>deep</b> path is called, the metadata of all subcorpora and
    * documents are also fetched.</p>
@@ -42,7 +42,7 @@ public interface MetadataService
    *
    * <ol>
    * <li>GET annis/meta/<b>{top}</b></li>
-   * <li>GET annis/meta/<b>{top}</b>/deep</li>
+   * <li>GET annis/meta/<b>{top}</b>/<b>{doc}</b></li>
    * </ol>
    *
    * <h3>MIME</h3>
@@ -56,4 +56,48 @@ public interface MetadataService
    * objects.
    */
   public Annotation getMetadata(String topLevelCorpus);
+
+  /**
+   * Fetches the meta data for a top level corpus.
+   *
+   * <h3>Path(s)</h3>
+   *
+   * <ol>
+   * <li>GET annis/meta/deep/<b>{top}</b></li>
+   * <li>GET annis/meta/deep/<b>{top}</b>/<b>{doc}</b></li>
+   *
+   * </ol>
+   *
+   * <h3>MIME</h3>
+   *
+   * accept:
+   * <code>application/xml</code>
+   *
+   * @param topLevelCorpus Determines the corpus, for which the annotations are
+   * retrieved.
+   * @param docname Determines the document name, for which the annotations are
+   * fetched. If null, all annotations of all documents are fetched.
+   * @return The xml representation of a list wich contains {@link Annotation}
+   * objects.
+   */
+  public Annotation getMetadataDeep(String topLevelCorpus, String docname);
+
+  /**
+   * Fetches all document names within a top level corpus.
+   *
+   * <h3>Path</h3>
+   *
+   * <p>GET annis/meta/docnames/<b>{top}</b></p> *
+   *
+   * <h3>MIME</h3>
+   *
+   * accept:
+   * <code>application/xml</code>
+   *
+   * @param topLevelCorpus Determines the corpus, for which the document names
+   * are retrieved.
+   * @return The xml representation of a list wich contains {@link Annotation}
+   * objects.
+   */
+  public Annotation getDocNames(String topLevelCorpus);
 }
