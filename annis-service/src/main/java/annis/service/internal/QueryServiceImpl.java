@@ -309,7 +309,7 @@ public class QueryServiceImpl implements QueryService
     {
       ext.setMetaKeys(null);
     }
-    
+
     data.addExtension(ext);
 
     StreamingOutput result = new StreamingOutput()
@@ -835,7 +835,6 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("corpora/{top}/{document}/binary/meta")
   @Produces("application/xml")
-  @Override
   public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
