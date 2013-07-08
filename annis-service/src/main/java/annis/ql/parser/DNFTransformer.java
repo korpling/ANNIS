@@ -98,7 +98,7 @@ public class DNFTransformer
   {
     if(node.getOp() == LogicClause.Operator.LEAF || node.getChildren().size() < 2)
     {
-      return false;
+      return true;
     }
     
     LogicClause left = node.getChildren().get(0);
