@@ -24,6 +24,7 @@ import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
 import java.io.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -977,7 +981,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    if (!executeSqlFromScript(dbLayout + "/cluster.sql", args))
+    if (executeSqlFromScript(dbLayout + "/cluster.sql", args) != null)
     {
       executeSqlFromScript("cluster.sql", args);
     }
@@ -1212,14 +1216,42 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
-  public boolean executeSqlFromScript(String script)
+  public PreparedStatement executeSqlFromScript(String script)
   {
     return executeSqlFromScript(script, null);
   }
 
+  private class CancelableStatements implements PreparedStatementCreator,
+    PreparedStatementCallback<Void>
+  {
+
+    String sqlQuery;
+
+    PreparedStatement statement;
+
+    public CancelableStatements(String sql)
+    {
+      sqlQuery = sql;
+    }
+
+    @Override
+    public PreparedStatement createPreparedStatement(Connection con) throws SQLException
+    {
+      statement = con.prepareStatement(sqlQuery);
+      return statement;
+    }
+
+    @Override
+    public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException
+    {
+      return null;
+    }
+  }
+
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
-  public boolean executeSqlFromScript(String script, MapSqlParameterSource args)
+  public PreparedStatement executeSqlFromScript(String script,
+    MapSqlParameterSource args)
   {
     File fScript = new File(scriptPath, script);
     if (fScript.canRead() && fScript.isFile())
@@ -1227,13 +1259,16 @@ public class DefaultAdministrationDao implements AdministrationDao
       Resource resource = new FileSystemResource(fScript);
       log.debug("executing SQL script: " + resource.getFilename());
       String sql = readSqlFromResource(resource, args);
-      jdbcTemplate.execute(sql);
-      return true;
+      CancelableStatements cancelableStats = new CancelableStatements(sql);
+
+
+      jdbcTemplate.execute(cancelableStats, cancelableStats);
+      return cancelableStats.statement;
     }
     else
     {
       log.debug("SQL script " + fScript.getName() + " does not exist");
-      return false;
+      return null;
     }
   }
 

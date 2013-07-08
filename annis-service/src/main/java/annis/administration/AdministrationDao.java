@@ -17,6 +17,7 @@ package annis.administration;
 
 import annis.exceptions.AnnisException;
 import annis.security.AnnisUserConfig;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -55,9 +56,9 @@ public interface AdministrationDao
 
   public boolean checkDatabaseSchemaVersion() throws AnnisException;
 
-  public boolean executeSqlFromScript(String script);
+  public PreparedStatement executeSqlFromScript(String script);
 
-  public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
+  public PreparedStatement executeSqlFromScript(String script, MapSqlParameterSource args);
 
   public AnnisUserConfig retrieveUserConfig(String userName);
 
