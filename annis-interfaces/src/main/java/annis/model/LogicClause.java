@@ -15,6 +15,7 @@
  */
 package annis.model;
 
+import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,7 +46,18 @@ public class LogicClause
     this.op = op;
   }
 
-  
+  /**
+   * Copy constructor
+   * @param other 
+   */
+  public LogicClause(LogicClause other)
+  {
+    this();
+    this.op = other.op;
+    this.parent = other.parent;
+    this.content = other.content;
+    this.children.addAll(other.children);
+  }
 
   public Operator getOp()
   {
@@ -57,16 +69,33 @@ public class LogicClause
     this.op = op;
   }
 
-  public List<LogicClause> getChildren()
+  public ImmutableList<LogicClause> getChildren()
   {
-    return children;
+    return ImmutableList.copyOf(children);
   }
-
-  public void setChildren(
-    List<LogicClause> children)
+  
+  public void addChild(LogicClause child)
   {
-    this.children = children;
+    child.parent = this;
+    children.add(child);
   }
+  
+  public void addChild(int idx, LogicClause child)
+  {
+    child.parent = this;
+    children.add(idx, child);
+  }
+  
+  public LogicClause removeChild(int idx)
+  {
+    LogicClause result = children.remove(idx);
+    if(result != null)
+    {
+      result.parent = null;
+    }
+    return result;
+  }
+  
 
   public QueryNode getContent()
   {
@@ -83,9 +112,6 @@ public class LogicClause
     return parent;
   }
 
-  public void setParent(LogicClause parent)
-  {
-    this.parent = parent;
-  }
+  
 
 }

@@ -17,6 +17,7 @@ package annis.ql.parser;
 
 import annis.model.LogicClause;
 import annis.model.QueryNode;
+import com.google.common.base.Preconditions;
 import java.util.ListIterator;
 
 /**
@@ -34,7 +35,10 @@ public class DNFTransformer
   {
     
     makeBinary(topNode);
-    //TODO: makeDNF
+    while(makeDNF(topNode) == false)
+    {
+      // do nothing, just repeat
+    }
     //TODO: makeFlat
   }
   
@@ -52,26 +56,23 @@ public class DNFTransformer
     {
       // push this node up
       int idx = parent.getChildren().indexOf(c);
-      parent.getChildren().remove(idx);
-      parent.getChildren().add(0, c.getChildren().get(0));
+      parent.removeChild(idx);
+      parent.addChild(0, c.getChildren().get(0));
     }
     else if(c.getChildren().size() > 2)
     {
       // merge together under a new node
       LogicClause newSubClause = new LogicClause(c.getOp());
-      newSubClause.setParent(c);
       
       ListIterator<LogicClause> itChildren = c.getChildren().listIterator(2);
       while(itChildren.hasNext())
       {
         LogicClause n = itChildren.next();
-        newSubClause.getChildren().add(n);
-        n.setParent(newSubClause);
-        
-        itChildren.remove();
+        newSubClause.addChild(n);
+        c.removeChild(itChildren.previousIndex());
       }
       
-      c.getChildren().add(newSubClause);
+      c.addChild(newSubClause);
     }
     
     // do the same thing for all children
@@ -84,8 +85,78 @@ public class DNFTransformer
     if(cSize == 2)
     {
       makeBinary(c.getChildren().get(1));
+    }    
+  }
+  
+
+  /**
+   * 
+   * @param node
+   * @return True if already in DNF
+   */
+  private static boolean makeDNF(LogicClause node)
+  {
+    if(node.getOp() == LogicClause.Operator.LEAF || node.getChildren().size() < 2)
+    {
+      return false;
     }
     
+    LogicClause left = node.getChildren().get(0);
+    LogicClause right = node.getChildren().get(1);
+    if(node.getOp() == LogicClause.Operator.AND)
+    {
+      // check if operator of this node and one of it's children is the same
+      
+      LogicClause x1 = null;
+      LogicClause x2 = null;
+      LogicClause y = null;
+      LogicClause z = null;
+      
+      if(right.getOp() == LogicClause.Operator.OR)
+      {
+        x1 = left;
+        x2 = new LogicClause(x1);
+        
+        Preconditions.checkArgument(right.getChildren().size() == 2, 
+          "OR nodes must always have exactly two children");
+        y = right.getChildren().get(0);
+        z = right.getChildren().get(1);
+      }
+      else if(left.getOp() == LogicClause.Operator.OR)
+      {
+        x1 = right;
+        x2 = new LogicClause(x1);
+        
+        Preconditions.checkArgument(left.getChildren().size() == 2, 
+          "OR nodes must always have exactly two children");
+        y = left.getChildren().get(0);
+        z = left.getChildren().get(1);
+      }
+      
+      if(x1 != null && x2 != null && y != null && z != null)
+      {
+        LogicClause topParent = new LogicClause(LogicClause.Operator.OR);
+        
+        LogicClause leftParent = new LogicClause(LogicClause.Operator.AND);
+        LogicClause rightParent = new LogicClause(LogicClause.Operator.AND);
+        
+        topParent.addChild(leftParent);
+        topParent.addChild(rightParent);
+        
+        leftParent.addChild(x1);
+        leftParent.addChild(y);
+        
+        rightParent.addChild(x2);
+        rightParent.addChild(z);
+        
+        // start over again
+        return false;
+      }
+    }
+    
+    // recursivly check children
+    return makeDNF(left) && makeDNF(right);
+
   }
   
 //  private static void cleanSubformula(QueryNode node)

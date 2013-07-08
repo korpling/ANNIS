@@ -101,8 +101,7 @@ public class AqlListener extends AqlBaseListener
     LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
     if(!alternativeStack.isEmpty())
     {
-      alternativeStack.get(0).getChildren().add(andClause);
-      andClause.setParent(alternativeStack.get(0));
+      alternativeStack.get(0).addChild(andClause);
     }
     alternativeStack.add(0, andClause);
   }
@@ -113,8 +112,7 @@ public class AqlListener extends AqlBaseListener
     LogicClause orClause = new LogicClause(LogicClause.Operator.OR);
     if(!alternativeStack.isEmpty())
     {
-      alternativeStack.get(0).getChildren().add(orClause);
-      orClause.setParent(alternativeStack.get(0));
+      alternativeStack.get(0).addChild(orClause);
     }
     alternativeStack.add(0, orClause);
   }
@@ -413,8 +411,7 @@ public class AqlListener extends AqlBaseListener
     n.setMarker(n.getVariable());
     LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
     c.setContent(n);
-    c.setParent(alternativeStack.get(0));
-    alternativeStack.get(0).getChildren().add(c);
+    alternativeStack.get(0).addChild(c);
     
     
     nodes.put(n.getVariable(), n);
