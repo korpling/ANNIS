@@ -41,6 +41,7 @@ public class LogicClause
 
   public LogicClause(Operator op)
   {
+    this();
     this.op = op;
   }
 

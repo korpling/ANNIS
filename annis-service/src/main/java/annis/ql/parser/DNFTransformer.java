@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.model.LogicClause;
 import annis.model.QueryNode;
 import java.util.ListIterator;
 
@@ -24,38 +25,68 @@ import java.util.ListIterator;
  */
 public class DNFTransformer
 {
-//  /**
-//   * Transforms a AQL query to the Disjunctive Normal Form.
-//   * @param topNode
-//   * @return 
-//   */
-//  public static boolean toDNF(QueryNode topNode)
-//  {
-//    boolean somethingChanged = false;
-//    while(testDNF(topNode) == false)
-//    {
-//      somethingChanged = true;
-//      
-//      cleanSubformula(topNode);
-//    }
-//    return somethingChanged;
-//  }
+  /**
+   * Transforms a AQL query to the Disjunctive Normal Form.
+   * @param topNode
+   * @return 
+   */
+  public static void toDNF(LogicClause topNode)
+  {
+    
+    makeBinary(topNode);
+    //TODO: makeDNF
+    //TODO: makeFlat
+  }
   
-//  private static void makeBinary(QueryNode parent, QueryNode node)
-//  {
-//    if(node.getType() == QueryNode.Type.NODE 
-//      || node.getAlternatives().isEmpty())
-//    {
-//      return;
-//    }
-//    
-//    if(parent != null && node.getAlternatives().size() == 1)
-//    {
-//      // push this node up
-//      
-//    }
-//    
-//  }
+  private static void makeBinary(LogicClause c)
+  {
+    if(c.getOp() == LogicClause.Operator.LEAF 
+      || c.getChildren().isEmpty())
+    {
+      return;
+    }
+    
+    // check if we have a degraded path with only one sibling
+    LogicClause parent = c.getParent();
+    if(c.getParent() != null && c.getChildren().size() == 1)
+    {
+      // push this node up
+      int idx = parent.getChildren().indexOf(c);
+      parent.getChildren().remove(idx);
+      parent.getChildren().add(0, c.getChildren().get(0));
+    }
+    else if(c.getChildren().size() > 2)
+    {
+      // merge together under a new node
+      LogicClause newSubClause = new LogicClause(c.getOp());
+      newSubClause.setParent(c);
+      
+      ListIterator<LogicClause> itChildren = c.getChildren().listIterator(2);
+      while(itChildren.hasNext())
+      {
+        LogicClause n = itChildren.next();
+        newSubClause.getChildren().add(n);
+        n.setParent(newSubClause);
+        
+        itChildren.remove();
+      }
+      
+      c.getChildren().add(newSubClause);
+    }
+    
+    // do the same thing for all children
+    int cSize = c.getChildren().size();
+    if(cSize >= 1)
+    {
+      makeBinary(c.getChildren().get(0));
+    }
+    
+    if(cSize == 2)
+    {
+      makeBinary(c.getChildren().get(1));
+    }
+    
+  }
   
 //  private static void cleanSubformula(QueryNode node)
 //  {
