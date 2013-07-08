@@ -1,1 +1,1 @@
- (node & cat=/NP/ & #1 . #2) | (/das/ & /Haus/ & #3 . #4) 
+ (node & cat=/NP/ & #1 . #2) | (/das/ & tok!=/Haus/ & #3 . #4) 

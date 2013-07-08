@@ -16,18 +16,12 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
-import annis.ql.AqlBaseListener;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
-import annis.sqlgen.model.Precedence;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -78,6 +72,16 @@ public class AnnisParserAntlr
     }
 
     return null;
+  }
+  
+  private QueryData createQueryDataFromTopNode(QueryNode topNode)
+  {
+    QueryData data = new QueryData();
+    
+    // TODO: add Metadata to QueryData
+    // TODO: create normalized 
+    
+    return data;
   }
 
   public int getPrecedenceBound()

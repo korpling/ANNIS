@@ -64,9 +64,6 @@ public class QueryNode implements Serializable
   // for sql generation
   private String marker;
   private Long matchedNodeInQuery;
-
-  private List<QueryNode> alternatives;
-  private Type type = Type.NODE;
   
   public enum TextMatching
   {
@@ -146,13 +143,6 @@ public class QueryNode implements Serializable
     nodeAnnotations = new TreeSet<QueryAnnotation>();
     edgeAnnotations = new TreeSet<QueryAnnotation>();
     joins = new ArrayList<Join>();
-    alternatives = new ArrayList<QueryNode>();
-  }
-  
-  public QueryNode(Type type)
-  {
-    this();
-    this.type = type;
   }
 
   public QueryNode(long id)
@@ -213,82 +203,71 @@ public class QueryNode implements Serializable
   {
     StringBuilder sb = new StringBuilder();
 
-    if(type == Type.NODE)
+    sb.append("node ");
+    sb.append(id);
+
+    if (marker != null)
     {
-      sb.append("node ");
-      sb.append(id);
-
-      if (marker != null)
-      {
-        sb.append("; marked '");
-        sb.append(marker);
-        sb.append("'");
-      }
-
-      if (variable != null)
-      {
-        sb.append("; bound to '");
-        sb.append(variable);
-        sb.append("'");
-      }
-
-      if (name != null)
-      {
-        sb.append("; named '");
-        sb.append(qName(namespace, name));
-        sb.append("'");
-      }
-
-      if (token)
-      {
-        sb.append("; is a token");
-      }
-
-      if (spannedText != null)
-      {
-        sb.append("; spans");
-        String op = spanTextMatching != null ? spanTextMatching.sqlOperator()
-          : " ";
-        String quote = spanTextMatching != null ? spanTextMatching.quote()
-          : "?";
-        sb.append(op);
-        sb.append(quote);
-        sb.append(spannedText);
-        sb.append(quote);
-      }
-
-      if (isRoot())
-      {
-        sb.append("; root node");
-      }
-
-      if (!nodeAnnotations.isEmpty())
-      {
-        sb.append("; node labels: ");
-        sb.append(nodeAnnotations);
-      }
-
-      if (!edgeAnnotations.isEmpty())
-      {
-        sb.append("; edge labes: ");
-        sb.append(edgeAnnotations);
-      }
-
-      for (Join join : joins)
-      {
-        sb.append("; ");
-        sb.append(join);
-      }
+      sb.append("; marked '");
+      sb.append(marker);
+      sb.append("'");
     }
-    else if(type == Type.AND)
+
+    if (variable != null)
     {
-      Joiner.on(" AND ").join(alternatives);
+      sb.append("; bound to '");
+      sb.append(variable);
+      sb.append("'");
     }
-    else if(type == Type.OR)
+
+    if (name != null)
     {
-      Joiner.on(" OR ").join(alternatives);
+      sb.append("; named '");
+      sb.append(qName(namespace, name));
+      sb.append("'");
     }
-    
+
+    if (token)
+    {
+      sb.append("; is a token");
+    }
+
+    if (spannedText != null)
+    {
+      sb.append("; spans");
+      String op = spanTextMatching != null ? spanTextMatching.sqlOperator()
+        : " ";
+      String quote = spanTextMatching != null ? spanTextMatching.quote()
+        : "?";
+      sb.append(op);
+      sb.append(quote);
+      sb.append(spannedText);
+      sb.append(quote);
+    }
+
+    if (isRoot())
+    {
+      sb.append("; root node");
+    }
+
+    if (!nodeAnnotations.isEmpty())
+    {
+      sb.append("; node labels: ");
+      sb.append(nodeAnnotations);
+    }
+
+    if (!edgeAnnotations.isEmpty())
+    {
+      sb.append("; edge labes: ");
+      sb.append(edgeAnnotations);
+    }
+
+    for (Join join : joins)
+    {
+      sb.append("; ");
+      sb.append(join);
+    }
+
 
     return sb.toString();
   }
@@ -679,25 +658,5 @@ public class QueryNode implements Serializable
     this.matchedNodeInQuery = matchedNodeInQuery;
   }
 
-  public List<QueryNode> getAlternatives()
-  {
-    return alternatives;
-  }
-
-  public void setAlternatives(
-    List<QueryNode> alternatives)
-  {
-    this.alternatives = alternatives;
-  }
-
-  public Type getType()
-  {
-    return type;
-  }
-
-  public void setType(Type type)
-  {
-    this.type = type;
-  }
   
 }

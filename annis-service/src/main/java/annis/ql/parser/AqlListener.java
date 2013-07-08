@@ -16,11 +16,11 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.LogicClause;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlParser;
-import annis.ql.node.PLingOp;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,9 +49,9 @@ public class AqlListener extends AqlBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
-  private QueryNode topNode = new QueryNode();
+  private LogicClause top = null;
 
-  private List<List<QueryNode>> alternativeStack = new LinkedList<List<QueryNode>>();
+  private List<LogicClause> alternativeStack = new LinkedList<LogicClause>();
 
   private int aliasCount = 0;
 
@@ -65,23 +64,23 @@ public class AqlListener extends AqlBaseListener
     this.precedenceBound = precedenceBound;
   }
 
-  public QueryNode getTopNode()
+  public LogicClause getTop()
   {
-    return topNode;
+    return top;
   }
 
   @Override
   public void enterAndTop(AqlParser.AndTopContext ctx)
   {
-    topNode.setType(QueryNode.Type.AND);
-    alternativeStack.add(0, topNode.getAlternatives());
+    top.setOp(LogicClause.Operator.AND);
+    alternativeStack.add(0, top);
   }
 
   @Override
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
-    topNode.setType(QueryNode.Type.OR);
-    alternativeStack.add(0, topNode.getAlternatives());
+    top.setOp(LogicClause.Operator.OR);
+    alternativeStack.add(0, top);
   }
 
   @Override
@@ -99,17 +98,25 @@ public class AqlListener extends AqlBaseListener
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    QueryNode exprNode = new QueryNode(QueryNode.Type.AND);
-    alternativeStack.get(0).add(exprNode);
-    alternativeStack.add(0, exprNode.getAlternatives());
+    LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
+    if(!alternativeStack.isEmpty())
+    {
+      alternativeStack.get(0).getChildren().add(andClause);
+      andClause.setParent(alternativeStack.get(0));
+    }
+    alternativeStack.add(0, andClause);
   }
 
   @Override
   public void enterOrExpr(AqlParser.OrExprContext ctx)
   {
-    QueryNode exprNode = new QueryNode(QueryNode.Type.OR);
-    alternativeStack.get(0).add(exprNode);
-    alternativeStack.add(0, exprNode.getAlternatives());
+    LogicClause orClause = new LogicClause(LogicClause.Operator.OR);
+    if(!alternativeStack.isEmpty())
+    {
+      alternativeStack.get(0).getChildren().add(orClause);
+      orClause.setParent(alternativeStack.get(0));
+    }
+    alternativeStack.add(0, orClause);
   }
 
   @Override
@@ -123,6 +130,14 @@ public class AqlListener extends AqlBaseListener
   {
     alternativeStack.remove(0);
   }
+
+  @Override
+  public void exitStart(AqlParser.StartContext ctx)
+  {
+    super.exitStart(ctx); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  
 
   @Override
   public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
@@ -164,7 +179,8 @@ public class AqlListener extends AqlBaseListener
   public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
   {
     QueryNode target = newNode();
-    String namespace = ctx.qName().namespace == null ? null : ctx.qName().namespace.getText();
+    String namespace = ctx.qName().namespace == null ? 
+      null : ctx.qName().namespace.getText();
     String name = ctx.qName().name.getText();
     String value = textFromSpec(ctx.txt);
     QueryNode.TextMatching matching = textMatchingFromSpec(ctx.txt,
@@ -331,11 +347,13 @@ public class AqlListener extends AqlBaseListener
   {
     if (txt instanceof AqlParser.ExactTextSpecContext)
     {
-      return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : QueryNode.TextMatching.EXACT_EQUAL;
+      return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : 
+        QueryNode.TextMatching.EXACT_EQUAL;
     }
     else if (txt instanceof AqlParser.RegexTextSpecContext)
     {
-      QueryNode.TextMatching matching = not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : QueryNode.TextMatching.REGEXP_EQUAL;
+     return  not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : 
+       QueryNode.TextMatching.REGEXP_EQUAL;
     }
     return null;
   }
@@ -393,7 +411,13 @@ public class AqlListener extends AqlBaseListener
     QueryNode n = new QueryNode(++aliasCount);
     n.setVariable("n" + n.getId());
     n.setMarker(n.getVariable());
-    alternativeStack.get(0).add(n);
+    LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
+    c.setContent(n);
+    c.setParent(alternativeStack.get(0));
+    alternativeStack.get(0).getChildren().add(c);
+    
+    
+    nodes.put(n.getVariable(), n);
     return n;
   }
 
