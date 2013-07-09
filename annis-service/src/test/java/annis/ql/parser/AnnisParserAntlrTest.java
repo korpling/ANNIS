@@ -49,9 +49,24 @@ public class AnnisParserAntlrTest
   public static Collection<Object[]> data() {
     Object[][] data = new Object[][]
     {
-      {"tok", "XXX"},
-      {"/abc/", "XXX"},
-      {" (node & cat=/NP/ & #1 . #2) | (/das/ & tok!=/Haus/ & #3 . #4) ", "XXX"}
+      {"tok", 
+        "ALTERNATIVES\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; is a token}"
+      },
+      {"/abc/", 
+        "ALTERNATIVES\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; spans~/abc/}"
+      },
+      {" (node & cat=/NP/ & #1 . #2) | (/das/ & tok!=/Haus/ & #3 . #4) ", 
+        "ALTERNATIVES\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; node labels: [node]; precedes node 2 (null 1, 1)} AND {node 2; marked 'n2'; bound to 'n2'; node labels: [cat ~ NP]}\n" +
+        "\t{node 3; marked 'n3'; bound to 'n3'; spans~/das/; precedes node 4 (null 1, 1)} AND {node 4; marked 'n4'; bound to 'n4'; is a token; spans!~/Haus/}"
+      },
+      {" \"das\" & ( \"Haus\" | \"Schaf\") & #1 . #2 & #1 . #3", 
+        "ALTERNATIVES\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; spans=\"das\"; precedes node 2 (null 1, 1)} AND {node 2; marked 'n2'; bound to 'n2'; spans=\"Haus\"}\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; spans=\"das\"; precedes node 3 (null 1, 1)} AND {node 3; marked 'n3'; bound to 'n3'; spans=\"Schaf\"}\n"
+      }
     };
     return Arrays.asList(data);
   }

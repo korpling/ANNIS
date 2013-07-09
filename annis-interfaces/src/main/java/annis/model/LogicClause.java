@@ -128,7 +128,7 @@ public class LogicClause
   @Override
   public String toString()
   {
-    return "{op: " + op + "; children: " + children.toString() + "}";
+    return "{op: " + op + "; content: " + content + "; children: " + children.toString() + "}";
   }
 
   
