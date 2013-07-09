@@ -29,6 +29,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
@@ -149,6 +150,37 @@ public class QueryNode implements Serializable
   {
     this();
     this.id = id;
+  }
+  
+  /**
+   * Copy constructor
+   * @param other 
+   */
+  public QueryNode(QueryNode other)
+  {
+    this.arity = other.arity;
+    this.corpus = other.corpus;
+    this.edgeAnnotations = new TreeSet<QueryAnnotation>(other.edgeAnnotations);
+    this.id = other.id;
+    this.joins = new ArrayList<Join>(other.joins);
+    this.left = other.left;
+    this.leftToken = other.leftToken;
+    this.marker = other.marker;
+    this.matchedNodeInQuery = other.matchedNodeInQuery;
+    this.name = other.name;
+    this.namespace = other.namespace;
+    this.nodeAnnotations = new TreeSet<QueryAnnotation>(other.nodeAnnotations);
+    this.partOfEdge = other.partOfEdge;
+    this.right = other.right;
+    this.rightToken = other.rightToken;
+    this.root = other.root;
+    this.spanTextMatching = other.spanTextMatching;
+    this.spannedText = other.spannedText;
+    this.textId = other.textId;
+    this.token = other.token;
+    this.tokenArity = other.tokenArity;
+    this.tokenIndex = other.tokenIndex;
+    this.variable = other.variable;
   }
 
   public QueryNode(long id, long corpusRef, long textRef, long left,
@@ -281,7 +313,7 @@ public class QueryNode implements Serializable
   {
     return nodeAnnotations.add(annotation);
   }
-
+  
   public boolean addJoin(Join join)
   {
     boolean result = joins.add(join);
@@ -296,7 +328,7 @@ public class QueryNode implements Serializable
 
     return result;
   }
-
+  
   public String getQualifiedName()
   {
     return qName(namespace, name);
@@ -535,7 +567,6 @@ public class QueryNode implements Serializable
   {
     return joins;
   }
-
   public boolean isToken()
   {
     return token;

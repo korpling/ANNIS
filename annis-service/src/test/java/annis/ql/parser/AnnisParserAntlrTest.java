@@ -65,7 +65,7 @@ public class AnnisParserAntlrTest
       {" \"das\" & ( \"Haus\" | \"Schaf\") & #1 . #2 & #1 . #3", 
         "ALTERNATIVES\n" +
         "\t{node 1; marked 'n1'; bound to 'n1'; spans=\"das\"; precedes node 2 (null 1, 1)} AND {node 2; marked 'n2'; bound to 'n2'; spans=\"Haus\"}\n" +
-        "\t{node 1; marked 'n1'; bound to 'n1'; spans=\"das\"; precedes node 3 (null 1, 1)} AND {node 3; marked 'n3'; bound to 'n3'; spans=\"Schaf\"}\n"
+        "\t{node 1; marked 'n1'; bound to 'n1'; spans=\"das\"; precedes node 3 (null 1, 1)} AND {node 3; marked 'n3'; bound to 'n3'; spans=\"Schaf\"}"
       }
     };
     return Arrays.asList(data);

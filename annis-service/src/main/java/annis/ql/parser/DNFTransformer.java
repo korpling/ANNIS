@@ -136,13 +136,15 @@ public class DNFTransformer
       
       if(x1 != null && x2 != null && y != null && z != null)
       {
-        LogicClause topParent = new LogicClause(LogicClause.Operator.OR);
+        node.setOp(LogicClause.Operator.OR);
+        node.setContent(null);
+        node.clearChildren();
         
         LogicClause leftParent = new LogicClause(LogicClause.Operator.AND);
         LogicClause rightParent = new LogicClause(LogicClause.Operator.AND);
         
-        topParent.addChild(leftParent);
-        topParent.addChild(rightParent);
+        node.addChild(leftParent);
+        node.addChild(rightParent);
         
         leftParent.addChild(x1);
         leftParent.addChild(y);

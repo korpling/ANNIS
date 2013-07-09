@@ -20,11 +20,15 @@ import annis.model.LogicClause;
 import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
+import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.ListIterator;
+import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -77,12 +81,41 @@ public class AnnisParserAntlr
         List<QueryNode> alternative = new ArrayList<QueryNode>();
         for(LogicClause c : andClause.getChildren())
         {
-          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
-          alternative.add(c.getContent());
+          QueryNode node = new QueryNode(c.getContent());
+          Preconditions.checkNotNull(node, "logical node must have an attached QueryNode");
+          
+          alternative.add(node);
         }
+        
         result.addAlternative(alternative);
-      }
+      } // end for each alternative
       result.setCorpusList(corpusList);
+      
+      
+      // remove all invalid edge joins
+      for(List<QueryNode> alternative : result.getAlternatives())
+      {
+        Set<Long> alternativeNodeIds = new HashSet<Long>();
+        for(QueryNode n : alternative)
+        {
+          alternativeNodeIds.add(n.getId());
+        }
+        
+        for(QueryNode node : alternative)
+        {
+          
+          ListIterator<Join> itJoins = node.getJoins().listIterator();
+          while(itJoins.hasNext())
+          {
+            Join j = itJoins.next();
+            QueryNode t = j.getTarget();
+            if(t!= null && !alternativeNodeIds.contains(t.getId()))
+            {
+              itJoins.remove();
+            }
+          }
+        }
+      }
       // TODO: what more do we need to set in the QueryData?
       
       return result;
