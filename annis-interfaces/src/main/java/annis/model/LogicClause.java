@@ -15,6 +15,7 @@
  */
 package annis.model;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
 import java.util.List;
@@ -76,12 +77,14 @@ public class LogicClause
   
   public void addChild(LogicClause child)
   {
+    Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(child);
   }
   
   public void addChild(int idx, LogicClause child)
   {
+    Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(idx, child);
   }
@@ -94,6 +97,15 @@ public class LogicClause
       result.parent = null;
     }
     return result;
+  }
+  
+  public void clearChildren()
+  {
+    for(LogicClause c : children)
+    {
+      c.parent = null;
+    }
+    children.clear();
   }
   
 

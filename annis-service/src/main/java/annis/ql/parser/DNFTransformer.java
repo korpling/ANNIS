@@ -16,8 +16,9 @@
 package annis.ql.parser;
 
 import annis.model.LogicClause;
-import annis.model.QueryNode;
 import com.google.common.base.Preconditions;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ListIterator;
 
 /**
@@ -39,7 +40,7 @@ public class DNFTransformer
     {
       // do nothing, just repeat
     }
-    //TODO: makeFlat
+    flattenDNF(topNode);
   }
   
   private static void makeBinary(LogicClause c)
@@ -157,6 +158,62 @@ public class DNFTransformer
     // recursivly check children
     return makeDNF(left) && makeDNF(right);
 
+  }
+  
+  private static void flattenDNF(LogicClause top)
+  {
+    if(top.getOp() == LogicClause.Operator.LEAF || top.getOp() == LogicClause.Operator.AND)
+    {
+      List<LogicClause> children = new ArrayList<LogicClause>();
+      findAllChildrenForAnd(top, children);
+      
+      top.setOp(LogicClause.Operator.OR);
+      top.clearChildren();
+      top.setContent(null);
+      
+      LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
+      top.addChild(andClause);
+      
+      for(LogicClause c : children)
+      {
+        andClause.addChild(c);
+      }
+    }
+    else if(top.getOp() == LogicClause.Operator.OR)
+    {
+      
+      // find sub and-clauses for all or-clauses
+      for(LogicClause subclause : top.getChildren())
+      {
+        Preconditions.checkArgument(subclause.getOp() == LogicClause.Operator.AND, "input is not in DNF");
+        
+        List<LogicClause> children = new ArrayList<LogicClause>();
+        findAllChildrenForAnd(subclause, children);
+          
+        subclause.clearChildren();
+        
+        for(LogicClause c : children)
+        {
+          subclause.addChild(c);
+        }
+      }
+    }
+  }
+  
+  private static void findAllChildrenForAnd(LogicClause node, List<LogicClause> followers)
+  {
+    if(node.getOp() == LogicClause.Operator.LEAF)
+    {
+      followers.add(node);
+      return;
+    }
+    
+    Preconditions.checkArgument(node.getOp() == LogicClause.Operator.AND);
+    
+    for(LogicClause c : node.getChildren())
+    {
+      findAllChildrenForAnd(c, followers);
+    }
   }
   
 //  private static void cleanSubformula(QueryNode node)
