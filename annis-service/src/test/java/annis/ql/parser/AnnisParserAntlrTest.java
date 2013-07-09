@@ -90,7 +90,7 @@ public class AnnisParserAntlrTest
     
     QueryData result = instance.parse(aql, corpusList);
     assertNotNull(result);
-    assertEquals(result.toString(), result);
+    assertEquals(expected, result.toString());
     
   }
 

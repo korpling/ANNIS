@@ -15,6 +15,7 @@
  */
 package annis.model;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -124,6 +125,13 @@ public class LogicClause
     return parent;
   }
 
+  @Override
+  public String toString()
+  {
+    return "{op: " + op + "; children: " + children.toString() + "}";
+  }
+
+  
   
 
 }

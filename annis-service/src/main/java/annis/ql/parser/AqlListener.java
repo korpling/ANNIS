@@ -72,6 +72,7 @@ public class AqlListener extends AqlBaseListener
   @Override
   public void enterAndTop(AqlParser.AndTopContext ctx)
   {
+    top = new LogicClause(LogicClause.Operator.AND);
     top.setOp(LogicClause.Operator.AND);
     alternativeStack.add(0, top);
   }
@@ -79,6 +80,7 @@ public class AqlListener extends AqlBaseListener
   @Override
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
+    top = new LogicClause(LogicClause.Operator.OR);
     top.setOp(LogicClause.Operator.OR);
     alternativeStack.add(0, top);
   }

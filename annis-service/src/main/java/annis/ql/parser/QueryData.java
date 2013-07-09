@@ -54,24 +54,24 @@ public class QueryData implements Cloneable
     StringBuilder sb = new StringBuilder();
     Iterator<List<QueryNode>> itOr = getAlternatives().iterator();
 
+    sb.append("ALTERNATIVES\n");
     while(itOr.hasNext())
     {
+      sb.append("\t");
       List<QueryNode> nextNodes = itOr.next();
       Iterator<QueryNode> itAnd = nextNodes.iterator();
       while(itAnd.hasNext())
       {
-        sb.append("\t").append(itAnd.next());
-        sb.append("\n");
+        sb.append("{").append(itAnd.next());
+        sb.append("}");
         if(itAnd.hasNext())
         {
-          sb.append("\tAND");
-          sb.append("\n");
+          sb.append(" AND ");
         }
       }
-
+      
       if(itOr.hasNext())
       {
-        sb.append("OR");
         sb.append("\n");
       }
     }
