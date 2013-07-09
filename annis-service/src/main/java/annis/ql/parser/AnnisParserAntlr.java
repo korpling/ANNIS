@@ -78,6 +78,7 @@ public class AnnisParserAntlr
       QueryData result = new QueryData();
       for(LogicClause andClause : top.getChildren())
       {
+        Set<Long> alternativeNodeIds = new HashSet<Long>();
         List<QueryNode> alternative = new ArrayList<QueryNode>();
         for(LogicClause c : andClause.getChildren())
         {
@@ -85,25 +86,12 @@ public class AnnisParserAntlr
           Preconditions.checkNotNull(node, "logical node must have an attached QueryNode");
           
           alternative.add(node);
+          alternativeNodeIds.add(node.getId());
         }
         
-        result.addAlternative(alternative);
-      } // end for each alternative
-      result.setCorpusList(corpusList);
-      
-      
-      // remove all invalid edge joins
-      for(List<QueryNode> alternative : result.getAlternatives())
-      {
-        Set<Long> alternativeNodeIds = new HashSet<Long>();
-        for(QueryNode n : alternative)
-        {
-          alternativeNodeIds.add(n.getId());
-        }
-        
+        // remove all invalid edge joins
         for(QueryNode node : alternative)
         {
-          
           ListIterator<Join> itJoins = node.getJoins().listIterator();
           while(itJoins.hasNext())
           {
@@ -115,7 +103,11 @@ public class AnnisParserAntlr
             }
           }
         }
-      }
+        
+        result.addAlternative(alternative);
+      } // end for each alternative
+      result.setCorpusList(corpusList);
+      
       // TODO: what more do we need to set in the QueryData?
       
       return result;
