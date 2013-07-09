@@ -96,6 +96,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   // if this is true, the staging area is not deleted
   private boolean temporaryStagingArea;
 
+  private StatementController statementController;
+
   public enum EXAMPLE_QUERIES_CONFIG
   {
 
@@ -1206,9 +1208,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         }
         catch (IOException ex)
         {
-          java.util.logging.Logger.getLogger(DefaultAdministrationDao.class
-            .
-            getName()).log(Level.SEVERE, null, ex);
+          log.error("close the reader for SQL script failed", ex);
         }
       }
     }
@@ -1229,7 +1229,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     PreparedStatement statement;
 
-    public CancelableStatements(String sql)
+    public CancelableStatements(String sql,
+      StatementController statementController)
     {
       sqlQuery = sql;
     }
@@ -1237,13 +1238,20 @@ public class DefaultAdministrationDao implements AdministrationDao
     @Override
     public PreparedStatement createPreparedStatement(Connection con) throws SQLException
     {
-      statement = con.prepareStatement(sqlQuery);
+      if (statementController.isCancelled())
+      {
+        throw new SQLException("process was cancelled");
+      }
+
+      statement = con.prepareCall(sqlQuery);
+      statementController.registerStatement(statement);
       return statement;
     }
 
     @Override
     public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException
     {
+      ps.execute();
       return null;
     }
   }
@@ -1259,8 +1267,18 @@ public class DefaultAdministrationDao implements AdministrationDao
       Resource resource = new FileSystemResource(fScript);
       log.debug("executing SQL script: " + resource.getFilename());
       String sql = readSqlFromResource(resource, args);
-      CancelableStatements cancelableStats = new CancelableStatements(sql);
+      CancelableStatements cancelableStats = new CancelableStatements(
+        sql, statementController);
 
+      // register the statement, so we could try to interrupt it in the gui.
+      if (statementController != null)
+      {
+        statementController.registerStatement(cancelableStats.statement);
+      }
+      else
+      {
+        log.info("statement controller is not initialized");
+      }
 
       jdbcTemplate.execute(cancelableStats, cancelableStats);
       return cancelableStats.statement;
@@ -1876,5 +1894,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       corpusNames.add(corpusName);
       deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames));
     }
+  }
+
+  @Override
+  public void registerGUICancelThread(StatementController statementCon)
+  {
+    this.statementController = statementCon;
   }
 }

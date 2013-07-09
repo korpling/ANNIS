@@ -62,5 +62,13 @@ public interface AdministrationDao
 
   public AnnisUserConfig retrieveUserConfig(String userName);
 
+  public void registerGUICancelThread(StatementController statementCon);
+
+  public interface StatementController {
+    public void registerStatement(PreparedStatement statement);
+    public void cancelStatements();
+    public boolean isCancelled();
+  }
+
   public void storeUserConfig(AnnisUserConfig config);
 }
