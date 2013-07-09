@@ -16,10 +16,13 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.LogicClause;
 import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import com.google.common.base.Joiner;
+import com.google.common.base.Preconditions;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.ANTLRInputStream;
@@ -64,14 +67,31 @@ public class AnnisParserAntlr
       ParseTreeWalker walker = new ParseTreeWalker();
       AqlListener listener = new AqlListener(precedenceBound);
       walker.walk(listener, tree);
+      
+      LogicClause top = listener.getTop();
+      DNFTransformer.toDNF(top);
+      
+      QueryData result = new QueryData();
+      for(LogicClause andClause : top.getChildren())
+      {
+        List<QueryNode> alternative = new ArrayList<QueryNode>();
+        for(LogicClause c : andClause.getChildren())
+        {
+          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
+          alternative.add(c.getContent());
+        }
+        result.addAlternative(alternative);
+      }
+      result.setCorpusList(corpusList);
+      // TODO: what more do we need to set in the QueryData?
+      
+      return result;
     }
     else
     {
       throw new AnnisQLSyntaxException("Parser error:\n"
         + Joiner.on("\n").join(errors));
     }
-
-    return null;
   }
   
   private QueryData createQueryDataFromTopNode(QueryNode topNode)
