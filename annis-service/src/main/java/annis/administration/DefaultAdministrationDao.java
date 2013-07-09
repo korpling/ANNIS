@@ -1221,6 +1221,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     return executeSqlFromScript(script, null);
   }
 
+  /**
+   * Registers a {@link PreparedStatement} to the {@link StatementController}.
+   */
   private class CancelableStatements implements PreparedStatementCreator,
     PreparedStatementCallback<Void>
   {
