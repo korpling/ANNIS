@@ -86,4 +86,9 @@ public class CorpusConfig implements Serializable
       return null;
     }
   }
+
+  public boolean isEmpty()
+  {
+    return this.config == null ? true : config.isEmpty();
+  }
 }

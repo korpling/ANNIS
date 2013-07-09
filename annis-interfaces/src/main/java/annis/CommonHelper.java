@@ -48,12 +48,25 @@ import org.slf4j.LoggerFactory;
  * Utilities class for non-gui operations on Salt.
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class CommonHelper
 {
 
   private final static Logger log = LoggerFactory.getLogger(CommonHelper.class);
 
+  /**
+   * Detects arabic characters in a string.
+   *
+   * <p>
+   * Every character is checked, if its bit representation lies between:
+   * <code>[1425, 1785] | [64286, 65019] | [65136, 65276]</code>
+   *
+   * </p>
+   *
+   * @param str The string to be checked.
+   * @return returns true, if arabic characters are detected.
+   */
   public static boolean containsRTLText(String str)
   {
     if (str != null)
@@ -81,6 +94,19 @@ public class CommonHelper
     return false;
   }
 
+  /**
+   * Calculates a {@link SOrderRelation} node chain of a {@link SDocumentGraph}.
+   *
+   * <p>If no segmentation name is set, a list of sorted {@link SToken} will be
+   * returned.<p>
+   *
+   * @param segName The segmentation name, for which the chain is computed.
+   * @param graph The salt document graph, which is traversed for the
+   * segmentation.
+   *
+   * @return Returns a List of {@link SNode}, which is sorted by the
+   * {@link SOrderRelation}.
+   */
   public static List<SNode> getSortedSegmentationNodes(String segName,
     SDocumentGraph graph)
   {
@@ -105,8 +131,7 @@ public class CommonHelper
           SNode node = rel.getSSource();
           outRelationForNode.put(node, rel);
 
-          EList<Edge> inEdgesForSource =
-            graph.getInEdges(node.getSId());
+          EList<Edge> inEdgesForSource = graph.getInEdges(node.getSId());
           boolean hasInOrderEdge = false;
           for (Edge e : inEdgesForSource)
           {

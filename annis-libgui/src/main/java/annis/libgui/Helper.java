@@ -20,6 +20,7 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -45,6 +46,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
+import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.slf4j.LoggerFactory;
@@ -319,10 +321,13 @@ public class Helper {
               .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
               .path("config").get(CorpusConfig.class);
     } catch (UnsupportedEncodingException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
     return corpusConfig;
@@ -336,7 +341,10 @@ public class Helper {
       defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
               .path("corpora").path("default-config").get(CorpusConfig.class);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
 
@@ -360,7 +368,10 @@ public class Helper {
       corpusConfigurations = Helper.getAnnisWebResource().path(
               "query").path("corpora").path("config").get(CorpusConfigMap.class);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
 

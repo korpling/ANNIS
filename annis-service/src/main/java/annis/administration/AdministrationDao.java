@@ -24,29 +24,42 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 /**
  *
  * @author thomas
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public interface AdministrationDao
-{ 
+{
+
   public List<Long> listToplevelCorpora();
+
   public void deleteCorpora(List<Long> ids);
-  
-  
+
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword, boolean useSSL);
-  public void importCorpus(String path);
-  
+
+  /**
+   * Reads relAnnis files from several directories.
+   *
+   * @param path Specifies the path to the corpora, which should be imported.
+   * @param overwrite If set to true conflicting top level corpora are deleted.
+   */
+  public void importCorpus(String path, boolean overwrite);
+
   public List<Map<String, Object>> listCorpusStats();
+
   public List<String> listUsedIndexes();
+
   public List<String> listUnusedIndexes();
-  
+
   public String getDatabaseSchemaVersion();
+
   public boolean checkDatabaseSchemaVersion() throws AnnisException;
-  
+
   public boolean executeSqlFromScript(String script);
+
   public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
-  
+
   public AnnisUserConfig retrieveUserConfig(String userName);
+
   public void storeUserConfig(AnnisUserConfig config);
-  
 }

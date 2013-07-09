@@ -36,7 +36,7 @@ public class CorpusConfigMap implements Serializable
    */
   public Map<String, CorpusConfig> getCorpusConfigs()
   {
-    return corpusConfigs;
+    return (corpusConfigs == null) ? new HashMap<String, CorpusConfig>() : corpusConfigs;
   }
 
   /**
@@ -71,5 +71,10 @@ public class CorpusConfigMap implements Serializable
     }
 
     return false;
+  }
+
+  public boolean isEmpty()
+  {
+    return (corpusConfigs == null)? true : corpusConfigs.isEmpty();
   }
 }
