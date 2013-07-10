@@ -97,6 +97,47 @@ public class QueryData implements Cloneable
 
     return sb.toString();
   }
+  
+  public String toAQL()
+  {
+    StringBuilder sb = new StringBuilder();
+    Iterator<List<QueryNode>> itAlternative = alternatives.iterator();
+    
+    
+    while(itAlternative.hasNext())
+    {
+      List<QueryNode> alt = itAlternative.next();
+     
+      if(alternatives.size() > 1)
+      {
+        sb.append("(");
+      }
+      
+      Iterator<QueryNode> itNode = alt.iterator();
+      while(itNode.hasNext())
+      {
+        QueryNode n = itNode.next();
+        sb.append(n.toAQLFragment());
+        
+        if(itNode.hasNext())
+        {
+          sb.append(" & ");
+        }
+      }
+      
+      if(alternatives.size() > 1)
+      {
+        sb.append(")");
+        if(itAlternative.hasNext())
+        {
+          sb.append("\n|\n");
+        }
+      }
+    }
+    // TODO: add metadata
+    
+    return sb.toString();
+  }
 
 	public List<List<QueryNode>> getAlternatives() {
 		return alternatives;

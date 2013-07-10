@@ -37,7 +37,7 @@ public abstract class Join extends DataObject {
 	
   public String toAQLFragment(QueryNode source)
   {
-    return "";
+    return "X";
   }
   
 }

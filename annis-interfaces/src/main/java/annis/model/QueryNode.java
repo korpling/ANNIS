@@ -306,46 +306,41 @@ public class QueryNode implements Serializable
   {
     StringBuilder sb = new StringBuilder();
 
-    if(joins.isEmpty())
+    if (token)
     {
-      if (token)
-      {
-        sb.append("tok");
-      }
-
-      if (spannedText != null && spanTextMatching != null)
-      {
-        if(token)
-        {
-          sb.append(spanTextMatching.aqlOperator());
-        }
-
-        sb.append(spanTextMatching.quote());
-        sb.append(spannedText);
-        sb.append(spanTextMatching.quote());
-      }
-
-
-      if (!nodeAnnotations.isEmpty())
-      {
-        QueryAnnotation anno=nodeAnnotations
-          .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
-        
-        sb.append(anno.getQualifiedName());
-        sb.append(anno.getTextMatching().quote());
-        sb.append(anno.getValue());
-        sb.append(anno.getTextMatching().quote());
-        
-      }
+      sb.append("tok");
     }
-    else
+
+    if (spannedText != null && spanTextMatching != null)
     {
-      for (Join join : joins)
+      if(token)
       {
-        
-        // TODO
+        sb.append(spanTextMatching.aqlOperator());
       }
+
+      sb.append(spanTextMatching.quote());
+      sb.append(spannedText);
+      sb.append(spanTextMatching.quote());
     }
+
+
+    if (!nodeAnnotations.isEmpty())
+    {
+      QueryAnnotation anno=nodeAnnotations
+        .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
+
+      sb.append(anno.getQualifiedName());
+      sb.append(anno.getTextMatching().quote());
+      sb.append(anno.getValue());
+      sb.append(anno.getTextMatching().quote());
+
+    }
+
+    for (Join join : joins)
+    {
+      sb.append(" & ").append(join.toAQLFragment(this));
+    }
+    
 
 
 
