@@ -403,7 +403,7 @@ public class AqlListener extends AqlBaseListener
 
   private QueryNode nodeByRef(Token ref)
   {
-    return nodes.get("n" + ref.getText().substring(1));
+    return nodes.get("" + ref.getText().substring(1));
   }
 
   /**
@@ -437,8 +437,7 @@ public class AqlListener extends AqlBaseListener
   private QueryNode newNode()
   {
     QueryNode n = new QueryNode(++aliasCount);
-    n.setVariable("n" + n.getId());
-    n.setMarker(n.getVariable());
+    n.setVariable("" + n.getId());
     LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
     c.setContent(n);
     alternativeStack.get(0).addChild(c);

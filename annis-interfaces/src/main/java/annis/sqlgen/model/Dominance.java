@@ -48,4 +48,30 @@ public class Dominance extends RankTableJoin {
 		return "dominates node " + target.getId() + " (" + name + ", " + minDistance + ", " + maxDistance + ")";
 	}
 
+  @Override
+  public String toAQLFragment(QueryNode source)
+  {
+    if(minDistance == 0 && maxDistance == 0 && name == null)
+    {
+      return "#" + source.getVariable()  + " > " + target.getVariable();
+    }
+    else if(minDistance == 0 && maxDistance == 0)
+    {
+      return "#" + source.getVariable()  + " >" + name
+        + " #" + target.getVariable();
+    }
+    else if(name == null)
+    {
+      return "#" + source.getVariable()  + " >" 
+        + minDistance + "," + maxDistance + " #" + target.getVariable();
+    }
+    else
+    {
+      return "#" + source.getVariable()  + " >" + name + " " 
+        + minDistance + "," + maxDistance + " #" + target.getVariable();
+    }
+  }
+  
+  
+
 }

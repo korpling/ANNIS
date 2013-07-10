@@ -17,7 +17,6 @@ package annis.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,8 +27,6 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
-import com.google.common.base.Joiner;
-import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
@@ -62,22 +59,26 @@ public class QueryNode implements Serializable
   private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
   private Range tokenArity;
-  // for sql generation
-  private String marker;
   private Long matchedNodeInQuery;
   
   public enum TextMatching
   {
 
-    EXACT_EQUAL("=", "\""), REGEXP_EQUAL("~", "/"), EXACT_NOT_EQUAL("<>",
-    "\""), REGEXP_NOT_EQUAL("!~", "/");
+    EXACT_EQUAL("=", "\"", "="), 
+    REGEXP_EQUAL("~", "/", "="), 
+    EXACT_NOT_EQUAL("<>", "\"", "!="), 
+    REGEXP_NOT_EQUAL("!~", "/", "!=");
+    
     private String sqlOperator;
     private String annisQuote;
+    private String aqlOperator;
 
-    private TextMatching(String sqlOperator, String annisQuote)
+    private TextMatching(String sqlOperator, String annisQuote, 
+      String aqlOperator)
     {
       this.sqlOperator = sqlOperator;
       this.annisQuote = annisQuote;
+      this.aqlOperator = aqlOperator;
     }
 
     @Override
@@ -94,6 +95,11 @@ public class QueryNode implements Serializable
     public String quote()
     {
       return annisQuote;
+    }
+    
+    public String aqlOperator()
+    {
+      return aqlOperator;
     }
   };
 
@@ -165,7 +171,6 @@ public class QueryNode implements Serializable
     this.joins = new ArrayList<Join>(other.joins);
     this.left = other.left;
     this.leftToken = other.leftToken;
-    this.marker = other.marker;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
     this.name = other.name;
     this.namespace = other.namespace;
@@ -238,13 +243,6 @@ public class QueryNode implements Serializable
     sb.append("node ");
     sb.append(id);
 
-    if (marker != null)
-    {
-      sb.append("; marked '");
-      sb.append(marker);
-      sb.append("'");
-    }
-
     if (variable != null)
     {
       sb.append("; bound to '");
@@ -299,6 +297,56 @@ public class QueryNode implements Serializable
       sb.append("; ");
       sb.append(join);
     }
+
+
+    return sb.toString();
+  }
+  
+  public String toAQLFragment()
+  {
+    StringBuilder sb = new StringBuilder();
+
+    if(joins.isEmpty())
+    {
+      if (token)
+      {
+        sb.append("tok");
+      }
+
+      if (spannedText != null && spanTextMatching != null)
+      {
+        if(token)
+        {
+          sb.append(spanTextMatching.aqlOperator());
+        }
+
+        sb.append(spanTextMatching.quote());
+        sb.append(spannedText);
+        sb.append(spanTextMatching.quote());
+      }
+
+
+      if (!nodeAnnotations.isEmpty())
+      {
+        QueryAnnotation anno=nodeAnnotations
+          .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
+        
+        sb.append(anno.getQualifiedName());
+        sb.append(anno.getTextMatching().quote());
+        sb.append(anno.getValue());
+        sb.append(anno.getTextMatching().quote());
+        
+      }
+    }
+    else
+    {
+      for (Join join : joins)
+      {
+        
+        // TODO
+      }
+    }
+
 
 
     return sb.toString();
@@ -423,11 +471,6 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if ((this.marker == null) ? (other.marker != null)
-      : !this.marker.equals(other.marker))
-    {
-      return false;
-    }
     if ((this.arity == null) ? (other.arity != null) : !this.arity.equals(
       other.arity))
     {
@@ -497,17 +540,7 @@ public class QueryNode implements Serializable
   {
     this.root = root;
   }
-
-  public String getMarker()
-  {
-    return marker;
-  }
-
-  public void setMarker(String marker)
-  {
-    this.marker = marker;
-  }
-
+  
   public String getName()
   {
     return name;

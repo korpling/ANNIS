@@ -35,4 +35,9 @@ public abstract class Join extends DataObject {
 		this.target = target;
 	}
 	
+  public String toAQLFragment(QueryNode source)
+  {
+    return "";
+  }
+  
 }

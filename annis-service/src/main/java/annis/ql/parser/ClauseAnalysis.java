@@ -633,8 +633,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
   private QueryNode newNode()
   {
     QueryNode n = new QueryNode(++aliasCount);
-    n.setVariable("n" + n.getId());
-    n.setMarker(n.getVariable());
+    n.setVariable("" + n.getId());
     nodes.put(n.getVariable(), n);
     
     return n;
@@ -799,7 +798,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       return null;
     }
-    return nodes.get("n" + tok);
+    return nodes.get("" + tok);
   }
 
   private QueryNode rhs(PLingOp node)
@@ -809,7 +808,7 @@ public class ClauseAnalysis extends DepthFirstAdapter
     {
       return null;
     }
-    return nodes.get("n" + tok);
+    return nodes.get("" + tok);
   }
 
   private String lhsStr(PLingOp node)
