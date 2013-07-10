@@ -45,6 +45,7 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
 public class AnnisParserAntlr
 {
   private int precedenceBound;
+  private List<QueryDataTransformer> postProcessors;
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
@@ -75,7 +76,36 @@ public class AnnisParserAntlr
       LogicClause top = listener.getTop();
       DNFTransformer.toDNF(top);
       
-      QueryData result = new QueryData();
+      QueryData data = createQueryDataFromTopNode(top);
+    
+      data.setCorpusList(corpusList);
+      data.addMetaAnnotations(listener.getMetaData());
+      
+      if (postProcessors != null)
+      {
+        for (QueryDataTransformer transformer : postProcessors)
+        {
+          data = transformer.transform(data);
+        }
+      }
+      // TODO: what more do we need to set in the QueryData?
+    
+      
+      return data;
+    }
+    else
+    {
+      throw new AnnisQLSyntaxException("Parser error:\n"
+        + Joiner.on("\n").join(errors));
+    }
+  }
+  
+  private QueryData createQueryDataFromTopNode(LogicClause top)
+  {
+    QueryData data = new QueryData();
+    
+      data.setMaxWidth(0);
+      
       for(LogicClause andClause : top.getChildren())
       {
         Set<Long> alternativeNodeIds = new HashSet<Long>();
@@ -88,6 +118,10 @@ public class AnnisParserAntlr
           alternative.add(node);
           alternativeNodeIds.add(node.getId());
         }
+        
+        // set maximal width
+        data.setMaxWidth(
+          Math.max(data.getMaxWidth(), alternativeNodeIds.size()));
         
         // remove all invalid edge joins
         for(QueryNode node : alternative)
@@ -104,27 +138,8 @@ public class AnnisParserAntlr
           }
         }
         
-        result.addAlternative(alternative);
+        data.addAlternative(alternative);
       } // end for each alternative
-      result.setCorpusList(corpusList);
-      
-      // TODO: what more do we need to set in the QueryData?
-      
-      return result;
-    }
-    else
-    {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
-    }
-  }
-  
-  private QueryData createQueryDataFromTopNode(QueryNode topNode)
-  {
-    QueryData data = new QueryData();
-    
-    // TODO: add Metadata to QueryData
-    // TODO: create normalized 
     
     return data;
   }
@@ -138,4 +153,17 @@ public class AnnisParserAntlr
   {
     this.precedenceBound = precedenceBound;
   }
+
+  public List<QueryDataTransformer> getPostProcessors()
+  {
+    return postProcessors;
+  }
+
+  public void setPostProcessors(
+    List<QueryDataTransformer> postProcessors)
+  {
+    this.postProcessors = postProcessors;
+  }
+  
+  
 }

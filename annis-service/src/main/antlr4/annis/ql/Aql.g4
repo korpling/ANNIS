@@ -30,6 +30,8 @@ tokens {
 }
   
 TOK:'tok';
+NODE:'node';
+META:'meta';
 AND:'&';
 OR:'|';
 EQ:'=';
@@ -60,6 +62,7 @@ BRACKET_CLOSE:']';
 SLASH:'/';
 DOUBLE_QUOTE:'"';
 COLON:':';
+DOUBLECOLON:'::';
 
 
 WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
@@ -180,15 +183,18 @@ unary_linguistic_term
 
 expr
 	: TOK # TokOnlyExpr 
+  | NODE # NodeExpr
   | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
 	|	txt=textSpec # TextOnly // shortcut for tok="..."
   | qName # AnnoOnlyExpr
 	|	qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
+  | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
   | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # OrExpr
   | BRACE_OPEN expr (AND expr)+ BRACE_CLOSE # AndExpr
   ;
+
 
 exprTop
   : expr (AND expr)* # AndTop

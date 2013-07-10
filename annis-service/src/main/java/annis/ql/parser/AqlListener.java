@@ -32,6 +32,7 @@ import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightOverlap;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -58,6 +59,8 @@ public class AqlListener extends AqlBaseListener
   private Map<String, QueryNode> nodes = new HashMap<String, QueryNode>();
 
   private int precedenceBound;
+  
+  private List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
   public AqlListener(int precedenceBound)
   {
@@ -68,6 +71,12 @@ public class AqlListener extends AqlBaseListener
   {
     return top;
   }
+
+  public List<QueryAnnotation> getMetaData()
+  {
+    return metaData;
+  }
+  
 
   @Override
   public void enterAndTop(AqlParser.AndTopContext ctx)
@@ -145,6 +154,13 @@ public class AqlListener extends AqlBaseListener
     QueryNode target = newNode();
     target.setToken(true);
   }
+
+  @Override
+  public void enterNodeExpr(AqlParser.NodeExprContext ctx)
+  {
+    newNode();
+  }
+  
 
   @Override
   public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
@@ -322,7 +338,19 @@ public class AqlListener extends AqlBaseListener
   {
     join(ctx, LeftOverlap.class);
   }
-  
+
+  @Override
+  public void enterMetaTermExpr(AqlParser.MetaTermExprContext ctx)
+  {
+    // TODO: we have to disallow OR expressions with metadata, how can we
+    // achvieve that?
+    String namespace = ctx.id.namespace == null ? 
+      null : ctx.id.namespace.getText();
+    QueryAnnotation anno = new QueryAnnotation(namespace,
+      ctx.id.name.getText());
+    metaData.add(anno);
+  }
+ 
   
 
   private String textFromSpec(AqlParser.TextSpecContext txtCtx)

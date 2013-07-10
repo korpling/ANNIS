@@ -59,7 +59,7 @@ public class AnnisParserAntlrTest
       },
       {" (node & cat=/NP/ & #1 . #2) | (/das/ & tok!=/Haus/ & #3 . #4) ", 
         "ALTERNATIVES\n" +
-        "\t{node 1; marked 'n1'; bound to 'n1'; node labels: [node]; precedes node 2 (null 1, 1)} AND {node 2; marked 'n2'; bound to 'n2'; node labels: [cat ~ NP]}\n" +
+        "\t{node 1; marked 'n1'; bound to 'n1'; precedes node 2 (null 1, 1)} AND {node 2; marked 'n2'; bound to 'n2'; node labels: [cat ~ NP]}\n" +
         "\t{node 3; marked 'n3'; bound to 'n3'; spans~/das/; precedes node 4 (null 1, 1)} AND {node 4; marked 'n4'; bound to 'n4'; is a token; spans!~/Haus/}"
       },
       {" \"das\" & ( \"Haus\" | \"Schaf\") & #1 . #2 & #1 . #3", 
