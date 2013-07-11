@@ -1241,13 +1241,16 @@ public class DefaultAdministrationDao implements AdministrationDao
     @Override
     public PreparedStatement createPreparedStatement(Connection con) throws SQLException
     {
-      if (statementController.isCancelled())
+      if (statementController != null && statementController.isCancelled())
       {
         throw new SQLException("process was cancelled");
       }
 
       statement = con.prepareCall(sqlQuery);
-      statementController.registerStatement(statement);
+      if(statementController != null)
+      {
+        statementController.registerStatement(statement);
+      }
       return statement;
     }
 
