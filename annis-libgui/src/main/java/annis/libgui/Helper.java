@@ -15,12 +15,15 @@
  */
 package annis.libgui;
 
+import annis.model.Annotation;
+import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -37,6 +40,7 @@ import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -46,7 +50,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.slf4j.LoggerFactory;
@@ -303,6 +306,54 @@ public class Helper {
       log.error(null, ex);
     }
     return "ERROR";
+  }
+  
+  /**
+   * Retrieve all the meta data for a given document of a corpus.
+   * @param toplevelCorpusName
+   * @param documentName
+   * @return 
+   */
+  public static List<Annotation> getMetaData(String toplevelCorpusName,
+    String documentName)
+  {
+    List<Annotation> result = new ArrayList<Annotation>();
+    WebResource res = Helper.getAnnisWebResource();
+    try
+    {
+      res = res.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
+      if (documentName != null)
+      {
+        res = res.path(documentName);
+      }
+
+      result = res.path("metadata").queryParam("exclude", "true").get(new GenericType<List<Annotation>>() {});
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    return result;
   }
 
   /**
