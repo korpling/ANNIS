@@ -72,7 +72,7 @@ public class GridExporter extends GeneralTextExporter
         new HashMap<String, TreeMap<Long, Span>>();
 
       counter++;
-      out.append((counter + offset) + ". ");
+      out.append((counter + offset) + ".");
 
       long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
       for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
@@ -98,7 +98,7 @@ public class GridExporter extends GeneralTextExporter
 
         if ("tok".equals(k))
         {
-          out.append("\t " + k + "\t ");
+          out.append("\t" + k + "\t ");
           for (AnnisNode annisNode : annisResult.getGraph().getTokens())
           {
             out.append(annisNode.getSpannedText() + " ");
@@ -109,7 +109,7 @@ public class GridExporter extends GeneralTextExporter
         {
           if(annos.get(k) != null)
           {
-            out.append("\t " + k + "\t ");
+            out.append("\t" + k + "\t ");
             for(Span s : annos.get(k).values())
             {
 
