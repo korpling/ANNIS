@@ -61,6 +61,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.node.Start;
+import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.AnnisAttribute;
 import annis.sqlgen.SaltAnnotateExtractor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -83,7 +84,7 @@ public class TestSpringAnnisDao
   // simple SpringDao instance with mocked dependencies
   private SpringAnnisDao simpleAnnisDao;
   @Mock
-  private AnnisParser annisParser;
+  private AnnisParserAntlr annisParser;
   @Mock
   private MetaDataFilter metaDataFilter;
   @Mock
@@ -108,7 +109,7 @@ public class TestSpringAnnisDao
   private QueryAnalysis queryAnalysis;
   // constants for flow control verification
   private static final String DDDQUERY = "DDDQUERY";
-  private static final Start STATEMENT = new Start();
+  private static final QueryData PARSE_RESULT = new QueryData();
   private static final String SQL = "SQL";
   private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
   private static final List<Long> DOCUMENT_LIST = new LinkedList<Long>();
@@ -131,7 +132,7 @@ public class TestSpringAnnisDao
     simpleAnnisDao.setQueryAnalysis(queryAnalysis);
     simpleAnnisDao.setMetaDataFilter(metaDataFilter);
 
-    when(annisParser.parse(anyString())).thenReturn(STATEMENT);
+    when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
     when(sqlGenerator.toSql(any(QueryData.class))).thenReturn(SQL);
 
     simpleJdbcTemplate = spy(simpleAnnisDao.getSimpleJdbcTemplate());

@@ -124,7 +124,7 @@
 
     <property name="dataSource" ref="dataSource"/>
 
-    <property name="aqlParser" ref="annisParser"/>
+    <property name="aqlParser" ref="annisParserAntlr"/>
     <property name="sqlGenerator" ref="findSqlGenerator"/>
 
     <property name="listCorpusSqlHelper" ref="listCorpusSqlHelper"/>

@@ -21,6 +21,7 @@ import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.ql.node.Start;
 import annis.ql.parser.AnnisParser;
+import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
@@ -311,7 +312,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private QueryAnalysis queryAnalysis;
 
-  private AnnisParser aqlParser;
+  private AnnisParserAntlr aqlParser;
 
   private HashMap<Long, Properties> corpusConfiguration;
 
@@ -575,9 +576,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     
     
     // parse the query
-    Start statement = aqlParser.parse(aql);
-    // analyze it
-    return queryAnalysis.analyzeQuery(statement, corpusList);
+    return aqlParser.parse(aql, corpusList);
   }
 
   @Override
@@ -777,12 +776,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return false;
   }
 
-  public AnnisParser getAqlParser()
+  public AnnisParserAntlr getAqlParser()
   {
     return aqlParser;
   }
 
-  public void setAqlParser(AnnisParser aqlParser)
+  public void setAqlParser(AnnisParserAntlr aqlParser)
   {
     this.aqlParser = aqlParser;
   }
