@@ -15,6 +15,7 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao.StatementController;
 import annis.administration.CorpusAdministration;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
@@ -23,6 +24,9 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import java.io.*;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -45,17 +49,80 @@ public class ImportDialog extends javax.swing.JDialog
     LoggerFactory.getLogger(ImportDialog.class);
 
   private File confFile;
+
   private Properties confProps;
+
+  private StatementController statementController = new StatementControllerImpl();
 
   private static class Status
   {
+
     public boolean ok = true;
+
     public Exception ex = new Exception();
+
+  }
+
+  private class StatementControllerImpl implements StatementController
+  {
+
+    PreparedStatement statement = null;
+
+    Boolean isCancelled = false;
+
+    @Override
+    public void registerStatement(PreparedStatement statement)
+    {
+
+      this.statement = statement;
+      if (isCancelled)
+      {
+        cancelStatements();
+      }
+
+    }
+
+    @Override
+    public void cancelStatements()
+    {
+      isCancelled = true;
+      if (statement != null)
+      {
+        try
+        {
+          log.info("cancel statement");
+          statement.cancel();
+        }
+        catch (SQLException ex)
+        {
+          log.error("problems with interrupting statement", ex);
+        }
+      }
+
+    }
+
+    @Override
+    public boolean isCancelled()
+    {
+      return isCancelled;
+    }
   }
 
   private class ImportDialogWorker extends SwingWorker<Status, Void> implements
     Serializable
   {
+
+    StatementController statementController;
+
+    public ImportDialogWorker(StatementController statementController)
+    {
+      this.statementController = statementController;
+    }
+
+    public void cancelStatement()
+    {
+      statementController.cancelStatements();
+    }
 
     @Override
     protected Status doInBackground() throws Exception
@@ -63,12 +130,12 @@ public class ImportDialog extends javax.swing.JDialog
       Status status = new Status();
       StringBuilder errorMessages = new StringBuilder();
 
-      if(corpora == null)
+      if (corpora == null)
       {
         try
         {
-          SwingUtilities.invokeLater(new Runnable() {
-
+          SwingUtilities.invokeLater(new Runnable()
+          {
             @Override
             public void run()
             {
@@ -79,6 +146,8 @@ public class ImportDialog extends javax.swing.JDialog
               pbCorpus.setValue(0);
             }
           });
+          corpusAdministration.getAdministrationDao().registerGUICancelThread(
+            statementController);
           corpusAdministration.importCorpora(txtInputDir.getText());
         }
         catch (Exception ex)
@@ -90,8 +159,8 @@ public class ImportDialog extends javax.swing.JDialog
       }
       else
       {
-        SwingUtilities.invokeLater(new Runnable() {
-
+        SwingUtilities.invokeLater(new Runnable()
+        {
           @Override
           public void run()
           {
@@ -101,28 +170,28 @@ public class ImportDialog extends javax.swing.JDialog
           }
         });
 
-        int i=0;
-        for(Map<String, Object> corpus : corpora)
+        int i = 0;
+        for (Map<String, Object> corpus : corpora)
         {
-          if(isCancelled())
+          if (isCancelled())
           {
             status.ok = true;
             return status;
           }
 
-          if(corpus.containsKey("source_path"))
+          if (corpus.containsKey("source_path"))
           {
             final String path = (String) corpus.get("source_path");
 
             final int finalI = i;
-            SwingUtilities.invokeLater(new Runnable() {
-
+            SwingUtilities.invokeLater(new Runnable()
+            {
               @Override
               public void run()
               {
                 lblCurrentCorpus.setText("import "
                   + StringUtils.abbreviateMiddle(path, "...", 40)
-                  + " [" + (finalI+1) + "/" + corpora.size() + "]");
+                  + " [" + (finalI + 1) + "/" + corpora.size() + "]");
                 pbCorpus.setValue(finalI);
               }
             });
@@ -130,6 +199,9 @@ public class ImportDialog extends javax.swing.JDialog
 
             try
             {
+
+              corpusAdministration.getAdministrationDao().
+                registerGUICancelThread(statementController);
               corpusAdministration.importCorpora(path);
             }
             catch (Exception ex)
@@ -143,7 +215,7 @@ public class ImportDialog extends javax.swing.JDialog
         }
       }
 
-      if(errorMessages.length() > 0)
+      if (errorMessages.length() > 0)
       {
         status.ok = false;
         return status;
@@ -165,7 +237,7 @@ public class ImportDialog extends javax.swing.JDialog
 
       try
       {
-        if(!isCancelled())
+        if (!isCancelled())
         {
           Status status = this.get();
           if (status.ok)
@@ -176,7 +248,7 @@ public class ImportDialog extends javax.swing.JDialog
           }
           else
           {
-            new ExceptionDialog( status.ex, "Import failed").setVisible(true);
+            new ExceptionDialog(status.ex, "Import failed").setVisible(true);
             setVisible(false);
           }
         }
@@ -188,8 +260,11 @@ public class ImportDialog extends javax.swing.JDialog
     }
   }
   private CorpusAdministration corpusAdministration;
+
   private SwingWorker<Status, Void> worker;
+
   private boolean isImporting;
+
   private List<Map<String, Object>> corpora;
 
   public ImportDialog(java.awt.Frame parent, boolean modal,
@@ -214,13 +289,13 @@ public class ImportDialog extends javax.swing.JDialog
       + "/.annis/kickstart.properties");
     try
     {
-      if(!confFile.exists())
+      if (!confFile.exists())
       {
-        if(!confFile.getParentFile().mkdirs())
+        if (!confFile.getParentFile().mkdirs())
         {
-          log.warn("Cannot create directory " +confFile.getAbsolutePath());
+          log.warn("Cannot create directory " + confFile.getAbsolutePath());
         }
-        if(!confFile.createNewFile())
+        if (!confFile.createNewFile())
         {
           log.warn("Cannot create file " + confFile.getAbsolutePath());
         }
@@ -238,12 +313,12 @@ public class ImportDialog extends javax.swing.JDialog
     getRootPane().setDefaultButton(btOk);
 
     isImporting = false;
-    worker = new ImportDialogWorker();
+    worker = new ImportDialogWorker(statementController);
 
     addAppender();
 
     // directly start import if we were called from outside
-    if(this.corpora != null)
+    if (this.corpora != null)
     {
       startImport();
     }
@@ -265,13 +340,13 @@ public class ImportDialog extends javax.swing.JDialog
     }
     finally
     {
-      if(oStream != null)
+      if (oStream != null)
       {
         try
         {
           oStream.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
           log.error(null, ex);
         }
@@ -287,7 +362,7 @@ public class ImportDialog extends javax.swing.JDialog
       iStream = new FileInputStream(confFile);
       confProps.load(iStream);
       String lastDirectory = confProps.getProperty("last-directory");
-      if(lastDirectory != null)
+      if (lastDirectory != null)
       {
         txtInputDir.setText(lastDirectory);
       }
@@ -299,13 +374,13 @@ public class ImportDialog extends javax.swing.JDialog
     }
     finally
     {
-      if(iStream != null)
+      if (iStream != null)
       {
         try
         {
           iStream.close();
         }
-        catch(IOException ex)
+        catch (IOException ex)
         {
           log.error(null, ex);
         }
@@ -323,7 +398,6 @@ public class ImportDialog extends javax.swing.JDialog
 
     Appender appender = new AppenderBase<ILoggingEvent>()
     {
-
       @Override
       protected void append(ILoggingEvent event)
       {
@@ -473,6 +547,7 @@ public class ImportDialog extends javax.swing.JDialog
       if (isImporting)
       {
         worker.cancel(true);
+        statementController.cancelStatements();
       }
       setVisible(false);
     }//GEN-LAST:event_btCancelActionPerformed

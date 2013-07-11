@@ -473,7 +473,7 @@ public class CorpusListPanel extends VerticalLayout implements
       return new Action[0];
     }
 
-    if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
+    if (Helper.getUser() == null)
     {
       // we can't change anything if we are not logged in so don't even try
       return new Action[0];

@@ -132,49 +132,6 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
   }
 
-  private List<Annotation> getMetaData(String toplevelCorpusName,
-    String documentName)
-  {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource();
-    try
-    {
-      res = res.path("query").path("corpora")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-
-      if (documentName != null)
-      {
-        res = res.path(documentName);
-      }
-
-      result = res.path("metadata").queryParam("exclude", "true").get(
-        new AnnotationListType());
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    return result;
-  }
-
   private Table setupTable(BeanItemContainer<Annotation> metaData)
   {
     final BeanItemContainer<Annotation> mData = metaData;
@@ -205,7 +162,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
    */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
-    List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
+    List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName, documentName);
 
     Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
 
@@ -302,7 +259,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
       lastSelectedItem = event.getProperty().toString();
-      List<Annotation> metaData = getMetaData(toplevelCorpusName,
+      List<Annotation> metaData = Helper.getMetaData(toplevelCorpusName,
         lastSelectedItem);
 
       if (metaData == null || metaData.isEmpty())
