@@ -99,6 +99,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
 
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
+    public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
 
     private AnnotationGrid grid;
 
@@ -149,8 +150,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
+        boolean showTokenAnnotations = 
+          Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_ANNOS_KEY));
+        
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
                 SSpan.class);
+        if(showTokenAnnotations)
+        {
+          List<String> tokenAnnos = EventExtractor.computeDisplayAnnotations(
+            input, SToken.class);
+          annos.addAll(tokenAnnos);
+        }
 
         EList<SToken> token = graph.getSortedSTokenByText();
 
@@ -163,8 +173,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-                EventExtractor.parseSalt(input, annos, (int) startIndex,
-                (int) endIndex, pdfController);
+          EventExtractor.parseSalt(input, showTokenAnnotations, annos,
+          (int) startIndex,
+          (int) endIndex, pdfController);
 
         // we will only add tokens of one texts which is mentioned by any
         // included annotation.
