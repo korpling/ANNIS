@@ -21,6 +21,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
@@ -42,7 +43,7 @@ public class TimeHelper
    *         one element of only start elements where found, 2 elements if both
    *         start and end time are found.
    */
-  public static double[] getOverlappedTime(SSpan node)
+  public static double[] getOverlappedTime(SNode node)
   {
     SGraph graph = node.getSGraph();
 
