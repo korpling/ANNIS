@@ -38,6 +38,7 @@ import annis.exceptions.AnnisException;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.node.Start;
+import java.util.LinkedList;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.tree.ParseTree;
@@ -57,6 +58,7 @@ public class TestAnnisParserExamples {
 
 	// simple AnnisParser instance
 	private AnnisParser parser;
+  private AnnisParserAntlr parserAntlr;
   
 	// load Spring application context once
 	@BeforeClass
@@ -70,6 +72,7 @@ public class TestAnnisParserExamples {
 	@Before
 	public void setup() {
 		parser = (AnnisParser) ctx.getBean("annisParser");
+    parserAntlr = (AnnisParserAntlr) ctx.getBean("annisParserAntlr");
 	}
 	
 	///// Syntax-Tree tests
@@ -112,16 +115,15 @@ public class TestAnnisParserExamples {
 			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
 			String annisQuery) 
   {
-    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(annisQuery));
-    AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
-    aqlParser.setBuildParseTree(true);
+    
     try
     {
-      AqlParser.StartContext tree = aqlParser.start();
-      assertThat(tree.toStringTree(), is(not(nullValue())));
+      QueryData result = parserAntlr.parse(annisQuery, new LinkedList<Long>());
+      assertThat(result, is(not(nullValue())));
     }
     catch (Exception ex)
     {
+      ex.printStackTrace(System.err);
       fail("good query throw exception: " + annisQuery);
     }
 	}
@@ -133,12 +135,9 @@ public class TestAnnisParserExamples {
 			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
 			String annisQuery) {
 		
-    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(annisQuery));
-    AqlParser aqlParser = new AqlParser(new CommonTokenStream(lexer));
     try
     {
-      ParseTree tree = aqlParser.start();
-      tree.toStringTree(aqlParser);
+      parserAntlr.parse(annisQuery, new LinkedList<Long>());
       
 			fail("bad query passed as good: " + annisQuery);
     }
