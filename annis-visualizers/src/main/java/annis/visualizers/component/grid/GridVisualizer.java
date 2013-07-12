@@ -151,7 +151,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
         boolean showTokenAnnotations = 
-          Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_ANNOS_KEY));
+          Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_TOK_ANNOS_KEY));
         
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
                 SSpan.class);

@@ -279,8 +279,9 @@ public class EventExtractor {
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-    Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace(),
-            type);
+    Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
+      getAnnotationLevelSet(graph, null, type)
+      : getAnnotationLevelSet(graph, input.getNamespace(), type);
     List<String> annos = new LinkedList<String>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
