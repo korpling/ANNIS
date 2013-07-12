@@ -53,12 +53,21 @@ import org.slf4j.LoggerFactory;
  *
  *
  * Mappings: <br/>
+ * <ul>
+ * <li>
  * It is possible to specify the order of annotation layers in each grid. Use
  * <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
  * annotation layers. If <b>anno:</b> is used, additional annotation layers not
  * present in the list will not be visualized. If mappings is left empty, layers
- * will be ordered alphabetically
- *
+ * will be ordered alphabetically.
+ * </li>
+ * <li>
+ * <b>tok_anno:true</b> can be used to also display the annotations of the token.
+ * </li>
+ * <li>
+ * <b>hide_tok:true</b> switches the line with the token value off.
+ * </li>
+ * </ul>
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
