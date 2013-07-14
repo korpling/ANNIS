@@ -16,6 +16,7 @@
 package annis.ql.parser;
 
 import annis.model.LogicClause;
+import annis.model.QueryNode;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.List;
@@ -187,17 +188,37 @@ public class DNFTransformer
       // find sub and-clauses for all or-clauses
       for(LogicClause subclause : top.getChildren())
       {
-        Preconditions.checkArgument(subclause.getOp() == LogicClause.Operator.AND, "input is not in DNF");
-        
-        List<LogicClause> children = new ArrayList<LogicClause>();
-        findAllChildrenForAnd(subclause, children);
+        if(subclause.getOp() == LogicClause.Operator.LEAF)
+        { 
+          // add an artificial "and" node
+          QueryNode content = subclause.getContent();
+          subclause.clearChildren();
+          subclause.setOp(LogicClause.Operator.AND);
+          subclause.setContent(null);
           
-        subclause.clearChildren();
-        
-        for(LogicClause c : children)
-        {
-          subclause.addChild(c);
+          LogicClause newLeaf = new LogicClause(LogicClause.Operator.LEAF);
+          newLeaf.setContent(content);
+          subclause.addChild(newLeaf);
+          
         }
+        else if (subclause.getOp() == LogicClause.Operator.AND)
+        {
+
+          List<LogicClause> children = new ArrayList<LogicClause>();
+          findAllChildrenForAnd(subclause, children);
+
+          subclause.clearChildren();
+
+          for(LogicClause c : children)
+          {
+            subclause.addChild(c);
+          }
+        }
+        else
+        {
+          Preconditions.checkArgument(false, "input is not in DNF");
+        }
+       
       }
     }
   }
@@ -217,86 +238,5 @@ public class DNFTransformer
       findAllChildrenForAnd(c, followers);
     }
   }
-  
-//  private static void cleanSubformula(QueryNode node)
-//  {
-//    if(node.getType() == QueryNode.Type.NODE || node.getAlternatives().isEmpty())
-//    {
-//      return;
-//    }
-//    QueryNode.Type parentType = node.getType();
-//
-//    // clean all child formula
-//    for(QueryNode c : node.getAlternatives())
-//    {
-//      cleanSubformula(c);
-//    }
-//    
-//    // check if we can clean the current one
-//    boolean allSame = true;
-//    for(QueryNode c : node.getAlternatives())
-//    {
-//      if(c.getType() != parentType)
-//      {
-//        allSame = false;
-//        break;
-//      }
-//    }
-//    
-//    if(allSame)
-//    {
-//      ListIterator<QueryNode> itChildren = node.getAlternatives().listIterator();
-//      while(itChildren.hasNext())
-//      {
-//        QueryNode child = itChildren.next();
-//        
-//         // add all the children list to the parent list and remove the old node
-//        node.getAlternatives().addAll(child.getAlternatives());
-//        itChildren.remove();
-//      }
-//    }
-//    
-//  }
-//  
-//  /**
-//   * Checks an AQL query if it is already in Disjunctive Normal Form.
-//   * @param topNode
-//   * @return True if in Disjunctive Normal Form.
-//   */
-//  public static boolean testDNF(QueryNode topNode)
-//  {
-//    if(topNode.getType() != QueryNode.Type.OR)
-//    {
-//      return false;
-//    }
-//    
-//    if(topNode.getAlternatives() == null)
-//    {
-//      return false;
-//    }
-//    
-//    for(QueryNode nAnd : topNode.getAlternatives())
-//    {
-//      if(nAnd.getType() != QueryNode.Type.AND)
-//      {
-//        return false;
-//      }
-//      
-//      if(nAnd.getAlternatives() == null)
-//      {
-//        return false;
-//      }
-//      
-//      for(QueryNode n : nAnd.getAlternatives())
-//      {
-//        if(n.getType() != QueryNode.Type.NODE)
-//        {
-//          return false;
-//        }
-//      }
-//    }
-//
-//    
-//    return true;
-//  }
+
 }
