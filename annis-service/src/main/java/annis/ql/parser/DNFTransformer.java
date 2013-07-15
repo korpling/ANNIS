@@ -19,6 +19,7 @@ import annis.model.LogicClause;
 import annis.model.QueryNode;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -63,17 +64,20 @@ public class DNFTransformer
     }
     else if(c.getChildren().size() > 2)
     {
+      LogicClause firstChild = c.getChildren().get(0);
       // merge together under a new node
       LogicClause newSubClause = new LogicClause(c.getOp());
       
-      ListIterator<LogicClause> itChildren = c.getChildren().listIterator(2);
+      ListIterator<LogicClause> itChildren = c.getChildren().listIterator(1);
       while(itChildren.hasNext())
       {
         LogicClause n = itChildren.next();
         newSubClause.addChild(n);
-        c.removeChild(itChildren.previousIndex());
       }
       
+      // rebuild the children
+      c.clearChildren();
+      c.addChild(firstChild);
       c.addChild(newSubClause);
     }
     

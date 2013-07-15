@@ -93,7 +93,7 @@ public class LogicClause
   public LogicClause removeChild(int idx)
   {
     LogicClause result = children.remove(idx);
-    if(result != null)
+    if(result != null && result.parent == this)
     {
       result.parent = null;
     }
@@ -104,7 +104,10 @@ public class LogicClause
   {
     for(LogicClause c : children)
     {
-      c.parent = null;
+      if(c.parent == this)
+      {
+        c.parent = null;
+      }
     }
     children.clear();
   }
