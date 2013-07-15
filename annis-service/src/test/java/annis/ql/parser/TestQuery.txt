@@ -1,1 +1,1 @@
-( (node & cat=/NP/ & #1 . #2) | (/das/ & /Haus/ & #3 . #4) )
+Topic="ab" & Inf-Stat="new" & #1 _i_ #2
