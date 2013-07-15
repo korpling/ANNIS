@@ -35,13 +35,8 @@ import annis.test.SpringQueryExamples;
 import annis.test.SpringSyntaxTreeExamples;
 import annis.test.SyntaxTreeExample;
 import annis.exceptions.AnnisException;
-import annis.ql.AqlLexer;
-import annis.ql.AqlParser;
 import annis.ql.node.Start;
 import java.util.LinkedList;
-import org.antlr.v4.runtime.ANTLRInputStream;
-import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.tree.ParseTree;
 import org.junit.Ignore;
 import org.junit.Test;
 

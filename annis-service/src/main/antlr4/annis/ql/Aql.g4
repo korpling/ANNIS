@@ -197,6 +197,7 @@ expr
 
 
 exprTop
-  : expr (AND expr)* # AndTop
-  | expr (OR expr)+ # OrTop
+  : expr (OR expr)+ # OrTop
+  | expr (AND expr)* # AndTop
+  | BRACE_OPEN exprTop BRACE_CLOSE # BracedTop
 	;

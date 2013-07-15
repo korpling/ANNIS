@@ -19,7 +19,6 @@ import annis.model.LogicClause;
 import annis.model.QueryNode;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 
@@ -45,30 +44,47 @@ public class DNFTransformer
     flattenDNF(topNode);
   }
   
-  private static void makeBinary(LogicClause c)
+  private static void makeBinary(LogicClause node)
   {
-    if(c.getOp() == LogicClause.Operator.LEAF 
-      || c.getChildren().isEmpty())
+    if(node.getOp() == LogicClause.Operator.LEAF 
+      || node.getChildren().isEmpty())
     {
       return;
     }
     
     // check if we have a degraded path with only one sibling
-    LogicClause parent = c.getParent();
-    if(c.getParent() != null && c.getChildren().size() == 1)
+    LogicClause parent = node.getParent();
+    if(node.getChildren().size() == 1)
     {
-      // push this node up
-      int idx = parent.getChildren().indexOf(c);
-      parent.removeChild(idx);
-      parent.addChild(0, c.getChildren().get(0));
+      if(node.getParent() == null)
+      {
+        // replace this node with it's only child
+        LogicClause child = node.getChildren().get(0);
+        node.clearChildren();
+        
+        node.setOp(child.getOp());
+        node.setContent(child.getContent());
+        
+        for(LogicClause newChild : child.getChildren())
+        {
+          node.addChild(newChild);
+        }
+      }
+      else
+      {
+        // push this node up
+        int idx = parent.getChildren().indexOf(node);
+        parent.removeChild(idx);
+        parent.addChild(0, node.getChildren().get(0));
+      }
     }
-    else if(c.getChildren().size() > 2)
+    else if(node.getChildren().size() > 2)
     {
-      LogicClause firstChild = c.getChildren().get(0);
+      LogicClause firstChild = node.getChildren().get(0);
       // merge together under a new node
-      LogicClause newSubClause = new LogicClause(c.getOp());
+      LogicClause newSubClause = new LogicClause(node.getOp());
       
-      ListIterator<LogicClause> itChildren = c.getChildren().listIterator(1);
+      ListIterator<LogicClause> itChildren = node.getChildren().listIterator(1);
       while(itChildren.hasNext())
       {
         LogicClause n = itChildren.next();
@@ -76,21 +92,21 @@ public class DNFTransformer
       }
       
       // rebuild the children
-      c.clearChildren();
-      c.addChild(firstChild);
-      c.addChild(newSubClause);
+      node.clearChildren();
+      node.addChild(firstChild);
+      node.addChild(newSubClause);
     }
     
     // do the same thing for all children
-    int cSize = c.getChildren().size();
+    int cSize = node.getChildren().size();
     if(cSize >= 1)
     {
-      makeBinary(c.getChildren().get(0));
+      makeBinary(node.getChildren().get(0));
     }
     
     if(cSize == 2)
     {
-      makeBinary(c.getChildren().get(1));
+      makeBinary(node.getChildren().get(1));
     }    
   }
   
@@ -231,7 +247,7 @@ public class DNFTransformer
   {
     if(node.getOp() == LogicClause.Operator.LEAF)
     {
-      followers.add(node);
+      followers.add(new LogicClause(node));
       return;
     }
     
