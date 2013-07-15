@@ -30,6 +30,7 @@ import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.Overlap;
+import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
@@ -404,6 +405,58 @@ public class AqlListener extends AqlBaseListener
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     left.addJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
   }
+
+  @Override
+  public void enterDirectPointing(AqlParser.DirectPointingContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("pointing"));
+    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    
+    String label = ctx.label == null ? null : ctx.label.getText();
+    
+    if(ctx.anno != null)
+    {
+      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      for (QueryAnnotation a : annotations)
+      {
+        right.addEdgeAnnotation(a);
+      }
+    }
+    
+    left.addJoin(new PointingRelation(right, label, 1));
+  }
+
+  @Override
+  public void enterIndirectPointing(AqlParser.IndirectPointingContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("pointing"));
+    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    
+    String label = ctx.label == null ? null : ctx.label.getText();
+   
+    left.addJoin(new PointingRelation(right, label));
+  }
+
+  @Override
+  public void enterRangePointing(AqlParser.RangePointingContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("pointing"));
+    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    
+    String label = ctx.label == null ? null : ctx.label.getText();
+   
+    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
+    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    left.addJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
+  }
+  
   
   
   @Override

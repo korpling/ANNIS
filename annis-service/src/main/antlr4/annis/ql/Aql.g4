@@ -148,9 +148,9 @@ dominance
 	;
 	
 pointing
-	: REF POINTING label=ID (anno=edgeSpec)? REF
-	| REF POINTING label=ID (anno=edgeSpec)? STAR REF
-	| REF POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec REF
+	: left=REF POINTING label=ID (anno=edgeSpec)? right=REF # DirectPointing
+	| left=REF POINTING label=ID (anno=edgeSpec)? STAR right=REF # IndirectPointing
+	| left=REF POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec right=REF # RangePointing
 	;
 
 spanrelation
