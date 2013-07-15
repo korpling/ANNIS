@@ -49,7 +49,6 @@ RIGHT_OVERLAP:'_or_';
 LEFT_CHILD:'@l';
 RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
-COMMON_ANCESTOR:'$*';
 ROOT:':root';
 ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
@@ -168,8 +167,8 @@ binary_linguistic_term
 	|	spanrelation # SpanRelation
 	|	dominance # DominanceRelation
 	|	pointing # PointingRelation
-	|	REF COMMON_PARENT REF # CommonParent
-	|	REF COMMON_ANCESTOR REF # CommonAncestor
+	|	left=REF COMMON_PARENT (label=ID)? right=REF # CommonParent
+	|	left=REF COMMON_PARENT (label=ID)? STAR right=REF # CommonAncestor
   | REF EQ REF # Identity
 	;
 	

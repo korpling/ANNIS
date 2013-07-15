@@ -22,6 +22,7 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlParser;
+import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
@@ -35,6 +36,7 @@ import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
+import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
@@ -456,6 +458,35 @@ public class AqlListener extends AqlBaseListener
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     left.addJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
   }
+
+  @Override
+  public void enterCommonParent(AqlParser.CommonParentContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("common parent"));
+    Preconditions.checkNotNull(right, errorRHS("common parent"));
+    
+    String label = ctx.label == null ? null : ctx.label.getText();
+    
+    left.addJoin(new Sibling(right, label));
+
+  }
+
+  @Override
+  public void enterCommonAncestor(AqlParser.CommonAncestorContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("common ancestor"));
+    Preconditions.checkNotNull(right, errorRHS("common ancestor"));
+    
+    String label = ctx.label == null ? null : ctx.label.getText();
+    
+    left.addJoin(new CommonAncestor(right, label));
+  }
+  
+  
   
   
   
