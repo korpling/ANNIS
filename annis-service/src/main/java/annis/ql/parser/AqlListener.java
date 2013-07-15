@@ -19,8 +19,10 @@ import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.LogicClause;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
+import annis.model.QueryNode.Range;
 import annis.ql.AqlBaseListener;
 import annis.ql.AqlParser;
+import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -338,6 +340,57 @@ public class AqlListener extends AqlBaseListener
   {
     join(ctx, LeftOverlap.class);
   }
+
+  @Override
+  public void enterDirectDominance(AqlParser.DirectDominanceContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("dominance"));
+    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    
+    String layer = ctx.layer == null ? null : ctx.layer.getText();
+    
+    if(ctx.anno != null)
+    {
+      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+      for (QueryAnnotation a : annotations)
+      {
+        right.addEdgeAnnotation(a);
+      }
+    }
+    left.addJoin(new Dominance(right, layer, 1));
+  }
+
+  @Override
+  public void enterIndirectDominance(AqlParser.IndirectDominanceContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("dominance"));
+    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    
+    String layer = ctx.layer == null ? null : ctx.layer.getText();
+   
+    left.addJoin(new Dominance(right, layer));
+  }
+
+  @Override
+  public void enterRangeDominance(AqlParser.RangeDominanceContext ctx)
+  {
+    QueryNode left = nodeByRef(ctx.left);
+    QueryNode right = nodeByRef(ctx.right);
+    Preconditions.checkNotNull(left, errorLHS("dominance"));
+    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    
+    String layer = ctx.layer == null ? null : ctx.layer.getText();
+   
+    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
+    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    left.addJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
+  }
+  
   
   @Override
   public void enterMetaTermExpr(AqlParser.MetaTermExprContext ctx)
@@ -358,6 +411,24 @@ public class AqlListener extends AqlBaseListener
   }
  
   
+  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
+    AqlParser.EdgeSpecContext ctx)
+  {
+    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
+    for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
+    {
+      String namespace = annoCtx.qName().namespace == null
+        ? null : annoCtx.qName().namespace.getText();
+      String name = annoCtx.qName().name.getText();
+      String value = textFromSpec(annoCtx.value);
+      QueryNode.TextMatching matching = textMatchingFromSpec(
+        annoCtx.value, annoCtx.NEQ() != null);
+      
+      annos.add(new QueryAnnotation(namespace, name, value, matching));
+      
+    }
+    return annos;
+  }
 
   private String textFromSpec(AqlParser.TextSpecContext txtCtx)
   {
@@ -419,7 +490,7 @@ public class AqlListener extends AqlBaseListener
    * and will construct a new join specified by the type using reflection.
    *
    * @node
-   * @type
+   * @type00
    */
   private void join(ParserRuleContext<Token> ctx, Class<? extends Join> type)
   {

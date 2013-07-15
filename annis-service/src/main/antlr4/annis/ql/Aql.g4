@@ -127,7 +127,7 @@ qName
 	;
 
 edgeAnno
-	:	 name=qName EQ value=textSpec
+	:	 name=qName op=(EQ|NEQ) value=textSpec
 	;
 
 edgeSpec
@@ -142,9 +142,9 @@ precedence
 	;
 
 dominance
-	: REF DOMINANCE (anno=edgeSpec)? REF
-	| REF DOMINANCE (anno=edgeSpec)? STAR REF
-	| REF DOMINANCE (anno=edgeSpec)? rangeSpec REF
+	: left=REF DOMINANCE (layer=ID)? (anno=edgeSpec)? right=REF # DirectDominance
+	| left=REF DOMINANCE (layer=ID)? STAR right=REF # IndirectDominance
+	| left=REF DOMINANCE (layer=ID)? rangeSpec right=REF # RangeDominance
 	;
 	
 pointing
