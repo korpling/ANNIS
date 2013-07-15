@@ -27,10 +27,12 @@ import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
+import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
+import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import com.google.common.base.Preconditions;
 import java.lang.reflect.Constructor;
@@ -359,7 +361,19 @@ public class AqlListener extends AqlBaseListener
         right.addEdgeAnnotation(a);
       }
     }
-    left.addJoin(new Dominance(right, layer, 1));
+    
+    if(ctx.LEFT_CHILD() != null)
+    {
+      left.addJoin(new LeftDominance(right, layer));
+    }
+    else if(ctx.RIGHT_CHILD() != null)
+    {
+      left.addJoin(new RightDominance(right, layer));
+    }
+    else
+    {
+      left.addJoin(new Dominance(right, layer, 1));
+    }
   }
 
   @Override

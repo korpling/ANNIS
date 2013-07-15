@@ -46,8 +46,8 @@ LEFT_ALIGN:'_l_';
 RIGHT_ALIGN:'_r_';
 LEFT_OVERLAP:'_ol_';
 RIGHT_OVERLAP:'_or_';
-LEFT_CHILD:'>@l';
-RIGHT_CHILD:'>@r';
+LEFT_CHILD:'@l';
+RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
 COMMON_ANCESTOR:'$*';
 ROOT:':root';
@@ -142,7 +142,7 @@ precedence
 	;
 
 dominance
-	: left=REF DOMINANCE (layer=ID)? (anno=edgeSpec)? right=REF # DirectDominance
+	: left=REF DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? right=REF # DirectDominance
 	| left=REF DOMINANCE (layer=ID)? STAR right=REF # IndirectDominance
 	| left=REF DOMINANCE (layer=ID)? rangeSpec right=REF # RangeDominance
 	;
@@ -167,8 +167,6 @@ binary_linguistic_term
 	:	precedence # PrecedenceRelation
 	|	spanrelation # SpanRelation
 	|	dominance # DominanceRelation
-	|	REF LEFT_CHILD REF # LeftChild
-	|	REF RIGHT_CHILD REF # RightChild
 	|	pointing # PointingRelation
 	|	REF COMMON_PARENT REF # CommonParent
 	|	REF COMMON_ANCESTOR REF # CommonAncestor
