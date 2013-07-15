@@ -338,7 +338,7 @@ public class AqlListener extends AqlBaseListener
   {
     join(ctx, LeftOverlap.class);
   }
-
+  
   @Override
   public void enterMetaTermExpr(AqlParser.MetaTermExprContext ctx)
   {
@@ -349,6 +349,12 @@ public class AqlListener extends AqlBaseListener
     QueryAnnotation anno = new QueryAnnotation(namespace,
       ctx.id.name.getText());
     metaData.add(anno);
+  }
+
+  @Override
+  public void enterIdentity(AqlParser.IdentityContext ctx)
+  {
+    join(ctx, Identical.class);
   }
  
   

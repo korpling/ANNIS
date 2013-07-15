@@ -1,1 +1,1 @@
-Topic="ab" & Inf-Stat="new" & #1 _i_ #2
+tok & tok & #1 = #2

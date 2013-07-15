@@ -164,14 +164,15 @@ spanrelation
 ; 
 
 binary_linguistic_term
-	:	precedence
-	|	spanrelation
-	|	dominance
-	|	REF LEFT_CHILD REF
-	|	REF RIGHT_CHILD REF
-	|	pointing
-	|	REF COMMON_PARENT REF
-	|	REF COMMON_ANCESTOR REF
+	:	precedence # PrecedenceRelation
+	|	spanrelation # SpanRelation
+	|	dominance # DominanceRelation
+	|	REF LEFT_CHILD REF # LeftChild
+	|	REF RIGHT_CHILD REF # RightChild
+	|	pointing # PointingRelation
+	|	REF COMMON_PARENT REF # CommonParent
+	|	REF COMMON_ANCESTOR REF # CommonAncestor
+  | REF EQ REF # Identity
 	;
 	
 unary_linguistic_term
