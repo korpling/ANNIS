@@ -122,8 +122,15 @@ public class Helper {
   }
 
   public static void setUser(AnnisUser user) {
-    VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
+    if(user == null)
+    {
+      VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+    }
+    else
+    {
+      VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
             user);
+    }
   }
 
   /**
