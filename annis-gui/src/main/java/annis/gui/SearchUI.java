@@ -327,7 +327,7 @@ public class SearchUI extends AnnisBaseUI
       public boolean handleRequest(VaadinSession session, VaadinRequest request,
         VaadinResponse response) throws IOException
       {
-        checkCitation(request);
+        checkCitation();
 
 
         if (request.getPathInfo() != null && request.getPathInfo().startsWith(
@@ -365,10 +365,10 @@ public class SearchUI extends AnnisBaseUI
 
     loadInstanceFonts();
 
-    checkCitation(request);
+    checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
-
+   
     updateUserInformation();
   }
 
@@ -475,7 +475,7 @@ public class SearchUI extends AnnisBaseUI
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
 
-  public void checkCitation(VaadinRequest request)
+  public void checkCitation()
   {
     Object origURLRaw = VaadinSession.getCurrent().getSession().getAttribute(
       "citation");
@@ -499,7 +499,7 @@ public class SearchUI extends AnnisBaseUI
     }
 
   }
-
+  
   public void evaluateCitation(String relativeUri)
   {
     Matcher m = citationPattern.matcher(relativeUri);

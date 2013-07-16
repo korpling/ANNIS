@@ -16,7 +16,7 @@ limitations under the License.
 <!DOCTYPE html>
 <html>
   <head>
-    <title>ANNIS Login</title>
+    <title>%title%</title>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
     <style>
       
@@ -25,7 +25,7 @@ limitations under the License.
         margin-left: auto;
         margin-right: auto;
         background-color: rgb(236, 240, 246);
-        border-radius: 15px;
+        border-radius: 10px;
         padding: 10px;
         border-color: rgb(179, 179, 179);
         border-style: solid;
@@ -53,13 +53,14 @@ font-size: 13px;
   </head>
   <body>
     <div class="control">
-      <h1>ANNIS Login</h1>
-      <form action="../LoginHandler" method="post" >
-        <div>Username<br /><input class="text" type="text" name="annis-login-user" value=""/></div>
-        <div>Password<br /><input class="text" type="password" name="annis-login-password" value=""/></div>
+      <h1>%title%</h1>
+      <form action="./LoginHandler" method="post" >
+        <input type="hidden" name="annis-referer" value="" />
+        <div>%usercaption%<br /><input class="text" type="text" name="annis-login-user" value=""/></div>
+        <div>%passwordcaption%<br /><input class="text" type="password" name="annis-login-password" value=""/></div>
         <div class="loginButtonBox">
           <input type="submit" value="Login" /> or 
-          <a href="../">Abort</a>
+          <a href="./">Abort</a>
         </div>
       </form>
     </div>

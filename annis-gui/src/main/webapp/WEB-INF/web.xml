@@ -41,6 +41,10 @@
     <servlet-name>BinaryServlet</servlet-name>
     <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>LoginHandler</servlet-name>
+    <servlet-class>annis.gui.servlets.LoginHandlerServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>Search</servlet-name>
@@ -57,6 +61,10 @@
   <servlet-mapping>
     <servlet-name>BinaryServlet</servlet-name>
     <url-pattern>/Binary/*</url-pattern>
+  </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LoginHandler</servlet-name>
+    <url-pattern>/LoginHandler</url-pattern>
   </servlet-mapping>
     
 </web-app>
