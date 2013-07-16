@@ -207,7 +207,7 @@ public class SearchUI extends AnnisBaseUI
         }
         else
         {
-          showLoginWindow();
+          showLoginPage();
         }
       }
     });
@@ -596,14 +596,9 @@ public class SearchUI extends AnnisBaseUI
     queryController.updateCorpusSetList();
   }
 
-  private void showLoginWindow()
+  private void showLoginPage()
   {
-    windowLogin = new LoginWindow();
-    windowLogin.setModal(true);
-    windowLogin.setSizeUndefined();
-
-    addWindow(windowLogin);
-    windowLogin.center();
+    Page.getCurrent().setLocation(Helper.getContext() + "/LoginHandler");
   }
 
   protected void checkLoginAttempt(VaadinRequest request)
