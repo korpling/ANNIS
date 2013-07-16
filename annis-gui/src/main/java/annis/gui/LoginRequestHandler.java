@@ -30,11 +30,11 @@ import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import javax.servlet.ServletException;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,22 +49,31 @@ public class LoginRequestHandler implements RequestHandler
   private final static Logger log = LoggerFactory.getLogger(
     LoginRequestHandler.class);
 
+  private LoginListener listener;
+
+  public LoginRequestHandler(LoginListener listener)
+  {
+    this.listener = listener;
+  }
+
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if (request.getPathInfo() != null
-      && request.getPathInfo().startsWith("/login")
-      && "GET".equalsIgnoreCase(request.getMethod()))
+    if (request.getPathInfo() != null && request.getPathInfo().startsWith(
+      "/login"))
     {
-      return doGet(response);
-    }
-    else if ("POST".equalsIgnoreCase(request.getMethod())
-      && request.getParameter("annis-login-password") != null
-      && request.getParameter("annis-login-user") != null)
-    {
-      return doPost(session, request);
-    }
+      if ("GET".equalsIgnoreCase(request.getMethod()))
+      {
+        return doGet(response);
+      }
+      else if ("POST".equalsIgnoreCase(request.getMethod())
+        && request.getParameter("annis-login-password") != null
+        && request.getParameter("annis-login-user") != null)
+      {
+        return doPost(session, request, response);
+      }
+    } // end if path starts with /login
     return false;
   }
 
@@ -73,7 +82,7 @@ public class LoginRequestHandler implements RequestHandler
     OutputStream out = response.getOutputStream();
     try
     {
-      String htmlSource = Resources.toString(LoginHandlerServlet.class.
+      String htmlSource = Resources.toString(LoginRequestHandler.class.
         getResource(
         "login.html"), Charsets.UTF_8);
 
@@ -104,7 +113,8 @@ public class LoginRequestHandler implements RequestHandler
     return false;
   }
 
-  private boolean doPost(VaadinSession session, VaadinRequest request) throws IOException
+  private boolean doPost(VaadinSession session, VaadinRequest request,
+    VaadinResponse response) throws IOException
   {
     String username = request.getParameter("annis-login-user");
     String password = request.getParameter("annis-login-password");
@@ -116,7 +126,7 @@ public class LoginRequestHandler implements RequestHandler
       session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
 
       // get the URL for the REST service
-      Object annisServiceURLObject = session.getAttribute(
+      Object annisServiceURLObject = session.getSession().getAttribute(
         AnnisBaseUI.WEBSERVICEURL_KEY);
 
       if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
@@ -167,6 +177,17 @@ public class LoginRequestHandler implements RequestHandler
         session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Unexpected exception:  + ex.getMessage()");
       }
+
+      if (listener != null)
+      {
+        listener.onLogin();
+      }
+
+      OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), Charsets.UTF_8);
+      String html = Resources.toString(LoginRequestHandler.class.getResource("closelogin.html"), Charsets.UTF_8);
+      CharStreams.copy(new StringReader(html), writer);
+      writer.close();
+
       return true;
     } // end if login attempt
 

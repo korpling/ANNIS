@@ -126,9 +126,4 @@ public class LoginWindow extends Window implements Button.ClickListener
     }
   }
   
-  public static interface LoginListener 
-  {
-    public void onLogin();
-  }
-  
 }
