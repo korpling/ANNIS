@@ -49,24 +49,26 @@ import org.slf4j.LoggerFactory;
  */
 public class LoginHandlerServlet extends HttpServlet
 {
-  
-  private final static Logger log = LoggerFactory.getLogger(LoginHandlerServlet.class);
+
+  private final static Logger log = LoggerFactory.getLogger(
+    LoginHandlerServlet.class);
 
   @Override
   protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
   {
     OutputStream out = resp.getOutputStream();
     try
-    { 
-      String htmlSource = Resources.toString(LoginHandlerServlet.class.getResource(
+    {
+      String htmlSource = Resources.toString(LoginHandlerServlet.class.
+        getResource(
         "login.html"), Charsets.UTF_8);
-      
+
       htmlSource = htmlSource
         .replaceAll("%usercaption%", "Username")
         .replaceAll("%passwordcaption%", "Password")
         .replaceAll("%title%", "ANNIS Login")
         .replaceAll("%referer%", "well...");
-      
+
       OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8);
       CharStreams.copy(new StringReader(htmlSource), writer);
       writer.close();
@@ -79,7 +81,6 @@ public class LoginHandlerServlet extends HttpServlet
     }
   }
 
-  
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
@@ -87,9 +88,14 @@ public class LoginHandlerServlet extends HttpServlet
 
     String username = request.getParameter("annis-login-user");
     String password = request.getParameter("annis-login-password");
+    String referer = request.getParameter("annis-referer");
 
     if (username != null && password != null)
     {
+      // forget any old user information
+      session.removeAttribute(AnnisBaseUI.USER_KEY);
+      session.removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
+
       // get the URL for the REST service
       Object annisServiceURLObject = session.getAttribute(
         AnnisBaseUI.WEBSERVICEURL_KEY);
@@ -111,35 +117,38 @@ public class LoginHandlerServlet extends HttpServlet
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          Helper.setUser(new AnnisUser(username, client));
+          session.setAttribute(AnnisBaseUI.USER_KEY, new AnnisUser(username,
+            client));
         }
       }
       catch (ClientHandlerException ex)
-    {
+      {
 //      Notification.show("Authentification error: " + ex.getMessage(),
 //        Notification.Type.WARNING_MESSAGE);
-    }
-    catch(UniformInterfaceException ex)
-    {
-      if(ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.getStatusCode())
-      {
-//        Notification.show("Username or password wrong", ex.getMessage(), 
-//          Notification.Type.WARNING_MESSAGE);
       }
-      else
+      catch (UniformInterfaceException ex)
+      {
+        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
+          getStatusCode())
+        {
+          session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+            "Username or password wrong");
+        }
+        else
+        {
+          log.error(null, ex);
+          session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+            "Unexpected exception:  + ex.getMessage()");
+        }
+      }
+      catch (Exception ex)
       {
         log.error(null, ex);
-//        Notification.show("Unexpected exception: " + ex.getMessage(),
-//          Notification.Type.WARNING_MESSAGE);
-      }
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
+        session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          "Unexpected exception:  + ex.getMessage()");
 
-//      Notification.show("Unexpected exception: " + ex.getMessage(),
-//        Notification.Type.WARNING_MESSAGE);
-    }
+      }
+      response.sendRedirect(referer == null ? "./" : referer);
     }
 
   }

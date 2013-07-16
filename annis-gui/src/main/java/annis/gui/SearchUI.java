@@ -73,7 +73,6 @@ import org.vaadin.cssinject.CSSInject;
  */
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
-  LoginWindow.LoginListener,
   MimeTypeErrorListener,
   Page.UriFragmentChangedListener
 {
@@ -369,7 +368,7 @@ public class SearchUI extends AnnisBaseUI
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
    
-    updateUserInformation();
+    checkLoginAttempt(request);
   }
 
   private void loadInstanceFonts()
@@ -607,12 +606,21 @@ public class SearchUI extends AnnisBaseUI
     windowLogin.center();
   }
 
-  @Override
-  public void onLogin()
+  protected void checkLoginAttempt(VaadinRequest request)
   {
     AnnisUser user = Helper.getUser();
 
-    if (user != null)
+    if (user == null)
+    {
+      Object loginErrorOject = request.getWrappedSession().getAttribute(USER_LOGIN_ERROR);
+      if(loginErrorOject != null && loginErrorOject instanceof String)
+      {
+        Notification.show((String) loginErrorOject, 
+          Notification.Type.WARNING_MESSAGE);
+      }
+      request.getWrappedSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
+    }
+    else if(user.getUserName() != null)
     {
       Notification.show("Logged in as \"" + user.getUserName() + "\"",
         Notification.Type.TRAY_NOTIFICATION);
