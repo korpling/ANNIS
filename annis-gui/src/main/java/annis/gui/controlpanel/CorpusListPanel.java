@@ -202,12 +202,12 @@ public class CorpusListPanel extends VerticalLayout implements
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
 
     tblCorpora.setSortContainerPropertyId("name");
-    updateCorpusSetList(true);
+    updateCorpusSetList();
   }
 
   public void updateCorpusSetList()
   {
-    updateCorpusSetList(false);
+    updateCorpusSetList(true);
   }
 
   private void updateCorpusSetList(boolean showLoginMessage)
@@ -224,7 +224,7 @@ public class CorpusListPanel extends VerticalLayout implements
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
           }
-          else if(Helper.getUser() == null)
+          else
           {
             Notification.
               show(

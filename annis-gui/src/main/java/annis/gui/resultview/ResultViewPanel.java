@@ -72,7 +72,7 @@ public class ResultViewPanel extends Panel
     if (corpora.size() == 1)
     {
       CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().next());
-      if (corpusConfig != null && corpusConfig.getConfig().containsKey(KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      if (corpusConfig.getConfig().containsKey(KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
         this.selectedSegmentationLayer = corpusConfig.getConfig(
           KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
