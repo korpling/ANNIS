@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets;
+package annis.gui;
 
+import annis.gui.servlets.LoginHandlerServlet;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
@@ -25,15 +26,15 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
 import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,16 +43,34 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class LoginHandlerServlet extends HttpServlet
+public class LoginRequestHandler implements RequestHandler
 {
 
   private final static Logger log = LoggerFactory.getLogger(
-    LoginHandlerServlet.class);
+    LoginRequestHandler.class);
 
   @Override
-  protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException
+  public boolean handleRequest(VaadinSession session, VaadinRequest request,
+    VaadinResponse response) throws IOException
   {
-    OutputStream out = resp.getOutputStream();
+    if (request.getPathInfo() != null
+      && request.getPathInfo().startsWith("/login")
+      && "GET".equalsIgnoreCase(request.getMethod()))
+    {
+      return doGet(response);
+    }
+    else if ("POST".equalsIgnoreCase(request.getMethod())
+      && request.getParameter("annis-login-password") != null
+      && request.getParameter("annis-login-user") != null)
+    {
+      return doPost(session, request);
+    }
+    return false;
+  }
+
+  private boolean doGet(VaadinResponse response) throws IOException
+  {
+    OutputStream out = response.getOutputStream();
     try
     {
       String htmlSource = Resources.toString(LoginHandlerServlet.class.
@@ -69,32 +88,32 @@ public class LoginHandlerServlet extends HttpServlet
       OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8);
       CharStreams.copy(new StringReader(htmlSource), writer);
       writer.close();
+
+      return true;
     }
-    catch(Exception ex)
+    catch (Exception ex)
     {
       log.error(null, ex);
     }
     finally
     {
-      resp.setContentType("text/html");
-      resp.setStatus(200);
+      response.setContentType("text/html");
+      response.setStatus(200);
       out.close();
     }
+    return false;
   }
 
-  @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+  private boolean doPost(VaadinSession session, VaadinRequest request) throws IOException
   {
-    HttpSession session = request.getSession();
-
     String username = request.getParameter("annis-login-user");
     String password = request.getParameter("annis-login-password");
 
     if (username != null && password != null)
     {
       // forget any old user information
-      session.removeAttribute(AnnisBaseUI.USER_KEY);
-      session.removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
+      session.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+      session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
 
       // get the URL for the REST service
       Object annisServiceURLObject = session.getAttribute(
@@ -102,8 +121,8 @@ public class LoginHandlerServlet extends HttpServlet
 
       if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
       {
-        throw new ServletException(
-          "AnnisWebService.URL was not set as init parameter in web.xml");
+        log.warn("AnnisWebService.URL was not set as init parameter in web.xml");
+        return false;
       }
 
       String webserviceURL = (String) annisServiceURLObject;
@@ -117,27 +136,28 @@ public class LoginHandlerServlet extends HttpServlet
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          session.setAttribute(AnnisBaseUI.USER_KEY, new AnnisUser(username,
+          session.getSession().setAttribute(AnnisBaseUI.USER_KEY, new AnnisUser(
+            username,
             client));
         }
       }
       catch (ClientHandlerException ex)
       {
-        session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-            "Authentification error: \" + ex.getMessage()");
+        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          "Authentification error: \" + ex.getMessage()");
       }
       catch (UniformInterfaceException ex)
       {
         if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
           getStatusCode())
         {
-          session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
         }
         else
         {
           log.error(null, ex);
-          session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Unexpected exception:  + ex.getMessage()");
         }
       }
@@ -147,7 +167,9 @@ public class LoginHandlerServlet extends HttpServlet
         session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Unexpected exception:  + ex.getMessage()");
       }
-    }
+      return true;
+    } // end if login attempt
 
+    return false;
   }
 }
