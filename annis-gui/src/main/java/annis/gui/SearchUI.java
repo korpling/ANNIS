@@ -133,9 +133,6 @@ public class SearchUI extends AnnisBaseUI
 
     this.instanceConfig = getInstanceConfig(request);
 
-    // we are not logged in by default
-    Helper.setUser(null);
-    
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
@@ -566,6 +563,7 @@ public class SearchUI extends AnnisBaseUI
         if (layoutToolbar.getComponentIndex(btLogin) > -1)
         {
           layoutToolbar.replaceComponent(btLogin, btLogout);
+          layoutToolbar.setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
         }
       }
     }
@@ -575,6 +573,7 @@ public class SearchUI extends AnnisBaseUI
       if (layoutToolbar.getComponentIndex(btLogout) > -1)
       {
         layoutToolbar.replaceComponent(btLogout, btLogin);
+        layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
       }
     }
 
@@ -584,37 +583,27 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onLogin()
   {
-    access(new Runnable()
+    AnnisUser user = Helper.getUser();
+
+    if (user == null)
     {
-      @Override
-      public void run()
+      Object loginErrorOject = VaadinSession.getCurrent().getSession().
+        getAttribute(USER_LOGIN_ERROR);
+      if (loginErrorOject != null && loginErrorOject instanceof String)
       {
-        AnnisUser user = Helper.getUser();
-
-        if (user == null)
-        {
-          Object loginErrorOject = VaadinSession.getCurrent().getSession().
-            getAttribute(USER_LOGIN_ERROR);
-          if (loginErrorOject != null && loginErrorOject instanceof String)
-          {
-            Notification.show((String) loginErrorOject,
-              Notification.Type.WARNING_MESSAGE);
-          }
-          VaadinSession.getCurrent().getSession().removeAttribute(
-            AnnisBaseUI.USER_LOGIN_ERROR);
-        }
-        else if (user.getUserName() != null)
-        {
-          Notification.show("Logged in as \"" + user.getUserName() + "\"",
-            Notification.Type.TRAY_NOTIFICATION);
-        }
-
-        updateUserInformation();
-        push();
+        Notification.show((String) loginErrorOject,
+          Notification.Type.WARNING_MESSAGE);
       }
-    });
+      VaadinSession.getCurrent().getSession().removeAttribute(
+        AnnisBaseUI.USER_LOGIN_ERROR);
+    }
+    else if (user.getUserName() != null)
+    {
+      Notification.show("Logged in as \"" + user.getUserName() + "\"",
+        Notification.Type.TRAY_NOTIFICATION);
+    }
 
-
+    updateUserInformation();
   }
 
   public boolean isLoggedIn()

@@ -15,7 +15,6 @@
  */
 package annis.gui;
 
-import annis.gui.servlets.LoginHandlerServlet;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
@@ -30,7 +29,6 @@ import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.UI;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -49,9 +47,9 @@ public class LoginRequestHandler implements RequestHandler
   private final static Logger log = LoggerFactory.getLogger(
     LoginRequestHandler.class);
 
-  private LoginListener listener;
+  private SearchUI listener;
 
-  public LoginRequestHandler(LoginListener listener)
+  public LoginRequestHandler(SearchUI listener)
   {
     this.listener = listener;
   }
@@ -122,7 +120,7 @@ public class LoginRequestHandler implements RequestHandler
     if (username != null && password != null)
     {
       // forget any old user information
-      session.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+      Helper.setUser(null);
       session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
 
       // get the URL for the REST service
@@ -146,15 +144,13 @@ public class LoginRequestHandler implements RequestHandler
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          session.getSession().setAttribute(AnnisBaseUI.USER_KEY, new AnnisUser(
-            username,
-            client));
+          Helper.setUser(new AnnisUser(username, client));
         }
       }
       catch (ClientHandlerException ex)
       {
         session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-          "Authentification error: \" + ex.getMessage()");
+          "Authentification error: " + ex.getMessage());
       }
       catch (UniformInterfaceException ex)
       {
@@ -168,19 +164,35 @@ public class LoginRequestHandler implements RequestHandler
         {
           log.error(null, ex);
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-            "Unexpected exception:  + ex.getMessage()");
+            "Unexpected exception: " + ex.getMessage());
         }
       }
       catch (Exception ex)
       {
         log.error(null, ex);
         session.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-          "Unexpected exception:  + ex.getMessage()");
+          "Unexpected exception: " + ex.getMessage());
       }
 
       if (listener != null)
       {
-        listener.onLogin();
+        listener.access(new Runnable() {
+
+          @Override
+          public void run()
+          {
+            VaadinSession.getCurrent().lock();
+            try
+            {
+              listener.onLogin();
+              listener.push();
+            }
+            finally
+            {
+              VaadinSession.getCurrent().unlock();
+            }
+          }
+        });
       }
 
       OutputStreamWriter writer = new OutputStreamWriter(response.getOutputStream(), Charsets.UTF_8);
