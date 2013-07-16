@@ -364,6 +364,8 @@ public class SearchUI extends AnnisBaseUI
     checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
+    
+    updateUserInformation();
   }
 
   private void loadInstanceFonts()
