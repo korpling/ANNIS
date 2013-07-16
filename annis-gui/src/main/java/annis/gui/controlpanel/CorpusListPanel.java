@@ -207,7 +207,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   public void updateCorpusSetList()
   {
-    updateCorpusSetList(true);
+    updateCorpusSetList(false);
   }
 
   private void updateCorpusSetList(boolean showLoginMessage)
