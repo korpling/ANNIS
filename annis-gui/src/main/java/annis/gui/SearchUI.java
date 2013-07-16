@@ -133,6 +133,9 @@ public class SearchUI extends AnnisBaseUI
 
     this.instanceConfig = getInstanceConfig(request);
 
+    // we are not logged in by default
+    Helper.setUser(null);
+    
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
