@@ -38,10 +38,9 @@ import annis.service.objects.AnnisCorpus;
 import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.Push;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.BrowserWindowOpener;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
@@ -50,7 +49,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -65,6 +63,8 @@ import java.util.regex.Pattern;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 import org.vaadin.cssinject.CSSInject;
 
@@ -73,7 +73,6 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push(PushMode.MANUAL)
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
@@ -136,6 +135,8 @@ public class SearchUI extends AnnisBaseUI
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
+    JavaScript.getCurrent().addFunction("annis.gui.logincallback", new LoginCloseCallback());
+    
     queryController = new QueryController(this);
 
     refresh = new Refresher();
@@ -201,11 +202,29 @@ public class SearchUI extends AnnisBaseUI
     lblUserName.setHeight("-1px");
     lblUserName.addStyleName("right-aligned-text");
 
-    btLogin = new Button("Login");
-    BrowserWindowOpener loginOpener =
-      new BrowserWindowOpener(Helper.getContext() + "/login");
-    loginOpener.setFeatures("height=200,width=300,resizable");
-    loginOpener.extend(btLogin);
+    btLogin = new Button("Login", new Button.ClickListener() {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        BrowserFrame frame = new BrowserFrame("login", new ExternalResource(
+          Helper.getContext() + "/login"));
+        frame.setWidth("100%");
+        frame.setHeight("200px");
+        
+        windowLogin = new Window("ANNIS Login", frame);
+        windowLogin.setModal(true);
+        windowLogin.setWidth("400px");
+        windowLogin.setHeight("250px");
+
+        addWindow(windowLogin);
+        windowLogin.center();
+      }
+    });
+//    BrowserWindowOpener loginOpener =
+//      new BrowserWindowOpener(Helper.getContext() + "/login");
+//    loginOpener.setFeatures("height=200,width=300,resizable");
+//    loginOpener.extend(btLogin);
 
     btLogout = new Button("Logout", new Button.ClickListener()
     {
@@ -828,6 +847,22 @@ public class SearchUI extends AnnisBaseUI
       checkCitation();
       return false;
     }
+  }
+  
+  private class LoginCloseCallback implements JavaScriptFunction
+  {
+
+    @Override
+    public void call(JSONArray arguments) throws JSONException
+    {
+      if(windowLogin != null)
+      {
+        removeWindow(windowLogin);
+        
+      }
+      onLogin();
+    }
+    
   }
 
   private static class AboutClickListener implements ClickListener
