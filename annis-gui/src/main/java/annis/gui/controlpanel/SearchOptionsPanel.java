@@ -264,7 +264,7 @@ public class SearchOptionsPanel extends FormLayout
     {
       cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
     }
-    else
+    else if(segment != null)
     {
       cbSegmentation.addItem(segment);
       cbSegmentation.setValue(segment);
