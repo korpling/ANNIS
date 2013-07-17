@@ -18,8 +18,8 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
   var connector = this;
   var rootDiv = $(this.getElement(this.getParentId()));
 
-  var mediaElement;
-  var globalPlayer;
+  var mediaElement = null;
+  var globalPlayer = null;
 
   // Handle changes from the server-side
   this.onStateChange = function() {
@@ -29,6 +29,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       rootDiv.append(mediaElement);
 
       mediaElement.attr("controls", "controls");
+      mediaElement.attr("preload", "metadata");
 
       var mediaElementSrc = $(document.createElement("source"));
       mediaElement.append(mediaElementSrc);
@@ -44,7 +45,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       options.alwaysShowControls = false;
       options.success = function(media, domObject, internalPlayer) {
         globalPlayer = $(media);
-        globalPlayer.on('canplay', loadedCallback);
+        globalPlayer.on('loadedmetadata', loadedCallback);
       };
 
       mediaElement.mediaelementplayer(options);
