@@ -1,0 +1,66 @@
+<!--
+Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+     http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+-->
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>%title%</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <style>
+      
+      .control {
+        width: 95%;
+        height: 150px;
+        background-color: rgb(236, 240, 246);
+        border-radius: 10px;
+        padding: 10px;
+        border-color: rgb(179, 179, 179);
+        border-style: solid;
+        border-width: 1px;
+        
+        font-family: Arial, Helvetica, 'Lucida Grande', 'Lucida Sans Unicode', Tahoma, Verdana, sans-serif;
+font-size: 13px;
+      }
+      
+      .control h1 {
+        font-size: 16px;
+        font-weight: bold;
+        padding: 0px;
+        margin-top: 0px;
+      }
+      
+      .loginButtonBox {
+        text-align: center;
+        
+      }
+      .text {
+        width: 100%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="control">
+      <h1>%title%</h1>
+      <form action="./login" method="post">
+        <div>%usercaption%<br /><input class="text" type="text" name="annis-login-user" value=""/></div>
+        <div>%passwordcaption%<br /><input class="text" type="password" name="annis-login-password" value=""/></div>
+        <div class="loginButtonBox">
+          <input type="submit" value="%logincaption%"/> %or% 
+          <a href="javascript:window.parent.annis.gui.logincallback();">%cancelcaption%</a>
+        </div>
+      </form>
+    </div>
+  </body>
+</html>
