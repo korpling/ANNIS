@@ -45,11 +45,6 @@
       <artifactId>vaadin-theme-compiler</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-push</artifactId>
-      <version>${vaadin.version}</version>
-    </dependency>
     
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
