@@ -167,6 +167,7 @@
         <entry key="ogg" value="audio/ogg"/>
         <entry key="wav" value="audio/wav"/>
         <entry key="mp3" value="audio/mpeg"/>
+        <entry key="mp4" value="video/mp4" />
         <entry key="pdf" value="application/pdf"/>
         <entry key="css" value="text/css"/>
         <entry key="config" value="application/x-config+text"/>

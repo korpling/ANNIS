@@ -23,7 +23,6 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.gui.widgets.VideoPlayer;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
