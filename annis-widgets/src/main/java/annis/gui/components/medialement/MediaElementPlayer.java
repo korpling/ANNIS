@@ -16,56 +16,103 @@
 package annis.gui.components.medialement;
 
 import annis.libgui.media.MediaPlayer;
+import annis.visualizers.LoadableVisualizer;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.server.ClassResource;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.JavaScriptFunction;
+import java.util.HashSet;
+import java.util.Set;
+import org.json.JSONArray;
+import org.json.JSONException;
 
 /**
- * An video/audio player based on the medialement.js library ({@link http://mediaelementjs.com/})
+ * An video/audio player based on the medialement.js library
+ * ({@link http://mediaelementjs.com/})
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@JavaScript({"vaadin://mediaelement/jquery.js", "vaadin://mediaelement/mediaelement-and-player.min.js", "mediaelement_connector.js"})
-@StyleSheet({"vaadin://mediaelement/mediaelementplayer.min.css"})
-public class MediaElementPlayer extends AbstractJavaScriptComponent 
-  implements MediaPlayer
+@JavaScript(
 {
-  
-  public MediaElementPlayer(MediaElement elementType, String resourceURL, String mimeType)
-  { 
+  "vaadin://mediaelement/jquery.js", "vaadin://mediaelement/mediaelement-and-player.js", "mediaelement_connector.js"
+})
+@StyleSheet(
+{
+  "vaadin://mediaelement/mediaelementplayer.min.css"
+})
+public class MediaElementPlayer extends AbstractJavaScriptComponent
+  implements MediaPlayer, LoadableVisualizer
+{
+
+  private Set<Callback> callbacks;
+
+  private boolean wasLoaded;
+
+  public MediaElementPlayer(MediaElement elementType, String resourceURL,
+    String mimeType)
+  {
+    this.callbacks = new HashSet<Callback>();
+    this.wasLoaded = false;
+
     getState().setElementType(elementType);
     getState().setResourceURL(resourceURL);
     getState().setMimeType(mimeType);
+
+    final MediaElementPlayer finalThis = this;
+    addFunction("wasLoaded", new JavaScriptFunction()
+    {
+      @Override
+      public void call(JSONArray arguments) throws JSONException
+      {
+        wasLoaded = true;
+        for (Callback c : callbacks)
+        {
+          c.visualizerLoaded(finalThis);
+        }
+      }
+    });
+
   }
-  
+
   @Override
-  public final MediaState getState() 
+  public final MediaState getState()
   {
     return (MediaState) super.getState();
   }
-  
+
   @Override
   public void play(double start)
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    callFunction("play", start);
   }
 
   @Override
   public void play(double start, double end)
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    callFunction("playRange", start, end);
   }
 
   @Override
   public void pause()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    callFunction("pause");
   }
 
   @Override
-  public void stop()
+  public boolean isLoaded()
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    return wasLoaded;
   }
-  
+
+  @Override
+  public void clearCallbacks()
+  {
+    callbacks.clear();
+  }
+
+  @Override
+  public void addOnLoadCallBack(Callback callback)
+  {
+    callbacks.add(callback);
+  }
 }

@@ -86,7 +86,6 @@ public abstract class MediaPlayerBase extends AbstractComponent
     requestRepaint();
   }
 
-  @Override
   public void stop()
   {
     action = PlayerAction.stop;

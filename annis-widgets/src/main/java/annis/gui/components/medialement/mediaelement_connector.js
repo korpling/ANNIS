@@ -14,42 +14,77 @@
  * limitations under the License.
  */
 
-window.annis_gui_components_medialement_MediaElementPlayer =
-function() {
-    var connector = this;
-    var rootDiv = $(this.getElement(this.getParentId()));
-  
-    var mediaElement = null;
-    var player = null;
-    
-    //TODO: Create the component
-   
-    // Handle changes from the server-side
-    this.onStateChange = function() {
-      if(mediaElement === null)
-        {
-          mediaElement = $(document.createElement(this.getState().elementType));
-          rootDiv.append(mediaElement);
-          
-          mediaElement.attr("controls", "controls");
-          
-          var mediaElementSrc = $(document.createElement("source"));
-          mediaElement.append(mediaElementSrc);
-          
-          mediaElementSrc.attr("type", this.getState().mimeType);
-          mediaElementSrc.attr("src", this.getState().resourceURL);
-          
-          var options = {};
-          options.alwaysShowControls=true;
-          player = new MediaElementPlayer(mediaElement.get(), options);
-          player.play();
-        }
-      // TODO
-    };
+window.annis_gui_components_medialement_MediaElementPlayer = function() {
+  var connector = this;
+  var rootDiv = $(this.getElement(this.getParentId()));
 
-    // Pass user interaction to the server-side
-    //mycomponent.click = function() {
-      // TODO
-      //  connector.onClick(mycomponent.getValue());
-    //};
+  var mediaElement;
+  var globalPlayer;
+
+  // Handle changes from the server-side
+  this.onStateChange = function() {
+    if (!mediaElement)
+    {
+      mediaElement = $(document.createElement(this.getState().elementType));
+      rootDiv.append(mediaElement);
+
+      mediaElement.attr("controls", "controls");
+
+      var mediaElementSrc = $(document.createElement("source"));
+      mediaElement.append(mediaElementSrc);
+
+      mediaElementSrc.attr("type", this.getState().mimeType);
+      mediaElementSrc.attr("src", this.getState().resourceURL);
+
+      var loadedCallback = function(e) {
+        connector.wasLoaded();
+      };
+
+      var options = {};
+      options.alwaysShowControls = false;
+      options.success = function(media, domObject, internalPlayer) {
+        globalPlayer = $(media);
+        globalPlayer.on('canplay', loadedCallback);
+      };
+
+      mediaElement.mediaelementplayer(options);
+
+    }
+  };
+
+  this.play = function(start) {
+    if (globalPlayer) {
+      globalPlayer[0].pause();
+      globalPlayer[0].setCurrentTime(start);
+      globalPlayer[0].play();
+    }
+  };
+
+  this.playRange = function(start, end) {
+    if (globalPlayer) {
+      globalPlayer[0].pause();
+      globalPlayer[0].setCurrentTime(start);
+
+      var timeHandler = function()
+      {
+        if (end !== null && globalPlayer[0].currentTime >= end)
+        {
+          globalPlayer[0].pause();
+        }
+      };
+      globalPlayer.on("timeupdate", timeHandler);
+      globalPlayer.on("pause", function()
+      {
+        globalPlayer.off();
+      });
+
+      globalPlayer[0].play();
+    }
+  };
+
+  this.pause = function() {
+    if (globalPlayer !== null) {
+      globalPlayer[0].play();
+    }
+  };
 };
