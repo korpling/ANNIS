@@ -16,7 +16,7 @@
 
 window.annis_gui_components_medialement_MediaElementPlayer = function() {
   var connector = this;
-  var rootDiv = $(this.getElement(this.getParentId()));
+  var rootDiv = $(this.getElement(this.getConnectorId()));
 
   var mediaElement = null;
   var globalPlayer = null;
