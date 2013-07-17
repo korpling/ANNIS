@@ -16,6 +16,8 @@
 package annis.visualizers.component;
 
 import annis.CommonHelper;
+import annis.gui.components.medialement.MediaElement;
+import annis.gui.components.medialement.MediaElementPlayer;
 import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
@@ -39,7 +41,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
-public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
+public class VideoVisualizer extends AbstractVisualizer<MediaElementPlayer>
 {
 
   private Logger log = LoggerFactory.getLogger(VideoVisualizer.class);
@@ -51,7 +53,7 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
   }
 
   @Override
-  public VideoPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle)
+  public MediaElementPlayer createComponent(VisualizerInput input, VisualizationToggle visToggle)
   {
     List<String> corpusPath =
       CommonHelper.getCorpusPath(input.getDocument().getSCorpusGraph(), input.getDocument());
@@ -101,8 +103,9 @@ public class VideoVisualizer extends AbstractVisualizer<VideoPlayer>
       + "&toplevelCorpusName=" + corpusName
       + "&mime=" + mimeTypeEncoded;
     
-    VideoPlayer player = new VideoPlayer(binaryServletPath, mimeType);
-
+    MediaElementPlayer player = new MediaElementPlayer(MediaElement.video,
+      binaryServletPath, mimeType);
+    
     if (VaadinSession.getCurrent().getAttribute(MediaController.class) != null)
     {
       VaadinSession.getCurrent().getAttribute(MediaController.class)
