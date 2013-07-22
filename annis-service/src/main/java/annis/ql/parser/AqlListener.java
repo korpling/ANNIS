@@ -20,8 +20,8 @@ import annis.model.LogicClause;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
-import annis.ql.AqlBaseListener;
 import annis.ql.AqlParser;
+import annis.ql.AqlParserBaseListener;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -53,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class AqlListener extends AqlBaseListener
+public class AqlListener extends AqlParserBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
@@ -112,7 +112,7 @@ public class AqlListener extends AqlBaseListener
   {
     alternativeStack.remove(0);
   }
-
+  
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
@@ -590,7 +590,7 @@ public class AqlListener extends AqlBaseListener
    * @node
    * @type00
    */
-  private void join(ParserRuleContext<Token> ctx, Class<? extends Join> type)
+  private void join(ParserRuleContext ctx, Class<? extends Join> type)
   {
     QueryNode left = nodeByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
     QueryNode right = nodeByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());

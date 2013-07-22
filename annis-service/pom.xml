@@ -264,7 +264,7 @@
     <dependency>
       <groupId>com.tunnelvisionlabs</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.0</version>
+      <version>4.1</version>
       <scope>compile</scope>
     </dependency>
     
@@ -319,7 +319,7 @@
       <plugin>
         <groupId>com.tunnelvisionlabs</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.0</version>
+        <version>4.1</version>
         <executions>
           <execution>
            <goals>

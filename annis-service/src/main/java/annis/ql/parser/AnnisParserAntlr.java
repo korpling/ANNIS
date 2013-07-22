@@ -52,7 +52,7 @@ public class AnnisParserAntlr
     AqlLexer lexer = new AqlLexer(new ANTLRInputStream(aql));
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
-
+    
     final List<String> errors = new LinkedList<String>();
 
     parser.removeErrorListeners();

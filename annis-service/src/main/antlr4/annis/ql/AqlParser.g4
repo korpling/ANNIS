@@ -14,106 +14,24 @@
  * limitations under the License.
  */
 
-grammar Aql;
+parser grammar AqlParser;
 
 options
 {
-  language = Java;
+  language=Java;
+  tokenVocab=AqlLexer;
 }
 
-// additional tokens
-tokens {
-	RANGE,
-	ANNO,
-	FROM_TO,
-	DOM
-}
-  
-TOK:'tok';
-NODE:'node';
-META:'meta';
-AND:'&';
-OR:'|';
-EQ:'=';
-NEQ:'!=';
-DOMINANCE:'>';
-POINTING:'->';
-PRECEDENCE:'.';
-IDENT_COV:'_=_';
-INCLUSION:'_i_';
-OVERLAP:'_o_';
-LEFT_ALIGN:'_l_';
-RIGHT_ALIGN:'_r_';
-LEFT_OVERLAP:'_ol_';
-RIGHT_OVERLAP:'_or_';
-LEFT_CHILD:'@l';
-RIGHT_CHILD:'@r';
-COMMON_PARENT:'$';
-ROOT:':root';
-ARITY:':arity';
-TOKEN_ARITY:':tokenarity';
-COMMA:',';
-STAR:'*';
-BRACE_OPEN:'(';
-BRACE_CLOSE:')';
-BRACKET_OPEN:'[';
-BRACKET_CLOSE:']';
-SLASH:'/';
-DOUBLE_QUOTE:'"';
-COLON:':';
-DOUBLECOLON:'::';
-
-
-WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
-
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
-    ;
-    
-REF
-	:	'#' ( '0' .. '9' )+
-	;
-
-DIGITS : ('0'..'9')+;
-
-
-fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
-fragment
-UNICODE_ESC
-    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    ;
-
-fragment
-OCTAL_ESC
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
-
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\'|'/')
-    |   UNICODE_ESC
-    |   OCTAL_ESC
-    ;
 
 start 
 	: exprTop EOF
 	;
 
-exactText
-  : ( ESC_SEQ | ~(DOUBLE_QUOTE) )+
-  ;
-
-regexText
-  : ( ESC_SEQ | ~(SLASH) )+
-  ;
-
 textSpec 
-	:	DOUBLE_QUOTE  DOUBLE_QUOTE # EmptyExactTextSpec
-  | DOUBLE_QUOTE content=exactText DOUBLE_QUOTE # ExactTextSpec
-  | SLASH SLASH #EmptyRegexTextSpec
-  | SLASH content=regexText SLASH # RegexTextSpec
+	:	START_TEXT_PLAIN  END_TEXT_PLAIN # EmptyExactTextSpec
+  | START_TEXT_PLAIN content=TEXT_PLAIN END_TEXT_PLAIN # ExactTextSpec
+  | START_TEXT_REGEX END_TEXT_REGEX #EmptyRegexTextSpec
+  | START_TEXT_REGEX content=TEXT_REGEX END_TEXT_REGEX # RegexTextSpec
 	;
 
 rangeSpec
