@@ -66,7 +66,11 @@ public class CorpusConfig implements Serializable
       config = new Properties();
     }
 
-    if(configName != null && configValue != null)
+    if(configValue == null)
+    {
+      config.remove(configName);
+    }
+    else
     {
       config.setProperty(configName, configValue);
     }

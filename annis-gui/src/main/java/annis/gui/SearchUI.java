@@ -58,6 +58,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.xeoh.plugins.base.PluginManager;
@@ -787,7 +788,33 @@ public class SearchUI extends AnnisBaseUI
           mappedCorpora.add(c);
         }
       }
-      queryController.setQuery(new Query("tok", mappedCorpora));
+      
+      // get list of all corpora
+      WebResource rootRes = Helper.getAnnisWebResource();
+      List<AnnisCorpus> allCorpora = rootRes.path("query").path("corpora")
+        .get(new GenericType<List<AnnisCorpus>>() {});
+      Set<String> allCorpusNames = new HashSet<String>();
+      for(AnnisCorpus c : allCorpora)
+      {
+        allCorpusNames.add(c.getName());
+      }
+      
+      // remove all corpora selections that do not exist
+      boolean someCorporaRemoved = mappedCorpora.retainAll(allCorpusNames);
+      
+      if(someCorporaRemoved)
+      {
+        // show a warning message that the corpus was not imported yet
+        new Notification("Linked corpus does not exist", 
+          "The corpus you wanted to access unfortunally does not (yet) exist in ANNIS<br/>"
+          + "A possible reason is that it has not been imported yet. Please ask the "
+          + "responsible person of the site that contained the link to import the corpus.", 
+          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      }
+      else
+      {
+        queryController.setQuery(new Query("tok", mappedCorpora));
+      }
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
