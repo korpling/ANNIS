@@ -4,7 +4,7 @@ Installing {#admin-install}
 [TOC]
 
 
-Installing an ANNIS public server {#testtest}
+Installing an ANNIS public server {#admin-install-server}
 ================================
 
 
