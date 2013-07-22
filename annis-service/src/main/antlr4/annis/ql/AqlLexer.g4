@@ -67,26 +67,6 @@ REF
 
 DIGITS : ('0'..'9')+;
 
-fragment
-HEX_DIGIT : ('0'..'9'|'a'..'f'|'A'..'F') ;
-
-fragment
-UNICODE_ESC
-    :   '\\' 'u' HEX_DIGIT HEX_DIGIT HEX_DIGIT HEX_DIGIT
-    ;
-
-fragment
-OCTAL_ESC
-    :   '\\' ('0'..'3') ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7') ('0'..'7')
-    |   '\\' ('0'..'7')
-    ;
-
-ESC_SEQ
-    :   '\\' ('b'|'t'|'n'|'f'|'r'|'\"'|'\''|'\\'|'/')
-    |   UNICODE_ESC
-    |   OCTAL_ESC
-    ;
 
 START_TEXT_REGEX : '/' -> pushMode(IN_REGEX);
 START_TEXT_PLAIN:'"' -> pushMode(IN_TEXT);
