@@ -1,10 +1,12 @@
 Installing {#admin-install}
-===========================
+==========
 
 [TOC]
 
-Installing an ANNIS public server {#admin-install-server}
----------------------------------
+
+Installing an ANNIS public server {#testtest}
+================================
+
 
 The ANNIS server version can be installed on UNIX based server, or else under
 Windows using Cygwin [http://www.cygwin.com/], the freely available UNIX
@@ -35,11 +37,18 @@ tar xzvf annis-service-<version>-distribution.tar.gz -C <installation directory>
 export ANNIS_HOME=<installation directory>
 export PATH=$PATH:$ANNIS_HOME/bin
 \endcode
-6. Next initialize your ANNIS database (only the first time you use the system):
+6. Next initialize your ANNIS database (only the first time you use the system).
+When the ANNIS service is normally installed, it assumes it can get PostgreSQL super user rights for this step. Thus you need the superuser password.
 \code{.sh}
-annis-admin.sh init -u <username> -d <dbname> -p
--P <postgres password>
+annis-admin.sh init -u <username> -d <dbname> -p <new user password>
+-P <postgres superuser password>
 \endcode
+This call will 
+<ul><li>create a new database with the name given by the "-d" parameter</li>
+<li>create a new PostgreSQL user with the user name given by the "-u" parameter and the password given by the "-p" parameter</li>
+<li>create all necessary tables, PSQL functions and initial data in the database</li></ul>
+\warning Do not use "postgres" as database name for ANNIS since it is reserved by PostgresSQL itself.
+
 You can omit the PostgreSQL administrator password option (`-P`). Then the database and user must already
 exists. E.g. you should execute the following as PostgreSQL administrator:
 \code{.sql}
@@ -72,8 +81,8 @@ container (this is depending on the servlet container you use).
 We also **strongly recommend** reconfiguring the Postgres server’s default
 settings as described [here](@ref admin-configure-postgresql).
 
-Installing a local version (ANNIS Kickstarter) {#admin-install-kickstarter}
-----------------------------------------------
+Installing a local version (ANNIS Kickstarter)     {#admin-install-kickstarter}
+==============================================
 
 Local users who do not wish to make their corpora available online can install
 ANNIS Kickstarter under most versions of Linux, Windows and Mac OS. To install
