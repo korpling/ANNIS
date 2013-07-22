@@ -73,26 +73,23 @@ public class Precedence extends RangedJoin
   }
 
   @Override
-  public String toAQLFragment(QueryNode source)
+  public String toAqlOperator()
   {
     if(minDistance == 0 && maxDistance == 0 && segmentationName == null)
     {
-      return "#" + source.getVariable()  + " . " + target.getVariable();
+      return ".";
     }
     else if(minDistance == 0 && maxDistance == 0)
     {
-      return "#" + source.getVariable()  + " ." + segmentationName
-        + " #" + target.getVariable();
+      return "." + segmentationName;
     }
     else if(segmentationName == null)
     {
-      return "#" + source.getVariable()  + " ." 
-        + minDistance + "," + maxDistance + " #" + target.getVariable();
+      return "." + minDistance + "," + maxDistance;
     }
     else
     {
-      return "#" + source.getVariable()  + " ." + segmentationName + " " 
-        + minDistance + "," + maxDistance + " #" + target.getVariable();
+      return "." + segmentationName + " " + minDistance + "," + maxDistance;
     }
   }
   

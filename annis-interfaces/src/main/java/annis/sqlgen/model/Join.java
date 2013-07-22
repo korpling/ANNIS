@@ -37,6 +37,11 @@ public abstract class Join extends DataObject {
 	
   public String toAQLFragment(QueryNode source)
   {
+    return "#" + source.getVariable() + toAqlOperator() + " #" + target.getVariable();
+  }
+  
+  public String toAqlOperator()
+  {
     return "X";
   }
   

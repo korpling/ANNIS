@@ -71,6 +71,27 @@ public class Dominance extends RankTableJoin {
         + minDistance + "," + maxDistance + " #" + target.getVariable();
     }
   }
+
+  @Override
+  public String toAqlOperator()
+  {
+    if(minDistance == 0 && maxDistance == 0 && name == null)
+    {
+      return  ">";
+    }
+    else if(minDistance == 0 && maxDistance == 0)
+    {
+      return  ">" + name;
+    }
+    else if(name == null)
+    {
+      return ">" + minDistance + "," + maxDistance;
+    }
+    else
+    {
+      return ">" + name + " "  + minDistance + "," + maxDistance ;
+    }
+  }
   
   
 

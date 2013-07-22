@@ -35,5 +35,13 @@ public class Identical extends Join
     return "identical node " + target.getId();
   }
 
+  @Override
+  public String toAqlOperator()
+  {
+    return "=";
+  }
+  
+  
+  
 
 }
