@@ -1283,7 +1283,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
       else
       {
-        log.info("statement controller is not initialized");
+        log.debug("statement controller is not initialized");
       }
 
       jdbcTemplate.execute(cancelableStats, cancelableStats);

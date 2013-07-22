@@ -23,6 +23,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import static annis.model.AnnisConstants.*;
 import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Properties;
 import java.util.SortedMap;
 import java.util.TreeMap;
@@ -108,12 +109,12 @@ public class PDFPageHelper {
   }
 
   /**
-   * Returns the value of page annotiation for a span. It takes the visualizer
+   * Returns the value of page annotiation for a node. It takes the visualizer
    * mappings into account. If no mapping is used, this definition is used: {@link
    * #PAGE_NUMBER_ANNOATATION_NAME}
    *
    */
-  public String getPageFromAnnotation(SSpan node) {
+  public String getPageFromAnnotation(SNode node) {
     if (node != null && node.getSAnnotations() != null) {
 
       EList<SLayer> layers = node.getSLayers();
