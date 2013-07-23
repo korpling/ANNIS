@@ -47,13 +47,13 @@ public class SemanticValidator implements QueryDataTransformer
     int i = 1;
     for (List<QueryNode> alternative : data.getAlternatives())
     {
-      checkAlternative(alternative, i++);
+      checkAlternative(data, alternative, i++);
     }
     // we actually don't manipulate the output
     return data;
   }
 
-  public void checkAlternative(List<QueryNode> alternative, int alternativeIndex)
+  public void checkAlternative(QueryData data, List<QueryNode> alternative, int alternativeIndex)
   {
     // check if there is at least one search expression
     if (alternative.isEmpty())
@@ -101,11 +101,22 @@ public class SemanticValidator implements QueryDataTransformer
           variables.add(n.getVariable());
         }
       }
-      throw new AnnisQLSemanticsException("Variable(s) ["
-        + Joiner.on(",").join(variables)
-        + "] not bound in alternative "
-        + alternativeIndex + "(use linguistic operators).");
-
+      
+      if(alternative.size() == 1)
+      {
+        throw new AnnisQLSemanticsException("Variable(s) ["
+          + Joiner.on(",").join(variables)
+          + "] not bound (use linguistic operators).");
+      }
+      else
+      {
+        throw new AnnisQLSemanticsException("Variable(s) ["
+          + Joiner.on(",").join(variables)
+          + "] not bound in alternative "
+          + alternativeIndex + "(use linguistic operators). "
+          + "Normalized query is: \n"
+          + data.toAQL());
+      }
     }
   }
   

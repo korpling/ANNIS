@@ -326,7 +326,7 @@ public class QueryNode implements Serializable
 
     if (nodeAnnotations.isEmpty())
     {
-      if(!isToken())
+      if(sb.length() == 0)
       {
         sb.append("node");
       }

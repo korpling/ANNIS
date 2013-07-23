@@ -49,48 +49,31 @@ public class Dominance extends RankTableJoin {
 	}
 
   @Override
-  public String toAQLFragment(QueryNode source)
-  {
-    if(minDistance == 0 && maxDistance == 0 && name == null)
-    {
-      return "#" + source.getVariable()  + " > " + target.getVariable();
-    }
-    else if(minDistance == 0 && maxDistance == 0)
-    {
-      return "#" + source.getVariable()  + " >" + name
-        + " #" + target.getVariable();
-    }
-    else if(name == null)
-    {
-      return "#" + source.getVariable()  + " >" 
-        + minDistance + "," + maxDistance + " #" + target.getVariable();
-    }
-    else
-    {
-      return "#" + source.getVariable()  + " >" + name + " " 
-        + minDistance + "," + maxDistance + " #" + target.getVariable();
-    }
-  }
-
-  @Override
   public String toAqlOperator()
   {
-    if(minDistance == 0 && maxDistance == 0 && name == null)
+    String extraDistance = "";
+    if(minDistance == 0 && maxDistance == 0 )
     {
-      return  ">";
+      extraDistance = "*";
     }
-    else if(minDistance == 0 && maxDistance == 0)
+    else if(minDistance > 1 && minDistance == maxDistance)
     {
-      return  ">" + name;
+      extraDistance = "" + minDistance;
     }
-    else if(name == null)
+    else if(minDistance > 1 || maxDistance > 1)
     {
-      return ">" + minDistance + "," + maxDistance;
+      extraDistance = "" + minDistance + "," + maxDistance;
+    }
+    
+    if(name == null)
+    {
+      return ">" + extraDistance;
     }
     else
     {
-      return ">" + name + " "  + minDistance + "," + maxDistance ;
+      return ">" + name + " " + extraDistance;
     }
+
   }
   
   
