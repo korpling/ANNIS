@@ -113,7 +113,8 @@ public class TestAnnisParserExamples {
     
     try
     {
-      QueryData result = parserAntlr.parse(annisQuery, new LinkedList<Long>());
+      QueryData result = parserAntlr.parse(annisQuery, 
+        new LinkedList<Long>());
       assertThat(result, is(not(nullValue())));
     }
     catch (Exception ex)
@@ -125,7 +126,6 @@ public class TestAnnisParserExamples {
 	
 	@Theory
   @Test
-  @Ignore
 	public void testBadQueriesAntLR(
 			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
 			String annisQuery) {

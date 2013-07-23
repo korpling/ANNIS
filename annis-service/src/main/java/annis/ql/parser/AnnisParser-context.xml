@@ -48,7 +48,9 @@ limitations under the License.
 		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
 	</util:list>
   
-  <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype">
+  <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype"> 
+    <bean class="annis.ql.parser.SemanticValidator" 
+          scope="prototype" />
 		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" 
           scope="prototype" />
 	</util:list>

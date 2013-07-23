@@ -324,12 +324,20 @@ public class QueryNode implements Serializable
     }
 
 
-    if (!nodeAnnotations.isEmpty())
+    if (nodeAnnotations.isEmpty())
+    {
+      if(!isToken())
+      {
+        sb.append("node");
+      }
+    }
+    else
     {
       QueryAnnotation anno=nodeAnnotations
         .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
 
       sb.append(anno.getQualifiedName());
+      sb.append(anno.getTextMatching().aqlOperator);
       sb.append(anno.getTextMatching().quote());
       sb.append(anno.getValue());
       sb.append(anno.getTextMatching().quote());
