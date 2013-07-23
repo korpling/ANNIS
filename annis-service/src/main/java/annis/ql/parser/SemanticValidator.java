@@ -18,15 +18,13 @@ package annis.ql.parser;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.QueryNode;
 import annis.sqlgen.model.Join;
-import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
-import java.util.HashMap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -76,7 +74,7 @@ public class SemanticValidator implements QueryDataTransformer
     }
     
     // get all nodes connected to the first one
-    Map<Long, Set<QueryNode>> connected = calculateConnected(alternative);
+    Multimap<Long, QueryNode> connected = calculateConnected(alternative);
     Set<Long> transitiveHull = new HashSet<Long>();
     transitiveHull.add(alternative.get(0).getId());
     createTransitiveHull(alternative.get(0), 
@@ -120,9 +118,9 @@ public class SemanticValidator implements QueryDataTransformer
     }
   }
   
-  private Map<Long, Set<QueryNode>> calculateConnected(List<QueryNode> nodes)
+  private Multimap<Long, QueryNode> calculateConnected(List<QueryNode> nodes)
   {
-    Map<Long, Set<QueryNode>> result = new HashMap<Long, Set<QueryNode>>();
+    Multimap<Long, QueryNode> result = HashMultimap.create();
     
     for(QueryNode n : nodes)
     {
@@ -133,16 +131,8 @@ public class SemanticValidator implements QueryDataTransformer
           long left = n.getId();
           long right = j.getTarget().getId();
           
-          if(result.get(left) == null)
-          {
-            result.put(left, new HashSet<QueryNode>());
-          }
-          if(result.get(right) == null)
-          {
-            result.put(right, new HashSet<QueryNode>());
-          }
-          result.get(left).add(j.getTarget());
-          result.get(right).add(n);
+          result.put(left, j.getTarget());
+          result.put(right, n);
         }
       }
     }
@@ -151,10 +141,10 @@ public class SemanticValidator implements QueryDataTransformer
   }
   
   private void createTransitiveHull(QueryNode n, 
-    final Map<Long, Set<QueryNode>> connected, 
+    final Multimap<Long, QueryNode> connected, 
     Set<Long> transitiveHull)
   {
-    Set<QueryNode> outgoing = connected.get(n.getId());
+    Collection<QueryNode> outgoing = connected.get(n.getId());
     if(outgoing != null)
     {
       for(QueryNode otherNode : outgoing)
