@@ -54,7 +54,7 @@ public class TestQueryAnalysis {
 
 	// simple QueryAnalysis instance with mocked dependencies
 	@InjectMocks private QueryAnalysis queryAnalysis = new QueryAnalysis();
-	@Mock private DnfTransformer dnfTransformer;
+	@Mock private DnfTransformerDepthFirstAdapter dnfTransformer;
 	@Mock private ClauseAnalysis clauseAnalysis;
 	@Mock private NodeRelationNormalizer nodeRelationNormalizer;
 	
@@ -183,8 +183,8 @@ public class TestQueryAnalysis {
     ClauseAnalysis clauseAnalysis1 = springManagedQueryAnalysis.getClauseAnalysis();
     ClauseAnalysis clauseAnalysis2 = springManagedQueryAnalysis.getClauseAnalysis();
     assertThat(clauseAnalysis1, is(not(sameInstance(clauseAnalysis2))));
-    DnfTransformer dnfTransformer1 = springManagedQueryAnalysis.getDnfTransformer();
-    DnfTransformer dnfTransformer2 = springManagedQueryAnalysis.getDnfTransformer();
+    DnfTransformerDepthFirstAdapter dnfTransformer1 = springManagedQueryAnalysis.getDnfTransformer();
+    DnfTransformerDepthFirstAdapter dnfTransformer2 = springManagedQueryAnalysis.getDnfTransformer();
     assertThat(dnfTransformer1, is(not(sameInstance(dnfTransformer2))));
     NodeRelationNormalizer nodeRelationNormalizer1 = springManagedQueryAnalysis.getNodeRelationNormalizer();
     NodeRelationNormalizer nodeRelationNormalizer2 = springManagedQueryAnalysis.getNodeRelationNormalizer();

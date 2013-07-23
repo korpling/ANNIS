@@ -35,11 +35,11 @@ import annis.ql.node.TDigits;
 public class QueryValidator extends DepthFirstAdapter
 {
 
-  private DnfTransformer dnfTransformer;
+  private DnfTransformerDepthFirstAdapter dnfTransformer;
 
   public QueryValidator()
   {
-    dnfTransformer = new DnfTransformer();
+    dnfTransformer = new DnfTransformerDepthFirstAdapter();
   }
 
   @Override

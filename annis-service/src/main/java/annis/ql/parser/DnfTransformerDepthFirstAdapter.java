@@ -34,10 +34,10 @@ import annis.ql.node.Start;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class DnfTransformer extends DepthFirstAdapter
+public class DnfTransformerDepthFirstAdapter extends DepthFirstAdapter
 {
 
-  private static final Logger log = LoggerFactory.getLogger(DnfTransformer.class);
+  private static final Logger log = LoggerFactory.getLogger(DnfTransformerDepthFirstAdapter.class);
   private SearchExpressionCounter counter;
   private DnfNodeRelNumberUpdater relNumberUpdater;
 

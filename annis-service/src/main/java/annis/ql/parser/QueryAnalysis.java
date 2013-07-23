@@ -38,7 +38,7 @@ public class QueryAnalysis
   // use each node in exactly one edge relation
   private boolean normalizeNodesInEdgeRelations;
 
-  private DnfTransformer dummyDnfTransformer;
+  private DnfTransformerDepthFirstAdapter dummyDnfTransformer;
 
   private ClauseAnalysis dummyClauseAnalysis;
 
@@ -57,7 +57,7 @@ public class QueryAnalysis
 
     // split statement into list of clauses
 
-    DnfTransformer dnfTransformer = getDnfTransformer();
+    DnfTransformerDepthFirstAdapter dnfTransformer = getDnfTransformer();
     statement.apply(dnfTransformer);
     List<PExpr> clauses = dnfTransformer.listClauses(statement);
 
@@ -98,12 +98,12 @@ public class QueryAnalysis
     return queryData;
   }
 
-  public DnfTransformer getDnfTransformer()
+  public DnfTransformerDepthFirstAdapter getDnfTransformer()
   {
     return dummyDnfTransformer;
   }
 
-  public void setDnfTransformer(DnfTransformer dnfTransformer)
+  public void setDnfTransformer(DnfTransformerDepthFirstAdapter dnfTransformer)
   {
     this.dummyDnfTransformer = dnfTransformer;
   }

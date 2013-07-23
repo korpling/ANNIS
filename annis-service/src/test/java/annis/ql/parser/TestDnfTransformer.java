@@ -41,14 +41,14 @@ import annis.ql.parser.AstComparator.DifferentTreeException;
 public class TestDnfTransformer {
 	
 	// class under test
-	private DnfTransformer dnfTransformer;
+	private DnfTransformerDepthFirstAdapter dnfTransformer;
 	private PExpr leaf1;
 	private PExpr leaf2;
 	private PExpr leaf3;
 	
 	@Before
 	public void setup() {
-		dnfTransformer = new DnfTransformer();
+		dnfTransformer = new DnfTransformerDepthFirstAdapter();
 
 		leaf1 = newAnnotationSearchExpr("leaf1");
 		leaf2 = newAnnotationSearchExpr("leaf2");
