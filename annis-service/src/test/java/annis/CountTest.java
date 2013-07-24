@@ -102,6 +102,10 @@ public class CountTest
     
     assertEquals(5, countPcc2("cat=\"NP\" & #1:arity=3 & node & #1 > #2 & #2:arity=3"));
     
+    assertEquals(8, countPcc2("cat=\"S\" & tok & #1 >secedge #2\n" +
+      "& cat=\"S\" \n" +
+      "& #3 >* #2"));
+
   }
   
   @Test

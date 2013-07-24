@@ -187,6 +187,17 @@ public class QueryNode implements Serializable
     this.tokenIndex = other.tokenIndex;
     this.variable = other.variable;
   }
+  
+  /**
+   * Copy constructor that allows to change the ID.
+   * @param newId
+   * @param other 
+   */
+  public QueryNode(long newId, QueryNode other)
+  {
+    this(other);
+    this.id = newId;
+  }
 
   public QueryNode(long id, long corpusRef, long textRef, long left,
     long right, String namespace, String name, long tokenIndex,
