@@ -22,10 +22,12 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.PointingRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -77,10 +79,11 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
   {
     Multimap<QueryNode, Join> joins = createJoinMap(nodes);
 
-    Multiset<QueryNode> keys = joins.keys();
-    for(QueryNode n : keys)
+    LinkedList<QueryNode> nodeCopy = new LinkedList<QueryNode>(nodes);
+    
+    for(QueryNode n : nodeCopy)
     {
-      if(keys.count(n) > 1)
+      if(joins.get(n).size() > 1)
       {
         // it is computational easier to replicate the a known target node, thus
         // search for a join where our current node is the target node
