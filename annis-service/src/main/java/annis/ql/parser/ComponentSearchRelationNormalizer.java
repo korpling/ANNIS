@@ -67,6 +67,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
       {
         // repeat
       }
+      data.setMaxWidth(Math.max(data.getMaxWidth(), alternative.size()));
     }
 
     return data;
