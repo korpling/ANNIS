@@ -20,10 +20,12 @@ import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.PointingRelation;
+import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
 
@@ -75,87 +77,68 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Multimap<QueryNode, Join> joins = createJoinMap(nodes);
 
     Multiset<QueryNode> keys = joins.keys();
-//    for (QueryNode source : keys)
-//    {
-//      if (keys.count(source) > 1)
-//      {
-//        ArrayList<Join> joinsForKey = new ArrayList<Join>(joins.get(source));
-//        Join joinToSplit = joinsForKey.get(0);
+    for(QueryNode n : keys)
+    {
+      if(keys.count(n) > 1)
+      {
+        // it is computational easier to replicate the a known target node, thus
+        // search for a join where our current node is the target node
+        Iterator<Join> itJoinsForNode = joins.get(n).iterator();
+        Join joinToSplit = itJoinsForNode.next();
         
-        // it is easier to replicate the target nodes, thus
-        // search for a join where our current node
+        if(joinToSplit.getTarget().getId() == n.getId())
+        {
+          replicateFromJoinTarget(joinToSplit, n, nodes, maxID);
+        }
+        else
+        {
+          replicateFromJoinSource(joinToSplit, n, nodes, maxID);
+        }
         
-        //TODO:
-//        while(joinToSplit.getTarget() != )
-//        
-//        QueryNode target = joinToCopy.getTarget();
-//        
-//        if (target != source)
-//        {
-//          // remove the join that will be copied
-//          source.getJoins().remove(joinToCopy);
-//
-//          QueryNode newSource = new QueryNode(maxID.incrementAndGet(),
-//            source);
-//          QueryNode newTarget = new QueryNode(maxID.incrementAndGet(),
-//            target);
-//
-//          newSource.getJoins().clear();
-//          newTarget.getJoins().clear();
-//
-//          // add the copied join to the new target
-//          joinToCopy.setTarget(newTarget);
-//          newSource.addJoin(joinToCopy);
-//
-//          // add additional joins that ensures the nodes are equal
-//          Identical identSource = new Identical(newSource);
-//          Identical identTarget = new Identical(newTarget);
-//
-//          source.addJoin(identSource);
-//          target.addJoin(identTarget);
-//
-//          nodes.add(newSource);
-//          nodes.add(newTarget);
-//        } // end if target node is not the current node
-//
-//        return true;
-//
-//      }
-//    }
+        return true;
+      }
+    }
+
     return false;
   }
   
-  private void replicateTargetOfJoin(Join join, QueryNode target, 
+  private void replicateFromJoinTarget(Join join, QueryNode node, 
     List<QueryNode> nodes, AtomicLong maxID)
   {
-    QueryNode newTarget = new QueryNode(maxID.incrementAndGet(), target);    
-    join.setTarget(newTarget);
+    QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
+    newNode.setVariable(newNode.getVariable() + "'");
     
-    Identical identJoin = new Identical(newTarget);
-    target.addJoin(identJoin);
+    join.setTarget(newNode);
     
-    nodes.add(newTarget);
+    Identical identJoin = new Identical(newNode);
+    node.addJoin(identJoin);
+    
+    nodes.add(newNode);
   }
   
-  private void replicateSourceOfJoin(Join join, QueryNode source,
+  private void replicateFromJoinSource(Join join, QueryNode node,
     List<QueryNode> nodes, AtomicLong maxID)
   {
-    QueryNode newSource = new QueryNode(maxID.incrementAndGet(), source);
-    source.getJoins().remove(join);
-    newSource.addJoin(join);
+    Preconditions.checkState(node.getJoins().remove(join), "The join was not attached to the source node.");
     
-    Identical identJoin = new Identical(newSource);
-    source.addJoin(identJoin);
+    QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node);
+    newNode.setVariable(newNode.getVariable() + "'");
+    newNode.addJoin(join);
     
-    nodes.add(newSource);
+    Identical identJoin = new Identical(newNode);
+    node.addJoin(identJoin);
+    
+    nodes.add(node);
   }
   
   private QueryNode searchSourceNode(Join j, List<QueryNode> nodes)
   {
     for(QueryNode n : nodes)
     {
-      if(n.getJoins().contains(j));
-      return n;
+      if(n.getJoins().contains(j))
+      {
+        return n;
+      }
     }
     return null;
   }
