@@ -24,8 +24,8 @@ sudo -u postgres psql
 \q
 \endcode
 
-2. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
-3. Make sure you have installed [JDK 6 or JDK 7](http://java.sun.com/javase/downloads/index.jsp)
+2. Make sure you have installed [JDK 6 or JDK 7](http://java.sun.com/javase/downloads/index.jsp)
+3. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
  (or install them if you don’t)
 4. Download the ANNIS service distribution file `annis-service-<version>-distribution.tar.gz` from our website
 and then unzip the downloaded file:
@@ -73,9 +73,17 @@ command.
 \code{.sh}
 annis-service.sh start
 \endcode
+If you don't want to use any authentification and every user should see every
+corpus without login you can start ANNIS with
+\code{.sh}
+annis-service-no-security.sh start
+\endcode
+instead of the default script.
 9. To get the ANNIS front-end running, first download annis-
 gui-<version>.war from our website and deploy it to your Java servlet
 container (this is depending on the servlet container you use).
+10. Configure users and groups as described [here](@ref admin-configure-user) 
+and define who is allowed to see which corpus.
 
 \note
 We also **strongly recommend** reconfiguring the Postgres server’s default
