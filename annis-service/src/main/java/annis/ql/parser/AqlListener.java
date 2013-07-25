@@ -594,12 +594,21 @@ public class AqlListener extends AqlParserBaseListener
   }
 
   @Override
-  public void enterVariableDefinition(AqlParser.VariableDefinitionContext ctx)
+  public void enterVariableTermExpr(AqlParser.VariableTermExprContext ctx)
   {
     lastVariableDefinition = null;
     if(ctx != null)
     {
-      lastVariableDefinition =  ctx.REF().getText().substring(1);
+      String text = ctx.VAR_DEF().getText();
+      // remove the trailing "#"
+      if(text.endsWith("#"))
+      {
+        lastVariableDefinition = text.substring(0, text.length()-1);
+      }
+      else
+      {
+        lastVariableDefinition = text;
+      }
     }
   }
   

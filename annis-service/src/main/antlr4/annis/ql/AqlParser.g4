@@ -96,10 +96,6 @@ unary_linguistic_term
 	|	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
 	;
 
-variableDefinition
-  : REF COLON
-  ;
-
 variableExpr
  	: TOK # TokOnlyExpr 
   | NODE # NodeExpr
@@ -110,7 +106,7 @@ variableExpr
   ;
 
 expr
-  : vardef=variableDefinition variableExpr # VariableTermExpr
+  : VAR_DEF variableExpr # VariableTermExpr
   | variableExpr # NoVariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
