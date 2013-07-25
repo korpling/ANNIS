@@ -111,12 +111,12 @@ variableExpr
 
 expr
   : vardef=variableDefinition variableExpr # VariableTermExpr
-  | variableDefinition # NoVariableTermExpr
+  | variableExpr # NoVariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
+  | BRACE_OPEN expr (AND expr)* BRACE_CLOSE # AndExpr
   | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # OrExpr
-  | BRACE_OPEN expr (AND expr)+ BRACE_CLOSE # AndExpr
   ;
 
 

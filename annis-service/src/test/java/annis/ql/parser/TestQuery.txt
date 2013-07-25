@@ -1,8 +1,8 @@
 pos="ART"
 & 
 (
-  ("Königstochter" & "wartete" & #2 . #3) 
+  (#tok:"Königstochter" & "wartete" & #tok . #3) 
   | 
-  ("mit")
+  (#tok:"mit")
 )
-& #a . #b
+& #1 . #tok
