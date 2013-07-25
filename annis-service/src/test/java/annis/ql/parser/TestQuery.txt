@@ -1,8 +1,8 @@
 pos="ART"
 & 
 (
-  (#tok:"Königstochter" & "wartete" & #tok . #3) 
+  (a#/[A-Z].*/ & lemma="warten" & #a . #3) 
   | 
-  (#tok:"mit")
+  (a#"mit")
 )
-& #1 . #tok
+& #1 . #a

@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.LogicClause;
 import annis.model.QueryNode;
@@ -69,10 +70,22 @@ public class AnnisParserAntlr
     ParseTree tree = parser.start();
     if (errors.isEmpty())
     {
+      
       ParseTreeWalker walker = new ParseTreeWalker();
       AqlListener listener = new AqlListener(precedenceBound);
-      walker.walk(listener, tree);
       
+      try
+      {
+        walker.walk(listener, tree);
+      }
+      catch(NullPointerException ex)
+      {
+        throw new AnnisQLSemanticsException(ex.getMessage());
+      }
+      catch(IllegalArgumentException ex)
+      {
+        throw new AnnisQLSemanticsException(ex.getMessage());
+      }
       LogicClause top = listener.getTop();
       DNFTransformer.toDNF(top);
       
@@ -88,9 +101,6 @@ public class AnnisParserAntlr
           data = transformer.transform(data);
         }
       }
-      // TODO: what more do we need to set in the QueryData?
-    
-      
       return data;
     }
     else
