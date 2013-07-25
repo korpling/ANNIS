@@ -1,1 +1,8 @@
-/abc/
+pos="ART"
+& 
+(
+  ("Königstochter" & "wartete" & #2 . #3) 
+  | 
+  ("mit")
+)
+& #a . #b

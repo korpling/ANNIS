@@ -38,12 +38,13 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.slf4j.Logger;
@@ -62,8 +63,9 @@ public class AqlListener extends AqlParserBaseListener
   private List<LogicClause> alternativeStack = new LinkedList<LogicClause>();
 
   private int aliasCount = 0;
+  private String lastVariableDefinition = null;
 
-  private Map<String, QueryNode> nodes = new HashMap<String, QueryNode>();
+  private Multimap<String, QueryNode> nodes = HashMultimap.create();
 
   private int precedenceBound;
   
@@ -215,76 +217,100 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterRootTerm(AqlParser.RootTermContext ctx)
   {
-    QueryNode target = nodeByRef(ctx.left);
-    Preconditions.checkNotNull(target, errorLHS("root"));
-    target.setRoot(true);
+    Collection<QueryNode> targets = nodesByRef(ctx.left);
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("root"));
+    for(QueryNode target : targets)
+    {
+      target.setRoot(true);
+    }
   }
 
   @Override
   public void enterArityTerm(AqlParser.ArityTermContext ctx)
   {
-    QueryNode target = nodeByRef(ctx.left);
-    Preconditions.checkNotNull(target, errorLHS("arity"));
-    target.setArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    Collection<QueryNode> targets = nodesByRef(ctx.left);
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("arity"));
+    
+    for(QueryNode target : targets)
+    {
+      target.setArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    }
   }
 
   @Override
   public void enterTokenArityTerm(AqlParser.TokenArityTermContext ctx)
   {
-    QueryNode target = nodeByRef(ctx.left);
-    Preconditions.checkNotNull(target, errorLHS("token-arity"));
-    target.setTokenArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    Collection<QueryNode> targets = nodesByRef(ctx.left);
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("token-arity"));
+    
+    for(QueryNode target : targets)
+    {
+      target.setTokenArity(annisRangeFromARangeSpec(ctx.rangeSpec()));
+    }
   }
 
   @Override
   public void enterDirectPrecedence(
     AqlParser.DirectPrecedenceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("precendence"));
-    Preconditions.checkNotNull(right, errorRHS("precendence"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
     
     String segmentationName = null;
     if(ctx.layer != null)
     {
       segmentationName=ctx.layer.getText();
     }
-    left.addJoin(new Precedence(right, 1, segmentationName));
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new Precedence(right, 1, segmentationName));
+      }
+    }
   }
 
   @Override
   public void enterIndirectPrecedence(
     AqlParser.IndirectPrecedenceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("precendence"));
-    Preconditions.checkNotNull(right, errorRHS("precendence"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
+    Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence"));
     
     String segmentationName = null;
     if(ctx.layer != null)
     {
       segmentationName=ctx.layer.getText();
     }
-    if(precedenceBound > 0)
+    
+    for (QueryNode left : nodesLeft)
     {
-      left.addJoin(
-        new Precedence(right, 1, precedenceBound, segmentationName));
-    }
-    else
-    {
-      left.addJoin(new Precedence(right, segmentationName));
+      for (QueryNode right : nodesRight)
+      {
+        if (precedenceBound > 0)
+        {
+          left.addJoin(
+            new Precedence(right, 1, precedenceBound, segmentationName));
+        }
+        else
+        {
+          left.addJoin(new Precedence(right, segmentationName));
+        }
+      }
     }
   }
 
   @Override
   public void enterRangePrecedence(AqlParser.RangePrecedenceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("precendence"));
-    Preconditions.checkNotNull(right, errorRHS("precendence"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
     
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
@@ -298,9 +324,17 @@ public class AqlListener extends AqlParserBaseListener
       {
         segmentationName=ctx.layer.getText();
       }
-
-      left.addJoin(
-        new Precedence(right, range.getMin(), range.getMax(), segmentationName));
+      
+      for (QueryNode left : nodesLeft)
+      {
+        for (QueryNode right : nodesRight)
+        {
+          left.addJoin(
+            new Precedence(right, range.getMin(), range.getMax(),
+            segmentationName));
+        }
+      }
+      
     }
   }
 
@@ -349,141 +383,192 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterDirectDominance(AqlParser.DirectDominanceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("dominance"));
-    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
     
-    if(ctx.anno != null)
+    for(QueryNode left : nodesLeft)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
-      for (QueryAnnotation a : annotations)
+      for(QueryNode right : nodesRight)
       {
-        right.addEdgeAnnotation(a);
-      }
-    }
     
-    if(ctx.LEFT_CHILD() != null)
-    {
-      left.addJoin(new LeftDominance(right, layer));
-    }
-    else if(ctx.RIGHT_CHILD() != null)
-    {
-      left.addJoin(new RightDominance(right, layer));
-    }
-    else
-    {
-      left.addJoin(new Dominance(right, layer, 1));
+        if(ctx.anno != null)
+        {
+          LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+          for (QueryAnnotation a : annotations)
+          {
+            right.addEdgeAnnotation(a);
+          }
+        }
+
+        if(ctx.LEFT_CHILD() != null)
+        {
+          left.addJoin(new LeftDominance(right, layer));
+        }
+        else if(ctx.RIGHT_CHILD() != null)
+        {
+          left.addJoin(new RightDominance(right, layer));
+        }
+        else
+        {
+          left.addJoin(new Dominance(right, layer, 1));
+        }
+      }
     }
   }
 
   @Override
   public void enterIndirectDominance(AqlParser.IndirectDominanceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("dominance"));
-    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
-    left.addJoin(new Dominance(right, layer));
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new Dominance(right, layer));
+      }
+    }
   }
 
   @Override
   public void enterRangeDominance(AqlParser.RangeDominanceContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("dominance"));
-    Preconditions.checkNotNull(right, errorRHS("dominance"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
     Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
-    left.addJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
+    
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
+      }
+    }
   }
 
   @Override
   public void enterDirectPointing(AqlParser.DirectPointingContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("pointing"));
-    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    if(ctx.anno != null)
+    for (QueryNode right : nodesRight)
     {
-      LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
-      for (QueryAnnotation a : annotations)
+      if (ctx.anno != null)
       {
-        right.addEdgeAnnotation(a);
+        LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
+        for (QueryAnnotation a : annotations)
+        {
+          right.addEdgeAnnotation(a);
+        }
+      }
+      
+      for (QueryNode left : nodesLeft)
+      {
+        left.addJoin(new PointingRelation(right, label, 1));
       }
     }
-    
-    left.addJoin(new PointingRelation(right, label, 1));
   }
 
   @Override
   public void enterIndirectPointing(AqlParser.IndirectPointingContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("pointing"));
-    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
-    left.addJoin(new PointingRelation(right, label));
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new PointingRelation(right, label));
+      }
+    }
   }
 
   @Override
   public void enterRangePointing(AqlParser.RangePointingContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("pointing"));
-    Preconditions.checkNotNull(right, errorRHS("pointing"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
     Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
-    left.addJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
+    
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
+      }
+    }
   }
 
   @Override
   public void enterCommonParent(AqlParser.CommonParentContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("common parent"));
-    Preconditions.checkNotNull(right, errorRHS("common parent"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common parent"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common parent"));
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addJoin(new Sibling(right, label));
-
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new Sibling(right, label));
+      }
+    }
   }
 
   @Override
   public void enterCommonAncestor(AqlParser.CommonAncestorContext ctx)
   {
-    QueryNode left = nodeByRef(ctx.left);
-    QueryNode right = nodeByRef(ctx.right);
-    Preconditions.checkNotNull(left, errorLHS("common ancestor"));
-    Preconditions.checkNotNull(right, errorRHS("common ancestor"));
+    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
+    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common ancestor"));
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common ancestor"));
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addJoin(new CommonAncestor(right, label));
+    for(QueryNode left : nodesLeft)
+    {
+      for(QueryNode right : nodesRight)
+      {
+        left.addJoin(new CommonAncestor(right, label));
+      }
+    }
   }
   
   
@@ -507,7 +592,19 @@ public class AqlListener extends AqlParserBaseListener
   {
     join(ctx, Identical.class);
   }
- 
+
+  @Override
+  public void enterVariableDefinition(AqlParser.VariableDefinitionContext ctx)
+  {
+    lastVariableDefinition = null;
+    if(ctx != null)
+    {
+      lastVariableDefinition =  ctx.REF().getText().substring(1);
+    }
+  }
+  
+  
+  
   
   private LinkedList<QueryAnnotation> fromEdgeAnnotation(
     AqlParser.EdgeSpecContext ctx)
@@ -544,7 +641,7 @@ public class AqlListener extends AqlParserBaseListener
     }
     return null;
   }
-
+  
   private QueryNode.TextMatching textMatchingFromSpec(
     AqlParser.TextSpecContext txt, boolean not)
   {
@@ -576,7 +673,7 @@ public class AqlListener extends AqlParserBaseListener
     }
   }
 
-  private QueryNode nodeByRef(Token ref)
+  private Collection<QueryNode> nodesByRef(Token ref)
   {
     return nodes.get("" + ref.getText().substring(1));
   }
@@ -592,27 +689,43 @@ public class AqlListener extends AqlParserBaseListener
    */
   private void join(ParserRuleContext ctx, Class<? extends Join> type)
   {
-    QueryNode left = nodeByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
-    QueryNode right = nodeByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());
+    Collection<QueryNode> leftNodes = nodesByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
+    Collection<QueryNode> rightNodes = nodesByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());
 
-    Preconditions.checkNotNull(left, errorLHS(type.getSimpleName()));
-    Preconditions.checkNotNull(right, errorRHS(type.getSimpleName()));
-    try
+    Preconditions.checkArgument(!leftNodes.isEmpty(), errorLHS(type.getSimpleName()));
+    Preconditions.checkNotNull(!rightNodes.isEmpty(), errorRHS(type.getSimpleName()));
+    
+    for (QueryNode left : leftNodes)
     {
-      Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
-      Join newJoin = c.newInstance(right);
-      left.addJoin(newJoin);
+      for (QueryNode right : rightNodes)
+      {
+        try
+        {
+          Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
+          Join newJoin = c.newInstance(right);
+          left.addJoin(newJoin);
+        }
+        catch (Exception ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-    }
+    
   }
   
   private QueryNode newNode()
   {
     QueryNode n = new QueryNode(++aliasCount);
-    n.setVariable("" + n.getId());
+    if(lastVariableDefinition == null)
+    {
+      n.setVariable("" + n.getId());
+    }
+    else
+    {
+      n.setVariable(lastVariableDefinition);
+    }
+    lastVariableDefinition = null;
     LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
     c.setContent(n);
     alternativeStack.get(0).addChild(c);

@@ -96,14 +96,22 @@ unary_linguistic_term
 	|	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
 	;
 
+variableDefinition
+  : REF COLON
+  ;
 
-expr
-	: TOK # TokOnlyExpr 
+variableExpr
+ 	: TOK # TokOnlyExpr 
   | NODE # NodeExpr
   | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
 	|	txt=textSpec # TextOnly // shortcut for tok="..."
   | qName # AnnoOnlyExpr
-	|	qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
+	| qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
+  ;
+
+expr
+  : vardef=variableDefinition variableExpr # VariableTermExpr
+  | variableDefinition # NoVariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
