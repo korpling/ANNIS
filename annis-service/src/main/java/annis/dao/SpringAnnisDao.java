@@ -19,8 +19,6 @@ import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
-import annis.ql.node.Start;
-import annis.ql.parser.AnnisParser;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
@@ -649,6 +647,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<Long> mapCorpusNamesToIds(List<String> corpusNames)
   {
+    if(corpusNames == null || corpusNames.isEmpty())
+    {
+      return new LinkedList<Long>();
+    }
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
     final List<Long> result = getJdbcTemplate().query(sql,
       listCorpusByNameDaoHelper);

@@ -384,6 +384,11 @@ public class QueryServiceImpl implements QueryService
     List<String> corpusNamesList = new LinkedList<String>(corpusNames);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
 
+    if(corpusIDs == null || corpusIDs.isEmpty())
+    {
+      throw new WebApplicationException(400);
+    }
+    
     data.setCorpusList(corpusIDs);
     data.addExtension(query.getMatches());
     long start = new Date().getTime();
