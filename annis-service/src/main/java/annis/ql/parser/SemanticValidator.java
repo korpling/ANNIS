@@ -20,7 +20,10 @@ import annis.model.QueryNode;
 import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
+import com.google.common.collect.TreeMultiset;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -30,9 +33,12 @@ import java.util.Set;
 /**
  * Performs semantic checks on the parsed query.
  *
- * - checks if there is no search expression at all - no binary linguistic
- * relations are allowed if there is only one node - checks if all nodes of an
- * alternative are connected (TODO)
+ * <ul>
+ * <li>checks if there is no search expression at all</li>
+ * <li>no binary linguistic relations are allowed if there is only one node</li> 
+ * <li>checks if all nodes of an alternative are connected</li>
+ * <li>every node variable name should be given only once in an alternative</li>
+ * </ul>
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
@@ -79,18 +85,20 @@ public class SemanticValidator implements QueryDataTransformer
     transitiveHull.add(alternative.get(0).getId());
     createTransitiveHull(alternative.get(0), 
       connected, transitiveHull);
+    
+    Multiset<String> variableNames = TreeMultiset.create();
    
     Set<Long> unconnectedNodes = new HashSet<Long>();
     for(QueryNode n : alternative)
     {
       unconnectedNodes.add(n.getId());
+      variableNames.add(n.getVariable());
     }
     unconnectedNodes.removeAll(transitiveHull);
    
     // check if each node is contained in the connected nodes
     if (!unconnectedNodes.isEmpty())
-    {
-      
+    { 
       List<String> variables = new LinkedList<String>();
       for (QueryNode n : alternative)
       {
@@ -115,6 +123,23 @@ public class SemanticValidator implements QueryDataTransformer
           + "Normalized query is: \n"
           + data.toAQL());
       }
+    }
+    
+    // check if any variable name was given more than once
+    List<String> invalidNames = new LinkedList<String>();
+    for(Multiset.Entry<String> e : variableNames.entrySet())
+    {
+      if(e.getCount() > 1)
+      {
+        invalidNames.add(e.getElement());
+      }
+    }
+    if(!invalidNames.isEmpty())
+    {
+      throw new AnnisQLSemanticsException("The following variable names are "
+        + "used for more than one node: " + Joiner.on(", ").join(invalidNames)
+        + "\nNormalized Query is: \n"
+        + data.toAQL());
     }
   }
   

@@ -348,11 +348,14 @@ public class QueryNode implements Serializable
         .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
 
       sb.append(anno.getQualifiedName());
-      sb.append(anno.getTextMatching().aqlOperator);
-      sb.append(anno.getTextMatching().quote());
-      sb.append(anno.getValue());
-      sb.append(anno.getTextMatching().quote());
-
+      
+      if(anno.getTextMatching() != null && anno.getValue() != null)
+      {
+        sb.append(anno.getTextMatching().aqlOperator);
+        sb.append(anno.getTextMatching().quote());
+        sb.append(anno.getValue());
+        sb.append(anno.getTextMatching().quote());
+      }
     }
 
     for (Join join : joins)
