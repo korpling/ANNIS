@@ -119,6 +119,7 @@ public class AnnisParserAntlr
       for(LogicClause andClause : top.getChildren())
       {
         Set<Long> alternativeNodeIds = new HashSet<Long>();
+        Set<String> alternativeNodeVars = new HashSet<String>();
         List<QueryNode> alternative = new ArrayList<QueryNode>();
         for(LogicClause c : andClause.getChildren())
         {
@@ -127,13 +128,14 @@ public class AnnisParserAntlr
           
           alternative.add(node);
           alternativeNodeIds.add(node.getId());
+          alternativeNodeVars.add(node.getVariable());
         }
         
         // set maximal width
         data.setMaxWidth(
           Math.max(data.getMaxWidth(), alternativeNodeIds.size()));
         
-        // remove all invalid edge joins
+        // check for invalid edge joins
         for(QueryNode node : alternative)
         {
           ListIterator<Join> itJoins = node.getJoins().listIterator();
@@ -141,11 +143,23 @@ public class AnnisParserAntlr
           {
             Join j = itJoins.next();
             QueryNode t = j.getTarget();
-            if(t!= null && !alternativeNodeIds.contains(t.getId()))
+            if(t != null)
             {
-              itJoins.remove();
-            }
-          }
+              if(!alternativeNodeVars.contains(t.getVariable()))
+              {
+                // the join partner is not contained in the alternative
+                throw new AnnisQLSemanticsException("Target node \"" + t.
+                  getVariable()
+                  + "\" is not contained in alternative. Normalized alternative: \n"
+                  + QueryData.toAQL(alternative));
+              }
+              else if(!alternativeNodeIds.contains(t.getId()))
+              {
+                // silently remove it
+                itJoins.remove();
+              }
+            } // end if target node not null
+          } // end for each join
         }
         
         data.addAlternative(alternative);

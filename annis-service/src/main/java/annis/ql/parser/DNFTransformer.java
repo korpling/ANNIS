@@ -23,13 +23,13 @@ import java.util.List;
 import java.util.ListIterator;
 
 /**
- *
+ * Utility functions for transforming an AQL query to the Disjunctive Normal Form.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class DNFTransformer
 {
   /**
-   * Transforms a AQL query to the Disjunctive Normal Form.
+   * Transforms an AQL query to the Disjunctive Normal Form.
    * @param topNode
    * @return 
    */
