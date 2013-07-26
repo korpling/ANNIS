@@ -8,7 +8,7 @@
 		
 	<util:map id="exampleSyntaxTrees">
     <entry key="tok">
-      <value><![CDATA[
+      <value><![CDATA[tok
 Start
    AAnnotationSearchExpr
       tok]]>
@@ -42,7 +42,8 @@ Start
 		<value><![CDATA[node]]></value>
 		<value><![CDATA[/das/ & /Haus/ & #1 . #2]]></value>
 		<value><![CDATA[node & pos="VVFIN" & cat="S" & node & #3 >[func="OA"] #1 & #3 >[func="SB"] #4 & #3 > #2 & #1 .* #2 & #2 .* #4]]></value>
-		<value><![CDATA[/das/ & ( (cat=/NP/ & #1 . #2) | (/Haus/ & #1 . #3 ))]]></value>
+		<value><![CDATA[/das/ & ( (a#cat=/NP/ & #1 . #a) | (a#/Haus/ & #1 . #a ))]]></value>
+    <value><![CDATA[/das/ & ( (cat=/NP/ & #1 . #2) | (/Haus/ & #1 . #3 ))]]></value>  
 		<value><![CDATA[( (node & cat=/NP/ & #1 . #2) | (/das/ & /Haus/ & #3 . #4) )]]></value>
     <value><![CDATA[key != "value"]]></value>
     <value><![CDATA[key!="value"]]></value>

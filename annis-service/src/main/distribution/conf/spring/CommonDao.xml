@@ -135,7 +135,6 @@
 
     <property name="listExampleQueriesHelper" ref="listExampleQueriesHelper" />
 
-    <property name="queryAnalysis" ref="aqlAnalysis"/>
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
     <property name="sqlSessionModifiers">
       <util:list>

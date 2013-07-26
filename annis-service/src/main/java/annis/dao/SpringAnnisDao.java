@@ -20,7 +20,6 @@ import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
-import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -307,8 +306,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private AnnotateSqlGenerator graphExtractor;
 
   private MetaDataFilter metaDataFilter;
-
-  private QueryAnalysis queryAnalysis;
 
   private AnnisParserAntlr aqlParser;
 
@@ -862,17 +859,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.findSqlGenerator = findSqlGenerator;
   }
-
-  public QueryAnalysis getQueryAnalysis()
-  {
-    return queryAnalysis;
-  }
-
-  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
-  {
-    this.queryAnalysis = queryAnalysis;
-  }
-
+  
   public ListCorpusByNameDaoHelper getListCorpusByNameDaoHelper()
   {
     return listCorpusByNameDaoHelper;

@@ -68,6 +68,7 @@ public class AnnisParserAntlr
     });
 
     ParseTree tree = parser.start();
+    
     if (errors.isEmpty())
     {
       
@@ -102,6 +103,38 @@ public class AnnisParserAntlr
         }
       }
       return data;
+    }
+    else
+    {
+      throw new AnnisQLSyntaxException("Parser error:\n"
+        + Joiner.on("\n").join(errors));
+    }
+  }
+  
+  public String dumpTree(String aql)
+  {
+    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(aql));
+    AqlParser parser = new AqlParser(new CommonTokenStream(
+      lexer));
+    
+    final List<String> errors = new LinkedList<String>();
+
+    parser.removeErrorListeners();
+    parser.addErrorListener(new BaseErrorListener()
+    {
+      @Override
+      public void syntaxError(Recognizer recognizer, Token offendingSymbol,
+        int line, int charPositionInLine, String msg, RecognitionException e)
+      {
+        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
+      }
+    });
+
+    ParseTree tree = parser.start();
+    
+    if (errors.isEmpty())
+    {
+      return tree.toStringTree();
     }
     else
     {

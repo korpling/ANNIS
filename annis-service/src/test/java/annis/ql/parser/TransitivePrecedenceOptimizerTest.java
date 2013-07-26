@@ -16,7 +16,6 @@
 package annis.ql.parser;
 
 import annis.model.QueryNode;
-import annis.ql.node.Start;
 import annis.sqlgen.model.Precedence;
 import java.util.LinkedList;
 import java.util.List;
@@ -25,7 +24,6 @@ import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
 import org.junit.runner.RunWith;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
@@ -38,30 +36,16 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 public class TransitivePrecedenceOptimizerTest
 {
 
- 	private AnnisParser parser;
-  
-  // QueryAnalysis instance that is managed by Spring (has Adapters injected)
-	@Autowired private QueryAnalysis queryAnalysis;
-  
-  private QueryAnalysis queryAnalysisNoBounds;
-  
+ 	private AnnisParserAntlr parser;
   public TransitivePrecedenceOptimizerTest()
   {
-    parser = new AnnisParser();
+    parser = new AnnisParserAntlr();
   }
 
   @Before
   public void setUp()
   {
-    // always create a fresh instance before each test
-    // but copy most of the members from the spring managed QueryAnalysis
-    queryAnalysisNoBounds = new QueryAnalysis();
-    ClauseAnalysis clause = queryAnalysis.getClauseAnalysis();
-    clause.setPrecedenceBound(0);
-    queryAnalysisNoBounds.setClauseAnalysis(clause);
-    queryAnalysisNoBounds.setDnfTransformer(queryAnalysis.getDnfTransformer());
-    queryAnalysisNoBounds.setNodeRelationNormalizer(queryAnalysis.getNodeRelationNormalizer());
-    queryAnalysisNoBounds.setPostProcessors(queryAnalysis.getPostProcessors());
+    parser.setPrecedenceBound(0);
   }
 
   @After
@@ -86,11 +70,12 @@ public class TransitivePrecedenceOptimizerTest
       + "& #3 .* #4 "
       + "& #4 .* #2";
     
+    parser.setPrecedenceBound(50);
+    
     // perform the initial parsing
-    Start start = parser.parse(aql);
-    queryAnalysis.getClauseAnalysis().setPrecedenceBound(50);
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
+    
     
     assertEquals("alternative added", 1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
@@ -192,9 +177,8 @@ public class TransitivePrecedenceOptimizerTest
       + "& #4 .* #2";
     
     // perform the initial parsing
-    Start start = parser.parse(aql);
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = queryAnalysisNoBounds.analyzeQuery(start, new LinkedList<Long>());
     
     assertEquals("alternative added", 1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
@@ -287,9 +271,8 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 .abc #2 & #2 .abc #3";
     
     // perform the initial parsing
-    Start start = parser.parse(aql);
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
     
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
@@ -306,9 +289,8 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 .def #2 & #2 .abc #3";
     
     // perform the initial parsing
-    Start start = parser.parse(aql);
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
     
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
@@ -325,9 +307,8 @@ public class TransitivePrecedenceOptimizerTest
     String aql = "node & node & node & #1 . #2 & #2 .abc #3";
     
     // perform the initial parsing
-    Start start = parser.parse(aql);
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
     // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
-    QueryData data = queryAnalysis.analyzeQuery(start, new LinkedList<Long>());
     
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);

@@ -62,10 +62,10 @@ public class AnnisParserAntlrTest
         "\t{node 1; bound to '1'; precedes node 2 (null 1, 1)} AND {node 2; bound to '2'; node labels: [cat ~ NP]}\n" +
         "\t{node 3; bound to '3'; spans~/das/; precedes node 4 (null 1, 1)} AND {node 4; bound to '4'; is a token; spans!~/Haus/}"
       },
-      {" \"das\" & ( \"Haus\" | \"Schaf\") & #1 . #2 & #1 . #3", 
+      {" \"das\" & ( x#\"Haus\" | x#\"Schaf\") & #1 . #x", 
         "ALTERNATIVES\n" +
-        "\t{node 1; bound to '1'; spans=\"das\"; precedes node 2 (null 1, 1)} AND {node 2; bound to '2'; spans=\"Haus\"}\n" +
-        "\t{node 1; bound to '1'; spans=\"das\"; precedes node 3 (null 1, 1)} AND {node 3; bound to '3'; spans=\"Schaf\"}"
+        "\t{node 1; bound to '1'; spans=\"das\"; precedes node 2 (null 1, 1)} AND {node 2; bound to 'x'; spans=\"Haus\"}\n" +
+        "\t{node 1; bound to '1'; spans=\"das\"; precedes node 3 (null 1, 1)} AND {node 3; bound to 'x'; spans=\"Schaf\"}"
       }
     };
     return Arrays.asList(data);

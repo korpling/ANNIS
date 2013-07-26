@@ -23,7 +23,6 @@ import static org.junit.Assert.assertThat;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
-import static org.mockito.Matchers.anyLong;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
@@ -50,9 +49,6 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 import annis.test.TestHelper;
 import annis.model.Annotation;
-import annis.model.AnnotationGraph;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
 import annis.sqlgen.AnnotateSqlGenerator;
@@ -60,14 +56,11 @@ import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
-import annis.ql.node.Start;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.AnnisAttribute;
 import annis.sqlgen.SaltAnnotateExtractor;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import javax.annotation.Resource;
-import org.springframework.context.annotation.PropertySource;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
@@ -105,8 +98,7 @@ public class TestSpringAnnisDao
   private ListAnnotationsSqlHelper listNodeAnnotationsSqlHelper;
   @Mock
   private ListCorpusAnnotationsSqlHelper listCorpusAnnotationsHelper;
-  @Mock
-  private QueryAnalysis queryAnalysis;
+  
   // constants for flow control verification
   private static final String DDDQUERY = "DDDQUERY";
   private static final QueryData PARSE_RESULT = new QueryData();
@@ -129,7 +121,6 @@ public class TestSpringAnnisDao
     simpleAnnisDao.setListCorpusSqlHelper(listCorpusHelper);
     simpleAnnisDao.setListAnnotationsSqlHelper(listNodeAnnotationsSqlHelper);
     simpleAnnisDao.setListCorpusAnnotationsSqlHelper(listCorpusAnnotationsHelper);
-    simpleAnnisDao.setQueryAnalysis(queryAnalysis);
     simpleAnnisDao.setMetaDataFilter(metaDataFilter);
 
     when(annisParser.parse(anyString(), anyList())).thenReturn(PARSE_RESULT);
@@ -154,8 +145,6 @@ public class TestSpringAnnisDao
     assertThat(springManagedDao.getListAnnotationsSqlHelper(),
       is(not(nullValue())));
 
-    // new
-    assertThat(springManagedDao.getQueryAnalysis(), is(not(nullValue())));
     assertThat(springManagedDao.getFindSqlGenerator(), is(not(nullValue())));
     assertThat(springManagedDao.getSqlSessionModifiers(), is(not(nullValue())));
     assertThat(springManagedDao.getListCorpusByNameDaoHelper(), is(
