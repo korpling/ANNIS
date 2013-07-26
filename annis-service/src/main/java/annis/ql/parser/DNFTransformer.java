@@ -17,10 +17,13 @@ package annis.ql.parser;
 
 import annis.model.LogicClause;
 import annis.model.QueryNode;
+import annis.sqlgen.model.Join;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Set;
 
 /**
  * Utility functions for transforming an AQL query to the Disjunctive Normal Form.
@@ -138,6 +141,11 @@ public class DNFTransformer
       {
         x1 = left;
         x2 = new LogicClause(x1);
+        if(x1.getContent() != null)
+        {
+          // set the content to a real copy
+          x2.setContent(new QueryNode(x1.getContent()));
+        }
         
         Preconditions.checkArgument(right.getChildren().size() == 2, 
           "OR nodes must always have exactly two children");
@@ -173,6 +181,11 @@ public class DNFTransformer
         rightParent.addChild(x2);
         rightParent.addChild(z);
         
+        // if the nodes have a content,
+        // clean up any references from x1/x2 that where removed in this split
+        cleanRelations(x1.getContent(), z);
+        cleanRelations(x2.getContent(), y);
+        
         // start over again
         return false;
       }
@@ -180,7 +193,52 @@ public class DNFTransformer
     
     // recursivly check children
     return makeDNF(left) && makeDNF(right);
+  }
+  
+  /**
+   * Cleaning up relations that where removed when splitting the node.
+   * @param node The node that might have references left
+   * @param toRemove {@link LogicClause} node that was removed from the clause.
+   */
+  private static void cleanRelations(QueryNode node, LogicClause toRemove)
+  {
+    if(node != null)
+    {
+      ListIterator<Join> itJoins = node.getJoins().listIterator();
+      // only search for node IDs when there are any joins
+      if(itJoins.hasNext())
+      {
+        Set<Long> nodesToRemove = new HashSet<Long>();
+        findQueryNodeIDs(toRemove, nodesToRemove);
 
+        while(itJoins.hasNext())
+        {
+          Join j = itJoins.next();
+          if(nodesToRemove.contains(j.getTarget().getId()))
+          {
+            itJoins.remove();
+          }
+        }
+      }
+    }
+  }
+  
+  private static void findQueryNodeIDs(LogicClause clause, Set<Long> queryNodeIDs)
+  {
+    if(queryNodeIDs != null)
+    {
+      if(clause.getContent() == null)
+      {
+        for(LogicClause childClause : clause.getChildren())
+        {
+          findQueryNodeIDs(childClause, queryNodeIDs);
+        }
+      }
+      else
+      {
+        queryNodeIDs.add(clause.getContent().getId());
+      }
+    }
   }
   
   private static void flattenDNF(LogicClause top)
