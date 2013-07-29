@@ -202,12 +202,12 @@ public class CorpusListPanel extends VerticalLayout implements
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
 
     tblCorpora.setSortContainerPropertyId("name");
-    updateCorpusSetList();
+    updateCorpusSetList(true);
   }
 
   public void updateCorpusSetList()
   {
-    updateCorpusSetList(true);
+    updateCorpusSetList(false);
   }
 
   private void updateCorpusSetList(boolean showLoginMessage)
@@ -224,7 +224,7 @@ public class CorpusListPanel extends VerticalLayout implements
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
           }
-          else
+          else if(Helper.getUser() == null)
           {
             Notification.
               show(
@@ -473,7 +473,7 @@ public class CorpusListPanel extends VerticalLayout implements
       return new Action[0];
     }
 
-    if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
+    if (Helper.getUser() == null)
     {
       // we can't change anything if we are not logged in so don't even try
       return new Action[0];

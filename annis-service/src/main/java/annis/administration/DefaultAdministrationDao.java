@@ -24,6 +24,7 @@ import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
 import java.io.*;
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -55,6 +56,9 @@ import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCallback;
+import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -91,6 +95,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // if this is true, the staging area is not deleted
   private boolean temporaryStagingArea;
+
+  private StatementController statementController;
 
   public enum EXAMPLE_QUERIES_CONFIG
   {
@@ -977,7 +983,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    if (!executeSqlFromScript(dbLayout + "/cluster.sql", args))
+    if (executeSqlFromScript(dbLayout + "/cluster.sql", args) != null)
     {
       executeSqlFromScript("cluster.sql", args);
     }
@@ -1202,9 +1208,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         }
         catch (IOException ex)
         {
-          java.util.logging.Logger.getLogger(DefaultAdministrationDao.class
-            .
-            getName()).log(Level.SEVERE, null, ex);
+          log.error("close the reader for SQL script failed", ex);
         }
       }
     }
@@ -1212,14 +1216,56 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
-  public boolean executeSqlFromScript(String script)
+  public PreparedStatement executeSqlFromScript(String script)
   {
     return executeSqlFromScript(script, null);
   }
 
+  /**
+   * Registers a {@link PreparedStatement} to the {@link StatementController}.
+   */
+  private class CancelableStatements implements PreparedStatementCreator,
+    PreparedStatementCallback<Void>
+  {
+
+    String sqlQuery;
+
+    PreparedStatement statement;
+
+    public CancelableStatements(String sql,
+      StatementController statementController)
+    {
+      sqlQuery = sql;
+    }
+
+    @Override
+    public PreparedStatement createPreparedStatement(Connection con) throws SQLException
+    {
+      if (statementController != null && statementController.isCancelled())
+      {
+        throw new SQLException("process was cancelled");
+      }
+
+      statement = con.prepareCall(sqlQuery);
+      if(statementController != null)
+      {
+        statementController.registerStatement(statement);
+      }
+      return statement;
+    }
+
+    @Override
+    public Void doInPreparedStatement(PreparedStatement ps) throws SQLException, DataAccessException
+    {
+      ps.execute();
+      return null;
+    }
+  }
+
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
-  public boolean executeSqlFromScript(String script, MapSqlParameterSource args)
+  public PreparedStatement executeSqlFromScript(String script,
+    MapSqlParameterSource args)
   {
     File fScript = new File(scriptPath, script);
     if (fScript.canRead() && fScript.isFile())
@@ -1227,13 +1273,26 @@ public class DefaultAdministrationDao implements AdministrationDao
       Resource resource = new FileSystemResource(fScript);
       log.debug("executing SQL script: " + resource.getFilename());
       String sql = readSqlFromResource(resource, args);
-      jdbcTemplate.execute(sql);
-      return true;
+      CancelableStatements cancelableStats = new CancelableStatements(
+        sql, statementController);
+
+      // register the statement, so we could try to interrupt it in the gui.
+      if (statementController != null)
+      {
+        statementController.registerStatement(cancelableStats.statement);
+      }
+      else
+      {
+        log.debug("statement controller is not initialized");
+      }
+
+      jdbcTemplate.execute(cancelableStats, cancelableStats);
+      return cancelableStats.statement;
     }
     else
     {
       log.debug("SQL script " + fScript.getName() + " does not exist");
-      return false;
+      return null;
     }
   }
 
@@ -1841,5 +1900,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       corpusNames.add(corpusName);
       deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames));
     }
+  }
+
+  @Override
+  public void registerGUICancelThread(StatementController statementCon)
+  {
+    this.statementController = statementCon;
   }
 }
