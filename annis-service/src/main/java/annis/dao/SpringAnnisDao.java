@@ -703,6 +703,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       log.warn(
         "No corpus configuration loaded due to missing database connection.");
     }
+    catch (org.springframework.jdbc.BadSqlGrammarException ex)
+    {
+      log.warn(
+        "Your database schema seems to be old. Probably you need to reinit it");
+    }
   }
 
   @Override
