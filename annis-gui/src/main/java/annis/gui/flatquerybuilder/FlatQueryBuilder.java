@@ -560,6 +560,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
       }
     }
+    result.add("tok");
     return result;
   }
 
