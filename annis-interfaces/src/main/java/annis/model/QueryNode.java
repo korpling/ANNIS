@@ -313,7 +313,7 @@ public class QueryNode implements Serializable
     return sb.toString();
   }
   
-  public String toAQLFragment()
+  public String toAQLNodeFragment()
   {
     StringBuilder sb = new StringBuilder();
 
@@ -358,14 +358,17 @@ public class QueryNode implements Serializable
       }
     }
 
+    
+    return sb.toString();
+  }
+  
+  public String toAQLEdgeFragment()
+  {
+    StringBuilder sb = new StringBuilder();
     for (Join join : joins)
     {
-      sb.append(" & ").append(join.toAQLFragment(this));
+      sb.append(join.toAQLFragment(this));
     }
-    
-
-
-
     return sb.toString();
   }
 

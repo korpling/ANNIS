@@ -24,6 +24,7 @@ import java.util.Set;
 
 import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
+import com.google.common.base.Joiner;
 import java.util.Iterator;
 import java.util.LinkedList;
 import org.slf4j.LoggerFactory;
@@ -119,19 +120,27 @@ public class QueryData implements Cloneable
    */
   public static String toAQL(List<QueryNode> alternative)
   {
-    StringBuilder sb = new StringBuilder();
-    Iterator<QueryNode> itNode = alternative.iterator();
-    while (itNode.hasNext())
+    List<String> fragments = new LinkedList<String>();
+    
+    for(QueryNode n : alternative)
     {
-      QueryNode n = itNode.next();
-      sb.append(n.toAQLFragment());
-
-      if (itNode.hasNext())
+      String frag = n.toAQLNodeFragment();
+      if(frag != null && !frag.isEmpty())
       {
-        sb.append(" & ");
+        fragments.add(frag);
       }
     }
-    return sb.toString();
+    
+    for(QueryNode n : alternative)
+    {
+      String frag = n.toAQLEdgeFragment();
+      if(frag != null && !frag.isEmpty())
+      {
+        fragments.add(frag);
+      }
+    }
+    
+    return Joiner.on(" & ").join(fragments);
   }
 
   /**
