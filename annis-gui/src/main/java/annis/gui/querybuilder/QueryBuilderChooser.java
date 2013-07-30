@@ -48,6 +48,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private Component lastComponent;
   private VerticalLayout layout;
   private InstanceConfig instanceConfig;
+  private Component component;
   
   public QueryBuilderChooser(QueryController controller, PluginSystem pluginSystem,
     InstanceConfig instanceConfig)
@@ -109,7 +110,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     }
     else
     {
-      Component component = plugin.createComponent(controller);
+      component = plugin.createComponent(controller);
       if(lastComponent != null)
       {
         layout.removeComponent(lastComponent);
@@ -120,5 +121,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     }
   }
   
+  public Component getQueryBuilder(){
+    return component;
+  }
   
 }

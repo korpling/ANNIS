@@ -53,6 +53,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Button btInitSpan;
   private Button btInitMeta;
   private Button btInitLanguage;
+  
+  private MenuBar addMenu;
+  private MenuBar addMenuSpan;
+  private MenuBar addMenuMeta;
+  
   private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout languagenodes;
@@ -196,13 +201,20 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   public void initialize()
   {
+    // try to remove all existing menus
+    try {
+      language.removeComponent(addMenu);
+      span.removeComponent(addMenuSpan);
+      meta.removeComponent(addMenuMeta);
+    } catch (Exception e) { }
+    
     //init variables:
     final FlatQueryBuilder sq = this;
     Collection<String> annonames = getAvailableAnnotationNames();
     Collection<String> metanames = getAvailableMetaNames();
     
     //Code from btInitLanguage:    
-    final MenuBar addMenu = new MenuBar();
+    addMenu = new MenuBar();
     addMenu.setDescription(INFO_INIT_LANG);
     addMenu.setAutoOpen(true);
     final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
@@ -228,7 +240,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     language.addComponent(addMenu);
     
     //Code from btInitSpan:    
-    final MenuBar addMenuSpan = new MenuBar();
+    addMenuSpan = new MenuBar();
     addMenuSpan.setDescription(INFO_INIT_SPAN);
     addMenuSpan.setAutoOpen(true);
     final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
@@ -248,7 +260,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     span.addComponent(addMenuSpan);
     
     //Code from btInitMeta:    
-    final MenuBar addMenuMeta = new MenuBar();
+    addMenuMeta = new MenuBar();
     addMenuMeta.setDescription(INFO_INIT_META);  
     addMenuMeta.setAutoOpen(true);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
