@@ -253,24 +253,34 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private String getAQLFragment(SearchBox sb)
   {
-    String result = ""; 
-    String value = sb.getValue();
+    String result = "";
+    String value = null;
+    try {
+      value = sb.getValue();
+    } catch (java.lang.NullPointerException ex) {
+      value = null;
+    }
     String level=sb.getAttribute();
-    if (sb.isRegEx() && !sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
+    if (value == null){
+      result = level;
     }
-    if (sb.isRegEx() && sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
-    }
-    if (!sb.isRegEx() && sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
-    }
-    if (!sb.isRegEx() && !sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
+    if (value != null){
+      if (sb.isRegEx() && !sb.isNegativeSearch())
+      {
+        result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
+      }
+      if (sb.isRegEx() && sb.isNegativeSearch())
+      {
+        result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
+      }
+      if (!sb.isRegEx() && sb.isNegativeSearch())
+      {
+        result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
+      }
+      if (!sb.isRegEx() && !sb.isNegativeSearch())
+      {
+        result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
+      }
     }
     return result;
   }
@@ -381,6 +391,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if (spb.isRegEx())
       {
         addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
+      }
+      if (spb.getValue().isEmpty()){
+        addQuery = "\n&" + spb.getAttribute();
       }
       ql += addQuery;
       for(Integer i : sentenceVars)
