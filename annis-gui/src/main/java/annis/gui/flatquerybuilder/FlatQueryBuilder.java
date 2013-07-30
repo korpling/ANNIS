@@ -50,6 +50,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private Button btGo;
   private Button btClear;
   private Button btInverse;
+  private Button btInitSpan;
+  private Button btInitMeta;
+  private Button btInitLanguage;
   private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout languagenodes;
@@ -119,8 +122,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
+    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener) this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
+    btInitLanguage.setDescription(INFO_INIT_LANG);
+    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
+    btInitSpan.setDescription(INFO_INIT_SPAN);
+    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
+    btInitMeta.setDescription(INFO_INIT_META);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
     reducingStringComparator rdc = new reducingStringComparator();
@@ -140,21 +149,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     language = new HorizontalLayout();
     languagenodes = new HorizontalLayout();
     language.addComponent(languagenodes);
-    //language.addComponent(btInitLanguage);
+    language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
     language.addStyleName("linguistics-panel");
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
-    //span.addComponent(btInitSpan);
+    span.addComponent(btInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
     span.addStyleName("span-panel");
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
-    //meta.addComponent(btInitMeta);
+    meta.addComponent(btInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
     meta.addStyleName("meta-panel");
@@ -183,10 +192,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
     getContent().setSizeFull();   
-    initialize();
   }
   
-  private void initialize()
+  public void initialize()
   {
     //init variables:
     final FlatQueryBuilder sq = this;
@@ -195,7 +203,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     //Code from btInitLanguage:    
     final MenuBar addMenu = new MenuBar();
-    addMenu.setDescription(INFO_INIT_LANG);    
+    addMenu.setDescription(INFO_INIT_LANG);
+    addMenu.setAutoOpen(true);
     final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -211,14 +220,17 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           VerticalNode vn = new VerticalNode(annoname, sq);
           languagenodes.addComponent(vn);
           vnodes.add(vn);
+          addMenu.setAutoOpen(false);
         }
       });
     }
+    language.removeComponent(btInitLanguage);
     language.addComponent(addMenu);
     
     //Code from btInitSpan:    
     final MenuBar addMenuSpan = new MenuBar();
-    addMenuSpan.setDescription(INFO_INIT_SPAN);    
+    addMenuSpan.setDescription(INFO_INIT_SPAN);
+    addMenuSpan.setAutoOpen(true);
     final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -226,16 +238,19 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         @Override
         public void menuSelected(MenuBar.MenuItem selectedItem) {          
           sq.removeSpanBox();
-          sq.addSpanBox(annoname);                              
+          sq.addSpanBox(annoname);
+          addMenuSpan.setAutoOpen(false);
         }
       });
     }
     spanMenu = addSpan;
+    span.removeComponent(btInitSpan);
     span.addComponent(addMenuSpan);
     
     //Code from btInitMeta:    
     final MenuBar addMenuMeta = new MenuBar();
-    addMenuMeta.setDescription(INFO_INIT_META);    
+    addMenuMeta.setDescription(INFO_INIT_META);  
+    addMenuMeta.setAutoOpen(true);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
     for (final String annoname : metanames)
     {
@@ -245,10 +260,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           MetaBox mb = new MetaBox(annoname, sq);
           meta.addComponent(mb);
           mboxes.add(mb);
+          addMenuMeta.setAutoOpen(false);
         }
       });
     }
-    meta.addComponent(addMenuMeta);    
+    meta.removeComponent(btInitMeta);
+    meta.addComponent(addMenuMeta);
   }
   
   private String getAQLFragment(SearchBox sb)
@@ -454,6 +471,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         catch(Exception e)
         {          
         }
+      }
+      if (event.getComponent() == btInitMeta || event.getComponent() == btInitSpan || event.getComponent() == btInitLanguage){
+        initialize();
       }
     }
   }

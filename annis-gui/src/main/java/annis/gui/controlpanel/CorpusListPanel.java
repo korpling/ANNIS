@@ -23,6 +23,7 @@ import annis.security.AnnisUserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -79,7 +80,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
-
+  
   public enum ActionType
   {
 
