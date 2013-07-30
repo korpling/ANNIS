@@ -69,8 +69,6 @@ public class TestAnnisParserExamples {
 	///// Syntax-Tree tests
 	
 	@Theory
-  @Ignore
-  // TODO: re-enable this test
 	public void testSyntaxTrees(
 			@SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation=EXAMPLES) 
 			SyntaxTreeExample example) 

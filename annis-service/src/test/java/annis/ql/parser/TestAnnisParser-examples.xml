@@ -8,28 +8,15 @@
 		
 	<util:map id="exampleSyntaxTrees">
     <entry key="tok">
-      <value><![CDATA[tok
-Start
-   AAnnotationSearchExpr
-      tok]]>
+      <value><![CDATA[tok]]>
       </value>
     </entry>
     <entry key="/abc/">
-      <value><![CDATA[
-Start
-   ATextSearchExpr
-      ARegexpTextSpec
-         abc]]>
+      <value><![CDATA[/abc/]]>
       </value>
     </entry>
     <entry key="tok=/abc/">
-      <value><![CDATA[
-Start
-   AAnnotationSearchExpr
-      tok
-      AEqualAnnoValue
-         ARegexpTextSpec
-            abc]]>
+      <value><![CDATA[tok=/abc/]]>
       </value>
     </entry>
   </util:map>
