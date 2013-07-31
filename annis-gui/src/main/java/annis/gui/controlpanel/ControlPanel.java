@@ -24,10 +24,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
- * @author thomas
+ * The panel on the left which controls the whole search.
+ * 
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ControlPanel extends Panel
+public class ControlPanel extends VerticalLayout
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
@@ -40,22 +41,16 @@ public class ControlPanel extends Panel
 
   private SearchOptionsPanel searchOptions;
 
-  private QueryController controller;
 
   public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
     ExampleQueriesPanel autoGenQueries)
   {
-    super("Search Form");
-    this.controller = controller;
-
     setSizeFull();
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    VerticalLayout layout = new VerticalLayout();
-    setContent(layout);
-    layout.setSizeFull();
+    setSizeFull();
 
     Accordion accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
@@ -73,10 +68,10 @@ public class ControlPanel extends Panel
     accordion.addTab(searchOptions, "Search Options", null);
     accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
 
-    layout.addComponent(queryPanel);
-    layout.addComponent(accordion);
+    addComponent(queryPanel);
+    addComponent(accordion);
 
-    layout.setExpandRatio(accordion, 1.0f);
+    setExpandRatio(accordion, 1.0f);
   }
 
   public CorpusListPanel getCorpusList()
