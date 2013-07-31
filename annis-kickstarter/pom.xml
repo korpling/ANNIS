@@ -5,9 +5,12 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.0.0</version>
+    <version>3.1.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
+
+  <artifactId>annis-kickstarter</artifactId>
+  <name>annis-kickstarter</name>
 
   <packaging>jar</packaging>
 
@@ -111,7 +114,5 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
   </properties>
-    <artifactId>annis-kickstarter</artifactId>
-    <name>annis-kickstarter</name>
 </project>
 

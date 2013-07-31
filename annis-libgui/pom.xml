@@ -4,11 +4,10 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.0.0</version>
+    <version>3.1.0-SNAPSHOT</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-libgui</artifactId>
-  <version>3.0.0</version>
   <name>annis-libgui</name>
   <packaging>jar</packaging>
   <description>Base project for a Vaadin based GUI.</description>
