@@ -142,11 +142,11 @@ public class SearchUI extends AnnisBaseUI
     // always get the resize events directly
     setImmediate(true);
 
-    VerticalLayout mainLayout = new VerticalLayout();
+    CssLayout mainLayout = new CssLayout();
     setContent(mainLayout);
 
     mainLayout.setSizeFull();
-    mainLayout.setMargin(false);
+
 
     final ScreenshotMaker screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
@@ -278,7 +278,6 @@ public class SearchUI extends AnnisBaseUI
     hSplit.setSizeFull();
 
     mainLayout.addComponent(hSplit);
-    mainLayout.setExpandRatio(hSplit, 1.0f);
 
     ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
       "example queries", this);
