@@ -4,13 +4,13 @@ Configure front-end web-application {#admin-configure-webapp}
 [TOC]
 
 Configuring Tomcat or Jetty as application container {#admin-configure-container}
-----------------------------------------------------
+====================================================
 
 We are providing a WAR-file that is deployable by every common Java Servlet
 Container like Tomcat or Jetty. Please use the documentation of the web
 application container of your choice how to deploy these war-files.
 
-### Tomcat: UTF8 encoding in server.xml ### {#admin-configure-tomcat-utf8}
+## Tomcat: UTF8 encoding in server.xml ## {#admin-configure-tomcat-utf8}
 
 If using Tomcat make sure the UTF-8 encoding is used for URLs. Some
 installations of Tomcat don't use UTF-8 for the encoding of the URLs and that will
@@ -27,7 +27,7 @@ executor="tomcatThreadPool" />
 \endcode
 
 General configuration advices {#admin-configure-general}
------------------------------
+=============================
 
 The ANNIS frontend will search in different folders for it's configuration.
 
@@ -43,7 +43,7 @@ overwrite the global configuration and the global configuration overwrites the
 default configuration.
 
 Create and configure instances {#admin-configure-instance}
-------------------------------
+==============================
 
 When multiple corpora from different sources are hosted on one server it is often
 still desired to group the corpora by their origin and present them differently.
@@ -94,7 +94,7 @@ configure your web server (e.g. Apache) to rewrite the URLs if you need a more
 project specific and less "technical" URL (e.g. `http://<server>/falko`).
 
 Configuring Visualizations {#admin-configure-vis}
---------------------------
+==========================
 
 By default, ANNIS displays all search results in the Key Word in Context (KWIC)
 view in the search result window. Further visualizations, such as syntax trees or
@@ -128,7 +128,7 @@ visibility | determines the visibility state of the visualizer. Valid values are
 order | determines the order in which visualizers are rendered in the interface (low to high)
 mappings | provides additional parameters for some visualizations, see the specific visualizer documentation for valid values
 
-### Visibility column ### {#admin-configure-visibility}
+## Visibility column ## {#admin-configure-visibility}
 
 These are the valid values for the `visibility` column in the `resolver_vis_map` table
 - `permanent` - the visualizer is shown and not closeable
@@ -137,7 +137,7 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 - `preloaded` - behaviour is the same as `hidden`, but the visualizer starts to be rendered in the background
 - `removed` - this visualizer is disabled, useful to deactivate a visualizer that is always shown (like [KWIC](@ref annis.visualizers.component.KWICPanel)
 
-### Visualizer list ### {#admin-configure-vislist}
+## Visualizer list ## {#admin-configure-vislist}
 
 short name| Description | Java class | Screenshot  
 ----------|-------------|------------|-----------
@@ -145,6 +145,7 @@ short name| Description | Java class | Screenshot
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
 `grid_tree` | a grid visualizing hierarchical tree annotations as ordered grid layers | [GridTreeVisualizer](@ref annis.visualizers.iframe.gridtree.GridTreeVisualizer ) | ![grid_tree](grid_tree_vis.png)
 `discourse` | a view of the entire text of a document, possibly with interactivecoreference links. | [CorefVisualizer](@ref annis.visualizers.iframe.CorefVisualizer) | ![discourse](discourse_vis.png)
+`coref` | a textual view of the match, possibly with interactivecoreference links. | [MatchCorefVisualizer](@ref annis.visualizers.iframe.MatchCorefVisualizer)| ...
 `arch_dependency` | dependency tree with labeled arches between tokens | [VakyarthaDependencyTree](@ref annis.visualizers.iframe.dependency.VakyarthaDependencyTree) | ![arch_dependency](arch_dependency_vis.png)
 `ordered_dependency` | arrow based dependency visualization for corpora with dependencies between non terminal nodes |[ProielRegularDependencyTree](@ref annis.visualizers.component.dependency.ProielRegularDependencyTree) | ![ordered_dependency](ordered_dependency_vis.png)
 `hierarchical_dependency` | unordered vertical tree of dependent tokens | [ProielDependecyTree](@ref annis.visualizers.component.dependency.ProielDependecyTree) | ![hierarchical_dependency](hierarchical_dependency_vis.png)
@@ -154,7 +155,7 @@ short name| Description | Java class | Screenshot
 `rst` and `rst_full` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
 
 
-### Visualizations with Software Requirements ### {#admin-configure-visibility}
+## Visualizations with Software Requirements ## {#admin-configure-visibility}
 
 Some ANNIS visualizers require additional software, depending on whether or
 not they render graphics as an image directly in Java or not. At present, three
