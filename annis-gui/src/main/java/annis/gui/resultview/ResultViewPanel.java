@@ -25,6 +25,7 @@ import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SE
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import com.vaadin.ui.Alignment;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
@@ -42,7 +43,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class ResultViewPanel extends Panel
+public class ResultViewPanel extends VerticalLayout
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
 
@@ -55,7 +56,6 @@ public class ResultViewPanel extends Panel
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
-  private VerticalLayout mainLayout;
   private QueryController controller;
   private String selectedSegmentationLayer;
   private InstanceConfig instanceConfig;
@@ -83,11 +83,7 @@ public class ResultViewPanel extends Panel
     this.instanceConfig = instanceConfig;
 
     setSizeFull();
-
-    mainLayout = new VerticalLayout();
-    setContent(mainLayout);
-    mainLayout.setMargin(false);
-    mainLayout.setSizeFull();
+    setMargin(false);
 
 
     MenuBar mbResult = new MenuBar();
@@ -103,10 +99,8 @@ public class ResultViewPanel extends Panel
     paging.setInfo("Result for query \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     paging.addCallback(controller);
 
-    mainLayout.addComponent(mbResult);
-    mainLayout.addComponent(paging);
-
-    mainLayout.setSizeFull();
+    addComponent(mbResult);
+    addComponent(paging);
 
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
@@ -115,14 +109,14 @@ public class ResultViewPanel extends Panel
     progressResult.setEnabled(true);
     progressResult.setVisible(true);
 
-    mainLayout.addComponent(progressResult);
+    addComponent(progressResult);
 
-    mainLayout.setComponentAlignment(paging, Alignment.TOP_CENTER);
-    mainLayout.setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
+    setComponentAlignment(paging, Alignment.TOP_CENTER);
+    setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
 
-    mainLayout.setExpandRatio(mbResult, 0.0f);
-    mainLayout.setExpandRatio(paging, 0.0f);
-    mainLayout.setExpandRatio(progressResult, 1.0f);
+    setExpandRatio(mbResult, 0.0f);
+    setExpandRatio(paging, 0.0f);
+    setExpandRatio(progressResult, 1.0f);
 
   }
 
@@ -134,7 +128,7 @@ public class ResultViewPanel extends Panel
 
     if (resultPanel != null)
     {
-      mainLayout.removeComponent(resultPanel);
+      removeComponent(resultPanel);
     }
     resultPanel = null;
 
@@ -144,9 +138,9 @@ public class ResultViewPanel extends Panel
         contextLeft, contextRight,
         segmentationLayer, this, offset);
 
-      mainLayout.addComponent(resultPanel);
-      mainLayout.setExpandRatio(resultPanel, 1.0f);
-      mainLayout.setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
+      addComponent(resultPanel);
+      setExpandRatio(resultPanel, 1.0f);
+      setComponentAlignment(resultPanel, Alignment.TOP_CENTER);
 
       resultPanel.setVisible(true);
     }
@@ -155,9 +149,9 @@ public class ResultViewPanel extends Panel
       // nothing to show since we have an empty result
       Label lblNoResult = new Label("No matches found.");
       lblNoResult.setSizeUndefined();
-      mainLayout.addComponent(lblNoResult);
-      mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
-      mainLayout.setExpandRatio(lblNoResult, 1.0f);
+      addComponent(lblNoResult);
+      setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
+      setExpandRatio(lblNoResult, 1.0f);
     }
 
   }
