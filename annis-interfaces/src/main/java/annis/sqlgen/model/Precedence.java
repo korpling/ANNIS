@@ -73,6 +73,35 @@ public class Precedence extends RangedJoin
   }
 
   @Override
+  public String toAqlOperator()
+  {
+    String extraDistance = "";
+    if(minDistance == 0 && maxDistance == 0 )
+    {
+      extraDistance = "*";
+    }
+    else if(minDistance > 1 && minDistance == maxDistance)
+    {
+      extraDistance = "" + minDistance;
+    }
+    else if(minDistance > 1 || maxDistance > 1)
+    {
+      extraDistance = "" + minDistance + "," + maxDistance;
+    }
+    
+    if(segmentationName == null)
+    {
+      return "." + extraDistance;
+    }
+    else
+    {
+      return "." + segmentationName + " " + extraDistance;
+    }
+  }
+  
+  
+
+  @Override
   public int hashCode()
   {
     int hash = 7;

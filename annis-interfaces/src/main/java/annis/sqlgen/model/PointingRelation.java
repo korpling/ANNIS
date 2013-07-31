@@ -37,4 +37,33 @@ public class PointingRelation extends RankTableJoin {
 		return "points to node " + target.getId() + " (" + name + ", " + minDistance + ", " + maxDistance + ")";
 	}
 
+  @Override
+  public String toAqlOperator()
+  {
+    String extraDistance = "";
+    if(minDistance == 0 && maxDistance == 0 )
+    {
+      extraDistance = "*";
+    }
+    else if(minDistance > 1 && minDistance == maxDistance)
+    {
+      extraDistance = "" + minDistance;
+    }
+    else if(minDistance > 1 || maxDistance > 1)
+    {
+      extraDistance = "" + minDistance + "," + maxDistance;
+    }
+    
+    if(name == null)
+    {
+      return "->" + extraDistance;
+    }
+    else
+    {
+      return "->" + name + " " + extraDistance;
+    }
+  }
+  
+  
+
 }

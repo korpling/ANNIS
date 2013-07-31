@@ -28,4 +28,11 @@ public class Inclusion extends Join {
 		return "includes node " + target.getId();
 	}
 
+  @Override
+  public String toAqlOperator()
+  {
+    return "_i_";
+  }
+  
+
 }

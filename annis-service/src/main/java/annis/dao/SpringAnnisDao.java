@@ -19,9 +19,7 @@ import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
-import annis.ql.node.Start;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryAnalysis;
+import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
@@ -309,9 +307,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private MetaDataFilter metaDataFilter;
 
-  private QueryAnalysis queryAnalysis;
-
-  private AnnisParser aqlParser;
+  private AnnisParserAntlr aqlParser;
 
   private HashMap<Long, Properties> corpusConfiguration;
 
@@ -558,10 +554,24 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
   {
+    // test the new AntLR based parser
+//    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(aql));
+//    AqlParser parser = new AqlParser(new CommonTokenStream(lexer));
+//    CommonTree tree;
+//    try
+//    {
+//      tree = (CommonTree) parser.start().getTree();
+//      
+//      log.info("parsed {} with result {}", aql, tree.toStringTree());
+//    }
+//    catch (RecognitionException ex)
+//    {
+//      log.error("parsing error for {}: {}", aql, ex.getMessage());
+//    }
+    
+    
     // parse the query
-    Start statement = aqlParser.parse(aql);
-    // analyze it
-    return queryAnalysis.analyzeQuery(statement, corpusList);
+    return aqlParser.parse(aql, corpusList);
   }
 
   @Override
@@ -634,6 +644,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<Long> mapCorpusNamesToIds(List<String> corpusNames)
   {
+    if(corpusNames == null || corpusNames.isEmpty())
+    {
+      return new LinkedList<Long>();
+    }
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
     final List<Long> result = getJdbcTemplate().query(sql,
       listCorpusByNameDaoHelper);
@@ -761,12 +775,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return false;
   }
 
-  public AnnisParser getAqlParser()
+  public AnnisParserAntlr getAqlParser()
   {
     return aqlParser;
   }
 
-  public void setAqlParser(AnnisParser aqlParser)
+  public void setAqlParser(AnnisParserAntlr aqlParser)
   {
     this.aqlParser = aqlParser;
   }
@@ -845,17 +859,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.findSqlGenerator = findSqlGenerator;
   }
-
-  public QueryAnalysis getQueryAnalysis()
-  {
-    return queryAnalysis;
-  }
-
-  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
-  {
-    this.queryAnalysis = queryAnalysis;
-  }
-
+  
   public ListCorpusByNameDaoHelper getListCorpusByNameDaoHelper()
   {
     return listCorpusByNameDaoHelper;

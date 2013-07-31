@@ -27,5 +27,13 @@ public class RightOverlap extends Join {
 	public String toString() {
 		return "right overlaps node " + target.getId();
 	}
+
+  @Override
+  public String toAqlOperator()
+  {
+    return "_or_";
+  }
 	
+  
+  
 }
