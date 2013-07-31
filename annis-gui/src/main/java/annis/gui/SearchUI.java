@@ -35,9 +35,9 @@ import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
-import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ExternalResource;
@@ -74,6 +74,7 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@Push
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
@@ -116,8 +117,6 @@ public class SearchUI extends AnnisBaseUI
 
   private QueryController queryController;
 
-  private Refresher refresh;
-
   private String lastQueriedFragment;
 
   private InstanceConfig instanceConfig;
@@ -139,12 +138,6 @@ public class SearchUI extends AnnisBaseUI
     JavaScript.getCurrent().addFunction("annis.gui.logincallback", new LoginCloseCallback());
     
     queryController = new QueryController(this);
-
-    refresh = new Refresher();
-    // deactivate refresher by default
-    refresh.setRefreshInterval(-1);
-    refresh.addListener(queryController);
-    addExtension(refresh);
 
     // always get the resize events directly
     setImmediate(true);
@@ -848,21 +841,6 @@ public class SearchUI extends AnnisBaseUI
     // reset title
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
-  }
-
-  public void setRefresherEnabled(boolean enabled)
-  {
-    if (refresh != null)
-    {
-      if (enabled)
-      {
-        refresh.setRefreshInterval(1000);
-      }
-      else
-      {
-        refresh.setRefreshInterval(-1);
-      }
-    }
   }
 
   private class CitationRequestHandler implements RequestHandler

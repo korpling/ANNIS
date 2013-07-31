@@ -45,6 +45,12 @@
     </dependency>
     
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-push</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+    
+    <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-widgets</artifactId>
       <version>${project.version}</version>

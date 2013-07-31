@@ -209,12 +209,6 @@
       <version>2.0.3</version>
     </dependency>
     
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>refresher</artifactId>
-      <version>1.2.1.7</version>
-    </dependency>
-
   </dependencies>
 
 </project>
