@@ -16,7 +16,6 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -30,6 +29,7 @@ public class SubgraphQuery implements Serializable
   private int left;
   private int right;
   private SaltURIGroupSet matches;
+  private SubgraphFilter filter = SubgraphFilter.All;
 
   public String getSegmentationLayer()
   {
@@ -70,6 +70,15 @@ public class SubgraphQuery implements Serializable
   {
     this.matches = matches;
   }
-  
-  
+
+  public SubgraphFilter getFilter()
+  {
+    return filter;
+  }
+
+  public void setFilter(SubgraphFilter filter)
+  {
+    this.filter = filter;
+  }
+
 }

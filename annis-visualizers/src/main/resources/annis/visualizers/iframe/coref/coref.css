@@ -1,5 +1,5 @@
 body {
-    font-size:11px;
+    font-size: 16px;
     font-style:normal;
 }
 
@@ -11,6 +11,7 @@ body {
 table {
   border-style: none;
   border-width: 0px;
+  font-size: 100%;
 }
 
 .text {
@@ -61,7 +62,7 @@ td.space {
 }
 
 table.token {
-  float:left; 
-  font-size:11px; 
+  float:left;
+  font-size: 87.5%;
   border-collapse: collapse;
 }

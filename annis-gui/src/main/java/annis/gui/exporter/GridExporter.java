@@ -15,14 +15,18 @@
  */
 package annis.gui.exporter;
 
+import annis.libgui.Helper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
+import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
@@ -33,6 +37,9 @@ public class GridExporter extends GeneralTextExporter
   public void convertText(AnnisResultSet queryResult, LinkedList<String> keys, 
     Map<String,String> args, Writer out, int offset) throws IOException
   {
+    
+    Map<String, Map<String, Annotation>> metadataCache = 
+      new HashMap<String, Map<String, Annotation>>();
 
 
     boolean showNumbers = true;
@@ -46,6 +53,16 @@ public class GridExporter extends GeneralTextExporter
         showNumbers = false;
       }
     }
+    List<String> metaKeys = new LinkedList<String>();
+    if(args.containsKey("metakeys"))
+    {
+      Iterable<String> it = 
+        Splitter.on(",").trimResults().split(args.get("metakeys"));
+      for(String s : it)
+      {
+        metaKeys.add(s);
+      }
+    }
 
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
@@ -54,7 +71,7 @@ public class GridExporter extends GeneralTextExporter
         new HashMap<String, TreeMap<Long, Span>>();
 
       counter++;
-      out.append((counter + offset) + ". ");
+      out.append((counter + offset) + ".");
 
       long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
       for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
@@ -80,7 +97,7 @@ public class GridExporter extends GeneralTextExporter
 
         if ("tok".equals(k))
         {
-          out.append("\t " + k + "\t ");
+          out.append("\t" + k + "\t ");
           for (AnnisNode annisNode : annisResult.getGraph().getTokens())
           {
             out.append(annisNode.getSpannedText() + " ");
@@ -91,7 +108,7 @@ public class GridExporter extends GeneralTextExporter
         {
           if(annos.get(k) != null)
           {
-            out.append("\t " + k + "\t ");
+            out.append("\t" + k + "\t ");
             for(Span s : annos.get(k).values())
             {
 
@@ -111,10 +128,55 @@ public class GridExporter extends GeneralTextExporter
           }
         }
       }
-
+      
+      if(!metaKeys.isEmpty())
+      {
+        String[] path = annisResult.getPath();
+        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+      }
       out.append("\n\n");
     }
   }
+  
+  private void appendMetaData(Writer out, 
+    List<String> metaKeys,
+    String toplevelCorpus, String documentName,
+    Map<String, Map<String, Annotation>> metadataCache)
+    throws IOException
+  {
+    Map<String, Annotation> metaData = new HashMap<String, Annotation>();
+    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
+    {
+      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
+    }
+    else
+    {
+      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
+      for(Annotation anno : asList)
+      {
+        metaData.put(anno.getQualifiedName(), anno);
+        metaData.put(anno.getName(), anno);
+      }
+      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
+    }
+    
+    for(String key : metaKeys)
+    {
+      Annotation anno = metaData.get(key);
+      if(anno != null)
+      {
+        out.append("\tmeta:" + key + "\t" + anno.getValue()).append("\n");
+      }
+    }
+  }
+
+  @Override
+  public SubgraphFilter getSubgraphFilter()
+  {
+    return SubgraphFilter.All;
+  }
+  
+  
 
 
   private static class Span

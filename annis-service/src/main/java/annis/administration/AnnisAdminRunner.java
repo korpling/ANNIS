@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -36,24 +36,31 @@ import org.springframework.core.io.Resource;
 import annis.AnnisBaseRunner;
 import annis.UsageException;
 import annis.corpuspathsearch.Search;
+import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
 import java.io.File;
 import java.util.LinkedList;
 import org.apache.commons.cli.CommandLine;
+import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class AnnisAdminRunner extends AnnisBaseRunner
 {
 
-  private static final Logger log = LoggerFactory.getLogger(AnnisAdminRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(
+    AnnisAdminRunner.class);
   // API for corpus administration
+
   private CorpusAdministration corpusAdministration;
-  
+
+  private QueriesGenerator queriesGenerator;
+
   public static void main(String[] args)
   {
     // get Runner from Spring
-    AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
+    AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.
+      getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
   }
 
   @Override
@@ -107,10 +114,35 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       // unknown command
     }
+    else if ("genexamples".equals(command))
+    {
+      doGenerateExampleQueries(commandArgs);
+    }
+    else if ("delexamples".equals(command))
+    {
+      doDeleteExampleQueries(commandArgs);
+    }
     else
     {
       throw new UsageException("Unknown command: " + command);
     }
+  }
+
+  /**
+   * @return the queriesGenerator
+   */
+  public QueriesGenerator getQueriesGenerator()
+  {
+    return queriesGenerator;
+  }
+
+  /**
+   * @param queriesGenerator the queriesGenerator to set
+   */
+  public void setQueriesGenerator(
+    QueriesGenerator queriesGenerator)
+  {
+    this.queriesGenerator = queriesGenerator;
   }
 
   static class OptionBuilder
@@ -123,7 +155,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       options = new Options();
     }
 
-    public OptionBuilder addParameter(String opt, String longOpt, String description)
+    public OptionBuilder addParameter(String opt, String longOpt,
+      String description)
     {
       options.addOption(opt, longOpt, true, description);
       return this;
@@ -135,7 +168,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       return this;
     }
 
-    public OptionBuilder addRequiredParameter(String opt, String longOpt, String description)
+    public OptionBuilder addRequiredParameter(String opt, String longOpt,
+      String description)
     {
       Option option = new Option(opt, longOpt, true, description);
       option.setRequired(true);
@@ -143,12 +177,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       return this;
     }
 
-    public OptionBuilder addToggle(String opt, String longOpt, boolean hasArg, String description)
+    public OptionBuilder addToggle(String opt, String longOpt, boolean hasArg,
+      String description)
     {
       options.addOption(opt, longOpt, false, description);
       return this;
     }
-    
+
     public Options createOptions()
     {
       return options;
@@ -157,134 +192,185 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private void doInit(List<String> commandArgs)
   {
+
     Options options = new OptionBuilder()
-      .addParameter("h", "host", "database server host (defaults to localhost)")
+      .addParameter("h", "host",
+      "database server host (defaults to localhost)")
       .addLongParameter("port", "database server port")
-      .addRequiredParameter("d", "database", "name of the ANNIS database (REQUIRED)")
+      .addRequiredParameter("d", "database",
+      "name of the ANNIS database (REQUIRED)")
       .addRequiredParameter("u", "user", "name of the ANNIS user (REQUIRED)")
-      .addRequiredParameter("p", "password", "password of the ANNIS suer (REQUIRED)")
-      .addParameter("D", "defaultdb", "name of the PostgreSQL default database (defaults to \"postgres\")")
-      .addParameter("U", "superuser", "name of a PostgreSQL super user (defaults to \"postgres\")")
-      .addParameter("P", "superpassword", "password of a PostgreSQL super user")
+      .addRequiredParameter("p", "password",
+      "password of the ANNIS suer (REQUIRED)")
+      .addParameter("D", "defaultdb",
+      "name of the PostgreSQL default database (defaults to \"postgres\")")
+      .addParameter("U", "superuser",
+      "name of a PostgreSQL super user (defaults to \"postgres\")")
+      .addParameter("P", "superpassword",
+      "password of a PostgreSQL super user")
       .addParameter("m", "migratecorpora",
-        "Try to import the already existing corpora into the database. "
-        + "You can set the root directory for corpus sources as an argument.")
-      .addToggle("s", "ssl", false, "if given use SSL for connecting to the database")
+      "Try to import the already existing corpora into the database. "
+      + "You can set the root directory for corpus sources as an argument.")
+      .addToggle("s", "ssl", false,
+      "if given use SSL for connecting to the database")
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
+
     try
     {
-      cmdLine = parser.parse(options, commandArgs.toArray(new String[commandArgs.size()]));
+      cmdLine = parser.parse(options, commandArgs.toArray(
+        new String[commandArgs.size()]));
+
+      // check for required flags
+      if (!cmdLine.hasOption("user") || !cmdLine.hasOption("database") || !cmdLine.
+        hasOption("password"))
+      {
+        throw new ParseException("required option is missing");
+      }
+
+      String host = cmdLine.getOptionValue("host", "localhost");
+      String port = cmdLine.getOptionValue("port", "5432");
+      String database = cmdLine.getOptionValue("database");
+      String user = cmdLine.getOptionValue("user");
+      String password = cmdLine.getOptionValue("password");
+      String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
+      String superUser = cmdLine.getOptionValue("superuser", "postgres");
+      String superPassword = cmdLine.getOptionValue("superpassword");
+      boolean useSSL = cmdLine.hasOption("ssl");
+
+      boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
+      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
+
+      if (migrateCorpora)
+      {
+        // get corpus list
+        try
+        {
+          existingCorpora = corpusAdministration.listCorpusStats();
+        }
+        catch (Exception ex)
+        {
+          log.warn(
+            "Could not get existing corpus list for migration, migrating "
+            + "the corpora will be disabled.", ex);
+          migrateCorpora = false;
+        }
+      }
+
+      corpusAdministration.
+        initializeDatabase(host, port, database, user, password,
+        defaultDatabase, superUser, superPassword, useSSL);
+
+      if (migrateCorpora && existingCorpora.size() > 0)
+      {
+        String corpusRoot = cmdLine.getOptionValue("migratecorpora");
+
+        Search search = null;
+        if (corpusRoot != null && !"".equals(corpusRoot))
+        {
+          File rootCorpusPath = new File(corpusRoot);
+          if (rootCorpusPath.isDirectory())
+          {
+            LinkedList<File> l = new LinkedList<File>();
+            l.add(rootCorpusPath);
+
+            search = new Search(l);
+          }
+        }
+
+        for (Map<String, Object> corpusStat : existingCorpora)
+        {
+          String corpusName = (String) corpusStat.get("name");
+          String migratePath = (String) corpusStat.get("source_path");
+
+          if (migratePath == null)
+          {
+
+            if (search == null)
+            {
+              log.error(
+                "You have to give a valid corpus root directory as argument to migratecorpora");
+              search = new Search(new LinkedList<File>());
+            }
+            else if (!search.isWasSearched())
+            {
+              log.info("Searching for corpora at given directory, "
+                + "this can take some minutes");
+              search.startSearch();
+            }
+
+            // used the searched corpus path of corpus path was not part of the
+            // corpus description in the database
+            if (search.getCorpusPaths().containsKey(corpusName))
+            {
+              migratePath = search.getCorpusPaths().get(corpusName).
+                getParentFile().getAbsolutePath();
+            }
+
+          } // end if migratePath == null
+
+
+          if (migratePath == null || !(new File(migratePath).isDirectory()))
+          {
+            log.warn(
+              "Unable to migrate \"" + corpusName + "\" because the system "
+              + "can not find a valid source directory where it is located.");
+          }
+          else
+          {
+            log.info("migrating corpus " + corpusName);
+            corpusAdministration.importCorpora(migratePath);
+          }
+        }
+
+
+      }
 
     }
     catch (ParseException e)
     {
-      throw new UsageException(e.getMessage());
-    }
-
-    String host = cmdLine.getOptionValue("host", "localhost");
-    String port = cmdLine.getOptionValue("port", "5432");
-    String database = cmdLine.getOptionValue("database");
-    String user = cmdLine.getOptionValue("user");
-    String password = cmdLine.getOptionValue("password");
-    String defaultDatabase = cmdLine.getOptionValue("defaultdb", "postgres");
-    String superUser = cmdLine.getOptionValue("superuser", "postgres");
-    String superPassword = cmdLine.getOptionValue("superpassword");
-    boolean useSSL = cmdLine.hasOption("ssl");
-
-    boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-    List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
-    
-    if (migrateCorpora)
-    {
-      // get corpus list
-      try
-      {
-        existingCorpora = corpusAdministration.listCorpusStats();
-      }
-      catch(Exception ex)
-      {
-        log.warn("Could not get existing corpus list for migration, migrating "
-          + "the corpora will be disabled.", ex);
-        migrateCorpora = false;
-      }
-    }
-
-    corpusAdministration.initializeDatabase(host, port, database, user, password, 
-      defaultDatabase, superUser, superPassword, useSSL);
-
-    if (migrateCorpora && existingCorpora.size() > 0)
-    {
-      String corpusRoot = cmdLine.getOptionValue("migratecorpora");
-
-      Search search = null;
-      if (corpusRoot != null && !"".equals(corpusRoot))
-      {
-        File rootCorpusPath = new File(corpusRoot);
-        if (rootCorpusPath.isDirectory())
-        {
-          LinkedList<File> l = new LinkedList<File>();
-          l.add(rootCorpusPath);
-
-          search = new Search(l);
-        }
-      }
-
-      for (Map<String, Object> corpusStat : existingCorpora)
-      {
-        String corpusName = (String) corpusStat.get("name");
-        String migratePath = (String) corpusStat.get("source_path");
-
-        if (migratePath == null)
-        {
-          
-          if(search == null)
-          {
-            log.error("You have to give a valid corpus root directory as argument to migratecorpora");
-            search = new Search(new LinkedList<File>());
-          }          
-          else if (!search.isWasSearched())
-          {
-            log.info("Searching for corpora at given directory, "
-              + "this can take some minutes");
-            search.startSearch();
-          }
-          
-          // used the searched corpus path of corpus path was not part of the
-          // corpus description in the database
-          if(search.getCorpusPaths().containsKey(corpusName))
-          {
-            migratePath = search.getCorpusPaths().get(corpusName).getParentFile().getAbsolutePath();
-          }
-          
-        } // end if migratePath == null
-
-
-        if (migratePath == null || !(new File(migratePath).isDirectory()))
-        {
-          log.warn("Unable to migrate \"" + corpusName + "\" because the system "
-            + "can not find a valid source directory where it is located.");
-        }
-        else
-        {
-          log.info("migrating corpus " + corpusName);
-          corpusAdministration.importCorpora(migratePath);
-        }
-      }
-
-
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh init", options);
     }
   }
 
   private void doImport(List<String> commandArgs)
   {
-    if (commandArgs.isEmpty())
-    {
-      throw new UsageException("Where can I find the corpus you want to import?");
-    }
+    Options options = new OptionBuilder().addToggle("o", "overwrite", false,
+      "Overwrites a corpus, when it is already stored in the database.")
+      .createOptions();
 
-    corpusAdministration.importCorpora(commandArgs);
+    try
+    {
+
+
+
+      CommandLineParser parser = new PosixParser();
+      CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
+        new String[commandArgs.size()]));
+
+      if (cmdLine.getArgList().isEmpty())
+      {
+        throw new ParseException(
+          "Where can I find the corpus you want to import?");
+      }
+
+      if (cmdLine.hasOption('o'))
+      {
+        corpusAdministration.importCorpora(cmdLine.getArgList(), true);
+      }
+      else
+      {
+        corpusAdministration.importCorpora(cmdLine.getArgList(), false);
+      }
+    }
+    catch (ParseException ex)
+    {
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh import [OPTION] DIR1 DIR2 ...",
+        options);
+    }
   }
 
   private void doDelete(List<String> commandArgs)
@@ -323,7 +409,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     printTable(stats);
   }
 
-
   private void doIndexes()
   {
     for (String indexDefinition : corpusAdministration.listUsedIndexes())
@@ -336,14 +421,58 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
   }
 
+  private void doDeleteExampleQueries(List<String> commandArgs)
+  {
+    if (commandArgs == null || commandArgs.isEmpty())
+    {
+      queriesGenerator.delExampleQueries(null);
+    }
+    else
+    {
+      queriesGenerator.delExampleQueries(commandArgs);
+    }
+  }
+
+  private void doGenerateExampleQueries(List<String> commandArgs)
+  {
+    if (commandArgs == null || commandArgs.isEmpty())
+    {
+      queriesGenerator.generateQueries(false);
+    }
+    else
+    {
+      boolean overwrite = false;
+
+      for (String c : commandArgs)
+      {
+        if ("--overwrite".equals(c) || "-o".equals(c))
+        {
+          overwrite = true;
+        }
+      }
+
+
+      for (String corpusNames : commandArgs)
+      {
+        if (corpusNames.startsWith("--") || corpusNames.startsWith("-"))
+        {
+          continue;
+        }
+        queriesGenerator.generateQueries(corpusNames, overwrite);
+      }
+    }
+  }
+
   private void usage(String error)
   {
     Resource resource = new ClassPathResource("annis/administration/usage.txt");
     BufferedReader reader = null;
     try
     {
-      reader = new BufferedReader(new InputStreamReader(resource.getInputStream(), "UTF-8"));
-      for (String line = reader.readLine(); line != null; line = reader.readLine())
+      reader = new BufferedReader(new InputStreamReader(resource.
+        getInputStream(), "UTF-8"));
+      for (String line = reader.readLine(); line != null; line = reader.
+        readLine())
       {
         System.out.println(line);
       }

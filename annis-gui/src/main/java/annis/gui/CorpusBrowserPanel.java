@@ -29,7 +29,9 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -235,8 +237,8 @@ public class CorpusBrowserPanel extends Panel
         containerEdgeType.addBean(cbeEdgeType);
 
         // the edge annotation entry
-        
-        if(!a.getValueSet().isEmpty())
+
+        if (!a.getValueSet().isEmpty())
         {
           CorpusBrowserEntry cbeEdgeAnno = new CorpusBrowserEntry();
           String edgeAnno = stripEdgeAnno
@@ -320,6 +322,20 @@ public class CorpusBrowserPanel extends Panel
       setSizeFull();
       setSelectable(true);
       setMultiSelect(false);
+
+      addGeneratedColumn("example", new ColumnGenerator()
+      {
+        @Override
+        public Object generateCell(Table source, Object itemId, Object columnId)
+        {
+          CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
+          Label l = new Label(corpusBrowserEntry.getExample());
+          l.setContentMode(ContentMode.TEXT);
+          l.addStyleName("corpus-font-force");
+          return l;
+        }
+      });
+
       setVisibleColumns(new String[]
       {
         "name", "example", "genlink"

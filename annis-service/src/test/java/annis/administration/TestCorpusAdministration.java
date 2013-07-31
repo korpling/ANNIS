@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -68,7 +68,7 @@ public class TestCorpusAdministration
     String path1 = "somePath";
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
-    
+
     administration.importCorpora(path1, path2, path3);
 
     // insertion of a corpus needs to follow an exact order
@@ -99,7 +99,7 @@ public class TestCorpusAdministration
   // a correct import requires this order
   private void verifyImport(InOrder inOrder, String path)
   {
-    inOrder.verify(administrationDao).importCorpus(path);
+    inOrder.verify(administrationDao).importCorpus(path, false);
 //    // create the staging area
 //    inOrder.verify(administrationDao).createStagingArea(true);
 //

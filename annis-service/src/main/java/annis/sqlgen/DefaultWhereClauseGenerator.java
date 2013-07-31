@@ -273,6 +273,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       conditions.add(join("=",  
         tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
         sqlString(join.getSegmentationName()))); 
+      
+      conditions.add(join("=",  
+        tables(target).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
     }
     
     
@@ -534,12 +538,22 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     List<Long> corpusList = queryData.getCorpusList();
     TableAccessStrategy tas = tables(null);
     String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
-    String parent = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "parent"));
-    String pre = TableAccessStrategy.column("children", tas.columnName(RANK_TABLE, "pre"));
+    String componentID1 = tables(node).aliasedColumn(COMPONENT_TABLE, "id");
+    String corpusRef1 = tables(node).aliasedColumn(NODE_TABLE, "corpus_ref");
+    
+    String parent = tas.column("children", tas.columnName(RANK_TABLE, "parent"));
+    String pre = tas.column("children", tas.columnName(RANK_TABLE, "pre"));
+    String componentID = tas.column("children", tas.columnName(COMPONENT_TABLE, "id"));;
+    String corpusRef = tas.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
+    
+    
     StringBuffer sb = new StringBuffer();
     sb.append("(SELECT count(DISTINCT " + pre + ")\n");
     sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
-    sb.append("\tWHERE " + parent + " = " + pre1 + " AND toplevel_corpus IN("
+    sb.append("\tWHERE " + parent + " = " + pre1 
+      + " AND " + componentID1 + " = " + componentID
+      + " AND " + corpusRef1 + " = " + corpusRef
+      + " AND toplevel_corpus IN("
       + (corpusList.isEmpty() ? "NULL" : StringUtils.join(corpusList, ","))
       + ")" + ")");
     QueryNode.Range arity = node.getArity();

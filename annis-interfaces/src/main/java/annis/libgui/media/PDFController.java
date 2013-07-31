@@ -47,4 +47,11 @@ public interface PDFController extends Plugin, Serializable
    *
    */
   public void openPDF(String resultID, String pageNumber);
+
+  /**
+   * Informs about the number of already registered pdf viewer.
+   *
+   * @return the number of registered pdf viewer.
+   */
+  public int sizeOfRegisterdPDFViewer();
 }

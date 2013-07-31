@@ -62,11 +62,18 @@ import org.vaadin.cssinject.CSSInject;
 @Theme("annis")
 public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 {
-
+  
+  static
+  {
+    SLF4JBridgeHandler.removeHandlersForRootLogger();
+    SLF4JBridgeHandler.install();
+  }
+  
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisBaseUI.class);
 
   public final static String USER_KEY = "annis.gui.AnnisBaseUI:USER_KEY";
+  public final static String USER_LOGIN_ERROR = "annis.gui.AnnisBaseUI:USER_LOGIN_ERROR";
   public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
 
@@ -87,12 +94,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
-
+  
   @Override
   protected void init(VaadinRequest request)
-  {
+  {  
     initLogging();
-    
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
     
@@ -256,11 +262,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
 
-  protected void initLogging()
+  protected final void initLogging()
   {
-    SLF4JBridgeHandler.removeHandlersForRootLogger();
-    SLF4JBridgeHandler.install();
-
     try
     {
       

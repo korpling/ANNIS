@@ -179,7 +179,7 @@ public class LegacyGraphConverterTest
     assertEquals("number of outgoing edges must be equal for [" + n1.toString() + "]", out1.size(), out2.size());
     for (Edge e1 : out1)
     {
-      assertTrue("edge [" + e1 +"] must be contained in outgoing edges",out2.contains(e1));
+      assertTrue("edge [" + e1 +"] must be contained in outgoing edges " + out2.toString(),out2.contains(e1));
       for (Edge e2 : out2)
       {
         if (e1.getPre() == e2.getPre())

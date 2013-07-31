@@ -26,6 +26,8 @@ import org.springframework.jdbc.core.JdbcTemplate;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.SubgraphFilter;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.dao.DataAccessException;
@@ -109,8 +111,22 @@ public abstract class AnnotateSqlGenerator<T>
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    
+    HashSet<String> result = new HashSet<String>();
+    
     TableAccessStrategy tables = tables(null);
 
+    List<AnnotateQueryData> annoExtList = queryData.getExtensions(AnnotateQueryData.class);
+    if(!annoExtList.isEmpty())
+    {
+      AnnotateQueryData annoExt = annoExtList.get(0);
+
+      if(annoExt.getFilter() == SubgraphFilter.Token)
+      {
+        result.add(tables.aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
+      }
+    }
+    
     StringBuilder sb = new StringBuilder();
 
     // restrict node table to corpus list
@@ -131,7 +147,6 @@ public abstract class AnnotateSqlGenerator<T>
         sb.append(StringUtils.join(corpusList, ", "));
         sb.append(") AND\n");
       }
-
     }
 
 
@@ -149,8 +164,6 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(tables.aliasedColumn(CORPUS_TABLE, "id"));
     sb.append(" = ");
     sb.append(tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
-
-    HashSet<String> result = new HashSet<String>();
 
     result.add(sb.toString());
 

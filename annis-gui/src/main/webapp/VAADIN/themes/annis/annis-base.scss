@@ -657,13 +657,20 @@
     text-shadow: 0 1px 0 rgb(55,58,157);
   }
 
-  .example-queries-table {
+  .example-queries-table table,
+  .example-queries-table .v-table-body-wrapper {
     border-collapse: collapse;
+    border-spacing: 0;
+    overflow-x: hidden !important;
+  }
+
+  .example-queries-table tr.v-selected {
+    background : grey;
+    color : #ECF0F6;
   }
 
   .example-queries-table .v-table-body td {
-		border: 1px solid #ECF0F6;
-    border-collapse: collapse;
+    border: 1px solid #ECF0F6;
     padding: 5px;
 	}
 }

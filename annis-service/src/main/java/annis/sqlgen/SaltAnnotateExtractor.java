@@ -4,7 +4,9 @@
  */
 package annis.sqlgen;
 
+import annis.model.RelannisNodeFeature;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisEdgeFeature;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -20,7 +22,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
 
@@ -43,10 +44,10 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotat
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.ListIterator;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -200,18 +201,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
    */
   private void removeArtificialDominancesEdges(SDocumentGraph graph)
   {
-    ListIterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().listIterator();
+    Iterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().iterator();
     List<SDominanceRelation> edgesToRemove = new LinkedList<SDominanceRelation>();
     while(itDomReal.hasNext())
     {
       SDominanceRelation rel = itDomReal.next();
       
-      SFeature featCompID = rel.getSFeature(ANNIS_NS, FEAT_COMPONENTID);
-      SFeature featPre = rel.getSFeature(ANNIS_NS, FEAT_INTERNALID);
-
+      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
       
       boolean allNull = true;
-      EList<String> types = rel.getSTypes();
+      List<String> types = rel.getSTypes();
       if(types != null)
       {
         for(String s : types)
@@ -225,24 +224,24 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       } // end if types not null
       if (allNull)
       {
-        EList<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
+        List<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
           getSTarget().getSId());
         if (mirrorEdges != null && mirrorEdges.size() > 1)
         {
           for (Edge mirror : mirrorEdges)
           {
-            if (mirror != rel && featCompID != null)
+            if (mirror != rel && featEdge != null )
             {
               SRelation mirrorRel = (SRelation) mirror;
               
-              if(mirrorRel.getSFeature(ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT) == null)
+              RelannisEdgeFeature mirrorFeat = RelannisEdgeFeature.extract(mirrorRel);
+              if(mirrorFeat != null && mirrorFeat.getArtificialDominanceComponent() == null)
               {
-                mirrorRel.createSFeature(
-                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_COMPONENT,
-                  featCompID.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
-                mirrorRel.createSFeature(
-                  ANNIS_NS, FEAT_ARTIFICIAL_DOMINANCE_PRE,
-                  featPre.getSValueSNUMERIC(), SDATATYPE.SNUMERIC);
+                mirrorFeat.setArtificialDominanceComponent(featEdge.getComponentID());
+                mirrorFeat.setArtificialDominancePre(featEdge.getPre());
+                // reset
+                mirrorRel.removeLabel(ANNIS_NS, FEAT_RELANNIS_EDGE);
+                mirrorRel.createSFeature(ANNIS_NS, FEAT_RELANNIS_EDGE, mirrorFeat, SDATATYPE.SOBJECT);
               }
             }
           }
@@ -255,12 +254,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     // actually remove the edges
     for(SDominanceRelation rel : edgesToRemove)
     {
+      // remove edge from layer (removing it from graph does not remove it from layer...)
       EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
       for(SLayer layer : layersOfRel)
       {
         layer.getSRelations().remove(rel);
       }
-      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );;
+      
+      // remove edge from graph
+      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );
+      
     }
     
   }
@@ -268,6 +271,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private void addOrderingRelations(SDocumentGraph graph,
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath)
   {
+    AtomicInteger numberOfSOrderRels = new AtomicInteger();
+    
     for(Map.Entry<String, TreeMap<Long, String>> e : nodeBySegmentationPath.entrySet())
     {
       TreeMap<Long, String> nodeBySegIndex = e.getValue();
@@ -283,6 +288,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           orderRel.setSSource(lastNode);
           orderRel.setSTarget(n);
           orderRel.addSType(e.getKey());
+          orderRel.setSName("sOrderRel" + numberOfSOrderRels.getAndIncrement());
           graph.addSRelation(orderRel);
         }
         lastNode = n;
@@ -306,23 +312,29 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     TreeMap<Long, String> tokenTexts,  TreeMap<Long, SToken> tokenByIndex)
   {
     STextualDS textDataSource = SaltFactory.eINSTANCE.createSTextualDS();
+    textDataSource.setSName("sText" + textID);
     graph.addSNode(textDataSource);
     
     StringBuilder sbText = new StringBuilder();
     Iterator<Map.Entry<Long, String>> itToken = tokenTexts.entrySet().
       iterator();
+    long index = 0;
     while (itToken.hasNext())
     {
       Map.Entry<Long, String> e = itToken.next();
       SToken tok = tokenByIndex.get(e.getKey());
       
-      if(tok.getSFeature(ANNIS_NS, FEAT_TEXTREF).getSValueSNUMERIC() == textID)
+      RelannisNodeFeature feat = (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getSValue();
+      
+      if(feat.getTextRef() == textID)
       {
         STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
         textRel.setSSource(tok);
         textRel.setSTarget(textDataSource);
         textRel.setSStart(sbText.length());
         textRel.setSEnd(sbText.length() + e.getValue().length());
+        
+        textRel.setSName("sTextRel" + textID + "_" + (index++));
 
         textRel.setSTextualDS(textDataSource);
         graph.addSRelation(textRel);
@@ -370,48 +382,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // create new node
       if (isToken)
       {
-        SToken tok = SaltFactory.eINSTANCE.createSToken();
-        node = tok;
-
-        // get spanned text of token
-        tokenTexts.put(tokenIndex, stringValue(resultSet, NODE_TABLE, "span"));
-        tokenByIndex.put(tokenIndex, tok);
+        node = createSToken(tokenIndex, resultSet, tokenTexts, tokenByIndex);
       }
       else
       {
-        // check if we have span, early detection of spans will spare
-        // us calls to recreateNode() which is quite costly since it
-        // removes nodes/edges and this is something Salt does not handle
-        // efficiently
-        String edgeType = stringValue(resultSet, COMPONENT_TABLE, "type");
-        if("c".equals(edgeType))
-        {
-          SSpan span = SaltFactory.eINSTANCE.createSSpan();
-          node = span;
-        }
-        else
-        {
-          // default fallback is a SStructure
-          SStructure struct = SaltFactory.eINSTANCE.createSStructure();
-          node = struct;
-        }
+        node = createOtherSNode(resultSet);
       }
 
       node.setSName(name);
-      graph.addNode(node);
-
-
-      addLongSFeature(node, FEAT_INTERNALID, internalID);
-      addLongSFeature(node, resultSet, FEAT_CORPUSREF, "node", "corpus_ref");
-      addLongSFeature(node, resultSet, FEAT_TEXTREF, "node", "text_ref");
-      addLongSFeature(node, resultSet, FEAT_LEFT, "node", "left");
-      addLongSFeature(node, resultSet, FEAT_LEFTTOKEN, "node", "left_token");
-      addLongSFeature(node, resultSet, FEAT_RIGHT, "node", "right");
-      addLongSFeature(node, resultSet, FEAT_RIGHTTOKEN, "node", "right_token");
-      addLongSFeature(node, resultSet, FEAT_TOKENINDEX, "node", "token_index");
-      addLongSFeature(node, resultSet, FEAT_SEGINDEX, "node", "seg_index");
-      addStringSFeature(node, resultSet, FEAT_SEGNAME, "node", "seg_name");
-     
+      
+      setFeaturesForNode(node, internalID, resultSet);
       
       Object nodeId = key.getNodeId(resultSet,
         outerQueryTableAccessStrategy);
@@ -419,21 +399,11 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList[matchedNode-1] = node.getSId();
+        keyNameList[matchedNode-1] = node.getSName();
       }
 
-      // map layer
-      String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
-      EList<SLayer> layerList = graph.getSLayerByName(namespace);
-      SLayer layer = (layerList != null && layerList.size() > 0)
-        ? layerList.get(0) : null;
-      if (layer == null)
-      {
-        layer = SaltFactory.eINSTANCE.createSLayer();
-        layer.setSName(namespace);
-        graph.addSLayer(layer);
-      }
-      node.getSLayers().add(layer);
+      graph.addNode(node);
+      mapLayer(node, graph, resultSet);
       
       long textRef = longValue(resultSet, NODE_TABLE, "text_ref");
       allTextIDs.add(textRef);
@@ -476,9 +446,81 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
     }
     
-    // TODO: what more do we have to do?
     return node;
   }
+  
+  private SToken createSToken(long tokenIndex, ResultSet resultSet,  
+    TreeMap<Long, String> tokenTexts,
+    TreeMap<Long, SToken> tokenByIndex) throws SQLException
+  {
+    SToken tok = SaltFactory.eINSTANCE.createSToken();
+    
+    // get spanned text of token
+    tokenTexts.put(tokenIndex, stringValue(resultSet, NODE_TABLE, "span"));
+    tokenByIndex.put(tokenIndex, tok);
+    
+    return tok;
+  }
+  
+  private SStructuredNode createOtherSNode(ResultSet resultSet) throws SQLException
+  {
+    // check if we have span, early detection of spans will spare
+    // us calls to recreateNode() which is quite costly since it
+    // removes nodes/edges and this is something Salt does not handle
+    // efficiently
+    String edgeType = stringValue(resultSet, COMPONENT_TABLE, "type");
+    if("c".equals(edgeType))
+    {
+      SSpan span = SaltFactory.eINSTANCE.createSSpan();
+      return span;
+    }
+    else
+    {
+      // default fallback is a SStructure
+      SStructure struct = SaltFactory.eINSTANCE.createSStructure();
+      return struct;
+    }
+  }
+  
+  private void setFeaturesForNode(SStructuredNode node, long internalID, ResultSet resultSet) throws SQLException
+  { 
+    
+    SFeature feat = SaltFactory.eINSTANCE.createSFeature();
+    feat.setSNS(ANNIS_NS);
+    feat.setSName(FEAT_RELANNIS_NODE);
+    
+    RelannisNodeFeature val = new RelannisNodeFeature();
+    val.setInternalID(longValue(resultSet, "node", "id"));
+    val.setCorpusRef(longValue(resultSet, "node", "corpus_ref"));
+    val.setTextRef(longValue(resultSet, "node", "text_ref"));
+    val.setLeft(longValue(resultSet, "node", "left"));
+    val.setLeftToken(longValue(resultSet, "node", "left_token"));
+    val.setRight(longValue(resultSet, "node", "right"));
+    val.setRightToken(longValue(resultSet, "node", "right_token"));
+    val.setTokenIndex(longValue(resultSet, "node", "token_index"));
+    val.setSegIndex(longValue(resultSet, "node", "seg_index"));
+    val.setSegName(stringValue(resultSet, "node", "seg_name"));
+    feat.setSValue(val);
+    
+    node.addSFeature(feat);
+  }
+  
+  private void mapLayer(SStructuredNode node, SDocumentGraph graph, ResultSet resultSet) 
+    throws SQLException
+  {
+    String namespace = stringValue(resultSet, NODE_TABLE, "namespace");
+    List<SLayer> layerList = graph.getSLayerByName(namespace);
+    SLayer layer = (layerList != null && layerList.size() > 0)
+      ? layerList.get(0) : null;
+    if (layer == null)
+    {
+      layer = SaltFactory.eINSTANCE.createSLayer();
+      layer.setSName(namespace);
+      graph.addSLayer(layer);
+    }
+    node.getSLayers().add(layer);
+  }
+  
 
   private void addLongSFeature(SNode node, String name,
     long value) throws SQLException
@@ -564,7 +606,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     from.getSLayers().clear();
  
-    EList<Edge> inEdges =  new BasicEList<Edge>(graph.getInEdges(from.getSId()));
+    List<Edge> inEdges =  graph.getInEdges(from.getSId());
     for(Edge e : inEdges)
     {
       if(e instanceof SRelation)
@@ -572,7 +614,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         Validate.isTrue(graph.removeEdge(e));
       }
     }
-    EList<Edge> outEdges = new BasicEList<Edge>(graph.getOutEdges(from.getSId()));
+    List<Edge> outEdges = graph.getOutEdges(from.getSId());
     for(Edge e : outEdges)
     {
       if(e instanceof SRelation)
@@ -634,7 +676,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   {
     SRelation rel = null;
     
-    EList<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
+    List<Edge> existingEdges = graph.getEdges(sourceNode.getSId(),
       targetNode.getSId());
     if (existingEdges != null)
     {
@@ -716,17 +758,15 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       rel.addSType(edgeName);
 
 
-      SFeature featInternalID = SaltFactory.eINSTANCE.createSFeature();
-      featInternalID.setSNS(ANNIS_NS);
-      featInternalID.setSName(FEAT_INTERNALID);
-      featInternalID.setSValue(Long.valueOf(pre));
-      rel.addSFeature(featInternalID);
+      RelannisEdgeFeature featEdge = new RelannisEdgeFeature();
+      featEdge.setPre(Long.valueOf(pre));
+      featEdge.setComponentID(Long.valueOf(componentID));
 
-      SFeature featComponentID = SaltFactory.eINSTANCE.createSFeature();
-      featComponentID.setSNS(ANNIS_NS);
-      featComponentID.setSName(FEAT_COMPONENTID);
-      featComponentID.setSValue(Long.valueOf(componentID));
-      rel.addSFeature(featComponentID);
+      SFeature sfeatEdge = SaltFactory.eINSTANCE.createSFeature();
+      sfeatEdge.setSNS(ANNIS_NS);
+      sfeatEdge.setSName(FEAT_RELANNIS_EDGE);
+      sfeatEdge.setValue(featEdge);
+      rel.addSFeature(sfeatEdge);
 
       rel.setSSource((SNode) nodeByPre.get(new RankID(componentID, parent)));
       if ("c".equals(type) && !(targetNode instanceof SToken))
@@ -805,7 +845,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       return null;
     }
 
-    EList<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
+    List<SLayer> layerList = graph.getSLayerByName(edgeNamespace);
     SLayer layer = (layerList != null && layerList.size() > 0)
       ? layerList.get(0) : null;
     if (layer == null)
@@ -832,6 +872,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     return rel;
   }
+  
   
   protected SolutionKey<?> createSolutionKey()
   {
@@ -1004,6 +1045,5 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     
     
   }
-  
   
 }

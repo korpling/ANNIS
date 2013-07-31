@@ -15,6 +15,7 @@
         </action>
         <action>
             <actionName>debug</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.2:exec</goal>
@@ -28,6 +29,7 @@
         </action>
         <action>
             <actionName>profile</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
@@ -45,6 +47,28 @@
             </goals>
             <properties>
                 <maven.test.skip>true</maven.test.skip>
+            </properties>
+        </action>
+        <action>
+            <actionName>test</actionName>
+            <goals>
+                <goal>test</goal>
+            </goals>
+            <properties>
+                <jub.consumers>CONSOLE,H2</jub.consumers>
+                <jub.db.file>.benchmarks.db</jub.db.file>
+            </properties>
+        </action>
+        <action>
+            <actionName>test.single</actionName>
+            <goals>
+                <goal>test-compile</goal>
+                <goal>surefire:test</goal>
+            </goals>
+            <properties>
+                <test>${packageClassName}</test>
+                <jub.consumers>CONSOLE,H2</jub.consumers>
+                <jub.db.file>.benchmarks.db</jub.db.file>
             </properties>
         </action>
     </actions>

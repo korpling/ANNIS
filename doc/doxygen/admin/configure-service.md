@@ -4,7 +4,7 @@ Configure back-end service {#admin-configure-service}
 [TOC]
 
 User Configuration {#admin-configure-user}
-------------------
+==================
 
 ANNIS has an authentication system which allows to handle multiple users
 which will see different corpora depending on which groups the user is part
@@ -16,30 +16,32 @@ Additionally, the adminstrator can also directly adjust the contents of the conf
 shiro.ini configuration file. This allows a much more individual configuration
 and the usage of external authorization services like LDAP.
 
-### Configuration file location ### {#admin-configure-userfileloc}
+Configuration file location {#admin-configure-userfileloc}
+---------------------------
 
 There is a central location where the user configuration files are stored.
 Configure the path to this location in the `conf/shiro.info` configuration file of
-the ANNIS service. The default path is `/etc/annis/user_config_trunk/` and
+the ANNIS service. The default path is `/etc/annis/user_config/` and
 must be changed at two locations in the configuration file.
 
 \verbatim
 [main]
 annisRealm = annis.security.ANNISUserRealm
-annisRealm.resourcePath=/etc/annis/user_config_trunk/
+annisRealm.resourcePath=/etc/annis/user_config/
 annisRealm.authenticationCachingEnabled = true
 globalPermResolver = annis.security.ANNISRolePermissionResolver
-globalPermResolver.resourcePath = /etc/annis/user_config_trunk/
+globalPermResolver.resourcePath = /etc/annis/user_config/
 \endverbatim
 
-### User and group files ### {#admin-configure-userformat}
+User and group files {#admin-configure-userformat}
+--------------------
 
-1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/user_config_trunk/groups`):
+1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/user_config/groups`):
 \verbatim
 group1=pcc3,falko,tiger2
 group2=pcc3
 group3=tiger1
-demo=pcc2,falko
+anonymous=pcc2,falko
 \endverbatim
 This example means that a member of group group1 will have access to
 corpora with the names pcc3,falko, tiger2 (corpus names can be displayed
@@ -74,8 +76,12 @@ $shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxa
   \endcode
   The last line is what you have to insert into the password field.
 
+### anonymous group ### {#admin-configure-anonymous}
+
+The special group `anonymous` is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login.
+
 Changing maximal context size {#admin-configure-contextsize}
-------------------------------
+=============================
 
 The maximal context size of ±n tokens from each search result (for the KWIC
 view, but also for other visualization) can be set for the ANNIS service in the file

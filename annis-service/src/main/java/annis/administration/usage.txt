@@ -1,18 +1,20 @@
 Annis Administration Utility
 ----------------------------
 
-usage: 
+usage:
   annis-admin init DATABASE OPTIONS
-  annis-admin import PATH [PATH ...]
+  annis-admin import OPTIONS PATH [PATH ...]
   annis-admin delete CORPUS_ID [CORPUS_ID ...]
   annis-admin list
   annis-admin indexes
+  annis-admin delexamples [CORPUS_NAME ...]
+  annis-admin genexamples [CORPUS_NAME ...]
 
-* init:    Initialize a PostgreSQL database for Annis and 
+* init:    Initialize a PostgreSQL database for Annis and
     update conf/database.properties
-  
+
   Options:
-  
+
   -d, --database    name of the Annis database (REQUIRED)
   -u, --user    name of the Annis user (REQUIRED)
   -p, --password    password of the Annis user (REQUIRED)
@@ -29,16 +31,34 @@ usage:
   -U, --superuser    name of a PostgreSQL super user
         (defaults to "postgres")
   -P, --superpassword  password of the PostgreSQL super user
-  -m, --migratecorpora  Try to import the already existing corpora 
-                        into the database. You can set the root 
+  -m, --migratecorpora  Try to import the already existing corpora
+                        into the database. You can set the root
                         directory for corpus sources as an argument.
-    
-* import:  Import a list of corpora.  
+
+* import:  Import a list of corpora.
     Specify the path to one or more corpora as arguments.
 
-* delete:   Delete a list of corpora. 
+  Option:
+    -o, --overwrite overwrites all corpora which have conflicting top
+                    level corpus names.
+
+
+* delete:   Delete a list of corpora.
     Specify the IDs of one or more corpora as arguments.
 
 * list:    List all top-level corpora.
 
 * indexes:  Show definitions of used and unused indexes.
+
+* genexamples:  Generate example queries for corpora.
+    Specify to one or more corpus names as arguments.
+
+  Options:
+    -o, --overwrite overwrites old example queries, if they exist.
+
+  NOTE: if no corpus is specified, it will generate example queries
+  for all corpora
+
+* delexamples: Delete example queries.
+    Specify a corpus name as an argument, otherwise all example queries
+    will be deleted.

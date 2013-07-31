@@ -222,6 +222,7 @@ CREATE TABLE user_config
 --CREATE TYPE ops AS ENUM ('.','.*','>','->','_i_');
 CREATE TABLE example_queries
 (
+  "id" serial PRIMARY KEY,
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL,
   "type" TEXT NOT NULL,

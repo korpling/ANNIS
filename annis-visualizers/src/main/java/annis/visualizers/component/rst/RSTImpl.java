@@ -15,12 +15,14 @@
  */
 package annis.visualizers.component.rst;
 
+import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.components.CssRenderInfo;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
 import annis.gui.widgets.gwt.client.ui.VJITWrapper;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -42,6 +44,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Stack;
 import java.util.TreeSet;
 import org.eclipse.emf.common.util.BasicEList;
@@ -120,6 +123,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   // sType for the rst relation
   private final String RST_RELATION = "rst";
 
+  private final String RST_LAYER = "rst";
+
   /**
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
@@ -142,6 +147,10 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   // contains all nodes which are marked as matches and child nodes of matches
   private final Map<SNode, Long> markedAndCovered;
 
+  private Properties mappings;
+
+  private String namespace;
+
   /**
    * Sorted list of all SStructures which overlapped a sentence. It's used for
    * mapping the sentence to a number by the order of the SStructures in the
@@ -149,46 +158,53 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    */
   private TreeSet<SStructure> sentences = new TreeSet<SStructure>(
           new Comparator<SStructure>() {
-            private int getStartPosition(SStructure s) {
-              EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
+    private int getStartPosition(SStructure s) {
+      EList<Edge> out = s.getSGraph().getOutEdges(s.getSId());
 
-              for (Edge e : out) {
-                if (e instanceof SRelation
-                        && ((SRelation) e).getTarget() instanceof SToken) {
-                  SToken tok = ((SToken) ((SRelation) e).getTarget());
-                  SFeature sf = tok.getSFeature(
-                          ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-                  return Integer.parseInt(sf.getSValueSTEXT());
-                }
-              }
+      for (Edge e : out) {
+        if (e instanceof SRelation
+                && ((SRelation) e).getTarget() instanceof SToken) {
+          SToken tok = ((SToken) ((SRelation) e).getTarget());
+          
+          RelannisNodeFeature feat = 
+            (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          
+          return (int) feat.getLeftToken();
+        }
+      }
+      
+      RelannisNodeFeature feat = 
+        (RelannisNodeFeature) s.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+     
+      return (int) feat.getLeftToken();
+    }
 
-              SFeature sf = s.getSFeature(
-                      ANNIS_NS + "::" + FEAT_LEFTTOKEN);
-              return Integer.parseInt(sf.getSValueSTEXT());
-            }
+    @Override
+    public int compare(SStructure t1, SStructure t2) {
+      int t1Idx = getStartPosition(t1);
+      int t2Idx = getStartPosition(t2);
 
-            @Override
-            public int compare(SStructure t1, SStructure t2) {
-              int t1Idx = getStartPosition(t1);
-              int t2Idx = getStartPosition(t2);
+      if (t1Idx < t2Idx) {
+        return -1;
+      }
 
-              if (t1Idx < t2Idx) {
-                return -1;
-              }
-
-              if (t1Idx == t2Idx) {
-                return 0;
-              } else {
-                return 1;
-              }
-            }
-          });
+      if (t1Idx == t2Idx) {
+        return 0;
+      } else {
+        return 1;
+      }
+    }
+  });
 
   private final Logger log = LoggerFactory.getLogger(RSTImpl.class);
 
   public RSTImpl(VisualizerInput visInput) {
 
     markedAndCovered = visInput.getMarkedAndCovered();
+
+    mappings = visInput.getMappings();
+
+    namespace = visInput.getNamespace();
 
     /**
      * build id and increase count for every instance, so we receive an unique
@@ -221,16 +237,28 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private String transformSaltToJSON(VisualizerInput visInput) {
     graph = visInput.getSResult().getSDocumentGraph();
     EList<SNode> rootSNodes = graph.getSRoots();
+    EList<SNode> rstRoots = new BasicEList<SNode>();
+
+
+    for (SNode sNode : rootSNodes) {
+      if (CommonHelper.checkSLayer(namespace, sNode)) {
+        rstRoots.add(sNode);
+      }
+    }
 
 
     if (rootSNodes.size() > 0) {
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+
+      // collect all sentence and sort them.
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "getSentences", new SGraphTraverseHandler() {
         @Override
         public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
-          if (currNode instanceof SStructure && isSegment(currNode)) {
+          if (currNode instanceof SStructure
+                  && isSegment(currNode)
+                  && CommonHelper.checkSLayer(namespace, fromNode)) {
             sentences.add((SStructure) currNode);
           }
         }
@@ -263,12 +291,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
         i++;
       }
 
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(rstRoots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "jsonBuild", this);
     } else {
       log.debug("does not find an annotation which matched {}",
               ANNOTATION_KEY);
-      graph.traverse(rootSNodes, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
+      graph.traverse(
+              rstRoots,
+              GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
               "jsonBuild", this);
     }
 
@@ -417,7 +447,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
           SNode currNode, SRelation sRelation, SNode fromNode, long order) {
-    st.push(createJsonEntry(currNode));
+    if (CommonHelper.checkSLayer(namespace, currNode)) {
+      st.push(createJsonEntry(currNode));
+    }
   }
 
   @Override
@@ -702,6 +734,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   }
 
   private String getRSTType() {
-    return RST_RELATION;
+    return mappings.getProperty("edge", RST_RELATION);
   }
 }

@@ -117,16 +117,33 @@ public class VMediaPlayerBase extends Widget implements Paintable
     if(uidl.hasAttribute(PLAY))
     {
       String[] time = uidl.getStringArrayAttribute(PLAY);
-      if(time.length == 1)
+      if(time != null && time.length > 0)
       {
-        media.setCurrentTime(Double.parseDouble(time[0]));
+        if(time.length == 1)
+        {
+          try
+          {
+            media.setCurrentTime(Double.parseDouble(time[0]));
+          }
+          catch(NumberFormatException ex)
+          {
+            VConsole.error(ex);
+          }
+        }
+        else if(time.length == 2)
+        {
+          try
+          {
+            media.setCurrentTime(Double.parseDouble(time[0]));
+            setEndTimeOnce(media, Double.parseDouble(time[1]));
+          }
+          catch(NumberFormatException ex)
+          {
+            VConsole.error(ex);
+          }
+        }
+        media.play();
       }
-      else if(time.length == 2)
-      {
-        media.setCurrentTime(Double.parseDouble(time[0]));
-        setEndTimeOnce(media, Double.parseDouble(time[1]));
-      }
-      media.play();
     }
     else if(uidl.hasAttribute(PAUSE))
     {

@@ -24,8 +24,8 @@ import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.media.PDFController;
-import annis.libgui.PDFPageHelper;
 import static annis.model.AnnisConstants.*;
+import annis.model.RelannisNodeFeature;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -53,12 +53,21 @@ import org.slf4j.LoggerFactory;
  *
  *
  * Mappings: <br/>
+ * <ul>
+ * <li>
  * It is possible to specify the order of annotation layers in each grid. Use
  * <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
  * annotation layers. If <b>anno:</b> is used, additional annotation layers not
  * present in the list will not be visualized. If mappings is left empty, layers
- * will be ordered alphabetically
- *
+ * will be ordered alphabetically.
+ * </li>
+ * <li>
+ * <b>tok_anno:true</b> can be used to also display the annotations of the token.
+ * </li>
+ * <li>
+ * <b>hide_tok:true</b> switches the line with the token value off.
+ * </li>
+ * </ul>
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
@@ -99,6 +108,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
 
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
+    public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
 
     private AnnotationGrid grid;
 
@@ -128,6 +138,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       layout.setSizeUndefined();
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
+      EList<STextualDS> texts = input.getDocument().getSDocumentGraph().
+                getSTextualDSs();
+
+      if (texts != null && texts.size() > 0)
+      {
+        if (CommonHelper.containsRTLText(texts.get(0).getSText()))
+        {
+          addStyleName("rtl");
+        }
+      }
+
       if (input != null) {
         String resultID = input.getId();
 
@@ -138,18 +159,32 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
+        boolean showTokenAnnotations = 
+          Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_TOK_ANNOS_KEY));
+        
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
                 SSpan.class);
+        if(showTokenAnnotations)
+        {
+          List<String> tokenAnnos = EventExtractor.computeDisplayAnnotations(
+            input, SToken.class);
+          annos.addAll(tokenAnnos);
+        }
 
         EList<SToken> token = graph.getSortedSTokenByText();
-        long startIndex = token.get(0).getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                getSValueSNUMERIC();
-        long endIndex = token.get(token.size() - 1).getSFeature(ANNIS_NS,
-                FEAT_TOKENINDEX).getSValueSNUMERIC();
+
+        RelannisNodeFeature featTokStart =
+          (RelannisNodeFeature) token.get(0).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        long startIndex = featTokStart.getTokenIndex();
+
+        RelannisNodeFeature featTokEnd =
+            (RelannisNodeFeature) token.get(token.size() - 1).getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-                EventExtractor.parseSalt(input, annos, (int) startIndex,
-                (int) endIndex);
+          EventExtractor.parseSalt(input, showTokenAnnotations, annos,
+          (int) startIndex,
+          (int) endIndex, pdfController);
 
         // we will only add tokens of one texts which is mentioned by any
         // included annotation.
@@ -187,10 +222,11 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
           }
 
           // only add token if text ID matches the valid one
-          if (tokenTextID != null && validTextIDs.contains(tokenTextID)) {
-            long idx = t.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                    getSValueSNUMERIC()
-                    - startIndex;
+          if (tokenTextID != null && validTextIDs.contains(tokenTextID))
+          {
+            RelannisNodeFeature feat =
+              (RelannisNodeFeature) t.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            long idx = feat.getTokenIndex() - startIndex;
 
             if (tokenOffsetForText < 0) {
               // set the token offset by assuming the first idx must be zero

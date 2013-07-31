@@ -15,6 +15,7 @@
  */
 package annis.examplequeries;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,10 +26,8 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
-public class ExampleQuery
+public class ExampleQuery implements Serializable
 {
-
-  private static final Logger log = LoggerFactory.getLogger(ExampleQuery.class);
 
   private String type;
 

@@ -43,6 +43,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.ws.rs.core.MediaType;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -98,6 +99,13 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
 
   public void setQuery(Query query)
   {
+    // Check if a corpus is selected.
+    if (ui.getControlPanel().getCorpusList().getSelectedCorpora().isEmpty()
+      && query.getCorpora() != null)
+    {
+      ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
+    }
+
     PagedResultQuery paged = new PagedResultQuery(
       ui.getControlPanel().getSearchOptions().getLeftContext(),
       ui.getControlPanel().getSearchOptions().getRightContext(),
@@ -231,6 +239,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         .queryParam("offset", "" + lastQuery.getOffset())
         .queryParam("limit", "" + lastQuery.getLimit())
         .queryParam("corpora", StringUtils.join(lastQuery.getCorpora(), ","))
+        .accept(MediaType.APPLICATION_XML_TYPE)
         .get(new MatchListType());
 
        ui.setRefresherEnabled(true);
@@ -284,8 +293,8 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   public void corpusSelectionChanged()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSegmentationList(ui.getControlPanel().getCorpusList().getSelectedCorpora());
-    
+      .updateSearchPanelConfiguration(ui.getControlPanel().getCorpusList().getSelectedCorpora());
+
   }
 
 
@@ -476,6 +485,11 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     futureCount = null;
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
     return true;
+  }
+
+  public String getQueryDraft()
+  {
+    return ui.getControlPanel().getQueryPanel().getQuery();
   }
 
   private static class MatchListType extends GenericType<List<Match>>

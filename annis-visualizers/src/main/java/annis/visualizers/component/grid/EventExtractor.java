@@ -18,13 +18,13 @@ package annis.visualizers.component.grid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.PDFPageHelper;
+import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
-import static annis.model.AnnisConstants.FEAT_LEFTTOKEN;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
-import static annis.model.AnnisConstants.FEAT_RIGHTTOKEN;
-import static annis.model.AnnisConstants.FEAT_TOKENINDEX;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNO_REGEX_KEY;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
@@ -40,7 +40,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,8 +47,8 @@ import java.util.ListIterator;
 import java.util.Map;
 import java.util.Random;
 import java.util.Set;
-import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.apache.commons.lang3.StringUtils;
@@ -68,17 +67,20 @@ public class EventExtractor {
   /**
    * Converts Salt document graph to rows.
    *
-   * @param graph
+   * @param input
+   * @param showTokenAnnos 
    * @param annotationNames
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
+   * @param pdfController makes status of all pdfviewer available for the
+   * events.
    * @return
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
-    VisualizerInput input,
-    List<String> annotationNames, long startTokenIndex, long endTokenIndex)
-  {
-    
+          VisualizerInput input, boolean showTokenAnnos,
+          List<String> annotationNames, long startTokenIndex, long endTokenIndex,
+          PDFController pdfController) {
+
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
     // only look at annotations which were defined by the user
@@ -89,91 +91,24 @@ public class EventExtractor {
       rowsByAnnotation.put(anno, new ArrayList<Row>());
     }
 
-    int eventCounter = 0;
+    AtomicInteger eventCounter = new AtomicInteger();
 
     PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
-    for (SSpan span : graph.getSSpans()) {
-      // calculate the left and right values of a span
-      // TODO: howto get these numbers with Salt?
-      long leftLong = span.getSFeature(ANNIS_NS, FEAT_LEFTTOKEN).
-              getSValueSNUMERIC();
-      long rightLong = span.getSFeature(ANNIS_NS, FEAT_RIGHTTOKEN).
-              getSValueSNUMERIC();
-
-      leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
-      rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
-
-      int left = (int) (leftLong - startTokenIndex);
-      int right = (int) (rightLong - startTokenIndex);
-
-      for (SAnnotation anno : span.getSAnnotations()) {
-        ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
-        if (rows == null) {
-          // try again with only the name
-          rows = rowsByAnnotation.get(anno.getSName());
-        }
-        if (rows != null) {
-          // only do something if the annotation was defined before
-
-          // 1. give each annotation of each span an own row
-          Row r = new Row();
-
-          String id = "event_" + eventCounter++;
-          GridEvent event = new GridEvent(id, left, right,
-                  anno.getSValueSTEXT());
-
-          // check if the span is a matched node
-          SFeature featMatched = span.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long match = featMatched == null ? null : featMatched.
-                  getSValueSNUMERIC();
-          event.setMatch(match);
-
-          // calculate overlapped SToken
-          EList<Edge> outEdges = graph.getOutEdges(span.getSId());
-          if (outEdges != null) {
-            for (Edge e : outEdges) {
-              if (e instanceof SSpanningRelation) {
-                SSpanningRelation spanRel = (SSpanningRelation) e;
-
-                SToken tok = spanRel.getSToken();
-                event.getCoveredIDs().add(tok.getSId());
-
-                // get the STextualDS of this token and add it to the event
-                EList<Edge> tokenOutEdges = graph.getOutEdges(tok.getSId());
-                if (tokenOutEdges != null) {
-                  for (Edge tokEdge : tokenOutEdges) {
-                    if (tokEdge instanceof STextualRelation) {
-                      event.setTextID(((STextualRelation) tokEdge).
-                              getSTextualDS().getSId());
-                      break;
-                    }
-                  }
-                }
-              }
-            }
-          }
-
-
-          // try to get time annotations
-          double[] startEndTime = TimeHelper.getOverlappedTime(span);
-          if (startEndTime.length == 1) {
-            event.setStartTime(startEndTime[0]);
-          } else if (startEndTime.length == 2) {
-            event.setStartTime(startEndTime[0]);
-            event.setEndTime(startEndTime[1]);
-          }
-
-          r.addEvent(event);
-          rows.add(r);
-
-          String page = pageNumberHelper.getPageFromAnnotation(span);
-          if (page != null) {
-            event.setPage(page);
-          }
-        }
-      } // end for each annotation of span
+    for (SSpan span : graph.getSSpans()) 
+    {
+      addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
+        pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
     } // end for each span
+    
+    if(showTokenAnnos)
+    {
+      for(SToken tok : graph.getSTokens())
+      {
+        addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
+          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
+      }
+    }
 
     // 2. merge rows when possible
     for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
@@ -195,6 +130,135 @@ public class EventExtractor {
     }
     return rowsByAnnotation;
   }
+  
+  private static void addAnnotationsForNode(SNode node,
+    SDocumentGraph graph,
+    long startTokenIndex, long endTokenIndex,
+    PDFController pdfController, PDFPageHelper pageNumberHelper,
+    AtomicInteger eventCounter,
+    LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation)
+  {
+
+    // calculate the left and right values of a span
+    // TODO: howto get these numbers with Salt?
+    RelannisNodeFeature feat = (RelannisNodeFeature) node.
+      getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+    long leftLong = feat.getLeftToken();
+    long rightLong = feat.getRightToken();
+
+    leftLong = clip(leftLong, startTokenIndex, endTokenIndex);
+    rightLong = clip(rightLong, startTokenIndex, endTokenIndex);
+
+    int left = (int) (leftLong - startTokenIndex);
+    int right = (int) (rightLong - startTokenIndex);
+
+    for (SAnnotation anno : node.getSAnnotations())
+    {
+      ArrayList<Row> rows = rowsByAnnotation.get(anno.getQName());
+      if (rows == null)
+      {
+        // try again with only the name
+        rows = rowsByAnnotation.get(anno.getSName());
+      }
+      if (rows != null)
+      {
+        // only do something if the annotation was defined before
+
+        // 1. give each annotation of each span an own row
+        Row r = new Row();
+
+        String id = "event_" + eventCounter.incrementAndGet();
+        GridEvent event = new GridEvent(id, left, right,
+          anno.getSValueSTEXT());
+
+        // check if the span is a matched node
+        SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long match = featMatched == null ? null : featMatched.
+          getSValueSNUMERIC();
+        event.setMatch(match);
+
+        if(node instanceof SSpan)
+        {
+          // calculate overlapped SToken
+          EList<Edge> outEdges = graph.getOutEdges(node.getSId());
+          if (outEdges != null)
+          {
+            for (Edge e : outEdges)
+            {
+              if (e instanceof SSpanningRelation)
+              {
+                SSpanningRelation spanRel = (SSpanningRelation) e;
+
+                SToken tok = spanRel.getSToken();
+                event.getCoveredIDs().add(tok.getSId());
+
+                // get the STextualDS of this token and add it to the event
+                String textID = getTextID(tok, graph);
+                if(textID != null)
+                {
+                  event.setTextID(textID);
+                }
+              }
+            }
+          } // end if span has out edges
+        }
+        else if(node instanceof SToken)
+        {
+          event.getCoveredIDs().add(node.getSId());
+          // get the STextualDS of this token and add it to the event
+          String textID = getTextID((SToken) node, graph);
+          if(textID != null)
+          {
+            event.setTextID(textID);
+          }
+        }
+
+
+        // try to get time annotations
+        double[] startEndTime = TimeHelper.getOverlappedTime(node);
+        if (startEndTime.length == 1)
+        {
+          event.setStartTime(startEndTime[0]);
+        }
+        else if (startEndTime.length == 2)
+        {
+          event.setStartTime(startEndTime[0]);
+          event.setEndTime(startEndTime[1]);
+        }
+
+        r.addEvent(event);
+        rows.add(r);
+
+        if (pdfController != null && 
+          pdfController.sizeOfRegisterdPDFViewer() > 0)
+        {
+          String page = pageNumberHelper.getPageFromAnnotation(node);
+          if (page != null)
+          {
+            event.setPage(page);
+          }
+        }
+      }
+    } // end for each annotation of span
+  }
+  
+  private static String getTextID(SToken tok, SDocumentGraph graph)
+  {
+    EList<Edge> tokenOutEdges = graph.getOutEdges(tok.getSId());
+    if (tokenOutEdges != null)
+    {
+      for (Edge tokEdge : tokenOutEdges)
+      {
+        if (tokEdge instanceof STextualRelation)
+        {
+          return ((STextualRelation) tokEdge).
+            getSTextualDS().getSId();
+        }
+      }
+    }
+    return null;
+  }
 
   /**
    * Returns the annotations to display according to the mappings configuration.
@@ -215,8 +279,9 @@ public class EventExtractor {
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
-    Set<String> annoPool = getAnnotationLevelSet(graph, input.getNamespace(),
-            type);
+    Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
+      getAnnotationLevelSet(graph, null, type)
+      : getAnnotationLevelSet(graph, input.getNamespace(), type);
     List<String> annos = new LinkedList<String>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
@@ -424,10 +489,15 @@ public class EventExtractor {
             return +1;
           }
 
-          long tokenIndex1 = node1.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                  getSValueSNUMERIC();
-          long tokenIndex2 = node2.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                  getSValueSNUMERIC();
+          RelannisNodeFeature feat1 =
+                  (RelannisNodeFeature) node1.getSFeature(ANNIS_NS,
+                  FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat2 =
+                  (RelannisNodeFeature) node2.getSFeature(ANNIS_NS,
+                  FEAT_RELANNIS_NODE).getValue();
+
+          long tokenIndex1 = feat1.getTokenIndex();
+          long tokenIndex2 = feat2.getTokenIndex();
 
           return ((Long) (tokenIndex1)).compareTo(tokenIndex2);
         }
@@ -438,8 +508,10 @@ public class EventExtractor {
       for (String id : sortedCoveredToken) {
 
         SNode node = graph.getSNode(id);
-        long tokenIndexRaw = node.getSFeature(ANNIS_NS, FEAT_TOKENINDEX).
-                getSValueSNUMERIC();
+        RelannisNodeFeature feat =
+                (RelannisNodeFeature) node.getSFeature(ANNIS_NS,
+                FEAT_RELANNIS_NODE).getValue();
+        long tokenIndexRaw = feat.getTokenIndex();
 
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
 

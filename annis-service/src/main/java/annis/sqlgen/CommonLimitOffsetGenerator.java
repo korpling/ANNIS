@@ -44,12 +44,12 @@ public class CommonLimitOffsetGenerator implements
       offset = LimitOffsetQueryData.getOffset();
     }
 
-    if (limit != null)
+    if (limit != null && limit >= 0)
     {
       sb.append("LIMIT ").append(limit).append("\n");
     }
 
-    if (offset != null)
+    if (offset != null && offset >= 0)
     {
       sb.append("OFFSET ").append(offset);
     }

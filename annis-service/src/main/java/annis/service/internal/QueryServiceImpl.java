@@ -20,7 +20,6 @@ import annis.CommonHelper;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
-import annis.dao.objects.AnnotatedMatch;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
 import annis.model.Annotation;
@@ -28,14 +27,15 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
+import annis.service.QueryService;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.AnnisBinary;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SubgraphQuery;
@@ -43,16 +43,24 @@ import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.mimeparse.MIMEParse;
+import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -61,8 +69,13 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.core.StreamingOutput;
+import javax.ws.rs.core.UriInfo;
+import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -79,10 +92,11 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("annis/query")
-public class QueryService
+public class QueryServiceImpl implements QueryService
 {
 
-  private final static Logger log = LoggerFactory.getLogger(QueryService.class);
+  private final static Logger log = LoggerFactory.getLogger(
+    QueryServiceImpl.class);
 
   private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
 
@@ -90,9 +104,18 @@ public class QueryService
 
   private WekaHelper wekaHelper;
 
-  private int maxContext = 10;
-
   private int port = 5711;
+
+  private CorpusConfig defaultCorpusConfig;
+
+  @Context
+  private UriInfo uriInfo;
+
+  @Context
+  private HttpServletRequest request;
+
+  @Context
+  private ResourceConfig rc;
 
   /**
    * Log the successful initialization of this bean.
@@ -141,7 +164,7 @@ public class QueryService
 
   @GET
   @Path("search/annotate")
-  @Produces("application/xml")
+  @Produces({"application/xml", "application/xmi+xml", "application/xmi+binary"})
   public SaltProject annotate(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
@@ -163,8 +186,8 @@ public class QueryService
 
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-    int left = Math.min(maxContext, Integer.parseInt(leftRaw));
-    int right = Math.min(maxContext, Integer.parseInt(rightRaw));
+    int left = Math.min(getContextLeft(), Integer.parseInt(leftRaw));
+    int right = Math.min(getContextRight(), Integer.parseInt(rightRaw));
 
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
     String logParameters = createAnnotateLogParameters(left, right, offset,
@@ -183,11 +206,52 @@ public class QueryService
 
   @GET
   @Path("search/find")
+  @Produces("text/plain")
+  public StreamingOutput findRaw(@QueryParam("q") final String query,
+    @QueryParam("corpora") final String rawCorpusNames,
+    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
+    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
+  {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora",
+      "comma separated list of corpus names");
+
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for (String c : corpusNames)
+    {
+      user.checkPermission("query:find:" + c);
+    }
+
+    int offset = Integer.parseInt(offsetRaw);
+    int limit = Integer.parseInt(limitRaw);
+
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
+    data.addExtension(new LimitOffsetQueryData(offset, limit));
+
+    return new StreamingOutput()
+    {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        long start = new Date().getTime();
+        annisDao.find(data, output);
+        long end = new Date().getTime();
+        logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames),
+          end - start);
+      }
+    };
+
+  }
+
+  @GET
+  @Path("search/find")
   @Produces("application/xml")
-  public List<Match> find(@QueryParam("q") String query,
+  public List<Match> findXml(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("10") @QueryParam("limit") String limitRaw) throws IOException
+    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
@@ -222,9 +286,9 @@ public class QueryService
   @GET
   @Path("search/matrix")
   @Produces("text/plain")
-  public String matrix(
-    @QueryParam("q") String query,
-    @QueryParam("corpora") String rawCorpusNames,
+  public StreamingOutput matrix(
+    final @QueryParam("q") String query,
+    final @QueryParam("corpora") String rawCorpusNames,
     @QueryParam("metakeys") String rawMetaKeys)
   {
     requiredParameter(query, "q", "AnnisQL query");
@@ -238,29 +302,34 @@ public class QueryService
       user.checkPermission("query:matrix:" + c);
     }
 
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
 
     MatrixQueryData ext = new MatrixQueryData();
-    if (rawMetaKeys != null)
+    if(rawMetaKeys != null)
     {
       ext.setMetaKeys(splitMatrixKeysFromRaw(rawMetaKeys));
     }
+    if(ext.getMetaKeys() != null && ext.getMetaKeys().isEmpty())
+    {
+      ext.setMetaKeys(null);
+    }
+    
     data.addExtension(ext);
 
-    long start = new Date().getTime();
-    List<AnnotatedMatch> matches = annisDao.matrix(data);
-    long end = new Date().getTime();
-    logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
-      end - start);
+    StreamingOutput result = new StreamingOutput()
+    {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        long start = new Date().getTime();
+        annisDao.matrix(data, output);
+        long end = new Date().getTime();
+        logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
+          end - start);
+      }
+    };
 
-    if (matches.isEmpty())
-    {
-      return "(empty)";
-    }
-    else
-    {
-      return WekaHelper.exportAsArff(matches);
-    }
+    return result;
   }
   
   /**
@@ -355,7 +424,7 @@ public class QueryService
     QueryData data = new QueryData();
 
     data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer()));
+      query.getSegmentationLayer(), query.getFilter()));
 
     Set<String> corpusNames = new TreeSet<String>();
 
@@ -442,6 +511,7 @@ public class QueryService
   {
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
     List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+
     // filter by which corpora the user is allowed to access
     Subject user = SecurityUtils.getSubject();
     for (AnnisCorpus c : allCorpora)
@@ -451,22 +521,53 @@ public class QueryService
         allowedCorpora.add(c);
       }
     }
+
     return allowedCorpora;
+  }
+
+  @GET
+  @Path("corpora/config")
+  @Produces("application/xml")
+  public CorpusConfigMap corpusConfigs()
+  {
+    CorpusConfigMap corpusConfigs = annisDao.getCorpusConfigurations();
+    CorpusConfigMap result = new CorpusConfigMap();
+    Subject user = SecurityUtils.getSubject();
+
+    if (corpusConfigs != null)
+    {
+      for (String c : corpusConfigs.getCorpusConfigs().keySet())
+      {
+        if (user.isPermitted("query:*:" + c))
+        {
+          result.put(c, corpusConfigs.get(c));
+        }
+      }
+    }
+
+    return result;
+  }
+
+  @GET
+  @Path("corpora/default-config")
+  @Produces("application/xml")
+  public CorpusConfig corpusDefaultConfig()
+  {
+    return defaultCorpusConfig;
   }
 
   @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")
-  public CorpusConfig corpusconfig(@PathParam("top") String toplevelName)
+  public CorpusConfig corpusConfig(@PathParam("top") String toplevelName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:config:" + toplevelName);
+    Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
+    CorpusConfig corpusConfig = new CorpusConfig();
+    corpusConfig.setConfig(tmp);
 
-
-    Map<String, String> tmp = annisDao.getCorpusConfiguration(toplevelName);
-    CorpusConfig result = new CorpusConfig();
-    result.setConfig(tmp);
-    return result;
+    return corpusConfig;
   }
 
   @GET
@@ -475,18 +576,29 @@ public class QueryService
   public List<AnnisAttribute> annotations(
     @PathParam("top") String toplevelCorpus,
     @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
-    @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues)
+    @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues) throws WebApplicationException
   {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:annotations:" + toplevelCorpus);
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      user.checkPermission("query:annotations:" + toplevelCorpus);
 
-    List<String> list = new LinkedList<String>();
-    list.add(toplevelCorpus);
-    List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
 
-    return annisDao.listAnnotations(corpusList,
-      Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
-      onlyMostFrequentValues));
+      List<String> list = new LinkedList<String>();
+      String decode = URLDecoder.decode(toplevelCorpus, "UTF-8");
+      log.info("corpus annotations for {}", decode);
+      list.add(decode);
+      List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
+
+      return annisDao.listAnnotations(corpusList,
+        Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
+        onlyMostFrequentValues));
+    }
+    catch (Exception ex)
+    {
+      log.error("could not get annotations for {}", toplevelCorpus, ex);
+      throw new WebApplicationException(400);
+    }
   }
 
   /**
@@ -565,6 +677,48 @@ public class QueryService
     return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
   }
 
+  @GET
+  @Path("corpora/{top}/{document}/binary/{offset}/{length}")
+  public Response binary1(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("offset") String rawOffset,
+    @PathParam("length") String rawLength)
+  {
+    return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, null);
+  }
+
+  @GET
+  @Path("corpora/{top}/{document}/binary")
+  public Response binary2(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName)
+  {
+    return binary(toplevelCorpusName, corpusName, null, null, null);
+  }
+
+  @GET
+  @Path("corpora/{top}/{document}/binary/{file}/{offset}/{length}")
+  public Response binary3(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("file") String file,
+    @PathParam("offset") String rawOffset,
+    @PathParam("length") String rawLength)
+  {
+    return binary(toplevelCorpusName, corpusName, rawOffset, rawLength, file);
+  }
+
+  @GET
+  @Path("corpora/{top}/{document}/binary/{file}")
+  public Response binary4(
+    @PathParam("top") String toplevelCorpusName,
+    @PathParam("document") String corpusName,
+    @PathParam("file") String file)
+  {
+    return binary(toplevelCorpusName, corpusName, null, null, file);
+  }
+
   /**
    * Get an Annis Binary object identified by its id.
    *
@@ -573,34 +727,114 @@ public class QueryService
    * @param rawLength how many bytes we take
    * @return AnnisBinary
    */
-  @GET
-  @Path("corpora/{top}/{document}/binary/{offset}/{length}")
-  @Produces("application/xml")
-  public AnnisBinary binary(
-    @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String corpusName,
-    @PathParam("offset") String rawOffset,
-    @PathParam("length") String rawLength,
-    @QueryParam("mime") String mimeType,
-    @QueryParam("title") String title)
+  @Override
+  public Response binary(
+    String toplevelCorpusName,
+    String corpusName,
+    String rawOffset,
+    String rawLength,
+    String fileName)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
-    int offset = Integer.parseInt(rawOffset);
-    int length = Integer.parseInt(rawLength);
+    String acceptHeader = request.getHeader("Accept");
+    if (acceptHeader == null || acceptHeader.isEmpty())
+    {
+      acceptHeader = "*/*";
+    }
 
-    AnnisBinary bin;
+    List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
+      corpusName);
+    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<String, AnnisBinaryMetaData>();
+
+    for (AnnisBinaryMetaData m : meta)
+    {
+      if (fileName == null)
+      {
+        // just add all available media types
+        if (!matchedMetaByType.containsKey(m.getMimeType()))
+        {
+          matchedMetaByType.put(m.getMimeType(), m);
+        }
+      }
+      else
+      {
+        // check if this binary has the right title/file name
+        if (fileName.equals(m.getFileName()))
+        {
+          matchedMetaByType.put(m.getMimeType(), m);
+        }
+      }
+    }
+
+    if (matchedMetaByType.isEmpty())
+    {
+      return Response.status(Response.Status.NOT_FOUND)
+        .entity("Requested binary not found")
+        .build();
+    }
+
+    // find the best matching mime type
+    String bestMediaTypeMatch =
+      MIMEParse.bestMatch(matchedMetaByType.keySet(), acceptHeader);
+    if (bestMediaTypeMatch.isEmpty())
+    {
+      return Response.status(Response.Status.NOT_ACCEPTABLE)
+        .entity("Client must accept one of the following media types: "
+        + StringUtils.join(matchedMetaByType.keySet(), ", "))
+        .build();
+    }
+    MediaType mediaType = MediaType.valueOf(bestMediaTypeMatch);
+
+    int offset = 0;
+    int length = 0;
+
+    if (rawLength == null || rawOffset == null)
+    {
+      // use matched binary meta data to get the complete file size
+      AnnisBinaryMetaData matchedBinary = matchedMetaByType.get(mediaType.
+        toString());
+      if (matchedBinary != null)
+      {
+        length = matchedBinary.getLength();
+      }
+    }
+    else
+    {
+      // use the provided information
+      offset = Integer.parseInt(rawOffset);
+      length = Integer.parseInt(rawLength);
+    }
+
     log.debug(
       "fetching  " + (length / 1024) + "kb (" + offset + "-" + (offset + length) + ") from binary "
-      + toplevelCorpusName + "/" + corpusName + (title == null ? "" : title) + " " 
-      + (mimeType == null ? "" : mimeType));
+      + toplevelCorpusName + "/" + corpusName + (fileName == null ? "" : fileName) + " "
+      + mediaType.toString());
 
-    bin = annisDao.getBinary(toplevelCorpusName, corpusName, mimeType, title,
-      offset + 1, length);
+    final InputStream stream = annisDao.
+      getBinary(toplevelCorpusName, corpusName, mediaType.toString(), fileName,
+      offset, length);
 
     log.debug("fetch successfully");
-    return bin;
+    StreamingOutput result = new StreamingOutput()
+    {
+      @Override
+      public void write(OutputStream output) throws IOException, WebApplicationException
+      {
+        try
+        {
+          IOUtils.copy(stream, output);
+          output.flush();
+        }
+        finally
+        {
+          stream.close();
+        }
+      }
+    };
+
+    return Response.ok(result, mediaType).build();
   }
 
   /**
@@ -615,19 +849,38 @@ public class QueryService
   public List<ExampleQuery> getExampleQueries(
     @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
   {
+
     try
     {
+      String[] corpusNames;
       if (rawCorpusNames != null)
       {
-        String[] corpusNames = rawCorpusNames.split(",");
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(Arrays.asList(
-          corpusNames));
-        return annisDao.getExampleQueries(corpusIDs);
+        corpusNames = rawCorpusNames.split(",");
       }
       else
       {
-        return annisDao.getExampleQueries(null);
+        List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+        corpusNames = new String[allCorpora.size()];
+        for (int i = 0; i < corpusNames.length; i++)
+        {
+          corpusNames[i] = allCorpora.get(i).getName();
+        }
       }
+
+      List<String> allowedCorpora = new ArrayList<String>();
+
+      // filter by which corpora the user is allowed to access
+      Subject user = SecurityUtils.getSubject();
+      for (String c : corpusNames)
+      {
+        if (user.isPermitted("query:*:" + c))
+        {
+          allowedCorpora.add(c);
+        }
+      }
+
+      List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(allowedCorpora);
+      return annisDao.getExampleQueries(corpusIDs);
     }
     catch (Exception ex)
     {
@@ -636,9 +889,7 @@ public class QueryService
   }
 
   /**
-   * Get the Metadata of an Annis Binary object identified by its id. This
-   * function calls getBinary(long id, 1, 1), so this function does not work, if
-   * the specs of getBinary(long id, int offset,int length) changed.
+   * Get the Metadata of an Annis Binary object identified by its id.
    *
    * @param id
    * @return AnnisBinaryMetaData
@@ -646,6 +897,7 @@ public class QueryService
   @GET
   @Path("corpora/{top}/{document}/binary/meta")
   @Produces("application/xml")
+  @Override
   public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
     @PathParam("document") String documentName)
@@ -816,14 +1068,48 @@ public class QueryService
     this.annisDao = annisDao;
   }
 
-  public int getMaxContext()
+  /**
+   * Retrieves the max right context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextRight()
   {
-    return maxContext;
+    return getCorpusConfigIntValues("max-context-right");
   }
 
-  public void setMaxContext(int maxContext)
+  /**
+   * Retrieves the max left context.
+   *
+   * @return The context is read from the annis-service.properties file and
+   * should be >= 0.
+   */
+  public int getContextLeft()
   {
-    this.maxContext = maxContext;
+    return getCorpusConfigIntValues("max-context-left");
+  }
+
+  /**
+   * Extract corpus configurations values with numeric values.
+   *
+   * @param context Must be a valid key of the corpus configuration section in
+   * the annis-service.properties file.
+   * @return Parses the String representation of the value to int and returns
+   * it.
+   *
+   */
+  private int getCorpusConfigIntValues(String context)
+  {
+    int value = Integer.parseInt(defaultCorpusConfig.getConfig().getProperty(
+      context));
+
+    if (value < 0)
+    {
+      throw new IllegalStateException("the value must be > 0");
+    }
+
+    return value;
   }
 
   public WekaHelper getWekaHelper()
@@ -844,5 +1130,22 @@ public class QueryService
   public void setPort(int port)
   {
     this.port = port;
+  }
+
+  /**
+   * @return the defaultCorpusConfig
+   */
+  public CorpusConfig getDefaultCorpusConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  /**
+   * @param defaultCorpusConfig the defaultCorpusConfig to set
+   */
+  public void setDefaultCorpusConfig(
+    CorpusConfig defaultCorpusConfig)
+  {
+    this.defaultCorpusConfig = defaultCorpusConfig;
   }
 }

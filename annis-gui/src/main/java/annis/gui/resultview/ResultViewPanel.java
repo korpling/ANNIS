@@ -19,9 +19,11 @@ import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
+import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
+import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
@@ -43,9 +45,9 @@ import org.slf4j.LoggerFactory;
 public class ResultViewPanel extends Panel
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
-  
+
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
-  
+
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
   private ProgressIndicator progressResult;
@@ -53,7 +55,7 @@ public class ResultViewPanel extends Panel
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
   private TreeMap<String, Boolean> tokenAnnoVisible;
-  private VerticalLayout mainLayout;  
+  private VerticalLayout mainLayout;
   private QueryController controller;
   private String selectedSegmentationLayer;
   private InstanceConfig instanceConfig;
@@ -65,8 +67,20 @@ public class ResultViewPanel extends Panel
     this.ps = ps;
     this.controller = controller;
     this.selectedSegmentationLayer = controller.getQuery().getSegmentation();
+    Set<String> corpora = controller.getQuery().getCorpora();
+
+    if (corpora.size() == 1)
+    {
+      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().next());
+      if (corpusConfig != null && corpusConfig.getConfig() != null 
+        && corpusConfig.getConfig().containsKey(KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        this.selectedSegmentationLayer = corpusConfig.getConfig(
+          KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+      }
+    }
+
     this.instanceConfig = instanceConfig;
-    
 
     setSizeFull();
 
@@ -74,45 +88,45 @@ public class ResultViewPanel extends Panel
     setContent(mainLayout);
     mainLayout.setMargin(false);
     mainLayout.setSizeFull();
-    
-    
+
+
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
-    
+
     miSegmentation = mbResult.addItem("Base text", null);
-    
+
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
     PagedResultQuery q = controller.getQuery();
-    
+
     paging = new PagingComponent(q.getOffset(), q.getLimit());
     paging.setInfo("Result for query \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     paging.addCallback(controller);
-    
+
     mainLayout.addComponent(mbResult);
     mainLayout.addComponent(paging);
-    
+
     mainLayout.setSizeFull();
-    
+
     progressResult = new ProgressIndicator();
     progressResult.setIndeterminate(true);
     progressResult.setPollingInterval(60000);
     progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     progressResult.setEnabled(true);
     progressResult.setVisible(true);
-    
+
     mainLayout.addComponent(progressResult);
-    
+
     mainLayout.setComponentAlignment(paging, Alignment.TOP_CENTER);
     mainLayout.setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
-    
+
     mainLayout.setExpandRatio(mbResult, 0.0f);
     mainLayout.setExpandRatio(paging, 0.0f);
     mainLayout.setExpandRatio(progressResult, 1.0f);
-    
+
   }
-  
-  public void setResult(List<Match> result, int contextLeft, int contextRight, 
+
+  public void setResult(List<Match> result, int contextLeft, int contextRight,
     String segmentationLayer, int offset)
   {
     progressResult.setVisible(false);
@@ -145,7 +159,7 @@ public class ResultViewPanel extends Panel
       mainLayout.setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
       mainLayout.setExpandRatio(lblNoResult, 1.0f);
     }
-    
+
   }
 
   public void setCount(int count)
@@ -173,14 +187,14 @@ public class ResultViewPanel extends Panel
   public void updateSegmentationLayer(Set<String> segLayers)
   {
     miSegmentation.removeChildren();
-    
+
     segLayers.add("");
-    
+
     for(String s : segLayers)
     {
-      MenuItem miSingleSegLayer = 
-        miSegmentation.addItem((s == null || "".equals(s)) ?  NULL_SEGMENTATION_VALUE : s, 
-        new MenuBar.Command() 
+      MenuItem miSingleSegLayer =
+        miSegmentation.addItem((s == null || "".equals(s)) ?  NULL_SEGMENTATION_VALUE : s,
+        new MenuBar.Command()
       {
 
         @Override
@@ -195,14 +209,14 @@ public class ResultViewPanel extends Panel
           {
             mi.setChecked(mi == selectedItem);
           }
-          
+
           resultPanel.setSegmentationLayer(selectedSegmentationLayer);
         }
       });
-     
+
       miSingleSegLayer.setCheckable(true);
       miSingleSegLayer.setChecked(
-        (selectedSegmentationLayer == null && "".equals(s)) 
+        (selectedSegmentationLayer == null && "".equals(s))
         || s.equals(selectedSegmentationLayer));
     }
   }
@@ -253,6 +267,6 @@ public class ResultViewPanel extends Panel
   {
     return paging;
   }
-  
-  
+
+
 }

@@ -18,8 +18,15 @@ package annis;
 import annis.dao.objects.AnnotatedMatch;
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.OutputStreamWriter;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -27,6 +34,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -34,21 +43,21 @@ import org.apache.commons.lang3.StringUtils;
  */
 public class WekaHelper
 {
-
-  public static String exportAsArff(List<AnnotatedMatch> annotatedMatches)
+  
+  private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
+  
+  public static SortedMap<Integer, SortedSet<String>> exportArffHeader(
+    Iterator<AnnotatedMatch> matches, PrintWriter w)
   {
-    StringBuilder sb = new StringBuilder();
-
     // header: relation name (unused)
-    sb.append("@relation name\n");
-    sb.append("\n");
-
+    w.append("@relation name\n");
+    w.append("\n");
     // figure out what annotations are used at each match position
-    SortedMap<Integer, SortedSet<String>> columnsByNodePos = new TreeMap<Integer, SortedSet<String>>();
-        
-    for(int i = 0; i < annotatedMatches.size(); ++i)
+    SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
+      new TreeMap<Integer, SortedSet<String>>();
+    while(matches.hasNext())
     {
-      AnnotatedMatch match = annotatedMatches.get(i);
+      AnnotatedMatch match = matches.next();
       for(int j = 0; j < match.size(); ++j)
       {
         AnnotatedSpan span = match.get(j);
@@ -60,34 +69,41 @@ public class WekaHelper
         {
           columnsByNodePos.get(j).add("anno_" + annotation.getQualifiedName());
         }
-        
+
         for(Annotation meta : span.getMetadata())
         {
           columnsByNodePos.get(j).add("meta_" + meta.getQualifiedName());
         }
-        
+
       }
     }
-
-
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
-    
     for(int j = 0; j < count; ++j)
     {
-      sb.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
-      sb.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
+      w.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
+      w.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
       SortedSet<String> annotationNames = columnsByNodePos.get(j);
       for(String name : annotationNames)
       {
-        sb.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
+        w.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
       }
     }
-    sb.append("\n@data\n\n");
-
+    
+    return columnsByNodePos;
+  }
+  
+  public static void exportArffData(Iterator<AnnotatedMatch> matches,
+    SortedMap<Integer, SortedSet<String>> columnsByNodePos, PrintWriter w)
+  {
+    int count = columnsByNodePos.keySet().size();
+      
+    w.append("\n@data\n\n");
     // print values
-    for(AnnotatedMatch match : annotatedMatches)
+    while(matches.hasNext())
     {
+      AnnotatedMatch match = matches.next();
+      
       List<String> line = new ArrayList<String>();
       int k = 0;
       for(; k < match.size(); ++k)
@@ -136,11 +152,34 @@ public class WekaHelper
           line.add("'NULL'");
         }
       }
-      sb.append(StringUtils.join(line, ","));
-      sb.append("\n");
+      w.append(StringUtils.join(line, ","));
+      w.append("\n");
     }
+  }
+  
+  public static void exportAsArff(List<AnnotatedMatch> annotatedMatches, OutputStream out)
+  {
+    PrintWriter w = null;
+    try
+    {
+      w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+      SortedMap<Integer, SortedSet<String>> columnsByNodePos =
+        exportArffHeader(annotatedMatches.iterator(), w);
 
-    return sb.toString();
+      exportArffData(annotatedMatches.iterator(), columnsByNodePos, w);
+
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+    }
+    finally
+    {
+      if(w != null)
+      {
+        w.flush();
+      }
+    }
   }
 
   private static String fullColumnName(int i, String name)
