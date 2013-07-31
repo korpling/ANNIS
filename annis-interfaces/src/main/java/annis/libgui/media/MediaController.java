@@ -45,12 +45,6 @@ public interface MediaController extends Plugin
   public void play(String resultID, double startTime, double endTime);
   
   /**
-   * Pause playback of the media file in all media players.
-   */
-  public void pauseAll();
-  
-  
-  /**
    * Register a {@link MediaPlayer} instance. 
    * @param player The instance.
    * @param resultID To which result this player belongs.

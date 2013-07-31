@@ -157,25 +157,6 @@ public class MediaControllerImpl implements MediaController, Serializable
     }
   }
   
-  @Override
-  public void pauseAll()
-  {
-    lock.readLock().lock();
-    try
-    {
-      for (List<MediaPlayer> playersForID : mediaPlayers.values())
-      {
-        for(MediaPlayer player : playersForID)
-        {
-          player.pause();
-        }
-      }
-    }
-    finally
-    {
-      lock.readLock().unlock();
-    }
-  }
 
   @Override
   public void addMediaPlayer(MediaPlayer player, String resultID,

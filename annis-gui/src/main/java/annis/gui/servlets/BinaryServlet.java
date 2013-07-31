@@ -60,7 +60,7 @@ public class BinaryServlet extends HttpServlet
 
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 5*1024; // max portion which is transfered over REST at once: 5MB
+  private static final int MAX_LENGTH = 1024*1024; // max portion which is transfered over REST at once: 1MB
 
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -102,6 +102,9 @@ public class BinaryServlet extends HttpServlet
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary");
 
+      // tell client that we support byte ranges
+      response.setHeader("Accept-Ranges", "bytes");
+      
       if (range != null)
       {
         responseStatus206(binaryRes, mimeType, out, response, range);

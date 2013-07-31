@@ -44,8 +44,4 @@ public interface MediaPlayer extends Serializable
    */
   public void pause();
   
-  /**
-   * Stop playback and release resources.
-   */
-  public void stop();
 }
