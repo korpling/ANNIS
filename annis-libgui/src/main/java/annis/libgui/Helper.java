@@ -46,7 +46,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
-import org.apache.http.conn.HttpHostConnectException;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.slf4j.LoggerFactory;

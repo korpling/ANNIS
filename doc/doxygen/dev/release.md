@@ -42,7 +42,7 @@ mvn clean
 mvn install
 \endcode
 7. Do manual tests.
-8. Tag the release and merge it with the `releases` branch, publish the new `releases` branch
+8. Tag the release and merge it into the `master` branch, publish the new `master` branch
 9. Deploy release to our Maven server
 \code{.sh}
 mvn deploy

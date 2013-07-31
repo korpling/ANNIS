@@ -1,3 +1,35 @@
+Version 3.0.0
+=============
+
+**IMPORTANT**
+This release changes the default user configuration directory from
+/etc/annis/user_config_trunk/
+to
+/etc/annis/user_config/
+Please either update your shiro.ini file to your custom location or
+move the folder on your file system to the new default location.
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?direction=asc&milestone=1&page=1&sort=created&state=closed
+
+[Bugs]
+ #158 Exception when using "#c=" fragment
+ #155 Cannot create user specific corpus groups (3.0.0-rc.1)
+ #147 test fails when building service
+ #145 Presence of page annotation creates PDF icon in grid even if there is no PDF registered for the corpus
+ #144 Cancel import in Kickstarter does not work (3.0.0-rc.1)
+ #143 Kickstarter does not start if an older database exists (3.0.0-rc.1)
+ #141 Right-to-left detection in grid visualizer doesn't work
+ #139 example query not always sensitive to default segmentation
+ #137 Match highlighting in KWIC is incorrect/missing in parallel corpus query of non-terminal elements 
+ #126 Hit marking in KWIC for segmentations precedence queries is incorrect
+
+[Enhancements]
+ #157 Add CorefVisualizer that is only using the result context
+ #42 user-friendly message in "annis-service import" on duplicate corpus
+ #4 Annotation explorer should also show available document metadata categories
+
+
 Version 3.0.0-rc.1
 ==================
 

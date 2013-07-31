@@ -169,6 +169,7 @@ public class SearchOptionsPanel extends FormLayout
 
     corpusConfigurations = Helper.getCorpusConfigs();
 
+
     if (corpusConfigurations == null
       || corpusConfigurations.get(DEFAULT_CONFIG) == null
       || corpusConfigurations.get(DEFAULT_CONFIG).isEmpty())
@@ -420,7 +421,7 @@ public class SearchOptionsPanel extends FormLayout
       log.warn("Invalid integer submitted to search options ComboBox", ex);
     }
 
-    return Math.max(0, result);
+    return Math.max(1, result);
   }
 
   public String getSegmentationLayer()
@@ -509,7 +510,14 @@ public class SearchOptionsPanel extends FormLayout
       }
     }
 
-    return segmentation;
+    if(segmentation == null)
+    {
+      return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(key);
+    }
+    else
+    {
+      return segmentation;
+    }
   }
 
   /**
