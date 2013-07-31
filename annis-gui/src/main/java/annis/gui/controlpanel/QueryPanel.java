@@ -82,13 +82,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setSpacing(true);
     setMargin(true);
 
-    addComponent(new Label("AnnisQL:"), 0, 0);
-    addComponent(new Label("Status:"), 0, 2);
+    Label lblAqlLabel = new Label("AnnisQL:");
+    Label lblStatusLabel = new Label("Status:");
+    lblAqlLabel.setSizeUndefined();
+    lblStatusLabel.setSizeUndefined();
+    
+    addComponent(lblAqlLabel, 0, 0);
+    addComponent(lblStatusLabel, 0, 2);
 
     
     setRowExpandRatio(0, 1.0f);
-    setColumnExpandRatio(0, 0.2f);
-    setColumnExpandRatio(1, 0.8f);
+    setColumnExpandRatio(0, 0.0f);
+    setColumnExpandRatio(1, 0.1f);
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
