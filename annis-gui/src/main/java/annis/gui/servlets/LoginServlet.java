@@ -50,6 +50,9 @@ public class LoginServlet extends HttpServlet
   @Override
   protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
+    
+    response.setContentType("text/html");
+    
     OutputStream out = response.getOutputStream();
     try
     {
@@ -75,7 +78,6 @@ public class LoginServlet extends HttpServlet
     }
     finally
     {
-      response.setContentType("text/html");
       response.setStatus(200);
       out.close();
     }
@@ -84,6 +86,9 @@ public class LoginServlet extends HttpServlet
   @Override
   protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
   {
+    
+    response.setContentType("text/html");
+    
     String username = request.getParameter("annis-login-user");
     String password = request.getParameter("annis-login-password");
 
