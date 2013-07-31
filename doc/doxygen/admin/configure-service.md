@@ -21,22 +21,22 @@ Configuration file location {#admin-configure-userfileloc}
 
 There is a central location where the user configuration files are stored.
 Configure the path to this location in the `conf/shiro.info` configuration file of
-the ANNIS service. The default path is `/etc/annis/user_config_trunk/` and
+the ANNIS service. The default path is `/etc/annis/user_config/` and
 must be changed at two locations in the configuration file.
 
 \verbatim
 [main]
 annisRealm = annis.security.ANNISUserRealm
-annisRealm.resourcePath=/etc/annis/user_config_trunk/
+annisRealm.resourcePath=/etc/annis/user_config/
 annisRealm.authenticationCachingEnabled = true
 globalPermResolver = annis.security.ANNISRolePermissionResolver
-globalPermResolver.resourcePath = /etc/annis/user_config_trunk/
+globalPermResolver.resourcePath = /etc/annis/user_config/
 \endverbatim
 
 User and group files {#admin-configure-userformat}
 --------------------
 
-1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/user_config_trunk/groups`):
+1. Create a file "groups" in the user-configuration directory (e.g. `/etc/annis/user_config/groups`):
 \verbatim
 group1=pcc3,falko,tiger2
 group2=pcc3
