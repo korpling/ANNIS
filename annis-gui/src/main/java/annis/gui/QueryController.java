@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
@@ -340,15 +341,18 @@ public class QueryController implements PagingCallback
           {
             if (causeFinal == null)
             {
-              String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
-              String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
-
-              ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
-                getMatchCount() + " " + matchesString
-                + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
-              if (lastResultView != null && lastCount.getMatchCount() > 0)
+              if(lastCount != null)
               {
-                lastResultView.setCount(lastCount.getMatchCount());
+                String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
+                String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
+
+                ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
+                  getMatchCount() + " " + matchesString
+                  + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
+                if (lastResultView != null && lastCount.getMatchCount() > 0)
+                {
+                  lastResultView.setCount(lastCount.getMatchCount());
+                }
               }
             }
             else
@@ -369,11 +373,7 @@ public class QueryController implements PagingCallback
               }
               else
               {
-                Notification.show(
-                  "unknown error " + causeFinal.
-                  getResponse().getStatus(),
-                  causeFinal.getResponse().getEntity(String.class),
-                  Notification.Type.WARNING_MESSAGE);
+                ExceptionDialog.show(causeFinal);
               }
             } // end if cause != null
             

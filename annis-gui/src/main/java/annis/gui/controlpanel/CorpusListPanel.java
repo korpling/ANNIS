@@ -384,8 +384,7 @@ public class CorpusListPanel extends VerticalLayout implements
     }
     catch (ClientHandlerException ex)
     {
-      log.error(
-        null, ex);
+      log.error(null, ex);
       Notification.show("Service not available: " + ex.getLocalizedMessage(),
         Notification.Type.TRAY_NOTIFICATION);
     }
@@ -399,8 +398,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
       else
       {
-        log.error(
-          null, ex);
+        log.error( null, ex);
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
           Notification.Type.TRAY_NOTIFICATION);
       }
