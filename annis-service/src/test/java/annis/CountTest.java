@@ -107,6 +107,7 @@ public class CountTest
       "& #3 >* #2"));
     assertEquals(358, countPcc2("cat & cat & cat & #1 >* #2 & #2 >* #3"));
     assertEquals(10, countPcc2("cat & cat & tok & #1 >* #2 & #2 >secedge #3"));
+    assertEquals(10, countPcc2("node & node & node & #1 >edge * #2 & #2 >secedge * #3"));
 
   }
   

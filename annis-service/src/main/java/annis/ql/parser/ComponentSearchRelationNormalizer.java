@@ -129,21 +129,9 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Identical identJoin = new Identical(newNode);
     node.addJoin(identJoin);
     
-    nodes.add(node);
+    nodes.add(newNode);
   }
   
-  private QueryNode searchSourceNode(Join j, List<QueryNode> nodes)
-  {
-    for(QueryNode n : nodes)
-    {
-      if(n.getJoins().contains(j))
-      {
-        return n;
-      }
-    }
-    return null;
-  }
-
   private Multimap<QueryNode, Join> createJoinMap(List<QueryNode> nodes)
   {
     Multimap<QueryNode, Join> result = HashMultimap.create();
