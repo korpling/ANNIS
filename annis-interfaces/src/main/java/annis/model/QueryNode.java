@@ -27,6 +27,8 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
+import com.google.common.base.Joiner;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
@@ -317,9 +319,19 @@ public class QueryNode implements Serializable
   {
     StringBuilder sb = new StringBuilder();
 
+    boolean foundConstraint = false;
+    
+    // check if we were given a custom name
+    String idAsString = "" + id;
+    if(variable != null && !idAsString.equals(variable))
+    {
+      sb.append(variable).append("#");
+    }
+    
     if (token)
     {
       sb.append("tok");
+      foundConstraint = true;
     }
 
     if (spannedText != null && spanTextMatching != null)
@@ -332,12 +344,13 @@ public class QueryNode implements Serializable
       sb.append(spanTextMatching.quote());
       sb.append(spannedText);
       sb.append(spanTextMatching.quote());
+      foundConstraint = true;
     }
 
 
     if (nodeAnnotations.isEmpty())
     {
-      if(sb.length() == 0)
+      if(!foundConstraint)
       {
         sb.append("node");
       }
@@ -364,12 +377,12 @@ public class QueryNode implements Serializable
   
   public String toAQLEdgeFragment()
   {
-    StringBuilder sb = new StringBuilder();
+    List<String> frags = new LinkedList<String>();
     for (Join join : joins)
     {
-      sb.append(join.toAQLFragment(this));
+      frags.add(join.toAQLFragment(this));
     }
-    return sb.toString();
+    return Joiner.on(" & ").join(frags);
   }
 
   public boolean addEdgeAnnotation(QueryAnnotation annotation)
