@@ -22,10 +22,7 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.PointingRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -85,8 +82,6 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     {
       if(joins.get(n).size() > 1)
       {
-        // it is computational easier to replicate the a known target node, thus
-        // search for a join where our current node is the target node
         Iterator<Join> itJoinsForNode = joins.get(n).iterator();
         Join joinToSplit = itJoinsForNode.next();
         
@@ -110,7 +105,8 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     List<QueryNode> nodes, AtomicLong maxID)
   {
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
-    newNode.setVariable(newNode.getVariable() + "'");
+    newNode.getJoins().clear();
+    newNode.setVariable("x" + node.getVariable());
     
     join.setTarget(newNode);
     
@@ -126,7 +122,8 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Preconditions.checkState(node.getJoins().remove(join), "The join was not attached to the source node.");
     
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node);
-    newNode.setVariable(newNode.getVariable() + "'");
+    newNode.getJoins().clear();
+    newNode.setVariable("x" + node.getVariable());
     newNode.addJoin(join);
     
     Identical identJoin = new Identical(newNode);

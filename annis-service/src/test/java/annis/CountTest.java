@@ -105,6 +105,8 @@ public class CountTest
     assertEquals(8, countPcc2("cat=\"S\" & tok & #1 >secedge #2\n" +
       "& cat=\"S\" \n" +
       "& #3 >* #2"));
+    assertEquals(358, countPcc2("cat & cat & cat & #1 >* #2 & #2 >* #3"));
+    assertEquals(10, countPcc2("cat & cat & tok & #1 >* #2 & #2 >secedge #3"));
 
   }
   
