@@ -97,7 +97,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private String META_CAPTION = "Meta information";
   private String SPAN_CAPTION = "Scope";
   private String LANG_CAPTION = "Linguistic sequence";
-  private String ADVANCED_CAPTION = "Advanced settings";
+  private String ADVANCED_CAPTION = "Advanced settings"; 
 
   public FlatQueryBuilder(QueryController cp)
   {
