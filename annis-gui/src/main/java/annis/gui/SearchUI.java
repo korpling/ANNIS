@@ -666,6 +666,7 @@ public class SearchUI extends AnnisBaseUI
       reportBugWindow.setResizable(true);
       addWindow(reportBugWindow);
       reportBugWindow.center();
+      lastBugReportCause = null;
     }
   }
 

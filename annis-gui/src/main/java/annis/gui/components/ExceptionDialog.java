@@ -17,6 +17,7 @@ package annis.gui.components;
 
 import annis.gui.ReportBugWindow;
 import annis.gui.SearchUI;
+import annis.libgui.Helper;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -45,6 +46,8 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   private Button btClose;
   private Button btReportBug;
   private Throwable cause;
+  private VerticalLayout layout;
+  private HorizontalLayout actionsLayout;
   
   public ExceptionDialog(Throwable ex)
   {
@@ -56,32 +59,42 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     this.cause = ex;
     Preconditions.checkNotNull(ex);
     
-    VerticalLayout layout = new VerticalLayout();
+    layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
     
     if(caption == null)
     {
-      setCaption("ERROR (" + ex.getClass().getSimpleName() + ")");
+      setCaption("Unexpected error");
     }
     else
     {
       setCaption(caption);
     }
     
+    Label lblInfo = new Label("An unexpected error occured.<br />The error message was:", 
+      ContentMode.HTML);
+    lblInfo.setHeight("-1px");
+    lblInfo.setWidth("100%");
+    layout.addComponent(lblInfo);
+    lblInfo.addStyleName("exception-message-caption");
+    
+    
     Label lblMessage = new Label(ex.getMessage());
-    lblMessage.addStyleName("message-caption");
+    lblMessage.addStyleName("exception-message-content");
+    lblMessage.setHeight("-1px");
+    lblMessage.setWidth("100%");
     layout.addComponent(lblMessage);
     
-    HorizontalLayout detailLayout = new HorizontalLayout();
-    detailLayout.addStyleName("exception-dlg-details");
-    detailLayout.setWidth("100%");
-    detailLayout.setHeight("-1px");
-    layout.addComponent(detailLayout);
+    actionsLayout = new HorizontalLayout();
+    actionsLayout.addStyleName("exception-dlg-details");
+    actionsLayout.setWidth("100%");
+    actionsLayout.setHeight("-1px");
+    layout.addComponent(actionsLayout);
     
     btDetails = new Button("Show Details", this);
     btDetails.setStyleName(BaseTheme.BUTTON_LINK);
-    detailLayout.addComponent(btDetails);
+    actionsLayout.addComponent(btDetails);
     
     btReportBug = new Button("Report Bug", this);
     btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
@@ -92,21 +105,11 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     {
       btReportBug.setVisible(((SearchUI) ui).canReportBugs());
     }
-    detailLayout.addComponent(btReportBug);
-    detailLayout.setComponentAlignment(btDetails, Alignment.TOP_LEFT);
-    detailLayout.setComponentAlignment(btReportBug, Alignment.TOP_RIGHT);
+    actionsLayout.addComponent(btReportBug);
+    actionsLayout.setComponentAlignment(btDetails, Alignment.TOP_LEFT);
+    actionsLayout.setComponentAlignment(btReportBug, Alignment.TOP_RIGHT);
     
-    StringBuilder details = new StringBuilder();
-    details.append(ex.getLocalizedMessage());
-    details.append("\nat\n");
-    StackTraceElement[] st = ex.getStackTrace();
-    for(int i=0; i < st.length; i++)
-    {
-      details.append(st[i].toString());
-      details.append("\n");
-    }
-    
-    lblStacktrace = new Label(details.toString(), ContentMode.PREFORMATTED);
+    lblStacktrace = new Label(Helper.convertExceptionToMessage(ex), ContentMode.PREFORMATTED);
     detailsPanel = new Panel(lblStacktrace);
     detailsPanel.setSizeFull();
     detailsPanel.setVisible(false);
@@ -118,8 +121,8 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     layout.addComponent(btClose);
     
     layout.setComponentAlignment(btClose, Alignment.BOTTOM_CENTER);
-    layout.setExpandRatio(detailsPanel, 1.0f);
-    layout.setExpandRatio(lblMessage, 0.5f);
+    layout.setExpandRatio(detailsPanel, 0.0f);
+    layout.setExpandRatio(actionsLayout, 1.0f);
   }
 
   @Override
@@ -132,12 +135,16 @@ public class ExceptionDialog extends Window implements Button.ClickListener
         detailsPanel.setVisible(false);
         btDetails.setCaption("Show Details");
         setHeight("200px");
+        layout.setExpandRatio(detailsPanel, 0.0f);
+        layout.setExpandRatio(actionsLayout, 1.0f);
       }
       else
       {
         detailsPanel.setVisible(true);
         btDetails.setCaption("Hide Details");
         setHeight("500px");
+        layout.setExpandRatio(detailsPanel, 1.0f);
+        layout.setExpandRatio(actionsLayout, 0.0f);
       }
     }
     else if(event.getButton() == btClose)

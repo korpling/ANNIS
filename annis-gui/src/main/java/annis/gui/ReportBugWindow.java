@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
@@ -230,18 +231,10 @@ public class ReportBugWindow extends Window
       
       if(cause != null)
       {
-        StringBuilder exception = new StringBuilder();
-        exception.append(cause.getLocalizedMessage());
-        exception.append("\nat\n");
-        StackTraceElement[] st = cause.getStackTrace();
-        for (int i = 0; i < st.length; i++)
-        {
-          exception.append(st[i].toString());
-          exception.append("\n");
-        }
         try
         {
-          mail.attach(new ByteArrayDataSource(exception.toString(), "text/plain"), "exception.txt", 
+          mail.attach(new ByteArrayDataSource(Helper.convertExceptionToMessage(
+            cause), "text/plain"), "exception.txt", 
           "Exception that caused the user to report the bug");
         }
         catch (IOException ex)

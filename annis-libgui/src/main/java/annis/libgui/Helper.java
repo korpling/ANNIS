@@ -500,4 +500,25 @@ public class Helper {
     }
     return result;
   }
+  
+  /**
+   * Returns a formatted string containing the type of the exception, the message
+   * and the stacktrace.
+   * @param ex
+   * @return 
+   */
+  public static String convertExceptionToMessage(Throwable ex)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
+    sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
+    sb.append("Stacktrace: \n");
+    StackTraceElement[] st = ex.getStackTrace();
+    for(int i=0; i < st.length; i++)
+    {
+      sb.append(st[i].toString());
+      sb.append("\n");
+    }
+    return sb.toString();
+  }
 }
