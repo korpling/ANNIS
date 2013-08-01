@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
@@ -40,6 +41,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
@@ -79,7 +81,7 @@ public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  LoginListener
+  LoginListener, ErrorHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -132,6 +134,8 @@ public class SearchUI extends AnnisBaseUI
   {
     super.init(request);
 
+    setErrorHandler(this);
+    
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
@@ -361,6 +365,16 @@ public class SearchUI extends AnnisBaseUI
     
     updateUserInformation();
   }
+
+  @Override
+  public void error(com.vaadin.server.ErrorEvent event)
+  {
+    log.error("Unknown error in some component: " + event.getThrowable().getLocalizedMessage(), 
+      event.getThrowable());
+    ExceptionDialog.show(event.getThrowable());
+  }
+  
+  
   
   public boolean canReportBugs()
   {

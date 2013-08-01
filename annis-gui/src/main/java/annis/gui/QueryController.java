@@ -373,6 +373,7 @@ public class QueryController implements PagingCallback
               }
               else
               {
+                log.error("Unexpected exception:  " + causeFinal.getLocalizedMessage(), causeFinal);
                 ExceptionDialog.show(causeFinal);
               }
             } // end if cause != null
