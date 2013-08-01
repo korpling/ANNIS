@@ -341,15 +341,18 @@ public class QueryController implements PagingCallback
           {
             if (causeFinal == null)
             {
-              String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
-              String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
-
-              ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
-                getMatchCount() + " " + matchesString
-                + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
-              if (lastResultView != null && lastCount.getMatchCount() > 0)
+              if(lastCount != null)
               {
-                lastResultView.setCount(lastCount.getMatchCount());
+                String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
+                String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
+
+                ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
+                  getMatchCount() + " " + matchesString
+                  + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
+                if (lastResultView != null && lastCount.getMatchCount() > 0)
+                {
+                  lastResultView.setCount(lastCount.getMatchCount());
+                }
               }
             }
             else
