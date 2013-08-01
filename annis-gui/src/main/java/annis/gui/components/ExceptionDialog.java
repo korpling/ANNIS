@@ -18,6 +18,7 @@ package annis.gui.components;
 import annis.gui.ReportBugWindow;
 import annis.gui.SearchUI;
 import com.google.common.base.Preconditions;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -43,6 +44,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   private Button btDetails;
   private Button btClose;
   private Button btReportBug;
+  private Throwable cause;
   
   public ExceptionDialog(Throwable ex)
   {
@@ -51,6 +53,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   
   public ExceptionDialog(Throwable ex, String caption)
   {
+    this.cause = ex;
     Preconditions.checkNotNull(ex);
     
     VerticalLayout layout = new VerticalLayout();
@@ -83,6 +86,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     btReportBug = new Button("Report Bug", this);
     btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
     btReportBug.setVisible(false);
+    btReportBug.setIcon(new ThemeResource("../runo/icons/16/email.png"));
     UI ui = UI.getCurrent();
     if(ui instanceof SearchUI)
     {
@@ -146,7 +150,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
       UI ui = UI.getCurrent();
       if(ui instanceof SearchUI)
       {
-        ((SearchUI) ui).reportBug();
+        ((SearchUI) ui).reportBug(cause);
       }
     }
   }

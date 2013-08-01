@@ -103,6 +103,7 @@ public class SearchUI extends AnnisBaseUI
 
   private Button btBugReport;
   private ScreenshotMaker screenshot;
+  private Throwable lastBugReportCause;
 
   private ControlPanel controlPanel;
 
@@ -367,6 +368,11 @@ public class SearchUI extends AnnisBaseUI
   }
   public void reportBug()
   {
+    reportBug(null);
+  }
+  public void reportBug(Throwable cause)
+  {
+    lastBugReportCause = cause;
     screenshot.makeScreenshot();
     btBugReport.setCaption("bug report is initialized...");
   }
@@ -654,7 +660,7 @@ public class SearchUI extends AnnisBaseUI
     if (bugEMailAddress != null)
     {
       ReportBugWindow reportBugWindow =
-        new ReportBugWindow(bugEMailAddress, imageData, mimeType);
+        new ReportBugWindow(bugEMailAddress, imageData, mimeType, lastBugReportCause);
 
       reportBugWindow.setModal(true);
       reportBugWindow.setResizable(true);
