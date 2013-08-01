@@ -17,8 +17,10 @@ package annis.administration;
 
 import annis.exceptions.AnnisException;
 import annis.security.AnnisUserConfig;
+import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
+import org.osgi.framework.AdminPermission;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -55,11 +57,53 @@ public interface AdministrationDao
 
   public boolean checkDatabaseSchemaVersion() throws AnnisException;
 
-  public boolean executeSqlFromScript(String script);
+  public PreparedStatement executeSqlFromScript(String script);
 
-  public boolean executeSqlFromScript(String script, MapSqlParameterSource args);
+  public PreparedStatement executeSqlFromScript(String script,
+    MapSqlParameterSource args);
 
   public AnnisUserConfig retrieveUserConfig(String userName);
+
+  public void registerGUICancelThread(StatementController statementCon);
+
+  /**
+   * Provides a interface to cancel {@link PreparedStatement} via a gui.
+   */
+  public interface StatementController
+  {
+
+    /**
+     * Registers a sql statement.
+     *
+     * @param statement The statement which maybe get cancelled.
+     */
+    public void registerStatement(PreparedStatement statement);
+
+    /**
+     * Interrupts a sql statement via the JDBC-Driver.
+     *
+     * <p>It relies on the actual implementation of the JDBC-Driver, if this
+     * method has an effect.</p>
+     *
+     * <p>If the {@link PreparedStatement#cancel()} It also set the internal
+     * isCancelled-flat to true, so {@link #isCancelled()} will always return
+     * true. This behaviour is inspired by the method interrupt method of the
+     * {@link Thread#interrupt()} method. The implementation of the
+     * {@link AdministrationDao} interface should poll against this flag and do
+     * not execute further sql-statements.</p>
+     *
+     */
+    public void cancelStatements();
+
+    /**
+     * Returns true when {@link #cancelStatements()} has been executed at most
+     * once.
+     *
+     * @return the value True signals, that no sql statements should be executed
+     * anymore.
+     */
+    public boolean isCancelled();
+  }
 
   public void storeUserConfig(AnnisUserConfig config);
 }

@@ -53,12 +53,21 @@ import org.slf4j.LoggerFactory;
  *
  *
  * Mappings: <br/>
+ * <ul>
+ * <li>
  * It is possible to specify the order of annotation layers in each grid. Use
  * <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
  * annotation layers. If <b>anno:</b> is used, additional annotation layers not
  * present in the list will not be visualized. If mappings is left empty, layers
- * will be ordered alphabetically
- *
+ * will be ordered alphabetically.
+ * </li>
+ * <li>
+ * <b>tok_anno:true</b> can be used to also display the annotations of the token.
+ * </li>
+ * <li>
+ * <b>hide_tok:true</b> switches the line with the token value off.
+ * </li>
+ * </ul>
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @PluginImplementation
@@ -99,6 +108,7 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
     public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
 
     public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
+    public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
 
     private AnnotationGrid grid;
 
@@ -128,6 +138,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
       layout.setSizeUndefined();
       addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
+      EList<STextualDS> texts = input.getDocument().getSDocumentGraph().
+                getSTextualDSs();
+
+      if (texts != null && texts.size() > 0)
+      {
+        if (CommonHelper.containsRTLText(texts.get(0).getSText()))
+        {
+          addStyleName("rtl");
+        }
+      }
+
       if (input != null) {
         String resultID = input.getId();
 
@@ -138,8 +159,17 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
 
         SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
+        boolean showTokenAnnotations = 
+          Boolean.parseBoolean(input.getMappings().getProperty(MAPPING_TOK_ANNOS_KEY));
+        
         List<String> annos = EventExtractor.computeDisplayAnnotations(input,
                 SSpan.class);
+        if(showTokenAnnotations)
+        {
+          List<String> tokenAnnos = EventExtractor.computeDisplayAnnotations(
+            input, SToken.class);
+          annos.addAll(tokenAnnos);
+        }
 
         EList<SToken> token = graph.getSortedSTokenByText();
 
@@ -152,8 +182,9 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
         long endIndex = featTokEnd.getTokenIndex();
 
         LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-                EventExtractor.parseSalt(input, annos, (int) startIndex,
-                (int) endIndex, pdfController);
+          EventExtractor.parseSalt(input, showTokenAnnotations, annos,
+          (int) startIndex,
+          (int) endIndex, pdfController);
 
         // we will only add tokens of one texts which is mentioned by any
         // included annotation.

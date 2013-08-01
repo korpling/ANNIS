@@ -28,7 +28,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
 public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder>
-{
+{  
   @Override
   public String getShortName()
   {

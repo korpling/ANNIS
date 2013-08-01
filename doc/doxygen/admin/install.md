@@ -1,10 +1,12 @@
 Installing {#admin-install}
-===========================
+==========
 
 [TOC]
 
+
 Installing an ANNIS public server {#admin-install-server}
----------------------------------
+================================
+
 
 The ANNIS server version can be installed on UNIX based server, or else under
 Windows using Cygwin [http://www.cygwin.com/], the freely available UNIX
@@ -22,8 +24,8 @@ sudo -u postgres psql
 \q
 \endcode
 
-2. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
-3. Make sure you have installed [JDK 6 or JDK 7](http://java.sun.com/javase/downloads/index.jsp)
+2. Make sure you have installed [JDK 6 or JDK 7](http://java.sun.com/javase/downloads/index.jsp)
+3. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
  (or install them if you don’t)
 4. Download the ANNIS service distribution file `annis-service-<version>-distribution.tar.gz` from our website
 and then unzip the downloaded file:
@@ -35,11 +37,18 @@ tar xzvf annis-service-<version>-distribution.tar.gz -C <installation directory>
 export ANNIS_HOME=<installation directory>
 export PATH=$PATH:$ANNIS_HOME/bin
 \endcode
-6. Next initialize your ANNIS database (only the first time you use the system):
+6. Next initialize your ANNIS database (only the first time you use the system).
+When the ANNIS service is normally installed, it assumes it can get PostgreSQL super user rights for this step. Thus you need the superuser password.
 \code{.sh}
-annis-admin.sh init -u <username> -d <dbname> -p
--P <postgres password>
+annis-admin.sh init -u <username> -d <dbname> -p <new user password>
+-P <postgres superuser password>
 \endcode
+This call will 
+<ul><li>create a new database with the name given by the "-d" parameter</li>
+<li>create a new PostgreSQL user with the user name given by the "-u" parameter and the password given by the "-p" parameter</li>
+<li>create all necessary tables, PSQL functions and initial data in the database</li></ul>
+\warning Do not use "postgres" as database name for ANNIS since it is reserved by PostgresSQL itself.
+
 You can omit the PostgreSQL administrator password option (`-P`). Then the database and user must already
 exists. E.g. you should execute the following as PostgreSQL administrator:
 \code{.sql}
@@ -64,16 +73,24 @@ command.
 \code{.sh}
 annis-service.sh start
 \endcode
+If you don't want to use any authentification and every user should see every
+corpus without login you can start ANNIS with
+\code{.sh}
+annis-service-no-security.sh start
+\endcode
+instead of the default script.
 9. To get the ANNIS front-end running, first download annis-
 gui-<version>.war from our website and deploy it to your Java servlet
 container (this is depending on the servlet container you use).
+10. Configure users and groups as described [here](@ref admin-configure-user) 
+and define who is allowed to see which corpus.
 
 \note
 We also **strongly recommend** reconfiguring the Postgres server’s default
 settings as described [here](@ref admin-configure-postgresql).
 
-Installing a local version (ANNIS Kickstarter) {#admin-install-kickstarter}
-----------------------------------------------
+Installing a local version (ANNIS Kickstarter)     {#admin-install-kickstarter}
+==============================================
 
 Local users who do not wish to make their corpora available online can install
 ANNIS Kickstarter under most versions of Linux, Windows and Mac OS. To install

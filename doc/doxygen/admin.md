@@ -8,3 +8,4 @@ You will find instructions how to install and configure ANNIS (either on a serve
 - \subpage admin-configure-service
 - \subpage admin-configure-webapp
 - \subpage admin-configure-postgresql
+- \subpage admin-multiple-servers

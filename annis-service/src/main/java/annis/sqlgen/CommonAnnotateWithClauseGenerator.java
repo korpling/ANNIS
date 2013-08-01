@@ -216,8 +216,8 @@ public class CommonAnnotateWithClauseGenerator
 
       String distLeft = "min" + i 
         + " - " 
-        + tas.aliasedColumn(NODE_TABLE, "right_token");
-      String distRight = tas.aliasedColumn(NODE_TABLE, "left_token") 
+        + tas.aliasedColumn(NODE_TABLE, "left_token");
+      String distRight = tas.aliasedColumn(NODE_TABLE, "right_token") 
         + " - max" 
         + i;
 

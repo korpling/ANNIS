@@ -166,7 +166,27 @@ public class SearchOptionsPanel extends FormLayout
       new HelpButton(cbSegmentation));
 
     addComponent(cbResultsPerPage);
+
     corpusConfigurations = Helper.getCorpusConfigs();
+
+
+    if (corpusConfigurations == null
+      || corpusConfigurations.get(DEFAULT_CONFIG) == null
+      || corpusConfigurations.get(DEFAULT_CONFIG).isEmpty())
+    {
+      CorpusConfig corpusConfig = new CorpusConfig();
+      corpusConfig.setConfig(KEY_MAX_CONTEXT_LEFT, "5");
+      corpusConfig.setConfig(KEY_MAX_CONTEXT_RIGHT, "5");
+      corpusConfig.setConfig(KEY_CONTEXT_STEPS, "5");
+      corpusConfig.setConfig(KEY_RESULT_PER_PAGE, "10");
+      corpusConfig.setConfig(KEY_DEFAULT_CONTEXT, "5");
+      corpusConfig.setConfig(KEY_DEFAULT_CONTEXT_SEGMENTATION, "tok");
+      corpusConfig.setConfig(KEY_DEFAULT_BASE_TEXT_SEGMENTATION, "tok");
+      corpusConfigurations = new CorpusConfigMap();
+      corpusConfigurations.put(DEFAULT_CONFIG, corpusConfig);
+    }
+
+
 
     Integer resultsPerPage = Integer.parseInt(corpusConfigurations.get(
       DEFAULT_CONFIG).getConfig(KEY_RESULT_PER_PAGE));
@@ -184,6 +204,7 @@ public class SearchOptionsPanel extends FormLayout
 
     Integer ctxSteps = Integer.parseInt(
       corpusConfigurations.get(DEFAULT_CONFIG).getConfig(KEY_CONTEXT_STEPS));
+
 
     String segment = corpusConfigurations.get(DEFAULT_CONFIG).getConfig(
       KEY_DEFAULT_CONTEXT_SEGMENTATION);
@@ -244,7 +265,7 @@ public class SearchOptionsPanel extends FormLayout
     {
       cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
     }
-    else
+    else if(segment != null)
     {
       cbSegmentation.addItem(segment);
       cbSegmentation.setValue(segment);
@@ -400,7 +421,7 @@ public class SearchOptionsPanel extends FormLayout
       log.warn("Invalid integer submitted to search options ComboBox", ex);
     }
 
-    return Math.max(0, result);
+    return Math.max(1, result);
   }
 
   public String getSegmentationLayer()
@@ -489,7 +510,14 @@ public class SearchOptionsPanel extends FormLayout
       }
     }
 
-    return segmentation;
+    if(segmentation == null)
+    {
+      return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(key);
+    }
+    else
+    {
+      return segmentation;
+    }
   }
 
   /**

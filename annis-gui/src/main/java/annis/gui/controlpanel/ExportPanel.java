@@ -42,7 +42,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.FutureTask;
-import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -346,7 +345,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "into the parameters box below. To display only a subset of annotations "
       + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
       + "to show tokens and the "
-      + "annotations pos and cat.");
+      + "annotations pos and cat.<br /><br />"
+      + "Parameters: <br/>"
+      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+      + "<code>metakeys=title,documentname</code>) <br />"
+      + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
+      + "<code>numbers=false</code>)");
   }
 
   public class ExporterSelectionHelpListener implements

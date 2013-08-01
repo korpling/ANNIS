@@ -15,11 +15,15 @@
  */
 package annis.libgui;
 
+import annis.model.Annotation;
+import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
@@ -35,6 +39,7 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -117,8 +122,15 @@ public class Helper {
   }
 
   public static void setUser(AnnisUser user) {
-    VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
+    if(user == null)
+    {
+      VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+    }
+    else
+    {
+      VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
             user);
+    }
   }
 
   /**
@@ -302,6 +314,54 @@ public class Helper {
     }
     return "ERROR";
   }
+  
+  /**
+   * Retrieve all the meta data for a given document of a corpus.
+   * @param toplevelCorpusName
+   * @param documentName
+   * @return 
+   */
+  public static List<Annotation> getMetaData(String toplevelCorpusName,
+    String documentName)
+  {
+    List<Annotation> result = new ArrayList<Annotation>();
+    WebResource res = Helper.getAnnisWebResource();
+    try
+    {
+      res = res.path("query").path("corpora")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
+      if (documentName != null)
+      {
+        res = res.path(documentName);
+      }
+
+      result = res.path("metadata").queryParam("exclude", "true").get(new GenericType<List<Annotation>>() {});
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "Remote exception: " + ex.getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error(null, ex);
+      Notification.show(
+        "UTF-8 encoding is not supported on server, this is weird: " + ex.
+        getLocalizedMessage(),
+        Notification.Type.WARNING_MESSAGE);
+    }
+    return result;
+  }
 
   /**
    * Loads the corpus config of a specific corpus.
@@ -319,10 +379,13 @@ public class Helper {
               .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
               .path("config").get(CorpusConfig.class);
     } catch (UnsupportedEncodingException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
     return corpusConfig;
@@ -336,7 +399,10 @@ public class Helper {
       defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
               .path("corpora").path("default-config").get(CorpusConfig.class);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
 
@@ -360,7 +426,10 @@ public class Helper {
       corpusConfigurations = Helper.getAnnisWebResource().path(
               "query").path("corpora").path("config").get(CorpusConfigMap.class);
     } catch (UniformInterfaceException ex) {
-      Notification.show("could not query corpus configuration", ex.
+      Notification.show("can not retrieve corpus configuration", ex.
+              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      Notification.show("can not retrieve corpus configuration", ex.
               getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
 
