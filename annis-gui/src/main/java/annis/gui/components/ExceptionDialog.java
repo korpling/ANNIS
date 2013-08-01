@@ -15,11 +15,15 @@
  */
 package annis.gui.components;
 
+import annis.gui.ReportBugWindow;
+import annis.gui.SearchUI;
 import com.google.common.base.Preconditions;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -38,6 +42,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
   private Label lblStacktrace;
   private Button btDetails;
   private Button btClose;
+  private Button btReportBug;
   
   public ExceptionDialog(Throwable ex)
   {
@@ -54,7 +59,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     
     if(caption == null)
     {
-      setCaption("ERROR (" + ex.getClass().getName() + ")");
+      setCaption("ERROR (" + ex.getClass().getSimpleName() + ")");
     }
     else
     {
@@ -65,11 +70,27 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     lblMessage.addStyleName("message-caption");
     layout.addComponent(lblMessage);
     
-    layout.addComponent(new Label("<hr/>", ContentMode.HTML));
+    HorizontalLayout detailLayout = new HorizontalLayout();
+    detailLayout.addStyleName("exception-dlg-details");
+    detailLayout.setWidth("100%");
+    detailLayout.setHeight("-1px");
+    layout.addComponent(detailLayout);
     
     btDetails = new Button("Show Details", this);
     btDetails.setStyleName(BaseTheme.BUTTON_LINK);
-    layout.addComponent(btDetails);
+    detailLayout.addComponent(btDetails);
+    
+    btReportBug = new Button("Report Bug", this);
+    btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
+    btReportBug.setVisible(false);
+    UI ui = UI.getCurrent();
+    if(ui instanceof SearchUI)
+    {
+      btReportBug.setVisible(((SearchUI) ui).canReportBugs());
+    }
+    detailLayout.addComponent(btReportBug);
+    detailLayout.setComponentAlignment(btDetails, Alignment.TOP_LEFT);
+    detailLayout.setComponentAlignment(btReportBug, Alignment.TOP_RIGHT);
     
     StringBuilder details = new StringBuilder();
     details.append(ex.getLocalizedMessage());
@@ -89,15 +110,12 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     lblStacktrace.setVisible(true);
     layout.addComponent(detailsPanel);
     
-    layout.addComponent(new Label("<hr/>", ContentMode.HTML));
-
-   
-    
     btClose = new Button("OK", this);
     layout.addComponent(btClose);
     
     layout.setComponentAlignment(btClose, Alignment.BOTTOM_CENTER);
     layout.setExpandRatio(detailsPanel, 1.0f);
+    layout.setExpandRatio(lblMessage, 0.5f);
   }
 
   @Override
@@ -121,6 +139,15 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     else if(event.getButton() == btClose)
     {
       this.close();
+    }
+    else if(event.getButton() == btReportBug)
+    {
+      this.close();
+      UI ui = UI.getCurrent();
+      if(ui instanceof SearchUI)
+      {
+        ((SearchUI) ui).reportBug();
+      }
     }
   }
   

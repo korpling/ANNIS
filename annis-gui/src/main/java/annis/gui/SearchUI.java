@@ -102,6 +102,7 @@ public class SearchUI extends AnnisBaseUI
   private Button btLogout;
 
   private Button btBugReport;
+  private ScreenshotMaker screenshot;
 
   private ControlPanel controlPanel;
 
@@ -148,7 +149,7 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
 
-    final ScreenshotMaker screenshot = new ScreenshotMaker(this);
+    screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
 
     css = new CSSInject(this);
@@ -171,13 +172,12 @@ public class SearchUI extends AnnisBaseUI
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
-    btBugReport.addListener(new Button.ClickListener()
+    btBugReport.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(ClickEvent event)
       {
-        screenshot.makeScreenshot();
-        btBugReport.setCaption("bug report is initialized...");
+        reportBug();
       }
     });
 
@@ -189,7 +189,7 @@ public class SearchUI extends AnnisBaseUI
     {
       this.bugEMailAddress = bugmail;
     }
-    btBugReport.setVisible(this.bugEMailAddress != null);
+    btBugReport.setVisible(canReportBugs());
 
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("-1px");
@@ -359,6 +359,16 @@ public class SearchUI extends AnnisBaseUI
     evaluateFragment(getPage().getUriFragment());
     
     updateUserInformation();
+  }
+  
+  public boolean canReportBugs()
+  {
+    return this.bugEMailAddress != null;
+  }
+  public void reportBug()
+  {
+    screenshot.makeScreenshot();
+    btBugReport.setCaption("bug report is initialized...");
   }
 
   private void loadInstanceFonts()

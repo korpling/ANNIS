@@ -210,5 +210,11 @@ $font-size: 10pt;
   .message-caption {
     font-size: 20pt;
   }
+  
+  .exception-dlg-details {
+    border-style: solid;
+    border-width: 1px 0px 1px 0px;
+    border-color: black;
+  }
 
 }
