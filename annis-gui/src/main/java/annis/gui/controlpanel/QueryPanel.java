@@ -19,6 +19,7 @@ import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
 import annis.libgui.InstanceConfig;
@@ -309,16 +310,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         log.error(
           "Exception when communicating with service", ex);
-        Notification.show("Exception when communicating with service: " + ex.getMessage(),
-          Notification.Type.TRAY_NOTIFICATION);
+        ExceptionDialog.show(ex, "Exception when communicating with service.");
       }
     }
     catch(ClientHandlerException ex)
     {
       log.error(
           "Could not connect to web service", ex);
-        Notification.show("Could not connect to web service: " + ex.getMessage(),
-          Notification.Type.TRAY_NOTIFICATION);
+        ExceptionDialog.show(ex, "Could not connect to web service");
     }
   }
 

@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
@@ -369,11 +370,7 @@ public class QueryController implements PagingCallback
               }
               else
               {
-                Notification.show(
-                  "unknown error " + causeFinal.
-                  getResponse().getStatus(),
-                  causeFinal.getResponse().getEntity(String.class),
-                  Notification.Type.WARNING_MESSAGE);
+                ExceptionDialog.show(causeFinal);
               }
             } // end if cause != null
             
