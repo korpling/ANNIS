@@ -26,10 +26,10 @@ import annis.resolver.ResolverEntry;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class SingleResultPanel extends VerticalLayout implements
+public class SingleResultPanel extends CssLayout implements
   Button.ClickListener
 {
 

@@ -74,7 +74,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
-    super(2,3);
+    super(4,3);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
@@ -82,12 +82,20 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setSpacing(true);
     setMargin(true);
 
-    addComponent(new Label("AnnisQL:"), 0, 0);
-    addComponent(new Label("Status:"), 0, 2);
+    Label lblAqlLabel = new Label("AnnisQL:");
+    Label lblStatusLabel = new Label("Status:");
+    lblAqlLabel.setSizeUndefined();
+    lblStatusLabel.setSizeUndefined();
+    
+    addComponent(lblAqlLabel, 0, 0);
+    addComponent(lblStatusLabel, 0, 2);
 
+    
     setRowExpandRatio(0, 1.0f);
-    setColumnExpandRatio(0, 0.2f);
-    setColumnExpandRatio(1, 0.8f);
+    setColumnExpandRatio(0, 0.0f);
+    setColumnExpandRatio(1, 0.1f);
+    setColumnExpandRatio(2, 0.0f);
+    setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
@@ -98,7 +106,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    addComponent(txtQuery, 1, 0);
+    addComponent(txtQuery, 1, 0, 3, 0);
 
     final VirtualKeyboard virtualKeyboard;
     if(instanceConfig.getKeyboardLayout() == null)
@@ -111,10 +119,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
       virtualKeyboard.extend(txtQuery);
     }
-    VerticalLayout panelStatusLayout = new VerticalLayout();
-    panelStatusLayout.setHeight("-1px");
-    panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
-
 
     lblStatus = new Label();
     lblStatus.setContentMode(ContentMode.HTML);
@@ -123,21 +127,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     lblStatus.setHeight(3.5f, Unit.EM);
     lblStatus.addStyleName("border-layout");
 
-    panelStatusLayout.addComponent(lblStatus);
-
-    addComponent(panelStatusLayout, 1, 2);
-
-    HorizontalLayout buttonLayout = new HorizontalLayout();
-    buttonLayout.setWidth("100%");
-    addComponent(buttonLayout, 1, 1);
+    addComponent(lblStatus, 1, 2, 3, 2);
 
     piCount = new ProgressIndicator();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
     piCount.setPollingInterval(60000);
-    panelStatusLayout.addComponent(piCount);
-
+    
 
     btShowResult = new Button("Show Result");
     btShowResult.setWidth("100%");
@@ -146,7 +143,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
     btShowResult.setDisableOnClick(true);
 
-    buttonLayout.addComponent(btShowResult);
 
     VerticalLayout historyListLayout = new VerticalLayout();
     historyListLayout.setSizeUndefined();
@@ -195,7 +191,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
-    buttonLayout.addComponent(btHistory);
 
     if(virtualKeyboard != null)
     {
@@ -204,10 +199,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
-      buttonLayout.addComponent(btShowKeyboard);
+      
+      addComponent(btShowResult, 1, 1);
+      addComponent(btHistory, 2, 1);
+      addComponent(btShowKeyboard, 3, 1);
     }
-    buttonLayout.setExpandRatio(btShowResult, 1.0f);
-
+    else
+    {
+      addComponent(btShowResult, 1, 1, 2, 1);
+      addComponent(btHistory, 3, 1);
+    }
+ 
 
   }
 
@@ -349,10 +351,25 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     if(piCount != null && btShowResult != null && lblStatus != null)
     {
-      lblStatus.setVisible(!enabled);
-      piCount.setVisible(enabled);
-      piCount.setEnabled(enabled);
-
+      if(enabled)
+      {
+        if(!piCount.isVisible())
+        {
+          replaceComponent(lblStatus, piCount);
+          piCount.setVisible(true);
+          piCount.setEnabled(true);
+        }
+      }
+      else
+      {
+        if(piCount.isVisible())
+        {
+          replaceComponent(piCount, lblStatus);
+          piCount.setVisible(false);
+          piCount.setEnabled(false);
+        }
+      }
+      
       btShowResult.setEnabled(!enabled);
     }
   }

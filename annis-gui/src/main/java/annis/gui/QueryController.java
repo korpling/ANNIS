@@ -231,7 +231,7 @@ public class QueryController implements PagingCallback
         .queryParam("corpora", StringUtils.join(lastQuery.getCorpora(), ","))
         .accept(MediaType.APPLICATION_XML_TYPE)
         .get(new MatchListType());
-      
+
       new MatchCallback().start();
 
     }
@@ -246,7 +246,7 @@ public class QueryController implements PagingCallback
         "q", lastQuery.getQuery()).queryParam("corpora",
         StringUtils.join(lastQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
-      
+
       new CountCallback().start();
     }
   }
@@ -305,16 +305,40 @@ public class QueryController implements PagingCallback
     @Override
     public void run()
     {
+
       if (futureCount != null)
       {
+        UniformInterfaceException cause = null;
         try
         {
           lastCount = futureCount.get();
-
-          ui.access(new Runnable()
+        }
+        catch (InterruptedException ex)
+        {
+          log.warn(null, ex);
+        }
+        catch (ExecutionException root)
+        {
+          if (root.getCause() instanceof UniformInterfaceException)
           {
-            @Override
-            public void run()
+            cause = (UniformInterfaceException) root.getCause();
+          }
+          else
+          {
+            log.error("Unexcepted ExecutionException cause", root);
+          }
+
+        }
+
+        futureCount = null;
+
+        final UniformInterfaceException causeFinal = cause;
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            if (causeFinal == null)
             {
               String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
               String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
@@ -327,63 +351,32 @@ public class QueryController implements PagingCallback
                 lastResultView.setCount(lastCount.getMatchCount());
               }
             }
-          });
-        }
-        catch (InterruptedException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (ExecutionException root)
-        {
-          final Throwable cause = root.getCause();
-
-          if (cause instanceof UniformInterfaceException)
-          {
-            ui.access(new Runnable()
+            else
             {
-              @Override
-              public void run()
+              if (causeFinal.getResponse().getStatus() == 400)
               {
-                UniformInterfaceException ex = (UniformInterfaceException) cause;
-                if (ex.getResponse().getStatus() == 400)
-                {
-                  Notification.show(
-                    "parsing error",
-                    ex.getResponse().getEntity(String.class),
-                    Notification.Type.WARNING_MESSAGE);
-                }
-                else if (ex.getResponse().getStatus() == 504) // gateway timeout
-                {
-                  Notification.show(
-                    "Timeout: query execution took too long.",
-                    "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                    Notification.Type.WARNING_MESSAGE);
-                }
-                else
-                {
-                  Notification.show(
-                    "unknown error " + ex.
-                    getResponse().getStatus(),
-                    ex.getResponse().getEntity(String.class),
-                    Notification.Type.WARNING_MESSAGE);
-                }
+                Notification.show(
+                  "parsing error",
+                  causeFinal.getResponse().getEntity(String.class),
+                  Notification.Type.WARNING_MESSAGE);
               }
-            });
-
-          }
-          else
-          {
-            log.error("Unexcepted ExecutionException cause", root);
-          }
-        }
-
-        futureCount = null;
-
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
+              else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
+              {
+                Notification.show(
+                  "Timeout: query execution took too long.",
+                  "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
+                  Notification.Type.WARNING_MESSAGE);
+              }
+              else
+              {
+                Notification.show(
+                  "unknown error " + causeFinal.
+                  getResponse().getStatus(),
+                  causeFinal.getResponse().getEntity(String.class),
+                  Notification.Type.WARNING_MESSAGE);
+              }
+            } // end if cause != null
+            
             ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
           }
         });

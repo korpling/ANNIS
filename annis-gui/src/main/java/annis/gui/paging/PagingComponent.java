@@ -90,10 +90,7 @@ public class PagingComponent extends CustomComponent implements
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(false, true, false, true));
 
-    Panel root = new Panel(layout);
-    root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    setCompositionRoot(root);
+    setCompositionRoot(layout);
 
 
     lblInfo = new Label();
@@ -137,8 +134,9 @@ public class PagingComponent extends CustomComponent implements
     Validator pageValidator = new PageValidator(
       "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
-    root.addAction(new EnterListener(txtPage));
-
+    txtPage.addShortcutListener(new EnterListener(txtPage));
+    
+    
     lblMaxPages = new Label();
     lblMaxPages.setDescription("maximal pages");
     lblMaxPages.setSizeUndefined();
@@ -155,9 +153,13 @@ public class PagingComponent extends CustomComponent implements
     layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
 
+    layout.setComponentAlignment(btFirst, Alignment.MIDDLE_LEFT);
+    layout.setComponentAlignment(btPrevious, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblStatus, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblMaxPages, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(txtPage, Alignment.MIDDLE_RIGHT);
+    layout.setComponentAlignment(btNext, Alignment.MIDDLE_RIGHT);
+    layout.setComponentAlignment(btLast, Alignment.MIDDLE_RIGHT);
 
     layout.setExpandRatio(lblStatus, 1.0f);
     layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
