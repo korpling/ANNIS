@@ -16,8 +16,9 @@
 package annis.gui.widgets.gwt.client.ui;
 
 import annis.gui.widgets.AutoHeightIFrame;
+import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
-import com.vaadin.client.ui.LegacyConnector;
+import com.vaadin.client.ui.AbstractComponentConnector;
 import com.vaadin.shared.ui.Connect;
 
 /**
@@ -25,14 +26,46 @@ import com.vaadin.shared.ui.Connect;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Connect(AutoHeightIFrame.class)
-public class AutoHeightIFrameConnector extends LegacyConnector
+public class AutoHeightIFrameConnector extends AbstractComponentConnector
 {
 
+  private AutoHeightIFrameServerRpc rpc = 
+    RpcProxy.create(AutoHeightIFrameServerRpc.class, this);
+  
+  public AutoHeightIFrameConnector()
+  {
+    getWidget().setLoadCallback(new LoadCallback() 
+    {
+      @Override
+      public void onIFrameLoaded(float newHeight)
+      {
+        rpc.newHeight(newHeight);
+      }
+    });
+  }
+  
   @Override
   public VAutoHeightIFrame getWidget()
   {
     return (VAutoHeightIFrame) super.getWidget();
   }
+
+  @Override
+  public AutoHeightIFrameState getState()
+  {
+    return (AutoHeightIFrameState) super.getState();
+  }
+
+  @Override
+  public void onStateChanged(StateChangeEvent stateChangeEvent)
+  {
+    super.onStateChanged(stateChangeEvent);
+    getWidget().update(getState().getUrl(), getState().getAdditionalHeight());
+  }
   
+  public interface LoadCallback
+  {
+    public void onIFrameLoaded(float newHeight);
+  }
   
 }

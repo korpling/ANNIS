@@ -1,47 +1,51 @@
 package annis.gui.widgets;
 
-import com.vaadin.server.PaintException;
-import com.vaadin.server.PaintTarget;
-import com.vaadin.server.Sizeable;
+import annis.gui.widgets.gwt.client.ui.AutoHeightIFrameServerRpc;
+import annis.gui.widgets.gwt.client.ui.AutoHeightIFrameState;
 import com.vaadin.ui.AbstractComponent;
-import com.vaadin.ui.LegacyComponent;
 import java.net.URI;
-import java.util.Map;
 
 /**
  * Server side component for the VAutoHeightIFrame widget.
  */
-public class AutoHeightIFrame extends AbstractComponent implements LegacyComponent
+public class AutoHeightIFrame extends AbstractComponent
 {
 
   private URI uri;
+
   private boolean heightWasSet = false;
+
   public static final int ADDITIONAL_HEIGHT = 25;
-  
+
   public final static String RES_KEY = "iframe-vis-res";
 
   public AutoHeightIFrame(URI uri)
   {
-     this.uri = uri;  
-     setWidth("100%");
+    this.uri = uri;
+    setWidth("100%");
+    registerRpc(rpc);
+    
+    getState().setUrl(uri.toASCIIString());
+    getState().setAdditionalHeight(ADDITIONAL_HEIGHT);
   }
-
-  @Override
-  public void paintContent(PaintTarget target) throws PaintException
+  
+  private AutoHeightIFrameServerRpc rpc = new AutoHeightIFrameServerRpc()
   {
-    target.addAttribute("url", uri.toASCIIString());
-    target.addAttribute("additional_height", ADDITIONAL_HEIGHT);
-  }  
-
-  @Override
-  public void changeVariables(Object source, Map<String, Object> variables)
-  {
-    if (!heightWasSet && variables.containsKey("height"))
+    @Override
+    public void newHeight(float height)
     {
-      int height = (Integer) variables.get("height");
-//      getWindow().showNotification("new height: " + height, Window.Notification.TYPE_TRAY_NOTIFICATION);
-      this.setHeight((float) height, Sizeable.UNITS_PIXELS);
-      heightWasSet = true;
-    }   
+      if (!heightWasSet)
+      {
+        setHeight(height, Unit.PIXELS);
+        heightWasSet = true;
+      }
+    }
+  };
+
+  @Override
+  protected AutoHeightIFrameState getState()
+  {
+    return (AutoHeightIFrameState) super.getState();
   }
+  
 }
