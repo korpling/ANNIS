@@ -60,7 +60,7 @@ public interface MetadataService
    * @return The xml representation of a list wich contains {@link Annotation}
    * objects.
    */
-  public Annotation getMetadata(String topLevelCorpus, boolean closure);
+  public List<Annotation> getMetadata(String topLevelCorpus, boolean closure);
 
   /**
    * Fetches the meta data for a top level corpus.
@@ -71,6 +71,7 @@ public interface MetadataService
    * <h3>Path(s)</h3>
    *
    * <ol>
+   * <li>GET annis/meta/doc/<b>{top}</b></li>
    * <li>GET annis/meta/doc/<b>{top}</b>/<b>{doc}</b></li>
    * <li>GET annis/meta/doc/<b>{top}</b>/<b>{doc}</b>/path</li>
    * </ol>
@@ -84,12 +85,12 @@ public interface MetadataService
    * retrieved.
    * @param docname Determines the document name, for which the annotations are
    * fetched. If null, all annotations of all documents are fetched.
-   * @param if true, the annotations of all corpora and documents contained in
-   * the path are also included
+   * @param path if true, the annotations of all corpora and documents contained
+   * in the path are also included
    * @return The xml representation of a list wich contains {@link Annotation}
    * objects.
    */
-  public Annotation getMetadataDoc(String topLevelCorpus, String docname,
+  public List<Annotation> getMetadataDoc(String topLevelCorpus, String docname,
     boolean path);
 
   /**
@@ -109,7 +110,7 @@ public interface MetadataService
    * @return The xml representation of a list wich contains {@link Annotation}
    * objects.
    */
-  public Annotation getDocNames(String topLevelCorpus);
+  public List<Annotation> getDocNames(String topLevelCorpus);
 
   /**
    * Get the metadata of all ANNIS binary objects for a specific document.

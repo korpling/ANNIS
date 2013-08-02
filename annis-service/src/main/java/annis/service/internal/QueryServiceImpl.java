@@ -388,7 +388,7 @@ public class QueryServiceImpl implements QueryService
     {
       throw new WebApplicationException(400);
     }
-    
+
     data.setCorpusList(corpusIDs);
     data.addExtension(query.getMatches());
     long start = new Date().getTime();
@@ -843,7 +843,6 @@ public class QueryServiceImpl implements QueryService
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
     return annisDao.getBinaryMeta(toplevelCorpusName, documentName);
-
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,
