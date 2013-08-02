@@ -36,15 +36,16 @@ public interface MetadataService
   /**
    * Fetches the meta data for a top level corpus.
    *
-   * <p>If the <b>deep</b> path is called, the metadata of all subcorpora and
-   * documents are also fetched.</p>
+   * <p>If the <b>closure</b> path is called, the metadata of all subcorpora and
+   * documents are also fetched. If the path closure path is selected, all
+   * annotations from all subcorpora and documents are fetched.</p>
    *
    *
    * <h3>Path(s)</h3>
    *
    * <ol>
-   * <li>GET annis/meta/<b>{top}</b></li>
-   * <li>GET annis/meta/<b>{top}</b>/<b>{doc}</b></li>
+   * <li>GET annis/meta/corpus<b>{top}</b></li>
+   * <li>GET annis/meta/corpus<b>{top}</b>/closure</li>
    * </ol>
    *
    * <h3>MIME</h3>
@@ -54,20 +55,24 @@ public interface MetadataService
    *
    * @param topLevelCorpus Determines the corpus, for which the annotations are
    * retrieved.
+   * @param closure if true, all annotations of all subcorpora or documents
+   * contained by the toplevel corpus are also fetched.
    * @return The xml representation of a list wich contains {@link Annotation}
    * objects.
    */
-  public Annotation getMetadata(String topLevelCorpus);
+  public Annotation getMetadata(String topLevelCorpus, boolean closure);
 
   /**
    * Fetches the meta data for a top level corpus.
    *
+   * <p>If the <strong>path</strong> path is selected, all annotations from the
+   * corpora and subcorpora of the name path are included.</p>
+   *
    * <h3>Path(s)</h3>
    *
    * <ol>
-   * <li>GET annis/meta/deep/<b>{top}</b></li>
-   * <li>GET annis/meta/deep/<b>{top}</b>/<b>{doc}</b></li>
-   *
+   * <li>GET annis/meta/doc/<b>{top}</b>/<b>{doc}</b></li>
+   * <li>GET annis/meta/doc/<b>{top}</b>/<b>{doc}</b>/path</li>
    * </ol>
    *
    * <h3>MIME</h3>
@@ -79,10 +84,13 @@ public interface MetadataService
    * retrieved.
    * @param docname Determines the document name, for which the annotations are
    * fetched. If null, all annotations of all documents are fetched.
+   * @param if true, the annotations of all corpora and documents contained in
+   * the path are also included
    * @return The xml representation of a list wich contains {@link Annotation}
    * objects.
    */
-  public Annotation getMetadataDeep(String topLevelCorpus, String docname);
+  public Annotation getMetadataDoc(String topLevelCorpus, String docname,
+    boolean path);
 
   /**
    * Fetches all document names within a top level corpus.
@@ -108,7 +116,7 @@ public interface MetadataService
    *
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>GET meta/<b>{top}</b>/<b>{document}</b>/binary/meta</li>
+   * <li>GET annis/meta/binary<b>{top}</b>/<b>{document}</b></li>
    * </ol>
    *
    * <h3>MIME</h3>
