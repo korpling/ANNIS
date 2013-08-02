@@ -44,8 +44,8 @@ public interface MetadataService
    * <h3>Path(s)</h3>
    *
    * <ol>
-   * <li>GET annis/meta/corpus<b>{top}</b></li>
-   * <li>GET annis/meta/corpus<b>{top}</b>/closure</li>
+   * <li>GET annis/meta/corpus/<b>{top}</b></li>
+   * <li>GET annis/meta/corpus/<b>{top}</b>/closure</li>
    * </ol>
    *
    * <h3>MIME</h3>
@@ -116,7 +116,7 @@ public interface MetadataService
    *
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>GET annis/meta/binary<b>{top}</b>/<b>{document}</b></li>
+   * <li>GET annis/meta/binary/<b>{top}</b>/<b>{document}</b></li>
    * </ol>
    *
    * <h3>MIME</h3>
