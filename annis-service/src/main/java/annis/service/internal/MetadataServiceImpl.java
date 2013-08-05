@@ -24,21 +24,33 @@ import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.core.MediaType;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-@Path("annis/query")
+@Component
+@Path("annis/meta")
 public class MetadataServiceImpl implements MetadataService
 {
+
+  private Logger log = LoggerFactory.getLogger(MetadataServiceImpl.class);
 
   private AnnisDao annisDao;
 
   @GET
   @Path("corpus/{toplevel}/closure")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
   public List<Annotation> getMetadata(
     @PathParam("toplevel") String topLevelCorpus)
   {
@@ -47,6 +59,19 @@ public class MetadataServiceImpl implements MetadataService
 
   @GET
   @Path("corpus/{toplevel}")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
+  public List<Annotation> getMetadataTopLevel(
+    @PathParam("toplevel") String topLevelCorpus)
+  {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + topLevelCorpus);
+
+    return getAnnisDao().listCorpusAnnotations(topLevelCorpus);
+  }
+
   @Override
   public List<Annotation> getMetadata(
     @PathParam("toplevel") String topLevelCorpus,
@@ -55,20 +80,31 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + topLevelCorpus);
 
-    return annisDao.listDocumentsAnnotations(topLevelCorpus, closure);
+    return getAnnisDao().listDocumentsAnnotations(topLevelCorpus, closure);
   }
 
   @GET
   @Path("docnames/{toplevel}")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
   @Override
   public List<Annotation> getDocNames(
     @PathParam("toplevel") String topLevelCorpus)
   {
-    return annisDao.listDocuments(topLevelCorpus);
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + topLevelCorpus);
+
+    return getAnnisDao().listDocuments(topLevelCorpus);
   }
 
   @GET
   @Path("binary/{top}/{doc}")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
   @Override
   public List<AnnisBinaryMetaData> binaryMeta(
     @PathParam("top") String toplevelCorpusName,
@@ -77,30 +113,51 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
-    return annisDao.getBinaryMeta(toplevelCorpusName, doc);
+    return getAnnisDao().getBinaryMeta(toplevelCorpusName, doc);
   }
 
   @GET
   @Path("doc/{toplevel}")
-  public List<Annotation> getMetaDataDoc(
-    @PathParam("toplevel") String topLevelCorpus)
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
+  public List<Annotation> getMetaDataDoc(@PathParam("toplevel") String topLevel)
   {
-    return getMetadataDoc(topLevelCorpus, null, false);
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:meta:" + topLevel);
+    
+    return getAnnisDao().listDocumentsAnnotations(topLevel, false);
   }
 
   @GET
   @Path("doc/{toplevel}/{doc}")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
   public List<Annotation> getMetaDataDoc(
-    @PathParam("toplevel") String topLevelCorpus, @PathParam("doc") String doc)
+    @PathParam("toplevel") String topLevelCorpus,
+    @PathParam("doc") String doc)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + topLevelCorpus);
 
-    return annisDao.listCorpusAnnotations(topLevelCorpus, doc, false);
+    return getAnnisDao().listCorpusAnnotations(topLevelCorpus, doc, true);
   }
 
   @GET
   @Path("doc/{toplevel}/{doc}/path")
+  @Produces(
+    {
+    MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON
+  })
+  public List<Annotation> getMetadataDoc(
+    @PathParam("toplevel") String toplevelCorpus, @PathParam("doc") String doc)
+  {
+    return getMetadataDoc(toplevelCorpus, doc, false);
+  }
+
   @Override
   public List<Annotation> getMetadataDoc(String topLevelCorpus, String docname,
     boolean path)
@@ -108,13 +165,38 @@ public class MetadataServiceImpl implements MetadataService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:meta:" + topLevelCorpus);
 
-    if (docname == null)
-    {
-      return annisDao.listDocumentsAnnotations(topLevelCorpus, path);
-    }
-    else
-    {
-      return annisDao.listCorpusAnnotations(topLevelCorpus, docname, false);
-    }
+    return getAnnisDao().listCorpusAnnotations(topLevelCorpus, docname, path);
+  }
+
+  /**
+   * Log the successful initialization of this bean.
+   *
+   * <p> XXX: This should be a private method annotated with
+   * <tt>@PostConstruct</tt>, but that doesn't seem to work. As a work-around,
+   * the method is called by Spring as an init-method.
+   */
+  public void init()
+  {
+    // check version of PostgreSQL
+    annisDao.checkDatabaseVersion();
+
+    // log a message after successful startup
+    log.info("ANNIS MetadataService loaded.");
+  }
+
+  /**
+   * @return the annisDao
+   */
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  /**
+   * @param annisDao the annisDao to set
+   */
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
   }
 }

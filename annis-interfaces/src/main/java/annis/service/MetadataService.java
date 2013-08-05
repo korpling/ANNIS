@@ -80,6 +80,7 @@ public interface MetadataService
    *
    * accept:
    * <code>application/xml</code>
+   * <code>application/json</code>
    *
    * @param topLevelCorpus Determines the corpus, for which the annotations are
    * retrieved.
@@ -104,6 +105,7 @@ public interface MetadataService
    *
    * accept:
    * <code>application/xml</code>
+   * <code>application/json</code>
    *
    * @param topLevelCorpus Determines the corpus, for which the document names
    * are retrieved.
@@ -122,7 +124,8 @@ public interface MetadataService
    *
    * <h3>MIME</h3>
    * <div>
-   * Accepts application/xml
+   * Accepts
+   * <code>application/xml</code>
    * </div>
    *
    * @param top The toplevel corpus name.
