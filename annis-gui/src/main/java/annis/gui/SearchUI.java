@@ -363,6 +363,8 @@ public class SearchUI extends AnnisBaseUI
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
     
+    setPollInterval(10000);
+    
     updateUserInformation();
   }
 

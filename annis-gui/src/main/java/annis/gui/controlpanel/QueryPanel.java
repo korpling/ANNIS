@@ -68,7 +68,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
-  private ProgressIndicator piCount;
+  private ProgressBar piCount;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
@@ -130,11 +130,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
     addComponent(lblStatus, 1, 2, 3, 2);
 
-    piCount = new ProgressIndicator();
+    piCount = new ProgressBar();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
-    piCount.setPollingInterval(60000);
     
 
     btShowResult = new Button("Show Result");

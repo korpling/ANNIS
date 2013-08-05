@@ -86,7 +86,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private File tmpOutputFile;
 
-  private ProgressIndicator progressIndicator;
+  private ProgressBar progressBar;
   private Label progressLabel;
 
   private FileDownloader downloader;
@@ -185,10 +185,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     VerticalLayout vLayout = new VerticalLayout();
     addComponent(vLayout);
     
-    progressIndicator = new ProgressIndicator();
-    progressIndicator.setEnabled(false);
-    progressIndicator.setIndeterminate(true);
-    vLayout.addComponent(progressIndicator);
+    progressBar = new ProgressBar();
+    progressBar.setEnabled(false);
+    progressBar.setIndeterminate(true);
+    vLayout.addComponent(progressBar);
     
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
@@ -254,7 +254,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           try
           {
             btExport.setEnabled(true);
-            progressIndicator.setEnabled(false);
+            progressBar.setEnabled(false);
             progressLabel.setValue("");
 
             try
@@ -304,7 +304,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         }
       };
 
-      progressIndicator.setEnabled(true);
+      progressBar.setEnabled(true);
       progressLabel.setValue("");
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();

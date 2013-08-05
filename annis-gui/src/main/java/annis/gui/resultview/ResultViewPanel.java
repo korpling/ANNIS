@@ -28,7 +28,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
-import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 import java.util.List;
 import java.util.Map.Entry;
@@ -49,7 +49,7 @@ public class ResultViewPanel extends VerticalLayout
 
   private PagingComponent paging;
   private ResultSetPanel resultPanel;
-  private ProgressIndicator progressResult;
+  private ProgressBar progressResult;
   private PluginSystem ps;
   private MenuItem miTokAnnos;
   private MenuItem miSegmentation;
@@ -100,9 +100,8 @@ public class ResultViewPanel extends VerticalLayout
     addComponent(mbResult);
     addComponent(paging);
 
-    progressResult = new ProgressIndicator();
+    progressResult = new ProgressBar();
     progressResult.setIndeterminate(true);
-    progressResult.setPollingInterval(60000);
     progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n", " ") + "\"");
     progressResult.setEnabled(true);
     progressResult.setVisible(true);
