@@ -39,4 +39,9 @@
     <property name="defaultCorpusConfig" ref="defaultCorpusConfig" />
     <property name="port" value="${annis.webservice-port}" />
   </bean>
+
+  <!-- MetadataService -->
+  <bean id="metadataService" class="annis.service.internal.MetadataServiceImpl" init-method="init" lazy-init="true">
+    <property name="annisDao" ref="annisDao" />
+  </bean>
 </beans>

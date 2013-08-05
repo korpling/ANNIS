@@ -314,12 +314,12 @@ public class Helper {
     }
     return "ERROR";
   }
-  
+
   /**
    * Retrieve all the meta data for a given document of a corpus.
    * @param toplevelCorpusName
    * @param documentName
-   * @return 
+   * @return
    */
   public static List<Annotation> getMetaData(String toplevelCorpusName,
     String documentName)
@@ -328,7 +328,7 @@ public class Helper {
     WebResource res = Helper.getAnnisWebResource();
     try
     {
-      res = res.path("query").path("corpora")
+      res = res.path("meta").path("doc")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
 
       if (documentName != null)
@@ -336,7 +336,7 @@ public class Helper {
         res = res.path(documentName);
       }
 
-      result = res.path("metadata").queryParam("exclude", "true").get(new GenericType<List<Annotation>>() {});
+      result = res.get(new GenericType<List<Annotation>>() {});
     }
     catch (UniformInterfaceException ex)
     {
@@ -500,12 +500,12 @@ public class Helper {
     }
     return result;
   }
-  
+
   /**
    * Returns a formatted string containing the type of the exception, the message
    * and the stacktrace.
    * @param ex
-   * @return 
+   * @return
    */
   public static String convertExceptionToMessage(Throwable ex)
   {
