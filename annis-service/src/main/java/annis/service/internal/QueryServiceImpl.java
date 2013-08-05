@@ -594,28 +594,6 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
-  @Path("corpora/{top}/allmetadata")
-  @Produces("application/xml")
-  public List<Annotation> getAllMetadata(
-    @PathParam("top") String toplevelCorpusName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-    return annisDao.listDocumentsAnnotations(toplevelCorpusName, true);
-  }
-
-  @GET
-  @Path("corpora/{top}/docmetadata")
-  @Produces("application/xml")
-  public List<Annotation> getDocMetadata(
-    @PathParam("top") String toplevelCorpusName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-    return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
-  }
-
-  @GET
   @Path("corpora/{top}/{document}/binary/{offset}/{length}")
   public Response binary1(
     @PathParam("top") String toplevelCorpusName,

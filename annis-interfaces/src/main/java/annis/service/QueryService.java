@@ -15,8 +15,6 @@
  */
 package annis.service;
 
-import annis.service.objects.AnnisBinaryMetaData;
-import java.util.List;
 import javax.ws.rs.core.Response;
 
 /**
