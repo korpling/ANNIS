@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client.ui;
+package annis.gui.widgets.gwt.client.ui.autoheightiframe;
 
 import com.vaadin.shared.AbstractComponentState;
 

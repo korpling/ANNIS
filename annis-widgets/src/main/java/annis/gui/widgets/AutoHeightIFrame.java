@@ -1,7 +1,7 @@
 package annis.gui.widgets;
 
-import annis.gui.widgets.gwt.client.ui.AutoHeightIFrameServerRpc;
-import annis.gui.widgets.gwt.client.ui.AutoHeightIFrameState;
+import annis.gui.widgets.gwt.client.ui.autoheightiframe.AutoHeightIFrameServerRpc;
+import annis.gui.widgets.gwt.client.ui.autoheightiframe.AutoHeightIFrameState;
 import com.vaadin.ui.AbstractComponent;
 import java.net.URI;
 

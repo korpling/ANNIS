@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.widgets.gwt.client.ui;
+package annis.gui.widgets.gwt.client.ui.autoheightiframe;
 
 import annis.gui.widgets.AutoHeightIFrame;
+import annis.gui.widgets.gwt.client.ui.VAutoHeightIFrame;
 import com.vaadin.client.communication.RpcProxy;
 import com.vaadin.client.communication.StateChangeEvent;
 import com.vaadin.client.ui.AbstractComponentConnector;
