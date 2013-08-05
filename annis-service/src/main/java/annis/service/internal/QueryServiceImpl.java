@@ -554,14 +554,6 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
-  @Path("corpora/{top}/documents")
-  @Produces(MediaType.APPLICATION_XML)
-  public List<Annotation> getDocNames(@PathParam("top") String topLevelCorpus)
-  {
-    return annisDao.listDocuments(topLevelCorpus);
-  }
-
-  @GET
   @Path("corpora/{top}/metadata")
   @Produces("application/xml")
   public List<Annotation> getMetadata(

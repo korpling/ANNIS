@@ -221,9 +221,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     WebResource res = Helper.getAnnisWebResource();
     try
     {
-      res = res.path("query").path("corpora")
+      res = res.path("meta").path("docnames")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      res = res.path("documents");
       docs = res.get(new AnnotationListType());
     }
     catch (UniformInterfaceException ex)
