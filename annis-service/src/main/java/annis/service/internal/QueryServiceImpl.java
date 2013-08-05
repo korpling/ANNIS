@@ -826,25 +826,6 @@ public class QueryServiceImpl implements QueryService
     }
   }
 
-  /**
-   * Get the Metadata of an Annis Binary object identified by its id.
-   *
-   * @param id
-   * @return AnnisBinaryMetaData
-   */
-  @GET
-  @Path("corpora/{top}/{document}/binary/meta")
-  @Produces("application/xml")
-  public List<AnnisBinaryMetaData> binaryMeta(
-    @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String documentName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:binary:" + toplevelCorpusName);
-
-    return annisDao.getBinaryMeta(toplevelCorpusName, documentName);
-  }
-
   private String createAnnotateLogParameters(int left, int right, int offset,
     int limit)
   {

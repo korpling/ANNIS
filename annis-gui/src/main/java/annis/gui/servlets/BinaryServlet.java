@@ -45,13 +45,6 @@ import org.slf4j.LoggerFactory;
  * This Servlet provides binary-files with a stream of partial-content. The
  * first GET-request is answered with the status-code 206 Partial Content.
  *
-<<<<<<< HEAD
- * TODO: handle more than one byte-range TODO:
-=======
- * TODO: handle more than one byte-range
- *
->>>>>>> Add basic pdf support based on pdfjs. If you check in a new version of pdfjs,
- *
  * @author benjamin
  *
  */
@@ -60,7 +53,7 @@ public class BinaryServlet extends HttpServlet
 
   private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
 
-  private static final int MAX_LENGTH = 1024*1024; // max portion which is transfered over REST at once: 1MB
+  private static final int MAX_LENGTH = 1024 * 1024; // max portion which is transfered over REST at once: 1MB
 
   @Override
   public void init(ServletConfig config) throws ServletException
@@ -95,23 +88,29 @@ public class BinaryServlet extends HttpServlet
 
       String annisServiceURL = (String) annisServiceURLObject;
 
-      WebResource annisRes = Helper.getAnnisWebResource(annisServiceURL,
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY));
-
-      WebResource binaryRes = annisRes.path("query").path("corpora")
+      WebResource binaryRes = Helper.getAnnisWebResource(annisServiceURL,
+        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+        .path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary");
 
+      WebResource metaBinaryRes = Helper.getAnnisWebResource(annisServiceURL,
+        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+        .path("meta").path("binary")
+        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
+        .path(URLEncoder.encode(documentName, "UTF-8"));
+
       // tell client that we support byte ranges
       response.setHeader("Accept-Ranges", "bytes");
-      
+
       if (range != null)
       {
-        responseStatus206(binaryRes, mimeType, out, response, range);
+        responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
+          range);
       }
       else
       {
-        responseStatus200(binaryRes, mimeType, out, response);
+        responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
       }
 
       out.flush();
@@ -132,12 +131,12 @@ public class BinaryServlet extends HttpServlet
     }
   }
 
-  private void responseStatus206(WebResource binaryRes, String mimeType,
-    ServletOutputStream out,
+  private void responseStatus206(WebResource metaBinaryRes,
+    WebResource binaryRes, String mimeType, ServletOutputStream out,
     HttpServletResponse response, String range) throws RemoteException, IOException
   {
-    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
-      .get(new AnnisBinaryMetaDataListType());
+    List<AnnisBinaryMetaData> allMeta = metaBinaryRes.get(
+      new AnnisBinaryMetaDataListType());
 
     if (allMeta.size() > 0)
     {
@@ -178,13 +177,13 @@ public class BinaryServlet extends HttpServlet
     }
   }
 
-  private void responseStatus200(WebResource binaryRes, String mimeType,
-    ServletOutputStream out,
+  private void responseStatus200(WebResource metaBinaryRes,
+    WebResource binaryRes, String mimeType, ServletOutputStream out,
     HttpServletResponse response) throws RemoteException, IOException
   {
 
 
-    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
+    List<AnnisBinaryMetaData> allMeta = metaBinaryRes.path("meta")
       .get(new AnnisBinaryMetaDataListType());
 
     if (allMeta.size() > 0)
@@ -247,7 +246,8 @@ public class BinaryServlet extends HttpServlet
     {
       int stepLength = Math.min(MAX_LENGTH, remaining);
 
-      ClientResponse response = binaryRes.path("" + offset).path("" + stepLength)
+      ClientResponse response = binaryRes.path("" + offset).
+        path("" + stepLength)
         .accept(mimeType).get(ClientResponse.class);
       int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
       Validate.isTrue(copiedBytes == stepLength);
