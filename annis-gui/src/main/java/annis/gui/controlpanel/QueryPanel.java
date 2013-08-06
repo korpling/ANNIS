@@ -109,12 +109,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    //addComponent(txtQuery, 1, 0, 3, 0);
+    addComponent(txtQuery, 1, 0, 3, 0);
     
     txtQueryExt = new AqlCodeEditor();
-    txtQueryExt.setHeight(10f, Unit.EM);
-    txtQueryExt.setWidth("100%");
-    addComponent(txtQueryExt, 1, 0, 3, 0);
+    txtQueryExt.extend(txtQuery);
     
 
     final VirtualKeyboard virtualKeyboard;
@@ -126,7 +124,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       virtualKeyboard = new VirtualKeyboard();
       virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
-      virtualKeyboard.extend(txtQuery);
+      //virtualKeyboard.extend(txtQuery);
     }
 
     lblStatus = new Label();

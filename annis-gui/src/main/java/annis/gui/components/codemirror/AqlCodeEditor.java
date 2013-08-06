@@ -17,7 +17,8 @@ package annis.gui.components.codemirror;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
-import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.server.AbstractJavaScriptExtension;
+import com.vaadin.ui.TextArea;
 
 /**
  * A Codemirror2 based code editor for AQL.
@@ -26,7 +27,17 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
  */
 @JavaScript({"lib/codemirror.js", "mode/properties/properties.js", "AqlCodeEditor.js"})
 @StyleSheet({"lib/codemirror.css", "AqlCodeEditor.css"})
-public class AqlCodeEditor extends AbstractJavaScriptComponent
+public class AqlCodeEditor extends AbstractJavaScriptExtension
 {
+  
+  public AqlCodeEditor()
+  {
+  }
 
+  public void extend(TextArea target)
+  {
+    super.extend(target);
+  }
+  
+  
 }

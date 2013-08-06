@@ -15,14 +15,19 @@
  */
 window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var component = this;
-    var componentDiv = this.getElement(this.getConnectorId());
     
-    var codemirrorTextArea = CodeMirror(componentDiv, 
-    {
-      value: "test=\"Hello World\"",
-      mode: "properties"
-    });
+    var origTextArea = this.getElement(this.getParentId());
     
+    var cmTextArea = CodeMirror.fromTextArea(origTextArea);
+    
+//    var componentDiv = this.getElement(this.getConnectorId());
+//    
+//    var codemirrorTextArea = CodeMirror(componentDiv, 
+//    {
+//      value: "test=\"Hello World\"",
+//      mode: "properties"
+//    });
+//    
     this.onStateChange = function() {
     };
     
