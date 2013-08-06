@@ -63,6 +63,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   // the view name
   public static final String NAME = "query";
 
+  private CssLayout txtQueryContainer;
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
@@ -100,16 +101,23 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
+    // HACK: without the container the sizing does not work,
+    // include this in an extra component that holds the TextArea itself
+    txtQueryContainer = new CssLayout();
+    txtQueryContainer.setWidth("100%");
+    txtQueryContainer.setHeight(10f, Unit.EM);
+    addComponent(txtQueryContainer, 1, 0, 3, 0);
+    
+    
     txtQuery = new TextArea();
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
-    txtQuery.setWidth("100%");
-    txtQuery.setHeight(10f, Unit.EM);
+    txtQuery.setSizeFull();
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    addComponent(txtQuery, 1, 0, 3, 0);
+    txtQueryContainer.addComponent(txtQuery);
     
     txtQueryExt = new AqlCodeEditor();
     txtQueryExt.extend(txtQuery);
