@@ -28,30 +28,81 @@
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
         <version>2.4</version>
-        <executions>
+        <configuration>
+          <appendAssemblyId>true</appendAssemblyId>
+        </configuration>
+        <executions>          
           <execution>
-            <id>create-distribution</id>
+            <id>withdeps</id>
             <phase>package</phase>
             <goals>
               <goal>single</goal>
             </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/jar.xml</descriptor>
+              </descriptors>
+              <archive>
+                <manifest>
+                  <addClasspath>true</addClasspath>
+                  <mainClass>de.hu_berlin.german.korpling.annis.kickstarter.MainFrame</mainClass>
+                </manifest>
+                <manifestEntries>
+                  <Version>${project.version}</Version>
+                  <Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>
+                  <SplashScreen-Image>splashscreen.gif</SplashScreen-Image>
+                </manifestEntries>
+              </archive>
+            </configuration>
+          </execution>
+          <execution>
+            <id>dist</id>
+            <phase>package</phase>
+            <goals>
+              <goal>single</goal>
+            </goals>
+            <configuration>
+              <descriptors>
+                <descriptor>src/main/assembly/kickstart.xml</descriptor>
+              </descriptors>
+              <finalName />
+            </configuration>
           </execution>
         </executions>
-        <configuration>
-          <descriptors>
-            <descriptor>src/main/assembly/kickstart.xml</descriptor>
-          </descriptors>
-          <finalName />
-        </configuration>
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-resources-plugin</artifactId>
-        <version>2.4.3</version>
+        <version>2.6</version>
         <configuration>
           <encoding>${project.build.sourceEncoding}</encoding>
         </configuration>
       </plugin>
+
+      <!--
+            <plugin>
+              <groupId>org.apache.maven.plugins</groupId>
+              <artifactId>maven-jar-plugin</artifactId>
+              <version>2.4</version>
+              <executions>
+                <execution>
+                  <phase>package</phase>
+                  <goals>
+                    <goal>jar</goal>
+                  </goals>
+                </execution>
+              </executions>
+              <configuration>
+                <archive>
+                  <manifestEntries>
+                    <Version>${project.version}</Version>
+                    <Implementation-Version>${project.version}-${buildNumber}</Implementation-Version>
+                    <SplashScreen-Image>splashscreen.gif</SplashScreen-Image>
+                  </manifestEntries>
+                </archive>
+              </configuration>
+            </plugin>
+      -->      
 
     </plugins>
   </build>
