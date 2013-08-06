@@ -9,6 +9,7 @@
     <file>
       <source>target/annis-kickstarter-${project.version}.jar</source>
       <outputDirectory>/</outputDirectory>
+      <destName>annis-kickstarter.jar</destName>
       <fileMode>0774</fileMode>
     </file>
   </files>
