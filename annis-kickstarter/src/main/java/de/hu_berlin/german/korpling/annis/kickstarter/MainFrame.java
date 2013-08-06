@@ -37,7 +37,6 @@ import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
 import org.eclipse.jetty.server.Server;
-import org.eclipse.jetty.util.log.Slf4jLog;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.LoggerFactory;
 
