@@ -21,6 +21,7 @@ import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.model.Query;
 import annis.libgui.InstanceConfig;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -72,6 +73,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
+  private AqlCodeEditor txtQueryExt;
 
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
@@ -107,7 +109,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    addComponent(txtQuery, 1, 0, 3, 0);
+    //addComponent(txtQuery, 1, 0, 3, 0);
+    
+    txtQueryExt = new AqlCodeEditor();
+    txtQueryExt.setHeight(10f, Unit.EM);
+    txtQueryExt.setWidth("100%");
+    addComponent(txtQueryExt, 1, 0, 3, 0);
+    
 
     final VirtualKeyboard virtualKeyboard;
     if(instanceConfig.getKeyboardLayout() == null)
