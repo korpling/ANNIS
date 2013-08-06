@@ -7,8 +7,9 @@
   </formats>
   <files>
     <file>
-      <source>target/annis-kickstarter-${project.version}-withdeps.jar</source>
+      <source>target/annis-kickstarter-${project.version}.jar</source>
       <outputDirectory>/</outputDirectory>
+      <fileMode>0774</fileMode>
     </file>
   </files>
   <fileSets>
@@ -48,7 +49,6 @@
   
   <dependencySets>
     <!-- our dependcies -->
-    <!--
     <dependencySet>
       <outputDirectory>lib/</outputDirectory>
       <fileMode>0644</fileMode>
@@ -56,8 +56,8 @@
       <excludes>
         <exclude>de.hu-berlin.german.korpling.annis:annis-gui:war:*</exclude>
       </excludes>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
-    -->
     <!-- service -->
     <dependencySet>
       <includes>
