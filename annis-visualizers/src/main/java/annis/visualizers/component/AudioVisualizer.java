@@ -72,7 +72,7 @@ public class AudioVisualizer extends AbstractVisualizer<MediaElementPlayer>
     }
     
     WebResource resMeta = Helper.getAnnisWebResource().path(
-      "query/corpora").path(corpusName).path(documentName).path("/binary/meta");
+      "meta/binary").path(corpusName).path(documentName);
     List<AnnisBinaryMetaData> meta = resMeta.get(new GenericType<List<AnnisBinaryMetaData>>() {});
 
     // if there is no document at all don't fail
