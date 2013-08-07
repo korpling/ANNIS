@@ -80,9 +80,12 @@ public class CorpusAdministration
     {
       try{
       log.info("Importing corpus from: " + path);
-      administrationDao.importCorpus(path, overwrite);
-      log.info("Finished import from: " + path);
-      }catch (DefaultAdministrationDao.ConflictingCorpusException ex)
+      if(administrationDao.importCorpus(path, overwrite))
+      {
+        log.info("Finished import from: " + path);
+      }
+      }
+      catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
         log.error(ex.getMessage());
       }

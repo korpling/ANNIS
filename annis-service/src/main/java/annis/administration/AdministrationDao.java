@@ -44,8 +44,10 @@ public interface AdministrationDao
    *
    * @param path Specifies the path to the corpora, which should be imported.
    * @param overwrite If set to true conflicting top level corpora are deleted.
+   * 
+   * @return true if successfull
    */
-  public void importCorpus(String path, boolean overwrite);
+  public boolean importCorpus(String path, boolean overwrite);
 
   public List<Map<String, Object>> listCorpusStats();
 

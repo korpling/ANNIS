@@ -17,7 +17,6 @@ package annis.service.internal;
 
 import annis.administration.AdministrationDao;
 import annis.security.AnnisUserConfig;
-import annis.libgui.CorpusSet;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -76,7 +75,14 @@ public class AdminService
     
     adminDao.storeUserConfig(config.getValue());      
       return Response.ok().build();
-    
+  }
+  
+  @POST
+  @Path("import")
+  @Consumes("application/zip")
+  public Response importCorpus()
+  {
+    return Response.serverError().build();
   }
   
   public AdministrationDao getAdminDao()

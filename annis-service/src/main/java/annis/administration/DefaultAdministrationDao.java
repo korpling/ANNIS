@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -58,7 +57,6 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
@@ -381,7 +379,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public void importCorpus(String path, boolean override)
+  public boolean importCorpus(String path, boolean override)
   {
 
     // check schema version first
@@ -389,7 +387,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     
     if(!lockCorpusTable())
     {
-      throw new AnnisException("Another import is currently running");
+      log.error("Another import is currently running");
+      return false;
     }
 
     createStagingArea(temporaryStagingArea);
@@ -454,6 +453,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
 
     generateExampleQueries(corpusID);
+    
+    return true;
   }
 
   ///// Subtasks of importing a corpus
