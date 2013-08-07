@@ -25,7 +25,7 @@ import com.vaadin.ui.TextArea;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@JavaScript({"lib/codemirror.js", "mode/properties/properties.js", "AqlCodeEditor.js"})
+@JavaScript({"lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditor.js"})
 @StyleSheet({"lib/codemirror.css", "AqlCodeEditor.css"})
 public class AqlCodeEditor extends AbstractJavaScriptExtension
 {

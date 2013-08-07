@@ -18,7 +18,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     var origTextArea = this.getElement(this.getParentId());
     
-    var cmTextArea = CodeMirror.fromTextArea(origTextArea);
+    var cmTextArea = CodeMirror.fromTextArea(origTextArea,
+    {
+      mode: 'aql'
+    });
     
 //    var componentDiv = this.getElement(this.getConnectorId());
 //    
