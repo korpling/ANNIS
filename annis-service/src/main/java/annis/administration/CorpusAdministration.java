@@ -78,12 +78,13 @@ public class CorpusAdministration
     // import each corpus
     for (String path : paths)
     {
-      try{
-      log.info("Importing corpus from: " + path);
-      if(administrationDao.importCorpus(path, overwrite))
+      try
       {
-        log.info("Finished import from: " + path);
-      }
+        log.info("Importing corpus from: " + path);
+        if(administrationDao.importCorpus(path, overwrite))
+        {
+          log.info("Finished import from: " + path);
+        }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
