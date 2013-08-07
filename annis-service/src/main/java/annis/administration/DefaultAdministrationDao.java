@@ -65,6 +65,7 @@ import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -273,7 +274,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, propagation = Propagation.NESTED)
   public String getDatabaseSchemaVersion()
   {
     try
@@ -309,6 +310,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return true;
   }
+  
+  @Transactional(propagation = Propagation.MANDATORY)
+  private boolean lockCorpusTable()
+  {
+    try
+    {
+      log.info("Locking corpus table to ensure no other import is running");
+      jdbcTemplate.execute("LOCK TABLE corpus NOWAIT");
+      return true;
+    }
+    catch(DataAccessException ex)
+    {
+      return false;
+    }
+  }
+  
 
   @Override
   public void initializeDatabase(String host, String port, String database,
@@ -363,12 +380,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   public void importCorpus(String path, boolean override)
   {
 
     // check schema version first
     checkDatabaseSchemaVersion();
+    
+    if(!lockCorpusTable())
+    {
+      throw new AnnisException("Another import is currently running");
+    }
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
