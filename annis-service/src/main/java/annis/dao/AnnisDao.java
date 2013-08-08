@@ -184,6 +184,11 @@ public interface AnnisDao
 
   public List<String> mapCorpusIdsToNames(List<Long> ids);
 
+  /**
+   * Return a list of internal IDs for a list of top-level corpus names.
+   * @param corpusNames
+   * @return 
+   */
   public List<Long> mapCorpusNamesToIds(List<String> corpusNames);
 
   /**
