@@ -28,12 +28,15 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
@@ -49,6 +52,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -86,13 +90,14 @@ public class CorpusListPanel extends VerticalLayout implements
     Add, Remove
 
   };
-  BeanContainer<String, AnnisCorpus> corpusContainer;
+  private BeanContainer<String, AnnisCorpus> corpusContainer;
 
   private Table tblCorpora;
 
   private QueryController controller;
 
   private ComboBox cbSelection;
+  private TextField txtFilter;
 
   private transient AnnisUserConfig userConfig;
 
@@ -147,6 +152,26 @@ public class CorpusListPanel extends VerticalLayout implements
     selectionLayout.setComponentAlignment(lblVisible, Alignment.MIDDLE_LEFT);
 
     addComponent(selectionLayout);
+    
+    txtFilter = new TextField();
+    txtFilter.setCaption("Filter");
+    txtFilter.setImmediate(true);
+    txtFilter.setTextChangeTimeout(500);
+    txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener() {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        corpusContainer.removeAllContainerFilters();
+        if(event.getText()!= null && !event.getText().isEmpty())
+        {
+          corpusContainer.addContainerFilter(
+            new SimpleStringFilter("name", event.getText(), true, false));
+        }
+      }
+    });
+    txtFilter.setWidth("100%");
+    addComponent(txtFilter);
 
     tblCorpora = new Table();
     addComponent(tblCorpora);
@@ -154,20 +179,14 @@ public class CorpusListPanel extends VerticalLayout implements
     corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
-
+    
 
     tblCorpora.setContainerDataSource(corpusContainer);
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
 
-    tblCorpora.setVisibleColumns(new String[]
-    {
-      "name", "textCount", "tokenCount", "info"
-    });
-    tblCorpora.setColumnHeaders(new String[]
-    {
-      "Name", "Texts", "Tokens", ""
-    });
+    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info");
+    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "");
     tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
