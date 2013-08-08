@@ -323,13 +323,13 @@ public class ExampleQueriesPanel extends Table
    * @param corpusNames Specifies the corpora example queries are fetched for.
    * If it is null or empty all available example queries are fetched.
    */
-  private static List<ExampleQuery> loadExamplesFromRemote(String[] corpusNames)
+  private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
     List<ExampleQuery> result = new LinkedList<ExampleQuery>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
-      if (corpusNames == null || corpusNames.length == 0)
+      if (corpusNames == null || corpusNames.isEmpty())
       {
         result = service.path("query").path("corpora").path(
           "example-queries").get(new GenericType<List<ExampleQuery>>()
@@ -364,7 +364,7 @@ public class ExampleQueriesPanel extends Table
    * @param selectedCorpus Specifies the corpora example queries are fetched
    * for. If it is null, all available example queries are fetched.
    */
-  public void setSelectedCorpusInBackground(final String[] selectedCorpora)
+  public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
     executor.submit(new Runnable()
     {
