@@ -162,13 +162,31 @@ public class CorpusListPanel extends VerticalLayout implements
         corpusContainer.removeAllContainerFilters();
         if(event.getText()!= null && !event.getText().isEmpty())
         {
+          Set<String> selectedIDs = getSelectedCorpora();
+          
           corpusContainer.addContainerFilter(
             new SimpleStringFilter("name", event.getText(), true, false));
           // select the first item
-          List<String> ids = corpusContainer.getItemIds();
-          if(!ids.isEmpty())
+          List<String> filteredIDs = corpusContainer.getItemIds();
+          
+          Set<String> selectedAndFiltered = new HashSet<String>(selectedIDs);
+          selectedAndFiltered.retainAll(filteredIDs);
+          
+          Set<String> selectedAndOutsideFilter = new HashSet<String>(selectedIDs);
+          selectedAndOutsideFilter.removeAll(filteredIDs);
+          
+          for(String id : selectedAndOutsideFilter)
           {
-            tblCorpora.select(ids.get(0));
+            tblCorpora.unselect(id);
+          }
+          
+          if(selectedAndFiltered.isEmpty() && !filteredIDs.isEmpty())
+          {
+            for(String id : selectedIDs)
+            {
+              tblCorpora.unselect(id);
+            }
+            tblCorpora.select(filteredIDs.get(0));
           }
         }
       }
