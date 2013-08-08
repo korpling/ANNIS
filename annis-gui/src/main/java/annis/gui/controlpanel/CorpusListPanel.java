@@ -28,7 +28,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -37,11 +36,9 @@ import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.event.ItemClickEvent;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -154,7 +151,7 @@ public class CorpusListPanel extends VerticalLayout implements
     addComponent(selectionLayout);
     
     txtFilter = new TextField();
-    txtFilter.setCaption("Filter");
+    txtFilter.setInputPrompt("Filter");
     txtFilter.setImmediate(true);
     txtFilter.setTextChangeTimeout(500);
     txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener() {
@@ -167,6 +164,12 @@ public class CorpusListPanel extends VerticalLayout implements
         {
           corpusContainer.addContainerFilter(
             new SimpleStringFilter("name", event.getText(), true, false));
+          // select the first item
+          List<String> ids = corpusContainer.getItemIds();
+          if(!ids.isEmpty())
+          {
+            tblCorpora.select(ids.get(0));
+          }
         }
       }
     });
@@ -380,7 +383,7 @@ public class CorpusListPanel extends VerticalLayout implements
         corpora[i++] = (String) itemId;
       }
     }
-    autoGenQueries.setSelectedCorpus(corpora);
+    autoGenQueries.setSelectedCorpusInBackground(corpora);
   }
 
   /**
