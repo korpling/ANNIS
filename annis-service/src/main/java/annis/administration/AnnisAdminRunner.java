@@ -320,7 +320,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           else
           {
             log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorpora(migratePath);
+            corpusAdministration.importCorpora(true, migratePath);
           }
         }
 
