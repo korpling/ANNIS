@@ -252,10 +252,10 @@ public class QueryController implements PagingCallback
     }
   }
 
-  public void corpusSelectionChanged()
+  public void corpusSelectionChangedInBackground()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfiguration(ui.getControlPanel().getCorpusList().
+      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().getCorpusList().
       getSelectedCorpora());
 
   }
