@@ -358,11 +358,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       if (cmdLine.hasOption('o'))
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), true);
+        corpusAdministration.importCorporaSave(cmdLine.getArgList(), true);
       }
       else
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), false);
+        corpusAdministration.importCorporaSave(cmdLine.getArgList(), false);
       }
     }
     catch (ParseException ex)

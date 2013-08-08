@@ -142,9 +142,16 @@ public class CorpusAdministration
     return true;
   }
 
+  /**
+   * Imports several corpora.
+   *
+   * @param overwrite if false, a conflicting top level corpus is silently
+   * skipped.
+   * @param paths the paths to the corpora
+   */
   public void importCorpora(boolean overwrite, String... paths)
   {
-    importCorpora(Arrays.asList(paths), overwrite);
+    importCorporaSave(Arrays.asList(paths), overwrite);
   }
 
   public List<Map<String, Object>> listCorpusStats()
