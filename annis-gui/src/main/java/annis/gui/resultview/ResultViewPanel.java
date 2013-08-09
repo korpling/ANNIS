@@ -70,7 +70,7 @@ public class ResultViewPanel extends VerticalLayout
     if (corpora.size() == 1)
     {
       CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().next());
-      if (corpusConfig != null && corpusConfig.getConfig() != null 
+      if (corpusConfig != null && corpusConfig.getConfig() != null
         && corpusConfig.getConfig().containsKey(KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
         this.selectedSegmentationLayer = corpusConfig.getConfig(
@@ -94,7 +94,7 @@ public class ResultViewPanel extends VerticalLayout
     PagedResultQuery q = controller.getQuery();
 
     paging = new PagingComponent(q.getOffset(), q.getLimit());
-    paging.setInfo("Result for query \"" + q.getQuery().replaceAll("\n", " ") + "\"");
+    paging.setInfo(q.getQuery());
     paging.addCallback(controller);
 
     addComponent(mbResult);
