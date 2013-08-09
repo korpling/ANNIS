@@ -180,8 +180,8 @@
               <classpathScope>compile</classpathScope>
               <mainClass>com.vaadin.sass.SassCompiler</mainClass>
               <arguments>
-                <argument>${project.baseUri}/src/main/webapp/VAADIN/themes/annis/styles.scss</argument>
-                <argument>${project.baseUri}/src/main/webapp/VAADIN/themes/annis/styles.css</argument>
+                <argument>src/main/webapp/VAADIN/themes/annis/styles.scss</argument>
+                <argument>src/main/webapp/VAADIN/themes/annis/styles.css</argument>
               </arguments>
             </configuration>
           </execution>
