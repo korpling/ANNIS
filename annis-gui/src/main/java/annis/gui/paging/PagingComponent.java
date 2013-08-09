@@ -336,13 +336,21 @@ public class PagingComponent extends CustomComponent implements
     }
   }
 
+  /**
+   * Cuts off long queries. Actually they are restricted to 50 characters. The
+   * full query is available with descriptions (tooltip in gui)
+   *
+   * @param text the query to display in the result view panel
+   */
   public void setInfo(String text)
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Result for \"<span class=\"corpus-font-force\">").append(text.
-      replaceAll("\n", " "));
-    sb.append("</span>\"");
-    lblInfo.setValue(sb.toString());
+    if (text != null && text.length() > 0)
+    {
+      String prefix = "Result for: <span class=\"corpus-font-force\">";
+      lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
+      lblInfo.setValue(text.length() < 50 ? prefix + text.substring(0, text.
+        length()) : prefix + text.substring(0, 50) + " ... </span>");
+    }
   }
 
   private static class PageValidator extends AbstractStringValidator
