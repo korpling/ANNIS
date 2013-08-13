@@ -108,18 +108,21 @@ public class AdminServiceImpl
   }
   
   @GET
-  @Path("import/status/current")
-  public ImportJob currentImport()
+  @Path("import/status")
+  public List<ImportJob> currentImports()
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("admin:query-import:current");
+    user.checkPermission("admin:query-import:running");
     
-    ImportJob job = importWorker.getCurrentJob();
-    if(job == null)
+    List<ImportJob> result = new LinkedList<ImportJob>();
+    ImportJob current = importWorker.getCurrentJob();
+    if(current != null && 
+      current.getStatus() != ImportJob.Status.SUCCESS && current.getStatus() != ImportJob.Status.ERROR)
     {
-      throw new WebApplicationException(404);
+      result.add(current);
     }
-    return job;
+    result.addAll(importWorker.getImportQueue());
+    return result;
   }
   
   @GET
