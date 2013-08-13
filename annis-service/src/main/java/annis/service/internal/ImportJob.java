@@ -36,6 +36,7 @@ public class ImportJob
   private String corpusName;
   private Status status;
   private List<String> messages = new LinkedList<String>();
+  private boolean overwrite;
 
   public String getUuid()
   {
@@ -81,5 +82,17 @@ public class ImportJob
   {
     return messages;
   }
+
+  public boolean isOverwrite()
+  {
+    return overwrite;
+  }
+
+  public void setOverwrite(boolean overwrite)
+  {
+    this.overwrite = overwrite;
+  }
+  
+  
   
 }

@@ -7,10 +7,17 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
   <import resource="Common.xml" />
-
+  
+<bean id="importWorker" class="annis.service.internal.ImportWorker" lazy-init="true">
+  <property name="adminDao" ref="administrationDao" />
+</bean>
+  
   <!-- AdminService -->
-  <bean id="adminService" class="annis.service.internal.AdminService" lazy-init="true">
+  <bean id="adminService" class="annis.service.internal.AdminServiceImpl" 
+        init-method="init" lazy-init="true">
     <property name="adminDao" ref="administrationDao"/>
+    <property name="importWorker" ref="importWorker" />
+    <property name="annisDao" ref="annisDao" />
   </bean>
 
   <!-- Default Corpus Config -->

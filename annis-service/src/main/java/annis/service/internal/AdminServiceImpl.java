@@ -19,7 +19,6 @@ import annis.administration.AdministrationDao;
 import annis.dao.AnnisDao;
 import annis.security.AnnisUserConfig;
 import annis.utils.RelANNISHelper;
-import com.google.common.collect.Maps;
 import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -28,10 +27,6 @@ import java.io.OutputStream;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
-import java.util.concurrent.ConcurrentMap;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
@@ -40,6 +35,7 @@ import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -47,7 +43,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -62,8 +57,13 @@ public class AdminServiceImpl
   
   private AdministrationDao adminDao;
   private AnnisDao annisDao;
-  @Autowired
-  private static ImportWorker importWorker;
+  private ImportWorker importWorker;
+  
+  
+  public void init()
+  {
+    importWorker.start();
+  }
   
   @GET
   @Path("is-authenticated")
@@ -106,9 +106,12 @@ public class AdminServiceImpl
   
   @POST
   @Path("import")
-  @Consumes("application/zip")
-  public Response importCorpus(@Context HttpServletRequest request)
+  @Consumes({"application/zip"})
+  public Response importCorpus(@Context HttpServletRequest request, 
+  @QueryParam("overwrite") String overwriteRaw)
   {
+    boolean overwrite = Boolean.parseBoolean(overwriteRaw);
+    
     // write content to temporary file
     OutputStream tmpOut = null;
     try
@@ -130,7 +133,7 @@ public class AdminServiceImpl
           List<String> asList = new LinkedList<String>();
           asList.add(corpusName);
           List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(asList);
-          if(corpusIDs == null || corpusIDs.isEmpty())
+          if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
           {
             ImportJob job = new ImportJob();
             UUID uuid = UUID.randomUUID();
@@ -138,6 +141,7 @@ public class AdminServiceImpl
             job.setCorpusName(corpusName);
             job.setInZip(zip);
             job.setStatus(ImportJob.Status.WAITING);
+            job.setOverwrite(overwrite);
             
             importWorker.getImportQueue().offer(job);
             
@@ -198,5 +202,31 @@ public class AdminServiceImpl
   {
     this.adminDao = adminDao;
   }
+
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+  
+  
+
+  public ImportWorker getImportWorker()
+  {
+    return importWorker;
+  }
+
+  public void setImportWorker(ImportWorker importWorker)
+  {
+    this.importWorker = importWorker;
+  }
+
+  
+  
+  
 
 }

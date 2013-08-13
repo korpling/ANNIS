@@ -21,6 +21,8 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.util.Enumeration;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.slf4j.Logger;
@@ -120,4 +122,42 @@ public class RelANNISHelper
     }
     return null;
   }
+  
+  /**
+   * Search the folder containing a special tab-file file in the zip file and return all
+   * other zip entries that are subelements of the folder.
+   * @param file
+   * @param table The table name which should be used as indicator.
+   * @param fileEnding The file ending of the file to search for
+   * @return A list containing all zip entries that belong the the relANNIS folder
+   */
+  public static List<ZipEntry> getRelANNISContent(ZipFile file, String table,
+    String fileEnding)
+  {
+    List<ZipEntry> result = new LinkedList<ZipEntry>(); 
+    ZipEntry entry = getRelANNISEntry(file, table, fileEnding);
+    
+    if(entry != null)
+    {
+      // replace all "\" with "/" in case a bogus zip programm did it wrong
+      String completeEntryName = entry.getName().replaceAll("\\/", "/");
+      // "navigate" one level up
+      String prefix = completeEntryName.substring(0, ("/" + table + "." + fileEnding).length()-1);
+      
+      // find all entries that match the prefix
+      Enumeration<? extends ZipEntry> zipEnum = file.entries();
+      while(zipEnum.hasMoreElements())
+      {
+        ZipEntry e = zipEnum.nextElement();
+        if(e.getName().replaceAll("\\/", "/").startsWith(prefix))
+        {
+          result.add(zipEnum.nextElement());
+        }
+      }
+       
+    }
+    
+    return result;
+  }
+  
 }
