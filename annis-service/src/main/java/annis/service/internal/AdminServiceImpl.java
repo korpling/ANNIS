@@ -47,6 +47,7 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 /**
@@ -55,15 +56,15 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("annis/admin")
-public class AdminService
+public class AdminServiceImpl
 {
-  private final static Logger log = LoggerFactory.getLogger(AdminService.class);
+  private final static Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
   
   private AdministrationDao adminDao;
   private AnnisDao annisDao;
-  private ExecutorService importExecutor = Executors.newSingleThreadExecutor();
-  private ConcurrentMap<String, Future<String>> importQueue = Maps.newConcurrentMap();
-
+  @Autowired
+  private static ImportWorker importWorker;
+  
   @GET
   @Path("is-authenticated")
   @Produces("text/plain")
@@ -131,13 +132,17 @@ public class AdminService
           List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(asList);
           if(corpusIDs == null || corpusIDs.isEmpty())
           {
-            ImportWorker worker = new ImportWorker(adminDao, zip, corpusName);
+            ImportJob job = new ImportJob();
             UUID uuid = UUID.randomUUID();
-            Future<String> future = importExecutor.submit(worker);
-            importQueue.put(uuid.toString(), future);
+            job.setUuid(uuid.toString());
+            job.setCorpusName(corpusName);
+            job.setInZip(zip);
+            job.setStatus(ImportJob.Status.WAITING);
+            
+            importWorker.getImportQueue().offer(job);
             
             return Response.status(Response.Status.ACCEPTED).header("Location", 
-              request.getContextPath() + "/annis/admin/import-status/" + uuid.toString())
+              request.getContextPath() + "/annis/admin/import-queue/" + uuid.toString())
               .build();
           }
           else
@@ -193,6 +198,5 @@ public class AdminService
   {
     this.adminDao = adminDao;
   }
-  
-  
+
 }

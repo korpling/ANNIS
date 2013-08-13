@@ -17,25 +17,32 @@ package annis.service.internal;
 
 import annis.administration.AdministrationDao;
 import annis.utils.RelANNISHelper;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Queues;
 import com.google.common.io.Files;
 import java.io.File;
-import java.util.concurrent.Callable;
+import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ImportWorker implements Callable<String>
+@Component
+public class ImportWorker extends Thread
 {
+  private final static Logger log = LoggerFactory.getLogger(ImportWorker.class);
   
+  @Autowired
   private AdministrationDao adminDao;
-  
-  private ZipFile inZip;
-  private String corpusName;
-  
-  private String status = null;
+  private BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
+  private ImportJob currentJob;
+  private Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().maximumSize(100).build();
   
   final private String[] allTables = new String[] {
     "corpus", "corpus_annotation", "text", "node", "component", "rank",
@@ -43,34 +50,50 @@ public class ImportWorker implements Callable<String>
     "example_queries"
   };
 
-  public ImportWorker(AdministrationDao adminDao, ZipFile inZip,
-    String corpusName)
+  public ImportWorker(AdministrationDao adminDao)
   {
+    
     this.adminDao = adminDao;
-    this.inZip = inZip;
-    this.corpusName = corpusName;
+  }
+
+  @Override
+  public void run()
+  {
+    while(isAlive())
+    {
+      try
+      {
+        currentJob =  importQueue.take();
+        importSingleCorpus(currentJob);
+      }
+      catch (InterruptedException ex)
+      {
+        log.error(null, ex);
+        break;
+      }
+    }
   }
   
-  @Override
-  public String call() throws Exception
+  private void importSingleCorpus(ImportJob job)
   {
     // unzip
     File outDir = Files.createTempDir();
     for(String table : allTables)
     {
-      ZipEntry entry = RelANNISHelper.getRelANNISEntry(inZip, table, "tab");
+      ZipEntry entry = RelANNISHelper.getRelANNISEntry(job.getInZip(), table, "tab");
       if(entry != null)
       {
         
       }
     }
-    
-    return "";
   }
 
-  public String getStatus()
+  public BlockingQueue<ImportJob> getImportQueue()
   {
-    return status;
+    return importQueue;
   }
+  
+  
+
   
 }
