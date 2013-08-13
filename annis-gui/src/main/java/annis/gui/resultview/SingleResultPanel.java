@@ -52,6 +52,7 @@ import java.util.Set;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -127,7 +128,16 @@ public class SingleResultPanel extends CssLayout implements
       result);
     Collections.reverse(path);
 
-    Label lblPath = new Label("Path: " + StringUtils.join(path, " > "));
+    MinMax minMax = getIds(result.getSDocumentGraph());
+
+    // build label
+    StringBuilder sb = new StringBuilder("Path: ");
+    sb.append(StringUtils.join(path, " > "));
+    sb.append(" (tokens ").append(minMax.min);
+    sb.append(" - ").append(minMax.max).append(")");
+
+    Label lblPath = new Label(sb.toString());
+
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
     infoBar.addComponent(lblPath);
@@ -411,14 +421,19 @@ public class SingleResultPanel extends CssLayout implements
           if (intervallO1 - intervallO2 != 0)
           {
             return intervallO1 - intervallO2;
-          } else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
+          }
+          else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
           {
             return (int) (feat1.getLeftToken() - feat2.getRightToken());
-          } else if (feat1.getRightToken() - feat2.getRightToken()!= 0)
+          }
+          else if (feat1.getRightToken() - feat2.getRightToken() != 0)
           {
-            return (int)(feat1.getRightToken() - feat2.getRightToken());
-          } else
-            return (int)(feat1.getInternalID() - feat2.getInternalID());
+            return (int) (feat1.getRightToken() - feat2.getRightToken());
+          }
+          else
+          {
+            return (int) (feat1.getInternalID() - feat2.getInternalID());
+          }
         }
       });
 
@@ -476,5 +491,45 @@ public class SingleResultPanel extends CssLayout implements
     {
       return matchedAndCovered;
     }
+  }
+
+  private class MinMax
+  {
+
+    long min;
+
+    long max;
+
+  }
+
+  private MinMax getIds(SDocumentGraph graph)
+  {
+    EList<SToken> sTokens = graph.getSTokens();
+
+
+    MinMax minMax = new MinMax();
+    minMax.min = Long.MAX_VALUE;
+    minMax.max = Long.MIN_VALUE;
+
+    if (sTokens != null)
+    {
+      for (SToken t : sTokens)
+      {
+        RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(ANNIS_NS,
+          FEAT_RELANNIS_NODE).getValue();
+
+        if (minMax.min > f.getTokenIndex())
+        {
+          minMax.min = f.getTokenIndex();
+        }
+
+        if (minMax.max < f.getTokenIndex())
+        {
+          minMax.max = f.getTokenIndex();
+        }
+      }
+    }
+
+    return minMax;
   }
 }
