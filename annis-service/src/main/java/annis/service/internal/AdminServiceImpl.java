@@ -111,6 +111,9 @@ public class AdminServiceImpl
   @Path("import/status/current")
   public ImportJob currentImport()
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("admin:query-import:current");
+    
     ImportJob job = importWorker.getCurrentJob();
     if(job == null)
     {
@@ -123,6 +126,9 @@ public class AdminServiceImpl
   @Path("import/status/finished/{uuid}")
   public ImportJob finishedImport(@PathParam("uuid") String uuid)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("admin:query-import:finished");
+    
     ImportJob job = importWorker.getFinishedJob(uuid);
     if(job == null)
     {
@@ -137,6 +143,8 @@ public class AdminServiceImpl
   public Response importCorpus(@Context HttpServletRequest request, 
   @QueryParam("overwrite") String overwriteRaw)
   {
+    Subject user = SecurityUtils.getSubject();
+    
     boolean overwrite = Boolean.parseBoolean(overwriteRaw);
     
     // write content to temporary file
@@ -157,6 +165,8 @@ public class AdminServiceImpl
         String corpusName = RelANNISHelper.extractToplevelCorpusName(zip.getInputStream(corpusTab));
         if(corpusName != null)
         {
+          user.checkPermission("admin:import:" + corpusName);
+          
           List<String> asList = new LinkedList<String>();
           asList.add(corpusName);
           List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(asList);
@@ -173,7 +183,7 @@ public class AdminServiceImpl
             importWorker.getImportQueue().offer(job);
             
             return Response.status(Response.Status.ACCEPTED).header("Location", 
-              request.getContextPath() + "/annis/admin/import-queue/" + uuid.toString())
+              request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
               .build();
           }
           else
