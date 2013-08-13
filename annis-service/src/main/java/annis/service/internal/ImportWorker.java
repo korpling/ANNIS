@@ -15,8 +15,14 @@
  */
 package annis.service.internal;
 
+import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
-import annis.utils.RelANNISHelper;
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.joran.JoranConfigurator;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.Appender;
+import ch.qos.logback.core.AppenderBase;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Queues;
@@ -31,8 +37,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
-import org.apache.commons.io.FileUtils;
-import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -56,15 +60,9 @@ public class ImportWorker extends Thread
   private Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().
     maximumSize(100).build();
 
-  final private String[] allTables = new String[]
-  {
-    "corpus", "corpus_annotation", "text", "node", "component", "rank",
-    "node_annotation", "edge_annotation", "resolver_vis_map", "media_files",
-    "example_queries"
-  };
-
   public ImportWorker()
   {
+    addAppender();
   }
 
   @Override
@@ -84,9 +82,35 @@ public class ImportWorker extends Thread
       }
     }
   }
+  
+  private void addAppender()
+  {
+    LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+    JoranConfigurator jc = new JoranConfigurator();
+    jc.setContext(lc);
+
+
+    Appender appender = new AppenderBase<ILoggingEvent>()
+    {
+      @Override
+      protected void append(ILoggingEvent event)
+      {
+        if (currentJob != null && event.getLevel().isGreaterOrEqual(Level.INFO))
+        {
+          currentJob.getMessages().add(event.getFormattedMessage());
+        }
+      }
+    };
+    ch.qos.logback.classic.Logger rootLogger = lc.getLogger(
+      Logger.ROOT_LOGGER_NAME);
+    rootLogger.addAppender(appender);
+    appender.start();
+  }
 
   private void importSingleCorpus(ImportJob job)
   {
+    currentJob.setStatus(ImportJob.Status.RUNNING);
+    
     // unzip
     File outDir = Files.createTempDir();
     outDir.deleteOnExit();
@@ -152,7 +176,15 @@ public class ImportWorker extends Thread
 
     if(rootDir != null)
     {
-      adminDao.importCorpus(rootDir.getAbsolutePath(), job.isOverwrite());
+      if(adminDao.importCorpus(rootDir.getAbsolutePath(), job.isOverwrite()))
+      {
+        currentJob.setStatus(ImportJob.Status.SUCCESS);
+      }
+      else
+      {
+        currentJob.setStatus(ImportJob.Status.ERROR);
+      }
+      finishedJobs.put(currentJob.getUuid(), currentJob);
     }
     
     // cleanup
@@ -172,6 +204,13 @@ public class ImportWorker extends Thread
     }
     
   }
+  
+  public ImportJob getFinishedJob(String uuid)
+  {
+    ImportJob job = finishedJobs.getIfPresent(uuid);
+    finishedJobs.invalidate(uuid);
+    return job;
+  }
 
   public BlockingQueue<ImportJob> getImportQueue()
   {
@@ -187,4 +226,11 @@ public class ImportWorker extends Thread
   {
     this.adminDao = adminDao;
   }
+
+  public ImportJob getCurrentJob()
+  {
+    return currentJob;
+  }
+  
+  
 }

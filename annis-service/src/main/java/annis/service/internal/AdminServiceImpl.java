@@ -15,6 +15,7 @@
  */
 package annis.service.internal;
 
+import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.dao.AnnisDao;
 import annis.security.AnnisUserConfig;
@@ -34,8 +35,10 @@ import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
@@ -102,6 +105,30 @@ public class AdminServiceImpl
     
     adminDao.storeUserConfig(config.getValue());      
       return Response.ok().build();
+  }
+  
+  @GET
+  @Path("import/status/current")
+  public ImportJob currentImport()
+  {
+    ImportJob job = importWorker.getCurrentJob();
+    if(job == null)
+    {
+      throw new WebApplicationException(404);
+    }
+    return job;
+  }
+  
+  @GET
+  @Path("import/status/finished/{uuid}")
+  public ImportJob finishedImport(@PathParam("uuid") String uuid)
+  {
+    ImportJob job = importWorker.getFinishedJob(uuid);
+    if(job == null)
+    {
+      throw new WebApplicationException(404);
+    }
+    return job;
   }
   
   @POST

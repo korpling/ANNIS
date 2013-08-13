@@ -13,16 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.service.internal;
+package annis.service.objects;
 
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipFile;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@XmlRootElement
 public class ImportJob
 {
   public enum Status
@@ -48,6 +51,7 @@ public class ImportJob
     this.uuid = uuid;
   }
 
+  @XmlTransient
   public ZipFile getInZip()
   {
     return inZip;
