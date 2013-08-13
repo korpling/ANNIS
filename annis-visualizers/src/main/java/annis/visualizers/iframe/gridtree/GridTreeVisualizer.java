@@ -14,23 +14,23 @@ import java.util.List;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
- * A grid visualizing hierarchical tree annotations as ordered grid 
+ * A grid visualizing hierarchical tree annotations as ordered grid
  * layers.
- * 
- * Note that all layers represent the same annotation name at different 
+ *
+ * Note that all layers represent the same annotation name at different
  * hierarchical depths, marked level:0,1,2,... etc. on the left
- * 
+ *
  * Known Bug: the visualizer does not handle crossing edges.
- * Equal annotation names which cover the same range or 
+ * Equal annotation names which cover the same range or
  * a subset of nodes and have the same hierarchical depths are not rendered
  * correctly by grid_tree.
  * https://github.com/korpling/ANNIS/issues/14
- * 
+ *
  * Mappings: <br />
- * Specify the name of the annotation to be visualized in the grid 
- * with <b>node_key:name</b>. Note that all grid levels visualize the same annotation 
+ * Specify the name of the annotation to be visualized in the grid
+ * with <b>node_key:name</b>. Note that all grid levels visualize the same annotation
  * name at different hierarchical depths.
- * 
+ *
  * @author Benjamin Weißenfels <b.pixeldrama@gmailcom>
  *
  */
@@ -190,7 +190,9 @@ public class GridTreeVisualizer extends WriterVisualizer
 
     try
     {
-      writer.append("<html><head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
+      writer.append("<!DOCTYPE html>\n"
+              + "<html>\n"
+              + "<head><meta http-equiv=\"Content-Type\" content=\"text/html; charset=utf-8\">");
 
       writer.append("<link href=\""
         + input.getResourcePath("jquery.tooltip.css")
@@ -257,7 +259,7 @@ public class GridTreeVisualizer extends WriterVisualizer
 
   /**
    * Returns the annotation of a {@link AnnisNode}
-   * 
+   *
    * @param n
    * @param anno
    * @return null, if the annotation not exists.

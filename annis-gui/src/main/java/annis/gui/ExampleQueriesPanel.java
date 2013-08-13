@@ -36,11 +36,15 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,8 @@ public class ExampleQueriesPanel extends Table
 
   // first column String
   private final String EXAMPLE_QUERY = "example query";
+
+  private ExecutorService executor = Executors.newSingleThreadExecutor();
 
   //main ui window
   private SearchUI ui;
@@ -308,7 +314,7 @@ public class ExampleQueriesPanel extends Table
    */
   private void loadExamplesFromRemote()
   {
-    loadExamplesFromRemote(null);
+    examples = loadExamplesFromRemote(null);
   }
 
   /**
@@ -317,14 +323,15 @@ public class ExampleQueriesPanel extends Table
    * @param corpusNames Specifies the corpora example queries are fetched for.
    * If it is null or empty all available example queries are fetched.
    */
-  private void loadExamplesFromRemote(String[] corpusNames)
+  private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
+    List<ExampleQuery> result = new LinkedList<ExampleQuery>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
-      if (corpusNames == null || corpusNames.length == 0)
+      if (corpusNames == null || corpusNames.isEmpty())
       {
-        examples = service.path("query").path("corpora").path(
+        result = service.path("query").path("corpora").path(
           "example-queries").get(new GenericType<List<ExampleQuery>>()
         {
         });
@@ -332,7 +339,7 @@ public class ExampleQueriesPanel extends Table
       else
       {
         String concatedCorpusNames = StringUtils.join(corpusNames, ",");
-        examples = service.path("query").path("corpora").path(
+        result = service.path("query").path("corpora").path(
           "example-queries").queryParam("corpora", concatedCorpusNames).get(
           new GenericType<List<ExampleQuery>>()
         {
@@ -348,6 +355,7 @@ public class ExampleQueriesPanel extends Table
       log.error("problems with getting example queries from remote for {}",
         corpusNames, ex);
     }
+    return result;
   }
 
   /**
@@ -356,19 +364,38 @@ public class ExampleQueriesPanel extends Table
    * @param selectedCorpus Specifies the corpora example queries are fetched
    * for. If it is null, all available example queries are fetched.
    */
-  public void setSelectedCorpus(String[] selectedCorpora)
+  public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    loadExamplesFromRemote(selectedCorpora);
-    try
+    executor.submit(new Runnable()
     {
-      removeAllItems();
-      addItems();
-    }
-    catch (Exception ex)
-    {
-      log.error("removing or adding of example queries failed for {}",
-        selectedCorpora, ex);
-    }
+      @Override
+      public void run()
+      {
+        final List<ExampleQuery> result =
+          loadExamplesFromRemote(selectedCorpora);
+
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            examples = result;
+            try
+            {
+              removeAllItems();
+              addItems();
+            }
+            catch (Exception ex)
+            {
+              log.error("removing or adding of example queries failed for {}",
+                selectedCorpora, ex);
+            }
+          }
+        });
+      }
+    });
+
+
   }
 
   private class ShowResultColumn implements Table.ColumnGenerator

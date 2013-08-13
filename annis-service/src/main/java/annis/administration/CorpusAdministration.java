@@ -36,7 +36,9 @@ public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
-  private static final Logger log = LoggerFactory.getLogger(CorpusAdministration.class);
+
+  private static final Logger log = LoggerFactory.getLogger(
+    CorpusAdministration.class);
 
   public CorpusAdministration()
   {
@@ -51,7 +53,8 @@ public class CorpusAdministration
     {
       if (!corpora.contains(id))
       {
-        throw new AnnisRunnerException("Corpus does not exist (or is not a top-level corpus): "
+        throw new AnnisRunnerException(
+          "Corpus does not exist (or is not a top-level corpus): "
           + id);
       }
     }
@@ -73,7 +76,44 @@ public class CorpusAdministration
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
   }
 
-  public void importCorpora(List<String> paths, boolean overwrite)
+  private void importCorpus(String path, boolean overwrite) throws DefaultAdministrationDao.ConflictingCorpusException
+  {
+    log.info("Importing corpus from: " + path);
+    administrationDao.importCorpus(path, overwrite);
+    log.info("Finished import from: " + path);
+  }
+
+  /**
+   *
+   * Imports several corpora. If a conflicting top level corpus exists a
+   * {@link DefaultAdministrationDao.ConflictingCorpusException} will be thrown,
+   * when the ovewrite flag is set to false.
+   *
+   * @param paths the pathes to the corpora
+   * @param overwrite if true, an existing corpus with the same top level corpus
+   * name will be overwritten.
+   * @throws
+   * annis.administration.DefaultAdministrationDao.ConflictingCorpusException
+   */
+  public void importCorpora(List<String> paths, boolean overwrite) throws DefaultAdministrationDao.ConflictingCorpusException
+  {
+    // import each corpus
+    for (String path : paths)
+    {
+      importCorpus(path, overwrite);
+    }
+  }
+
+  /**
+   * Imports several corpora and catches a possible thrown
+   * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
+   * overwrite flag is set to false.
+   *
+   * @param paths Valid pathes to corpora.
+   * @param overwrite If set to false, a conflicting corpus is not silently
+   * reimported.
+   */
+  public void importCorporaSave(List<String> paths, boolean overwrite)
   {
     // import each corpus
     for (String path : paths)
@@ -90,7 +130,6 @@ public class CorpusAdministration
       {
         log.error(ex.getMessage());
       }
-
     }
   }
 
@@ -100,16 +139,23 @@ public class CorpusAdministration
     {
       administrationDao.checkDatabaseSchemaVersion();
     }
-    catch(AnnisException ex)
+    catch (AnnisException ex)
     {
       return false;
     }
     return true;
   }
 
-  public void importCorpora(String... paths)
+  /**
+   * Imports several corpora.
+   *
+   * @param overwrite if false, a conflicting top level corpus is silently
+   * skipped.
+   * @param paths the paths to the corpora
+   */
+  public void importCorpora(boolean overwrite, String... paths)
   {
-    importCorpora(Arrays.asList(paths), false);
+    importCorporaSave(Arrays.asList(paths), overwrite);
   }
 
   public List<Map<String, Object>> listCorpusStats()
@@ -152,7 +198,7 @@ public class CorpusAdministration
     }
     finally
     {
-      if(writer != null)
+      if (writer != null)
       {
         try
         {

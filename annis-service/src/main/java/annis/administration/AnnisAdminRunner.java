@@ -320,7 +320,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           else
           {
             log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorpora(migratePath);
+            corpusAdministration.importCorpora(true, migratePath);
           }
         }
 
@@ -358,11 +358,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       if (cmdLine.hasOption('o'))
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), true);
+        corpusAdministration.importCorporaSave(cmdLine.getArgList(), true);
       }
       else
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), false);
+        corpusAdministration.importCorporaSave(cmdLine.getArgList(), false);
       }
     }
     catch (ParseException ex)
