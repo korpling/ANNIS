@@ -167,7 +167,7 @@ public class VAutoHeightIFrame extends Widget
   /**
    * Returns true, if the user agent is belongs to the IE family.
    */
-  public final native boolean isIE() /*-{
-   return navigator.userAgent.toLowerCase().contains("msie");
+  public final native String isIE() /*-{
+   return navigator.userAgent.toLowerCase();
    }-*/;
 }
