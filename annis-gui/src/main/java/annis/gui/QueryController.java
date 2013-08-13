@@ -173,6 +173,21 @@ public class QueryController implements PagingCallback
 
   }
 
+  /**
+   * Adds a history entry to the history panel.
+   *
+   * @param e the entry, which is added.
+   *
+   * @see HistoryPanel
+   */
+  public void addHistoryEntry(HistoryEntry e)
+  {
+    // remove it first in order to let it appear on the beginning of the list
+    history.remove(e);
+    history.add(0, e);
+    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
+  }
+
   public void executeQuery(boolean executeCount, boolean executeResult)
   {
 
@@ -194,11 +209,8 @@ public class QueryController implements PagingCallback
     HistoryEntry e = new HistoryEntry();
     e.setCorpora(lastQuery.getCorpora());
     e.setQuery(lastQuery.getQuery());
-    // remove it first in order to let it appear on the beginning of the list
-    history.remove(e);
-    history.add(0, e);
-    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
 
+    addHistoryEntry(e);
 
     if (lastQuery.getCorpora() == null || lastQuery.getCorpora().isEmpty())
     {
@@ -255,7 +267,8 @@ public class QueryController implements PagingCallback
   public void corpusSelectionChangedInBackground()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().getCorpusList().
+      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
+      getCorpusList().
       getSelectedCorpora());
 
   }
@@ -341,7 +354,7 @@ public class QueryController implements PagingCallback
           {
             if (causeFinal == null)
             {
-              if(lastCount != null)
+              if (lastCount != null)
               {
                 String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
                 String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
@@ -373,11 +386,12 @@ public class QueryController implements PagingCallback
               }
               else
               {
-                log.error("Unexpected exception:  " + causeFinal.getLocalizedMessage(), causeFinal);
+                log.error("Unexpected exception:  " + causeFinal.
+                  getLocalizedMessage(), causeFinal);
                 ExceptionDialog.show(causeFinal);
               }
             } // end if cause != null
-            
+
             ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
           }
         });
