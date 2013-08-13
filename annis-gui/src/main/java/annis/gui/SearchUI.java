@@ -39,6 +39,7 @@ import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
@@ -77,6 +78,7 @@ import org.vaadin.cssinject.CSSInject;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Push
+@Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
