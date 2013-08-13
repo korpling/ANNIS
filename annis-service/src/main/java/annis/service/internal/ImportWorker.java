@@ -97,7 +97,7 @@ public class ImportWorker extends Thread
       {
         if (currentJob != null && event.getLevel().isGreaterOrEqual(Level.INFO))
         {
-          currentJob.getMessages().add(event.getFormattedMessage());
+          currentJob.getMessages().add(event.toString());
         }
       }
     };
