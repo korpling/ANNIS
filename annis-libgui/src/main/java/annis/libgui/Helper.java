@@ -122,14 +122,12 @@ public class Helper {
   }
 
   public static void setUser(AnnisUser user) {
-    if(user == null)
-    {
-      VaadinSession.getCurrent().getSession().removeAttribute(AnnisBaseUI.USER_KEY);
-    }
-    else
-    {
+    if (user == null) {
+      VaadinSession.getCurrent().getSession().removeAttribute(
+              AnnisBaseUI.USER_KEY);
+    } else {
       VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
-            user);
+              user);
     }
   }
 
@@ -316,49 +314,86 @@ public class Helper {
   }
 
   /**
-   * Retrieve all the meta data for a given document of a corpus.
-   * @param toplevelCorpusName
-   * @param documentName
-   * @return
+   * Retrieve the meta data for a given document of a corpus.
+   *
+   * @param toplevelCorpusName specifies the toplevel corpus
+   * @param documentName specifies the document.
+   * @return returns only the meta data for a single document.
    */
-  public static List<Annotation> getMetaData(String toplevelCorpusName,
-    String documentName)
-  {
+  public static List<Annotation> getMetaDataDoc(String toplevelCorpusName,
+          String documentName) {
     List<Annotation> result = new ArrayList<Annotation>();
     WebResource res = Helper.getAnnisWebResource();
-    try
-    {
+    try {
       res = res.path("meta").path("doc")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+              .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+      res = res.path(URLEncoder.encode(documentName, "UTF-8"));
 
-      if (documentName != null)
-      {
+      result = res.get(new GenericType<List<Annotation>>() {
+      });
+    } catch (UniformInterfaceException ex) {
+      log.error(null, ex);
+      Notification.show(
+              "Remote exception: " + ex.getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
+      log.error(null, ex);
+      Notification.show(
+              "Remote exception: " + ex.getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+    } catch (UnsupportedEncodingException ex) {
+      log.error(null, ex);
+      Notification.show(
+              "UTF-8 encoding is not supported on server, this is weird: " + ex.
+              getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+    }
+    return result;
+  }
+
+  /**
+   * Retrieve all the meta data for a given document of a corpus including the
+   * metadata of all corora in the path to the document.
+   *
+   * @param toplevelCorpusName Specifies the the toplevel corpus
+   * @param documentName Specifies the document
+   * @return Returns also the metada of the all parent corpora. There must be at
+   * least one of them.
+   */
+  public static List<Annotation> getMetaData(String toplevelCorpusName,
+          String documentName) {
+    List<Annotation> result = new ArrayList<Annotation>();
+    WebResource res = Helper.getAnnisWebResource();
+    try {
+      res = res.path("meta").path("doc")
+              .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
+      if (documentName != null) {
         res = res.path(documentName);
       }
 
-      result = res.get(new GenericType<List<Annotation>>() {});
-    }
-    catch (UniformInterfaceException ex)
-    {
+      if (documentName != null && !toplevelCorpusName.equals(documentName)) {
+        res = res.path("path");
+      }
+
+      result = res.get(new GenericType<List<Annotation>>() {
+      });
+    } catch (UniformInterfaceException ex) {
       log.error(null, ex);
       Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
+              "Remote exception: " + ex.getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+    } catch (ClientHandlerException ex) {
       log.error(null, ex);
       Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
+              "Remote exception: " + ex.getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+    } catch (UnsupportedEncodingException ex) {
       log.error(null, ex);
       Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
+              "UTF-8 encoding is not supported on server, this is weird: " + ex.
+              getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
     }
     return result;
   }
@@ -502,20 +537,19 @@ public class Helper {
   }
 
   /**
-   * Returns a formatted string containing the type of the exception, the message
-   * and the stacktrace.
+   * Returns a formatted string containing the type of the exception, the
+   * message and the stacktrace.
+   *
    * @param ex
    * @return
    */
-  public static String convertExceptionToMessage(Throwable ex)
-  {
+  public static String convertExceptionToMessage(Throwable ex) {
     StringBuilder sb = new StringBuilder();
     sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
     sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
     sb.append("Stacktrace: \n");
     StackTraceElement[] st = ex.getStackTrace();
-    for(int i=0; i < st.length; i++)
-    {
+    for (int i = 0; i < st.length; i++) {
       sb.append(st[i].toString());
       sb.append("\n");
     }

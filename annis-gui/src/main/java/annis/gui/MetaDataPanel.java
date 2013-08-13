@@ -258,7 +258,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
       lastSelectedItem = event.getProperty().toString();
-      List<Annotation> metaData = Helper.getMetaData(toplevelCorpusName,
+      List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName,
         lastSelectedItem);
 
       if (metaData == null || metaData.isEmpty())
