@@ -64,7 +64,7 @@ public class VAutoHeightIFrame extends Widget
                   checkIFrameLoaded(doc);
                 }
               };
-              t.schedule(100);
+              t.schedule(50);
             }
           }
           catch (JavaScriptException ex)
@@ -88,7 +88,7 @@ public class VAutoHeightIFrame extends Widget
 
     if (contentType != null && contentType.startsWith("image/"))
     {
-      // image
+      // imagef
       NodeList<Element> imgList = doc.getElementsByTagName("img");
       if (imgList.getLength() > 0)
       {
@@ -102,14 +102,22 @@ public class VAutoHeightIFrame extends Widget
         "scrollHeight"));
       logger.fine("document height defined?: " + doc.getDocumentElement().
         hasAttribute("scrollHeight"));
-      int bodyHeight = doc.getBody().getScrollHeight();
+
+      /**
+       * Use for small iframe heights <= 150px the offset height, since the
+       * scrollHeight will be fixed for 150px for some reasons.
+       */
+      int bodyHeight = doc.getBody().getScrollHeight() <= 150 ? doc.getBody().
+        getOffsetHeight() : Math.min(doc.getBody().getScrollHeight(), doc.
+        getBody().getOffsetHeight());
       int documentHeight = doc.getDocumentElement().getScrollHeight();
 
 
       logger.fine("body scrollHeight: " + bodyHeight
         + "document scrollHeight: " + documentHeight);
 
-      int maxHeight = isIE() ? Math.max(bodyHeight, documentHeight) : bodyHeight;
+      int maxHeight = isIE().contains("msie") ? Math.max(bodyHeight,
+        documentHeight) : Math.min(bodyHeight, documentHeight);
 
       if (maxHeight > 20)
       {
