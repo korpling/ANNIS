@@ -27,8 +27,24 @@
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
-   
   </servlet>
+  <!--
+  <servlet>
+    <servlet-name>Admin</servlet-name>
+    <servlet-class>annis.gui.servlets.AnnisVaadinServlet</servlet-class>
+    <init-param>
+      <param-name>UI</param-name>
+      <param-value>annis.gui.AdminUI</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Application widgetset
+      </description>
+      <param-name>widgetset</param-name>        	
+      <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
+    </init-param>
+  </servlet>
+  -->
   <servlet>
     <servlet-name>CitationRedirectionServlet</servlet-name>
     <servlet-class>annis.gui.servlets.CitationRedirectionServlet</servlet-class>
@@ -50,6 +66,12 @@
     <servlet-name>Search</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
+  <!--
+  <servlet-mapping>
+    <servlet-name>Admin</servlet-name>
+    <url-pattern>/admin/*</url-pattern>
+  </servlet-mapping>
+  -->
   <servlet-mapping>
     <servlet-name>CitationRedirectionServlet</servlet-name>
     <url-pattern>/Cite/*</url-pattern>
