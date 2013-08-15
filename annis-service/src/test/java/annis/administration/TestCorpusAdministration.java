@@ -46,7 +46,7 @@ public class TestCorpusAdministration
   {
 
     String path = "somePath";
-    administration.importCorpora(true, path);
+    administration.importCorporaSave(true, path);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);
@@ -69,7 +69,7 @@ public class TestCorpusAdministration
     String path2 = "anotherPath";
     String path3 = "yetAnotherPath";
 
-    administration.importCorpora(true, path1, path2, path3);
+    administration.importCorporaSave(true, path1, path2, path3);
 
     // insertion of a corpus needs to follow an exact order
     InOrder inOrder = inOrder(administrationDao);

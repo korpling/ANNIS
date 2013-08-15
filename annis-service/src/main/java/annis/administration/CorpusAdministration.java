@@ -84,27 +84,6 @@ public class CorpusAdministration
   }
 
   /**
-   *
-   * Imports several corpora. If a conflicting top level corpus exists a
-   * {@link DefaultAdministrationDao.ConflictingCorpusException} will be thrown,
-   * when the ovewrite flag is set to false.
-   *
-   * @param paths the pathes to the corpora
-   * @param overwrite if true, an existing corpus with the same top level corpus
-   * name will be overwritten.
-   * @throws
-   * annis.administration.DefaultAdministrationDao.ConflictingCorpusException
-   */
-  public void importCorpora(List<String> paths, boolean overwrite) throws DefaultAdministrationDao.ConflictingCorpusException
-  {
-    // import each corpus
-    for (String path : paths)
-    {
-      importCorpus(path, overwrite);
-    }
-  }
-
-  /**
    * Imports several corpora and catches a possible thrown
    * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
    * overwrite flag is set to false.
@@ -113,7 +92,7 @@ public class CorpusAdministration
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
    */
-  public void importCorporaSave(List<String> paths, boolean overwrite)
+  public void importCorporaSave(boolean overwrite, List<String> paths)
   {
     // import each corpus
     for (String path : paths)
@@ -129,6 +108,10 @@ public class CorpusAdministration
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
         log.error(ex.getMessage());
+      }
+      catch(Throwable ex)
+      {
+        log.error("Error on importing corpus", ex);
       }
     }
   }
@@ -153,9 +136,9 @@ public class CorpusAdministration
    * skipped.
    * @param paths the paths to the corpora
    */
-  public void importCorpora(boolean overwrite, String... paths)
+  public void importCorporaSave(boolean overwrite, String... paths)
   {
-    importCorporaSave(Arrays.asList(paths), overwrite);
+    importCorporaSave(overwrite, Arrays.asList(paths));
   }
 
   public List<Map<String, Object>> listCorpusStats()

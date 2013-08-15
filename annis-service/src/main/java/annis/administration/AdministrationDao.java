@@ -48,7 +48,7 @@ public interface AdministrationDao
    * @return true if successful
    */
   public boolean importCorpus(String path, boolean overwrite);
-
+  
   public List<Map<String, Object>> listCorpusStats();
 
   public List<String> listUsedIndexes();

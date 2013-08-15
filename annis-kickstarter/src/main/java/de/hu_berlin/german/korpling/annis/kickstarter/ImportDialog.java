@@ -150,7 +150,7 @@ public class ImportDialog extends javax.swing.JDialog
           corpusAdministration.getAdministrationDao().registerGUICancelThread(
             statementController);
 
-          corpusAdministration.importCorpora(jCheckBox1.isSelected(),
+          corpusAdministration.importCorporaSave(jCheckBox1.isSelected(),
             txtInputDir.getText());
         }
         catch (Exception ex)
@@ -205,7 +205,7 @@ public class ImportDialog extends javax.swing.JDialog
 
               corpusAdministration.getAdministrationDao().
                 registerGUICancelThread(statementController);
-              corpusAdministration.importCorpora(jCheckBox1.isSelected(), path);
+              corpusAdministration.importCorporaSave(jCheckBox1.isSelected(), path);
             }
             catch (Exception ex)
             {
