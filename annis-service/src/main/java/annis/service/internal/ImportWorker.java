@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
+import annis.administration.CorpusAdministration;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -27,14 +28,11 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.collect.Queues;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -52,7 +50,7 @@ public class ImportWorker extends Thread
 
   private final static Logger log = LoggerFactory.getLogger(ImportWorker.class);
 
-  private AdministrationDao adminDao;
+  private CorpusAdministration corpusAdmin;
 
   private BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
 
@@ -96,7 +94,9 @@ public class ImportWorker extends Thread
       @Override
       protected void append(ILoggingEvent event)
       {
-        if (currentJob != null && event.getLevel().isGreaterOrEqual(Level.INFO))
+        if (currentJob != null 
+          && event.getLevel().isGreaterOrEqual(Level.INFO)
+          && event.getLoggerName().startsWith("annis.administration."))
         {
           currentJob.getMessages().add(event.toString());
         }
@@ -179,7 +179,9 @@ public class ImportWorker extends Thread
   private void importSingleCorpus(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
-
+    corpusAdmin.sendStatusMail(currentJob.getStatusEmail(), 
+          currentJob.getCorpusName(), ImportJob.Status.RUNNING, null);
+    
     // unzip
     File outDir = new File(System.getProperty("user.home"), ".annis/zip-imports/"
       + job.getCorpusName() + "-" + job.getUuid());
@@ -187,7 +189,8 @@ public class ImportWorker extends Thread
     
     if (rootDir != null)
     {
-      if (adminDao.importCorpus(rootDir.getAbsolutePath(), job.isOverwrite()))
+      if (corpusAdmin.importCorporaSave(job.isOverwrite(), 
+        job.getStatusEmail(), rootDir.getAbsolutePath()))
       {
         currentJob.setStatus(ImportJob.Status.SUCCESS);
       }
@@ -211,18 +214,19 @@ public class ImportWorker extends Thread
     return importQueue;
   }
 
-  public AdministrationDao getAdminDao()
-  {
-    return adminDao;
-  }
-
-  public void setAdminDao(AdministrationDao adminDao)
-  {
-    this.adminDao = adminDao;
-  }
-
   public ImportJob getCurrentJob()
   {
     return currentJob;
   }
+
+  public CorpusAdministration getCorpusAdmin()
+  {
+    return corpusAdmin;
+  }
+
+  public void setCorpusAdmin(CorpusAdministration corpusAdmin)
+  {
+    this.corpusAdmin = corpusAdmin;
+  }
+  
 }

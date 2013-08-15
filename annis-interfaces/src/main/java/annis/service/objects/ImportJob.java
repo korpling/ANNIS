@@ -41,6 +41,7 @@ public class ImportJob
   private Status status;
   private List<String> messages = new LinkedList<String>();
   private boolean overwrite;
+  private String statusEmail;
 
   public String getUuid()
   {
@@ -97,6 +98,16 @@ public class ImportJob
   public void setOverwrite(boolean overwrite)
   {
     this.overwrite = overwrite;
+  }
+
+  public String getStatusEmail()
+  {
+    return statusEmail;
+  }
+
+  public void setStatusEmail(String statusEmail)
+  {
+    this.statusEmail = statusEmail;
   }
   
   

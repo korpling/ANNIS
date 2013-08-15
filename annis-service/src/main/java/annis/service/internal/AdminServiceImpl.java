@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
+import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
 import annis.security.AnnisUserConfig;
 import annis.utils.RelANNISHelper;
@@ -59,6 +60,7 @@ public class AdminServiceImpl
   private final static Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
   
   private AdministrationDao adminDao;
+  private CorpusAdministration corpusAdmin;
   private AnnisDao annisDao;
   private ImportWorker importWorker;
   
@@ -144,7 +146,8 @@ public class AdminServiceImpl
   @Path("import")
   @Consumes({"application/zip"})
   public Response importCorpus(@Context HttpServletRequest request, 
-  @QueryParam("overwrite") String overwriteRaw)
+  @QueryParam("overwrite") String overwriteRaw,
+  @QueryParam("statusMail") String statusMail)
   {
     Subject user = SecurityUtils.getSubject();
     
@@ -184,6 +187,9 @@ public class AdminServiceImpl
             job.setOverwrite(overwrite);
             
             importWorker.getImportQueue().offer(job);
+            
+            corpusAdmin.sendStatusMail(statusMail, corpusName,
+              ImportJob.Status.WAITING, null);
             
             return Response.status(Response.Status.ACCEPTED).header("Location", 
               request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
@@ -265,8 +271,15 @@ public class AdminServiceImpl
     this.importWorker = importWorker;
   }
 
-  
-  
-  
+  public CorpusAdministration getCorpusAdmin()
+  {
+    return corpusAdmin;
+  }
+
+  public void setCorpusAdmin(CorpusAdministration corpusAdmin)
+  {
+    this.corpusAdmin = corpusAdmin;
+  }
+
 
 }

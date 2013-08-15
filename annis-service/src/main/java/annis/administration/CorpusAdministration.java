@@ -89,9 +89,12 @@ public class CorpusAdministration
    * @param paths Valid pathes to corpora.
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
+   * @return True if all corpora where imported successfully.
    */
-  public void importCorporaSave(boolean overwrite, String statusEmailAdress, List<String> paths)
+  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, List<String> paths)
   {
+    boolean result = true;
+    
     // import each corpus
     for (String path : paths)
     {
@@ -105,20 +108,25 @@ public class CorpusAdministration
         }
         else
         {
+          result = false;
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, null);
         }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
+        result = false;
         log.error(ex.getMessage());
         sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
       }
       catch(Throwable ex)
       {
+        result = false;
         log.error("Error on importing corpus", ex);
         sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
       }
     }
+    
+    return result;
   }
   
   public void sendStatusMail(String adress, String corpusPath, 
@@ -225,10 +233,11 @@ public class CorpusAdministration
    * @param overwrite if false, a conflicting top level corpus is silently
    * skipped.
    * @param paths the paths to the corpora
+   * @return True if all corpora where imported successfully.
    */
-  public void importCorporaSave(boolean overwrite, String statusEmailAdress, String... paths)
+  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, String... paths)
   {
-    importCorporaSave(overwrite, statusEmailAdress, Arrays.asList(paths));
+    return importCorporaSave(overwrite, statusEmailAdress, Arrays.asList(paths));
   }
 
   public List<Map<String, Object>> listCorpusStats()
