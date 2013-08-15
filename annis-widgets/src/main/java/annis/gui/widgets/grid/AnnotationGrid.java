@@ -44,6 +44,16 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 
   private int tokenIndexOffset;
 
+  /**
+   * Returns a generic Grid-Object.
+   *
+   * @param resultID The salt Id of the result.
+   */
+  public AnnotationGrid(String resultID)
+  {
+    this(null, null, resultID);
+  }
+
   public AnnotationGrid(MediaController mediaController,
     PDFController pdfController, String resultID)
   {
