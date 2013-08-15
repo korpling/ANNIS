@@ -37,6 +37,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -82,7 +83,7 @@ public class ImportWorker extends Thread
       }
     }
   }
-  
+
   private void addAppender()
   {
     LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -107,37 +108,36 @@ public class ImportWorker extends Thread
     appender.start();
   }
 
-  private void importSingleCorpus(ImportJob job)
+  /**
+   * Extract the zipped relANNIS corpus files to an output directory.
+   * 
+   * @param outDir The ouput directory.
+   * @param zip ZIP-file to extract.
+   * @return The root directory where the tab-files are located if found, null otherwise.
+   */
+  private File unzipCorpus(File outDir, ZipFile zip)
   {
-    currentJob.setStatus(ImportJob.Status.RUNNING);
-    
-    // unzip
-    File outDir = Files.createTempDir();
-    outDir.deleteOnExit();
-
     File rootDir = null;
-    
-    List<File> createdFiles = new LinkedList<File>();
-    List<File> createdDirs = new LinkedList<File>();
-    
-    Enumeration<? extends ZipEntry> zipEnum = job.getInZip().entries();
+
+    Enumeration<? extends ZipEntry> zipEnum = zip.entries();
     while (zipEnum.hasMoreElements())
     {
       ZipEntry e = zipEnum.nextElement();
       File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
       outFile.deleteOnExit();
-      
-      if(e.isDirectory())
+
+      if (e.isDirectory())
       {
-        if(!outFile.mkdirs())
+        if (!outFile.mkdirs())
         {
-          log.warn("Could not create temporary directory " + outFile.getAbsolutePath());
+          log.warn("Could not create temporary directory " + outFile.
+            getAbsolutePath());
         }
-        createdDirs.add(0, outFile);
       } // end if directory
       else
       {
-        if("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(outFile.getName()))
+        if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
+          outFile.getName()))
         {
           rootDir = outFile.getParentFile();
         }
@@ -146,8 +146,7 @@ public class ImportWorker extends Thread
         try
         {
           outStream = new FileOutputStream(outFile);
-          ByteStreams.copy(job.getInZip().getInputStream(e), outStream);
-          createdFiles.add(0, outFile);
+          ByteStreams.copy(zip.getInputStream(e), outStream);
         }
         catch (FileNotFoundException ex)
         {
@@ -174,9 +173,21 @@ public class ImportWorker extends Thread
       } // end else is file
     } // end for each entry in zip file
 
-    if(rootDir != null)
+    return rootDir;
+  }
+
+  private void importSingleCorpus(ImportJob job)
+  {
+    currentJob.setStatus(ImportJob.Status.RUNNING);
+
+    // unzip
+    File outDir = new File(System.getProperty("user.home"), ".annis/zip-imports/"
+      + job.getCorpusName() + "-" + job.getUuid());
+    File rootDir = unzipCorpus(outDir, job.getInZip());
+    
+    if (rootDir != null)
     {
-      if(adminDao.importCorpus(rootDir.getAbsolutePath(), job.isOverwrite()))
+      if (adminDao.importCorpus(rootDir.getAbsolutePath(), job.isOverwrite()))
       {
         currentJob.setStatus(ImportJob.Status.SUCCESS);
       }
@@ -186,25 +197,8 @@ public class ImportWorker extends Thread
       }
       finishedJobs.put(currentJob.getUuid(), currentJob);
     }
-    
-    // cleanup
-    for(File f : createdFiles)
-    {
-      if(!f.delete())
-      {
-        log.warn("Could not delete temporary file " + f.getAbsolutePath());
-      }
-    }
-    for(File f : createdDirs)
-    {
-      if(!f.delete())
-      {
-        log.warn("Could not delete temporary directory " + f.getAbsolutePath());
-      }
-    }
-    
   }
-  
+
   public ImportJob getFinishedJob(String uuid)
   {
     ImportJob job = finishedJobs.getIfPresent(uuid);
@@ -231,6 +225,4 @@ public class ImportWorker extends Thread
   {
     return currentJob;
   }
-  
-  
 }
