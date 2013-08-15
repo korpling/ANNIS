@@ -454,6 +454,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     generateExampleQueries(corpusID);
     
+
     return true;
   }
 
