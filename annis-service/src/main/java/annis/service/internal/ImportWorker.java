@@ -96,7 +96,7 @@ public class ImportWorker extends Thread
       {
         if (currentJob != null 
           && event.getLevel().isGreaterOrEqual(Level.INFO)
-          && event.getLoggerName().startsWith("annis.administration."))
+          && event.getLoggerName().equals("annis.administration.AdministrationDao"))
         {
           currentJob.getMessages().add(event.toString());
         }

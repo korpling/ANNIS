@@ -185,11 +185,13 @@ public class AdminServiceImpl
             job.setInZip(zip);
             job.setStatus(ImportJob.Status.WAITING);
             job.setOverwrite(overwrite);
-            
-            importWorker.getImportQueue().offer(job);
+            job.setStatusEmail(statusMail);
             
             corpusAdmin.sendStatusMail(statusMail, corpusName,
               ImportJob.Status.WAITING, null);
+            
+            importWorker.getImportQueue().offer(job);
+            
             
             return Response.status(Response.Status.ACCEPTED).header("Location", 
               request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
