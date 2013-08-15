@@ -339,6 +339,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   {
     Options options = new OptionBuilder().addToggle("o", "overwrite", false,
       "Overwrites a corpus, when it is already stored in the database.")
+      .addParameter("m", "mail", "e-mail adress to where status updates should be send")
       .createOptions();
 
     try
@@ -358,11 +359,15 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       if (cmdLine.hasOption('o'))
       {
-        corpusAdministration.importCorporaSave(true, cmdLine.getArgList());
+        corpusAdministration.importCorporaSave(true, 
+          options.getOption("mail").getValue(), 
+          cmdLine.getArgList());
       }
       else
       {
-        corpusAdministration.importCorporaSave(false, cmdLine.getArgList());
+        corpusAdministration.importCorporaSave(false, 
+          options.getOption("mail").getValue(), 
+          cmdLine.getArgList());
       }
     }
     catch (ParseException ex)

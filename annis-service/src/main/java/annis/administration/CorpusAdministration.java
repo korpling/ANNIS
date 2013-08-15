@@ -24,7 +24,11 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.exceptions.AnnisException;
+import annis.service.objects.ImportJob;
+import java.util.LinkedList;
+import javax.mail.internet.InternetAddress;
 import org.apache.commons.io.output.FileWriterWithEncoding;
+import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +40,7 @@ public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private String statusMailSender;
 
   private static final Logger log = LoggerFactory.getLogger(
     CorpusAdministration.class);
@@ -76,13 +81,6 @@ public class CorpusAdministration
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
   }
 
-  private void importCorpus(String path, boolean overwrite) throws DefaultAdministrationDao.ConflictingCorpusException
-  {
-    log.info("Importing corpus from: " + path);
-    administrationDao.importCorpus(path, overwrite);
-    log.info("Finished import from: " + path);
-  }
-
   /**
    * Imports several corpora and catches a possible thrown
    * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
@@ -92,7 +90,7 @@ public class CorpusAdministration
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
    */
-  public void importCorporaSave(boolean overwrite, List<String> paths)
+  public void importCorporaSave(boolean overwrite, String statusEmailAdress, List<String> paths)
   {
     // import each corpus
     for (String path : paths)
@@ -103,16 +101,108 @@ public class CorpusAdministration
         if(administrationDao.importCorpus(path, overwrite))
         {
           log.info("Finished import from: " + path);
+          sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
+        }
+        else
+        {
+          sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, null);
         }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
         log.error(ex.getMessage());
+        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
       }
       catch(Throwable ex)
       {
         log.error("Error on importing corpus", ex);
+        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
       }
+    }
+  }
+  
+  public void sendStatusMail(String adress, String corpusPath, 
+    ImportJob.Status status, String additionalInfo)
+  {
+    if(adress == null || corpusPath == null)
+    {
+      return;
+    }
+    
+    // check valid properties
+    if(statusMailSender == null || statusMailSender.isEmpty())
+    {
+      log.warn("Could not send status mail because \"annis.mail-sender\" "
+        + "property was not configured in conf/annis-service-properties.");
+      return;
+    }
+    
+    try
+    {
+      SimpleEmail mail = new SimpleEmail();
+      List<InternetAddress> to = new LinkedList<InternetAddress>();
+      to.add(new InternetAddress(adress));
+
+      StringBuilder sbMsg = new StringBuilder();
+      sbMsg.append("Dear Sir or Madam,\n");
+      sbMsg.append("\n");
+      sbMsg.append("this is the requested status update to the ANNIS corpus import "
+        + "you have started. Please note that this message is automated and "
+        + "if you have any question regarding the import you have to ask the "
+        + "adminstrator of the ANNIS instance directly.\n\n");
+      
+      mail.setTo(to);
+      if(status == ImportJob.Status.SUCCESS)
+      {
+        mail.setSubject("ANNIS import finished successfully (" + corpusPath + ")");
+        sbMsg.append("Status:\nThe corpus \"").append(corpusPath)
+          .append("\" was successfully imported and can be used from now on.\n");
+      }
+      else if(status == ImportJob.Status.ERROR)
+      {
+        mail.setSubject("ANNIS import *failed* (" + corpusPath + ")");
+        sbMsg.append("Status:\nUnfortunally the corpus \"").append(corpusPath).append(
+          "\" could not be imported successfully. "
+          + "You may ask the adminstrator of the ANNIS installation for "
+          + "assistance why the corpus import failed.\n");
+      }
+      else if(status == ImportJob.Status.RUNNING)
+      {
+        mail.setSubject("ANNIS import started (" + corpusPath + ")");
+        sbMsg.append("Status:\nThe import of the corpus \"").append(corpusPath)
+          .append("\" was started.\n");
+      }
+      else if(status == ImportJob.Status.WAITING)
+      {
+        mail.setSubject("ANNIS import was scheduled (" + corpusPath + ")");
+        sbMsg.append("Status:\nThe import of the corpus \"").append(corpusPath)
+          .append("\" was scheduled and is currently waiting for other imports to "
+          + "finish. As soon as the previous imports are finished this import "
+          + "job will be executed.\n");
+      }
+      else
+      {
+        // we don't know how to handle this, just don't send a message
+        return;
+      }
+      if(additionalInfo != null && !additionalInfo.isEmpty())
+      {
+        sbMsg.append("Addtional information:\n");
+        sbMsg.append(additionalInfo).append("\n");
+      }
+      
+      sbMsg.append("\n\nSincerely yours,\n\nthe ANNIS import service.");
+      mail.setMsg(sbMsg.toString());
+      mail.setHostName("localhost");
+      mail.setFrom(statusMailSender);
+      
+      mail.send();
+      log.info("Send status ({}) mail to {}.", new String[] {status.name(), adress});
+      
+    }
+    catch(Throwable ex)
+    {
+      log.warn("Could not send mail: " + ex.getMessage());
     }
   }
 
@@ -136,9 +226,9 @@ public class CorpusAdministration
    * skipped.
    * @param paths the paths to the corpora
    */
-  public void importCorporaSave(boolean overwrite, String... paths)
+  public void importCorporaSave(boolean overwrite, String statusEmailAdress, String... paths)
   {
-    importCorporaSave(overwrite, Arrays.asList(paths));
+    importCorporaSave(overwrite, statusEmailAdress, Arrays.asList(paths));
   }
 
   public List<Map<String, Object>> listCorpusStats()
@@ -206,4 +296,17 @@ public class CorpusAdministration
   {
     this.administrationDao = administrationDao;
   }
+
+  public String getStatusMailSender()
+  {
+    return statusMailSender;
+  }
+
+  public void setStatusMailSender(String statusMailSender)
+  {
+    this.statusMailSender = statusMailSender;
+  }
+  
+  
+  
 }

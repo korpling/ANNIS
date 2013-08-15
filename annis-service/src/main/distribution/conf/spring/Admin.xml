@@ -21,6 +21,7 @@
   <!-- Public API for corpus administration -->
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
+    <property name="statusMailSender" value="${annis.mail-sender}"/>
   </bean>
 
   <!-- AnnisAdminRunner -->
