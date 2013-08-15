@@ -136,7 +136,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
        * Add the last row. For placing it to the bottom of the table, we need to
        * get the string representation of the last index.
        */
-      table.put(String.valueOf(table.size()), baseRows);
+      table.put("tok", baseRows);
 
       grid.setRowsByAnnotation(table);
 
