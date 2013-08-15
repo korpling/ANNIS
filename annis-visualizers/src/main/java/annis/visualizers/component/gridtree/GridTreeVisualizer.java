@@ -40,6 +40,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.util.TreeMap;
 import static annis.CommonHelper.*;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 
 /**
  *
@@ -219,6 +220,12 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         int rightIdx = Math.min(((int) f.getRightToken()) - startIdx, endIdx);
 
         GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno);
+
+        // add match id
+        SFeature featMatched = currNode.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+        Long match = featMatched == null ? null : featMatched.
+                getSValueSNUMERIC();
+        e.setMatch(match);
 
         // always only one row for a gridtree
         table.get(rIdx).get(0).addEvent(e);
