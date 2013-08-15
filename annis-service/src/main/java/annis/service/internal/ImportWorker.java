@@ -190,7 +190,7 @@ public class ImportWorker extends Thread
     if (rootDir != null)
     {
       if (corpusAdmin.importCorporaSave(job.isOverwrite(), 
-        job.getStatusEmail(), rootDir.getAbsolutePath()))
+        job.getStatusEmail(), true, rootDir.getAbsolutePath()))
       {
         currentJob.setStatus(ImportJob.Status.SUCCESS);
       }

@@ -320,7 +320,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           else
           {
             log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorporaSave(true, migratePath);
+            corpusAdministration.importCorporaSave(true, null, false, migratePath);
           }
         }
 
@@ -361,12 +361,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       {
         corpusAdministration.importCorporaSave(true, 
           options.getOption("mail").getValue(), 
+          false,
           cmdLine.getArgList());
       }
       else
       {
         corpusAdministration.importCorporaSave(false, 
           options.getOption("mail").getValue(), 
+          false,
           cmdLine.getArgList());
       }
     }

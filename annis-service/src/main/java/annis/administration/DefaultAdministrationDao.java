@@ -310,12 +310,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
   
   @Transactional(propagation = Propagation.MANDATORY)
-  private boolean lockCorpusTable()
+  private boolean lockCorpusTable(boolean waitForOtherTasks)
   {
     try
     {
       log.info("Locking corpus table to ensure no other import is running");
-      jdbcTemplate.execute("LOCK TABLE corpus NOWAIT");
+      jdbcTemplate.execute("LOCK TABLE corpus" + (waitForOtherTasks ? "" : " NOWAIT"));
       return true;
     }
     catch(DataAccessException ex)
@@ -379,13 +379,13 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public boolean importCorpus(String path, boolean override)
+  public boolean importCorpus(String path, boolean override, boolean waitForOtherTasks)
   {
 
     // check schema version first
     checkDatabaseSchemaVersion();
     
-    if(!lockCorpusTable())
+    if(!lockCorpusTable(waitForOtherTasks))
     {
       log.error("Another import is currently running");
       return false;
@@ -1025,8 +1025,14 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Transactional(readOnly = false)
   @Override
-  public void deleteCorpora(List<Long> ids)
+  public void deleteCorpora(List<Long> ids, boolean waitForOtherTasks)
   {
+    if(!lockCorpusTable(waitForOtherTasks))
+    {
+      log.error("Another import is currently running");
+      return;
+    }
+    
     File dataDir = getRealDataDir();
 
     for (long l : ids)
@@ -1921,7 +1927,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.info("delete conflicting corpus: {}", corpusName);
       List<String> corpusNames = new LinkedList<String>();
       corpusNames.add(corpusName);
-      deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames));
+      deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames), false);
     }
   }
 

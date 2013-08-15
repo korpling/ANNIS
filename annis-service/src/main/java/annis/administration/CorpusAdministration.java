@@ -64,7 +64,7 @@ public class CorpusAdministration
       }
     }
     log.info("Deleting corpora: " + ids);
-    administrationDao.deleteCorpora(ids);
+    administrationDao.deleteCorpora(ids, true);
     log.info("Finished deleting corpora: " + ids);
   }
 
@@ -89,9 +89,12 @@ public class CorpusAdministration
    * @param paths Valid pathes to corpora.
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
+   * @param waitForOtherTasks If true wait for other imports to finish, 
+   * if false abort the import.
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, List<String> paths)
+  public boolean importCorporaSave(boolean overwrite, 
+    String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
     boolean result = true;
     
@@ -101,7 +104,7 @@ public class CorpusAdministration
       try
       {
         log.info("Importing corpus from: " + path);
-        if(administrationDao.importCorpus(path, overwrite))
+        if(administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
         {
           log.info("Finished import from: " + path);
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
@@ -232,12 +235,19 @@ public class CorpusAdministration
    *
    * @param overwrite if false, a conflicting top level corpus is silently
    * skipped.
+   * @param statusEmailAdress If not null the email adress of the user who 
+   * started the import.
+   * @param waitForOtherTasks If true wait for other imports to finish, 
+   * if false abort the import.
    * @param paths the paths to the corpora
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, String... paths)
+  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, 
+    boolean waitForOtherTasks, String... paths)
   {
-    return importCorporaSave(overwrite, statusEmailAdress, Arrays.asList(paths));
+    return importCorporaSave(overwrite, statusEmailAdress,
+      waitForOtherTasks,
+      Arrays.asList(paths));
   }
 
   public List<Map<String, Object>> listCorpusStats()

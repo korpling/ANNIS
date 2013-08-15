@@ -20,7 +20,6 @@ import annis.security.AnnisUserConfig;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import org.osgi.framework.AdminPermission;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -33,7 +32,7 @@ public interface AdministrationDao
 
   public List<Long> listToplevelCorpora();
 
-  public void deleteCorpora(List<Long> ids);
+  public void deleteCorpora(List<Long> ids, boolean waitForOtherTasks);
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
@@ -44,10 +43,11 @@ public interface AdministrationDao
    *
    * @param path Specifies the path to the corpora, which should be imported.
    * @param overwrite If set to true conflicting top level corpora are deleted.
+   * @param waitForOtherTasks If true wait for other tasks to finish, if false abort.
    * 
    * @return true if successful
    */
-  public boolean importCorpus(String path, boolean overwrite);
+  public boolean importCorpus(String path, boolean overwrite, boolean waitForOtherTasks);
   
   public List<Map<String, Object>> listCorpusStats();
 
