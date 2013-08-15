@@ -315,7 +315,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       log.info("Locking corpus table to ensure no other import is running");
-      jdbcTemplate.execute("LOCK TABLE corpus" + (waitForOtherTasks ? "" : " NOWAIT"));
+      jdbcTemplate.execute("LOCK TABLE corpus IN EXCLUSIVE MODE" + (waitForOtherTasks ? "" : " NOWAIT"));
       return true;
     }
     catch(DataAccessException ex)
@@ -723,19 +723,6 @@ public class DefaultAdministrationDao implements AdministrationDao
    * @param file Specifies the file to be imported.
    * @param corpusRef Assigns the file this corpus.
    */
-  private void importSingleFile(File file, long corpusRef)
-  {
-    BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
-      corpusRef, mimeTypeMapping);
-    jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
-  }
-
-  /**
-   * Imports a single binary file.
-   *
-   * @param file Specifies the file to be imported.
-   * @param corpusRef Assigns the file this corpus.
-   */
   private void importSingleFile(String file, long corpusRef)
   {
 
@@ -1023,11 +1010,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       newInstance(Long.class));
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   @Override
-  public void deleteCorpora(List<Long> ids, boolean waitForOtherTasks)
+  public void deleteCorpora(List<Long> ids, boolean acquireLock)
   {
-    if(!lockCorpusTable(waitForOtherTasks))
+    if(acquireLock && !lockCorpusTable(false))
     {
       log.error("Another import is currently running");
       return;
@@ -1245,6 +1232,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
+  @Transactional(propagation = Propagation.MANDATORY)
   public PreparedStatement executeSqlFromScript(String script)
   {
     return executeSqlFromScript(script, null);
@@ -1293,6 +1281,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
+  @Transactional(propagation = Propagation.MANDATORY)
   public PreparedStatement executeSqlFromScript(String script,
     MapSqlParameterSource args)
   {
@@ -1883,6 +1872,7 @@ public class DefaultAdministrationDao implements AdministrationDao
    * @param topLevelCorpusName The name of the corpus, which is checked.
    * @return Is false, if the no top level coprpus exists.
    */
+  @Transactional(propagation = Propagation.MANDATORY)
   private boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
   {
     String sql = "SELECT count(name) as amount FROM corpus WHERE name='"

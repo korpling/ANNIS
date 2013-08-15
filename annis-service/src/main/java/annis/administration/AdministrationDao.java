@@ -32,7 +32,7 @@ public interface AdministrationDao
 
   public List<Long> listToplevelCorpora();
 
-  public void deleteCorpora(List<Long> ids, boolean waitForOtherTasks);
+  public void deleteCorpora(List<Long> ids, boolean acquireLock);
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
