@@ -280,7 +280,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         e.setMatch(match);
 
         // set tooltip
-        e.setTooltip(anno.getQName() + "=\"" + e.getValue()+"\"");
+        e.setTooltip(anno.getQName() + "=\"" + e.getValue() + "\"");
 
         // always only one row for a gridtree
         table.get(rIdx).get(0).addEvent(e);
@@ -313,7 +313,8 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       EList<SAnnotation> annos = n.getSAnnotations();
       if (annos != null) {
         for (SAnnotation a : annos) {
-          if (annotationKey.equals(a.getSName())) {
+          String qAnnoKey = (namespace + a.getNSSeperator() + annotationKey);
+          if (qAnnoKey.equals(a.getQName())) {
             return a;
           }
         }
