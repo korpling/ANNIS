@@ -27,21 +27,41 @@ import java.util.List;
  */
 public class GridEvent implements Serializable
 {
+
   private String id;
+
   private int left;
+
   private int right;
+
   private String value;
+
   private Long match;
+
   private List<String> coveredIDs;
+
   private Double startTime;
+
   private Double endTime;
+
   private boolean gap;
+
   private String textID;
+
   private String pageNumber;
 
-  public GridEvent(String id, int left, int right, String value)
+  /**
+   * Inits a new GridEvent.
+   *
+   * @param sID This is the salt id of the node, sppan or tok. Used for
+   * identifying highlighted nodes with {@link #getCoveredIDs()}
+   * @param left the most left token index
+   * @param right the most right token index
+   * @param value the value displayed in the table row
+   */
+  public GridEvent(String sID, int left, int right, String value)
   {
-    this.id = id;
+    this.id = sID;
     this.left = left;
     this.right = right;
     this.value = value;
@@ -136,6 +156,7 @@ public class GridEvent implements Serializable
 
   /**
    * Salt ID of the text this event belongs to.
+   *
    * @return
    */
   public String getTextID()
@@ -151,7 +172,7 @@ public class GridEvent implements Serializable
   @Override
   public String toString()
   {
-    return "" + id +  " -> " + value + " (" + left + "-" + right +")";
+    return "" + id + " -> " + value + " (" + left + "-" + right + ")";
   }
 
   public String getPageNumber()

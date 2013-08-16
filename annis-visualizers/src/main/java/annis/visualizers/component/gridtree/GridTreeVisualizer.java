@@ -15,7 +15,6 @@
  */
 package annis.visualizers.component.gridtree;
 
-import annis.CommonHelper;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
@@ -41,6 +40,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import java.util.TreeMap;
 import static annis.CommonHelper.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import java.util.Map.Entry;
 
 /**
  *
@@ -138,6 +138,9 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
        */
       table.put("tok", baseRows);
 
+      addCoveredIDs("tok", table);
+
+      // finally put the table into the rendering class
       grid.setRowsByAnnotation(table);
 
       grid.setTokenIndexOffset(startIdx);
@@ -149,6 +152,48 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       grid.addStyleName("partitur_table");
       grid.addStyleName("corpus-font-force");
 
+    }
+
+    /**
+     * Sets the covered ids for gridtree spans.
+     *
+     * @param baseRowIdx the index of the row from which the salt ids are
+     * extracted. Most of the time the index would be "tok".
+     * @param table abstract representation of the table which is rendered by
+     * {@link AnnotationGrid}
+     */
+    private void addCoveredIDs(String baseRowIdx,
+            Map<String, ArrayList<Row>> table) {
+
+      if (!table.containsKey(baseRowIdx)) {
+        throw new IllegalArgumentException("table index does not exist");
+      }
+
+      // get the base row. There should be only one
+      Row baseRow = table.get(baseRowIdx).get(0);
+
+      // iterate over all rows, except the row with the base index
+      for (Entry<String, ArrayList<Row>> e : table.entrySet()) {
+
+        // skip the base row
+        if (e.getKey().equals(baseRowIdx)) {
+          continue;
+        }
+
+        // find all base events which have a token index range with the span event
+        Row row = table.get(e.getKey()).get(0);
+        for (GridEvent event : row.getEvents()) {
+          int leftIdx = event.getLeft();
+          int rightIdx = event.getRight();
+
+          for (GridEvent baseEvent : baseRow.getEvents()) {
+            if (leftIdx <= baseEvent.getLeft()
+                    && baseEvent.getRight() <= rightIdx) {
+              event.getCoveredIDs().add(baseEvent.getId());
+            }
+          }
+        }
+      }
     }
 
     private String getNodeKey() {
