@@ -111,8 +111,6 @@ public class SearchUI extends AnnisBaseUI
 
   private ControlPanel controlPanel;
 
-  private TutorialPanel tutorial;
-
   private TabSheet mainTab;
 
   private Window windowLogin;
@@ -287,22 +285,18 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
-    ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
-      "example queries", this);
+    final HelpPanel help = new HelpPanel(this);
 
     controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
+      help.getExamples());
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     hSplit.setFirstComponent(controlPanel);
 
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(autoGenQueries, "example queries");
-    mainTab.addTab(tutorial, "Tutorial");
+    mainTab.addTab(help, "Help");
 
     queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder");
@@ -346,7 +340,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void handleAction(Object sender, Object target)
       {
-        mainTab.setSelectedTab(tutorial);
+        mainTab.setSelectedTab(help);
       }
     });
 
