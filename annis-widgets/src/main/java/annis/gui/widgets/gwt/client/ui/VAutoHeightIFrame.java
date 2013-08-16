@@ -109,7 +109,7 @@ public class VAutoHeightIFrame extends Widget
       logger.fine("body scrollHeight: " + bodyHeight
         + "document scrollHeight: " + documentHeight);
 
-      int maxHeight = isIE() ? Math.max(bodyHeight, documentHeight) : bodyHeight;
+      int maxHeight = Math.max(bodyHeight, documentHeight);
 
       if (maxHeight > 20)
       {
@@ -162,12 +162,5 @@ public class VAutoHeightIFrame extends Widget
 
   public final native String getContentType(Document doc) /*-{
    return doc.contentType;
-   }-*/;
-
-  /**
-   * Returns true, if the user agent is belongs to the IE family.
-   */
-  public final native String isIE() /*-{
-   return navigator.userAgent.toLowerCase();
    }-*/;
 }
