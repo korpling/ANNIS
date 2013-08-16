@@ -40,6 +40,9 @@ public class GridEvent implements Serializable
 
   private List<String> coveredIDs;
 
+  // used for a tooltip in the frontend
+  private String tooltip;
+
   private Double startTime;
 
   private Double endTime;
@@ -183,5 +186,25 @@ public class GridEvent implements Serializable
   public void setPage(String pageNumber)
   {
     this.pageNumber = pageNumber;
+  }
+
+  /**
+   * Returns the tooltip, which should be displayed when hovering this event.
+   *
+   * @return The tooltip value could be null.
+   */
+  public String getTooltip()
+  {
+    return tooltip;
+  }
+
+  /**
+   * Sets the tooltip which is display when hovering this event.
+   *
+   * @param tooltip the title to set, could be null.
+   */
+  public void setTooltip(String tooltip)
+  {
+    this.tooltip = tooltip;
   }
 }

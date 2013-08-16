@@ -114,7 +114,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
       // init the traversal
       SGraphTraverseHandler traverse = new Traverse(startIdx, endIdx,
-              getNodeKey(), table);
+              getNodeKey(), input.getNamespace(), table);
 
       // TODO build the grid tree above the token/annotation level
       graph.traverse(roots, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
@@ -221,7 +221,11 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
     Map<String, ArrayList<Row>> table;
 
+    // tracks all nodes which was visited.
     Set<SNode> visited = new HashSet<SNode>();
+
+    // the namespace which has triggered the visualiztion
+    private final String namespace;
 
     /**
      * Init a traverse handler for building a tree of topological fields.
@@ -230,13 +234,15 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
      * @param endIdx the most right index
      * @param nodeKey the annotation key. Only nodes which contain this key will
      * be taken into account
+     * @param namespace the namespace which triggered this visualization
      * @param table the abstract representation of the table
      */
-    private Traverse(int startIdx, int endIdx, String nodeKey,
+    private Traverse(int startIdx, int endIdx, String nodeKey, String namespace,
             Map<String, ArrayList<Row>> table) {
       this.startIdx = startIdx;
       this.endIdx = endIdx;
       this.annotationKey = nodeKey;
+      this.namespace = namespace;
       this.table = table;
     }
 
@@ -245,9 +251,9 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             SNode currNode, SRelation edge, SNode fromNode, long l) {
 
       // retrieve the annotation by the node key
-      String anno = getAnno(currNode);
+      SAnnotation anno = getAnno(currNode);
 
-      if (!anno.equals("")) {
+      if (anno != null) {
 
         String rIdx = String.valueOf(depth);
 
@@ -264,13 +270,17 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         int leftIdx = Math.max(((int) f.getLeftToken()), startIdx);
         int rightIdx = Math.min(((int) f.getRightToken()), endIdx);
 
-        GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno);
+        GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno.
+                getSValueSTEXT());
 
         // add match id
         SFeature featMatched = currNode.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
         Long match = featMatched == null ? null : featMatched.
                 getSValueSNUMERIC();
         e.setMatch(match);
+
+        // set tooltip
+        e.setTooltip(anno.getQName() + "=\"" + e.getValue()+"\"");
 
         // always only one row for a gridtree
         table.get(rIdx).get(0).addEvent(e);
@@ -299,17 +309,17 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       return true;
     }
 
-    private String getAnno(SNode n) {
+    private SAnnotation getAnno(SNode n) {
       EList<SAnnotation> annos = n.getSAnnotations();
       if (annos != null) {
         for (SAnnotation a : annos) {
           if (annotationKey.equals(a.getSName())) {
-            return a.getSValueSTEXT();
+            return a;
           }
         }
       }
 
-      return "";
+      return null;
     }
   }
 }

@@ -130,6 +130,11 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
             target.addAttribute("right", event.getRight() - tokenIndexOffset);
             target.addAttribute("value", event.getValue());
 
+            if(event.getTooltip() != null)
+            {
+              target.addAttribute("tooltip", event.getTooltip());
+            }
+
             if (event.getStartTime() != null)
             {
               target.addAttribute("startTime", event.getStartTime());
