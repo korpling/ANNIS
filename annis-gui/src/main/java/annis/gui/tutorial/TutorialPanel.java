@@ -18,7 +18,6 @@ package annis.gui.tutorial;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.BrowserFrame;
-import com.vaadin.ui.Embedded;
 import com.vaadin.ui.VerticalLayout;
 
 /**

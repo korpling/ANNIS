@@ -39,6 +39,7 @@ import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
@@ -77,6 +78,7 @@ import org.vaadin.cssinject.CSSInject;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Push
+@Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
@@ -108,8 +110,6 @@ public class SearchUI extends AnnisBaseUI
   private Throwable lastBugReportCause;
 
   private ControlPanel controlPanel;
-
-  private TutorialPanel tutorial;
 
   private TabSheet mainTab;
 
@@ -285,22 +285,18 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
-    ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
-      "example queries", this);
+    final HelpPanel help = new HelpPanel(this);
 
     controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
+      help.getExamples());
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     hSplit.setFirstComponent(controlPanel);
 
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(autoGenQueries, "example queries");
-    mainTab.addTab(tutorial, "Tutorial");
+    mainTab.addTab(help, "Help");
 
     queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder");
@@ -344,7 +340,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void handleAction(Object sender, Object target)
       {
-        mainTab.setSelectedTab(tutorial);
+        mainTab.setSelectedTab(help);
       }
     });
 
