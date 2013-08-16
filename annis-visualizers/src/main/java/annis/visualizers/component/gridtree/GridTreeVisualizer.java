@@ -128,7 +128,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(
                 ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        int idx = (int) f.getTokenIndex() - startIdx;
+        int idx = (int) f.getTokenIndex();
         baseRow.addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
       }
 
@@ -261,8 +261,8 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
                 getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
         // cut off the most left and right indexes
-        int leftIdx = Math.max(((int) f.getLeftToken()) - startIdx, startIdx);
-        int rightIdx = Math.min(((int) f.getRightToken()) - startIdx, endIdx);
+        int leftIdx = Math.max(((int) f.getLeftToken()), startIdx);
+        int rightIdx = Math.min(((int) f.getRightToken()), endIdx);
 
         GridEvent e = new GridEvent(currNode.getId(), leftIdx, rightIdx, anno);
 
