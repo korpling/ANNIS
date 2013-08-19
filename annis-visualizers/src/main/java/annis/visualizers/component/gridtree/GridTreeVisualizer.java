@@ -39,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.util.TreeMap;
 import static annis.CommonHelper.*;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import java.util.Map.Entry;
 
@@ -64,6 +65,8 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
     private VisualizerInput input;
 
+    private SDocumentGraph graph;
+
     public GridTreePanel(VisualizerInput visInput, VisualizationToggle visToggle) {
 
       // nothing to render if no input is there
@@ -75,10 +78,10 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       this.input = visInput;
 
       // save the graph for convenience access
-      SDocumentGraph graph = input.getSResult().getSDocumentGraph();
+      graph = input.getSResult().getSDocumentGraph();
 
       // init an empty grid
-      AnnotationGrid grid = new AnnotationGrid(input.getId());
+      AnnotationGrid grid = new AnnotationGrid(input.getId(), getTokKey());
 
       // get all roots for having a start point for the traversal
       EList<SNode> roots = graph.getSRoots();
@@ -121,24 +124,15 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
               "gridtree", traverse);
 
       // add the last row, TODO extend to arbitrary nodes not only token level
-      ArrayList<Row> baseRows = new ArrayList<Row>();
-      Row baseRow = new Row();
-      baseRows.add(baseRow);
-      for (SToken t : sortedToken) {
-        RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(
-                ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-
-        int idx = (int) f.getTokenIndex();
-        baseRow.addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
-      }
+      ArrayList<Row> baseRows = createBaseRows();
 
       /**
        * Add the last row. For placing it to the bottom of the table, we need to
        * get the string representation of the last index.
        */
-      table.put("tok", baseRows);
+      table.put(getTokKey(), baseRows);
 
-      addCoveredIDs("tok", table);
+      addCoveredIDs(getTokKey() , table);
 
       // finally put the table into the rendering class
       grid.setRowsByAnnotation(table);
@@ -196,8 +190,76 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       }
     }
 
+    private String getTokKey() {
+      return input.getMappings().getProperty("tok_key", "tok");
+    }
+
     private String getNodeKey() {
       return input.getMappings().getProperty("node_key", "cat");
+    }
+
+    private boolean hasAnno(SNode n) {
+      EList<SAnnotation> annos = n.getSAnnotations();
+      if (annos != null) {
+        for (SAnnotation a : annos) {
+          if (getTokKey().equals(a.getName())) {
+            return true;
+          }
+        }
+      }
+
+      return false;
+    }
+
+    private ArrayList<Row> createBaseRows() {
+      ArrayList<Row> baseRows = new ArrayList<Row>();
+      Row baseRow = new Row();
+      baseRows.add(baseRow);
+
+      if (getTokKey().equals("tok")) {
+
+        for (SToken t : graph.getSortedSTokenByText()) {
+          RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(
+                  ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+          int idx = (int) f.getTokenIndex();
+          baseRow.
+                  addEvent(new GridEvent(t.getId(), idx, idx, getSpannedText(t)));
+        }
+      } else {
+
+        EList<SSpan> sSpans = graph.getSSpans();
+        if (sSpans != null) {
+          for (SNode n : sSpans) {
+            if (hasAnno(n)) {
+              RelannisNodeFeature f = (RelannisNodeFeature) n.getSFeature(
+                      ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+              int leftIdx = (int) f.getLeftToken();
+              int rightIdx = (int) f.getRightToken();
+              baseRow.
+                      addEvent(new GridEvent(n.getId(), leftIdx, rightIdx,
+                      getAnnoText(n)));
+            }
+          }
+        }
+      }
+
+      return baseRows;
+    }
+
+    private String getAnnoText(SNode n) {
+
+      EList<SAnnotation> annos = n.getSAnnotations();
+      if (annos != null) {
+        for (SAnnotation a : annos) {
+          if (getTokKey().equals(a.getName())) {
+            return a.getSValueSTEXT();
+          }
+        }
+      }
+
+      return "";
     }
   }
 
@@ -313,8 +375,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
       EList<SAnnotation> annos = n.getSAnnotations();
       if (annos != null) {
         for (SAnnotation a : annos) {
-          String qAnnoKey = (namespace + a.getNSSeperator() + annotationKey);
-          if (qAnnoKey.equals(a.getQName())) {
+          if (annotationKey.equals(a.getName())) {
             return a;
           }
         }
