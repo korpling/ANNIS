@@ -75,7 +75,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
   {
-    super(4,3);
+    super(4,5);
     this.controller = controller;
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
@@ -83,15 +83,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setSpacing(true);
     setMargin(true);
 
-    Label lblAqlLabel = new Label("AnnisQL:");
     Label lblStatusLabel = new Label("Status:");
-    lblAqlLabel.setSizeUndefined();
     lblStatusLabel.setSizeUndefined();
     
-    addComponent(lblAqlLabel, 0, 0);
-    addComponent(lblStatusLabel, 0, 2);
-
-    
+   
     setRowExpandRatio(0, 1.0f);
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 0.1f);
@@ -99,6 +94,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new TextArea();
+    txtQuery.setInputPrompt("Query in ANNIS Query Language");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
@@ -107,7 +103,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    addComponent(txtQuery, 1, 0, 3, 0);
+   
 
     final VirtualKeyboard virtualKeyboard;
     if(instanceConfig.getKeyboardLayout() == null)
@@ -128,15 +124,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     lblStatus.setHeight(3.5f, Unit.EM);
     lblStatus.addStyleName("border-layout");
 
-    addComponent(lblStatus, 1, 2, 3, 2);
-
     piCount = new ProgressBar();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
     
 
-    btShowResult = new Button("Show Result");
+    btShowResult = new Button("Search");
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
@@ -192,24 +186,60 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
 
+    Button btShowKeyboard = null;
     if(virtualKeyboard != null)
     {
-      Button btShowKeyboard = new Button();
+      btShowKeyboard = new Button();
+      btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
-      
-      addComponent(btShowResult, 1, 1);
-      addComponent(btHistory, 2, 1);
-      addComponent(btShowKeyboard, 3, 1);
     }
-    else
+    
+    Button btShowQueryBuilder = new Button("Query<br />Builder");
+    btShowQueryBuilder.setHtmlContentAllowed(true);
+    PopupButton btMoreActions = new PopupButton("More");
+    
+    /*
+     * We use the grid layout for a better rendering efficiency, but this comes
+     * with the cost of some complexitiy when defining the positions of the
+     * elements in the layout.
+     * 
+     * This grid hopefully helps a little bit in understanding the "magic"
+     * numbers better.
+     * 
+     * AQL: label with "AnnisQL"
+     * Q: Query text field
+     * QB: Button to toggle query builder // TODO
+     * KEY: Button to show virtual keyboard
+     * SEA: "Search" button
+     * MOR: "More actions" button 
+     * HIST: "History" button
+     * LST: "Status" label
+     * STAT: Text field with the real status
+     * 
+     *   \  0  |  1  |  2  |  3  
+     * --+-----+---+---+---+-----
+     * 0 | QB  |  Q  |  Q  |  Q  
+     * --+-----+-----+-----+-----
+     * 1 | KEY |  Q  |  Q  |  Q  
+     * --+-----+-----+-----+-----
+     * 2 |     | SEA | MOR | HIST
+     * --+-----+-----+-----+-----
+     * 3 | LST | STAT| STAT| STAT
+     */
+    addComponent(lblStatusLabel, 0, 3);
+    addComponent(txtQuery, 1, 0, 3, 1);
+    addComponent(lblStatus, 1, 3, 3, 3);
+    addComponent(btShowResult, 1, 2);
+    addComponent(btMoreActions, 2, 2);
+    addComponent(btHistory, 3, 2);
+    addComponent(btShowQueryBuilder, 0, 0);
+    if(btShowKeyboard != null)
     {
-      addComponent(btShowResult, 1, 1, 2, 1);
-      addComponent(btHistory, 3, 1);
+      addComponent(btShowKeyboard, 0, 1);
     }
- 
 
   }
 
