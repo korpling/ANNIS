@@ -30,7 +30,6 @@ import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.tutorial.TutorialPanel;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
@@ -55,6 +54,7 @@ import com.vaadin.server.WebBrowser;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
@@ -296,8 +296,10 @@ public class SearchUI extends AnnisBaseUI
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(help, "Help");
-
+    
+    Tab helpTab = mainTab.addTab(help, "Help");
+    helpTab.setClosable(false);
+    
     queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder");
 
