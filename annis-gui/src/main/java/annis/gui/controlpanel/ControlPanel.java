@@ -16,8 +16,7 @@
 package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
-import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.themes.ChameleonTheme;
 import org.slf4j.Logger;
@@ -41,7 +40,7 @@ public class ControlPanel extends VerticalLayout
 
   private SearchOptionsPanel searchOptions;
 
-  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+  public ControlPanel(SearchUI ui,
     ExampleQueriesPanel autoGenQueries)
   {
     setSizeFull();
@@ -53,17 +52,17 @@ public class ControlPanel extends VerticalLayout
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
+    corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
 
     searchOptions = new SearchOptionsPanel();
 
-    queryPanel = new QueryPanel(controller, instanceConfig);
+    queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
 
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList, controller), "Export", null);
+    accordion.addTab(new ExportPanel(queryPanel, corpusList, ui.getQueryController()), "Export", null);
 
     addComponent(queryPanel);
     addComponent(accordion);

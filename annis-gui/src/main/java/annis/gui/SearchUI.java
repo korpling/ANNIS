@@ -117,8 +117,6 @@ public class SearchUI extends AnnisBaseUI
 
   private Window windowLogin;
 
-  private QueryBuilderChooser queryBuilder;
-
   private String bugEMailAddress;
 
   private QueryController queryController;
@@ -290,7 +288,7 @@ public class SearchUI extends AnnisBaseUI
 
     final HelpPanel help = new HelpPanel(this);
 
-    controlPanel = new ControlPanel(queryController, instanceConfig,
+    controlPanel = new ControlPanel(this,
       help.getExamples());
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
@@ -302,10 +300,7 @@ public class SearchUI extends AnnisBaseUI
     
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setClosable(false);
-    
-    queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
-    mainTab.addTab(queryBuilder, "Query Builder");
-
+   
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
     hSplit.addSplitterClickListener(
@@ -331,14 +326,6 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
-    addAction(new ShortcutListener("^Query builder")
-    {
-      @Override
-      public void handleAction(Object sender, Object target)
-      {
-        mainTab.setSelectedTab(queryBuilder);
-      }
-    });
 
     addAction(new ShortcutListener("Tutor^eial")
     {

@@ -16,11 +16,8 @@
 package annis.gui;
 
 import annis.gui.tutorial.TutorialPanel;
-import com.vaadin.server.PaintException;
-import com.vaadin.server.PaintTarget;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Accordion;
-import com.vaadin.ui.JavaScript;
 
 /**
  *

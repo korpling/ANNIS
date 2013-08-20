@@ -18,11 +18,12 @@ package annis.gui.controlpanel;
 import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
-import annis.libgui.InstanceConfig;
+import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -32,12 +33,14 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
@@ -74,10 +77,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
 
-  public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
+  public QueryPanel(SearchUI ui)
   {
     super(4,5);
-    this.controller = controller;
+    
+    this.controller = ui.getQueryController();
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
 
@@ -107,14 +111,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
    
 
     final VirtualKeyboard virtualKeyboard;
-    if(instanceConfig.getKeyboardLayout() == null)
+    if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
       virtualKeyboard = null;
     }
     else
     {
       virtualKeyboard = new VirtualKeyboard();
-      virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
+      virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
       virtualKeyboard.extend(txtQuery);
     }
 
@@ -204,6 +208,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
     btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/applications-development.png"));
+    btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     PopupButton btMoreActions = new PopupButton("More");
     
@@ -438,6 +443,51 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       virtualKeyboard.show();
     }
+  }
+  
+  private static class ShowQueryBuilderClickListener implements ClickListener
+  {
+    
+    private QueryBuilderChooser queryBuilder;
+    private SearchUI ui;
+    
+    public ShowQueryBuilderClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(queryBuilder == null)
+      {
+         queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
+      }
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(queryBuilder);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(queryBuilder, "Query Builder", 
+          new ThemeResource("tango-icons/16x16/applications-development.png"));
+        
+        ui.addAction(new ShortcutListener("^Query builder")
+        {
+          @Override
+          public void handleAction(Object sender, Object target)
+          {
+            if(queryBuilder != null && tabSheet.getTab(queryBuilder) != null)
+            {
+              tabSheet.setSelectedTab(queryBuilder);
+            }
+          }
+        });
+      }
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(queryBuilder);
+    }
+    
   }
 
   public QueryController getQueryController()
