@@ -271,6 +271,7 @@ public class QueryController implements PagingCallback
       getCorpusList().
       getSelectedCorpora());
 
+    ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
   }
 
   public Set<String> getSelectedCorpora()

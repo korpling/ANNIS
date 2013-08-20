@@ -49,6 +49,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -493,8 +494,25 @@ public class CorpusListPanel extends VerticalLayout implements
         log.error(
           "could not store new corpus set", ex);
         Notification.show("Could not store new corpus set: "
-          + ex.getLocalizedMessage(),
-          Notification.Type.WARNING_MESSAGE);
+          + ex.getLocalizedMessage(), Type.WARNING_MESSAGE);
+      }
+      catch (UniformInterfaceException ex)
+      {
+
+        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
+          getStatusCode())
+        {
+          log.error(ex.getLocalizedMessage());
+          Notification.show("Not allowed",
+            "you have not the permission to add a new corpus group",
+            Type.WARNING_MESSAGE);
+        }
+        else
+        {
+          log.error("error occures while storing new corpus set", ex);
+          Notification.show("error occures while storing new corpus set",
+            "Maybe you will have to log in", Type.WARNING_MESSAGE);
+        }
       }
     } // end if new item
   }

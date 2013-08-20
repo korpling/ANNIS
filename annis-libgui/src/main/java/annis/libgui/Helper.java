@@ -226,7 +226,7 @@ public class Helper {
 
   }
 
-  private static String encodeBase64URL(String val) {
+  public static String encodeBase64URL(String val) {
     try {
       return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
     } catch (UnsupportedEncodingException ex) {

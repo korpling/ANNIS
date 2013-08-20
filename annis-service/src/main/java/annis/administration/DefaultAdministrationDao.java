@@ -411,8 +411,6 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     computeLeftTokenRightToken();
 
-//    if (true) return;
-
     adjustRankPrePost();
     adjustTextId();
     long corpusID = updateIds();
