@@ -33,6 +33,7 @@ import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -94,7 +95,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new TextArea();
-    txtQuery.setInputPrompt("Query in ANNIS Query Language");
+    txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
@@ -193,12 +194,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
+    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
+    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/applications-development.png"));
+    
     PopupButton btMoreActions = new PopupButton("More");
     
     /*
@@ -241,6 +247,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       addComponent(btShowKeyboard, 0, 1);
     }
 
+    // alignment
+    setRowExpandRatio(0, 0.0f);
+    setRowExpandRatio(1, 1.0f);
+    
+    //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
+    
   }
 
   public void updateShortHistory(List<HistoryEntry> history)
