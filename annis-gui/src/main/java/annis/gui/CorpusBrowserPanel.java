@@ -120,11 +120,6 @@ public class CorpusBrowserPanel extends Panel
     tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
 
-    accordion.addTab(tblNodeAnno, "Node Annotations", null);
-    accordion.addTab(tblEdgeTypes, "Edge Types", null);
-    accordion.addTab(tblEdgeAnno, "Edge Annotations", null);
-    accordion.addTab(tblMetaAnno, "Meta Annotations", null);
-
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
@@ -268,6 +263,41 @@ public class CorpusBrowserPanel extends Panel
     tblEdgeTypes.setSortContainerPropertyId("name");
     tblEdgeAnno.setSortContainerPropertyId("name");
 
+    if (containerNodeAnno.size() == 0)
+    {
+      accordion.addTab(getCenteredLabel(), "Node Annotations", null);
+    }
+    else
+    {
+      accordion.addTab(tblNodeAnno, "Node Annotations", null);
+    }
+
+    if (tblEdgeAnno.getContainerDataSource().size() == 0)
+    {
+      accordion.addTab(getCenteredLabel(), "Edge Annotations", null);
+    }
+    else
+    {
+      accordion.addTab(tblEdgeAnno, "Edge Annotations", null);
+    }
+
+    if (tblEdgeTypes.getContainerDataSource().size() == 0)
+    {
+      accordion.addTab(getCenteredLabel(), "Edge Types", null);
+    }
+    else
+    {
+      accordion.addTab(tblEdgeTypes, "Edge Types", null);
+    }
+
+    if (tblMetaAnno.getContainerDataSource().size() == 0)
+    {
+      accordion.addTab(getCenteredLabel(), "Meta Annotations", null);
+    }
+    else
+    {
+      accordion.addTab(tblMetaAnno, "Meta Annotations", null);
+    }
   }
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
@@ -356,6 +386,7 @@ public class CorpusBrowserPanel extends Panel
     @Override
     public void valueChange(ValueChangeEvent event)
     {
+
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
       Set<String> corpusNameSet = new HashSet<String>();
@@ -414,5 +445,12 @@ public class CorpusBrowserPanel extends Panel
     public AnnisAttributeListType()
     {
     }
+  }
+
+  static private Label getCenteredLabel()
+  {
+    Label l = new Label("none");
+    l.setSizeUndefined();
+    return l;
   }
 }
