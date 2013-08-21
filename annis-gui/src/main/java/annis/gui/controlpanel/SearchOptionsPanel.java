@@ -90,12 +90,12 @@ public class SearchOptionsPanel extends FormLayout
   private ComboBox cbSegmentation;
   // TODO: make this configurable
 
-  private static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
+  public static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
   {
     1, 2, 5, 10, 20, 25
   };
 
-  static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
+  public static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
   {
     0, 1, 2, 5, 10, 20
   };

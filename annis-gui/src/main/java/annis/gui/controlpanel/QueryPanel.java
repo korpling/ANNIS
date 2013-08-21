@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.ExportPanel;
 import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
@@ -210,7 +211,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/applications-development.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
+    VerticalLayout moreActionsLayout = new VerticalLayout();
     PopupButton btMoreActions = new PopupButton("More");
+    btMoreActions.setContent(moreActionsLayout);
+    
+    Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    moreActionsLayout.addComponent(btShowExport);
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
@@ -443,6 +449,43 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       virtualKeyboard.show();
     }
+  }
+  
+  private class ShowExportClickListener implements ClickListener
+  {
+    private SearchUI ui;
+    private ExportPanel panel;
+    private ExportOptionsPanel optionsPanel;
+    
+    public ShowExportClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(panel == null)
+      {
+        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
+      }
+      if(optionsPanel == null)
+      {
+        optionsPanel = new ExportOptionsPanel();
+      }
+      
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(panel);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(panel, "Export");
+      }
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(panel);
+    }
+    
   }
   
   private static class ShowQueryBuilderClickListener implements ClickListener

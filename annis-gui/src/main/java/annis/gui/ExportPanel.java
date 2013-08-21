@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
+package annis.gui;
 
-import annis.gui.QueryController;
-import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
-import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.QueryPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
@@ -30,7 +29,6 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.ThemeResource;
@@ -69,13 +67,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private ComboBox cbExporter;
 
-  private ComboBox cbLeftContext;
-
-  private ComboBox cbRightContext;
-
-  private TextField txtAnnotationKeys;
-
-  private TextField txtParameters;
+  
 
   private Button btDownload;
 
@@ -133,45 +125,6 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
     addComponent(new HelpButton(cbExporter));
-
-    cbLeftContext = new ComboBox("Left Context");
-    cbRightContext = new ComboBox("Right Context");
-
-    cbLeftContext.setNullSelectionAllowed(false);
-    cbRightContext.setNullSelectionAllowed(false);
-
-    cbLeftContext.setNewItemsAllowed(true);
-    cbRightContext.setNewItemsAllowed(true);
-
-    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-
-    for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
-    {
-      cbLeftContext.addItem(i);
-      cbRightContext.addItem(i);
-    }
-
-
-    cbLeftContext.setValue(5);
-    cbRightContext.setValue(5);
-
-    addComponent(cbLeftContext);
-    addComponent(cbRightContext);
-
-    txtAnnotationKeys = new TextField("Annotation Keys");
-    txtAnnotationKeys.setDescription("Some exporters will use this comma "
-      + "seperated list of annotation keys to limit the exported data to these "
-      + "annotations.");
-    addComponent(new HelpButton(txtAnnotationKeys));
-
-    txtParameters = new TextField("Parameters");
-    txtParameters.setDescription("You can input special parameters "
-      + "for certain exporters. See the description of each exporter "
-      + "(‘?’ button above) for specific parameter settings.");
-    addComponent(new HelpButton(txtParameters));
 
 
     btExport = new Button("Perform Export");
@@ -243,14 +196,15 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           OutputStreamWriter outWriter =
             new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
 
-          exporter.convertText(queryPanel.getQuery(),
-            (Integer) cbLeftContext.getValue(),
-            (Integer) cbRightContext.getValue(),
-            corpusListPanel.getSelectedCorpora(),
-            txtAnnotationKeys.getValue(),
-            txtParameters.getValue(),
-            Helper.getAnnisWebResource().path("query"),
-            outWriter, eventBus);
+          Notification.show("TODO");
+//          exporter.convertText(queryPanel.getQuery(),
+//            (Integer) cbLeftContext.getValue(),
+//            (Integer) cbRightContext.getValue(),
+//            corpusListPanel.getSelectedCorpora(),
+//            txtAnnotationKeys.getValue(),
+//            txtParameters.getValue(),
+//            Helper.getAnnisWebResource().path("query"),
+//            outWriter, eventBus);
 
           outWriter.close();
 

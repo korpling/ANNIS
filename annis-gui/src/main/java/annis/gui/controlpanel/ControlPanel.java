@@ -15,6 +15,7 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.ExportPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.SearchUI;
 import com.vaadin.ui.*;
@@ -62,7 +63,6 @@ public class ControlPanel extends VerticalLayout
 
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList, ui.getQueryController()), "Export", null);
 
     addComponent(queryPanel);
     addComponent(accordion);
