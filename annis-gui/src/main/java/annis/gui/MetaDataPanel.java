@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
 import java.io.UnsupportedEncodingException;
@@ -325,12 +326,14 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     layout.setExpandRatio(corpusAnnotationTable, 1.0f);
   }
 
+  /**
+   * Places a label in the middle center of the corpus browser panel.
+   */
   private void addEmptyLabel()
   {
     if (emptyLabel == null)
     {
       emptyLabel = new Label("none");
-      emptyLabel.setSizeUndefined();
     }
 
     if (corpusAnnotationTable != null)
@@ -338,9 +341,13 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       layout.removeComponent(corpusAnnotationTable);
     }
 
-
     layout.addComponent(emptyLabel);
-    layout.setComponentAlignment(emptyLabel, Alignment.TOP_LEFT);
+
+    // this has only an effect after adding the component to a parent. Bug by vaadin?
+    emptyLabel.setSizeUndefined();
+
+    layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
+    layout.setExpandRatio(emptyLabel, 1.0f);
   }
 
   private void removeEmptyLabel()

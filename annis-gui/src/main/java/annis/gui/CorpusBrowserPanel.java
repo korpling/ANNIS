@@ -31,10 +31,13 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -265,7 +268,7 @@ public class CorpusBrowserPanel extends Panel
 
     if (containerNodeAnno.size() == 0)
     {
-      accordion.addTab(getCenteredLabel(), "Node Annotations", null);
+      placeEmptyLabel(accordion, "Node Annotations");
     }
     else
     {
@@ -274,7 +277,7 @@ public class CorpusBrowserPanel extends Panel
 
     if (tblEdgeAnno.getContainerDataSource().size() == 0)
     {
-      accordion.addTab(getCenteredLabel(), "Edge Annotations", null);
+      placeEmptyLabel(accordion, "Edge Annotations");
     }
     else
     {
@@ -283,7 +286,7 @@ public class CorpusBrowserPanel extends Panel
 
     if (tblEdgeTypes.getContainerDataSource().size() == 0)
     {
-      accordion.addTab(getCenteredLabel(), "Edge Types", null);
+      placeEmptyLabel(accordion, "Edge Types");
     }
     else
     {
@@ -292,7 +295,7 @@ public class CorpusBrowserPanel extends Panel
 
     if (tblMetaAnno.getContainerDataSource().size() == 0)
     {
-      accordion.addTab(getCenteredLabel(), "Meta Annotations", null);
+      placeEmptyLabel(accordion, "Meta Annotations");
     }
     else
     {
@@ -447,10 +450,22 @@ public class CorpusBrowserPanel extends Panel
     }
   }
 
-  static private Label getCenteredLabel()
+  /**
+   * Places a label with the text "none" in the centered middle of the accordion
+   * tab.
+   *
+   * @param accordion the target accordion
+   * @param caption is set as caption of the accordion tab
+   */
+  private void placeEmptyLabel(Accordion accordion, String caption)
   {
+    VerticalLayout v = new VerticalLayout();
+    v.setSizeFull();
     Label l = new Label("none");
+    v.addComponent(l);
     l.setSizeUndefined();
-    return l;
+    v.setComponentAlignment(l, Alignment.MIDDLE_CENTER);
+    accordion.addTab(v, "Meta Annotations", null);
+    l.setSizeUndefined();
   }
 }
