@@ -27,6 +27,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -658,6 +659,9 @@ public class SearchOptionsPanel extends FormLayout
     c.setValue(defaultCtx);
   }
 
+  
+  
+  
   private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
   {
 

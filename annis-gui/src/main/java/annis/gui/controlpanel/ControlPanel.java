@@ -15,11 +15,13 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.ExportPanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.SearchUI;
 import com.vaadin.ui.*;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.HashMap;
+import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,7 +30,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ControlPanel extends VerticalLayout
+public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTabChangeListener
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
@@ -40,16 +42,24 @@ public class ControlPanel extends VerticalLayout
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
+  
+  private Tab optionTab;
+  private Map<Component, Component> optionComponentRegistry;
+  private Map<Component, String> optionComponentCaptions;
+  private Accordion accordion;
+  private SearchUI ui;
 
   public ControlPanel(SearchUI ui,
     ExampleQueriesPanel autoGenQueries)
   {
+    this.ui = ui;
+    
     setSizeFull();
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    Accordion accordion = new Accordion();
+    accordion = new Accordion();
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
@@ -62,14 +72,21 @@ public class ControlPanel extends VerticalLayout
     queryPanel.setWidth("100%");
 
     accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(searchOptions, "Search Options", null);
+    optionTab = accordion.addTab(searchOptions, "Search Options", null);
+    
+    ui.getMainTab().addSelectedTabChangeListener(this);
 
     addComponent(queryPanel);
     addComponent(accordion);
 
     setExpandRatio(accordion, 1.0f);
+    
+    optionComponentRegistry = new HashMap<Component, Component>();
+    optionComponentCaptions = new HashMap<Component, String>();
   }
 
+  
+  
   public CorpusListPanel getCorpusList()
   {
     return corpusList;
@@ -83,5 +100,45 @@ public class ControlPanel extends VerticalLayout
   public SearchOptionsPanel getSearchOptions()
   {
     return searchOptions;
+  }
+  
+  public void registerOptionComponent(String caption, Component optionComponent, Component tabComponent)
+  {
+    optionComponentRegistry.put(tabComponent, optionComponent);
+    optionComponentCaptions.put(tabComponent, caption);
+  }
+
+  @Override
+  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  {
+    if(event.getTabSheet() != ui.getMainTab())
+    {
+      return;
+    }
+    
+    boolean wasSelected = optionTab != null 
+      && accordion.getSelectedTab() == optionTab.getComponent();
+    
+    Component selection = ui.getMainTab().getSelectedTab();
+    if(selection != null && optionComponentRegistry.get(selection) != null)
+    {
+      accordion.removeTab(optionTab);
+      optionTab = accordion.addTab(optionComponentRegistry.get(selection), optionComponentCaptions.get(selection));
+    }
+    else
+    {
+      // replace/leave the default search options
+      if(optionTab != null)
+      {
+        accordion.removeTab(optionTab);
+      }
+      
+      optionTab = accordion.addTab(searchOptions, "Search Options", null);
+    }
+    
+    if(wasSelected)
+    {
+      accordion.setSelectedTab(optionTab.getComponent());
+    }
   }
 }

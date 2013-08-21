@@ -26,7 +26,6 @@ import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
@@ -221,11 +220,7 @@ public class SearchUI extends AnnisBaseUI
         windowLogin.center();
       }
     });
-//    BrowserWindowOpener loginOpener =
-//      new BrowserWindowOpener(Helper.getContext() + "/login");
-//    loginOpener.setFeatures("height=200,width=300,resizable");
-//    loginOpener.extend(btLogin);
-
+    
     btLogout = new Button("Logout", new Button.ClickListener()
     {
       @Override
@@ -288,12 +283,6 @@ public class SearchUI extends AnnisBaseUI
 
     final HelpPanel help = new HelpPanel(this);
 
-    controlPanel = new ControlPanel(this,
-      help.getExamples());
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
-    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    hSplit.setFirstComponent(controlPanel);
-
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
@@ -326,7 +315,14 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
+    
+    controlPanel = new ControlPanel(this,
+      help.getExamples());
+    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    hSplit.setFirstComponent(controlPanel);
 
+    
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
@@ -952,8 +948,4 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  public TabSheet getTabSheet()
-  {
-    return mainTab;
-  }
 }
