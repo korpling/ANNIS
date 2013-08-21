@@ -120,10 +120,10 @@ public class CorpusBrowserPanel extends Panel
     tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
 
-    accordion.addTab(tblNodeAnno, "Node annotations", null);
-    accordion.addTab(tblEdgeTypes, "Edge types", null);
-    accordion.addTab(tblEdgeAnno, "Edge annotations", null);
-    accordion.addTab(tblMetaAnno, "Meta annotations", null);
+    accordion.addTab(tblNodeAnno, "Node Annotations", null);
+    accordion.addTab(tblEdgeTypes, "Edge Types", null);
+    accordion.addTab(tblEdgeAnno, "Edge Annotations", null);
+    accordion.addTab(tblMetaAnno, "Meta Annotations", null);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
