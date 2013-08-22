@@ -46,7 +46,7 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
   private Tab optionTab;
   private Map<Component, Component> optionComponentRegistry;
   private Map<Component, String> optionComponentCaptions;
-  private Accordion accordion;
+  private TabSheet optionsTab;
   private SearchUI ui;
 
   public ControlPanel(SearchUI ui,
@@ -59,9 +59,9 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    accordion = new Accordion();
-    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab = new TabSheet();
+    optionsTab.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
     corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
 
@@ -71,15 +71,15 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
 
-    accordion.addTab(corpusList, "Corpus List", null);
-    optionTab = accordion.addTab(searchOptions, "Search Options", null);
+    optionsTab.addTab(corpusList, "Corpus List", null);
+    optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
     
     ui.getMainTab().addSelectedTabChangeListener(this);
 
     addComponent(queryPanel);
-    addComponent(accordion);
+    addComponent(optionsTab);
 
-    setExpandRatio(accordion, 1.0f);
+    setExpandRatio(optionsTab, 1.0f);
     
     optionComponentRegistry = new HashMap<Component, Component>();
     optionComponentCaptions = new HashMap<Component, String>();
@@ -117,28 +117,28 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
     }
     
     boolean wasSelected = optionTab != null 
-      && accordion.getSelectedTab() == optionTab.getComponent();
+      && optionsTab.getSelectedTab() == optionTab.getComponent();
     
     Component selection = ui.getMainTab().getSelectedTab();
     if(selection != null && optionComponentRegistry.get(selection) != null)
     {
-      accordion.removeTab(optionTab);
-      optionTab = accordion.addTab(optionComponentRegistry.get(selection), optionComponentCaptions.get(selection));
+      optionsTab.removeTab(optionTab);
+      optionTab = optionsTab.addTab(optionComponentRegistry.get(selection), optionComponentCaptions.get(selection));
     }
     else
     {
       // replace/leave the default search options
       if(optionTab != null)
       {
-        accordion.removeTab(optionTab);
+        optionsTab.removeTab(optionTab);
       }
       
-      optionTab = accordion.addTab(searchOptions, "Search Options", null);
+      optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
     }
     
     if(wasSelected)
     {
-      accordion.setSelectedTab(optionTab.getComponent());
+      optionsTab.setSelectedTab(optionTab.getComponent());
     }
   }
 }
