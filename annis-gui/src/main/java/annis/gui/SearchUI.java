@@ -846,10 +846,6 @@ public class SearchUI extends AnnisBaseUI
           + "responsible person of the site that contained the link to import the corpus.",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
-      else
-      {
-        queryController.setQuery(new Query("tok", mappedCorpora));
-      }
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
