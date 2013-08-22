@@ -20,8 +20,6 @@ import annis.gui.SearchUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.HashMap;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,7 +28,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTabChangeListener
+public class ControlPanel extends VerticalLayout
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
@@ -44,8 +42,6 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
   private SearchOptionsPanel searchOptions;
   
   private Tab optionTab;
-  private Map<Component, Component> optionComponentRegistry;
-  private Map<Component, String> optionComponentCaptions;
   private TabSheet optionsTab;
   private SearchUI ui;
 
@@ -73,16 +69,12 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
 
     optionsTab.addTab(corpusList, "Corpus List", null);
     optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
-    
-    ui.getMainTab().addSelectedTabChangeListener(this);
 
     addComponent(queryPanel);
     addComponent(optionsTab);
 
     setExpandRatio(optionsTab, 1.0f);
     
-    optionComponentRegistry = new HashMap<Component, Component>();
-    optionComponentCaptions = new HashMap<Component, String>();
   }
 
   
@@ -102,43 +94,5 @@ public class ControlPanel extends VerticalLayout implements TabSheet.SelectedTab
     return searchOptions;
   }
   
-  public void registerOptionComponent(String caption, Component optionComponent, Component tabComponent)
-  {
-    optionComponentRegistry.put(tabComponent, optionComponent);
-    optionComponentCaptions.put(tabComponent, caption);
-  }
-
-  @Override
-  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
-  {
-    if(event.getTabSheet() != ui.getMainTab())
-    {
-      return;
-    }
-    
-    boolean wasSelected = optionTab != null 
-      && optionsTab.getSelectedTab() == optionTab.getComponent();
-    
-    Component selection = ui.getMainTab().getSelectedTab();
-    if(selection != null && optionComponentRegistry.get(selection) != null)
-    {
-      optionsTab.removeTab(optionTab);
-      optionTab = optionsTab.addTab(optionComponentRegistry.get(selection), optionComponentCaptions.get(selection));
-    }
-    else
-    {
-      // replace/leave the default search options
-      if(optionTab != null)
-      {
-        optionsTab.removeTab(optionTab);
-      }
-      
-      optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
-    }
-    
-    if(wasSelected)
-    {
-      optionsTab.setSelectedTab(optionTab.getComponent());
-    }
-  }
+  
 }

@@ -34,43 +34,6 @@ public class ExportOptionsPanel extends FormLayout
   
   public ExportOptionsPanel()
   {
-    cbLeftContext = new ComboBox("Left Context");
-    cbRightContext = new ComboBox("Right Context");
-
-    cbLeftContext.setNullSelectionAllowed(false);
-    cbRightContext.setNullSelectionAllowed(false);
-
-    cbLeftContext.setNewItemsAllowed(true);
-    cbRightContext.setNewItemsAllowed(true);
-
-    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
-      Integer.MIN_VALUE, Integer.MAX_VALUE));
-
-    for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
-    {
-      cbLeftContext.addItem(i);
-      cbRightContext.addItem(i);
-    }
-
-
-    cbLeftContext.setValue(5);
-    cbRightContext.setValue(5);
-
-    addComponent(cbLeftContext);
-    addComponent(cbRightContext);
-
-    txtAnnotationKeys = new TextField("Annotation Keys");
-    txtAnnotationKeys.setDescription("Some exporters will use this comma "
-      + "seperated list of annotation keys to limit the exported data to these "
-      + "annotations.");
-    addComponent(new HelpButton(txtAnnotationKeys));
-
-    txtParameters = new TextField("Parameters");
-    txtParameters.setDescription("You can input special parameters "
-      + "for certain exporters. See the description of each exporter "
-      + "(‘?’ button above) for specific parameter settings.");
-    addComponent(new HelpButton(txtParameters));
+    
   }
 }

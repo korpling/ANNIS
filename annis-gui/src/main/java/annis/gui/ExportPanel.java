@@ -19,6 +19,7 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
@@ -29,6 +30,7 @@ import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.ThemeResource;
@@ -54,6 +56,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     ExportPanel.class);
+  
+  private ComboBox cbLeftContext;
+  private ComboBox cbRightContext;
+  private TextField txtAnnotationKeys;
+  private TextField txtParameters;
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -108,6 +115,45 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addStyleName("contextsensible-formlayout");
 
     initHelpMessages();
+    
+    cbLeftContext = new ComboBox("Left Context");
+    cbRightContext = new ComboBox("Right Context");
+
+    cbLeftContext.setNullSelectionAllowed(false);
+    cbRightContext.setNullSelectionAllowed(false);
+
+    cbLeftContext.setNewItemsAllowed(true);
+    cbRightContext.setNewItemsAllowed(true);
+
+    cbLeftContext.addValidator(new IntegerRangeValidator("must be a number",
+      Integer.MIN_VALUE, Integer.MAX_VALUE));
+    cbRightContext.addValidator(new IntegerRangeValidator("must be a number",
+      Integer.MIN_VALUE, Integer.MAX_VALUE));
+
+    for (Integer i : SearchOptionsPanel.PREDEFINED_CONTEXTS)
+    {
+      cbLeftContext.addItem(i);
+      cbRightContext.addItem(i);
+    }
+
+
+    cbLeftContext.setValue(5);
+    cbRightContext.setValue(5);
+
+    addComponent(cbLeftContext);
+    addComponent(cbRightContext);
+
+    txtAnnotationKeys = new TextField("Annotation Keys");
+    txtAnnotationKeys.setDescription("Some exporters will use this comma "
+      + "seperated list of annotation keys to limit the exported data to these "
+      + "annotations.");
+    addComponent(new HelpButton(txtAnnotationKeys));
+
+    txtParameters = new TextField("Parameters");
+    txtParameters.setDescription("You can input special parameters "
+      + "for certain exporters. See the description of each exporter "
+      + "(‘?’ button above) for specific parameter settings.");
+    addComponent(new HelpButton(txtParameters));
 
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);

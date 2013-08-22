@@ -474,8 +474,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
         optionsPanel = new ExportOptionsPanel();
       }
       
-      ui.getControlPanel().registerOptionComponent("Export Options", optionsPanel, panel);
-      
       final TabSheet tabSheet = ui.getMainTab();
       Tab tab = tabSheet.getTab(panel);
       
