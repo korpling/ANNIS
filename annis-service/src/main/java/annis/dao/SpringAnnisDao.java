@@ -398,9 +398,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs)
   {
-    return (List<ExampleQuery>) getJdbcTemplate().query(
-      listExampleQueriesHelper.createSQLQuery(corpusIDs),
-      listExampleQueriesHelper);
+    if (corpusIDs == null || corpusIDs.isEmpty())
+    {
+      return null;
+    }
+    else
+    {
+      return (List<ExampleQuery>) getJdbcTemplate().query(
+        listExampleQueriesHelper.createSQLQuery(corpusIDs),
+        listExampleQueriesHelper);
+    }
   }
 
   @Transactional(readOnly = true)
@@ -568,8 +575,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 //    {
 //      log.error("parsing error for {}: {}", aql, ex.getMessage());
 //    }
-    
-    
+
+
     // parse the query
     return aqlParser.parse(aql, corpusList);
   }
@@ -644,7 +651,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public List<Long> mapCorpusNamesToIds(List<String> corpusNames)
   {
-    if(corpusNames == null || corpusNames.isEmpty())
+    if (corpusNames == null || corpusNames.isEmpty())
     {
       return new LinkedList<Long>();
     }
@@ -859,7 +866,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     this.findSqlGenerator = findSqlGenerator;
   }
-  
+
   public ListCorpusByNameDaoHelper getListCorpusByNameDaoHelper()
   {
     return listCorpusByNameDaoHelper;
