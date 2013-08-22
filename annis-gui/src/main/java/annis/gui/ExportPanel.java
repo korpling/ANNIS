@@ -25,6 +25,7 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import annis.libgui.Helper;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -116,6 +117,23 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
     initHelpMessages();
     
+    cbExporter = new ComboBox("Exporter");
+    cbExporter.setNewItemsAllowed(false);
+    cbExporter.setNullSelectionAllowed(false);
+    cbExporter.setImmediate(true);
+    exporterMap = new HashMap<String, Exporter>();
+    for (Exporter e : EXPORTER)
+    {
+      String name = e.getClass().getSimpleName();
+      exporterMap.put(name, e);
+      cbExporter.addItem(name);
+    }
+    cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
+    cbExporter.addListener(new ExporterSelectionHelpListener());
+    cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
+
+    addComponent(new HelpButton(cbExporter));
+    
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
 
@@ -154,23 +172,6 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "for certain exporters. See the description of each exporter "
       + "(‘?’ button above) for specific parameter settings.");
     addComponent(new HelpButton(txtParameters));
-
-    cbExporter = new ComboBox("Exporter");
-    cbExporter.setNewItemsAllowed(false);
-    cbExporter.setNullSelectionAllowed(false);
-    cbExporter.setImmediate(true);
-    exporterMap = new HashMap<String, Exporter>();
-    for (Exporter e : EXPORTER)
-    {
-      String name = e.getClass().getSimpleName();
-      exporterMap.put(name, e);
-      cbExporter.addItem(name);
-    }
-    cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
-    cbExporter.addListener(new ExporterSelectionHelpListener());
-    cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
-
-    addComponent(new HelpButton(cbExporter));
 
 
     btExport = new Button("Perform Export");
@@ -242,15 +243,14 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           OutputStreamWriter outWriter =
             new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
 
-          Notification.show("TODO");
-//          exporter.convertText(queryPanel.getQuery(),
-//            (Integer) cbLeftContext.getValue(),
-//            (Integer) cbRightContext.getValue(),
-//            corpusListPanel.getSelectedCorpora(),
-//            txtAnnotationKeys.getValue(),
-//            txtParameters.getValue(),
-//            Helper.getAnnisWebResource().path("query"),
-//            outWriter, eventBus);
+          exporter.convertText(queryPanel.getQuery(),
+            (Integer) cbLeftContext.getValue(),
+            (Integer) cbRightContext.getValue(),
+            corpusListPanel.getSelectedCorpora(),
+            txtAnnotationKeys.getValue(),
+            txtParameters.getValue(),
+            Helper.getAnnisWebResource().path("query"),
+            outWriter, eventBus);
 
           outWriter.close();
 
