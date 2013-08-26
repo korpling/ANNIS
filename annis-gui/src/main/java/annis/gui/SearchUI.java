@@ -52,6 +52,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -78,7 +79,7 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push
+@Push(PushMode.MANUAL)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
