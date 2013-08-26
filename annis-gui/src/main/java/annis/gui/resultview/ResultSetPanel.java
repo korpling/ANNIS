@@ -46,6 +46,7 @@ import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -126,8 +127,6 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     // enable indicator in order to get refresh GUI regulary
     progress.setEnabled(true);
 
-    ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
-
     Callable<Boolean> run = new AllResultsFetcher();
     FutureTask<Boolean> task = new FutureTask<Boolean>(
       run)
@@ -135,20 +134,18 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       @Override
       protected void done()
       {
-        VaadinSession session = VaadinSession.getCurrent();
-        session.lock();
-        try
-        {
-          progress.setEnabled(false);
-          progress.setVisible(false);
-          indicatorLayout.setVisible(false);
-        }
-        finally
-        {
-          session.unlock();
-        }
+        UI.getCurrent().access(new Runnable() {
+          @Override
+          public void run()
+          {
+            progress.setEnabled(false);
+            progress.setVisible(false);
+            indicatorLayout.setVisible(false);
+          }
+        });
       }
     };
+    ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
     singleExecutor.submit(task);
   }
   
@@ -401,7 +398,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       {
         res = res.path("query/search/subgraph");
 
-        int j=0;
+        final AtomicInteger j = new AtomicInteger();
         SaltProject lastProject = null;
         for(Match m : matches)
         {
@@ -422,29 +419,16 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             allSuccessfull = false;
           }
           
-          VaadinSession session = VaadinSession.getCurrent();
-          session.lock();
-          try
+          final SaltProject p = lastProject;
+          UI.getCurrent().access(new Runnable() 
           {
-            
-            if(lastProject != null)
+            @Override
+            public void run()
             {
-              addQueryResult(lastProject, j+firstMatchOffset);
+              updateUIFromResult(p, j);
             }
-            progress.setValue((float) j++ / (float) matches.size());
-            if(j == matches.size())
-            {
-              progress.setValue(1.0f);
-            }
-          }
-          catch(Throwable ex)
-          {
-            log.error("Exception when adding query result", ex);
-          }
-          finally
-          {
-            session.unlock();
-          }
+          });
+         
         }
         
       }
@@ -454,6 +438,26 @@ public class ResultSetPanel extends Panel implements ResolverProvider
  
   } // end class AllResultsFetcher
 
+  private void updateUIFromResult(SaltProject lastProject, AtomicInteger j)
+  {
+    try
+    {
+      if (lastProject != null)
+      {
+        addQueryResult(lastProject, j.get() + firstMatchOffset);
+      }
+      progress.setValue((float) j.getAndIncrement() / (float) matches.size());
+      if (j.get() == matches.size())
+      {
+        progress.setValue(1.0f);
+      }
+    }
+    catch(Throwable ex)
+    {
+      log.error("Exception when adding query result", ex);
+    }
+  }
+  
   private static class ResolverEntryListType extends GenericType<List<ResolverEntry>>
   {
 

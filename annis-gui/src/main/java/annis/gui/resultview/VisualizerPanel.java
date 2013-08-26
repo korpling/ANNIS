@@ -35,12 +35,18 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -49,18 +55,15 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,8 +95,6 @@ public class VisualizerPanel extends CssLayout
 
   private ResolverEntry entry;
 
-  private Random rand = new Random();
-
   private transient Map<SNode, Long> markedAndCovered;
 
   private transient List<SToken> token;
@@ -109,7 +110,6 @@ public class VisualizerPanel extends CssLayout
   private String resultID;
 
   private transient VisualizerPlugin visPlugin;
-
   private Set<String> visibleTokenAnnos;
 
   private String segmentationName;
@@ -378,101 +378,59 @@ public class VisualizerPanel extends CssLayout
   private void loadVisualizer(final LoadableVisualizer.Callback callback)
   {
     if (visPlugin != null)
-    {
-      Executor exec = Executors.newSingleThreadExecutor();
-      FutureTask<Component> future = new FutureTask<Component>(
-        new LoadComponentTask())
+    { 
+      ListeningExecutorService exeService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+      List<Callable<Component>> tasks = new LinkedList<Callable<Component>>();
+      tasks.add(new LoadComponentTask());
+      try
       {
-        @Override
-        public void run()
+        List<Future<Component>> futures = exeService.invokeAll(tasks, 60, TimeUnit.SECONDS);
+        ListenableFuture<Component> firstFuture = (ListenableFuture<Component>) futures.get(0);
+        Futures.addCallback(firstFuture, new FutureCallback<Component>()
         {
-          VaadinSession session = VaadinSession.getCurrent();
-          try
-          {
-            super.run();
-            // wait maximum 60 seconds
-            vis = get(60, TimeUnit.SECONDS);
-            session.lock();
-            try
-            {
-              if (callback != null && vis instanceof LoadableVisualizer)
-              {
-                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-                if (loadableVis.isLoaded())
-                {
-                  // direct call callback since the visualizer is already ready
-                  if (vis instanceof LoadableVisualizer)
-                  {
-                    callback.visualizerLoaded((LoadableVisualizer) vis);
-                  }
-                }
-                else
-                {
-                  loadableVis.clearCallbacks();
-                  // add listener when player was fully loaded
-                  loadableVis.addOnLoadCallBack(callback);
-                }
-              }
 
-              if (getComponentIndex(progress) > -1)
-              {
-                removeComponent(progress);
-              }
+          @Override
+          public void onSuccess(Component result)
+          {
+            UI.getCurrent().access(new Runnable() {
 
-              if (vis != null)
+              @Override
+              public void run()
               {
-                btEntry.setEnabled(true);
-                vis.setVisible(true);
-                if (vis instanceof PDFViewer)
-                {
-                  ((PDFViewer)vis).openPDFPage("-1");
-                }
-                // add if not already added
-                if(getComponentIndex(vis) < 0)
-                {
-                  addComponent(vis);
-                }
+                updateGUIAfterLoadingVisualizer(callback);
               }
-            }
-            finally
-            {
-              session.unlock();
-            }
+            });
           }
-          catch (InterruptedException ex)
+
+          @Override
+          public void onFailure(final Throwable ex)
           {
-            log.error("Visualizer creation interrupted " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (ExecutionException ex)
-          {
-            log.error("Exception when creating visualizer " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (TimeoutException ex)
-          {
-            log.
-              error(
-              "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
+            log.error(
+              "Could create visualizer " + visPlugin.getShortName() 
+              + " in 60 seconds: Timeout",
               ex);
-            session.lock();
-            try
+            
+            UI.getCurrent().access(new Runnable() 
             {
-              Notification.show(
-                "Could not create visualizer " + visPlugin.getShortName(),
-                ex.toString(),
-                Notification.Type.WARNING_MESSAGE);
-            }
-            finally
-            {
-              session.unlock();
-            }
-            cancel(true);
+              @Override
+              public void run()
+              {
+                Notification.show(
+                  "Could not create visualizer " + visPlugin.getShortName(),
+                  ex.toString(),
+                  Notification.Type.WARNING_MESSAGE);
+              }
+            });
           }
-        }
-      };
-      exec.execute(future);
-
+          
+        });
+      }
+      catch (InterruptedException ex)
+      {
+        log.error("Visualizer creation interrupted " + visPlugin.
+              getShortName(), ex);
+      }
+      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -484,6 +442,48 @@ public class VisualizerPanel extends CssLayout
 
   } // end loadVisualizer
 
+  private void updateGUIAfterLoadingVisualizer(LoadableVisualizer.Callback callback)
+  {
+  if (callback != null && vis instanceof LoadableVisualizer)
+    {
+      LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+      if (loadableVis.isLoaded())
+      {
+        // direct call callback since the visualizer is already ready
+        if (vis instanceof LoadableVisualizer)
+        {
+          callback.visualizerLoaded((LoadableVisualizer) vis);
+        }
+      }
+      else
+      {
+        loadableVis.clearCallbacks();
+        // add listener when player was fully loaded
+        loadableVis.addOnLoadCallBack(callback);
+      }
+    }
+
+    if (getComponentIndex(progress) > -1)
+    {
+      removeComponent(progress);
+    }
+
+    if (vis != null)
+    {
+      btEntry.setEnabled(true);
+      vis.setVisible(true);
+      if (vis instanceof PDFViewer)
+      {
+        ((PDFViewer) vis).openPDFPage("-1");
+      }
+      // add if not already added
+      if (getComponentIndex(vis) < 0)
+      {
+        addComponent(vis);
+      }
+    }
+  }
+  
   @Override
   public void toggleVisualizer(boolean visible,
     LoadableVisualizer.Callback callback)

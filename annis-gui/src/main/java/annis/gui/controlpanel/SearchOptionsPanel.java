@@ -107,8 +107,6 @@ public class SearchOptionsPanel extends FormLayout
    */
   private Map<String, CorpusConfig> lastSelection;
 
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
-
   public SearchOptionsPanel()
   {
     setWidth("99%");
@@ -230,6 +228,7 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora)
   {
+    ExecutorService executor = Executors.newSingleThreadExecutor();
     executor.submit(new Runnable()
     {
       @Override

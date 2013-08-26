@@ -52,6 +52,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -136,8 +137,9 @@ public class SearchUI extends AnnisBaseUI
   @Override
   protected void init(VaadinRequest request)
   {
+    getPushConfiguration().setTransport(Transport.STREAMING);
+    
     super.init(request);
-
     setErrorHandler(this);
 
     this.instanceConfig = getInstanceConfig(request);
