@@ -26,11 +26,6 @@ import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphQuery;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -52,8 +47,6 @@ import java.net.URLEncoder;
 import java.util.*;
 import java.util.concurrent.*;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -63,48 +56,38 @@ import org.slf4j.LoggerFactory;
 public class ResultSetPanel extends Panel implements ResolverProvider
 {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    ResultSetPanel.class);
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(ResultSetPanel.class);
 
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
-
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
-
   private List<SingleResultPanel> resultPanelList;
-
   private PluginSystem ps;
-
   private String segmentationName;
-
   private int firstMatchOffset;
-
+  
+  private int contextLeft;
+  private int contextRight;
   private ResultViewPanel parent;
-
   private List<Match> matches;
-
   private Set<String> tokenAnnotationLevelSet =
     Collections.synchronizedSet(new TreeSet<String>());
-
   private Set<String> segmentationLayerSet =
     Collections.synchronizedSet(new TreeSet<String>());
-
   private ProgressBar progress;
-
   private VerticalLayout indicatorLayout;
-
   private CssLayout layout;
-
   private InstanceConfig instanceConfig;
 
-  public ResultSetPanel(List<Match> matches, PluginSystem ps,
-    InstanceConfig instanceConfig,
+  public ResultSetPanel(List<Match> matches, PluginSystem ps, InstanceConfig instanceConfig,
     int contextLeft, int contextRight,
     String segmentationName,
     ResultViewPanel parent, int firstMatchOffset)
   {
     this.ps = ps;
     this.segmentationName = segmentationName;
+    this.contextLeft = contextLeft;
+    this.contextRight = contextRight;
     this.parent = parent;
     this.matches = Collections.synchronizedList(matches);
     this.firstMatchOffset = firstMatchOffset;
@@ -117,7 +100,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
     setSizeFull();
-
+    
     layout = new CssLayout();
     setContent(layout);
     layout.addStyleName("result-view-css");
@@ -127,56 +110,45 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     addStyleName("result-view");
 
     indicatorLayout = new VerticalLayout();
-
+    
     progress = new ProgressBar();
     progress.setIndeterminate(false);
     progress.setValue(0f);
     progress.setSizeUndefined();
-
+    
     indicatorLayout.addComponent(progress);
     indicatorLayout.setWidth("100%");
     indicatorLayout.setHeight("-1px");
     indicatorLayout.setComponentAlignment(progress, Alignment.TOP_CENTER);
     indicatorLayout.setVisible(true);
-
+    
     layout.addComponent(indicatorLayout);
-
+       
     // enable indicator in order to get refresh GUI regulary
     progress.setEnabled(true);
 
-    ListeningExecutorService service =
-      MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
-
-    WebResource res = Helper.getAnnisWebResource();
-    if (res != null)
+    Callable<Boolean> run = new AllResultsFetcher();
+    FutureTask<Boolean> task = new FutureTask<Boolean>(
+      run)
     {
-      res = res.path("query/search/subgraph");
-      List<Callable<SaltProject>> callables = new LinkedList<Callable<SaltProject>>();
-      for (Match m : matches)
+      @Override
+      protected void done()
       {
-        callables.add(new SingleResultFetcher(contextLeft, contextRight,
-          segmentationName, res, m));
+        UI.getCurrent().access(new Runnable() {
+          @Override
+          public void run()
+          {
+            progress.setEnabled(false);
+            progress.setVisible(false);
+            indicatorLayout.setVisible(false);
+          }
+        });
       }
-      try
-      {
-        int j=0;
-        List<Future<SaltProject>> futures = service.invokeAll(callables);
-        for (Future<SaltProject> f : futures)
-        {
-          Futures.addCallback((ListenableFuture<SaltProject>) f, 
-            new SingleResultCallback(j++, j == futures.size()));
-        }
-      }
-      catch (InterruptedException ex)
-      {
-        Logger.getLogger(ResultSetPanel.class.getName()).log(Level.SEVERE, null,
-          ex);
-      }
-
-    }
-
+    };
+    ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
+    singleExecutor.submit(task);
   }
-
+  
   private void addQueryResult(SaltProject p, int offset)
   {
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
@@ -204,7 +176,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       layout.addComponent(panel);
     }
   }
-
+  
   private void updateVariables(SaltProject p)
   {
     segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
@@ -214,20 +186,18 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     parent.updateSegmentationLayer(segmentationLayerSet);
     parent.updateTokenAnnos(tokenAnnotationLevelSet);
   }
-
+  
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
   {
     List<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
-
-    int i = 0;
+    
+    int i=0;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      SingleResultPanel panel = new SingleResultPanel(corpusGraph.
-        getSDocuments().get(0),
-        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName,
-        instanceConfig);
+      SingleResultPanel panel = new SingleResultPanel(corpusGraph.getSDocuments().get(0), 
+        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName, instanceConfig);
       i++;
-
+      
       panel.setWidth("100%");
       panel.setHeight("-1px");
 
@@ -235,6 +205,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
     return result;
   }
+
 
   @Override
   public ResolverEntry[] getResolverEntries(SDocument doc)
@@ -266,8 +237,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         }
         catch (NullPointerException ex)
         {
-          log.warn(
-            "NullPointerException when using Salt, was trying to get layer name",
+          log.warn("NullPointerException when using Salt, was trying to get layer name",
             ex);
         }
       }
@@ -306,8 +276,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
           String type = r.getType() == null ? null : r.getType().toString();
           if (corpusName != null && namespace != null && type != null)
           {
-            WebResource res = resResolver.path(corpusName).path(namespace).path(
-              type);
+            WebResource res = resResolver.path(corpusName).path(namespace).path(type);
             try
             {
               tmp = res.get(new ResolverEntryListType());
@@ -328,7 +297,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         {
           log.error(null, ex);
         }
-        catch (UnsupportedEncodingException ex)
+        catch(UnsupportedEncodingException ex)
         {
           log.error(null, ex);
         }
@@ -357,66 +326,14 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       p.setVisibleTokenAnnosVisible(annos);
     }
   }
-  
-  public class SingleResultCallback implements FutureCallback<SaltProject>
+
+  public class AllResultsFetcher implements Callable<Boolean>
   {
 
-    private int j;
-    private boolean lastOne;
-
-    public SingleResultCallback(int j, boolean lastOne)
-    {
-      this.j = j;
-      this.lastOne = lastOne;
-    }
-
-    @Override
-    public void onSuccess(final SaltProject result)
-    {
-      UI.getCurrent().access(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          updateUIFromResult(result, j);
-          if(lastOne)
-          {
-            progress.setEnabled(false);
-            progress.setVisible(false);
-            indicatorLayout.setVisible(false);
-          }
-          UI.getCurrent().push();
-        }
-      });
-    }
-
-    @Override
-    public void onFailure(Throwable t)
+    public AllResultsFetcher()
     {
     }
-  }
-
-  public static class SingleResultFetcher implements Callable<SaltProject>
-  {
-
-    private int contextLeft, contextRight;
-
-    private String segmentationName;
-
-    private WebResource res;
-
-    private Match match;
-
-    public SingleResultFetcher(int contextLeft, int contextRight,
-      String segmentationName, WebResource res, Match match)
-    {
-      this.contextLeft = contextLeft;
-      this.contextRight = contextRight;
-      this.segmentationName = segmentationName;
-      this.res = res;
-      this.match = match;
-    }
-
+    
     private SaltProject executeQuery(WebResource subgraphRes,
       SubgraphQuery query)
     {
@@ -470,97 +387,77 @@ public class ResultSetPanel extends Panel implements ResolverProvider
       query.setMatches(saltURIs);
       return query;
     }
-
+    
     @Override
-    public SaltProject call() throws Exception
+    public Boolean call() throws Exception
     {
-      List<Match> sub = new LinkedList<Match>();
-      sub.add(match);
-
-      SubgraphQuery query = prepareQuery(sub);
-      if (query.getMatches().getGroups().size() > 0)
+      boolean allSuccessfull = true;
+      
+      WebResource res = Helper.getAnnisWebResource();
+      if (res != null)
       {
-        SaltProject p = executeQuery(res, query);
-        return p;
+        res = res.path("query/search/subgraph");
+
+        final AtomicInteger j = new AtomicInteger();
+        SaltProject lastProject = null;
+        for(Match m : matches)
+        {
+          List<Match> sub = new LinkedList<Match>();
+          sub.add(m);
+          SubgraphQuery query = prepareQuery(sub);
+          if(query.getMatches().getGroups().size() > 0)
+          {
+            SaltProject p = executeQuery(res, query);
+            
+            if(p != null)
+            {
+              lastProject = p;
+            } 
+          }
+          else
+          {
+            allSuccessfull = false;
+          }
+          
+          final SaltProject p = lastProject;
+          UI.getCurrent().access(new Runnable() 
+          {
+            @Override
+            public void run()
+            {
+              updateUIFromResult(p, j);
+            }
+          });
+         
+        }
+        
       }
-      return null;
+      return allSuccessfull;
     }
-  }
 
-//  public class AllResultsFetcher implements Callable<Boolean>
-//  {
-//
-//    public AllResultsFetcher()
-//    {
-//    }
-//
-//    @Override
-//    public Boolean call() throws Exception
-//    {
-//      boolean allSuccessfull = true;
-//
-//      WebResource res = Helper.getAnnisWebResource();
-//      if (res != null)
-//      {
-//        res = res.path("query/search/subgraph");
-//
-//        final AtomicInteger j = new AtomicInteger();
-//        SaltProject lastProject = null;
-//        for (Match m : matches)
-//        {
-//          List<Match> sub = new LinkedList<Match>();
-//          sub.add(m);
-//          SubgraphQuery query = prepareQuery(sub);
-//          if (query.getMatches().getGroups().size() > 0)
-//          {
-//            SaltProject p = executeQuery(res, query);
-//
-//            if (p != null)
-//            {
-//              lastProject = p;
-//            }
-//          }
-//          else
-//          {
-//            allSuccessfull = false;
-//          }
-//
-//          final SaltProject p = lastProject;
-//          UI.getCurrent().access(new Runnable()
-//          {
-//            @Override
-//            public void run()
-//            {
-//            }
-//          });
-//
-//        }
-//
-//      }
-//      return allSuccessfull;
-//    }
-//  } // end class AllResultsFetcher
+ 
+  } // end class AllResultsFetcher
 
-  private void updateUIFromResult(SaltProject lastProject, int j)
+  private void updateUIFromResult(SaltProject lastProject, AtomicInteger j)
   {
     try
     {
       if (lastProject != null)
       {
-        addQueryResult(lastProject, j + firstMatchOffset);
+        addQueryResult(lastProject, j.get() + firstMatchOffset);
       }
-      progress.setValue((float) j / (float) matches.size());
-      if (j == matches.size())
+      progress.setValue((float) j.getAndIncrement() / (float) matches.size());
+      if (j.get() == matches.size())
       {
         progress.setValue(1.0f);
       }
     }
-    catch (Throwable ex)
+    catch(Throwable ex)
     {
       log.error("Exception when adding query result", ex);
     }
   }
-
+  
   private static class ResolverEntryListType extends GenericType<List<ResolverEntry>>
   {
 
@@ -569,8 +466,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     }
   }
 
-  private static class ResolverEntryComparator implements
-    Comparator<ResolverEntry>, Serializable
+  private static class ResolverEntryComparator implements Comparator<ResolverEntry>, Serializable
   {
 
     public ResolverEntryComparator()
