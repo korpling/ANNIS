@@ -506,6 +506,10 @@ public class SearchUI extends AnnisBaseUI
 
   public void checkCitation()
   {
+    if(VaadinSession.getCurrent() == null || VaadinSession.getCurrent().getSession() == null)
+    {
+      return;
+    }
     Object origURLRaw = VaadinSession.getCurrent().getSession().getAttribute(
       "citation");
     if (origURLRaw == null || !(origURLRaw instanceof String))
