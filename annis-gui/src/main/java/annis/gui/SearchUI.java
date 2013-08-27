@@ -293,12 +293,6 @@ public class SearchUI extends AnnisBaseUI
     ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
       "example queries", this);
 
-    controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
-    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    hSplit.setFirstComponent(controlPanel);
-
     tutorial = new TutorialPanel();
     tutorial.setHeight("99%");
 
@@ -306,6 +300,12 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.addTab(autoGenQueries, "example queries");
     mainTab.addTab(tutorial, "Tutorial");
+
+    controlPanel = new ControlPanel(queryController, instanceConfig,
+      autoGenQueries, mainTab);
+    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    hSplit.setFirstComponent(controlPanel);
 
     queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
     mainTab.addTab(queryBuilder, "Query Builder");

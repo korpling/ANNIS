@@ -42,7 +42,7 @@ public class ControlPanel extends VerticalLayout
   private SearchOptionsPanel searchOptions;
 
   public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
-    ExampleQueriesPanel autoGenQueries)
+    ExampleQueriesPanel autoGenQueries, TabSheet tab)
   {
     setSizeFull();
 
@@ -53,7 +53,7 @@ public class ControlPanel extends VerticalLayout
     accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
     accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
 
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
+    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, tab);
 
     searchOptions = new SearchOptionsPanel();
 

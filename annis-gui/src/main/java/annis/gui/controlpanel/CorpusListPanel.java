@@ -23,6 +23,7 @@ import annis.security.AnnisUserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
+import annis.gui.docbrowser.DocBrowser;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -50,6 +51,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -82,6 +84,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
+  private final TabSheet tabSheet;
 
   public enum ActionType
   {
@@ -106,11 +109,12 @@ public class CorpusListPanel extends VerticalLayout implements
   private InstanceConfig instanceConfig;
 
   public CorpusListPanel(QueryController controller,
-    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries)
+    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries, TabSheet tab)
   {
     this.controller = controller;
     this.instanceConfig = instanceConfig;
     this.autoGenQueries = autoGenQueries;
+    this.tabSheet = tab;
 
     final CorpusListPanel finalThis = this;
 
@@ -668,7 +672,7 @@ public class CorpusListPanel extends VerticalLayout implements
         @Override
         public void buttonClick(ClickEvent event)
         {
-          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+          new DocBrowser(tabSheet, id);
         }
       });
 
