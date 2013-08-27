@@ -60,7 +60,7 @@ public class ExampleQueriesPanel extends Table
   // first column String
   private final String EXAMPLE_QUERY = "example query";
 
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private transient ExecutorService executor;
 
   //main ui window
   private SearchUI ui;
@@ -366,7 +366,7 @@ public class ExampleQueriesPanel extends Table
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    executor.submit(new Runnable()
+    getExecutor().submit(new Runnable()
     {
       @Override
       public void run()
@@ -462,5 +462,14 @@ public class ExampleQueriesPanel extends Table
       ExampleQuery eQ = (ExampleQuery) itemId;
       return getOpenCorpusPanel(eQ.getCorpusName());
     }
+  }
+  
+  private ExecutorService getExecutor()
+  {
+    if(executor == null)
+    {
+      executor = Executors.newSingleThreadExecutor();
+    }
+    return executor;
   }
 }
