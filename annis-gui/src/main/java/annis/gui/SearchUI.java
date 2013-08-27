@@ -52,6 +52,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -63,6 +64,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.xeoh.plugins.base.PluginManager;
@@ -78,7 +82,7 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push
+@Push(value = PushMode.MANUAL, transport = Transport.STREAMING)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
@@ -134,11 +138,10 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  
   @Override
   protected void init(VaadinRequest request)
-  {
-    getPushConfiguration().setTransport(Transport.STREAMING);
-    
+  {    
     super.init(request);
     setErrorHandler(this);
 
@@ -370,7 +373,7 @@ public class SearchUI extends AnnisBaseUI
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
 
-    setPollInterval(10000);
+    setPollInterval(-1);
 
     updateUserInformation();
   }
@@ -915,6 +918,8 @@ public class SearchUI extends AnnisBaseUI
       UI.getCurrent().getPage().setUriFragment("");
     }
   }
+  
+  
 
   private class CitationRequestHandler implements RequestHandler
   {

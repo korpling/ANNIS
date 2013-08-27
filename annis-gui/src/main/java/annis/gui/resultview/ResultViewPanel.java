@@ -169,15 +169,16 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     progressResult.setVisible(false);
 
     addComponent(progressResult);
-
+    addComponent(resultLayout);
+    
+    
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
 
     setExpandRatio(mbResult, 0.0f);
     setExpandRatio(paging, 0.0f);
-    setExpandRatio(progressResult, 1.0f);
-    
-    addComponent(resultLayout);
+    setExpandRatio(progressResult, 0.0f);
+    setExpandRatio(resultLayout, 1.0f);
 
   }
 
@@ -189,6 +190,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n",
       " ") + "\"");
     progressResult.setVisible(true);
+    setExpandRatio(progressResult, 1.0f);
 
     segmentationName = q.getSegmentation();
   }
@@ -211,12 +213,16 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
 
   public void showSubgraphSearchInProgress(PagedResultQuery q, float percent)
   {
-    resultLayout.removeAllComponents();
-    currentResults = 0;
-
+    if(percent == 0.0f)
+    {
+      resultLayout.removeAllComponents();
+      currentResults = 0;
+    }
+    
     progressResult.setIndeterminate(false);
     progressResult.setCaption("");
     progressResult.setVisible(true);
+    setExpandRatio(progressResult, 0.0f);
     progressResult.setValue(percent);
   }
   

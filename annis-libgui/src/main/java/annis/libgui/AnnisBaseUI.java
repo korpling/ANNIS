@@ -39,6 +39,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -94,6 +96,13 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
+  
+  private static final Lock pollLock = new ReentrantLock();
+  private int fastPollCounter;
+  private int slowPollCounter;
+  public final static int DEFAULT_POLL_INTERVALL = -1;
+  public final static int FAST_POLL_INTERVALL = 250;
+  public final static int SLOW_POLL_INTERVALL = 1000;
   
   @Override
   protected void init(VaadinRequest request)
@@ -460,7 +469,101 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
 
+  /**
+   * Request to set polling interval to "slow". 
+   * Always unset this with {@link #unrequestSlowPoll()  } (use a {@code finally {}} block).
+   * If there are any other requests for "fast" polling, the fast polling will be used instead.
+   * 
+   * This method is thread-safe.
+   */
+  public void requestSlowPoll()
+  {
+    pollLock.lock();
+    try
+    {
+      slowPollCounter++;
+      updatePollIntervall();
+    }
+    finally
+    {
+      pollLock.unlock();
+    }
+  }
+  
+  /**
+   * Request to set polling interval to "fast". 
+   * Always unset this with {@link #unrequestFastPoll() } (use a {@code finally {}} block).
+   * 
+   * This method is thread-safe.
+   */
+  public void requestFastPoll()
+  {
+    pollLock.lock();
+    try
+    {
+      fastPollCounter++;
+      updatePollIntervall();
+    }
+    finally
+    {
+      pollLock.unlock();
+    }
+  }
+  
+  /**
+   * @see  #requestSlowPoll()
+   */
+  public void unrequestSlowPoll()
+  {
+    pollLock.lock();
+    try
+    {
+      slowPollCounter = Math.max(0, slowPollCounter-1);
+      updatePollIntervall();
+    }
+    finally
+    {
+      pollLock.unlock();
+    }
+  }
+  
+  /**
+   * @see  #requestFastPoll()
+   */
+  public void unrequestFastPoll()
+  {
+    pollLock.lock();
+    try
+    {
+      fastPollCounter = Math.max(0, fastPollCounter-1);
+      updatePollIntervall();
+    }
+    finally
+    {
+      pollLock.unlock();
+    }
+  }
+  
+  private void updatePollIntervall()
+  {
+    if(fastPollCounter > 0)
+    {
+      setPollInterval(FAST_POLL_INTERVALL);
+      log.debug("Fast polling activated (polling set to {})", FAST_POLL_INTERVALL);
+    }
+    else if(slowPollCounter > 0)
+    {
+      setPollInterval(SLOW_POLL_INTERVALL);
+      log.debug("Slow polling activated (polling set to {})", SLOW_POLL_INTERVALL);
+    }
+    else
+    {
+      setPollInterval(DEFAULT_POLL_INTERVALL);
+      log.debug("Default polling activated (polling set to {})", DEFAULT_POLL_INTERVALL);
+    }
+  }
 
+  
   @Override
   public PluginManager getPluginManager()
   {

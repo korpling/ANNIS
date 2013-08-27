@@ -38,6 +38,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.logging.Level;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -54,7 +55,6 @@ class ResultFetchThread extends Thread
 
   private static final Logger log = LoggerFactory.getLogger(
     ResultFetchThread.class);
-
   private ResultViewPanel resultPanel;
 
   private Future<List<Match>> futureMatches;
@@ -65,9 +65,9 @@ class ResultFetchThread extends Thread
 
   private PagedResultQuery query;
 
-  private UI ui;
+  private SearchUI ui;
 
-  ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel, UI ui)
+  ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel, SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
@@ -152,16 +152,6 @@ class ResultFetchThread extends Thread
     return subgraphQuery;
   }
 
-  private long throttledPush(long lastPushTime, Runnable run)
-  {
-    long currentTime = System.currentTimeMillis();
-    
-    if(currentTime - lastPushTime > 250)
-    {
-      ui.access(run);
-    }
-    return System.currentTimeMillis();
-  }
   
   @Override
   public void run()
@@ -170,10 +160,21 @@ class ResultFetchThread extends Thread
       Helper.getAnnisWebResource().path("query/search/subgraph");
 
     List<Match> result = null;
+    ui.requestFastPoll();
+    
+    // update the new poll time
+    ui.accessSynchronously(new Runnable() 
+    {
+      @Override
+      public void run()
+      {
+        ui.push();
+      }
+    });
+    
     try
     {
-      long lastPushTime = throttledPush(0,
-        new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()
@@ -185,8 +186,6 @@ class ResultFetchThread extends Thread
       // get the matches
       result = futureMatches.get(60, TimeUnit.SECONDS);
 
-      final LinkedList<SaltProject> projectBuffer = new LinkedList<SaltProject>();
-       
       // get the subgraph for each match
       if (result.isEmpty())
       {
@@ -201,7 +200,7 @@ class ResultFetchThread extends Thread
       }
       else
       {
-        lastPushTime = throttledPush(lastPushTime, new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -227,22 +226,16 @@ class ResultFetchThread extends Thread
           SubgraphQuery subgraphQuery = prepareQuery(subList);
           final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
           
-          projectBuffer.add(p);
-          
           final float progress = (float) current / (float) totalResultSize;
           
-          lastPushTime = throttledPush(lastPushTime, new Runnable()
+          ui.access(new Runnable()
             {
               @Override
               public void run()
               {
                 log.info("GUILOCK: updating progress result panel");
                 resultPanel.showSubgraphSearchInProgress(query, progress);
-                for(SaltProject p : projectBuffer)
-                {
-                  resultPanel.addQueryResult(query, p);
-                }
-                projectBuffer.clear();
+                resultPanel.addQueryResult(query, p);
               }
             });
           
@@ -257,10 +250,6 @@ class ResultFetchThread extends Thread
         @Override
         public void run()
         {
-          for(SaltProject p : projectBuffer)
-          {
-            resultPanel.addQueryResult(query, p);
-          }
           log.info("GUILOCK: finalizer");
           resultPanel.showFinishedSubgraphSearch();
         }
@@ -279,7 +268,7 @@ class ResultFetchThread extends Thread
     }
     catch (final ExecutionException root)
     {
-      UI.getCurrent().access(new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()
@@ -314,18 +303,20 @@ class ResultFetchThread extends Thread
         }
       });
     }
-    final List<Match> finalResult = result;
-    //      ui.access(new Runnable()
-    //      {
-    //        @Override
-    //        public void run()
-    //        {
-    //          lastResultView.setResult(finalResult,
-    //            lastQuery.getContextLeft(),
-    //            lastQuery.getContextRight(), lastQuery.getSegmentation(),
-    //            lastQuery.getOffset());
-    //        }
-    //      });
+    finally
+    {
+      ui.unrequestFastPoll();
+       // update the new poll time
+      ui.accessSynchronously(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          ui.push();
+        }
+      });
+    }
+
   }
 
   private static class MatchListType extends GenericType<List<Match>>
