@@ -208,9 +208,11 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setContainerDataSource(corpusContainer);
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
+    tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
 
-    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info");
-    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "");
+    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
+      "docs");
+    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
     tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
@@ -650,6 +652,28 @@ public class CorpusListPanel extends VerticalLayout implements
     }
 
     return result;
+  }
+
+  public class DocLinkGenerator implements Table.ColumnGenerator
+  {
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      final String id = (String) itemId;
+      Button docBtn = new Button("open docs");
+      docBtn.setDescription("opens the document browser for " + id);
+      docBtn.addClickListener(new Button.ClickListener()
+      {
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+      });
+
+      return docBtn;
+    }
   }
 
   public class InfoGenerator implements Table.ColumnGenerator
