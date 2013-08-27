@@ -687,8 +687,7 @@ public class CorpusListPanel extends VerticalLayout implements
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
-
-      l.addListener(new Button.ClickListener()
+      l.addClickListener(new Button.ClickListener()
       {
         @Override
         public void buttonClick(ClickEvent event)
