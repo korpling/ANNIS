@@ -227,7 +227,7 @@ public class QueryController implements PagingCallback
 
     }
 
-    if (executeCount)
+    if (false && executeCount)
     {
       // start count query
       ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);

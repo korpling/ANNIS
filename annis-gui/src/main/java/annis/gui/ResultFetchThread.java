@@ -152,6 +152,17 @@ class ResultFetchThread extends Thread
     return subgraphQuery;
   }
 
+  private long throttledPush(long lastPushTime, Runnable run)
+  {
+    long currentTime = System.currentTimeMillis();
+    
+    if(currentTime - lastPushTime > 250)
+    {
+      ui.access(run);
+    }
+    return System.currentTimeMillis();
+  }
+  
   @Override
   public void run()
   {
@@ -161,7 +172,8 @@ class ResultFetchThread extends Thread
     List<Match> result = null;
     try
     {
-      ui.accessSynchronously(new Runnable()
+      long lastPushTime = throttledPush(0,
+        new Runnable()
       {
         @Override
         public void run()
@@ -173,10 +185,12 @@ class ResultFetchThread extends Thread
       // get the matches
       result = futureMatches.get(60, TimeUnit.SECONDS);
 
+      final LinkedList<SaltProject> projectBuffer = new LinkedList<SaltProject>();
+       
       // get the subgraph for each match
       if (result.isEmpty())
       {
-        ui.accessSynchronously(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -187,18 +201,22 @@ class ResultFetchThread extends Thread
       }
       else
       {
-        ui.accessSynchronously(new Runnable()
+        lastPushTime = throttledPush(lastPushTime, new Runnable()
         {
           @Override
           public void run()
           {
-            resultPanel.showSubgraphSearchInProgress(query);
+            resultPanel.showSubgraphSearchInProgress(query, 0.0f);
           }
         });
         
         final int totalResultSize = result.size();
+        int current = 0;
+        
+         
         for (Match m : result)
         {
+          log.info("query next match");
           if (aborted)
           {
             return;
@@ -208,26 +226,47 @@ class ResultFetchThread extends Thread
           subList.add(m);
           SubgraphQuery subgraphQuery = prepareQuery(subList);
           final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
-
-          ui.accessSynchronously(new Runnable()
-          {
-            @Override
-            public void run()
+          
+          projectBuffer.add(p);
+          
+          final float progress = (float) current / (float) totalResultSize;
+          
+          lastPushTime = throttledPush(lastPushTime, new Runnable()
             {
-              resultPanel.addQueryResult(query, p, totalResultSize);
-            }
-          });
+              @Override
+              public void run()
+              {
+                log.info("GUILOCK: updating progress result panel");
+                resultPanel.showSubgraphSearchInProgress(query, progress);
+                for(SaltProject p : projectBuffer)
+                {
+                  resultPanel.addQueryResult(query, p);
+                }
+                projectBuffer.clear();
+              }
+            });
+          
+          
+          log.info("finished next match");
+          current++;
         }
       } // end if no results
 
-      ui.accessSynchronously(new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()
         {
+          for(SaltProject p : projectBuffer)
+          {
+            resultPanel.addQueryResult(query, p);
+          }
+          log.info("GUILOCK: finalizer");
           resultPanel.showFinishedSubgraphSearch();
         }
       });
+      
+      log.info("ok, everything done as planned");
 
     }
     catch (TimeoutException ex)

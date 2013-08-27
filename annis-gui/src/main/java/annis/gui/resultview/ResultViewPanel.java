@@ -209,7 +209,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     setExpandRatio(lblNoResult, 1.0f);
   }
 
-  public void showSubgraphSearchInProgress(PagedResultQuery q)
+  public void showSubgraphSearchInProgress(PagedResultQuery q, float percent)
   {
     resultLayout.removeAllComponents();
     currentResults = 0;
@@ -217,14 +217,12 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     progressResult.setIndeterminate(false);
     progressResult.setCaption("");
     progressResult.setVisible(true);
+    progressResult.setValue(percent);
   }
+  
 
-  public void addQueryResult(PagedResultQuery q, SaltProject p, int totalResultSize)
+  public void addQueryResult(PagedResultQuery q, SaltProject p)
   {
-    progressResult.setIndeterminate(false);
-    progressResult.setCaption("");
-    progressResult.setVisible(true);
-
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
     {
@@ -250,12 +248,6 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
       resultPanelList.add(panel);
       resultLayout.addComponent(panel);
     }
-    
-     progressResult.setValue((float) currentResults / (float) totalResultSize);
-      if (currentResults == totalResultSize)
-      {
-        progressResult.setValue(1.0f);
-      }
   }
   
   public void showFinishedSubgraphSearch()
