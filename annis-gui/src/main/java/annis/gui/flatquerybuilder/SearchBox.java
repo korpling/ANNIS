@@ -45,6 +45,7 @@ import java.util.Vector;
 import java.util.concurrent.ConcurrentSkipListSet;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.collections15.bidimap.DualHashBidiMap;
+import com.vaadin.ui.Label;
 
 /**
  *
@@ -58,23 +59,15 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
   private Button btAdd;
   private boolean reBoxSingleValue; /*Saves the boolean value of reBox when the SearchBox shifts from single-value to multi-value*/
   
-  /*OLD ATTRIBUTE LIST, SOME STUFF CAN BE DELETED*/
   private Button btClose;
-  /*DELETE*/private Collection<Button> ors;
-  /*DELETE*/private Collection<Button> nors;
   private VerticalNode vn;
   private VerticalLayout vnframe;
   private String ebene;
-  //private SensitiveComboBox cb;
-  /*DELETE*/ /*private Vector<SensitiveComboBox> cbs;*/
-  private DualHashBidiMap<SensitiveComboBox, Button> cbframes;
   private CheckBox reBox;
   private CheckBox negSearchBox;
-  /*DELETE*/private Collection<String> annonames;
   private FlatQueryBuilder sq;
   private VerticalLayout sb;
   public static final String BUTTON_CLOSE_LABEL = "X";
-  /*DELETE*/private static final String SB_CB_WIDTH = "130px";
   private static final String CAPTION_REBOX = "Regex";
   private static final String NEGATIVE_SEARCH_LABEL = "Neg. search";
   private static final String LABEL_BUTTON_ADD = "+";
