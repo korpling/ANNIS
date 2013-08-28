@@ -73,6 +73,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private SpanBox spbox;
   private String query;
   private MenuBar.MenuItem spanMenu;
+  private reducingStringComparator rsc;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -115,6 +116,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private void launch(QueryController cp)
   {
     this.cp = cp;
+    rsc = new reducingStringComparator();
     this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
@@ -351,7 +353,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     return result.replace("/", "\\x2F");
   }
   
-  private String unescape(String s)
+  public String unescape(String s)
 	{
     //first unescape slashes and quotes:
 		
@@ -755,17 +757,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mboxes.clear();
   }
   
-  public Collection<String> parseMultipleValueExpression(String expression)
+  private Collection<String> splitMultipleValueExpression(String expression)
 	/*
 	 * only for complex regex expressions
 	 */
 	{		
-		Collection<String> values = new TreeSet<String>();
+		/*Collection<String> values = new TreeSet<String>();
 		int i=0;
+    boolean connected = true;
 		
 		while(expression.length()>0)
 		{
-			if((expression.charAt(i)=='|')|(i==expression.length()-1))
+			if(((expression.charAt(i)=='|')&(!connected))|(i==expression.length()-1))
 			{
 				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
 				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
@@ -780,11 +783,47 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 			else
 			{
 				i++;
-			}
+			}      
 		}
 		
-		return values;
+		return values;*/
+    
+    /*NEW CODE*/
+    ArrayList<String> values = new ArrayList<String>();
+    String s = expression;
+    
+    while(s.length()>0)
+    {
+       if(s.charAt(0)=='|') {s = s.substring(1);}
+       if(s.charAt(0)!='(')
+       {
+         values = new ArrayList<String>();
+         values.add(expression);
+         return values;
+       }
+       else
+       {
+         int pc = 1;
+         int i = 1;
+         while(pc!=0)
+         {
+           char c = s.charAt(i);
+           if(c==')') {pc--;}
+           else if(c=='(') {pc++;}
+           i++;
+         }         
+         values.add(unescape(s.substring(1, i-1))); //in respect to removal of parentheses
+         s = s.substring(i);
+       }
+    }
+    
+    return values;
 	}
+  
+  public reducingStringComparator getRSC()
+  {
+    return rsc;
+  }
   
   public void loadQuery() throws UnknownLevelException, EqualityConstraintException
     /*
@@ -885,11 +924,16 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           if(!annonames.contains(con.getLevel()))
           {
             throw new UnknownLevelException(con.getLevel());
-            //is that a good idea?
+            //is that a good idea? YES
           }
           if(!indexedVnodes.containsKey(i))
           {            
             vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
+            if(con.isRegEx())
+            {
+              SearchBox sb = vn.getSearchBoxes().iterator().next();
+              sb.setValue(splitMultipleValueExpression(con.getValue()));
+            }
             indexedVnodes.put(i, vn);
           }
 
@@ -903,7 +947,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
                 indexedVnodes.put(b, null);
                 Constraint bcon = constraints.get(b);
                 SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
-                sb.setValue(bcon.getValue());
+                Collection<String> values = splitMultipleValueExpression(bcon.getValue());
+                if(values.size()>1)
+                {
+                  sb.setValue(values);
+                }
+                else
+                {
+                  sb.setValue(bcon.getValue());
+                }
                 vn.addSearchBox(sb);
               }
             }          
@@ -983,7 +1035,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         {
           if(mc.isRegEx())
           {
-            Collection<String> values = parseMultipleValueExpression(mc.getValue());
+            Collection<String> values = splitMultipleValueExpression(mc.getValue());
             MetaBox mb = new MetaBox(mc.getLevel(), this);
             mb.setValue(values);
             mboxes.add(mb);
