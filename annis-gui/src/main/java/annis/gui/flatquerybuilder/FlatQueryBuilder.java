@@ -357,7 +357,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 	{
     //first unescape slashes and quotes:
 		
-		s = s.replace("\\x2F", "/").replace("\\x22", "\"");       
+		s = s.replace("\\x2F", "/").replace("\\x22", "\"");
     
     //unescape regex characters:
 		int i=1;
@@ -381,6 +381,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     return s;
 	}
+  
+  public String unescapeParentheses(String s)
+  {
+    return s.replace("\\x2F", "/").replace("\\x22", "\"");
+  }
 
   private String getAQLQuery()
   {
@@ -812,7 +817,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
            else if(c=='(') {pc++;}
            i++;
          }         
-         values.add(unescape(s.substring(1, i-1))); //in respect to removal of parentheses
+         values.add(unescapeParentheses(s.substring(1, i-1))); //in respect to removal of parentheses
          s = s.substring(i);
        }
     }
@@ -932,7 +937,16 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             if(con.isRegEx())
             {
               SearchBox sb = vn.getSearchBoxes().iterator().next();
-              sb.setValue(splitMultipleValueExpression(con.getValue()));
+              /*CHECK FIRST IF WE REALLY HAVE A MULTIPLE VALUE EXPRESSION*/
+              Collection<String> mvalue = splitMultipleValueExpression(con.getValue());
+              if(mvalue.size()==1)
+              {
+                sb.setValue(mvalue.iterator().next());
+              }
+              else
+              {
+                sb.setValue(mvalue); 
+              }              
             }
             indexedVnodes.put(i, vn);
           }
