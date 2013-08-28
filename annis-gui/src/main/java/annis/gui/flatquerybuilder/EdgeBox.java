@@ -42,7 +42,8 @@ public class EdgeBox extends Panel
   private static HashMap<String, String> EO;
   private static final String UD_EO_DESCRIPTION = "\t(user defined)";  
   private static final String WIDTH = "45px";
-  private static final String REGEX_PATTERN = "\\.[1-9]+[0-9]*,[1-9]+[0-9]*";
+  private static final String REGEX_PATTERN = "(\\.((\\*)|([1-9]+[0-9]*(,[1-9]+[0-9]*)?))?)";
+  private static final String REGEX_PATTERN_DOUBLEBOUND = "\\\\.[1-9]+[0-9]*,[1-9]+[0-9]*";
   
   public EdgeBox (FlatQueryBuilder sq)
   {
@@ -130,13 +131,16 @@ public class EdgeBox extends Panel
   private boolean validOperator(String o)
   {
     String s = o.replace(" ", "");
-    boolean a = Pattern.matches(REGEX_PATTERN, s);
-    if(a)
+    if(Pattern.matches(REGEX_PATTERN, s))
     {
-      int split = s.indexOf(",");
-      String s1 = s.substring(1, split);
-      String s2 = s.substring(split+1);
-      return (Integer.parseInt(s1)<=Integer.parseInt(s2));
+      if(Pattern.matches(REGEX_PATTERN_DOUBLEBOUND, s))
+      {
+        int split = s.indexOf(",");
+        String s1 = s.substring(1, split);
+        String s2 = s.substring(split+1);
+        return (Integer.parseInt(s1)<=Integer.parseInt(s2));
+      }
+      else return true;
     }    
     return false;  
   }
