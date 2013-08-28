@@ -153,7 +153,6 @@ public class QueryController implements PagingCallback
     }
 
     futureCount = null;
-    lastResultView = null;
 
   }
 
