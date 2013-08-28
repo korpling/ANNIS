@@ -57,6 +57,7 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
   /*NEW ADDITIONAL ATTRIBUTES*/
   private Collection<ValueField> vfs;
   private Button btAdd;
+  private Label lbl;
   private boolean reBoxSingleValue; /*Saves the boolean value of reBox when the SearchBox shifts from single-value to multi-value*/
   
   private Button btClose;
@@ -98,13 +99,13 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     this.sb = new VerticalLayout(); //maybe other name? sb is "reserved" by SearchBox
     sb.setImmediate(true);
     sb.setSpacing(false);     //used to be true
+    lbl = new Label(ebene);    
     HorizontalLayout sbtoolbar = new HorizontalLayout();
     sbtoolbar.setSpacing(false);
     // searchbox tickbox for regex
     reBox = new CheckBox(CAPTION_REBOX);
     reBox.setImmediate(true);
     sbtoolbar.addComponent(reBox);
-    /*CHECK THIS LATER!*/
     reBox.addValueChangeListener(new ValueChangeListener() {
       // TODO make this into a nice subroutine
       @Override
@@ -142,19 +143,25 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     negSearchBox = new CheckBox(NEGATIVE_SEARCH_LABEL);
     negSearchBox.setImmediate(true);
     negSearchBox.setValue(negativeSearch);
-    
+        
     sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);    
-    vnframe.addComponent(btClose);
-    vnframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
+    
+    HorizontalLayout titleBar = new HorizontalLayout();
+    titleBar.setWidth(vnframe.getWidth(), vnframe.getWidthUnits());
+    titleBar.addComponent(lbl);
+    titleBar.setComponentAlignment(lbl, Alignment.BOTTOM_LEFT);
+    titleBar.addComponent(btClose);
+    titleBar.setComponentAlignment(btClose, Alignment.TOP_RIGHT);    
     
     btAdd = new Button(LABEL_BUTTON_ADD);
     btAdd.addClickListener((Button.ClickListener)this);
     btAdd.setStyleName(ChameleonTheme.BUTTON_SMALL);
-        
-    vnframe.addComponent(sb);
+    
+    vnframe.addComponent(titleBar);
+    vnframe.addComponent(sb);    
     vnframe.addComponent(btAdd);
     vnframe.setComponentAlignment(btAdd, Alignment.BOTTOM_RIGHT);    
     vnframe.addComponent(sbtoolbar);    
