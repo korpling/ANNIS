@@ -61,8 +61,6 @@ class ResultFetchThread extends Thread
 
   private AsyncWebResource res;
 
-  private boolean aborted = false;
-
   private PagedResultQuery query;
 
   private SearchUI ui;
@@ -87,15 +85,11 @@ class ResultFetchThread extends Thread
 
   public void abort()
   {
-    aborted = true;
     if (futureMatches != null && !futureMatches.isDone())
     {
       futureMatches.cancel(true);
     }
-    if(resultPanel != null)
-    {
-      resultPanel.showNoResult();
-    }
+    interrupt();
   }
 
   private SaltProject executeQuery(WebResource subgraphRes,
@@ -163,6 +157,10 @@ class ResultFetchThread extends Thread
   
     try
     {
+      if (isInterrupted())
+      {
+        return;
+      }
       ui.access(new Runnable()
       {
         @Override
@@ -179,6 +177,10 @@ class ResultFetchThread extends Thread
       // get the subgraph for each match
       if (result.isEmpty())
       {
+        if (isInterrupted())
+        {
+          return;
+        }
         ui.access(new Runnable()
         {
           @Override
@@ -190,6 +192,10 @@ class ResultFetchThread extends Thread
       }
       else
       {
+        if (isInterrupted())
+          {
+            return;
+          }
         ui.access(new Runnable()
         {
           @Override
@@ -206,7 +212,7 @@ class ResultFetchThread extends Thread
          
         for (Match m : result)
         {
-          if (aborted)
+          if (isInterrupted())
           {
             return;
           }
@@ -218,6 +224,10 @@ class ResultFetchThread extends Thread
           
           final float progress = (float) current / (float) totalResultSize;
           
+          if (isInterrupted())
+          {
+            return;
+          }
           ui.access(new Runnable()
             {
               @Override
@@ -233,6 +243,10 @@ class ResultFetchThread extends Thread
         }
       } // end if no results
 
+      if (isInterrupted())
+      {
+        return;
+      }
       ui.access(new Runnable()
       {
         @Override
@@ -289,6 +303,10 @@ class ResultFetchThread extends Thread
     }
     finally
     {
+      if (isInterrupted())
+      {
+        return;
+      }
       ui.access(new Runnable()
       {
         @Override

@@ -149,7 +149,6 @@ public class QueryController implements PagingCallback
     if (lastMatchThread != null && lastMatchThread.isAlive())
     {
       lastMatchThread.abort();
-
     }
 
     futureCount = null;

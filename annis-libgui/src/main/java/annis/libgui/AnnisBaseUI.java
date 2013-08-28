@@ -101,11 +101,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient TreeSet<String> alreadyAddedCSS;
   
   private final Lock pushThrottleLock = new ReentrantLock();
-  private Timer pushTimer = new Timer("Push Timer");
+  private transient Timer pushTimer;
   private long lastPushTime;
   public static final long MINIMUM_PUSH_WAIT_TIME = 1000;
   private AtomicInteger pushCounter = new AtomicInteger();
-  private TimerTask pushTask;
+  private transient TimerTask pushTask;
   
   @Override
   protected void init(VaadinRequest request)
@@ -485,7 +485,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
             }
           };
-          pushTimer.schedule(pushTask, waitTime);
+          getPushTimer().schedule(pushTask, waitTime);
           log.debug("Push scheduled to be executed in {} ms", waitTime);
         }
       }
@@ -499,8 +499,20 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       pushThrottleLock.unlock();
     }
   }
+
+  public Timer getPushTimer()
+  {
+    if(pushTimer == null)
+    {
+      pushTimer = new Timer("Push Timer");
+      pushTask = null;
+    }
+    return pushTimer;
+  }
   
 
+      
+  
   @Override
   public void close()
   {
