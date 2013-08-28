@@ -37,6 +37,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.locks.Lock;
@@ -97,12 +99,10 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private transient TreeSet<String> alreadyAddedCSS;
   
-  private static final Lock pollLock = new ReentrantLock();
-  private int fastPollCounter;
-  private int slowPollCounter;
-  public final static int DEFAULT_POLL_INTERVALL = -1;
-  public final static int FAST_POLL_INTERVALL = 250;
-  public final static int SLOW_POLL_INTERVALL = 1000;
+  private final Lock pushThrottleLock = new ReentrantLock();
+  private Timer pushTask = null;
+  private long lastPushTime;
+  public static final long MINIMUM_PUSH_WAIT_TIME = 1000;
   
   @Override
   protected void init(VaadinRequest request)
@@ -438,6 +438,61 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   }
 
   @Override
+  public void push()
+  {
+    pushThrottleLock.lock();
+    try
+    {
+      long currentTime = System.currentTimeMillis();
+      long timeSinceLastPush = currentTime - lastPushTime;
+      if(pushTask == null)
+      {
+        if(timeSinceLastPush >= MINIMUM_PUSH_WAIT_TIME)
+        {
+          // push directly
+          super.push();
+          lastPushTime = System.currentTimeMillis();
+        }
+        else
+        {
+          
+          long waitTime = Math.max(0, MINIMUM_PUSH_WAIT_TIME - timeSinceLastPush);
+          
+          // schedule a new task
+          pushTask = new Timer();
+          pushTask.schedule(new TimerTask() 
+          {
+
+            @Override
+            public void run()
+            {
+              pushThrottleLock.lock();
+              try
+              {
+                AnnisBaseUI.super.push();
+                lastPushTime = System.currentTimeMillis();
+                pushTask = null;
+              }
+              finally
+              {
+                pushThrottleLock.unlock();
+              }
+                
+            }
+          }, waitTime);
+        }
+      }
+    }
+    finally
+    {
+      pushThrottleLock.unlock();
+    }
+    super.push(); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+ 
+
+  @Override
   public void close()
   {
     if (pluginManager != null)
@@ -466,100 +521,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       CSSInject cssInject = new CSSInject(UI.getCurrent());
       cssInject.setStyles(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
-    }
-  }
-
-  /**
-   * Request to set polling interval to "slow". 
-   * Always unset this with {@link #unrequestSlowPoll()  } (use a {@code finally {}} block).
-   * If there are any other requests for "fast" polling, the fast polling will be used instead.
-   * 
-   * This method is thread-safe.
-   */
-  public void requestSlowPoll()
-  {
-    pollLock.lock();
-    try
-    {
-      slowPollCounter++;
-      updatePollIntervall();
-    }
-    finally
-    {
-      pollLock.unlock();
-    }
-  }
-  
-  /**
-   * Request to set polling interval to "fast". 
-   * Always unset this with {@link #unrequestFastPoll() } (use a {@code finally {}} block).
-   * 
-   * This method is thread-safe.
-   */
-  public void requestFastPoll()
-  {
-    pollLock.lock();
-    try
-    {
-      fastPollCounter++;
-      updatePollIntervall();
-    }
-    finally
-    {
-      pollLock.unlock();
-    }
-  }
-  
-  /**
-   * @see  #requestSlowPoll()
-   */
-  public void unrequestSlowPoll()
-  {
-    pollLock.lock();
-    try
-    {
-      slowPollCounter = Math.max(0, slowPollCounter-1);
-      updatePollIntervall();
-    }
-    finally
-    {
-      pollLock.unlock();
-    }
-  }
-  
-  /**
-   * @see  #requestFastPoll()
-   */
-  public void unrequestFastPoll()
-  {
-    pollLock.lock();
-    try
-    {
-      fastPollCounter = Math.max(0, fastPollCounter-1);
-      updatePollIntervall();
-    }
-    finally
-    {
-      pollLock.unlock();
-    }
-  }
-  
-  private void updatePollIntervall()
-  {
-    if(fastPollCounter > 0)
-    {
-      setPollInterval(FAST_POLL_INTERVALL);
-      log.debug("Fast polling activated (polling set to {})", FAST_POLL_INTERVALL);
-    }
-    else if(slowPollCounter > 0)
-    {
-      setPollInterval(SLOW_POLL_INTERVALL);
-      log.debug("Slow polling activated (polling set to {})", SLOW_POLL_INTERVALL);
-    }
-    else
-    {
-      setPollInterval(DEFAULT_POLL_INTERVALL);
-      log.debug("Default polling activated (polling set to {})", DEFAULT_POLL_INTERVALL);
     }
   }
 

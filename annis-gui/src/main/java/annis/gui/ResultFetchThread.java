@@ -160,8 +160,7 @@ class ResultFetchThread extends Thread
       Helper.getAnnisWebResource().path("query/search/subgraph");
 
     List<Match> result = null;
-    ui.requestFastPoll();
-    
+  
     // update the new poll time
     ui.accessSynchronously(new Runnable() 
     {
@@ -305,8 +304,6 @@ class ResultFetchThread extends Thread
     }
     finally
     {
-      ui.unrequestFastPoll();
-       // update the new poll time
       ui.accessSynchronously(new Runnable()
       {
         @Override
