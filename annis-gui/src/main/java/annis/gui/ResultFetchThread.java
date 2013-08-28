@@ -161,16 +161,6 @@ class ResultFetchThread extends Thread
 
     List<Match> result = null;
   
-    // update the new poll time
-    ui.accessSynchronously(new Runnable() 
-    {
-      @Override
-      public void run()
-      {
-        ui.push();
-      }
-    });
-    
     try
     {
       ui.access(new Runnable()
@@ -205,6 +195,7 @@ class ResultFetchThread extends Thread
           public void run()
           {
             resultPanel.showSubgraphSearchInProgress(query, 0.0f);
+            ui.push();
           }
         });
         
@@ -214,7 +205,6 @@ class ResultFetchThread extends Thread
          
         for (Match m : result)
         {
-          log.info("query next match");
           if (aborted)
           {
             return;
@@ -232,14 +222,12 @@ class ResultFetchThread extends Thread
               @Override
               public void run()
               {
-                log.info("GUILOCK: updating progress result panel");
                 resultPanel.showSubgraphSearchInProgress(query, progress);
                 resultPanel.addQueryResult(query, p);
+                ui.push();
               }
             });
           
-          
-          log.info("finished next match");
           current++;
         }
       } // end if no results
@@ -249,13 +237,9 @@ class ResultFetchThread extends Thread
         @Override
         public void run()
         {
-          log.info("GUILOCK: finalizer");
           resultPanel.showFinishedSubgraphSearch();
         }
       });
-      
-      log.info("ok, everything done as planned");
-
     }
     catch (TimeoutException ex)
     {
@@ -304,7 +288,7 @@ class ResultFetchThread extends Thread
     }
     finally
     {
-      ui.accessSynchronously(new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()

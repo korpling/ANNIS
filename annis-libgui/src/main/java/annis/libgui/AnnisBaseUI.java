@@ -41,6 +41,7 @@ import java.util.Timer;
 import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import net.xeoh.plugins.base.Plugin;
@@ -100,9 +101,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient TreeSet<String> alreadyAddedCSS;
   
   private final Lock pushThrottleLock = new ReentrantLock();
-  private Timer pushTask = null;
+  private Timer pushTimer = new Timer("Push Timer");
   private long lastPushTime;
   public static final long MINIMUM_PUSH_WAIT_TIME = 1000;
+  private AtomicInteger pushCounter = new AtomicInteger();
+  private TimerTask pushTask;
   
   @Override
   protected void init(VaadinRequest request)
@@ -445,24 +448,24 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     {
       long currentTime = System.currentTimeMillis();
       long timeSinceLastPush = currentTime - lastPushTime;
-      if(pushTask == null)
+      
+      if (pushTask == null)
       {
-        if(timeSinceLastPush >= MINIMUM_PUSH_WAIT_TIME)
+
+        if (timeSinceLastPush >= MINIMUM_PUSH_WAIT_TIME)
         {
           // push directly
           super.push();
           lastPushTime = System.currentTimeMillis();
+          log.debug("direct push #{} executed", pushCounter.getAndIncrement());
         }
         else
         {
           
-          long waitTime = Math.max(0, MINIMUM_PUSH_WAIT_TIME - timeSinceLastPush);
-          
           // schedule a new task
-          pushTask = new Timer();
-          pushTask.schedule(new TimerTask() 
+          long waitTime = Math.max(0, MINIMUM_PUSH_WAIT_TIME - timeSinceLastPush);
+          pushTask = new TimerTask()
           {
-
             @Override
             public void run()
             {
@@ -472,25 +475,31 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
                 AnnisBaseUI.super.push();
                 lastPushTime = System.currentTimeMillis();
                 pushTask = null;
+                log.debug("Throttled push #{} executed", pushCounter.
+                  getAndIncrement());
               }
               finally
               {
                 pushThrottleLock.unlock();
               }
-                
+
             }
-          }, waitTime);
+          };
+          pushTimer.schedule(pushTask, waitTime);
+          log.debug("Push scheduled to be executed in {} ms", waitTime);
         }
+      }
+      else
+      {
+        log.debug("no push executed since another one is already running");
       }
     }
     finally
     {
       pushThrottleLock.unlock();
     }
-    super.push(); //To change body of generated methods, choose Tools | Templates.
   }
   
- 
 
   @Override
   public void close()
