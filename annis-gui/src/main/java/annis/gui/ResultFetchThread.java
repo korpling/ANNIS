@@ -169,6 +169,7 @@ class ResultFetchThread extends Thread
         public void run()
         {
           resultPanel.showMatchSearchInProgress(query);
+          ui.push();
         }
       });
 
