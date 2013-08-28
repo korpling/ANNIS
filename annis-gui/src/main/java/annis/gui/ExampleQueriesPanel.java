@@ -374,7 +374,7 @@ public class ExampleQueriesPanel extends Table
         final List<ExampleQuery> result =
           loadExamplesFromRemote(selectedCorpora);
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -384,6 +384,7 @@ public class ExampleQueriesPanel extends Table
             {
               removeAllItems();
               addItems();
+              ui.push();
             }
             catch (Exception ex)
             {
