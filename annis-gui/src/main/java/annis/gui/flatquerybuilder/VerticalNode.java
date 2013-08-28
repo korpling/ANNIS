@@ -81,6 +81,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     if(event.getButton() == btClose)
     {
       sq.removeVerticalNode(this);
+      sq.updateQuery(); //think about it
     }  
   }
 
