@@ -35,11 +35,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
-import com.google.common.util.concurrent.FutureCallback;
-import com.google.common.util.concurrent.Futures;
-import com.google.common.util.concurrent.ListenableFuture;
-import com.google.common.util.concurrent.ListeningExecutorService;
-import com.google.common.util.concurrent.MoreExecutors;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -55,15 +50,17 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,6 +107,7 @@ public class VisualizerPanel extends CssLayout
   private String resultID;
 
   private transient VisualizerPlugin visPlugin;
+
   private Set<String> visibleTokenAnnos;
 
   private String segmentationName;
@@ -378,73 +376,28 @@ public class VisualizerPanel extends CssLayout
   private void loadVisualizer(final LoadableVisualizer.Callback callback)
   {
     if (visPlugin != null)
-    { 
-      ListeningExecutorService exeService = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
-      List<Callable<Component>> tasks = new LinkedList<Callable<Component>>();
-      tasks.add(new LoadComponentTask());
-      try
-      {
-        List<Future<Component>> futures = exeService.invokeAll(tasks, 60, TimeUnit.SECONDS);
-        ListenableFuture<Component> firstFuture = (ListenableFuture<Component>) futures.get(0);
-        Futures.addCallback(firstFuture, new FutureCallback<Component>()
-        {
+    {
+      ExecutorService execService = Executors.newSingleThreadExecutor();
 
-          @Override
-          public void onSuccess(Component result)
-          {
-            UI.getCurrent().access(new Runnable() {
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      Thread background = new BackgroundThread(future, callback);
+      background.start();
 
-              @Override
-              public void run()
-              {
-                updateGUIAfterLoadingVisualizer(callback);
-              }
-            });
-          }
-
-          @Override
-          public void onFailure(final Throwable ex)
-          {
-            log.error(
-              "Could create visualizer " + visPlugin.getShortName() 
-              + " in 60 seconds: Timeout",
-              ex);
-            
-            UI.getCurrent().access(new Runnable() 
-            {
-              @Override
-              public void run()
-              {
-                Notification.show(
-                  "Could not create visualizer " + visPlugin.getShortName(),
-                  ex.toString(),
-                  Notification.Type.WARNING_MESSAGE);
-              }
-            });
-          }
-          
-        });
-      }
-      catch (InterruptedException ex)
-      {
-        log.error("Visualizer creation interrupted " + visPlugin.
-              getShortName(), ex);
-      }
-      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress);
-    }
-    // end if create input was needed
+    } // end if create input was needed
 
   } // end loadVisualizer
 
-  private void updateGUIAfterLoadingVisualizer(LoadableVisualizer.Callback callback)
+  private void updateGUIAfterLoadingVisualizer(
+    LoadableVisualizer.Callback callback)
   {
-  if (callback != null && vis instanceof LoadableVisualizer)
+    if (callback != null && vis instanceof LoadableVisualizer)
     {
       LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
       if (loadableVis.isLoaded())
@@ -483,7 +436,7 @@ public class VisualizerPanel extends CssLayout
       }
     }
   }
-  
+
   @Override
   public void toggleVisualizer(boolean visible,
     LoadableVisualizer.Callback callback)
@@ -588,6 +541,79 @@ public class VisualizerPanel extends CssLayout
           sfeature.
           getValueString());
       }
+    }
+  }
+
+  private class BackgroundThread extends Thread
+  {
+    private Future<Component> future;
+    private LoadableVisualizer.Callback callback;
+    public BackgroundThread(
+      Future<Component> future, LoadableVisualizer.Callback callback)
+    {
+      this.future = future;
+      this.callback = callback;
+    }
+    
+    
+    
+    @Override
+    public void run()
+    {
+      Throwable exception = null;
+      try
+      {
+        final Component result = future.get(60, TimeUnit.SECONDS);
+        
+        UI.getCurrent().access(new Runnable()
+           {
+             @Override
+             public void run()
+             {
+               vis = result;
+               updateGUIAfterLoadingVisualizer(callback);
+               UI.getCurrent().push();
+             }
+           });
+      }
+      catch (InterruptedException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (ExecutionException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (TimeoutException ex)
+      {
+        future.cancel(true);
+        log.error(
+          "Could create visualizer " + visPlugin.getShortName()
+          + " in 60 seconds: Timeout",
+          ex);
+        exception = ex;
+      }
+      
+      if(exception != null)
+      {
+        final Throwable finalException = exception;
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Notification.show(
+              "Error when creating visualizer " + visPlugin.getShortName(),
+              finalException.toString(),
+              Notification.Type.WARNING_MESSAGE);
+            UI.getCurrent().push();
+          }
+        });
+      }
+      
+
     }
   }
 
