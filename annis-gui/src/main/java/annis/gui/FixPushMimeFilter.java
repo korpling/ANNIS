@@ -13,33 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets;
+package annis.gui;
 
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinServlet;
+import java.io.IOException;
+import javax.servlet.Filter;
+import javax.servlet.FilterChain;
+import javax.servlet.FilterConfig;
 import javax.servlet.ServletException;
+import javax.servlet.ServletRequest;
+import javax.servlet.ServletResponse;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class AnnisVaadinServlet extends VaadinServlet
+public class FixPushMimeFilter implements Filter
 {
 
   @Override
-  protected void servletInitialized() throws ServletException
+  public void init(FilterConfig filterConfig) throws ServletException
   {
-    super.servletInitialized();
-    getService().addSessionInitListener(new SessionInitListener() {
+  }
 
-      @Override
-      public void sessionInit(SessionInitEvent event) throws ServiceException
-      {
-     //   event.getSession().addBootstrapListener(new AnnisBootstrapListener());
-      }
-    });
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response,
+    FilterChain chain) throws IOException, ServletException
+  {
+    response.setContentType("text/plain");
+    chain.doFilter(request, response);
+  }
+
+  @Override
+  public void destroy()
+  {
   }
   
 }
