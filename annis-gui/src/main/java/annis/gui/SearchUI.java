@@ -21,6 +21,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
@@ -52,6 +53,7 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -77,7 +79,7 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push
+@Push(PushMode.MANUAL)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
@@ -130,6 +132,8 @@ public class SearchUI extends AnnisBaseUI
   private InstanceConfig instanceConfig;
 
   private CSSInject css;
+  
+  private DocBrowserController docBrowserController;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -147,6 +151,9 @@ public class SearchUI extends AnnisBaseUI
 
     JavaScript.getCurrent().addFunction("annis.gui.logincallback",
       new LoginCloseCallback());
+    
+    // init a doc browser controller
+    docBrowserController = new DocBrowserController(this);
 
     queryController = new QueryController(this);
 
@@ -302,7 +309,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addTab(tutorial, "Tutorial");
 
     controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries, mainTab);
+      autoGenQueries, this);
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     hSplit.setFirstComponent(controlPanel);
@@ -968,5 +975,10 @@ public class SearchUI extends AnnisBaseUI
   public TabSheet getTabSheet()
   {
     return mainTab;
+  }
+  
+  public DocBrowserController getDocBrowserController()
+  {
+    return docBrowserController;
   }
 }

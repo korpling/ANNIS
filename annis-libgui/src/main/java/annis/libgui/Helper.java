@@ -60,499 +60,508 @@ import org.slf4j.LoggerFactory;
  */
 public class Helper {
 
-  public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
+    public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
+    public final static String DEFAULT_CONFIG = "default-config";
+    private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+            Helper.class);
+    private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
 
-  public final static String DEFAULT_CONFIG = "default-config";
+    /**
+     * Creates an authentificiated REST client
+     *
+     * @param userName
+     * @param password
+     * @return A newly created client.
+     */
+    public static Client createRESTClient(String userName, String password) {
 
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-          Helper.class);
+        DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
+        rc.getClasses().add(SaltProjectProvider.class);
 
-  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
+        rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
+                new ThreadSafeClientConnManager());
 
-  /**
-   * Creates an authentificiated REST client
-   *
-   * @param userName
-   * @param password
-   * @return A newly created client.
-   */
-  public static Client createRESTClient(String userName, String password) {
+        if (userName != null && password != null) {
+            CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
+            credentialsProvider.setCredentials(AuthScope.ANY,
+                    new UsernamePasswordCredentials(userName, password));
 
-    DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
-    rc.getClasses().add(SaltProjectProvider.class);
+            rc.getProperties().put(
+                    ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
+                    credentialsProvider);
+            rc.getProperties().put(
+                    ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION,
+                    true);
 
-    rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
-            new ThreadSafeClientConnManager());
-
-    if (userName != null && password != null) {
-      CredentialsProvider credentialsProvider = new BasicCredentialsProvider();
-      credentialsProvider.setCredentials(AuthScope.ANY,
-              new UsernamePasswordCredentials(userName, password));
-
-      rc.getProperties().put(
-              ApacheHttpClient4Config.PROPERTY_CREDENTIALS_PROVIDER,
-              credentialsProvider);
-      rc.getProperties().put(
-              ApacheHttpClient4Config.PROPERTY_PREEMPTIVE_BASIC_AUTHENTICATION,
-              true);
-
-    }
-
-    Client c = ApacheHttpClient4.create(rc);
-    return c;
-  }
-
-  /**
-   * Create a REST web service client which is not authentificated.
-   *
-   * @return A newly created client.
-   */
-  public static Client createRESTClient() {
-    return createRESTClient(null, null);
-  }
-
-  public static AnnisUser getUser() {
-    Object o = VaadinSession.getCurrent().getSession().getAttribute(
-            AnnisBaseUI.USER_KEY);
-    if (o instanceof AnnisUser) {
-      return (AnnisUser) o;
-    } else {
-      return null;
-    }
-  }
-
-  public static void setUser(AnnisUser user) {
-    if (user == null) {
-      VaadinSession.getCurrent().getSession().removeAttribute(
-              AnnisBaseUI.USER_KEY);
-    } else {
-      VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
-              user);
-    }
-  }
-
-  /**
-   * Gets or creates a web resource to the ANNIS service.
-   *
-   * @param uri The URI where the service can be found
-   * @param user The user object or null (should be of type {@link AnnisUser}).
-   * @return A reference to the ANNIS service root resource.
-   */
-  public static WebResource getAnnisWebResource(String uri, AnnisUser user) {
-
-    if (user != null) {
-      return user.getClient().resource(uri);
-    }
-
-    // use the anonymous client
-    if (anonymousClient.get() == null) {
-      // anonymous client not created yet
-      anonymousClient.set(createRESTClient());
-    }
-
-    return anonymousClient.get().resource(uri);
-  }
-
-  /**
-   * Gets or creates an asynchronous web resource to the ANNIS service.
-   *
-   * @param uri The URI where the service can be found
-   * @param user The user object or null (should be of type {@link AnnisUser}).
-   * @return A reference to the ANNIS service root resource.
-   */
-  public static AsyncWebResource getAnnisAsyncWebResource(String uri,
-          AnnisUser user) {
-
-    if (user != null) {
-      return user.getClient().asyncResource(uri);
-    }
-
-    // use the anonymous client
-    if (anonymousClient.get() == null) {
-      // anonymous client not created yet
-      anonymousClient.set(createRESTClient());
-    }
-
-    return anonymousClient.get().asyncResource(uri);
-  }
-
-  /**
-   * Gets or creates a web resource to the ANNIS service.
-   *
-   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)
-   * }
-   * that does not need any arguments
-   *
-   * @return A reference to the ANNIS service root resource.
-   */
-  public static WebResource getAnnisWebResource() {
-    // get URI used by the application
-    String uri = (String) VaadinSession.getCurrent().getAttribute(
-            KEY_WEB_SERVICE_URL);
-
-    // if already authentificated the REST client is set as the "user" property
-    AnnisUser user = getUser();
-
-    return getAnnisWebResource(uri, user);
-  }
-
-  /**
-   * Gets or creates an asynchronous web resource to the ANNIS service.
-   *
-   * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)
-   * }
-   * that does not need any arguments
-   *
-   * @return A reference to the ANNIS service root resource.
-   */
-  public static AsyncWebResource getAnnisAsyncWebResource() {
-    // get URI used by the application
-    String uri = (String) VaadinSession.getCurrent().getAttribute(
-            KEY_WEB_SERVICE_URL);
-
-    // if already authentificated the REST client is set as the "user" property
-    AnnisUser user = getUser();
-
-    return getAnnisAsyncWebResource(uri, user);
-  }
-
-  public static String getContext() {
-    if (VaadinService.getCurrentRequest() != null) {
-      return VaadinService.getCurrentRequest().getContextPath();
-    } else {
-      return (String) VaadinSession.getCurrent().getAttribute(
-              AnnisBaseUI.CONTEXT_PATH);
-    }
-
-  }
-
-  public static String encodeBase64URL(String val) {
-    try {
-      return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
-    } catch (UnsupportedEncodingException ex) {
-      log.
-              error(
-              "Java Virtual Maschine can't handle UTF-8: I'm utterly confused",
-              ex);
-    }
-    return "";
-  }
-
-  public static List<String> citationFragment(String aql,
-          Set<String> corpora, int contextLeft, int contextRight,
-          String segmentation,
-          int start, int limit) {
-    List<String> result = new ArrayList<String>();
-    try {
-      result.add("_q=" + encodeBase64URL(aql));
-      result.add("_c="
-              + encodeBase64URL(StringUtils.join(corpora, ",")));
-      result.add("cl="
-              + URLEncoder.encode("" + contextLeft, "UTF-8"));
-      result.add("cr="
-              + URLEncoder.encode("" + contextRight, "UTF-8"));
-      result.add("s="
-              + URLEncoder.encode("" + start, "UTF-8"));
-      result.add("l="
-              + URLEncoder.encode("" + limit, "UTF-8"));
-      if (segmentation != null) {
-        result.add("_seg="
-                + encodeBase64URL(segmentation));
-      }
-    } catch (UnsupportedEncodingException ex) {
-      log.warn(ex.getMessage(), ex);
-    }
-
-    return result;
-  }
-
-  public static String generateCitation(String aql,
-          Set<String> corpora, int contextLeft, int contextRight,
-          String segmentation,
-          int start, int limit) {
-    try {
-      URI appURI = UI.getCurrent().getPage().getLocation();
-
-      return new URI(appURI.getScheme(), null,
-              appURI.getHost(), appURI.getPort(),
-              getContext(), null,
-              StringUtils.join(citationFragment(aql, corpora,
-              contextLeft, contextRight, segmentation, start, limit), "&"))
-              .toASCIIString();
-    } catch (URISyntaxException ex) {
-      log.error(null, ex);
-    }
-    return "ERROR";
-  }
-
-  public static String generateClassicCitation(String aql,
-          List<String> corpora,
-          int contextLeft, int contextRight) {
-    StringBuilder sb = new StringBuilder();
-
-    URI appURI = UI.getCurrent().getPage().getLocation();
-
-    sb.append(getContext());
-    sb.append("/Cite/AQL(");
-    sb.append(aql);
-    sb.append("),CIDS(");
-    sb.append(StringUtils.join(corpora, ","));
-    sb.append("),CLEFT(");
-    sb.append(contextLeft);
-    sb.append("),CRIGHT(");
-    sb.append(contextRight);
-    sb.append(")");
-
-    try {
-      return new URI(appURI.getScheme(), null,
-              appURI.getHost(), appURI.getPort(),
-              sb.toString(), null, null).toASCIIString();
-    } catch (URISyntaxException ex) {
-      log.error(null, ex);
-    }
-    return "ERROR";
-  }
-
-  /**
-   * Retrieve the meta data for a given document of a corpus.
-   *
-   * @param toplevelCorpusName specifies the toplevel corpus
-   * @param documentName specifies the document.
-   * @return returns only the meta data for a single document.
-   */
-  public static List<Annotation> getMetaDataDoc(String toplevelCorpusName,
-          String documentName) {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource();
-    try {
-      res = res.path("meta").path("doc")
-              .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      res = res.path(URLEncoder.encode(documentName, "UTF-8"));
-
-      result = res.get(new GenericType<List<Annotation>>() {
-      });
-    } catch (UniformInterfaceException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "Remote exception: " + ex.getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    } catch (ClientHandlerException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "Remote exception: " + ex.getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    } catch (UnsupportedEncodingException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "UTF-8 encoding is not supported on server, this is weird: " + ex.
-              getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    }
-    return result;
-  }
-
-  /**
-   * Retrieve all the meta data for a given document of a corpus including the
-   * metadata of all corora in the path to the document.
-   *
-   * @param toplevelCorpusName Specifies the the toplevel corpus
-   * @param documentName Specifies the document
-   * @return Returns also the metada of the all parent corpora. There must be at
-   * least one of them.
-   */
-  public static List<Annotation> getMetaData(String toplevelCorpusName,
-          String documentName) {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource();
-    try {
-      res = res.path("meta").path("doc")
-              .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-
-      if (documentName != null) {
-        res = res.path(documentName);
-      }
-
-      if (documentName != null && !toplevelCorpusName.equals(documentName)) {
-        res = res.path("path");
-      }
-
-      result = res.get(new GenericType<List<Annotation>>() {
-      });
-    } catch (UniformInterfaceException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "Remote exception: " + ex.getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    } catch (ClientHandlerException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "Remote exception: " + ex.getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    } catch (UnsupportedEncodingException ex) {
-      log.error(null, ex);
-      Notification.show(
-              "UTF-8 encoding is not supported on server, this is weird: " + ex.
-              getLocalizedMessage(),
-              Notification.Type.WARNING_MESSAGE);
-    }
-    return result;
-  }
-
-  /**
-   * Loads the corpus config of a specific corpus.
-   *
-   * @param corpus The name of the corpus, for which the config is fetched.
-   * @return A {@link CorpusConfig} object, which wraps a {@link Properties}
-   * object. This Properties object stores the corpus configuration as simple
-   * key-value pairs.
-   */
-  public static CorpusConfig getCorpusConfig(String corpus) {
-    CorpusConfig corpusConfig = new CorpusConfig();
-
-    try {
-      corpusConfig = Helper.getAnnisWebResource().path("query")
-              .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
-              .path("config").get(CorpusConfig.class);
-    } catch (UnsupportedEncodingException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
-    } catch (UniformInterfaceException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    } catch (ClientHandlerException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    }
-    return corpusConfig;
-  }
-
-  public static CorpusConfig getDefaultCorpusConfig() {
-
-    CorpusConfig defaultCorpusConfig = new CorpusConfig();
-
-    try {
-      defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
-              .path("corpora").path("default-config").get(CorpusConfig.class);
-    } catch (UniformInterfaceException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    } catch (ClientHandlerException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    }
-
-    return defaultCorpusConfig;
-  }
-
-  /**
-   * Loads the all available corpus configurations.
-   *
-   *
-   * @return A {@link CorpusConfigMap} object, which wraps a Map of
-   * {@link Properties} objects. The keys to the properties are the corpus
-   * names. A Properties object stores the corpus configuration as simple
-   * key-value pairs. The Map includes also the default corpus configuration.
-   */
-  public static CorpusConfigMap getCorpusConfigs() {
-
-    CorpusConfigMap corpusConfigurations = null;
-
-    try {
-      corpusConfigurations = Helper.getAnnisWebResource().path(
-              "query").path("corpora").path("config").get(CorpusConfigMap.class);
-    } catch (UniformInterfaceException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    } catch (ClientHandlerException ex) {
-      Notification.show("can not retrieve corpus configuration", ex.
-              getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
-    }
-
-    if (corpusConfigurations == null) {
-      corpusConfigurations = new CorpusConfigMap();
-    }
-
-    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
-
-    return corpusConfigurations;
-  }
-
-  /**
-   * Loads the available corpus configurations for a list of specific corpora.
-   *
-   *
-   * @param corpora A Set of corpora names.
-   * @return A {@link CorpusConfigMap} object, which wraps a Map of
-   * {@link Properties} objects. The keys to the properties are the corpus
-   * names. A Properties object stores the corpus configuration as simple
-   * key-value pairs. The map includes the default configuration.
-   */
-  public static CorpusConfigMap getCorpusConfigs(Set<String> corpora) {
-
-    CorpusConfigMap corpusConfigurations = new CorpusConfigMap();
-
-    for (String corpus : corpora) {
-      corpusConfigurations.put(corpus, getCorpusConfig(corpus));
-    }
-
-    corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
-    return corpusConfigurations;
-  }
-
-  /**
-   * Parses the fragment.
-   *
-   * Fragments have the form key1=value&key2=test ...
-   *
-   * @param fragment
-   * @return
-   */
-  public static Map<String, String> parseFragment(String fragment) {
-    Map<String, String> result = new TreeMap<String, String>();
-
-    fragment = StringUtils.removeStart(fragment, "!");
-
-    String[] split = StringUtils.split(fragment, "&");
-    for (String s : split) {
-      String[] parts = s.split("=", 2);
-      String name = parts[0].trim();
-      String value = "";
-      if (parts.length == 2) {
-        try {
-          // every name that starts with "_" is base64 encoded
-          if (name.startsWith("_")) {
-            value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
-          } else {
-            value = URLDecoder.decode(parts[1], "UTF-8");
-          }
-        } catch (UnsupportedEncodingException ex) {
-          log.error(ex.getMessage(), ex);
         }
-      }
-      name = StringUtils.removeStart(name, "_");
 
-      result.put(name, value);
+        Client c = ApacheHttpClient4.create(rc);
+        return c;
     }
-    return result;
-  }
 
-  /**
-   * Returns a formatted string containing the type of the exception, the
-   * message and the stacktrace.
-   *
-   * @param ex
-   * @return
-   */
-  public static String convertExceptionToMessage(Throwable ex) {
-    StringBuilder sb = new StringBuilder();
-    sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
-    sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
-    sb.append("Stacktrace: \n");
-    StackTraceElement[] st = ex.getStackTrace();
-    for (int i = 0; i < st.length; i++) {
-      sb.append(st[i].toString());
-      sb.append("\n");
+    /**
+     * Create a REST web service client which is not authentificated.
+     *
+     * @return A newly created client.
+     */
+    public static Client createRESTClient() {
+        return createRESTClient(null, null);
     }
-    return sb.toString();
-  }
+
+    public static AnnisUser getUser() {
+        Object o = VaadinSession.getCurrent().getSession().getAttribute(
+                AnnisBaseUI.USER_KEY);
+        if (o instanceof AnnisUser) {
+            return (AnnisUser) o;
+        } else {
+            return null;
+        }
+    }
+
+    public static void setUser(AnnisUser user) {
+        if (user == null) {
+            VaadinSession.getCurrent().getSession().removeAttribute(
+                    AnnisBaseUI.USER_KEY);
+        } else {
+            VaadinSession.getCurrent().getSession().setAttribute(AnnisBaseUI.USER_KEY,
+                    user);
+        }
+    }
+
+    /**
+     * Gets or creates a web resource to the ANNIS service.
+     *
+     * @param uri The URI where the service can be found
+     * @param user The user object or null (should be of type
+     * {@link AnnisUser}).
+     * @return A reference to the ANNIS service root resource.
+     */
+    public static WebResource getAnnisWebResource(String uri, AnnisUser user) {
+
+        if (user != null) {
+            return user.getClient().resource(uri);
+        }
+
+        // use the anonymous client
+        if (anonymousClient.get() == null) {
+            // anonymous client not created yet
+            anonymousClient.set(createRESTClient());
+        }
+
+        return anonymousClient.get().resource(uri);
+    }
+
+    /**
+     * Gets or creates an asynchronous web resource to the ANNIS service.
+     *
+     * @param uri The URI where the service can be found
+     * @param user The user object or null (should be of type
+     * {@link AnnisUser}).
+     * @return A reference to the ANNIS service root resource.
+     */
+    public static AsyncWebResource getAnnisAsyncWebResource(String uri,
+            AnnisUser user) {
+
+        if (user != null) {
+            return user.getClient().asyncResource(uri);
+        }
+
+        // use the anonymous client
+        if (anonymousClient.get() == null) {
+            // anonymous client not created yet
+            anonymousClient.set(createRESTClient());
+        }
+
+        return anonymousClient.get().asyncResource(uri);
+    }
+
+    /**
+     * Gets or creates a web resource to the ANNIS service.
+     *
+     * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)
+     * }
+     * that does not need any arguments
+     *
+     * @return A reference to the ANNIS service root resource.
+     */
+    public static WebResource getAnnisWebResource() {
+        // get URI used by the application
+        String uri = (String) VaadinSession.getCurrent().getAttribute(
+                KEY_WEB_SERVICE_URL);
+
+        // if already authentificated the REST client is set as the "user" property
+        AnnisUser user = getUser();
+
+        return getAnnisWebResource(uri, user);
+    }
+
+    /**
+     * Gets or creates an asynchronous web resource to the ANNIS service.
+     *
+     * This is a convenience wrapper to {@link #getAnnisWebResource(java.lang.String, annis.security.AnnisUser)
+     * }
+     * that does not need any arguments
+     *
+     * @return A reference to the ANNIS service root resource.
+     */
+    public static AsyncWebResource getAnnisAsyncWebResource() {
+        // get URI used by the application
+        String uri = (String) VaadinSession.getCurrent().getAttribute(
+                KEY_WEB_SERVICE_URL);
+
+        // if already authentificated the REST client is set as the "user" property
+        AnnisUser user = getUser();
+
+        return getAnnisAsyncWebResource(uri, user);
+    }
+
+    public static String getContext() {
+        if (VaadinService.getCurrentRequest() != null) {
+            return VaadinService.getCurrentRequest().getContextPath();
+        } else {
+            return (String) VaadinSession.getCurrent().getAttribute(
+                    AnnisBaseUI.CONTEXT_PATH);
+        }
+
+    }
+
+    public static String encodeBase64URL(String val) {
+        try {
+            return Base64.encodeBase64URLSafeString(val.getBytes("UTF-8"));
+        } catch (UnsupportedEncodingException ex) {
+            log.
+                    error(
+                    "Java Virtual Maschine can't handle UTF-8: I'm utterly confused",
+                    ex);
+        }
+        return "";
+    }
+
+    public static List<String> citationFragment(String aql,
+            Set<String> corpora, int contextLeft, int contextRight,
+            String segmentation,
+            int start, int limit) {
+        List<String> result = new ArrayList<String>();
+        try {
+            result.add("_q=" + encodeBase64URL(aql));
+            result.add("_c="
+                    + encodeBase64URL(StringUtils.join(corpora, ",")));
+            result.add("cl="
+                    + URLEncoder.encode("" + contextLeft, "UTF-8"));
+            result.add("cr="
+                    + URLEncoder.encode("" + contextRight, "UTF-8"));
+            result.add("s="
+                    + URLEncoder.encode("" + start, "UTF-8"));
+            result.add("l="
+                    + URLEncoder.encode("" + limit, "UTF-8"));
+            if (segmentation != null) {
+                result.add("_seg="
+                        + encodeBase64URL(segmentation));
+            }
+        } catch (UnsupportedEncodingException ex) {
+            log.warn(ex.getMessage(), ex);
+        }
+
+        return result;
+    }
+
+    public static String generateCitation(String aql,
+            Set<String> corpora, int contextLeft, int contextRight,
+            String segmentation,
+            int start, int limit) {
+        try {
+            URI appURI = UI.getCurrent().getPage().getLocation();
+
+            return new URI(appURI.getScheme(), null,
+                    appURI.getHost(), appURI.getPort(),
+                    getContext(), null,
+                    StringUtils.join(citationFragment(aql, corpora,
+                    contextLeft, contextRight, segmentation, start, limit), "&"))
+                    .toASCIIString();
+        } catch (URISyntaxException ex) {
+            log.error(null, ex);
+        }
+        return "ERROR";
+    }
+
+    public static String generateClassicCitation(String aql,
+            List<String> corpora,
+            int contextLeft, int contextRight) {
+        StringBuilder sb = new StringBuilder();
+
+        URI appURI = UI.getCurrent().getPage().getLocation();
+
+        sb.append(getContext());
+        sb.append("/Cite/AQL(");
+        sb.append(aql);
+        sb.append("),CIDS(");
+        sb.append(StringUtils.join(corpora, ","));
+        sb.append("),CLEFT(");
+        sb.append(contextLeft);
+        sb.append("),CRIGHT(");
+        sb.append(contextRight);
+        sb.append(")");
+
+        try {
+            return new URI(appURI.getScheme(), null,
+                    appURI.getHost(), appURI.getPort(),
+                    sb.toString(), null, null).toASCIIString();
+        } catch (URISyntaxException ex) {
+            log.error(null, ex);
+        }
+        return "ERROR";
+    }
+
+    /**
+     * Retrieve the meta data for a given document of a corpus.
+     *
+     * @param toplevelCorpusName specifies the toplevel corpus
+     * @param documentName specifies the document.
+     * @return returns only the meta data for a single document.
+     */
+    public static List<Annotation> getMetaDataDoc(String toplevelCorpusName,
+            String documentName) {
+        List<Annotation> result = new ArrayList<Annotation>();
+        WebResource res = Helper.getAnnisWebResource();
+        try {
+            res = res.path("meta").path("doc")
+                    .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+            res = res.path(URLEncoder.encode(documentName, "UTF-8"));
+
+            result = res.get(new GenericType<List<Annotation>>() {
+            });
+        } catch (UniformInterfaceException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "Remote exception: " + ex.getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        } catch (ClientHandlerException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "Remote exception: " + ex.getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "UTF-8 encoding is not supported on server, this is weird: " + ex.
+                    getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        }
+        return result;
+    }
+
+    /**
+     * Retrieve all the meta data for a given document of a corpus including the
+     * metadata of all corora in the path to the document.
+     *
+     * @param toplevelCorpusName Specifies the the toplevel corpus
+     * @param documentName Specifies the document
+     * @return Returns also the metada of the all parent corpora. There must be
+     * at least one of them.
+     */
+    public static List<Annotation> getMetaData(String toplevelCorpusName,
+            String documentName) {
+        List<Annotation> result = new ArrayList<Annotation>();
+        WebResource res = Helper.getAnnisWebResource();
+        try {
+            res = res.path("meta").path("doc")
+                    .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+
+            if (documentName != null) {
+                res = res.path(documentName);
+            }
+
+            if (documentName != null && !toplevelCorpusName.equals(documentName)) {
+                res = res.path("path");
+            }
+
+            result = res.get(new GenericType<List<Annotation>>() {
+            });
+        } catch (UniformInterfaceException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "Remote exception: " + ex.getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        } catch (ClientHandlerException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "Remote exception: " + ex.getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        } catch (UnsupportedEncodingException ex) {
+            log.error(null, ex);
+            Notification.show(
+                    "UTF-8 encoding is not supported on server, this is weird: " + ex.
+                    getLocalizedMessage(),
+                    Notification.Type.WARNING_MESSAGE);
+        }
+        return result;
+    }
+
+    /**
+     * Loads the corpus config of a specific corpus.
+     *
+     * @param corpus The name of the corpus, for which the config is fetched.
+     * @return A {@link CorpusConfig} object, which wraps a {@link Properties}
+     * object. This Properties object stores the corpus configuration as simple
+     * key-value pairs.
+     */
+    public static CorpusConfig getCorpusConfig(String corpus) {
+        CorpusConfig corpusConfig = new CorpusConfig();
+
+        try {
+            corpusConfig = Helper.getAnnisWebResource().path("query")
+                    .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+                    .path("config").get(CorpusConfig.class);
+        } catch (UnsupportedEncodingException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
+        } catch (UniformInterfaceException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        } catch (ClientHandlerException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        }
+        return corpusConfig;
+    }
+
+    public static CorpusConfig getDefaultCorpusConfig() {
+
+        CorpusConfig defaultCorpusConfig = new CorpusConfig();
+
+        try {
+            defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
+                    .path("corpora").path("default-config").get(CorpusConfig.class);
+        } catch (UniformInterfaceException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        } catch (ClientHandlerException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        }
+
+        return defaultCorpusConfig;
+    }
+
+    /**
+     * Loads the all available corpus configurations.
+     *
+     *
+     * @return A {@link CorpusConfigMap} object, which wraps a Map of
+     * {@link Properties} objects. The keys to the properties are the corpus
+     * names. A Properties object stores the corpus configuration as simple
+     * key-value pairs. The Map includes also the default corpus configuration.
+     */
+    public static CorpusConfigMap getCorpusConfigs() {
+
+        CorpusConfigMap corpusConfigurations = null;
+
+        try {
+            corpusConfigurations = Helper.getAnnisWebResource().path(
+                    "query").path("corpora").path("config").get(CorpusConfigMap.class);
+        } catch (UniformInterfaceException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        } catch (ClientHandlerException ex) {
+            Notification.show("can not retrieve corpus configuration", ex.
+                    getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+        }
+
+        if (corpusConfigurations == null) {
+            corpusConfigurations = new CorpusConfigMap();
+        }
+
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+
+        return corpusConfigurations;
+    }
+
+    /**
+     * Loads the available corpus configurations for a list of specific corpora.
+     *
+     *
+     * @param corpora A Set of corpora names.
+     * @return A {@link CorpusConfigMap} object, which wraps a Map of
+     * {@link Properties} objects. The keys to the properties are the corpus
+     * names. A Properties object stores the corpus configuration as simple
+     * key-value pairs. The map includes the default configuration.
+     */
+    public static CorpusConfigMap getCorpusConfigs(Set<String> corpora) {
+
+        CorpusConfigMap corpusConfigurations = new CorpusConfigMap();
+
+        for (String corpus : corpora) {
+            corpusConfigurations.put(corpus, getCorpusConfig(corpus));
+        }
+
+        corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
+        return corpusConfigurations;
+    }
+
+    /**
+     * Parses the fragment.
+     *
+     * Fragments have the form key1=value&key2=test ...
+     *
+     * @param fragment
+     * @return
+     */
+    public static Map<String, String> parseFragment(String fragment) {
+        Map<String, String> result = new TreeMap<String, String>();
+
+        fragment = StringUtils.removeStart(fragment, "!");
+
+        String[] split = StringUtils.split(fragment, "&");
+        for (String s : split) {
+            String[] parts = s.split("=", 2);
+            String name = parts[0].trim();
+            String value = "";
+            if (parts.length == 2) {
+                try {
+                    // every name that starts with "_" is base64 encoded
+                    if (name.startsWith("_")) {
+                        value = new String(Base64.decodeBase64(parts[1]), "UTF-8");
+                    } else {
+                        value = URLDecoder.decode(parts[1], "UTF-8");
+                    }
+                } catch (UnsupportedEncodingException ex) {
+                    log.error(ex.getMessage(), ex);
+                }
+            }
+            name = StringUtils.removeStart(name, "_");
+
+            result.put(name, value);
+        }
+        return result;
+    }
+
+    /**
+     * Returns a formatted string containing the type of the exception, the
+     * message and the stacktrace.
+     *
+     * @param ex
+     * @return
+     */
+    public static String convertExceptionToMessage(Throwable ex) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("Exception type: ").append(ex.getClass().getName()).append("\n");
+        sb.append("Message: ").append(ex.getLocalizedMessage()).append("\n");
+        sb.append("Stacktrace: \n");
+        StackTraceElement[] st = ex.getStackTrace();
+        for (int i = 0; i < st.length; i++) {
+            sb.append(st[i].toString());
+            sb.append("\n");
+        }
+        return sb.toString();
+    }
+
+    /**
+     * Casts a list of Annotations to the Type
+     * <code>List<Annotation></code>
+     */
+    public static class AnnotationListType extends GenericType<List<Annotation>> {
+
+        public AnnotationListType() {
+        }
+    }
 }

@@ -23,7 +23,7 @@ import annis.security.AnnisUserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
-import annis.gui.docbrowser.DocBrowser;
+import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -66,6 +66,7 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
+import static annis.gui.docbrowser.DocBrowserTable.getDocBrowserTable;
 
 /**
  *
@@ -83,8 +84,9 @@ public class CorpusListPanel extends VerticalLayout implements
   public static final String ALL_CORPORA = "All";
 
   // holds the panels of auto generated queries
-  private final ExampleQueriesPanel autoGenQueries;
-  private final TabSheet tabSheet;
+  private final ExampleQueriesPanel autoGenQueries;  
+
+  private transient SearchUI ui;
 
   public enum ActionType
   {
@@ -109,12 +111,13 @@ public class CorpusListPanel extends VerticalLayout implements
   private InstanceConfig instanceConfig;
 
   public CorpusListPanel(QueryController controller,
-    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries, TabSheet tab)
+    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
+    SearchUI ui)
   {
     this.controller = controller;
     this.instanceConfig = instanceConfig;
     this.autoGenQueries = autoGenQueries;
-    this.tabSheet = tab;
+    this.ui = ui;
 
     final CorpusListPanel finalThis = this;
 
@@ -672,7 +675,7 @@ public class CorpusListPanel extends VerticalLayout implements
         @Override
         public void buttonClick(ClickEvent event)
         {
-          new DocBrowser(tabSheet, id);
+          ui.getDocBrowserController().openDocBrowser(id);
         }
       });
 

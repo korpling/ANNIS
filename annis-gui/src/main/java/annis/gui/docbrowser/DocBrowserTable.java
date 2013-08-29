@@ -15,33 +15,27 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.model.Annotation;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
+import java.util.List;
 
 /**
  * List documents for a specific corpus.
  *
  * @author benjamin
  */
-public class DocBrowser extends Table
+public class DocBrowserTable extends Table
 {
 
-  // holds the vaadin session
-  SearchUI ui;
-
-  /**
-   * Inits a new doc browser table.
-   *
-   * @param tabSheet The main tab sheet.
-   * @param corpus The name of the corpus the documents.
-   */
-  public DocBrowser(TabSheet tabSheet, String corpus)
+  BeanItemContainer<Annotation> annoBean;
+  
+  void setDocNames(List<Annotation> docs)
   {
-    this.ui = ui;
-    String caption = "doc browser " + corpus;
-    tabSheet.addTab(this, caption);    
+    annoBean = new BeanItemContainer<Annotation>(docs);
+    annoBean.addAll(docs);
+    setContainerDataSource(annoBean);
   }
 
   /**
@@ -56,5 +50,14 @@ public class DocBrowser extends Table
       Label l = new Label((String) itemId);
       return l;
     }
-  }  
+  }
+
+  public static DocBrowserTable getDocBrowserTable()
+  {    
+    DocBrowserTable docBrowserTable = new DocBrowserTable();
+    docBrowserTable.setSizeFull();
+    docBrowserTable.setVisibleColumns("corpusName");
+    
+    return docBrowserTable;
+  }
 }
