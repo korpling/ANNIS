@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.libgui.Helper;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
@@ -53,10 +54,13 @@ public class ReportBugWindow extends Window
   
   private Button btSubmit;
   private Button btCancel;
+  private Throwable cause;
   
   public ReportBugWindow(final String bugEMailAddress, final byte[] screenImage, 
-    final String imageMimeType)
+    final String imageMimeType, Throwable cause)
   {
+    this.cause = cause;
+    
     setSizeUndefined();
     setCaption("Report Bug");
           
@@ -171,7 +175,8 @@ public class ReportBugWindow extends Window
   }
   
 
-  private boolean sendBugReport(String bugEMailAddress, byte[] screenImage, String imageMimeType)
+  private boolean sendBugReport(String bugEMailAddress, 
+    byte[] screenImage, String imageMimeType)
   {
     MultiPartEmail mail = new MultiPartEmail();
     try
@@ -216,11 +221,25 @@ public class ReportBugWindow extends Window
         {
           log.error(null, ex);
         }
-        
-        File logfile = new File(VaadinService.getCurrent().getBaseDirectory(), "/WEB-INF/log/annis-gui.log");
-        if(logfile.exists() && logfile.isFile() && logfile.canRead())
+      }
+       
+      File logfile = new File(VaadinService.getCurrent().getBaseDirectory(), "/WEB-INF/log/annis-gui.log");
+      if(logfile.exists() && logfile.isFile() && logfile.canRead())
+      {
+        mail.attach(new FileDataSource(logfile), "annis-gui.log", "Logfile of the GUI (shared by all users)");
+      }
+      
+      if(cause != null)
+      {
+        try
         {
-          mail.attach(new FileDataSource(logfile), "annis-gui.log", "Logfile of the GUI (shared by all users)");
+          mail.attach(new ByteArrayDataSource(Helper.convertExceptionToMessage(
+            cause), "text/plain"), "exception.txt", 
+          "Exception that caused the user to report the bug");
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
         }
       }
     
@@ -231,7 +250,9 @@ public class ReportBugWindow extends Window
     catch (EmailException ex)
     {
       Notification.show("E-Mail not configured on server", 
-        "If this is no Kickstarter version please ask the adminstrator of this ANNIS-instance for assistance. "
+        "If this is no Kickstarter version please ask the adminstrator (" 
+        + bugEMailAddress 
+        + ") of this ANNIS-instance for assistance. "
         + "Bug reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);
       log.error(null,
         ex);

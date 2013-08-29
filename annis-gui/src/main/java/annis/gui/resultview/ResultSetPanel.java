@@ -73,7 +73,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
     Collections.synchronizedSet(new TreeSet<String>());
   private Set<String> segmentationLayerSet =
     Collections.synchronizedSet(new TreeSet<String>());
-  private ProgressIndicator indicator;
+  private ProgressBar progress;
   private VerticalLayout indicatorLayout;
   private CssLayout layout;
   private InstanceConfig instanceConfig;
@@ -110,22 +110,21 @@ public class ResultSetPanel extends Panel implements ResolverProvider
 
     indicatorLayout = new VerticalLayout();
     
-    indicator = new ProgressIndicator();
-    indicator.setIndeterminate(false);
-    indicator.setValue(0f);
-    indicator.setPollingInterval(250);
-    indicator.setSizeUndefined();
+    progress = new ProgressBar();
+    progress.setIndeterminate(false);
+    progress.setValue(0f);
+    progress.setSizeUndefined();
     
-    indicatorLayout.addComponent(indicator);
+    indicatorLayout.addComponent(progress);
     indicatorLayout.setWidth("100%");
     indicatorLayout.setHeight("-1px");
-    indicatorLayout.setComponentAlignment(indicator, Alignment.TOP_CENTER);
+    indicatorLayout.setComponentAlignment(progress, Alignment.TOP_CENTER);
     indicatorLayout.setVisible(true);
     
     layout.addComponent(indicatorLayout);
        
     // enable indicator in order to get refresh GUI regulary
-    indicator.setEnabled(true);
+    progress.setEnabled(true);
 
     ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
 
@@ -140,8 +139,8 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         session.lock();
         try
         {
-          indicator.setEnabled(false);
-          indicator.setVisible(false);
+          progress.setEnabled(false);
+          progress.setVisible(false);
           indicatorLayout.setVisible(false);
         }
         finally
@@ -169,7 +168,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         newPanels = createPanels(p, offset);
       }
     }
-    catch (Exception ex)
+    catch (Throwable ex)
     {
       log.error(null, ex);
     }
@@ -432,13 +431,13 @@ public class ResultSetPanel extends Panel implements ResolverProvider
             {
               addQueryResult(lastProject, j+firstMatchOffset);
             }
-            indicator.setValue((float) j++ / (float) matches.size());
+            progress.setValue((float) j++ / (float) matches.size());
             if(j == matches.size())
             {
-              indicator.setValue(1.0f);
+              progress.setValue(1.0f);
             }
           }
-          catch(Exception ex)
+          catch(Throwable ex)
           {
             log.error("Exception when adding query result", ex);
           }

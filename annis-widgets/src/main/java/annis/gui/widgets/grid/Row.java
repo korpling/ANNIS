@@ -23,6 +23,7 @@ import java.util.Set;
 
 /**
  * Represents one row in the grid view
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class Row implements Serializable
@@ -30,7 +31,7 @@ public class Row implements Serializable
   private ArrayList<GridEvent> events;
   private BitSet occupancySet;
   private Set<String> textIDs;
-  
+
   /**
    * Default constructor.
    */
@@ -38,10 +39,10 @@ public class Row implements Serializable
   {
     this.events = new ArrayList<GridEvent>();
     this.textIDs = new HashSet<String>();
-    
+
     occupancySet = new BitSet();
   }
-  
+
   /**
    * Adds an event to this row
    * @param e
@@ -59,35 +60,35 @@ public class Row implements Serializable
     // set all bits to true that are covered by the other event
     occupancySet.or(eventOccupance);
     events.add(e);
-    
+
     if(e.getTextID() != null && !e.getTextID().isEmpty())
     {
       textIDs.add(e.getTextID());
     }
-    
+
     return true;
   }
-  
-  /** 
+
+  /**
    * Returns true if merge is possible.
-   * 
-   * @see #merge(annis.gui.visualizers.component.grid.Row) 
+   *
+   * @see #merge(annis.gui.visualizers.component.grid.Row)
    */
   public boolean canMerge(Row other)
   {
     return !occupancySet.intersects(other.occupancySet);
   }
-  
-  /** 
+
+  /**
    * Merges the other row into this row.
-   * This means all events from the other {@link Row} are added to this row. The other 
+   * This means all events from the other {@link Row} are added to this row. The other
    * {@link Row} will not be changed.
-   * Only rows which have no overlapping events can be merged. 
-   * 
+   * Only rows which have no overlapping events can be merged.
+   *
    * @param other The other {@link Row} which will be merged into this one.
    * @return Returns true if merge was successfull, false if no merge was done.
-   * 
-   * @see #canMerge(annis.gui.visualizers.component.grid.Row) 
+   *
+   * @see #canMerge(annis.gui.visualizers.component.grid.Row)
    */
   public boolean merge(Row other) throws IllegalArgumentException
   {
@@ -113,13 +114,13 @@ public class Row implements Serializable
 
   /**
    * Get Salt IDs of all texts used by events of this row.
-   * @return 
+   * @return
    */
   public Set<String> getTextIDs()
   {
     return new HashSet<String>(textIDs);
   }
-  
-  
+
+
 
 }

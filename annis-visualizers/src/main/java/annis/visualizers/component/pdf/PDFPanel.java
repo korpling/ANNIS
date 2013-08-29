@@ -113,8 +113,7 @@ public class PDFPanel extends AbstractJavaScriptComponent {
     }
 
     WebResource resMeta = Helper.getAnnisWebResource().path(
-            "query/corpora").path(corpusName).path(documentName).path(
-            "/binary/meta");
+            "meta/binary").path(corpusName).path(documentName);
     List<AnnisBinaryMetaData> meta = resMeta.get(
             new GenericType<List<AnnisBinaryMetaData>>() {
     });

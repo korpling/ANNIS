@@ -85,7 +85,7 @@ public class AboutWindow extends Window
     
     StringBuilder sb = new StringBuilder();
     
-    sb.append("The ANNIS team want's to thank these third party software that "
+    sb.append("The ANNIS team wants to thank these third party software that "
       + "made the ANNIS GUI possible:\n");
     
     File thirdPartyFolder = 

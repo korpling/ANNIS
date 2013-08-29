@@ -28,4 +28,12 @@ public class LeftOverlap extends Join {
 		return "left overlaps node " + target.getId();
 	}
 
+  @Override
+  public String toAqlOperator()
+  {
+    return "_ol_";
+  }
+  
+  
+
 }

@@ -34,7 +34,6 @@ import annis.ql.parser.QueryData;
 import annis.service.internal.QueryServiceImpl;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
-import java.util.LinkedList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -89,9 +88,14 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
     }
 
-    for (i = alternative.size(); i < maxWidth; ++i)
+    for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      ids.add("NULL");
+      ids.add("NULL AS id" + i);
+      ids.add("NULL AS node_name" + i);
+      if(outputCorpusPath)
+      {
+        ids.add("NULL AS path_name" + i);
+      }
     }
 
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
@@ -170,8 +174,15 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       {
         if (corpusPathExtractor != null && metaData.getColumnName(column).startsWith("path_name"))
         {
-          corpus_path = corpusPathExtractor.extractCorpusPath(rs,
+          List<String> genCorpusPath = corpusPathExtractor.extractCorpusPath(rs,
             metaData.getColumnName(column));
+          // only use corpus path if valid
+          if(genCorpusPath != null)
+          {
+            corpus_path = genCorpusPath;
+            // all corpus paths are the same
+            break;
+          }
         }
       }
     }

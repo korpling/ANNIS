@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
@@ -26,7 +27,7 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
-import com.github.wolfie.refresher.Refresher;
+import com.google.gwt.editor.client.impl.Refresher;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -36,8 +37,6 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.collections15.set.ListOrderedSet;
 import org.apache.commons.lang3.StringUtils;
@@ -49,26 +48,31 @@ import org.slf4j.LoggerFactory;
  * Manages all the query related actions.
  *
  * <strong>This class is not reentrant.</strong>
- * It is expected that you call the functions from the Vaadin session lock context,
- * either implicitly (e.g. from a component constructor or a handler callback)
- * or explicitly with {@link VaadinSession#lock() }.
+ * It is expected that you call the functions from the Vaadin session lock
+ * context, either implicitly (e.g. from a component constructor or a handler
+ * callback) or explicitly with {@link VaadinSession#lock() }.
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController implements PagingCallback, Refresher.RefreshListener
+public class QueryController implements PagingCallback
 {
-  private static final Logger log = LoggerFactory.getLogger(ResultViewPanel.class);
+
+  private static final Logger log = LoggerFactory.getLogger(
+    ResultViewPanel.class);
 
   private SearchUI ui;
 
   private PagedResultQuery lastQuery;
+
   private ListOrderedSet<HistoryEntry> history;
+
   private ResultViewPanel lastResultView;
+
   private MatchAndDocumentCount lastCount;
 
   private Future<MatchAndDocumentCount> futureCount;
-  private Future<List<Match>> futureMatches;
 
+  private Future<List<Match>> futureMatches;
 
   public QueryController(SearchUI ui)
   {
@@ -83,7 +87,8 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
 
   public void setQuery(String query)
   {
-    setQuery(new Query(query, ui.getControlPanel().getCorpusList().getSelectedCorpora()));
+    setQuery(new Query(query, ui.getControlPanel().getCorpusList().
+      getSelectedCorpora()));
   }
 
   public void setQuery(Query query)
@@ -101,8 +106,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       0,
       ui.getControlPanel().getSearchOptions().getResultsPerPage(),
       ui.getControlPanel().getSearchOptions().getSegmentationLayer(),
-      query.getQuery(), query.getCorpora()
-    );
+      query.getQuery(), query.getCorpora());
     setQuery(paged);
   }
 
@@ -136,15 +140,15 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   /**
    * Cancel queries from the client side.
    *
-   * Important: This does not magically cancel the query on the server side,
-   * so don't use this to implement a "real" query cancelation.
+   * Important: This does not magically cancel the query on the server side, so
+   * don't use this to implement a "real" query cancelation.
    */
   private void cancelQueries()
   {
     // don't spin forever when canceled
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
 
-    if(lastResultView != null && lastQuery != null)
+    if (lastResultView != null && lastQuery != null)
     {
       // explicitly show empty result
       lastResultView.setResult(null,
@@ -153,15 +157,12 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         lastQuery.getOffset());
     }
 
-    // disable the refresher
-    ui.setRefresherEnabled(false);
-
     // abort last tasks if running
-    if(futureCount != null && !futureCount.isDone())
+    if (futureCount != null && !futureCount.isDone())
     {
       futureCount.cancel(true);
     }
-    if(futureMatches != null && !futureMatches.isDone())
+    if (futureMatches != null && !futureMatches.isDone())
     {
       futureMatches.cancel(true);
 
@@ -172,17 +173,33 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
 
   }
 
+  /**
+   * Adds a history entry to the history panel.
+   *
+   * @param e the entry, which is added.
+   *
+   * @see HistoryPanel
+   */
+  public void addHistoryEntry(HistoryEntry e)
+  {
+    // remove it first in order to let it appear on the beginning of the list
+    history.remove(e);
+    history.add(0, e);
+    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
+  }
+
   public void executeQuery(boolean executeCount, boolean executeResult)
   {
 
-    Validate.notNull(lastQuery, "You have to set a query before you can execute it.");
+    Validate.notNull(lastQuery,
+      "You have to set a query before you can execute it.");
 
     cancelQueries();
 
     // cleanup resources
     VaadinSession session = VaadinSession.getCurrent();
     session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
-    if(session.getAttribute(MediaController.class) != null)
+    if (session.getAttribute(MediaController.class) != null)
     {
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
@@ -192,11 +209,8 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     HistoryEntry e = new HistoryEntry();
     e.setCorpora(lastQuery.getCorpora());
     e.setQuery(lastQuery.getQuery());
-    // remove it first in order to let it appear on the beginning of the list
-    history.remove(e);
-    history.add(0, e);
-    ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
 
+    addHistoryEntry(e);
 
     if (lastQuery.getCorpora() == null || lastQuery.getCorpora().isEmpty())
     {
@@ -212,7 +226,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
 
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
-    if(executeResult)
+    if (executeResult)
     {
       // remove old result from view
       if (lastResultView != null)
@@ -223,7 +237,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
       ui.getMainTab().addTab(lastResultView, "Query Result");
       ui.getMainTab().setSelectedTab(lastResultView);
 
-       futureMatches = res.path("query").path("search").path("find")
+      futureMatches = res.path("query").path("search").path("find")
         .queryParam("q", lastQuery.getQuery())
         .queryParam("offset", "" + lastQuery.getOffset())
         .queryParam("limit", "" + lastQuery.getLimit())
@@ -231,7 +245,7 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         .accept(MediaType.APPLICATION_XML_TYPE)
         .get(new MatchListType());
 
-       ui.setRefresherEnabled(true);
+      new MatchCallback().start();
 
     }
 
@@ -246,17 +260,19 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
         StringUtils.join(lastQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
 
-      ui.setRefresherEnabled(true);
+      new CountCallback().start();
     }
   }
 
-  public void corpusSelectionChanged()
+  public void corpusSelectionChangedInBackground()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfiguration(ui.getControlPanel().getCorpusList().getSelectedCorpora());
+      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
+      getCorpusList().
+      getSelectedCorpora());
 
+    ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
   }
-
 
   public Set<String> getSelectedCorpora()
   {
@@ -271,14 +287,14 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
   @Override
   public void switchPage(int offset, int limit)
   {
-    if(lastQuery != null)
+    if (lastQuery != null)
     {
       lastQuery.setOffset(offset);
       lastQuery.setLimit(limit);
 
       // execute the result query again
       executeQuery(false, true);
-      if(lastResultView != null && lastCount != null)
+      if (lastResultView != null && lastCount != null)
       {
         lastResultView.setCount(lastCount.getMatchCount());
       }
@@ -293,163 +309,170 @@ public class QueryController implements PagingCallback, Refresher.RefreshListene
     return futureCount != null || futureMatches != null;
   }
 
-  @Override
-  public void refresh(Refresher source)
-  {
-    if(source.getRefreshInterval() <= 0)
-    {
-      // do nothing if refresher is not longer activated
-      return;
-    }
-    boolean matchFinished = true;
-    if(futureMatches != null)
-    {
-      matchFinished = checkFutureMatchesFinished();
-    }
-
-    // initialize to true value in case futureCount is null
-    boolean countFinished = true;
-    if(futureCount != null)
-    {
-      countFinished = checkFutureCount();
-    }
-
-    if(matchFinished && countFinished)
-    {
-      // we are finished loading the results, do not refresh any longer
-      ui.setRefresherEnabled(false);
-    }
-  }
-
-  private boolean checkFutureMatchesFinished()
-  {
-    List<Match> result = null;
-    try
-    {
-      result = futureMatches.get(100, TimeUnit.MILLISECONDS);
-    }
-    catch (InterruptedException ex)
-    {
-      log.warn(null, ex);
-    }
-    catch (ExecutionException root)
-    {
-      if (lastResultView != null && lastResultView.getPaging() != null)
-      {
-        PagingComponent paging = lastResultView.getPaging();
-
-        Throwable cause = root.getCause();
-
-        if (cause instanceof UniformInterfaceException)
-        {
-          UniformInterfaceException ex = (UniformInterfaceException) cause;
-
-          if (ex.getResponse().getStatus() == 400)
-          {
-            paging.setInfo("parsing error: " +
-              ex.getResponse().getEntity(String.class));
-          }
-          else if (ex.getResponse().getStatus() == 504) // gateway timeout
-          {
-            paging.setInfo("Timeout: query exeuction took too long");
-          }
-          else
-          {
-            paging.setInfo("unknown error: " + ex );
-          }
-        }
-        else
-        {
-          log.error("Unexcepted ExecutionException cause", root);
-        }
-
-      }
-    }
-    catch (TimeoutException ex)
-    {
-      // we ignore this
-      return false;
-    }
-
-    lastResultView.setResult(result,
-      lastQuery.getContextLeft(),
-      lastQuery.getContextRight(), lastQuery.getSegmentation(),
-      lastQuery.getOffset());
-    futureMatches = null;
-
-    return true;
-  }
-
-  private boolean checkFutureCount()
-  {
-    try
-    {
-      lastCount = futureCount.get(100, TimeUnit.MILLISECONDS);
-      String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
-      String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
-
-      ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
-        getMatchCount() + " " + matchesString
-        + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
-      if (lastResultView != null && lastCount.getMatchCount() > 0)
-      {
-        lastResultView.setCount(lastCount.getMatchCount());
-      }
-
-    }
-    catch (InterruptedException ex)
-    {
-      log.warn(null, ex);
-    }
-    catch (ExecutionException root)
-    {
-      Throwable cause = root.getCause();
-
-      if(cause instanceof UniformInterfaceException)
-      {
-        UniformInterfaceException ex = (UniformInterfaceException) cause;
-        if (ex.getResponse().getStatus() == 400)
-        {
-          Notification.show(
-            "parsing error",
-            ex.getResponse().getEntity(String.class),
-            Notification.Type.WARNING_MESSAGE);
-        }
-        else if (ex.getResponse().getStatus() == 504) // gateway timeout
-        {
-          Notification.show(
-            "Timeout: query execution took too long.",
-            "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-            Notification.Type.WARNING_MESSAGE);
-        }
-        else
-        {
-          Notification.show(
-            "unknown error " + ex.
-            getResponse().getStatus(),
-            ex.getResponse().getEntity(String.class),
-            Notification.Type.WARNING_MESSAGE);
-        }
-      }
-      else
-      {
-        log.error("Unexcepted ExecutionException cause", root);
-      }
-    }
-    catch (TimeoutException ex)
-    {
-      // we ignore this
-      return false;
-    }
-
-    futureCount = null;
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-    return true;
-  }
-
   public String getQueryDraft()
   {
     return ui.getControlPanel().getQueryPanel().getQuery();
+  }
+
+  private class CountCallback extends Thread
+  {
+
+    @Override
+    public void run()
+    {
+
+      if (futureCount != null)
+      {
+        UniformInterfaceException cause = null;
+        try
+        {
+          lastCount = futureCount.get();
+        }
+        catch (InterruptedException ex)
+        {
+          log.warn(null, ex);
+        }
+        catch (ExecutionException root)
+        {
+          if (root.getCause() instanceof UniformInterfaceException)
+          {
+            cause = (UniformInterfaceException) root.getCause();
+          }
+          else
+          {
+            log.error("Unexcepted ExecutionException cause", root);
+          }
+
+        }
+
+        futureCount = null;
+
+        final UniformInterfaceException causeFinal = cause;
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            if (causeFinal == null)
+            {
+              if (lastCount != null)
+              {
+                String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
+                String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
+
+                ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
+                  getMatchCount() + " " + matchesString
+                  + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
+                if (lastResultView != null && lastCount.getMatchCount() > 0)
+                {
+                  lastResultView.setCount(lastCount.getMatchCount());
+                }
+              }
+            }
+            else
+            {
+              if (causeFinal.getResponse().getStatus() == 400)
+              {
+                Notification.show(
+                  "parsing error",
+                  causeFinal.getResponse().getEntity(String.class),
+                  Notification.Type.WARNING_MESSAGE);
+              }
+              else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
+              {
+                Notification.show(
+                  "Timeout: query execution took too long.",
+                  "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
+                  Notification.Type.WARNING_MESSAGE);
+              }
+              else
+              {
+                log.error("Unexpected exception:  " + causeFinal.
+                  getLocalizedMessage(), causeFinal);
+                ExceptionDialog.show(causeFinal);
+              }
+            } // end if cause != null
+
+            ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+          }
+        });
+      }
+    }
+  }
+
+  private class MatchCallback extends Thread
+  {
+
+    @Override
+    public void run()
+    {
+      List<Match> result = null;
+      try
+      {
+        result = futureMatches.get();
+      }
+      catch (InterruptedException ex)
+      {
+        log.warn(null, ex);
+      }
+      catch (final ExecutionException root)
+      {
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            if (lastResultView != null && lastResultView.getPaging() != null)
+            {
+              PagingComponent paging = lastResultView.getPaging();
+
+              Throwable cause = root.getCause();
+
+              if (cause instanceof UniformInterfaceException)
+              {
+                UniformInterfaceException ex = (UniformInterfaceException) cause;
+
+                if (ex.getResponse().getStatus() == 400)
+                {
+                  paging.setInfo("parsing error: "
+                    + ex.getResponse().getEntity(String.class));
+                }
+                else if (ex.getResponse().getStatus() == 504) // gateway timeout
+                {
+                  paging.setInfo("Timeout: query exeuction took too long");
+                }
+                else
+                {
+                  paging.setInfo("unknown error: " + ex);
+                }
+              }
+              else
+              {
+                log.error("Unexcepted ExecutionException cause", root);
+              }
+
+            }
+          }
+        });
+
+      }
+
+      final List<Match> finalResult = result;
+      ui.access(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          lastResultView.setResult(finalResult,
+            lastQuery.getContextLeft(),
+            lastQuery.getContextRight(), lastQuery.getSegmentation(),
+            lastQuery.getOffset());
+        }
+      });
+
+
+      futureMatches = null;
+    }
   }
 
   private static class MatchListType extends GenericType<List<Match>>

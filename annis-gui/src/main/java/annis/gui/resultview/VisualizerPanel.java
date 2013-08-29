@@ -29,7 +29,6 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.ProgressIndicator;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -39,8 +38,9 @@ import static annis.model.AnnisConstants.*;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.ProgressBar;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
-public class VisualizerPanel extends VerticalLayout
+public class VisualizerPanel extends CssLayout
   implements Button.ClickListener, VisualizationToggle
 {
 
@@ -122,7 +122,7 @@ public class VisualizerPanel extends VerticalLayout
 
   private final String PRELOADED = "preloaded";
 
-  private ProgressIndicator progress;
+  private ProgressBar progress;
 
   private InstanceConfig instanceConfig;
 
@@ -162,7 +162,7 @@ public class VisualizerPanel extends VerticalLayout
     this.htmlID = htmlID;
     this.resultID = resultID;
 
-    this.progress = new ProgressIndicator();
+    this.progress = new ProgressBar();
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -251,6 +251,7 @@ public class VisualizerPanel extends VerticalLayout
     Component c = visPlugin.createComponent(input, this);
     c.setVisible(false);
     c.addStyleName("corpus-font");
+    c.addStyleName("vis-content");
 
     return c;
   }
@@ -476,7 +477,6 @@ public class VisualizerPanel extends VerticalLayout
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
-      progress.setPollingInterval(250);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress);
     }

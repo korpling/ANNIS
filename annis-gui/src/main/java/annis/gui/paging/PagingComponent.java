@@ -22,6 +22,7 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -34,6 +35,7 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.LoggerFactory;
+import org.w3c.dom.Text;
 
 /**
  *
@@ -42,27 +44,44 @@ import org.slf4j.LoggerFactory;
 public class PagingComponent extends CustomComponent implements
   Button.ClickListener
 {
-  
-  private static final org.slf4j.Logger log = LoggerFactory.getLogger(PagingComponent.class);
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    PagingComponent.class);
 
   public static final ThemeResource LEFT_ARROW = new ThemeResource(
     "left_arrow.png");
+
   public static final ThemeResource RIGHT_ARROW = new ThemeResource(
     "right_arrow.png");
+
   public static final ThemeResource FIRST = new ThemeResource("first.png");
+
   public static final ThemeResource LAST = new ThemeResource("last.png");
+
   private HorizontalLayout layout;
+
   private Button btFirst;
+
   private Button btLast;
+
   private Button btNext;
+
   private Button btPrevious;
+
   private TextField txtPage;
+
   private Label lblMaxPages;
+
   private Label lblStatus;
+
   private Set<PagingCallback> callbacks;
+
   private AtomicInteger count;
+
   private int pageSize;
+
   private int currentPage;
+
   private Label lblInfo;
 
   public PagingComponent(int count, int pageSize)
@@ -90,13 +109,11 @@ public class PagingComponent extends CustomComponent implements
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(false, true, false, true));
 
-    Panel root = new Panel(layout);
-    root.setStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-    setCompositionRoot(root);
+    setCompositionRoot(layout);
 
 
     lblInfo = new Label();
+    lblInfo.setContentMode(ContentMode.HTML);
     lblInfo.addStyleName("right-aligned-text");
 
     layout.setWidth("100%");
@@ -137,7 +154,8 @@ public class PagingComponent extends CustomComponent implements
     Validator pageValidator = new PageValidator(
       "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
-    root.addAction(new EnterListener(txtPage));
+    txtPage.addShortcutListener(new EnterListener(txtPage));
+
 
     lblMaxPages = new Label();
     lblMaxPages.setDescription("maximal pages");
@@ -155,9 +173,13 @@ public class PagingComponent extends CustomComponent implements
     layout.addComponent(lblStatus);
     layout.addComponent(lblInfo);
 
+    layout.setComponentAlignment(btFirst, Alignment.MIDDLE_LEFT);
+    layout.setComponentAlignment(btPrevious, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblStatus, Alignment.MIDDLE_LEFT);
     layout.setComponentAlignment(lblMaxPages, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(txtPage, Alignment.MIDDLE_RIGHT);
+    layout.setComponentAlignment(btNext, Alignment.MIDDLE_RIGHT);
+    layout.setComponentAlignment(btLast, Alignment.MIDDLE_RIGHT);
 
     layout.setExpandRatio(lblStatus, 1.0f);
     layout.setComponentAlignment(lblInfo, Alignment.MIDDLE_RIGHT);
@@ -213,10 +235,10 @@ public class PagingComponent extends CustomComponent implements
   {
     return (currentPage - 1) * pageSize;
   }
-  
+
   public void setStartNumber(int startNumber)
   {
-    currentPage = (startNumber / pageSize)+1;
+    currentPage = (startNumber / pageSize) + 1;
     update(false);
   }
 
@@ -314,9 +336,21 @@ public class PagingComponent extends CustomComponent implements
     }
   }
 
+  /**
+   * Cuts off long queries. Actually they are restricted to 50 characters. The
+   * full query is available with descriptions (tooltip in gui)
+   *
+   * @param text the query to display in the result view panel
+   */
   public void setInfo(String text)
   {
-    lblInfo.setValue(text);
+    if (text != null && text.length() > 0)
+    {
+      String prefix = "Result for: <span class=\"corpus-font-force\">";
+      lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
+      lblInfo.setValue(text.length() < 50 ? prefix + text.substring(0, text.
+        length()) : prefix + text.substring(0, 50) + " ... </span>");
+    }
   }
 
   private static class PageValidator extends AbstractStringValidator

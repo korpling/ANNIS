@@ -102,6 +102,13 @@ public class CountTest
     
     assertEquals(5, countPcc2("cat=\"NP\" & #1:arity=3 & node & #1 > #2 & #2:arity=3"));
     
+    assertEquals(8, countPcc2("cat=\"S\" & tok & #1 >secedge #2\n" +
+      "& cat=\"S\" \n" +
+      "& #3 >* #2"));
+    assertEquals(358, countPcc2("cat & cat & cat & #1 >* #2 & #2 >* #3"));
+    assertEquals(10, countPcc2("cat & cat & tok & #1 >* #2 & #2 >secedge #3"));
+    assertEquals(10, countPcc2("node & node & node & #1 >edge * #2 & #2 >secedge * #3"));
+
   }
   
   @Test
@@ -168,12 +175,12 @@ public class CountTest
   
   private int countTiger2(String aql)
   {
+    System.out.println("tiger2 query: " + aql);
     return count(aql, tiger2CorpusID);
   }
   
   private int count(String aql, List<Long> corpora)
   {
-    System.out.println("tiger2 query: " + aql);
     QueryData qd = annisDao.parseAQL(aql, corpora);
     return annisDao.count(qd);
   }
