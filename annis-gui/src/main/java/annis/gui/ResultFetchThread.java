@@ -27,18 +27,18 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.concurrent.ArrayBlockingQueue;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.logging.Level;
 import javax.ws.rs.core.MediaType;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
@@ -65,7 +65,7 @@ class ResultFetchThread extends Thread
 
   private SearchUI ui;
 
-  ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel, SearchUI ui)
+  public ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel, SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
@@ -193,9 +193,9 @@ class ResultFetchThread extends Thread
       else
       {
         if (isInterrupted())
-          {
-            return;
-          }
+        {
+          return;
+        }
         ui.access(new Runnable()
         {
           @Override
@@ -209,6 +209,8 @@ class ResultFetchThread extends Thread
         final int totalResultSize = result.size();
         int current = 0;
         
+        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
+          3);
          
         for (Match m : result)
         {
@@ -222,22 +224,31 @@ class ResultFetchThread extends Thread
           SubgraphQuery subgraphQuery = prepareQuery(subList);
           final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
           
+          queue.put(p);
+          
           final float progress = (float) current / (float) totalResultSize;
+          final boolean first = current == 0;
+          
           
           if (isInterrupted())
           {
             return;
           }
           ui.access(new Runnable()
+          {
+            @Override
+            public void run()
             {
-              @Override
-              public void run()
+              resultPanel.showSubgraphSearchInProgress(query, progress);
+              
+              if(first)
               {
-                resultPanel.showSubgraphSearchInProgress(query, progress);
-                resultPanel.addQueryResult(query, p);
+                resultPanel.addQueryResultQueue(queue, query); 
                 ui.push();
               }
-            });
+             
+            }
+          });
           
           current++;
         }

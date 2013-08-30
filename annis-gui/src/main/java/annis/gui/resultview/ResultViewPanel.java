@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
+import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
@@ -26,11 +27,12 @@ import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SE
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.Match;
+import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -60,14 +62,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.BlockingQueue;
+import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
-public class ResultViewPanel extends VerticalLayout implements ResolverProvider
+public class ResultViewPanel extends VerticalLayout implements ResolverProvider, OnLoadCallbackExtension.Callback
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -109,6 +112,9 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
 
   private int currentResults;
 
+  private transient BlockingQueue<SaltProject> projectQueue;
+  private PagedResultQuery currentQuery;
+  
   public ResultViewPanel(QueryController controller,
     PluginSystem ps, InstanceConfig instanceConfig)
   {
@@ -226,8 +232,19 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     progressResult.setValue(percent);
   }
   
+  public void addQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q)
+  {
+    this.projectQueue = queue;
+    this.currentQuery = q;
+    
+    // get the first query result
+    SaltProject first = queue.poll();
+    Preconditions.checkState(first != null, "There must be already an element in the queue");
+    
+    addQueryResult(q, first);
+  }
 
-  public void addQueryResult(PagedResultQuery q, SaltProject p)
+  private void addQueryResult(PagedResultQuery q, SaltProject p)
   {
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
@@ -254,6 +271,15 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
       resultPanelList.add(panel);
       resultLayout.addComponent(panel);
     }
+    
+    if(projectQueue != null && q != null 
+      && !newPanels.isEmpty() && currentResults < q.getLimit()-1)
+    {
+      // add a callback so we can load the next single result
+      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 1000);
+      ext.extend(newPanels.get(newPanels.size()-1));
+    }
+    
   }
   
   public void showFinishedSubgraphSearch()
@@ -277,6 +303,8 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
       panel.setWidth("100%");
       panel.setHeight("-1px");
 
+      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
+      ext.extend(panel);
       result.add(panel);
     }
     return result;
@@ -492,6 +520,33 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider
     Arrays.sort(visArray, new ResolverEntryComparator());
     return visArray;
   }
+
+  @Override
+  public boolean onCompononentLoaded(AbstractClientConnector source)
+  {
+    if(source != null && projectQueue != null && currentQuery != null)
+    {
+      try
+      {
+        final SaltProject p = projectQueue.poll(100, TimeUnit.MILLISECONDS);
+        if(p == null)
+        {
+          return false;
+        }
+        
+        addQueryResult(currentQuery, p);
+        
+      }
+      catch (InterruptedException ex)
+      {
+        log.warn(null, ex);
+      }
+    }
+    return true;
+  }
+  
+  
+  
 
   private void setVisibleTokenAnnosVisible(Set<String> annos)
   {
