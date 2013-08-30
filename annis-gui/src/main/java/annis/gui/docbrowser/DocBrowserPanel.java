@@ -18,6 +18,7 @@ package annis.gui.docbrowser;
 import annis.gui.SearchUI;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
+import annis.libgui.PluginSystem;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.communication.PushMode;
@@ -35,7 +36,7 @@ import java.util.List;
 public class DocBrowserPanel extends Panel
 {
 
-  private SearchUI ui;
+  private transient SearchUI ui;
 
   private Layout layout;
 
@@ -43,7 +44,7 @@ public class DocBrowserPanel extends Panel
   private Label loadingMsg;
 
   // the name of the corpus from which the documents are fetched
-  private String corpus;
+  private String corpus; 
 
   private DocBrowserPanel(SearchUI ui, String corpus)
   {
@@ -95,9 +96,9 @@ public class DocBrowserPanel extends Panel
         get(new Helper.AnnotationListType());
       loadingMsg.setVisible(false);
       layout.removeComponent(loadingMsg);
-      DocBrowserTable table = DocBrowserTable.getDocBrowserTable();
+      DocBrowserTable table = DocBrowserTable.getDocBrowserTable(corpus, ui);
       table.setDocNames(docs);
-      layout.addComponent(table);
+      layout.addComponent(table);   
       ui.push();
     }
   }

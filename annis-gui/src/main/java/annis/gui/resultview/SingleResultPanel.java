@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;

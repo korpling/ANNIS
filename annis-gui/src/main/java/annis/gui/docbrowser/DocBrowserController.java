@@ -16,18 +16,21 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
+import annis.libgui.PluginSystem;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.TabSheet;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
+ * Represents a global controller for the doc browser feature.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class DocBrowserController
 {
 
+  // holds the complete state of the gui
   private transient final SearchUI ui;
 
   // track the already initiated doc browsers

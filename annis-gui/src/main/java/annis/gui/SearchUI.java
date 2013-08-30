@@ -133,7 +133,7 @@ public class SearchUI extends AnnisBaseUI
 
   private CSSInject css;
   
-  private DocBrowserController docBrowserController;
+  private transient DocBrowserController docBrowserController;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 

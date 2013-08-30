@@ -260,8 +260,7 @@ public class VisualizerPanel extends CssLayout
   {
     VisualizerInput input = new VisualizerInput();
     input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
-      getAttribute(
-      "AnnisWebService.URL"));
+      getAttribute("AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
     input.
       setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
@@ -300,12 +299,12 @@ public class VisualizerPanel extends CssLayout
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
 
-      SDocument wholeDocument = p.getSCorpusGraphs().get(0).
-        getSDocuments().get(0);
+      SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
+        .get(0);
 
       input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
-        input.
-        getDocument(), wholeDocument));
+        input.getDocument(), wholeDocument));
+
       input.setDocument(wholeDocument);
     }
     else
@@ -425,10 +424,10 @@ public class VisualizerPanel extends CssLayout
                 vis.setVisible(true);
                 if (vis instanceof PDFViewer)
                 {
-                  ((PDFViewer)vis).openPDFPage("-1");
+                  ((PDFViewer) vis).openPDFPage("-1");
                 }
                 // add if not already added
-                if(getComponentIndex(vis) < 0)
+                if (getComponentIndex(vis) < 0)
                 {
                   addComponent(vis);
                 }
