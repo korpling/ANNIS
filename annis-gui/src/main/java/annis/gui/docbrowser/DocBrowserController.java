@@ -51,32 +51,34 @@ public class DocBrowserController implements Serializable
   private transient final Map<String, TabSheet.Tab> initedDocBrowsers;
 
   // cache for already initiated visualizations, the key is the doc name
-  private transient Map<String, TabSheet.Tab> initedVisualizations;
+  private transient Map<String, Component> initiatedVis;
 
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<String, TabSheet.Tab>();
-    this.initedVisualizations = new HashMap<String, TabSheet.Tab>();
+    this.initiatedVis = new HashMap<String, Component>();
   }
 
   public void openDocVis(String corpus, String doc)
   {
     String canonicalTitle = "doc view: " + corpus + " > " + doc;
-    if (initedVisualizations.containsKey(canonicalTitle))
+    if (initiatedVis.containsKey(canonicalTitle))
     {
-      ui.getTabSheet().setSelectedTab(initedVisualizations.get(canonicalTitle));
+      TabSheet.Tab addTab = ui.getTabSheet().addTab(initiatedVis.get(
+        canonicalTitle), canonicalTitle);
+      ui.getTabSheet().setSelectedTab(addTab);
+      addTab.setClosable(true);
     }
     else
     {
-
       VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(
         "grid_tree");
       Component vis = visualizer.createComponent(createInput(corpus, doc), null);
       TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, canonicalTitle);
       visTab.setClosable(true);
       ui.getTabSheet().setSelectedTab(vis);
-      initedVisualizations.put(canonicalTitle, visTab);
+      initiatedVis.put(canonicalTitle, vis);
     }
   }
 

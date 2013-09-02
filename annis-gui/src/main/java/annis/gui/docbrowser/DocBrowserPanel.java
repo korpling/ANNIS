@@ -16,18 +16,14 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
-import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -37,8 +33,6 @@ import org.slf4j.LoggerFactory;
  */
 public class DocBrowserPanel extends Panel
 {
-
-  private Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
 
   private transient SearchUI ui;
 
@@ -50,18 +44,12 @@ public class DocBrowserPanel extends Panel
   // the name of the corpus from which the documents are fetched
   private String corpus;
 
-
-
   private DocBrowserTable table;
-
-  // holds the docbrowser controller for opening new document
-  private final transient DocBrowserController docBrowserController;
 
   private DocBrowserPanel(SearchUI ui, String corpus)
   {
     this.ui = ui;
     this.corpus = corpus;
-    this.docBrowserController = ui.getDocBrowserController();
 
     // init layout 
     layout = new VerticalLayout();
@@ -74,7 +62,7 @@ public class DocBrowserPanel extends Panel
     layout.setWidth(100, Unit.PERCENTAGE);
     layout.setHeight(100, Unit.PERCENTAGE);
 
-    table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);   
+    table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
   }
 
   @Override
@@ -122,8 +110,7 @@ public class DocBrowserPanel extends Panel
       layout.removeComponent(loadingMsg);
 
       table.setDocNames(docs);
-
-      layout.addComponent(table, 1);
+      layout.addComponent(table);
       ui.push();
     }
   }
