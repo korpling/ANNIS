@@ -18,16 +18,18 @@ package annis.gui.docbrowser;
 import annis.gui.SearchUI;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
-import annis.libgui.PluginSystem;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.shared.communication.PushMode;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -36,35 +38,43 @@ import java.util.List;
 public class DocBrowserPanel extends Panel
 {
 
+  private Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
+
   private transient SearchUI ui;
 
-  private Layout layout;
+  private VerticalLayout layout;
 
   // displayed while the docnames are fetched
   private Label loadingMsg;
 
   // the name of the corpus from which the documents are fetched
-  private String corpus; 
+  private String corpus;
+
+
+
+  private DocBrowserTable table;
+
+  // holds the docbrowser controller for opening new document
+  private final transient DocBrowserController docBrowserController;
 
   private DocBrowserPanel(SearchUI ui, String corpus)
   {
     this.ui = ui;
     this.corpus = corpus;
+    this.docBrowserController = ui.getDocBrowserController();
 
     // init layout 
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
 
-    // init paging
-    PagingComponent paging = new PagingComponent(0, 100);
-    layout.addComponent(paging);
-
     // set loading component
     loadingMsg = new Label("loading documents for " + corpus);
     layout.addComponent(loadingMsg);
     layout.setWidth(100, Unit.PERCENTAGE);
     layout.setHeight(100, Unit.PERCENTAGE);
+
+    table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);   
   }
 
   @Override
@@ -74,6 +84,14 @@ public class DocBrowserPanel extends Panel
     ui.access(new LoadingDocs());
   }
 
+  /**
+   * Initiated the {@link DocBrowserPanel} and put the main tab navigation.
+   *
+   * @param ui The main application class of the gui.
+   * @param corpus The corpus, for which the doc browser is initiated.
+   * @return A new wrapper panel for a doc browser. Make sure, that this is not
+   * done several times.
+   */
   public static TabSheet.Tab initDocBrowserPanel(SearchUI ui, String corpus)
   {
     TabSheet tabSheet = ui.getTabSheet();
@@ -85,6 +103,11 @@ public class DocBrowserPanel extends Panel
     return docBrowserTab;
   }
 
+  public void openVis(String doc)
+  {
+    ui.getDocBrowserController().openDocVis(corpus, doc);
+  }
+
   private class LoadingDocs extends Thread
   {
 
@@ -94,11 +117,13 @@ public class DocBrowserPanel extends Panel
       WebResource res = Helper.getAnnisWebResource();
       List<Annotation> docs = res.path("meta/docnames/" + corpus).
         get(new Helper.AnnotationListType());
+
       loadingMsg.setVisible(false);
       layout.removeComponent(loadingMsg);
-      DocBrowserTable table = DocBrowserTable.getDocBrowserTable(corpus, ui);
+
       table.setDocNames(docs);
-      layout.addComponent(table);   
+
+      layout.addComponent(table, 1);
       ui.push();
     }
   }

@@ -15,34 +15,12 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
-import annis.libgui.Helper;
-import annis.libgui.PluginSystem;
-import annis.libgui.ResolverProvider;
-import annis.libgui.ResolverProviderImpl;
-import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.visualizers.VisualizerPlugin;
 import annis.model.Annotation;
-import annis.resolver.ResolverEntry;
-import annis.resolver.SingleResolverRequest;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Layout;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.Window;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import java.net.URLEncoder;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Map;
-import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -54,15 +32,11 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserTable extends Table
 {
 
-  private Logger log = LoggerFactory.getLogger(DocBrowserController.class);
+  private Logger log = LoggerFactory.getLogger(DocBrowserTable.class);
 
   private BeanItemContainer<Annotation> annoBean;
 
-  private final transient PluginSystem ps;
-
-  private String topLevelCorpusName;
-
-  private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+  private DocBrowserPanel parent;
 
   void setDocNames(List<Annotation> docs)
   {
@@ -77,46 +51,13 @@ public class DocBrowserTable extends Table
     });
   }
 
-  private VisualizerInput createInput(String docName)
+  private DocBrowserTable(DocBrowserPanel parent)
   {
-    VisualizerInput input = new VisualizerInput();
 
-    // get the whole document wrapped in a salt project
-    SaltProject txt = null;
-    try
-    {
-      topLevelCorpusName = URLEncoder.encode(topLevelCorpusName, "UTF-8");
-      docName = URLEncoder.encode(docName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graphs").path(topLevelCorpusName).
-        path(docName).get(SaltProject.class);
-    }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
-    {
-      log.error("General remote service exception", e);
-    }
+    this.parent = parent;
 
-    if (txt != null)
-    {
-      SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
-      input.setResult(sDoc);
-    }
-    
-    // set empty mapping for avoiding errors with pure written visualizers
-    input.setMappings(new Properties());
-    return input;
-
-
-  }
-
-  private DocBrowserTable(String corpus, SearchUI ui)
-  {
-    this.ps = (PluginSystem) ui;
-    this.topLevelCorpusName = corpus;
+    // configure layout
+    setSizeFull();
   }
 
   /**
@@ -147,11 +88,9 @@ public class DocBrowserTable extends Table
     }
   }
 
-  public static DocBrowserTable getDocBrowserTable(String corpus, SearchUI ui)
+  public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)
   {
-    DocBrowserTable docBrowserTable = new DocBrowserTable(corpus, ui);
-    docBrowserTable.cacheResolver = Collections.synchronizedMap(
-      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());;
+    DocBrowserTable docBrowserTable = new DocBrowserTable(parent);    
     return docBrowserTable;
   }
 
@@ -168,17 +107,8 @@ public class DocBrowserTable extends Table
     @Override
     public void buttonClick(Button.ClickEvent event)
     {
-      VisualizerPlugin visualizer = ps.getVisualizer("discourse");
-      Layout l = new HorizontalLayout();
-      Component vis = visualizer.createComponent(createInput(
-        docName), null);
 
-      l.addComponent(vis);
-      l.setSizeUndefined();
-      Window win = new Window();
-      win.setContent(l);
-      win.setCaption("full text view for: " + docName);
-      ((SearchUI) ps).addWindow(win);
+      parent.openVis(docName);
     }
   }
 }

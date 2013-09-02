@@ -16,19 +16,33 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
+import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.visualizers.VisualizerPlugin;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.Serializable;
+import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Properties;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Represents a global controller for the doc browser feature.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class DocBrowserController
+public class DocBrowserController implements Serializable
 {
+
+  private Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
   private transient final SearchUI ui;
@@ -36,10 +50,34 @@ public class DocBrowserController
   // track the already initiated doc browsers
   private transient final Map<String, TabSheet.Tab> initedDocBrowsers;
 
+  // cache for already initiated visualizations, the key is the doc name
+  private transient Map<String, TabSheet.Tab> initedVisualizations;
+
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<String, TabSheet.Tab>();
+    this.initedVisualizations = new HashMap<String, TabSheet.Tab>();
+  }
+
+  public void openDocVis(String corpus, String doc)
+  {
+    String canonicalTitle = "doc view: " + corpus + " > " + doc;
+    if (initedVisualizations.containsKey(canonicalTitle))
+    {
+      ui.getTabSheet().setSelectedTab(initedVisualizations.get(canonicalTitle));
+    }
+    else
+    {
+
+      VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(
+        "grid_tree");
+      Component vis = visualizer.createComponent(createInput(corpus, doc), null);
+      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, canonicalTitle);
+      visTab.setClosable(true);
+      ui.getTabSheet().setSelectedTab(vis);
+      initedVisualizations.put(canonicalTitle, visTab);
+    }
   }
 
   public void openDocBrowser(String corpus)
@@ -72,5 +110,39 @@ public class DocBrowserController
     {
       initedDocBrowsers.remove(corpus);
     }
+  }
+
+  private VisualizerInput createInput(String corpus, String docName)
+  {
+    VisualizerInput input = new VisualizerInput();
+
+    // get the whole document wrapped in a salt project
+    SaltProject txt = null;
+    try
+    {
+      String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
+      docName = URLEncoder.encode(docName, "UTF-8");
+      WebResource annisResource = Helper.getAnnisWebResource();
+      txt = annisResource.path("query").path("graphs").path(topLevelCorpusName).
+        path(docName).get(SaltProject.class);
+    }
+    catch (RuntimeException e)
+    {
+      log.error("General remote service exception", e);
+    }
+    catch (Exception e)
+    {
+      log.error("General remote service exception", e);
+    }
+
+    if (txt != null)
+    {
+      SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
+      input.setResult(sDoc);
+    }
+
+    // set empty mapping for avoiding errors with pure written visualizers
+    input.setMappings(new Properties());
+    return input;
   }
 }
