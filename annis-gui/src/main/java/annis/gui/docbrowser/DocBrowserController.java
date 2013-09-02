@@ -48,7 +48,7 @@ public class DocBrowserController implements Serializable
   private transient final SearchUI ui;
 
   // track the already initiated doc browsers
-  private transient final Map<String, TabSheet.Tab> initedDocBrowsers;
+  private transient final Map<String, Component> initedDocBrowsers;
 
   // cache for already initiated visualizations, the key is the doc name
   private transient Map<String, Component> initiatedVis;
@@ -56,7 +56,7 @@ public class DocBrowserController implements Serializable
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
-    this.initedDocBrowsers = new HashMap<String, TabSheet.Tab>();
+    this.initedDocBrowsers = new HashMap<String, Component>();
     this.initiatedVis = new HashMap<String, Component>();
   }
 
@@ -84,34 +84,22 @@ public class DocBrowserController implements Serializable
 
   public void openDocBrowser(String corpus)
   {
+    String caption = "doc browser " + corpus;
+
+    // if not already init, do it now
     if (!initedDocBrowsers.containsKey(corpus))
     {
-      TabSheet.Tab tab = DocBrowserPanel.initDocBrowserPanel(ui, corpus);
-      initedDocBrowsers.put(corpus, tab);
-      tab.getComponent().addDetachListener(new DetachDocBrowserListener(corpus));
-    }
-    else
-    {
-      ui.getTabSheet().setSelectedTab(initedDocBrowsers.get(corpus));
-    }
-  }
-
-  private class DetachDocBrowserListener implements
-    ClientConnector.DetachListener
-  {
-
-    String corpus;
-
-    public DetachDocBrowserListener(String corpus)
-    {
-      this.corpus = corpus;
+      DocBrowserPanel browseTbl = DocBrowserPanel.
+        initDocBrowserPanel(ui, corpus);
+      initedDocBrowsers.put(corpus, browseTbl);
     }
 
-    @Override
-    public void detach(ClientConnector.DetachEvent event)
-    {
-      initedDocBrowsers.remove(corpus);
-    }
+    // init tab and put to front
+    ui.getTabSheet().addTab(initedDocBrowsers.get(corpus), caption);
+    TabSheet.Tab tab = ui.getTabSheet().addTab(initedDocBrowsers.get(corpus),
+      caption);
+    tab.setClosable(true);
+    ui.getTabSheet().setSelectedTab(tab);
   }
 
   private VisualizerInput createInput(String corpus, String docName)

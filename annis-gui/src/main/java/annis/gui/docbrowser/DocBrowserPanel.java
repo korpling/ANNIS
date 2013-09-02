@@ -21,11 +21,8 @@ import annis.model.Annotation;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
 import java.util.List;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -80,15 +77,9 @@ public class DocBrowserPanel extends Panel
    * @return A new wrapper panel for a doc browser. Make sure, that this is not
    * done several times.
    */
-  public static TabSheet.Tab initDocBrowserPanel(SearchUI ui, String corpus)
-  {
-    TabSheet tabSheet = ui.getTabSheet();
-    String caption = "doc browser " + corpus;
-    DocBrowserPanel docBrowserPanel = new DocBrowserPanel(ui, corpus);
-    TabSheet.Tab docBrowserTab = tabSheet.addTab(docBrowserPanel, caption);
-    docBrowserTab.setClosable(true);
-    tabSheet.setSelectedTab(docBrowserTab);
-    return docBrowserTab;
+  public static DocBrowserPanel initDocBrowserPanel(SearchUI ui, String corpus)
+  {    
+    return new DocBrowserPanel(ui, corpus);
   }
 
   public void openVis(String doc)
