@@ -63,23 +63,21 @@ public class DocBrowserController implements Serializable
   public void openDocVis(String corpus, String doc)
   {
     String canonicalTitle = "doc view: " + corpus + " > " + doc;
-    if (initiatedVis.containsKey(canonicalTitle))
+
+    // check if a visualization is already initiated
+    if (!initiatedVis.containsKey(canonicalTitle))
     {
-      TabSheet.Tab addTab = ui.getTabSheet().addTab(initiatedVis.get(
-        canonicalTitle), canonicalTitle);
-      ui.getTabSheet().setSelectedTab(addTab);
-      addTab.setClosable(true);
-    }
-    else
-    {
+
       VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(
         "grid_tree");
       Component vis = visualizer.createComponent(createInput(corpus, doc), null);
-      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, canonicalTitle);
-      visTab.setClosable(true);
-      ui.getTabSheet().setSelectedTab(vis);
       initiatedVis.put(canonicalTitle, vis);
     }
+
+    Component vis = initiatedVis.get(canonicalTitle);
+    TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, canonicalTitle);
+    visTab.setClosable(true);
+    ui.getTabSheet().setSelectedTab(vis);
   }
 
   public void openDocBrowser(String corpus)
