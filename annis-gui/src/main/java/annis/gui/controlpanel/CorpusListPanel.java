@@ -51,7 +51,6 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -66,7 +65,6 @@ import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
-import static annis.gui.docbrowser.DocBrowserTable.getDocBrowserTable;
 
 /**
  *
@@ -81,10 +79,13 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
+  private static final ThemeResource DOC_ICON = new ThemeResource(
+    "document_ico.png");
+
   public static final String ALL_CORPORA = "All";
 
   // holds the panels of auto generated queries
-  private final ExampleQueriesPanel autoGenQueries;  
+  private final ExampleQueriesPanel autoGenQueries;
 
   private transient SearchUI ui;
 
@@ -668,9 +669,11 @@ public class CorpusListPanel extends VerticalLayout implements
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       final String id = (String) itemId;
-      Button docBtn = new Button("open docs");
-      docBtn.setDescription("opens the document browser for " + id);
-      docBtn.addClickListener(new Button.ClickListener()
+      Button l = new Button();
+      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setIcon(DOC_ICON);
+      l.setDescription("opens the document browser for " + id);
+      l.addClickListener(new Button.ClickListener()
       {
         @Override
         public void buttonClick(ClickEvent event)
@@ -679,7 +682,7 @@ public class CorpusListPanel extends VerticalLayout implements
         }
       });
 
-      return docBtn;
+      return l;
     }
   }
 
