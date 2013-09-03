@@ -15,12 +15,16 @@
  */
 package annis.gui.docbrowser;
 
+import annis.libgui.Helper;
 import annis.model.Annotation;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import java.util.List;
 import org.slf4j.Logger;
@@ -38,9 +42,11 @@ public class DocBrowserTable extends Table
 
   private BeanItemContainer<Annotation> annoBean;
 
-  private DocBrowserPanel parent;
+  private final DocBrowserPanel parent;
 
   private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
+
+  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
   void setDocNames(List<Annotation> docs)
   {
@@ -49,13 +55,15 @@ public class DocBrowserTable extends Table
     setContainerDataSource(annoBean);
     addGeneratedColumn("document name", new DocNameColumnGen());
     addGeneratedColumn("open visualizer", new DocViewColumn());
+    addGeneratedColumn("info browser", new InfoButtonColumnGen());
     setVisibleColumns(new Object[]
     {
-      "document name", "open visualizer"
+      "document name", "open visualizer", "info browser"
     });
-    
-    setColumnHeaders("document name", "");
+
+    setColumnHeaders("document name", "", "");
     setColumnWidth("open visualizer", 16);
+    setColumnWidth("info browser", 16);
   }
 
   private DocBrowserTable(DocBrowserPanel parent)
@@ -65,6 +73,65 @@ public class DocBrowserTable extends Table
 
     // configure layout
     setSizeFull();
+  }
+
+  private class InfoButtonColumnGen implements Table.ColumnGenerator
+  {
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      Annotation a = (Annotation) itemId;
+      final String docName = a.getName();
+      Button btn = new Button();
+      btn.setStyleName(BaseTheme.BUTTON_LINK);
+      btn.setIcon(INFO_ICON);
+      btn.addClickListener(new Button.ClickListener()
+      {
+        @Override
+        public void buttonClick(Button.ClickEvent event)
+        {
+          try
+          {
+            // get the metadata of a specific doc
+            WebResource res = Helper.getAnnisWebResource();
+            res = res.path("meta/doc/").path(parent.getCorpus()).path(docName);
+            List<Annotation> annos = res.get(new Helper.AnnotationListType());
+
+            // create datasource and bind it to a table
+            BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
+              Annotation.class, annos);
+            Table metaTable = new Table();
+            metaTable.setContainerDataSource(dataSource);
+
+            // style the table
+            metaTable.setVisibleColumns(new Object[]
+            {
+              "name", "value"
+            });
+            metaTable.setColumnHeaders("name", "value");
+            metaTable.setSizeFull();
+
+            // create and style the extra window for the metadata table
+            Window metaWin = new Window();
+            metaWin.setContent(metaTable);
+            metaWin.setCaption("metadata doc " + docName);
+            metaWin.center();
+            metaWin.setWidth(400, Unit.PIXELS);
+            metaWin.setHeight(400, Unit.PIXELS);
+
+            // paint the window
+            parent.getUI().addWindow(metaWin);
+          }
+          catch (UniformInterfaceException ex)
+          {
+            log.error("can not retrieve metadata for document " + docName, ex);
+          }
+
+        }
+      });
+      return btn;
+    }
   }
 
   /**

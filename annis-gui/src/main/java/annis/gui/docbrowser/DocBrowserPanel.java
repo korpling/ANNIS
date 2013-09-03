@@ -78,7 +78,7 @@ public class DocBrowserPanel extends Panel
    * done several times.
    */
   public static DocBrowserPanel initDocBrowserPanel(SearchUI ui, String corpus)
-  {    
+  {
     return new DocBrowserPanel(ui, corpus);
   }
 
@@ -104,5 +104,10 @@ public class DocBrowserPanel extends Panel
       layout.addComponent(table);
       ui.push();
     }
+  }
+
+  public String getCorpus()
+  {
+    return corpus;
   }
 }
