@@ -22,6 +22,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -33,6 +34,7 @@ import java.util.Map;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.stringtemplate.v4.compiler.CodeGenerator;
 
 /**
  * Represents a global controller for the doc browser feature.
@@ -52,6 +54,11 @@ public class DocBrowserController implements Serializable
 
   // cache for already initiated visualizations, the key is the doc name
   private transient Map<String, Component> initiatedVis;
+
+  private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
+
+  private static final ThemeResource DOC_ICON = new ThemeResource(
+    "document_ico.png");
 
   public DocBrowserController(SearchUI ui)
   {
@@ -75,15 +82,14 @@ public class DocBrowserController implements Serializable
     }
 
     Component vis = initiatedVis.get(canonicalTitle);
-    TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, canonicalTitle);
+    TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, doc);
+    visTab.setIcon(EYE_ICON);
     visTab.setClosable(true);
     ui.getTabSheet().setSelectedTab(vis);
   }
 
   public void openDocBrowser(String corpus)
   {
-    String caption = "doc browser " + corpus;
-
     // if not already init, do it now
     if (!initedDocBrowsers.containsKey(corpus))
     {
@@ -93,9 +99,9 @@ public class DocBrowserController implements Serializable
     }
 
     // init tab and put to front
-    ui.getTabSheet().addTab(initedDocBrowsers.get(corpus), caption);
     TabSheet.Tab tab = ui.getTabSheet().addTab(initedDocBrowsers.get(corpus),
-      caption);
+      corpus);
+    tab.setIcon(DOC_ICON);
     tab.setClosable(true);
     ui.getTabSheet().setSelectedTab(tab);
   }
