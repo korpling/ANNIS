@@ -17,16 +17,24 @@ package annis.gui.docbrowser;
 
 import annis.libgui.Helper;
 import annis.model.Annotation;
+import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
+import java.util.logging.Level;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,6 +56,11 @@ public class DocBrowserTable extends Table
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
+  // the key for the json config of the doc visualization
+  private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
+
+  private JSONArray configArray;
+
   void setDocNames(List<Annotation> docs)
   {
     annoBean = new BeanItemContainer<Annotation>(docs);
@@ -62,8 +75,7 @@ public class DocBrowserTable extends Table
     });
 
     setColumnHeaders("document name", "", "");
-    setColumnWidth("open visualizer", 16);
-    setColumnWidth("info browser", 16);
+    setColumnWidth("info browser", 20);
   }
 
   private DocBrowserTable(DocBrowserPanel parent)
@@ -73,6 +85,8 @@ public class DocBrowserTable extends Table
 
     // configure layout
     setSizeFull();
+
+    this.configArray = getDocBrowserConfig();
   }
 
   private class InfoButtonColumnGen implements Table.ColumnGenerator
@@ -84,7 +98,7 @@ public class DocBrowserTable extends Table
       Annotation a = (Annotation) itemId;
       final String docName = a.getName();
       Button btn = new Button();
-      btn.setStyleName(BaseTheme.BUTTON_LINK);
+      btn.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
       btn.setIcon(INFO_ICON);
       btn.addClickListener(new Button.ClickListener()
       {
@@ -155,14 +169,55 @@ public class DocBrowserTable extends Table
     @Override
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
-      String docName = ((Annotation) itemId).getName();
-      Button openVis = new Button();
-      openVis.setStyleName(BaseTheme.BUTTON_LINK);
-      openVis.setIcon(EYE_ICON);
-      openVis.setDescription("open visualizer with the full text of " + docName);
-      openVis.addClickListener(new OpenVisualizerWindow(docName));
-      return openVis;
+      Panel p = new Panel();
+      VerticalLayout l = new VerticalLayout();
+
+      for (int i = 0; i < configArray.length(); i++)
+      {
+        try
+        {
+          JSONObject config = configArray.getJSONObject(i);
+          String docName = ((Annotation) itemId).getName();
+          Button openVis = new Button(config.getString("displayName"));
+          openVis.setDescription(
+            "open visualizer with the full text of " + docName);
+          openVis.addClickListener(new OpenVisualizerWindow(docName, config.
+            getString("type")));
+          openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          l.addComponent(openVis);
+        }
+        catch (JSONException ex)
+        {
+          log.error("cannnot retrieve json object", ex);
+        }
+      }
+
+      p.setContent(l);
+      return p;
     }
+  }
+
+  private JSONArray getDocBrowserConfig()
+  {
+    CorpusConfig corpusConfig = Helper.getCorpusConfig(parent.getCorpus());
+
+    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
+      DOC_BROWSER_CONFIG_KEY))
+    {
+      corpusConfig = Helper.getDefaultCorpusConfig();
+    }
+
+    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
+    try
+    {
+      return new JSONArray(c);
+    }
+    catch (JSONException ex)
+    {
+      log.error("could not read the doc browser config", ex);
+    }
+
+    return null;
   }
 
   public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)
@@ -176,16 +231,19 @@ public class DocBrowserTable extends Table
 
     private String docName;
 
-    public OpenVisualizerWindow(String docName)
+    private String visType;
+
+    public OpenVisualizerWindow(String docName, String visType)
     {
       this.docName = docName;
+      this.visType = visType;
     }
 
     @Override
     public void buttonClick(Button.ClickEvent event)
     {
 
-      parent.openVis(docName);
+      parent.openVis(docName, visType);
     }
   }
 }

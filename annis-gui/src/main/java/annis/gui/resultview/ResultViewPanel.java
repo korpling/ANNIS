@@ -258,6 +258,4 @@ public class ResultViewPanel extends VerticalLayout
   {
     return paging;
   }
-
-
 }

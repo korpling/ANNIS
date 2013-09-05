@@ -56,8 +56,7 @@ public class DocBrowserPanel extends Panel
     // set loading component
     loadingMsg = new Label("loading documents for " + corpus);
     layout.addComponent(loadingMsg);
-    layout.setWidth(100, Unit.PERCENTAGE);
-    layout.setHeight(100, Unit.PERCENTAGE);
+    setSizeFull();
 
     table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
   }
@@ -82,9 +81,9 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc)
+  public void openVis(String doc, String visType)
   {
-    ui.getDocBrowserController().openDocVis(corpus, doc);
+    ui.getDocBrowserController().openDocVis(corpus, doc, visType);
   }
 
   private class LoadingDocs extends Thread

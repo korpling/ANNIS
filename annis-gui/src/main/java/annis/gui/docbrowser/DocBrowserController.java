@@ -67,7 +67,7 @@ public class DocBrowserController implements Serializable
     this.initiatedVis = new HashMap<String, Component>();
   }
 
-  public void openDocVis(String corpus, String doc)
+  public void openDocVis(String corpus, String doc, String visType)
   {
     String canonicalTitle = "doc view: " + corpus + " > " + doc;
 
@@ -75,8 +75,7 @@ public class DocBrowserController implements Serializable
     if (!initiatedVis.containsKey(canonicalTitle))
     {
 
-      VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(
-        "grid_tree");
+      VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(visType);
       Component vis = visualizer.createComponent(createInput(corpus, doc), null);
       initiatedVis.put(canonicalTitle, vis);
     }
