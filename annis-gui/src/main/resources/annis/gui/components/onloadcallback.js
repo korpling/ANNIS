@@ -23,6 +23,7 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
   this.execCallback = function() {
     if(timeoutID) {
       window.clearTimeout(timeoutID);
+      timeoutID = null;
     }
     component.loaded();
   };
@@ -30,6 +31,8 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
   $(document).ready(this.execCallback);
 
   this.requestRecall = function(delay) {
-    timeoutID = window.setTimeout(this.execCallback, delay);
+    if(!timeoutID) {
+      timeoutID = window.setTimeout(this.execCallback, delay);
+    }
   };
 };

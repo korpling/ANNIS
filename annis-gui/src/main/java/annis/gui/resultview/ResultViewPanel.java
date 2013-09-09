@@ -243,6 +243,12 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     
     addQueryResult(q, first);
   }
+  
+  public void resetQueryResultQueue()
+  {
+    this.projectQueue = null;
+    this.currentQuery = null;
+  }
 
   private void addQueryResult(PagedResultQuery q, SaltProject p)
   {

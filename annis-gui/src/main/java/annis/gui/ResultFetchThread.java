@@ -323,6 +323,10 @@ class ResultFetchThread extends Thread
         @Override
         public void run()
         {
+          if (resultPanel != null)
+          {
+            resultPanel.resetQueryResultQueue();
+          }
           ui.push();
         }
       });
