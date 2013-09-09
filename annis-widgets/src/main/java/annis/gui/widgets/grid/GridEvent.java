@@ -21,25 +21,50 @@ import java.util.List;
 
 /**
  * An event has a right and left border (but might have holes)
+ *
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class GridEvent implements Serializable
 {
+
   private String id;
+
   private int left;
+
   private int right;
+
   private String value;
+
   private Long match;
+
   private List<String> coveredIDs;
+
+  // used for a tooltip in the frontend
+  private String tooltip;
+
   private Double startTime;
+
   private Double endTime;
+
   private boolean gap;
+
   private String textID;
+
   private String pageNumber;
 
-  public GridEvent(String id, int left, int right, String value)
+  /**
+   * Inits a new GridEvent.
+   *
+   * @param sID This is the salt id of the node, sppan or tok. Used for
+   * identifying highlighted nodes with {@link #getCoveredIDs()}
+   * @param left the most left token index
+   * @param right the most right token index
+   * @param value the value displayed in the table row
+   */
+  public GridEvent(String sID, int left, int right, String value)
   {
-    this.id = id;
+    this.id = sID;
     this.left = left;
     this.right = right;
     this.value = value;
@@ -134,6 +159,7 @@ public class GridEvent implements Serializable
 
   /**
    * Salt ID of the text this event belongs to.
+   *
    * @return
    */
   public String getTextID()
@@ -149,7 +175,7 @@ public class GridEvent implements Serializable
   @Override
   public String toString()
   {
-    return "" + id +  " -> " + value + " (" + left + "-" + right +")";
+    return "" + id + " -> " + value + " (" + left + "-" + right + ")";
   }
 
   public String getPageNumber()
@@ -160,5 +186,25 @@ public class GridEvent implements Serializable
   public void setPage(String pageNumber)
   {
     this.pageNumber = pageNumber;
+  }
+
+  /**
+   * Returns the tooltip, which should be displayed when hovering this event.
+   *
+   * @return The tooltip value could be null.
+   */
+  public String getTooltip()
+  {
+    return tooltip;
+  }
+
+  /**
+   * Sets the tooltip which is display when hovering this event.
+   *
+   * @param tooltip the title to set, could be null.
+   */
+  public void setTooltip(String tooltip)
+  {
+    this.tooltip = tooltip;
   }
 }

@@ -1,4 +1,3 @@
-BEGIN; -- transaction
 -----------
 -- FACTS --
 -----------
@@ -156,6 +155,3 @@ CREATE INDEX idx__sample_n__:id ON facts_node_:id(n_sample);
 CREATE INDEX idx__sample_n_tok__:id ON facts_node_:id(n_sample) WHERE is_token = TRUE;
 CREATE INDEX idx__sample_n_r_c__:id ON facts_edge_:id(r_c_sample);
 
-
-
-END; -- transaction

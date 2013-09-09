@@ -196,7 +196,15 @@ public class VAnnotationGrid extends Composite implements Paintable
       String value = event.getStringAttribute("value");
 
       VLabel label = new VLabel(value);
-      label.setTitle(caption);
+
+      if (event.hasAttribute("tooltip"))
+      {
+        label.setTitle(event.getStringAttribute("tooltip"));
+      }
+      else
+      {
+        label.setTitle(caption);
+      }
 
       // +1 because we also have a caption column, subtract columns we
       // jumped over by using colspan

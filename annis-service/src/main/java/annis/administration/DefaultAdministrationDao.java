@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -58,13 +57,13 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
-import org.springframework.jdbc.core.PreparedStatementCreatorFactory;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
@@ -273,7 +272,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, propagation = Propagation.NESTED)
   public String getDatabaseSchemaVersion()
   {
     try
@@ -309,6 +308,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return true;
   }
+  
+  @Transactional(propagation = Propagation.MANDATORY)
+  private boolean lockCorpusTable(boolean waitForOtherTasks)
+  {
+    try
+    {
+      log.info("Locking corpus table to ensure no other import is running");
+      jdbcTemplate.execute("LOCK TABLE corpus IN EXCLUSIVE MODE" + (waitForOtherTasks ? "" : " NOWAIT"));
+      return true;
+    }
+    catch(DataAccessException ex)
+    {
+      return false;
+    }
+  }
+  
 
   @Override
   public void initializeDatabase(String host, String port, String database,
@@ -363,12 +378,18 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   @Override
-  @Transactional(readOnly = false)
-  public void importCorpus(String path, boolean override)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  public boolean importCorpus(String path, boolean override, boolean waitForOtherTasks)
   {
 
     // check schema version first
     checkDatabaseSchemaVersion();
+    
+    if(!lockCorpusTable(waitForOtherTasks))
+    {
+      log.error("Another import is currently running");
+      return false;
+    }
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
@@ -389,8 +410,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeStagingTables();
 
     computeLeftTokenRightToken();
-
-//    if (true) return;
 
     adjustRankPrePost();
     adjustTextId();
@@ -432,6 +451,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
 
     generateExampleQueries(corpusID);
+    
+
+    return true;
   }
 
   ///// Subtasks of importing a corpus
@@ -692,19 +714,6 @@ public class DefaultAdministrationDao implements AdministrationDao
         }
       }
     }
-  }
-
-  /**
-   * Imports a single binary file.
-   *
-   * @param file Specifies the file to be imported.
-   * @param corpusRef Assigns the file this corpus.
-   */
-  private void importSingleFile(File file, long corpusRef)
-  {
-    BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
-      corpusRef, mimeTypeMapping);
-    jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
   }
 
   /**
@@ -1000,10 +1009,16 @@ public class DefaultAdministrationDao implements AdministrationDao
       newInstance(Long.class));
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   @Override
-  public void deleteCorpora(List<Long> ids)
+  public void deleteCorpora(List<Long> ids, boolean acquireLock)
   {
+    if(acquireLock && !lockCorpusTable(false))
+    {
+      log.error("Another import is currently running");
+      return;
+    }
+    
     File dataDir = getRealDataDir();
 
     for (long l : ids)
@@ -1216,6 +1231,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts
   @Override
+  @Transactional(propagation = Propagation.MANDATORY)
   public PreparedStatement executeSqlFromScript(String script)
   {
     return executeSqlFromScript(script, null);
@@ -1264,6 +1280,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   // executes an SQL script from $ANNIS_HOME/scripts, substituting the parameters found in args
   @Override
+  @Transactional(propagation = Propagation.MANDATORY)
   public PreparedStatement executeSqlFromScript(String script,
     MapSqlParameterSource args)
   {
@@ -1854,6 +1871,7 @@ public class DefaultAdministrationDao implements AdministrationDao
    * @param topLevelCorpusName The name of the corpus, which is checked.
    * @return Is false, if the no top level coprpus exists.
    */
+  @Transactional(propagation = Propagation.MANDATORY)
   private boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
   {
     String sql = "SELECT count(name) as amount FROM corpus WHERE name='"
@@ -1898,7 +1916,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.info("delete conflicting corpus: {}", corpusName);
       List<String> corpusNames = new LinkedList<String>();
       corpusNames.add(corpusName);
-      deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames));
+      deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames), false);
     }
   }
 

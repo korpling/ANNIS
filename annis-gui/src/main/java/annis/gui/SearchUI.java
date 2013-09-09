@@ -39,6 +39,7 @@ import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
@@ -77,6 +78,7 @@ import org.vaadin.cssinject.CSSInject;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @Push
+@Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
@@ -104,7 +106,9 @@ public class SearchUI extends AnnisBaseUI
   private Button btLogout;
 
   private Button btBugReport;
+
   private ScreenshotMaker screenshot;
+
   private Throwable lastBugReportCause;
 
   private ControlPanel controlPanel;
@@ -135,14 +139,15 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
 
     setErrorHandler(this);
-    
+
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
-    JavaScript.getCurrent().addFunction("annis.gui.logincallback", new LoginCloseCallback());
-    
+    JavaScript.getCurrent().addFunction("annis.gui.logincallback",
+      new LoginCloseCallback());
+
     queryController = new QueryController(this);
 
     // always get the resize events directly
@@ -201,8 +206,8 @@ public class SearchUI extends AnnisBaseUI
     lblUserName.setHeight("-1px");
     lblUserName.addStyleName("right-aligned-text");
 
-    btLogin = new Button("Login", new Button.ClickListener() {
-
+    btLogin = new Button("Login", new Button.ClickListener()
+    {
       @Override
       public void buttonClick(ClickEvent event)
       {
@@ -210,7 +215,7 @@ public class SearchUI extends AnnisBaseUI
           Helper.getContext() + "/login"));
         frame.setWidth("100%");
         frame.setHeight("200px");
-        
+
         windowLogin = new Window("ANNIS Login", frame);
         windowLogin.setModal(true);
         windowLogin.setWidth("400px");
@@ -362,30 +367,31 @@ public class SearchUI extends AnnisBaseUI
     checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
-    
+
     setPollInterval(10000);
-    
+
     updateUserInformation();
   }
 
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
   {
-    log.error("Unknown error in some component: " + event.getThrowable().getLocalizedMessage(), 
+    log.error("Unknown error in some component: " + event.getThrowable().
+      getLocalizedMessage(),
       event.getThrowable());
     ExceptionDialog.show(event.getThrowable());
   }
-  
-  
-  
+
   public boolean canReportBugs()
   {
     return this.bugEMailAddress != null;
   }
+
   public void reportBug()
   {
     reportBug(null);
   }
+
   public void reportBug(Throwable cause)
   {
     lastBugReportCause = cause;
@@ -676,7 +682,8 @@ public class SearchUI extends AnnisBaseUI
     if (bugEMailAddress != null)
     {
       ReportBugWindow reportBugWindow =
-        new ReportBugWindow(bugEMailAddress, imageData, mimeType, lastBugReportCause);
+        new ReportBugWindow(bugEMailAddress, imageData, mimeType,
+        lastBugReportCause);
 
       reportBugWindow.setModal(true);
       reportBugWindow.setResizable(true);
@@ -724,7 +731,7 @@ public class SearchUI extends AnnisBaseUI
         && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.
         contains(mimeType))
       {
-        new Notification("Media file type unsupported by your browser", 
+        new Notification("Media file type unsupported by your browser",
           "Please install the WebM plugin for Internet Explorer 9 from "
           + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
           + " or use a browser from the following list "
@@ -814,32 +821,30 @@ public class SearchUI extends AnnisBaseUI
           mappedCorpora.add(c);
         }
       }
-      
+
       // get list of all corpora
       WebResource rootRes = Helper.getAnnisWebResource();
       List<AnnisCorpus> allCorpora = rootRes.path("query").path("corpora")
-        .get(new GenericType<List<AnnisCorpus>>() {});
+        .get(new GenericType<List<AnnisCorpus>>()
+      {
+      });
       Set<String> allCorpusNames = new HashSet<String>();
-      for(AnnisCorpus c : allCorpora)
+      for (AnnisCorpus c : allCorpora)
       {
         allCorpusNames.add(c.getName());
       }
-      
+
       // remove all corpora selections that do not exist
       boolean someCorporaRemoved = mappedCorpora.retainAll(allCorpusNames);
-      
-      if(someCorporaRemoved)
+
+      if (someCorporaRemoved)
       {
         // show a warning message that the corpus was not imported yet
-        new Notification("Linked corpus does not exist", 
+        new Notification("Linked corpus does not exist",
           "The corpus you wanted to access unfortunally does not (yet) exist in ANNIS<br/>"
           + "A possible reason is that it has not been imported yet. Please ask the "
-          + "responsible person of the site that contained the link to import the corpus.", 
+          + "responsible person of the site that contained the link to import the corpus.",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      }
-      else
-      {
-        queryController.setQuery(new Query("tok", mappedCorpora));
       }
     }
     else if (args.get("cl") != null && args.get("cr") != null)
@@ -861,6 +866,15 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
+  /**
+   * Updates the browser address bar with the current query paramaters and the
+   * query itself.
+   *
+   * This is for convenient reloading the vaadin app and easy copying citation
+   * links.
+   *
+   * @param q The query where the parameters are extracted from.
+   */
   public void updateFragment(PagedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
@@ -876,6 +890,26 @@ public class SearchUI extends AnnisBaseUI
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
   }
 
+  /**
+   * Adds the _c fragement to the URL in the browser adress bar when a corpus is
+   * selected.
+   *
+   * @param corpora A list of corpora, which are add to the fragment.
+   */
+  public void updateFragementWithSelectedCorpus(Set<String> corpora)
+  {
+    if (corpora != null && !corpora.isEmpty())
+    {
+      String fragment = "_c=" + Helper.encodeBase64URL(StringUtils.
+        join(corpora, ","));
+      UI.getCurrent().getPage().setUriFragment(fragment);
+    }
+    else
+    {
+      UI.getCurrent().getPage().setUriFragment("");
+    }
+  }
+
   private class CitationRequestHandler implements RequestHandler
   {
 
@@ -887,21 +921,20 @@ public class SearchUI extends AnnisBaseUI
       return false;
     }
   }
-  
+
   private class LoginCloseCallback implements JavaScriptFunction
   {
 
     @Override
     public void call(JSONArray arguments) throws JSONException
     {
-      if(windowLogin != null)
+      if (windowLogin != null)
       {
         removeWindow(windowLogin);
-        
+
       }
       onLogin();
     }
-    
   }
 
   private static class AboutClickListener implements ClickListener

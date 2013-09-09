@@ -25,7 +25,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * This panel allows the user to control and execute queries.
- * 
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class ControlPanel extends VerticalLayout
@@ -63,7 +63,7 @@ public class ControlPanel extends VerticalLayout
 
     accordion.addTab(corpusList, "Corpus List", null);
     accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
+    accordion.addTab(new ExportPanel(queryPanel, corpusList, controller), "Export", null);
 
     addComponent(queryPanel);
     addComponent(accordion);

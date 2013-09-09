@@ -168,7 +168,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
         newPanels = createPanels(p, offset);
       }
     }
-    catch (Exception ex)
+    catch (Throwable ex)
     {
       log.error(null, ex);
     }
@@ -437,7 +437,7 @@ public class ResultSetPanel extends Panel implements ResolverProvider
               progress.setValue(1.0f);
             }
           }
-          catch(Exception ex)
+          catch(Throwable ex)
           {
             log.error("Exception when adding query result", ex);
           }

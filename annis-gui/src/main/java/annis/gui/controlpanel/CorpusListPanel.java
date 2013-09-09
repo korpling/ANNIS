@@ -33,12 +33,13 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.MouseEventDetails;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -48,7 +49,9 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
@@ -86,13 +89,15 @@ public class CorpusListPanel extends VerticalLayout implements
     Add, Remove
 
   };
-  BeanContainer<String, AnnisCorpus> corpusContainer;
+  private BeanContainer<String, AnnisCorpus> corpusContainer;
 
   private Table tblCorpora;
 
   private QueryController controller;
 
   private ComboBox cbSelection;
+
+  private TextField txtFilter;
 
   private transient AnnisUserConfig userConfig;
 
@@ -148,6 +153,50 @@ public class CorpusListPanel extends VerticalLayout implements
 
     addComponent(selectionLayout);
 
+    txtFilter = new TextField();
+    txtFilter.setInputPrompt("Filter");
+    txtFilter.setImmediate(true);
+    txtFilter.setTextChangeTimeout(500);
+    txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        corpusContainer.removeAllContainerFilters();
+        if (event.getText() != null && !event.getText().isEmpty())
+        {
+          Set<String> selectedIDs = getSelectedCorpora();
+
+          corpusContainer.addContainerFilter(
+            new SimpleStringFilter("name", event.getText(), true, false));
+          // select the first item
+          List<String> filteredIDs = corpusContainer.getItemIds();
+
+          Set<String> selectedAndFiltered = new HashSet<String>(selectedIDs);
+          selectedAndFiltered.retainAll(filteredIDs);
+
+          Set<String> selectedAndOutsideFilter = new HashSet<String>(selectedIDs);
+          selectedAndOutsideFilter.removeAll(filteredIDs);
+
+          for (String id : selectedAndOutsideFilter)
+          {
+            tblCorpora.unselect(id);
+          }
+
+          if (selectedAndFiltered.isEmpty() && !filteredIDs.isEmpty())
+          {
+            for (String id : selectedIDs)
+            {
+              tblCorpora.unselect(id);
+            }
+            tblCorpora.select(filteredIDs.get(0));
+          }
+        }
+      }
+    });
+    txtFilter.setWidth("100%");
+    addComponent(txtFilter);
+
     tblCorpora = new Table();
     addComponent(tblCorpora);
 
@@ -160,14 +209,8 @@ public class CorpusListPanel extends VerticalLayout implements
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
 
-    tblCorpora.setVisibleColumns(new String[]
-    {
-      "name", "textCount", "tokenCount", "info"
-    });
-    tblCorpora.setColumnHeaders(new String[]
-    {
-      "Name", "Texts", "Tokens", ""
-    });
+    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info");
+    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "");
     tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
@@ -178,9 +221,22 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
-    
+    tblCorpora.addItemClickListener(new ItemClickEvent.ItemClickListener()
+    {
+      @Override
+      public void itemClick(ItemClickEvent event)
+      {
+        Set selections = (Set) tblCorpora.getValue();
+        if (selections.size() == 1
+          && event.isCtrlKey() && tblCorpora.isSelected(event.getItemId()))
+        {
+          tblCorpora.setValue(null);
+        }
+      }
+    });
+
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
-   
+
     setExpandRatio(tblCorpora, 1.0f);
 
     Button btReload = new Button();
@@ -224,7 +280,7 @@ public class CorpusListPanel extends VerticalLayout implements
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
           }
-          else if(Helper.getUser() == null)
+          else if (Helper.getUser() == null)
           {
             Notification.
               show(
@@ -340,28 +396,13 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   private void updateAutoGeneratedQueriesPanel()
   {
-    Set<String> selectedCorpora = getSelectedCorpora();
-    String[] corpora = new String[selectedCorpora.size()];
+    Set<String> corpora = getSelectedCorpora();
 
-    if (!selectedCorpora.isEmpty())
+    if (corpora.isEmpty())
     {
-      int i = 0;
-      for (String c : selectedCorpora)
-      {
-        corpora[i++] = c;
-      }
+      corpora.addAll(corpusContainer.getItemIds());
     }
-    else
-    {
-
-      corpora = new String[tblCorpora.getItemIds().size()];
-      int i = 0;
-      for (Object itemId : tblCorpora.getItemIds())
-      {
-        corpora[i++] = (String) itemId;
-      }
-    }
-    autoGenQueries.setSelectedCorpus(corpora);
+    autoGenQueries.setSelectedCorpusInBackground(corpora);
   }
 
   /**
@@ -398,7 +439,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
       else
       {
-        log.error( null, ex);
+        log.error(null, ex);
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
           Notification.Type.TRAY_NOTIFICATION);
       }
@@ -453,8 +494,25 @@ public class CorpusListPanel extends VerticalLayout implements
         log.error(
           "could not store new corpus set", ex);
         Notification.show("Could not store new corpus set: "
-          + ex.getLocalizedMessage(),
-          Notification.Type.WARNING_MESSAGE);
+          + ex.getLocalizedMessage(), Type.WARNING_MESSAGE);
+      }
+      catch (UniformInterfaceException ex)
+      {
+
+        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
+          getStatusCode())
+        {
+          log.error(ex.getLocalizedMessage());
+          Notification.show("Not allowed",
+            "you have not the permission to add a new corpus group",
+            Type.WARNING_MESSAGE);
+        }
+        else
+        {
+          log.error("error occures while storing new corpus set", ex);
+          Notification.show("error occures while storing new corpus set",
+            "Maybe you will have to log in", Type.WARNING_MESSAGE);
+        }
       }
     } // end if new item
   }
@@ -669,7 +727,7 @@ public class CorpusListPanel extends VerticalLayout implements
     @Override
     public void valueChange(ValueChangeEvent event)
     {
-      finalThis.controller.corpusSelectionChanged();
+      finalThis.controller.corpusSelectionChangedInBackground();
       updateAutoGeneratedQueriesPanel();
     }
   }

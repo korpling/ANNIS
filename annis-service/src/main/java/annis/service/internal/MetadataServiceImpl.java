@@ -67,7 +67,7 @@ public class MetadataServiceImpl implements MetadataService
     @PathParam("toplevel") String topLevelCorpus)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevelCorpus);
+    user.checkPermission("meta:" + topLevelCorpus);
 
     return getAnnisDao().listCorpusAnnotations(topLevelCorpus);
   }
@@ -78,7 +78,7 @@ public class MetadataServiceImpl implements MetadataService
     @DefaultValue(value = "false") boolean closure)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevelCorpus);
+    user.checkPermission("meta:" + topLevelCorpus);
 
     return getAnnisDao().listDocumentsAnnotations(topLevelCorpus, closure);
   }
@@ -94,7 +94,7 @@ public class MetadataServiceImpl implements MetadataService
     @PathParam("toplevel") String topLevelCorpus)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevelCorpus);
+    user.checkPermission("meta:" + topLevelCorpus);
 
     return getAnnisDao().listDocuments(topLevelCorpus);
   }
@@ -111,7 +111,7 @@ public class MetadataServiceImpl implements MetadataService
     @PathParam("doc") String doc)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:binary:" + toplevelCorpusName);
+    user.checkPermission("meta:" + toplevelCorpusName);
 
     return getAnnisDao().getBinaryMeta(toplevelCorpusName, doc);
   }
@@ -125,7 +125,7 @@ public class MetadataServiceImpl implements MetadataService
   public List<Annotation> getMetaDataDoc(@PathParam("toplevel") String topLevel)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevel);
+    user.checkPermission("meta:" + topLevel);
     
     return getAnnisDao().listDocumentsAnnotations(topLevel, false);
   }
@@ -141,7 +141,7 @@ public class MetadataServiceImpl implements MetadataService
     @PathParam("doc") String doc)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevelCorpus);
+    user.checkPermission("meta:" + topLevelCorpus);
 
     return getAnnisDao().listCorpusAnnotations(topLevelCorpus, doc, true);
   }
@@ -163,7 +163,7 @@ public class MetadataServiceImpl implements MetadataService
     boolean path)
   {
     Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + topLevelCorpus);
+    user.checkPermission("meta:" + topLevelCorpus);
 
     return getAnnisDao().listCorpusAnnotations(topLevelCorpus, docname, path);
   }

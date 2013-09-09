@@ -15,6 +15,9 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.QueryController;
+import annis.gui.SearchUI;
+import annis.gui.beans.HistoryEntry;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.gui.exporter.Exporter;
@@ -71,7 +74,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private ComboBox cbRightContext;
 
   private TextField txtAnnotationKeys;
-  
+
   private TextField txtParameters;
 
   private Button btDownload;
@@ -87,22 +90,27 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private File tmpOutputFile;
 
   private ProgressBar progressBar;
+
   private Label progressLabel;
 
   private FileDownloader downloader;
 
   private transient EventBus eventBus;
-  
+
   private transient Stopwatch exportTime = new Stopwatch();
-  
-  public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel)
+
+  private final QueryController controller;
+
+  public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
+    QueryController controller)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
+    this.controller = controller;
 
     this.eventBus = new EventBus();
     this.eventBus.register(this);
-    
+
     setWidth("99%");
     setHeight("-1px");
     addStyleName("contextsensible-formlayout");
@@ -158,7 +166,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "seperated list of annotation keys to limit the exported data to these "
       + "annotations.");
     addComponent(new HelpButton(txtAnnotationKeys));
-    
+
     txtParameters = new TextField("Parameters");
     txtParameters.setDescription("You can input special parameters "
       + "for certain exporters. See the description of each exporter "
@@ -184,12 +192,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
     VerticalLayout vLayout = new VerticalLayout();
     addComponent(vLayout);
-    
+
     progressBar = new ProgressBar();
     progressBar.setEnabled(false);
     progressBar.setIndeterminate(true);
     vLayout.addComponent(progressBar);
-    
+
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
   }
@@ -219,6 +227,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         return;
       }
 
+      HistoryEntry e = new HistoryEntry();
+      e.setCorpora(corpusListPanel.getSelectedCorpora());
+      e.setQuery(queryPanel.getQuery());
+      controller.addHistoryEntry(e);
+
       Callable<File> callable = new Callable<File>()
       {
         @Override
@@ -234,7 +247,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
             (Integer) cbLeftContext.getValue(),
             (Integer) cbRightContext.getValue(),
             corpusListPanel.getSelectedCorpora(),
-            txtAnnotationKeys.getValue(), 
+            txtAnnotationKeys.getValue(),
             txtParameters.getValue(),
             Helper.getAnnisWebResource().path("query"),
             outWriter, eventBus);
@@ -244,6 +257,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
           return currentTmpFile;
         }
       };
+
       FutureTask<File> task = new FutureTask<File>(callable)
       {
         @Override
@@ -309,13 +323,13 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
       singleExecutor.submit(task);
-      if(exportTime == null)
+      if (exportTime == null)
       {
         exportTime = new Stopwatch();
       }
       exportTime.reset();
       exportTime.start();
-      
+
     }
 
   }
@@ -372,7 +386,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       }
     }
   }
-  
+
   @Subscribe
   public void handleExportProgress(Integer exports)
   {
@@ -380,9 +394,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     session.lock();
     try
     {
-      if(exportTime != null &&  exportTime.isRunning())
+      if (exportTime != null && exportTime.isRunning())
       {
-        progressLabel.setValue("exported " + exports + " items in " + exportTime.toString());
+        progressLabel.setValue(
+          "exported " + exports + " items in " + exportTime.toString());
       }
       else
       {
