@@ -39,8 +39,10 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -130,9 +132,13 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
 
+    
     resultLayout = new CssLayout();
     resultLayout.addStyleName("result-view-css");
-
+    Panel resultPanel = new Panel(resultLayout);
+    resultPanel.setSizeFull();
+    resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    
     Set<String> corpora = controller.getQuery().getCorpora();
 
     if (corpora.size() == 1)
@@ -169,14 +175,12 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
 
     addComponent(mbResult);
     addComponent(paging);
-
     progressResult = new ProgressBar();
 
     progressResult.setVisible(false);
 
-    addComponent(progressResult);
-    addComponent(resultLayout);
-    
+    addComponent(progressResult);   
+    addComponent(resultPanel);
     
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
@@ -184,7 +188,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     setExpandRatio(mbResult, 0.0f);
     setExpandRatio(paging, 0.0f);
     setExpandRatio(progressResult, 0.0f);
-    setExpandRatio(resultLayout, 1.0f);
+    setExpandRatio(resultPanel, 1.0f);
 
   }
 
