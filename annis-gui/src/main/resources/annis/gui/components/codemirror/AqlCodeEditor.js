@@ -17,12 +17,26 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var component = this;
     
     var origTextArea = this.getElement(this.getParentId());
-    
     var cmTextArea = CodeMirror.fromTextArea(origTextArea,
     {
       mode: 'aql'
     });
     
+    cmTextArea.on("change", function(instance, changeObj)
+    {
+      instance.save();
+      // simulate onchange event
+      var element = instance.getTextArea();
+      if ("createEvent" in document) {
+        var evt = document.createEvent("HTMLEvents");
+        evt.initEvent("change", false, true);
+        element.dispatchEvent(evt);
+      }
+      else {
+        element.fireEvent("onchange");
+      }
+    });
+
 //    var componentDiv = this.getElement(this.getConnectorId());
 //    
 //    var codemirrorTextArea = CodeMirror(componentDiv, 
@@ -33,6 +47,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
 //    
     this.onStateChange = function() {
     };
+    
+    this.updateText = function(newText) {
+      cmTextArea.setValue(newText);
+    }
     
     
 };

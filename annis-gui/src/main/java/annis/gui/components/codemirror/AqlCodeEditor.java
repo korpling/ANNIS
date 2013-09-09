@@ -17,19 +17,27 @@ package annis.gui.components.codemirror;
 
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.data.Property;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.TextArea;
 
 /**
  * A Codemirror2 based code editor for AQL.
- * 
+ *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@JavaScript({"lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditor.js"})
-@StyleSheet({"lib/codemirror.css", "AqlCodeEditor.css"})
+@JavaScript(
+{
+  "lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditor.js"
+})
+@StyleSheet(
+{
+  "lib/codemirror.css", "AqlCodeEditor.css"
+})
 public class AqlCodeEditor extends AbstractJavaScriptExtension
 {
-  
+
   public AqlCodeEditor()
   {
   }
@@ -37,7 +45,14 @@ public class AqlCodeEditor extends AbstractJavaScriptExtension
   public void extend(TextArea target)
   {
     super.extend(target);
+    target.addValueChangeListener(new Property.ValueChangeListener()
+    {
+
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        callFunction("updateText", event.getProperty().getValue());
+      }
+    });
   }
-  
-  
 }
