@@ -68,7 +68,7 @@ public class EventExtractor {
    * Converts Salt document graph to rows.
    *
    * @param input
-   * @param showTokenAnnos 
+   * @param showTokenAnnos
    * @param annotationNames
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
@@ -95,12 +95,12 @@ public class EventExtractor {
 
     PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
-    for (SSpan span : graph.getSSpans()) 
+    for (SSpan span : graph.getSSpans())
     {
       addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
         pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
     } // end for each span
-    
+
     if(showTokenAnnos)
     {
       for(SToken tok : graph.getSTokens())
@@ -130,7 +130,7 @@ public class EventExtractor {
     }
     return rowsByAnnotation;
   }
-  
+
   private static void addAnnotationsForNode(SNode node,
     SDocumentGraph graph,
     long startTokenIndex, long endTokenIndex,
@@ -230,7 +230,7 @@ public class EventExtractor {
         r.addEvent(event);
         rows.add(r);
 
-        if (pdfController != null && 
+        if (pdfController != null &&
           pdfController.sizeOfRegisterdPDFViewer() > 0)
         {
           String page = pageNumberHelper.getPageFromAnnotation(node);
@@ -242,7 +242,7 @@ public class EventExtractor {
       }
     } // end for each annotation of span
   }
-  
+
   private static String getTextID(SToken tok, SDocumentGraph graph)
   {
     EList<Edge> tokenOutEdges = graph.getOutEdges(tok.getSId());
