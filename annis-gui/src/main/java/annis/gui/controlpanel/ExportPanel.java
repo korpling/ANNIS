@@ -16,7 +16,6 @@
 package annis.gui.controlpanel;
 
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
@@ -263,58 +262,59 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         @Override
         protected void done()
         {
-          VaadinSession session = VaadinSession.getCurrent();
-          session.lock();
-          try
+          UI.getCurrent().access(new Runnable() 
           {
-            btExport.setEnabled(true);
-            progressBar.setEnabled(false);
-            progressLabel.setValue("");
+            @Override
+            public void run()
+            {
+              btExport.setEnabled(true);
+              progressBar.setEnabled(false);
+              progressLabel.setValue("");
 
-            try
-            {
-              // copy the result to the class member in order to delete if
-              // when not longer needed
-              tmpOutputFile = get();
-            }
-            catch (InterruptedException ex)
-            {
-              log.error(null, ex);
-            }
-            catch (ExecutionException ex)
-            {
-              log.error(null, ex);
-            }
-
-            if (tmpOutputFile == null)
-            {
-              Notification.show("Could not create the Exporter",
-                "The server logs might contain more information about this "
-                + "so you should contact the provider of this ANNIS installation "
-                + "for help.", Notification.Type.ERROR_MESSAGE);
-            }
-            else
-            {
-              if (downloader != null && btDownload.getExtensions().contains(
-                downloader))
+              try
               {
-                btDownload.removeExtension(downloader);
+                // copy the result to the class member in order to delete if
+                // when not longer needed
+                tmpOutputFile = get();
               }
-              downloader = new FileDownloader(new FileResource(
-                tmpOutputFile));
+              catch (InterruptedException ex)
+              {
+                log.error(null, ex);
+              }
+              catch (ExecutionException ex)
+              {
+                log.error(null, ex);
+              }
 
-              downloader.extend(btDownload);
-              btDownload.setEnabled(true);
+              if (tmpOutputFile == null)
+              {
+                Notification.show("Could not create the Exporter",
+                  "The server logs might contain more information about this "
+                  + "so you should contact the provider of this ANNIS installation "
+                  + "for help.", Notification.Type.ERROR_MESSAGE);
+              }
+              else
+              {
+                if (downloader != null && btDownload.getExtensions().contains(
+                  downloader))
+                {
+                  btDownload.removeExtension(downloader);
+                }
+                downloader = new FileDownloader(new FileResource(
+                  tmpOutputFile));
 
-              Notification.show("Export finished",
-                "Click on the button right to the export button to actually download the file.",
-                Notification.Type.HUMANIZED_MESSAGE);
+                downloader.extend(btDownload);
+                btDownload.setEnabled(true);
+
+                Notification.show("Export finished",
+                  "Click on the button right to the export button to actually download the file.",
+                  Notification.Type.HUMANIZED_MESSAGE);
+              }
+              
+              UI.getCurrent().push();
             }
-          }
-          finally
-          {
-            session.unlock();
-          }
+          });
+          
         }
       };
 
@@ -388,26 +388,29 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   }
 
   @Subscribe
-  public void handleExportProgress(Integer exports)
+  public void handleExportProgress(final Integer exports)
   {
-    VaadinSession session = VaadinSession.getCurrent();
-    session.lock();
-    try
+    UI.getCurrent().access(new Runnable()
     {
-      if (exportTime != null && exportTime.isRunning())
+
+      @Override
+      public void run()
       {
-        progressLabel.setValue(
-          "exported " + exports + " items in " + exportTime.toString());
+        if (exportTime != null && exportTime.isRunning())
+        {
+          progressLabel.setValue(
+            "exported " + exports + " items in " + exportTime.toString());
+        }
+        else
+        {
+          progressLabel.setValue("exported " + exports + " items");
+        }
+        
+        UI.getCurrent().push();
       }
-      else
-      {
-        progressLabel.setValue("exported " + exports + " items");
-      }
-    }
-    finally
-    {
-      session.unlock();
-    }
+      
+    });
+
   }
 
   @Override
