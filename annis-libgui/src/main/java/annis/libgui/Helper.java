@@ -408,10 +408,12 @@ public class Helper {
     public static CorpusConfig getCorpusConfig(String corpus) {
 
         if (corpus == null || corpus.isEmpty()) {
-            Notification.show("no corpus selected", Notification.Type.TRAY_NOTIFICATION);
+            Notification.show("no corpus is selected",
+                    "please select at leas one corpus and execute query again",
+                    Notification.Type.WARNING_MESSAGE);
             return null;
         }
-        
+
         CorpusConfig corpusConfig = new CorpusConfig();
 
         try {
