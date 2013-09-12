@@ -208,7 +208,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowQueryBuilder.setHtmlContentAllowed(true);
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
-    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/applications-development.png"));
+    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
@@ -514,7 +514,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(queryBuilder, "Query Builder", 
-          new ThemeResource("tango-icons/16x16/applications-development.png"));
+          new ThemeResource("tango-icons/16x16/document-properties.png"));
         
         ui.addAction(new ShortcutListener("^Query builder")
         {
