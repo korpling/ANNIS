@@ -174,7 +174,7 @@ public class SearchUI extends AnnisBaseUI
 
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
+    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
@@ -282,7 +282,7 @@ public class SearchUI extends AnnisBaseUI
     //HorizontalLayout hLayout = new HorizontalLayout();
     final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
     hSplit.setSizeFull();
-
+   
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
