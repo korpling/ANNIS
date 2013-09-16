@@ -171,8 +171,6 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
 
     paging = new PagingComponent(q.getOffset(), q.getLimit());
     paging.setInfo(q.getQuery());
-    paging.addCallback(controller);
-
     addComponent(mbResult);
     addComponent(paging);
     progressResult = new ProgressBar();

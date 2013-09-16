@@ -70,6 +70,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
+  private Button btShowResultNewTab;
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
@@ -212,11 +213,21 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
+    moreActionsLayout.setWidth("250px");
     PopupButton btMoreActions = new PopupButton("More");
     btMoreActions.setContent(moreActionsLayout);
     
+    btShowResultNewTab = new Button("Search (open in new tab)");
+    btShowResultNewTab.setWidth("100%");
+    btShowResultNewTab.addClickListener(new ShowResultInNewTabClickListener());
+    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong>");
+    btShowResultNewTab.setDisableOnClick(true);
+    moreActionsLayout.addComponent(btShowResultNewTab);
+    
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
+    
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
@@ -397,6 +408,20 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
     }
   }
+  
+  public class ShowResultInNewTabClickListener implements Button.ClickListener
+  {
+
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(controller != null)
+      {
+        controller.setQuery((txtQuery.getValue()));
+        controller.executeQuery(false);
+      }
+    }
+  }
 
   public void setCountIndicatorEnabled(boolean enabled)
   {
@@ -422,6 +447,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       
       btShowResult.setEnabled(!enabled);
+      btShowResultNewTab.setEnabled(!enabled);
     }
   }
 

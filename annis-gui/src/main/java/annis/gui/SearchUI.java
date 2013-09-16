@@ -654,7 +654,7 @@ public class SearchUI extends AnnisBaseUI
     tabsheet.removeComponent(tabContent);
     if(tabContent instanceof ResultViewPanel)
     {
-      getQueryController().notifiyTabClose((ResultViewPanel) tabContent);
+      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
     }
   }
   
@@ -857,13 +857,13 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
     else
     {
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
   }
 

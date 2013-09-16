@@ -34,6 +34,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -56,7 +57,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController implements PagingCallback
+public class QueryController
 {
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -67,8 +68,6 @@ public class QueryController implements PagingCallback
   private ResultFetchThread lastMatchThread;
   private ListOrderedSet<HistoryEntry> history;
 
-  private MatchAndDocumentCount lastCount;
-
   private Future<MatchAndDocumentCount> futureCount;
   
   private UUID lastQueryUUID;
@@ -77,6 +76,7 @@ public class QueryController implements PagingCallback
   
   private transient BiMap<UUID, PagedResultQuery> queries;
   private transient BiMap<UUID, ResultViewPanel> queryPanels;
+  private transient Map<UUID, MatchAndDocumentCount> counts;
   
   public QueryController(SearchUI ui)
   {
@@ -180,10 +180,15 @@ public class QueryController implements PagingCallback
   
   public UUID executeQuery()
   {
-    return executeQuery(true, true);
+    return executeQuery(true);
   }
   
-  public UUID executeQuery(boolean executeCount, boolean executeResult)
+  public UUID executeQuery(boolean replaceOldTab)
+  {
+    return executeQuery(true, true, replaceOldTab, null);
+  }
+  
+  private UUID executeQuery(boolean executeCount, boolean executeResult, boolean replaceOldTab, UUID forcedUUID)
   {
 
     Validate.notNull(preparedQuery,
@@ -220,7 +225,7 @@ public class QueryController implements PagingCallback
     }
     
     UUID oldQueryUUID = lastQueryUUID;
-    lastQueryUUID = UUID.randomUUID();
+    lastQueryUUID = forcedUUID == null ? UUID.randomUUID() : forcedUUID;
     
     // remember the query object for later re-usage
     if(!getQueries().containsValue(preparedQuery) )
@@ -233,7 +238,7 @@ public class QueryController implements PagingCallback
     if (executeResult)
     {
       // remove old result from view
-      if (oldQueryUUID != null && getQueryPanels().get(oldQueryUUID) != null)
+      if (replaceOldTab && oldQueryUUID != null && getQueryPanels().get(oldQueryUUID) != null)
       {
         ui.getMainTab().removeComponent(queryPanels.get(oldQueryUUID));
       }
@@ -241,6 +246,8 @@ public class QueryController implements PagingCallback
       Tab newTab = ui.getMainTab().addTab(newResultView, "Query Result");
       ui.getMainTab().setSelectedTab(newResultView);
       newTab.setClosable(true);
+      newResultView.getPaging().addCallback(new SpecificPagingCallback(
+        lastQueryUUID));
 
 
       getQueryPanels().put(lastQueryUUID, newResultView);
@@ -262,7 +269,7 @@ public class QueryController implements PagingCallback
         StringUtils.join(preparedQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
 
-      new CountCallback().start();
+      new CountCallback(lastQueryUUID).start();
     }
     
     return lastQueryUUID;
@@ -288,25 +295,7 @@ public class QueryController implements PagingCallback
     return preparedQuery;
   }
 
-  @Override
-  public void switchPage(int offset, int limit)
-  {
-    if (preparedQuery != null)
-    {
-      preparedQuery.setOffset(offset);
-      preparedQuery.setLimit(limit);
-
-      // execute the result query again
-      executeQuery(false, true);
-      if (lastQueryUUID != null && lastCount != null 
-        && getQueryPanels().get(lastQueryUUID) != null)
-      {
-        getQueryPanels().get(lastQueryUUID).setCount(lastCount.getMatchCount());
-      }
-    }
-  }
-  
-  public void notifiyTabClose(ResultViewPanel panel)
+  public void notifyTabClose(ResultViewPanel panel)
   {
     if(panel != null)
     {
@@ -315,6 +304,7 @@ public class QueryController implements PagingCallback
       {
         getQueries().remove(queryUUID);
         getQueryPanels().remove(queryUUID);
+        getCounts().remove(queryUUID);
       }
     }
   }
@@ -343,19 +333,73 @@ public class QueryController implements PagingCallback
     return queryPanels;
   }
 
+  private Map<UUID, MatchAndDocumentCount> getCounts()
+  {
+    if(counts == null)
+    {
+      counts = new HashMap<UUID, MatchAndDocumentCount>();
+    }
+    return counts;
+  }
+  
+  
+  
+  private class SpecificPagingCallback implements PagingCallback
+  {
+    private UUID uuid;
+
+    public SpecificPagingCallback(UUID uuid)
+    {
+      this.uuid = uuid;
+    }
+    
+    
+    @Override
+    public void switchPage(int offset, int limit)
+    {
+      PagedResultQuery query = getQueries().get(uuid);
+      if (query != null)
+      {
+        query.setOffset(offset);
+        query.setLimit(limit);
+
+        // execute the result query again
+        executeQuery(false, true, true, uuid);
+        if (getCounts().get(uuid) != null
+          && getQueryPanels().get(uuid) != null)
+        {
+          getQueryPanels().get(uuid).
+            setCount(getCounts().get(uuid).getMatchCount());
+        }
+      }
+    }
+  }
+
   private class CountCallback extends Thread
   {
+    
+    private UUID uuid;
+
+    public CountCallback(UUID uuid)
+    {
+      this.uuid = uuid;
+    }
+    
+    
 
     @Override
     public void run()
     {
 
+      final MatchAndDocumentCount countResult;
+      MatchAndDocumentCount tmpCountResult = null;
       if (futureCount != null)
       {
         UniformInterfaceException cause = null;
         try
         {
-          lastCount = futureCount.get();
+          tmpCountResult = futureCount.get();
+          getCounts().put(uuid, tmpCountResult);
         }
         catch (InterruptedException ex)
         {
@@ -371,7 +415,10 @@ public class QueryController implements PagingCallback
           {
             log.error("Unexcepted ExecutionException cause", root);
           }
-
+        }
+        finally
+        {
+          countResult = tmpCountResult;
         }
 
         futureCount = null;
@@ -384,18 +431,18 @@ public class QueryController implements PagingCallback
           {
             if (causeFinal == null)
             {
-              if (lastCount != null)
+              if (countResult != null)
               {
-                String documentString = lastCount.getDocumentCount() > 1 ? "documents" : "document";
-                String matchesString = lastCount.getMatchCount() > 1 ? "matches" : "match";
+                String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
+                String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
 
-                ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
+                ui.getControlPanel().getQueryPanel().setStatus("" + countResult.
                   getMatchCount() + " " + matchesString
-                  + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
-                if (lastQueryUUID != null && lastCount.getMatchCount() > 0
+                  + " <br/>in " + countResult.getDocumentCount() + " " + documentString);
+                if (lastQueryUUID != null && countResult.getMatchCount() > 0
                   && getQueryPanels().get(lastQueryUUID) != null)
                 {
-                  getQueryPanels().get(lastQueryUUID).setCount(lastCount.getMatchCount());
+                  getQueryPanels().get(lastQueryUUID).setCount(countResult.getMatchCount());
                 }
               }
             }
