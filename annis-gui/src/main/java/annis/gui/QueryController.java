@@ -25,12 +25,19 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.MatchAndDocumentCount;
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
+import java.util.LinkedHashMap;
+import java.util.Map;
 import java.util.Set;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.apache.commons.collections15.set.ListOrderedSet;
@@ -57,15 +64,19 @@ public class QueryController implements PagingCallback
 
   private SearchUI ui;
 
-  private PagedResultQuery lastQuery;
   private ResultFetchThread lastMatchThread;
   private ListOrderedSet<HistoryEntry> history;
-
-  private ResultViewPanel lastResultView;
 
   private MatchAndDocumentCount lastCount;
 
   private Future<MatchAndDocumentCount> futureCount;
+  
+  private UUID lastQueryUUID;
+  
+  private PagedResultQuery preparedQuery;
+  
+  private transient BiMap<UUID, PagedResultQuery> queries;
+  private transient BiMap<UUID, ResultViewPanel> queryPanels;
   
   public QueryController(SearchUI ui)
   {
@@ -100,6 +111,7 @@ public class QueryController implements PagingCallback
       ui.getControlPanel().getSearchOptions().getResultsPerPage(),
       ui.getControlPanel().getSearchOptions().getSegmentationLayer(),
       query.getQuery(), query.getCorpora());
+    
     setQuery(paged);
   }
 
@@ -108,7 +120,7 @@ public class QueryController implements PagingCallback
     // only allow offset at multiples of the limit size
     query.setOffset(query.getOffset() - (query.getOffset() % query.getLimit()));
 
-    lastQuery = query;
+    preparedQuery = query;
 
 
     ui.getControlPanel().getQueryPanel().setQuery(query.getQuery());
@@ -123,11 +135,7 @@ public class QueryController implements PagingCallback
     {
       ui.getControlPanel().getCorpusList().selectCorpora(query.getCorpora());
     }
-  }
-
-  public void executeQuery()
-  {
-    executeQuery(true, true);
+    
   }
 
   /**
@@ -169,11 +177,16 @@ public class QueryController implements PagingCallback
     history.add(0, e);
     ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
   }
-
-  public void executeQuery(boolean executeCount, boolean executeResult)
+  
+  public UUID executeQuery()
+  {
+    return executeQuery(true, true);
+  }
+  
+  public UUID executeQuery(boolean executeCount, boolean executeResult)
   {
 
-    Validate.notNull(lastQuery,
+    Validate.notNull(preparedQuery,
       "You have to set a query before you can execute it.");
 
     cancelQueries();
@@ -186,41 +199,54 @@ public class QueryController implements PagingCallback
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    ui.updateFragment(lastQuery);
+    ui.updateFragment(preparedQuery);
 
     HistoryEntry e = new HistoryEntry();
-    e.setCorpora(lastQuery.getCorpora());
-    e.setQuery(lastQuery.getQuery());
+    e.setCorpora(preparedQuery.getCorpora());
+    e.setQuery(preparedQuery.getQuery());
 
     addHistoryEntry(e);
 
-    if (lastQuery.getCorpora() == null || lastQuery.getCorpora().isEmpty())
+    if (preparedQuery.getCorpora() == null || preparedQuery.getCorpora().isEmpty())
     {
       Notification.show("Please select a corpus",
         Notification.Type.WARNING_MESSAGE);
-      return;
+      return null;
     }
-    if ("".equals(lastQuery.getQuery()))
+    if ("".equals(preparedQuery.getQuery()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
-      return;
+      return null;
     }
-
+    
+    UUID oldQueryUUID = lastQueryUUID;
+    lastQueryUUID = UUID.randomUUID();
+    
+    // remember the query object for later re-usage
+    if(!getQueries().containsValue(preparedQuery) )
+    {
+      getQueries().put(lastQueryUUID, preparedQuery);
+    }
+    
     AsyncWebResource res = Helper.getAnnisAsyncWebResource();
 
     if (executeResult)
     {
       // remove old result from view
-      if (lastResultView != null)
+      if (oldQueryUUID != null && getQueryPanels().get(oldQueryUUID) != null)
       {
-        ui.getMainTab().removeComponent(lastResultView);
+        ui.getMainTab().removeComponent(queryPanels.get(oldQueryUUID));
       }
-      lastResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
-      ui.getMainTab().addTab(lastResultView, "Query Result");
-      ui.getMainTab().setSelectedTab(lastResultView);
+      ResultViewPanel newResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
+      Tab newTab = ui.getMainTab().addTab(newResultView, "Query Result");
+      ui.getMainTab().setSelectedTab(newResultView);
+      newTab.setClosable(true);
 
+
+      getQueryPanels().put(lastQueryUUID, newResultView);
+      
      
-      ResultFetchThread thread = new ResultFetchThread(lastQuery, lastResultView, ui);
+      ResultFetchThread thread = new ResultFetchThread(preparedQuery, newResultView, ui);
       thread.start();
 
     }
@@ -232,12 +258,14 @@ public class QueryController implements PagingCallback
 
       futureCount = res.path("query").path("search").path("count").
         queryParam(
-        "q", lastQuery.getQuery()).queryParam("corpora",
-        StringUtils.join(lastQuery.getCorpora(), ",")).get(
+        "q", preparedQuery.getQuery()).queryParam("corpora",
+        StringUtils.join(preparedQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
 
       new CountCallback().start();
     }
+    
+    return lastQueryUUID;
   }
 
   public void corpusSelectionChangedInBackground()
@@ -257,22 +285,36 @@ public class QueryController implements PagingCallback
 
   public PagedResultQuery getQuery()
   {
-    return lastQuery;
+    return preparedQuery;
   }
 
   @Override
   public void switchPage(int offset, int limit)
   {
-    if (lastQuery != null)
+    if (preparedQuery != null)
     {
-      lastQuery.setOffset(offset);
-      lastQuery.setLimit(limit);
+      preparedQuery.setOffset(offset);
+      preparedQuery.setLimit(limit);
 
       // execute the result query again
       executeQuery(false, true);
-      if (lastResultView != null && lastCount != null)
+      if (lastQueryUUID != null && lastCount != null 
+        && getQueryPanels().get(lastQueryUUID) != null)
       {
-        lastResultView.setCount(lastCount.getMatchCount());
+        getQueryPanels().get(lastQueryUUID).setCount(lastCount.getMatchCount());
+      }
+    }
+  }
+  
+  public void notifiyTabClose(ResultViewPanel panel)
+  {
+    if(panel != null)
+    {
+      UUID queryUUID = getQueryPanels().inverse().get(panel);
+      if(queryUUID != null)
+      {
+        getQueries().remove(queryUUID);
+        getQueryPanels().remove(queryUUID);
       }
     }
   }
@@ -280,6 +322,25 @@ public class QueryController implements PagingCallback
   public String getQueryDraft()
   {
     return ui.getControlPanel().getQueryPanel().getQuery();
+  }
+
+  private Map<UUID, PagedResultQuery> getQueries()
+  {
+    if(queries == null)
+    {
+      queries = HashBiMap.create();
+    }
+    return queries;
+  }
+
+
+  private BiMap<UUID, ResultViewPanel> getQueryPanels()
+  {
+    if(queryPanels == null)
+    {
+      queryPanels = HashBiMap.create();
+    }
+    return queryPanels;
   }
 
   private class CountCallback extends Thread
@@ -331,9 +392,10 @@ public class QueryController implements PagingCallback
                 ui.getControlPanel().getQueryPanel().setStatus("" + lastCount.
                   getMatchCount() + " " + matchesString
                   + " <br/>in " + lastCount.getDocumentCount() + " " + documentString);
-                if (lastResultView != null && lastCount.getMatchCount() > 0)
+                if (lastQueryUUID != null && lastCount.getMatchCount() > 0
+                  && getQueryPanels().get(lastQueryUUID) != null)
                 {
-                  lastResultView.setCount(lastCount.getMatchCount());
+                  getQueryPanels().get(lastQueryUUID).setCount(lastCount.getMatchCount());
                 }
               }
             }
@@ -367,6 +429,10 @@ public class QueryController implements PagingCallback
       }
     }
   }
+
+  
+  
+  
 
 
 }

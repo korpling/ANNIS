@@ -28,6 +28,7 @@ import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
@@ -87,7 +88,7 @@ public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  LoginListener, ErrorHandler
+  LoginListener, ErrorHandler, TabSheet.CloseHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -291,6 +292,7 @@ public class SearchUI extends AnnisBaseUI
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
+    mainTab.setCloseHandler(this);
     
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setClosable(false);
@@ -645,6 +647,17 @@ public class SearchUI extends AnnisBaseUI
 
     updateUserInformation();
   }
+
+  @Override
+  public void onTabClose(TabSheet tabsheet, Component tabContent)
+  {
+    tabsheet.removeComponent(tabContent);
+    if(tabContent instanceof ResultViewPanel)
+    {
+      getQueryController().notifiyTabClose((ResultViewPanel) tabContent);
+    }
+  }
+  
 
   public boolean isLoggedIn()
   {
