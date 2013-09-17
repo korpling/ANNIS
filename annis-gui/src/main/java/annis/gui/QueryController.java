@@ -334,6 +334,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
       if(uuid != null)
       {
         lastQueryUUID = uuid;
+        PagedResultQuery query = getQueries().get(uuid);
+        if(query != null)
+        {
+          ui.updateFragment(query);
+        }
       }
     }
   }

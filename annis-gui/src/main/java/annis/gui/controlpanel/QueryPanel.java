@@ -220,8 +220,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowResultNewTab = new Button("Search (open in new tab)");
     btShowResultNewTab.setWidth("100%");
     btShowResultNewTab.addClickListener(new ShowResultInNewTabClickListener());
-    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong>");
+    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong><br />Ctrl + Shift + Enter");
     btShowResultNewTab.setDisableOnClick(true);
+    btShowResultNewTab.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL, ModifierKey.SHIFT);
     moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
