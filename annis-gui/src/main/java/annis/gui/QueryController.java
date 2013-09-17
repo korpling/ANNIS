@@ -251,7 +251,7 @@ public class QueryController
 
     ResultViewPanel newResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
 
-    Tab newTab = ui.getMainTab().addTab(newResultView, "Query Result " + displayShortID);
+    Tab newTab = ui.getMainTab().addTab(newResultView, "Query Result #" + displayShortID);
     ui.getMainTab().setSelectedTab(newResultView);
     newTab.setClosable(true);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
@@ -498,6 +498,8 @@ public class QueryController
                 if (lastQueryUUID != null && countResult.getMatchCount() > 0
                   && getQueryPanels().get(lastQueryUUID) != null)
                 {
+                  getQueryPanels().get(lastQueryUUID).getPaging().setPageSize(
+                    getQueries().get(uuid).getLimit(), true);
                   getQueryPanels().get(lastQueryUUID).setCount(countResult.getMatchCount());
                 }
               }
