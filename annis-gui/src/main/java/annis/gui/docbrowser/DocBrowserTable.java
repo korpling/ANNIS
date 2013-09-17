@@ -181,8 +181,7 @@ public class DocBrowserTable extends Table
           Button openVis = new Button(config.getString("displayName"));
           openVis.setDescription(
             "open visualizer with the full text of " + docName);
-          openVis.addClickListener(new OpenVisualizerWindow(docName, config.
-            getString("type")));
+          openVis.addClickListener(new OpenVisualizerWindow(docName, config));
           openVis.setStyleName(BaseTheme.BUTTON_LINK);
           l.addComponent(openVis);
         }
@@ -225,25 +224,25 @@ public class DocBrowserTable extends Table
     DocBrowserTable docBrowserTable = new DocBrowserTable(parent);
     return docBrowserTable;
   }
-
+  
   private class OpenVisualizerWindow implements Button.ClickListener
   {
 
     private String docName;
 
-    private String visType;
+    private JSONObject config;
 
-    public OpenVisualizerWindow(String docName, String visType)
+    public OpenVisualizerWindow(String docName, JSONObject config)
     {
       this.docName = docName;
-      this.visType = visType;
+      this.config = config;
     }
 
     @Override
     public void buttonClick(Button.ClickEvent event)
     {
 
-      parent.openVis(docName, visType);
+      parent.openVis(docName, config);
     }
   }
 }

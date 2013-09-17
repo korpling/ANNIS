@@ -23,6 +23,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import java.util.List;
+import org.json.JSONObject;
 
 /**
  *
@@ -81,9 +82,9 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc, String visType)
+  public void openVis(String doc, JSONObject config)
   {
-    ui.getDocBrowserController().openDocVis(corpus, doc, visType);
+    ui.getDocBrowserController().openDocVis(corpus, doc, config);
   }
 
   private class LoadingDocs extends Thread

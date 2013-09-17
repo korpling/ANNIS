@@ -31,6 +31,8 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,25 +67,32 @@ public class DocBrowserController implements Serializable
     this.initiatedVis = new HashMap<String, Component>();
   }
 
-  public void openDocVis(String corpus, String doc, String visType)
+  public void openDocVis(String corpus, String doc, JSONObject config)
   {
-
-    String canonicalTitle = "doc view: " + corpus + " > " + doc + " - " + visType;
-
-    // check if a visualization is already initiated
-    if (!initiatedVis.containsKey(canonicalTitle))
+    try
     {
+      String type = config.getString("type");
+      String canonicalTitle = "doc view: " + corpus + " > " + doc + " - " + type;
 
-      VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(visType);
-      Component vis = visualizer.createComponent(createInput(corpus, doc), null);
-      initiatedVis.put(canonicalTitle, vis);
+      // check if a visualization is already initiated
+      if (!initiatedVis.containsKey(canonicalTitle))
+      {
+        VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(type);
+        Component vis = visualizer.createComponent(
+          createInput(corpus, doc, config), null);
+        initiatedVis.put(canonicalTitle, vis);
+      }
+
+      Component vis = initiatedVis.get(canonicalTitle);
+      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, doc);
+      visTab.setIcon(EYE_ICON);
+      visTab.setClosable(true);
+      ui.getTabSheet().setSelectedTab(vis);
     }
-
-    Component vis = initiatedVis.get(canonicalTitle);
-    TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, doc);
-    visTab.setIcon(EYE_ICON);
-    visTab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(vis);
+    catch (JSONException ex)
+    {
+      log.error("problems with reading document visualizer config", ex);
+    }
   }
 
   public void openDocBrowser(String corpus)
@@ -104,7 +113,8 @@ public class DocBrowserController implements Serializable
     ui.getTabSheet().setSelectedTab(tab);
   }
 
-  private VisualizerInput createInput(String corpus, String docName)
+  private VisualizerInput createInput(String corpus, String docName,
+    JSONObject config)
   {
     VisualizerInput input = new VisualizerInput();
 
@@ -133,8 +143,57 @@ public class DocBrowserController implements Serializable
       input.setResult(sDoc);
     }
 
-    // set empty mapping for avoiding errors with pure written visualizers
-    input.setMappings(new Properties());
+    // set mappings and namespaces. some visualizer do not survive without   
+    input.setMappings(parseMappings(config));
+    input.setNamespace(getNamespace(config));
+
     return input;
+  }
+
+  private Properties parseMappings(JSONObject config)
+  {
+    Properties mappings = new Properties();
+    String mappingsAsString = null;
+
+    try
+    {
+      mappingsAsString = config.getString("mapping");
+    }
+    catch (JSONException ex)
+    {
+      log.debug("no mappings defined", ex);
+    }
+
+    if (mappingsAsString != null)
+    {
+      // split the entrys
+      String[] entries = mappingsAsString.split(";");
+      for (String e : entries)
+      {
+        // split key-value
+        String[] keyvalue = e.split(":", 2);
+        if (keyvalue.length == 2)
+        {
+          mappings.put(keyvalue[0].trim(), keyvalue[1].trim());
+        }
+      }
+    }
+
+    return mappings;
+  }
+
+  private String getNamespace(JSONObject config)
+  {
+    String namespace = null;
+    try
+    {
+      namespace = config.getString("namespace");
+    }
+    catch (JSONException ex)
+    {
+      log.error("no namespace retrieved for doc visualizer", ex);
+    }
+
+    return namespace;
   }
 }
