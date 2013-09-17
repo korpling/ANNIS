@@ -293,6 +293,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
+    mainTab.addSelectedTabChangeListener(queryController);
     
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setClosable(false);

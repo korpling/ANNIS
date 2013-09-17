@@ -31,6 +31,7 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import java.util.HashMap;
 import java.util.Map;
@@ -55,7 +56,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController
+public class QueryController implements TabSheet.SelectedTabChangeListener
 {
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -75,7 +76,6 @@ public class QueryController
   private transient Map<UUID, PagedResultQuery> queries;
   private transient BiMap<UUID, ResultViewPanel> queryPanels;
   private transient Map<UUID, MatchAndDocumentCount> counts;
-  private transient TreeMap<UUID, Integer> shortIDs;
   private int maxShortID;
   
   public QueryController(SearchUI ui)
@@ -234,26 +234,35 @@ public class QueryController
     // begin execute match fetching
     //
     // remove old result from view
-    if (replaceOldTab && oldQueryUUID != null && getQueryPanels().get(oldQueryUUID) != null)
+    ResultViewPanel oldPanel = getQueryPanels().get(oldQueryUUID);
+    
+    if (replaceOldTab && oldQueryUUID != null && oldPanel != null)
     {
       removeQuery(oldQueryUUID);
     }
 
 
     // create a short ID for display
-    int displayShortID = 1;
-    if(!getShortIDs().isEmpty())
-    {
-      displayShortID = maxShortID + 1;
-    }
-    getShortIDs().put(lastQueryUUID, displayShortID);
-    maxShortID = Math.max(displayShortID, maxShortID);
+    maxShortID++;
 
     ResultViewPanel newResultView = new ResultViewPanel(this, ui, ui.getInstanceConfig());
 
-    Tab newTab = ui.getMainTab().addTab(newResultView, "Query Result #" + displayShortID);
+    
+    Tab newTab;
+    
+    if(replaceOldTab && oldPanel != null)
+    {
+       ui.getMainTab().replaceComponent(oldPanel, newResultView);
+       newTab = ui.getMainTab().getTab(newResultView);
+       newTab.setCaption("Query Result #" + maxShortID);
+    }
+    else
+    {
+      newTab = ui.getMainTab().addTab(newResultView, "Query Result #" + maxShortID);
+      newTab.setClosable(true);
+    }
     ui.getMainTab().setSelectedTab(newResultView);
-    newTab.setClosable(true);
+    
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       lastQueryUUID));
 
@@ -315,6 +324,22 @@ public class QueryController
     ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
   }
 
+  @Override
+  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  {
+    if(event.getTabSheet().getSelectedTab() instanceof ResultViewPanel)
+    {
+      ResultViewPanel panel = (ResultViewPanel) event.getTabSheet().getSelectedTab();
+      UUID uuid = getQueryPanels().inverse().get(panel);
+      if(uuid != null)
+      {
+        lastQueryUUID = uuid;
+      }
+    }
+  }
+  
+  
+
   public Set<String> getSelectedCorpora()
   {
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
@@ -334,22 +359,10 @@ public class QueryController
   private void removeQuery(UUID uuid)
   {
     if(uuid != null)
-    {
-      ResultViewPanel panel = getQueryPanels().get(uuid);
-      if(panel != null)
-      {
-        ui.getMainTab().removeComponent(panel);
-      }
-      
+    {      
       getQueries().remove(uuid);
       getQueryPanels().remove(uuid);
       getCounts().remove(uuid);
-      
-      Integer shortID = getShortIDs().remove(uuid);
-      if(shortID != null && shortID.intValue() == maxShortID)
-      {
-        maxShortID--;
-      }
     }
   }
 
@@ -358,6 +371,7 @@ public class QueryController
     if(panel != null)
     {
       removeQuery(getQueryPanels().inverse().get(panel));
+      ui.getMainTab().removeComponent(panel);
     }
   }
   
@@ -393,17 +407,6 @@ public class QueryController
     }
     return counts;
   }
-  
-  private TreeMap<UUID, Integer> getShortIDs()
-  {
-    if(shortIDs == null)
-    {
-      shortIDs = new TreeMap<UUID, Integer>();
-    }
-    return shortIDs;
-  }
-  
-  
   
   private class SpecificPagingCallback implements PagingCallback
   {
