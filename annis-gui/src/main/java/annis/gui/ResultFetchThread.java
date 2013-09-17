@@ -243,7 +243,7 @@ class ResultFetchThread extends Thread
               
               if(first)
               {
-                resultPanel.addQueryResultQueue(queue, query); 
+                resultPanel.setQueryResultQueue(queue, query); 
                 ui.push();
               }
              

@@ -139,20 +139,6 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     resultPanel.setSizeFull();
     resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
-    Set<String> corpora = controller.getQuery().getCorpora();
-
-    if (corpora.size() == 1)
-    {
-      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
-        next());
-      if (corpusConfig != null && corpusConfig.getConfig() != null
-        && corpusConfig.getConfig().containsKey(
-        KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
-      {
-        this.selectedSegmentationLayer = corpusConfig.getConfig(
-          KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
-      }
-    }
 
     this.instanceConfig = instanceConfig;
 
@@ -162,17 +148,11 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
 
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
-
+    addComponent(mbResult);
+    
     miSegmentation = mbResult.addItem("Base text", null);
-
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    PagedResultQuery q = controller.getQuery();
-
-    paging = new PagingComponent(q.getOffset(), q.getLimit());
-    paging.setInfo(q.getQuery());
-    addComponent(mbResult);
-    addComponent(paging);
     progressResult = new ProgressBar();
 
     progressResult.setVisible(false);
@@ -180,13 +160,18 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     addComponent(progressResult);   
     addComponent(resultPanel);
     
-    setComponentAlignment(paging, Alignment.TOP_CENTER);
     setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
 
     setExpandRatio(mbResult, 0.0f);
-    setExpandRatio(paging, 0.0f);
     setExpandRatio(progressResult, 0.0f);
     setExpandRatio(resultPanel, 1.0f);
+    
+    paging = new PagingComponent();
+    
+    addComponent(paging, 1);
+
+    setComponentAlignment(paging, Alignment.TOP_CENTER);
+    setExpandRatio(paging, 0.0f);
 
   }
 
@@ -234,10 +219,32 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     progressResult.setValue(percent);
   }
   
-  public void addQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q)
+  public void setQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q)
   {
     this.projectQueue = queue;
     this.currentQuery = q;
+
+    paging.setPageSize(q.getLimit(), false);
+    paging.setInfo(q.getQuery());
+    
+    resultLayout.removeAllComponents();
+    resultPanelList.clear();
+    
+    
+    Set<String> corpora = q.getCorpora();
+
+    if (corpora.size() == 1)
+    {
+      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
+        next());
+      if (corpusConfig != null && corpusConfig.getConfig() != null
+        && corpusConfig.getConfig().containsKey(
+        KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+      {
+        this.selectedSegmentationLayer = corpusConfig.getConfig(
+          KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+      }
+    }
     
     // get the first query result
     SaltProject first = queue.poll();
