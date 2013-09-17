@@ -21,7 +21,6 @@ import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.ClientConnector;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.TabSheet;
@@ -34,7 +33,6 @@ import java.util.Map;
 import java.util.Properties;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.stringtemplate.v4.compiler.CodeGenerator;
 
 /**
  * Represents a global controller for the doc browser feature.
@@ -69,7 +67,8 @@ public class DocBrowserController implements Serializable
 
   public void openDocVis(String corpus, String doc, String visType)
   {
-    String canonicalTitle = "doc view: " + corpus + " > " + doc;
+
+    String canonicalTitle = "doc view: " + corpus + " > " + doc + " - " + visType;
 
     // check if a visualization is already initiated
     if (!initiatedVis.containsKey(canonicalTitle))
