@@ -140,7 +140,7 @@ public class SearchUI extends AnnisBaseUI
   {    
     super.init(request);
     setErrorHandler(this);
-
+    
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
