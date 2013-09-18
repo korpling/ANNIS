@@ -250,15 +250,18 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     
     Tab newTab;
     
+    String caption = getQueryPanels().isEmpty() 
+      ? "Query Result" : "Query Result #" + maxShortID;
+    
     if(replaceOldTab && oldPanel != null)
     {
        ui.getMainTab().replaceComponent(oldPanel, newResultView);
        newTab = ui.getMainTab().getTab(newResultView);
-       newTab.setCaption("Query Result #" + maxShortID);
+       newTab.setCaption(caption);
     }
     else
     {
-      newTab = ui.getMainTab().addTab(newResultView, "Query Result #" + maxShortID);
+      newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
     }
     ui.getMainTab().setSelectedTab(newResultView);
