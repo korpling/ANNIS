@@ -60,6 +60,7 @@ public class DocBrowserController implements Serializable
 
   private static final ThemeResource DOC_ICON = new ThemeResource(
     "document_ico.png");
+ 
 
   public DocBrowserController(SearchUI ui)
   {
@@ -190,7 +191,10 @@ public class DocBrowserController implements Serializable
     String namespace = null;
     try
     {
-      namespace = config.getString("namespace");
+      if (config.has("namespace"))
+      {
+        namespace = config.getString("namespace");
+      }
     }
     catch (JSONException ex)
     {
