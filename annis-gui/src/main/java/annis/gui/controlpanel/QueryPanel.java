@@ -70,7 +70,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
-  private Button btShowResultNewTab;
+  //private Button btShowResultNewTab;
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
@@ -78,6 +78,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
+  private PopupButton btMoreActions;
 
   public QueryPanel(SearchUI ui)
   {
@@ -214,16 +215,16 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
     moreActionsLayout.setWidth("250px");
-    PopupButton btMoreActions = new PopupButton("More");
+    btMoreActions = new PopupButton("More");
     btMoreActions.setContent(moreActionsLayout);
     
-    btShowResultNewTab = new Button("Search (open in new tab)");
-    btShowResultNewTab.setWidth("100%");
-    btShowResultNewTab.addClickListener(new ShowResultInNewTabClickListener());
-    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong><br />Ctrl + Shift + Enter");
-    btShowResultNewTab.setDisableOnClick(true);
-    btShowResultNewTab.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL, ModifierKey.SHIFT);
-    moreActionsLayout.addComponent(btShowResultNewTab);
+//    btShowResultNewTab = new Button("Search (open in new tab)");
+//    btShowResultNewTab.setWidth("100%");
+//    btShowResultNewTab.addClickListener(new ShowResultInNewTabClickListener());
+//    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong><br />Ctrl + Shift + Enter");
+//    btShowResultNewTab.setDisableOnClick(true);
+//    btShowResultNewTab.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL, ModifierKey.SHIFT);
+//    moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
     btShowExport.setWidth("100%");
@@ -410,19 +411,19 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
   }
   
-  public class ShowResultInNewTabClickListener implements Button.ClickListener
-  {
-
-    @Override
-    public void buttonClick(ClickEvent event)
-    {
-      if(controller != null)
-      {
-        controller.setQuery((txtQuery.getValue()));
-        controller.executeQuery(false);
-      }
-    }
-  }
+//  public class ShowResultInNewTabClickListener implements Button.ClickListener
+//  {
+//
+//    @Override
+//    public void buttonClick(ClickEvent event)
+//    {
+//      if(controller != null)
+//      {
+//        controller.setQuery((txtQuery.getValue()));
+//        controller.executeQuery(false);
+//      }
+//    }
+//  }
 
   public void setCountIndicatorEnabled(boolean enabled)
   {
@@ -448,7 +449,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       
       btShowResult.setEnabled(!enabled);
-      btShowResultNewTab.setEnabled(!enabled);
+//      btShowResultNewTab.setEnabled(!enabled);
     }
   }
 
@@ -513,6 +514,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       tab.setClosable(true);
       tabSheet.setSelectedTab(panel);
       
+      btMoreActions.setPopupVisible(false);
     }
     
   }
