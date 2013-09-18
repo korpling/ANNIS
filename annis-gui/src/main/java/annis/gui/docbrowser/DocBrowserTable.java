@@ -31,7 +31,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
-import java.util.logging.Level;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -74,7 +73,7 @@ public class DocBrowserTable extends Table
       "document name", "open visualizer", "info browser"
     });
 
-    setColumnHeaders("document name", "", "");
+    setColumnHeaders("document name", "visualizer", "");
     setColumnWidth("info browser", 20);
   }
 
@@ -85,6 +84,9 @@ public class DocBrowserTable extends Table
 
     // configure layout
     setSizeFull();
+
+    // put stripes to the table
+    addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     this.configArray = getDocBrowserConfig();
   }
@@ -98,7 +100,7 @@ public class DocBrowserTable extends Table
       Annotation a = (Annotation) itemId;
       final String docName = a.getName();
       Button btn = new Button();
-      btn.setStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+      btn.setStyleName(BaseTheme.BUTTON_LINK);
       btn.setIcon(INFO_ICON);
       btn.addClickListener(new Button.ClickListener()
       {
@@ -171,6 +173,7 @@ public class DocBrowserTable extends Table
     {
       Panel p = new Panel();
       VerticalLayout l = new VerticalLayout();
+      p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
       for (int i = 0; i < configArray.length(); i++)
       {
@@ -224,7 +227,7 @@ public class DocBrowserTable extends Table
     DocBrowserTable docBrowserTable = new DocBrowserTable(parent);
     return docBrowserTable;
   }
-  
+
   private class OpenVisualizerWindow implements Button.ClickListener
   {
 
