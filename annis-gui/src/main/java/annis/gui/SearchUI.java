@@ -294,6 +294,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addStyleName("blue-tab");
     
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setClosable(false);

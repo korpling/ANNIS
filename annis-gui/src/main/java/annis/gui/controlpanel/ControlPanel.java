@@ -58,6 +58,7 @@ public class ControlPanel extends VerticalLayout
     optionsTab = new TabSheet();
     optionsTab.setHeight(100f, Layout.UNITS_PERCENTAGE);
     optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.addStyleName("blue-tab");
 
     corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
 
