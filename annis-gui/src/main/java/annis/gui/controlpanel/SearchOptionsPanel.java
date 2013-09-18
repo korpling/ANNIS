@@ -27,6 +27,7 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -90,12 +91,12 @@ public class SearchOptionsPanel extends FormLayout
   private ComboBox cbSegmentation;
   // TODO: make this configurable
 
-  private static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
+  public static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
   {
     1, 2, 5, 10, 20, 25
   };
 
-  static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
+  public static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
   {
     0, 1, 2, 5, 10, 20
   };
@@ -657,6 +658,9 @@ public class SearchOptionsPanel extends FormLayout
     c.setValue(defaultCtx);
   }
 
+  
+  
+  
   private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
   {
 

@@ -84,6 +84,10 @@ public class PagingComponent extends CustomComponent implements
 
   private Label lblInfo;
 
+  public PagingComponent()
+  {
+    this(0, 0);
+  }
   public PagingComponent(int count, int pageSize)
   {
     if (pageSize <= 0)
@@ -262,14 +266,14 @@ public class PagingComponent extends CustomComponent implements
     return pageSize;
   }
 
-  public void setPageSize(int pageSize)
+  public void setPageSize(int pageSize, boolean update)
   {
     if (pageSize <= 0)
     {
       pageSize = 1;
     }
     this.pageSize = pageSize;
-    update(true);
+    update(update);
   }
 
   @Override

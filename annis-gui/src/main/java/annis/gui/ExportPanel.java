@@ -13,17 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
+package annis.gui;
 
-import annis.gui.QueryController;
 import annis.gui.beans.HistoryEntry;
-import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import annis.libgui.Helper;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -33,7 +35,6 @@ import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import java.io.*;
@@ -55,6 +56,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     ExportPanel.class);
+  
+  private ComboBox cbLeftContext;
+  private ComboBox cbRightContext;
+  private TextField txtAnnotationKeys;
+  private TextField txtParameters;
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -68,13 +74,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private ComboBox cbExporter;
 
-  private ComboBox cbLeftContext;
-
-  private ComboBox cbRightContext;
-
-  private TextField txtAnnotationKeys;
-
-  private TextField txtParameters;
+  
 
   private Button btDownload;
 
@@ -115,7 +115,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addStyleName("contextsensible-formlayout");
 
     initHelpMessages();
-
+    
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -132,7 +132,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
     addComponent(new HelpButton(cbExporter));
-
+    
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
 

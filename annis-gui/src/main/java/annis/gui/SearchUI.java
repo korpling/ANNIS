@@ -26,11 +26,10 @@ import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.tutorial.TutorialPanel;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
@@ -57,6 +56,7 @@ import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
@@ -88,7 +88,7 @@ public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  LoginListener, ErrorHandler
+  LoginListener, ErrorHandler, TabSheet.CloseHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -118,13 +118,9 @@ public class SearchUI extends AnnisBaseUI
 
   private ControlPanel controlPanel;
 
-  private TutorialPanel tutorial;
-
   private TabSheet mainTab;
 
   private Window windowLogin;
-
-  private QueryBuilderChooser queryBuilder;
 
   private String bugEMailAddress;
 
@@ -144,7 +140,7 @@ public class SearchUI extends AnnisBaseUI
   {    
     super.init(request);
     setErrorHandler(this);
-
+    
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
@@ -179,7 +175,7 @@ public class SearchUI extends AnnisBaseUI
 
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
+    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
@@ -230,11 +226,7 @@ public class SearchUI extends AnnisBaseUI
         windowLogin.center();
       }
     });
-//    BrowserWindowOpener loginOpener =
-//      new BrowserWindowOpener(Helper.getContext() + "/login");
-//    loginOpener.setFeatures("height=200,width=300,resizable");
-//    loginOpener.extend(btLogin);
-
+    
     btLogout = new Button("Logout", new Button.ClickListener()
     {
       @Override
@@ -291,30 +283,23 @@ public class SearchUI extends AnnisBaseUI
     //HorizontalLayout hLayout = new HorizontalLayout();
     final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
     hSplit.setSizeFull();
-
+   
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
-    ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
-      "example queries", this);
+    final HelpPanel help = new HelpPanel(this);
 
-    controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
-    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    hSplit.setFirstComponent(controlPanel);
-
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(autoGenQueries, "example queries");
-    mainTab.addTab(tutorial, "Tutorial");
-
-    queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
-    mainTab.addTab(queryBuilder, "Query Builder");
-
+    mainTab.setCloseHandler(this);
+    mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addStyleName("blue-tab");
+    
+    Tab helpTab = mainTab.addTab(help, "Help");
+    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
+    helpTab.setClosable(false);
+   
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
     hSplit.addSplitterClickListener(
@@ -340,21 +325,20 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
-    addAction(new ShortcutListener("^Query builder")
-    {
-      @Override
-      public void handleAction(Object sender, Object target)
-      {
-        mainTab.setSelectedTab(queryBuilder);
-      }
-    });
+    
+    controlPanel = new ControlPanel(this,
+      help.getExamples());
+    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    hSplit.setFirstComponent(controlPanel);
 
+    
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
       public void handleAction(Object sender, Object target)
       {
-        mainTab.setSelectedTab(tutorial);
+        mainTab.setSelectedTab(help);
       }
     });
 
@@ -667,6 +651,17 @@ public class SearchUI extends AnnisBaseUI
     updateUserInformation();
   }
 
+  @Override
+  public void onTabClose(TabSheet tabsheet, Component tabContent)
+  {
+    tabsheet.removeComponent(tabContent);
+    if(tabContent instanceof ResultViewPanel)
+    {
+      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
+    }
+  }
+  
+
   public boolean isLoggedIn()
   {
     return Helper.getUser() != null;
@@ -865,13 +860,13 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
     else
     {
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
   }
 
@@ -976,8 +971,4 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  public TabSheet getTabSheet()
-  {
-    return mainTab;
-  }
 }

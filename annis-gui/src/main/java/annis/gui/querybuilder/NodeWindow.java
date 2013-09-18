@@ -39,7 +39,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
 {
   
   public static final int HEIGHT=100;
-  public static final int WIDTH=250;
+  public static final int WIDTH=275;
   
   private static final String[] NODE_OPERATORS = new String[] 
   {
@@ -97,17 +97,20 @@ public class NodeWindow extends Panel implements Button.ClickListener
     vLayout.addComponent(toolbar);
 
     btMove = new Button("");
+    btMove.setWidth("100%");
     btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
     btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
-    btMove.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btMove.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btMove.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
    
     
-    btEdge = new Button("");
-    btEdge.setIcon(new ThemeResource("tango-icons/22x22/go-jump.png"));
+    btEdge = new Button("Edge");
+    btEdge.setIcon(new ThemeResource("tango-icons/16x16/go-jump.png"));
     btEdge.addClickListener((Button.ClickListener) this);
-    btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btEdge.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    //btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
       + "two nodes click this button first. "
@@ -117,9 +120,10 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btEdge.setImmediate(true);
     toolbar.addComponent(btEdge);
     
-    btAdd = new Button("");
-    btAdd.setIcon(new ThemeResource("tango-icons/22x22/list-add.png"));
-    btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btAdd = new Button("Add");
+    btAdd.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"));
+    btAdd.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    //btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addClickListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
       + "Every condition will constraint the node described by this window. "
@@ -127,9 +131,10 @@ public class NodeWindow extends Panel implements Button.ClickListener
       + "values of the annotation a node needs to have.");
     toolbar.addComponent(btAdd);
     
-    btClear = new Button("");
-    btClear.setIcon(new ThemeResource("tango-icons/22x22/edit-clear.png"));
-    btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btClear = new Button("Clear");
+    btClear.setIcon(new ThemeResource("tango-icons/16x16/edit-clear.png"));
+    btClear.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    //btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addClickListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
     toolbar.addComponent(btClear);
@@ -137,12 +142,17 @@ public class NodeWindow extends Panel implements Button.ClickListener
     btClose = new Button("");
     btClose.setIcon(new ThemeResource("tango-icons/22x22/process-stop.png"));
     btClose.setDescription("<strong>Close</strong><br />Close this node description window");
-    btClose.addStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btClose.addClickListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
     toolbar.setComponentAlignment(btMove, Alignment.MIDDLE_LEFT);
+    toolbar.setExpandRatio(btMove, 1.0f);
+    
     toolbar.setComponentAlignment(btEdge, Alignment.MIDDLE_CENTER);
+    toolbar.setComponentAlignment(btAdd, Alignment.MIDDLE_CENTER);
+    toolbar.setComponentAlignment(btClear, Alignment.MIDDLE_CENTER);
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
 
   }
@@ -163,8 +173,8 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else
     {
-      btEdge.setIcon(new ThemeResource("tango-icons/22x22/go-jump.png"));
-      btEdge.setCaption("");
+      btEdge.setIcon(new ThemeResource("tango-icons/16x16/go-jump.png"));
+      btEdge.setCaption("Edge");
     }
   }
 
