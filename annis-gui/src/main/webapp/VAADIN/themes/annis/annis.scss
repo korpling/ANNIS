@@ -220,5 +220,19 @@ $font-size: 10pt;
     border-style: dashed;
     border-width: 1px;
   }
+  
+  .help-tab .v-accordion-item-caption {
+    background-color: #ecffe7;
+  }
+  
+  /* Chamaeleon theme tab appeareance is sub-optimal */
+  .blue-tab .v-tabsheet-tabitem {
+    border: 1px solid rgb(204,204,204);
+    border-bottom: none;
+  }
+  
+  .v-tabsheet-tabcontainer-blue-tab {
+    background-color: #ecf0f6;
+  }
 
 }

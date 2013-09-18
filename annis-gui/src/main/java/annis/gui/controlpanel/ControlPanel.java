@@ -16,9 +16,9 @@
 package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
-import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import com.vaadin.ui.*;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,37 +40,46 @@ public class ControlPanel extends VerticalLayout
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
+  
+  private Tab optionTab;
+  private TabSheet optionsTab;
+  private SearchUI ui;
 
-  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+  public ControlPanel(SearchUI ui,
     ExampleQueriesPanel autoGenQueries)
   {
+    this.ui = ui;
+    
     setSizeFull();
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    Accordion accordion = new Accordion();
-    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab = new TabSheet();
+    optionsTab.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.addStyleName("blue-tab");
 
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
+    corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
 
     searchOptions = new SearchOptionsPanel();
 
-    queryPanel = new QueryPanel(controller, instanceConfig);
+    queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
 
-    accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList, controller), "Export", null);
+    optionsTab.addTab(corpusList, "Corpus List", null);
+    optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
 
     addComponent(queryPanel);
-    addComponent(accordion);
+    addComponent(optionsTab);
 
-    setExpandRatio(accordion, 1.0f);
+    setExpandRatio(optionsTab, 1.0f);
+    
   }
 
+  
+  
   public CorpusListPanel getCorpusList()
   {
     return corpusList;
@@ -85,4 +94,6 @@ public class ControlPanel extends VerticalLayout
   {
     return searchOptions;
   }
+  
+  
 }
