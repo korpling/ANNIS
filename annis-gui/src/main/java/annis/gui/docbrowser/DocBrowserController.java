@@ -31,6 +31,7 @@ import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -72,7 +73,7 @@ public class DocBrowserController implements Serializable
     try
     {
       String type = config.getString("type");
-      String canonicalTitle = "doc view: " + corpus + " > " + doc + " - " + type;
+      String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
 
       // check if a visualization is already initiated
       if (!initiatedVis.containsKey(canonicalTitle))
@@ -81,10 +82,12 @@ public class DocBrowserController implements Serializable
         Component vis = visualizer.createComponent(
           createInput(corpus, doc, config), null);
         initiatedVis.put(canonicalTitle, vis);
+        vis.setCaption(canonicalTitle);
       }
 
+      String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
       Component vis = initiatedVis.get(canonicalTitle);
-      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, doc);
+      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, tabCaption);
       visTab.setIcon(EYE_ICON);
       visTab.setClosable(true);
       ui.getTabSheet().setSelectedTab(vis);
