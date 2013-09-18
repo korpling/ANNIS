@@ -29,6 +29,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -256,12 +257,14 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     {
        ui.getMainTab().replaceComponent(oldPanel, newResultView);
        newTab = ui.getMainTab().getTab(newResultView);
+       
        newTab.setCaption(caption);
     }
     else
     {
       newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
+      newTab.setIcon(new ThemeResource("tango-icons/16x16/internet-news-reader.png"));
     }
     ui.getMainTab().setSelectedTab(newResultView);
     

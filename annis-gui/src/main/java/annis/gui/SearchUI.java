@@ -297,6 +297,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addStyleName("blue-tab");
     
     Tab helpTab = mainTab.addTab(help, "Help");
+    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
    
     hSplit.setSecondComponent(mainTab);

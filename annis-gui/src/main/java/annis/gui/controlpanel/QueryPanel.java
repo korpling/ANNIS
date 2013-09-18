@@ -508,6 +508,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
+        tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
       }
       
       
