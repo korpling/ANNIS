@@ -58,7 +58,7 @@ public class DocBrowserTable extends Table
   // the key for the json config of the doc visualization
   private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
 
-  private JSONArray configArray;
+  private JSONObject docVisualizerConfig;
 
   void setDocNames(List<Annotation> docs)
   {
@@ -88,7 +88,7 @@ public class DocBrowserTable extends Table
     // put stripes to the table
     addStyleName(ChameleonTheme.TABLE_STRIPED);
 
-    this.configArray = getDocBrowserConfig();
+    this.docVisualizerConfig = getDocBrowserConfig();
   }
 
   private class InfoButtonColumnGen implements Table.ColumnGenerator
@@ -174,11 +174,13 @@ public class DocBrowserTable extends Table
       Panel p = new Panel();
       VerticalLayout l = new VerticalLayout();
       p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
-      for (int i = 0; i < configArray.length(); i++)
+      try
       {
-        try
+        JSONArray configArray = docVisualizerConfig.getJSONArray("vis");
+
+        for (int i = 0; i < configArray.length(); i++)
         {
+
           JSONObject config = configArray.getJSONObject(i);
           String docName = ((Annotation) itemId).getName();
           Button openVis = new Button(config.getString("displayName"));
@@ -187,11 +189,13 @@ public class DocBrowserTable extends Table
           openVis.addClickListener(new OpenVisualizerWindow(docName, config));
           openVis.setStyleName(BaseTheme.BUTTON_LINK);
           l.addComponent(openVis);
+
         }
-        catch (JSONException ex)
-        {
-          log.error("cannnot retrieve json object", ex);
-        }
+
+      }
+      catch (JSONException ex)
+      {
+        log.error("cannnot retrieve json object", ex);
       }
 
       p.setContent(l);
@@ -199,7 +203,7 @@ public class DocBrowserTable extends Table
     }
   }
 
-  private JSONArray getDocBrowserConfig()
+  private JSONObject getDocBrowserConfig()
   {
     CorpusConfig corpusConfig = Helper.getCorpusConfig(parent.getCorpus());
 
@@ -212,7 +216,7 @@ public class DocBrowserTable extends Table
     String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
     try
     {
-      return new JSONArray(c);
+      return new JSONObject(c);
     }
     catch (JSONException ex)
     {
