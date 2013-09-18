@@ -23,6 +23,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
 import java.io.UnsupportedEncodingException;
@@ -60,7 +61,13 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private List<Annotation> docs;
 
   // holds the current corpus annotation table, when called from corpus browser
-  private Table corpusAnnoationTable = null;
+  private Table corpusAnnotationTable = null;
+
+  /**
+   * this empty label is currently use for empty metadata list on the left side
+   * of the corpusbrowser
+   */
+  private Label emptyLabel = new Label("none");
 
   public MetaDataPanel(String toplevelCorpusName)
   {
@@ -120,59 +127,34 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       List<BeanItemContainer<Annotation>> l = putInBeanContainer(hashMData);
       Accordion accordion = new Accordion();
       accordion.setSizeFull();
-      layout.addComponent(accordion);
 
-      for (BeanItemContainer<Annotation> item : l)
+      // set output to none if no metadata are available
+      if (l.isEmpty())
       {
-        String corpusName = item.getIdByIndex(0).getCorpusName();
-        accordion.addTab(setupTable(item),
-          (toplevelCorpusName.equals(corpusName)) ? "corpus: " + corpusName
-          : "document: " + corpusName);
+        addEmptyLabel();
+      }
+      else
+      {
+
+        for (BeanItemContainer<Annotation> item : l)
+        {
+          String corpusName = item.getIdByIndex(0).getCorpusName();
+          String path = toplevelCorpusName.equals(corpusName) ? "corpus: " + corpusName
+            : "document: " + corpusName;
+
+          if (item.getItemIds().isEmpty())
+          {
+            accordion.addTab(new Label("none"), path);
+          }
+          else
+          {
+            accordion.addTab(setupTable(item), path);
+          }
+        }
+
+        layout.addComponent(accordion);
       }
     }
-  }
-
-  private List<Annotation> getMetaData(String toplevelCorpusName,
-    String documentName)
-  {
-    List<Annotation> result = new ArrayList<Annotation>();
-    WebResource res = Helper.getAnnisWebResource();
-    try
-    {
-      res = res.path("query").path("corpora")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-
-      if (documentName != null)
-      {
-        res = res.path(documentName);
-      }
-
-      result = res.path("metadata").queryParam("exclude", "true").get(
-        new AnnotationListType());
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    return result;
   }
 
   private Table setupTable(BeanItemContainer<Annotation> metaData)
@@ -205,12 +187,13 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
    */
   private Map<Integer, List<Annotation>> splitListAnnotations()
   {
-    List<Annotation> metadata = getMetaData(toplevelCorpusName, documentName);
+    List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName,
+      documentName);
 
     Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
 
 
-    if(metadata != null && !metadata.isEmpty())
+    if (metadata != null && !metadata.isEmpty())
     {
       // if called from corpus browser sort the other way around.
       if (documentName != null)
@@ -247,14 +230,16 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
       new ArrayList<BeanItemContainer<Annotation>>();
 
+
+
     for (List<Annotation> list : splittedAnnotationsList.values())
     {
       BeanItemContainer<Annotation> metaContainer =
         new BeanItemContainer<Annotation>(Annotation.class);
       metaContainer.addAll(list);
+
       listOfBeanItemCon.add(metaContainer);
     }
-
     return listOfBeanItemCon;
   }
 
@@ -264,9 +249,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     WebResource res = Helper.getAnnisWebResource();
     try
     {
-      res = res.path("query").path("corpora")
+      res = res.path("meta").path("docnames")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      res = res.path("documents");
       docs = res.get(new AnnotationListType());
     }
     catch (UniformInterfaceException ex)
@@ -302,20 +286,22 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
       lastSelectedItem = event.getProperty().toString();
-      List<Annotation> metaData = getMetaData(toplevelCorpusName,
+      List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName,
         lastSelectedItem);
 
       if (metaData == null || metaData.isEmpty())
       {
         super.setCaption("No metadata available");
-        if (corpusAnnoationTable != null)
+        addEmptyLabel();
+        if (corpusAnnotationTable != null)
         {
-          corpusAnnoationTable.removeAllItems();
+          corpusAnnotationTable.removeAllItems();
         }
       }
       else
       {
         super.setCaption("Metadata");
+        removeEmptyLabel();
         loadTable(toplevelCorpusName, metaData);
       }
     }
@@ -327,16 +313,49 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       new BeanItemContainer<Annotation>(Annotation.class);
     metaContainer.addAll(metaData);
 
-    if (corpusAnnoationTable != null)
+    if (corpusAnnotationTable != null)
     {
-      layout.removeComponent(corpusAnnoationTable);
+      layout.removeComponent(corpusAnnotationTable);
     }
 
-    corpusAnnoationTable = setupTable(metaContainer);
-    corpusAnnoationTable.setHeight(100, Unit.PERCENTAGE);
-    corpusAnnoationTable.setWidth(100, Unit.PERCENTAGE);
-    layout.addComponent(corpusAnnoationTable);
-    layout.setExpandRatio(corpusAnnoationTable, 1.0f);
+    layout.removeComponent(emptyLabel);
+    corpusAnnotationTable = setupTable(metaContainer);
+    corpusAnnotationTable.setHeight(100, Unit.PERCENTAGE);
+    corpusAnnotationTable.setWidth(100, Unit.PERCENTAGE);
+    layout.addComponent(corpusAnnotationTable);
+    layout.setExpandRatio(corpusAnnotationTable, 1.0f);
+  }
+
+  /**
+   * Places a label in the middle center of the corpus browser panel.
+   */
+  private void addEmptyLabel()
+  {
+    if (emptyLabel == null)
+    {
+      emptyLabel = new Label("none");
+    }
+
+    if (corpusAnnotationTable != null)
+    {
+      layout.removeComponent(corpusAnnotationTable);
+    }
+
+    layout.addComponent(emptyLabel);
+
+    // this has only an effect after adding the component to a parent. Bug by vaadin?
+    emptyLabel.setSizeUndefined();
+
+    layout.setComponentAlignment(emptyLabel, Alignment.MIDDLE_CENTER);
+    layout.setExpandRatio(emptyLabel, 1.0f);
+  }
+
+  private void removeEmptyLabel()
+  {
+    if (emptyLabel != null)
+    {
+      layout.removeComponent(emptyLabel);
+    }
   }
 
   private static class AnnotationListType extends GenericType<List<Annotation>>

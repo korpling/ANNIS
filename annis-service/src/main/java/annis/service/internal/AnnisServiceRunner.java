@@ -1,5 +1,5 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -28,7 +28,6 @@ import com.sun.jersey.spi.spring.container.SpringComponentProviderFactory;
 import java.io.File;
 import java.net.InetSocketAddress;
 import java.util.EnumSet;
-import java.util.concurrent.TimeUnit;
 import javax.servlet.DispatcherType;
 import org.apache.shiro.web.env.EnvironmentLoaderListener;
 import org.apache.shiro.web.servlet.ShiroFilter;
@@ -37,7 +36,6 @@ import org.eclipse.jetty.servlet.ServletContextHandler;
 import org.eclipse.jetty.servlet.ServletHolder;
 import org.eclipse.jetty.servlets.GzipFilter;
 import org.eclipse.jetty.util.thread.ExecutorThreadPool;
-import org.eclipse.jetty.util.thread.QueuedThreadPool;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.support.GenericXmlApplicationContext;
@@ -45,40 +43,47 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 public class AnnisServiceRunner extends AnnisBaseRunner
 {
 
-  private static final Logger log = LoggerFactory.getLogger(AnnisServiceRunner.class);
+  private static final Logger log = LoggerFactory.getLogger(
+    AnnisServiceRunner.class);
+
   private static AnnisServiceRunner annisServiceRunner;
+
   private boolean isShutdownRequested = false;
+
   private static Thread mainThread;
+
   private Server server;
-  
+
   private boolean useAuthentification = true;
 
   public AnnisServiceRunner()
-  {    
-    boolean nosecurity = Boolean.parseBoolean(System.getProperty("annis.nosecurity", "false"));
+  {
+    boolean nosecurity = Boolean.parseBoolean(System.getProperty(
+      "annis.nosecurity", "false"));
     this.useAuthentification = !nosecurity;
-    if(this.useAuthentification)
+    if (this.useAuthentification)
     {
       log.info("Using authentification");
     }
     else
     {
-      log.warn("*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
+      log.warn(
+        "*NOT* using authentification, your ANNIS service *IS NOT SECURED*");
     }
   }
-  
+
   public static void main(String[] args) throws Exception
   {
-    
+
     boolean daemonMode = false;
-    if(args.length == 1 && ("-d".equals(args[0])))
+    if (args.length == 1 && ("-d".equals(args[0])))
     {
       daemonMode = true;
     }
-    
+
     AnnisBaseRunner.setupLogging(!daemonMode);
 
-    
+
     mainThread = Thread.currentThread();
 
     annisServiceRunner = new AnnisServiceRunner();
@@ -93,7 +98,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
       annisServiceRunner.start(false);
 
-      if(!annisServiceRunner.isShutdownRequested)
+      if (!annisServiceRunner.isShutdownRequested)
       {
         closeSystemStreams();
       }
@@ -107,11 +112,11 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       annisServiceRunner.start(false);
     }
 
-    if(!annisServiceRunner.isShutdownRequested)
+    if (!annisServiceRunner.isShutdownRequested)
     {
       addShutdownHook();
     }
-    
+
     try
     {
       while (!annisServiceRunner.isShutdownRequested)
@@ -155,7 +160,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
     Runtime.getRuntime().addShutdownHook(new Thread()
     {
-
       @Override
       public void run()
       {
@@ -170,14 +174,16 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     // create beans
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
     AnnisXmlContextHelper.prepareContext(ctx);
-    ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").getAbsolutePath());
+    ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").
+      getAbsolutePath());
     ctx.refresh();
 
 
-    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal", "annis.provider", "annis.rest.provider"    );
-    
-    final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(rc,
-      ctx);
+    ResourceConfig rc = new PackagesResourceConfig("annis.service.internal",
+      "annis.provider", "annis.rest.provider");
+
+    final IoCComponentProviderFactory factory = new SpringComponentProviderFactory(
+      rc, ctx);
 
     int port = ctx.getBean(QueryServiceImpl.class).getPort();
     try
@@ -187,59 +193,62 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       // use a HTTP proxy which also should use SSL encryption
       InetSocketAddress addr = new InetSocketAddress("localhost", port);
       server = new Server(addr);
-            
-      ServletContextHandler context = 
+
+      ServletContextHandler context =
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
       // enable gzip compression
-      context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+      context.setInitParameter(
+        "com.sun.jersey.spi.container.ContainerRequestFilters",
         "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+      context.setInitParameter(
+        "com.sun.jersey.spi.container.ContainerResponseFilters",
         "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      
+
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
-      
-      
+
+
       ServletContainer jerseyContainer = new ServletContainer(rc)
       {
         @Override
         protected void initiate(ResourceConfig rc, WebApplication wa)
         {
           wa.initiate(rc, factory);
-        }        
+        }
       };
-      
+
       ServletHolder holder = new ServletHolder(jerseyContainer);
       context.addServlet(holder, "/*");
 
-      
-      if(useAuthentification)
+
+      if (useAuthentification)
       {
         context.setInitParameter("shiroConfigLocations",
-        "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
+          "file:" + System.getProperty("annis.home") + "/conf/shiro.ini");
       }
       else
       {
         context.setInitParameter("shiroConfigLocations",
-        "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
+          "file:" + System.getProperty("annis.home") + "/conf/shiro_no_security.ini");
       }
-      
-      EnumSet<DispatcherType> gzipDispatcher = EnumSet.of(DispatcherType.REQUEST);
+
+      EnumSet<DispatcherType> gzipDispatcher = EnumSet.
+        of(DispatcherType.REQUEST);
       context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
       // enable compression
-      //context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters", 
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters",
       //  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      //context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters", 
+      //context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters",
       ///  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      
+
       // configure Apache Shiro with the web application
       context.addEventListener(new EnvironmentLoaderListener());
       EnumSet<DispatcherType> shiroDispatchers = EnumSet.of(
         DispatcherType.REQUEST, DispatcherType.FORWARD, DispatcherType.INCLUDE,
         DispatcherType.ERROR);
       context.addFilter(ShiroFilter.class, "/*", shiroDispatchers);
-      
+
     }
     catch (IllegalArgumentException ex)
     {
@@ -256,7 +265,9 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   /**
    * Creates and starts the server
-   * @param rethrowExceptions Set to true if you want to get exceptions re-thrown to parent 
+   *
+   * @param rethrowExceptions Set to true if you want to get exceptions
+   * re-thrown to parent
    */
   public void start(boolean rethrowExceptions) throws Exception
   {
@@ -278,16 +289,16 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("could not start ANNIS REST service", ex);
       isShutdownRequested = true;
-      
-      if(rethrowExceptions)
+
+      if (rethrowExceptions)
       {
-        if(!(ex instanceof AnnisException) && ex.getCause() instanceof AnnisException)
+        if (!(ex instanceof AnnisException) && ex.getCause() instanceof AnnisException)
         {
-          throw((AnnisException) ex.getCause());
+          throw ((AnnisException) ex.getCause());
         }
         else
         {
-          throw(ex);
+          throw (ex);
         }
       }
     }
@@ -295,7 +306,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   /**
    * True if authorization is enabled.
-   * @return 
+   *
+   * @return
    */
   public boolean isUseAuthentification()
   {
@@ -304,14 +316,14 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
   /**
    * Set wether you want to protect the service using authentification.
-   * 
+   *
    * Default value is true.
-   * @param useAuthentification True if service should be authentificated, false if not.
+   *
+   * @param useAuthentification True if service should be authentificated, false
+   * if not.
    */
   public void setUseAuthentification(boolean useAuthentification)
   {
     this.useAuthentification = useAuthentification;
   }
-  
-  
 }

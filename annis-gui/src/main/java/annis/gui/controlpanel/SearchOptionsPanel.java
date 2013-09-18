@@ -27,6 +27,8 @@ import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collection;
@@ -38,6 +40,8 @@ import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,12 +91,12 @@ public class SearchOptionsPanel extends FormLayout
   private ComboBox cbSegmentation;
   // TODO: make this configurable
 
-  private static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
+  public static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
   {
     1, 2, 5, 10, 20, 25
   };
 
-  static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
+  public static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
   {
     0, 1, 2, 5, 10, 20
   };
@@ -212,7 +216,7 @@ public class SearchOptionsPanel extends FormLayout
     updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
     updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
     updateResultsPerPage(resultsPerPage, false);
-    updateSegmentations(null, segment);
+    updateSegmentations(segment, null);
 
     cbLeftContext.setNewItemHandler(new CustomContext(cbLeftContext, leftCtx,
       ctxSteps));
@@ -222,39 +226,96 @@ public class SearchOptionsPanel extends FormLayout
       resultsPerPage));
   }
 
-  public void updateSearchPanelConfiguration(Set<String> corpora)
+  public void updateSearchPanelConfigurationInBackground(
+    final Set<String> corpora)
   {
-    // check if a configuration is already calculated
-    String key = buildKey(corpora);
-    if (!lastSelection.containsKey(key))
+    ExecutorService executor = Executors.newSingleThreadExecutor();
+    executor.submit(new Runnable()
     {
-      lastSelection.put(key, generateConfig(corpora));
-    }
+      @Override
+      public void run()
+      {
+        final List<AnnisAttribute> attributes = getAttributesFromService(corpora);
+
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            // check if a configuration is already calculated
+            String key = buildKey(corpora);
+            if (!lastSelection.containsKey(key))
+            {
+              lastSelection.put(key, generateConfig(corpora));
+            }
 
 
-    Integer leftCtx = Integer.parseInt(lastSelection.get(key).getConfig(
-      KEY_MAX_CONTEXT_LEFT));
-    Integer rightCtx = Integer.parseInt(lastSelection.get(key).getConfig(
-      KEY_MAX_CONTEXT_RIGHT));
-    Integer defaultCtx = Integer.parseInt(lastSelection.get(key).getConfig(
-      KEY_DEFAULT_CONTEXT));
-    Integer ctxSteps = Integer.parseInt(lastSelection.get(key).getConfig(
-      KEY_CONTEXT_STEPS));
-    Integer resultsPerPage = Integer.parseInt(lastSelection.get(key).getConfig(
-      KEY_RESULT_PER_PAGE));
-    String segment = lastSelection.get(key).getConfig(
-      KEY_DEFAULT_CONTEXT_SEGMENTATION);
+            Integer leftCtx = Integer.parseInt(lastSelection.get(key).getConfig(
+              KEY_MAX_CONTEXT_LEFT));
+            Integer rightCtx = Integer.parseInt(lastSelection.get(key).
+              getConfig(
+              KEY_MAX_CONTEXT_RIGHT));
+            Integer defaultCtx = Integer.parseInt(lastSelection.get(key).
+              getConfig(
+              KEY_DEFAULT_CONTEXT));
+            Integer ctxSteps = Integer.parseInt(lastSelection.get(key).
+              getConfig(
+              KEY_CONTEXT_STEPS));
+            Integer resultsPerPage = Integer.parseInt(lastSelection.get(key).
+              getConfig(
+              KEY_RESULT_PER_PAGE));
+            String segment = lastSelection.get(key).getConfig(
+              KEY_DEFAULT_CONTEXT_SEGMENTATION);
 
-    // update the left and right context
-    updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
-    updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
-    updateResultsPerPage(resultsPerPage, false);
+            // update the left and right context
+            updateContext(cbLeftContext, leftCtx, ctxSteps, defaultCtx, false);
+            updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
+            updateResultsPerPage(resultsPerPage, false);
 
-    updateSegmentations(corpora, segment);
+            updateSegmentations(segment, attributes);
+          }
+        });
+      }
+    });
+
+
 
   }
 
-  private void updateSegmentations(Set<String> corpora, String segment)
+  private static List<AnnisAttribute> getAttributesFromService(
+    Set<String> corpora)
+  {
+    List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+    WebResource service = Helper.getAnnisWebResource();
+    if (service != null)
+    {
+      for (String corpus : corpora)
+      {
+        try
+        {
+          attributes.addAll(
+            service.path("query").path("corpora").path(URLEncoder.encode(
+            corpus,
+            "UTF-8"))
+            .path("annotations").queryParam(
+            "fetchvalues", "true").
+            queryParam("onlymostfrequentvalues", "true").
+            get(new AnnisAttributeListType()));
+        }
+        catch (UnsupportedEncodingException ex)
+        {
+          log.error(null, ex);
+        }
+      }
+
+
+    }
+
+    return attributes;
+  }
+
+  private void updateSegmentations(String segment,
+    List<AnnisAttribute> attributes)
   {
 
     cbSegmentation.removeAllItems();
@@ -265,49 +326,21 @@ public class SearchOptionsPanel extends FormLayout
     {
       cbSegmentation.setValue(NULL_SEGMENTATION_VALUE);
     }
-    else
+    else if (segment != null)
     {
       cbSegmentation.addItem(segment);
       cbSegmentation.setValue(segment);
     }
 
-    if (corpora != null && !corpora.isEmpty())
+    if (attributes != null && !attributes.isEmpty())
     {
-      // get all segmentation paths
-      WebResource service = Helper.getAnnisWebResource();
-      if (service != null)
+      for (AnnisAttribute att : attributes)
       {
-
-        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
-
-        for (String corpus : corpora)
+        if (AnnisAttribute.Type.segmentation == att.getType()
+          && att.getName() != null
+          && !att.getName().equalsIgnoreCase(segment))
         {
-          try
-          {
-            attributes.addAll(
-              service.path("query").path("corpora").path(URLEncoder.encode(
-              corpus,
-              "UTF-8"))
-              .path("annotations").queryParam(
-              "fetchvalues", "true").
-              queryParam("onlymostfrequentvalues", "true").
-              get(new AnnisAttributeListType()));
-          }
-          catch (UnsupportedEncodingException ex)
-          {
-            log.error(null, ex);
-          }
-        }
-
-
-        for (AnnisAttribute att : attributes)
-        {
-          if (AnnisAttribute.Type.segmentation == att.getType()
-            && att.getName() != null
-            && !att.getName().equalsIgnoreCase(segment))
-          {
-            cbSegmentation.addItem(att.getName());
-          }
+          cbSegmentation.addItem(att.getName());
         }
       }
     }
@@ -510,7 +543,7 @@ public class SearchOptionsPanel extends FormLayout
       }
     }
 
-    if(segmentation == null)
+    if (segmentation == null)
     {
       return corpusConfigurations.get(DEFAULT_CONFIG).getConfig(key);
     }
@@ -625,6 +658,9 @@ public class SearchOptionsPanel extends FormLayout
     c.setValue(defaultCtx);
   }
 
+  
+  
+  
   private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
   {
 
@@ -640,7 +676,7 @@ public class SearchOptionsPanel extends FormLayout
    * @return A String which is a concatenation of all corpus names, sorted by
    * their names.
    */
-  private String buildKey(Set<String> corpusNames)
+  private static String buildKey(Set<String> corpusNames)
   {
     SortedSet<String> names = new TreeSet<String>(corpusNames);
     StringBuilder key = new StringBuilder();

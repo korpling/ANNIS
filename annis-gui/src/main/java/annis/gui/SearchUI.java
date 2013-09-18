@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.components.ExceptionDialog;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
@@ -25,22 +26,23 @@ import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.tutorial.TutorialPanel;
-import annis.libgui.visualizers.IFrameResource;
-import annis.libgui.visualizers.IFrameResourceMap;
+import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
-import com.github.wolfie.refresher.Refresher;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
+import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
@@ -49,9 +51,12 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
@@ -59,11 +64,16 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
+import org.json.JSONArray;
+import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 import org.vaadin.cssinject.CSSInject;
 
@@ -72,11 +82,13 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
+@Push(value = PushMode.MANUAL, transport = Transport.STREAMING)
+@Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
-  LoginWindow.LoginListener,
   MimeTypeErrorListener,
-  Page.UriFragmentChangedListener
+  Page.UriFragmentChangedListener,
+  LoginListener, ErrorHandler, TabSheet.CloseHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -90,27 +102,29 @@ public class SearchUI extends AnnisBaseUI
     "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
     Pattern.MULTILINE | Pattern.DOTALL);
 
+  private HorizontalLayout layoutToolbar;
+
   private Label lblUserName;
 
-  private Button btLoginLogout;
+  private Button btLogin;
+
+  private Button btLogout;
 
   private Button btBugReport;
 
-  private ControlPanel controlPanel;
+  private ScreenshotMaker screenshot;
 
-  private TutorialPanel tutorial;
+  private Throwable lastBugReportCause;
+
+  private ControlPanel controlPanel;
 
   private TabSheet mainTab;
 
   private Window windowLogin;
 
-  private QueryBuilderChooser queryBuilder;
-
   private String bugEMailAddress;
 
   private QueryController queryController;
-
-  private Refresher refresh;
 
   private String lastQueriedFragment;
 
@@ -120,23 +134,22 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  
   @Override
   protected void init(VaadinRequest request)
-  {
+  {    
     super.init(request);
-
+    setErrorHandler(this);
+    
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
-    queryController = new QueryController(this);
+    JavaScript.getCurrent().addFunction("annis.gui.logincallback",
+      new LoginCloseCallback());
 
-    refresh = new Refresher();
-    // deactivate refresher by default
-    refresh.setRefreshInterval(-1);
-    refresh.addListener(queryController);
-    addExtension(refresh);
+    queryController = new QueryController(this);
 
     // always get the resize events directly
     setImmediate(true);
@@ -147,12 +160,12 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
 
-    final ScreenshotMaker screenshot = new ScreenshotMaker(this);
+    screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
 
     css = new CSSInject(this);
 
-    HorizontalLayout layoutToolbar = new HorizontalLayout();
+    layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
     layoutToolbar.setHeight("-1px");
 
@@ -162,7 +175,7 @@ public class SearchUI extends AnnisBaseUI
 
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
+    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
@@ -170,13 +183,12 @@ public class SearchUI extends AnnisBaseUI
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
-    btBugReport.addListener(new Button.ClickListener()
+    btBugReport.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(ClickEvent event)
       {
-        screenshot.makeScreenshot();
-        btBugReport.setCaption("bug report is initialized...");
+        reportBug();
       }
     });
 
@@ -188,34 +200,52 @@ public class SearchUI extends AnnisBaseUI
     {
       this.bugEMailAddress = bugmail;
     }
-    btBugReport.setVisible(this.bugEMailAddress != null);
+    btBugReport.setVisible(canReportBugs());
 
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("-1px");
     lblUserName.setHeight("-1px");
     lblUserName.addStyleName("right-aligned-text");
 
-    btLoginLogout = new Button("Login", new Button.ClickListener()
+    btLogin = new Button("Login", new Button.ClickListener()
     {
       @Override
       public void buttonClick(ClickEvent event)
       {
-        if (isLoggedIn())
-        {
-          // logout
-          Helper.setUser(null);
-          Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
-          updateUserInformation();
-        }
-        else
-        {
-          showLoginWindow();
-        }
+        BrowserFrame frame = new BrowserFrame("login", new ExternalResource(
+          Helper.getContext() + "/login"));
+        frame.setWidth("100%");
+        frame.setHeight("200px");
+
+        windowLogin = new Window("ANNIS Login", frame);
+        windowLogin.setModal(true);
+        windowLogin.setWidth("400px");
+        windowLogin.setHeight("250px");
+
+        addWindow(windowLogin);
+        windowLogin.center();
       }
     });
-    btLoginLogout.setSizeUndefined();
-    btLoginLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btLoginLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
+    
+    btLogout = new Button("Logout", new Button.ClickListener()
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        // logout
+        Helper.setUser(null);
+        Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
+        updateUserInformation();
+      }
+    });
+
+    btLogin.setSizeUndefined();
+    btLogin.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLogin.setIcon(new ThemeResource("../runo/icons/16/user.png"));
+
+    btLogout.setSizeUndefined();
+    btLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     Button btOpenSource = new Button("Help us to make ANNIS better!");
     btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
@@ -240,43 +270,36 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(btOpenSource);
     layoutToolbar.addComponent(lblUserName);
-    layoutToolbar.addComponent(btLoginLogout);
+    layoutToolbar.addComponent(btLogin);
 
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
-    layoutToolbar.setComponentAlignment(btLoginLogout, Alignment.MIDDLE_RIGHT);
+    layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
     layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
 
     //HorizontalLayout hLayout = new HorizontalLayout();
     final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
     hSplit.setSizeFull();
-
+   
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
-    ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
-      "example queries", this);
+    final HelpPanel help = new HelpPanel(this);
 
-    controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
-    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    hSplit.setFirstComponent(controlPanel);
-
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(autoGenQueries, "example queries");
-    mainTab.addTab(tutorial, "Tutorial");
-
-    queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
-    mainTab.addTab(queryBuilder, "Query Builder");
-
+    mainTab.setCloseHandler(this);
+    mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addStyleName("blue-tab");
+    
+    Tab helpTab = mainTab.addTab(help, "Help");
+    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
+    helpTab.setClosable(false);
+   
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
     hSplit.addSplitterClickListener(
@@ -302,63 +325,27 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
-    addAction(new ShortcutListener("^Query builder")
-    {
-      @Override
-      public void handleAction(Object sender, Object target)
-      {
-        mainTab.setSelectedTab(queryBuilder);
-      }
-    });
+    
+    controlPanel = new ControlPanel(this,
+      help.getExamples());
+    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    hSplit.setFirstComponent(controlPanel);
 
+    
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
       public void handleAction(Object sender, Object target)
       {
-        mainTab.setSelectedTab(tutorial);
+        mainTab.setSelectedTab(help);
       }
     });
 
     getPage().addUriFragmentChangedListener(this);
 
-    getSession().addRequestHandler(new RequestHandler()
-    {
-      @Override
-      public boolean handleRequest(VaadinSession session, VaadinRequest request,
-        VaadinResponse response) throws IOException
-      {
-        checkCitation(request);
-
-
-        if (request.getPathInfo() != null && request.getPathInfo().startsWith(
-          "/vis-iframe-res/"))
-        {
-          String uuidString = StringUtils.removeStart(request.getPathInfo(),
-            "/vis-iframe-res/");
-          UUID uuid = UUID.fromString(uuidString);
-          IFrameResourceMap map =
-            VaadinSession.getCurrent().getAttribute(IFrameResourceMap.class);
-          if (map == null)
-          {
-            response.setStatus(404);
-          }
-          else
-          {
-            IFrameResource res = map.get(uuid);
-            if (res != null)
-            {
-              response.setStatus(200);
-              response.setContentType(res.getMimeType());
-              response.getOutputStream().write(res.getData());
-            }
-          }
-          return true;
-        }
-
-        return false;
-      }
-    });
+    getSession().addRequestHandler(new CitationRequestHandler());
+    getSession().addRequestHandler(new ResourceRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
 
@@ -366,11 +353,39 @@ public class SearchUI extends AnnisBaseUI
 
     loadInstanceFonts();
 
-    checkCitation(request);
+    checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
 
+    setPollInterval(-1);
+
     updateUserInformation();
+  }
+
+  @Override
+  public void error(com.vaadin.server.ErrorEvent event)
+  {
+    log.error("Unknown error in some component: " + event.getThrowable().
+      getLocalizedMessage(),
+      event.getThrowable());
+    ExceptionDialog.show(event.getThrowable());
+  }
+
+  public boolean canReportBugs()
+  {
+    return this.bugEMailAddress != null;
+  }
+
+  public void reportBug()
+  {
+    reportBug(null);
+  }
+
+  public void reportBug(Throwable cause)
+  {
+    lastBugReportCause = cause;
+    screenshot.makeScreenshot();
+    btBugReport.setCaption("bug report is initialized...");
   }
 
   private void loadInstanceFonts()
@@ -476,8 +491,12 @@ public class SearchUI extends AnnisBaseUI
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
 
-  public void checkCitation(VaadinRequest request)
+  public void checkCitation()
   {
+    if(VaadinSession.getCurrent() == null || VaadinSession.getCurrent().getSession() == null)
+    {
+      return;
+    }
     Object origURLRaw = VaadinSession.getCurrent().getSession().getAttribute(
       "citation");
     if (origURLRaw == null || !(origURLRaw instanceof String))
@@ -575,7 +594,7 @@ public class SearchUI extends AnnisBaseUI
 
   public void updateUserInformation()
   {
-    if (btLoginLogout == null || lblUserName == null)
+    if (layoutToolbar == null || lblUserName == null)
     {
       return;
     }
@@ -586,26 +605,24 @@ public class SearchUI extends AnnisBaseUI
       {
         lblUserName.setValue("logged in as \"" + ((AnnisUser) user).
           getUserName() + "\"");
-        btLoginLogout.setCaption("Logout");
+        if (layoutToolbar.getComponentIndex(btLogin) > -1)
+        {
+          layoutToolbar.replaceComponent(btLogin, btLogout);
+          layoutToolbar.setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
+        }
       }
     }
     else
     {
       lblUserName.setValue("not logged in");
-      btLoginLogout.setCaption("Login");
+      if (layoutToolbar.getComponentIndex(btLogout) > -1)
+      {
+        layoutToolbar.replaceComponent(btLogout, btLogin);
+        layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+      }
     }
 
     queryController.updateCorpusSetList();
-  }
-
-  private void showLoginWindow()
-  {
-    windowLogin = new LoginWindow();
-    windowLogin.setModal(true);
-    windowLogin.setSizeUndefined();
-
-    addWindow(windowLogin);
-    windowLogin.center();
   }
 
   @Override
@@ -613,15 +630,37 @@ public class SearchUI extends AnnisBaseUI
   {
     AnnisUser user = Helper.getUser();
 
-    if (user != null)
+    if (user == null)
+    {
+      Object loginErrorOject = VaadinSession.getCurrent().getSession().
+        getAttribute(USER_LOGIN_ERROR);
+      if (loginErrorOject != null && loginErrorOject instanceof String)
+      {
+        Notification.show((String) loginErrorOject,
+          Notification.Type.WARNING_MESSAGE);
+      }
+      VaadinSession.getCurrent().getSession().removeAttribute(
+        AnnisBaseUI.USER_LOGIN_ERROR);
+    }
+    else if (user.getUserName() != null)
     {
       Notification.show("Logged in as \"" + user.getUserName() + "\"",
         Notification.Type.TRAY_NOTIFICATION);
     }
 
     updateUserInformation();
-
   }
+
+  @Override
+  public void onTabClose(TabSheet tabsheet, Component tabContent)
+  {
+    tabsheet.removeComponent(tabContent);
+    if(tabContent instanceof ResultViewPanel)
+    {
+      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
+    }
+  }
+  
 
   public boolean isLoggedIn()
   {
@@ -647,12 +686,14 @@ public class SearchUI extends AnnisBaseUI
     if (bugEMailAddress != null)
     {
       ReportBugWindow reportBugWindow =
-        new ReportBugWindow(bugEMailAddress, imageData, mimeType);
+        new ReportBugWindow(bugEMailAddress, imageData, mimeType,
+        lastBugReportCause);
 
       reportBugWindow.setModal(true);
       reportBugWindow.setResizable(true);
       addWindow(reportBugWindow);
       reportBugWindow.center();
+      lastBugReportCause = null;
     }
   }
 
@@ -694,21 +735,21 @@ public class SearchUI extends AnnisBaseUI
         && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.
         contains(mimeType))
       {
-        Notification.show("Media file type unsupported by your browser",
+        new Notification("Media file type unsupported by your browser",
           "Please install the WebM plugin for Internet Explorer 9 from "
           + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
           + " or use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Notification.Type.WARNING_MESSAGE);
+          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
       else
       {
-        Notification.show("Media file type unsupported by your browser",
+        new Notification("Media file type unsupported by your browser",
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList,
-          Notification.Type.WARNING_MESSAGE);
+          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
     }
     else
@@ -784,32 +825,30 @@ public class SearchUI extends AnnisBaseUI
           mappedCorpora.add(c);
         }
       }
-      
+
       // get list of all corpora
       WebResource rootRes = Helper.getAnnisWebResource();
       List<AnnisCorpus> allCorpora = rootRes.path("query").path("corpora")
-        .get(new GenericType<List<AnnisCorpus>>() {});
+        .get(new GenericType<List<AnnisCorpus>>()
+      {
+      });
       Set<String> allCorpusNames = new HashSet<String>();
-      for(AnnisCorpus c : allCorpora)
+      for (AnnisCorpus c : allCorpora)
       {
         allCorpusNames.add(c.getName());
       }
-      
+
       // remove all corpora selections that do not exist
       boolean someCorporaRemoved = mappedCorpora.retainAll(allCorpusNames);
-      
-      if(someCorporaRemoved)
+
+      if (someCorporaRemoved)
       {
         // show a warning message that the corpus was not imported yet
-        new Notification("Linked corpus does not exist", 
+        new Notification("Linked corpus does not exist",
           "The corpus you wanted to access unfortunally does not (yet) exist in ANNIS<br/>"
           + "A possible reason is that it has not been imported yet. Please ask the "
-          + "responsible person of the site that contained the link to import the corpus.", 
+          + "responsible person of the site that contained the link to import the corpus.",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      }
-      else
-      {
-        queryController.setQuery(new Query("tok", mappedCorpora));
       }
     }
     else if (args.get("cl") != null && args.get("cr") != null)
@@ -821,16 +860,25 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
     else
     {
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
   }
 
+  /**
+   * Updates the browser address bar with the current query paramaters and the
+   * query itself.
+   *
+   * This is for convenient reloading the vaadin app and easy copying citation
+   * links.
+   *
+   * @param q The query where the parameters are extracted from.
+   */
   public void updateFragment(PagedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
@@ -842,21 +890,56 @@ public class SearchUI extends AnnisBaseUI
     UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
 
     // reset title
-    getPage().setTitle(instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
+    getPage().setTitle(
+      instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
   }
 
-  public void setRefresherEnabled(boolean enabled)
+  /**
+   * Adds the _c fragement to the URL in the browser adress bar when a corpus is
+   * selected.
+   *
+   * @param corpora A list of corpora, which are add to the fragment.
+   */
+  public void updateFragementWithSelectedCorpus(Set<String> corpora)
   {
-    if (refresh != null)
+    if (corpora != null && !corpora.isEmpty())
     {
-      if (enabled)
+      String fragment = "_c=" + Helper.encodeBase64URL(StringUtils.
+        join(corpora, ","));
+      UI.getCurrent().getPage().setUriFragment(fragment);
+    }
+    else
+    {
+      UI.getCurrent().getPage().setUriFragment("");
+    }
+  }
+  
+  
+
+  private class CitationRequestHandler implements RequestHandler
+  {
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request,
+      VaadinResponse response) throws IOException
+    {
+      checkCitation();
+      return false;
+    }
+  }
+
+  private class LoginCloseCallback implements JavaScriptFunction
+  {
+
+    @Override
+    public void call(JSONArray arguments) throws JSONException
+    {
+      if (windowLogin != null)
       {
-        refresh.setRefreshInterval(1000);
+        removeWindow(windowLogin);
+
       }
-      else
-      {
-        refresh.setRefreshInterval(-1);
-      }
+      onLogin();
     }
   }
 
@@ -888,8 +971,4 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  public TabSheet getTabSheet()
-  {
-    return mainTab;
-  }
 }

@@ -27,8 +27,28 @@
       <param-name>widgetset</param-name>        	
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
-   
   </servlet>
+  <filter>
+    <filter-name>Push_Mime</filter-name>
+    <filter-class>annis.gui.FixPushMimeFilter</filter-class>
+  </filter>
+  <!--
+  <servlet>
+    <servlet-name>Admin</servlet-name>
+    <servlet-class>annis.gui.servlets.AnnisVaadinServlet</servlet-class>
+    <init-param>
+      <param-name>UI</param-name>
+      <param-value>annis.gui.AdminUI</param-value>
+    </init-param>
+    <init-param>
+      <description>
+        Application widgetset
+      </description>
+      <param-name>widgetset</param-name>        	
+      <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
+    </init-param>
+  </servlet>
+  -->
   <servlet>
     <servlet-name>CitationRedirectionServlet</servlet-name>
     <servlet-class>annis.gui.servlets.CitationRedirectionServlet</servlet-class>
@@ -41,11 +61,21 @@
     <servlet-name>BinaryServlet</servlet-name>
     <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
   </servlet>
+  <servlet>
+    <servlet-name>LoginServlet</servlet-name>
+    <servlet-class>annis.gui.servlets.LoginServlet</servlet-class>
+  </servlet>
 
   <servlet-mapping>
     <servlet-name>Search</servlet-name>
     <url-pattern>/*</url-pattern>
   </servlet-mapping>
+  <!--
+  <servlet-mapping>
+    <servlet-name>Admin</servlet-name>
+    <url-pattern>/admin/*</url-pattern>
+  </servlet-mapping>
+  -->
   <servlet-mapping>
     <servlet-name>CitationRedirectionServlet</servlet-name>
     <url-pattern>/Cite/*</url-pattern>
@@ -58,5 +88,14 @@
     <servlet-name>BinaryServlet</servlet-name>
     <url-pattern>/Binary/*</url-pattern>
   </servlet-mapping>
+  <servlet-mapping>
+    <servlet-name>LoginServlet</servlet-name>
+    <url-pattern>/login</url-pattern>
+  </servlet-mapping>
+    
+  <filter-mapping>>
+    <filter-name>Push_Mime</filter-name>
+    <url-pattern>/PUSH/*</url-pattern>
+  </filter-mapping>
     
 </web-app>

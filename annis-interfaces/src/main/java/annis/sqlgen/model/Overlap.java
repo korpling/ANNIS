@@ -28,4 +28,11 @@ public class Overlap extends Join {
 		return "overlaps node " + target.getId();
 	}
 
+  @Override
+  public String toAqlOperator()
+  {
+    return "_o_";
+  }
+
+  
 }

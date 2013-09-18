@@ -320,7 +320,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           else
           {
             log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorpora(migratePath);
+            corpusAdministration.importCorporaSave(true, null, false, migratePath);
           }
         }
 
@@ -339,6 +339,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   {
     Options options = new OptionBuilder().addToggle("o", "overwrite", false,
       "Overwrites a corpus, when it is already stored in the database.")
+      .addParameter("m", "mail", "e-mail adress to where status updates should be send")
       .createOptions();
 
     try
@@ -358,11 +359,17 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       if (cmdLine.hasOption('o'))
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), true);
+        corpusAdministration.importCorporaSave(true, 
+          options.getOption("mail").getValue(), 
+          false,
+          cmdLine.getArgList());
       }
       else
       {
-        corpusAdministration.importCorpora(cmdLine.getArgList(), false);
+        corpusAdministration.importCorporaSave(false, 
+          options.getOption("mail").getValue(), 
+          false,
+          cmdLine.getArgList());
       }
     }
     catch (ParseException ex)

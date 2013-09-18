@@ -56,30 +56,36 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
+public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
+{
 
   @Override
-  public String getShortName() {
+  public String getShortName()
+  {
     return "kwic";
   }
 
   @Override
   public KWICInterface createComponent(VisualizerInput visInput,
-          VisualizationToggle visToggle) {
+    VisualizationToggle visToggle)
+  {
     MediaController mediaController = VaadinSession.getCurrent().getAttribute(
-            MediaController.class);
+      MediaController.class);
     PDFController pdfController = VaadinSession.getCurrent().getAttribute(
-            PDFController.class);
+      PDFController.class);
 
     EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().
-            getSTextualDSs();
+      getSTextualDSs();
 
     // having the KWIC nested in a panel can slow down rendering
-    if (texts.size() == 1) {
+    if (texts.size() == 1)
+    {
       // directly return the single non-nested KWIC panel
       return new KWICPanelImpl(visInput, mediaController, pdfController, texts.
-              get(0));
-    } else {
+        get(0));
+    }
+    else
+    {
       // return a more complicated implementation which can handle several texts
       return new KWICMultipleTextImpl(visInput, mediaController, pdfController);
     }
@@ -87,15 +93,17 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
   @Override
   public void setVisibleTokenAnnosVisible(KWICInterface visualizerImplementation,
-          Set<String> annos) {
+    Set<String> annos)
+  {
     visualizerImplementation.setVisibleTokenAnnosVisible(annos);
   }
 
   @Override
   public void setSegmentationLayer(KWICInterface visualizerImplementation,
-          String segmentationName, Map<SNode, Long> markedAndCovered) {
+    String segmentationName, Map<SNode, Long> markedAndCovered)
+  {
     visualizerImplementation.setSegmentationLayer(segmentationName,
-            markedAndCovered);
+      markedAndCovered);
   }
 
   /**
@@ -103,12 +111,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
    * their context in a table like view. This is the basic interface for
    * different variants of the KWIC panel implementation.
    */
-  public interface KWICInterface extends Component {
+  public interface KWICInterface extends Component
+  {
 
     public void setVisibleTokenAnnosVisible(Set<String> annos);
 
     public void setSegmentationLayer(String segmentationName,
-            Map<SNode, Long> markedAndCovered);
+      Map<SNode, Long> markedAndCovered);
   }
 
   /**
@@ -116,19 +125,23 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
    * to an extra div.
    */
   public static class KWICMultipleTextImpl extends CssLayout
-          implements KWICInterface {
+    implements KWICInterface
+  {
 
     private List<KWICPanelImpl> kwicPanels;
 
     public KWICMultipleTextImpl(VisualizerInput visInput,
-            MediaController mediaController, PDFController pdfController) {
+      MediaController mediaController, PDFController pdfController)
+    {
       this.kwicPanels = new LinkedList<KWICPanelImpl>();
-      if (visInput != null) {
+      if (visInput != null)
+      {
         EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().
-                getSTextualDSs();
-        for (STextualDS t : texts) {
+          getSTextualDSs();
+        for (STextualDS t : texts)
+        {
           KWICPanelImpl kwic = new KWICPanelImpl(visInput, mediaController,
-                  pdfController, t);
+            pdfController, t);
           kwicPanels.add(kwic);
 
           addComponent(kwic);
@@ -137,16 +150,20 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
     }
 
     @Override
-    public void setVisibleTokenAnnosVisible(Set<String> annos) {
-      for (KWICPanelImpl kwic : kwicPanels) {
+    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    {
+      for (KWICPanelImpl kwic : kwicPanels)
+      {
         kwic.setVisibleTokenAnnosVisible(annos);
       }
     }
 
     @Override
     public void setSegmentationLayer(String segmentationName,
-            Map<SNode, Long> markedAndCovered) {
-      for (KWICPanelImpl kwic : kwicPanels) {
+      Map<SNode, Long> markedAndCovered)
+    {
+      for (KWICPanelImpl kwic : kwicPanels)
+      {
         kwic.setSegmentationLayer(segmentationName, markedAndCovered);
       }
     }
@@ -156,39 +173,31 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
    * Implementation for one single text.
    */
   public static class KWICPanelImpl extends Table
-          implements ItemClickEvent.ItemClickListener, KWICInterface {
+    implements ItemClickEvent.ItemClickListener, KWICInterface
+  {
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(
-            KWICPanelImpl.class);
-
+      KWICPanelImpl.class);
     private transient SDocument result;
-
     private static final String DUMMY_COLUMN = "dummyColumn";
-
     private BeanItemContainer<String> containerAnnos;
-
     private List<String> baseAnnoSet;
-
     private transient Map<SNode, Long> markedAndCovered;
-
     private transient MediaController mediaController;
-
     // only used for media files
-    private String[] media_annotations = {
+    private String[] media_annotations =
+    {
       "time"
     };
-
     private List<Object> generatedColumns;
-
     private transient VisualizerInput visInput;
-
     private transient STextualDS text;
-
     private transient PDFController pdfController;
 
     public KWICPanelImpl(VisualizerInput visInput,
-            MediaController mediaController, PDFController pdfController,
-            STextualDS text) {
+      MediaController mediaController, PDFController pdfController,
+      STextualDS text)
+    {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
       this.mediaController = mediaController;
@@ -197,17 +206,19 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
       if (visInput != null)
       {
-        baseAnnoSet =  EventExtractor.computeDisplayAnnotations(visInput, SToken.class);
+        baseAnnoSet = EventExtractor.computeDisplayAnnotations(visInput,
+          SToken.class);
         initKWICPanel(visInput.getSResult(),
-                visInput.getVisibleTokenAnnos(),
-                visInput.getMarkedAndCovered(),
-                visInput.getSegmentationName());
+          visInput.getVisibleTokenAnnos(),
+          visInput.getMarkedAndCovered(),
+          visInput.getSegmentationName());
       }
     }
 
     private void initKWICPanel(SDocument result,
-            Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
-            String segmentationName) {
+      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
+      String segmentationName)
+    {
       this.result = result;
       this.markedAndCovered = markedAndCovered;
       this.addListener((ItemClickEvent.ItemClickListener) this);
@@ -230,7 +241,8 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
       addStyleName("single-result");
 
-      if (CommonHelper.containsRTLText(text.getSText())) {
+      if (CommonHelper.containsRTLText(text.getSText()))
+      {
         addStyleName("rtl");
       }
 
@@ -240,20 +252,24 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       Long lastTokenIndex = null;
 
       List<SNode> token = CommonHelper.getSortedSegmentationNodes(
-              segmentationName, graph);
+        segmentationName, graph);
 
-      for (SNode t : token) {
+      for (SNode t : token)
+      {
         STextualDS tokenText = null;
         EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
         types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
 
 
         EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
-                t,
-                types);
-        if (dataSources != null) {
-          for (SDataSourceSequence seq : dataSources) {
-            if (seq.getSSequentialDS() instanceof STextualDS) {
+          t,
+          types);
+        if (dataSources != null)
+        {
+          for (SDataSourceSequence seq : dataSources)
+          {
+            if (seq.getSSequentialDS() instanceof STextualDS)
+            {
               tokenText = (STextualDS) seq.getSSequentialDS();
               break;
             }
@@ -261,50 +277,59 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
         }
 
         Long tokenIndex = null;
-        RelannisNodeFeature featRelannis = 
-          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).getValue();
-        
-        if(featRelannis != null)
+        RelannisNodeFeature featRelannis =
+          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
+          AnnisConstants.FEAT_RELANNIS_NODE).getValue();
+
+        if (featRelannis != null)
         {
-           tokenIndex = segmentationName == null ? featRelannis.getTokenIndex() : 
-            featRelannis.getSegIndex();
+          tokenIndex = segmentationName == null ? featRelannis.getTokenIndex()
+            : featRelannis.getSegIndex();
         }
-        
-        if (tokenText == text) {
+
+        if (tokenText == text)
+        {
           // TODO: howto nativly detect gaps in Salt?
           if (lastTokenIndex != null && tokenIndex != null
-                  && tokenIndex > (lastTokenIndex.
-                  longValue() + 1)) {
+            && tokenIndex > (lastTokenIndex.
+            longValue() + 1))
+          {
             // add "(...)"
             Long gapColumnID = tokenIndex;
             addGeneratedColumn(gapColumnID,
-                    new KWICPanelImpl.GapColumnGenerator());
+              new KWICPanelImpl.GapColumnGenerator());
             generatedColumns.add(gapColumnID);
             setColumnExpandRatio(gapColumnID, 0.0f);
             visible.add(gapColumnID);
           }
 
           //add a column for each token
-          try {
+          try
+          {
             addGeneratedColumn(t.getSId(),
-                    new KWICPanelImpl.TokenColumnGenerator(t, segmentationName));
+              new KWICPanelImpl.TokenColumnGenerator(t, segmentationName));
             generatedColumns.add(t.getSId());
             setColumnExpandRatio(t.getSId(), 0.0f);
-          } catch (IllegalArgumentException ex) {
+          }
+          catch (IllegalArgumentException ex)
+          {
             log.error("unknown", ex);
           }
           visible.add(t.getSId());
 
 
-          if (tokenIndex != null) {
+          if (tokenIndex != null)
+          {
             lastTokenIndex = tokenIndex;
           }
         } // end if token belongs to text
       }
 
-      addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator() {
+      addGeneratedColumn(DUMMY_COLUMN, new Table.ColumnGenerator()
+      {
         @Override
-        public Object generateCell(Table source, Object itemId, Object columnId) {
+        public Object generateCell(Table source, Object itemId, Object columnId)
+        {
           return "";
         }
       });
@@ -329,8 +354,10 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
     }
 
     @Override
-    public void setVisibleTokenAnnosVisible(Set<String> annos) {
-      if (containerAnnos != null) {
+    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    {
+      if (containerAnnos != null)
+      {
         containerAnnos.removeAllItems();
         containerAnnos.addItem("tok");
 
@@ -342,10 +369,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
     @Override
     public void setSegmentationLayer(String segmentationName,
-            Map<SNode, Long> markedAndCovered) {
+      Map<SNode, Long> markedAndCovered)
+    {
       // delete old columns
-      if (generatedColumns != null) {
-        for (Object o : generatedColumns) {
+      if (generatedColumns != null)
+      {
+        for (Object o : generatedColumns)
+        {
           removeGeneratedColumn(o);
         }
       }
@@ -353,22 +383,27 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       // re-init the complete KWIC
 
       generatedColumns = new LinkedList<Object>();
-      if (visInput != null) {
+      if (visInput != null)
+      {
         initKWICPanel(visInput.getSResult(),
-                visInput.getVisibleTokenAnnos(),
-                markedAndCovered,
-                segmentationName);
+          visInput.getVisibleTokenAnnos(),
+          markedAndCovered,
+          segmentationName);
 
       }
     }
 
     public class TooltipGenerator implements
-            AbstractSelect.ItemDescriptionGenerator {
+      AbstractSelect.ItemDescriptionGenerator
+    {
 
-      public String generateDescription(String layer, SNode node) {
+      public String generateDescription(String layer, SNode node)
+      {
         SAnnotation a = node.getSAnnotation(layer);
-        if (a != null) {
-          if ("annis::time".equals(a.getQName())) {
+        if (a != null)
+        {
+          if ("annis::time".equals(a.getQName()))
+          {
 
             return "play excerpt " + getShortenedTime(a.getValueString());
           }
@@ -380,16 +415,20 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
 
       @Override
       public String generateDescription(Component source, Object itemId,
-              Object propertyId) {
-        if (result == null) {
+        Object propertyId)
+      {
+        if (result == null)
+        {
           log.error("TooltipGenerator was restored from serialization and "
-                  + "can not generate new cells");
+            + "can not generate new cells");
           return null;
         }
 
-        if (propertyId != null && propertyId instanceof String) {
+        if (propertyId != null && propertyId instanceof String)
+        {
           SNode node = result.getSDocumentGraph().getSNode((String) propertyId);
-          if (node != null) {
+          if (node != null)
+          {
             return generateDescription((String) itemId, node);
           }
         }
@@ -397,23 +436,34 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
     }
 
-    public class KWICStyleGenerator implements Table.CellStyleGenerator {
+    public class KWICStyleGenerator implements Table.CellStyleGenerator
+    {
 
-      public String getStyle(String layer, SNode node) {
-        if ("tok".equals(layer)) {
+      public String getStyle(String layer, SNode node)
+      {
+        if ("tok".equals(layer))
+        {
 
-          if (markedAndCovered != null && markedAndCovered.containsKey(node)) {
+          if (markedAndCovered != null && markedAndCovered.containsKey(node))
+          {
             // add color
             return MatchedNodeColors.colorClassByMatch(markedAndCovered.
-                    get(node));
-          } else {
+              get(node));
+          }
+          else
+          {
             return null;
           }
-        } else {
+        }
+        else
+        {
           SAnnotation a = node.getSAnnotation(layer);
-          if (a != null) {
-            for (String media_anno : media_annotations) {
-              if (media_anno.equals(a.getName())) {
+          if (a != null)
+          {
+            for (String media_anno : media_annotations)
+            {
+              if (media_anno.equals(a.getName()))
+              {
                 return "kwic-media";
               }
             }
@@ -423,16 +473,20 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
 
       @Override
-      public String getStyle(Table source, Object itemId, Object propertyId) {
-        if (result == null) {
+      public String getStyle(Table source, Object itemId, Object propertyId)
+      {
+        if (result == null)
+        {
           log.error("KWICStyleGenerator was restored from serialization and "
-                  + "can not generate new cells");
+            + "can not generate new cells");
           return null;
 
         }
-        if (propertyId != null && propertyId instanceof String) {
+        if (propertyId != null && propertyId instanceof String)
+        {
           SNode node = result.getSDocumentGraph().getSNode((String) propertyId);
-          if (node != null) {
+          if (node != null)
+          {
             return getStyle((String) itemId, node);
           }
         }
@@ -441,10 +495,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
     }
 
-    public static class GapColumnGenerator implements Table.ColumnGenerator {
+    public static class GapColumnGenerator implements Table.ColumnGenerator
+    {
 
-      public Object generateCell(String layer) {
-        if ("tok".equals(layer)) {
+      public Object generateCell(String layer)
+      {
+        if ("tok".equals(layer))
+        {
           return "(...)";
         }
 
@@ -452,37 +509,42 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
 
       @Override
-      public Object generateCell(Table source, Object itemId, Object columnId) {
+      public Object generateCell(Table source, Object itemId, Object columnId)
+      {
         return generateCell((String) itemId);
       }
     }
 
-    public class TokenColumnGenerator implements Table.ColumnGenerator {
+    public class TokenColumnGenerator implements Table.ColumnGenerator
+    {
 
       private transient Map<String, SAnnotation> annotationsByQName;
-
       private transient SNode token;
-
       private String segmentationName;
 
-      public TokenColumnGenerator(SNode token, String segmentationName) {
+      public TokenColumnGenerator(SNode token, String segmentationName)
+      {
         this.token = token;
         this.segmentationName = segmentationName;
         annotationsByQName = new HashMap<String, SAnnotation>();
-        for (SAnnotation a : token.getSAnnotations()) {
+        for (SAnnotation a : token.getSAnnotations())
+        {
           annotationsByQName.put(a.getQName(), a);
           // also add non-qualified name if we are working on a segmentation path
-          if (a.getSName().equals(segmentationName)) {
+          if (a.getSName().equals(segmentationName))
+          {
             annotationsByQName.put(a.getSName(), a);
           }
         }
       }
 
-      public Object generateCell(String layer) {
+      public Object generateCell(String layer)
+      {
 
-        if (result == null || token == null || annotationsByQName == null) {
+        if (result == null || token == null || annotationsByQName == null)
+        {
           log.error("TokenColumnGenerator was restored from serialization and "
-                  + "can not generate new cells");
+            + "can not generate new cells");
           return new Label("ERROR");
         }
 
@@ -491,27 +553,37 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
         SDocumentGraph docGraph = result.getSDocumentGraph();
 
 
-        if ("tok".equals(layer)) {
-          if (segmentationName == null) {
+        if ("tok".equals(layer))
+        {
+          if (segmentationName == null)
+          {
             SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
-                    textualRelation).get(0);
+              textualRelation).get(0);
 
             return ((String) seq.getSSequentialDS().getSData()).substring(seq.
-                    getSStart(), seq.getSEnd());
+              getSStart(), seq.getSEnd());
 
-          } else {
+          }
+          else
+          {
             SAnnotation a = annotationsByQName.get(segmentationName);
-            if (a != null) {
+            if (a != null)
+            {
               return a.getValueString();
             }
 
           }
 
-        } else {
+        }
+        else
+        {
           SAnnotation a = annotationsByQName.get(layer);
-          if (a != null) {
-            for (String media_anno : media_annotations) {
-              if (media_anno.equals(a.getName())) {
+          if (a != null)
+          {
+            for (String media_anno : media_annotations)
+            {
+              if (media_anno.equals(a.getName()))
+              {
                 return "";
 //                return getShortenedTime(a.getValueString());
               }
@@ -524,45 +596,57 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
 
       @Override
-      public Object generateCell(Table source, Object itemId, Object columnId) {
+      public Object generateCell(Table source, Object itemId, Object columnId)
+      {
         return generateCell((String) itemId);
       }
     }
 
-    private String getShortenedTime(String time) {
+    private String getShortenedTime(String time)
+    {
       String[] splitTime = StringUtils.splitByWholeSeparator(time,
-              "-", 2);
+        "-", 2);
       double startTime = Double.parseDouble(splitTime[0]);
-      double endTime = splitTime.length > 1 ? Double.parseDouble(splitTime[1]) : -1;
+      double endTime = splitTime.length > 1 ? Double.parseDouble(splitTime[1])
+        : -1;
 
       NumberFormat format = DecimalFormat.getInstance(Locale.US);
       format.setMaximumFractionDigits(4);
       format.setMinimumFractionDigits(0);
-      if (endTime >= 0) {
+      if (endTime >= 0)
+      {
         return format.format(startTime) + "-" + format.format(endTime);
-      } else {
+      }
+      else
+      {
         return format.format(startTime);
       }
     }
 
     @Override
-    public void itemClick(ItemClickEvent event) {
+    public void itemClick(ItemClickEvent event)
+    {
 
       // check if it is a time annotation
       String buttonName = (String) event.getItemId();
 
-      if (buttonName == null) {
+      if (buttonName == null)
+      {
         return;
       }
 
-      if (buttonName.matches("(annis::)?time")) {
+      if (buttonName.matches("(annis::)?time"))
+      {
         String time = null;
         String tokenID = (String) event.getPropertyId();
 
         SNode token = result.getSDocumentGraph().getSNode(tokenID);
-        for (SAnnotation anno : token.getSAnnotations()) {
-          for (String media_anno : media_annotations) {
-            if (media_anno.equals(anno.getName())) {
+        for (SAnnotation anno : token.getSAnnotations())
+        {
+          for (String media_anno : media_annotations)
+          {
+            if (media_anno.equals(anno.getName()))
+            {
               time = anno.getValueString();
             }
           }
@@ -570,14 +654,17 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
         startMediaVisualizers(time);
       } // end checkbuttonName
 
-      if (buttonName.matches("(annis::)?page") && pdfController != null) {
+      if (buttonName.matches("(annis::)?page") && pdfController != null)
+      {
 
         String page = null;
         String tokenID = (String) event.getPropertyId();
         SNode token = result.getSDocumentGraph().getSNode(tokenID);
 
-        for (SAnnotation anno : token.getSAnnotations()) {
-          if ("page".equals(anno.getName())) {
+        for (SAnnotation anno : token.getSAnnotations())
+        {
+          if ("page".equals(anno.getName()))
+          {
             page = anno.getValueString();
           }
         }
@@ -587,22 +674,37 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface> {
       }
     }
 
-    public void startMediaVisualizers(String time) {
+    public void startMediaVisualizers(String time)
+    {
 
       // do not start the media player, when there is only an
       // end time defined
-      if (time == null || time.matches("\\-[0-9]*(\\.[0-9]*)?")) {
+      if (time == null || time.matches("\\-[0-9]*(\\.[0-9]*)?"))
+      {
         return;
       }
 
-      if (mediaController != null && visInput != null) {
+      if (mediaController != null && visInput != null)
+      {
 
         String[] split = time.split("-");
-        if (split.length == 1) {
-          mediaController.play(visInput.getId(), Double.parseDouble(split[0]));
-        } else if (split.length == 2) {
+
+
+        if (split.length == 1)
+        {
+
+          double val1 = Double.parseDouble(split[0]);
+          mediaController.play(visInput.getId(), val1);
+        }
+        else if (split.length == 2)
+        {
+
+          double val1 = Double.parseDouble(split[0]);
+          double val2 = Double.parseDouble(split[1]);
+
+          // use min/max if by accident the annotations are reversed
           mediaController.play(visInput.getId(),
-                  Double.parseDouble(split[0]), Double.parseDouble(split[1]));
+            Math.min(val1, val2), Math.max(val1, val2));
         }
       }
     }

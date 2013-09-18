@@ -9,3 +9,4 @@
 (MIT License) html2canvas 0.4.0 (http://html2canvas.hertzen.com)
 (Apache License, Version 2.0) pdf.js (http://mozilla.github.io/pdf.js/)
 (MIT License) jQuery Noty Plugin v0.1 (http://needim.github.com/noty/)
+(MIT License) MediaElement.js (http://mediaelementjs.com/)

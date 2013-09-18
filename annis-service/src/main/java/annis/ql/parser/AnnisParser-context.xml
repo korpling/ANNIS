@@ -33,42 +33,18 @@ limitations under the License.
     </property>
   </bean>
   
-	<!-- Annis QL Parser -->
-	<bean id="annisParser" class="annis.ql.parser.AnnisParser">
-		<lookup-method name="getInternalParser" bean="annisInternalParser"/>
-		<lookup-method name="getPostProcessors" bean="annisParserPostProcessors"/>
-	</bean>
-	
-	<!-- internal SableCC parser -->
-	<bean id="annisInternalParser" class="annis.ql.parser.AnnisParser$InternalParser" scope="prototype"/>
-		
-	<!-- default post-processors -->
-	<util:list id="annisParserPostProcessors" value-type="annis.ql.analysis.DepthFirstAdapter" scope="prototype">
-		<bean class="annis.ql.parser.NodeSearchNormalizer" scope="prototype" />
-		<bean class="annis.ql.parser.QueryValidator" scope="prototype"/>
+  <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype"> 
+    <bean class="annis.ql.parser.SemanticValidator" 
+          scope="prototype" />
+    <bean class="annis.ql.parser.ComponentSearchRelationNormalizer" 
+          scope="prototype" />
+		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" 
+          scope="prototype" />
 	</util:list>
   
-  <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype">
-		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" scope="prototype" />
-	</util:list>
-
-  <!-- transforms a AQL query into its disjunctive normal form -->
-  <bean id="aqlDnfTransformer" class="annis.ql.parser.DnfTransformer" scope="prototype" />
-
-  <bean id="aqlClauseAnalysis" class="annis.ql.parser.ClauseAnalysis" scope="prototype">
+  <bean id="annisParserAntlr" class="annis.ql.parser.AnnisParserAntlr">
     <property name="precedenceBound" value="${annis.precedence-restriction}"/>
-  </bean>
-
-  <bean id="nodeRelationNormalizer" class="annis.ql.parser.NodeRelationNormalizer" scope="prototype">
-  </bean>
-  
-  <bean id="aqlAnalysis" class="annis.ql.parser.QueryAnalysis">
-    <lookup-method name="getDnfTransformer" bean="aqlDnfTransformer"/>
-    <lookup-method name="getClauseAnalysis" bean="aqlClauseAnalysis"/>
-    <lookup-method name="getNodeRelationNormalizer" bean="nodeRelationNormalizer"/>
-   
     <property name="postProcessors" ref="queryAnalysisPostProcessors" />    
-    <property name="normalizeNodesInEdgeRelations" value="${annis.normalize-nodes-in-edge-relations}"/>
   </bean>
 
 </beans>

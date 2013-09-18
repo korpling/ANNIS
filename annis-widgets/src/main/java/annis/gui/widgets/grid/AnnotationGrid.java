@@ -44,6 +44,34 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 
   private int tokenIndexOffset;
 
+  private String tokRowKey = "tok";
+
+  /**
+   * Returns a generic Grid-Object.
+   *
+   * @param resultID The salt Id of the result.
+   */
+  public AnnotationGrid(String resultID)
+  {
+    this(null, null, resultID);
+  }
+
+  /**
+   * Returns a generic Grid-Object.
+   *
+   * @param resultID The salt Id of the result.
+   * @param tokRowKey Defines the tok row and applies the token style. If null
+   * the "tok" value is used.
+   */
+  public AnnotationGrid(String resultID, String tokRowKey)
+  {
+    this(null, null, resultID);
+    if (tokRowKey != null)
+    {
+      this.tokRowKey = tokRowKey;
+    }
+  }
+
   public AnnotationGrid(MediaController mediaController,
     PDFController pdfController, String resultID)
   {
@@ -120,6 +148,11 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
             target.addAttribute("right", event.getRight() - tokenIndexOffset);
             target.addAttribute("value", event.getValue());
 
+            if (event.getTooltip() != null)
+            {
+              target.addAttribute("tooltip", event.getTooltip());
+            }
+
             if (event.getStartTime() != null)
             {
               target.addAttribute("startTime", event.getStartTime());
@@ -160,7 +193,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   {
     ArrayList<String> styles = new ArrayList<String>();
 
-    if ("tok".equals(annoName))
+    if (tokRowKey.equals(annoName))
     {
       styles.add("token");
     }

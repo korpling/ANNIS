@@ -2,7 +2,8 @@
 *.log
 *~
 /.netbeans/
-/annis-service-implementation/.settings/
+/annis-service/.settings/
+/annis-service/src/main/antlr3/annis/ql/output/
 target/
 /annis-kickstarter/.settings/
 /.settings/

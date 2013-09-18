@@ -15,6 +15,7 @@
  */
 package annis.utils;
 
+import annis.CommonHelper;
 import annis.service.objects.AnnisResultImpl;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
@@ -139,6 +140,9 @@ public class LegacyGraphConverter
     Set<String> matchSet = new HashSet<String>(matchedNodeNames);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
+    annoGraph.setPath(
+      CommonHelper.getCorpusPath(docGraph.getSDocument().getSCorpusGraph(), 
+      docGraph.getSDocument()).toArray(new String[0]));
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
     Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();

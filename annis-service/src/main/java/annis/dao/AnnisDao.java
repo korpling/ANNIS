@@ -53,12 +53,12 @@ public interface AnnisDao
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
   /**
-   * Creates sql for getting annations of corpora.
+   * Creates sql for getting annotations of corpora.
    *
    * @param toplevelCorpusName The toplevel corpus defines the root.
-   * @param corpusName Specifies the document, for which the annoations are
+   * @param corpusName Specifies the document, for which the annotations are
    * fetched.
-   * @param exclude If set to true, the top level corpus annoations are
+   * @param exclude If set to true, the top level corpus annotations are
    * excluded. Only has an effect, if corpus name is different from top level
    * corpus name.
    * @return Valid sql as string.
@@ -137,7 +137,7 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
    * null null null null null null null null null null null null null null null
-   * null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -184,6 +184,12 @@ public interface AnnisDao
 
   public List<String> mapCorpusIdsToNames(List<Long> ids);
 
+  /**
+   * Return a list of internal IDs for a list of top-level corpus names.
+   *
+   * @param corpusNames
+   * @return
+   */
   public List<Long> mapCorpusNamesToIds(List<String> corpusNames);
 
   /**
@@ -230,7 +236,8 @@ public interface AnnisDao
    *
    * @param corpusIDs determines the corpora, for which the example queries are
    * defined. If null then all auto generated queries are fetched.
-   * @return Is null, if no example queries exists in the database.
+   * @return Is null, if no example queries exists in the database or no corpus
+   * ids are specified.
    */
   public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
 }

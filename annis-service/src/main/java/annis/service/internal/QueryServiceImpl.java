@@ -309,7 +309,7 @@ public class QueryServiceImpl implements QueryService
     {
       ext.setMetaKeys(null);
     }
-    
+
     data.addExtension(ext);
 
     StreamingOutput result = new StreamingOutput()
@@ -383,6 +383,11 @@ public class QueryServiceImpl implements QueryService
 
     List<String> corpusNamesList = new LinkedList<String>(corpusNames);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
+
+    if(corpusIDs == null || corpusIDs.isEmpty())
+    {
+      throw new WebApplicationException(400);
+    }
 
     data.setCorpusList(corpusIDs);
     data.addExtension(query.getMatches());
@@ -546,68 +551,6 @@ public class QueryServiceImpl implements QueryService
   {
     annisDao.parseAQL(query, new LinkedList<Long>());
     return "ok";
-  }
-
-  @GET
-  @Path("corpora/{top}/documents")
-  @Produces(MediaType.APPLICATION_XML)
-  public List<Annotation> getDocNames(@PathParam("top") String topLevelCorpus)
-  {
-    return annisDao.listDocuments(topLevelCorpus);
-  }
-
-  @GET
-  @Path("corpora/{top}/metadata")
-  @Produces("application/xml")
-  public List<Annotation> getMetadata(
-    @PathParam("top") String toplevelCorpusName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-
-    return annisDao.listCorpusAnnotations(toplevelCorpusName);
-  }
-
-  @GET
-  @Path("corpora/{top}/{document}/metadata")
-  @Produces("application/xml")
-  public List<Annotation> getMetadata(
-    @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String documentName,
-    @QueryParam("exclude") @DefaultValue("false") boolean exclude)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-
-    if (documentName == null)
-    {
-      documentName = toplevelCorpusName;
-    }
-
-    return annisDao.listCorpusAnnotations(toplevelCorpusName, documentName,
-      exclude);
-  }
-
-  @GET
-  @Path("corpora/{top}/allmetadata")
-  @Produces("application/xml")
-  public List<Annotation> getAllMetadata(
-    @PathParam("top") String toplevelCorpusName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-    return annisDao.listDocumentsAnnotations(toplevelCorpusName, true);
-  }
-
-  @GET
-  @Path("corpora/{top}/docmetadata")
-  @Produces("application/xml")
-  public List<Annotation> getDocMetadata(
-    @PathParam("top") String toplevelCorpusName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:meta:" + toplevelCorpusName);
-    return annisDao.listDocumentsAnnotations(toplevelCorpusName, false);
   }
 
   @GET
@@ -819,27 +762,6 @@ public class QueryServiceImpl implements QueryService
     {
       throw new WebApplicationException(400);
     }
-  }
-
-  /**
-   * Get the Metadata of an Annis Binary object identified by its id.
-   *
-   * @param id
-   * @return AnnisBinaryMetaData
-   */
-  @GET
-  @Path("corpora/{top}/{document}/binary/meta")
-  @Produces("application/xml")
-  @Override
-  public List<AnnisBinaryMetaData> binaryMeta(
-    @PathParam("top") String toplevelCorpusName,
-    @PathParam("document") String documentName)
-  {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:binary:" + toplevelCorpusName);
-
-    return annisDao.getBinaryMeta(toplevelCorpusName, documentName);
-
   }
 
   private String createAnnotateLogParameters(int left, int right, int offset,

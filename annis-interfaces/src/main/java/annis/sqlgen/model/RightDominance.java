@@ -33,5 +33,14 @@ public class RightDominance extends Dominance {
 	public String toString() {
 		return "right-dominates node " + target.getId() + " (" + name + ")";
 	}
+
+  @Override
+  public String toAqlOperator()
+  {
+    String domOp = super.toAqlOperator();
+    return ">@r" + domOp.substring(1); // remove the ">" and replace with our own
+  }
+  
+  
 	
 }

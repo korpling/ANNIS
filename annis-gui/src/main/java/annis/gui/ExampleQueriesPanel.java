@@ -36,11 +36,15 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,6 +59,8 @@ public class ExampleQueriesPanel extends Table
 
   // first column String
   private final String EXAMPLE_QUERY = "example query";
+
+  private transient ExecutorService executor;
 
   //main ui window
   private SearchUI ui;
@@ -74,17 +80,17 @@ public class ExampleQueriesPanel extends Table
   // reference to the tab which holds this component
   private TabSheet.Tab tab;
 
-  // hold the main window of annis3
-  private TabSheet mainTab;
+  // hold the parent tab of annis3
+  private HelpPanel parentTab;
 
   private static final ThemeResource SEARCH_ICON = new ThemeResource(
     "tango-icons/16x16/system-search.png");
 
-  public ExampleQueriesPanel(String caption, SearchUI ui)
+  public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
     super(caption);
     this.ui = ui;
-    this.mainTab = ui.getTabSheet();
+    this.parentTab = parentTab;
 
     //
     egContainer = new BeanItemContainer<ExampleQuery>(ExampleQuery.class);
@@ -202,35 +208,28 @@ public class ExampleQueriesPanel extends Table
    */
   private void showTab()
   {
-    if (mainTab == null)
+    if (parentTab != null)
     {
-      mainTab = ui.getMainTab();
-    }
-
-    if (mainTab != null)
-    {
-      tab = mainTab.getTab(this);
-      tab.getComponent().addStyleName("example-queries-tab");
-      tab.setEnabled(true);
-
-      if (!(mainTab.getSelectedTab() instanceof ResultViewPanel))
+      tab = parentTab.getTab(this);
+      if(tab != null)
       {
-        mainTab.setSelectedTab(tab);
-      }
+        // FIXME: this should be added by the constructor or by the panel that adds this tab
+       // tab.getComponent().addStyleName("example-queries-tab");
+        tab.setEnabled(true);
 
+        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
+        {
+          parentTab.setSelectedTab(tab);
+        }
+      }
     }
   }
 
   private void hideTabSheet()
   {
-    if (mainTab == null)
+    if (parentTab != null)
     {
-      mainTab = ui.getMainTab();
-    }
-
-    if (mainTab != null)
-    {
-      tab = mainTab.getTab(this);
+      tab = parentTab.getTab(this);
 
       if (tab != null)
       {
@@ -308,7 +307,7 @@ public class ExampleQueriesPanel extends Table
    */
   private void loadExamplesFromRemote()
   {
-    loadExamplesFromRemote(null);
+    examples = loadExamplesFromRemote(null);
   }
 
   /**
@@ -317,14 +316,15 @@ public class ExampleQueriesPanel extends Table
    * @param corpusNames Specifies the corpora example queries are fetched for.
    * If it is null or empty all available example queries are fetched.
    */
-  private void loadExamplesFromRemote(String[] corpusNames)
+  private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
+    List<ExampleQuery> result = new LinkedList<ExampleQuery>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
-      if (corpusNames == null || corpusNames.length == 0)
+      if (corpusNames == null || corpusNames.isEmpty())
       {
-        examples = service.path("query").path("corpora").path(
+        result = service.path("query").path("corpora").path(
           "example-queries").get(new GenericType<List<ExampleQuery>>()
         {
         });
@@ -332,7 +332,7 @@ public class ExampleQueriesPanel extends Table
       else
       {
         String concatedCorpusNames = StringUtils.join(corpusNames, ",");
-        examples = service.path("query").path("corpora").path(
+        result = service.path("query").path("corpora").path(
           "example-queries").queryParam("corpora", concatedCorpusNames).get(
           new GenericType<List<ExampleQuery>>()
         {
@@ -348,6 +348,7 @@ public class ExampleQueriesPanel extends Table
       log.error("problems with getting example queries from remote for {}",
         corpusNames, ex);
     }
+    return result;
   }
 
   /**
@@ -356,19 +357,39 @@ public class ExampleQueriesPanel extends Table
    * @param selectedCorpus Specifies the corpora example queries are fetched
    * for. If it is null, all available example queries are fetched.
    */
-  public void setSelectedCorpus(String[] selectedCorpora)
+  public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    loadExamplesFromRemote(selectedCorpora);
-    try
+    getExecutor().submit(new Runnable()
     {
-      removeAllItems();
-      addItems();
-    }
-    catch (Exception ex)
-    {
-      log.error("removing or adding of example queries failed for {}",
-        selectedCorpora, ex);
-    }
+      @Override
+      public void run()
+      {
+        final List<ExampleQuery> result =
+          loadExamplesFromRemote(selectedCorpora);
+
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            examples = result;
+            try
+            {
+              removeAllItems();
+              addItems();
+              ui.push();
+            }
+            catch (Exception ex)
+            {
+              log.error("removing or adding of example queries failed for {}",
+                selectedCorpora, ex);
+            }
+          }
+        });
+      }
+    });
+
+
   }
 
   private class ShowResultColumn implements Table.ColumnGenerator
@@ -435,5 +456,14 @@ public class ExampleQueriesPanel extends Table
       ExampleQuery eQ = (ExampleQuery) itemId;
       return getOpenCorpusPanel(eQ.getCorpusName());
     }
+  }
+  
+  private ExecutorService getExecutor()
+  {
+    if(executor == null)
+    {
+      executor = Executors.newSingleThreadExecutor();
+    }
+    return executor;
   }
 }

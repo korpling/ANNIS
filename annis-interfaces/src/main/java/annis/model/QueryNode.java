@@ -17,7 +17,6 @@ package annis.model;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -28,10 +27,13 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
+import com.google.common.base.Joiner;
+import java.util.LinkedList;
 
 @SuppressWarnings("serial")
 public class QueryNode implements Serializable
 {
+  public enum Type {NODE, AND, OR};
 
   // this class is send to the front end
   // node object in database
@@ -59,22 +61,26 @@ public class QueryNode implements Serializable
   private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
   private Range tokenArity;
-  // for sql generation
-  private String marker;
   private Long matchedNodeInQuery;
-
+  
   public enum TextMatching
   {
 
-    EXACT_EQUAL("=", "\""), REGEXP_EQUAL("~", "/"), EXACT_NOT_EQUAL("<>",
-    "\""), REGEXP_NOT_EQUAL("!~", "/");
+    EXACT_EQUAL("=", "\"", "="), 
+    REGEXP_EQUAL("~", "/", "="), 
+    EXACT_NOT_EQUAL("<>", "\"", "!="), 
+    REGEXP_NOT_EQUAL("!~", "/", "!=");
+    
     private String sqlOperator;
     private String annisQuote;
+    private String aqlOperator;
 
-    private TextMatching(String sqlOperator, String annisQuote)
+    private TextMatching(String sqlOperator, String annisQuote, 
+      String aqlOperator)
     {
       this.sqlOperator = sqlOperator;
       this.annisQuote = annisQuote;
+      this.aqlOperator = aqlOperator;
     }
 
     @Override
@@ -91,6 +97,11 @@ public class QueryNode implements Serializable
     public String quote()
     {
       return annisQuote;
+    }
+    
+    public String aqlOperator()
+    {
+      return aqlOperator;
     }
   };
 
@@ -148,6 +159,47 @@ public class QueryNode implements Serializable
     this();
     this.id = id;
   }
+  
+  /**
+   * Copy constructor
+   * @param other 
+   */
+  public QueryNode(QueryNode other)
+  {
+    this.arity = other.arity;
+    this.corpus = other.corpus;
+    this.edgeAnnotations = new TreeSet<QueryAnnotation>(other.edgeAnnotations);
+    this.id = other.id;
+    this.joins = new ArrayList<Join>(other.joins);
+    this.left = other.left;
+    this.leftToken = other.leftToken;
+    this.matchedNodeInQuery = other.matchedNodeInQuery;
+    this.name = other.name;
+    this.namespace = other.namespace;
+    this.nodeAnnotations = new TreeSet<QueryAnnotation>(other.nodeAnnotations);
+    this.partOfEdge = other.partOfEdge;
+    this.right = other.right;
+    this.rightToken = other.rightToken;
+    this.root = other.root;
+    this.spanTextMatching = other.spanTextMatching;
+    this.spannedText = other.spannedText;
+    this.textId = other.textId;
+    this.token = other.token;
+    this.tokenArity = other.tokenArity;
+    this.tokenIndex = other.tokenIndex;
+    this.variable = other.variable;
+  }
+  
+  /**
+   * Copy constructor that allows to change the ID.
+   * @param newId
+   * @param other 
+   */
+  public QueryNode(long newId, QueryNode other)
+  {
+    this(other);
+    this.id = newId;
+  }
 
   public QueryNode(long id, long corpusRef, long textRef, long left,
     long right, String namespace, String name, long tokenIndex,
@@ -199,17 +251,10 @@ public class QueryNode implements Serializable
   @Override
   public String toString()
   {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
 
     sb.append("node ");
     sb.append(id);
-
-    if (marker != null)
-    {
-      sb.append("; marked '");
-      sb.append(marker);
-      sb.append("'");
-    }
 
     if (variable != null)
     {
@@ -266,7 +311,78 @@ public class QueryNode implements Serializable
       sb.append(join);
     }
 
+
     return sb.toString();
+  }
+  
+  public String toAQLNodeFragment()
+  {
+    StringBuilder sb = new StringBuilder();
+
+    boolean foundConstraint = false;
+    
+    // check if we were given a custom name
+    String idAsString = "" + id;
+    if(variable != null && !idAsString.equals(variable))
+    {
+      sb.append(variable).append("#");
+    }
+    
+    if (token)
+    {
+      sb.append("tok");
+      foundConstraint = true;
+    }
+
+    if (spannedText != null && spanTextMatching != null)
+    {
+      if(token)
+      {
+        sb.append(spanTextMatching.aqlOperator());
+      }
+
+      sb.append(spanTextMatching.quote());
+      sb.append(spannedText);
+      sb.append(spanTextMatching.quote());
+      foundConstraint = true;
+    }
+
+
+    if (nodeAnnotations.isEmpty())
+    {
+      if(!foundConstraint)
+      {
+        sb.append("node");
+      }
+    }
+    else
+    {
+      QueryAnnotation anno=nodeAnnotations
+        .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
+
+      sb.append(anno.getQualifiedName());
+      
+      if(anno.getTextMatching() != null && anno.getValue() != null)
+      {
+        sb.append(anno.getTextMatching().aqlOperator);
+        sb.append(anno.getTextMatching().quote());
+        sb.append(anno.getValue());
+        sb.append(anno.getTextMatching().quote());
+      }
+    }
+
+    
+    return sb.toString();
+  }
+  
+  public String toAQLEdgeFragment()
+  {
+    List<String> frags = new LinkedList<String>();
+    for (Join join : joins)
+    {
+      frags.add(join.toAQLFragment(this));
+    }
+    return Joiner.on(" & ").join(frags);
   }
 
   public boolean addEdgeAnnotation(QueryAnnotation annotation)
@@ -278,7 +394,7 @@ public class QueryNode implements Serializable
   {
     return nodeAnnotations.add(annotation);
   }
-
+  
   public boolean addJoin(Join join)
   {
     boolean result = joins.add(join);
@@ -293,7 +409,7 @@ public class QueryNode implements Serializable
 
     return result;
   }
-
+  
   public String getQualifiedName()
   {
     return qName(namespace, name);
@@ -388,11 +504,6 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if ((this.marker == null) ? (other.marker != null)
-      : !this.marker.equals(other.marker))
-    {
-      return false;
-    }
     if ((this.arity == null) ? (other.arity != null) : !this.arity.equals(
       other.arity))
     {
@@ -462,17 +573,7 @@ public class QueryNode implements Serializable
   {
     this.root = root;
   }
-
-  public String getMarker()
-  {
-    return marker;
-  }
-
-  public void setMarker(String marker)
-  {
-    this.marker = marker;
-  }
-
+  
   public String getName()
   {
     return name;
@@ -532,7 +633,6 @@ public class QueryNode implements Serializable
   {
     return joins;
   }
-
   public boolean isToken()
   {
     return token;
@@ -655,4 +755,5 @@ public class QueryNode implements Serializable
     this.matchedNodeInQuery = matchedNodeInQuery;
   }
 
+  
 }
