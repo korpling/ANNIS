@@ -371,7 +371,7 @@ public class QueryServiceImpl implements QueryService
       {
         FrequencyTableEntry entry = new FrequencyTableEntry();
       
-        entry.setReferencedNode(Integer.parseInt(splitted[0]));
+        entry.setReferencedNode(splitted[0]);
         if("tok".equals(splitted[1]))
         {
           entry.setType(FrequencyTableEntryType.span);

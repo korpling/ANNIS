@@ -23,12 +23,17 @@ import annis.service.objects.FrequencyTableEntryType;
 import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
+import com.google.common.base.Function;
+import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.MapMaker;
+import com.google.common.collect.Maps;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -89,6 +94,16 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     Validate.notEmpty(freqQueryData);    
     ext = freqQueryData.get(0);
     
+    ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(
+      alternative.iterator(), new Function<QueryNode, String>()
+    {
+      @Override
+      public String apply(QueryNode input)
+      {
+        return input.getVariable();
+      }
+    });
+    
     int i=1;
     for(FrequencyTableEntry e : ext)
     {
@@ -100,7 +115,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
       // specificly join on top level corpus
       conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus" );
       // join on node ID
-      conditions.add("v" + i + ".id = solutions.id" + e.getReferencedNode() );
+      conditions.add("v" + i + ".id = solutions.id" + idxNodeVariables.get(e.getReferencedNode()).getId());
       
       if(e.getType() == FrequencyTableEntryType.span)
       {
@@ -123,7 +138,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
     }
     
     return conditions;
-//    throw new UnsupportedOperationException("Not supported yet.");
   }
   
   @Override

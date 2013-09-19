@@ -27,7 +27,7 @@ public class FrequencyTableEntry implements Serializable
 
   private String key;
 
-  private int referencedNode;
+  private String referencedNode;
 
   public FrequencyTableEntryType getType()
   {
@@ -49,12 +49,12 @@ public class FrequencyTableEntry implements Serializable
     this.key = key;
   }
 
-  public int getReferencedNode()
+  public String getReferencedNode()
   {
     return referencedNode;
   }
 
-  public void setReferencedNode(int referencedNode)
+  public void setReferencedNode(String referencedNode)
   {
     this.referencedNode = referencedNode;
   }

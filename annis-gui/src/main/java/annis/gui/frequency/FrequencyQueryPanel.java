@@ -216,7 +216,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           AbstractSelect cbType = (AbstractSelect) item.getItemProperty("type").getValue();
           
           entry.setKey((String) textKey.getValue());
-          entry.setReferencedNode(Integer.parseInt((String) textNr.getValue()));
+          entry.setReferencedNode((String) textNr.getValue());
           entry.setType(FrequencyTableEntryType.valueOf((String) cbType.getValue()));
           freqDefinition.add(entry);
         }
