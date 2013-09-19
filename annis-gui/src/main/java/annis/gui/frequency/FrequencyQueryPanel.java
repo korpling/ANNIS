@@ -55,6 +55,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 {
   private Table tblFrequencyDefinition;
   private Button btAdd;
+  private Button btReset;
   private Button btDeleteRow;
   private Button btShowFrequencies;
   private int counter;
@@ -163,7 +164,28 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       }
     });
     layoutButtons.addComponent(btDeleteRow);
+    
+    btReset = new Button("Reset");
+    btReset.addClickListener(new Button.ClickListener() 
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        manuallyChanged = false;
+        createAutomaticEntriesForQuery(controller.getQueryDraft());
+      }
+    });
+    layoutButtons.addComponent(btReset);
+    
+    layoutButtons.setComponentAlignment(btAdd, Alignment.MIDDLE_LEFT);
+    layoutButtons.setComponentAlignment(btDeleteRow, Alignment.MIDDLE_LEFT);
+    layoutButtons.setComponentAlignment(btReset, Alignment.MIDDLE_RIGHT);
+    layoutButtons.setExpandRatio(btAdd, 0.0f);
+    layoutButtons.setExpandRatio(btDeleteRow, 0.0f);
+    layoutButtons.setExpandRatio(btReset, 1.0f);
+    
     layoutButtons.setMargin(true);
+    layoutButtons.setSpacing(true);
     layoutButtons.setHeight("-1px");
     layoutButtons.setWidth("100%");
     
@@ -267,6 +289,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void valueChange(ValueChangeEvent event)
       {
+        manuallyChanged = true;
         if("span".equals(cbType.getValue()))
         {
           txtAnno.setEnabled(false);
@@ -286,7 +309,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   @Override
   public void textChange(FieldEvents.TextChangeEvent event)
   {
-    createAutomaticEntriesForQuery(event.getText());
+    if(!manuallyChanged)
+    {
+      createAutomaticEntriesForQuery(event.getText());
+    }
   }
   
   
