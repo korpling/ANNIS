@@ -31,10 +31,13 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Accordion;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -119,11 +122,6 @@ public class CorpusBrowserPanel extends Panel
 
     tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
-
-    accordion.addTab(tblNodeAnno, "Node annotations", null);
-    accordion.addTab(tblEdgeTypes, "Edge types", null);
-    accordion.addTab(tblEdgeAnno, "Edge annotations", null);
-    accordion.addTab(tblMetaAnno, "Meta annotations", null);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
@@ -268,6 +266,41 @@ public class CorpusBrowserPanel extends Panel
     tblEdgeTypes.setSortContainerPropertyId("name");
     tblEdgeAnno.setSortContainerPropertyId("name");
 
+    if (containerNodeAnno.size() == 0)
+    {
+      placeEmptyLabel(accordion, "Node Annotations");
+    }
+    else
+    {
+      accordion.addTab(tblNodeAnno, "Node Annotations", null);
+    }
+
+    if (tblEdgeAnno.getContainerDataSource().size() == 0)
+    {
+      placeEmptyLabel(accordion, "Edge Annotations");
+    }
+    else
+    {
+      accordion.addTab(tblEdgeAnno, "Edge Annotations", null);
+    }
+
+    if (tblEdgeTypes.getContainerDataSource().size() == 0)
+    {
+      placeEmptyLabel(accordion, "Edge Types");
+    }
+    else
+    {
+      accordion.addTab(tblEdgeTypes, "Edge Types", null);
+    }
+
+    if (tblMetaAnno.getContainerDataSource().size() == 0)
+    {
+      placeEmptyLabel(accordion, "Meta Annotations");
+    }
+    else
+    {
+      accordion.addTab(tblMetaAnno, "Meta Annotations", null);
+    }
   }
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
@@ -356,6 +389,7 @@ public class CorpusBrowserPanel extends Panel
     @Override
     public void valueChange(ValueChangeEvent event)
     {
+
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
       Set<String> corpusNameSet = new HashSet<String>();
@@ -414,5 +448,24 @@ public class CorpusBrowserPanel extends Panel
     public AnnisAttributeListType()
     {
     }
+  }
+
+  /**
+   * Places a label with the text "none" in the centered middle of the accordion
+   * tab.
+   *
+   * @param accordion the target accordion
+   * @param caption is set as caption of the accordion tab
+   */
+  private void placeEmptyLabel(Accordion accordion, String caption)
+  {
+    VerticalLayout v = new VerticalLayout();
+    v.setSizeFull();
+    Label l = new Label("none");
+    v.addComponent(l);
+    l.setSizeUndefined();
+    v.setComponentAlignment(l, Alignment.MIDDLE_CENTER);
+    accordion.addTab(v, "Meta Annotations", null);
+    l.setSizeUndefined();
   }
 }

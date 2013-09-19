@@ -41,10 +41,9 @@ limitations under the License.
     <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
 
     <property name="annisDao" ref="annisDao"/>
-    <property name="annisParser" ref="annisParser"/>
+    <property name="annisParser" ref="annisParserAntlr"/>
     <property name="helloMessage" value="ANNIS Interactive Shell 3.0.0"/>
     <property name="prompt" value="ANNIS"/>
-    <property name="aqlAnalysis" ref="aqlAnalysis" />
     <property name="matchLimit" value="10"/>
     <property name="metaDataFilter" ref="metaDataFilter" />
     <property name="queriesGenerator" ref="queriesGenerator" />

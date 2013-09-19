@@ -48,7 +48,7 @@ public class CorpusPathWhereClauseGenerator extends AbstractFromClauseGenerator
     for (int i = 0; i < alternative.size(); i++)
     {
       QueryNode n = alternative.get(i);
-      tables.add("corpus" + " AS corpus" + (i + 1));
+      tables.add(tableAliasDefinition(n, "corpus", 1));
     }
     return StringUtils.join(tables, ", " + indent + TABSTOP);
   }

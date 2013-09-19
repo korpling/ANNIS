@@ -1,4 +1,3 @@
-BEGIN; -- transaction
 -----------
 -- FACTS --
 -----------
@@ -150,5 +149,3 @@ CREATE INDEX idx__sample_n_na__:id ON facts_:id(n_na_sample);
 CREATE INDEX idx__sample_n_r_c__:id ON facts_:id(n_r_c_sample);
 CREATE INDEX idx__sample_n_r_c_ea__:id ON facts_:id(n_r_c_ea_sample);
 CREATE INDEX idx__sample_n_r_c_na__:id ON facts_:id(n_r_c_na_sample);
-
-END; -- transaction

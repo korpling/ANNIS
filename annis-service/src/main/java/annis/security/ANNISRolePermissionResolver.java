@@ -123,6 +123,7 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
     if("*".equals(roleString))
     {
       perms.add(new WildcardPermission("query:*:*"));
+      perms.add(new WildcardPermission("meta:*"));
     }
     else
     {
@@ -148,6 +149,7 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
           for(String c : corpora)
           {
             perms.add(new WildcardPermission("query:*:" + c.trim()));
+            perms.add(new WildcardPermission("meta:" + c.trim()));
           }
         }
       }

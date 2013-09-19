@@ -15,10 +15,14 @@ public class ArrayCorpusPathExtractor implements CorpusPathExtractor
   public List<String> extractCorpusPath(ResultSet resultSet, String columnName) throws SQLException
   {
     Array jdbcArray = resultSet.getArray(columnName);
-    String[] pathArray = (String[]) jdbcArray.getArray();
-    List<String> path = asList(pathArray);
-    Collections.reverse(path);
-    return path;
+    if(!resultSet.wasNull())
+    {
+      String[] pathArray = (String[]) jdbcArray.getArray();
+      List<String> path = asList(pathArray);
+      Collections.reverse(path);
+      return path;
+    }
+    return null;
   }
   
 }

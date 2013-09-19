@@ -20,10 +20,14 @@ import annis.gui.model.Query;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.event.ItemClickEvent;
+import com.vaadin.event.ItemClickEvent.ItemClickListener;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.util.HashSet;
 import java.util.List;
 
@@ -32,7 +36,7 @@ import java.util.List;
  * @author thomas
  */
 public class HistoryPanel extends Panel
-  implements ValueChangeListener
+  implements ValueChangeListener, ItemClickListener
 {
 
   private Table tblHistory;
@@ -82,7 +86,8 @@ public class HistoryPanel extends Panel
     tblHistory.setColumnHeader("genlink", "URL");
     tblHistory.setColumnExpandRatio("query", 1.0f);
     tblHistory.setImmediate(true);
-    tblHistory.addListener((ValueChangeListener) this);
+    tblHistory.addValueChangeListener((ValueChangeListener) this);
+    tblHistory.addItemClickListener((ItemClickListener) this);
 
   }
 
@@ -91,9 +96,24 @@ public class HistoryPanel extends Panel
   {
     HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
     
-    if(controller != null)
+    if(e != null && controller != null)
     {
       controller.setQuery(new Query(e.getQuery(), new HashSet<String>(e.getCorpora())));
     }
   }
+
+  @Override
+  public void itemClick(ItemClickEvent event)
+  {
+    if(controller != null && event.isDoubleClick())
+    {
+      controller.executeQuery();
+      if(getParent() instanceof Window)
+      {
+        UI.getCurrent().removeWindow((Window) getParent());
+      }
+    }
+  }
+  
+  
 }

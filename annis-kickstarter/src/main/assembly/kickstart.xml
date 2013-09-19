@@ -5,15 +5,16 @@
     <format>dir</format>
     <format>zip</format>
   </formats>
-  <fileSets>
-    <fileSet>
-      <directory>src/main/resources/</directory>
-      <includes>
-        <include>splashscreen.gif</include>
-      </includes>
+  <files>
+    <file>
+      <source>target/annis-kickstarter-${project.version}.jar</source>
       <outputDirectory>/</outputDirectory>
-    </fileSet>    
-     <!-- overwrite the database.properties -->
+      <destName>annis-kickstarter.jar</destName>
+      <fileMode>0774</fileMode>
+    </file>
+  </files>
+  <fileSets>
+    <!-- overwrite the database.properties -->
     <fileSet>
       <directory>src/main/resources/</directory>
       <includes>
@@ -56,6 +57,7 @@
       <excludes>
         <exclude>de.hu-berlin.german.korpling.annis:annis-gui:war:*</exclude>
       </excludes>
+      <useProjectArtifact>false</useProjectArtifact>
     </dependencySet>
     <!-- service -->
     <dependencySet>

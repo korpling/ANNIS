@@ -52,7 +52,7 @@ public class ListDocumentsAnnotationsSqlHelper implements
     }
     else
     {
-      return sql.replaceAll(":>", "<").replaceAll(":<", "<=");
+      return sql.replaceAll(":>", ">").replaceAll(":<", "<");
     }
   }
 

@@ -16,18 +16,19 @@
 package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
-import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import com.vaadin.ui.*;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * This panel allows the user to control and execute queries.
  *
- * @author thomas
+ * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ControlPanel extends Panel
+public class ControlPanel extends VerticalLayout
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
@@ -39,49 +40,51 @@ public class ControlPanel extends Panel
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
+  
+  private Tab optionTab;
+  private TabSheet optionsTab;
+  private SearchUI ui;
 
-  private QueryController controller;
-
-  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+  public ControlPanel(SearchUI ui,
     ExampleQueriesPanel autoGenQueries)
   {
-    super("Search Form");
-    this.controller = controller;
-
+    this.ui = ui;
+    
     setSizeFull();
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    VerticalLayout layout = new VerticalLayout();
-    setContent(layout);
-    layout.setSizeFull();
+    optionsTab = new TabSheet();
+    optionsTab.setHeight(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.addStyleName("blue-tab");
 
-    Accordion accordion = new Accordion();
-    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
-
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
+    corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
 
     searchOptions = new SearchOptionsPanel();
 
-    queryPanel = new QueryPanel(controller, instanceConfig);
+    queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
     
-    frequencyQueryPanel = new FrequencyQueryPanel(controller);
+    frequencyQueryPanel = new FrequencyQueryPanel(ui.getQueryController());
+
     
-    accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList), "Export", null);
-    accordion.addTab(frequencyQueryPanel, "Frequency analysis", null);
 
-    layout.addComponent(queryPanel);
-    layout.addComponent(accordion);
+    optionsTab.addTab(corpusList, "Corpus List", null);
+    optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
+    optionsTab.addTab(frequencyQueryPanel, "Frequency analysis", null);
 
-    layout.setExpandRatio(accordion, 1.0f);
+    addComponent(queryPanel);
+    addComponent(optionsTab);
+
+    setExpandRatio(optionsTab, 1.0f);
+    
   }
 
+  
+  
   public CorpusListPanel getCorpusList()
   {
     return corpusList;

@@ -54,8 +54,6 @@ import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
-import annis.ql.parser.AnnisParser;
-import annis.ql.parser.QueryAnalysis;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
@@ -75,6 +73,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
+import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
 
 
@@ -100,15 +99,11 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private AnnisDao annisDao;
 
-  private AnnisParser annisParser;
-
-  private QueryAnalysis aqlAnalysis;
-
   private int context;
 
+  private AnnisParserAntlr annisParser;
+  
   private int matchLimit;
-
-  private QueryAnalysis queryAnalysis;
 
   private QueriesGenerator queriesGenerator;
   // settings
@@ -1216,12 +1211,12 @@ public class AnnisRunner extends AnnisBaseRunner
     return "";
   }
 
-  public AnnisParser getAnnisParser()
+  public AnnisParserAntlr getAnnisParser()
   {
     return annisParser;
   }
 
-  public void setAnnisParser(AnnisParser annisParser)
+  public void setAnnisParser(AnnisParserAntlr annisParser)
   {
     this.annisParser = annisParser;
   }
@@ -1234,16 +1229,6 @@ public class AnnisRunner extends AnnisBaseRunner
   public void setAnnisDao(AnnisDao annisDao)
   {
     this.annisDao = annisDao;
-  }
-
-  public QueryAnalysis getAqlAnalysis()
-  {
-    return aqlAnalysis;
-  }
-
-  public void setAqlAnalysis(QueryAnalysis aqlAnalysis)
-  {
-    this.aqlAnalysis = aqlAnalysis;
   }
 
   public List<Long> getCorpusList()
@@ -1274,16 +1259,6 @@ public class AnnisRunner extends AnnisBaseRunner
   public void setMatchLimit(int matchLimit)
   {
     this.matchLimit = matchLimit;
-  }
-
-  public QueryAnalysis getQueryAnalysis()
-  {
-    return queryAnalysis;
-  }
-
-  public void setQueryAnalysis(QueryAnalysis queryAnalysis)
-  {
-    this.queryAnalysis = queryAnalysis;
   }
 
   public SqlGenerator<QueryData, Integer> getCountSqlGenerator()

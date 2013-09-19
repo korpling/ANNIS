@@ -34,8 +34,9 @@ import org.springframework.context.support.ClassPathXmlApplicationContext;
 import annis.test.SpringQueryExamples;
 import annis.test.SpringSyntaxTreeExamples;
 import annis.test.SyntaxTreeExample;
-import annis.exceptions.AnnisException;
-import annis.ql.node.Start;
+import java.util.LinkedList;
+import org.junit.Ignore;
+import org.junit.Test;
 
 // see http://junit.sourceforge.net/doc/ReleaseNotes4.4.html
 // and http://popper.tigris.org/tutorial.html
@@ -48,9 +49,9 @@ public class TestAnnisParserExamples {
 	// access to AnnisParser
 	static ApplicationContext ctx;
 
-	// simple DddQueryParser instance
-	private AnnisParser parser;
-	
+	// simple AnnisParser instance
+  private AnnisParserAntlr parserAntlr;
+  
 	// load Spring application context once
 	@BeforeClass
 	public static void loadApplicationContext() {
@@ -62,7 +63,7 @@ public class TestAnnisParserExamples {
 	// setup a fresh parser
 	@Before
 	public void setup() {
-		parser = (AnnisParser) ctx.getBean("annisParser");
+    parserAntlr = (AnnisParserAntlr) ctx.getBean("annisParserAntlr");
 	}
 	
 	///// Syntax-Tree tests
@@ -70,33 +71,57 @@ public class TestAnnisParserExamples {
 	@Theory
 	public void testSyntaxTrees(
 			@SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation=EXAMPLES) 
-			SyntaxTreeExample example) {
-		Start syntaxTree = parser.parse(example.getQuery());
-		assertThat(syntaxTree, is(not(nullValue())));
-		String actual = parser.dumpTree(syntaxTree).trim();
-                // replace the unix line ending from the SVN with the systems line ending
-                // (the dump tree will use the system line ending and the examples were created under linux)
-                String provided = example.getSyntaxTree().replaceAll("\n", System.getProperty("line.separator"));
-		assertEquals("wrong syntax tree for: " + example.getQuery(),provided.trim(), actual.trim());
+			SyntaxTreeExample example) 
+  {
+  
+    QueryData data = parserAntlr.parse(example.getQuery(), new LinkedList<Long>());
+    assertThat(data, is(not(nullValue())));
+    
+    String actual = data.toAQL().trim();
+    
+    String provided = example.getSyntaxTree();
+    
+		assertEquals("wrong parse result for: " + example.getQuery(),provided.trim(), actual.trim());
 	}
 
-	@Theory
-	public void testGoodQueries(
+  
+  @Theory
+  @Test
+	public void testGoodQueriesAntLR(
 			@SpringQueryExamples(exampleList = "good", contextLocation=EXAMPLES) 
-			String annisQuery) {
-		assertThat(parser.parse(annisQuery), is(not(nullValue())));
+			String annisQuery) 
+  {
+    
+    try
+    {
+      QueryData result = parserAntlr.parse(annisQuery, 
+        new LinkedList<Long>());
+      assertThat(result, is(not(nullValue())));
+    }
+    catch (Exception ex)
+    {
+      ex.printStackTrace(System.err);
+      fail("good query throw exception: " + annisQuery);
+    }
 	}
 	
 	@Theory
-	public void testBadQueries(
+  @Test
+	public void testBadQueriesAntLR(
 			@SpringQueryExamples(exampleList = "bad", contextLocation=EXAMPLES) 
 			String annisQuery) {
-		try {
-			parser.parse(annisQuery);
+		
+    try
+    {
+      parserAntlr.parse(annisQuery, new LinkedList<Long>());
+      
 			fail("bad query passed as good: " + annisQuery);
-		} catch (AnnisException e) {
-			// ok
-		}
+    }
+    catch (Exception ex)
+    {
+      // ok
+    }
+
 	}
 	
 }

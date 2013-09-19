@@ -28,4 +28,12 @@ public class LeftAlignment extends Join {
 		return "left aligned with node " + target.getId();
 	}
 
+  @Override
+  public String toAqlOperator()
+  {
+    return "_l_";
+  }
+  
+  
+
 }

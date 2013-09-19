@@ -1,2 +1,4 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<Context antiJARLocking="true" path="/annis-gui"/>
+<Context antiJARLocking="true" path="/annis-gui">
+  <Loader delegate="true"/>
+</Context>

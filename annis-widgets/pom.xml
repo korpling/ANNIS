@@ -16,7 +16,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.1.0</vaadin.version>
+    <vaadin.version>7.1.5</vaadin.version>
   </properties>
 
   <build>
@@ -209,12 +209,6 @@
       <version>2.0.3</version>
     </dependency>
     
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>refresher</artifactId>
-      <version>1.2.1.7</version>
-    </dependency>
-
   </dependencies>
 
 </project>

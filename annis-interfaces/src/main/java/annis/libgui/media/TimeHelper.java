@@ -60,7 +60,7 @@ public class TimeHelper
           SToken tok = ((SSpanningRelation) e).getSToken();
           
           SAnnotation anno = tok.getSAnnotation("annis::time");
-          if(anno != null)
+          if(anno != null && !anno.getSValueSTEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
           {
             String[] split = anno.getSValueSTEXT().split("-");
             if(split.length == 1)

@@ -15,13 +15,16 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.ExportPanel;
 import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.model.Query;
-import annis.libgui.InstanceConfig;
+import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -31,11 +34,14 @@ import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
+import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.LinkedList;
 import java.util.List;
@@ -64,32 +70,39 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private TextArea txtQuery;
   private Label lblStatus;
   private Button btShowResult;
+  //private Button btShowResultNewTab;
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
-  private ProgressIndicator piCount;
+  private ProgressBar piCount;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
+  private PopupButton btMoreActions;
 
-  public QueryPanel(final QueryController controller, InstanceConfig instanceConfig)
+  public QueryPanel(SearchUI ui)
   {
-    super(2,3);
-    this.controller = controller;
+    super(4,5);
+    
+    this.controller = ui.getQueryController();
     this.lastPublicStatus = "Ok";
     this.history = new LinkedList<HistoryEntry>();
 
     setSpacing(true);
     setMargin(true);
 
-    addComponent(new Label("AnnisQL:"), 0, 0);
-    addComponent(new Label("Status:"), 0, 2);
-
+    Label lblStatusLabel = new Label("Status:");
+    lblStatusLabel.setSizeUndefined();
+    
+   
     setRowExpandRatio(0, 1.0f);
-    setColumnExpandRatio(0, 0.2f);
-    setColumnExpandRatio(1, 0.8f);
+    setColumnExpandRatio(0, 0.0f);
+    setColumnExpandRatio(1, 0.1f);
+    setColumnExpandRatio(2, 0.0f);
+    setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new TextArea();
+    txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
@@ -98,23 +111,19 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setTextChangeTimeout(1000);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    addComponent(txtQuery, 1, 0);
+   
 
     final VirtualKeyboard virtualKeyboard;
-    if(instanceConfig.getKeyboardLayout() == null)
+    if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
       virtualKeyboard = null;
     }
     else
     {
       virtualKeyboard = new VirtualKeyboard();
-      virtualKeyboard.setKeyboardLayout(instanceConfig.getKeyboardLayout());
+      virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
       virtualKeyboard.extend(txtQuery);
     }
-    VerticalLayout panelStatusLayout = new VerticalLayout();
-    panelStatusLayout.setHeight("-1px");
-    panelStatusLayout.setWidth(100f, Unit.PERCENTAGE);
-
 
     lblStatus = new Label();
     lblStatus.setContentMode(ContentMode.HTML);
@@ -123,30 +132,19 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     lblStatus.setHeight(3.5f, Unit.EM);
     lblStatus.addStyleName("border-layout");
 
-    panelStatusLayout.addComponent(lblStatus);
-
-    addComponent(panelStatusLayout, 1, 2);
-
-    HorizontalLayout buttonLayout = new HorizontalLayout();
-    buttonLayout.setWidth("100%");
-    addComponent(buttonLayout, 1, 1);
-
-    piCount = new ProgressIndicator();
+    piCount = new ProgressBar();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
     piCount.setVisible(false);
-    piCount.setPollingInterval(60000);
-    panelStatusLayout.addComponent(piCount);
+    
 
-
-    btShowResult = new Button("Show Result");
+    btShowResult = new Button("Search");
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
     btShowResult.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL);
     btShowResult.setDisableOnClick(true);
 
-    buttonLayout.addComponent(btShowResult);
 
     VerticalLayout historyListLayout = new VerticalLayout();
     historyListLayout.setSizeUndefined();
@@ -195,20 +193,90 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btHistory.setDescription("<strong>Show History</strong><br />"
       + "Either use the short overview (arrow down) or click on the button "
       + "for the extended view.");
-    buttonLayout.addComponent(btHistory);
 
+    Button btShowKeyboard = null;
     if(virtualKeyboard != null)
     {
-      Button btShowKeyboard = new Button();
+      btShowKeyboard = new Button();
+      btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
-      buttonLayout.addComponent(btShowKeyboard);
     }
-    buttonLayout.setExpandRatio(btShowResult, 1.0f);
+    
+    Button btShowQueryBuilder = new Button("Query<br />Builder");
+    btShowQueryBuilder.setHtmlContentAllowed(true);
+    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
+    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/document-properties.png"));
+    btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
+    
+    VerticalLayout moreActionsLayout = new VerticalLayout();
+    moreActionsLayout.setWidth("250px");
+    btMoreActions = new PopupButton("More");
+    btMoreActions.setContent(moreActionsLayout);
+    
+//    btShowResultNewTab = new Button("Search (open in new tab)");
+//    btShowResultNewTab.setWidth("100%");
+//    btShowResultNewTab.addClickListener(new ShowResultInNewTabClickListener());
+//    btShowResultNewTab.setDescription("<strong>Show Result and open result in new tab</strong><br />Ctrl + Shift + Enter");
+//    btShowResultNewTab.setDisableOnClick(true);
+//    btShowResultNewTab.setClickShortcut(KeyCode.ENTER, ModifierKey.CTRL, ModifierKey.SHIFT);
+//    moreActionsLayout.addComponent(btShowResultNewTab);
+    
+    Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setWidth("100%");
+    moreActionsLayout.addComponent(btShowExport);
+    
+    
+    /*
+     * We use the grid layout for a better rendering efficiency, but this comes
+     * with the cost of some complexitiy when defining the positions of the
+     * elements in the layout.
+     * 
+     * This grid hopefully helps a little bit in understanding the "magic"
+     * numbers better.
+     * 
+     * AQL: label with "AnnisQL"
+     * Q: Query text field
+     * QB: Button to toggle query builder // TODO
+     * KEY: Button to show virtual keyboard
+     * SEA: "Search" button
+     * MOR: "More actions" button 
+     * HIST: "History" button
+     * LST: "Status" label
+     * STAT: Text field with the real status
+     * 
+     *   \  0  |  1  |  2  |  3  
+     * --+-----+---+---+---+-----
+     * 0 | QB  |  Q  |  Q  |  Q  
+     * --+-----+-----+-----+-----
+     * 1 | KEY |  Q  |  Q  |  Q  
+     * --+-----+-----+-----+-----
+     * 2 |     | SEA | MOR | HIST
+     * --+-----+-----+-----+-----
+     * 3 | LST | STAT| STAT| STAT
+     */
+    addComponent(lblStatusLabel, 0, 3);
+    addComponent(txtQuery, 1, 0, 3, 1);
+    addComponent(lblStatus, 1, 3, 3, 3);
+    addComponent(btShowResult, 1, 2);
+    addComponent(btMoreActions, 2, 2);
+    addComponent(btHistory, 3, 2);
+    addComponent(btShowQueryBuilder, 0, 0);
+    if(btShowKeyboard != null)
+    {
+      addComponent(btShowKeyboard, 0, 1);
+    }
 
-
+    // alignment
+    setRowExpandRatio(0, 0.0f);
+    setRowExpandRatio(1, 1.0f);
+    
+    //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
+    
   }
 
   public void updateShortHistory(List<HistoryEntry> history)
@@ -307,16 +375,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         log.error(
           "Exception when communicating with service", ex);
-        Notification.show("Exception when communicating with service: " + ex.getMessage(),
-          Notification.Type.TRAY_NOTIFICATION);
+        ExceptionDialog.show(ex, "Exception when communicating with service.");
       }
     }
     catch(ClientHandlerException ex)
     {
       log.error(
           "Could not connect to web service", ex);
-        Notification.show("Could not connect to web service: " + ex.getMessage(),
-          Notification.Type.TRAY_NOTIFICATION);
+        ExceptionDialog.show(ex, "Could not connect to web service");
     }
   }
 
@@ -344,16 +410,46 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
     }
   }
+  
+//  public class ShowResultInNewTabClickListener implements Button.ClickListener
+//  {
+//
+//    @Override
+//    public void buttonClick(ClickEvent event)
+//    {
+//      if(controller != null)
+//      {
+//        controller.setQuery((txtQuery.getValue()));
+//        controller.executeQuery(false);
+//      }
+//    }
+//  }
 
   public void setCountIndicatorEnabled(boolean enabled)
   {
     if(piCount != null && btShowResult != null && lblStatus != null)
     {
-      lblStatus.setVisible(!enabled);
-      piCount.setVisible(enabled);
-      piCount.setEnabled(enabled);
-
+      if(enabled)
+      {
+        if(!piCount.isVisible())
+        {
+          replaceComponent(lblStatus, piCount);
+          piCount.setVisible(true);
+          piCount.setEnabled(true);
+        }
+      }
+      else
+      {
+        if(piCount.isVisible())
+        {
+          replaceComponent(piCount, lblStatus);
+          piCount.setVisible(false);
+          piCount.setEnabled(false);
+        }
+      }
+      
       btShowResult.setEnabled(!enabled);
+//      btShowResultNewTab.setEnabled(!enabled);
     }
   }
 
@@ -381,6 +477,92 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       virtualKeyboard.show();
     }
+  }
+  
+  private class ShowExportClickListener implements ClickListener
+  {
+    private SearchUI ui;
+    private ExportPanel panel;
+    private ExportOptionsPanel optionsPanel;
+    
+    public ShowExportClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(panel == null)
+      {
+        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
+      }
+      if(optionsPanel == null)
+      {
+        optionsPanel = new ExportOptionsPanel();
+      }
+      
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(panel);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(panel, "Export");
+        tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+      }
+      
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(panel);
+      
+      btMoreActions.setPopupVisible(false);
+    }
+    
+  }
+  
+  private static class ShowQueryBuilderClickListener implements ClickListener
+  {
+    
+    private QueryBuilderChooser queryBuilder;
+    private SearchUI ui;
+    
+    public ShowQueryBuilderClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(queryBuilder == null)
+      {
+         queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
+      }
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(queryBuilder);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(queryBuilder, "Query Builder", 
+          new ThemeResource("tango-icons/16x16/document-properties.png"));
+        
+        ui.addAction(new ShortcutListener("^Query builder")
+        {
+          @Override
+          public void handleAction(Object sender, Object target)
+          {
+            if(queryBuilder != null && tabSheet.getTab(queryBuilder) != null)
+            {
+              tabSheet.setSelectedTab(queryBuilder);
+            }
+          }
+        });
+      }
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(queryBuilder);
+    }
+    
   }
 
   public QueryController getQueryController()
