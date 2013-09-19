@@ -660,6 +660,10 @@ public class SearchUI extends AnnisBaseUI
     {
       getQueryController().notifyTabClose((ResultViewPanel) tabContent);
     }
+    else if(tabContent instanceof FrequencyQueryPanel)
+    {
+      controlPanel.getQueryPanel().notifyFrequencyTabClose();
+    }
   }
   
 

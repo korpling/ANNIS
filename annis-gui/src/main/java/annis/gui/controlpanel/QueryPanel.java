@@ -81,6 +81,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
   private PopupButton btMoreActions;
+  private FrequencyQueryPanel frequencyPanel;
   
   public QueryPanel(SearchUI ui)
   {
@@ -331,6 +332,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     validateQuery(event.getText());
   }
+  
+  public void notifyFrequencyTabClose()
+  {
+    txtQuery.removeTextChangeListener(frequencyPanel);
+    frequencyPanel = null;
+  }
 
 
   private void validateQuery(String query)
@@ -524,7 +531,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private class ShowFrequencyClickListener implements ClickListener
   {
     private SearchUI ui;
-    private FrequencyQueryPanel frequencyPanel;
     
     public ShowFrequencyClickListener(SearchUI ui)
     {
@@ -537,6 +543,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(frequencyPanel == null)
       {
         frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
+        txtQuery.addTextChangeListener(frequencyPanel);
       }
       
       final TabSheet tabSheet = ui.getMainTab();

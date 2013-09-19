@@ -64,6 +64,7 @@ public class QueryNode implements Serializable
   private Range arity;
   private Range tokenArity;
   private Long matchedNodeInQuery;
+  private boolean artificial;
   
   public enum TextMatching
   {
@@ -761,6 +762,20 @@ public class QueryNode implements Serializable
   public void setMatchedNodeInQuery(Long matchedNodeInQuery)
   {
     this.matchedNodeInQuery = matchedNodeInQuery;
+  }
+
+  /**
+   * Returns if this query node was artificially created by some normalization process.
+   * @return 
+   */
+  public boolean isArtificial()
+  {
+    return artificial;
+  }
+
+  public void setArtificial(boolean artificial)
+  {
+    this.artificial = artificial;
   }
 
   
