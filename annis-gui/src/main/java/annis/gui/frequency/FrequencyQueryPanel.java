@@ -139,8 +139,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           AbstractField textNr = (AbstractField) tblFrequencyDefinition.getItem(id)
             .getItemProperty("nr").getValue();
-          nr = Math.max(nr, Integer.parseInt((String) textNr.getValue()));
-          
+          try
+          {
+            nr = Math.max(nr, Integer.parseInt((String) textNr.getValue()));
+          }
+          catch(NumberFormatException ex)
+          {
+            // was not a number but a named node
+          }
         }
         tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
           FrequencyTableEntryType.span, ""), counter++);
@@ -172,6 +178,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       public void buttonClick(ClickEvent event)
       {
         manuallyChanged = false;
+        btShowFrequencies.setEnabled(true);
         createAutomaticEntriesForQuery(controller.getQueryDraft());
       }
     });
