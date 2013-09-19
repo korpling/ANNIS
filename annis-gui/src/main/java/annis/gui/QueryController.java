@@ -353,7 +353,10 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
       }
       lastFrequencyView = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
         freqDefinition, queryPanel);
-      ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
+      Tab freqTab = ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
+      freqTab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+      freqTab.setClosable(true);
+      
       ui.getMainTab().setSelectedTab(lastFrequencyView);
     }
   }
@@ -421,6 +424,14 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     {
       removeQuery(getQueryPanels().inverse().get(panel));
       ui.getMainTab().removeComponent(panel);
+    }
+  }
+  public void notifyTabClose(FrequencyResultPanel panel)
+  {
+    if(panel != null)
+    {
+      ui.getMainTab().removeComponent(panel);
+      lastFrequencyView = null;
     }
   }
   
