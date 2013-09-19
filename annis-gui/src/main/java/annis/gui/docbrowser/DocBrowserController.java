@@ -60,7 +60,6 @@ public class DocBrowserController implements Serializable
 
   private static final ThemeResource DOC_ICON = new ThemeResource(
     "document_ico.png");
- 
 
   public DocBrowserController(SearchUI ui)
   {
@@ -84,6 +83,7 @@ public class DocBrowserController implements Serializable
           createInput(corpus, doc, config), null);
         initiatedVis.put(canonicalTitle, vis);
         vis.setCaption(canonicalTitle);
+        vis.setPrimaryStyleName("docviewer");
       }
 
       String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
