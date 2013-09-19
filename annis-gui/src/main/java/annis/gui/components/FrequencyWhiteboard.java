@@ -20,6 +20,7 @@ import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.Notification;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,6 @@ import org.json.JSONException;
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
   public final int PIXEL_PER_VALUE = 45;
-
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");
@@ -48,6 +48,10 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
       this.desc = desc;
     }
   }
+  
+  private List<String> labels;
+  private List<Long> values;
+  private Scale lastScale;
   
   public FrequencyWhiteboard(final FrequencyResultPanel freqPanel)
   {  
@@ -63,12 +67,25 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
         freqPanel.selectRow(arguments.getInt(0));
       }
     });
+    
   }
-
+  
+  @Override
+  public void beforeClientResponse(boolean initial)
+  {
+    super.beforeClientResponse(initial);
+    if(labels != null && values != null)
+    {
+      callFunction("showData", labels, values, lastScale.desc);
+    }
+  }
+  
+  
+  
   public void setFrequencyData(FrequencyTable table, Scale scale)
   {
-    List<String> labels = new LinkedList<String>();
-    List<Long> values = new LinkedList<Long>();
+    labels = new LinkedList<String>();
+    values = new LinkedList<Long>();
 
     for (FrequencyTable.Entry e : table.getEntries())
     {
@@ -76,7 +93,10 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
       values.add(e.getCount());
     }
     setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
-    callFunction("showData", labels, values, scale.desc);
+    lastScale = scale;
+    
+//    callFunction("showData", labels, values, scale.desc);
   }
+  
   
 }
