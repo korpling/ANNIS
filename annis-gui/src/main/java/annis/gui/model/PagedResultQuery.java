@@ -15,13 +15,14 @@
  */
 package annis.gui.model;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
  * Parameters for a query that shows the result to the user
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class PagedResultQuery extends Query
+public class PagedResultQuery extends Query implements Serializable
 {
   private int contextLeft;
   private int contextRight;

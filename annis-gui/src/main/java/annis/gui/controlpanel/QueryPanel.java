@@ -81,7 +81,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
   private PopupButton btMoreActions;
-
+  
   public QueryPanel(SearchUI ui)
   {
     super(4,5);
@@ -524,7 +524,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private class ShowFrequencyClickListener implements ClickListener
   {
     private SearchUI ui;
-    private FrequencyQueryPanel panel;
+    private FrequencyQueryPanel frequencyPanel;
+    
     public ShowFrequencyClickListener(SearchUI ui)
     {
       this.ui = ui;
@@ -533,23 +534,23 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(panel == null)
+      if(frequencyPanel == null)
       {
-        panel = new FrequencyQueryPanel(ui.getQueryController());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
       }
       
       final TabSheet tabSheet = ui.getMainTab();
-      Tab tab = tabSheet.getTab(panel);
+      Tab tab = tabSheet.getTab(frequencyPanel);
       
       if(tab == null)
       {
-        tab = tabSheet.addTab(panel, "Frequency Analysis");
+        tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
         tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
       }
       
       
       tab.setClosable(true);
-      tabSheet.setSelectedTab(panel);
+      tabSheet.setSelectedTab(frequencyPanel);
       
       btMoreActions.setPopupVisible(false);
     }

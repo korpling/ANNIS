@@ -18,6 +18,7 @@ package annis.gui.components;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.data.Property;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -49,7 +50,8 @@ public class FrequencyChart extends VerticalLayout
     options.addItem(FrequencyWhiteboard.Scale.LINEAR);
     options.addItem(FrequencyWhiteboard.Scale.LOG10);
     options.setItemCaption(FrequencyWhiteboard.Scale.LINEAR, "linear scale");
-    options.setItemCaption(FrequencyWhiteboard.Scale.LOG10, "log_10 scale");
+    options.setItemCaption(FrequencyWhiteboard.Scale.LOG10, "log<sub>10</sub> scale");
+    options.setHtmlContentAllowed(true);
     options.setImmediate(true);
     options.setValue(FrequencyWhiteboard.Scale.LINEAR);
     options.addStyleName("horizontal");

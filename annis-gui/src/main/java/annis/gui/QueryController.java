@@ -37,6 +37,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -60,7 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController implements TabSheet.SelectedTabChangeListener
+public class QueryController implements TabSheet.SelectedTabChangeListener, Serializable
 {
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -74,8 +75,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
   private Future<MatchAndDocumentCount> futureCount;
   
   private UUID lastQueryUUID;
-  private FrequencyResultPanel lastFrequencyView;
-  
+
   private PagedResultQuery preparedQuery;
   
   private transient Map<UUID, PagedResultQuery> queries;
@@ -328,38 +328,6 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
       thread.start();
     }
   }
-  
-//  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
-//  {
-//    if (preparedQuery != null)
-//    {
-//      FrequencyQueryPanel queryPanel = ui.getControlPanel().getFrequencyQueryPanel();
-//      
-//      if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
-//      {
-//        Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
-//        queryPanel.getBtShowFrequencies().setEnabled(true);
-//        return;
-//      }
-//      if ("".equals(preparedQuery.getQuery()))
-//      {
-//        Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
-//        queryPanel.getBtShowFrequencies().setEnabled(true);
-//        return;
-//      }
-//      if(lastFrequencyView != null)
-//      {
-//        ui.getMainTab().removeComponent(lastFrequencyView);
-//      }
-//      lastFrequencyView = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
-//        freqDefinition, queryPanel);
-//      Tab freqTab = ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
-//      freqTab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
-//      freqTab.setClosable(true);
-//      
-//      ui.getMainTab().setSelectedTab(lastFrequencyView);
-//    }
-//  }
 
   public void corpusSelectionChangedInBackground()
   {
@@ -428,15 +396,6 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     if(panel != null)
     {
       removeQuery(getQueryPanels().inverse().get(panel));
-      ui.getMainTab().removeComponent(panel);
-    }
-  }
-  public void notifyTabClose(FrequencyResultPanel panel)
-  {
-    if(panel != null)
-    {
-      ui.getMainTab().removeComponent(panel);
-      lastFrequencyView = null;
     }
   }
   

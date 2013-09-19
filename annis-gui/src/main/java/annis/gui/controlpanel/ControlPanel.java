@@ -17,6 +17,8 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.SearchUI;
+import annis.gui.frequency.FrequencyResultPanel;
+import annis.gui.resultview.ResultViewPanel;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -76,8 +78,6 @@ public class ControlPanel extends VerticalLayout
     setExpandRatio(optionsTab, 1.0f);
     
   }
-
-  
   
   public CorpusListPanel getCorpusList()
   {

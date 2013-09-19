@@ -17,6 +17,7 @@ package annis.gui.frequency;
 
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
+import annis.gui.resultview.ResultViewPanel;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
@@ -36,6 +37,7 @@ import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -45,7 +47,7 @@ import java.util.Set;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class FrequencyQueryPanel extends VerticalLayout
+public class FrequencyQueryPanel extends VerticalLayout implements Serializable
 {
   private Table tblFrequencyDefinition;
   private Button btAdd;
