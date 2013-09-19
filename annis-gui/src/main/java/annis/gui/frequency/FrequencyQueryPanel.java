@@ -71,6 +71,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     setWidth("99%");
     setHeight("99%");
+    setMargin(true);
     
     manuallyChanged = false;
     
