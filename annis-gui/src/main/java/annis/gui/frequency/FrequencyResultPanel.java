@@ -123,7 +123,7 @@ public class FrequencyResultPanel extends VerticalLayout
         {
           if(queryPanel != null)
           {
-            queryPanel.setExecuteFrequencyAnalysisButtonEnabled(true);
+            queryPanel.notifiyQueryFinished();
           }
           FrequencyTable table = get();
           recreateTable(table);

@@ -199,7 +199,24 @@ public class FrequencyQueryPanel extends VerticalLayout
     queryLayout.setExpandRatio(layoutButtons, 0.0f);
     queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
     
+    btShowQuery = new Button("New query", new Button.ClickListener() 
+    {
+
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        btShowQuery.setVisible(false);
+        queryLayout.setVisible(true);
+        resultPanel.setVisible(false);
+      }
+    });
+    btShowQuery.setVisible(false);
+    
     addComponent(queryLayout);
+    addComponent(btShowQuery);
+    
+    setComponentAlignment(btShowQuery, Alignment.TOP_CENTER);
+    
   }
   
   private Object[] createNewTableRow(int nodeNr, FrequencyTableEntryType type, String annotation)
@@ -270,12 +287,15 @@ public class FrequencyQueryPanel extends VerticalLayout
         freqDefinition, this);
       addComponent(resultPanel);
       setExpandRatio(resultPanel, 1.0f);
+      
+      queryLayout.setVisible(false);
     }
   }
   
-  public void setExecuteFrequencyAnalysisButtonEnabled(boolean enabled)
+  public void notifiyQueryFinished()
   {
-    btShowFrequencies.setEnabled(enabled);
+    btShowFrequencies.setEnabled(true);
+    btShowQuery.setVisible(true);
   }
   
 }
