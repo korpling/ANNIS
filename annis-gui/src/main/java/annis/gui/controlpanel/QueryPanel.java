@@ -23,6 +23,8 @@ import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -229,6 +231,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
+    
+    Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setWidth("100%");
+    moreActionsLayout.addComponent(btShowFrequency);
     
     
     /*
@@ -483,7 +489,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     private SearchUI ui;
     private ExportPanel panel;
-    private ExportOptionsPanel optionsPanel;
     
     public ShowExportClickListener(SearchUI ui)
     {
@@ -497,10 +502,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
       }
-      if(optionsPanel == null)
-      {
-        optionsPanel = new ExportOptionsPanel();
-      }
       
       final TabSheet tabSheet = ui.getMainTab();
       Tab tab = tabSheet.getTab(panel);
@@ -509,6 +510,41 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         tab = tabSheet.addTab(panel, "Export");
         tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+      }
+      
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(panel);
+      
+      btMoreActions.setPopupVisible(false);
+    }
+    
+  }
+  
+  private class ShowFrequencyClickListener implements ClickListener
+  {
+    private SearchUI ui;
+    private FrequencyQueryPanel panel;
+    public ShowFrequencyClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(panel == null)
+      {
+        panel = new FrequencyQueryPanel(ui.getQueryController());
+      }
+      
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(panel);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(panel, "Frequency Analysis");
+        tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
       }
       
       

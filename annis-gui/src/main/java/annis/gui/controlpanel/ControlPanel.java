@@ -36,7 +36,6 @@ public class ControlPanel extends VerticalLayout
   private static final long serialVersionUID = -2220211539424865671L;
 
   private QueryPanel queryPanel;
-  private FrequencyQueryPanel frequencyQueryPanel;
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
@@ -68,13 +67,8 @@ public class ControlPanel extends VerticalLayout
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
     
-    frequencyQueryPanel = new FrequencyQueryPanel(ui.getQueryController());
-
-    
-
     optionsTab.addTab(corpusList, "Corpus List", null);
     optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
-    optionsTab.addTab(frequencyQueryPanel, "Frequency analysis", null);
 
     addComponent(queryPanel);
     addComponent(optionsTab);
@@ -98,11 +92,5 @@ public class ControlPanel extends VerticalLayout
   public SearchOptionsPanel getSearchOptions()
   {
     return searchOptions;
-  }
-
-  public FrequencyQueryPanel getFrequencyQueryPanel()
-  {
-    return frequencyQueryPanel;
-  }
-  
+  }  
 }

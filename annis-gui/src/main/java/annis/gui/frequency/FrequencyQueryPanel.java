@@ -13,15 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
+package annis.gui.frequency;
 
 import annis.gui.QueryController;
+import annis.gui.model.PagedResultQuery;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
+import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
@@ -29,11 +31,14 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -47,13 +52,21 @@ public class FrequencyQueryPanel extends VerticalLayout
   private Button btDeleteRow;
   private Button btShowFrequencies;
   private int counter;
+  private FrequencyResultPanel resultPanel;
+  private Button btShowQuery;
+  private VerticalLayout queryLayout;
+  private QueryController controller;
   
   public FrequencyQueryPanel(final QueryController controller)
   {
+    this.controller = controller;
     
     setWidth("99%");
     setHeight("99%");
     
+    queryLayout = new VerticalLayout();
+    queryLayout.setWidth("100%");
+    queryLayout.setHeight("-1px");
     
     tblFrequencyDefinition = new Table();
     tblFrequencyDefinition.setImmediate(true);
@@ -79,7 +92,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     });
     
     tblFrequencyDefinition.setWidth("100%");
-    tblFrequencyDefinition.setHeight("100%");
+    tblFrequencyDefinition.setHeight("-1px");
     
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
@@ -99,7 +112,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     tblFrequencyDefinition.setColumnExpandRatio("type", 0.3f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
     
-    addComponent(tblFrequencyDefinition);
+    queryLayout.addComponent(tblFrequencyDefinition);
     
     HorizontalLayout layoutButtons = new HorizontalLayout();
     
@@ -143,7 +156,7 @@ public class FrequencyQueryPanel extends VerticalLayout
     layoutButtons.setHeight("-1px");
     layoutButtons.setWidth("100%");
     
-    addComponent(layoutButtons);
+    queryLayout.addComponent(layoutButtons);
     
     btShowFrequencies = new Button("Perform frequency analysis");
     btShowFrequencies.setDisableOnClick(true);
@@ -171,20 +184,22 @@ public class FrequencyQueryPanel extends VerticalLayout
         if(controller != null)
         {
           controller.setQueryFromUI();
-          controller.executeFrequencyQuery(freqDefinition);
+          executeFrequencyQuery(freqDefinition);
         }
           
       }
     });
-    addComponent(btShowFrequencies);
+    queryLayout.addComponent(btShowFrequencies);
     
-    setComponentAlignment(tblFrequencyDefinition, Alignment.TOP_CENTER);
-    setComponentAlignment(layoutButtons, Alignment.TOP_CENTER);
-    setComponentAlignment(btShowFrequencies, Alignment.TOP_CENTER);
+    queryLayout.setComponentAlignment(tblFrequencyDefinition, Alignment.TOP_CENTER);
+    queryLayout.setComponentAlignment(layoutButtons, Alignment.TOP_CENTER);
+    queryLayout.setComponentAlignment(btShowFrequencies, Alignment.TOP_CENTER);
     
-    setExpandRatio(tblFrequencyDefinition, 1.0f);
-    setExpandRatio(layoutButtons, 0.0f);
-    setExpandRatio(btShowFrequencies, 0.0f);
+    queryLayout.setExpandRatio(tblFrequencyDefinition, 1.0f);
+    queryLayout.setExpandRatio(layoutButtons, 0.0f);
+    queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
+    
+    addComponent(queryLayout);
   }
   
   private Object[] createNewTableRow(int nodeNr, FrequencyTableEntryType type, String annotation)
@@ -229,9 +244,38 @@ public class FrequencyQueryPanel extends VerticalLayout
     return new Object[] {txtNode, cbType, txtAnno};
   }
 
-  public Button getBtShowFrequencies()
+  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
   {
-    return btShowFrequencies;
+    if (controller != null && controller.getPreparedQuery() != null)
+    {
+      PagedResultQuery preparedQuery = controller.getPreparedQuery();
+      
+      if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
+      {
+        Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+        btShowFrequencies.setEnabled(true);
+        return;
+      }
+      if ("".equals(preparedQuery.getQuery()))
+      {
+        Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
+        btShowFrequencies.setEnabled(true);
+        return;
+      }
+      if(resultPanel != null)
+      {
+        removeComponent(resultPanel);
+      }
+      resultPanel = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
+        freqDefinition, this);
+      addComponent(resultPanel);
+      setExpandRatio(resultPanel, 1.0f);
+    }
+  }
+  
+  public void setExecuteFrequencyAnalysisButtonEnabled(boolean enabled)
+  {
+    btShowFrequencies.setEnabled(enabled);
   }
   
 }

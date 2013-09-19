@@ -123,7 +123,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
     this.ps = ps;
     this.controller = controller;
-    this.selectedSegmentationLayer = controller.getQuery().getSegmentation();
+    this.selectedSegmentationLayer = controller.getPreparedQuery().getSegmentation();
 
     cacheResolver =
       Collections.synchronizedMap(
@@ -338,7 +338,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
   public void setCount(int count)
   {
     paging.setCount(count, false);
-    paging.setStartNumber(controller.getQuery().getOffset());
+    paging.setStartNumber(controller.getPreparedQuery().getOffset());
   }
 
   public Set<String> getVisibleTokenAnnos()

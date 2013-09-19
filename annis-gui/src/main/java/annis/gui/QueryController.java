@@ -18,7 +18,7 @@ package annis.gui;
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.controlpanel.FrequencyQueryPanel;
+import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
@@ -329,37 +329,37 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     }
   }
   
-  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
-  {
-    if (preparedQuery != null)
-    {
-      FrequencyQueryPanel queryPanel = ui.getControlPanel().getFrequencyQueryPanel();
-      
-      if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
-      {
-        Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
-        queryPanel.getBtShowFrequencies().setEnabled(true);
-        return;
-      }
-      if ("".equals(preparedQuery.getQuery()))
-      {
-        Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
-        queryPanel.getBtShowFrequencies().setEnabled(true);
-        return;
-      }
-      if(lastFrequencyView != null)
-      {
-        ui.getMainTab().removeComponent(lastFrequencyView);
-      }
-      lastFrequencyView = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
-        freqDefinition, queryPanel);
-      Tab freqTab = ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
-      freqTab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
-      freqTab.setClosable(true);
-      
-      ui.getMainTab().setSelectedTab(lastFrequencyView);
-    }
-  }
+//  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
+//  {
+//    if (preparedQuery != null)
+//    {
+//      FrequencyQueryPanel queryPanel = ui.getControlPanel().getFrequencyQueryPanel();
+//      
+//      if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
+//      {
+//        Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+//        queryPanel.getBtShowFrequencies().setEnabled(true);
+//        return;
+//      }
+//      if ("".equals(preparedQuery.getQuery()))
+//      {
+//        Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
+//        queryPanel.getBtShowFrequencies().setEnabled(true);
+//        return;
+//      }
+//      if(lastFrequencyView != null)
+//      {
+//        ui.getMainTab().removeComponent(lastFrequencyView);
+//      }
+//      lastFrequencyView = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
+//        freqDefinition, queryPanel);
+//      Tab freqTab = ui.getMainTab().addTab(lastFrequencyView, "Frequency analysis", null);
+//      freqTab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+//      freqTab.setClosable(true);
+//      
+//      ui.getMainTab().setSelectedTab(lastFrequencyView);
+//    }
+//  }
 
   public void corpusSelectionChangedInBackground()
   {
@@ -397,7 +397,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
   }
 
-  public PagedResultQuery getQuery()
+  /**
+   * Get the query that is currently prepared for execution, but not executed
+   * yet.
+   * @return 
+   */
+  public PagedResultQuery getPreparedQuery()
   {
     return preparedQuery;
   }

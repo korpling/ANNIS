@@ -16,7 +16,6 @@
 package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
-import annis.gui.controlpanel.FrequencyQueryPanel;
 import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
@@ -124,7 +123,7 @@ public class FrequencyResultPanel extends VerticalLayout
         {
           if(queryPanel != null)
           {
-            queryPanel.getBtShowFrequencies().setEnabled(true);
+            queryPanel.setExecuteFrequencyAnalysisButtonEnabled(true);
           }
           FrequencyTable table = get();
           recreateTable(table);
