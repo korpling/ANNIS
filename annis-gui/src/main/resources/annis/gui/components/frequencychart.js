@@ -55,7 +55,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           show: true
         },
         yaxis : {
-          scaling: scale
+          scaling: scale,
+          min: 0
         },
         xaxis : {
           ticks: t,
