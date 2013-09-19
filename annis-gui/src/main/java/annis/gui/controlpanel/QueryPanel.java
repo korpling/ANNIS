@@ -354,6 +354,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       try
       {
         String result = future.get(1, TimeUnit.SECONDS);
+
         if ("ok".equalsIgnoreCase(result))
         {
           lblStatus.setValue(lastPublicStatus);
@@ -369,6 +370,22 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       }
       catch (ExecutionException ex)
       {
+        if(ex.getCause() instanceof UniformInterfaceException)
+        {
+          UniformInterfaceException cause = (UniformInterfaceException) ex.
+            getCause();
+          if (cause.getResponse().getStatus() == 400)
+          {
+            lblStatus.setValue(cause.getResponse().getEntity(String.class));
+          }
+          else
+          {
+            log.error(
+              "Exception when communicating with service", ex);
+            ExceptionDialog.show(ex,
+              "Exception when communicating with service.");
+          }
+        }
        // ok, there was some serios error
         log.error(null, ex);
       }
@@ -377,19 +394,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
         lblStatus.setValue("Validation of query took too long.");
       }
 
-    }
-    catch(UniformInterfaceException ex)
-    {
-      if(ex.getResponse().getStatus() == 400)
-      {
-        lblStatus.setValue(ex.getResponse().getEntity(String.class));
-      }
-      else
-      {
-        log.error(
-          "Exception when communicating with service", ex);
-        ExceptionDialog.show(ex, "Exception when communicating with service.");
-      }
     }
     catch(ClientHandlerException ex)
     {

@@ -369,7 +369,13 @@ public class SearchUI extends AnnisBaseUI
     log.error("Unknown error in some component: " + event.getThrowable().
       getLocalizedMessage(),
       event.getThrowable());
-    ExceptionDialog.show(event.getThrowable());
+    // get the source throwable (thus the one that triggered the error)
+    Throwable source = event.getThrowable();
+    while(source != null && source.getCause() != null)
+    {
+      source = source.getCause();
+    }
+    ExceptionDialog.show(source);
   }
 
   public boolean canReportBugs()
