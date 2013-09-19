@@ -22,7 +22,6 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
-import annis.model.Annotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
@@ -70,6 +69,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -618,6 +618,27 @@ public class QueryServiceImpl implements QueryService
   {
     annisDao.parseAQL(query, new LinkedList<Long>());
     return "ok";
+  }
+  
+  /**
+   * Return the list of the query nodes if this is a valid query 
+   * or throw exception when invalid
+   *
+   * @param query Query to get the query nodes for
+   * @return
+   */
+  @GET
+  @Path("parse/nodes")
+  @Produces("application/xml")
+  public Response parseNodes(@QueryParam("q") String query)
+  {
+    QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
+    List<QueryNode> nodes = new LinkedList<QueryNode>();
+    for(List<QueryNode> alternative : data.getAlternatives())
+    {
+      nodes.addAll(alternative);
+    }
+    return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
 
   @GET

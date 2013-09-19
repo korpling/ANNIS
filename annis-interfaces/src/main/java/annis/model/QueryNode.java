@@ -29,8 +29,10 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
 import java.util.LinkedList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-@SuppressWarnings("serial")
+@XmlRootElement
 public class QueryNode implements Serializable
 {
   public enum Type {NODE, AND, OR};
@@ -111,6 +113,11 @@ public class QueryNode implements Serializable
     private int min;
     private int max;
 
+    public Range()
+    {
+      this(0,0);
+    }
+    
     public Range(int _min, int _max)
     {
       min = _min;
@@ -629,6 +636,7 @@ public class QueryNode implements Serializable
     return id;
   }
 
+  @XmlTransient // currently not supported, might be added later
   public List<Join> getJoins()
   {
     return joins;
