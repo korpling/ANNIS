@@ -61,6 +61,8 @@ public class FrequencyResultPanel extends VerticalLayout
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(FrequencyResultPanel.class);
   
+  public static final int MAX_NUMBER_OF_CHART_ITEMS = 500;
+  
   private Table tblResult;
   private Button btDownloadCSV;
   FrequencyChart chart;
@@ -136,7 +138,16 @@ public class FrequencyResultPanel extends VerticalLayout
           downloader.extend(btDownloadCSV);
           
           chart.setVisible(true);
-          chart.setFrequencyData(table);
+          FrequencyTable clippedTable = table;
+          if(clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
+          {
+            clippedTable = new FrequencyTable();
+            clippedTable.setEntries(table.getEntries().subList(0,
+              MAX_NUMBER_OF_CHART_ITEMS));
+            clippedTable.setSum(table.getSum());
+            chart.setCaption("Clipped to most frequent 500 values");
+          }
+          chart.setFrequencyData(clippedTable);
           
         }
         catch (InterruptedException ex)
