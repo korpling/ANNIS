@@ -93,7 +93,7 @@ public class CountTest
   {
     assumeTrue(pcc2CorpusID.size() > 0);
     
-    assertEquals(5, countPcc2("Topic=\"ab\" & Inf-Stat=\"new\" & #1 _i_ #2"));
+    assertEquals(7, countPcc2("Topic=\"ab\" & Inf-Stat=/[Nn]ew/ & #1 _i_ #2"));
     assertEquals(5, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent  #1"));
     assertEquals(13, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent * #1"));
     assertEquals(2, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent * #1 & cat=\"NP\" & cat=\"S\" & #4 >[func=\"SB\"] #3 & #3 _i_ #2"));
