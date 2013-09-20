@@ -172,7 +172,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     });
     layoutButtons.addComponent(btDeleteRow);
     
-    btReset = new Button("Reset");
+    btReset = new Button("Reset to default");
     btReset.addClickListener(new Button.ClickListener() 
     {
       @Override
