@@ -161,7 +161,7 @@ public class DocBrowserController implements Serializable
 
     try
     {
-      mappingsAsString = config.getString("mapping");
+      mappingsAsString = config.getString("mappings");
     }
     catch (JSONException ex)
     {
