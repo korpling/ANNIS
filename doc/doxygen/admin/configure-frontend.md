@@ -152,7 +152,7 @@ short name| Description | Java class | Screenshot
 `dot_vis` | a debug view of the annotation graph | [DotGraphVisualizer](@ref annis.visualizers.component.graph.DotGraphVisualizer) | ![dot_vis](graph_vis.png)
 `video` | a linked video file | [VideoVisualizer](@ref annis.visualizers.component.VideoVisualizer) | ![video](video.png)
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
-`rst` and `rst_full` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
+`rst` and `rstdoc` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
 
 
 ## Visualizations with Software Requirements ## {#admin-configure-visibility}
@@ -167,5 +167,28 @@ your local machine for Kickstarter) and make sure it is available in your system
 path (check this by calling e.g. the program `dot` on the command line).
 
 
+## Document Visualizer
+
+It is also possible to use a custom visualizer for browsing a whole
+document. The configuration is in JSON-Syntax and placed in the
+corpus.properties file, which can be add to the ExtData directory of
+each corpus.
 
 
+\code{.json}
+{
+	vis : [
+		{type : 'htmldoc', displayName : 'diplomatic view', segment : 'tok' },
+		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
+	],
+	metadata : [
+		{namespace : null, name : 'Genre'} // optional
+	]
+}
+\endcode
+
+All visualizer from the list above with the suffix "doc" in their name
+are suitable for using as doc visualizer. The field metadata is
+optional. For every defined metadata object an additional column is
+generated with the metadata key as column header and the matadata
+value as column cell value.
