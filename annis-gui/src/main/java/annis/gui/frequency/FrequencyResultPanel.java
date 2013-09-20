@@ -72,7 +72,7 @@ public class FrequencyResultPanel extends VerticalLayout
 
   public FrequencyResultPanel(String aql,
     Set<String> corpora,
-    List<FrequencyTableEntry> freqDefinition, final FrequencyQueryPanel queryPanel)
+    final List<FrequencyTableEntry> freqDefinition, final FrequencyQueryPanel queryPanel)
   {
     this.aql = aql;
     this.corpora = corpora;
@@ -94,11 +94,12 @@ public class FrequencyResultPanel extends VerticalLayout
     addComponent(chart);
     
     
-    btDownloadCSV = new Button("CSV");
+    btDownloadCSV = new Button("Download as CSV");
     btDownloadCSV.setDescription("Download as CSV");
+    btDownloadCSV.setSizeUndefined();
     addComponent(btDownloadCSV);
     setComponentAlignment(btDownloadCSV, Alignment.TOP_RIGHT);
-    btDownloadCSV.setSizeUndefined();
+    
     btDownloadCSV.setVisible(false);
     btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
     btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -129,7 +130,9 @@ public class FrequencyResultPanel extends VerticalLayout
           recreateTable(table);
           
           btDownloadCSV.setVisible(true);
-          FileDownloader downloader = new FileDownloader(new StreamResource(new CSVResource(table), "frequency.csv"));
+          FileDownloader downloader = new FileDownloader(
+            new StreamResource(new CSVResource(table, freqDefinition), 
+            "frequency.csv"));
           downloader.extend(btDownloadCSV);
           
           chart.setVisible(true);
@@ -145,7 +148,7 @@ public class FrequencyResultPanel extends VerticalLayout
           log.error(null, ex);
         }
         
-      } 
+      }
     };
     
     Executor exec = Executors.newSingleThreadExecutor();
@@ -246,7 +249,13 @@ public class FrequencyResultPanel extends VerticalLayout
       for(int i=1; i <= tupelCount; i++)
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
-        tblResult.setColumnHeader("tupel-"+ i, "feat. " + i);
+        FrequencyTableEntry e = freqDefinition.get(i-1);
+        String caption = "#" + e.getReferencedNode() + " ("
+          + (e.getType() == FrequencyTableEntryType.span 
+            ? "spanned text" : e.getKey())
+          + ")";
+        
+        tblResult.setColumnHeader("tupel-"+ i, caption);
       }
       
       tblResult.addContainerProperty("count", Long.class, -1l);
@@ -276,9 +285,11 @@ public class FrequencyResultPanel extends VerticalLayout
   public static class CSVResource implements StreamResource.StreamSource
   {
     private FrequencyTable data;
-    public CSVResource(FrequencyTable data)
+    private List<FrequencyTableEntry> freqDefinition;
+    public CSVResource(FrequencyTable data, List<FrequencyTableEntry> freqDefinition)
     {
       this.data = data;
+      this.freqDefinition = freqDefinition;
     }
 
     @Override
@@ -298,7 +309,13 @@ public class FrequencyResultPanel extends VerticalLayout
         {
           for(int i=0; i < data.getEntries().get(0).getTupel().length; i++)
           {
-            header.add("feature " + (i+1));
+            FrequencyTableEntry e = freqDefinition.get(i);
+            String caption = "#" + e.getReferencedNode() + " ("
+              + (e.getType() == FrequencyTableEntryType.span
+              ? "spanned text" : e.getKey())
+              + ")";
+            
+            header.add(caption);
           }
         }
         // add count
