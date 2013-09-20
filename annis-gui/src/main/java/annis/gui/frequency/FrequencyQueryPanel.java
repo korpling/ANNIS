@@ -107,20 +107,17 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
-    tblFrequencyDefinition.addContainerProperty("type", ComboBox.class, null);
     tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
     
-    tblFrequencyDefinition.setColumnHeader("nr", "Node");
-    tblFrequencyDefinition.setColumnHeader("type", "Type");
-    tblFrequencyDefinition.setColumnHeader("annotation", "Annotation");
+    tblFrequencyDefinition.setColumnHeader("nr", "Node definition");
+    tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
     createAutomaticEntriesForQuery(controller.getQueryDraft());
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
-    tblFrequencyDefinition.setColumnExpandRatio("type", 0.3f);
-    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
+    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.85f);
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
@@ -214,11 +211,17 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           Item item = tblFrequencyDefinition.getItem(oid);
           AbstractField textNr = (AbstractField) item.getItemProperty("nr").getValue();
           AbstractField textKey = (AbstractField) item.getItemProperty("annotation").getValue();
-          AbstractSelect cbType = (AbstractSelect) item.getItemProperty("type").getValue();
           
           entry.setKey((String) textKey.getValue());
           entry.setReferencedNode((String) textNr.getValue());
-          entry.setType(FrequencyTableEntryType.valueOf((String) cbType.getValue()));
+          if(textKey.getValue() != null && "tok".equals(textKey.getValue()))
+          {
+            entry.setType(FrequencyTableEntryType.span);
+          }
+          else
+          {
+            entry.setType(FrequencyTableEntryType.annotation);
+          }
           freqDefinition.add(entry);
         }
         
@@ -274,44 +277,21 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     txtNode.addValidator(new IntegerValidator("Node reference must be a valid number"));
     txtNode.setWidth("100%");
     
-    final ComboBox cbType = new ComboBox();
-    cbType.addItem("span");
-    cbType.addItem("annotation");
-    cbType.setValue(type.name());
-    cbType.setNullSelectionAllowed(false);
-    cbType.setWidth("100%");
-    cbType.setImmediate(true);
-    
     final TextField txtAnno = new TextField();
-    txtAnno.setValue(annotation);
+    
     if(type == FrequencyTableEntryType.span)
     {
-      txtAnno.setEnabled(false);
-      txtAnno.setInputPrompt("disabled");
+      txtAnno.setInputPrompt("tok");
+      txtAnno.setValue("tok");
+    }
+    else
+    {
+      txtAnno.setValue(annotation);
     }
     
     txtAnno.setWidth("100%");
     
-    cbType.addValueChangeListener(new Property.ValueChangeListener() 
-    {
-      @Override
-      public void valueChange(ValueChangeEvent event)
-      {
-        manuallyChanged = true;
-        if("span".equals(cbType.getValue()))
-        {
-          txtAnno.setEnabled(false);
-          txtAnno.setInputPrompt("disabled");
-        }
-        else
-        {
-          txtAnno.setEnabled(true);
-          txtAnno.setInputPrompt("");
-        }
-      }
-    });
-    
-    return new Object[] {txtNode, cbType, txtAnno};
+    return new Object[] {txtNode, txtAnno};
   }
 
   @Override

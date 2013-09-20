@@ -256,7 +256,7 @@ public class FrequencyResultPanel extends VerticalLayout
       FrequencyTable.Entry firstEntry = table.getEntries().get(0);
       int tupelCount = firstEntry.getTupel().length;
       
-      tblResult.addContainerProperty("pos", Integer.class, -1);
+      tblResult.addContainerProperty("rank", Integer.class, -1);
       for(int i=1; i <= tupelCount; i++)
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
