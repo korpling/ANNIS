@@ -37,6 +37,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -84,7 +85,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setSortEnabled(false);
     tblFrequencyDefinition.setSelectable(true);
     tblFrequencyDefinition.setMultiSelect(true);
-    tblFrequencyDefinition.setEditable(true);
+    //tblFrequencyDefinition.setEditable(true);
     tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() 
     {
       @Override
@@ -108,16 +109,20 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
     tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
+    tblFrequencyDefinition.addContainerProperty("comment", String.class, "manually created");
     
     tblFrequencyDefinition.setColumnHeader("nr", "Node definition");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
+    tblFrequencyDefinition.setColumnHeader("comment", "Comment");
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
     createAutomaticEntriesForQuery(controller.getQueryDraft());
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
-    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.85f);
+    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
+    tblFrequencyDefinition.setColumnExpandRatio("comment", 0.2f);
+    
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
@@ -147,7 +152,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           }
         }
         tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-          FrequencyTableEntryType.span, ""), counter++);
+          FrequencyTableEntryType.span, "", false), counter++);
       }
     });
     layoutButtons.addComponent(btAdd);
@@ -270,7 +275,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
   }
   
-  private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, String annotation)
+  private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, 
+    String annotation, boolean automaticCreation)
   {
     TextField txtNode = new TextField();
     txtNode.setValue(nodeVariable);
@@ -291,7 +297,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     txtAnno.setWidth("100%");
     
-    return new Object[] {txtNode, txtAnno};
+    return new Object[] {txtNode, txtAnno, automaticCreation ? "automatically created" : "manually created"};
   }
 
   @Override
@@ -362,13 +368,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           if(n.getNodeAnnotations().isEmpty())
           {
             tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.span, ""), counter++);
+              FrequencyTableEntryType.span, "", true), counter++);
           }
           else
           {
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
             tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.annotation, firstAnno.getName()), counter++);
+              FrequencyTableEntryType.annotation, firstAnno.getName(), true), 
+              counter++);
 
           }
         }
