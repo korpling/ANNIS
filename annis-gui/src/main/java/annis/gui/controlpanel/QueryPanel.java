@@ -123,7 +123,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
 
     lblStatus = new Label();
-    lblStatus.setContentMode(ContentMode.HTML);
+    lblStatus.setContentMode(ContentMode.PREFORMATTED);
     lblStatus.setValue(this.lastPublicStatus);
     lblStatus.setWidth("100%");
     lblStatus.setHeight(3.5f, Unit.EM);

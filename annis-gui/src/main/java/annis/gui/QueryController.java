@@ -507,7 +507,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
 
                 ui.getControlPanel().getQueryPanel().setStatus("" + countResult.
                   getMatchCount() + " " + matchesString
-                  + " <br/>in " + countResult.getDocumentCount() + " " + documentString);
+                  + "\nin " + countResult.getDocumentCount() + " " + documentString);
                 if (lastQueryUUID != null && countResult.getMatchCount() > 0
                   && getQueryPanels().get(lastQueryUUID) != null)
                 {
