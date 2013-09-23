@@ -104,11 +104,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
-    txtQuery.setHeight(10f, Unit.EM);
-    txtQuery.setTextChangeTimeout(1000);
+//    txtQuery.setHeight(10f, Unit.EM);
+    txtQuery.setRows(10);
+    txtQuery.setTextChangeTimeout(500);
     txtQuery.addTextChangeListener((TextChangeListener) this);
-
-   
 
     final VirtualKeyboard virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
