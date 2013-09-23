@@ -48,13 +48,13 @@ public class DocBrowserController implements Serializable
   private Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
-  private transient final SearchUI ui;
+  private final SearchUI ui;
 
   // track the already initiated doc browsers
-  private transient final Map<String, Component> initedDocBrowsers;
+  private final Map<String, Component> initedDocBrowsers;
 
   // cache for already initiated visualizations, the key is the doc name
-  private transient Map<String, Component> initiatedVis;
+  private final Map<String, Component> initiatedVis;
 
   private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
 
@@ -68,30 +68,45 @@ public class DocBrowserController implements Serializable
     this.initiatedVis = new HashMap<String, Component>();
   }
 
-  public void openDocVis(String corpus, String doc, JSONObject config)
+  public void openDocVis(final String corpus, final String doc,
+    final JSONObject config)
   {
     try
     {
-      String type = config.getString("type");
-      String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
+      final String type = config.getString("type");
+      final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
+      final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
-      // check if a visualization is already initiated
-      if (!initiatedVis.containsKey(canonicalTitle))
+
+      ui.access(new Runnable()
       {
-        VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(type);
-        Component vis = visualizer.createComponent(
-          createInput(corpus, doc, config), null);
-        initiatedVis.put(canonicalTitle, vis);
-        vis.setCaption(canonicalTitle);
-        vis.setPrimaryStyleName("docviewer");
-      }
+        @Override
+        public void run()
+        {
+          // check if a visualization is already initiated
+          if (!initiatedVis.containsKey(canonicalTitle))
+          {
 
-      String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
-      Component vis = initiatedVis.get(canonicalTitle);
-      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, tabCaption);
-      visTab.setIcon(EYE_ICON);
-      visTab.setClosable(true);
-      ui.getTabSheet().setSelectedTab(vis);
+            VisualizerPlugin visualizer = ((PluginSystem) ui).
+              getVisualizer(type);
+            VisualizerInput input = createInput(corpus, doc, config);
+            Component vis = visualizer.createComponent(input, null);
+            initiatedVis.put(canonicalTitle, vis);
+            vis.setCaption(canonicalTitle);
+            vis.setPrimaryStyleName("docviewer");
+          }
+          else
+          {
+            Component vis = initiatedVis.get(canonicalTitle);
+            TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, tabCaption);
+            visTab.setIcon(EYE_ICON);
+            visTab.setClosable(true);
+            ui.getTabSheet().setSelectedTab(vis);
+          }
+
+          ui.push();
+        }
+      });
     }
     catch (JSONException ex)
     {
