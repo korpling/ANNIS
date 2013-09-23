@@ -66,6 +66,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   // the view name
   public static final String NAME = "query";
+  public static final String OK_STATUS = "Status: Ok";
 
   private TextArea txtQuery;
   private Label lblStatus;
@@ -85,16 +86,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     super(4,5);
     
     this.controller = ui.getQueryController();
-    this.lastPublicStatus = "Ok";
+    this.lastPublicStatus = OK_STATUS;
     this.history = new LinkedList<HistoryEntry>();
 
     setSpacing(true);
     setMargin(true);
 
-    Label lblStatusLabel = new Label("Status:");
-    lblStatusLabel.setSizeUndefined();
-    
-   
     setRowExpandRatio(0, 1.0f);
     setColumnExpandRatio(0, 0.0f);
     setColumnExpandRatio(1, 0.1f);
@@ -239,41 +236,42 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * This grid hopefully helps a little bit in understanding the "magic"
      * numbers better.
      * 
-     * AQL: label with "AnnisQL"
      * Q: Query text field
      * QB: Button to toggle query builder // TODO
      * KEY: Button to show virtual keyboard
      * SEA: "Search" button
      * MOR: "More actions" button 
      * HIST: "History" button
-     * LST: "Status" label
      * STAT: Text field with the real status
      * 
      *   \  0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
-     * 0 | QB  |  Q  |  Q  |  Q  
+     * 0 |  Q  |  Q  |  Q  | QB 
      * --+-----+-----+-----+-----
-     * 1 | KEY |  Q  |  Q  |  Q  
+     * 1 |  Q  |  Q  |  Q  | KEY 
      * --+-----+-----+-----+-----
-     * 2 |     | SEA | MOR | HIST
+     * 2 | SEA | MOR | HIST|     
      * --+-----+-----+-----+-----
-     * 3 | LST | STAT| STAT| STAT
+     * 3 | STAT| STAT| STAT| STAT
      */
-    addComponent(lblStatusLabel, 0, 3);
-    addComponent(txtQuery, 1, 0, 3, 1);
-    addComponent(lblStatus, 1, 3, 3, 3);
-    addComponent(btShowResult, 1, 2);
-    addComponent(btMoreActions, 2, 2);
-    addComponent(btHistory, 3, 2);
-    addComponent(btShowQueryBuilder, 0, 0);
+    addComponent(txtQuery, 0, 0, 2, 1);
+    addComponent(lblStatus, 0, 3, 3, 3);
+    addComponent(btShowResult, 0, 2);
+    addComponent(btMoreActions, 1, 2);
+    addComponent(btHistory, 2, 2);
+    addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
-      addComponent(btShowKeyboard, 0, 1);
+      addComponent(btShowKeyboard, 3, 1);
     }
 
     // alignment
     setRowExpandRatio(0, 0.0f);
     setRowExpandRatio(1, 1.0f);
+    setColumnExpandRatio(0, 1.0f);
+    setColumnExpandRatio(1, 0.0f);
+    setColumnExpandRatio(2, 0.0f);
+    setColumnExpandRatio(3, 0.0f);
     
     //setComponentAlignment(btShowQueryBuilder, Alignment.BOTTOM_CENTER);
     
