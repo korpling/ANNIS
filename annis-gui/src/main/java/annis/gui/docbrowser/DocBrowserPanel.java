@@ -16,6 +16,8 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
+import annis.gui.paging.PagingCallback;
+import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.WebResource;
@@ -44,6 +46,8 @@ public class DocBrowserPanel extends Panel
 
   private DocBrowserTable table;
 
+  private PagingComponent paging;
+
   private DocBrowserPanel(SearchUI ui, String corpus)
   {
     this.ui = ui;
@@ -59,7 +63,20 @@ public class DocBrowserPanel extends Panel
     layout.addComponent(loadingMsg);
     setSizeFull();
 
-    table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+    paging = new PagingComponent();
+    
+//    addComponentAttachListener(new ComponentAttachListener() {
+//
+//      @Override
+//      public void componentAttachedToContainer(ComponentAttachEvent event)
+//      {
+//        if (paging != null && table != null)
+//        {
+//          layout.setExpandRatio(paging, 0.2f);
+//          layout.setExpandRatio(table, 0.8f);
+//        }
+//      }
+//    });
   }
 
   @Override
@@ -94,14 +111,34 @@ public class DocBrowserPanel extends Panel
     public void run()
     {
       WebResource res = Helper.getAnnisWebResource();
-      List<Annotation> docs = res.path("meta/docnames/" + corpus).
+      final List<Annotation> docs = res.path("meta/docnames/" + corpus).
         get(new Helper.AnnotationListType());
 
       loadingMsg.setVisible(false);
       layout.removeComponent(loadingMsg);
 
-      table.setDocNames(docs);
-      layout.addComponent(table);
+      paging.addCallback(new PagingCallback()
+      {
+        @Override
+        public void switchPage(int offset, int limit)
+        {
+          if (table != null)
+          {
+            layout.removeComponent(table);
+          }
+          
+          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+          layout.addComponent(table);
+          layout.setExpandRatio(table, 0.85f);
+          List<Annotation> docPage = docs.subList(offset, offset + limit);
+          table.setDocNames(docPage);
+        }
+      });
+
+      paging.setPageSize(1, false);
+      paging.setCount(docs.size(), true);
+
+      layout.addComponent(paging, 0);
       ui.push();
     }
   }
@@ -109,5 +146,10 @@ public class DocBrowserPanel extends Panel
   public String getCorpus()
   {
     return corpus;
+  }
+
+  public PagingComponent getPagingComponent()
+  {
+    return paging;
   }
 }

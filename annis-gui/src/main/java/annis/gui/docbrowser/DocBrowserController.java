@@ -77,7 +77,6 @@ public class DocBrowserController implements Serializable
       final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
       final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
-
       ui.access(new Runnable()
       {
         @Override
@@ -119,9 +118,9 @@ public class DocBrowserController implements Serializable
     // if not already init, do it now
     if (!initedDocBrowsers.containsKey(corpus))
     {
-      DocBrowserPanel browseTbl = DocBrowserPanel.
-        initDocBrowserPanel(ui, corpus);
-      initedDocBrowsers.put(corpus, browseTbl);
+      DocBrowserPanel docBrowser = DocBrowserPanel.initDocBrowserPanel(
+        ui, corpus);
+      initedDocBrowsers.put(corpus, docBrowser);
     }
 
     // init tab and put to front
