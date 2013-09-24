@@ -829,7 +829,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     return rsc;
   }
   
-  public void loadQuery() throws UnknownLevelException, EqualityConstraintException
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, AnnotationLevelConflictException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -916,7 +916,18 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
             tempCon = "";
           }
-        }        
+        }
+        
+        /*CHECK FOR INVALID OR REDUNDANT MUTLIPLE VALUE ASSIGNMENT*/
+        for(Relation rel : eRelations)
+        {
+          Constraint con1 = constraints.get(rel.getFirst());
+          Constraint con2 = constraints.get(rel.getSecond());
+          if(con1.getLevel().equals(con2.getLevel()))
+          {
+            throw new AnnotationLevelConflictException(con1.toString()+" <-> "+con2.toString());           
+          }
+        }
         
         //create Vertical Nodes
         HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
@@ -954,7 +965,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           {
             if(rel.contains(i))
             {
-              int b = rel.whosMyFriend(i);
+              int b = rel.whosMyFriend(i);              
               if(!indexedVnodes.containsKey(b))
               {
                 indexedVnodes.put(b, null);
@@ -1070,10 +1081,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       catch(Exception e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException))
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof AnnotationLevelConflictException))
         {
           Notification.show(e.getMessage());
-          //maybe highlight the critical character sequence          
+          //LATER: maybe highlight the critical character sequence          
         }
         else
         {
@@ -1150,6 +1161,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     {
       return negative;
     }
+    
+    @Override
+    public String toString()
+    {
+      String op = (negative) ? "!=" : "=";
+      String val = (regEx) ? "/"+value+"/" : "\""+value+"\"";
+      return level+op+val;
+    }
   }
   
   private class Relation
@@ -1176,7 +1195,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       char c = in.charAt(1);
       in = in.replace(" ", "");
       
-      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$'))
+      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$')&(c!='='))
       {
         o1str+=c;
         i++;
@@ -1282,6 +1301,23 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     public String getMessage()
     {
       return ERROR_MESSAGE+level;
+    }
+  }
+  
+  private class AnnotationLevelConflictException extends Exception
+  {
+    private static final String ERROR_MESSAGE = "Invalid or redundant assignment of multiple values: ";
+    private String critical;
+    
+    public AnnotationLevelConflictException(String s)
+    {
+      critical = s;
+    }
+    
+    @Override
+    public String getMessage()
+    {
+      return ERROR_MESSAGE+"\n"+critical;
     }
   }
   
