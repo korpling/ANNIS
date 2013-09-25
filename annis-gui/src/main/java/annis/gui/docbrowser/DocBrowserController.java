@@ -23,6 +23,7 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -94,14 +95,17 @@ public class DocBrowserController implements Serializable
             vis.setCaption(canonicalTitle);
             vis.setPrimaryStyleName("docviewer");
           }
-          else
-          {
-            Component vis = initiatedVis.get(canonicalTitle);
-            TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, tabCaption);
-            visTab.setIcon(EYE_ICON);
-            visTab.setClosable(true);
-            ui.getTabSheet().setSelectedTab(vis);
-          }
+
+          Component vis = initiatedVis.get(canonicalTitle);
+          Panel visHolder = new Panel();
+          visHolder.setContent(vis);
+          visHolder.setSizeFull();
+          vis.setSizeUndefined();
+          TabSheet.Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+          visTab.setIcon(EYE_ICON);
+          visTab.setClosable(true);
+          ui.getTabSheet().setSelectedTab(vis);
+
 
           ui.push();
         }
