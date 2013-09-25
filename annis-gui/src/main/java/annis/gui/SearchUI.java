@@ -21,6 +21,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
@@ -53,7 +54,9 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.communication.PushMode;
+
 import com.vaadin.shared.ui.ui.Transport;
+
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -65,9 +68,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import net.xeoh.plugins.base.PluginManager;
@@ -133,15 +133,16 @@ public class SearchUI extends AnnisBaseUI
 
   private CSSInject css;
 
+  private transient DocBrowserController docBrowserController;
+
   public final static int CONTROL_PANEL_WIDTH = 360;
 
-  
   @Override
   protected void init(VaadinRequest request)
-  {    
+  {
     super.init(request);
     setErrorHandler(this);
-    
+
     this.instanceConfig = getInstanceConfig(request);
 
     getPage().setTitle(
@@ -149,6 +150,9 @@ public class SearchUI extends AnnisBaseUI
 
     JavaScript.getCurrent().addFunction("annis.gui.logincallback",
       new LoginCloseCallback());
+
+    // init a doc browser controller
+    docBrowserController = new DocBrowserController(this);
 
     queryController = new QueryController(this);
 
@@ -227,7 +231,7 @@ public class SearchUI extends AnnisBaseUI
         windowLogin.center();
       }
     });
-    
+
     btLogout = new Button("Logout", new Button.ClickListener()
     {
       @Override
@@ -284,23 +288,23 @@ public class SearchUI extends AnnisBaseUI
     //HorizontalLayout hLayout = new HorizontalLayout();
     final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
     hSplit.setSizeFull();
-   
+
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
     final HelpPanel help = new HelpPanel(this);
-
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addSelectedTabChangeListener(queryController);
     mainTab.addStyleName("blue-tab");
-    
+
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
-   
+
+
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
     hSplit.addSplitterClickListener(
@@ -326,14 +330,14 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
-    
-    controlPanel = new ControlPanel(this,
-      help.getExamples());
+    controlPanel = new ControlPanel(queryController, instanceConfig,
+      help.getExamples(), this);
+
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     hSplit.setFirstComponent(controlPanel);
 
-    
+
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
@@ -371,7 +375,7 @@ public class SearchUI extends AnnisBaseUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    while(source != null && source.getCause() != null)
+    while (source != null && source.getCause() != null)
     {
       source = source.getCause();
     }
@@ -500,7 +504,8 @@ public class SearchUI extends AnnisBaseUI
 
   public void checkCitation()
   {
-    if(VaadinSession.getCurrent() == null || VaadinSession.getCurrent().getSession() == null)
+    if (VaadinSession.getCurrent() == null || VaadinSession.getCurrent().
+      getSession() == null)
     {
       return;
     }
@@ -662,7 +667,7 @@ public class SearchUI extends AnnisBaseUI
   public void onTabClose(TabSheet tabsheet, Component tabContent)
   {
     tabsheet.removeComponent(tabContent);
-    if(tabContent instanceof ResultViewPanel)
+    if (tabContent instanceof ResultViewPanel)
     {
       getQueryController().notifyTabClose((ResultViewPanel) tabContent);
     }
@@ -671,7 +676,6 @@ public class SearchUI extends AnnisBaseUI
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
   }
-  
 
   public boolean isLoggedIn()
   {
@@ -924,8 +928,6 @@ public class SearchUI extends AnnisBaseUI
       UI.getCurrent().getPage().setUriFragment("");
     }
   }
-  
-  
 
   private class CitationRequestHandler implements RequestHandler
   {
@@ -982,4 +984,13 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
+  public TabSheet getTabSheet()
+  {
+    return mainTab;
+  }
+
+  public DocBrowserController getDocBrowserController()
+  {
+    return docBrowserController;
+  }
 }

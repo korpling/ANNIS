@@ -542,17 +542,18 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     node.addSFeature(feat);
   }
 
-  private void addLongSFeature(SNode node, ResultSet resultSet, String name,
-    String table, String tupleName) throws SQLException
-  {
-    addLongSFeature(node, name, longValue(resultSet, table, tupleName));
-  }
-  
-  private void addStringSFeature(SNode node, ResultSet resultSet, String name,
-    String table, String tupleName) throws SQLException
-  {
-    addStringSFeature(node, name, stringValue(resultSet, table, tupleName));
-  }
+// non used functions, commmented out in order to avoid some findbugs warnings 
+//  private void addLongSFeature(SNode node, ResultSet resultSet, String name,
+//    String table, String tupleName) throws SQLException
+//  {
+//    addLongSFeature(node, name, longValue(resultSet, table, tupleName));
+//  }
+//  
+//  private void addStringSFeature(SNode node, ResultSet resultSet, String name,
+//    String table, String tupleName) throws SQLException
+//  {
+//    addStringSFeature(node, name, stringValue(resultSet, table, tupleName));
+//  }
 
   private SStructuredNode recreateNode(Class<? extends SStructuredNode> clazz,
     SStructuredNode oldNode)

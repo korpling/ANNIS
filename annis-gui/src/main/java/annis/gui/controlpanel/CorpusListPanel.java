@@ -23,6 +23,7 @@ import annis.security.AnnisUserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -78,10 +79,15 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
+  private static final ThemeResource DOC_ICON = new ThemeResource(
+    "document_ico.png");
+
   public static final String ALL_CORPORA = "All";
 
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
+
+  private transient SearchUI ui;
 
   public enum ActionType
   {
@@ -106,11 +112,13 @@ public class CorpusListPanel extends VerticalLayout implements
   private InstanceConfig instanceConfig;
 
   public CorpusListPanel(QueryController controller,
-    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries)
+    InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
+    SearchUI ui)
   {
     this.controller = controller;
     this.instanceConfig = instanceConfig;
     this.autoGenQueries = autoGenQueries;
+    this.ui = ui;
 
     final CorpusListPanel finalThis = this;
 
@@ -208,9 +216,11 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setContainerDataSource(corpusContainer);
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
+    tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
 
-    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info");
-    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "");
+    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
+      "docs");
+    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
     tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
     tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
     tblCorpora.setSelectable(true);
@@ -652,6 +662,30 @@ public class CorpusListPanel extends VerticalLayout implements
     return result;
   }
 
+  public class DocLinkGenerator implements Table.ColumnGenerator
+  {
+
+    @Override
+    public Object generateCell(Table source, Object itemId, Object columnId)
+    {
+      final String id = (String) itemId;
+      Button l = new Button();
+      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setIcon(DOC_ICON);
+      l.setDescription("opens the document browser for " + id);
+      l.addClickListener(new Button.ClickListener()
+      {
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          ui.getDocBrowserController().openDocBrowser(id);
+        }
+      });
+
+      return l;
+    }
+  }
+
   public class InfoGenerator implements Table.ColumnGenerator
   {
 
@@ -663,8 +697,7 @@ public class CorpusListPanel extends VerticalLayout implements
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
-
-      l.addListener(new Button.ClickListener()
+      l.addClickListener(new Button.ClickListener()
       {
         @Override
         public void buttonClick(ClickEvent event)

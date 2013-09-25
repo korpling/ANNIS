@@ -505,7 +505,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     if(pushTimer == null)
     {
       pushTimer = new Timer("Push Timer");
-      pushTask = null;
     }
     return pushTimer;
   }

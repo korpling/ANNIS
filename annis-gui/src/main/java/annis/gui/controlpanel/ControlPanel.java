@@ -16,6 +16,8 @@
 package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
+import annis.libgui.InstanceConfig;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.resultview.ResultViewPanel;
@@ -46,8 +48,9 @@ public class ControlPanel extends VerticalLayout
   private TabSheet optionsTab;
   private SearchUI ui;
 
-  public ControlPanel(SearchUI ui,
-    ExampleQueriesPanel autoGenQueries)
+
+  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+    ExampleQueriesPanel autoGenQueries, SearchUI ui)
   {
     this.ui = ui;
     
@@ -61,8 +64,8 @@ public class ControlPanel extends VerticalLayout
     optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
     optionsTab.addStyleName("blue-tab");
 
-    corpusList = new CorpusListPanel(ui.getQueryController(), ui.getInstanceConfig(), autoGenQueries);
-
+    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
+    
     searchOptions = new SearchOptionsPanel();
 
     queryPanel = new QueryPanel(ui);

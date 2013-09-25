@@ -24,6 +24,7 @@ import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.libgui.ResolverProviderImpl;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
@@ -72,16 +73,20 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class ResultViewPanel extends VerticalLayout implements ResolverProvider, OnLoadCallbackExtension.Callback
+public class ResultViewPanel extends VerticalLayout implements
+  OnLoadCallbackExtension.Callback
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     ResultViewPanel.class);
 
   public static final String NULL_SEGMENTATION_VALUE = "tokens (default)";
+
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
+
   public static final String FILESYSTEM_CACHE_RESULT =
     "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+
   private PagingComponent paging;
 
   private ProgressBar progressResult;
@@ -113,10 +118,12 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
   private String segmentationName;
 
   private int currentResults;
+  private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
+
   private PagedResultQuery currentQuery;
-  
+
   public ResultViewPanel(QueryController controller,
     PluginSystem ps, InstanceConfig instanceConfig)
   {
@@ -128,17 +135,17 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     cacheResolver =
       Collections.synchronizedMap(
       new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
-    
+
     resultPanelList =
       Collections.synchronizedList(new LinkedList<SingleResultPanel>());
 
-    
+
     resultLayout = new CssLayout();
     resultLayout.addStyleName("result-view-css");
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
     resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    
+
 
     this.instanceConfig = instanceConfig;
 
@@ -149,7 +156,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
     addComponent(mbResult);
-    
+
     miSegmentation = mbResult.addItem("Base text", null);
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
@@ -157,17 +164,17 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
 
     progressResult.setVisible(false);
 
-    addComponent(progressResult);   
+    addComponent(progressResult);
     addComponent(resultPanel);
-    
+
     setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
 
     setExpandRatio(mbResult, 0.0f);
     setExpandRatio(progressResult, 0.0f);
     setExpandRatio(resultPanel, 1.0f);
-    
+
     paging = new PagingComponent();
-    
+
     addComponent(paging, 1);
 
     setComponentAlignment(paging, Alignment.TOP_CENTER);
@@ -184,7 +191,7 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
       " ") + "\"");
     progressResult.setVisible(true);
     setExpandRatio(progressResult, 1.0f);
-
+  
     segmentationName = q.getSegmentation();
   }
 
@@ -206,31 +213,32 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
 
   public void showSubgraphSearchInProgress(PagedResultQuery q, float percent)
   {
-    if(percent == 0.0f)
+    if (percent == 0.0f)
     {
       resultLayout.removeAllComponents();
       currentResults = 0;
     }
-    
+
     progressResult.setIndeterminate(false);
     progressResult.setCaption("");
     progressResult.setVisible(true);
     setExpandRatio(progressResult, 0.0f);
     progressResult.setValue(percent);
   }
-  
-  public void setQueryResultQueue(BlockingQueue<SaltProject> queue, PagedResultQuery q)
+
+  public void setQueryResultQueue(BlockingQueue<SaltProject> queue,
+    PagedResultQuery q, int numberOfResults)
   {
     this.projectQueue = queue;
     this.currentQuery = q;
+    this.numberOfResults = numberOfResults;
 
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
-    
+
     resultLayout.removeAllComponents();
     resultPanelList.clear();
-    
-    
+
     Set<String> corpora = q.getCorpora();
 
     if (corpora.size() == 1)
@@ -245,22 +253,30 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
           KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
       }
     }
-    
+
     // get the first query result
     SaltProject first = queue.poll();
-    Preconditions.checkState(first != null, "There must be already an element in the queue");
-    
+    Preconditions.checkState(first != null,
+      "There must be already an element in the queue");
+
     addQueryResult(q, first);
   }
-  
-  public void resetQueryResultQueue()
+
+  private void resetQueryResultQueue()
   {
     this.projectQueue = null;
     this.currentQuery = null;
+    this.currentResults = 0;
+    this.numberOfResults = 0;
   }
 
   private void addQueryResult(PagedResultQuery q, SaltProject p)
   {
+    if(q == null)
+    {
+      return;
+    }
+    
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
     {
@@ -274,6 +290,25 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
         updateVariables(p);
         newPanels = createPanels(p, q.getOffset() + currentResults);
         currentResults += newPanels.size();
+        
+        if(currentResults == numberOfResults)
+        {
+          resetQueryResultQueue();
+        }
+     
+        for (SingleResultPanel panel : newPanels)
+        {
+          resultPanelList.add(panel);
+          resultLayout.addComponent(panel);
+        }
+
+        if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
+        {
+          // add a callback so we can load the next single result
+          OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
+          ext.extend(newPanels.get(newPanels.size() - 1));
+        }
+        
       }
     }
     catch (Throwable ex)
@@ -281,22 +316,10 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
       log.error(null, ex);
     }
 
-    for (SingleResultPanel panel : newPanels)
-    {
-      resultPanelList.add(panel);
-      resultLayout.addComponent(panel);
-    }
     
-    if(projectQueue != null && q != null 
-      && !newPanels.isEmpty() && currentResults < q.getLimit()-1)
-    {
-      // add a callback so we can load the next single result
-      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 1000);
-      ext.extend(newPanels.get(newPanels.size()-1));
-    }
-    
+
   }
-  
+
   public void showFinishedSubgraphSearch()
   {
     progressResult.setVisible(false);
@@ -311,7 +334,8 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
     {
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
-        i + offset, this, ps, tokenAnnotationLevelSet, segmentationName,
+        i + offset, new ResolverProviderImpl(cacheResolver), ps,
+        tokenAnnotationLevelSet, segmentationName,
         instanceConfig);
       i++;
 
@@ -431,137 +455,33 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
       miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
     }
   }
-  
-  @Override
-  public ResolverEntry[] getResolverEntries(SDocument doc)
-  {
-    HashSet<ResolverEntry> visSet = new HashSet<ResolverEntry>();
-
-    // create a request for resolver entries
-    HashSet<SingleResolverRequest> resolverRequests =
-      new HashSet<SingleResolverRequest>();
-
-    Set<String> nodeLayers = new HashSet<String>();
-
-    for (SNode n : doc.getSDocumentGraph().getSNodes())
-    {
-      for (SLayer layer : n.getSLayers())
-      {
-        nodeLayers.add(layer.getSName());
-      }
-    }
-
-    Set<String> edgeLayers = new HashSet<String>();
-    for (SRelation e : doc.getSDocumentGraph().getSRelations())
-    {
-      for (SLayer layer : e.getSLayers())
-      {
-        try
-        {
-          edgeLayers.add(layer.getSName());
-        }
-        catch (NullPointerException ex)
-        {
-          log.warn("NullPointerException when using Salt, was trying to get layer name",
-            ex);
-        }
-      }
-    }
-
-    for (String ns : nodeLayers)
-    {
-      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns, ResolverEntry.ElementType.node));
-    }
-    for (String ns : edgeLayers)
-    {
-      resolverRequests.add(new SingleResolverRequest(doc.getSCorpusGraph().
-        getSRootCorpus().get(0).getSName(), ns, ResolverEntry.ElementType.edge));
-    }
-
-    // query with this resolver request and make sure it is unique
-    if (cacheResolver.containsKey(resolverRequests))
-    {
-      visSet.addAll(cacheResolver.get(resolverRequests));
-    }
-    else
-    {
-      List<ResolverEntry> resolverList = new LinkedList<ResolverEntry>();
-
-      WebResource resResolver = Helper.getAnnisWebResource()
-        .path("query").path("resolver");
-
-      for (SingleResolverRequest r : resolverRequests)
-      {
-        List<ResolverEntry> tmp;
-        try
-        {
-          String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
-          String namespace = r.getNamespace();
-          String type = r.getType() == null ? null : r.getType().toString();
-          if (corpusName != null && namespace != null && type != null)
-          {
-            WebResource res = resResolver.path(corpusName).path(namespace).path(type);
-            try
-            {
-              tmp = res.get(new ResolverEntryListType());
-              resolverList.addAll(tmp);
-            }
-            catch (Exception ex)
-            {
-              log.error("could not query resolver entries: "
-                + res.toString(), ex);
-            }
-          }
-        }
-        catch (UniformInterfaceException ex)
-        {
-          log.error(null, ex);
-        }
-        catch (ClientHandlerException ex)
-        {
-          log.error(null, ex);
-        }
-        catch(UnsupportedEncodingException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-      visSet.addAll(resolverList);
-      cacheResolver.put(resolverRequests, resolverList);
-    }
-    // sort everything
-    ResolverEntry[] visArray = visSet.toArray(new ResolverEntry[visSet.size()]);
-    Arrays.sort(visArray, new ResolverEntryComparator());
-    return visArray;
-  }
 
   @Override
   public boolean onCompononentLoaded(AbstractClientConnector source)
   {
-    if(source != null && projectQueue != null && currentQuery != null)
+    if (source != null && projectQueue != null && currentQuery != null)
     {
       try
       {
-        final SaltProject p = projectQueue.poll(100, TimeUnit.MILLISECONDS);
-        if(p == null)
+        final SaltProject p = projectQueue.poll(250, TimeUnit.MILLISECONDS);
+        if (p == null)
         {
+          log.debug("no SaltProject graph in queue");
           return false;
         }
-        
+        log.debug("adding new SaltProject graph");
         addQueryResult(currentQuery, p);
-        
+        return true;
+
       }
       catch (InterruptedException ex)
       {
         log.warn(null, ex);
       }
     }
+    
     return true;
   }
-  
-  
-  
 
   private void setVisibleTokenAnnosVisible(Set<String> annos)
   {
@@ -582,38 +502,5 @@ public class ResultViewPanel extends VerticalLayout implements ResolverProvider,
   public PagingComponent getPaging()
   {
     return paging;
-  }
-  
-  private static class ResolverEntryListType extends GenericType<List<ResolverEntry>>
-  {
-
-    public ResolverEntryListType()
-    {
-    }
-  }
-  
-  private static class ResolverEntryComparator implements Comparator<ResolverEntry>, Serializable
-  {
-
-    public ResolverEntryComparator()
-    {
-    }
-
-    @Override
-    public int compare(ResolverEntry o1, ResolverEntry o2)
-    {
-      if (o1.getOrder() < o2.getOrder())
-      {
-        return -1;
-      }
-      else if (o1.getOrder() > o2.getOrder())
-      {
-        return 1;
-      }
-      else
-      {
-        return 0;
-      }
-    }
   }
 }

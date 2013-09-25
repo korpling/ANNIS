@@ -190,12 +190,22 @@ public class AdminServiceImpl
             corpusAdmin.sendStatusMail(statusMail, corpusName,
               ImportJob.Status.WAITING, null);
             
-            importWorker.getImportQueue().offer(job);
-            
-            
-            return Response.status(Response.Status.ACCEPTED).header("Location", 
-              request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
-              .build();
+            try
+            {
+              importWorker.getImportQueue().put(job);
+
+
+              return Response.status(Response.Status.ACCEPTED).header("Location", 
+                request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
+                .build();
+            }
+            catch(InterruptedException ex)
+            {
+              log.error("Could not add job to import queue", ex);
+              return Response.serverError().entity("Could not add job to "
+                + "import queue. There might be more information in the server "
+                + "log files. Contact the administrator if necessary.").build();
+            }
           }
           else
           {
