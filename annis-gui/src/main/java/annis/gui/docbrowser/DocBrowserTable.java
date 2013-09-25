@@ -55,8 +55,6 @@ public class DocBrowserTable extends Table
 
   private final DocBrowserPanel docBrowserPanel;
 
-  private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
-
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
   // the key for the visualizer json array list
@@ -188,7 +186,7 @@ public class DocBrowserTable extends Table
 
     // init metadata cache
     docMetaDataCache = new HashMap<String, List<Annotation>>();
-    
+
     addStyleName("docvis-table");
 
     this.docVisualizerConfig = docBrowserPanel.getDocBrowserConfig();
@@ -286,8 +284,10 @@ public class DocBrowserTable extends Table
           Button openVis = new Button(config.getString("displayName"));
           openVis.setDescription(
             "open visualizer with the full text of " + docName);
-          openVis.addClickListener(new OpenVisualizerWindow(docName, config));
+          openVis.addClickListener(new OpenVisualizerWindow(docName, config,
+            openVis));
           openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          openVis.setDisableOnClick(true);
           l.addComponent(openVis);
         }
       }
@@ -314,8 +314,11 @@ public class DocBrowserTable extends Table
 
     private JSONObject config;
 
-    public OpenVisualizerWindow(String docName, JSONObject config)
+    private final Button button;
+
+    public OpenVisualizerWindow(String docName, JSONObject config, Button btn)
     {
+      this.button = btn;
       this.docName = docName;
       this.config = config;
     }
@@ -324,7 +327,7 @@ public class DocBrowserTable extends Table
     public void buttonClick(Button.ClickEvent event)
     {
 
-      docBrowserPanel.openVis(docName, config);
+      docBrowserPanel.openVis(docName, config, button);
     }
   }
 

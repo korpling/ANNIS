@@ -22,6 +22,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
@@ -70,61 +71,10 @@ public class DocBrowserController implements Serializable
     this.initiatedVis = new HashMap<String, Panel>();
   }
 
-  public void openDocVis(final String corpus, final String doc,
-    final JSONObject config)
+  public void openDocVis(String corpus, String doc, JSONObject config,
+    Button btn)
   {
-    try
-    {
-      final String type = config.getString("type");
-      final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
-      final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
-
-      ui.access(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          // check if a visualization is already initiated
-          if (!initiatedVis.containsKey(canonicalTitle))
-          {
-            VisualizerPlugin visualizer = ((PluginSystem) ui).
-              getVisualizer(type);
-            VisualizerInput input = createInput(corpus, doc, config);
-            Component vis = visualizer.createComponent(input, null);
-            vis.addStyleName("corpus-font-force");
-            Panel visHolder = new Panel();
-            visHolder.setContent(vis);
-            visHolder.setSizeFull();
-            vis.setSizeUndefined();
-            initiatedVis.put(canonicalTitle, visHolder);
-            vis.setCaption(canonicalTitle);
-            vis.setPrimaryStyleName("docviewer");
-          }
-
-          Tab visTab = ui.getTabSheet().getTab(initiatedVis.get(canonicalTitle));
-
-          if (visTab == null)
-          {
-            Component vis = initiatedVis.get(canonicalTitle);
-
-            visTab = ui.getTabSheet().addTab(vis, tabCaption);
-            visTab.setIcon(EYE_ICON);
-            visTab.setClosable(true);
-            ui.getTabSheet().setSelectedTab(vis);
-          }
-          else
-          {
-            ui.getTabSheet().setSelectedTab(visTab);
-          }
-
-          ui.push();
-        }
-      });
-    }
-    catch (JSONException ex)
-    {
-      log.error("problems with reading document visualizer config", ex);
-    }
+    new DocVisualizerFetcher(corpus, doc, config, btn).start();
   }
 
   public void openDocBrowser(String corpus)
@@ -230,5 +180,85 @@ public class DocBrowserController implements Serializable
     }
 
     return namespace;
+  }
+
+  private class DocVisualizerFetcher extends Thread
+  {
+
+    JSONObject config;
+
+    String corpus;
+
+    String doc;
+    
+    final Button btn;
+
+    public DocVisualizerFetcher(String corpus, String doc, JSONObject config, Button btn)
+    {
+      this.corpus = corpus;
+      this.doc = doc;
+      this.btn = btn;
+      this.config = config;
+    }
+
+    @Override
+    public void run()
+    {
+      try
+      {
+        
+        final String type = config.getString("type");
+        final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
+        final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
+
+        // check if a visualization is already initiated
+        if (!initiatedVis.containsKey(canonicalTitle))
+        {
+          VisualizerPlugin visualizer = ((PluginSystem) ui).
+            getVisualizer(type);
+          VisualizerInput input = createInput(corpus, doc, config);
+          Component vis = visualizer.createComponent(input, null);
+          vis.addStyleName("corpus-font-force");
+          Panel visHolder = new Panel();
+          visHolder.setContent(vis);
+          visHolder.setSizeFull();
+          vis.setSizeUndefined();
+          initiatedVis.put(canonicalTitle, visHolder);
+          vis.setCaption(canonicalTitle);
+          vis.setPrimaryStyleName("docviewer");
+        }
+
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Tab visTab = ui.getTabSheet().getTab(initiatedVis.
+              get(canonicalTitle));
+
+            if (visTab == null)
+            {
+              Component vis = initiatedVis.get(canonicalTitle);
+
+              visTab = ui.getTabSheet().addTab(vis, tabCaption);
+              visTab.setIcon(EYE_ICON);
+              visTab.setClosable(true);
+              ui.getTabSheet().setSelectedTab(vis);
+            }
+            else
+            {
+              ui.getTabSheet().setSelectedTab(visTab);
+            }
+            
+            btn.setEnabled(true);
+            ui.push();
+          }
+        });
+      }
+      catch (JSONException ex)
+      {
+        log.error("problems with reading document visualizer config", ex);
+      }
+    }
   }
 }

@@ -22,6 +22,7 @@ import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -160,9 +161,9 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc, JSONObject config)
+  public void openVis(String doc, JSONObject config, Button btn)
   {
-    ui.getDocBrowserController().openDocVis(corpus, doc, config);
+    ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
 
   private class LoadingDocs extends Thread
