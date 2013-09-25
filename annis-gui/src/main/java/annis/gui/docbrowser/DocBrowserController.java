@@ -25,6 +25,7 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
@@ -55,7 +56,7 @@ public class DocBrowserController implements Serializable
   private final Map<String, Component> initedDocBrowsers;
 
   // cache for already initiated visualizations, the key is the doc name
-  private final Map<String, Component> initiatedVis;
+  private final Map<String, Panel> initiatedVis;
 
   private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
 
@@ -66,7 +67,7 @@ public class DocBrowserController implements Serializable
   {
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<String, Component>();
-    this.initiatedVis = new HashMap<String, Component>();
+    this.initiatedVis = new HashMap<String, Panel>();
   }
 
   public void openDocVis(final String corpus, final String doc,
@@ -86,26 +87,34 @@ public class DocBrowserController implements Serializable
           // check if a visualization is already initiated
           if (!initiatedVis.containsKey(canonicalTitle))
           {
-
             VisualizerPlugin visualizer = ((PluginSystem) ui).
               getVisualizer(type);
             VisualizerInput input = createInput(corpus, doc, config);
             Component vis = visualizer.createComponent(input, null);
-            initiatedVis.put(canonicalTitle, vis);
+            Panel visHolder = new Panel();
+            visHolder.setContent(vis);
+            visHolder.setSizeFull();
+            vis.setSizeUndefined();
+            initiatedVis.put(canonicalTitle, visHolder);
             vis.setCaption(canonicalTitle);
             vis.setPrimaryStyleName("docviewer");
           }
 
-          Component vis = initiatedVis.get(canonicalTitle);
-          Panel visHolder = new Panel();
-          visHolder.setContent(vis);
-          visHolder.setSizeFull();
-          vis.setSizeUndefined();
-          TabSheet.Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
-          visTab.setIcon(EYE_ICON);
-          visTab.setClosable(true);
-          ui.getTabSheet().setSelectedTab(vis);
+          Tab visTab = ui.getTabSheet().getTab(initiatedVis.get(canonicalTitle));
 
+          if (visTab == null)
+          {
+            Component vis = initiatedVis.get(canonicalTitle);
+
+            visTab = ui.getTabSheet().addTab(vis, tabCaption);
+            visTab.setIcon(EYE_ICON);
+            visTab.setClosable(true);
+            ui.getTabSheet().setSelectedTab(vis);
+          }
+          else
+          {
+            ui.getTabSheet().setSelectedTab(visTab);
+          }
 
           ui.push();
         }
