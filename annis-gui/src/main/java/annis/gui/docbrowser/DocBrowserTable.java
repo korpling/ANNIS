@@ -18,7 +18,6 @@ package annis.gui.docbrowser;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.model.Annotation;
-import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
@@ -60,17 +59,14 @@ public class DocBrowserTable extends Table
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
-  // the key for the json config of the doc visualization
-  private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
+  // the key for the visualizer json array list
+  public final String VIS_CONFIG_KEY = "vis";
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
   private transient JSONObject docVisualizerConfig;
-
-  // the key for the visualizer json array list
-  private final String VIS_CONFIG_KEY = "vis";
 
   // the key for the meta cols, which are generated in the main table
   private final String VIS_META_CONFIG = "metadata";
@@ -100,7 +96,7 @@ public class DocBrowserTable extends Table
     annoBean = new BeanItemContainer<Annotation>(Annotation.class, docs);
 
     setContainerDataSource(annoBean);
-    
+
     if (!generatedColumns)
     {
       generatedColumns = true;
@@ -195,7 +191,7 @@ public class DocBrowserTable extends Table
     // init metadata cache
     docMetaDataCache = new HashMap<String, List<Annotation>>();
 
-    this.docVisualizerConfig = getDocBrowserConfig();
+    this.docVisualizerConfig = docBrowserPanel.getDocBrowserConfig();
   }
 
   private class InfoButtonColumnGen implements Table.ColumnGenerator
@@ -303,30 +299,6 @@ public class DocBrowserTable extends Table
       p.setContent(l);
       return p;
     }
-  }
-
-  JSONObject getDocBrowserConfig()
-  {
-    CorpusConfig corpusConfig = Helper.getCorpusConfig(docBrowserPanel.
-      getCorpus());
-
-    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
-      DOC_BROWSER_CONFIG_KEY))
-    {
-      corpusConfig = Helper.getDefaultCorpusConfig();
-    }
-
-    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
-    try
-    {
-      return new JSONObject(c);
-    }
-    catch (JSONException ex)
-    {
-      log.error("could not read the doc browser config", ex);
-    }
-
-    return null;
   }
 
   public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)
