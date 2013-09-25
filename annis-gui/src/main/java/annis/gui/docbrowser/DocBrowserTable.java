@@ -91,8 +91,6 @@ public class DocBrowserTable extends Table
    */
   void setDocNames(List<Annotation> docs)
   {
-    PagingComponent paging = docBrowserPanel.getPagingComponent();
-
     annoBean = new BeanItemContainer<Annotation>(Annotation.class, docs);
 
     setContainerDataSource(annoBean);
