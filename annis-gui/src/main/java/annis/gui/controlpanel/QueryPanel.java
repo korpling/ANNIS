@@ -69,7 +69,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   public static final String OK_STATUS = "Status: Ok";
 
   private TextArea txtQuery;
-  private Label lblStatus;
+  private TextArea txtStatus;
   private Button btShowResult;
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
@@ -121,13 +121,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       virtualKeyboard.extend(txtQuery);
     }
 
-    lblStatus = new Label();
-    lblStatus.setContentMode(ContentMode.PREFORMATTED);
-    lblStatus.setValue(this.lastPublicStatus);
-    lblStatus.setWidth("100%");
-    lblStatus.setHeight(3.5f, Unit.EM);
-    lblStatus.addStyleName("border-layout");
-
+    txtStatus = new TextArea();
+    txtStatus.setValue(this.lastPublicStatus);
+    txtStatus.setWidth("100%");
+    txtStatus.setHeight(3.5f, Unit.EM);
+    txtStatus.addStyleName("border-layout");
+    txtStatus.setReadOnly(true);
+    
+    
     piCount = new ProgressBar();
     piCount.setIndeterminate(true);
     piCount.setEnabled(false);
@@ -254,7 +255,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * 3 | STAT| STAT| STAT| STAT
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(lblStatus, 0, 3, 3, 3);
+    addComponent(txtStatus, 0, 3, 3, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);
     addComponent(btHistory, 2, 2);
@@ -326,69 +327,73 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   private void validateQuery(String query)
   {
+    txtStatus.setReadOnly(false);
+    
     if(query.isEmpty())
     {
-      lblStatus.setValue("Empty query");
-      return;
+      txtStatus.setValue("Empty query");
     }
-    
-    // validate query
-    try
+    else
     {
-      AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-      Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
-        .get(String.class);
-
-      // wait for maximal one seconds
-
+      // validate query
       try
       {
-        String result = future.get(1, TimeUnit.SECONDS);
+        AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
+        Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
+          .get(String.class);
 
-        if ("ok".equalsIgnoreCase(result))
+        // wait for maximal one seconds
+
+        try
         {
-          lblStatus.setValue(lastPublicStatus);
-        }
-        else
-        {
-          lblStatus.setValue(result);
-        }
-      }
-      catch (InterruptedException ex)
-      {
-        log.warn(null, ex);
-      }
-      catch (ExecutionException ex)
-      {
-        if(ex.getCause() instanceof UniformInterfaceException)
-        {
-          UniformInterfaceException cause = (UniformInterfaceException) ex.
-            getCause();
-          if (cause.getResponse().getStatus() == 400)
+          String result = future.get(1, TimeUnit.SECONDS);
+
+          if ("ok".equalsIgnoreCase(result))
           {
-            lblStatus.setValue(cause.getResponse().getEntity(String.class));
+            txtStatus.setValue(lastPublicStatus);
           }
           else
           {
-            log.error(
-              "Exception when communicating with service", ex);
-            ExceptionDialog.show(ex,
-              "Exception when communicating with service.");
+            txtStatus.setValue(result);
           }
         }
-      }
-      catch (TimeoutException ex)
-      {
-        lblStatus.setValue("Validation of query took too long.");
-      }
+        catch (InterruptedException ex)
+        {
+          log.warn(null, ex);
+        }
+        catch (ExecutionException ex)
+        {
+          if(ex.getCause() instanceof UniformInterfaceException)
+          {
+            UniformInterfaceException cause = (UniformInterfaceException) ex.
+              getCause();
+            if (cause.getResponse().getStatus() == 400)
+            {
+              txtStatus.setValue(cause.getResponse().getEntity(String.class));
+            }
+            else
+            {
+              log.error(
+                "Exception when communicating with service", ex);
+              ExceptionDialog.show(ex,
+                "Exception when communicating with service.");
+            }
+          }
+        }
+        catch (TimeoutException ex)
+        {
+          txtStatus.setValue("Validation of query took too long.");
+        }
 
+      }
+      catch(ClientHandlerException ex)
+      {
+        log.error(
+            "Could not connect to web service", ex);
+          ExceptionDialog.show(ex, "Could not connect to web service");
+      }
     }
-    catch(ClientHandlerException ex)
-    {
-      log.error(
-          "Could not connect to web service", ex);
-        ExceptionDialog.show(ex, "Could not connect to web service");
-    }
+    txtStatus.setReadOnly(true);
   }
 
   @Override
@@ -432,13 +437,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   public void setCountIndicatorEnabled(boolean enabled)
   {
-    if(piCount != null && btShowResult != null && lblStatus != null)
+    if(piCount != null && btShowResult != null && txtStatus != null)
     {
       if(enabled)
       {
         if(!piCount.isVisible())
         {
-          replaceComponent(lblStatus, piCount);
+          replaceComponent(txtStatus, piCount);
           piCount.setVisible(true);
           piCount.setEnabled(true);
         }
@@ -447,7 +452,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(piCount.isVisible())
         {
-          replaceComponent(piCount, lblStatus);
+          replaceComponent(piCount, txtStatus);
           piCount.setVisible(false);
           piCount.setEnabled(false);
         }
@@ -460,10 +465,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   public void setStatus(String status)
   {
-    if(lblStatus != null)
+    if(txtStatus != null)
     {
-      lblStatus.setValue(status);
+      txtStatus.setReadOnly(false);
+      txtStatus.setValue(status);
       lastPublicStatus = status;
+      txtStatus.setReadOnly(true);
     }
   }
 
