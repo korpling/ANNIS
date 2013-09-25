@@ -32,7 +32,7 @@ public class AnnisQLSyntaxMapper implements
   @Override
   public Response toResponse(AnnisQLSyntaxException exception)
   {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Syntax error: "
-      + exception.getMessage()).type("text/plain").build();
+    return Response.status(Response.Status.BAD_REQUEST).entity(
+      exception.getMessage()).type("text/plain").build();
   }
 }

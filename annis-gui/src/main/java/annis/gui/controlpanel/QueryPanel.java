@@ -326,6 +326,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   private void validateQuery(String query)
   {
+    if(query.isEmpty())
+    {
+      lblStatus.setValue("Empty query");
+      return;
+    }
+    
     // validate query
     try
     {
@@ -370,8 +376,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
               "Exception when communicating with service.");
           }
         }
-       // ok, there was some serios error
-        log.error(null, ex);
       }
       catch (TimeoutException ex)
       {

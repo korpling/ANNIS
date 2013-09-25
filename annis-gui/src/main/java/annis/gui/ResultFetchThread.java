@@ -304,6 +304,9 @@ class ResultFetchThread extends Thread
               log.error("Unexcepted ExecutionException cause",
                 root);
             }
+            
+            resultPanel.showFinishedSubgraphSearch();
+            
           }
         }
       });
