@@ -190,6 +190,8 @@ public class DocBrowserTable extends Table
 
     // init metadata cache
     docMetaDataCache = new HashMap<String, List<Annotation>>();
+    
+    addStyleName("docvis-table");
 
     this.docVisualizerConfig = docBrowserPanel.getDocBrowserConfig();
   }
