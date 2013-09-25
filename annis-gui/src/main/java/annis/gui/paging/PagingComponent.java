@@ -266,14 +266,14 @@ public class PagingComponent extends CustomComponent implements
     return pageSize;
   }
 
-  public void setPageSize(int pageSize, boolean update)
+  public void setPageSize(int pageSize, boolean informCallback)
   {
     if (pageSize <= 0)
     {
       pageSize = 1;
     }
     this.pageSize = pageSize;
-    update(update);
+    update(informCallback);
   }
 
   @Override

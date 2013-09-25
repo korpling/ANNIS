@@ -512,7 +512,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
                   && getQueryPanels().get(lastQueryUUID) != null)
                 {
                   getQueryPanels().get(lastQueryUUID).getPaging().setPageSize(
-                    getQueries().get(uuid).getLimit(), true);
+                    getQueries().get(uuid).getLimit(), false);
                   getQueryPanels().get(lastQueryUUID).setCount(countResult.getMatchCount());
                 }
               }
