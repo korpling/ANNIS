@@ -19,6 +19,7 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.UI;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -26,30 +27,42 @@ import org.json.JSONException;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@JavaScript({"jquery-1.9.1.min.js", "onloadcallback.js"})
+@JavaScript(
+{
+  "jquery-1.9.1.min.js", "onloadcallback.js"
+})
 public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
 {
+
   private AbstractClientConnector target;
-  
+
   public OnLoadCallbackExtension(Callback c)
   {
     this(c, 250);
   }
-  
-  public OnLoadCallbackExtension(final Callback c, final int recallDelay)
-  { 
-    addFunction("loaded", new JavaScriptFunction() {
 
+  public OnLoadCallbackExtension(final Callback c, final int recallDelay)
+  {
+    addFunction("loaded", new JavaScriptFunction()
+    {
       @Override
       public void call(JSONArray arguments) throws JSONException
       {
-        if(c != null)
-        { 
-          boolean handled = c.onCompononentLoaded(target);
-          if(!handled)
+        if (c != null)
+        {
+          UI.getCurrent().access(new Runnable()
           {
-            callFunction("requestRecall", recallDelay);
-          }
+            @Override
+            public void run()
+            {
+              boolean handled = c.onCompononentLoaded(target);
+              if (!handled)
+              {
+                callFunction("requestRecall", recallDelay);
+              }
+            }
+          });
+
         }
       }
     });
@@ -67,11 +80,12 @@ public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
    */
   public static interface Callback
   {
+
     /**
-     * Called whenever the extended component was rendered. If you want to
-     * get a repeated callback (e.g. because you are waiting for a longer process
-     * to complete it's calculation) you can return "false".
-     * 
+     * Called whenever the extended component was rendered. If you want to get a
+     * repeated callback (e.g. because you are waiting for a longer process to
+     * complete it's calculation) you can return "false".
+     *
      * @param source
      * @return True if handled, if false the callback will be called again after
      * a certain time span.

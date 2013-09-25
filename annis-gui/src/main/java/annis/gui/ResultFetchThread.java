@@ -154,14 +154,14 @@ class ResultFetchThread extends Thread
       Helper.getAnnisWebResource().path("query/search/subgraph");
 
     List<Match> result = null;
-  
+    
     try
     {
       if (isInterrupted())
       {
         return;
       }
-      ui.access(new Runnable()
+      ui.accessSynchronously(new Runnable()
       {
         @Override
         public void run()
@@ -196,7 +196,7 @@ class ResultFetchThread extends Thread
         {
           return;
         }
-        ui.access(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -219,6 +219,8 @@ class ResultFetchThread extends Thread
             return;
           }
           
+          
+          
           List<Match> subList = new LinkedList<Match>();
           subList.add(m);
           SubgraphQuery subgraphQuery = prepareQuery(subList);
@@ -226,29 +228,23 @@ class ResultFetchThread extends Thread
           
           queue.put(p);
           
-          final float progress = (float) current / (float) totalResultSize;
-          final boolean first = current == 0;
-          
+          if(current == 0)
+          {
+            ui.accessSynchronously(new Runnable() 
+            {
+              @Override
+              public void run()
+              {
+                resultPanel.setQueryResultQueue(queue, query, totalResultSize);
+                ui.push();
+              }
+            });
+          }
           
           if (isInterrupted())
           {
             return;
           }
-          ui.access(new Runnable()
-          {
-            @Override
-            public void run()
-            {
-              resultPanel.showSubgraphSearchInProgress(query, progress);
-              
-              if(first)
-              {
-                resultPanel.setQueryResultQueue(queue, query); 
-                ui.push();
-              }
-             
-            }
-          });
           
           current++;
         }
@@ -258,7 +254,7 @@ class ResultFetchThread extends Thread
       {
         return;
       }
-      ui.access(new Runnable()
+      ui.accessSynchronously(new Runnable()
       {
         @Override
         public void run()
@@ -277,7 +273,7 @@ class ResultFetchThread extends Thread
     }
     catch (final ExecutionException root)
     {
-      ui.access(new Runnable()
+      ui.accessSynchronously(new Runnable()
       {
         @Override
         public void run()
@@ -308,6 +304,9 @@ class ResultFetchThread extends Thread
               log.error("Unexcepted ExecutionException cause",
                 root);
             }
+            
+            resultPanel.showFinishedSubgraphSearch();
+            
           }
         }
       });
@@ -318,15 +317,11 @@ class ResultFetchThread extends Thread
       {
         return;
       }
-      ui.access(new Runnable()
+      ui.accessSynchronously(new Runnable()
       {
         @Override
         public void run()
         {
-          if (resultPanel != null)
-          {
-            resultPanel.resetQueryResultQueue();
-          }
           ui.push();
         }
       });

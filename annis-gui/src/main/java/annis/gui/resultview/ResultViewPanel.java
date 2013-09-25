@@ -118,6 +118,7 @@ public class ResultViewPanel extends VerticalLayout implements
   private String segmentationName;
 
   private int currentResults;
+  private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
 
@@ -190,7 +191,7 @@ public class ResultViewPanel extends VerticalLayout implements
       " ") + "\"");
     progressResult.setVisible(true);
     setExpandRatio(progressResult, 1.0f);
-
+  
     segmentationName = q.getSegmentation();
   }
 
@@ -226,10 +227,11 @@ public class ResultViewPanel extends VerticalLayout implements
   }
 
   public void setQueryResultQueue(BlockingQueue<SaltProject> queue,
-    PagedResultQuery q)
+    PagedResultQuery q, int numberOfResults)
   {
     this.projectQueue = queue;
     this.currentQuery = q;
+    this.numberOfResults = numberOfResults;
 
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
@@ -260,14 +262,21 @@ public class ResultViewPanel extends VerticalLayout implements
     addQueryResult(q, first);
   }
 
-  public void resetQueryResultQueue()
+  private void resetQueryResultQueue()
   {
     this.projectQueue = null;
     this.currentQuery = null;
+    this.currentResults = 0;
+    this.numberOfResults = 0;
   }
 
   private void addQueryResult(PagedResultQuery q, SaltProject p)
   {
+    if(q == null)
+    {
+      return;
+    }
+    
     List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
     {
@@ -281,6 +290,25 @@ public class ResultViewPanel extends VerticalLayout implements
         updateVariables(p);
         newPanels = createPanels(p, q.getOffset() + currentResults);
         currentResults += newPanels.size();
+        
+        if(currentResults == numberOfResults)
+        {
+          resetQueryResultQueue();
+        }
+     
+        for (SingleResultPanel panel : newPanels)
+        {
+          resultPanelList.add(panel);
+          resultLayout.addComponent(panel);
+        }
+
+        if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
+        {
+          // add a callback so we can load the next single result
+          OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
+          ext.extend(newPanels.get(newPanels.size() - 1));
+        }
+        
       }
     }
     catch (Throwable ex)
@@ -288,19 +316,7 @@ public class ResultViewPanel extends VerticalLayout implements
       log.error(null, ex);
     }
 
-    for (SingleResultPanel panel : newPanels)
-    {
-      resultPanelList.add(panel);
-      resultLayout.addComponent(panel);
-    }
-
-    if (projectQueue != null && q != null
-      && !newPanels.isEmpty() && currentResults < q.getLimit() - 1)
-    {
-      // add a callback so we can load the next single result
-      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 1000);
-      ext.extend(newPanels.get(newPanels.size() - 1));
-    }
+    
 
   }
 
@@ -447,13 +463,15 @@ public class ResultViewPanel extends VerticalLayout implements
     {
       try
       {
-        final SaltProject p = projectQueue.poll(100, TimeUnit.MILLISECONDS);
+        final SaltProject p = projectQueue.poll(250, TimeUnit.MILLISECONDS);
         if (p == null)
         {
+          log.debug("no SaltProject graph in queue");
           return false;
         }
-
+        log.debug("adding new SaltProject graph");
         addQueryResult(currentQuery, p);
+        return true;
 
       }
       catch (InterruptedException ex)
@@ -461,6 +479,7 @@ public class ResultViewPanel extends VerticalLayout implements
         log.warn(null, ex);
       }
     }
+    
     return true;
   }
 
