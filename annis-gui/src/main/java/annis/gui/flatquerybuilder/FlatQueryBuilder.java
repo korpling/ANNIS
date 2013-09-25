@@ -829,7 +829,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     return rsc;
   }
   
-  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, AnnotationLevelConflictException
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -925,7 +925,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           Constraint con2 = constraints.get(rel.getSecond());
           if(con1.getLevel().equals(con2.getLevel()))
           {
-            throw new AnnotationLevelConflictException(con1.toString()+" <-> "+con2.toString());           
+            throw new MultipleAssignmentException(con1.toString()+" <-> "+con2.toString());           
           }
         }
         
@@ -1081,7 +1081,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       catch(Exception e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof AnnotationLevelConflictException))
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException))
         {
           Notification.show(e.getMessage());
           //LATER: maybe highlight the critical character sequence          
@@ -1304,12 +1304,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     }
   }
   
-  private class AnnotationLevelConflictException extends Exception
+  private class MultipleAssignmentException extends Exception
   {
     private static final String ERROR_MESSAGE = "Invalid or redundant assignment of multiple values: ";
     private String critical;
     
-    public AnnotationLevelConflictException(String s)
+    public MultipleAssignmentException(String s)
     {
       critical = s;
     }
