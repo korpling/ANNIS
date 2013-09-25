@@ -91,6 +91,7 @@ public class DocBrowserController implements Serializable
               getVisualizer(type);
             VisualizerInput input = createInput(corpus, doc, config);
             Component vis = visualizer.createComponent(input, null);
+            vis.addStyleName("corpus-font-force");
             Panel visHolder = new Panel();
             visHolder.setContent(vis);
             visHolder.setSizeFull();
