@@ -31,13 +31,10 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractField;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -152,7 +149,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           }
         }
         tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-          FrequencyTableEntryType.span, "", false), counter++);
+          FrequencyTableEntryType.span, "", ""), counter++);
       }
     });
     layoutButtons.addComponent(btAdd);
@@ -276,7 +273,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   }
   
   private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, 
-    String annotation, boolean automaticCreation)
+    String annotation, String comment)
   {
     TextField txtNode = new TextField();
     txtNode.setValue(nodeVariable);
@@ -297,7 +294,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     txtAnno.setWidth("100%");
     
-    return new Object[] {txtNode, txtAnno, automaticCreation ? "automatically created" : "manually created"};
+    return new Object[] {txtNode, txtAnno, comment == null ? ""  : comment};
   }
 
   @Override
@@ -365,16 +362,20 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       {
         if(!n.isArtificial())
         {
+          n.getId();
           if(n.getNodeAnnotations().isEmpty())
           {
             tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.span, "", true), counter++);
+              FrequencyTableEntryType.span, "", 
+              "automatically created from " + n.toAQLNodeFragment()),
+              counter++);
           }
           else
           {
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
             tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.annotation, firstAnno.getName(), true), 
+              FrequencyTableEntryType.annotation, firstAnno.getName(), 
+              "automatically created from " + n.toAQLNodeFragment()), 
               counter++);
 
           }

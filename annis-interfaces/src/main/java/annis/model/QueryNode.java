@@ -368,7 +368,14 @@ public class QueryNode implements Serializable
       QueryAnnotation anno=nodeAnnotations
         .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
 
-      sb.append(anno.getQualifiedName());
+      if(anno.getNamespace() == null || "".equals(anno.getNamespace()))
+      {
+        sb.append(anno.getName());
+      }
+      else
+      {
+        sb.append(anno.getQualifiedName());
+      }
       
       if(anno.getTextMatching() != null && anno.getValue() != null)
       {
@@ -635,6 +642,11 @@ public class QueryNode implements Serializable
   public long getId()
   {
     return id;
+  }
+  
+  public void setId(long id)
+  {
+    this.id = id;
   }
 
   @XmlTransient // currently not supported, might be added later
