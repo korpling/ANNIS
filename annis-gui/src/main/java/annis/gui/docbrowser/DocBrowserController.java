@@ -241,6 +241,7 @@ public class DocBrowserController implements Serializable
               Component vis = initiatedVis.get(canonicalTitle);
 
               visTab = ui.getTabSheet().addTab(vis, tabCaption);
+              visTab.setDescription(canonicalTitle);
               visTab.setIcon(EYE_ICON);
               visTab.setClosable(true);
               ui.getTabSheet().setSelectedTab(vis);
