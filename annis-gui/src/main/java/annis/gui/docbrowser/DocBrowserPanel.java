@@ -25,6 +25,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 import java.util.List;
 import org.json.JSONException;
@@ -42,9 +43,6 @@ public class DocBrowserPanel extends Panel
   private transient SearchUI ui;
 
   private VerticalLayout layout;
-
-  // displayed while the docnames are fetched
-  private Label loadingMsg;
 
   // the name of the corpus from which the documents are fetched
   private String corpus;
@@ -77,9 +75,6 @@ public class DocBrowserPanel extends Panel
     setContent(layout);
     layout.setSizeFull();
 
-    // set loading component
-    loadingMsg = new Label("loading documents for " + corpus);
-    layout.addComponent(loadingMsg);
     setSizeFull();
 
     paging = new PagingComponent();
@@ -172,36 +167,48 @@ public class DocBrowserPanel extends Panel
     @Override
     public void run()
     {
+
+      final ProgressBar progress = new ProgressBar();
+      layout.addComponent(progress);
+
       WebResource res = Helper.getAnnisWebResource();
       final List<Annotation> docs = res.path("meta/docnames/" + corpus).
         get(new Helper.AnnotationListType());
 
-      loadingMsg.setVisible(false);
-      layout.removeComponent(loadingMsg);
 
-      paging.addCallback(new PagingCallback()
+      ui.access(new Runnable()
       {
         @Override
-        public void switchPage(int offset, int limit)
+        public void run()
         {
-          if (table != null)
-          {
-            layout.removeComponent(table);
-          }
+          layout.removeComponent(progress);
 
-          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-          layout.addComponent(table);
-          layout.setExpandRatio(table, 0.85f);
-          List<Annotation> docPage = docs.subList(offset, offset + limit);
-          table.setDocNames(docPage);
+          paging.addCallback(new PagingCallback()
+          {
+            @Override
+            public void switchPage(int offset, int limit)
+            {
+              if (table != null)
+              {
+                layout.removeComponent(table);
+              }
+
+              table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+              layout.addComponent(table);
+              layout.setExpandRatio(table, 0.85f);
+              List<Annotation> docPage = docs.subList(offset, offset + limit);
+              table.setDocNames(docPage);
+            }
+          });
+
+          paging.setPageSize(getPageSize(docs.size()), true);
+          paging.setCount(docs.size(), true);
+
+          layout.addComponent(paging, 0);
+          ui.push();
+          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
       });
-
-      paging.setPageSize(getPageSize(docs.size()), true);
-      paging.setCount(docs.size(), true);
-
-      layout.addComponent(paging, 0);
-      ui.push();
     }
   }
 
