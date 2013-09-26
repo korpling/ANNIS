@@ -15,8 +15,8 @@
  */
 package annis.sqlgen;
 
-import annis.dao.AnnotatedMatch;
-import annis.dao.AnnotatedSpan;
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
 import java.sql.ResultSet;
 import java.util.ArrayList;

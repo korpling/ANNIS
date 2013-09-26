@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryAnnotation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
@@ -34,6 +35,7 @@ import org.mockito.Spy;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.Map;
 
 public class TestAbstractFromClauseGenerator {
 
@@ -69,9 +71,9 @@ public class TestAbstractFromClauseGenerator {
 		String table = uniqueString();
 		String tableAlias = uniqueString();
 		int count = 1;
-		setupTableAliases(table, tableAlias, count);
+		Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
 		// when
-		String alias = generator.tableAliasDefinition(node, table, count);
+		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tableAliases, node, table, count);
 		// then
 		String expected = tableAlias + " AS " + tableAlias + id;
 		assertThat(alias, is(expected));
@@ -87,10 +89,10 @@ public class TestAbstractFromClauseGenerator {
 		QueryNode node = new QueryNode(id);
 		String table = uniqueString();
 		String tableAlias = uniqueString();
-		int count = uniqueInt();
-		setupTableAliases(table, tableAlias, count);
+		int count = uniqueInt(2, 100);
+		Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
 		// when
-		String alias = generator.tableAliasDefinition(node, table, count);
+		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tableAliases, node, table, count);
 		// then
 		String expected = tableAlias + " AS " + tableAlias + id + "_" + count;
 		assertThat(alias, is(expected));
@@ -98,13 +100,29 @@ public class TestAbstractFromClauseGenerator {
 
 	// set up table access strategy to return the requested table alias
 	// simulate that count copies of the table (alias) are required
-	private void setupTableAliases(String table, String tableAlias, int count) {
+	private Map<String, String> setupTableAliases(QueryNode node, String table, String tableAlias, int count) 
+  {
 		HashMap<String, String> tableAliases = new HashMap<String, String>();
 		tableAliases.put(table, tableAlias);
+    if(count > 0)
+    {
+      tableAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE, tableAlias);
+    } 
+    for(int i=0; i < count; i++)
+    {
+      // this will add new entries for the source tables
+      node.addNodeAnnotation(new QueryAnnotation("dummy", "dummy" + i));
+    }
+    
 		tableAccessStrategy.setTableAliases(tableAliases);
+    tableAccessStrategy.setNode(node);
 		Bag tables = new HashBag();
 		tables.add(tableAlias, count);
-		given(tableAccessStrategy.computeSourceTables()).willReturn(tables);
+		given(tableAccessStrategy.computeSourceTables())
+      .willReturn(tables);
+    
+    return tableAliases;
+    
 	}
 	
 }

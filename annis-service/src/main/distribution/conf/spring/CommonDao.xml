@@ -120,7 +120,9 @@
     <property name="saltAnnotateExtractor" ref="saltAnnotateExtractor"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
     <property name="graphSqlGenerator" ref="graphSqlGenerator" />
+    <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
+
 
     <property name="dataSource" ref="dataSource"/>
 

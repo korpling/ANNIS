@@ -19,6 +19,8 @@ import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
+import annis.gui.frequency.FrequencyResultPanel;
+import annis.gui.resultview.ResultViewPanel;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -38,7 +40,6 @@ public class ControlPanel extends VerticalLayout
   private static final long serialVersionUID = -2220211539424865671L;
 
   private QueryPanel queryPanel;
-
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
@@ -70,7 +71,7 @@ public class ControlPanel extends VerticalLayout
     queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
-
+    
     optionsTab.addTab(corpusList, "Corpus List", null);
     optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
 
@@ -80,8 +81,6 @@ public class ControlPanel extends VerticalLayout
     setExpandRatio(optionsTab, 1.0f);
     
   }
-
-  
   
   public CorpusListPanel getCorpusList()
   {
@@ -96,7 +95,5 @@ public class ControlPanel extends VerticalLayout
   public SearchOptionsPanel getSearchOptions()
   {
     return searchOptions;
-  }
-  
-  
+  }  
 }
