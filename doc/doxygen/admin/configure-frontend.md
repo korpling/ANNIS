@@ -178,7 +178,7 @@ each corpus.
 \code{.json}
 {
 	vis : [
-		{type : 'htmldoc', displayName : 'diplomatic view', segment : 'tok' },
+		{type : 'htmldoc', displayName : 'diplomatic view'},
 		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
 	],
 	metadata : [
