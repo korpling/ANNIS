@@ -18,12 +18,15 @@ package annis.gui;
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.visualizers.IFrameResourceMap;
+import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -34,7 +37,9 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import java.io.Serializable;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -56,7 +61,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class QueryController implements TabSheet.SelectedTabChangeListener
+public class QueryController implements TabSheet.SelectedTabChangeListener, Serializable
 {
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -70,7 +75,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
   private Future<MatchAndDocumentCount> futureCount;
   
   private UUID lastQueryUUID;
-  
+
   private PagedResultQuery preparedQuery;
   
   private transient Map<UUID, PagedResultQuery> queries;
@@ -88,7 +93,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
   {
     ui.getControlPanel().getCorpusList().updateCorpusSetList();
   }
-
+  
+  public void setQueryFromUI()
+  {
+    setQuery(ui.getControlPanel().getQueryPanel().getQuery());
+  }
+  
   public void setQuery(String query)
   {
     setQuery(new Query(query, ui.getControlPanel().getCorpusList().
@@ -355,7 +365,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
   }
 
-  public PagedResultQuery getQuery()
+  /**
+   * Get the query that is currently prepared for execution, but not executed
+   * yet.
+   * @return 
+   */
+  public PagedResultQuery getPreparedQuery()
   {
     return preparedQuery;
   }
@@ -381,7 +396,6 @@ public class QueryController implements TabSheet.SelectedTabChangeListener
     if(panel != null)
     {
       removeQuery(getQueryPanels().inverse().get(panel));
-      ui.getMainTab().removeComponent(panel);
     }
   }
   

@@ -105,6 +105,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     List<QueryNode> nodes, AtomicLong maxID)
   {
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
+    newNode.setArtificial(true);
     newNode.getJoins().clear();
     newNode.setVariable("x" + node.getVariable());
     

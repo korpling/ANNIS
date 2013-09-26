@@ -20,14 +20,13 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.sqlgen.AbstractFromClauseGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
-import annis.sqlgen.SolutionKey;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.TableAccessStrategy;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
 
@@ -42,16 +41,15 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    TableAccessStrategy tas = createTableAccessStrategy();
+    TableAccessStrategy tas = tables(null);
     List<Long> corpusList = queryData.getCorpusList();
     StringBuilder sb = new StringBuilder();
     
     sb.append(indent).append("solutions,\n");
 
     sb.append(indent).append(TABSTOP);
-    // really ugly
     sb.append(
-      getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true));
+      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));;
     sb.append("\n");
     sb.append(indent).append(TABSTOP);
     sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (")
@@ -181,8 +179,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.\"name\" AS edge_annotation_name, "
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
-      // really ugly
-      + "\t" + getTableJoinsInFromClauseSqlGenerator().fromClauseForNode(null, true) + "\n"
+      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1) + "\n"
       + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
         + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
       + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")
