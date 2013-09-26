@@ -21,9 +21,15 @@ import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.ClientConnector;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.TabSheet.Tab;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
@@ -48,13 +54,16 @@ public class DocBrowserController implements Serializable
   private Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
-  private transient final SearchUI ui;
+  private final SearchUI ui;
 
   // track the already initiated doc browsers
-  private transient final Map<String, Component> initedDocBrowsers;
+  private final Map<String, Component> initedDocBrowsers;
 
   // cache for already initiated visualizations, the key is the doc name
-  private transient Map<String, Component> initiatedVis;
+  private final Map<String, Component> initiatedVis;
+
+  // keep track of already visible doc visualizer, so it easy to switch to them.
+  private final Map<String, Panel> visibleVisHolder;
 
   private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
 
@@ -66,32 +75,57 @@ public class DocBrowserController implements Serializable
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<String, Component>();
     this.initiatedVis = new HashMap<String, Component>();
+    this.visibleVisHolder = new HashMap<String, Panel>();
   }
 
-  public void openDocVis(String corpus, String doc, JSONObject config)
+  public void openDocVis(String corpus, String doc, JSONObject config,
+    Button btn)
   {
     try
     {
-      String type = config.getString("type");
-      String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
+      final String type = config.getString("type");
+      final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
+      final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
-      // check if a visualization is already initiated
-      if (!initiatedVis.containsKey(canonicalTitle))
+      if (visibleVisHolder.containsKey(canonicalTitle))
       {
-        VisualizerPlugin visualizer = ((PluginSystem) ui).getVisualizer(type);
-        Component vis = visualizer.createComponent(
-          createInput(corpus, doc, config), null);
-        initiatedVis.put(canonicalTitle, vis);
-        vis.setCaption(canonicalTitle);
-        vis.setPrimaryStyleName("docviewer");
+        Panel visHolder = visibleVisHolder.get(canonicalTitle);
+        ui.getTabSheet().setSelectedTab(visHolder);
+        return;
       }
 
-      String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
-      Component vis = initiatedVis.get(canonicalTitle);
-      TabSheet.Tab visTab = ui.getTabSheet().addTab(vis, tabCaption);
+      Panel visHolder = new Panel();
+      visHolder.setSizeFull();
+      visHolder.addDetachListener(new ClientConnector.DetachListener()
+      {
+        @Override
+        public void detach(ClientConnector.DetachEvent event)
+        {
+          visibleVisHolder.remove(canonicalTitle);
+        }
+      });
+
+      // first set loading indicator
+      ProgressBar progressBar = new ProgressBar(1.0f);
+      progressBar.setIndeterminate(true);
+      progressBar.setSizeFull();
+      visHolder.setContent(progressBar);
+
+
+      Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+      visTab.setDescription(canonicalTitle);
       visTab.setIcon(EYE_ICON);
       visTab.setClosable(true);
-      ui.getTabSheet().setSelectedTab(vis);
+      ui.getTabSheet().setSelectedTab(visTab);
+
+
+      // register visible visHolder
+      this.visibleVisHolder.put(canonicalTitle, visHolder);
+
+
+      new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
+        config, btn).
+        start();
     }
     catch (JSONException ex)
     {
@@ -104,9 +138,9 @@ public class DocBrowserController implements Serializable
     // if not already init, do it now
     if (!initedDocBrowsers.containsKey(corpus))
     {
-      DocBrowserPanel browseTbl = DocBrowserPanel.
-        initDocBrowserPanel(ui, corpus);
-      initedDocBrowsers.put(corpus, browseTbl);
+      DocBrowserPanel docBrowser = DocBrowserPanel.initDocBrowserPanel(
+        ui, corpus);
+      initedDocBrowsers.put(corpus, docBrowser);
     }
 
     // init tab and put to front
@@ -161,7 +195,7 @@ public class DocBrowserController implements Serializable
 
     try
     {
-      mappingsAsString = config.getString("mapping");
+      mappingsAsString = config.getString("mappings");
     }
     catch (JSONException ex)
     {
@@ -202,5 +236,80 @@ public class DocBrowserController implements Serializable
     }
 
     return namespace;
+  }
+
+  private class DocVisualizerFetcher extends Thread
+  {
+
+    JSONObject config;
+
+    String corpus;
+
+    String doc;
+
+    final Button btn;
+
+    private final String canonicalTitle;
+
+    private final String type;
+
+    private final Panel visHolder;
+
+    public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
+      String type,
+      Panel visHolder,
+      JSONObject config,
+      Button btn)
+    {
+      this.corpus = corpus;
+      this.doc = doc;
+      this.btn = btn;
+      this.config = config;
+      this.canonicalTitle = canonicalTitle;
+      this.type = type;
+      this.visHolder = visHolder;
+    }
+
+    @Override
+    public void run()
+    {
+      // check if a visualization is already initiated
+      {
+        if (!initiatedVis.containsKey(canonicalTitle))
+        {
+          VisualizerPlugin visualizer = ((PluginSystem) ui).
+            getVisualizer(type);
+
+          // fetch the salt project - so long part
+          VisualizerInput input = createInput(corpus, doc, config);
+
+          // create and format visualizer
+          Component vis = visualizer.createComponent(input, null);
+          vis.addStyleName("corpus-font-force");
+          vis.setPrimaryStyleName("docviewer");
+          vis.setCaption(canonicalTitle);
+          vis.setWidth(100, Unit.PERCENTAGE);
+          vis.setHeight(-1, Unit.PIXELS);
+
+          // update visualizer memory cache
+          initiatedVis.put(canonicalTitle, vis);
+        }
+      }
+
+      // after initializing the visualizer update the gui
+      ui.access(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+
+          Component vis = initiatedVis.get(canonicalTitle);
+          visHolder.setContent(vis);
+
+          btn.setEnabled(true);
+          ui.push();
+        }
+      });
+    }
   }
 }

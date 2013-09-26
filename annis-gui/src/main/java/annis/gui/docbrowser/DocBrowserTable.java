@@ -17,7 +17,6 @@ package annis.gui.docbrowser;
 
 import annis.libgui.Helper;
 import annis.model.Annotation;
-import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
@@ -53,23 +52,18 @@ public class DocBrowserTable extends Table
 
   private BeanItemContainer<Annotation> annoBean;
 
-  private final DocBrowserPanel parent;
-
-  private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
+  private final DocBrowserPanel docBrowserPanel;
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
-  // the key for the json config of the doc visualization
-  private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
+  // the key for the visualizer json array list
+  public final String VIS_CONFIG_KEY = "vis";
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
-  private transient JSONObject docVisualizerConfig;
-
-  // the key for the visualizer json array list
-  private final String VIS_CONFIG_KEY = "vis";
+  private JSONObject docVisualizerConfig;
 
   // the key for the meta cols, which are generated in the main table
   private final String VIS_META_CONFIG = "metadata";
@@ -83,31 +77,45 @@ public class DocBrowserTable extends Table
   // cache for doc meta data
   private Map<String, List<Annotation>> docMetaDataCache;
 
+  // flag for avoiding column setting twice
+  private boolean generatedColumns;
+
+  /**
+   * Updates the table with docnames and generate the additional columns defined
+   * by the user.
+   *
+   * @param docs the list of documents, wrapped in the {@link Annotation} POJO
+   */
   void setDocNames(List<Annotation> docs)
   {
-    annoBean = new BeanItemContainer<Annotation>(docs);
-    annoBean.addAll(docs);
+    annoBean = new BeanItemContainer<Annotation>(Annotation.class, docs);
+
     setContainerDataSource(annoBean);
-    addGeneratedColumn("document name", new DocNameColumnGen());
-    List<Object> generateMetaColumns = generateMetaColumns();
-    addGeneratedColumn("open visualizer", new DocViewColumn());
-    addGeneratedColumn("info browser", new InfoButtonColumnGen());
-    Object[] columnNames = ArrayUtils.addAll(ArrayUtils.addAll(new Object[]
-    {
-      "document name"
-    }, generateMetaColumns.toArray()), new Object[]
-    {
-      "open visualizer", "info browser"
-    });
 
-    setVisibleColumns(columnNames);
-
-    for (Object colName : columnNames)
+    if (!generatedColumns)
     {
-      setColumnHeader((String) colName, (String) colName);
+      generatedColumns = true;
+      addGeneratedColumn("document name", new DocNameColumnGen());
+      List<Object> generateMetaColumns = generateMetaColumns();
+      addGeneratedColumn("open visualizer", new DocViewColumn());
+      addGeneratedColumn("info browser", new InfoButtonColumnGen());
+      Object[] columnNames = ArrayUtils.addAll(ArrayUtils.addAll(new Object[]
+      {
+        "document name"
+      }, generateMetaColumns.toArray()), new Object[]
+      {
+        "open visualizer", "info browser"
+      });
+
+      setVisibleColumns(columnNames);
+
+      for (Object colName : columnNames)
+      {
+        setColumnHeader((String) colName, (String) colName);
+      }
+
+      setColumnWidth("info browser", 26);
     }
-
-    setColumnWidth("info browser", 26);
   }
 
   private List<Object> generateMetaColumns()
@@ -127,7 +135,7 @@ public class DocBrowserTable extends Table
       {
         JSONObject c = metaArray.getJSONObject(i);
         String namespace = null;
-        String name = null;
+        String name;
 
         if (c.has(VIS_META_CONFIG_NAMESPACE)
           && c.getString(VIS_META_CONFIG_NAMESPACE) != null
@@ -166,7 +174,8 @@ public class DocBrowserTable extends Table
   private DocBrowserTable(DocBrowserPanel parent)
   {
 
-    this.parent = parent;
+    // the panel which contains this table
+    this.docBrowserPanel = parent;
 
     // configure layout
     setSizeFull();
@@ -174,11 +183,12 @@ public class DocBrowserTable extends Table
     // put stripes to the table
     addStyleName(ChameleonTheme.TABLE_STRIPED);
 
-
     // init metadata cache
     docMetaDataCache = new HashMap<String, List<Annotation>>();
 
-    this.docVisualizerConfig = getDocBrowserConfig();
+    addStyleName("docvis-table");
+
+    this.docVisualizerConfig = docBrowserPanel.getDocBrowserConfig();
   }
 
   private class InfoButtonColumnGen implements Table.ColumnGenerator
@@ -225,7 +235,7 @@ public class DocBrowserTable extends Table
             metaWin.setHeight(400, Unit.PIXELS);
 
             // paint the window
-            parent.getUI().addWindow(metaWin);
+            docBrowserPanel.getUI().addWindow(metaWin);
           }
           catch (UniformInterfaceException ex)
           {
@@ -273,8 +283,10 @@ public class DocBrowserTable extends Table
           Button openVis = new Button(config.getString("displayName"));
           openVis.setDescription(
             "open visualizer with the full text of " + docName);
-          openVis.addClickListener(new OpenVisualizerWindow(docName, config));
+          openVis.addClickListener(new OpenVisualizerWindow(docName, config,
+            openVis));
           openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          openVis.setDisableOnClick(true);
           l.addComponent(openVis);
         }
       }
@@ -286,29 +298,6 @@ public class DocBrowserTable extends Table
       p.setContent(l);
       return p;
     }
-  }
-
-  private JSONObject getDocBrowserConfig()
-  {
-    CorpusConfig corpusConfig = Helper.getCorpusConfig(parent.getCorpus());
-
-    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
-      DOC_BROWSER_CONFIG_KEY))
-    {
-      corpusConfig = Helper.getDefaultCorpusConfig();
-    }
-
-    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
-    try
-    {
-      return new JSONObject(c);
-    }
-    catch (JSONException ex)
-    {
-      log.error("could not read the doc browser config", ex);
-    }
-
-    return null;
   }
 
   public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)
@@ -324,8 +313,11 @@ public class DocBrowserTable extends Table
 
     private JSONObject config;
 
-    public OpenVisualizerWindow(String docName, JSONObject config)
+    private final Button button;
+
+    public OpenVisualizerWindow(String docName, JSONObject config, Button btn)
     {
+      this.button = btn;
       this.docName = docName;
       this.config = config;
     }
@@ -334,10 +326,17 @@ public class DocBrowserTable extends Table
     public void buttonClick(Button.ClickEvent event)
     {
 
-      parent.openVis(docName, config);
+      docBrowserPanel.openVis(docName, config, button);
     }
   }
 
+  /**
+   * Retrieves date from the cache or from the annis rest service for a specific
+   * document.
+   *
+   * @param doc The document the data are fetched for.
+   * @return The a list of meta data. Can be empty but never null.
+   */
   private List<Annotation> getDocMetaData(String doc)
   {
     // lookup up meta data in the cache
@@ -348,7 +347,7 @@ public class DocBrowserTable extends Table
 
     // get the metadata of a specific doc
     WebResource res = Helper.getAnnisWebResource();
-    res = res.path("meta/doc/").path(parent.getCorpus()).path(doc);
+    res = res.path("meta/doc/").path(docBrowserPanel.getCorpus()).path(doc);
     List<Annotation> annos = res.get(new Helper.AnnotationListType());
 
     // update cache

@@ -658,7 +658,9 @@
   }
 
   .example-queries-table table,
-  .example-queries-table .v-table-body-wrapper {
+  .example-queries-table .v-table-body-wrapper,
+  .docvis-table .v-table-body td,
+  .docvis-table .v-table-body-wrapper {
     border-collapse: collapse;
     border-spacing: 0;
     overflow-x: hidden !important;
@@ -669,12 +671,12 @@
     color : #ECF0F6;
   }
 
-  .example-queries-table .v-table-body td {
-    border: 1px solid #ECF0F6;
+  .example-queries-table .v-table-body td, .docvis-table .v-table-body td {    
+    border-collapse: collapse;
     padding: 5px;
 	}
 
-  .docviewer .v-panel-captionwrap {    
+  .docviewer .v-panel-captionwrap {
     border-color: rgb(130, 138, 148);
     background: #ECF0F6 url(../chameleon/img/grad-light-top.png) repeat-x;
     line-height: normal;
