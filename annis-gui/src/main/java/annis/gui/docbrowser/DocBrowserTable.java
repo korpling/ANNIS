@@ -15,7 +15,6 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -64,7 +63,7 @@ public class DocBrowserTable extends Table
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
-  private transient JSONObject docVisualizerConfig;
+  private JSONObject docVisualizerConfig;
 
   // the key for the meta cols, which are generated in the main table
   private final String VIS_META_CONFIG = "metadata";
