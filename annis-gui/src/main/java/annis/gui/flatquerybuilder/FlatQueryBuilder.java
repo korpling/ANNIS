@@ -297,19 +297,19 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     if (value != null){
       if (sb.isRegEx() && !sb.isNegativeSearch())
       {
-        result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
+        result = level+"=/"+value.replace("/", "\\x2F") +"/";
       }
       if (sb.isRegEx() && sb.isNegativeSearch())
       {
-        result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
+        result = level+"!=/"+value.replace("/", "\\x2F") +"/";
       }
       if (!sb.isRegEx() && sb.isNegativeSearch())
       {
-        result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
+        result = level+"!=\""+value.replace("\"", "\\x22") +"\"";            
       }
       if (!sb.isRegEx() && !sb.isNegativeSearch())
       {
-        result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
+        result = level+"=\""+value.replace("\"", "\\x22") +"\"";      
       }
     }
     return result;
@@ -342,7 +342,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   public String escapeRegexCharacters(String tok)
   {
-    if(tok==null | tok.equals("")){return "";}
+    if(tok==null){return "";}
+    if(tok.equals("")) {return "";};
     String result=tok;
     for (int i = 0; i<REGEX_CHARACTERS.length; i++)
     {
@@ -740,8 +741,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   }
   
   public String getFilterMechanism()
-  {
-    String out = "";
+  { 
     return filtering.getItemCaption(filtering.getValue());
   }
   
@@ -765,34 +765,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 	/*
 	 * only for complex regex expressions
 	 */
-	{		
-		/*Collection<String> values = new TreeSet<String>();
-		int i=0;
-    boolean connected = true;
-		
-		while(expression.length()>0)
-		{
-			if(((expression.charAt(i)=='|')&(!connected))|(i==expression.length()-1))
-			{
-				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
-				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
-				{
-					value = value.substring(1, value.length()-1);
-				}
-				value = unescape(value);
-        values.add(value);
-				expression = expression.substring(i+1);
-				i=0;				
-			}
-			else
-			{
-				i++;
-			}      
-		}
-		
-		return values;*/
-    
-    /*NEW CODE*/
+	{	
     ArrayList<String> values = new ArrayList<String>();
     String s = expression;
     
