@@ -29,13 +29,11 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Text;
 
 /**
  *
@@ -218,7 +216,7 @@ public class PagingComponent extends CustomComponent implements
         
         if (currentPage == getMaxPage() && currentPage > 1)
         {
-          currentSize = getMaxPage() % getCount();
+          currentSize = getCount() % getMaxPage() + 1;
         } else {
           currentSize = pageSize;
         }
