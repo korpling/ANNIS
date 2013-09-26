@@ -22,10 +22,10 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
@@ -35,10 +35,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import java.io.Serializable;
 import java.net.URLEncoder;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -290,7 +288,8 @@ public class DocBrowserController implements Serializable
           vis.addStyleName("corpus-font-force");
           vis.setPrimaryStyleName("docviewer");
           vis.setCaption(canonicalTitle);
-          vis.setSizeUndefined();
+          vis.setWidth(100, Unit.PERCENTAGE);
+          vis.setHeight(-1, Unit.PIXELS);
 
           // update visualizer memory cache
           initiatedVis.put(canonicalTitle, vis);
