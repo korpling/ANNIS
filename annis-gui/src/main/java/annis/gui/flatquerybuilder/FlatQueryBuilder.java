@@ -265,6 +265,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     addMenuMeta.setDescription(INFO_INIT_META);  
     addMenuMeta.setAutoOpen(true);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
+    int i = 0;
     for (final String annoname : metanames)
     {
       addMeta.addItem(annoname, new MenuBar.Command() {
@@ -274,6 +275,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           meta.addComponent(mb);
           mboxes.add(mb);
           addMenuMeta.setAutoOpen(false);
+          //addMeta.removeChild(selectedItem);
+          selectedItem.setVisible(false);
         }
       });
     }
@@ -568,7 +571,20 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   public void removeMetaBox(MetaBox v)
   {
     meta.removeComponent(v);
-    mboxes.remove(v);
+    mboxes.remove(v);   
+    MenuBar.MenuItem addMeta = addMenuMeta.getItems().iterator().next();
+    List<MenuBar.MenuItem> items = addMeta.getChildren();
+    boolean found = false;
+    String metalevel = v.getMetaDatum();
+    for(int i=0; (i<items.size())&!found; i++)
+    {
+      MenuBar.MenuItem itm = items.get(i);
+      if(itm.getText().equals(metalevel))
+      {
+        itm.setVisible(true);
+        found = true;
+      }
+    }
   }
 
   public Collection<String> getAnnotationValues(String level)
