@@ -1311,7 +1311,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   private class EqualityConstraintException extends Exception
   {
-    private static final String ERROR_MESSAGE = "Redundant use of equality operator: ";
+    private static final String ERROR_MESSAGE = "Invalid use of equality operator: ";
     private final String critical;
     
     public EqualityConstraintException(String s)

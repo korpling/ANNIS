@@ -63,7 +63,15 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
   {
     ValueField vf = new ValueField(sq, this, ebene);    
     vfs.add(vf);
-    sb.addComponent(vf);    
+    sb.addComponent(vf);
+    if(vfs.size()>1)
+    {
+      vfs.iterator().next().setProtected(false);
+    }
+    else
+    {
+      vfs.iterator().next().setProtected(true);
+    }
     
     return vf;
   }
@@ -147,9 +155,10 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     vnframe.setComponentAlignment(btAdd, Alignment.BOTTOM_RIGHT);    
     vnframe.addComponent(sbtoolbar);    
     
-    ValueField vf = new ValueField(sq, this, ebene);    
+    ValueField vf = new ValueField(sq, this, ebene);
+    vf.setProtected(true);
     vfs.add(vf);
-    sb.addComponent(vf); 
+    sb.addComponent(vf);
     
     setContent(vnframe); 
   }
@@ -265,7 +274,8 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     if(vfs.size()<2)
     {
       reBox.setEnabled(true);
-      reBox.setValue(reBoxSingleValue);      
+      reBox.setValue(reBoxSingleValue);
+      vfs.iterator().next().setProtected(true);
     }
   }
 }

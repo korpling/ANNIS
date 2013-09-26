@@ -265,6 +265,11 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "");
   }
   
+  public void setProtected(boolean p)
+  {
+    bt.setVisible(!p);
+  }
+  
   public enum ValueMode
   {
     NORMAL, REGEX;
