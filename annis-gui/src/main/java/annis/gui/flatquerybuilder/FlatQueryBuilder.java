@@ -571,9 +571,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   public void removeMetaBox(MetaBox v)
   {
     meta.removeComponent(v);
-    mboxes.remove(v);   
-    MenuBar.MenuItem addMeta = addMenuMeta.getItems().get(0);
-    List<MenuBar.MenuItem> items = addMeta.getChildren();
+    mboxes.remove(v);       
+    List<MenuBar.MenuItem> items = addMenuMeta.getItems().get(0).getChildren();
     boolean found = false;
     String metalevel = v.getMetaDatum();
     for(int i=0; (i<items.size())&!found; i++)
