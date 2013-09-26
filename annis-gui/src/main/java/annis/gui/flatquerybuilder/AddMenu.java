@@ -54,7 +54,7 @@ public class AddMenu extends Panel
     addMenu.setSizeUndefined();
     setContent(addMenu);
   }
-  
+  /*SUSPICIOUS METHOD - CHECK FOR CORRECTNESS*/
   public void reActivateItem(final String ebene)
   {
     final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
