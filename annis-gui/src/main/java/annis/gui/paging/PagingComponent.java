@@ -216,7 +216,7 @@ public class PagingComponent extends CustomComponent implements
         
         if (currentPage == getMaxPage() && currentPage > 1)
         {
-          currentSize = getCount() % getMaxPage() + 1;
+          currentSize = getCount() % getStartNumber();
         } else {
           currentSize = pageSize;
         }

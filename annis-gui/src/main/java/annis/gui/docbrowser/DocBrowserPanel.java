@@ -201,7 +201,7 @@ public class DocBrowserPanel extends Panel
             }
           });
 
-          paging.setPageSize(getPageSize(docs.size()), true);
+          paging.setPageSize(getPageSize(docs.size()), false);
           paging.setCount(docs.size(), true);
 
           layout.addComponent(paging, 0);
