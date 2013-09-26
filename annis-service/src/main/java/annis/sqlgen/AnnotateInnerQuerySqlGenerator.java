@@ -1,5 +1,6 @@
   package annis.sqlgen;
 
+import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.ResultSet;

@@ -49,7 +49,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import annis.dao.AnnisDao;
-import annis.dao.AnnotatedMatch;
+import annis.dao.objects.AnnotatedMatch;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
@@ -60,10 +60,11 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SaltURIGroupSet;
-import annis.sqlgen.AnnotateQueryData;
 import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.FrequencySqlGenerator;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.utils.Utils;
 import au.com.bytecode.opencsv.CSVWriter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -74,6 +75,7 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
+
 
 // TODO: test AnnisRunner
 public class AnnisRunner extends AnnisBaseRunner
@@ -92,6 +94,7 @@ public class AnnisRunner extends AnnisBaseRunner
   private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
 
   private AnnotateSqlGenerator<?> graphSqlGenerator;
+  private FrequencySqlGenerator frequencySqlGenerator;
   // dependencies
 
   private AnnisDao annisDao;
@@ -442,7 +445,11 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       generator = getGraphSqlGenerator();
     }
-
+    else if("frequency".equals(function))
+    {
+      generator = frequencySqlGenerator;
+    }
+    
     Validate.notNull(generator, "don't now query function: " + function);
 
     return generator;
@@ -1307,6 +1314,18 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     this.metaDataFilter = metaDataFilter;
   }
+
+  public FrequencySqlGenerator getFrequencySqlGenerator()
+  {
+    return frequencySqlGenerator;
+  }
+
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
+  {
+    this.frequencySqlGenerator = frequencySqlGenerator;
+  }
+  
+  
 
   private QueryData extractSaltIds(String param)
   {

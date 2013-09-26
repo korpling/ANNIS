@@ -17,6 +17,7 @@ package annis.dao;
 
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
+import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
@@ -36,6 +37,7 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
@@ -111,7 +113,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private AnnotateSqlGenerator<SaltProject> graphSqlGenerator;
 
+  private FrequencySqlGenerator frequencySqlGenerator;
+
+
   private String externalFilesPath;
+
   // configuration
 
   private int timeout;
@@ -548,6 +554,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     });
   }
 
+  @Transactional(readOnly = true)
+  @Override
+  public FrequencyTable frequency(QueryData queryData)
+  {
+    return executeQueryFunction(queryData, frequencySqlGenerator);
+  }
+  
   @Override
   @Transactional(readOnly = true)
   public String explain(SqlGenerator<QueryData, ?> generator,
@@ -904,10 +917,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   public void setCountMatchesAndDocumentsSqlGenerator(
-    CountMatchesAndDocumentsSqlGenerator countSqlGenerator)
+    CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator)
   {
-    this.countMatchesAndDocumentsSqlGenerator = countSqlGenerator;
+    this.countMatchesAndDocumentsSqlGenerator = countMatchesAndDocumentsSqlGenerator;
   }
+
+  public CountSqlGenerator getCountSqlGenerator()
+  {
+    return countSqlGenerator;
+  }
+
+  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  {
+    this.countSqlGenerator = countSqlGenerator;
+  }
+  
+  
 
   @Override
   public CorpusConfigMap getCorpusConfigurations()
@@ -1053,14 +1078,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.annotateSqlGenerator = annotateSqlGenerator;
   }
 
-  public CountSqlGenerator getCountSqlGenerator()
+  public FrequencySqlGenerator getFrequencySqlGenerator()
   {
-    return countSqlGenerator;
+    return frequencySqlGenerator;
   }
 
-  public void setCountSqlGenerator(CountSqlGenerator countSqlGenerator)
+  public void setFrequencySqlGenerator(FrequencySqlGenerator frequencySqlGenerator)
   {
-    this.countSqlGenerator = countSqlGenerator;
+    this.frequencySqlGenerator = frequencySqlGenerator;
   }
 
   public MetaByteHelper getMetaByteHelper()

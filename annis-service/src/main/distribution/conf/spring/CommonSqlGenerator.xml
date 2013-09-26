@@ -204,7 +204,6 @@ limitations under the License.
         parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-    <property name="tableJoinsInFromClauseGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
     <property name="innerQuerySqlGenerator" ref="noCorpusPathFindSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
@@ -225,6 +224,26 @@ limitations under the License.
     </property>
   </bean>
   
+  <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
+        parent="tableAccessStrategyFactory" lazy-init="true">
+    
+    <property name="innerQuerySqlGenerator" ref="noCorpusPathFindSqlGenerator" />
+
+    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
+    
+  </bean>
+
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor" lazy-init="true"/>
 
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype" lazy-init="true">
@@ -283,8 +302,6 @@ limitations under the License.
     
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
-
-    <property name="tableJoinsInFromClauseSqlGenerator" ref="tableJoinsInFromClauseSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
     <property name="fromClauseSqlGenerators">

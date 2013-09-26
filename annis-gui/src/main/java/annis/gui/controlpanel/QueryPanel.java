@@ -23,6 +23,8 @@ import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -80,7 +82,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private List<HistoryEntry> history;
   private Window historyWindow;
   private PopupButton btMoreActions;
-
+  private FrequencyQueryPanel frequencyPanel;
+  
   public QueryPanel(SearchUI ui)
   {
     super(4,5);
@@ -227,6 +230,10 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
     
+    Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setWidth("100%");
+    moreActionsLayout.addComponent(btShowFrequency);
+    
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
@@ -322,6 +329,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   public void textChange(TextChangeEvent event)
   {
     validateQuery(event.getText());
+  }
+  
+  public void notifyFrequencyTabClose()
+  {
+    txtQuery.removeTextChangeListener(frequencyPanel);
+    frequencyPanel = null;
   }
 
 
@@ -495,7 +508,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     private SearchUI ui;
     private ExportPanel panel;
-    private ExportOptionsPanel optionsPanel;
     
     public ShowExportClickListener(SearchUI ui)
     {
@@ -508,10 +520,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(panel == null)
       {
         panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
-      }
-      if(optionsPanel == null)
-      {
-        optionsPanel = new ExportOptionsPanel();
       }
       
       final TabSheet tabSheet = ui.getMainTab();
@@ -526,6 +534,42 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       
       tab.setClosable(true);
       tabSheet.setSelectedTab(panel);
+      
+      btMoreActions.setPopupVisible(false);
+    }
+    
+  }
+  
+  private class ShowFrequencyClickListener implements ClickListener
+  {
+    private SearchUI ui;
+    
+    public ShowFrequencyClickListener(SearchUI ui)
+    {
+      this.ui = ui;
+    }
+    
+    @Override
+    public void buttonClick(ClickEvent event)
+    {
+      if(frequencyPanel == null)
+      {
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
+        txtQuery.addTextChangeListener(frequencyPanel);
+      }
+      
+      final TabSheet tabSheet = ui.getMainTab();
+      Tab tab = tabSheet.getTab(frequencyPanel);
+      
+      if(tab == null)
+      {
+        tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
+        tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+      }
+      
+      
+      tab.setClosable(true);
+      tabSheet.setSelectedTab(frequencyPanel);
       
       btMoreActions.setPopupVisible(false);
     }

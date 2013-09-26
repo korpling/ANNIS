@@ -15,7 +15,7 @@
  */
 package annis.sqlgen;
 
-import annis.dao.AnnotatedSpan;
+import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
 import java.io.UnsupportedEncodingException;
 import java.sql.Array;

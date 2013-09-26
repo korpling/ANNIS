@@ -38,6 +38,7 @@ limitations under the License.
     <property name="annotateSqlGenerator" ref="annotateSqlGenerator"/>
     <property name="matrixSqlGenerator" ref="matrixSqlGenerator"/>
     <property name="graphSqlGenerator" ref="graphSqlGenerator" />
+    <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
 
     <property name="annisDao" ref="annisDao"/>
     <property name="annisParser" ref="annisParserAntlr"/>

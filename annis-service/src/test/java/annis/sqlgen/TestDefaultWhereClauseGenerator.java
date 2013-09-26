@@ -788,7 +788,9 @@ public class TestDefaultWhereClauseGenerator
     alternative.add(node);
     Set<String> actual = generator.whereConditions(queryData, alternative, "");
     for (String item : expected)
+    {
       assertThat(actual, hasItem(item));
+    }
     assertThat(actual, is(size(expected.length)));
   }
 
