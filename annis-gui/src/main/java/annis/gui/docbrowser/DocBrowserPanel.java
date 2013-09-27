@@ -16,14 +16,11 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
-import annis.gui.paging.PagingCallback;
-import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
@@ -48,8 +45,6 @@ public class DocBrowserPanel extends Panel
   private String corpus;
 
   private DocBrowserTable table;
-
-  private PagingComponent paging;
 
   // the key for the json config of the doc visualization
   private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
@@ -76,15 +71,13 @@ public class DocBrowserPanel extends Panel
     layout.setSizeFull();
 
     setSizeFull();
-
-    paging = new PagingComponent();
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    ui.access(new LoadingDocs());
+    (new LoadingDocs()).start();
   }
 
   /**
@@ -169,6 +162,7 @@ public class DocBrowserPanel extends Panel
     {
 
       final ProgressBar progress = new ProgressBar();
+      progress.setIndeterminate(true);
       layout.addComponent(progress);
 
       WebResource res = Helper.getAnnisWebResource();
@@ -181,32 +175,12 @@ public class DocBrowserPanel extends Panel
         @Override
         public void run()
         {
+          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
           layout.removeComponent(progress);
+          layout.addComponent(table);
 
-          paging.addCallback(new PagingCallback()
-          {
-            @Override
-            public void switchPage(int offset, int limit)
-            {
-              if (table != null)
-              {
-                layout.removeComponent(table);
-              }
-
-              table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-              layout.addComponent(table);
-              layout.setExpandRatio(table, 0.85f);
-              List<Annotation> docPage = docs.subList(offset, offset + limit);
-              table.setDocNames(docPage);
-            }
-          });
-
-          paging.setPageSize(getPageSize(docs.size()), false);
-          paging.setCount(docs.size(), true);
-
-          layout.addComponent(paging, 0);
+          table.setDocNames(docs);
           ui.push();
-          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
         }
       });
     }
@@ -215,10 +189,5 @@ public class DocBrowserPanel extends Panel
   public String getCorpus()
   {
     return corpus;
-  }
-
-  public PagingComponent getPagingComponent()
-  {
-    return paging;
   }
 }
