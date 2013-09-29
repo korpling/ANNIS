@@ -100,7 +100,12 @@ public class CountTest
     assertEquals(3, countPcc2("Inf-Stat=\"new\" & PP & #1 _o_ #2"));
     assertEquals(1, countPcc2("np_form=\"defnp\" & np_form=\"pper\"  & #2 ->anaphor_antecedent #1 & cat=\"NP\" & node & #4 >[func=\"OA\"] #3 & #3 _i_ #2"));
     
+
     assertEquals(5, countPcc2("cat=\"NP\" & #1:arity=3 & node & #1 > #2 & #2:arity=3"));
+
+    // test if precendence optimizatin is applied correctly when it is used with spans
+    // that cover more than one token
+    assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
   }
   

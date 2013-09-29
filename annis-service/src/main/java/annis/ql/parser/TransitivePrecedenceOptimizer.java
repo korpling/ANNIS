@@ -153,10 +153,15 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
           else
           {
             // calculate the new range depending on old one
-            if((range.getMin() == 0 && range.getMax() == 0) 
+            if(
+              currentNode.isToken() == false
+              || (range.getMin() == 0 && range.getMax() == 0) 
               || (p.getMinDistance() == 0 && p.getMaxDistance() == 0))
             {
-              // unlimited range, nothing to calculate
+              // use unlimited range since 
+              // a) the node could also be a 
+              //    span covering more than one token, 
+              // b) the original constraint is an unlimited range
               newRange = new Range(0, 0);
             }
             else
