@@ -112,7 +112,7 @@ public class DocBrowserPanel extends Panel
   JSONObject getDocBrowserConfig()
   {
     // check first, if the a config is already fetched.
-    if (corpusConfig != null)
+    if (corpusConfig == null)
     {
       corpusConfig = Helper.getCorpusConfig(corpus);
     }

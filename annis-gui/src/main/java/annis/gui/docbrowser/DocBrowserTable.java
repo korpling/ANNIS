@@ -35,6 +35,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -51,8 +52,6 @@ public class DocBrowserTable extends Table
 {
 
   private Logger log = LoggerFactory.getLogger(DocBrowserTable.class);
-
-  private BeanItemContainer<Annotation> annoBean;
 
   private final DocBrowserPanel docBrowserPanel;
 
@@ -76,6 +75,8 @@ public class DocBrowserTable extends Table
   // the key for the meta data name
   private final String VIS_META_CONFIG_NAME = "name";
 
+  private final String ORDER_BY = "orderBy";
+
   // cache for doc meta data
   private Map<String, List<Annotation>> docMetaDataCache;
 
@@ -93,9 +94,9 @@ public class DocBrowserTable extends Table
     container = new IndexedContainer();
 
     container.addContainerProperty("document name", String.class, "n/a");
-    List<MetaDatum> generatedMetaColumns = generateMetaColumns();
+    MetaColumns metaCols = generateMetaColumns();
 
-    for (MetaDatum metaDatum : generatedMetaColumns)
+    for (MetaDatum metaDatum : metaCols.visibleColumns)
     {
       container.
         addContainerProperty(metaDatum.getColName(), String.class, "n/a");
@@ -111,10 +112,19 @@ public class DocBrowserTable extends Table
       row.getItemProperty("document name").setValue(doc);
 
       // add the metadata columns. Their number is not fixed
-      for (MetaDatum metaDatum : generatedMetaColumns)
+      for (MetaDatum metaDatum : metaCols.visibleColumns)
       {
         String value = generateCell(doc, metaDatum);
         row.getItemProperty(metaDatum.getColName()).setValue(value);
+      }
+
+      for (MetaDatum metaDatum : metaCols.sortColumns)
+      {
+        if (!metaCols.visibleColumns.contains(metaDatum))
+        {
+          String value = generateCell(doc, metaDatum);
+          row.getItemProperty(metaDatum.getColName()).setValue(value);
+        }
       }
 
       row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
@@ -122,11 +132,11 @@ public class DocBrowserTable extends Table
     }
 
     setContainerDataSource(container);
-    Object[] metaDataColNames = new Object[generatedMetaColumns.size()];
+    Object[] metaDataColNames = new Object[metaCols.visibleColumns.size()];
 
     for (int i = 0; i < metaDataColNames.length; i++)
     {
-      metaDataColNames[i] = generatedMetaColumns.get(i).getColName();
+      metaDataColNames[i] = metaCols.visibleColumns.get(i).getColName();
     }
 
     Object[] columnNames = ArrayUtils.addAll(ArrayUtils.addAll(new Object[]
@@ -146,59 +156,64 @@ public class DocBrowserTable extends Table
     }
 
     setColumnWidth("info", 26);
+
+    sortByMetaData();
   }
 
-  private List<MetaDatum> generateMetaColumns()
+  private class MetaColumns
   {
 
-    List<MetaDatum> columnNames = new ArrayList<MetaDatum>();
+    List<MetaDatum> visibleColumns;
 
-    if (!docVisualizerConfig.has(VIS_META_CONFIG))
+    List<MetaDatum> sortColumns;
+
+    public MetaColumns()
     {
-      return columnNames;
+      this.visibleColumns = new ArrayList<MetaDatum>();
+      this.sortColumns = new ArrayList<MetaDatum>();
     }
+  }
 
-    try
+  private MetaColumns generateMetaColumns()
+  {
+
+    MetaColumns metaColumns = new MetaColumns();
+
+
+    if (docVisualizerConfig.has(VIS_META_CONFIG))
     {
-      JSONArray metaArray = docVisualizerConfig.getJSONArray(VIS_META_CONFIG);
-      for (int i = 0; i < metaArray.length(); i++)
+      try
       {
-        JSONObject c = metaArray.getJSONObject(i);
-        String namespace = null;
-        String name;
-
-        if (c.has(VIS_META_CONFIG_NAMESPACE)
-          && c.getString(VIS_META_CONFIG_NAMESPACE) != null
-          && !c.getString(VIS_META_CONFIG_NAMESPACE).equalsIgnoreCase("null"))
+        JSONArray metaArray = docVisualizerConfig.getJSONArray(VIS_META_CONFIG);
+        for (int i = 0; i < metaArray.length(); i++)
         {
-          namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
-        }
+          JSONObject c = metaArray.getJSONObject(i);
+          String namespace = null;
+          String name;
 
-        if (c.has(VIS_META_CONFIG_NAME))
-        {
-          String colname;
-          name = c.getString(VIS_META_CONFIG_NAME);
-
-          if (namespace != null)
+          if (c.has(VIS_META_CONFIG_NAMESPACE)
+            && c.getString(VIS_META_CONFIG_NAMESPACE) != null
+            && !c.getString(VIS_META_CONFIG_NAMESPACE).equalsIgnoreCase("null"))
           {
-            colname = namespace + ":" + name;
-          }
-          else
-          {
-            colname = name;
+            namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
           }
 
-          MetaDatum metaDatum = new MetaDatum(namespace, name);
-          columnNames.add(metaDatum);
+          if (c.has(VIS_META_CONFIG_NAME))
+          {
+            name = c.getString(VIS_META_CONFIG_NAME);
+
+            MetaDatum metaDatum = new MetaDatum(namespace, name);
+            metaColumns.visibleColumns.add(metaDatum);
+          }
         }
       }
-    }
-    catch (JSONException ex)
-    {
-      log.error("cannot retrieve meta array from doc visualizer config", ex);
+      catch (JSONException ex)
+      {
+        log.error("cannot retrieve meta array from doc visualizer config", ex);
+      }
     }
 
-    return columnNames;
+    return metaColumns;
   }
 
   private DocBrowserTable(DocBrowserPanel parent)
@@ -272,18 +287,75 @@ public class DocBrowserTable extends Table
   }
 
   /**
-   * Generates a link to the visualization configured the the corpus config.
+   * Sort the table by a given config. The config includes metadata keys and the
+   * table is sorted lexicographically by their values. If not config for
+   * sorting is determined the document name is used for sorting.
    */
-  private class DocNameColumnGen implements Table.ColumnGenerator
+  private void sortByMetaData()
   {
-
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    JSONArray sortingConfig = null;
+    try
     {
-      Annotation a = (Annotation) itemId;
-      Label l = new Label((String) a.getName());
-      return l;
+      sortingConfig = docVisualizerConfig.getJSONArray(ORDER_BY);
     }
+    catch (JSONException ex)
+    {
+      log.warn("no sorting by meta data defined -> use document name");
+    }
+
+
+    if (sortingConfig == null || sortingConfig.length() == 0)
+    {
+      sort(new Object[]
+      {
+        "document name"
+      }, new boolean[]
+      {
+        true
+      });
+
+      return;
+    }
+
+    Object[] sortByColumns = new Object[sortingConfig.length()];
+    boolean[] ascendingOrDescending = new boolean[sortingConfig.length()];
+
+    for (int i = 0; i < sortingConfig.length(); i++)
+    {
+      try
+      {
+        JSONObject jsonConfig = sortingConfig.getJSONObject(i);
+        MetaDatum metaDatum;
+        String namespace = null;
+        String name;
+
+        if (jsonConfig.has("namespace"))
+        {
+          namespace = jsonConfig.getString("namespace");
+        }
+
+        name = jsonConfig.getString("name");
+        metaDatum = new MetaDatum(namespace, name);
+        sortByColumns[i] = metaDatum.getColName();
+
+        if (jsonConfig.has("ascending"))
+        {
+          ascendingOrDescending[i] = jsonConfig.getBoolean("ascending");
+        }
+        else
+        {
+          ascendingOrDescending[i] = true;
+        }
+      }
+      catch (JSONException ex)
+      {
+        log.warn("cannot read sorting config for corpus "
+          + docBrowserPanel.getCorpus());
+      }
+
+      sort(sortByColumns, ascendingOrDescending);
+    }
+
   }
 
   private Panel generateVisualizerLinks(String docName)
@@ -411,7 +483,37 @@ public class DocBrowserTable extends Table
 
     String getColName()
     {
-      return namespace != null ? namespace + ":" + name : name;
+      return namespace != null && !namespace.equalsIgnoreCase("null") ? namespace + ":" + name : name;
+    }
+
+    @Override
+    public boolean equals(Object m)
+    {
+      if (m == null && !(m instanceof MetaDatum))
+      {
+        return false;
+      }
+
+      if (this == m)
+      {
+        return true;
+      }
+
+      if (getColName().equals(((MetaDatum) m).getColName()))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 7;
+      hash = 97 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+      hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+      return hash;
     }
   }
 }
