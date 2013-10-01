@@ -461,7 +461,9 @@ public class DocBrowserTable extends Table
         return a.getValue();
       }
 
-      if (metaDatum.name.equals(a.getName()))
+      if (metaDatum.namespace == null
+        && a.getNamespace() == null
+        && metaDatum.name.equals(a.getName()))
       {
         return a.getValue();
       }
