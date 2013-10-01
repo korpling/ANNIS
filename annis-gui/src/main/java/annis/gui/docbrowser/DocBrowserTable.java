@@ -455,7 +455,7 @@ public class DocBrowserTable extends Table
       }
     }
 
-    return "";
+    return "n/a";
   }
 
   private class MetaColumns
