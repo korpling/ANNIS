@@ -24,7 +24,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -35,7 +34,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -67,7 +65,7 @@ public class DocBrowserTable extends Table
   private JSONObject docVisualizerConfig;
 
   // the key for the meta cols, which are generated in the main table
-  private final String VIS_META_CONFIG = "metadata";
+  private final String VIS_META_DATA_COLUMNS = "metaDataColumns";
 
   // the key for the meta data namespace
   public final String VIS_META_CONFIG_NAMESPACE = "namespace";
@@ -96,13 +94,13 @@ public class DocBrowserTable extends Table
     container.addContainerProperty("document name", String.class, "n/a");
     MetaColumns metaCols = generateMetaColumns();
 
-    for (MetaDatum metaDatum : metaCols.visibleColumns)
+    for (MetaDataCol metaDatum : metaCols.visibleColumns)
     {
       container.
         addContainerProperty(metaDatum.getColName(), String.class, "n/a");
     }
 
-    for (MetaDatum metaDatum : metaCols.sortColumns)
+    for (MetaDataCol metaDatum : metaCols.sortColumns)
     {
       container.
         addContainerProperty(metaDatum.getColName(), String.class, "n/a");
@@ -118,18 +116,18 @@ public class DocBrowserTable extends Table
       row.getItemProperty("document name").setValue(doc);
 
       // add the metadata columns. Their number is not fixed
-      for (MetaDatum metaDatum : metaCols.visibleColumns)
+      for (MetaDataCol metaDataCol : metaCols.visibleColumns)
       {
-        String value = generateCell(doc, metaDatum);
-        row.getItemProperty(metaDatum.getColName()).setValue(value);
+        String value = generateCell(doc, metaDataCol);
+        row.getItemProperty(metaDataCol.getColName()).setValue(value);
       }
 
-      for (MetaDatum metaDatum : metaCols.sortColumns)
+      for (MetaDataCol metaDataCol : metaCols.sortColumns)
       {
-        if (!metaCols.visibleColumns.contains(metaDatum))
+        if (!metaCols.visibleColumns.contains(metaDataCol))
         {
-          String value = generateCell(doc, metaDatum);
-          row.getItemProperty(metaDatum.getColName()).setValue(value);
+          String value = generateCell(doc, metaDataCol);
+          row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
       }
 
@@ -166,20 +164,6 @@ public class DocBrowserTable extends Table
     sortByMetaData(metaCols.sortColumns);
   }
 
-  private class MetaColumns
-  {
-
-    List<MetaDatum> visibleColumns;
-
-    List<MetaDatum> sortColumns;
-
-    public MetaColumns()
-    {
-      this.visibleColumns = new ArrayList<MetaDatum>();
-      this.sortColumns = new ArrayList<MetaDatum>();
-    }
-  }
-
   private MetaColumns generateMetaColumns()
   {
 
@@ -187,9 +171,10 @@ public class DocBrowserTable extends Table
 
     try
     {
-      if (docVisualizerConfig.has(VIS_META_CONFIG))
+      if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
       {
-        JSONArray metaArray = docVisualizerConfig.getJSONArray(VIS_META_CONFIG);
+        JSONArray metaArray = docVisualizerConfig.getJSONArray(
+          VIS_META_DATA_COLUMNS);
 
 
         for (int i = 0; i < metaArray.length(); i++)
@@ -208,7 +193,7 @@ public class DocBrowserTable extends Table
             name = c.getString(VIS_META_CONFIG_NAME);
           }
 
-          metaColumns.visibleColumns.add(new MetaDatum(namespace, name));
+          metaColumns.visibleColumns.add(new MetaDataCol(namespace, name));
         }
 
       }
@@ -240,7 +225,8 @@ public class DocBrowserTable extends Table
             ascending = c.getBoolean("ascending");
           }
 
-          metaColumns.sortColumns.add(new MetaDatum(nameSpace, name, ascending));
+          metaColumns.sortColumns.add(
+            new MetaDataCol(nameSpace, name, ascending));
         }
       }
     }
@@ -328,7 +314,7 @@ public class DocBrowserTable extends Table
    * table is sorted lexicographically by their values. If not config for
    * sorting is determined the document name is used for sorting.
    */
-  private void sortByMetaData(List<MetaDatum> sortColumns)
+  private void sortByMetaData(List<MetaDataCol> sortColumns)
   {
     if (sortColumns == null || sortColumns.isEmpty())
     {
@@ -447,7 +433,7 @@ public class DocBrowserTable extends Table
     return annos;
   }
 
-  private String generateCell(String documentName, MetaDatum metaDatum)
+  private String generateCell(String documentName, MetaDataCol metaDatum)
   {
     List<Annotation> metaData = getDocMetaData(documentName);
 
@@ -472,7 +458,21 @@ public class DocBrowserTable extends Table
     return "";
   }
 
-  private class MetaDatum
+  private class MetaColumns
+  {
+
+    List<MetaDataCol> visibleColumns;
+
+    List<MetaDataCol> sortColumns;
+
+    public MetaColumns()
+    {
+      this.visibleColumns = new ArrayList<MetaDataCol>();
+      this.sortColumns = new ArrayList<MetaDataCol>();
+    }
+  }
+
+  private class MetaDataCol
   {
 
     String namespace;
@@ -481,13 +481,13 @@ public class DocBrowserTable extends Table
 
     boolean ascending;
 
-    public MetaDatum(String namespace, String name)
+    public MetaDataCol(String namespace, String name)
     {
       this.namespace = namespace;
       this.name = name;
     }
 
-    public MetaDatum(String namespace, String name, boolean ascending)
+    public MetaDataCol(String namespace, String name, boolean ascending)
     {
       this(namespace, name);
       this.ascending = ascending;
@@ -501,7 +501,7 @@ public class DocBrowserTable extends Table
     @Override
     public boolean equals(Object m)
     {
-      if (m == null && !(m instanceof MetaDatum))
+      if (m == null && !(m instanceof MetaDataCol))
       {
         return false;
       }
@@ -511,7 +511,7 @@ public class DocBrowserTable extends Table
         return true;
       }
 
-      if (getColName().equals(((MetaDatum) m).getColName()))
+      if (getColName().equals(((MetaDataCol) m).getColName()))
       {
         return true;
       }
