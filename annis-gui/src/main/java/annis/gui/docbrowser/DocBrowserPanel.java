@@ -76,6 +76,7 @@ public class DocBrowserPanel extends Panel
 
     progress = new ProgressBar();
     progress.setIndeterminate(true);
+    progress.setSizeFull();
   }
 
   @Override
