@@ -53,6 +53,8 @@ public class DocBrowserPanel extends Panel
 
   private CorpusConfig corpusConfig;
 
+  final ProgressBar progress;
+
   /**
    * Normally get the page size from annis-service.properties for the paging
    * component. If something went wrong this value or the amount of documents
@@ -71,12 +73,16 @@ public class DocBrowserPanel extends Panel
     layout.setSizeFull();
 
     setSizeFull();
+
+    progress = new ProgressBar();
+    progress.setIndeterminate(true);
   }
 
   @Override
   public void attach()
   {
     super.attach();
+    layout.addComponent(progress);
     (new LoadingDocs()).start();
   }
 
@@ -161,9 +167,6 @@ public class DocBrowserPanel extends Panel
     public void run()
     {
 
-      final ProgressBar progress = new ProgressBar();
-      progress.setIndeterminate(true);
-      layout.addComponent(progress);
 
       WebResource res = Helper.getAnnisWebResource();
       final List<Annotation> docs = res.path("meta/docnames/" + corpus).

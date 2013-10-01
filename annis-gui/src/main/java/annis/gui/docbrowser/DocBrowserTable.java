@@ -102,6 +102,12 @@ public class DocBrowserTable extends Table
         addContainerProperty(metaDatum.getColName(), String.class, "n/a");
     }
 
+    for (MetaDatum metaDatum : metaCols.sortColumns)
+    {
+      container.
+        addContainerProperty(metaDatum.getColName(), String.class, "n/a");
+    }
+
     container.addContainerProperty("info", Button.class, null);
     container.addContainerProperty("visualizer", Panel.class, null);
 
@@ -157,7 +163,7 @@ public class DocBrowserTable extends Table
 
     setColumnWidth("info", 26);
 
-    sortByMetaData();
+    sortByMetaData(metaCols.sortColumns);
   }
 
   private class MetaColumns
@@ -179,21 +185,20 @@ public class DocBrowserTable extends Table
 
     MetaColumns metaColumns = new MetaColumns();
 
-
-    if (docVisualizerConfig.has(VIS_META_CONFIG))
+    try
     {
-      try
+      if (docVisualizerConfig.has(VIS_META_CONFIG))
       {
         JSONArray metaArray = docVisualizerConfig.getJSONArray(VIS_META_CONFIG);
+
+
         for (int i = 0; i < metaArray.length(); i++)
         {
           JSONObject c = metaArray.getJSONObject(i);
           String namespace = null;
-          String name;
+          String name = null;
 
-          if (c.has(VIS_META_CONFIG_NAMESPACE)
-            && c.getString(VIS_META_CONFIG_NAMESPACE) != null
-            && !c.getString(VIS_META_CONFIG_NAMESPACE).equalsIgnoreCase("null"))
+          if (c.has(VIS_META_CONFIG_NAMESPACE))
           {
             namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
           }
@@ -201,17 +206,49 @@ public class DocBrowserTable extends Table
           if (c.has(VIS_META_CONFIG_NAME))
           {
             name = c.getString(VIS_META_CONFIG_NAME);
-
-            MetaDatum metaDatum = new MetaDatum(namespace, name);
-            metaColumns.visibleColumns.add(metaDatum);
           }
+
+          metaColumns.visibleColumns.add(new MetaDatum(namespace, name));
+        }
+
+      }
+
+      if (docVisualizerConfig.has(ORDER_BY))
+      {
+
+        JSONArray sortColumns = docVisualizerConfig.getJSONArray(ORDER_BY);
+
+        for (int i = 0; i < sortColumns.length(); i++)
+        {
+          JSONObject c = sortColumns.getJSONObject(i);
+          String nameSpace = null;
+          String name = null;
+          boolean ascending = true;
+
+          if (c.has(VIS_META_CONFIG_NAMESPACE))
+          {
+            nameSpace = c.getString(VIS_META_CONFIG_NAMESPACE);
+          }
+
+          if (c.has(VIS_META_CONFIG_NAME))
+          {
+            name = c.getString(VIS_META_CONFIG_NAME);
+          }
+
+          if (c.has("ascending"))
+          {
+            ascending = c.getBoolean("ascending");
+          }
+
+          metaColumns.sortColumns.add(new MetaDatum(nameSpace, name, ascending));
         }
       }
-      catch (JSONException ex)
-      {
-        log.error("cannot retrieve meta array from doc visualizer config", ex);
-      }
     }
+    catch (JSONException ex)
+    {
+      log.error("cannot retrieve meta array from doc visualizer config", ex);
+    }
+
 
     return metaColumns;
   }
@@ -291,20 +328,9 @@ public class DocBrowserTable extends Table
    * table is sorted lexicographically by their values. If not config for
    * sorting is determined the document name is used for sorting.
    */
-  private void sortByMetaData()
+  private void sortByMetaData(List<MetaDatum> sortColumns)
   {
-    JSONArray sortingConfig = null;
-    try
-    {
-      sortingConfig = docVisualizerConfig.getJSONArray(ORDER_BY);
-    }
-    catch (JSONException ex)
-    {
-      log.warn("no sorting by meta data defined -> use document name");
-    }
-
-
-    if (sortingConfig == null || sortingConfig.length() == 0)
+    if (sortColumns == null || sortColumns.isEmpty())
     {
       sort(new Object[]
       {
@@ -317,44 +343,20 @@ public class DocBrowserTable extends Table
       return;
     }
 
-    Object[] sortByColumns = new Object[sortingConfig.length()];
-    boolean[] ascendingOrDescending = new boolean[sortingConfig.length()];
+    Object[] sortByColumns = new Object[sortColumns.size()];
+    boolean[] ascendingOrDescending = new boolean[sortColumns.size()];
 
-    for (int i = 0; i < sortingConfig.length(); i++)
+    for (int i = 0; i < sortColumns.size(); i++)
     {
-      try
-      {
-        JSONObject jsonConfig = sortingConfig.getJSONObject(i);
-        MetaDatum metaDatum;
-        String namespace = null;
-        String name;
 
-        if (jsonConfig.has("namespace"))
-        {
-          namespace = jsonConfig.getString("namespace");
-        }
+      sortByColumns[i] = sortColumns.get(i).getColName();
 
-        name = jsonConfig.getString("name");
-        metaDatum = new MetaDatum(namespace, name);
-        sortByColumns[i] = metaDatum.getColName();
+      ascendingOrDescending[i] = sortColumns.get(i).ascending;
 
-        if (jsonConfig.has("ascending"))
-        {
-          ascendingOrDescending[i] = jsonConfig.getBoolean("ascending");
-        }
-        else
-        {
-          ascendingOrDescending[i] = true;
-        }
-      }
-      catch (JSONException ex)
-      {
-        log.warn("cannot read sorting config for corpus "
-          + docBrowserPanel.getCorpus());
-      }
-
-      sort(sortByColumns, ascendingOrDescending);
     }
+
+    sort(sortByColumns, ascendingOrDescending);
+
 
   }
 
@@ -475,10 +477,18 @@ public class DocBrowserTable extends Table
 
     String name;
 
+    boolean ascending;
+
     public MetaDatum(String namespace, String name)
     {
       this.namespace = namespace;
       this.name = name;
+    }
+
+    public MetaDatum(String namespace, String name, boolean ascending)
+    {
+      this(namespace, name);
+      this.ascending = ascending;
     }
 
     String getColName()
