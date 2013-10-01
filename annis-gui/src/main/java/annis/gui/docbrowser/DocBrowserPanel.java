@@ -82,8 +82,13 @@ public class DocBrowserPanel extends Panel
   public void attach()
   {
     super.attach();
-    layout.addComponent(progress);
-    (new LoadingDocs()).start();
+
+    // start fetching table only if not done yet.
+    if (table == null)
+    {
+      layout.addComponent(progress);
+      (new LoadingDocs()).start();
+    }
   }
 
   /**
