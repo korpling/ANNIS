@@ -19,10 +19,11 @@ import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
@@ -43,14 +44,12 @@ import org.slf4j.LoggerFactory;
 /**
  * List documents for a specific corpus.
  *
- * @author benjamin
+ * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
  */
 public class DocBrowserTable extends Table
 {
 
   private Logger log = LoggerFactory.getLogger(DocBrowserTable.class);
-
-  private BeanItemContainer<Annotation> annoBean;
 
   private final DocBrowserPanel docBrowserPanel;
 
@@ -66,7 +65,7 @@ public class DocBrowserTable extends Table
   private JSONObject docVisualizerConfig;
 
   // the key for the meta cols, which are generated in the main table
-  private final String VIS_META_CONFIG = "metadata";
+  private final String VIS_META_DATA_COLUMNS = "metaDataColumns";
 
   // the key for the meta data namespace
   public final String VIS_META_CONFIG_NAMESPACE = "namespace";
@@ -74,11 +73,12 @@ public class DocBrowserTable extends Table
   // the key for the meta data name
   private final String VIS_META_CONFIG_NAME = "name";
 
+  private final String ORDER_BY = "orderBy";
+
   // cache for doc meta data
   private Map<String, List<Annotation>> docMetaDataCache;
 
-  // flag for avoiding column setting twice
-  private boolean generatedColumns;
+  private IndexedContainer container;
 
   /**
    * Updates the table with docnames and generate the additional columns defined
@@ -88,78 +88,145 @@ public class DocBrowserTable extends Table
    */
   void setDocNames(List<Annotation> docs)
   {
-    annoBean = new BeanItemContainer<Annotation>(Annotation.class, docs);
 
-    setContainerDataSource(annoBean);
+    container = new IndexedContainer();
 
-    if (!generatedColumns)
+    container.addContainerProperty("document name", String.class, "n/a");
+    MetaColumns metaCols = generateMetaColumns();
+
+    for (MetaDataCol metaDatum : metaCols.visibleColumns)
     {
-      generatedColumns = true;
-      addGeneratedColumn("document name", new DocNameColumnGen());
-      List<Object> generateMetaColumns = generateMetaColumns();
-      addGeneratedColumn("open visualizer", new DocViewColumn());
-      addGeneratedColumn("info browser", new InfoButtonColumnGen());
-      Object[] columnNames = ArrayUtils.addAll(ArrayUtils.addAll(new Object[]
-      {
-        "document name"
-      }, generateMetaColumns.toArray()), new Object[]
-      {
-        "open visualizer", "info browser"
-      });
+      container.
+        addContainerProperty(metaDatum.getColName(), String.class, "n/a");
+    }
 
-      setVisibleColumns(columnNames);
+    for (MetaDataCol metaDatum : metaCols.sortColumns)
+    {
+      container.
+        addContainerProperty(metaDatum.getColName(), String.class, "n/a");
+    }
 
-      for (Object colName : columnNames)
+    container.addContainerProperty("info", Button.class, null);
+    container.addContainerProperty("visualizer", Panel.class, null);
+
+    for (Annotation a : docs)
+    {
+      String doc = a.getName();
+      Item row = container.addItem(doc);
+      row.getItemProperty("document name").setValue(doc);
+
+      // add the metadata columns. Their number is not fixed
+      for (MetaDataCol metaDataCol : metaCols.visibleColumns)
       {
-        setColumnHeader((String) colName, (String) colName);
+        String value = generateCell(doc, metaDataCol);
+        row.getItemProperty(metaDataCol.getColName()).setValue(value);
       }
 
-      setColumnWidth("info browser", 26);
+      for (MetaDataCol metaDataCol : metaCols.sortColumns)
+      {
+        if (!metaCols.visibleColumns.contains(metaDataCol))
+        {
+          String value = generateCell(doc, metaDataCol);
+          row.getItemProperty(metaDataCol.getColName()).setValue(value);
+        }
+      }
+
+      row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
+      row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
     }
+
+    setContainerDataSource(container);
+    Object[] metaDataColNames = new Object[metaCols.visibleColumns.size()];
+
+    for (int i = 0; i < metaDataColNames.length; i++)
+    {
+      metaDataColNames[i] = metaCols.visibleColumns.get(i).getColName();
+    }
+
+    Object[] columnNames = ArrayUtils.addAll(ArrayUtils.addAll(new Object[]
+    {
+      "document name"
+    }, metaDataColNames), new Object[]
+    {
+      "visualizer", "info"
+    });
+
+
+    setVisibleColumns(columnNames);
+
+    for (Object colName : columnNames)
+    {
+      setColumnHeader((String) colName, (String) colName);
+    }
+
+    setColumnWidth("info", 26);
+
+    sortByMetaData(metaCols.sortColumns);
   }
 
-  private List<Object> generateMetaColumns()
+  private MetaColumns generateMetaColumns()
   {
 
-    List<Object> columnNames = new ArrayList<Object>();
-
-    if (!docVisualizerConfig.has(VIS_META_CONFIG))
-    {
-      return columnNames;
-    }
+    MetaColumns metaColumns = new MetaColumns();
 
     try
     {
-      JSONArray metaArray = docVisualizerConfig.getJSONArray(VIS_META_CONFIG);
-      for (int i = 0; i < metaArray.length(); i++)
+      if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
       {
-        JSONObject c = metaArray.getJSONObject(i);
-        String namespace = null;
-        String name;
+        JSONArray metaArray = docVisualizerConfig.getJSONArray(
+          VIS_META_DATA_COLUMNS);
 
-        if (c.has(VIS_META_CONFIG_NAMESPACE)
-          && c.getString(VIS_META_CONFIG_NAMESPACE) != null
-          && !c.getString(VIS_META_CONFIG_NAMESPACE).equalsIgnoreCase("null"))
+
+        for (int i = 0; i < metaArray.length(); i++)
         {
-          namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
+          JSONObject c = metaArray.getJSONObject(i);
+          String namespace = null;
+          String name = null;
+
+          if (c.has(VIS_META_CONFIG_NAMESPACE))
+          {
+            namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
+          }
+
+          if (c.has(VIS_META_CONFIG_NAME))
+          {
+            name = c.getString(VIS_META_CONFIG_NAME);
+          }
+
+          metaColumns.visibleColumns.add(new MetaDataCol(namespace, name));
         }
 
-        if (c.has(VIS_META_CONFIG_NAME))
+      }
+
+      if (docVisualizerConfig.has(ORDER_BY))
+      {
+
+        JSONArray sortColumns = docVisualizerConfig.getJSONArray(ORDER_BY);
+
+        for (int i = 0; i < sortColumns.length(); i++)
         {
-          String colname;
-          name = c.getString(VIS_META_CONFIG_NAME);
+          JSONObject c = sortColumns.getJSONObject(i);
+          String nameSpace = null;
+          String name = null;
+          boolean ascending = true;
 
-          if (namespace != null)
+          if (c.has(VIS_META_CONFIG_NAMESPACE))
           {
-            colname = namespace + ":" + name;
-          }
-          else
-          {
-            colname = name;
+            nameSpace = c.getString(VIS_META_CONFIG_NAMESPACE);
           }
 
-          columnNames.add(colname);
-          addGeneratedColumn(colname, new MetaDataColumn(namespace, name));
+          if (c.has(VIS_META_CONFIG_NAME))
+          {
+            name = c.getString(VIS_META_CONFIG_NAME);
+          }
+
+          if (c.has("ascending"))
+          {
+            ascending = c.getBoolean("ascending");
+          }
+
+          metaColumns.sortColumns.add(
+            new MetaDataCol(nameSpace, name, ascending));
         }
       }
     }
@@ -168,7 +235,8 @@ public class DocBrowserTable extends Table
       log.error("cannot retrieve meta array from doc visualizer config", ex);
     }
 
-    return columnNames;
+
+    return metaColumns;
   }
 
   private DocBrowserTable(DocBrowserPanel parent)
@@ -191,113 +259,122 @@ public class DocBrowserTable extends Table
     this.docVisualizerConfig = docBrowserPanel.getDocBrowserConfig();
   }
 
-  private class InfoButtonColumnGen implements Table.ColumnGenerator
+  public Button generateInfoButtonCell(final String docName)
   {
-
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    Button btn = new Button();
+    btn.setStyleName(BaseTheme.BUTTON_LINK);
+    btn.setIcon(INFO_ICON);
+    btn.addClickListener(new Button.ClickListener()
     {
-      Annotation a = (Annotation) itemId;
-      final String docName = a.getName();
-      Button btn = new Button();
-      btn.setStyleName(BaseTheme.BUTTON_LINK);
-      btn.setIcon(INFO_ICON);
-      btn.addClickListener(new Button.ClickListener()
+      @Override
+      public void buttonClick(Button.ClickEvent event)
       {
-        @Override
-        public void buttonClick(Button.ClickEvent event)
+        try
         {
-          try
+
+          List<Annotation> annos = getDocMetaData(docName);
+
+          // create datasource and bind it to a table
+          BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
+            Annotation.class, annos);
+          Table metaTable = new Table();
+          metaTable.setContainerDataSource(dataSource);
+
+          // style the table
+          metaTable.setVisibleColumns(new Object[]
           {
+            "name", "value"
+          });
+          metaTable.setColumnHeaders("name", "value");
+          metaTable.setSizeFull();
 
-            List<Annotation> annos = getDocMetaData(docName);
+          // create and style the extra window for the metadata table
+          Window metaWin = new Window();
+          metaWin.setContent(metaTable);
+          metaWin.setCaption("metadata doc " + docName);
+          metaWin.center();
+          metaWin.setWidth(400, Unit.PIXELS);
+          metaWin.setHeight(400, Unit.PIXELS);
 
-            // create datasource and bind it to a table
-            BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
-              Annotation.class, annos);
-            Table metaTable = new Table();
-            metaTable.setContainerDataSource(dataSource);
-
-            // style the table
-            metaTable.setVisibleColumns(new Object[]
-            {
-              "name", "value"
-            });
-            metaTable.setColumnHeaders("name", "value");
-            metaTable.setSizeFull();
-
-            // create and style the extra window for the metadata table
-            Window metaWin = new Window();
-            metaWin.setContent(metaTable);
-            metaWin.setCaption("metadata doc " + docName);
-            metaWin.center();
-            metaWin.setWidth(400, Unit.PIXELS);
-            metaWin.setHeight(400, Unit.PIXELS);
-
-            // paint the window
-            docBrowserPanel.getUI().addWindow(metaWin);
-          }
-          catch (UniformInterfaceException ex)
-          {
-            log.error("can not retrieve metadata for document " + docName, ex);
-          }
-
+          // paint the window
+          docBrowserPanel.getUI().addWindow(metaWin);
         }
-      });
-      return btn;
-    }
+        catch (UniformInterfaceException ex)
+        {
+          log.error("can not retrieve metadata for document " + docName, ex);
+        }
+
+      }
+    });
+    return btn;
   }
 
   /**
-   * Generates a link to the visualization configured the the corpus config.
+   * Sort the table by a given config. The config includes metadata keys and the
+   * table is sorted lexicographically by their values. If not config for
+   * sorting is determined the document name is used for sorting.
    */
-  private class DocNameColumnGen implements Table.ColumnGenerator
+  private void sortByMetaData(List<MetaDataCol> sortColumns)
   {
-
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    if (sortColumns == null || sortColumns.isEmpty())
     {
-      Annotation a = (Annotation) itemId;
-      Label l = new Label((String) a.getName());
-      return l;
+      sort(new Object[]
+      {
+        "document name"
+      }, new boolean[]
+      {
+        true
+      });
+
+      return;
     }
+
+    Object[] sortByColumns = new Object[sortColumns.size()];
+    boolean[] ascendingOrDescending = new boolean[sortColumns.size()];
+
+    for (int i = 0; i < sortColumns.size(); i++)
+    {
+
+      sortByColumns[i] = sortColumns.get(i).getColName();
+
+      ascendingOrDescending[i] = sortColumns.get(i).ascending;
+
+    }
+
+    sort(sortByColumns, ascendingOrDescending);
+
+
   }
 
-  private class DocViewColumn implements Table.ColumnGenerator
+  private Panel generateVisualizerLinks(String docName)
   {
-
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    Panel p = new Panel();
+    VerticalLayout l = new VerticalLayout();
+    p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    try
     {
-      Panel p = new Panel();
-      VerticalLayout l = new VerticalLayout();
-      p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-      try
-      {
-        JSONArray configArray = docVisualizerConfig.getJSONArray(VIS_CONFIG_KEY);
+      JSONArray configArray = docVisualizerConfig.getJSONArray(VIS_CONFIG_KEY);
 
-        for (int i = 0; i < configArray.length(); i++)
-        {
-          JSONObject config = configArray.getJSONObject(i);
-          String docName = ((Annotation) itemId).getName();
-          Button openVis = new Button(config.getString("displayName"));
-          openVis.setDescription(
-            "open visualizer with the full text of " + docName);
-          openVis.addClickListener(new OpenVisualizerWindow(docName, config,
-            openVis));
-          openVis.setStyleName(BaseTheme.BUTTON_LINK);
-          openVis.setDisableOnClick(true);
-          l.addComponent(openVis);
-        }
-      }
-      catch (JSONException ex)
+      for (int i = 0; i < configArray.length(); i++)
       {
-        log.error("cannnot retrieve json object", ex);
+        JSONObject config = configArray.getJSONObject(i);
+        Button openVis = new Button(config.getString("displayName"));
+        openVis.setDescription(
+          "open visualizer with the full text of " + docName);
+        openVis.addClickListener(new OpenVisualizerWindow(docName, config,
+          openVis));
+        openVis.setStyleName(BaseTheme.BUTTON_LINK);
+        openVis.setDisableOnClick(true);
+        l.addComponent(openVis);
       }
-
-      p.setContent(l);
-      return p;
     }
+    catch (JSONException ex)
+    {
+      log.error("cannnot retrieve json object", ex);
+    }
+
+    p.setContent(l);
+    return p;
   }
 
   public static DocBrowserTable getDocBrowserTable(DocBrowserPanel parent)
@@ -356,40 +433,99 @@ public class DocBrowserTable extends Table
     return annos;
   }
 
-  private class MetaDataColumn implements Table.ColumnGenerator
+  private String generateCell(String documentName, MetaDataCol metaDatum)
+  {
+    List<Annotation> metaData = getDocMetaData(documentName);
+
+    // lookup meta data
+    for (Annotation a : metaData)
+    {
+      if (metaDatum.namespace != null
+        && metaDatum.namespace.equals(a.getNamespace())
+        && metaDatum.name.equals(a.getName()))
+      {
+        return a.getValue();
+      }
+
+      if (metaDatum.namespace == null
+        && a.getNamespace() == null
+        && metaDatum.name.equals(a.getName()))
+      {
+        return a.getValue();
+      }
+    }
+
+    return "n/a";
+  }
+
+  private class MetaColumns
+  {
+
+    List<MetaDataCol> visibleColumns;
+
+    List<MetaDataCol> sortColumns;
+
+    public MetaColumns()
+    {
+      this.visibleColumns = new ArrayList<MetaDataCol>();
+      this.sortColumns = new ArrayList<MetaDataCol>();
+    }
+  }
+
+  private class MetaDataCol
   {
 
     String namespace;
 
     String name;
 
-    public MetaDataColumn(String namespace, String name)
+    boolean ascending;
+
+    public MetaDataCol(String namespace, String name)
     {
       this.namespace = namespace;
       this.name = name;
     }
 
-    @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    public MetaDataCol(String namespace, String name, boolean ascending)
     {
-      Annotation docs = (Annotation) itemId;
-      List<Annotation> metaData = getDocMetaData(docs.getName());
+      this(namespace, name);
+      this.ascending = ascending;
+    }
 
-      // lookup meta data
-      for (Annotation a : metaData)
+    String getColName()
+    {
+      return namespace != null && !namespace.equalsIgnoreCase("null") ? namespace + ":" + name : name;
+    }
+
+    @Override
+    public boolean equals(Object m)
+    {
+      if (m == null && !(m instanceof MetaDataCol))
       {
-        if (namespace != null && namespace.equals(a.getNamespace())
-          && name.equals(a.getName()))
-        {
-          return a.getValue();
-        }
-
-        if (name.equals(a.getName()))
-        {
-          return a.getValue();
-        }
+        return false;
       }
-      return "";
+
+      if (this == m)
+      {
+        return true;
+      }
+
+      if (getColName().equals(((MetaDataCol) m).getColName()))
+      {
+        return true;
+      }
+
+      return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+      int hash = 7;
+      hash = 97 * hash + (this.namespace != null ? this.namespace.hashCode() : 0);
+      hash = 97 * hash + (this.name != null ? this.name.hashCode() : 0);
+      return hash;
     }
   }
 }

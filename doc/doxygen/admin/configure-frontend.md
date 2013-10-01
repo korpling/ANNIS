@@ -37,7 +37,7 @@ Folder | Description
 `$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
 `~/.annis/` | User specific configuration inside the `.annis` sub-folder inside the user's home folder
 
-Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688) 
+Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688)
 or [JSON](http://www.json.org/) format. Configuration files from the user directory can
 overwrite the global configuration and the global configuration overwrites the
 default configuration.
@@ -60,20 +60,20 @@ Thus the file `instances/falko.json` defines the instance named "falko".
     "default-querybuilder": "tigersearch",
     "default-corpusset": "falko-essays",
     "corpus-sets": [
-        {
-            "name": "falko-essays",
-            "corpus": [
-                "falko-essay-l1",
-                "falko-essay-l2"
-            ]
-        },
-        {
-            "name": "falko-summaries",
-            "corpus": [
-                "falko-summary-l1",
-                "falko-summary-l2"
-            ]
-        }
+	{
+	    "name": "falko-essays",
+	    "corpus": [
+		"falko-essay-l1",
+		"falko-essay-l2"
+	    ]
+	},
+	{
+	    "name": "falko-summaries",
+	    "corpus": [
+		"falko-summary-l1",
+		"falko-summary-l2"
+	    ]
+	}
     ]
 }
 \endcode
@@ -139,7 +139,7 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 
 ## Visualizer list ## {#admin-configure-vislist}
 
-short name| Description | Java class | Screenshot  
+short name| Description | Java class | Screenshot
 ----------|-------------|------------|-----------
 `tree` | constituent syntax tree | [TigerTreeVisualizer](@ref annis.visualizers.component.tree.TigerTreeVisualizer) | ![tree](tiger_tree_vis.png)
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
@@ -160,7 +160,7 @@ short name| Description | Java class | Screenshot
 Some ANNIS visualizers require additional software, depending on whether or
 not they render graphics as an image directly in Java or not. At present, three
 visualizations require an installation of the freely available software GraphViz
-(http://www.graphviz.org/): [ordered_dependency](@ref annis.visualizers.component.dependency.ProielRegularDependencyTree), 
+(http://www.graphviz.org/): [ordered_dependency](@ref annis.visualizers.component.dependency.ProielRegularDependencyTree),
 [hierarchical_dependency](@ref annis.visualizers.component.dependency.ProielDependecyTree) and
 the general [dot](@ref annis.visualizers.component.graph.DebugVisualizer) visualization. To use these, install GraphViz on the server (or
 your local machine for Kickstarter) and make sure it is available in your system
@@ -181,14 +181,27 @@ each corpus.
 		{type : 'htmldoc', displayName : 'diplomatic view'},
 		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
 	],
-	metadata : [
-		{namespace : null, name : 'Genre'} // optional
+	metaDataColumns : [
+		{namespace : 'annis', name : 'Genre'} // optional
+	],
+	orderBy : [
+		{ namespace : 'annis', name :'Titel', ascending : 'false'}
 	]
+
 }
 \endcode
 
-All visualizer from the list above with the suffix "doc" in their name
-are suitable for using as doc visualizer. The field metadata is
-optional. For every defined metadata object an additional column is
-generated with the metadata key as column header and the matadata
-value as column cell value.
+Explanation in detail:
+
+* vis: All visualizer from the list above with the suffix "doc" in
+  their name are suitable for using as doc visualizer.
+
+* metaDataColumns (optional): For every defined metadata object an
+  additional column is generated with the metadata key as column
+  header and the metadata value as table cell value. The subfield
+  'namespace' is optional.
+
+* orderBy (optional): In the default state the table is sorted by
+  document name. But it's also possible to define a custom sort by the
+  metadata fields, even if the column is not visible. 'namespace' and
+  'ascending' is optional. 'ascending' its default setting is 'true'.
