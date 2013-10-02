@@ -39,7 +39,6 @@ import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -78,7 +77,7 @@ public class DocBrowserController implements Serializable
     this.visibleVisHolder = new HashMap<String, Panel>();
   }
 
-  public void openDocVis(String corpus, String doc, JSONObject config,
+  public void openDocVis(String corpus, String doc, JSONSerializable config,
     Button btn)
   {
     try
@@ -152,7 +151,7 @@ public class DocBrowserController implements Serializable
   }
 
   private VisualizerInput createInput(String corpus, String docName,
-    JSONObject config)
+    JSONSerializable config)
   {
     VisualizerInput input = new VisualizerInput();
 
@@ -188,7 +187,7 @@ public class DocBrowserController implements Serializable
     return input;
   }
 
-  private Properties parseMappings(JSONObject config)
+  private Properties parseMappings(JSONSerializable config)
   {
     Properties mappings = new Properties();
     String mappingsAsString = null;
@@ -220,7 +219,7 @@ public class DocBrowserController implements Serializable
     return mappings;
   }
 
-  private String getNamespace(JSONObject config)
+  private String getNamespace(JSONSerializable config)
   {
     String namespace = null;
     try
@@ -241,7 +240,7 @@ public class DocBrowserController implements Serializable
   private class DocVisualizerFetcher extends Thread
   {
 
-    JSONObject config;
+    JSONSerializable config;
 
     String corpus;
 
@@ -258,7 +257,7 @@ public class DocBrowserController implements Serializable
     public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
       String type,
       Panel visHolder,
-      JSONObject config,
+      JSONSerializable config,
       Button btn)
     {
       this.corpus = corpus;

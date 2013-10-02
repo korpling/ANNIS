@@ -26,7 +26,6 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
 import java.util.List;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +120,7 @@ public class DocBrowserPanel extends Panel
     return result;
   }
 
-  JSONObject getDocBrowserConfig()
+  public JSONSerializable getDocBrowserConfig()
   {
     // check first, if the a config is already fetched.
     if (corpusConfig == null)
@@ -138,7 +137,7 @@ public class DocBrowserPanel extends Panel
     String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
     try
     {
-      return new JSONObject(c);
+      return new JSONSerializable(c);
     }
     catch (JSONException ex)
     {
@@ -161,7 +160,7 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc, JSONObject config, Button btn)
+  public void openVis(String doc, JSONSerializable config, Button btn)
   {
     ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }

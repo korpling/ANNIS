@@ -37,7 +37,6 @@ import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -62,7 +61,7 @@ public class DocBrowserTable extends Table
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
-  private JSONObject docVisualizerConfig;
+  private JSONSerializable docVisualizerConfig;
 
   // the key for the meta cols, which are generated in the main table
   private final String VIS_META_DATA_COLUMNS = "metaDataColumns";
@@ -179,7 +178,7 @@ public class DocBrowserTable extends Table
 
         for (int i = 0; i < metaArray.length(); i++)
         {
-          JSONObject c = metaArray.getJSONObject(i);
+          JSONSerializable c = new JSONSerializable(metaArray.getJSONObject(i));
           String namespace = null;
           String name = null;
 
@@ -205,7 +204,7 @@ public class DocBrowserTable extends Table
 
         for (int i = 0; i < sortColumns.length(); i++)
         {
-          JSONObject c = sortColumns.getJSONObject(i);
+          JSONSerializable c = new JSONSerializable(sortColumns.getJSONObject(i));
           String nameSpace = null;
           String name = null;
           boolean ascending = true;
@@ -357,7 +356,8 @@ public class DocBrowserTable extends Table
 
       for (int i = 0; i < configArray.length(); i++)
       {
-        JSONObject config = configArray.getJSONObject(i);
+        JSONSerializable config = new JSONSerializable(configArray.
+          getJSONObject(i));
         Button openVis = new Button(config.getString("displayName"));
         openVis.setDescription(
           "open visualizer with the full text of " + docName);
@@ -388,11 +388,12 @@ public class DocBrowserTable extends Table
 
     private String docName;
 
-    private JSONObject config;
+    private JSONSerializable config;
 
     private final Button button;
 
-    public OpenVisualizerWindow(String docName, JSONObject config, Button btn)
+    public OpenVisualizerWindow(String docName, JSONSerializable config,
+      Button btn)
     {
       this.button = btn;
       this.docName = docName;
