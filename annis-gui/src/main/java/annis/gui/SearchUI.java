@@ -133,7 +133,7 @@ public class SearchUI extends AnnisBaseUI
 
   private CSSInject css;
 
-  private transient DocBrowserController docBrowserController;
+  private DocBrowserController docBrowserController;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
@@ -671,7 +671,7 @@ public class SearchUI extends AnnisBaseUI
     {
       getQueryController().notifyTabClose((ResultViewPanel) tabContent);
     }
-    else if(tabContent instanceof FrequencyQueryPanel)
+    else if (tabContent instanceof FrequencyQueryPanel)
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }

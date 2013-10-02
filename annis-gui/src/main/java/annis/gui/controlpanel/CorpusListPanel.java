@@ -87,7 +87,7 @@ public class CorpusListPanel extends VerticalLayout implements
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
 
-  private transient SearchUI ui;
+  private SearchUI ui;
 
   public enum ActionType
   {
