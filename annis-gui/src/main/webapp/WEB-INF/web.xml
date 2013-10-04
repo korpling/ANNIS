@@ -5,14 +5,21 @@
     <session-timeout>4</session-timeout>
   </session-config>
   <context-param>
-   <param-name>heartbeatInterval</param-name>
-   <param-value>60</param-value>
+    <param-name>heartbeatInterval</param-name>
+    <param-value>60</param-value>
   </context-param>
   <context-param>
     <description>Vaadin production mode</description>
     <param-name>productionMode</param-name>
     <param-value>false</param-value>
   </context-param>
+  
+  <context-param>
+    <description>Kickstarter Environment mode</description>
+    <param-name>kickstarterEnvironment</param-name>
+    <param-value>false</param-value>
+  </context-param>
+  
   <servlet>
     <servlet-name>Search</servlet-name>
     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>

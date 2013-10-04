@@ -43,6 +43,7 @@ import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
@@ -274,15 +275,14 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(btOpenSource);
-    layoutToolbar.addComponent(lblUserName);
-    layoutToolbar.addComponent(btLogin);
 
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
-    layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
-    layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+
+    addLoginButton(layoutToolbar);
+
     layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
 
     //HorizontalLayout hLayout = new HorizontalLayout();
@@ -926,6 +926,35 @@ public class SearchUI extends AnnisBaseUI
     else
     {
       UI.getCurrent().getPage().setUriFragment("");
+    }
+  }
+
+  /**
+   * Adds the login button + login text to the toolbar. This is only happened,
+   * when the gui is not started via the kickstarter.
+   *
+   * <p>The Kickstarter overrides the "kickstarterEnvironment" context parameter
+   * and set it to "true", so the gui can detect, that is not necessary to offer
+   * a login button.</p>
+   *
+   * @param layoutToolbar The login text and login button are added to this
+   * component.
+   */
+  private void addLoginButton(HorizontalLayout layoutToolbar)
+  {
+    DeploymentConfiguration configuration = getSession().getConfiguration();
+
+    boolean kickstarter = Boolean.parseBoolean(
+      configuration.getInitParameters().getProperty("kickstarterEnvironment",
+      "false"));
+
+    if (!kickstarter)
+    {
+      layoutToolbar.addComponent(btLogin);
+      layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+      layoutToolbar.addComponent(lblUserName);
+      layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
+
     }
   }
 
