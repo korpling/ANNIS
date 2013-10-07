@@ -657,7 +657,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
           // use the provided password
           client = Helper.createRESTClient(remoteUser, password);
         }
-        Helper.setUser(new AnnisUser(remoteUser, client));
+        Helper.setUser(new AnnisUser(remoteUser, client, true));
       }
       
       // we never write any information in this handler
