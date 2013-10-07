@@ -326,7 +326,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       String result = "\n& meta::"+mb.getMetaDatum()+" = ";
       if(values.size()==1)
       {
-        result += "\""+values.iterator().next()+"\"";
+        result += "\""+values.iterator().next().replace("\"", "\\x22")+"\"";
       }
       else
       {      
@@ -346,7 +346,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   public String escapeRegexCharacters(String tok)
   {
     if(tok==null){return "";}
-    if(tok.equals("")) {return "";};
+    if(tok.equals("")){return "";}
     String result=tok;
     for (int i = 0; i<REGEX_CHARACTERS.length; i++)
     {
@@ -360,7 +360,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 	{
     //first unescape slashes and quotes:
 		
-		s = s.replace("\\x2F", "/").replace("\\x22", "\"");
+		s = unescapeSlQ(s);
     
     //unescape regex characters:
 		int i=1;
@@ -385,7 +385,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     return s;
 	}
   
-  public String unescapeParentheses(String s)
+  public String unescapeSlQ(String s)
   {
     return s.replace("\\x2F", "/").replace("\\x22", "\"");
   }
@@ -804,7 +804,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
            else if(c=='(') {pc++;}
            i++;
          }         
-         values.add(unescapeParentheses(s.substring(1, i-1))); //in respect to removal of parentheses
+         values.add(unescapeSlQ(s.substring(1, i-1))); //in respect to removal of parentheses
          s = s.substring(i);
        }
     }
@@ -1047,7 +1047,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         {
           if(mc.isRegEx())
           {
-            Collection<String> values = splitMultipleValueExpression(mc.getValue());
+            Collection<String> values = splitMultipleValueExpression(unescape(unescapeSlQ(mc.getValue())));
             MetaBox mb = new MetaBox(mc.getLevel(), this);
             mb.setValue(values);
             mboxes.add(mb);
@@ -1059,7 +1059,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             //for a particular reason (unknown) setValue() with a String parameter
             //is not accepted by OptionGroup
             Collection<String> values = new TreeSet<String>();
-            values.add(mc.getValue());
+            values.add(unescapeSlQ(mc.getValue()));
             mb.setValue(values);
             mboxes.add(mb);
             meta.addComponent(mb);
