@@ -716,10 +716,6 @@ public class SearchUI extends AnnisBaseUI
   {
     return queryController;
   }
-  
-  public QueryBuilderChooser getQueryBuilderChooser(){
-    return queryBuilder;
-  }
 
   public TabSheet getMainTab()
   {
