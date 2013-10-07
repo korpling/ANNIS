@@ -41,6 +41,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -52,13 +53,12 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
@@ -91,8 +91,6 @@ public class VisualizerPanel extends CssLayout
   private transient PluginSystem ps;
 
   private ResolverEntry entry;
-
-  private Random rand = new Random();
 
   private transient Map<SNode, Long> markedAndCovered;
 
@@ -260,8 +258,7 @@ public class VisualizerPanel extends CssLayout
   {
     VisualizerInput input = new VisualizerInput();
     input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
-      getAttribute(
-      "AnnisWebService.URL"));
+      getAttribute("AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
     input.
       setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
@@ -300,12 +297,12 @@ public class VisualizerPanel extends CssLayout
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
 
-      SDocument wholeDocument = p.getSCorpusGraphs().get(0).
-        getSDocuments().get(0);
+      SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
+        .get(0);
 
       input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
-        input.
-        getDocument(), wholeDocument));
+        input.getDocument(), wholeDocument));
+
       input.setDocument(wholeDocument);
     }
     else
@@ -379,99 +376,13 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      Executor exec = Executors.newSingleThreadExecutor();
-      FutureTask<Component> future = new FutureTask<Component>(
-        new LoadComponentTask())
-      {
-        @Override
-        public void run()
-        {
-          VaadinSession session = VaadinSession.getCurrent();
-          try
-          {
-            super.run();
-            // wait maximum 60 seconds
-            vis = get(60, TimeUnit.SECONDS);
-            session.lock();
-            try
-            {
-              if (callback != null && vis instanceof LoadableVisualizer)
-              {
-                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-                if (loadableVis.isLoaded())
-                {
-                  // direct call callback since the visualizer is already ready
-                  if (vis instanceof LoadableVisualizer)
-                  {
-                    callback.visualizerLoaded((LoadableVisualizer) vis);
-                  }
-                }
-                else
-                {
-                  loadableVis.clearCallbacks();
-                  // add listener when player was fully loaded
-                  loadableVis.addOnLoadCallBack(callback);
-                }
-              }
 
-              if (getComponentIndex(progress) > -1)
-              {
-                removeComponent(progress);
-              }
+      ExecutorService execService = Executors.newSingleThreadExecutor();
 
-              if (vis != null)
-              {
-                btEntry.setEnabled(true);
-                vis.setVisible(true);
-                if (vis instanceof PDFViewer)
-                {
-                  ((PDFViewer)vis).openPDFPage("-1");
-                }
-                // add if not already added
-                if(getComponentIndex(vis) < 0)
-                {
-                  addComponent(vis);
-                }
-              }
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          catch (InterruptedException ex)
-          {
-            log.error("Visualizer creation interrupted " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (ExecutionException ex)
-          {
-            log.error("Exception when creating visualizer " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (TimeoutException ex)
-          {
-            log.
-              error(
-              "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
-              ex);
-            session.lock();
-            try
-            {
-              Notification.show(
-                "Could not create visualizer " + visPlugin.getShortName(),
-                ex.toString(),
-                Notification.Type.WARNING_MESSAGE);
-            }
-            finally
-            {
-              session.unlock();
-            }
-            cancel(true);
-          }
-        }
-      };
-      exec.execute(future);
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      Thread background = new BackgroundThread(future, callback);
+      background.start();
 
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
@@ -479,10 +390,52 @@ public class VisualizerPanel extends CssLayout
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress);
-    }
-    // end if create input was needed
+    } // end if create input was needed
 
   } // end loadVisualizer
+
+  private void updateGUIAfterLoadingVisualizer(
+    LoadableVisualizer.Callback callback)
+  {
+    if (callback != null && vis instanceof LoadableVisualizer)
+    {
+      LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+      if (loadableVis.isLoaded())
+      {
+        // direct call callback since the visualizer is already ready
+        if (vis instanceof LoadableVisualizer)
+        {
+          callback.visualizerLoaded((LoadableVisualizer) vis);
+        }
+      }
+      else
+      {
+        loadableVis.clearCallbacks();
+        // add listener when player was fully loaded
+        loadableVis.addOnLoadCallBack(callback);
+      }
+    }
+
+    if (getComponentIndex(progress) > -1)
+    {
+      removeComponent(progress);
+    }
+
+    if (vis != null)
+    {
+      btEntry.setEnabled(true);
+      vis.setVisible(true);
+      if (vis instanceof PDFViewer)
+      {
+        ((PDFViewer) vis).openPDFPage("-1");
+      }
+      // add if not already added
+      if (getComponentIndex(vis) < 0)
+      {
+        addComponent(vis);
+      }
+    }
+  }
 
   @Override
   public void toggleVisualizer(boolean visible,
@@ -588,6 +541,79 @@ public class VisualizerPanel extends CssLayout
           sfeature.
           getValueString());
       }
+    }
+  }
+
+  private class BackgroundThread extends Thread
+  {
+    private Future<Component> future;
+    private LoadableVisualizer.Callback callback;
+    public BackgroundThread(
+      Future<Component> future, LoadableVisualizer.Callback callback)
+    {
+      this.future = future;
+      this.callback = callback;
+    }
+    
+    
+    
+    @Override
+    public void run()
+    {
+      Throwable exception = null;
+      try
+      {
+        final Component result = future.get(60, TimeUnit.SECONDS);
+        
+        UI.getCurrent().access(new Runnable()
+           {
+             @Override
+             public void run()
+             {
+               vis = result;
+               updateGUIAfterLoadingVisualizer(callback);
+               UI.getCurrent().push();
+             }
+           });
+      }
+      catch (InterruptedException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (ExecutionException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (TimeoutException ex)
+      {
+        future.cancel(true);
+        log.error(
+          "Could create visualizer " + visPlugin.getShortName()
+          + " in 60 seconds: Timeout",
+          ex);
+        exception = ex;
+      }
+      
+      if(exception != null)
+      {
+        final Throwable finalException = exception;
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Notification.show(
+              "Error when creating visualizer " + visPlugin.getShortName(),
+              finalException.toString(),
+              Notification.Type.WARNING_MESSAGE);
+            UI.getCurrent().push();
+          }
+        });
+      }
+      
+
     }
   }
 

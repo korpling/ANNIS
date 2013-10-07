@@ -17,19 +17,26 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import java.util.Map;
 
 public abstract class AbstractFromClauseGenerator 
 	extends TableAccessStrategyFactory 
 	implements FromClauseSqlGenerator<QueryData>
 {
 
-	  protected String tableAliasDefinition(QueryNode node, String table, int count)
+    protected String tableAliasDefinition(QueryNode node, String table, int count)
+	  {
+      return tableAliasDefinition(tables(node).getTableAliases(), node, table, count);
+    }
+  
+	  public static String tableAliasDefinition(
+      Map<String, String> tableAliases, QueryNode node, String table, int count)
 	  {
 	    StringBuilder sb = new StringBuilder();
 
-	    sb.append(tables(node).tableName(table));
+	    sb.append(TableAccessStrategy.tableName(tableAliases, table));
 	    sb.append(" AS ");
-	    sb.append(tables(node).aliasedTable(table, count));
+	    sb.append(TableAccessStrategy.aliasedTable(node, tableAliases, table, count));
 
 	    return sb.toString();
 	  }

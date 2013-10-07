@@ -20,7 +20,6 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.GenericType;
@@ -61,7 +60,7 @@ public class ExampleQueriesPanel extends Table
   // first column String
   private final String EXAMPLE_QUERY = "example query";
 
-  private ExecutorService executor = Executors.newSingleThreadExecutor();
+  private transient ExecutorService executor;
 
   //main ui window
   private SearchUI ui;
@@ -81,17 +80,17 @@ public class ExampleQueriesPanel extends Table
   // reference to the tab which holds this component
   private TabSheet.Tab tab;
 
-  // hold the main window of annis3
-  private TabSheet mainTab;
+  // hold the parent tab of annis3
+  private HelpPanel parentTab;
 
   private static final ThemeResource SEARCH_ICON = new ThemeResource(
     "tango-icons/16x16/system-search.png");
 
-  public ExampleQueriesPanel(String caption, SearchUI ui)
+  public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
     super(caption);
     this.ui = ui;
-    this.mainTab = ui.getTabSheet();
+    this.parentTab = parentTab;
 
     //
     egContainer = new BeanItemContainer<ExampleQuery>(ExampleQuery.class);
@@ -209,35 +208,28 @@ public class ExampleQueriesPanel extends Table
    */
   private void showTab()
   {
-    if (mainTab == null)
+    if (parentTab != null)
     {
-      mainTab = ui.getMainTab();
-    }
-
-    if (mainTab != null)
-    {
-      tab = mainTab.getTab(this);
-      tab.getComponent().addStyleName("example-queries-tab");
-      tab.setEnabled(true);
-
-      if (!(mainTab.getSelectedTab() instanceof ResultViewPanel || mainTab.getSelectedTab() instanceof QueryBuilderChooser))
+      tab = parentTab.getTab(this);
+      if(tab != null)
       {
-        mainTab.setSelectedTab(tab);
-      }
+        // FIXME: this should be added by the constructor or by the panel that adds this tab
+       // tab.getComponent().addStyleName("example-queries-tab");
+        tab.setEnabled(true);
 
+        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
+        {
+          parentTab.setSelectedTab(tab);
+        }
+      }
     }
   }
 
   private void hideTabSheet()
   {
-    if (mainTab == null)
+    if (parentTab != null)
     {
-      mainTab = ui.getMainTab();
-    }
-
-    if (mainTab != null)
-    {
-      tab = mainTab.getTab(this);
+      tab = parentTab.getTab(this);
 
       if (tab != null)
       {
@@ -367,7 +359,7 @@ public class ExampleQueriesPanel extends Table
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    executor.submit(new Runnable()
+    getExecutor().submit(new Runnable()
     {
       @Override
       public void run()
@@ -375,7 +367,7 @@ public class ExampleQueriesPanel extends Table
         final List<ExampleQuery> result =
           loadExamplesFromRemote(selectedCorpora);
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -385,6 +377,7 @@ public class ExampleQueriesPanel extends Table
             {
               removeAllItems();
               addItems();
+              ui.push();
             }
             catch (Exception ex)
             {
@@ -463,5 +456,14 @@ public class ExampleQueriesPanel extends Table
       ExampleQuery eQ = (ExampleQuery) itemId;
       return getOpenCorpusPanel(eQ.getCorpusName());
     }
+  }
+  
+  private ExecutorService getExecutor()
+  {
+    if(executor == null)
+    {
+      executor = Executors.newSingleThreadExecutor();
+    }
+    return executor;
   }
 }

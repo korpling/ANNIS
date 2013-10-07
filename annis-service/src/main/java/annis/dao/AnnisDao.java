@@ -16,6 +16,7 @@
 package annis.dao;
 
 import annis.administration.BinaryImportHelper;
+import annis.dao.objects.AnnotatedMatch;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
@@ -30,6 +31,7 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
@@ -149,8 +151,11 @@ public interface AnnisDao
 
   String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
     final boolean analyze);
+  
+  FrequencyTable frequency(QueryData queryData);
 
   public void matrix(final QueryData queryData, final OutputStream out);
+
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);

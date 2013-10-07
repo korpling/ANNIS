@@ -33,7 +33,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
   private static final String[] EDGE_OPERATORS = new String[]
   {
     ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
-    "_l_", "'_r_", "_o_", "_ol_", "_or_"
+    "_l_", "_r_", "_o_", "_ol_", "_or_"
   };
     
   private TigerQueryBuilderCanvas parent;
@@ -64,11 +64,12 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     HorizontalLayout toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
     toolbar.setWidth("100%");
-    toolbar.setHeight("20px");
+    toolbar.setHeight("-1px");
     vLayout.addComponent(toolbar);
         
     btClose = new Button();
-    btClose.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);

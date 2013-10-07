@@ -37,6 +37,7 @@
         <prop key="results-per-page">${results-per-page}</prop>
         <prop key="default-context-segmentation">${default-context-segmentation}</prop>
         <prop key="default-base-text-segmentation">${default-base-text-segmentation}</prop>
+        <prop key="browse-document-visualizers">${browse-document-visualizers}</prop>
       </props>
     </property>
   </bean>

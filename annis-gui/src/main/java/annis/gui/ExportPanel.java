@@ -13,18 +13,19 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.controlpanel;
+package annis.gui;
 
-import annis.gui.QueryController;
-import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
-import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.gui.controlpanel.CorpusListPanel;
+import annis.gui.controlpanel.QueryPanel;
+import annis.gui.controlpanel.SearchOptionsPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import annis.libgui.Helper;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -34,7 +35,6 @@ import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import java.io.*;
@@ -56,6 +56,11 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     ExportPanel.class);
+  
+  private ComboBox cbLeftContext;
+  private ComboBox cbRightContext;
+  private TextField txtAnnotationKeys;
+  private TextField txtParameters;
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -69,13 +74,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private ComboBox cbExporter;
 
-  private ComboBox cbLeftContext;
-
-  private ComboBox cbRightContext;
-
-  private TextField txtAnnotationKeys;
-
-  private TextField txtParameters;
+  
 
   private Button btDownload;
 
@@ -116,7 +115,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     addStyleName("contextsensible-formlayout");
 
     initHelpMessages();
-
+    
     cbExporter = new ComboBox("Exporter");
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
@@ -133,7 +132,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
     addComponent(new HelpButton(cbExporter));
-
+    
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
 
@@ -263,58 +262,59 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         @Override
         protected void done()
         {
-          VaadinSession session = VaadinSession.getCurrent();
-          session.lock();
-          try
+          UI.getCurrent().access(new Runnable() 
           {
-            btExport.setEnabled(true);
-            progressBar.setEnabled(false);
-            progressLabel.setValue("");
+            @Override
+            public void run()
+            {
+              btExport.setEnabled(true);
+              progressBar.setEnabled(false);
+              progressLabel.setValue("");
 
-            try
-            {
-              // copy the result to the class member in order to delete if
-              // when not longer needed
-              tmpOutputFile = get();
-            }
-            catch (InterruptedException ex)
-            {
-              log.error(null, ex);
-            }
-            catch (ExecutionException ex)
-            {
-              log.error(null, ex);
-            }
-
-            if (tmpOutputFile == null)
-            {
-              Notification.show("Could not create the Exporter",
-                "The server logs might contain more information about this "
-                + "so you should contact the provider of this ANNIS installation "
-                + "for help.", Notification.Type.ERROR_MESSAGE);
-            }
-            else
-            {
-              if (downloader != null && btDownload.getExtensions().contains(
-                downloader))
+              try
               {
-                btDownload.removeExtension(downloader);
+                // copy the result to the class member in order to delete if
+                // when not longer needed
+                tmpOutputFile = get();
               }
-              downloader = new FileDownloader(new FileResource(
-                tmpOutputFile));
+              catch (InterruptedException ex)
+              {
+                log.error(null, ex);
+              }
+              catch (ExecutionException ex)
+              {
+                log.error(null, ex);
+              }
 
-              downloader.extend(btDownload);
-              btDownload.setEnabled(true);
+              if (tmpOutputFile == null)
+              {
+                Notification.show("Could not create the Exporter",
+                  "The server logs might contain more information about this "
+                  + "so you should contact the provider of this ANNIS installation "
+                  + "for help.", Notification.Type.ERROR_MESSAGE);
+              }
+              else
+              {
+                if (downloader != null && btDownload.getExtensions().contains(
+                  downloader))
+                {
+                  btDownload.removeExtension(downloader);
+                }
+                downloader = new FileDownloader(new FileResource(
+                  tmpOutputFile));
 
-              Notification.show("Export finished",
-                "Click on the button right to the export button to actually download the file.",
-                Notification.Type.HUMANIZED_MESSAGE);
+                downloader.extend(btDownload);
+                btDownload.setEnabled(true);
+
+                Notification.show("Export finished",
+                  "Click on the button right to the export button to actually download the file.",
+                  Notification.Type.HUMANIZED_MESSAGE);
+              }
+              
+              UI.getCurrent().push();
             }
-          }
-          finally
-          {
-            session.unlock();
-          }
+          });
+          
         }
       };
 
@@ -388,26 +388,29 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   }
 
   @Subscribe
-  public void handleExportProgress(Integer exports)
+  public void handleExportProgress(final Integer exports)
   {
-    VaadinSession session = VaadinSession.getCurrent();
-    session.lock();
-    try
+    UI.getCurrent().access(new Runnable()
     {
-      if (exportTime != null && exportTime.isRunning())
+
+      @Override
+      public void run()
       {
-        progressLabel.setValue(
-          "exported " + exports + " items in " + exportTime.toString());
+        if (exportTime != null && exportTime.isRunning())
+        {
+          progressLabel.setValue(
+            "exported " + exports + " items in " + exportTime.toString());
+        }
+        else
+        {
+          progressLabel.setValue("exported " + exports + " items");
+        }
+        
+        UI.getCurrent().push();
       }
-      else
-      {
-        progressLabel.setValue("exported " + exports + " items");
-      }
-    }
-    finally
-    {
-      session.unlock();
-    }
+      
+    });
+
   }
 
   @Override

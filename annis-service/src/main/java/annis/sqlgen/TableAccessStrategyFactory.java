@@ -19,7 +19,8 @@ import annis.model.QueryNode;
 
 public class TableAccessStrategyFactory {
 
-	public TableAccessStrategy tables(QueryNode node) {
+	public TableAccessStrategy tables(QueryNode node) 
+  {
 		TableAccessStrategy tableAccessStrategy = createTableAccessStrategy();
 		tableAccessStrategy.setNode(node);
 		return tableAccessStrategy;

@@ -32,9 +32,9 @@ import org.slf4j.LoggerFactory;
 public class PDFControllerImpl implements PDFController, Serializable
 {
 
-  private final Logger log = LoggerFactory.getLogger(PDFControllerImpl.class);
+  private static final Logger log = LoggerFactory.getLogger(PDFControllerImpl.class);
 
-  private Map<String, List<PDFViewer>> registeredPDFViewer;
+  private transient Map<String, List<PDFViewer>> registeredPDFViewer;
 
   /**
    * Since everone can call us asynchronously we need a locking mechanism

@@ -13,33 +13,27 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets;
+package annis.gui.controlpanel;
 
-import com.vaadin.server.ServiceException;
-import com.vaadin.server.SessionInitEvent;
-import com.vaadin.server.SessionInitListener;
-import com.vaadin.server.VaadinServlet;
-import javax.servlet.ServletException;
+import annis.gui.components.HelpButton;
+import com.vaadin.data.validator.IntegerRangeValidator;
+import com.vaadin.ui.ComboBox;
+import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.TextField;
 
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class AnnisVaadinServlet extends VaadinServlet
+public class ExportOptionsPanel extends FormLayout
 {
-
-  @Override
-  protected void servletInitialized() throws ServletException
-  {
-    super.servletInitialized();
-    getService().addSessionInitListener(new SessionInitListener() {
-
-      @Override
-      public void sessionInit(SessionInitEvent event) throws ServiceException
-      {
-     //   event.getSession().addBootstrapListener(new AnnisBootstrapListener());
-      }
-    });
-  }
+  private ComboBox cbLeftContext;
+  private ComboBox cbRightContext;
+  private TextField txtAnnotationKeys;
+  private TextField txtParameters;
   
+  public ExportOptionsPanel()
+  {
+    
+  }
 }

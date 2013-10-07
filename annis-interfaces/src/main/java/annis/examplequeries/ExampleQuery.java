@@ -17,8 +17,6 @@ package annis.examplequeries;
 
 import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Wraps example queries.

@@ -16,8 +16,8 @@
 package annis.dao.autogenqueries;
 
 import annis.examplequeries.ExampleQuery;
-import annis.sqlgen.AnnotateQueryData;
-import annis.sqlgen.LimitOffsetQueryData;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 
 /**
  * Implements the initializing of the {@link ExampleQuery} class, which might be

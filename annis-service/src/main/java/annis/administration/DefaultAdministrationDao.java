@@ -118,13 +118,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   private Map<String, String> tableInsertFrom;
 
   // all files have to carry this suffix.
-  private final String REL_ANNIS_FILE_SUFFIX = ".tab";
+  private static final String REL_ANNIS_FILE_SUFFIX = ".tab";
 
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
    */
-  private final String EXAMPLE_QUERIES_TAB = "example_queries";
+  private static final String EXAMPLE_QUERIES_TAB = "example_queries";
 
   /**
    * The name of the file and the relation containing the resolver information.
@@ -136,7 +136,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   /**
    * The corpus configuration is saved in the media files table.
    */
-  public final String CORPUS_CONFIG_FILE = "corpus.properties";
+  public static final String CORPUS_CONFIG_FILE = "corpus.properties";
 
   private String[] importedTables =
   {
@@ -1036,7 +1036,10 @@ public class DefaultAdministrationDao implements AdministrationDao
         File f = new File(dataDir, fileName);
         if (f.exists())
         {
-          f.delete();
+          if(!f.delete())
+          {
+            log.warn("Could not delete {}", f.getAbsolutePath());
+          }
         }
       }
 
@@ -1896,7 +1899,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     return numberOfCorpora > 0;
   }
 
-  public class ConflictingCorpusException extends AnnisException
+  public static class ConflictingCorpusException extends AnnisException
   {
 
     public ConflictingCorpusException(String msg)
