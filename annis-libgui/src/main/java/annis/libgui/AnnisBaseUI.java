@@ -146,6 +146,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     initPlugins();
     
+    checkIfRemoteLoggedIn(request);
     getSession().addRequestHandler(new RemoteUserRequestHandler());
   }
   
@@ -491,6 +492,34 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
   }
+  
+  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  {
+     // check if we are logged in using an external authentification mechanism
+      // like Schibboleth
+      String remoteUser = request.getRemoteUser();
+      if(remoteUser != null)
+      {
+        String password = null;
+        if(remoteUserPasswords != null)
+        {
+          password = remoteUserPasswords.getProperty(remoteUser, null);
+        }
+        
+        Client client;
+        if(password == null)
+        {
+          // treat as anonymous user
+          client = Helper.createRESTClient();
+        }
+        else
+        {
+          // use the provided password
+          client = Helper.createRESTClient(remoteUser, password);
+        }
+        Helper.setUser(new AnnisUser(remoteUser, client, true));
+      }
+  }
 
   @Override
   public void push()
@@ -635,31 +664,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     public boolean handleRequest(VaadinSession session, VaadinRequest request,
       VaadinResponse response) throws IOException
     {
-      // check if we are logged in using an external authentification mechanism
-      // like Schibboleth
-      String remoteUser = request.getRemoteUser();
-      if(remoteUser != null)
-      {
-        String password = null;
-        if(remoteUserPasswords != null)
-        {
-          password = remoteUserPasswords.getProperty(remoteUser, null);
-        }
-        
-        Client client;
-        if(password == null)
-        {
-          // treat as anonymous user
-          client = Helper.createRESTClient();
-        }
-        else
-        {
-          // use the provided password
-          client = Helper.createRESTClient(remoteUser, password);
-        }
-        Helper.setUser(new AnnisUser(remoteUser, client, true));
-      }
-      
+      checkIfRemoteLoggedIn(request);
       // we never write any information in this handler
       return false;
     }
