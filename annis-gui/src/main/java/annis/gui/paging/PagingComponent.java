@@ -29,13 +29,11 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
 import org.slf4j.LoggerFactory;
-import org.w3c.dom.Text;
 
 /**
  *
@@ -84,6 +82,10 @@ public class PagingComponent extends CustomComponent implements
 
   private Label lblInfo;
 
+  public PagingComponent()
+  {
+    this(0, 0);
+  }
   public PagingComponent(int count, int pageSize)
   {
     if (pageSize <= 0)
@@ -210,7 +212,16 @@ public class PagingComponent extends CustomComponent implements
     {
       for (PagingCallback c : callbacks)
       {
-        c.switchPage(getStartNumber(), pageSize);
+        int currentSize;
+        
+        if (currentPage == getMaxPage() && currentPage > 1)
+        {
+          currentSize = getCount() % getStartNumber();
+        } else {
+          currentSize = pageSize;
+        }
+        
+        c.switchPage(getStartNumber(), currentSize);
       }
     }
   }
@@ -262,14 +273,14 @@ public class PagingComponent extends CustomComponent implements
     return pageSize;
   }
 
-  public void setPageSize(int pageSize)
+  public void setPageSize(int pageSize, boolean informCallback)
   {
     if (pageSize <= 0)
     {
       pageSize = 1;
     }
     this.pageSize = pageSize;
-    update(true);
+    update(informCallback);
   }
 
   @Override

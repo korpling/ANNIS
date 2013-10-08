@@ -22,7 +22,6 @@ import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.Match;
-import annis.model.Annotation;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
@@ -32,13 +31,17 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableEntry;
+import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.SaltURIGroup;
-import annis.sqlgen.AnnotateQueryData;
-import annis.sqlgen.LimitOffsetQueryData;
 import annis.service.objects.SubgraphQuery;
 import annis.sqlgen.MatrixQueryData;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -66,6 +69,7 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -327,6 +331,69 @@ public class QueryServiceImpl implements QueryService
 
     return result;
   }
+  
+  /**
+   * Frequency analysis.
+   * 
+   * @param  rawFields Comma seperated list of result vector elements. 
+   *                   Each element has the form <node-nr>:<anno-name>. The
+   *                   annotation name can be set to "tok" to indicate that the
+   *                   span should be used instead of an annotation.
+   */
+  @GET
+  @Path("search/frequency")
+  @Produces("application/xml")
+  public FrequencyTable frequency(
+    @QueryParam("q") String query,
+    @QueryParam("corpora") String rawCorpusNames,
+    @QueryParam("fields") String rawFields)
+  {
+    requiredParameter(query, "q", "AnnisQL query");
+    requiredParameter(rawCorpusNames, "corpora", "comma separated list of corpus names");
+    requiredParameter(rawFields, "fields", "Comma seperated list of result vector elements.");
+    
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for(String c : corpusNames)
+    {
+      user.checkPermission("query:matrix:" + c);
+    }
+    
+    
+    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    String[] fields = rawFields.split("\\s*,\\s*");
+    FrequencyTableQueryData ext = new FrequencyTableQueryData();
+    for(String f: fields)
+    {
+      String[] splitted = f.split(":", 2);
+      
+      if(splitted.length == 2)
+      {
+        FrequencyTableEntry entry = new FrequencyTableEntry();
+      
+        entry.setReferencedNode(splitted[0]);
+        if("tok".equals(splitted[1]))
+        {
+          entry.setType(FrequencyTableEntryType.span);
+        }
+        else
+        {
+          entry.setType(FrequencyTableEntryType.annotation);
+          entry.setKey(splitted[1]);
+        }
+        ext.add(entry);
+      }
+    }
+    data.addExtension(ext);
+    
+    long start = new Date().getTime();
+    FrequencyTable freqTable = annisDao.frequency(data);
+    long end = new Date().getTime();
+    logQuery("FREQUENCY", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    
+    return freqTable;
+  }
+  
 
   /**
    * Get a graph as {@link SaltProject} of a set of Salt IDs.
@@ -551,6 +618,27 @@ public class QueryServiceImpl implements QueryService
   {
     annisDao.parseAQL(query, new LinkedList<Long>());
     return "ok";
+  }
+  
+  /**
+   * Return the list of the query nodes if this is a valid query 
+   * or throw exception when invalid
+   *
+   * @param query Query to get the query nodes for
+   * @return
+   */
+  @GET
+  @Path("parse/nodes")
+  @Produces("application/xml")
+  public Response parseNodes(@QueryParam("q") String query)
+  {
+    QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
+    List<QueryNode> nodes = new LinkedList<QueryNode>();
+    for(List<QueryNode> alternative : data.getAlternatives())
+    {
+      nodes.addAll(alternative);
+    }
+    return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
 
   @GET

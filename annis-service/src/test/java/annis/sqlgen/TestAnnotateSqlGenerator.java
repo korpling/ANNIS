@@ -1,5 +1,7 @@
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.LimitOffsetQueryData;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;

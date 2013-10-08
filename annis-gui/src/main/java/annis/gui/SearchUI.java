@@ -21,16 +21,17 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
-import annis.gui.tutorial.TutorialPanel;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
@@ -42,6 +43,7 @@ import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
@@ -52,9 +54,14 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
+
+import com.vaadin.shared.ui.ui.Transport;
+
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
@@ -77,13 +84,13 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push
+@Push(value = PushMode.MANUAL, transport = Transport.STREAMING)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  LoginListener, ErrorHandler
+  LoginListener, ErrorHandler, TabSheet.CloseHandler
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -113,13 +120,9 @@ public class SearchUI extends AnnisBaseUI
 
   private ControlPanel controlPanel;
 
-  private TutorialPanel tutorial;
-
   private TabSheet mainTab;
 
   private Window windowLogin;
-
-  private QueryBuilderChooser queryBuilder;
 
   private String bugEMailAddress;
 
@@ -131,13 +134,14 @@ public class SearchUI extends AnnisBaseUI
 
   private CSSInject css;
 
+  private DocBrowserController docBrowserController;
+
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   @Override
   protected void init(VaadinRequest request)
   {
     super.init(request);
-
     setErrorHandler(this);
 
     this.instanceConfig = getInstanceConfig(request);
@@ -147,6 +151,9 @@ public class SearchUI extends AnnisBaseUI
 
     JavaScript.getCurrent().addFunction("annis.gui.logincallback",
       new LoginCloseCallback());
+
+    // init a doc browser controller
+    docBrowserController = new DocBrowserController(this);
 
     queryController = new QueryController(this);
 
@@ -174,7 +181,7 @@ public class SearchUI extends AnnisBaseUI
 
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("info.gif"));
+    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
@@ -225,10 +232,6 @@ public class SearchUI extends AnnisBaseUI
         windowLogin.center();
       }
     });
-//    BrowserWindowOpener loginOpener =
-//      new BrowserWindowOpener(Helper.getContext() + "/login");
-//    loginOpener.setFeatures("height=200,width=300,resizable");
-//    loginOpener.extend(btLogin);
 
     btLogout = new Button("Logout", new Button.ClickListener()
     {
@@ -272,15 +275,14 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(btOpenSource);
-    layoutToolbar.addComponent(lblUserName);
-    layoutToolbar.addComponent(btLogin);
 
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
-    layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
-    layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+
+    addLoginButton(layoutToolbar);
+
     layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
 
     //HorizontalLayout hLayout = new HorizontalLayout();
@@ -290,25 +292,18 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.addComponent(hSplit);
     mainLayout.setExpandRatio(hSplit, 1.0f);
 
-    ExampleQueriesPanel autoGenQueries = new ExampleQueriesPanel(
-      "example queries", this);
-
-    controlPanel = new ControlPanel(queryController, instanceConfig,
-      autoGenQueries);
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
-    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    hSplit.setFirstComponent(controlPanel);
-
-    tutorial = new TutorialPanel();
-    tutorial.setHeight("99%");
+    final HelpPanel help = new HelpPanel(this);
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.addTab(autoGenQueries, "example queries");
-    mainTab.addTab(tutorial, "Tutorial");
+    mainTab.setCloseHandler(this);
+    mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addStyleName("blue-tab");
 
-    queryBuilder = new QueryBuilderChooser(queryController, this, instanceConfig);
-    mainTab.addTab(queryBuilder, "Query Builder");
+    Tab helpTab = mainTab.addTab(help, "Help");
+    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
+    helpTab.setClosable(false);
+
 
     hSplit.setSecondComponent(mainTab);
     hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
@@ -335,21 +330,20 @@ public class SearchUI extends AnnisBaseUI
     });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
-    addAction(new ShortcutListener("^Query builder")
-    {
-      @Override
-      public void handleAction(Object sender, Object target)
-      {
-        mainTab.setSelectedTab(queryBuilder);
-      }
-    });
+    controlPanel = new ControlPanel(queryController, instanceConfig,
+      help.getExamples(), this);
+
+    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    hSplit.setFirstComponent(controlPanel);
+
 
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
       public void handleAction(Object sender, Object target)
       {
-        mainTab.setSelectedTab(tutorial);
+        mainTab.setSelectedTab(help);
       }
     });
 
@@ -368,7 +362,7 @@ public class SearchUI extends AnnisBaseUI
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
 
-    setPollInterval(10000);
+    setPollInterval(-1);
 
     updateUserInformation();
   }
@@ -379,7 +373,13 @@ public class SearchUI extends AnnisBaseUI
     log.error("Unknown error in some component: " + event.getThrowable().
       getLocalizedMessage(),
       event.getThrowable());
-    ExceptionDialog.show(event.getThrowable());
+    // get the source throwable (thus the one that triggered the error)
+    Throwable source = event.getThrowable();
+    while (source != null && source.getCause() != null)
+    {
+      source = source.getCause();
+    }
+    ExceptionDialog.show(source);
   }
 
   public boolean canReportBugs()
@@ -504,6 +504,11 @@ public class SearchUI extends AnnisBaseUI
 
   public void checkCitation()
   {
+    if (VaadinSession.getCurrent() == null || VaadinSession.getCurrent().
+      getSession() == null)
+    {
+      return;
+    }
     Object origURLRaw = VaadinSession.getCurrent().getSession().getAttribute(
       "citation");
     if (origURLRaw == null || !(origURLRaw instanceof String))
@@ -658,6 +663,20 @@ public class SearchUI extends AnnisBaseUI
     updateUserInformation();
   }
 
+  @Override
+  public void onTabClose(TabSheet tabsheet, Component tabContent)
+  {
+    tabsheet.removeComponent(tabContent);
+    if (tabContent instanceof ResultViewPanel)
+    {
+      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
+    }
+    else if (tabContent instanceof FrequencyQueryPanel)
+    {
+      controlPanel.getQueryPanel().notifyFrequencyTabClose();
+    }
+  }
+
   public boolean isLoggedIn()
   {
     return Helper.getUser() != null;
@@ -698,10 +717,6 @@ public class SearchUI extends AnnisBaseUI
     return queryController;
   }
   
-  public QueryBuilderChooser getQueryBuilderChooser(){
-    return queryBuilder;
-  }
-
   public TabSheet getMainTab()
   {
     return mainTab;
@@ -860,13 +875,13 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
     else
     {
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery(true, true);
+      queryController.executeQuery();
     }
   }
 
@@ -911,6 +926,35 @@ public class SearchUI extends AnnisBaseUI
     else
     {
       UI.getCurrent().getPage().setUriFragment("");
+    }
+  }
+
+  /**
+   * Adds the login button + login text to the toolbar. This is only happened,
+   * when the gui is not started via the kickstarter.
+   *
+   * <p>The Kickstarter overrides the "kickstarterEnvironment" context parameter
+   * and set it to "true", so the gui can detect, that is not necessary to offer
+   * a login button.</p>
+   *
+   * @param layoutToolbar The login text and login button are added to this
+   * component.
+   */
+  private void addLoginButton(HorizontalLayout layoutToolbar)
+  {
+    DeploymentConfiguration configuration = getSession().getConfiguration();
+
+    boolean kickstarter = Boolean.parseBoolean(
+      configuration.getInitParameters().getProperty("kickstarterEnvironment",
+      "false"));
+
+    if (!kickstarter)
+    {
+      layoutToolbar.addComponent(lblUserName);
+      layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
+      layoutToolbar.addComponent(btLogin);
+      layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+
     }
   }
 
@@ -972,5 +1016,10 @@ public class SearchUI extends AnnisBaseUI
   public TabSheet getTabSheet()
   {
     return mainTab;
+  }
+
+  public DocBrowserController getDocBrowserController()
+  {
+    return docBrowserController;
   }
 }

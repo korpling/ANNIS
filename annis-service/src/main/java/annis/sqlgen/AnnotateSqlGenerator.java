@@ -27,6 +27,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.SubgraphFilter;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import org.springframework.dao.DataAccessException;
@@ -50,7 +51,6 @@ public abstract class AnnotateSqlGenerator<T>
   private boolean includeDocumentNameInAnnotateQuery;
   // include is_token column in SELECT clause
   private boolean includeIsTokenColumn;
-  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator;
   private TableAccessStrategy outerQueryTableAccessStrategy;
   private ResultSetExtractor<T> resultExtractor;
   // helper to extract the corpus path from a JDBC result set
@@ -193,17 +193,6 @@ public abstract class AnnotateSqlGenerator<T>
     throws SQLException, DataAccessException
   {
     return resultExtractor.extractData(resultSet);
-  }
-
-  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseSqlGenerator()
-  {
-    return tableJoinsInFromClauseSqlGenerator;
-  }
-
-  public void setTableJoinsInFromClauseSqlGenerator(
-    TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseSqlGenerator)
-  {
-    this.tableJoinsInFromClauseSqlGenerator = tableJoinsInFromClauseSqlGenerator;
   }
 
   public TableAccessStrategy getOuterQueryTableAccessStrategy()

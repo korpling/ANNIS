@@ -1,11 +1,11 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2009-2011 Collaborative Research Centre SFB 632 
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *      http://www.apache.org/licenses/LICENSE-2.0
+ *    http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,17 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.resultview;
+package annis.dao.objects;
 
-import annis.resolver.ResolverEntry;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
-/**
- *
- * @author thomas
- */
-public interface ResolverProvider
-{
-  public ResolverEntry[] getResolverEntries(SDocument result);
-  
+@SuppressWarnings("serial")
+public class AnnotatedMatch extends ArrayList<AnnotatedSpan> {
+
+	public AnnotatedMatch() {
+		super();
+	}
+	
+	public AnnotatedMatch(List<AnnotatedSpan> spans) {
+		this();
+		addAll(spans);
+	}
+	
+	public AnnotatedMatch(AnnotatedSpan... spans) {
+		this(Arrays.asList(spans));
+	}
+	
 }

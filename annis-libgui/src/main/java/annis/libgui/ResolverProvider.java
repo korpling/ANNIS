@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,36 +13,17 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen;
+package annis.libgui;
+
+import annis.resolver.ResolverEntry;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 
 /**
  *
- * @author benjamin
+ * @author thomas
  */
-public class LimitOffsetQueryData
+public interface ResolverProvider
 {
-
-  private int offset;
-  private int limit;
-
-  public LimitOffsetQueryData(int offset, int limit)
-  {
-    this.offset = offset;
-    this.limit = limit;
-  }
-
-  public int getLimit()
-  {
-    return limit;
-  }
-
-  public int getOffset()
-  {
-    return offset;
-  }
+  public ResolverEntry[] getResolverEntries(SDocument result);
   
-  public boolean isPaged()
-  {
-    return offset != 0 || limit != 0;
-  }
 }

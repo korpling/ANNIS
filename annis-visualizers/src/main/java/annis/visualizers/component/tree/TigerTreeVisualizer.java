@@ -54,7 +54,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private static final int SIDE_MARGIN = 20;
   private static final int TOP_MARGIN = 40;
   private static final int TREE_DISTANCE = 40;
-  private final Java2dBackend backend;
+  private transient Java2dBackend backend;
   private final DefaultLabeler labeler;
   private final DefaultStyler styler;
   private final AnnisGraphTools graphtools;
@@ -266,9 +266,8 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
 
   public TigerTreeVisualizer()
   {
-    backend = new Java2dBackend();
     labeler = new DefaultLabeler();
-    styler = new DefaultStyler(backend);
+    styler = new DefaultStyler(getBackend());
     graphtools = new AnnisGraphTools();
   }
 
@@ -295,7 +294,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       {
       
         ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
-          g, backend, labeler, styler, input);
+          g, getBackend(), labeler, styler, input);
 
         AbstractImageGraphicsItem item = cl.createLayout(
           new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.
@@ -370,5 +369,16 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   {
     return "image/png";
   }
+
+  private Java2dBackend getBackend()
+  {
+    if(backend == null)
+    {
+      backend = new Java2dBackend();
+    }
+    return backend;
+  }
+  
+  
   
 }

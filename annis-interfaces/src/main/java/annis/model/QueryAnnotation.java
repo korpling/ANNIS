@@ -35,6 +35,11 @@ public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializabl
 	private String corpusName;
 	private TextMatching textMatching;
 
+  public QueryAnnotation()
+  {
+    this("", "");
+  }
+  
 	public QueryAnnotation(String namespace, String name)
 	{
 		this(namespace, name, null, null);

@@ -26,8 +26,6 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 import org.eclipse.emf.common.util.EList;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Generates a simple query for a specific tok.
@@ -43,9 +41,6 @@ import org.slf4j.LoggerFactory;
  */
 public class AutoTokQuery extends AbstractAutoQuery
 {
-
-  String aql = "tok";
-
   String finalAql = "default";
 
   @Override
