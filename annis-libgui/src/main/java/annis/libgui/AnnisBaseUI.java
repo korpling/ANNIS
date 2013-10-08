@@ -113,15 +113,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private AtomicInteger pushCounter = new AtomicInteger();
   private transient TimerTask pushTask;
   
-  private transient Properties remoteUserPasswords = new Properties();
-  
   @Override
   protected void init(VaadinRequest request)
   {  
     initLogging();
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
-    loadRemoteUserPasswords();
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
@@ -149,49 +146,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     checkIfRemoteLoggedIn(request);
     getSession().addRequestHandler(new RemoteUserRequestHandler());
   }
-  
-  private void loadRemoteUserPasswords()
-  {
-    remoteUserPasswords = new Properties();
-    List<File> locations = getAllConfigLocations("remote-users.properties");
-    for(File f : locations)
-    {
-      if(f.isFile() && f.canRead())
-      {
-        FileInputStream fis = null;
-        try
-        {
-          fis = new FileInputStream(f);
-          try
-          {
-            remoteUserPasswords.load(fis);
-          }
-          catch(IOException ex)
-          {
-            log.warn("could not read a remote-users.properties file", ex);
-          }
-        }
-        catch (FileNotFoundException ex)
-        {
-          log.warn("remote user file not found, even it was existing just moments ago", ex);
-        } 
-        finally
-        {
-          try
-          {
-            if(fis != null)
-            {
-              fis.close();
-            }
-          }
-          catch (IOException ex)
-          {
-            log.error(null, ex);
-          }
-        }
-      }
-    } // end for each found file
-  }
+ 
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -499,24 +454,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       // like Schibboleth
       String remoteUser = request.getRemoteUser();
       if(remoteUser != null)
-      {
-        String password = null;
-        if(remoteUserPasswords != null)
-        {
-          password = remoteUserPasswords.getProperty(remoteUser, null);
-        }
-        
-        Client client;
-        if(password == null)
-        {
-          // treat as anonymous user
-          client = Helper.createRESTClient();
-        }
-        else
-        {
-          // use the provided password
-          client = Helper.createRESTClient(remoteUser, password);
-        }
+      { 
+        // treat as anonymous user
+        Client client = Helper.createRESTClient();;
         Helper.setUser(new AnnisUser(remoteUser, client, true));
       }
   }
