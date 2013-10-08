@@ -17,6 +17,7 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.CorpusBrowserPanel;
+import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
 import annis.security.AnnisUserConfig;
@@ -111,7 +112,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private InstanceConfig instanceConfig;
 
-  public CorpusListPanel(QueryController controller,
+  public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
   {

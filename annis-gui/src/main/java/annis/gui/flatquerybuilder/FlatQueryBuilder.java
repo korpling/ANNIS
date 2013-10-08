@@ -16,6 +16,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
@@ -44,7 +45,7 @@ import java.util.TreeSet;
  * @author martin
  * @author tom
  */
-public class FlatQueryBuilder extends Panel implements Button.ClickListener
+public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
   {
   private Button btGo;
   private Button btClear;
@@ -199,8 +200,17 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     setContent(mainLayout);
     getContent().setSizeFull();   
   }
+
+  @Override
+  public void onCorpusSelectionChanged(
+    Set<String> selectedCorpora)
+  {
+    initialize();
+  }
   
-  public void initialize()
+  
+  
+  private void initialize()
   {
     // try to remove all existing menus
     try {
