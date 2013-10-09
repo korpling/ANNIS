@@ -20,7 +20,6 @@ import annis.gui.controlpanel.ControlPanel;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.model.Query;
-import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.GenericType;
@@ -218,8 +217,7 @@ public class ExampleQueriesPanel extends Table
        // tab.getComponent().addStyleName("example-queries-tab");
         tab.setEnabled(true);
 
-        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel  
-          || parentTab.getSelectedTab() instanceof QueryBuilderChooser))
+        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
         {
           parentTab.setSelectedTab(tab);
         }
