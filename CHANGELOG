@@ -1,3 +1,13 @@
+Version 3.0.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?direction=asc&milestone=10&page=1&sort=created&state=closed
+
+
+[Bugs]
+ #221 Precedence optimization fails when applied to spans which cover more than one token
+
 Version 3.0.0
 =============
 
