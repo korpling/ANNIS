@@ -56,25 +56,25 @@ Thus the file `instances/falko.json` defines the instance named "falko".
 
 \code{.json}
 {
-    "display-name": "Falko",
-    "default-querybuilder": "tigersearch",
-    "default-corpusset": "falko-essays",
-    "corpus-sets": [
+	"display-name": "Falko",
+	"default-querybuilder": "tigersearch",
+	"default-corpusset": "falko-essays",
+	"corpus-sets": [
 	{
-	    "name": "falko-essays",
-	    "corpus": [
+		"name": "falko-essays",
+		"corpus": [
 		"falko-essay-l1",
 		"falko-essay-l2"
-	    ]
+		]
 	},
 	{
-	    "name": "falko-summaries",
-	    "corpus": [
+		"name": "falko-summaries",
+		"corpus": [
 		"falko-summary-l1",
 		"falko-summary-l2"
-	    ]
+		]
 	}
-    ]
+	]
 }
 \endcode
 
@@ -167,7 +167,7 @@ your local machine for Kickstarter) and make sure it is available in your system
 path (check this by calling e.g. the program `dot` on the command line).
 
 
-## Document Visualizer
+# Document Browsing # {#document-visualizer}
 
 It is also possible to use a custom visualizer for browsing a whole
 document. The configuration is in JSON-Syntax and placed in the
@@ -205,3 +205,46 @@ Explanation in detail:
   document name. But it's also possible to define a custom sort by the
   metadata fields, even if the column is not visible. 'namespace' and
   'ascending' is optional. 'ascending' its default setting is 'true'.
+
+# Web fonts # {#web-fonts}
+
+The configuration of web fonts is placed within an instance file (see
+[configuration of instances](@ref admin-configure-instance)). Thus a
+web font is applied to a specific instance. If you not want to define
+an extra instance, it is possible to add the font configuration to the
+default.json file in the *instance* directory. If no *instance*
+directory or default.json file exists, create it. Add a property
+**font** to the config with the following parameters:
+
+\code{.json}
+{
+ ...
+
+ "font" :
+ {
+   "name" : "foo",
+   "url": "https://example.com/foo.css",
+   "size": "12pt" // optional
+ }
+}
+\endcode
+
+You must also provide a css file, which contains the `@font-face` rule
+und is reachable under the defined link in the instance config:
+
+\code{.css}
+
+@font-face {
+  font-family: 'bar;
+  font-style: normal;
+  font-weight: normal;
+  font-size: larger;
+  src:
+	local('bar'),
+	url(bar.woff) format('woff');
+}
+\endcode
+
+Further explantation about the `@font-face` rule is availabe on the [W3C
+websites](http://www.w3.org/TR/css-fonts-3/#font-face-rule).
+
