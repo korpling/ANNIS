@@ -44,6 +44,8 @@ public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuild
   @Override
   public FlatQueryBuilder createComponent(QueryController controlPanel)
   {
-    return new FlatQueryBuilder(controlPanel);
+    FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
+    controlPanel.addCorpusSelectionChangeListener(qb);
+    return qb;
   }
 }

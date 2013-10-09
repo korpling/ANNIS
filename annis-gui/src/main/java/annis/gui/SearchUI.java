@@ -716,7 +716,7 @@ public class SearchUI extends AnnisBaseUI
   {
     return queryController;
   }
-
+  
   public TabSheet getMainTab()
   {
     return mainTab;
@@ -950,10 +950,10 @@ public class SearchUI extends AnnisBaseUI
 
     if (!kickstarter)
     {
-      layoutToolbar.addComponent(btLogin);
-      layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
       layoutToolbar.addComponent(lblUserName);
       layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
+      layoutToolbar.addComponent(btLogin);
+      layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
 
     }
   }

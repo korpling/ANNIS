@@ -134,7 +134,7 @@ public class SingleResultPanel extends CssLayout implements
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
     sb.append(StringUtils.join(path, " > "));
-    sb.append(" (tokens ").append(minMax.min);
+    sb.append(" (" + minMax.segName + " ").append(minMax.min);
     sb.append(" - ").append(minMax.max).append(")");
 
     Label lblPath = new Label(sb.toString());
@@ -497,6 +497,8 @@ public class SingleResultPanel extends CssLayout implements
   private class MinMax
   {
 
+    String segName = "tokens";
+
     long min;
 
     long max;
@@ -507,26 +509,53 @@ public class SingleResultPanel extends CssLayout implements
   {
     EList<SToken> sTokens = graph.getSTokens();
 
-
     MinMax minMax = new MinMax();
     minMax.min = Long.MAX_VALUE;
     minMax.max = Long.MIN_VALUE;
 
-    if (sTokens != null)
-    {
-      for (SToken t : sTokens)
-      {
-        RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(ANNIS_NS,
-          FEAT_RELANNIS_NODE).getValue();
 
-        if (minMax.min > f.getTokenIndex())
+    if (segmentationName == null)
+    {
+      minMax.segName = "tokens";
+
+      if (sTokens != null)
+      {
+        for (SToken t : sTokens)
         {
-          minMax.min = f.getTokenIndex();
+          RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(ANNIS_NS,
+            FEAT_RELANNIS_NODE).getValue();
+
+          if (minMax.min > f.getTokenIndex())
+          {
+            minMax.min = f.getTokenIndex();
+          }
+
+          if (minMax.max < f.getTokenIndex())
+          {
+            minMax.max = f.getTokenIndex();
+          }
+        }
+      }
+    }
+    else
+    {
+      minMax.segName = segmentationName;
+
+      List<SNode> nodes = CommonHelper.getSortedSegmentationNodes(
+        segmentationName, graph);
+
+      for (SNode n : nodes)
+      {
+        RelannisNodeFeature f = RelannisNodeFeature.extract(n);
+
+        if (minMax.min > f.getSegIndex())
+        {
+          minMax.min = f.getSegIndex();
         }
 
-        if (minMax.max < f.getTokenIndex())
+        if (minMax.max < f.getSegIndex())
         {
-          minMax.max = f.getTokenIndex();
+          minMax.max = f.getSegIndex();
         }
       }
     }
