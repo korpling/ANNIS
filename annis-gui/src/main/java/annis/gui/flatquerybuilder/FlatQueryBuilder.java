@@ -844,7 +844,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     return rsc;
   }
   
-  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException, InvalidCharacterSequenceException
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException, InvalidCharacterSequenceException, EmptyReferenceException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -876,6 +876,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         //Step 1: get indices of tq-chars, where constraints are separated (&)
         String tempCon="";
         int count = 1;
+        int maxId = 0;
         boolean inclusionCheck=false;
 
         for(int i=0; i<tq.length(); i++)
@@ -921,6 +922,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
                 }
                 inclusionCheck=true;
               }
+              int newMax = (r.getFirst()>r.getSecond()) ? r.getFirst() : r.getSecond();
+              maxId = (maxId<newMax) ? newMax : maxId;
             }         
             else 
             {
@@ -929,6 +932,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
             tempCon = "";
           }
+        }
+        /*CHECK FOR EMPTY REFERENCE*/
+        /*IDEA: If the highest element-id is not empty, all lower ids can't be empty*/
+        /*one additional increment of count has to be taken into account*/
+        /*empty means, the element the id is refering to does not exist*/
+        if(maxId>=count)
+        {
+          throw new EmptyReferenceException(Integer.toString(maxId));
         }
         
         /*CHECK FOR INVALID OR REDUNDANT MUTLIPLE VALUE ASSIGNMENT*/
@@ -1054,9 +1065,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
             eboxes.add(eb);
             VerticalNode v = indexedVnodes.get(rel.getSecond());
             vnodes.add(v);
-
             languagenodes.addComponent(eb);
             languagenodes.addComponent(v);  
+            
           }
         }
 
@@ -1094,7 +1105,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       }
       catch(Exception e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException))
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException) | (e instanceof EmptyReferenceException))
         {
           Notification.show(e.getMessage());
           //LATER: maybe highlight the critical character sequence          
@@ -1367,6 +1378,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       super(s);
       ERROR_MESSAGE="Invalid character sequence: \n\n";
+    }
+  }
+  
+  private class EmptyReferenceException extends LoadQueryException
+  {
+    public EmptyReferenceException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Element not found. Empty reference: #";
     }
   }
 }
