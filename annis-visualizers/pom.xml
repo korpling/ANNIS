@@ -4,11 +4,10 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.0.0</version>
+    <version>3.0.1</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-visualizers</artifactId>
-  <version>3.0.0</version>
   <name>annis-visualizers</name>
   <url>http://maven.apache.org</url>
   <properties>
