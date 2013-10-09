@@ -31,7 +31,7 @@
     </filter>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>annis.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>${annis.home}/log/annis.%d{yyyy-MM-dd}.log</FileNamePattern>
       <!-- keep 7 days' worth of history -->
       <MaxHistory>7</MaxHistory>
 
@@ -52,7 +52,7 @@
     </filter>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>error.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>${annis.home}/log/error.%d{yyyy-MM-dd}.log</FileNamePattern>
       <!-- keep 7 days' worth of history -->
       <MaxHistory>7</MaxHistory>
 
@@ -75,7 +75,7 @@
     </filter>
 
     <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
-      <FileNamePattern>annis.%d{yyyy-MM-dd}.log</FileNamePattern>
+      <FileNamePattern>${annis.home}/log/annis.%d{yyyy-MM-dd}.log</FileNamePattern>
       <!-- keep 1 days' worth of history -->
       <MaxHistory>1</MaxHistory>
 
