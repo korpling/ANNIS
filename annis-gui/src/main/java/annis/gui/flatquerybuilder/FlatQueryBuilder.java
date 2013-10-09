@@ -42,8 +42,8 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /*
- * @author martin
- * @author tom
+ * @author martin klotz (martin.klotz@hu-berlin.de)
+ * @author tom ruette (tom.ruette@hu-berlin.de)
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
   {
@@ -84,7 +84,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your Query.";
+  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your query.";
 
   private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
@@ -827,7 +827,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     return rsc;
   }
   
-  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException, InvalidCharacterSequenceException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -836,10 +836,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
      * the one delivered by the text field
      */
   {
-    
-    String tq;//typed-in query
-    
-    tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
+    /*get clean query from control panel text field*/
+    String tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
     //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
@@ -1079,7 +1077,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       }
       catch(Exception e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException))
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException))
         {
           Notification.show(e.getMessage());
           //LATER: maybe highlight the critical character sequence          
@@ -1099,45 +1097,62 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     private boolean regEx;
     private boolean negative;
     
-    public Constraint(String s)
+    public Constraint(String s) throws InvalidCharacterSequenceException
     {
       int e=0;
-      while(s.charAt(e)!='=')
+      if(s.contains("="))
       {
-        e++;
+        while(s.charAt(e)!='=')
+        {
+          e++;
+        }
+
+        String l;
+
+        if(s.charAt(e-1)=='!')
+        {
+          l = s.substring(0, e-1).replace(" ", "");
+          negative = true;
+        }
+        else
+        {
+          l = s.substring(0, e).replace(" ", "").replace("meta::", "");
+          negative = false;
+        }
+
+        String v = s.substring(e+1);
+        while(v.startsWith(" "))
+        {
+          v = v.substring(1);
+        }
+        if(v.startsWith("\""))
+        {
+          regEx = false;
+        }
+        else
+        {
+          regEx = true;
+        }
+        //remove " or / :
+        v = v.substring(1, v.length()-1);
+
+        level = l;
+        value = v;
       }
-      
-      String l;
-      
-      if(s.charAt(e-1)=='!')
+      else if( ((s.charAt(0)=='\"')&(s.charAt(s.length()-1)=='\"')) | ((s.charAt(0)=='/')&(s.charAt(s.length()-1)=='/')))
       {
-        l = s.substring(0, e-1).replace(" ", "");
-        negative = true;
+        level = "tok";
+        value = s.substring(1, s.length()-1);
+      }
+      else if((s.contains("\""))|(s.contains("/")))
+      {
+        throw new InvalidCharacterSequenceException(s);
       }
       else
       {
-        l = s.substring(0, e).replace(" ", "").replace("meta::", "");
-        negative = false;
+        level = s;
+        value = "";
       }
-      
-      String v = s.substring(e+1);
-      while(v.startsWith(" "))
-      {
-        v = v.substring(1);
-      }
-      if(v.startsWith("\""))
-      {
-        regEx = false;
-      }
-      else
-      {
-        regEx = true;
-      }
-      //remove " or / :
-      v = v.substring(1, v.length()-1);
-      
-      level = l;
-      value = v;
     }
     
     public String getLevel()
@@ -1285,46 +1300,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     PRECEDENCE, DOMINANCE, INCLUSION, EQUALITY
   }
   
-  private class UnknownLevelException extends Exception
+  private abstract class LoadQueryException extends Exception
   {
-    private static final String ERROR_MESSAGE = "Unknown annotation level: ";
-    private String level;
+    protected String ERROR_MESSAGE;
+    protected String critical;
     
-    public UnknownLevelException(String level)
-    {
-      this.level = level;
-    }
-    
-    @Override
-    public String getMessage()
-    {
-      return ERROR_MESSAGE+level;
-    }
-  }
-  
-  private class MultipleAssignmentException extends Exception
-  {
-    private static final String ERROR_MESSAGE = "Invalid or redundant assignment of multiple values: ";
-    private String critical;
-    
-    public MultipleAssignmentException(String s)
-    {
-      critical = s;
-    }
-    
-    @Override
-    public String getMessage()
-    {
-      return ERROR_MESSAGE+"\n"+critical;
-    }
-  }
-  
-  private class EqualityConstraintException extends Exception
-  {
-    private static final String ERROR_MESSAGE = "Invalid use of equality operator: ";
-    private final String critical;
-    
-    public EqualityConstraintException(String s)
+    public LoadQueryException(String s)
     {
       critical = s;
     }
@@ -1333,6 +1314,42 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     public String getMessage()
     {
       return ERROR_MESSAGE+critical;
+    }
+  }
+  
+  private class UnknownLevelException extends LoadQueryException
+  {
+    public UnknownLevelException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Unknown annotation level: ";
+    }
+  }
+  
+  private class MultipleAssignmentException extends LoadQueryException
+  {
+    public MultipleAssignmentException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Invalid or redundant assignment of multiple values:\n\n";
+    }
+  }
+  
+  private class EqualityConstraintException extends LoadQueryException
+  {
+    public EqualityConstraintException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Invalid use of equality operator: ";      
+    }
+  }
+  
+  private class InvalidCharacterSequenceException extends LoadQueryException
+  {
+    public InvalidCharacterSequenceException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE="Invalid character sequence: \n\n";
     }
   }
 }
