@@ -110,7 +110,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public FlatQueryBuilder(QueryController cp)
   {
-    launch(cp);    
+    launch(cp); 
+    
   }
 
   private void launch(QueryController cp)
@@ -206,6 +207,22 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Set<String> selectedCorpora)
   {
     initialize();
+  }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    cp.addCorpusSelectionChangeListener(this);
+  }
+  
+  
+
+  @Override
+  public void detach()
+  {
+    super.detach();
+    cp.removeCorpusSelectionChangeListener(this);
   }
   
   
