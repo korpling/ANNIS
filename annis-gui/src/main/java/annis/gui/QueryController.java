@@ -200,6 +200,18 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
     }
     corpusSelChangeListeners.add(listener);
   }
+  
+  public void removeCorpusSelectionChangeListener(CorpusSelectionChangeListener listener)
+  {
+    if(corpusSelChangeListeners == null)
+    {
+      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+    }
+    else
+    {
+      corpusSelChangeListeners.remove(listener);
+    }
+  }
 
   
   public UUID executeQuery()
