@@ -45,7 +45,7 @@ PROJECT_BRIEF          = "An open source, versatile web browser-based search and
 # exceed 55 pixels and the maximum width should not exceed 200 pixels. 
 # Doxygen will copy the logo to the output directory.
 
-PROJECT_LOGO           = /home/thomas/annis/doc/doxygen/annis_64.png
+PROJECT_LOGO           = doxygen/annis_64.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) 
 # base path where the generated documentation will be put. 
