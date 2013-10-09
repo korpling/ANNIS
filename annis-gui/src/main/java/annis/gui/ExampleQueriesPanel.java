@@ -217,8 +217,7 @@ public class ExampleQueriesPanel extends Table
        // tab.getComponent().addStyleName("example-queries-tab");
         tab.setEnabled(true);
 
-        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel  
-          || parentTab.getSelectedTab() instanceof QueryBuilderChooser))
+        if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
         {
           parentTab.setSelectedTab(tab);
         }
