@@ -24,8 +24,8 @@ import java.util.HashMap;
 import java.util.regex.Pattern;
 
 /**
- * @author martin
- * @author tom
+ * @author Martin Klotz (martin.klotz@hu-berlin.de)
+ * @author Tom Ruette (tom.ruette@hu-berlin.de)
  */
 public class EdgeBox extends Panel
 {
@@ -40,6 +40,9 @@ public class EdgeBox extends Panel
   };
   /*BASIS_OPERATORS + userdefined Operators (with Description):*/
   private static HashMap<String, String> EO;
+  /*last set value:*/
+  private String storedValue;
+  
   private static final String UD_EO_DESCRIPTION = "\t(user defined)";  
   private static final String WIDTH = "45px";
   private static final String REGEX_PATTERN = "(\\.((\\*)|([1-9]+[0-9]*(,[1-9]+[0-9]*)?))?)";
@@ -48,6 +51,7 @@ public class EdgeBox extends Panel
   public EdgeBox (FlatQueryBuilder sq)
   {
     initEOs();
+    storedValue=".";
     edge = new ComboBox();
     edge.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT);
     for(String o : EO.keySet())
@@ -71,22 +75,31 @@ public class EdgeBox extends Panel
     edge.addBlurListener(new BlurListener(){
       @Override
       public void blur(FieldEvents.BlurEvent e)
-      {        
-        String value = edge.getValue().toString();
-        if(!value.equals(""))
+      {
+        if(edge.getValue()!=null)
         {
-         boolean valid = validOperator(value);
-         if(!EO.containsKey(value) & valid)
-         {          
-           String caption = value+UD_EO_DESCRIPTION;
-           EO.put(value, caption);
-           edge.setItemCaption(value, caption);
-         }
-         if(!valid)
-         {
-           edge.removeItem(value);
-           edge.select(null);
-         }
+          String value = edge.getValue().toString(); //<--- CATCH NullPointerException HERE!
+          if(!value.equals(""))
+          {
+           boolean valid = validOperator(value);
+           if(!EO.containsKey(value) & valid)
+           {          
+             String caption = value+UD_EO_DESCRIPTION;
+             EO.put(value, caption);
+             edge.setItemCaption(value, caption);
+           }
+           if(!valid)
+           {
+             edge.removeItem(value);
+             /*this should make the user recognize his/her mistake:*/
+             edge.select(null);
+           }
+          }
+          storedValue = (edge.getValue()!=null) ? edge.getValue().toString() : storedValue;
+        }
+        else
+        {
+          edge.setValue(storedValue);
         }
       }
     });
@@ -121,6 +134,7 @@ public class EdgeBox extends Panel
     if(valid)
     {
       edge.setValue(value);
+      storedValue = value;
     }
     else
     {
