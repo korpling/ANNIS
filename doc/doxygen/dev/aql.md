@@ -4,11 +4,11 @@ ANNIS Query Language (AQL) {#dev-aql}
 [TOC]
 
 Complete List of Operators {#dev-aql-oplist}
---------------------------
+=========================
 
 The ANNIS Query Language (AQL) currently includes the following listed operators.
 
-### direct precedence: "." ### {#dev-aql-directprec}
+## direct precedence: "." ## {#dev-aql-directprec}
 
 ![(Illustration)](A-pred-B.svg)
 \verbatim
@@ -17,7 +17,7 @@ A & B & #1 . #2
 
 For non-terminal nodes, precedence is determined by the right most  and left most terminal children.
 
-### indirect precedence: ".*" ### {#dev-aql-indirectprec}
+## indirect precedence: ".*" ## {#dev-aql-indirectprec}
 
 ![(Illustration)](A-pred-ind-B.svg)
 \verbatim
@@ -28,7 +28,7 @@ A & B & #1 .2,4 #2
 
 For specific sizes of precedence spans, `.n,m` can be used, e.g. `.3,4` - between 3 and 4 token distance
 
-### direct dominance: ">" ### {#dev-aql-directdom}
+## direct dominance: ">" ## {#dev-aql-directdom}
 
 ![(Illustration)](A-dom-B.svg)
 \verbatim
@@ -41,7 +41,7 @@ A specific edge type may be specifed, e.g.: `>secedge` to find secondary edges.
 Edges labels are specified in brackets, e.g. `>[func="OA"]` for an edge with the
 function 'object, accusative.
 
-### indirect dominance: ">*" ### {#dev-aql-indirectprec}
+## indirect dominance: ">*" ## {#dev-aql-indirectprec}
 
 ![(Illustration)](A-dom-ind-B.svg)
 \verbatim
@@ -54,7 +54,7 @@ A & B & #1 >[func="OA"] 2,4 #2
 For specific distance o dominance, `>n,m` can be used, e.g. `>3,4` - dominates with 3 to 4 edges
 distance.
 
-### identical coveragee: "_=_" ### {#dev-aql-identcov}
+## identical coveragee: "_=_" ## {#dev-aql-identcov}
 
 ![(Illustration)](A-cov-ident-B.svg)
 \verbatim
@@ -63,7 +63,7 @@ A & B & #1 _=_ #2
 
 Applies when two annotation cover the exact same span of tokens.
 
-### inclusion: "_i_" ### {#dev-aql-inclusion}
+## inclusion: "_i_" ## {#dev-aql-inclusion}
 
 ![(Illustration)](A-cov-incl-B.svg)
 \verbatim
@@ -72,7 +72,7 @@ A & B & #1 _i_ #2
 
 Applies when one annotation covers a span identical to or larger than another.
 
-### overlap: "_o_" ### {#dev-aql-overlap}
+## overlap: "_o_" ## {#dev-aql-overlap}
 
 ![(Illustration)](A-cov-over-B.svg)
 \verbatim
@@ -83,7 +83,7 @@ A & B & #1 _or_ #2
 
 For overlap only on the left or right side, use `_ol_` and `_or_` respectively.
 
-### left aligned: "_l_" ### {#dev-aql-leftalign}
+## left aligned: "_l_" ## {#dev-aql-leftalign}
 
 ![(Illustration)](A-cov-left-B.svg)
 \verbatim
@@ -92,7 +92,7 @@ A & B & #1 _l_ #2
 
 Both elements span an area beginning with the same token.
 
-### right aligned: "_r_" ### {#dev-aql-rightalign}
+## right aligned: "_r_" ## {#dev-aql-rightalign}
 
 ![(Illustration)](A-cov-right-B.svg)
 \verbatim
@@ -101,7 +101,7 @@ A & B & #1 _r_ #2
 
 Both elements span an area ending with the same token.
 
-### labeled direct pointing relation: "->LABEL" ### {#dev-aql-directpoint}
+## labeled direct pointing relation: "->LABEL" ## {#dev-aql-directpoint}
 
 ![(Illustration)](A-point-direct-B.svg)
 \verbatim
@@ -112,7 +112,7 @@ A & B & #1 ->LABEL[annotation="VALUE"] #2
 A labeled, directed relationship between two
 elements. Annotations can be specified with `->LABEL[annotation="VALUE"]`
 
-### labeled indirect pointing relation: "->LABEL *" ### {#dev-aql-indirectpoint}
+## labeled indirect pointing relation: "->LABEL *" ## {#dev-aql-indirectpoint}
 
 ![(Illustration)](A-point-ind-B.svg)
 \verbatim
@@ -124,35 +124,35 @@ An indirect labeled relationship between two elements. The length
 of the chain may be specified with `->LABEL n,m` for relation chains of
 length `n` to `m`.
 
-### left-most child: ">@l" ### {#dev-aql-leftchild}
+## left-most child: ">@l" ## {#dev-aql-leftchild}
 
 ![(Illustration)](A-left-B.svg)
 \verbatim
 A & B & #1 >@l #2
 \endverbatim
 
-### right-most child: ">@r" ### {#dev-aql-rightchild}
+## right-most child: ">@r" ## {#dev-aql-rightchild}
 
 ![(Illustration)](A-right-B.svg)
 \verbatim
 A & B & #1 >@r #2
 \endverbatim
 
-### common parent node: ">$" ### {#dev-aql-commonparent}
+## common parent node: ">$" ## {#dev-aql-commonparent}
 
 ![(Illustration)](A-parent-B.svg)
 \verbatim
 A & B & #1 >$ #2
 \endverbatim
 
-### common ancestor node: ">$*" ### {#dev-aql-commonancestor}
+## common ancestor node: ">$*" ## {#dev-aql-commonancestor}
 
 ![(Illustration)](A-ancestor-B.svg)
 \verbatim
 A & B & #1 >$* #2
 \endverbatim
 
-### arity: "#x:arity=n" ### {#dev-aql-arity}
+## arity: "#x:arity=n" ## {#dev-aql-arity}
 
 ![(Illustration)](A-arity.svg)
 \verbatim
@@ -162,7 +162,7 @@ A & #1:arity=2
 Specifies the amount of directly dominated children that the
 searched node has.
 
-### length: "#x:length=n" ### {#dev-aql-length}
+## length: "#x:length=n" ## {#dev-aql-length}
 
 ![(Illustration)](A-length.svg)
 \verbatim
@@ -171,7 +171,7 @@ A & #1:length=2
 
 Specifies the length of the span of tokens covered by the node.
 
-### root: "#x:root" ### {#dev-aql-root}
+## root: "#x:root" ## {#dev-aql-root}
 
 ![(Illustration)](A-root.svg)
 \verbatim

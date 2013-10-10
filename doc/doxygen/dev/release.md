@@ -3,9 +3,6 @@ Making a new ANNIS release  {#dev-release}
 
 [TOC]
 
-\warning
-This is work and progress and will be improved as more releases we perform.
-
 Introduction {#dev-release-intro}
 ============
 
