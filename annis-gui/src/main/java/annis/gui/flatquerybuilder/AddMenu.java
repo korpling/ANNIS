@@ -19,7 +19,7 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.Command;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Panel;
-import java.util.Iterator;
+import java.util.List;
 
 /**
  * @author martin
@@ -31,53 +31,44 @@ public class AddMenu extends Panel
   private VerticalNode vn;
   private FlatQueryBuilder sq;
   
-  private static final String BUTTON_ADDLEVEL_LABEL = "Add level"; 
+  private static final String BUTTON_ADDLEVEL_LABEL = "+"; 
   
   public AddMenu(final FlatQueryBuilder sq, final VerticalNode vn, String firstLevel)
   {
     this.vn = vn;
     this.sq = sq;
-    final MenuBar.MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
+    final MenuItem add = addMenu.addItem(BUTTON_ADDLEVEL_LABEL, null);
     for (final String annoname : vn.getAnnonames())
     {      
-      if(!annoname.equals(firstLevel))
-      {        
-        add.addItem(annoname, new Command() {
-          @Override
-          public void menuSelected(MenuItem selectedItem) {         
-            vn.createSearchBox(annoname);
-            add.removeChild(selectedItem);
-          }
-        });
-      }      
+              
+      add.addItem(annoname, new Command() {
+        @Override
+        public void menuSelected(MenuItem selectedItem) {         
+          vn.createSearchBox(annoname);
+          selectedItem.setVisible(false);
+        }
+      });
+      /*FIRST ITEM HAS TO BE IN THE LIST*/
+      if(annoname.equals(firstLevel))
+      {
+        add.getChildren().get(add.getChildren().size()-1).setVisible(false);
+      }
     }
+    addMenu.setSizeUndefined();
     setContent(addMenu);
   }
-  
-  public void reActivateItem(final String ebene)
+  public void reActivateItem(final String level)
   {
-    final MenuBar.MenuItem root = addMenu.getItems().iterator().next();
-    int p = 0;    
-    Iterator<String> items = vn.getAnnonames().iterator();  
-    Command com = new Command(){
-      @Override
-      public void menuSelected(MenuItem selectedItem)
+    List<MenuItem> items = addMenu.getItems().get(0).getChildren();
+    boolean found = false;
+    for(int i=0; (i<items.size())&!found; i++)
+    {
+      MenuItem itm = items.get(i);
+      if(itm.getText().equals(level))
       {
-        vn.createSearchBox(ebene);
-        root.removeChild(selectedItem);
+        itm.setVisible(true);
+        found = true;
       }
-    };
-    while(!items.next().equals(ebene))
-    {
-      p++;
-    }
-    if(items.hasNext())
-    {
-      root.addItemBefore(ebene, null, com, root.getChildren().get(p));
-    }
-    else 
-    {
-      root.addItem(ebene, com);
     }
   }
 }

@@ -15,23 +15,17 @@
  */
 package annis.gui.flatquerybuilder;
 
-import com.vaadin.data.Item;
-import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.FieldEvents.BlurListener;
-import com.vaadin.event.FieldEvents.FocusListener;
 import com.vaadin.ui.AbstractSelect;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.ComboBox;
-import com.vaadin.ui.Notification;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import java.util.HashMap;
+import java.util.regex.Pattern;
 
 /**
- * @author martin
- * @author tom
+ * @author Martin Klotz (martin.klotz@hu-berlin.de)
+ * @author Tom Ruette (tom.ruette@hu-berlin.de)
  */
 public class EdgeBox extends Panel
 {
@@ -46,12 +40,18 @@ public class EdgeBox extends Panel
   };
   /*BASIS_OPERATORS + userdefined Operators (with Description):*/
   private static HashMap<String, String> EO;
+  /*last set value:*/
+  private String storedValue;
+  
   private static final String UD_EO_DESCRIPTION = "\t(user defined)";  
   private static final String WIDTH = "45px";
+  private static final String REGEX_PATTERN = "(\\.((\\*)|([1-9]+[0-9]*(,[1-9]+[0-9]*)?))?)";
+  private static final String REGEX_PATTERN_DOUBLEBOUND = "\\\\.[1-9]+[0-9]*,[1-9]+[0-9]*";
   
   public EdgeBox (FlatQueryBuilder sq)
   {
     initEOs();
+    storedValue=".";
     edge = new ComboBox();
     edge.setItemCaptionMode(AbstractSelect.ItemCaptionMode.EXPLICIT);
     for(String o : EO.keySet())
@@ -75,16 +75,31 @@ public class EdgeBox extends Panel
     edge.addBlurListener(new BlurListener(){
       @Override
       public void blur(FieldEvents.BlurEvent e)
-      {        
-        String value = edge.getValue().toString();
-        if(!value.equals(""))
+      {
+        if(edge.getValue()!=null)
         {
-         if(!EO.containsKey(value))
-         {          
-           String caption = value+UD_EO_DESCRIPTION;
-           EO.put(value, caption);
-           edge.setItemCaption(value, caption);
-         }
+          String value = edge.getValue().toString(); //<--- CATCH NullPointerException HERE!
+          if(!value.equals(""))
+          {
+           boolean valid = validOperator(value);
+           if(!EO.containsKey(value) & valid)
+           {          
+             String caption = value+UD_EO_DESCRIPTION;
+             EO.put(value, caption);
+             edge.setItemCaption(value, caption);
+           }
+           if(!valid)
+           {
+             edge.removeItem(value);
+             /*this should make the user recognize his/her mistake:*/
+             edge.select(null);
+           }
+          }
+          storedValue = (edge.getValue()!=null) ? edge.getValue().toString() : storedValue;
+        }
+        else
+        {
+          edge.setValue(storedValue);
         }
       }
     });
@@ -108,13 +123,39 @@ public class EdgeBox extends Panel
   
   public void setValue(String value)
   {    
-    if(!EO.containsKey(value))
+    boolean valid = validOperator(value);
+    if(!EO.containsKey(value) & valid)
     {
       String caption = value+UD_EO_DESCRIPTION;
       EO.put(value, caption);
       edge.addItem(value);
       edge.setItemCaption(value, caption);
     }
-    edge.setValue(value);
+    if(valid)
+    {
+      edge.setValue(value);
+      storedValue = value;
+    }
+    else
+    {
+      edge.select(null);
+    }
+  }
+  
+  private boolean validOperator(String o)
+  {
+    String s = o.replace(" ", "");
+    if(Pattern.matches(REGEX_PATTERN, s))
+    {
+      if(Pattern.matches(REGEX_PATTERN_DOUBLEBOUND, s))
+      {
+        int split = s.indexOf(",");
+        String s1 = s.substring(1, split);
+        String s2 = s.substring(split+1);
+        return (Integer.parseInt(s1)<=Integer.parseInt(s2));
+      }
+      else return true;
+    }    
+    return false;  
   }
 }

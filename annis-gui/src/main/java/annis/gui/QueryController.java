@@ -39,6 +39,7 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import java.io.Serializable;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -82,6 +83,9 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
   private transient BiMap<UUID, ResultViewPanel> queryPanels;
   private transient Map<UUID, MatchAndDocumentCount> counts;
   private int maxShortID;
+  
+  private transient List<CorpusSelectionChangeListener> corpusSelChangeListeners
+    = new LinkedList<CorpusSelectionChangeListener>();
   
   public QueryController(SearchUI ui)
   {
@@ -187,6 +191,28 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
     history.add(0, e);
     ui.getControlPanel().getQueryPanel().updateShortHistory(history.asList());
   }
+  
+  public void addCorpusSelectionChangeListener(CorpusSelectionChangeListener listener)
+  {
+    if(corpusSelChangeListeners == null)
+    {
+      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+    }
+    corpusSelChangeListeners.add(listener);
+  }
+  
+  public void removeCorpusSelectionChangeListener(CorpusSelectionChangeListener listener)
+  {
+    if(corpusSelChangeListeners == null)
+    {
+      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+    }
+    else
+    {
+      corpusSelChangeListeners.remove(listener);
+    }
+  }
+
   
   public UUID executeQuery()
   {
@@ -337,6 +363,16 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       getSelectedCorpora());
 
     ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
+    
+    if(corpusSelChangeListeners != null)
+    {
+      
+      Set<String> selected = getSelectedCorpora();
+      for(CorpusSelectionChangeListener listener : corpusSelChangeListeners)
+      {
+        listener.onCorpusSelectionChanged(selected);
+      }
+    }
   }
 
   @Override

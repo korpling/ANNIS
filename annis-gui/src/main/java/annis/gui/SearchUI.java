@@ -716,7 +716,7 @@ public class SearchUI extends AnnisBaseUI
   {
     return queryController;
   }
-
+  
   public TabSheet getMainTab()
   {
     return mainTab;

@@ -17,7 +17,6 @@ package annis.gui.flatquerybuilder;
 
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -40,7 +39,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   private Collection<SearchBox> sboxes;
   private AddMenu am;
   
-  private static final String WIDTH = "150px";
+  private static final String WIDTH = "180px";
   
   public VerticalNode(String level, FlatQueryBuilder sq)
   {
@@ -51,6 +50,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   {      
     this.sq = sq;
     v = new VerticalLayout();
+    v.setSpacing(true);
     vframe = new VerticalLayout();
     vframe.setSpacing(true);
     sboxes = new ArrayList<SearchBox>(); 
@@ -64,12 +64,12 @@ public class VerticalNode extends Panel implements Button.ClickListener
     sboxes.add(sb);   
     annonames = sq.getAvailableAnnotationNames();
     am = new AddMenu(sq, this, ebene);
-    HorizontalLayout vntoolbar = new HorizontalLayout();
     vframe.addComponent(btClose);
     vframe.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
     v.addComponent(sb);
     vframe.addComponent(v);
     vframe.addComponent(am);
+    vframe.setComponentAlignment(am, Alignment.BOTTOM_RIGHT);
     setWidth(WIDTH);
     setContent(vframe);
   }
@@ -80,6 +80,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
     if(event.getButton() == btClose)
     {
       sq.removeVerticalNode(this);
+      sq.updateQuery(); //think about it
     }  
   }
 

@@ -16,6 +16,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
@@ -27,7 +28,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.NativeSelect;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
@@ -42,14 +42,22 @@ import java.util.Set;
 import java.util.TreeSet;
 
 /*
- * @author martin
- * @author tom
+ * @author martin klotz (martin.klotz@hu-berlin.de)
+ * @author tom ruette (tom.ruette@hu-berlin.de)
  */
-public class FlatQueryBuilder extends Panel implements Button.ClickListener
+public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
   {
   private Button btGo;
   private Button btClear;
   private Button btInverse;
+  private Button btInitSpan;
+  private Button btInitMeta;
+  private Button btInitLanguage;
+  
+  private MenuBar addMenu;
+  private MenuBar addMenuSpan;
+  private MenuBar addMenuMeta;
+  
   private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout languagenodes;
@@ -65,6 +73,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private SpanBox spbox;
   private String query;
   private MenuBar.MenuItem spanMenu;
+  private reducingStringComparator rsc;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -75,7 +84,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   private static final String NO_CORPORA_WARNING = "No corpora selected, please select "
     + "at least one corpus.";
   private static final String INCOMPLETE_QUERY_WARNING = "Query seems to be incomplete.";
-  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your Query.";
+  private static final String QUERY_ERROR_WARNING = "An Error occured. Please check your query.";
 
   private static final String ADD_LING_PARAM = "Add";
   private static final String ADD_SPAN_PARAM = "Add";
@@ -94,19 +103,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     + "choose a filtering mechanism here.";
   
   private String TOOLBAR_CAPTION = "Toolbar";
-  private String META_CAPTION = "Restrict the search by means of meta information";
-  private String SPAN_CAPTION = "Restrict the scope of the linguistic sequence";
-  private String LANG_CAPTION = "Create a linguistic sequence";
-  private String ADVANCED_CAPTION = "Advanced settings";
+  private String META_CAPTION = "Meta information";
+  private String SPAN_CAPTION = "Scope";
+  private String LANG_CAPTION = "Linguistic sequence";
+  private String ADVANCED_CAPTION = "Advanced settings"; 
 
   public FlatQueryBuilder(QueryController cp)
   {
-    launch(cp);    
+    launch(cp); 
+    
   }
 
   private void launch(QueryController cp)
   {
     this.cp = cp;
+    rsc = new reducingStringComparator();
     this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
@@ -119,8 +130,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     btGo.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btClear = new Button(BUTTON_CLEAR_LABEL, (Button.ClickListener) this);
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener)this);
+    btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener) this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
+    btInitLanguage.setDescription(INFO_INIT_LANG);
+    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
+    btInitSpan.setDescription(INFO_INIT_SPAN);
+    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
+    btInitMeta.setDescription(INFO_INIT_META);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
     reducingStringComparator rdc = new reducingStringComparator();
@@ -139,23 +156,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     // language layout
     language = new HorizontalLayout();
     languagenodes = new HorizontalLayout();
-    language.setSpacing(true);
     language.addComponent(languagenodes);
-    //language.addComponent(btInitLanguage);
+    language.addComponent(btInitLanguage);
     language.setMargin(true);
     language.setCaption(LANG_CAPTION);
+    language.addStyleName("linguistics-panel");
     // span layout
     span = new HorizontalLayout();
     span.setSpacing(true);
-    //span.addComponent(btInitSpan);
+    span.addComponent(btInitSpan);
     span.setMargin(true);
     span.setCaption(SPAN_CAPTION);
+    span.addStyleName("span-panel");
     // meta layout
     meta = new HorizontalLayout();
     meta.setSpacing(true);
-    //meta.addComponent(btInitMeta);
+    meta.addComponent(btInitMeta);
     meta.setMargin(true);
     meta.setCaption(META_CAPTION);
+    meta.addStyleName("meta-panel");
     // toolbar layout
     toolbar = new HorizontalLayout();
     toolbar.setSpacing(true);
@@ -164,12 +183,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     toolbar.addComponent(btInverse);
     toolbar.setMargin(true);
     toolbar.setCaption(TOOLBAR_CAPTION);
+    toolbar.addStyleName("toolbar-panel");
     // advanced
     advanced = new HorizontalLayout();
     advanced.setSpacing(true);
     advanced.addComponent(filtering);
     advanced.setMargin(true);
     advanced.setCaption(ADVANCED_CAPTION);
+    advanced.addStyleName("advanced-panel");
     // put everything on the layout
     mainLayout.setSpacing(true);
     mainLayout.addComponent(language);
@@ -179,19 +200,51 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
     getContent().setSizeFull();   
+  }
+
+  @Override
+  public void onCorpusSelectionChanged(
+    Set<String> selectedCorpora)
+  {
     initialize();
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    cp.addCorpusSelectionChangeListener(this);
+  }
+  
+  
+
+  @Override
+  public void detach()
+  {
+    super.detach();
+    cp.removeCorpusSelectionChangeListener(this);
+  }
+  
+  
   
   private void initialize()
   {
+    // try to remove all existing menus
+    try {
+      language.removeComponent(addMenu);
+      span.removeComponent(addMenuSpan);
+      meta.removeComponent(addMenuMeta);
+    } catch (Exception e) { }
+    
     //init variables:
     final FlatQueryBuilder sq = this;
     Collection<String> annonames = getAvailableAnnotationNames();
     Collection<String> metanames = getAvailableMetaNames();
     
     //Code from btInitLanguage:    
-    final MenuBar addMenu = new MenuBar();
-    addMenu.setDescription(INFO_INIT_LANG);    
+    addMenu = new MenuBar();
+    addMenu.setDescription(INFO_INIT_LANG);
+    addMenu.setAutoOpen(true);
     final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -207,14 +260,17 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           VerticalNode vn = new VerticalNode(annoname, sq);
           languagenodes.addComponent(vn);
           vnodes.add(vn);
+          addMenu.setAutoOpen(false);
         }
       });
     }
+    language.removeComponent(btInitLanguage);
     language.addComponent(addMenu);
     
     //Code from btInitSpan:    
-    final MenuBar addMenuSpan = new MenuBar();
-    addMenuSpan.setDescription(INFO_INIT_SPAN);    
+    addMenuSpan = new MenuBar();
+    addMenuSpan.setDescription(INFO_INIT_SPAN);
+    addMenuSpan.setAutoOpen(true);
     final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -222,17 +278,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         @Override
         public void menuSelected(MenuBar.MenuItem selectedItem) {          
           sq.removeSpanBox();
-          sq.addSpanBox(annoname);                              
+          sq.addSpanBox(annoname);
+          addMenuSpan.setAutoOpen(false);
         }
       });
     }
     spanMenu = addSpan;
+    span.removeComponent(btInitSpan);
     span.addComponent(addMenuSpan);
     
     //Code from btInitMeta:    
-    final MenuBar addMenuMeta = new MenuBar();
-    addMenuMeta.setDescription(INFO_INIT_META);    
+    addMenuMeta = new MenuBar();
+    addMenuMeta.setDescription(INFO_INIT_META);  
+    addMenuMeta.setAutoOpen(true);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
+    int i = 0;
     for (final String annoname : metanames)
     {
       addMeta.addItem(annoname, new MenuBar.Command() {
@@ -241,32 +301,46 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           MetaBox mb = new MetaBox(annoname, sq);
           meta.addComponent(mb);
           mboxes.add(mb);
+          addMenuMeta.setAutoOpen(false);
+          //addMeta.removeChild(selectedItem);
+          selectedItem.setVisible(false);
         }
       });
     }
-    meta.addComponent(addMenuMeta);    
+    meta.removeComponent(btInitMeta);
+    meta.addComponent(addMenuMeta);
   }
   
   private String getAQLFragment(SearchBox sb)
   {
-    String result = ""; 
-    String value = sb.getValue();
+    String result = "";
+    String value = null;
+    try {
+      value = sb.getValue();
+    } catch (java.lang.NullPointerException ex) {
+      value = null;
+    }
     String level=sb.getAttribute();
-    if (sb.isRegEx() && !sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"=/.*/" : level+"=/"+value.replace("/", "\\x2F") +"/";
+    if (value == null){
+      result = level;
     }
-    if (sb.isRegEx() && sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"!=/.*/" : level+"!=/"+value.replace("/", "\\x2F") +"/";
-    }
-    if (!sb.isRegEx() && sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"!=/.*/" : level+"!=\""+value.replace("\"", "\\x22") +"\"";            
-    }
-    if (!sb.isRegEx() && !sb.isNegativeSearch())
-    {
-      result = (value==null) ? level+"=/.*/" : level+"=\""+value.replace("\"", "\\x22") +"\"";      
+    if (value != null){
+      if (sb.isRegEx() && !sb.isNegativeSearch())
+      {
+        result = level+"=/"+value.replace("/", "\\x2F") +"/";
+      }
+      if (sb.isRegEx() && sb.isNegativeSearch())
+      {
+        result = level+"!=/"+value.replace("/", "\\x2F") +"/";
+      }
+      if (!sb.isRegEx() && sb.isNegativeSearch())
+      {
+        result = level+"!=\""+value.replace("\"", "\\x22") +"\"";            
+      }
+      if (!sb.isRegEx() && !sb.isNegativeSearch())
+      {
+        result = level+"=\""+value.replace("\"", "\\x22") +"\"";      
+      }
     }
     return result;
   }
@@ -279,7 +353,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       String result = "\n& meta::"+mb.getMetaDatum()+" = ";
       if(values.size()==1)
       {
-        result += "\""+values.iterator().next()+"\"";
+        result += "\""+values.iterator().next().replace("\"", "\\x22")+"\"";
       }
       else
       {      
@@ -298,7 +372,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   
   public String escapeRegexCharacters(String tok)
   {
-    if(tok==null | tok.equals("")){return "";}
+    if(tok==null){return "";}
+    if(tok.equals("")){return "";}
     String result=tok;
     for (int i = 0; i<REGEX_CHARACTERS.length; i++)
     {
@@ -308,11 +383,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     return result.replace("/", "\\x2F");
   }
   
-  private String unescape(String s)
+  public String unescape(String s)
 	{
     //first unescape slashes and quotes:
 		
-		s = s.replace("\\x2F", "/").replace("\\x22", "\"");       
+		s = unescapeSlQ(s);
     
     //unescape regex characters:
 		int i=1;
@@ -336,6 +411,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     
     return s;
 	}
+  
+  public String unescapeSlQ(String s)
+  {
+    return s.replace("\\x2F", "/").replace("\\x22", "\"");
+  }
 
   private String getAQLQuery()
   {
@@ -377,6 +457,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       if (spb.isRegEx())
       {
         addQuery = "\n& "+ spb.getAttribute() + " = /" + spb.getValue().replace("/", "\\x2F") + "/";
+      }
+      if (spb.getValue().isEmpty()){
+        addQuery = "\n&" + spb.getAttribute();
       }
       ql += addQuery;
       for(Integer i : sentenceVars)
@@ -437,6 +520,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         catch(Exception e)
         {          
         }
+      }
+      if (event.getComponent() == btInitMeta || event.getComponent() == btInitSpan || event.getComponent() == btInitLanguage){
+        initialize();
       }
     }
   }
@@ -512,7 +598,19 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   public void removeMetaBox(MetaBox v)
   {
     meta.removeComponent(v);
-    mboxes.remove(v);
+    mboxes.remove(v);       
+    List<MenuBar.MenuItem> items = addMenuMeta.getItems().get(0).getChildren();
+    boolean found = false;
+    String metalevel = v.getMetaDatum();
+    for(int i=0; (i<items.size())&!found; i++)
+    {
+      MenuBar.MenuItem itm = items.get(i);
+      if(itm.getText().equals(metalevel))
+      {
+        itm.setVisible(true);
+        found = true;
+      }
+    }
   }
 
   public Collection<String> getAnnotationValues(String level)
@@ -556,6 +654,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       {
       }
     }
+    result.add("tok");
     return result;
   }
 
@@ -684,8 +783,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
   }
   
   public String getFilterMechanism()
-  {
-    String out = "";
+  { 
     return filtering.getItemCaption(filtering.getValue());
   }
   
@@ -705,38 +803,48 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     mboxes.clear();
   }
   
-  public Collection<String> parseMetaExpression(String expression)
+  private Collection<String> splitMultipleValueExpression(String expression)
 	/*
 	 * only for complex regex expressions
 	 */
-	{		
-		Collection<String> values = new TreeSet<String>();
-		int i=0;
-		
-		while(expression.length()>0)
-		{
-			if((expression.charAt(i)=='|')|(i==expression.length()-1))
-			{
-				String value = (i==expression.length()-1) ? expression : expression.substring(0, i);
-				if((value.startsWith("("))&(value.charAt(value.length()-1)==')'))
-				{
-					value = value.substring(1, value.length()-1);
-				}
-				value = unescape(value);
-        values.add(value);
-				expression = expression.substring(i+1);
-				i=0;				
-			}
-			else
-			{
-				i++;
-			}
-		}
-		
-		return values;
+	{	
+    ArrayList<String> values = new ArrayList<String>();
+    String s = expression;
+    
+    while(s.length()>0)
+    {
+       if(s.charAt(0)=='|') {s = s.substring(1);}
+       if(s.charAt(0)!='(')
+       {
+         values = new ArrayList<String>();
+         values.add(expression);
+         return values;
+       }
+       else
+       {
+         int pc = 1;
+         int i = 1;
+         while(pc!=0)
+         {
+           char c = s.charAt(i);
+           if(c==')') {pc--;}
+           else if(c=='(') {pc++;}
+           i++;
+         }         
+         values.add(unescapeSlQ(s.substring(1, i-1))); //in respect to removal of parentheses
+         s = s.substring(i);
+       }
+    }
+    
+    return values;
 	}
   
-  public void loadQuery() throws UnknownLevelException, EqualityConstraintException
+  public reducingStringComparator getRSC()
+  {
+    return rsc;
+  }
+  
+  public void loadQuery() throws UnknownLevelException, EqualityConstraintException, MultipleAssignmentException, InvalidCharacterSequenceException, EmptyReferenceException
     /*
      * this method is called by btInverse
      * When the query has changed in the
@@ -745,10 +853,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
      * the one delivered by the text field
      */
   {
-    
-    String tq;//typed-in query
-    
-    tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
+    /*get clean query from control panel text field*/
+    String tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
     //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)
@@ -770,6 +876,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         //Step 1: get indices of tq-chars, where constraints are separated (&)
         String tempCon="";
         int count = 1;
+        int maxId = 0;
         boolean inclusionCheck=false;
 
         for(int i=0; i<tq.length(); i++)
@@ -815,6 +922,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
                 }
                 inclusionCheck=true;
               }
+              int newMax = (r.getFirst()>r.getSecond()) ? r.getFirst() : r.getSecond();
+              maxId = (maxId<newMax) ? newMax : maxId;
             }         
             else 
             {
@@ -823,7 +932,26 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
 
             tempCon = "";
           }
-        }        
+        }
+        /*CHECK FOR EMPTY REFERENCE*/
+        /*IDEA: If the highest element-id is not empty, all lower ids can't be empty*/
+        /*one additional increment of count has to be taken into account*/
+        /*empty means, the element the id is refering to does not exist*/
+        if(maxId>=count)
+        {
+          throw new EmptyReferenceException(Integer.toString(maxId));
+        }
+        
+        /*CHECK FOR INVALID OR REDUNDANT MUTLIPLE VALUE ASSIGNMENT*/
+        for(Relation rel : eRelations)
+        {
+          Constraint con1 = constraints.get(rel.getFirst());
+          Constraint con2 = constraints.get(rel.getSecond());
+          if(con1.getLevel().equals(con2.getLevel()))
+          {
+            throw new MultipleAssignmentException(con1.toString()+" <-> "+con2.toString());           
+          }
+        }
         
         //create Vertical Nodes
         HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
@@ -835,11 +963,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           if(!annonames.contains(con.getLevel()))
           {
             throw new UnknownLevelException(con.getLevel());
-            //is that a good idea?
+            //is that a good idea? YES
           }
           if(!indexedVnodes.containsKey(i))
-          {          
+          {            
             vn = new VerticalNode(con.getLevel(), con.getValue(), this, con.isRegEx(), con.isNegative());
+            if(con.isRegEx())
+            {
+              SearchBox sb = vn.getSearchBoxes().iterator().next();
+              /*CHECK FIRST IF WE REALLY HAVE A MULTIPLE VALUE EXPRESSION*/
+              Collection<String> mvalue = splitMultipleValueExpression(con.getValue());
+              if(mvalue.size()==1)
+              {
+                sb.setValue(mvalue.iterator().next());
+              }
+              else
+              {
+                sb.setValue(mvalue); 
+              }              
+            }
             indexedVnodes.put(i, vn);
           }
 
@@ -847,13 +989,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
           {
             if(rel.contains(i))
             {
-              int b = rel.whosMyFriend(i);
+              int b = rel.whosMyFriend(i);              
               if(!indexedVnodes.containsKey(b))
               {
                 indexedVnodes.put(b, null);
                 Constraint bcon = constraints.get(b);
                 SearchBox sb = new SearchBox(bcon.getLevel(), this, vn, bcon.isRegEx(), bcon.isNegative());              
-                sb.setValue(bcon.getValue());
+                Collection<String> values = splitMultipleValueExpression(bcon.getValue());
+                if(values.size()>1)
+                {
+                  sb.setValue(values);
+                }
+                else
+                {
+                  sb.setValue(bcon.getValue());
+                }
                 vn.addSearchBox(sb);
               }
             }          
@@ -915,9 +1065,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             eboxes.add(eb);
             VerticalNode v = indexedVnodes.get(rel.getSecond());
             vnodes.add(v);
-
             languagenodes.addComponent(eb);
             languagenodes.addComponent(v);  
+            
           }
         }
 
@@ -933,7 +1083,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
         {
           if(mc.isRegEx())
           {
-            Collection<String> values = parseMetaExpression(mc.getValue());
+            Collection<String> values = splitMultipleValueExpression(unescape(unescapeSlQ(mc.getValue())));
             MetaBox mb = new MetaBox(mc.getLevel(), this);
             mb.setValue(values);
             mboxes.add(mb);
@@ -945,7 +1095,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
             //for a particular reason (unknown) setValue() with a String parameter
             //is not accepted by OptionGroup
             Collection<String> values = new TreeSet<String>();
-            values.add(mc.getValue());
+            values.add(unescapeSlQ(mc.getValue()));
             mb.setValue(values);
             mboxes.add(mb);
             meta.addComponent(mb);
@@ -955,10 +1105,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       }
       catch(Exception e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException))
+        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException) | (e instanceof EmptyReferenceException))
         {
           Notification.show(e.getMessage());
-          //maybe highlight the critical character sequence          
+          //LATER: maybe highlight the critical character sequence          
         }
         else
         {
@@ -975,45 +1125,62 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     private boolean regEx;
     private boolean negative;
     
-    public Constraint(String s)
+    public Constraint(String s) throws InvalidCharacterSequenceException
     {
       int e=0;
-      while(s.charAt(e)!='=')
+      if(s.contains("="))
       {
-        e++;
+        while(s.charAt(e)!='=')
+        {
+          e++;
+        }
+
+        String l;
+
+        if(s.charAt(e-1)=='!')
+        {
+          l = s.substring(0, e-1).replace(" ", "");
+          negative = true;
+        }
+        else
+        {
+          l = s.substring(0, e).replace(" ", "").replace("meta::", "");
+          negative = false;
+        }
+
+        String v = s.substring(e+1);
+        while(v.startsWith(" "))
+        {
+          v = v.substring(1);
+        }
+        if(v.startsWith("\""))
+        {
+          regEx = false;
+        }
+        else
+        {
+          regEx = true;
+        }
+        //remove " or / :
+        v = v.substring(1, v.length()-1);
+
+        level = l;
+        value = v;
       }
-      
-      String l;
-      
-      if(s.charAt(e-1)=='!')
+      else if( ((s.charAt(0)=='\"')&(s.charAt(s.length()-1)=='\"')) | ((s.charAt(0)=='/')&(s.charAt(s.length()-1)=='/')))
       {
-        l = s.substring(0, e-1).replace(" ", "");
-        negative = true;
+        level = "tok";
+        value = s.substring(1, s.length()-1);
+      }
+      else if((s.contains("\""))|(s.contains("/")))
+      {
+        throw new InvalidCharacterSequenceException(s);
       }
       else
       {
-        l = s.substring(0, e).replace(" ", "").replace("meta::", "");
-        negative = false;
+        level = s;
+        value = "";
       }
-      
-      String v = s.substring(e+1);
-      while(v.startsWith(" "))
-      {
-        v = v.substring(1);
-      }
-      if(v.startsWith("\""))
-      {
-        regEx = false;
-      }
-      else
-      {
-        regEx = true;
-      }
-      //remove " or / :
-      v = v.substring(1, v.length()-1);
-      
-      level = l;
-      value = v;
     }
     
     public String getLevel()
@@ -1034,6 +1201,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     public boolean isNegative()
     {
       return negative;
+    }
+    
+    @Override
+    public String toString()
+    {
+      String op = (negative) ? "!=" : "=";
+      String val = (regEx) ? "/"+value+"/" : "\""+value+"\"";
+      return level+op+val;
     }
   }
   
@@ -1061,7 +1236,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
       char c = in.charAt(1);
       in = in.replace(" ", "");
       
-      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$'))
+      while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$')&(c!='='))
       {
         o1str+=c;
         i++;
@@ -1153,29 +1328,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     PRECEDENCE, DOMINANCE, INCLUSION, EQUALITY
   }
   
-  private class UnknownLevelException extends Exception
+  private abstract class LoadQueryException extends Exception
   {
-    private static final String ERROR_MESSAGE = "Unknown annotation level: ";
-    private String level;
+    protected String ERROR_MESSAGE;
+    protected String critical;
     
-    public UnknownLevelException(String level)
-    {
-      this.level = level;
-    }
-    
-    @Override
-    public String getMessage()
-    {
-      return ERROR_MESSAGE+level;
-    }
-  }
-  
-  private class EqualityConstraintException extends Exception
-  {
-    private static final String ERROR_MESSAGE = "Redundant use of equality operator: ";
-    private final String critical;
-    
-    public EqualityConstraintException(String s)
+    public LoadQueryException(String s)
     {
       critical = s;
     }
@@ -1184,6 +1342,51 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener
     public String getMessage()
     {
       return ERROR_MESSAGE+critical;
+    }
+  }
+  
+  private class UnknownLevelException extends LoadQueryException
+  {
+    public UnknownLevelException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Unknown annotation level: ";
+    }
+  }
+  
+  private class MultipleAssignmentException extends LoadQueryException
+  {
+    public MultipleAssignmentException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Invalid or redundant assignment of multiple values:\n\n";
+    }
+  }
+  
+  private class EqualityConstraintException extends LoadQueryException
+  {
+    public EqualityConstraintException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Invalid use of equality operator: ";      
+    }
+  }
+  
+  private class InvalidCharacterSequenceException extends LoadQueryException
+  {
+    public InvalidCharacterSequenceException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE="Invalid character sequence: \n\n";
+    }
+  }
+  
+  private class EmptyReferenceException extends LoadQueryException
+  {
+    public EmptyReferenceException(String s)
+    {
+      super(s);
+      ERROR_MESSAGE = "Element not found. Empty reference: #";
     }
   }
 }
