@@ -4,7 +4,7 @@ PostgreSQL Server Configuration {#admin-configure-postgresql}
 [TOC]
 
 Performance tuning {#admin-configure-postgresperf}
-------------------
+==================
 
 The default configuration of PostgreSQL uses system resource very sparingly. To improve the performance of the ANNIS service it is necessary to change a few settings in the PostgreSQL configuration file `postgresql.conf` as shown in the excerpt below.
 
@@ -54,7 +54,7 @@ More information on these settings can be found in the PostgreSQL manual:
 - "PostgreSQL Wiki": http://wiki.postgresql.org/wiki/SlowQueryQuestions
 
 Logging {#admin-configure-logging}
--------
+=======
 
 If you want to log the duration of SQL statements you should also set the following options in `postgresql.conf`:
 
@@ -63,7 +63,7 @@ log_min_duration_statement = 0
 \endverbatim
 
 Remote access {#admin-configure-remote}
--------------
+=============
 
 If the PostgreSQL server runs on a separate machine, remote access has to be enabled.
 
@@ -82,20 +82,20 @@ host annis_db annis_user 192.168.1.2/0 md5
 Where 192.168.1.2 is the machine running the ANNIS service that is connecting to the remote PostgreSQL server.
 
 Configuration of System Resources {#admin-configure-res}
----------------------------------
+=================================
 
 PostgreSQL needs to access large areas of continuous RAM which can easily exceed the maximum size allowed by the operating system. PostgreSQL will check the OS resource settings during startup and exit with an error if they are not adequate.
 
 Reproduced below are the commands to change the resource settings on Linux and OS X. More information can be found in the PostgreSQL manual: [Managing Kernel Resources](http://www.postgresql.org/docs/8.3/interactive/kernel-resources.html 17.4.).
 
-### Linux ###
+## Linux ##
 
 \verbatim
 sysctl -w kernel.shmmax=536870912   # bytes; corresponds to 512MB
 \endverbatim
 This command takes effect immediately. To make the change permanent across system reboots, add it to the file `/etc/sysctl.conf`.
 
-### Mac OS X ###
+## Mac OS X ##
 
 \verbatim
 sysctl -w kern.sysv.shmmax=536870912        # bytes; corresponds to 512MB
