@@ -122,6 +122,10 @@ public class CountTest
     assertEquals(10, countPcc2(
       "node & node & node & #1 >edge * #2 & #2 >secedge * #3"));
 
+    // test if precendence optimizatin is applied correctly when it is used with spans
+    // that cover more than one token
+    assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
+    
   }
 
   @Test
