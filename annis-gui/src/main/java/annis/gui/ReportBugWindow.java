@@ -24,6 +24,7 @@ import com.vaadin.server.StreamResource;
 import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Version;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Button.ClickListener;
@@ -201,6 +202,8 @@ public class ReportBugWindow extends Window
         toString()).append(")\n");
       sbMsg.append("Version: ").append(VaadinSession.getCurrent().getAttribute(
         "annis-version")).append(
+        "\n");
+      sbMsg.append("Vaadin Version: ").append(Version.getFullVersion()).append(
         "\n");
       sbMsg.append("URL: ").append(UI.getCurrent().getPage().getLocation().toASCIIString()).append(
         "\n");
