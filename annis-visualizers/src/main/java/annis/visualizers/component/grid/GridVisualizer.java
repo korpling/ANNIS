@@ -191,9 +191,15 @@ public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisual
                         validTextIDs.addAll(r.getTextIDs());
                     }
                 }
-                // we want to show all token if no valid text was found and we have only one text
+                
+                /**
+                 * we want to show all token if no valid text was found and
+                 * we have only one text and the first one if there are more
+                 * than one text.
+                 */
                 EList<STextualDS> allTexts = graph.getSTextualDSs();
-                if (validTextIDs.isEmpty() && allTexts != null && allTexts.size() == 1) {
+                if (validTextIDs.isEmpty() && allTexts != null &&
+                        (allTexts.size() == 1 || allTexts.size() == 2)) {
                     validTextIDs.add(allTexts.get(0).getSId());
                 }
 
