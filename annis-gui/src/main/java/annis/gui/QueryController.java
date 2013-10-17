@@ -18,15 +18,12 @@ package annis.gui;
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.libgui.media.MediaController;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.visualizers.IFrameResourceMap;
-import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -309,8 +306,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
 
     getQueryPanels().put(lastQueryUUID, newResultView);
 
-    ResultFetchThread thread = new ResultFetchThread(preparedQuery, newResultView, ui);
-    thread.start();
+    lastMatchThread = new ResultFetchThread(preparedQuery, newResultView, ui);
+    lastMatchThread.start();
 
     //
     // end execute match fetching
