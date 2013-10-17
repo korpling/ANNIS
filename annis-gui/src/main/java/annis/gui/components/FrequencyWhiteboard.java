@@ -74,7 +74,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
   public void beforeClientResponse(boolean initial)
   {
     super.beforeClientResponse(initial);
-    if(labels != null && values != null)
+    if(labels != null && values != null && lastScale != null)
     {
       callFunction("showData", labels, values, lastScale.desc);
     }
