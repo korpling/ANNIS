@@ -67,7 +67,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
 
   private final SearchUI ui;
 
-  private ResultFetchThread lastMatchThread;
+  private transient ResultFetchThread lastMatchThread;
   private final ListOrderedSet<HistoryEntry> history;
 
   private Future<MatchAndDocumentCount> futureCount;
