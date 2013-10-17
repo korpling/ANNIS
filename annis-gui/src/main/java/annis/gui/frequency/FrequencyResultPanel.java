@@ -142,9 +142,10 @@ public class FrequencyResultPanel extends VerticalLayout
           FrequencyTable clippedTable = table;
           if(clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
           {
-            clippedTable = new FrequencyTable();
             List<FrequencyTable.Entry> entries = 
               new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+            
+            clippedTable = new FrequencyTable();
             clippedTable.setEntries(entries.subList(0,
               MAX_NUMBER_OF_CHART_ITEMS));
             clippedTable.setSum(table.getSum());
