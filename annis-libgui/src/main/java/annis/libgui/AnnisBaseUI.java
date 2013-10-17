@@ -21,10 +21,14 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.hash.Hashing;
+import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
 import java.text.DateFormat;
@@ -44,6 +48,8 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -136,9 +142,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
     
     initPlugins();
+    
+    checkIfRemoteLoggedIn(request);
+    getSession().addRequestHandler(new RemoteUserRequestHandler());
   }
-  
-  
+ 
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -439,6 +447,19 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
   }
+  
+  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  {
+     // check if we are logged in using an external authentification mechanism
+      // like Schibboleth
+      String remoteUser = request.getRemoteUser();
+      if(remoteUser != null)
+      { 
+        // treat as anonymous user
+        Client client = Helper.createRESTClient();;
+        Helper.setUser(new AnnisUser(remoteUser, client, true));
+      }
+  }
 
   @Override
   public void push()
@@ -574,5 +595,19 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         true);
     }
     return jsonMapper;
+  }
+  
+  private class RemoteUserRequestHandler implements RequestHandler
+  {
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request,
+      VaadinResponse response) throws IOException
+    {
+      checkIfRemoteLoggedIn(request);
+      // we never write any information in this handler
+      return false;
+    }
+    
   }
 }

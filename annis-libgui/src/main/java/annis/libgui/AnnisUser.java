@@ -21,12 +21,20 @@ public class AnnisUser
 {
   private transient Client client;
   private String userName = "";
+  private boolean remote = false;
   
 
   public AnnisUser(String userName, Client client)
   {
     this.userName = userName;
     this.client = client;
+  }
+  
+  public AnnisUser(String userName, Client client, boolean remote)
+  {
+    this.userName = userName;
+    this.client = client;
+    this.remote = remote;
   }
 
   
@@ -49,5 +57,21 @@ public class AnnisUser
   {
     this.client = client;
   }
+
+  /**
+   * True if the user a remote user, thus cannot e.g. logout by itself
+   * @return 
+   */
+  public boolean isRemote()
+  {
+    return remote;
+  }
+
+  public void setRemote(boolean remote)
+  {
+    this.remote = remote;
+  }
+
+  
   
 }

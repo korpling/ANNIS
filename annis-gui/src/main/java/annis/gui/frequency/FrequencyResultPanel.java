@@ -21,6 +21,7 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -42,7 +43,6 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -142,9 +142,10 @@ public class FrequencyResultPanel extends VerticalLayout
           FrequencyTable clippedTable = table;
           if(clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
           {
-            clippedTable = new FrequencyTable();
             List<FrequencyTable.Entry> entries = 
               new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+            
+            clippedTable = new FrequencyTable();
             clippedTable.setEntries(entries.subList(0,
               MAX_NUMBER_OF_CHART_ITEMS));
             clippedTable.setSum(table.getSum());
@@ -249,7 +250,10 @@ public class FrequencyResultPanel extends VerticalLayout
     tblResult = new Table();
     tblResult.setSizeFull();
     
-    tblResult.setCaption(table.getEntries().size() + " items with a total sum of " + table.getSum());
+    tblResult.setCaption(table.getEntries().size() 
+      + " items with a total sum of " + table.getSum()
+      + " (query on " + Joiner.on(", ").join(this.corpora) + ")"
+    );
     
     tblResult.setSelectable(true);
     tblResult.setMultiSelect(false);

@@ -622,6 +622,8 @@ public class SearchUI extends AnnisBaseUI
           layoutToolbar.replaceComponent(btLogin, btLogout);
           layoutToolbar.setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
         }
+        // do not show the logout button if the user cannot logout using ANNIS
+        btLogout.setVisible(!user.isRemote());
       }
     }
     else
