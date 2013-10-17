@@ -81,12 +81,6 @@ body.v-ie7 .v-menubar-submenu,
   font-size: 12px;
 }
 
-.v-label,
-.sidebar-menu .v-label,
-.v-table-scrollposition {
-  @optional-generated-shadow@
-}
-
 /* Base background color */
 .v-button:active,
 .v-ie .v-button.v-pressed,
@@ -413,12 +407,6 @@ body.v-ie7 .v-menubar-submenu,
 .v-popupview-popup select,
 .v-datefield-popup select {
   font-size: 12px;
-}
-
-.v-label,
-.sidebar-menu .v-label,
-.v-table-scrollposition {
-  @optional-generated-shadow@
 }
 
 /* Base background color */
