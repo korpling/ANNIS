@@ -21,6 +21,7 @@ import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import com.google.common.collect.ImmutableList;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.AbstractSelect;
@@ -31,7 +32,9 @@ import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
@@ -82,24 +85,23 @@ public class SearchOptionsPanel extends FormLayout
    */
   private CorpusConfigMap corpusConfigurations;
 
-  private ComboBox cbLeftContext;
+  private final ComboBox cbLeftContext;
 
-  private ComboBox cbRightContext;
+  private final ComboBox cbRightContext;
 
-  private ComboBox cbResultsPerPage;
+  private final ComboBox cbResultsPerPage;
 
-  private ComboBox cbSegmentation;
+  private final ComboBox cbSegmentation;
   // TODO: make this configurable
 
-  public static final Integer[] PREDEFINED_PAGE_SIZES = new Integer[]
-  {
+  private static final List<Integer> PREDEFINED_PAGE_SIZES = ImmutableList.of(
     1, 2, 5, 10, 20, 25
-  };
+  );
+ 
 
-  public static final Integer[] PREDEFINED_CONTEXTS = new Integer[]
-  {
+  public static final List<Integer> PREDEFINED_CONTEXTS = ImmutableList.of(
     0, 1, 2, 5, 10, 20
-  };
+  );
 
   /**
    * Caches all calculated corpus configurations. Note, also multiple selection
