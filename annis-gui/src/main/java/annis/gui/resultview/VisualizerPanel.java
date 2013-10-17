@@ -403,10 +403,7 @@ public class VisualizerPanel extends CssLayout
       if (loadableVis.isLoaded())
       {
         // direct call callback since the visualizer is already ready
-        if (vis instanceof LoadableVisualizer)
-        {
-          callback.visualizerLoaded((LoadableVisualizer) vis);
-        }
+        callback.visualizerLoaded(loadableVis);
       }
       else
       {
@@ -546,8 +543,8 @@ public class VisualizerPanel extends CssLayout
 
   private class BackgroundThread extends Thread
   {
-    private Future<Component> future;
-    private LoadableVisualizer.Callback callback;
+    private final Future<Component> future;
+    private final LoadableVisualizer.Callback callback;
     public BackgroundThread(
       Future<Component> future, LoadableVisualizer.Callback callback)
     {
