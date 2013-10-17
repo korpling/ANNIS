@@ -500,25 +500,28 @@ public class DocBrowserTable extends Table
     }
 
     @Override
-    public boolean equals(Object m)
+    public boolean equals(Object obj)
     {
-      if (m == null && !(m instanceof MetaDataCol))
+      if (obj == null)
       {
         return false;
       }
-
-      if (this == m)
+      if (getClass() != obj.getClass())
       {
-        return true;
+        return false;
       }
-
-      if (getColName().equals(((MetaDataCol) m).getColName()))
+      final MetaDataCol other = (MetaDataCol) obj;
+      if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
       {
-        return true;
+        return false;
       }
-
-      return false;
+      if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
+      {
+        return false;
+      }
+      return true;
     }
+
 
     @Override
     public int hashCode()
