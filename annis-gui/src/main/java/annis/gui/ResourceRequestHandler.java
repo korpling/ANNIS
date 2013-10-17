@@ -30,7 +30,7 @@ import org.apache.commons.lang3.StringUtils;
  * 
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-class ResourceRequestHandler implements RequestHandler
+public class ResourceRequestHandler implements RequestHandler
 {
 
   @Override

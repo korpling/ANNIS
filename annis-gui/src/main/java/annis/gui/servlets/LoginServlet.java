@@ -118,8 +118,7 @@ public class LoginServlet extends HttpServlet
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          request.getSession().setAttribute(AnnisBaseUI.USER_KEY,
-            new AnnisUser(username, client));
+          Helper.setUser(new AnnisUser(username, client));
         }
       }
       catch (ClientHandlerException ex)
