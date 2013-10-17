@@ -212,16 +212,7 @@ public class PagingComponent extends CustomComponent implements
     {
       for (PagingCallback c : callbacks)
       {
-        int currentSize;
-        
-        if (currentPage == getMaxPage() && currentPage > 1)
-        {
-          currentSize = getCount() % getStartNumber();
-        } else {
-          currentSize = pageSize;
-        }
-        
-        c.switchPage(getStartNumber(), currentSize);
+        c.switchPage(getStartNumber(), pageSize);
       }
     }
   }
