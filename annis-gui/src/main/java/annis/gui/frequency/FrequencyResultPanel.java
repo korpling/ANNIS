@@ -21,6 +21,7 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -38,9 +39,11 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileWriter;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -302,8 +305,8 @@ public class FrequencyResultPanel extends VerticalLayout
   
   public static class CSVResource implements StreamResource.StreamSource
   {
-    private FrequencyTable data;
-    private List<FrequencyTableEntry> freqDefinition;
+    private final FrequencyTable data;
+    private final List<FrequencyTableEntry> freqDefinition;
     public CSVResource(FrequencyTable data, List<FrequencyTableEntry> freqDefinition)
     {
       this.data = data;
@@ -317,7 +320,7 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         File tmpFile = File.createTempFile("annis-frequency", ".csv");
         tmpFile.deleteOnExit();
-        FileWriter writer = new FileWriter(tmpFile);
+        Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
         
         CSVWriter csv = new CSVWriter(writer);
         
