@@ -42,6 +42,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -142,7 +143,9 @@ public class FrequencyResultPanel extends VerticalLayout
           if(clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
           {
             clippedTable = new FrequencyTable();
-            clippedTable.setEntries(table.getEntries().subList(0,
+            List<FrequencyTable.Entry> entries = 
+              new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+            clippedTable.setEntries(entries.subList(0,
               MAX_NUMBER_OF_CHART_ITEMS));
             clippedTable.setSum(table.getSum());
             chart.setCaption("Clipped to most frequent 500 values");
@@ -253,7 +256,7 @@ public class FrequencyResultPanel extends VerticalLayout
     
     if(!table.getEntries().isEmpty())
     {
-      FrequencyTable.Entry firstEntry = table.getEntries().get(0);
+      FrequencyTable.Entry firstEntry = table.getEntries().iterator().next();
       int tupelCount = firstEntry.getTupel().length;
       
       tblResult.addContainerProperty("rank", Integer.class, -1);
@@ -318,7 +321,7 @@ public class FrequencyResultPanel extends VerticalLayout
         ArrayList<String> header = new ArrayList<String>();
         if(data.getEntries().size() > 0)
         {
-          for(int i=0; i < data.getEntries().get(0).getTupel().length; i++)
+          for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
           {
             FrequencyTableEntry e = freqDefinition.get(i);
             String caption = "#" + e.getReferencedNode() + " ("

@@ -16,13 +16,14 @@
 package annis.service.objects;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Comparator;
-import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 /**
  * A frequency table holds the result of a frequency analysis on a specific result.
@@ -34,6 +35,7 @@ public class FrequencyTable implements Serializable
 {
   
   private long sum;
+  @XmlTransient
   private Set<Entry> entries;
 
   public FrequencyTable()
@@ -75,14 +77,15 @@ public class FrequencyTable implements Serializable
     }
   }
 
-  public List<Entry> getEntries()
+  @XmlElement(name = "entry")
+  public Collection<Entry> getEntries()
   {
-    return new ArrayList<Entry>(entries);
+    return entries;
   }
   
-  public void setEntries(List<Entry> entries)
+  public void setEntries(Collection<Entry> entries)
   {
-    this.entries.clear();
+    this.entries = new TreeSet<Entry>(new HighestCountComparator()); 
     this.entries.addAll(entries);
   }
   
