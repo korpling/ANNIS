@@ -65,10 +65,10 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
   private static final Logger log = LoggerFactory.getLogger(
     ResultViewPanel.class);
 
-  private SearchUI ui;
+  private final SearchUI ui;
 
   private ResultFetchThread lastMatchThread;
-  private ListOrderedSet<HistoryEntry> history;
+  private final ListOrderedSet<HistoryEntry> history;
 
   private Future<MatchAndDocumentCount> futureCount;
   
@@ -341,14 +341,14 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
   private void updateMatches(UUID uuid, PagedResultQuery newQuery)
   {
     ResultViewPanel panel = getQueryPanels().get(uuid);
-    if(panel != null)
+    if(panel != null && preparedQuery != null)
     {
       prepareExecuteQuery();
       
       getQueries().put(uuid, newQuery); 
-      ResultFetchThread thread = new ResultFetchThread(newQuery,
+      lastMatchThread = new ResultFetchThread(newQuery,
         panel, ui);
-      thread.start();
+      lastMatchThread.start();
     }
   }
 
