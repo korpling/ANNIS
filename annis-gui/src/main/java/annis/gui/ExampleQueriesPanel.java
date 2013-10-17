@@ -36,7 +36,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
@@ -44,7 +43,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -354,12 +352,12 @@ public class ExampleQueriesPanel extends Table
   /**
    * Sets the selected corpora and causes a reload
    *
-   * @param selectedCorpus Specifies the corpora example queries are fetched
+   * @param selectedCorpora Specifies the corpora example queries are fetched
    * for. If it is null, all available example queries are fetched.
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    getExecutor().submit(new Runnable()
+    Thread t = new Thread(new Runnable()
     {
       @Override
       public void run()
@@ -388,7 +386,7 @@ public class ExampleQueriesPanel extends Table
         });
       }
     });
-
+    t.start();
 
   }
 
@@ -456,14 +454,5 @@ public class ExampleQueriesPanel extends Table
       ExampleQuery eQ = (ExampleQuery) itemId;
       return getOpenCorpusPanel(eQ.getCorpusName());
     }
-  }
-  
-  private ExecutorService getExecutor()
-  {
-    if(executor == null)
-    {
-      executor = Executors.newSingleThreadExecutor();
-    }
-    return executor;
   }
 }

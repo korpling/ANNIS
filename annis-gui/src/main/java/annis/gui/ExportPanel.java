@@ -44,6 +44,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.FutureTask;
 import org.slf4j.LoggerFactory;
 
@@ -57,10 +58,10 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     ExportPanel.class);
   
-  private ComboBox cbLeftContext;
-  private ComboBox cbRightContext;
-  private TextField txtAnnotationKeys;
-  private TextField txtParameters;
+  private final ComboBox cbLeftContext;
+  private final ComboBox cbRightContext;
+  private final TextField txtAnnotationKeys;
+  private final TextField txtParameters;
 
   private static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -72,29 +73,27 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
 
   private final Map<String, String> help4Exporter = new HashMap<String, String>();
 
-  private ComboBox cbExporter;
+  private final ComboBox cbExporter;
 
-  
+  private final Button btDownload;
 
-  private Button btDownload;
+  private final Button btExport;
 
-  private Button btExport;
+  private final Map<String, Exporter> exporterMap;
 
-  private Map<String, Exporter> exporterMap;
+  private final QueryPanel queryPanel;
 
-  private QueryPanel queryPanel;
-
-  private CorpusListPanel corpusListPanel;
+  private final CorpusListPanel corpusListPanel;
 
   private File tmpOutputFile;
 
-  private ProgressBar progressBar;
+  private final ProgressBar progressBar;
 
-  private Label progressLabel;
+  private final Label progressLabel;
 
   private FileDownloader downloader;
 
-  private transient EventBus eventBus;
+  private final transient EventBus eventBus;
 
   private transient Stopwatch exportTime = new Stopwatch();
 
@@ -322,14 +321,16 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       progressLabel.setValue("");
 
       ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
-      singleExecutor.submit(task);
-      if (exportTime == null)
+      Future<?> future = singleExecutor.submit(task);
+      if(future != null)
       {
-        exportTime = new Stopwatch();
+        if (exportTime == null)
+        {
+          exportTime = new Stopwatch();
+        }
+        exportTime.reset();
+        exportTime.start();
       }
-      exportTime.reset();
-      exportTime.start();
-
     }
 
   }
