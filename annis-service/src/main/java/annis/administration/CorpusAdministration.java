@@ -160,7 +160,7 @@ public class CorpusAdministration
       sbMsg.append("this is the requested status update to the ANNIS corpus import "
         + "you have started. Please note that this message is automated and "
         + "if you have any question regarding the import you have to ask the "
-        + "adminstrator of the ANNIS instance directly.\n\n");
+        + "administrator of the ANNIS instance directly.\n\n");
       
       mail.setTo(to);
       if(status == ImportJob.Status.SUCCESS)
@@ -174,7 +174,7 @@ public class CorpusAdministration
         mail.setSubject("ANNIS import *failed* (" + corpusPath + ")");
         sbMsg.append("Status:\nUnfortunally the corpus \"").append(corpusPath).append(
           "\" could not be imported successfully. "
-          + "You may ask the adminstrator of the ANNIS installation for "
+          + "You may ask the administrator of the ANNIS installation for "
           + "assistance why the corpus import failed.\n");
       }
       else if(status == ImportJob.Status.RUNNING)

@@ -253,7 +253,7 @@ public class ReportBugWindow extends Window
     catch (EmailException ex)
     {
       Notification.show("E-Mail not configured on server", 
-        "If this is no Kickstarter version please ask the adminstrator (" 
+        "If this is no Kickstarter version please ask the administrator (" 
         + bugEMailAddress 
         + ") of this ANNIS-instance for assistance. "
         + "Bug reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);

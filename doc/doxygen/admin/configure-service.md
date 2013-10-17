@@ -12,7 +12,7 @@ of. Behind the scenes ANNIS uses the [Apache Shiro](http://shiro.apache.org/
 ) security framework. Per default ANNIS uses a file based authentication and
 authorization approach where some configuration files with an ANNIS specific
 layout are evaluated. This section will discuss how to manage this configuration.
-Additionally, the adminstrator can also directly adjust the contents of the conf/
+Additionally, the administrator can also directly adjust the contents of the conf/
 shiro.ini configuration file. This allows a much more individual configuration
 and the usage of external authorization services like LDAP.
 
