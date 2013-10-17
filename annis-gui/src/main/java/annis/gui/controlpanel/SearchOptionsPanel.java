@@ -231,8 +231,7 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora)
   {
-    ExecutorService executor = Executors.newSingleThreadExecutor();
-    executor.submit(new Runnable()
+    Thread t = new Thread(new Runnable()
     {
       @Override
       public void run()
@@ -279,7 +278,7 @@ public class SearchOptionsPanel extends FormLayout
         });
       }
     });
-
+    t.start();
 
 
   }
