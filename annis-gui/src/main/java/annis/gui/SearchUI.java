@@ -375,11 +375,14 @@ public class SearchUI extends AnnisBaseUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    while (source != null && source.getCause() != null)
+    if(source != null)
     {
-      source = source.getCause();
+      while (source.getCause() != null)
+      {
+        source = source.getCause();
+      }
+      ExceptionDialog.show(source);
     }
-    ExceptionDialog.show(source);
   }
 
   public boolean canReportBugs()
