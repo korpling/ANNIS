@@ -141,7 +141,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
-    mbResult.addStyleName("hover");
+    mbResult.addStyleName("menu-hover");
     addComponent(mbResult);
 
     miSegmentation = mbResult.addItem("Base text", null);
