@@ -260,8 +260,8 @@ public class Helper
     {
       log.
         error(
-        "Java Virtual Maschine can't handle UTF-8: I'm utterly confused",
-        ex);
+          "Java Virtual Maschine can't handle UTF-8: I'm utterly confused",
+          ex);
     }
     return "";
   }
@@ -312,7 +312,7 @@ public class Helper
         appURI.getHost(), appURI.getPort(),
         getContext(), null,
         StringUtils.join(citationFragment(aql, corpora,
-        contextLeft, contextRight, segmentation, start, limit), "&"))
+            contextLeft, contextRight, segmentation, start, limit), "&"))
         .toASCIIString();
     }
     catch (URISyntaxException ex)
@@ -662,8 +662,7 @@ public class Helper
   }
 
   /**
-   * Casts a list of Annotations to the Type
-   * <code>List<Annotation></code>
+   * Casts a list of Annotations to the Type <code>List<Annotation></code>
    */
   public static class AnnotationListType extends GenericType<List<Annotation>>
   {

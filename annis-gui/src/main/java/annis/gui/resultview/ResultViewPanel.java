@@ -29,10 +29,6 @@ import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
@@ -46,16 +42,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
-import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.Arrays;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -84,8 +71,8 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
-  public static final String FILESYSTEM_CACHE_RESULT =
-    "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+  public static final String FILESYSTEM_CACHE_RESULT
+    = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
   private PagingComponent paging;
 
@@ -103,11 +90,11 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private String selectedSegmentationLayer;
 
-  private Set<String> segmentationLayerSet =
-    Collections.synchronizedSet(new TreeSet<String>());
+  private Set<String> segmentationLayerSet
+    = Collections.synchronizedSet(new TreeSet<String>());
 
-  private Set<String> tokenAnnotationLevelSet =
-    Collections.synchronizedSet(new TreeSet<String>());
+  private Set<String> tokenAnnotationLevelSet
+    = Collections.synchronizedSet(new TreeSet<String>());
 
   private InstanceConfig instanceConfig;
 
@@ -118,6 +105,7 @@ public class ResultViewPanel extends VerticalLayout implements
   private String segmentationName;
 
   private int currentResults;
+
   private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
@@ -130,15 +118,15 @@ public class ResultViewPanel extends VerticalLayout implements
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
     this.ps = ps;
     this.controller = controller;
-    this.selectedSegmentationLayer = controller.getPreparedQuery().getSegmentation();
+    this.selectedSegmentationLayer = controller.getPreparedQuery().
+      getSegmentation();
 
-    cacheResolver =
-      Collections.synchronizedMap(
-      new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
+    cacheResolver
+      = Collections.synchronizedMap(
+        new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
 
-    resultPanelList =
-      Collections.synchronizedList(new LinkedList<SingleResultPanel>());
-
+    resultPanelList
+      = Collections.synchronizedList(new LinkedList<SingleResultPanel>());
 
     resultLayout = new CssLayout();
     resultLayout.addStyleName("result-view-css");
@@ -146,15 +134,14 @@ public class ResultViewPanel extends VerticalLayout implements
     resultPanel.setSizeFull();
     resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-
     this.instanceConfig = instanceConfig;
 
     setSizeFull();
     setMargin(false);
 
-
     MenuBar mbResult = new MenuBar();
     mbResult.setWidth("100%");
+    mbResult.addStyleName("hover");
     addComponent(mbResult);
 
     miSegmentation = mbResult.addItem("Base text", null);
@@ -182,17 +169,23 @@ public class ResultViewPanel extends VerticalLayout implements
 
   }
 
-  public void showMatchSearchInProgress(PagedResultQuery q)
+  /**
+   * Informs the user about the searching process.
+   *
+   * @param query Represents a limited query
+   */
+  public void showMatchSearchInProgress(PagedResultQuery query)
   {
     resultLayout.removeAllComponents();
 
     progressResult.setIndeterminate(true);
-    progressResult.setCaption("Searching for \"" + q.getQuery().replaceAll("\n",
+    progressResult.setCaption("Searching for \"" + query.getQuery().replaceAll(
+      "\n",
       " ") + "\"");
     progressResult.setVisible(true);
     setExpandRatio(progressResult, 1.0f);
-  
-    segmentationName = q.getSegmentation();
+
+    segmentationName = query.getSegmentation();
   }
 
   public void showNoResult()
@@ -226,6 +219,13 @@ public class ResultViewPanel extends VerticalLayout implements
     progressResult.setValue(percent);
   }
 
+  /**
+   * Set a new querys in result panel.
+   *
+   * @param queue holds the salt graph
+   * @param q holds the ordinary query
+   * @param numberOfResults the figure of all matches.
+   */
   public void setQueryResultQueue(BlockingQueue<SaltProject> queue,
     PagedResultQuery q, int numberOfResults)
   {
@@ -243,14 +243,19 @@ public class ResultViewPanel extends VerticalLayout implements
 
     if (corpora.size() == 1)
     {
+
+      // fetched corpus config
       CorpusConfig corpusConfig = Helper.getCorpusConfig(corpora.iterator().
         next());
       if (corpusConfig != null && corpusConfig.getConfig() != null
         && corpusConfig.getConfig().containsKey(
-        KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
+          KEY_DEFAULT_BASE_TEXT_SEGMENTATION))
       {
-        this.selectedSegmentationLayer = corpusConfig.getConfig(
-          KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        if (selectedSegmentationLayer == null)
+        {
+          selectedSegmentationLayer = corpusConfig.getConfig(
+            KEY_DEFAULT_BASE_TEXT_SEGMENTATION);
+        }
       }
     }
 
@@ -272,12 +277,12 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void addQueryResult(PagedResultQuery q, SaltProject p)
   {
-    if(q == null)
+    if (q == null)
     {
       return;
     }
-    
-    List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
+
+    List<SingleResultPanel> newPanels;
     try
     {
       if (p == null)
@@ -290,12 +295,12 @@ public class ResultViewPanel extends VerticalLayout implements
         updateVariables(p);
         newPanels = createPanels(p, q.getOffset() + currentResults);
         currentResults += newPanels.size();
-        
-        if(currentResults == numberOfResults)
+
+        if (currentResults == numberOfResults)
         {
           resetQueryResultQueue();
         }
-     
+
         for (SingleResultPanel panel : newPanels)
         {
           resultPanelList.add(panel);
@@ -308,15 +313,13 @@ public class ResultViewPanel extends VerticalLayout implements
           OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
           ext.extend(newPanels.get(newPanels.size() - 1));
         }
-        
+
       }
     }
     catch (Throwable ex)
     {
       log.error(null, ex);
     }
-
-    
 
   }
 
@@ -380,41 +383,79 @@ public class ResultViewPanel extends VerticalLayout implements
     return result;
   }
 
+  /**
+   * Listens to events on the base text menu and updates the segmentation layer.
+   */
+  private class MenuBaseTextCommand implements MenuBar.Command
+  {
+
+    @Override
+    public void menuSelected(MenuItem selectedItem)
+    {
+      // set the new selected item
+      selectedSegmentationLayer = selectedItem.getText();
+
+      if (NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
+      {
+        selectedSegmentationLayer = null;
+      }
+      for (MenuItem mi : miSegmentation.getChildren())
+      {
+        mi.setChecked(mi == selectedItem);
+      }
+
+      setSegmentationLayer(selectedSegmentationLayer);
+    }
+  }
+
   private void updateSegmentationLayer(Set<String> segLayers)
   {
+
+    // clear the menu base text
     miSegmentation.removeChildren();
 
+    // add the default token layer
     segLayers.add("");
 
+    // iterate of all segmentation layers and add them to the menu
     for (String s : segLayers)
     {
-      MenuItem miSingleSegLayer =
-        miSegmentation.addItem(
-        (s == null || "".equals(s)) ? NULL_SEGMENTATION_VALUE : s,
-        new MenuBar.Command()
+      // the new menu entry
+      MenuItem miSingleSegLayer;
+
+      /**
+       * TODO maybe it would be better, to mark the default text level
+       * corresponding to the corpus.properties.
+       *
+       * There exists always a default text level.
+       */
+      if (s == null || "".equals(s))
       {
-        @Override
-        public void menuSelected(MenuItem selectedItem)
-        {
-          selectedSegmentationLayer = selectedItem.getText();
-          if (NULL_SEGMENTATION_VALUE.equals(selectedSegmentationLayer))
-          {
-            selectedSegmentationLayer = null;
-          }
-          for (MenuItem mi : miSegmentation.getChildren())
-          {
-            mi.setChecked(mi == selectedItem);
-          }
+        miSingleSegLayer = miSegmentation.addItem(
+          NULL_SEGMENTATION_VALUE, new MenuBaseTextCommand());
+      }
+      else
+      {
+        miSingleSegLayer = miSegmentation.addItem(s, new MenuBaseTextCommand());
+      }
 
-          setSegmentationLayer(selectedSegmentationLayer);
-        }
-      });
-
+      // mark as selectable
       miSingleSegLayer.setCheckable(true);
-      miSingleSegLayer.setChecked(
-        (selectedSegmentationLayer == null && "".equals(s))
-        || s.equals(selectedSegmentationLayer));
-    }
+
+      /**
+       * Check if a segmentation item must set checked. If no segmentation layer
+       * is selected, set the default layer as selected.
+       */
+      if ((selectedSegmentationLayer == null && "".equals(s))
+        || s.equals(selectedSegmentationLayer))
+      {
+        miSingleSegLayer.setChecked(true);
+      }
+      else
+      {
+        miSingleSegLayer.setChecked(false);
+      }
+    } // end iterate for segmentation layer
   }
 
   private void updateTokenAnnos(Set<String> tokenAnnotationLevelSet)
@@ -479,7 +520,7 @@ public class ResultViewPanel extends VerticalLayout implements
         log.warn(null, ex);
       }
     }
-    
+
     return true;
   }
 
