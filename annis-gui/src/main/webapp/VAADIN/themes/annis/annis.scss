@@ -54,8 +54,10 @@ $font-size: 10pt;
     color: grey;
   }
 
-  .pointer, .v-table-cell-content-kwic-media {
-    cursor: pointer;
+  .pointer, 
+  .v-table-cell-content-kwic-media,
+  .menu-hover .v-menubar-menuitem {
+    cursor: pointer !important;
   }
 
   .v-table-cell-content-kwic-media {

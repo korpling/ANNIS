@@ -55,6 +55,7 @@ class ResultFetchThread extends Thread
 
   private static final Logger log = LoggerFactory.getLogger(
     ResultFetchThread.class);
+
   private ResultViewPanel resultPanel;
 
   private Future<List<Match>> futureMatches;
@@ -65,7 +66,8 @@ class ResultFetchThread extends Thread
 
   private SearchUI ui;
 
-  public ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel, SearchUI ui)
+  public ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel,
+    SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
@@ -146,21 +148,23 @@ class ResultFetchThread extends Thread
     return subgraphQuery;
   }
 
-  
   @Override
   public void run()
   {
-    WebResource subgraphRes =
-      Helper.getAnnisWebResource().path("query/search/subgraph");
+    WebResource subgraphRes
+      = Helper.getAnnisWebResource().path("query/search/subgraph");
 
-    List<Match> result = null;
-    
+    // holds the ids of the matches.
+    List<Match> result;
+
     try
     {
       if (isInterrupted())
       {
         return;
       }
+
+      // set the the progress bar, for given the user some information about the loading process
       ui.accessSynchronously(new Runnable()
       {
         @Override
@@ -174,13 +178,17 @@ class ResultFetchThread extends Thread
       // get the matches
       result = futureMatches.get(60, TimeUnit.SECONDS);
 
-      // get the subgraph for each match
+      // get the subgraph for each match, when the result is not empty
       if (result.isEmpty())
       {
+
+        // check if thread was interrupted
         if (isInterrupted())
         {
           return;
         }
+
+        // nothing found, so inform the user about this.
         ui.access(new Runnable()
         {
           @Override
@@ -196,6 +204,8 @@ class ResultFetchThread extends Thread
         {
           return;
         }
+
+        // since annis found something, inform the user that subgraphs are created
         ui.accessSynchronously(new Runnable()
         {
           @Override
@@ -205,32 +215,30 @@ class ResultFetchThread extends Thread
             ui.push();
           }
         });
-        
+
+        // prepare fetching subgraphs
         final int totalResultSize = result.size();
-        int current = 0;
-        
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
           3);
-         
+        int current = 0;
+
         for (Match m : result)
         {
           if (isInterrupted())
           {
             return;
           }
-          
-          
-          
+
           List<Match> subList = new LinkedList<Match>();
           subList.add(m);
           SubgraphQuery subgraphQuery = prepareQuery(subList);
           final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
-          
+
           queue.put(p);
-          
-          if(current == 0)
+
+          if (current == 0)
           {
-            ui.accessSynchronously(new Runnable() 
+            ui.accessSynchronously(new Runnable()
             {
               @Override
               public void run()
@@ -240,12 +248,12 @@ class ResultFetchThread extends Thread
               }
             });
           }
-          
+
           if (isInterrupted())
           {
             return;
           }
-          
+
           current++;
         }
       } // end if no results
@@ -304,9 +312,9 @@ class ResultFetchThread extends Thread
               log.error("Unexcepted ExecutionException cause",
                 root);
             }
-            
+
             resultPanel.showFinishedSubgraphSearch();
-            
+
           }
         }
       });
