@@ -460,6 +460,17 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void updateTokenAnnos(Set<String> tokenAnnotationLevelSet)
   {
+    // if no token annotations are there, do not show this mneu
+    if (tokenAnnotationLevelSet == null
+      || tokenAnnotationLevelSet.isEmpty())
+    {
+      miTokAnnos.setVisible(false);
+    }
+    else
+    {
+      miTokAnnos.setVisible(true);
+    }
+
     // add new annotations
     for (String s : tokenAnnotationLevelSet)
     {
