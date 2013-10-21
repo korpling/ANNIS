@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
+import com.vaadin.client.Util;
 import com.vaadin.client.VConsole;
 import com.vaadin.client.ui.VLabel;
 
@@ -69,6 +70,12 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   // build maps row and col to a pdf page number
   private Map<Position, String> pdfPageNumbers;
+
+  /**
+   * when true, all html tags are rendered as text and are shown in grid cells.
+   * Does not effect row captions.
+   */
+  private boolean escapeHTML = true;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -121,6 +128,10 @@ public class VAnnotationGrid extends Composite implements Paintable
 
     try
     {
+      if (uidl.hasAttribute("escapeHTML")){
+        this.escapeHTML = uidl.getBooleanAttribute("escapeHTML");
+      }
+
       UIDL rows = uidl.getChildByTagName("rows");
       if (rows != null)
       {
@@ -195,7 +206,7 @@ public class VAnnotationGrid extends Composite implements Paintable
       int right = event.getIntAttribute("right");
       String value = event.getStringAttribute("value");
 
-      VLabel label = new VLabel(value);
+      VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
 
       if (event.hasAttribute("tooltip"))
       {
@@ -291,7 +302,6 @@ public class VAnnotationGrid extends Composite implements Paintable
       }
 
     }
-
 
     if (pdfPageNumbers.containsKey(pos))
     {

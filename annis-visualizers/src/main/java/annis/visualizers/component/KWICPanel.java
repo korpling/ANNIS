@@ -28,6 +28,7 @@ import annis.visualizers.component.grid.EventExtractor;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
@@ -193,6 +194,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     private transient VisualizerInput visInput;
     private transient STextualDS text;
     private transient PDFController pdfController;
+    
+    /**
+     * Specifies if html tags are shown as text or if the browser should render them.
+     */
+    private boolean escapeHTML;
 
     public KWICPanelImpl(VisualizerInput visInput,
       MediaController mediaController, PDFController pdfController,
@@ -206,6 +212,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 
       if (visInput != null)
       {
+        escapeHTML = Boolean.parseBoolean(visInput.getMappings().getProperty("escape_html", "true"));
         baseAnnoSet = EventExtractor.computeDisplayAnnotations(visInput,
           SToken.class);
         initKWICPanel(visInput.getSResult(),
@@ -559,9 +566,9 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
           {
             SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
               textualRelation).get(0);
-
-            return ((String) seq.getSSequentialDS().getSData()).substring(seq.
-              getSStart(), seq.getSEnd());
+            
+            return new Label(((String) seq.getSSequentialDS().getSData()).substring(seq.
+              getSStart(), seq.getSEnd()), escapeHTML ? ContentMode.TEXT : ContentMode.HTML);
 
           }
           else

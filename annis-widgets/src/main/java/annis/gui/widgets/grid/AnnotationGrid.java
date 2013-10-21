@@ -47,6 +47,12 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private String tokRowKey = "tok";
 
   /**
+   * when true, all html tags are rendered as text and are shown in grid cells.
+   * Does not effect row captions.
+   */
+  private boolean escapeHTML = true;
+
+  /**
    * Returns a generic Grid-Object.
    *
    * @param resultID The salt Id of the result.
@@ -117,6 +123,9 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
+
+    target.addAttribute("escapeHTML", escapeHTML);
+
     if (rowsByAnnotation != null)
     {
       target.startTag("rows");
@@ -242,5 +251,15 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   public void setTokenIndexOffset(int tokenIndexOffset)
   {
     this.tokenIndexOffset = tokenIndexOffset;
+  }
+
+  /**
+   * Defines, if the grid visualization render html as text.
+   *
+   * @param escapeHTML the escapeHTML to set
+   */
+  public void setEscapeHTML(boolean escapeHTML)
+  {
+    this.escapeHTML = escapeHTML;
   }
 }
