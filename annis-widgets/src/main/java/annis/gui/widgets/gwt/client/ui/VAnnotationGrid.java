@@ -71,7 +71,11 @@ public class VAnnotationGrid extends Composite implements Paintable
   // build maps row and col to a pdf page number
   private Map<Position, String> pdfPageNumbers;
 
-  private final boolean ESCAPE_HTML = true;
+  /**
+   * when true, all html tags are rendered as text and are shown in grid cells.
+   * Does not effect row captions.
+   */
+  private boolean escapeHTML = true;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -124,6 +128,10 @@ public class VAnnotationGrid extends Composite implements Paintable
 
     try
     {
+      if (uidl.hasAttribute("escapeHTML")){
+        this.escapeHTML = uidl.getBooleanAttribute("escapeHTML");
+      }
+
       UIDL rows = uidl.getChildByTagName("rows");
       if (rows != null)
       {
@@ -198,7 +206,7 @@ public class VAnnotationGrid extends Composite implements Paintable
       int right = event.getIntAttribute("right");
       String value = event.getStringAttribute("value");
 
-      VLabel label = new VLabel(ESCAPE_HTML ? Util.escapeHTML(value) : value);
+      VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
 
       if (event.hasAttribute("tooltip"))
       {
@@ -294,7 +302,6 @@ public class VAnnotationGrid extends Composite implements Paintable
       }
 
     }
-
 
     if (pdfPageNumbers.containsKey(pos))
     {
