@@ -140,9 +140,11 @@ public class LegacyGraphConverter
     Set<String> matchSet = new HashSet<String>(matchedNodeNames);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
-    annoGraph.setPath(
+    List<String> pathList = 
       CommonHelper.getCorpusPath(docGraph.getSDocument().getSCorpusGraph(), 
-      docGraph.getSDocument()).toArray(new String[0]));
+      docGraph.getSDocument());
+    
+    annoGraph.setPath(pathList.toArray(new String[pathList.size()]));
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
     Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();
