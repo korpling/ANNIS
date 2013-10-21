@@ -33,6 +33,7 @@ import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -350,8 +351,9 @@ public class PagingComponent extends CustomComponent implements
     {
       String prefix = "Result for: <span class=\"corpus-font-force\">";
       lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
-      lblInfo.setValue(text.length() < 50 ? prefix + text.substring(0, text.
-        length()) : prefix + text.substring(0, 50) + " ... </span>");
+      lblInfo.setValue(text.length() < 50 ? prefix + StringEscapeUtils.
+        escapeHtml4(text.substring(0, text.length())) : prefix + StringEscapeUtils.
+        escapeHtml4(text.substring(0, 50)) + " ... </span>");
     }
   }
 
