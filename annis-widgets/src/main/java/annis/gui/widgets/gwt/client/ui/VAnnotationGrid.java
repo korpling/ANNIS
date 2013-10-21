@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
+import com.vaadin.client.Util;
 import com.vaadin.client.VConsole;
 import com.vaadin.client.ui.VLabel;
 
@@ -69,6 +70,8 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   // build maps row and col to a pdf page number
   private Map<Position, String> pdfPageNumbers;
+
+  private final boolean ESCAPE_HTML = true;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -195,7 +198,7 @@ public class VAnnotationGrid extends Composite implements Paintable
       int right = event.getIntAttribute("right");
       String value = event.getStringAttribute("value");
 
-      VLabel label = new VLabel(value);
+      VLabel label = new VLabel(ESCAPE_HTML ? Util.escapeHTML(value) : value);
 
       if (event.hasAttribute("tooltip"))
       {
