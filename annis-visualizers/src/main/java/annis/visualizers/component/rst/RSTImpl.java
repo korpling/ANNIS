@@ -495,13 +495,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     EList<SDataSourceSequence> sSequences = currNode.getSDocumentGraph().
             getOverlappedDSSequences(currNode, relationTypes);
 
-    log.debug("sSequences {}", sSequences.toString());
-
     // only support one text for spanns
     if (sSequences == null || sSequences.size() != 1) {
       log.error("rst supports only one text and only text level");
       return null;
     }
+    
+    log.debug("sSequences {}", sSequences.toString());
 
     /**
      * Check if it is a text data structure. As described in the salt manual in
