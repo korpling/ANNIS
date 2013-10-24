@@ -980,6 +980,18 @@ var VKI_attach, VKI_show, VKI_close;
       [["Shift", "Shift"], ["\u2c8d", "\u2c8c"], ["\u2c9d", "\u2c9c"], ["\u2cad", "\u2cac"], ["\u2cab", "\u2caa"], ["\u2c83", "\u2c82"], ["\u2c9b", "\u2c9a"], ["\u2c99", "\u2c98"], ["\u03ed", "\u03ec"], ["\u03ef", "\u03ee"], ["\u2c8f", "\u2c8e"], ["Shift", "Shift"]],
       [[" ", " "], ["Alt", "Alt"]]
     ], 'lang': ["cop"] };
+  
+  // Greek polytonic virtual keybard by Claudia Schneider
+  
+	
+  this.VKI_layout['\u0395\u03bb\u03bb\u03b7\u03bd\u03b9\u03ba\u03ac polytonic'] = {
+    'name': "Greek polytonic", 'keys': [
+      [["`", "\u02d8", "\u1fc1"], ["\u1fbf", "1", "!"], ["\u1fcd", "2", "@", "\u00b2"], ["\u1fce", "3", "#", "\u00b3"], ["\u1fcf", "4", "$", "\u00a3"], ["\u1ffe", "5", "%", "\u00a7"], ["\u1fdd", "6", "^", "\u00b6"], ["\u1fde", "7", "&"], ["\u1fdf", "8", "*", "\u00a4"], ["\u1fed", "9", "(", "\u00a6"], ["\u1fee", "0", ")", "\u00ba"], ["-", "_", "\u00b1"], ["~", "=", "+", "\u00bd"], ["Bksp", "Bksp"]],
+      [["Tab", "Tab"], [";", ":"], ["\u03c2", "^"], ["\u03b5", "\u0395"], ["\u03c1", "\u03a1"], ["\u03c4", "\u03a4"], ["\u03c5", "\u03a5", "\u03cb", "\u03ab"], ["\u03b8", "\u0398", "\u03d1", "\u03f4"], ["\u03b9", "\u0399", "\u03ca", "\u03aa"], ["\u03bf", "\u039f"], ["\u03c0", "\u03a0"], ["[", "{", "\u201c"], ["]", "}", "\u201d"], ["\\", "|", "\u00ac"]],
+      [["Caps", "Caps"], ["\u03b1", "\u0391", "\u1fb3", "\u1fbc"], ["\u03c3", "\u03a3"], ["\u03b4", "\u0394"], ["\u03c6", "\u03a6", "\u03dd", "\u03dc"], ["\u03b3", "\u0393"], ["\u03b7", "\u0397", "\u1fc3", "\u1fcc"], ["\u03be", "\u039e"], ["\u03ba", "\u039a"], ["\u03bb", "\u039b"], ["/", "\u0384", "\u00a8", "\u0385"], ["'", '"'], ["Enter", "Enter"]],
+      [["Shift", "Shift"], ["<", ">"], ["\u03b6", "\u0396"], ["\u03c7", "\u03a7"], ["\u03c8", "\u03a8"], ["\u03c9", "\u03a9", "\u1ff3", "\u1ffc"], ["\u03b2", "\u0392"], ["\u03bd", "\u039d"], ["\u03bc", "\u039c"], [",", "<"], [".", ">"], ["\u0387", "?"], ["Shift", "Shift"]],
+      [[" ", " ", " ", " "], ["AltGr", "AltGr"]]
+    ], 'lang': ["el"]};
 
 
   /* ***** Define Dead Keys ************************************** */
@@ -1064,6 +1076,68 @@ var VKI_attach, VKI_show, VKI_close;
     '\u30cf': "\u30d1", '\u30d2': "\u30d4", '\u30d5': "\u30d7", '\u30d8': "\u30da", '\u30db': "\u30dd"
   };
 
+// begin customization
+  this.VKI_deadkey['\u1fbf'] = {// Lenis / psili
+    '\u03b1': "\u1f00", '\u03b5': "\u1f10", '\u03b7': "\u1f20", '\u03b9': "\u1f30", '\u03bf': "\u1f40", '\u03c5': "\u1f50", '\u03c9': "\u1f60", '\u1fb3': "\u1f80", '\u1fc3': "\u1f90", '\u1ff3': "\u1fa0", '\u03c1': "\u1fe4",
+    '\u0391': "\u1f08", '\u0395': "\u1f18", '\u0397': "\u1f28", '\u0399': "\u1f38", '\u039f': "\u1f48", '\u03a9': "\u1f68", '\u1fbc': "\u1f88", '\u1fcc': "\u1f98", '\u1ffc': "\u1fa8"
+  };
+  this.VKI_deadkey['\u1ffe'] = {// Asper / dasia
+    '\u03b1': "\u1f01", '\u03b5': "\u1f11", '\u03b7': "\u1f21", '\u03b9': "\u1f31", '\u03bf': "\u1f41", '\u03c5': "\u1f51", '\u03c9': "\u1f61", '\u1fb3': "\u1f81", '\u1fc3': "\u1f91", '\u1ff3': "\u1fa1", '\u03c1': "\u1fe5",
+    '\u0391': "\u1f09", '\u0395': "\u1f19", '\u0397': "\u1f29", '\u0399': "\u1f39", '\u039f': "\u1f49", '\u03a5': "\u1f59", '\u03a9': "\u1f69", '\u1fbc': "\u1f89", '\u1fcc': "\u1f99", '\u1ffc': "\u1fa9", '\u03a1': "\u1fec"
+  };
+  this.VKI_deadkey['\u1fcd'] = {// Lenis & Grave / psili & varia
+    '\u03b1': "\u1f02", '\u03b5': "\u1f12", '\u03b7': "\u1f22", '\u03b9': "\u1f32", '\u03bf': "\u1f42", '\u03c5': "\u1f52", '\u03c9': "\u1f62", '\u1fb3': "\u1f82", '\u1fc3': "\u1f92", '\u1ff3': "\u1fa2",
+    '\u0391': "\u1f0a", '\u0395': "\u1f1a", '\u0397': "\u1f2a", '\u0399': "\u1f3a", '\u039f': "\u1f4a", '\u03a9': "\u1f6a", '\u1fbc': "\u1f8a", '\u1fcc': "\u1f9a", '\u1ffc': "\u1faa"
+  };
+  this.VKI_deadkey['\u1fdd'] = {// Asper & Grave / dasia & varia
+    '\u03b1': "\u1f03", '\u03b5': "\u1f13", '\u03b7': "\u1f23", '\u03b9': "\u1f33", '\u03bf': "\u1f43", '\u03c5': "\u1f53", '\u03c9': "\u1f63", '\u1fb3': "\u1f83", '\u1fc3': "\u1f93", '\u1ff3': "\u1fa3",
+    '\u0391': "\u1f0b", '\u0395': "\u1f1b", '\u0397': "\u1f2b", '\u0399': "\u1f3b", '\u039f': "\u1f4b", '\u03a5': "\u1f5b", '\u03a9': "\u1f6b", '\u1fbc': "\u1f8b", '\u1fcc': "\u1f9b", '\u1ffc': "\u1fab"
+  };
+  this.VKI_deadkey['\u1fce'] = {// Lenis & Acute / psili & oxeia
+    '\u03b1': "\u1f04", '\u03b5': "\u1f14", '\u03b7': "\u1f24", '\u03b9': "\u1f34", '\u03bf': "\u1f44", '\u03c5': "\u1f54", '\u03c9': "\u1f64", '\u1fb3': "\u1f84", '\u1fc3': "\u1f94", '\u1ff3': "\u1fa4",
+    '\u0391': "\u1f0c", '\u0395': "\u1f1c", '\u0397': "\u1f2c", '\u0399': "\u1f3c", '\u039f': "\u1f4c", '\u03a9': "\u1f6c", '\u1fbc': "\u1f8c", '\u1fcc': "\u1f9c", '\u1ffc': "\u1fac"
+  };
+  this.VKI_deadkey['\u1fde'] = {// Asper & Acute / dasia & oxeia
+    '\u03b1': "\u1f05", '\u03b5': "\u1f15", '\u03b7': "\u1f25", '\u03b9': "\u1f35", '\u03bf': "\u1f45", '\u03c5': "\u1f55", '\u03c9': "\u1f65", '\u1fb3': "\u1f85", '\u1fc3': "\u1f95", '\u1ff3': "\u1fa5",
+    '\u0391': "\u1f0d", '\u0395': "\u1f1d", '\u0397': "\u1f2d", '\u0399': "\u1f3d", '\u039f': "\u1f4d", '\u03a5': "\u1f5d", '\u03a9': "\u1f6d", '\u1fbc': "\u1f8d", '\u1fcc': "\u1f9d", '\u1ffc': "\u1fad"
+  };
+  this.VKI_deadkey['\u1fcf'] = {// Lenis & Circumflex / psili & perispomeni
+    '\u03b1': "\u1f06", '\u03b7': "\u1f26", '\u03b9': "\u1f36", '\u03c5': "\u1f56", '\u03c9': "\u1f66", '\u1fb3': "\u1f86", '\u1fc3': "\u1f96", '\u1ff3': "\u1fa6",
+    '\u0391': "\u1f0e", '\u0397': "\u1f2e", '\u0399': "\u1f3e", '\u03a9': "\u1f6e", '\u1fbc': "\u1f8e", '\u1fcc': "\u1f9e", '\u1ffc': "\u1fae"
+  };
+  this.VKI_deadkey['\u1fdf'] = {// Asper & Circumflex / dasia & perispomeni
+    '\u03b1': "\u1f07", '\u03b7': "\u1f27", '\u03b9': "\u1f37", '\u03c9': "\u1f67", '\u1fb3': "\u1f87", '\u1fc3': "\u1f97", '\u1ff3': "\u1fa7", '\u03c5': "\u1f57",
+    '\u0391': "\u1f0f", '\u0397': "\u1f2f", '\u0399': "\u1f3f", '\u03a5': "\u1f5f", '\u03a9': "\u1f6f", '\u1fbc': "\u1f8f", '\u1fcc': "\u1f9f", '\u1ffc': "\u1faf"
+  };
+  this.VKI_deadkey['\u1fed'] = {// Grave & Trema / varia & dialytika
+    '\u03b9': "\u1fd2", '\u03c5': "\u1fe2",
+  };
+  this.VKI_deadkey['\u1fee'] = {// Acute & Trema / oxeia & dialytika
+    '\u03b9': "\u1fd3", '\u03c5': "\u1fe3"
+  };
+  this.VKI_deadkey['~'] = {// Tilde/Circumflex / perispomeni
+    '\u03b1': "\u1fb6", '\u03b7': "\u1fc6", '\u1fc3': "\u1fc7", '\u03b9': "\u1fd6", '\u03c5': "\u1fe6", '\u03c9': "\u1ff6", '\u1fb3': "\u1fb7", '\u1ff3': "\u1ff7"
+  };
+  this.VKI_deadkey['\u1fc1'] = {// Tilde &  Trema / perispomeni & dialytika
+    '\u03b9': "\u1fd7", '\u03c5': "\u1fe8", '\u03c9': "\u1ff6", '\u03c9': "\u1ff6"
+  };
+  this.VKI_deadkey['`'] = {// Grave / varia
+    '\u03b1': "\u1f70", '\u03b5': "\u1f72", '\u03b7': "\u1f74", '\u03b9': "\u1f76", '\u03bf': "\u1f78", '\u03c5': "\u1f7a", '\u03c9': "\u1f7c", '\u1ff3': "\u1ff2", '\u1fc3': "\u1fc2", '\u1fb3': "\u1fb2", '\1ufb3': "\u1fb2", '\u03cb': "\u1fe2", '\u03ca': "\u1fd2",
+    '\u0391': "\u1fba", '\u0395': "\u1fc8", '\u0397': "\u1fca", '\u0399': "\u1fda", '\u039f': "\u1ff8", '\u03a5': "\u1fea", '\u03a9': "\u1ffa"
+  };
+  this.VKI_deadkey["'"] = {// Acute / oxeia
+    '\u03b1': "\u1f71", '\u03b5': "\u1f73", '\u03b7': "\u1f75", '\u03b9': "\u1f77", '\u03bf': "\u1f79", '\u03c5': "\u1f7b", '\u03c9': "\u1f7d", '\u1ff3': "\u1ff4", '\u1fc3': "\u1fc4", '\u1fb4': "\u1fb4", '\u03cb': "\u03b0", '\u03ca': "\u0390", '\u1fb3': "\u1fb4",
+    '\u0391': "\u1fbb", '\u0395': "\u1fc9", '\u0397': "\u1fcb", '\u0399': "\u1fdb", '\u039f': "\u1ff9", '\u03a5': "\u1feb", '\u03a9': "\u1ffb"
+  };
+  this.VKI_deadkey['-'] = {// Long / makron
+    '\u03b1': "\u1fb1", '\u03b9': "\u1fd1", '\u03c5': "\u1fe1",
+    '\u0391': "\u1fb9", '\u0399': "\u1fd9", '\u03a5': "\u1fe9"
+  };
+  this.VKI_deadkey['\u02d8'] = {// Short / breve / vrachy
+    '\u03b1': "\u1fb0", '\u03b9': "\u1fd0", '\u03c5': "\u1fe0",
+    '\u0391': "\u1fb8", '\u0399': "\u1fd8", '\u03a5': "\u1fe8"
+  };
+// end customization
 
   /* ***** Define Symbols **************************************** */
   this.VKI_symbol = {
