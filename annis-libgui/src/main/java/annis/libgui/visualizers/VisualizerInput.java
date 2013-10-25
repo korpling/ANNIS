@@ -41,21 +41,38 @@ public class VisualizerInput implements Serializable
 {
 
   private transient SDocument document = SaltFactory.eINSTANCE.createSDocument();
+
   private String namespace = "";
+
   private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
+
   private Map<String, String> markableMap = new HashMap<String, String>();
+
   private Map<String, String> markableExactMap = new HashMap<String, String>();
+
   private String id = "";
+
   private String contextPath;
+
   private String annisWebServiceURL;
+
   private String dotPath;
+
   private AnnisResult result;
+
   private Properties mappings;
+
   private String resourcePathTemplate = "%s";
+
   private List<SToken> token;
+
   private Set<String> tokenAnnos;
+
   private String segmentationName;
+
   private FontConfig font;
+
+  private String rawText;
 
   public String getAnnisWebServiceURL()
   {
@@ -259,9 +276,9 @@ public class VisualizerInput implements Serializable
   {
     if (result == null)
     {
-      result =
-        new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(
-        document));
+      result
+        = new AnnisResultImpl(LegacyGraphConverter.convertToAnnotationGraph(
+            document));
     }
     return result;
   }
@@ -335,7 +352,7 @@ public class VisualizerInput implements Serializable
   {
     return this.token;
   }
-  
+
   /**
    * Set all token annotations which should be displayed by the visualizer and
    * correspondands to the annos choosen by the user in the annis gui.
@@ -368,10 +385,11 @@ public class VisualizerInput implements Serializable
   }
 
   /**
-   * Get the properties of the (web-) font in which this visualizer should render the output.
-   * The visualizer is self-responsible for declaring a backup font that is
-   * used when this font is not available.
-   * @return 
+   * Get the properties of the (web-) font in which this visualizer should
+   * render the output. The visualizer is self-responsible for declaring a
+   * backup font that is used when this font is not available.
+   *
+   * @return
    */
   public FontConfig getFont()
   {
@@ -383,5 +401,36 @@ public class VisualizerInput implements Serializable
     this.font = font;
   }
 
-  
+  /**
+   * Gets the original text from the relAnnis text.tab file represented as a
+   * String.
+   *
+   * <p>
+   * This is a convenient and very fast method for extracting the whole text of
+   * a document, since this method simply reads database tupel and does not map
+   * anything to salt.</p>
+   *
+   * @return <ul><li>null - if the {@link VisualizerPlugin#isUsingRawText()}
+   * method false for this visualizer.</li>
+   *
+   * <li>"" - if there are only segmentations and the token layer is empty</li>
+   *
+   */
+  public String getRawText()
+  {
+    return rawText;
+  }
+
+  /**
+   * Sets the raw text. This should only be done, if
+   * {@link VisualizerPlugin#isUsingText()} return true.
+   *
+   * @param rawText the original text from the text.tab file in relAnnis.
+   * Therefore could be an empty string.
+   */
+  public void setRawText(String rawText)
+  {
+    this.rawText = rawText;
+  }
+
 }
