@@ -192,8 +192,7 @@ public class FrequencyResultPanel extends VerticalLayout
       String message;
       if (ex.getResponse().getStatus() == 400)
       {
-        message = "parsing error: "
-          + ex.getResponse().getEntity(String.class);
+        message = ex.getResponse().getEntity(String.class);
       }
       else if (ex.getResponse().getStatus() == 504) // gateway timeout
       {
