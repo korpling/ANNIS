@@ -89,7 +89,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 
     for (FrequencyTable.Entry e : table.getEntries())
     {
-      labels.add(StringUtils.join(e.getTupel(), "/"));
+      labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
       values.add(e.getCount());
     }
     setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
