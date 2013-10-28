@@ -17,7 +17,6 @@ package annis.gui.components;
 
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
-import com.google.common.collect.Ordering;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
@@ -38,6 +37,7 @@ import org.json.JSONException;
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
   public final int PIXEL_PER_VALUE = 45;
+  public final int ADDTIONAL_PIXEL_WIDTH = 100;
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");
@@ -92,7 +92,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
       labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
       values.add(e.getCount());
     }
-    setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
+    setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
     lastScale = scale;
     
 //    callFunction("showData", labels, values, scale.desc);
