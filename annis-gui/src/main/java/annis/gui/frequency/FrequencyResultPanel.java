@@ -152,7 +152,7 @@ public class FrequencyResultPanel extends VerticalLayout
             clippedTable.setEntries(entries.subList(0,
               MAX_NUMBER_OF_CHART_ITEMS));
             clippedTable.setSum(table.getSum());
-            chart.setCaption("Clipped to most frequent 500 values");
+            chart.setCaption("Showing historgram of top 500 results, see table below for complete dataset.");
           }
           chart.setFrequencyData(clippedTable);
           

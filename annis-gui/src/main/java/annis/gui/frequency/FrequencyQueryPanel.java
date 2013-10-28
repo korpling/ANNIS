@@ -252,7 +252,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.setExpandRatio(layoutButtons, 0.0f);
     queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
     
-    btShowQuery = new Button("New query", new Button.ClickListener() 
+    btShowQuery = new Button("New Analysis", new Button.ClickListener() 
     {
 
       @Override
