@@ -15,6 +15,7 @@
  */
 package annis.gui.frequency;
 
+import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
 import annis.libgui.Helper;
@@ -22,6 +23,7 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -35,6 +37,7 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
@@ -52,16 +55,18 @@ import java.util.Set;
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {
   private Table tblFrequencyDefinition;
-  private Button btAdd;
-  private Button btReset;
+  private final Button btAdd;
+  private final Button btReset;
   private Button btDeleteRow;
   private Button btShowFrequencies;
   private int counter;
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private QueryController controller;
+  private final QueryController controller;
   private boolean manuallyChanged;
+  private final Label lblCorpusList;
+  private final Label lblAQL;
   
   public FrequencyQueryPanel(final QueryController controller)
   {
@@ -76,6 +81,28 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout = new VerticalLayout();
     queryLayout.setWidth("100%");
     queryLayout.setHeight("-1px");
+    
+    HorizontalLayout queryDescriptionLayout = new HorizontalLayout();
+    queryDescriptionLayout.setSpacing(true);
+    queryDescriptionLayout.setWidth("100%");
+    queryDescriptionLayout.setHeight("-1px");
+    queryLayout.addComponent(queryDescriptionLayout);
+    
+    lblCorpusList = new Label("");
+    lblCorpusList.setCaption("selected corpora:");
+    lblCorpusList.setWidth("100%");
+    
+    lblAQL = new Label("");
+    lblAQL.setCaption("query to analyze:");
+    lblAQL.setWidth("100%");
+    
+    queryDescriptionLayout.addComponent(lblCorpusList);
+    queryDescriptionLayout.addComponent(lblAQL);
+    
+    queryDescriptionLayout.setComponentAlignment(lblCorpusList,
+      Alignment.MIDDLE_LEFT);
+    queryDescriptionLayout.setComponentAlignment(lblAQL,
+      Alignment.MIDDLE_RIGHT);
     
     tblFrequencyDefinition = new Table();
     tblFrequencyDefinition.setImmediate(true);
@@ -115,11 +142,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
     createAutomaticEntriesForQuery(controller.getQueryDraft());
+    updateQueryInfo(controller.getQueryDraft());
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
     tblFrequencyDefinition.setColumnExpandRatio("comment", 0.2f);
-    
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
@@ -148,6 +175,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             // was not a number but a named node
           }
         }
+        List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
+        nr = Math.min(nr, nodes.size()-1);
         tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
           FrequencyTableEntryType.span, "", ""), counter++);
       }
@@ -252,7 +281,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.setExpandRatio(layoutButtons, 0.0f);
     queryLayout.setExpandRatio(btShowFrequencies, 0.0f);
     
-    btShowQuery = new Button("New query", new Button.ClickListener() 
+    btShowQuery = new Button("New Analysis", new Button.ClickListener() 
     {
 
       @Override
@@ -269,7 +298,23 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     addComponent(btShowQuery);
     
     setComponentAlignment(btShowQuery, Alignment.TOP_CENTER);
-    
+   
+    if(controller != null)
+    {
+      controller.addCorpusSelectionChangeListener(new CorpusSelectionChangeListener()
+      {
+
+        @Override
+        public void onCorpusSelectionChanged(Set<String> selectedCorpora)
+        {
+          if (!manuallyChanged)
+          {
+            createAutomaticEntriesForQuery(controller.getQueryDraft());
+          }
+          updateQueryInfo(controller.getQueryDraft());
+        }
+      });
+    }
   }
   
   private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, 
@@ -304,6 +349,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     {
       createAutomaticEntriesForQuery(event.getText());
     }
+    updateQueryInfo(event.getText());
   }
   
   
@@ -339,7 +385,17 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
   }
   
-  public final void createAutomaticEntriesForQuery(String query)
+  private List<QueryNode> parseQuery(String query)
+  {
+    // let the service parse the query
+    WebResource res = Helper.getAnnisWebResource();
+    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
+      .get(new GenericType<List<QueryNode>>() {});
+    
+    return nodes;
+  }
+  
+  private void createAutomaticEntriesForQuery(String query)
   {
     if(query == null || query.isEmpty())
     {
@@ -347,17 +403,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     try
-    {
-
-      // let the service parse the query
-      WebResource res = Helper.getAnnisWebResource();
-      List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
-        .get(new GenericType<List<QueryNode>>() {});
+    { 
 
       tblFrequencyDefinition.removeAllItems();
 
       counter = 0;
-
+      List<QueryNode> nodes = parseQuery(query);
       for(QueryNode n : nodes)
       {
         if(!n.isArtificial())
@@ -387,6 +438,28 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       // non-valid query, ignore
     }
     
+  }
+  
+  private void updateQueryInfo(String query)
+  {
+    Set<String> selectedCorpora = controller.getSelectedCorpora();
+    if(selectedCorpora.isEmpty())
+    {
+      lblCorpusList.setValue("none");
+    }
+    else
+    {
+      lblCorpusList.
+        setValue(Joiner.on(", ").join(selectedCorpora));
+    }
+    if(query == null || query.isEmpty())
+    {
+      lblAQL.setValue("<empty query>");
+    }
+    else
+    {
+      lblAQL.setValue(query.replaceAll("[\n\r]+", " "));
+    }
   }
   
   public void notifiyQueryFinished()
