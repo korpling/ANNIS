@@ -17,10 +17,10 @@ package annis.gui.components;
 
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
+import com.google.common.collect.Ordering;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.Notification;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;

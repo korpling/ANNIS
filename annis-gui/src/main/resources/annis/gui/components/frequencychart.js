@@ -35,6 +35,23 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   
   this.showData = function(labels, values, scale) {
   
+    var predefinedYTicks = null;
+    // the list is ordered
+    var maxValue = values[0];
+    if(scale === "logarithmic") {
+      // adjust ticks manually since the flotr2 library does not handle this well
+      predefinedYTicks = [];
+      predefinedYTicks.push(0);
+      predefinedYTicks.push(1);
+      
+      var lastTick = 1;
+      do
+      {
+        lastTick = lastTick * 10;
+        predefinedYTicks.push(lastTick);
+      }
+      while (lastTick < maxValue);
+    }
     var d = [];
     for(var i=0; i < values.length; i++)
     {
@@ -56,6 +73,7 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
         },
         yaxis : {
           scaling: scale,
+          ticks: predefinedYTicks,
           min: 0
         },
         xaxis : {
