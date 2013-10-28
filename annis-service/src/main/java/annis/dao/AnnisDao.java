@@ -245,4 +245,21 @@ public interface AnnisDao
    * ids are specified.
    */
   public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
+
+  /**
+   * Returns the raw text from the text.tab file of the relAnnis format.
+   *
+   * @param topLevelCorpus The name of the corpus.
+   * @param documentName The name of the document
+   * @return "" if no text.tab is empty
+   */
+  public List<String> getRawText(String topLevelCorpus, String documentName);
+
+  /**
+   * Returns the corpus internal corpus id of a top level corpus.
+   *
+   * @param topLevelCorpus the name of the corpus
+   * @return the corpus id
+   */
+  public long mapCorpusNameToId(String topLevelCorpus);
 }

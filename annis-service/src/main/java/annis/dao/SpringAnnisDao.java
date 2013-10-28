@@ -46,6 +46,7 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
+import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
@@ -78,6 +79,7 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import javax.ws.rs.core.GenericEntity;
 import org.apache.commons.io.input.BoundedInputStream;
 
 import org.slf4j.Logger;
@@ -85,6 +87,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
@@ -115,6 +118,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private FrequencySqlGenerator frequencySqlGenerator;
 
+  // reads the raw text entries of relannis format, originally placed in text.tab
+  private RawTextSqlHelper rawTextHelper;
 
   private String externalFilesPath;
 
@@ -233,6 +238,37 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public HashMap<Long, Properties> getCorpusConfiguration()
   {
     return corpusConfiguration;
+  }
+
+  @Override
+  public List<String> getRawText(String topLevelCorpus, String documentName)
+  {
+    if (topLevelCorpus == null || documentName == null)
+    {
+      throw new IllegalArgumentException(
+        "top level corpus and document name may not be null");
+    }
+
+    long topLevelCorpusId = mapCorpusNameToId(topLevelCorpus);
+    return (List<String>)getJdbcTemplate().query(rawTextHelper.createSQL(
+      topLevelCorpusId, documentName),rawTextHelper);
+
+  }
+
+  /**
+   * @return the rawTextHelper
+   */
+  public RawTextSqlHelper getRawTextHelper()
+  {
+    return rawTextHelper;
+  }
+
+  /**
+   * @param rawTextHelper the rawTextHelper to set
+   */
+  public void setRawTextHelper(RawTextSqlHelper rawTextHelper)
+  {
+    this.rawTextHelper = rawTextHelper;
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -1132,5 +1168,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     ListExampleQueriesHelper listExampleQueriesHelper)
   {
     this.listExampleQueriesHelper = listExampleQueriesHelper;
+  }
+
+  @Override
+  public long mapCorpusNameToId(String topLevelCorpus)
+  {
+    if (topLevelCorpus == null)
+    {
+      throw new IllegalArgumentException("corpus name may not be null");
+    }
+
+    List<String> corpusNames = new ArrayList<String>();
+    corpusNames.add(topLevelCorpus);
+    List<Long> corpusIds =  mapCorpusNamesToIds(corpusNames);
+
+    if (corpusIds == null || corpusIds.isEmpty())
+    {
+      throw new IllegalArgumentException("corpus name \"" +topLevelCorpus+"\" is not known to the system");
+    }
+
+    // corpus names of top level corpora are unique.
+    return corpusIds.get(0);
   }
 }
