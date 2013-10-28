@@ -52,15 +52,15 @@ import java.util.Set;
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {
   private Table tblFrequencyDefinition;
-  private Button btAdd;
-  private Button btReset;
+  private final Button btAdd;
+  private final Button btReset;
   private Button btDeleteRow;
   private Button btShowFrequencies;
   private int counter;
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private QueryController controller;
+  private final QueryController controller;
   private boolean manuallyChanged;
   
   public FrequencyQueryPanel(final QueryController controller)
@@ -148,6 +148,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             // was not a number but a named node
           }
         }
+        List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
+        nr = Math.min(nr, nodes.size()-1);
         tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
           FrequencyTableEntryType.span, "", ""), counter++);
       }
@@ -339,7 +341,17 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
   }
   
-  public final void createAutomaticEntriesForQuery(String query)
+  private List<QueryNode> parseQuery(String query)
+  {
+    // let the service parse the query
+    WebResource res = Helper.getAnnisWebResource();
+    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
+      .get(new GenericType<List<QueryNode>>() {});
+    
+    return nodes;
+  }
+  
+  private void createAutomaticEntriesForQuery(String query)
   {
     if(query == null || query.isEmpty())
     {
@@ -347,17 +359,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     try
-    {
-
-      // let the service parse the query
-      WebResource res = Helper.getAnnisWebResource();
-      List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
-        .get(new GenericType<List<QueryNode>>() {});
+    { 
 
       tblFrequencyDefinition.removeAllItems();
 
       counter = 0;
-
+      List<QueryNode> nodes = parseQuery(query);
       for(QueryNode n : nodes)
       {
         if(!n.isArtificial())
