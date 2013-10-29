@@ -47,6 +47,10 @@ public class DNFTransformer
     }
     cleanEmptyLeafs(topNode);
     flattenDNF(topNode);
+    for(LogicClause alternative : topNode.getChildren())
+    {
+      cleanRelationForAlternative(alternative);
+    }
   }
   
   private static void makeBinary(LogicClause node)
@@ -212,8 +216,8 @@ public class DNFTransformer
         
         // if the nodes have a content,
         // clean up any references from x1/x2 that where removed in this split
-        cleanRelations(x1.getContent(), z);
-        cleanRelations(x2.getContent(), y);
+        //cleanRelations(x1.getContent(), z);
+        //cleanRelations(x2.getContent(), y);
         
         // start over again
         return false;
@@ -222,6 +226,41 @@ public class DNFTransformer
     
     // recursivly check children
     return makeDNF(left) && makeDNF(right);
+  }
+  
+  private static void cleanRelationForAlternative(LogicClause alternative)
+  {
+    Preconditions.checkNotNull(alternative);
+    Preconditions.checkArgument(alternative.getOp() == LogicClause.Operator.AND);
+    
+    Set<Long> validNodeIDs = new HashSet<Long>();
+    
+    // first collect all IDs that exist in this alternative
+    for(LogicClause c : alternative.getChildren())
+    {
+      if(c.getOp() == LogicClause.Operator.LEAF && c.getContent() != null)
+      {
+        QueryNode node = c.getContent();
+        validNodeIDs.add(node.getId());
+      }
+    }
+    
+    // second remove all joins that refer to non-existing IDs
+    for(LogicClause c : alternative.getChildren())
+    {
+      if(c.getContent() != null)
+      {
+        ListIterator<Join> joins = c.getContent().getJoins().listIterator();
+        while(joins.hasNext())
+        {
+          Join j = joins.next();
+          if(! validNodeIDs.contains(j.getTarget().getId()))
+          {
+            joins.remove();
+          }
+        }
+      }
+    }
   }
   
   /**
@@ -305,6 +344,11 @@ public class DNFTransformer
     }
   }
   
+  /**
+   * Flatten the clause in the sense that there is only one toplevel OR layer
+   * and one layer of AND-clauses.
+   * @param top 
+   */
   private static void flattenDNF(LogicClause top)
   {
     if(top.getOp() == LogicClause.Operator.LEAF || top.getOp() == LogicClause.Operator.AND)
