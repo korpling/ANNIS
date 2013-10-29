@@ -1109,8 +1109,11 @@ public class QueryServiceImpl implements QueryService
   public RawTextWrapper getRawText(@PathParam("top") String top,
     @PathParam("docname") String docname)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:raw_text:" + top);
+
     RawTextWrapper result = new RawTextWrapper();
-    result.texts = annisDao.getRawText(top, docname);
+    result.setTexts(annisDao.getRawText(top, docname));
     return result;
   }
 }

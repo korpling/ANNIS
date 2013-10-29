@@ -19,6 +19,7 @@ import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
 import annis.service.objects.AnnisResultImpl;
+import annis.service.objects.RawTextWrapper;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -72,7 +73,7 @@ public class VisualizerInput implements Serializable
 
   private FontConfig font;
 
-  private String rawText;
+  private RawTextWrapper rawText;
 
   public String getAnnisWebServiceURL()
   {
@@ -413,10 +414,11 @@ public class VisualizerInput implements Serializable
    * @return <ul><li>null - if the {@link VisualizerPlugin#isUsingRawText()}
    * method false for this visualizer.</li>
    *
-   * <li>"" - if there are only segmentations and the token layer is empty</li>
+   * <li>empty list - if there are only segmentations and the token layer is
+   * empty</li>
    *
    */
-  public String getRawText()
+  public RawTextWrapper getRawText()
   {
     return rawText;
   }
@@ -428,7 +430,7 @@ public class VisualizerInput implements Serializable
    * @param rawText the original text from the text.tab file in relAnnis.
    * Therefore could be an empty string.
    */
-  public void setRawText(String rawText)
+  public void setRawText(RawTextWrapper rawText)
   {
     this.rawText = rawText;
   }

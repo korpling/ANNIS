@@ -84,6 +84,10 @@ public class VisualizerPanel extends CssLayout
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
 
+  private String corpusName;
+
+  private String documentName;
+
   private Component vis;
 
   private transient SDocument result;
@@ -132,6 +136,8 @@ public class VisualizerPanel extends CssLayout
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
+    String corpusName,
+    String documentName,
     List<SToken> token,
     Set<String> visibleTokenAnnos,
     Map<SNode, Long> markedAndCovered,
@@ -153,6 +159,8 @@ public class VisualizerPanel extends CssLayout
 
 
     this.result = result;
+    this.corpusName = corpusName;
+    this.documentName = documentName;
     this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
@@ -308,6 +316,12 @@ public class VisualizerPanel extends CssLayout
     else
     {
       input.setDocument(result);
+    }
+
+    // getting the raw text, when the visualizer wants to have it
+    if (visPlugin != null && visPlugin.isUsingRawText())
+    {
+      input.setRawText(Helper.getRawText(corpusName, documentName));
     }
 
     return input;

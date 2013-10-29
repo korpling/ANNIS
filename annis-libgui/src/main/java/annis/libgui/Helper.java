@@ -20,6 +20,7 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -659,6 +660,14 @@ public class Helper
       sb.append("\n");
     }
     return sb.toString();
+  }
+
+  public static RawTextWrapper getRawText(String corpusName, String documentName)
+  {
+    WebResource webResource = getAnnisWebResource();
+    webResource = webResource.path("query").path("rawtext").path(corpusName).path(documentName);
+    RawTextWrapper texts = webResource.get(RawTextWrapper.class);
+    return texts;
   }
 
   /**

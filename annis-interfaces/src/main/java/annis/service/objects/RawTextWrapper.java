@@ -19,12 +19,61 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Wrapper for the rest api call for extracting the raw text. 
+ * Wrapper for the rest api call for extracting the raw text.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
 public class RawTextWrapper
 {
-  public List<String> texts;
+
+  // holds the texts of a document.
+  List<String> texts;
+
+  /**
+   * Sets the texts of a document.
+   * @param texts Can be null or empty.
+   */
+  public void setTexts(List<String> texts){
+    this.texts = texts;
+  }
+
+  /**
+   * Returns a list of all texts.
+   *
+   * @return If the document only uses segmentations and has only an artificial
+   * token layer this list of strings is null
+   */
+  public List<String> getTexts()
+  {
+    return texts;
+  }
+
+  /**
+   * Checks, whether at least one text exists
+   */
+  public boolean hasTexts()
+  {
+    return texts != null && !texts.isEmpty();
+  }
+
+  /**
+   * Checks, if multiple texts are stored for one document.
+   *
+   * @return true if there are more than 1 text.
+   */
+  public boolean hasMultipleTexts()
+  {
+    return texts != null && texts.size() > 1;
+  }
+
+  /**
+   * Extracts first text or an empty string, when texts are empty.
+   *
+   * @return A string, which represents the first text of a document.
+   */
+  public String getFirstText()
+  {
+    return texts != null && !texts.isEmpty() ? texts.get(0) : "";
+  }
 }
