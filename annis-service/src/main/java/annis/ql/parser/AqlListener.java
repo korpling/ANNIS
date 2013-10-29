@@ -150,10 +150,16 @@ public class AqlListener extends AqlParserBaseListener
   }
 
   @Override
-  public void exitStart(AqlParser.StartContext ctx)
+  public void enterBinaryTermExpr(AqlParser.BinaryTermExprContext ctx)
   {
-    super.exitStart(ctx); //To change body of generated methods, choose Tools | Templates.
+    LogicClause leaf = new LogicClause(LogicClause.Operator.LEAF);
+    if(!alternativeStack.isEmpty())
+    {
+      alternativeStack.get(0).addChild(leaf);
+    }
   }
+
+
   
   
 

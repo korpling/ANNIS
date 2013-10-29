@@ -7,6 +7,16 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 		
 	<util:map id="exampleSyntaxTrees">
+    <!--
+    <entry key="word &amp; word &amp; (#1 . #2 | #2 . #1)">
+      <value><![CDATA[
+(word & word & #1 . #2)
+|
+(word & word & #2 . #1)
+]]>
+      </value>
+    </entry>
+    -->
     <entry key="tok">
       <value><![CDATA[tok]]>
       </value>

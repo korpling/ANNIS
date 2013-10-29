@@ -69,6 +69,7 @@ public class TestAnnisParserExamples {
 	///// Syntax-Tree tests
 	
 	@Theory
+  @Test
 	public void testSyntaxTrees(
 			@SpringSyntaxTreeExamples(exampleMap = "exampleSyntaxTrees", contextLocation=EXAMPLES) 
 			SyntaxTreeExample example) 

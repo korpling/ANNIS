@@ -1,8 +1,1 @@
-pos="ART"
-& 
-(
-  (a#/[A-Z].*/ & lemma="warten" & #a . #3) 
-  | 
-  (a#"mit")
-)
-& #1 . #a
+word & word & (#1 . #2 | #2 . #1)

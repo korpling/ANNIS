@@ -27,13 +27,25 @@ import java.util.List;
  */
 public class LogicClause
 {
-  public static enum Operator {AND, OR, LEAF}
+  public enum Operator {
+    AND, OR, LEAF;
+
+    @Override
+    public String toString()
+    {
+      return super.toString();
+    }
+  }
   
   private Operator op;
   private List<LogicClause> children;
   private QueryNode content;
   private LogicClause parent;
 
+  /**
+   * Default constructor. Will create a LogicClause which is a leaf and has
+   * no content 
+   */
   public LogicClause()
   {
     this.op = Operator.LEAF;

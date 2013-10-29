@@ -156,8 +156,9 @@ public class AnnisParserAntlr
         List<QueryNode> alternative = new ArrayList<QueryNode>();
         for(LogicClause c : andClause.getChildren())
         {
+          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
+          
           QueryNode node = new QueryNode(c.getContent());
-          Preconditions.checkNotNull(node, "logical node must have an attached QueryNode");
           
           alternative.add(node);
           alternativeNodeIds.add(node.getId());

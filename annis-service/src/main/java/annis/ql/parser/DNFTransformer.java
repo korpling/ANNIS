@@ -21,6 +21,7 @@ import annis.sqlgen.model.Join;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Set;
@@ -44,6 +45,7 @@ public class DNFTransformer
     {
       // do nothing, just repeat
     }
+    cleanEmptyLeafs(topNode);
     flattenDNF(topNode);
   }
   
@@ -238,6 +240,41 @@ public class DNFTransformer
       {
         queryNodeIDs.add(clause.getContent().getId());
       }
+    }
+  }
+  
+  /**
+   * During parsing there will be leafs created with no QueryNode attached (e.g.
+   * binary terms). This functions removes all these leafs.   * 
+   * @param clause The clause to remove the empty leafs from.
+   */
+  private static void cleanEmptyLeafs(LogicClause clause)
+  {
+    if(clause == null || clause.getOp() == LogicClause.Operator.LEAF)
+    {
+      return;
+    }
+    
+    LinkedList<LogicClause> childListCopy = new LinkedList<LogicClause>(clause.getChildren());
+    
+    clause.clearChildren();
+    
+    ListIterator<LogicClause> itChildren = childListCopy.listIterator();
+    while(itChildren.hasNext())
+    {
+      LogicClause n = itChildren.next();
+      
+      // don't add empty leafs, add everything else
+      if(!(n.getOp() == LogicClause.Operator.LEAF && n.getContent() == null)) 
+      {
+        clause.addChild(n);
+      }
+    }
+    
+    // clean all sub clauses
+    for(LogicClause c : clause.getChildren())
+    {
+      cleanEmptyLeafs(c);
     }
   }
   
