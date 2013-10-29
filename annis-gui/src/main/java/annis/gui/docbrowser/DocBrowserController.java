@@ -20,6 +20,7 @@ import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
+import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.Sizeable.Unit;
@@ -50,7 +51,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserController implements Serializable
 {
 
-  private Logger log = LoggerFactory.getLogger(DocBrowserController.class);
+  private final Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
   private final SearchUI ui;
@@ -110,17 +111,14 @@ public class DocBrowserController implements Serializable
       progressBar.setSizeFull();
       visHolder.setContent(progressBar);
 
-
       Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
       visTab.setDescription(canonicalTitle);
       visTab.setIcon(EYE_ICON);
       visTab.setClosable(true);
       ui.getTabSheet().setSelectedTab(visTab);
 
-
       // register visible visHolder
       this.visibleVisHolder.put(canonicalTitle, visHolder);
-
 
       new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
         config, btn).
@@ -150,20 +148,50 @@ public class DocBrowserController implements Serializable
     ui.getTabSheet().setSelectedTab(tab);
   }
 
+  /**
+   * Creates the input. It only takes the salt project or the raw text from the
+   * text table, never both, since the increase the performance for large texts.
+   *
+   * @param corpus the name of the toplevel corpus
+   * @param docName the name of the document
+   * @param config the visualizer configuration
+   * @param isUsingRawText indicates, whether the text from text table is taken,
+   * or if the salt project is traversed.
+   * @return a {@link VisualizerInput} input, which is usable for rendering the
+   * whole document.
+   */
   private VisualizerInput createInput(String corpus, String docName,
-    JSONSerializable config)
+    JSONSerializable config, boolean isUsingRawText)
   {
     VisualizerInput input = new VisualizerInput();
 
-    // get the whole document wrapped in a salt project
-    SaltProject txt = null;
     try
     {
-      String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
-      docName = URLEncoder.encode(docName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graphs").path(topLevelCorpusName).
-        path(docName).get(SaltProject.class);
+      if (isUsingRawText)
+      {
+        WebResource w = Helper.getAnnisWebResource();
+        w = w.path("query").path("rawtext").path(corpus).path(docName);
+        RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
+        input.setRawText(rawTextWrapper);
+      }
+      else
+      {
+        // get the whole document wrapped in a salt project
+        SaltProject txt = null;
+
+        String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
+        docName = URLEncoder.encode(docName, "UTF-8");
+        WebResource annisResource = Helper.getAnnisWebResource();
+        txt = annisResource.path("query").path("graphs").
+          path(topLevelCorpusName).
+          path(docName).get(SaltProject.class);
+
+        if (txt != null)
+        {
+          SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
+          input.setResult(sDoc);
+        }
+      }
     }
     catch (RuntimeException e)
     {
@@ -172,12 +200,6 @@ public class DocBrowserController implements Serializable
     catch (Exception e)
     {
       log.error("General remote service exception", e);
-    }
-
-    if (txt != null)
-    {
-      SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
-      input.setResult(sDoc);
     }
 
     // set mappings and namespaces. some visualizer do not survive without   
@@ -280,7 +302,8 @@ public class DocBrowserController implements Serializable
             getVisualizer(type);
 
           // fetch the salt project - so long part
-          VisualizerInput input = createInput(corpus, doc, config);
+          VisualizerInput input = createInput(corpus, doc, config, visualizer.
+            isUsingRawText());
 
           // create and format visualizer
           Component vis = visualizer.createComponent(input, null);

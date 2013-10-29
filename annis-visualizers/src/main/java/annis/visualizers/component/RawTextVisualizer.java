@@ -20,7 +20,9 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.RawTextWrapper;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
@@ -52,13 +54,20 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         RawTextWrapper texts = visInput.getRawText();
         Panel p = new Panel();
 
-        if (texts.hasMultipleTexts()) {
+        if (texts != null && texts.hasMultipleTexts()) {
+
+            Layout l = new HorizontalLayout();
+            l.setSizeFull();
+
             for (int i = 0; i < texts.getTexts().size(); i++) {
                 Label text = new Label(texts.getTexts().get(i), ContentMode.TEXT);
                 text.setCaption("text " + (i + 1));
-                p.setContent(text);
+                l.addComponent(text);
             }
-        } else if (visInput.getRawText().hasTexts()) {
+
+            p.setContent(l);
+
+        } else if (texts != null && visInput.getRawText().hasTexts()) {
             Label text = new Label(texts.getFirstText(), ContentMode.TEXT);
             p.setContent(text);
         } else {
