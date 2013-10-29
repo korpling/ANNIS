@@ -117,8 +117,35 @@ public class DNFTransformer
   
 
   /**
+   * Iteration step to transform a {@link LogicClause} into DNF.
    * 
-   * @param node
+   * In DNF all OR relations must be toplevel. Thus constructions like
+   * 
+   * <pre>
+   *  AND             AND
+   *  / \      or     / \
+   * X  OR          OR   X
+   *    / \        /  \
+   *   Y   Z       Y  Z
+   * </pre>
+   * 
+   * are illegal and will be replaced with
+   * 
+   * <pre>
+   *       OR       
+   *     /    \    
+   *   AND    AND  
+   *   / \    / \    
+   *  X   Y  X   Z
+   * </pre>
+   * 
+   * according to the distributivity rule of Boolean Algebra. We assume that
+   * every input formula is already binary.
+   * 
+   * Only one transformation will be done in this function, repeat it
+   * in order to replace all illegal constructions.
+   * 
+   * @param node The node to transform into DNF.
    * @return True if already in DNF
    */
   private static boolean makeDNF(LogicClause node)
