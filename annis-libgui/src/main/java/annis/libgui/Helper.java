@@ -664,9 +664,26 @@ public class Helper
 
   public static RawTextWrapper getRawText(String corpusName, String documentName)
   {
-    WebResource webResource = getAnnisWebResource();
-    webResource = webResource.path("query").path("rawtext").path(corpusName).path(documentName);
-    RawTextWrapper texts = webResource.get(RawTextWrapper.class);
+    RawTextWrapper texts = null;
+    try
+    {
+      WebResource webResource = getAnnisWebResource();
+      webResource = webResource.path("query").path("rawtext").path(corpusName).
+        path(documentName);
+      texts = webResource.get(RawTextWrapper.class);      
+    }
+    
+    catch (UniformInterfaceException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+    
     return texts;
   }
 
