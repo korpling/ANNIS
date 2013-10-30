@@ -136,6 +136,14 @@ public class QueryNode implements Serializable
     }
 
     @Override
+    public String toString()
+    {
+      return min + "," + max;
+    }
+    
+    
+
+    @Override
     public int hashCode()
     {
       return new HashCodeBuilder().append(min).append(max).toHashCode();
@@ -397,6 +405,17 @@ public class QueryNode implements Serializable
     {
       frags.add(join.toAQLFragment(this));
     }
+    
+    if(isRoot())
+    {
+      frags.add("#" + getVariable() + ":root");
+    }
+    
+    if(getArity() != null)
+    {
+      frags.add("#" + getVariable() + ":arity=" + getArity().toString());
+    }
+    
     return Joiner.on(" & ").join(frags);
   }
 

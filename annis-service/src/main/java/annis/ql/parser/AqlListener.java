@@ -22,6 +22,7 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
 import annis.ql.AqlParser;
 import annis.ql.AqlParserBaseListener;
+import static annis.service.objects.AnnisAttribute.SubType.n;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -47,6 +48,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import static org.apache.commons.lang3.StringUtils.right;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -159,7 +161,17 @@ public class AqlListener extends AqlParserBaseListener
     }
   }
 
+  @Override
+  public void enterUnaryTermExpr(AqlParser.UnaryTermExprContext ctx)
+  {
+    LogicClause leaf = new LogicClause(LogicClause.Operator.LEAF);
+    if(!alternativeStack.isEmpty())
+    {
+      alternativeStack.get(0).addChild(leaf);
+    }
+  }
 
+  
   
   
 

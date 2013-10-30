@@ -149,6 +149,9 @@ public class AnnisParserAntlr
     
       data.setMaxWidth(0);
       
+      Preconditions.checkArgument(top.getOp() == LogicClause.Operator.OR,
+        "Toplevel logic clause must be of type OR");
+      
       for(LogicClause andClause : top.getChildren())
       {
         Set<Long> alternativeNodeIds = new HashSet<Long>();
