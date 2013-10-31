@@ -730,7 +730,13 @@ public class AqlListener extends AqlParserBaseListener
         {
           Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
           Join newJoin = c.newInstance(right);
-          left.addJoin(newJoin);
+          
+          Preconditions.checkState(!alternativeStack.isEmpty(),
+            "There must be an alternative on the stack in order to add a join");
+          
+          LogicClause clause = new LogicClause(LogicClause.Operator.LEAF);
+          clause.setContent(left);
+          clause.setJoin(newJoin);
         }
         catch (Exception ex)
         {

@@ -25,10 +25,12 @@ import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Map;
 import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
@@ -154,23 +156,52 @@ public class AnnisParserAntlr
       
       for(LogicClause andClause : top.getChildren())
       {
-        Set<Long> alternativeNodeIds = new HashSet<Long>();
         Set<String> alternativeNodeVars = new HashSet<String>();
         List<QueryNode> alternative = new ArrayList<QueryNode>();
+        
+        Map<Long, QueryNode> alternativeNodesByID = new HashMap<Long, QueryNode>();
+        
+        // collect nodes
         for(LogicClause c : andClause.getChildren())
         {
+          Preconditions.checkState(c.getOp() == LogicClause.Operator.LEAF, 
+            "alternative child node must be a leaf");
           Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
-          
-          QueryNode node = new QueryNode(c.getContent());
-          
-          alternative.add(node);
-          alternativeNodeIds.add(node.getId());
-          alternativeNodeVars.add(node.getVariable());
+         
+          if(c.getJoin() == null)
+          {
+            // this is a normal query node and not a join
+            QueryNode node = c.getContent();
+
+            alternative.add(node);
+            alternativeNodesByID.put(node.getId(), node);
+            alternativeNodeVars.add(node.getVariable());
+          }
+        }
+        
+        // add joins
+        for(LogicClause c : andClause.getChildren())
+        {
+          Preconditions.checkState(c.getOp() == LogicClause.Operator.LEAF, 
+            "alternative child node must be a leaf");
+          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
+         
+          if(c.getContent() != null && c.getJoin() != null)
+          {
+            Join j = c.getJoin();
+            QueryNode node = alternativeNodesByID.get(c.getContent().getId());
+            QueryNode target = alternativeNodesByID.get(j.getTarget().getId());
+            
+            if(node != null && target != null)
+            {
+              node.addJoin(j);
+            }
+          }
         }
         
         // set maximal width
         data.setMaxWidth(
-          Math.max(data.getMaxWidth(), alternativeNodeIds.size()));
+          Math.max(data.getMaxWidth(), alternativeNodesByID.size()));
         
         // check for invalid edge joins
         for(QueryNode node : alternative)
@@ -190,7 +221,7 @@ public class AnnisParserAntlr
                   + "\" is not contained in alternative. Normalized alternative: \n"
                   + QueryData.toAQL(alternative));
               }
-              else if(!alternativeNodeIds.contains(t.getId()))
+              else if(!alternativeNodesByID.containsKey(t.getId()))
               {
                 // silently remove it
                 itJoins.remove();

@@ -15,7 +15,7 @@
  */
 package annis.model;
 
-import com.google.common.base.Joiner;
+import annis.sqlgen.model.Join;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
@@ -40,6 +40,7 @@ public class LogicClause
   private Operator op;
   private List<LogicClause> children;
   private QueryNode content;
+  private Join join;
   private LogicClause parent;
 
   /**
@@ -52,6 +53,7 @@ public class LogicClause
     this.children = new ArrayList<LogicClause>();
     this.content = null;
     this.parent = null;
+    this.join = null;
   }
 
   public LogicClause(Operator op)
@@ -70,6 +72,7 @@ public class LogicClause
     this.op = other.op;
     this.parent = other.parent;
     this.content = other.content;
+    this.join = other.join;
     this.children.addAll(other.children);
   }
 
@@ -135,6 +138,16 @@ public class LogicClause
     this.content = content;
   }
 
+  public Join getJoin()
+  {
+    return join;
+  }
+
+  public void setJoin(Join join)
+  {
+    this.join = join;
+  }
+  
   public LogicClause getParent()
   {
     return parent;
