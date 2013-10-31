@@ -138,6 +138,12 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  // the name of the web font class, the css class contains !important.
+  public final String CORPUS_FONT_FORCE = "corpus-font-force";
+
+  // the name of the web font class.
+  public final String CORPUS_FONT = "corpus-font";
+
   @Override
   protected void init(VaadinRequest request)
   {
@@ -412,8 +418,8 @@ public class SearchUI extends AnnisBaseUI
       {
         css.setStyles(
           "@import url(" + cfg.getUrl() + ");\n"
-          + ".corpus-font-force {font-family: '" + cfg.getName() + "', monospace !important; }\n"
-          + ".corpus-font {font-family: '" + cfg.getName() + "', monospace; }\n"
+          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
+          + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
           + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
@@ -423,15 +429,15 @@ public class SearchUI extends AnnisBaseUI
       {
         css.setStyles(
           "@import url(" + cfg.getUrl() + ");\n"
-          + ".corpus-font-force {\n"
+          + "." + CORPUS_FONT_FORCE + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
           + "  font-size: " + cfg.getSize() + " !important;\n"
           + "}\n"
-          + ".corpus-font {\n"
+          + "." + CORPUS_FONT + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace;\n"
           + "  font-size: " + cfg.getSize() + ";\n"
           + "}\n"
-          + ".corpus-font .v-table-table {\n"
+          + "." + CORPUS_FONT + " .v-table-table {\n"
           + "    font-size: " + cfg.getSize() + ";\n"
           + "}"
           // this one is for the virtual keyboard
