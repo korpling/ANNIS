@@ -25,6 +25,7 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import java.util.regex.Pattern;
@@ -46,22 +47,27 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  */
 @PluginImplementation
 public class RawTextVisualizer extends AbstractVisualizer<Panel> {
-
+    
     private final String NO_TEXT = "no text available";
 
     // pattern for checking the token layer
     private final Pattern whiteSpaceMatcher = Pattern.compile("^\\s+$");
 
+    // 
+    private final String PANEL_CLASS = "raw_text";
+    
+    private final String LABEL_CLASS = "raw_text_label";
+    
     @Override
     public String getShortName() {
         return "raw_text";
     }
-
+    
     @Override
     public boolean isUsingRawText() {
         return true;
     }
-
+    
     @Override
     public Panel createComponent(VisualizerInput visInput, VisualizationToggle visToggle) {
 
@@ -74,16 +80,19 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         // create the main panel
         Panel p = new Panel();
         p.setSizeFull();
-
+        p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+        p.addStyleName(PANEL_CLASS);
+        
         Layout l;
-
+        
         if (texts == null) {
             Label text = new Label(NO_TEXT);
+            text.addStyleName(LABEL_CLASS);
             text.setSizeFull();
             p.setContent(text);
             return p;
         }
-
+        
         if (texts.hasMultipleTexts()) {
 
             // set the aligmnent
@@ -98,7 +107,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
 
             // add the texts to the layout
             for (int i = 0; i < texts.getTexts().size(); i++) {
-
+                
                 String s = texts.getTexts().get(i);
                 Label lblText;
 
@@ -108,27 +117,29 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
                 } else {
                     lblText = new Label(s, ContentMode.TEXT);
                 }
-
+                
                 lblText.setCaption("text " + (i + 1));
+                lblText.addStyleName(LABEL_CLASS);
                 l.addComponent(lblText);
             }
 
             // apply the panel
             p.setContent(l);
             return p;
-
+            
         }
-
+        
         Label lblText;
         if (texts.hasTexts() && !hasOnlyWhiteSpace(texts.getFirstText())) {
             lblText = new Label(texts.getFirstText(), ContentMode.TEXT);
         } else {
             lblText = new Label(NO_TEXT);
         }
-
+        
         lblText.setSizeFull();
+        lblText.addStyleName(LABEL_CLASS);
         p.setContent(lblText);
-
+        
         return p;
     }
 
@@ -144,5 +155,5 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
     public boolean hasOnlyWhiteSpace(String text) {
         return whiteSpaceMatcher.matcher(text).matches();
     }
-
+    
 }

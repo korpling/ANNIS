@@ -24,6 +24,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -70,6 +71,7 @@ public class DocBrowserPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
+    layout.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     setSizeFull();
 
