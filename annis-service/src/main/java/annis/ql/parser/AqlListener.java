@@ -66,7 +66,7 @@ public class AqlListener extends AqlParserBaseListener
   private int aliasCount = 0;
   private String lastVariableDefinition = null;
 
-  private final Multimap<String, QueryNode> nodes = HashMultimap.create();
+  private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
   
   private final int precedenceBound;
   
@@ -98,12 +98,13 @@ public class AqlListener extends AqlParserBaseListener
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
     currentAlternative.clear();
+    localNodes.clear();
   }
 
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(currentAlternative);
+    data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
   }
 
   
@@ -635,7 +636,7 @@ public class AqlListener extends AqlParserBaseListener
 
   private Collection<QueryNode> nodesByRef(Token ref)
   {
-    return nodes.get("" + ref.getText().substring(1));
+    return localNodes.get("" + ref.getText().substring(1));
   }
 
   /**
@@ -688,7 +689,7 @@ public class AqlListener extends AqlParserBaseListener
     lastVariableDefinition = null;
     
     currentAlternative.add(n);
-    nodes.put(n.getVariable(), n);
+    localNodes.put(n.getVariable(), n);
     
     return n;
   }
