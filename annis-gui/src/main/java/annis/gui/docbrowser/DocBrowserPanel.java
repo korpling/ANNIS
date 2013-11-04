@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private transient SearchUI ui;
+  private SearchUI ui;
 
   private VerticalLayout layout;
 
