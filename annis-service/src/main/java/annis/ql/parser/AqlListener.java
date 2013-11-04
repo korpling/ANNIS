@@ -38,16 +38,17 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Set;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,10 +64,11 @@ public class AqlListener extends AqlParserBaseListener
 
   private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
 
-  private int aliasCount = 0;
+  private long aliasCount = 0l;
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
+  private final Map<Interval, Long> tokenposition2NodeID = Maps.newHashMap();
   
   private final int precedenceBound;
   
@@ -112,21 +114,21 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
   {
-    QueryNode target = newNode();
+    QueryNode target = newNode(ctx);
     target.setToken(true);
   }
 
   @Override
   public void enterNodeExpr(AqlParser.NodeExprContext ctx)
   {
-    newNode();
+    newNode(ctx);
   }
   
 
   @Override
   public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
   {
-    QueryNode target = newNode();
+    QueryNode target = newNode(ctx);
     target.setToken(true);
     QueryNode.TextMatching txtMatch = textMatchingFromSpec(ctx.textSpec(),
       ctx.NEQ() != null);
@@ -137,7 +139,7 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterTextOnly(AqlParser.TextOnlyContext ctx)
   {
-    QueryNode target = newNode();
+    QueryNode target = newNode(ctx);
     target.setSpannedText(textFromSpec(ctx.txt),
       textMatchingFromSpec(ctx.txt, false));
   }
@@ -145,7 +147,7 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
   {
-    QueryNode target = newNode();
+    QueryNode target = newNode(ctx);
     String namespace = ctx.qName().namespace == null ? null : ctx.qName().namespace.getText();
     QueryAnnotation anno = new QueryAnnotation(namespace,
       ctx.qName().name.getText());
@@ -155,7 +157,7 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
   {
-    QueryNode target = newNode();
+    QueryNode target = newNode(ctx);
     String namespace = ctx.qName().namespace == null ? 
       null : ctx.qName().namespace.getText();
     String name = ctx.qName().name.getText();
@@ -675,9 +677,16 @@ public class AqlListener extends AqlParserBaseListener
     
   }
   
-  private QueryNode newNode()
+  private QueryNode newNode(ParserRuleContext ctx)
   {
-    QueryNode n = new QueryNode(++aliasCount);
+    Long existingID = tokenposition2NodeID.get(ctx.getSourceInterval());
+    
+    if(existingID == null)
+    {
+      existingID = ++aliasCount;
+    }
+    
+    QueryNode n = new QueryNode(existingID);
     if(lastVariableDefinition == null)
     {
       n.setVariable("" + n.getId());
@@ -690,6 +699,7 @@ public class AqlListener extends AqlParserBaseListener
     
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
+    tokenposition2NodeID.put(ctx.getSourceInterval(), n.getId());
     
     return n;
   }

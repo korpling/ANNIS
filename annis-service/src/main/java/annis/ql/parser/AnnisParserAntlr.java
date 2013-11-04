@@ -26,6 +26,7 @@ import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -36,10 +37,12 @@ import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
+import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
+import org.antlr.v4.runtime.misc.TestRig;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.slf4j.Logger;
@@ -62,10 +65,17 @@ public class AnnisParserAntlr
     
     // bring first into DNF
     RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
-    ParseTree treeRaw = rawParser.start();
+    
+    //rawParser.setBuildParseTree(true);
+    
+    RawAqlPreParser.StartContext treeRaw = rawParser.start();
+    
+    //treeRaw.inspect(rawParser);
+    
     ParseTreeWalker walkerRaw = new ParseTreeWalker();
     RawAqlListener listenerRaw = new RawAqlListener();
     walkerRaw.walk(listenerRaw, treeRaw);
+    
     
     LogicClause topNode = listenerRaw.getRoot();
     DNFTransformer.toDNF(topNode);
