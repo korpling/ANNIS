@@ -17,10 +17,11 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClause;
+import annis.model.LogicClauseOld;
 import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
+import annis.ql.RawAqlPreParser;
 import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -38,8 +39,11 @@ import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -47,19 +51,33 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  */
 public class AnnisParserAntlr
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(AnnisParserAntlr.class);
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(aql));
-    AqlParser parser = new AqlParser(new CommonTokenStream(
-      lexer));
+    AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
     
+    // bring first into DNF
+    RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
+    ParseTree treeRaw = rawParser.start();
+    ParseTreeWalker walkerRaw = new ParseTreeWalker();
+    RawAqlListener listenerRaw = new RawAqlListener();
+    walkerRaw.walk(listenerRaw, treeRaw);
+    
+    LogicClause topNode = listenerRaw.getRoot();
+    DNFTransformer.toDNF(topNode);
+    
+    // use the DNF form and parse it again
+    
+    TokenSource source = new ListTokenSource(topNode.getCoveredToken());
+    AqlParser parserDNF = new AqlParser(new CommonTokenStream(source));
     final List<String> errors = new LinkedList<String>();
 
-    parser.removeErrorListeners();
-    parser.addErrorListener(new BaseErrorListener()
+    parserDNF.removeErrorListeners();
+    parserDNF.addErrorListener(new BaseErrorListener()
     {
       @Override
       public void syntaxError(Recognizer recognizer, Token offendingSymbol,
@@ -69,17 +87,17 @@ public class AnnisParserAntlr
       }
     });
 
-    ParseTree tree = parser.start();
+    ParseTree treeDNF = parserDNF.start();
     
     if (errors.isEmpty())
     {
       
       ParseTreeWalker walker = new ParseTreeWalker();
-      AqlListener listener = new AqlListener(precedenceBound);
+      AqlListener listenerDNF = new AqlListener(precedenceBound);
       
       try
       {
-        walker.walk(listener, tree);
+        walker.walk(listenerDNF, treeDNF);
       }
       catch(NullPointerException ex)
       {
@@ -89,13 +107,12 @@ public class AnnisParserAntlr
       {
         throw new AnnisQLSemanticsException(ex.getMessage());
       }
-      LogicClause top = listener.getTop();
-      DNFTransformer.toDNF(top);
+      LogicClauseOld top = listenerDNF.getTop();
       
       QueryData data = createQueryDataFromTopNode(top);
     
       data.setCorpusList(corpusList);
-      data.addMetaAnnotations(listener.getMetaData());
+      data.addMetaAnnotations(listenerDNF.getMetaData());
       
       if (postProcessors != null)
       {
@@ -108,6 +125,8 @@ public class AnnisParserAntlr
     }
     else
     {
+      log.info("Parse tree is \n" + topNode.toString());
+      
       throw new AnnisQLSyntaxException("Parser error:\n"
         + Joiner.on("\n").join(errors));
     }
@@ -145,16 +164,16 @@ public class AnnisParserAntlr
     }
   }
   
-  private QueryData createQueryDataFromTopNode(LogicClause top)
+  private QueryData createQueryDataFromTopNode(LogicClauseOld top)
   {
     QueryData data = new QueryData();
     
       data.setMaxWidth(0);
       
-      Preconditions.checkArgument(top.getOp() == LogicClause.Operator.OR,
+      Preconditions.checkArgument(top.getOp() == LogicClauseOld.Operator.OR,
         "Toplevel logic clause must be of type OR");
       
-      for(LogicClause andClause : top.getChildren())
+      for(LogicClauseOld andClause : top.getChildren())
       {
         Set<String> alternativeNodeVars = new HashSet<String>();
         List<QueryNode> alternative = new ArrayList<QueryNode>();
@@ -162,9 +181,9 @@ public class AnnisParserAntlr
         Map<Long, QueryNode> alternativeNodesByID = new HashMap<Long, QueryNode>();
         
         // collect nodes
-        for(LogicClause c : andClause.getChildren())
+        for(LogicClauseOld c : andClause.getChildren())
         {
-          Preconditions.checkState(c.getOp() == LogicClause.Operator.LEAF, 
+          Preconditions.checkState(c.getOp() == LogicClauseOld.Operator.LEAF, 
             "alternative child node must be a leaf");
           Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
          
@@ -180,9 +199,9 @@ public class AnnisParserAntlr
         }
         
         // add joins
-        for(LogicClause c : andClause.getChildren())
+        for(LogicClauseOld c : andClause.getChildren())
         {
-          Preconditions.checkState(c.getOp() == LogicClause.Operator.LEAF, 
+          Preconditions.checkState(c.getOp() == LogicClauseOld.Operator.LEAF, 
             "alternative child node must be a leaf");
           Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
          

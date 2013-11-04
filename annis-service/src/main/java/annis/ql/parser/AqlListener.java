@@ -16,7 +16,7 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClause;
+import annis.model.LogicClauseOld;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
@@ -60,9 +60,9 @@ public class AqlListener extends AqlParserBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
-  private LogicClause top = null;
+  private LogicClauseOld top = null;
 
-  private List<LogicClause> alternativeStack = new LinkedList<LogicClause>();
+  private List<LogicClauseOld> alternativeStack = new LinkedList<LogicClauseOld>();
 
   private int aliasCount = 0;
   private String lastVariableDefinition = null;
@@ -78,7 +78,7 @@ public class AqlListener extends AqlParserBaseListener
     this.precedenceBound = precedenceBound;
   }
 
-  public LogicClause getTop()
+  public LogicClauseOld getTop()
   {
     return top;
   }
@@ -88,28 +88,14 @@ public class AqlListener extends AqlParserBaseListener
     return metaData;
   }
   
-
-  @Override
-  public void enterAndTop(AqlParser.AndTopContext ctx)
-  {
-    top = new LogicClause(LogicClause.Operator.AND);
-    top.setOp(LogicClause.Operator.AND);
-    alternativeStack.add(0, top);
-  }
-
   @Override
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
-    top = new LogicClause(LogicClause.Operator.OR);
-    top.setOp(LogicClause.Operator.OR);
+    top = new LogicClauseOld(LogicClauseOld.Operator.OR);
+    top.setOp(LogicClauseOld.Operator.OR);
     alternativeStack.add(0, top);
   }
 
-  @Override
-  public void exitAndTop(AqlParser.AndTopContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
 
   @Override
   public void exitOrTop(AqlParser.OrTopContext ctx)
@@ -120,7 +106,7 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
+    LogicClauseOld andClause = new LogicClauseOld(LogicClauseOld.Operator.AND);
     if(!alternativeStack.isEmpty())
     {
       alternativeStack.get(0).addChild(andClause);
@@ -128,33 +114,18 @@ public class AqlListener extends AqlParserBaseListener
     alternativeStack.add(0, andClause);
   }
 
-  @Override
-  public void enterOrExpr(AqlParser.OrExprContext ctx)
-  {
-    LogicClause orClause = new LogicClause(LogicClause.Operator.OR);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(orClause);
-    }
-    alternativeStack.add(0, orClause);
-  }
-
+  
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
     alternativeStack.remove(0);
   }
 
-  @Override
-  public void exitOrExpr(AqlParser.OrExprContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
 
   @Override
   public void enterBinaryTermExpr(AqlParser.BinaryTermExprContext ctx)
   {
-    LogicClause leaf = new LogicClause(LogicClause.Operator.LEAF);
+    LogicClauseOld leaf = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
     if(!alternativeStack.isEmpty())
     {
       alternativeStack.get(0).addChild(leaf);
@@ -164,7 +135,7 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterUnaryTermExpr(AqlParser.UnaryTermExprContext ctx)
   {
-    LogicClause leaf = new LogicClause(LogicClause.Operator.LEAF);
+    LogicClauseOld leaf = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
     if(!alternativeStack.isEmpty())
     {
       alternativeStack.get(0).addChild(leaf);
@@ -734,7 +705,7 @@ public class AqlListener extends AqlParserBaseListener
           Preconditions.checkState(!alternativeStack.isEmpty(),
             "There must be an alternative on the stack in order to add a join");
           
-          LogicClause clause = new LogicClause(LogicClause.Operator.LEAF);
+          LogicClauseOld clause = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
           clause.setContent(left);
           clause.setJoin(newJoin);
         }
@@ -759,7 +730,7 @@ public class AqlListener extends AqlParserBaseListener
       n.setVariable(lastVariableDefinition);
     }
     lastVariableDefinition = null;
-    LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
+    LogicClauseOld c = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
     c.setContent(n);
     alternativeStack.get(0).addChild(c);
     

@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class LogicClause
+public class LogicClauseOld
 {
   public enum Operator {
     AND, OR, LEAF;
@@ -38,25 +38,25 @@ public class LogicClause
   }
   
   private Operator op;
-  private List<LogicClause> children;
+  private List<LogicClauseOld> children;
   private QueryNode content;
   private Join join;
-  private LogicClause parent;
+  private LogicClauseOld parent;
 
   /**
    * Default constructor. Will create a LogicClause which is a leaf and has
    * no content 
    */
-  public LogicClause()
+  public LogicClauseOld()
   {
     this.op = Operator.LEAF;
-    this.children = new ArrayList<LogicClause>();
+    this.children = new ArrayList<LogicClauseOld>();
     this.content = null;
     this.parent = null;
     this.join = null;
   }
 
-  public LogicClause(Operator op)
+  public LogicClauseOld(Operator op)
   {
     this();
     this.op = op;
@@ -66,7 +66,7 @@ public class LogicClause
    * Copy constructor
    * @param other 
    */
-  public LogicClause(LogicClause other)
+  public LogicClauseOld(LogicClauseOld other)
   {
     this();
     this.op = other.op;
@@ -86,28 +86,28 @@ public class LogicClause
     this.op = op;
   }
 
-  public ImmutableList<LogicClause> getChildren()
+  public ImmutableList<LogicClauseOld> getChildren()
   {
     return ImmutableList.copyOf(children);
   }
   
-  public void addChild(LogicClause child)
+  public void addChild(LogicClauseOld child)
   {
     Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(child);
   }
   
-  public void addChild(int idx, LogicClause child)
+  public void addChild(int idx, LogicClauseOld child)
   {
     Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(idx, child);
   }
   
-  public LogicClause removeChild(int idx)
+  public LogicClauseOld removeChild(int idx)
   {
-    LogicClause result = children.remove(idx);
+    LogicClauseOld result = children.remove(idx);
     if(result != null && result.parent == this)
     {
       result.parent = null;
@@ -117,7 +117,7 @@ public class LogicClause
   
   public void clearChildren()
   {
-    for(LogicClause c : children)
+    for(LogicClauseOld c : children)
     {
       if(c.parent == this)
       {
@@ -148,7 +148,7 @@ public class LogicClause
     this.join = join;
   }
   
-  public LogicClause getParent()
+  public LogicClauseOld getParent()
   {
     return parent;
   }

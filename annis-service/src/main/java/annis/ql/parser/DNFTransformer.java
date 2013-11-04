@@ -15,16 +15,12 @@
  */
 package annis.ql.parser;
 
-import annis.model.LogicClause;
-import annis.model.QueryNode;
-import annis.sqlgen.model.Join;
 import com.google.common.base.Preconditions;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
-import java.util.Set;
+import org.antlr.v4.runtime.Token;
 
 /**
  * Utility functions for transforming an AQL query to the Disjunctive Normal Form.
@@ -40,83 +36,12 @@ public class DNFTransformer
   public static void toDNF(LogicClause topNode)
   {
     
-    makeBinary(topNode);
     while(makeDNF(topNode) == false)
     {
       // do nothing, just repeat
     }
     cleanEmptyLeafs(topNode);
     flattenDNF(topNode);
-    for(LogicClause alternative : topNode.getChildren())
-    {
-      cleanRelationForAlternative(alternative);
-    }
-  }
-  
-  private static void makeBinary(LogicClause node)
-  {
-    if(node.getOp() == LogicClause.Operator.LEAF 
-      || node.getChildren().isEmpty())
-    {
-      return;
-    }
-    
-    // check if we have a degraded path with only one sibling
-    LogicClause parent = node.getParent();
-    if(node.getChildren().size() == 1)
-    {
-      if(node.getParent() == null)
-      {
-        // replace this node with it's only child
-        LogicClause child = node.getChildren().get(0);
-        node.clearChildren();
-        
-        node.setOp(child.getOp());
-        node.setContent(child.getContent());
-        
-        for(LogicClause newChild : child.getChildren())
-        {
-          node.addChild(newChild);
-        }
-      }
-      else
-      {
-        // push this node up
-        int idx = parent.getChildren().indexOf(node);
-        parent.removeChild(idx);
-        parent.addChild(0, node.getChildren().get(0));
-      }
-    }
-    else if(node.getChildren().size() > 2)
-    {
-      LogicClause firstChild = node.getChildren().get(0);
-      // merge together under a new node
-      LogicClause newSubClause = new LogicClause(node.getOp());
-      
-      ListIterator<LogicClause> itChildren = node.getChildren().listIterator(1);
-      while(itChildren.hasNext())
-      {
-        LogicClause n = itChildren.next();
-        newSubClause.addChild(n);
-      }
-      
-      // rebuild the children
-      node.clearChildren();
-      node.addChild(firstChild);
-      node.addChild(newSubClause);
-    }
-    
-    // do the same thing for all children
-    int cSize = node.getChildren().size();
-    if(cSize >= 1)
-    {
-      makeBinary(node.getChildren().get(0));
-    }
-    
-    if(cSize == 2)
-    {
-      makeBinary(node.getChildren().get(1));
-    }    
   }
   
 
@@ -177,7 +102,7 @@ public class DNFTransformer
         if(x1.getContent() != null)
         {
           // set the content to a real copy
-          x2.setContent(new QueryNode(x1.getContent()));
+          x2.setContent(x1.getContent());
         }
         
         Preconditions.checkArgument(right.getChildren().size() == 2, 
@@ -214,11 +139,6 @@ public class DNFTransformer
         rightParent.addChild(x2);
         rightParent.addChild(z);
         
-        // if the nodes have a content,
-        // clean up any references from x1/x2 that where removed in this split
-        //cleanRelations(x1.getContent(), z);
-        //cleanRelations(x2.getContent(), y);
-        
         // start over again
         return false;
       }
@@ -227,87 +147,7 @@ public class DNFTransformer
     // recursivly check children
     return makeDNF(left) && makeDNF(right);
   }
-  
-  private static void cleanRelationForAlternative(LogicClause alternative)
-  {
-    Preconditions.checkNotNull(alternative);
-    Preconditions.checkArgument(alternative.getOp() == LogicClause.Operator.AND);
-    
-    Set<Long> validNodeIDs = new HashSet<Long>();
-    
-    // first collect all IDs that exist in this alternative
-    for(LogicClause c : alternative.getChildren())
-    {
-      if(c.getOp() == LogicClause.Operator.LEAF && c.getContent() != null)
-      {
-        QueryNode node = c.getContent();
-        validNodeIDs.add(node.getId());
-      }
-    }
-    
-    // second remove all joins that refer to non-existing IDs
-    for(LogicClause c : alternative.getChildren())
-    {
-      if(c.getContent() != null)
-      {
-        ListIterator<Join> joins = c.getContent().getJoins().listIterator();
-        while(joins.hasNext())
-        {
-          Join j = joins.next();
-          if(! validNodeIDs.contains(j.getTarget().getId()))
-          {
-            joins.remove();
-          }
-        }
-      }
-    }
-  }
-  
-  /**
-   * Cleaning up relations that where removed when splitting the node.
-   * @param node The node that might have references left
-   * @param toRemove {@link LogicClause} node that was removed from the clause.
-   */
-  private static void cleanRelations(QueryNode node, LogicClause toRemove)
-  {
-    if(node != null)
-    {
-      ListIterator<Join> itJoins = node.getJoins().listIterator();
-      // only search for node IDs when there are any joins
-      if(itJoins.hasNext())
-      {
-        Set<Long> nodesToRemove = new HashSet<Long>();
-        findQueryNodeIDs(toRemove, nodesToRemove);
 
-        while(itJoins.hasNext())
-        {
-          Join j = itJoins.next();
-          if(nodesToRemove.contains(j.getTarget().getId()))
-          {
-            itJoins.remove();
-          }
-        }
-      }
-    }
-  }
-  
-  private static void findQueryNodeIDs(LogicClause clause, Set<Long> queryNodeIDs)
-  {
-    if(queryNodeIDs != null)
-    {
-      if(clause.getContent() == null)
-      {
-        for(LogicClause childClause : clause.getChildren())
-        {
-          findQueryNodeIDs(childClause, queryNodeIDs);
-        }
-      }
-      else
-      {
-        queryNodeIDs.add(clause.getContent().getId());
-      }
-    }
-  }
   
   /**
    * During parsing there will be leafs created with no QueryNode attached (e.g.
@@ -377,7 +217,7 @@ public class DNFTransformer
         if(subclause.getOp() == LogicClause.Operator.LEAF)
         { 
           // add an artificial "and" node
-          QueryNode content = subclause.getContent();
+          List<Token> content = subclause.getContent();
           subclause.clearChildren();
           subclause.setOp(LogicClause.Operator.AND);
           subclause.setContent(null);
