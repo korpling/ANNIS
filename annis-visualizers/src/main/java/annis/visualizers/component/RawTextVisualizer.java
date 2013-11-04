@@ -15,11 +15,14 @@
  */
 package annis.visualizers.component;
 
+import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.RawTextWrapper;
+import com.vaadin.server.Sizeable;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Layout;
@@ -80,11 +83,17 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
         // create the main panel
         Panel p = new Panel();
         p.setSizeFull();
+
+        // some layout configuration
         p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
         p.addStyleName(PANEL_CLASS);
         
+        // enable webfonts
+        p.addStyleName(Helper.CORPUS_FONT_FORCE);
+
         Layout l;
         
+        // if no text available inform user and exit
         if (texts == null) {
             Label text = new Label(NO_TEXT);
             text.addStyleName(LABEL_CLASS);
@@ -99,7 +108,7 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
             if (vertical) {
                 l = new VerticalLayout();
             } else {
-                l = new HorizontalLayout();
+                l = new GridLayout(texts.getTexts().size(), 1);
             }
 
             // limit the size to the parent panel.
@@ -120,13 +129,14 @@ public class RawTextVisualizer extends AbstractVisualizer<Panel> {
                 
                 lblText.setCaption("text " + (i + 1));
                 lblText.addStyleName(LABEL_CLASS);
+                lblText.setWidth(98, Sizeable.Unit.PERCENTAGE);
+
                 l.addComponent(lblText);
             }
 
             // apply the panel
             p.setContent(l);
             return p;
-            
         }
         
         Label lblText;

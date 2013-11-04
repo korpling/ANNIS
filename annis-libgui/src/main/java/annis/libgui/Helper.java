@@ -66,6 +66,12 @@ public class Helper
 
   public final static String DEFAULT_CONFIG = "default-config";
 
+  // the name of the web font class, the css class contains !important.
+  public final static String CORPUS_FONT_FORCE = "corpus-font-force";
+
+  // the name of the web font class.
+  public final static String CORPUS_FONT = "corpus-font";
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
 

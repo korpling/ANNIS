@@ -33,6 +33,7 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
+import static annis.libgui.Helper.*;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
@@ -137,12 +138,6 @@ public class SearchUI extends AnnisBaseUI
   private DocBrowserController docBrowserController;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
-
-  // the name of the web font class, the css class contains !important.
-  public final String CORPUS_FONT_FORCE = "corpus-font-force";
-
-  // the name of the web font class.
-  public final String CORPUS_FONT = "corpus-font";
 
   @Override
   protected void init(VaadinRequest request)
