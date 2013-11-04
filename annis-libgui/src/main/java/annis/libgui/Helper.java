@@ -20,6 +20,7 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -64,6 +65,12 @@ public class Helper
   public final static String KEY_WEB_SERVICE_URL = "AnnisWebService.URL";
 
   public final static String DEFAULT_CONFIG = "default-config";
+
+  // the name of the web font class, the css class contains !important.
+  public final static String CORPUS_FONT_FORCE = "corpus-font-force";
+
+  // the name of the web font class.
+  public final static String CORPUS_FONT = "corpus-font";
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
@@ -659,6 +666,31 @@ public class Helper
       sb.append("\n");
     }
     return sb.toString();
+  }
+
+  public static RawTextWrapper getRawText(String corpusName, String documentName)
+  {
+    RawTextWrapper texts = null;
+    try
+    {
+      WebResource webResource = getAnnisWebResource();
+      webResource = webResource.path("query").path("rawtext").path(corpusName).
+        path(documentName);
+      texts = webResource.get(RawTextWrapper.class);      
+    }
+    
+    catch (UniformInterfaceException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+    
+    return texts;
   }
 
   /**

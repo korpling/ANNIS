@@ -33,6 +33,7 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
+import static annis.libgui.Helper.*;
 import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
@@ -412,8 +413,8 @@ public class SearchUI extends AnnisBaseUI
       {
         css.setStyles(
           "@import url(" + cfg.getUrl() + ");\n"
-          + ".corpus-font-force {font-family: '" + cfg.getName() + "', monospace !important; }\n"
-          + ".corpus-font {font-family: '" + cfg.getName() + "', monospace; }\n"
+          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
+          + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
           + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
@@ -423,15 +424,15 @@ public class SearchUI extends AnnisBaseUI
       {
         css.setStyles(
           "@import url(" + cfg.getUrl() + ");\n"
-          + ".corpus-font-force {\n"
+          + "." + CORPUS_FONT_FORCE + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
           + "  font-size: " + cfg.getSize() + " !important;\n"
           + "}\n"
-          + ".corpus-font {\n"
+          + "." + CORPUS_FONT + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace;\n"
           + "  font-size: " + cfg.getSize() + ";\n"
           + "}\n"
-          + ".corpus-font .v-table-table {\n"
+          + "." + CORPUS_FONT + " .v-table-table {\n"
           + "    font-size: " + cfg.getSize() + ";\n"
           + "}"
           // this one is for the virtual keyboard

@@ -1,0 +1,20 @@
+/*
+    Document   : raw text
+    Created on : 31.10.2013
+    Author     : Benjamin Weißenfels <b.pixeldrama@gmail.com>
+    Description:
+        layouts the raw text visualizer
+*/
+
+.v-caption-raw_text_label .v-captiontext {
+  margin: auto 5px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.raw_text_label {
+  display: block ;
+  margin: 0 0 20px 0;
+  padding: 5px;
+  border: 1px dotted grey;
+}

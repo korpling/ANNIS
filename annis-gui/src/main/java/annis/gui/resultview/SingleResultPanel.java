@@ -93,6 +93,10 @@ public class SingleResultPanel extends CssLayout implements
 
   private HorizontalLayout infoBar;
 
+  private String corpusName;
+
+  private String documentName;
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
@@ -125,9 +129,14 @@ public class SingleResultPanel extends CssLayout implements
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
 
-    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(),
-      result);
+    /**
+     * Extract the top level corpus name and the document name of this single
+     * result.
+     */
+    path = CommonHelper.getCorpusPath(result.getSCorpusGraph(), result);
     Collections.reverse(path);
+    corpusName = path.get(0);
+    documentName = path.get(path.size() - 1);
 
     MinMax minMax = getIds(result.getSDocumentGraph());
 
@@ -171,7 +180,7 @@ public class SingleResultPanel extends CssLayout implements
         String htmlID = "resolver-" + resultNumber + "_" + i;
 
         VisualizerPanel p = new VisualizerPanel(
-          entries[i], result,
+          entries[i], result, corpusName, documentName,
           token, visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
           htmlID, resultID, this,

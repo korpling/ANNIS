@@ -36,6 +36,7 @@ import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.RawTextWrapper;
 import annis.service.objects.SaltURIGroup;
 import annis.service.objects.SubgraphQuery;
 import annis.sqlgen.MatrixQueryData;
@@ -74,6 +75,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
+import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -1090,5 +1092,28 @@ public class QueryServiceImpl implements QueryService
     CorpusConfig defaultCorpusConfig)
   {
     this.defaultCorpusConfig = defaultCorpusConfig;
+  }
+
+  /**
+   * Fetches the raw text from the text.tab file.
+   *
+   * @param top the name of the top level corpus.
+   * @param docname the name of the document.
+   *
+   * @return Can be empty, if the corpus only contains media data or
+   * segmentations.
+   */
+  @GET
+  @Path("rawtext/{top}/{docname}")
+  @Produces(MediaType.APPLICATION_XML)
+  public RawTextWrapper getRawText(@PathParam("top") String top,
+    @PathParam("docname") String docname)
+  {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:raw_text:" + top);
+
+    RawTextWrapper result = new RawTextWrapper();
+    result.setTexts(annisDao.getRawText(top, docname));
+    return result;
   }
 }

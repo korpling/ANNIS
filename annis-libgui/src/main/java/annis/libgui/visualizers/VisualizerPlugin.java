@@ -43,7 +43,8 @@ import net.xeoh.plugins.base.Plugin;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public interface VisualizerPlugin<I extends Component> extends Plugin,
-        Serializable {
+  Serializable
+{
 
   /**
    * Get the shorted name of the linguistic type of this visualizer ("partitur",
@@ -59,7 +60,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin,
    *
    */
   public I createComponent(VisualizerInput visInput,
-          VisualizationToggle visToggle);
+    VisualizationToggle visToggle);
 
   /**
    * Checks if the Plugin needs the primary text source.
@@ -72,7 +73,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin,
    * @param annos Which token annotations (qualified name) to show.
    */
   public void setVisibleTokenAnnosVisible(I visualizerImplementation,
-          Set<String> annos);
+    Set<String> annos);
 
   /**
    * If applicable change the displayed segmentation.
@@ -80,5 +81,23 @@ public interface VisualizerPlugin<I extends Component> extends Plugin,
    * @param segmentationName
    */
   public void setSegmentationLayer(I visualizerImplementation,
-          String segmentationName, Map<SNode, Long> markedAndCovered);
+    String segmentationName, Map<SNode, Long> markedAndCovered);
+
+  /**
+   * Determines if this visaulizer wants to use the original text.
+   *
+   * <p>
+   * This is a convenient and very fast method for extracting the whole text of
+   * a document, since this method simply reads database tupels and does not map
+   * anything to salt. It is recommended to use the raw text over the
+   * {@link VisualizerPlugin#isUsingText()} method, which indicates, that the
+   * visualizer needs the whole document graph, which can slow down the user
+   * experience.</p>
+   *
+   * <p>
+   * It can be use in parralel with {@link #isUsingText()}, but makes in most
+   * cases no sense.</p>
+   *
+   */
+  public boolean isUsingRawText();
 }

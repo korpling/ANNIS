@@ -58,6 +58,9 @@
   <!-- Helper for listDocuments command -->
   <bean id="listDocumentsSqlHelper" class="annis.sqlgen.ListDocumentsSqlHelper" lazy-init="true"/>
 
+  <!-- Helper for raw text extraction -->
+  <bean id="rawTextSqlHelper" class="annis.sqlgen.RawTextSqlHelper" lazy-init="true" />
+
   <!-- Helper for list example queries -->
   <bean id="listExampleQueriesHelper" class="annis.sqlgen.ListExampleQueriesHelper" lazy-init="true"/>
 
@@ -123,7 +126,7 @@
     <property name="frequencySqlGenerator" ref="frequencySqlGenerator" />
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
 
-
+    <property name="rawTextHelper" ref="rawTextSqlHelper" />
     <property name="dataSource" ref="dataSource"/>
 
     <property name="aqlParser" ref="annisParserAntlr"/>
