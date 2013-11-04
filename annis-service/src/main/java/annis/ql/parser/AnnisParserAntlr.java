@@ -17,7 +17,7 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClauseOld;
+import annis.model.LogicClauseDNF;
 import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
@@ -107,9 +107,7 @@ public class AnnisParserAntlr
       {
         throw new AnnisQLSemanticsException(ex.getMessage());
       }
-      LogicClauseOld top = listenerDNF.getTop();
-      
-      QueryData data = createQueryDataFromTopNode(top);
+      QueryData data = listenerDNF.getQueryData();
     
       data.setCorpusList(corpusList);
       data.addMetaAnnotations(listenerDNF.getMetaData());
@@ -164,16 +162,17 @@ public class AnnisParserAntlr
     }
   }
   
-  private QueryData createQueryDataFromTopNode(LogicClauseOld top)
+  @Deprecated
+  private QueryData createQueryDataFromTopNode(LogicClauseDNF top)
   {
     QueryData data = new QueryData();
     
       data.setMaxWidth(0);
       
-      Preconditions.checkArgument(top.getOp() == LogicClauseOld.Operator.OR,
+      Preconditions.checkArgument(top.getOp() == LogicClauseDNF.Operator.OR,
         "Toplevel logic clause must be of type OR");
       
-      for(LogicClauseOld andClause : top.getChildren())
+      for(LogicClauseDNF andClause : top.getChildren())
       {
         Set<String> alternativeNodeVars = new HashSet<String>();
         List<QueryNode> alternative = new ArrayList<QueryNode>();
@@ -181,9 +180,9 @@ public class AnnisParserAntlr
         Map<Long, QueryNode> alternativeNodesByID = new HashMap<Long, QueryNode>();
         
         // collect nodes
-        for(LogicClauseOld c : andClause.getChildren())
+        for(LogicClauseDNF c : andClause.getChildren())
         {
-          Preconditions.checkState(c.getOp() == LogicClauseOld.Operator.LEAF, 
+          Preconditions.checkState(c.getOp() == LogicClauseDNF.Operator.LEAF, 
             "alternative child node must be a leaf");
           Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
          
@@ -199,9 +198,9 @@ public class AnnisParserAntlr
         }
         
         // add joins
-        for(LogicClauseOld c : andClause.getChildren())
+        for(LogicClauseDNF c : andClause.getChildren())
         {
-          Preconditions.checkState(c.getOp() == LogicClauseOld.Operator.LEAF, 
+          Preconditions.checkState(c.getOp() == LogicClauseDNF.Operator.LEAF, 
             "alternative child node must be a leaf");
           Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
          

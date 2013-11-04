@@ -16,13 +16,11 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClauseOld;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
 import annis.ql.AqlParser;
 import annis.ql.AqlParserBaseListener;
-import static annis.service.objects.AnnisAttribute.SubType.n;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -41,14 +39,15 @@ import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import java.lang.reflect.Constructor;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import static org.apache.commons.lang3.StringUtils.right;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,27 +59,27 @@ public class AqlListener extends AqlParserBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
-  private LogicClauseOld top = null;
+  private QueryData data = null;
 
-  private List<LogicClauseOld> alternativeStack = new LinkedList<LogicClauseOld>();
+  private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
 
   private int aliasCount = 0;
   private String lastVariableDefinition = null;
 
-  private Multimap<String, QueryNode> nodes = HashMultimap.create();
-
-  private int precedenceBound;
+  private final Multimap<String, QueryNode> nodes = HashMultimap.create();
   
-  private List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
+  private final int precedenceBound;
+  
+  private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
   public AqlListener(int precedenceBound)
   {
     this.precedenceBound = precedenceBound;
   }
 
-  public LogicClauseOld getTop()
+  public QueryData getQueryData()
   {
-    return top;
+    return data;
   }
 
   public List<QueryAnnotation> getMetaData()
@@ -91,59 +90,22 @@ public class AqlListener extends AqlParserBaseListener
   @Override
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
-    top = new LogicClauseOld(LogicClauseOld.Operator.OR);
-    top.setOp(LogicClauseOld.Operator.OR);
-    alternativeStack.add(0, top);
+    data = new QueryData();
+    
   }
 
-
-  @Override
-  public void exitOrTop(AqlParser.OrTopContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
-  
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    LogicClauseOld andClause = new LogicClauseOld(LogicClauseOld.Operator.AND);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(andClause);
-    }
-    alternativeStack.add(0, andClause);
+    currentAlternative.clear();
   }
 
-  
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    alternativeStack.remove(0);
+    data.addAlternative(currentAlternative);
   }
 
-
-  @Override
-  public void enterBinaryTermExpr(AqlParser.BinaryTermExprContext ctx)
-  {
-    LogicClauseOld leaf = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(leaf);
-    }
-  }
-
-  @Override
-  public void enterUnaryTermExpr(AqlParser.UnaryTermExprContext ctx)
-  {
-    LogicClauseOld leaf = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(leaf);
-    }
-  }
-
-  
-  
   
 
   @Override
@@ -701,15 +663,9 @@ public class AqlListener extends AqlParserBaseListener
         {
           Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
           Join newJoin = c.newInstance(right);
-          
-          Preconditions.checkState(!alternativeStack.isEmpty(),
-            "There must be an alternative on the stack in order to add a join");
-          
-          LogicClauseOld clause = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
-          clause.setContent(left);
-          clause.setJoin(newJoin);
+          left.addJoin(newJoin);
         }
-        catch (Exception ex)
+        catch (ReflectiveOperationException ex)
         {
           log.error(null, ex);
         }
@@ -730,12 +686,10 @@ public class AqlListener extends AqlParserBaseListener
       n.setVariable(lastVariableDefinition);
     }
     lastVariableDefinition = null;
-    LogicClauseOld c = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
-    c.setContent(n);
-    alternativeStack.get(0).addChild(c);
     
-    
+    currentAlternative.add(n);
     nodes.put(n.getVariable(), n);
+    
     return n;
   }
 

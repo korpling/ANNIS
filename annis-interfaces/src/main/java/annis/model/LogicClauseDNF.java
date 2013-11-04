@@ -25,7 +25,7 @@ import java.util.List;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class LogicClauseOld
+public class LogicClauseDNF
 {
   public enum Operator {
     AND, OR, LEAF;
@@ -38,25 +38,25 @@ public class LogicClauseOld
   }
   
   private Operator op;
-  private List<LogicClauseOld> children;
+  private List<LogicClauseDNF> children;
   private QueryNode content;
   private Join join;
-  private LogicClauseOld parent;
+  private LogicClauseDNF parent;
 
   /**
    * Default constructor. Will create a LogicClause which is a leaf and has
    * no content 
    */
-  public LogicClauseOld()
+  public LogicClauseDNF()
   {
     this.op = Operator.LEAF;
-    this.children = new ArrayList<LogicClauseOld>();
+    this.children = new ArrayList<LogicClauseDNF>();
     this.content = null;
     this.parent = null;
     this.join = null;
   }
 
-  public LogicClauseOld(Operator op)
+  public LogicClauseDNF(Operator op)
   {
     this();
     this.op = op;
@@ -66,7 +66,7 @@ public class LogicClauseOld
    * Copy constructor
    * @param other 
    */
-  public LogicClauseOld(LogicClauseOld other)
+  public LogicClauseDNF(LogicClauseDNF other)
   {
     this();
     this.op = other.op;
@@ -86,28 +86,28 @@ public class LogicClauseOld
     this.op = op;
   }
 
-  public ImmutableList<LogicClauseOld> getChildren()
+  public ImmutableList<LogicClauseDNF> getChildren()
   {
     return ImmutableList.copyOf(children);
   }
   
-  public void addChild(LogicClauseOld child)
+  public void addChild(LogicClauseDNF child)
   {
     Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(child);
   }
   
-  public void addChild(int idx, LogicClauseOld child)
+  public void addChild(int idx, LogicClauseDNF child)
   {
     Preconditions.checkArgument(child != this, "Cannot add itself as children");
     child.parent = this;
     children.add(idx, child);
   }
   
-  public LogicClauseOld removeChild(int idx)
+  public LogicClauseDNF removeChild(int idx)
   {
-    LogicClauseOld result = children.remove(idx);
+    LogicClauseDNF result = children.remove(idx);
     if(result != null && result.parent == this)
     {
       result.parent = null;
@@ -117,7 +117,7 @@ public class LogicClauseOld
   
   public void clearChildren()
   {
-    for(LogicClauseOld c : children)
+    for(LogicClauseDNF c : children)
     {
       if(c.parent == this)
       {
@@ -148,7 +148,7 @@ public class LogicClauseOld
     this.join = join;
   }
   
-  public LogicClauseOld getParent()
+  public LogicClauseDNF getParent()
   {
     return parent;
   }

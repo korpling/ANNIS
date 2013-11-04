@@ -15,7 +15,7 @@
  */
 package annis.ql.parser;
 
-import annis.model.LogicClauseOld;
+import annis.model.LogicClauseDNF;
 import annis.model.QueryNode;
 import annis.sqlgen.model.Join;
 import com.google.common.base.Preconditions;
@@ -37,7 +37,7 @@ public class DNFTransformerOld
    * @param topNode
    * @return 
    */
-  public static void toDNF(LogicClauseOld topNode)
+  public static void toDNF(LogicClauseDNF topNode)
   {
     
     makeBinary(topNode);
@@ -47,34 +47,34 @@ public class DNFTransformerOld
     }
     cleanEmptyLeafs(topNode);
     flattenDNF(topNode);
-    for(LogicClauseOld alternative : topNode.getChildren())
+    for(LogicClauseDNF alternative : topNode.getChildren())
     {
       cleanRelationForAlternative(alternative);
     }
   }
   
-  private static void makeBinary(LogicClauseOld node)
+  private static void makeBinary(LogicClauseDNF node)
   {
-    if(node.getOp() == LogicClauseOld.Operator.LEAF 
+    if(node.getOp() == LogicClauseDNF.Operator.LEAF 
       || node.getChildren().isEmpty())
     {
       return;
     }
     
     // check if we have a degraded path with only one sibling
-    LogicClauseOld parent = node.getParent();
+    LogicClauseDNF parent = node.getParent();
     if(node.getChildren().size() == 1)
     {
       if(node.getParent() == null)
       {
         // replace this node with it's only child
-        LogicClauseOld child = node.getChildren().get(0);
+        LogicClauseDNF child = node.getChildren().get(0);
         node.clearChildren();
         
         node.setOp(child.getOp());
         node.setContent(child.getContent());
         
-        for(LogicClauseOld newChild : child.getChildren())
+        for(LogicClauseDNF newChild : child.getChildren())
         {
           node.addChild(newChild);
         }
@@ -89,14 +89,14 @@ public class DNFTransformerOld
     }
     else if(node.getChildren().size() > 2)
     {
-      LogicClauseOld firstChild = node.getChildren().get(0);
+      LogicClauseDNF firstChild = node.getChildren().get(0);
       // merge together under a new node
-      LogicClauseOld newSubClause = new LogicClauseOld(node.getOp());
+      LogicClauseDNF newSubClause = new LogicClauseDNF(node.getOp());
       
-      ListIterator<LogicClauseOld> itChildren = node.getChildren().listIterator(1);
+      ListIterator<LogicClauseDNF> itChildren = node.getChildren().listIterator(1);
       while(itChildren.hasNext())
       {
-        LogicClauseOld n = itChildren.next();
+        LogicClauseDNF n = itChildren.next();
         newSubClause.addChild(n);
       }
       
@@ -121,7 +121,7 @@ public class DNFTransformerOld
   
 
   /**
-   * Iteration step to transform a {@link LogicClauseOld} into DNF.
+   * Iteration step to transform a {@link LogicClauseDNF} into DNF.
    * 
    * In DNF all OR relations must be toplevel. Thus constructions like
    * 
@@ -152,28 +152,28 @@ public class DNFTransformerOld
    * @param node The node to transform into DNF.
    * @return True if already in DNF
    */
-  private static boolean makeDNF(LogicClauseOld node)
+  private static boolean makeDNF(LogicClauseDNF node)
   {
-    if(node.getOp() == LogicClauseOld.Operator.LEAF || node.getChildren().size() < 2)
+    if(node.getOp() == LogicClauseDNF.Operator.LEAF || node.getChildren().size() < 2)
     {
       return true;
     }
     
-    LogicClauseOld left = node.getChildren().get(0);
-    LogicClauseOld right = node.getChildren().get(1);
-    if(node.getOp() == LogicClauseOld.Operator.AND)
+    LogicClauseDNF left = node.getChildren().get(0);
+    LogicClauseDNF right = node.getChildren().get(1);
+    if(node.getOp() == LogicClauseDNF.Operator.AND)
     {
       // check if operator of this node and one of it's children is the same
       
-      LogicClauseOld x1 = null;
-      LogicClauseOld x2 = null;
-      LogicClauseOld y = null;
-      LogicClauseOld z = null;
+      LogicClauseDNF x1 = null;
+      LogicClauseDNF x2 = null;
+      LogicClauseDNF y = null;
+      LogicClauseDNF z = null;
       
-      if(right.getOp() == LogicClauseOld.Operator.OR)
+      if(right.getOp() == LogicClauseDNF.Operator.OR)
       {
         x1 = left;
-        x2 = new LogicClauseOld(x1);
+        x2 = new LogicClauseDNF(x1);
         if(x1.getContent() != null)
         {
           // set the content to a real copy
@@ -185,10 +185,10 @@ public class DNFTransformerOld
         y = right.getChildren().get(0);
         z = right.getChildren().get(1);
       }
-      else if(left.getOp() == LogicClauseOld.Operator.OR)
+      else if(left.getOp() == LogicClauseDNF.Operator.OR)
       {
         x1 = right;
-        x2 = new LogicClauseOld(x1);
+        x2 = new LogicClauseDNF(x1);
         
         Preconditions.checkArgument(left.getChildren().size() == 2, 
           "OR nodes must always have exactly two children");
@@ -198,12 +198,12 @@ public class DNFTransformerOld
       
       if(x1 != null && x2 != null && y != null && z != null)
       {
-        node.setOp(LogicClauseOld.Operator.OR);
+        node.setOp(LogicClauseDNF.Operator.OR);
         node.setContent(null);
         node.clearChildren();
         
-        LogicClauseOld leftParent = new LogicClauseOld(LogicClauseOld.Operator.AND);
-        LogicClauseOld rightParent = new LogicClauseOld(LogicClauseOld.Operator.AND);
+        LogicClauseDNF leftParent = new LogicClauseDNF(LogicClauseDNF.Operator.AND);
+        LogicClauseDNF rightParent = new LogicClauseDNF(LogicClauseDNF.Operator.AND);
         
         node.addChild(leftParent);
         node.addChild(rightParent);
@@ -228,17 +228,17 @@ public class DNFTransformerOld
     return makeDNF(left) && makeDNF(right);
   }
   
-  private static void cleanRelationForAlternative(LogicClauseOld alternative)
+  private static void cleanRelationForAlternative(LogicClauseDNF alternative)
   {
     Preconditions.checkNotNull(alternative);
-    Preconditions.checkArgument(alternative.getOp() == LogicClauseOld.Operator.AND);
+    Preconditions.checkArgument(alternative.getOp() == LogicClauseDNF.Operator.AND);
     
     Set<Long> validNodeIDs = new HashSet<Long>();
     
     // first collect all IDs that exist in this alternative
-    for(LogicClauseOld c : alternative.getChildren())
+    for(LogicClauseDNF c : alternative.getChildren())
     {
-      if(c.getOp() == LogicClauseOld.Operator.LEAF && c.getContent() != null)
+      if(c.getOp() == LogicClauseDNF.Operator.LEAF && c.getContent() != null)
       {
         QueryNode node = c.getContent();
         validNodeIDs.add(node.getId());
@@ -246,7 +246,7 @@ public class DNFTransformerOld
     }
     
     // second remove all joins that refer to non-existing IDs
-    for(LogicClauseOld c : alternative.getChildren())
+    for(LogicClauseDNF c : alternative.getChildren())
     {
       if(c.getContent() != null)
       {
@@ -266,9 +266,9 @@ public class DNFTransformerOld
   /**
    * Cleaning up relations that where removed when splitting the node.
    * @param node The node that might have references left
-   * @param toRemove {@link LogicClauseOld} node that was removed from the clause.
+   * @param toRemove {@link LogicClauseDNF} node that was removed from the clause.
    */
-  private static void cleanRelations(QueryNode node, LogicClauseOld toRemove)
+  private static void cleanRelations(QueryNode node, LogicClauseDNF toRemove)
   {
     if(node != null)
     {
@@ -291,13 +291,13 @@ public class DNFTransformerOld
     }
   }
   
-  private static void findQueryNodeIDs(LogicClauseOld clause, Set<Long> queryNodeIDs)
+  private static void findQueryNodeIDs(LogicClauseDNF clause, Set<Long> queryNodeIDs)
   {
     if(queryNodeIDs != null)
     {
       if(clause.getContent() == null)
       {
-        for(LogicClauseOld childClause : clause.getChildren())
+        for(LogicClauseDNF childClause : clause.getChildren())
         {
           findQueryNodeIDs(childClause, queryNodeIDs);
         }
@@ -314,31 +314,31 @@ public class DNFTransformerOld
    * binary terms). This functions removes all these leafs.   * 
    * @param clause The clause to remove the empty leafs from.
    */
-  private static void cleanEmptyLeafs(LogicClauseOld clause)
+  private static void cleanEmptyLeafs(LogicClauseDNF clause)
   {
-    if(clause == null || clause.getOp() == LogicClauseOld.Operator.LEAF)
+    if(clause == null || clause.getOp() == LogicClauseDNF.Operator.LEAF)
     {
       return;
     }
     
-    LinkedList<LogicClauseOld> childListCopy = new LinkedList<LogicClauseOld>(clause.getChildren());
+    LinkedList<LogicClauseDNF> childListCopy = new LinkedList<LogicClauseDNF>(clause.getChildren());
     
     clause.clearChildren();
     
-    ListIterator<LogicClauseOld> itChildren = childListCopy.listIterator();
+    ListIterator<LogicClauseDNF> itChildren = childListCopy.listIterator();
     while(itChildren.hasNext())
     {
-      LogicClauseOld n = itChildren.next();
+      LogicClauseDNF n = itChildren.next();
       
       // don't add empty leafs, add everything else
-      if(!(n.getOp() == LogicClauseOld.Operator.LEAF && n.getContent() == null)) 
+      if(!(n.getOp() == LogicClauseDNF.Operator.LEAF && n.getContent() == null)) 
       {
         clause.addChild(n);
       }
     }
     
     // clean all sub clauses
-    for(LogicClauseOld c : clause.getChildren())
+    for(LogicClauseDNF c : clause.getChildren())
     {
       cleanEmptyLeafs(c);
     }
@@ -349,53 +349,53 @@ public class DNFTransformerOld
    * and one layer of AND-clauses.
    * @param top 
    */
-  private static void flattenDNF(LogicClauseOld top)
+  private static void flattenDNF(LogicClauseDNF top)
   {
-    if(top.getOp() == LogicClauseOld.Operator.LEAF || top.getOp() == LogicClauseOld.Operator.AND)
+    if(top.getOp() == LogicClauseDNF.Operator.LEAF || top.getOp() == LogicClauseDNF.Operator.AND)
     {
-      List<LogicClauseOld> children = new ArrayList<LogicClauseOld>();
+      List<LogicClauseDNF> children = new ArrayList<LogicClauseDNF>();
       findAllChildrenForAnd(top, children);
       
-      top.setOp(LogicClauseOld.Operator.OR);
+      top.setOp(LogicClauseDNF.Operator.OR);
       top.clearChildren();
       top.setContent(null);
       
-      LogicClauseOld andClause = new LogicClauseOld(LogicClauseOld.Operator.AND);
+      LogicClauseDNF andClause = new LogicClauseDNF(LogicClauseDNF.Operator.AND);
       top.addChild(andClause);
       
-      for(LogicClauseOld c : children)
+      for(LogicClauseDNF c : children)
       {
         andClause.addChild(c);
       }
     }
-    else if(top.getOp() == LogicClauseOld.Operator.OR)
+    else if(top.getOp() == LogicClauseDNF.Operator.OR)
     {
       
       // find sub and-clauses for all or-clauses
-      for(LogicClauseOld subclause : top.getChildren())
+      for(LogicClauseDNF subclause : top.getChildren())
       {
-        if(subclause.getOp() == LogicClauseOld.Operator.LEAF)
+        if(subclause.getOp() == LogicClauseDNF.Operator.LEAF)
         { 
           // add an artificial "and" node
           QueryNode content = subclause.getContent();
           subclause.clearChildren();
-          subclause.setOp(LogicClauseOld.Operator.AND);
+          subclause.setOp(LogicClauseDNF.Operator.AND);
           subclause.setContent(null);
           
-          LogicClauseOld newLeaf = new LogicClauseOld(LogicClauseOld.Operator.LEAF);
+          LogicClauseDNF newLeaf = new LogicClauseDNF(LogicClauseDNF.Operator.LEAF);
           newLeaf.setContent(content);
           subclause.addChild(newLeaf);
           
         }
-        else if (subclause.getOp() == LogicClauseOld.Operator.AND)
+        else if (subclause.getOp() == LogicClauseDNF.Operator.AND)
         {
 
-          List<LogicClauseOld> children = new ArrayList<LogicClauseOld>();
+          List<LogicClauseDNF> children = new ArrayList<LogicClauseDNF>();
           findAllChildrenForAnd(subclause, children);
 
           subclause.clearChildren();
 
-          for(LogicClauseOld c : children)
+          for(LogicClauseDNF c : children)
           {
             subclause.addChild(c);
           }
@@ -409,17 +409,17 @@ public class DNFTransformerOld
     }
   }
   
-  private static void findAllChildrenForAnd(LogicClauseOld node, List<LogicClauseOld> followers)
+  private static void findAllChildrenForAnd(LogicClauseDNF node, List<LogicClauseDNF> followers)
   {
-    if(node.getOp() == LogicClauseOld.Operator.LEAF)
+    if(node.getOp() == LogicClauseDNF.Operator.LEAF)
     {
-      followers.add(new LogicClauseOld(node));
+      followers.add(new LogicClauseDNF(node));
       return;
     }
     
-    Preconditions.checkArgument(node.getOp() == LogicClauseOld.Operator.AND);
+    Preconditions.checkArgument(node.getOp() == LogicClauseDNF.Operator.AND);
     
-    for(LogicClauseOld c : node.getChildren())
+    for(LogicClauseDNF c : node.getChildren())
     {
       findAllChildrenForAnd(c, followers);
     }
