@@ -95,15 +95,14 @@ public class DNFTransformer
       LogicClause y = null;
       LogicClause z = null;
       
+      List<? extends Token> orToken = null;
+      
       if(right.getOp() == LogicClause.Operator.OR)
       {
         x1 = left;
         x2 = new LogicClause(x1);
-        if(x1.getContent() != null)
-        {
-          // set the content to a real copy
-          x2.setContent(x1.getContent());
-        }
+        
+        orToken = right.getContent();
         
         Preconditions.checkArgument(right.getChildren().size() == 2, 
           "OR nodes must always have exactly two children");
@@ -115,6 +114,8 @@ public class DNFTransformer
         x1 = right;
         x2 = new LogicClause(x1);
         
+        orToken = left.getContent();
+        
         Preconditions.checkArgument(left.getChildren().size() == 2, 
           "OR nodes must always have exactly two children");
         y = left.getChildren().get(0);
@@ -123,21 +124,26 @@ public class DNFTransformer
       
       if(x1 != null && x2 != null && y != null && z != null)
       {
+        
+        LogicClause leftParentAnd = new LogicClause(LogicClause.Operator.AND);
+        LogicClause rightParentAnd = new LogicClause(LogicClause.Operator.AND);
+        
+        // replicate the original "&" token to both new AND nodes
+        leftParentAnd.setContent(new ArrayList<Token>(node.getContent()));
+        rightParentAnd.setContent(new ArrayList<Token>(node.getContent()));
+        
         node.setOp(LogicClause.Operator.OR);
-        node.setContent(null);
+        node.setContent(orToken);
         node.clearChildren();
         
-        LogicClause leftParent = new LogicClause(LogicClause.Operator.AND);
-        LogicClause rightParent = new LogicClause(LogicClause.Operator.AND);
+        node.addChild(leftParentAnd);
+        node.addChild(rightParentAnd);
         
-        node.addChild(leftParent);
-        node.addChild(rightParent);
+        leftParentAnd.addChild(x1);
+        leftParentAnd.addChild(y);
         
-        leftParent.addChild(x1);
-        leftParent.addChild(y);
-        
-        rightParent.addChild(x2);
-        rightParent.addChild(z);
+        rightParentAnd.addChild(x2);
+        rightParentAnd.addChild(z);
         
         // start over again
         return false;
@@ -198,6 +204,7 @@ public class DNFTransformer
       
       top.setOp(LogicClause.Operator.OR);
       top.clearChildren();
+      // there is no original "|" in the token stream which we can refer to
       top.setContent(null);
       
       LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
@@ -209,17 +216,17 @@ public class DNFTransformer
       }
     }
     else if(top.getOp() == LogicClause.Operator.OR)
-    {
-      
+    { 
       // find sub and-clauses for all or-clauses
       for(LogicClause subclause : top.getChildren())
       {
         if(subclause.getOp() == LogicClause.Operator.LEAF)
         { 
           // add an artificial "and" node
-          List<Token> content = subclause.getContent();
+          List<? extends Token> content = subclause.getContent();
           subclause.clearChildren();
           subclause.setOp(LogicClause.Operator.AND);
+          // there is no original "&" in the token stream which we can refer to
           subclause.setContent(null);
           
           LogicClause newLeaf = new LogicClause(LogicClause.Operator.LEAF);

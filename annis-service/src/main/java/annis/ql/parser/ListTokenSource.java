@@ -39,8 +39,17 @@ public class ListTokenSource implements TokenSource
     this.token = token;
     Preconditions.checkNotNull(token);
     Preconditions.checkArgument(!token.isEmpty(), "Internal token list must not be empty");
-    Preconditions.checkNotNull(token.get(0).getTokenSource(), "Internal token list needs a valid TokenSource");
-    this.factory = token.get(0).getTokenSource().getTokenFactory();
+    
+    for(Token t : token)
+    {
+      if(t.getTokenSource() != null)
+      {
+        this.factory = t.getTokenSource().getTokenFactory();
+        break;
+      }
+    }
+    Preconditions.checkNotNull(this.factory, "Internal token list needs a valid TokenSource");
+    
   }
 
   @Override

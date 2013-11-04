@@ -19,6 +19,7 @@ package annis.ql.parser;
 import annis.ql.RawAqlPreParser;
 import annis.ql.RawAqlPreParserBaseListener;
 import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.Token;
@@ -44,6 +45,7 @@ public class RawAqlListener extends RawAqlPreParserBaseListener
   public void enterAndExpr(RawAqlPreParser.AndExprContext ctx)
   {
     LogicClause nodeAnd = new LogicClause(LogicClause.Operator.AND);
+    nodeAnd.setContent(Lists.newArrayList(ctx.AND().getSymbol()));
     if(current != null)
     {
       current.addChild(nodeAnd);
@@ -62,6 +64,7 @@ public class RawAqlListener extends RawAqlPreParserBaseListener
   public void enterOrExpr(RawAqlPreParser.OrExprContext ctx)
   {
     LogicClause nodeOr = new LogicClause(LogicClause.Operator.OR);
+    nodeOr.setContent(Lists.newArrayList(ctx.OR().getSymbol()));
     if(current != null)
     {
       current.addChild(nodeOr);
@@ -87,12 +90,16 @@ public class RawAqlListener extends RawAqlPreParserBaseListener
     }
     
     // get all token covered by this node
-    List<Token> token = new LinkedList<Token>();
-    collectToken(ctx, token);
-    
-    nodeLeaf.setContent(token);
+    nodeLeaf.setContent(collectToken(ctx));
     
     current = nodeLeaf;
+  }
+  
+  private static List<Token> collectToken(ParseTree node)
+  {
+    List<Token> token = new LinkedList<Token>();
+    collectToken(node, token);
+    return token;
   }
   
   private static void collectToken(ParseTree node, List<Token> token)

@@ -19,6 +19,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import org.antlr.v4.runtime.Token;
@@ -40,7 +41,7 @@ public class LogicClause
   
   private Operator op;
   private List<LogicClause> children;
-  private List<Token> content;
+  private List<? extends Token> content;
   private LogicClause parent;
 
   /**
@@ -70,7 +71,7 @@ public class LogicClause
     this();
     this.op = other.op;
     this.parent = other.parent;
-    this.content = other.content;
+    this.content = new ArrayList<Token>(other.content);
     this.children.addAll(other.children);
   }
 
@@ -126,12 +127,12 @@ public class LogicClause
   }
   
 
-  public List<Token> getContent()
+  public List<? extends Token> getContent()
   {
     return content;
   }
 
-  public void setContent(List<Token> content)
+  public void setContent(List<? extends Token> content)
   {
     this.content = content;
   }
@@ -139,21 +140,35 @@ public class LogicClause
   public List<Token> getCoveredToken()
   {
     List<Token> result = new LinkedList<Token>();
-    if(op == Operator.LEAF)
+    
+    if(content != null && !content.isEmpty()
+      && (op == Operator.AND || op == Operator.OR))
     {
-      if(content != null)
+      // add children and put our own operator between them
+      
+      Iterator<LogicClause> itChild = children.iterator();
+      while(itChild.hasNext())
       {
-        result.addAll(content);
+        result.addAll(itChild.next().getCoveredToken());
+        if(itChild.hasNext())
+        {
+          result.addAll(content);
+        }
       }
+    }
+    else if(op == Operator.LEAF && content != null)
+    {
+      result.addAll(content);
     }
     else
     {
+      // fallback: this node has no own token but it's children might have
       for(LogicClause child : children)
       {
         result.addAll(child.getCoveredToken());
       }
     }
-    
+
     return result;
   }
 
