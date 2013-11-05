@@ -8,6 +8,7 @@
     <Or>
       <Class name="annis.ql.AqlLexer"/>
       <Class name="annis.ql.AqlParser"/>
+      <Class name="annis.ql.RawAqlPreParser"/>
       <Class name="com.google.mimeparse.MIMEParse" />
       <Class name="com.google.mimeparse.MIMEParse$FitnessAndQuality" />
     </Or>
