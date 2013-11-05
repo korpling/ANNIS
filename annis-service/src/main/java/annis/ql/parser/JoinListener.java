@@ -13,13 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClause;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
-import annis.model.QueryNode.Range;
 import annis.ql.AqlParser;
 import annis.ql.AqlParserBaseListener;
 import annis.sqlgen.model.CommonAncestor;
@@ -41,7 +40,6 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -52,173 +50,62 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class AqlListener extends AqlParserBaseListener
+public class JoinListener extends AqlParserBaseListener
 {
-  private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
-  private LogicClause top = null;
-
-  private List<LogicClause> alternativeStack = new LinkedList<LogicClause>();
-
-  private int aliasCount = 0;
-  private String lastVariableDefinition = null;
-
-  private Multimap<String, QueryNode> nodes = HashMultimap.create();
-
-  private int precedenceBound;
+  private static final Logger log = LoggerFactory.getLogger(JoinListener.class);
   
-  private List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
-
-  public AqlListener(int precedenceBound)
+  private final int precedenceBound;
+  /** An array which has an entry for each alternative. 
+   *  Each entry maps node variables to a collection of query nodes.
+   */
+  private final Multimap<String, QueryNode>[] alternativeNodes;
+  private int alternativeIndex;
+  
+  /**
+   * Constructor.
+   * @param data The {@link QueryData} containing the already parsed nodes.
+   * @param precedenceBound  maximal range of precedence
+   */
+  public JoinListener(QueryData data, int precedenceBound)
   {
     this.precedenceBound = precedenceBound;
+    this.alternativeNodes = new Multimap[data.getAlternatives().size()];
+    
+    int i=0;
+    for(List<QueryNode> alternative : data.getAlternatives())
+    {
+      alternativeNodes[i] = HashMultimap.create();
+      for(QueryNode n : alternative)
+      {
+        alternativeNodes[i].put(n.getVariable(), n);
+      }
+      i++;
+    }
   }
 
-  public LogicClause getTop()
-  {
-    return top;
-  }
-
-  public List<QueryAnnotation> getMetaData()
-  {
-    return metaData;
-  }
-  
-
-  @Override
-  public void enterAndTop(AqlParser.AndTopContext ctx)
-  {
-    top = new LogicClause(LogicClause.Operator.AND);
-    top.setOp(LogicClause.Operator.AND);
-    alternativeStack.add(0, top);
-  }
-
-  @Override
-  public void enterOrTop(AqlParser.OrTopContext ctx)
-  {
-    top = new LogicClause(LogicClause.Operator.OR);
-    top.setOp(LogicClause.Operator.OR);
-    alternativeStack.add(0, top);
-  }
-
-  @Override
-  public void exitAndTop(AqlParser.AndTopContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
-
-  @Override
-  public void exitOrTop(AqlParser.OrTopContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
-  
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(andClause);
-    }
-    alternativeStack.add(0, andClause);
-  }
-
-  @Override
-  public void enterOrExpr(AqlParser.OrExprContext ctx)
-  {
-    LogicClause orClause = new LogicClause(LogicClause.Operator.OR);
-    if(!alternativeStack.isEmpty())
-    {
-      alternativeStack.get(0).addChild(orClause);
-    }
-    alternativeStack.add(0, orClause);
+    Preconditions.checkArgument(alternativeIndex < alternativeNodes.length);
   }
 
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    alternativeStack.remove(0);
-  }
-
-  @Override
-  public void exitOrExpr(AqlParser.OrExprContext ctx)
-  {
-    alternativeStack.remove(0);
-  }
-
-  @Override
-  public void exitStart(AqlParser.StartContext ctx)
-  {
-    super.exitStart(ctx); //To change body of generated methods, choose Tools | Templates.
+    alternativeIndex++;
   }
   
   
-
-  @Override
-  public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
-  {
-    QueryNode target = newNode();
-    target.setToken(true);
-  }
-
-  @Override
-  public void enterNodeExpr(AqlParser.NodeExprContext ctx)
-  {
-    newNode();
-  }
   
-
-  @Override
-  public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
-  {
-    QueryNode target = newNode();
-    target.setToken(true);
-    QueryNode.TextMatching txtMatch = textMatchingFromSpec(ctx.textSpec(),
-      ctx.NEQ() != null);
-    String content = textFromSpec(ctx.textSpec());
-    target.setSpannedText(content, txtMatch);
-  }
-
-  @Override
-  public void enterTextOnly(AqlParser.TextOnlyContext ctx)
-  {
-    QueryNode target = newNode();
-    target.setSpannedText(textFromSpec(ctx.txt),
-      textMatchingFromSpec(ctx.txt, false));
-  }
-
-  @Override
-  public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
-  {
-    QueryNode target = newNode();
-    String namespace = ctx.qName().namespace == null ? null : ctx.qName().namespace.getText();
-    QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.qName().name.getText());
-    target.addNodeAnnotation(anno);
-  }
-
-  @Override
-  public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
-  {
-    QueryNode target = newNode();
-    String namespace = ctx.qName().namespace == null ? 
-      null : ctx.qName().namespace.getText();
-    String name = ctx.qName().name.getText();
-    String value = textFromSpec(ctx.txt);
-    QueryNode.TextMatching matching = textMatchingFromSpec(ctx.txt,
-      ctx.NEQ() != null);
-    QueryAnnotation anno = new QueryAnnotation(namespace, name, value, matching);
-    target.addNodeAnnotation(anno);
-  }
-
   @Override
   public void enterRootTerm(AqlParser.RootTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("root"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("root") 
+      + ": " + ctx.getText());
     for(QueryNode target : targets)
     {
       target.setRoot(true);
@@ -229,7 +116,8 @@ public class AqlListener extends AqlParserBaseListener
   public void enterArityTerm(AqlParser.ArityTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("arity"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("arity") 
+      + ": " + ctx.getText());
     
     for(QueryNode target : targets)
     {
@@ -241,7 +129,8 @@ public class AqlListener extends AqlParserBaseListener
   public void enterTokenArityTerm(AqlParser.TokenArityTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("token-arity"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("token-arity") 
+      + ": " + ctx.getText());
     
     for(QueryNode target : targets)
     {
@@ -255,8 +144,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence")
+      + ": " + ctx.getText());
     
     String segmentationName = null;
     if(ctx.layer != null)
@@ -278,8 +169,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence")
+      + ": " + ctx.getText());
     
     String segmentationName = null;
     if(ctx.layer != null)
@@ -309,8 +202,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence") 
+      + ": " + ctx.getText());
     
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
@@ -386,8 +281,10 @@ public class AqlListener extends AqlParserBaseListener
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
     
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+     + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+     + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
     
@@ -426,8 +323,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+      + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
@@ -445,12 +344,14 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+      + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
-    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
@@ -468,8 +369,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -496,8 +399,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
@@ -515,12 +420,14 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
-    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
@@ -538,8 +445,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common parent"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common parent"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common parent")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common parent")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -557,8 +466,10 @@ public class AqlListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common ancestor"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common ancestor"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common ancestor")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common ancestor")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -571,122 +482,12 @@ public class AqlListener extends AqlParserBaseListener
     }
   }
   
-  
-  
-  
-  
-  @Override
-  public void enterMetaTermExpr(AqlParser.MetaTermExprContext ctx)
-  {
-    // TODO: we have to disallow OR expressions with metadata, how can we
-    // achvieve that?
-    String namespace = ctx.id.namespace == null ? 
-      null : ctx.id.namespace.getText();
-    QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.id.name.getText());
-    metaData.add(anno);
-  }
-
   @Override
   public void enterIdentity(AqlParser.IdentityContext ctx)
   {
     join(ctx, Identical.class);
   }
-
-  @Override
-  public void enterVariableTermExpr(AqlParser.VariableTermExprContext ctx)
-  {
-    lastVariableDefinition = null;
-    if(ctx != null)
-    {
-      String text = ctx.VAR_DEF().getText();
-      // remove the trailing "#"
-      if(text.endsWith("#"))
-      {
-        lastVariableDefinition = text.substring(0, text.length()-1);
-      }
-      else
-      {
-        lastVariableDefinition = text;
-      }
-    }
-  }
   
-  
-  
-  
-  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
-    AqlParser.EdgeSpecContext ctx)
-  {
-    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
-    for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
-    {
-      String namespace = annoCtx.qName().namespace == null
-        ? null : annoCtx.qName().namespace.getText();
-      String name = annoCtx.qName().name.getText();
-      String value = textFromSpec(annoCtx.value);
-      QueryNode.TextMatching matching = textMatchingFromSpec(
-        annoCtx.value, annoCtx.NEQ() != null);
-      
-      annos.add(new QueryAnnotation(namespace, name, value, matching));
-      
-    }
-    return annos;
-  }
-
-  private String textFromSpec(AqlParser.TextSpecContext txtCtx)
-  {
-    if (txtCtx instanceof AqlParser.EmptyExactTextSpecContext || txtCtx instanceof AqlParser.EmptyRegexTextSpecContext)
-    {
-      return "";
-    }
-    else if (txtCtx instanceof AqlParser.ExactTextSpecContext)
-    {
-      return ((AqlParser.ExactTextSpecContext) txtCtx).content.getText();
-    }
-    else if (txtCtx instanceof AqlParser.RegexTextSpecContext)
-    {
-      return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
-    }
-    return null;
-  }
-  
-  private QueryNode.TextMatching textMatchingFromSpec(
-    AqlParser.TextSpecContext txt, boolean not)
-  {
-    if (txt instanceof AqlParser.ExactTextSpecContext)
-    {
-      return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : 
-        QueryNode.TextMatching.EXACT_EQUAL;
-    }
-    else if (txt instanceof AqlParser.RegexTextSpecContext)
-    {
-     return  not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : 
-       QueryNode.TextMatching.REGEXP_EQUAL;
-    }
-    return null;
-  }
-
-  private QueryNode.Range annisRangeFromARangeSpec(
-    AqlParser.RangeSpecContext spec)
-  {
-    String min = spec.min.getText();
-    String max = spec.max != null ? spec.max.getText() : null;
-    if (max == null)
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
-    }
-    else
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
-    }
-  }
-
-  private Collection<QueryNode> nodesByRef(Token ref)
-  {
-    return nodes.get("" + ref.getText().substring(1));
-  }
-
   /**
    * Automatically create a join from a node and a join class.
    *
@@ -701,8 +502,10 @@ public class AqlListener extends AqlParserBaseListener
     Collection<QueryNode> leftNodes = nodesByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
     Collection<QueryNode> rightNodes = nodesByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());
 
-    Preconditions.checkArgument(!leftNodes.isEmpty(), errorLHS(type.getSimpleName()));
-    Preconditions.checkNotNull(!rightNodes.isEmpty(), errorRHS(type.getSimpleName()));
+    Preconditions.checkArgument(!leftNodes.isEmpty(), errorLHS(type.getSimpleName())
+      + ": " + ctx.getText());
+    Preconditions.checkNotNull(!rightNodes.isEmpty(), errorRHS(type.getSimpleName())
+      + ": " + ctx.getText());
     
     for (QueryNode left : leftNodes)
     {
@@ -714,36 +517,55 @@ public class AqlListener extends AqlParserBaseListener
           Join newJoin = c.newInstance(right);
           left.addJoin(newJoin);
         }
-        catch (Exception ex)
+        catch (ReflectiveOperationException ex)
         {
           log.error(null, ex);
         }
       }
     }
-    
   }
   
-  private QueryNode newNode()
+  
+  private QueryNode.Range annisRangeFromARangeSpec(
+    AqlParser.RangeSpecContext spec)
   {
-    QueryNode n = new QueryNode(++aliasCount);
-    if(lastVariableDefinition == null)
+    String min = spec.min.getText();
+    String max = spec.max != null ? spec.max.getText() : null;
+    if (max == null)
     {
-      n.setVariable("" + n.getId());
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
     }
     else
     {
-      n.setVariable(lastVariableDefinition);
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
     }
-    lastVariableDefinition = null;
-    LogicClause c = new LogicClause(LogicClause.Operator.LEAF);
-    c.setContent(n);
-    alternativeStack.get(0).addChild(c);
-    
-    
-    nodes.put(n.getVariable(), n);
-    return n;
   }
-
+  
+  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
+    AqlParser.EdgeSpecContext ctx)
+  {
+    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
+    for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
+    {
+      String namespace = annoCtx.qName().namespace == null
+        ? null : annoCtx.qName().namespace.getText();
+      String name = annoCtx.qName().name.getText();
+      String value = QueryNodeListener.textFromSpec(annoCtx.value);
+      QueryNode.TextMatching matching = QueryNodeListener.textMatchingFromSpec(
+        annoCtx.value, annoCtx.NEQ() != null);
+      
+      annos.add(new QueryAnnotation(namespace, name, value, matching));
+      
+    }
+    return annos;
+  }
+  
+  private Collection<QueryNode> nodesByRef(Token ref)
+  {
+    return alternativeNodes[alternativeIndex].get("" + ref.getText().substring(1));
+  }
+  
+  
   private String errorLHS(String function)
   {
     return function + " operator needs a left-hand-side";

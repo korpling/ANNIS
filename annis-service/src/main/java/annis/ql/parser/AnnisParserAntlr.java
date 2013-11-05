@@ -17,27 +17,23 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClause;
-import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
-import annis.sqlgen.model.Join;
+import annis.ql.RawAqlPreParser;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.TokenSource;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -45,56 +41,64 @@ import org.antlr.v4.runtime.tree.ParseTreeWalker;
  */
 public class AnnisParserAntlr
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(AnnisParserAntlr.class);
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    AqlLexer lexer = new AqlLexer(new ANTLRInputStream(aql));
-    AqlParser parser = new AqlParser(new CommonTokenStream(
-      lexer));
-    
     final List<String> errors = new LinkedList<String>();
-
-    parser.removeErrorListeners();
-    parser.addErrorListener(new BaseErrorListener()
-    {
-      @Override
-      public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-        int line, int charPositionInLine, String msg, RecognitionException e)
-      {
-        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
-      }
-    });
-
-    ParseTree tree = parser.start();
     
-    if (errors.isEmpty())
-    {
-      
-      ParseTreeWalker walker = new ParseTreeWalker();
-      AqlListener listener = new AqlListener(precedenceBound);
-      
-      try
-      {
-        walker.walk(listener, tree);
-      }
-      catch(NullPointerException ex)
-      {
-        throw new AnnisQLSemanticsException(ex.getMessage());
-      }
-      catch(IllegalArgumentException ex)
-      {
-        throw new AnnisQLSemanticsException(ex.getMessage());
-      }
-      LogicClause top = listener.getTop();
-      DNFTransformer.toDNF(top);
-      
-      QueryData data = createQueryDataFromTopNode(top);
+    AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
     
+    // bring first into DNF
+    RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
+    rawParser.removeErrorListeners();
+    rawParser.addErrorListener(new StringListErrorListener(errors));
+    
+    RawAqlPreParser.StartContext treeRaw = rawParser.start();
+    if (!errors.isEmpty())
+    {
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+    }
+    
+    ParseTreeWalker walkerRaw = new ParseTreeWalker();
+    RawAqlListener listenerRaw = new RawAqlListener();
+    walkerRaw.walk(listenerRaw, treeRaw);
+    
+    LogicClause topNode = listenerRaw.getRoot();
+    DNFTransformer.toDNF(topNode);
+    
+    // use the DNF form and parse it again
+    TokenSource source = new ListTokenSource(topNode.getCoveredToken());
+    AqlParser parserDNF = new AqlParser(new CommonTokenStream(source));
+    
+    parserDNF.removeErrorListeners();
+    parserDNF.addErrorListener(new StringListErrorListener(errors));
+
+    ParseTree treeDNF = parserDNF.start();
+    
+    if (!errors.isEmpty())
+    {
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+    }
+      
+    ParseTreeWalker walker = new ParseTreeWalker();
+    QueryNodeListener nodeListener = new QueryNodeListener();
+
+    try
+    {
+      walker.walk(nodeListener, treeDNF);
+
+      QueryData data = nodeListener.getQueryData();
+
       data.setCorpusList(corpusList);
-      data.addMetaAnnotations(listener.getMetaData());
-      
+      data.addMetaAnnotations(nodeListener.getMetaData());
+
+      JoinListener joinListener = new JoinListener(data, precedenceBound);
+      walker.walk(joinListener, treeDNF);
+
       if (postProcessors != null)
       {
         for (QueryDataTransformer transformer : postProcessors)
@@ -103,12 +107,18 @@ public class AnnisParserAntlr
         }
       }
       return data;
+
     }
-    else
+    catch(NullPointerException ex)
     {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
+      log.warn(null, ex);
+      throw new AnnisQLSemanticsException(ex.getMessage());
     }
+    catch(IllegalArgumentException ex)
+    {
+      throw new AnnisQLSemanticsException(ex.getMessage());
+    }
+    
   }
   
   public String dumpTree(String aql)
@@ -120,15 +130,7 @@ public class AnnisParserAntlr
     final List<String> errors = new LinkedList<String>();
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new BaseErrorListener()
-    {
-      @Override
-      public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-        int line, int charPositionInLine, String msg, RecognitionException e)
-      {
-        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
-      }
-    });
+    parser.addErrorListener(new StringListErrorListener(errors));
 
     ParseTree tree = parser.start();
     
@@ -138,69 +140,10 @@ public class AnnisParserAntlr
     }
     else
     {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
     }
   }
   
-  private QueryData createQueryDataFromTopNode(LogicClause top)
-  {
-    QueryData data = new QueryData();
-    
-      data.setMaxWidth(0);
-      
-      for(LogicClause andClause : top.getChildren())
-      {
-        Set<Long> alternativeNodeIds = new HashSet<Long>();
-        Set<String> alternativeNodeVars = new HashSet<String>();
-        List<QueryNode> alternative = new ArrayList<QueryNode>();
-        for(LogicClause c : andClause.getChildren())
-        {
-          QueryNode node = new QueryNode(c.getContent());
-          Preconditions.checkNotNull(node, "logical node must have an attached QueryNode");
-          
-          alternative.add(node);
-          alternativeNodeIds.add(node.getId());
-          alternativeNodeVars.add(node.getVariable());
-        }
-        
-        // set maximal width
-        data.setMaxWidth(
-          Math.max(data.getMaxWidth(), alternativeNodeIds.size()));
-        
-        // check for invalid edge joins
-        for(QueryNode node : alternative)
-        {
-          ListIterator<Join> itJoins = node.getJoins().listIterator();
-          while(itJoins.hasNext())
-          {
-            Join j = itJoins.next();
-            QueryNode t = j.getTarget();
-            if(t != null)
-            {
-              if(!alternativeNodeVars.contains(t.getVariable()))
-              {
-                // the join partner is not contained in the alternative
-                throw new AnnisQLSemanticsException("Target node \"" + t.
-                  getVariable()
-                  + "\" is not contained in alternative. Normalized alternative: \n"
-                  + QueryData.toAQL(alternative));
-              }
-              else if(!alternativeNodeIds.contains(t.getId()))
-              {
-                // silently remove it
-                itJoins.remove();
-              }
-            } // end if target node not null
-          } // end for each join
-        }
-        
-        data.addAlternative(alternative);
-      } // end for each alternative
-    
-    return data;
-  }
-
   public int getPrecedenceBound()
   {
     return precedenceBound;
@@ -222,5 +165,24 @@ public class AnnisParserAntlr
     this.postProcessors = postProcessors;
   }
   
+  public static class StringListErrorListener extends BaseErrorListener
+  {
+    private final List<String> errors;
+
+    public StringListErrorListener(List<String> errors)
+    {
+      this.errors = errors;
+    }
+    
+     @Override
+    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
+      int line, int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
+      }
+    }
+  }
   
 }

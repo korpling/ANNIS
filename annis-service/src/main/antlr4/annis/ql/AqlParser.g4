@@ -111,13 +111,13 @@ expr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
-  | BRACE_OPEN expr (AND expr)* BRACE_CLOSE # AndExpr
-  | BRACE_OPEN expr (OR expr)+ BRACE_CLOSE # OrExpr
+  ;
+
+andTopExpr
+  : ((expr (AND expr)*) | (BRACE_OPEN expr (AND expr)* BRACE_CLOSE)) # AndExpr
   ;
 
 
 exprTop
-  : expr (OR expr)+ # OrTop
-  | expr (AND expr)* # AndTop
-  | BRACE_OPEN exprTop BRACE_CLOSE # BracedTop
+  : andTopExpr (OR andTopExpr)* # OrTop
 	;

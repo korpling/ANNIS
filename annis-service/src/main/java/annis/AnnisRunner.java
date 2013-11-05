@@ -329,7 +329,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doDebug(String ignore)
   {
     doCorpus("pcc2");
-    doMatrix("tok & pos & #1 . #2");
+    doCount("#1 . #2 & #a . #3 & tok & tok & a#tok");
   }
 
   public void doParse(String annisQuery)
