@@ -40,6 +40,7 @@ import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
+import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -517,7 +518,19 @@ public class JoinListener extends AqlParserBaseListener
           Join newJoin = c.newInstance(right);
           left.addJoin(newJoin);
         }
-        catch (ReflectiveOperationException ex)
+        catch (NoSuchMethodException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (InstantiationException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (IllegalAccessException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (InvocationTargetException ex)
         {
           log.error(null, ex);
         }
