@@ -200,7 +200,7 @@ public class DNFTransformer
     if(top.getOp() == LogicClause.Operator.LEAF || top.getOp() == LogicClause.Operator.AND)
     {
       List<LogicClause> children = new ArrayList<LogicClause>();
-      findAllChildrenForAnd(top, children);
+      findAllChildrenForOp(top, children, LogicClause.Operator.AND);
       
       List<? extends Token> orginalAndContent = top.getContent();
       
@@ -214,13 +214,18 @@ public class DNFTransformer
       andClause.setContent(orginalAndContent);
       top.addChild(andClause);
       
-      for(LogicClause c : children)
-      {
-        andClause.addChild(c);
-      }
+      andClause.addAllChildren(children);
+      
     }
     else if(top.getOp() == LogicClause.Operator.OR)
     { 
+      // first flatten the OR operator
+      List<LogicClause> allOrNodes = new ArrayList<LogicClause>();
+      findAllChildrenForOp(top, allOrNodes, LogicClause.Operator.OR, true);
+      
+      top.clearChildren();
+      top.addAllChildren(allOrNodes);
+      
       // find sub and-clauses for all or-clauses
       for(LogicClause subclause : top.getChildren())
       {
@@ -242,7 +247,7 @@ public class DNFTransformer
         {
 
           List<LogicClause> children = new ArrayList<LogicClause>();
-          findAllChildrenForAnd(subclause, children);
+          findAllChildrenForOp(subclause, children, LogicClause.Operator.AND);
 
           subclause.clearChildren();
 
@@ -260,19 +265,31 @@ public class DNFTransformer
     }
   }
   
-  private static void findAllChildrenForAnd(LogicClause node, List<LogicClause> followers)
+  private static void findAllChildrenForOp(LogicClause node, List<LogicClause> followers, 
+    LogicClause.Operator op)
   {
-    if(node.getOp() == LogicClause.Operator.LEAF)
+    findAllChildrenForOp(node, followers, op, false);
+  }
+  
+  private static void findAllChildrenForOp(LogicClause node, List<LogicClause> followers, 
+    LogicClause.Operator op, boolean addOtherOpsAsChild)
+  {
+    if(node.getOp() == LogicClause.Operator.LEAF 
+      || (addOtherOpsAsChild && node.getOp() != op))
     {
       followers.add(new LogicClause(node));
       return;
     }
     
-    Preconditions.checkArgument(node.getOp() == LogicClause.Operator.AND);
+    
+    if(!addOtherOpsAsChild)
+    {
+      Preconditions.checkArgument(node.getOp() == op, "BUG: Wrong operator found");
+    }
     
     for(LogicClause c : node.getChildren())
     {
-      findAllChildrenForAnd(c, followers);
+      findAllChildrenForOp(c, followers, op, addOtherOpsAsChild);
     }
   }
 

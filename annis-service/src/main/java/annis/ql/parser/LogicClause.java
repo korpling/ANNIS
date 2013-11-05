@@ -19,6 +19,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -88,6 +89,17 @@ public class LogicClause
   public ImmutableList<LogicClause> getChildren()
   {
     return ImmutableList.copyOf(children);
+  }
+  
+  public void addAllChildren(Collection<LogicClause> children)
+  {
+    if(children != null)
+    {
+      for(LogicClause c : children)
+      {
+        addChild(c);
+      }
+    }
   }
   
   public void addChild(LogicClause child)
