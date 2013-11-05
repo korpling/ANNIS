@@ -17,32 +17,19 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.LogicClauseDNF;
-import annis.model.QueryNode;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.RawAqlPreParser;
-import annis.sqlgen.model.Join;
 import com.google.common.base.Joiner;
-import com.google.common.base.Preconditions;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
-import java.util.Map;
-import java.util.Set;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
-import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.RecognitionException;
 import org.antlr.v4.runtime.Recognizer;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.TokenSource;
-import org.antlr.v4.runtime.misc.TestRig;
 import org.antlr.v4.runtime.tree.ParseTree;
 import org.antlr.v4.runtime.tree.ParseTreeWalker;
 import org.slf4j.Logger;
@@ -87,15 +74,7 @@ public class AnnisParserAntlr
     final List<String> errors = new LinkedList<String>();
 
     parserDNF.removeErrorListeners();
-    parserDNF.addErrorListener(new BaseErrorListener()
-    {
-      @Override
-      public void syntaxError(Recognizer recognizer, Token offendingSymbol,
-        int line, int charPositionInLine, String msg, RecognitionException e)
-      {
-        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
-      }
-    });
+    parserDNF.addErrorListener(new ListErrorListener(errors));
 
     ParseTree treeDNF = parserDNF.start();
     
@@ -176,98 +155,6 @@ public class AnnisParserAntlr
     }
   }
   
-  @Deprecated
-  private QueryData createQueryDataFromTopNode(LogicClauseDNF top)
-  {
-    QueryData data = new QueryData();
-    
-      data.setMaxWidth(0);
-      
-      Preconditions.checkArgument(top.getOp() == LogicClauseDNF.Operator.OR,
-        "Toplevel logic clause must be of type OR");
-      
-      for(LogicClauseDNF andClause : top.getChildren())
-      {
-        Set<String> alternativeNodeVars = new HashSet<String>();
-        List<QueryNode> alternative = new ArrayList<QueryNode>();
-        
-        Map<Long, QueryNode> alternativeNodesByID = new HashMap<Long, QueryNode>();
-        
-        // collect nodes
-        for(LogicClauseDNF c : andClause.getChildren())
-        {
-          Preconditions.checkState(c.getOp() == LogicClauseDNF.Operator.LEAF, 
-            "alternative child node must be a leaf");
-          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
-         
-          if(c.getJoin() == null)
-          {
-            // this is a normal query node and not a join
-            QueryNode node = c.getContent();
-
-            alternative.add(node);
-            alternativeNodesByID.put(node.getId(), node);
-            alternativeNodeVars.add(node.getVariable());
-          }
-        }
-        
-        // add joins
-        for(LogicClauseDNF c : andClause.getChildren())
-        {
-          Preconditions.checkState(c.getOp() == LogicClauseDNF.Operator.LEAF, 
-            "alternative child node must be a leaf");
-          Preconditions.checkNotNull(c.getContent(), "logical node must have an attached QueryNode");
-         
-          if(c.getContent() != null && c.getJoin() != null)
-          {
-            Join j = c.getJoin();
-            QueryNode node = alternativeNodesByID.get(c.getContent().getId());
-            QueryNode target = alternativeNodesByID.get(j.getTarget().getId());
-            
-            if(node != null && target != null)
-            {
-              node.addJoin(j);
-            }
-          }
-        }
-        
-        // set maximal width
-        data.setMaxWidth(
-          Math.max(data.getMaxWidth(), alternativeNodesByID.size()));
-        
-        // check for invalid edge joins
-        for(QueryNode node : alternative)
-        {
-          ListIterator<Join> itJoins = node.getJoins().listIterator();
-          while(itJoins.hasNext())
-          {
-            Join j = itJoins.next();
-            QueryNode t = j.getTarget();
-            if(t != null)
-            {
-              if(!alternativeNodeVars.contains(t.getVariable()))
-              {
-                // the join partner is not contained in the alternative
-                throw new AnnisQLSemanticsException("Target node \"" + t.
-                  getVariable()
-                  + "\" is not contained in alternative. Normalized alternative: \n"
-                  + QueryData.toAQL(alternative));
-              }
-              else if(!alternativeNodesByID.containsKey(t.getId()))
-              {
-                // silently remove it
-                itJoins.remove();
-              }
-            } // end if target node not null
-          } // end for each join
-        }
-        
-        data.addAlternative(alternative);
-      } // end for each alternative
-    
-    return data;
-  }
-
   public int getPrecedenceBound()
   {
     return precedenceBound;
@@ -289,5 +176,24 @@ public class AnnisParserAntlr
     this.postProcessors = postProcessors;
   }
   
+  public static class ListErrorListener extends BaseErrorListener
+  {
+    private final List<String> errors;
+
+    public ListErrorListener(List<String> errors)
+    {
+      this.errors = errors;
+    }
+    
+     @Override
+    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
+      int line, int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        errors.add("line " + line + ":" + charPositionInLine + " " + msg);
+      }
+    }
+  }
   
 }
