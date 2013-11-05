@@ -139,8 +139,6 @@ public class AnnisParserAntlr
     }
     else
     {
-      log.info("Parse tree is \n" + topNode.toString());
-      
       throw new AnnisQLSyntaxException("Parser error:\n"
         + Joiner.on("\n").join(errors));
     }

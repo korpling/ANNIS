@@ -202,12 +202,16 @@ public class DNFTransformer
       List<LogicClause> children = new ArrayList<LogicClause>();
       findAllChildrenForAnd(top, children);
       
+      List<? extends Token> orginalAndContent = top.getContent();
+      
       top.setOp(LogicClause.Operator.OR);
       top.clearChildren();
       // there is no original "|" in the token stream which we can refer to
+      
       top.setContent(null);
       
       LogicClause andClause = new LogicClause(LogicClause.Operator.AND);
+      andClause.setContent(orginalAndContent);
       top.addChild(andClause);
       
       for(LogicClause c : children)
