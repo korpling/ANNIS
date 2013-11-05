@@ -104,7 +104,8 @@ public class JoinListener extends AqlParserBaseListener
   public void enterRootTerm(AqlParser.RootTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("root"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("root") 
+      + ": " + ctx.getText());
     for(QueryNode target : targets)
     {
       target.setRoot(true);
@@ -115,7 +116,8 @@ public class JoinListener extends AqlParserBaseListener
   public void enterArityTerm(AqlParser.ArityTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("arity"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("arity") 
+      + ": " + ctx.getText());
     
     for(QueryNode target : targets)
     {
@@ -127,7 +129,8 @@ public class JoinListener extends AqlParserBaseListener
   public void enterTokenArityTerm(AqlParser.TokenArityTermContext ctx)
   {
     Collection<QueryNode> targets = nodesByRef(ctx.left);
-    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("token-arity"));
+    Preconditions.checkArgument(!targets.isEmpty(), errorLHS("token-arity") 
+      + ": " + ctx.getText());
     
     for(QueryNode target : targets)
     {
@@ -141,8 +144,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence")
+      + ": " + ctx.getText());
     
     String segmentationName = null;
     if(ctx.layer != null)
@@ -164,8 +169,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence")
+      + ": " + ctx.getText());
     
     String segmentationName = null;
     if(ctx.layer != null)
@@ -195,8 +202,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence"));
+    Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence") 
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence") 
+      + ": " + ctx.getText());
     
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
@@ -272,8 +281,10 @@ public class JoinListener extends AqlParserBaseListener
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
     
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+     + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+     + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
     
@@ -312,8 +323,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+      + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
@@ -331,8 +344,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("dominance")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("dominance")
+      + ": " + ctx.getText());
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
@@ -354,8 +369,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -382,8 +399,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
@@ -401,8 +420,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("pointing")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("pointing")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
@@ -424,8 +445,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common parent"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common parent"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common parent")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common parent")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -443,8 +466,10 @@ public class JoinListener extends AqlParserBaseListener
   {
     Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
     Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
-    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common ancestor"));
-    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common ancestor"));
+    Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("common ancestor")
+      + ": " + ctx.getText());
+    Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("common ancestor")
+      + ": " + ctx.getText());
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
@@ -477,8 +502,10 @@ public class JoinListener extends AqlParserBaseListener
     Collection<QueryNode> leftNodes = nodesByRef(ctx.getToken(AqlParser.REF, 0).getSymbol());
     Collection<QueryNode> rightNodes = nodesByRef(ctx.getToken(AqlParser.REF, 1).getSymbol());
 
-    Preconditions.checkArgument(!leftNodes.isEmpty(), errorLHS(type.getSimpleName()));
-    Preconditions.checkNotNull(!rightNodes.isEmpty(), errorRHS(type.getSimpleName()));
+    Preconditions.checkArgument(!leftNodes.isEmpty(), errorLHS(type.getSimpleName())
+      + ": " + ctx.getText());
+    Preconditions.checkNotNull(!rightNodes.isEmpty(), errorRHS(type.getSimpleName())
+      + ": " + ctx.getText());
     
     for (QueryNode left : leftNodes)
     {

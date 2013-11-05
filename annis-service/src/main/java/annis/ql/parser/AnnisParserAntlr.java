@@ -60,8 +60,7 @@ public class AnnisParserAntlr
     RawAqlPreParser.StartContext treeRaw = rawParser.start();
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
     }
     
     ParseTreeWalker walkerRaw = new ParseTreeWalker();
@@ -82,8 +81,7 @@ public class AnnisParserAntlr
     
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
     }
       
     ParseTreeWalker walker = new ParseTreeWalker();
@@ -142,8 +140,7 @@ public class AnnisParserAntlr
     }
     else
     {
-      throw new AnnisQLSyntaxException("Parser error:\n"
-        + Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
     }
   }
   

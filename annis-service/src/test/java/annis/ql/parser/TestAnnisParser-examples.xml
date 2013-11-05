@@ -58,6 +58,7 @@
     <value><![CDATA[key!= /value.*/]]></value>
     <value><![CDATA[tok & tok & #1 .2 #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm #2]]></value>
+    <value><![CDATA[#1 . #2 & #2 . #a & tok & tok & a#tok]]></value>
     <value><![CDATA[tok & tok & #1 .norm* #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm,1 #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm,1,3 #2]]></value>
