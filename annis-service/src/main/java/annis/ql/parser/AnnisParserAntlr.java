@@ -103,33 +103,39 @@ public class AnnisParserAntlr
     {
       
       ParseTreeWalker walker = new ParseTreeWalker();
-      AqlListener listenerDNF = new AqlListener(precedenceBound);
+      QueryNodeListener nodeListener = new QueryNodeListener();
       
       try
       {
-        walker.walk(listenerDNF, treeDNF);
+        walker.walk(nodeListener, treeDNF);
+
+        QueryData data = nodeListener.getQueryData();
+
+        data.setCorpusList(corpusList);
+        data.addMetaAnnotations(nodeListener.getMetaData());
+
+        JoinListener joinListener = new JoinListener(data, precedenceBound);
+        walker.walk(joinListener, treeDNF);
+        
+        if (postProcessors != null)
+        {
+          for (QueryDataTransformer transformer : postProcessors)
+          {
+            data = transformer.transform(data);
+          }
+        }
+        return data;
+        
       }
       catch(NullPointerException ex)
       {
+        log.warn(null, ex);
         throw new AnnisQLSemanticsException(ex.getMessage());
       }
       catch(IllegalArgumentException ex)
       {
         throw new AnnisQLSemanticsException(ex.getMessage());
       }
-      QueryData data = listenerDNF.getQueryData();
-    
-      data.setCorpusList(corpusList);
-      data.addMetaAnnotations(listenerDNF.getMetaData());
-      
-      if (postProcessors != null)
-      {
-        for (QueryDataTransformer transformer : postProcessors)
-        {
-          data = transformer.transform(data);
-        }
-      }
-      return data;
     }
     else
     {

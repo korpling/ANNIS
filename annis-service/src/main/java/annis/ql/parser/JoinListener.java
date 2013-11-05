@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
-import annis.model.QueryNode.Range;
 import annis.ql.AqlParser;
 import annis.ql.AqlParserBaseListener;
 import annis.sqlgen.model.CommonAncestor;
@@ -38,136 +38,68 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
-import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class AqlListener extends AqlParserBaseListener
+public class JoinListener extends AqlParserBaseListener
 {
-  private static final Logger log = LoggerFactory.getLogger(AqlListener.class);
   
-  private QueryData data = null;
-
-  private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
-
-  private long aliasCount = 0l;
-  private String lastVariableDefinition = null;
-
-  private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
-  private final Map<Interval, Long> tokenposition2NodeID = Maps.newHashMap();
+  private static final Logger log = LoggerFactory.getLogger(JoinListener.class);
   
   private final int precedenceBound;
+  /** An array which has an entry for each alternative. 
+   *  Each entry maps node variables to a collection of query nodes.
+   */
+  private final Multimap<String, QueryNode>[] alternativeNodes;
+  private int alternativeIndex;
   
-  private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
-
-  public AqlListener(int precedenceBound)
+  /**
+   * Constructor.
+   * @param data The {@link QueryData} containing the already parsed nodes.
+   * @param precedenceBound  maximal range of precedence
+   */
+  public JoinListener(QueryData data, int precedenceBound)
   {
     this.precedenceBound = precedenceBound;
-  }
-
-  public QueryData getQueryData()
-  {
-    return data;
-  }
-
-  public List<QueryAnnotation> getMetaData()
-  {
-    return metaData;
-  }
-  
-  @Override
-  public void enterOrTop(AqlParser.OrTopContext ctx)
-  {
-    data = new QueryData();
+    this.alternativeNodes = new Multimap[data.getAlternatives().size()];
     
+    int i=0;
+    for(List<QueryNode> alternative : data.getAlternatives())
+    {
+      alternativeNodes[i] = HashMultimap.create();
+      for(QueryNode n : alternative)
+      {
+        alternativeNodes[i].put(n.getVariable(), n);
+      }
+      i++;
+    }
   }
 
   @Override
   public void enterAndExpr(AqlParser.AndExprContext ctx)
   {
-    currentAlternative.clear();
-    localNodes.clear();
+    Preconditions.checkArgument(alternativeIndex < alternativeNodes.length);
   }
 
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
-  }
-
-  
-
-  @Override
-  public void enterTokOnlyExpr(AqlParser.TokOnlyExprContext ctx)
-  {
-    QueryNode target = newNode(ctx);
-    target.setToken(true);
-  }
-
-  @Override
-  public void enterNodeExpr(AqlParser.NodeExprContext ctx)
-  {
-    newNode(ctx);
+    alternativeIndex++;
   }
   
-
-  @Override
-  public void enterTokTextExpr(AqlParser.TokTextExprContext ctx)
-  {
-    QueryNode target = newNode(ctx);
-    target.setToken(true);
-    QueryNode.TextMatching txtMatch = textMatchingFromSpec(ctx.textSpec(),
-      ctx.NEQ() != null);
-    String content = textFromSpec(ctx.textSpec());
-    target.setSpannedText(content, txtMatch);
-  }
-
-  @Override
-  public void enterTextOnly(AqlParser.TextOnlyContext ctx)
-  {
-    QueryNode target = newNode(ctx);
-    target.setSpannedText(textFromSpec(ctx.txt),
-      textMatchingFromSpec(ctx.txt, false));
-  }
-
-  @Override
-  public void enterAnnoOnlyExpr(AqlParser.AnnoOnlyExprContext ctx)
-  {
-    QueryNode target = newNode(ctx);
-    String namespace = ctx.qName().namespace == null ? null : ctx.qName().namespace.getText();
-    QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.qName().name.getText());
-    target.addNodeAnnotation(anno);
-  }
-
-  @Override
-  public void enterAnnoEqTextExpr(AqlParser.AnnoEqTextExprContext ctx)
-  {
-    QueryNode target = newNode(ctx);
-    String namespace = ctx.qName().namespace == null ? 
-      null : ctx.qName().namespace.getText();
-    String name = ctx.qName().name.getText();
-    String value = textFromSpec(ctx.txt);
-    QueryNode.TextMatching matching = textMatchingFromSpec(ctx.txt,
-      ctx.NEQ() != null);
-    QueryAnnotation anno = new QueryAnnotation(namespace, name, value, matching);
-    target.addNodeAnnotation(anno);
-  }
-
+  
+  
   @Override
   public void enterRootTerm(AqlParser.RootTermContext ctx)
   {
@@ -404,7 +336,7 @@ public class AqlListener extends AqlParserBaseListener
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
-    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
@@ -474,7 +406,7 @@ public class AqlListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
-    Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
@@ -525,122 +457,12 @@ public class AqlListener extends AqlParserBaseListener
     }
   }
   
-  
-  
-  
-  
-  @Override
-  public void enterMetaTermExpr(AqlParser.MetaTermExprContext ctx)
-  {
-    // TODO: we have to disallow OR expressions with metadata, how can we
-    // achvieve that?
-    String namespace = ctx.id.namespace == null ? 
-      null : ctx.id.namespace.getText();
-    QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.id.name.getText());
-    metaData.add(anno);
-  }
-
   @Override
   public void enterIdentity(AqlParser.IdentityContext ctx)
   {
     join(ctx, Identical.class);
   }
-
-  @Override
-  public void enterVariableTermExpr(AqlParser.VariableTermExprContext ctx)
-  {
-    lastVariableDefinition = null;
-    if(ctx != null)
-    {
-      String text = ctx.VAR_DEF().getText();
-      // remove the trailing "#"
-      if(text.endsWith("#"))
-      {
-        lastVariableDefinition = text.substring(0, text.length()-1);
-      }
-      else
-      {
-        lastVariableDefinition = text;
-      }
-    }
-  }
   
-  
-  
-  
-  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
-    AqlParser.EdgeSpecContext ctx)
-  {
-    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
-    for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
-    {
-      String namespace = annoCtx.qName().namespace == null
-        ? null : annoCtx.qName().namespace.getText();
-      String name = annoCtx.qName().name.getText();
-      String value = textFromSpec(annoCtx.value);
-      QueryNode.TextMatching matching = textMatchingFromSpec(
-        annoCtx.value, annoCtx.NEQ() != null);
-      
-      annos.add(new QueryAnnotation(namespace, name, value, matching));
-      
-    }
-    return annos;
-  }
-
-  private String textFromSpec(AqlParser.TextSpecContext txtCtx)
-  {
-    if (txtCtx instanceof AqlParser.EmptyExactTextSpecContext || txtCtx instanceof AqlParser.EmptyRegexTextSpecContext)
-    {
-      return "";
-    }
-    else if (txtCtx instanceof AqlParser.ExactTextSpecContext)
-    {
-      return ((AqlParser.ExactTextSpecContext) txtCtx).content.getText();
-    }
-    else if (txtCtx instanceof AqlParser.RegexTextSpecContext)
-    {
-      return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
-    }
-    return null;
-  }
-  
-  private QueryNode.TextMatching textMatchingFromSpec(
-    AqlParser.TextSpecContext txt, boolean not)
-  {
-    if (txt instanceof AqlParser.ExactTextSpecContext)
-    {
-      return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : 
-        QueryNode.TextMatching.EXACT_EQUAL;
-    }
-    else if (txt instanceof AqlParser.RegexTextSpecContext)
-    {
-     return  not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : 
-       QueryNode.TextMatching.REGEXP_EQUAL;
-    }
-    return null;
-  }
-
-  private QueryNode.Range annisRangeFromARangeSpec(
-    AqlParser.RangeSpecContext spec)
-  {
-    String min = spec.min.getText();
-    String max = spec.max != null ? spec.max.getText() : null;
-    if (max == null)
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
-    }
-    else
-    {
-      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
-    }
-  }
-
-  private Collection<QueryNode> nodesByRef(Token ref)
-  {
-    return localNodes.get("" + ref.getText().substring(1));
-  }
-
   /**
    * Automatically create a join from a node and a join class.
    *
@@ -674,36 +496,49 @@ public class AqlListener extends AqlParserBaseListener
         }
       }
     }
-    
   }
   
-  private QueryNode newNode(ParserRuleContext ctx)
+  
+  private QueryNode.Range annisRangeFromARangeSpec(
+    AqlParser.RangeSpecContext spec)
   {
-    Long existingID = tokenposition2NodeID.get(ctx.getSourceInterval());
-    
-    if(existingID == null)
+    String min = spec.min.getText();
+    String max = spec.max != null ? spec.max.getText() : null;
+    if (max == null)
     {
-      existingID = ++aliasCount;
-    }
-    
-    QueryNode n = new QueryNode(existingID);
-    if(lastVariableDefinition == null)
-    {
-      n.setVariable("" + n.getId());
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(min));
     }
     else
     {
-      n.setVariable(lastVariableDefinition);
+      return new QueryNode.Range(Integer.parseInt(min), Integer.parseInt(max));
     }
-    lastVariableDefinition = null;
-    
-    currentAlternative.add(n);
-    localNodes.put(n.getVariable(), n);
-    tokenposition2NodeID.put(ctx.getSourceInterval(), n.getId());
-    
-    return n;
   }
-
+  
+  private LinkedList<QueryAnnotation> fromEdgeAnnotation(
+    AqlParser.EdgeSpecContext ctx)
+  {
+    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
+    for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
+    {
+      String namespace = annoCtx.qName().namespace == null
+        ? null : annoCtx.qName().namespace.getText();
+      String name = annoCtx.qName().name.getText();
+      String value = QueryNodeListener.textFromSpec(annoCtx.value);
+      QueryNode.TextMatching matching = QueryNodeListener.textMatchingFromSpec(
+        annoCtx.value, annoCtx.NEQ() != null);
+      
+      annos.add(new QueryAnnotation(namespace, name, value, matching));
+      
+    }
+    return annos;
+  }
+  
+  private Collection<QueryNode> nodesByRef(Token ref)
+  {
+    return alternativeNodes[alternativeIndex].get("" + ref.getText().substring(1));
+  }
+  
+  
   private String errorLHS(String function)
   {
     return function + " operator needs a left-hand-side";

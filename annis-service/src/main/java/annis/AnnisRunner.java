@@ -329,7 +329,7 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doDebug(String ignore)
   {
     doCorpus("pcc2");
-    doCount("/das/ & ( (cat=/NP/ & #1 . #2) | (/Haus/ & #1 . #3 ))");
+    doCount("\"das\" & ( x#\"Haus\" | x#\"Schaf\") & #1 . #x");
   }
 
   public void doParse(String annisQuery)
