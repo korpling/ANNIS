@@ -19,9 +19,9 @@
 -->        
     <entry key="word &amp; word &amp; (#1 . #2 | #2 . #1)">
       <value><![CDATA[
-(word & word & #1 . #2 & #2 . #1)
+(word & word & #1 . #2)
 |
-(word & word & #1 . #2 & #2 . #1)
+(word & word & #2 . #1)
 ]]>
       </value>
     </entry>
