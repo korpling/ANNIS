@@ -272,6 +272,24 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     this.rawTextHelper = rawTextHelper;
   }
 
+  @Override
+  public String mapCorpusIdToName(long corpusId)
+  {
+
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(corpusId);
+    List<String> names = mapCorpusIdsToNames(ids);
+
+    if (names == null || names.isEmpty())
+    {
+      String msg = "corpus is not known to the system";
+      throw new DataAccessException(msg){};
+    }
+
+    return names.get(0);
+
+  }
+
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
@@ -391,7 +409,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     for (Long id : ids)
     {
-      names.add(corpusNamesById.get(id));
+      if (corpusNamesById.containsKey(id))
+      {
+        names.add(corpusNamesById.get(id));
+      }
     }
     return names;
   }
