@@ -86,11 +86,14 @@ public class CorpusAdministration
    * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
    * overwrite flag is set to false.
    *
-   * @param paths Valid pathes to corpora.
+   *
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
+   * @param statusEmailAdress an email adress for informating the admin about
+   * statuses
    * @param waitForOtherTasks If true wait for other imports to finish, 
    * if false abort the import.
+   * @param paths Valid pathes to corpora.
    * @return True if all corpora where imported successfully.
    */
   public boolean importCorporaSave(boolean overwrite, 
