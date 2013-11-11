@@ -13,27 +13,42 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.model;
+package annis.ql.parser;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableList;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
-
+import org.antlr.v4.runtime.Token;
 /**
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public class LogicClause
 {
-  public static enum Operator {AND, OR, LEAF}
+  public enum Operator {
+    AND, OR, LEAF;
+
+    @Override
+    public String toString()
+    {
+      return super.toString();
+    }
+  }
   
   private Operator op;
   private List<LogicClause> children;
-  private QueryNode content;
+  private List<? extends Token> content;
   private LogicClause parent;
 
+  /**
+   * Default constructor. Will create a LogicClause which is a leaf and has
+   * no content 
+   */
   public LogicClause()
   {
     this.op = Operator.LEAF;
@@ -57,7 +72,7 @@ public class LogicClause
     this();
     this.op = other.op;
     this.parent = other.parent;
-    this.content = other.content;
+    this.content = new ArrayList<Token>(other.content);
     this.children.addAll(other.children);
   }
 
@@ -74,6 +89,17 @@ public class LogicClause
   public ImmutableList<LogicClause> getChildren()
   {
     return ImmutableList.copyOf(children);
+  }
+  
+  public void addAllChildren(Collection<LogicClause> children)
+  {
+    if(children != null)
+    {
+      for(LogicClause c : children)
+      {
+        addChild(c);
+      }
+    }
   }
   
   public void addChild(LogicClause child)
@@ -113,14 +139,49 @@ public class LogicClause
   }
   
 
-  public QueryNode getContent()
+  public List<? extends Token> getContent()
   {
     return content;
   }
 
-  public void setContent(QueryNode content)
+  public void setContent(List<? extends Token> content)
   {
     this.content = content;
+  }
+  
+  public List<Token> getCoveredToken()
+  {
+    List<Token> result = new LinkedList<Token>();
+    
+    if(content != null && !content.isEmpty()
+      && (op == Operator.AND || op == Operator.OR))
+    {
+      // add children and put our own operator between them
+      
+      Iterator<LogicClause> itChild = children.iterator();
+      while(itChild.hasNext())
+      {
+        result.addAll(itChild.next().getCoveredToken());
+        if(itChild.hasNext())
+        {
+          result.addAll(content);
+        }
+      }
+    }
+    else if(op == Operator.LEAF && content != null)
+    {
+      result.addAll(content);
+    }
+    else
+    {
+      // fallback: this node has no own token but it's children might have
+      for(LogicClause child : children)
+      {
+        result.addAll(child.getCoveredToken());
+      }
+    }
+
+    return result;
   }
 
   public LogicClause getParent()
@@ -131,19 +192,24 @@ public class LogicClause
   @Override
   public String toString()
   {
-    if(children.isEmpty())
+    if(op == Operator.AND)
     {
-      return "{ op: " + op + "; content: " + content + "} ";
+      return "(" + Joiner.on(" & ").join(children) + ")";
     }
-    else
+    else if(op == Operator.OR)
     {
-      return "{ op: " + op + "; content: " + content 
-        + "; children:" + children.toString() + " }";
+      return Joiner.on(" \n| \n").join(children);
     }
     
+    LinkedList<String> texts = new LinkedList<String>();
+    if(content != null)
+    {
+      for(Token t : content)
+      {
+        texts.add(t.getText());
+      }
+    }
+    return Joiner.on(" ").join(texts);
   }
-
-  
-  
 
 }

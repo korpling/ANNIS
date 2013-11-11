@@ -7,6 +7,24 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 		
 	<util:map id="exampleSyntaxTrees">
+<!--
+    <entry key="node &amp; (#1:root | #1:arity=2)">
+      <value><![CDATA[
+(node & #1:root)
+|
+(node & #1:arity=2,2)
+]]>
+      </value>
+    </entry>
+-->        
+    <entry key="word &amp; word &amp; (#1 . #2 | #2 . #1)">
+      <value><![CDATA[
+(word & word & #1 . #2)
+|
+(word & word & #2 . #1)
+]]>
+      </value>
+    </entry>
     <entry key="tok">
       <value><![CDATA[tok]]>
       </value>
@@ -40,12 +58,16 @@
     <value><![CDATA[key!= /value.*/]]></value>
     <value><![CDATA[tok & tok & #1 .2 #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm #2]]></value>
+    <value><![CDATA[#1 . #2 & #2 . #a & tok & tok & a#tok]]></value>
     <value><![CDATA[tok & tok & #1 .norm* #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm,1 #2]]></value>
     <value><![CDATA[tok & tok & #1 .norm,1,3 #2]]></value>
     <value><![CDATA[Inf-Stat="new" & PP & #1 _o_ #2]]></value>
     <value><![CDATA[Topic="ab" & Inf-Stat="new" & #1 _i_ #2]]></value>
     <value><![CDATA[( (tok))]]></value>
+    <!-- corner cases of OR -->
+    <value><![CDATA["das" | "die" | "der"]]></value>
+    <value><![CDATA["das" | ("die" & pos="NN" & #2 . #3) | "der"]]></value>
 	</util:list>
 	
 	<util:list id="bad">
