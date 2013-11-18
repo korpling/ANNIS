@@ -15,6 +15,7 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao;
 import annis.administration.AdministrationDao.StatementController;
 import annis.administration.CorpusAdministration;
 import ch.qos.logback.classic.Level;
@@ -128,6 +129,7 @@ public class ImportDialog extends javax.swing.JDialog
     protected Status doInBackground() throws Exception
     {
       Status status = new Status();
+      AdministrationDao.ImportStats importStats = null;
       StringBuilder errorMessages = new StringBuilder();
 
       if (corpora == null)
@@ -150,11 +152,9 @@ public class ImportDialog extends javax.swing.JDialog
           corpusAdministration.getAdministrationDao().registerGUICancelThread(
             statementController);
 
-          corpusAdministration.importCorporaSave(jCheckBox1.isSelected(),
-            null,
-            null,
-            false,
-            txtInputDir.getText());
+          importStats = corpusAdministration.importCorporaSave(
+            jCheckBox1.isSelected(), null, null, false, txtInputDir.getText());
+
         }
         catch (Exception ex)
         {
@@ -208,9 +208,15 @@ public class ImportDialog extends javax.swing.JDialog
 
               corpusAdministration.getAdministrationDao().
                 registerGUICancelThread(statementController);
-              corpusAdministration.importCorporaSave(jCheckBox1.isSelected(),
-                null,
-                null, false, path);
+
+              if (importStats == null)
+              {
+              importStats = corpusAdministration.importCorporaSave(
+                jCheckBox1.isSelected(), null, null, false, path);
+              } else {
+                importStats.add(corpusAdministration.importCorporaSave(
+                  jCheckBox1.isSelected(), null, null, false, path));
+              }
             }
             catch (Exception ex)
             {
@@ -223,9 +229,10 @@ public class ImportDialog extends javax.swing.JDialog
         }
       }
 
-      if (errorMessages.length() > 0)
+      if (!importStats.getStatus())
       {
         status.ok = false;
+        status.ex = (Exception) importStats.getExceptions().get(importStats.getExceptions().size() -1);
         return status;
       }
 

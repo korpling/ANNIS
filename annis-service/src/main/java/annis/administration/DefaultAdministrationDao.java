@@ -1852,7 +1852,10 @@ public class DefaultAdministrationDao implements AdministrationDao
   private String getTopLevelCorpusFromTmpArea()
   {
     String sql = "SELECT name FROM " + tableInStagingArea("corpus")
-      + " WHERE type='CORPUS'";
+      + " WHERE type='CORPUS'\n"
+      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus") +")\n"
+      + "AND post = (SELECT max(post) FROM " + tableInStagingArea("corpus") + ")";
+
     return jdbcTemplate.query(sql, new ResultSetExtractor<String>()
     {
       @Override

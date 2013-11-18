@@ -206,19 +206,20 @@ public class ImportWorker extends Thread
           + "imported before without setting the \"overwrite\" parameter");
       }
     }
-    if(!outDir.mkdirs())
+    if (!outDir.mkdirs())
     {
-      throw new IllegalStateException("Could not create directory " 
+      throw new IllegalStateException("Could not create directory "
         + outDir.getAbsolutePath());
     }
-    
+
     // unzip
     File rootDir = unzipCorpus(outDir, job.getInZip());
-    
+
     if (rootDir != null)
     {
-      if (corpusAdmin.importCorporaSave(job.isOverwrite(), null,
-        job.getStatusEmail(), true, rootDir.getAbsolutePath()))
+      AdministrationDao.ImportStats importStats = corpusAdmin.importCorporaSave(
+        job.isOverwrite(), null, job.getStatusEmail(), true, rootDir.getAbsolutePath());
+      if (importStats.getStatus())
       {
         currentJob.setStatus(ImportJob.Status.SUCCESS);
       }
