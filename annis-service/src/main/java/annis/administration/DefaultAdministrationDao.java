@@ -379,7 +379,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public boolean importCorpus(String path, boolean override, boolean waitForOtherTasks)
+  public boolean importCorpus(String path, 
+    String aliasName,
+    boolean override, 
+    boolean waitForOtherTasks)
   {
 
     // check schema version first
@@ -393,7 +396,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-
+    
     // remove conflicting top level corpora, when override is set to true.
     if (override)
     {
@@ -451,6 +454,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
 
     generateExampleQueries(corpusID);
+    
+    if(aliasName != null && !aliasName.isEmpty())
+    {
+      addCorpusAlias(corpusID, aliasName);
+    }
     
 
     return true;
@@ -1145,6 +1153,20 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
 
+  @Override
+  public void addCorpusAlias(long corpusID, String alias)
+  {
+    jdbcTemplate.update(
+      "INSERT INTO corpus_alias (alias, corpus_ref)\n"
+      + "VALUES(\n"
+      + "  ?, \n"
+      + "  ?\n"
+      + ");", 
+      alias, corpusID);
+  }
+  
+  
+
   ///// Helpers
   private List<String> importedAndCreatedTables()
   {
@@ -1617,6 +1639,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       // count cols for detecting old resolver_vis_map table format
       File resolver_vis_tab = new File(path, table + REL_ANNIS_FILE_SUFFIX);
 
+      if(!resolver_vis_tab.isFile())
+      {
+        return;
+      }
+      
       BufferedReader bReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
       String firstLine = bReader.readLine();

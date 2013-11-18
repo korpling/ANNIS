@@ -38,11 +38,11 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id),
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   id    integer,
   name  varchar,
   text  text,
-  toplevel_corpus integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   PRIMARY KEY(corpus_ref, id)
 );
 COMMENT ON COLUMN text.id IS 'primary key';

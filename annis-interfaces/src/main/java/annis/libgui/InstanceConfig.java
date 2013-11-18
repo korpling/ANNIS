@@ -43,7 +43,6 @@ public class InstanceConfig implements Serializable
   private String defaultQueryBuilder;
   private List<CorpusSet> corpusSets;
   private String defaultCorpusSet;
-  private Map<String,String> corpusMappings;
   private FontConfig font;
   private String keyboardLayout;
   
@@ -54,7 +53,6 @@ public class InstanceConfig implements Serializable
     defaultQueryBuilder = "";
     corpusSets = new LinkedList<CorpusSet>();
     defaultCorpusSet = "";
-    corpusMappings = new HashMap<String, String>();
     
   }
 
@@ -136,25 +134,6 @@ public class InstanceConfig implements Serializable
   {
     this.defaultCorpusSet = defaultCorpusSet;
   }
-
-  /**
-   * Get the mappings of corpus names.
-   * 
-   * A mapping is an alias for an imported corpus which can be used e.g.
-   * by external applications to reference to a persistant identifier instead
-   * of the internal corpus name.
-   * @return 
-   */
-  @XmlElement(name="corpus-mappings")
-  public Map<String, String> getCorpusMappings()
-  {
-    return corpusMappings;
-  }
-
-  public void setCorpusMappings(Map<String, String> corpusMappings)
-  {
-    this.corpusMappings = corpusMappings;
-  }  
 
   /**
    * Get the special font used by this instance.

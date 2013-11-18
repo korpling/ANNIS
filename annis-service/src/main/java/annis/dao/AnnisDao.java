@@ -48,6 +48,7 @@ public interface AnnisDao
     String documentName);
 
   public List<AnnisCorpus> listCorpora();
+  public List<AnnisCorpus> listCorpora(List<Long> ids);
 
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
@@ -123,6 +124,8 @@ public interface AnnisDao
    */
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String subCorpusName);
+  
+  public List<Long> mapCorpusAliasToIds(String alias);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 

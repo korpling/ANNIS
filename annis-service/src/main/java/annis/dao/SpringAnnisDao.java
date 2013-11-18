@@ -70,6 +70,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -637,6 +638,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return (List<AnnisCorpus>) getJdbcTemplate().query(
       listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
   }
+  
+  @Override
+  @Transactional(readOnly = true)
+  public List<AnnisCorpus> listCorpora(List<Long> ids)
+  { 
+    return (List<AnnisCorpus>) getJdbcTemplate().query(
+      listCorpusSqlHelper.createSqlQueryWithList(ids.size()),
+      listCorpusSqlHelper, ids.toArray());
+  }
 
   @Override
   @Transactional(readOnly = true)
@@ -1101,6 +1111,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       singleEntry.setLength((int) f.length());
     }
     return metaData;
+  }
+  
+  @Override
+  public List<Long> mapCorpusAliasToIds(String alias)
+  {
+    try
+    {
+      return getJdbcTemplate().queryForList("SELECT corpus_ref FROM corpus_alias WHERE alias=?", 
+        Long.class, alias);
+    }
+    catch(DataAccessException ex)
+    {
+      return new LinkedList<Long>();
+    }
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()

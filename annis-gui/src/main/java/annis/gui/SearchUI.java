@@ -808,6 +808,34 @@ public class SearchUI extends AnnisBaseUI
   {
     evaluateFragment(event.getUriFragment());
   }
+  
+  /**
+   * Takes a list of raw corpus names as given by the #c parameter and returns
+   * a list of corpus names that are known to exist. 
+   * It also replaces alias names
+   * with the real corpus names.
+   * @param originalNames
+   * @return 
+   */
+  private Set<String> getMappedCorpora(List<String> originalNames)
+  {
+    WebResource rootRes = Helper.getAnnisWebResource();
+    Set<String> mappedNames = new HashSet<String>();
+    // iterate over given corpora and map names if necessary
+    for (String selectedCorpusName : originalNames)
+    {
+      // get the real corpus descriptions by the name (which could be an alias)
+      List<AnnisCorpus> corporaByName = 
+        rootRes.path("query").path("corpora").path(selectedCorpusName)
+          .get(new GenericType<List<AnnisCorpus>>(){});
+
+      for(AnnisCorpus c : corporaByName)
+      {
+        mappedNames.add(c.getName());
+      }
+    }
+    return mappedNames;
+  }
 
   private void evaluateFragment(String fragment)
   {
@@ -824,45 +852,15 @@ public class SearchUI extends AnnisBaseUI
 
     if (args.containsKey("c"))
     {
-      String[] corporaSplitted = args.get("c").split("\\s*,\\s*");
-      corpora.addAll(Arrays.asList(corporaSplitted));
+      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
+      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
     }
 
     if (args.containsKey("c") && args.size() == 1)
     {
-      // special case: we were called from outside and should only select
-      // our corpus
-      Set<String> mappedCorpora = new HashSet<String>();
-      // iterate over given corpora and map names if necessary
-      for (String c : corpora)
-      {
-        if (instanceConfig.getCorpusMappings() != null
-          && instanceConfig.getCorpusMappings().containsKey(c))
-        {
-          mappedCorpora.add(instanceConfig.getCorpusMappings().get(c));
-        }
-        else
-        {
-          mappedCorpora.add(c);
-        }
-      }
-
-      // get list of all corpora
-      WebResource rootRes = Helper.getAnnisWebResource();
-      List<AnnisCorpus> allCorpora = rootRes.path("query").path("corpora")
-        .get(new GenericType<List<AnnisCorpus>>()
-      {
-      });
-      Set<String> allCorpusNames = new HashSet<String>();
-      for (AnnisCorpus c : allCorpora)
-      {
-        allCorpusNames.add(c.getName());
-      }
-
-      // remove all corpora selections that do not exist
-      boolean someCorporaRemoved = mappedCorpora.retainAll(allCorpusNames);
-
-      if (someCorporaRemoved)
+      // special case: we were called from outside and should only select,
+      // but not query, the selected corpora
+      if (corpora.isEmpty())
       {
         // show a warning message that the corpus was not imported yet
         new Notification("Linked corpus does not exist",
@@ -871,6 +869,11 @@ public class SearchUI extends AnnisBaseUI
           + "responsible person of the site that contained the link to import the corpus.",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
+      else
+      {
+        getControlPanel().getCorpusList().selectCorpora(corpora);
+      }
+      
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {

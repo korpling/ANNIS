@@ -153,7 +153,7 @@ public class ImportDialog extends javax.swing.JDialog
             statementController);
 
           importStats = corpusAdministration.importCorporaSave(
-            jCheckBox1.isSelected(), null, false, txtInputDir.getText());
+            jCheckBox1.isSelected(), null, null, false, txtInputDir.getText());
 
         }
         catch (Exception ex)
@@ -212,10 +212,10 @@ public class ImportDialog extends javax.swing.JDialog
               if (importStats == null)
               {
               importStats = corpusAdministration.importCorporaSave(
-                jCheckBox1.isSelected(), null, false, path);
+                jCheckBox1.isSelected(), null, null, false, path);
               } else {
                 importStats.add(corpusAdministration.importCorporaSave(
-                  jCheckBox1.isSelected(), null, false, path));
+                  jCheckBox1.isSelected(), null, null, false, path));
               }
             }
             catch (Exception ex)

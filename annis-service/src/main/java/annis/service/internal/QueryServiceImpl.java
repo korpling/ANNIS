@@ -21,6 +21,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
+import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -45,6 +46,7 @@ import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.impl.provider.entity.XMLListElementProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -515,8 +518,10 @@ public class QueryServiceImpl implements QueryService
   @Path("corpora")
   @Produces("application/xml")
   public List<AnnisCorpus> corpora()
-  {
+  { 
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+    
+    
     List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
 
     // filter by which corpora the user is allowed to access
@@ -554,6 +559,7 @@ public class QueryServiceImpl implements QueryService
 
     return result;
   }
+  
 
   @GET
   @Path("corpora/default-config")
@@ -563,6 +569,36 @@ public class QueryServiceImpl implements QueryService
     return defaultCorpusConfig;
   }
 
+  @GET
+  @Path("corpora/{top}")
+  @Produces("application/xml")
+  public List<AnnisCorpus> singleCorpus(@PathParam("top") String toplevelName)
+  {
+    List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
+    
+    Subject user = SecurityUtils.getSubject();
+    
+    LinkedList<String> originalCorpusNames = new LinkedList<String>();
+    originalCorpusNames.add(toplevelName);
+    List<Long> ids = annisDao.mapCorpusNamesToIds(originalCorpusNames);
+    
+    // also add all corpora that match the alias name
+    ids.addAll(annisDao.mapCorpusAliasToIds(toplevelName));
+    if(!ids.isEmpty())
+    {
+      List<AnnisCorpus> allCorpora = annisDao.listCorpora(ids);
+      for(AnnisCorpus c : allCorpora)
+      {
+        if(user.isPermitted("query:*:" + c.getName()))
+        {
+          result.add(c);
+        }
+      }
+    }
+
+    return result;
+  }
+  
   @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")

@@ -37,12 +37,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private SchemeFixer schemeFixer;
   private String statusMailSender;
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -82,6 +83,12 @@ public class CorpusAdministration
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
+    
+    // create tables and other stuff that is handled by the scheme fixer
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
   }
 
   /**
@@ -92,14 +99,16 @@ public class CorpusAdministration
    *
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
+   * @param aliasName An common alias name for all imported corpora or null
    * @param statusEmailAdress an email adress for informating the admin about
    * statuses
    * @param waitForOtherTasks If true wait for other imports to finish, if false
    * abort the import.
    * @param paths Valid pathes to corpora.
    * @return True if all corpora where imported successfully.
-   */
+   */  
   public ImportStats importCorporaSave(boolean overwrite,
+    String aliasName,
     String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
 
@@ -107,13 +116,20 @@ public class CorpusAdministration
     ImportStats importStats = new ImportStatsImpl();
     importStats.setStatus(true);
 
+    // check if database scheme is ok
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
+    
     // import each corpus
     for (String path : paths)
     {
       try
       {
         log.info("Importing corpus from: " + path);
-        if (administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
+        if(administrationDao.importCorpus(path, aliasName,
+          overwrite, waitForOtherTasks))
         {
           log.info("Finished import from: " + path);
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
@@ -321,6 +337,7 @@ public class CorpusAdministration
    *
    * @param overwrite if false, a conflicting top level corpus is silently
    * skipped.
+   * @param aliasName An common alias name for all imported corpora or null
    * @param statusEmailAdress If not null the email adress of the user who 
    * started the import.
    * @param waitForOtherTasks If true wait for other imports to finish, 
@@ -329,9 +346,11 @@ public class CorpusAdministration
    * @return True if all corpora where imported successfully.
    */
   public ImportStats importCorporaSave(boolean overwrite,
+  	String aliasName,
     String statusEmailAdress, boolean waitForOtherTasks, String... paths)
   {
-    return importCorporaSave(overwrite, statusEmailAdress, waitForOtherTasks,
+    return importCorporaSave(overwrite, aliasName, 
+      statusEmailAdress, waitForOtherTasks,
       Arrays.asList(paths));
   }
 
@@ -410,6 +429,17 @@ public class CorpusAdministration
   {
     this.statusMailSender = statusMailSender;
   }
+
+  public SchemeFixer getSchemeFixer()
+  {
+    return schemeFixer;
+  }
+
+  public void setSchemeFixer(SchemeFixer schemeFixer)
+  {
+    this.schemeFixer = schemeFixer;
+  }
+  
   
   
   

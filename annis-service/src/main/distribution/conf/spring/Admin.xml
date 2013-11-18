@@ -22,11 +22,13 @@
   <bean id="corpusAdministration" class="annis.administration.CorpusAdministration" lazy-init="true" >
     <property name="administrationDao" ref="administrationDao"/>
     <property name="statusMailSender" value="${annis.mail-sender}"/>
+    <property name="schemeFixer" ref="schemeFixer" />
   </bean>
 
   <!-- AnnisAdminRunner -->
   <bean id="annisAdminRunner" class="annis.administration.AnnisAdminRunner" lazy-init="true">
     <property name="corpusAdministration" ref="corpusAdministration" />
+    <property name="annisDao" ref="annisDao" />
     <property name="queriesGenerator" ref="queriesGenerator"/>
   </bean>
 

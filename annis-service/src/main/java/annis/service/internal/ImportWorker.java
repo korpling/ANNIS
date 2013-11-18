@@ -32,7 +32,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -73,7 +76,7 @@ public class ImportWorker extends Thread
       try
       {
         currentJob = importQueue.take();
-        importSingleCorpus(currentJob);
+        importSingleCorpusFile(currentJob);
       }
       catch (InterruptedException ex)
       {
@@ -114,11 +117,11 @@ public class ImportWorker extends Thread
    * 
    * @param outDir The ouput directory.
    * @param zip ZIP-file to extract.
-   * @return The root directory where the tab-files are located if found, null otherwise.
+   * @return A list of root directories where the tab-files are located if found, null otherwise.
    */
-  private File unzipCorpus(File outDir, ZipFile zip)
+  private List<File> unzipCorpus(File outDir, ZipFile zip)
   {
-    File rootDir = null;
+    List<File> rootDirs = new ArrayList<File>();
 
     Enumeration<? extends ZipEntry> zipEnum = zip.entries();
     while (zipEnum.hasMoreElements())
@@ -140,7 +143,7 @@ public class ImportWorker extends Thread
         if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
           outFile.getName()))
         {
-          rootDir = outFile.getParentFile();
+          rootDirs.add(outFile.getParentFile());
         }
 
         FileOutputStream outStream = null;
@@ -174,36 +177,28 @@ public class ImportWorker extends Thread
       } // end else is file
     } // end for each entry in zip file
 
-    return rootDir;
+    return rootDirs;
   }
 
-  private void importSingleCorpus(ImportJob job)
+  private void importSingleCorpusFile(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
     corpusAdmin.sendStatusMail(currentJob.getStatusEmail(), 
-          currentJob.getCorpusName(), ImportJob.Status.RUNNING, null);
+          job.getCaption(), ImportJob.Status.RUNNING, null);
+    
     
     File outDir = new File(System.getProperty("user.home"), ".annis/zip-imports/"
-      + job.getCorpusName());
+      + getSafeDirName(job.getCaption()));
     if(outDir.exists())
     {
-      if(job.isOverwrite())
+      try
       {
-        try
-        {
-          // delete old data inside the corpus directory
-          FileUtils.deleteDirectory(outDir);
-        }
-        catch (IOException ex)
-        {
-          log.warn("Could not recursivly delete the output directory", ex);
-        }
+        // delete old data inside the corpus directory
+        FileUtils.deleteDirectory(outDir);
       }
-      else
+      catch (IOException ex)
       {
-        throw new IllegalStateException("Target directory for corpus already "
-          + "exist. You attempt to import a corpus which was already "
-          + "imported before without setting the \"overwrite\" parameter");
+        log.warn("Could not recursivly delete the output directory", ex);
       }
     }
     if (!outDir.mkdirs())
@@ -213,21 +208,45 @@ public class ImportWorker extends Thread
     }
 
     // unzip
-    File rootDir = unzipCorpus(outDir, job.getInZip());
+    List<File> rootDirectories = unzipCorpus(outDir, job.getInZip());
 
-    if (rootDir != null)
+    boolean success = true;
+    
+    for(File rootDir : rootDirectories)
     {
+      // do the actual import
       AdministrationDao.ImportStats importStats = corpusAdmin.importCorporaSave(
-        job.isOverwrite(), job.getStatusEmail(), true, rootDir.getAbsolutePath());
-      if (importStats.getStatus())
+        job.isOverwrite(), job.getAlias(), job.getStatusEmail(), true, rootDir.getAbsolutePath());
+      if (!importStats.getStatus())
       {
-        currentJob.setStatus(ImportJob.Status.SUCCESS);
+        success = false; 
       }
-      else
-      {
-        currentJob.setStatus(ImportJob.Status.ERROR);
-      }
-      finishedJobs.put(currentJob.getUuid(), currentJob);
+    }
+    if(success)
+    {
+      currentJob.setStatus(ImportJob.Status.SUCCESS);
+    }
+    else
+    {
+      currentJob.setStatus(ImportJob.Status.ERROR);
+    }
+    finishedJobs.put(currentJob.getUuid(), currentJob);
+  }
+  
+  /**
+   * Returns a directory name for an import job that is safe to use as a file name.
+   * @param job
+   * @return 
+   */
+  private String getSafeDirName(String jobName)
+  {
+    if(jobName != null)
+    {
+      return jobName.replaceAll("[^0-9A-Za-z.-]", "_");
+    }
+    else
+    {
+      return UUID.randomUUID().toString();
     }
   }
 

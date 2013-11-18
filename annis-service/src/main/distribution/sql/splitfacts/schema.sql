@@ -47,11 +47,11 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id),
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   id    integer,
   name  varchar,
   text  text,
-  toplevel_corpus integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   PRIMARY KEY(corpus_ref, id)
 );
 
@@ -77,8 +77,8 @@ CREATE TABLE facts_node (
   fid bigserial,
   id bigint,
   text_ref integer,
-  corpus_ref integer REFERENCES corpus(id),
-  toplevel_corpus integer REFERENCES corpus(id),
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   node_namespace varchar,
   node_name varchar,
   "left" integer,
@@ -98,7 +98,7 @@ CREATE TABLE facts_node (
 CREATE TABLE facts_edge (
   fid bigserial,
   node_ref bigint, -- node reference
-  toplevel_corpus integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   pre integer, -- pre-order value
   post integer, -- post-order value
   parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots

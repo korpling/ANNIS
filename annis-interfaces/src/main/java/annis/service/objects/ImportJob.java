@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipFile;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -37,10 +38,11 @@ public class ImportJob
   
   private String uuid;
   private ZipFile inZip;
-  private String corpusName;
+  private String caption;
   private Status status;
   private List<String> messages = new LinkedList<String>();
   private boolean overwrite;
+  private String alias;
   private String statusEmail;
 
   public String getUuid()
@@ -64,16 +66,18 @@ public class ImportJob
     this.inZip = inZip;
   }
 
-  public String getCorpusName()
+  public String getCaption()
   {
-    return corpusName;
+    return caption;
   }
 
-  public void setCorpusName(String corpusName)
+  public void setCaption(String caption)
   {
-    this.corpusName = corpusName;
+    this.caption = caption;
   }
 
+  
+  
   public Status getStatus()
   {
     return status;
@@ -84,7 +88,8 @@ public class ImportJob
     this.status = status;
   }
 
-  @XmlElement(name = "messages")
+  @XmlElementWrapper(name = "messages")
+  @XmlElement(name="m")
   public List<String> getMessages()
   {
     return messages;
@@ -108,6 +113,16 @@ public class ImportJob
   public void setStatusEmail(String statusEmail)
   {
     this.statusEmail = statusEmail;
+  }
+
+  public String getAlias()
+  {
+    return alias;
+  }
+
+  public void setAlias(String alias)
+  {
+    this.alias = alias;
   }
   
   
