@@ -88,6 +88,9 @@ public class CorpusAdministration
    * overwrite flag is set to false.
    *
    * @param paths Valid pathes to corpora.
+   * @param aliasName An common alias name for all imported corpora or null
+   * @param statusEmailAdress If not null an e-mail will be sent to this address 
+   * whenever the import status changes.
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
    * @param waitForOtherTasks If true wait for other imports to finish, 
@@ -95,6 +98,7 @@ public class CorpusAdministration
    * @return True if all corpora where imported successfully.
    */
   public boolean importCorporaSave(boolean overwrite, 
+    String aliasName,
     String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
     boolean result = true;
@@ -111,7 +115,8 @@ public class CorpusAdministration
       try
       {
         log.info("Importing corpus from: " + path);
-        if(administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
+        if(administrationDao.importCorpus(path, aliasName,
+          overwrite, waitForOtherTasks))
         {
           log.info("Finished import from: " + path);
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
@@ -242,6 +247,7 @@ public class CorpusAdministration
    *
    * @param overwrite if false, a conflicting top level corpus is silently
    * skipped.
+   * @param aliasName An common alias name for all imported corpora or null
    * @param statusEmailAdress If not null the email adress of the user who 
    * started the import.
    * @param waitForOtherTasks If true wait for other imports to finish, 
@@ -249,10 +255,12 @@ public class CorpusAdministration
    * @param paths the paths to the corpora
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, 
+  public boolean importCorporaSave(boolean overwrite, 
+    String aliasName,
+    String statusEmailAdress, 
     boolean waitForOtherTasks, String... paths)
   {
-    return importCorporaSave(overwrite, statusEmailAdress,
+    return importCorporaSave(overwrite, null, statusEmailAdress,
       waitForOtherTasks,
       Arrays.asList(paths));
   }

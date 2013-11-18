@@ -320,7 +320,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           else
           {
             log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorporaSave(true, null, false, migratePath);
+            corpusAdministration.importCorporaSave(true, null, null, false, migratePath);
           }
         }
 
@@ -337,9 +337,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private void doImport(List<String> commandArgs)
   {
-    Options options = new OptionBuilder().addToggle("o", "overwrite", false,
+    Options options = new OptionBuilder()
+      .addToggle("o", "overwrite", false,
       "Overwrites a corpus, when it is already stored in the database.")
       .addParameter("m", "mail", "e-mail adress to where status updates should be send")
+      .addParameter("a", "alias", "an alias name for this corpus")
       .createOptions();
 
     try
@@ -360,6 +362,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       if (cmdLine.hasOption('o'))
       {
         corpusAdministration.importCorporaSave(true, 
+          options.getOption("alias").getValue(),
           options.getOption("mail").getValue(), 
           false,
           cmdLine.getArgList());
@@ -367,6 +370,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       else
       {
         corpusAdministration.importCorporaSave(false, 
+          options.getOption("alias").getValue(),
           options.getOption("mail").getValue(), 
           false,
           cmdLine.getArgList());

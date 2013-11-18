@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -379,7 +380,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public boolean importCorpus(String path, boolean override, boolean waitForOtherTasks)
+  public boolean importCorpus(String path, 
+    String aliasName,
+    boolean override, 
+    boolean waitForOtherTasks)
   {
 
     // check schema version first

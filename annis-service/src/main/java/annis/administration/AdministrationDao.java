@@ -20,6 +20,7 @@ import annis.security.AnnisUserConfig;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -42,12 +43,16 @@ public interface AdministrationDao
    * Reads relAnnis files from several directories.
    *
    * @param path Specifies the path to the corpora, which should be imported.
+   * @param aliasName An alias name for this corpus. Can be null.
    * @param overwrite If set to true conflicting top level corpora are deleted.
    * @param waitForOtherTasks If true wait for other tasks to finish, if false abort.
    * 
    * @return true if successful
    */
-  public boolean importCorpus(String path, boolean overwrite, boolean waitForOtherTasks);
+  public boolean importCorpus(String path, 
+    String aliasName,
+    boolean overwrite, 
+    boolean waitForOtherTasks);
   
   public List<Map<String, Object>> listCorpusStats();
 
