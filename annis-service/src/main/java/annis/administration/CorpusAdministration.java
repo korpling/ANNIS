@@ -328,11 +328,10 @@ public class CorpusAdministration
    * @param paths the paths to the corpora
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, 
-    boolean waitForOtherTasks, String... paths)
+  public ImportStats importCorporaSave(boolean overwrite,
+    String statusEmailAdress, boolean waitForOtherTasks, String... paths)
   {
-    return importCorporaSave(overwrite, statusEmailAdress,
-      waitForOtherTasks,
+    return importCorporaSave(overwrite, statusEmailAdress, waitForOtherTasks,
       Arrays.asList(paths));
   }
 
