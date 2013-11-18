@@ -1639,6 +1639,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       // count cols for detecting old resolver_vis_map table format
       File resolver_vis_tab = new File(path, table + REL_ANNIS_FILE_SUFFIX);
 
+      if(!resolver_vis_tab.isFile())
+      {
+        return;
+      }
+      
       BufferedReader bReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
       String firstLine = bReader.readLine();
