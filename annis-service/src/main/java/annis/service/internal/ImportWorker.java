@@ -191,23 +191,14 @@ public class ImportWorker extends Thread
       + getSafeDirName(job.getCaption()));
     if(outDir.exists())
     {
-      if(job.isOverwrite())
+      try
       {
-        try
-        {
-          // delete old data inside the corpus directory
-          FileUtils.deleteDirectory(outDir);
-        }
-        catch (IOException ex)
-        {
-          log.warn("Could not recursivly delete the output directory", ex);
-        }
+        // delete old data inside the corpus directory
+        FileUtils.deleteDirectory(outDir);
       }
-      else
+      catch (IOException ex)
       {
-        throw new IllegalStateException("Target directory for corpus already "
-          + "exist. You attempt to import a corpus which was already "
-          + "imported before without setting the \"overwrite\" parameter");
+        log.warn("Could not recursivly delete the output directory", ex);
       }
     }
     if (!outDir.mkdirs())
