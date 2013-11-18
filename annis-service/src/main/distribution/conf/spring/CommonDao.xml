@@ -187,6 +187,10 @@
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queriesGenerator" ref="queriesGenerator" />
   </bean>
+  
+  <bean id="schemeFixerBase" class="annis.administration.SchemeFixer" lazy-init="true">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
 
   <!-- END EXPORTS -->
 

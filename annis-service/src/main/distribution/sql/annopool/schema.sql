@@ -220,6 +220,7 @@ CREATE TABLE user_config
 );
 
 --CREATE TYPE ops AS ENUM ('.','.*','>','->','_i_');
+DROP TABLE IF EXISTS example_queries;
 CREATE TABLE example_queries
 (
   "id" serial PRIMARY KEY,

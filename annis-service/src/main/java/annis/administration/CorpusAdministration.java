@@ -34,12 +34,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private SchemeFixer schemeFixer;
   private String statusMailSender;
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -97,6 +98,12 @@ public class CorpusAdministration
     String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
     boolean result = true;
+    
+    // check if database scheme is ok
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
     
     // import each corpus
     for (String path : paths)
@@ -325,6 +332,17 @@ public class CorpusAdministration
   {
     this.statusMailSender = statusMailSender;
   }
+
+  public SchemeFixer getSchemeFixer()
+  {
+    return schemeFixer;
+  }
+
+  public void setSchemeFixer(SchemeFixer schemeFixer)
+  {
+    this.schemeFixer = schemeFixer;
+  }
+  
   
   
   

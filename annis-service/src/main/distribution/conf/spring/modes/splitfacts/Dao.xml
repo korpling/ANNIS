@@ -30,6 +30,9 @@
   <bean id="administrationDao" class="annis.administration.SfAdministrationDao" parent="administrationDaoBase" lazy-init="true">
     <property name="schemaVersion" value="3.0.0-beta2-splitfacts"/>
   </bean>
+  
+  <bean id="schemeFixer" class="annis.administration.SchemeFixer" parent="schemeFixerBase" lazy-init="true">
+  </bean>
 
   <!-- END EXPORTS -->
 
