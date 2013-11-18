@@ -21,6 +21,7 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
+import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -45,6 +46,7 @@ import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
+import com.sun.jersey.core.impl.provider.entity.XMLListElementProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
@@ -52,6 +54,7 @@ import java.io.OutputStream;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -553,6 +556,30 @@ public class QueryServiceImpl implements QueryService
     }
 
     return result;
+  }
+  
+  @GET
+  @Path("corpora/alias/{name}")
+  @Produces("application/xml")
+  public Response aliasForCorpus(@PathParam("name") String name)
+  {
+    List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
+    
+    Subject user = SecurityUtils.getSubject();
+    
+    List<Long> ids = annisDao.getCorporaForAlias(name);
+    if(!ids.isEmpty())
+    {
+      List<AnnisCorpus> allCorpora = annisDao.listCorpora(ids);
+      for(AnnisCorpus c : allCorpora)
+      {
+        if(user.isPermitted("query:*:" + c.getName()))
+        {
+          result.add(c);
+        }
+      }
+    }
+    return Response.ok(new GenericEntity<List<AnnisCorpus>>(result) {}).build();
   }
 
   @GET
