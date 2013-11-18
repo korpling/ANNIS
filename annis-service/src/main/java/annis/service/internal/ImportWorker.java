@@ -217,7 +217,7 @@ public class ImportWorker extends Thread
       // do the actual import
       AdministrationDao.ImportStats importStats = corpusAdmin.importCorporaSave(
         job.isOverwrite(), job.getAlias(), job.getStatusEmail(), true, rootDir.getAbsolutePath());
-      if (importStats.getStatus())
+      if (!importStats.getStatus())
       {
         success = false; 
       }
