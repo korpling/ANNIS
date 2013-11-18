@@ -518,8 +518,10 @@ public class QueryServiceImpl implements QueryService
   @Path("corpora")
   @Produces("application/xml")
   public List<AnnisCorpus> corpora()
-  {
+  { 
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
+    
+    
     List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
 
     // filter by which corpora the user is allowed to access
@@ -558,16 +560,30 @@ public class QueryServiceImpl implements QueryService
     return result;
   }
   
+
   @GET
-  @Path("corpora/alias/{name}")
+  @Path("corpora/default-config")
   @Produces("application/xml")
-  public Response aliasForCorpus(@PathParam("name") String name)
+  public CorpusConfig corpusDefaultConfig()
+  {
+    return defaultCorpusConfig;
+  }
+
+  @GET
+  @Path("corpora/{top}")
+  @Produces("application/xml")
+  public List<AnnisCorpus> singleCorpus(@PathParam("top") String toplevelName)
   {
     List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
     
     Subject user = SecurityUtils.getSubject();
     
-    List<Long> ids = annisDao.getCorporaForAlias(name);
+    LinkedList<String> originalCorpusNames = new LinkedList<String>();
+    originalCorpusNames.add(toplevelName);
+    List<Long> ids = annisDao.mapCorpusNamesToIds(originalCorpusNames);
+    
+    // also add all corpora that match the alias name
+    ids.addAll(annisDao.mapCorpusAliasToIds(toplevelName));
     if(!ids.isEmpty())
     {
       List<AnnisCorpus> allCorpora = annisDao.listCorpora(ids);
@@ -579,17 +595,10 @@ public class QueryServiceImpl implements QueryService
         }
       }
     }
-    return Response.ok(new GenericEntity<List<AnnisCorpus>>(result) {}).build();
-  }
 
-  @GET
-  @Path("corpora/default-config")
-  @Produces("application/xml")
-  public CorpusConfig corpusDefaultConfig()
-  {
-    return defaultCorpusConfig;
+    return result;
   }
-
+  
   @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")

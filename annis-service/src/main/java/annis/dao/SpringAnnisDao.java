@@ -1114,7 +1114,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
   
   @Override
-  public List<Long> getCorporaForAlias(String alias)
+  public List<Long> mapCorpusAliasToIds(String alias)
   {
     try
     {

@@ -125,7 +125,7 @@ public interface AnnisDao
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String subCorpusName);
   
-  public List<Long> getCorporaForAlias(String alias);
+  public List<Long> mapCorpusAliasToIds(String alias);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
