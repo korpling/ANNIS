@@ -23,8 +23,11 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.administration.AdministrationDao.ImportStats;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedList;
 import javax.mail.internet.InternetAddress;
 import org.apache.commons.io.output.FileWriterWithEncoding;
@@ -91,66 +94,146 @@ public class CorpusAdministration
    * reimported.
    * @param statusEmailAdress an email adress for informating the admin about
    * statuses
-   * @param waitForOtherTasks If true wait for other imports to finish, 
-   * if false abort the import.
+   * @param waitForOtherTasks If true wait for other imports to finish, if false
+   * abort the import.
    * @param paths Valid pathes to corpora.
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, 
+  public ImportStats importCorporaSave(boolean overwrite,
     String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
-    boolean result = true;
-    
+
+    // init the import stats. From the beginning everything is ok
+    ImportStats importStats = new ImportStatsImpl();
+    importStats.setStatus(true);
+
     // import each corpus
     for (String path : paths)
     {
       try
       {
         log.info("Importing corpus from: " + path);
-        if(administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
+        if (administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
         {
           log.info("Finished import from: " + path);
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
         }
         else
         {
-          result = false;
+          importStats.setStatus(false);
           sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, null);
         }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
-        result = false;
-        log.error(ex.getMessage());
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
+        importStats.setStatus(false);
+        importStats.addException(path, ex);
+        log.error("Error on conflicting top level corpus name");
+        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.
+          getMessage());
       }
-      catch(Throwable ex)
+      catch (Throwable ex)
       {
-        result = false;
+        importStats.setStatus(false);
+        importStats.addException(path, ex);
         log.error("Error on importing corpus", ex);
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
+        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.
+          getMessage());
       }
     }
-    
-    return result;
+
+    return importStats;
   }
-  
-  public void sendStatusMail(String adress, String corpusPath, 
+
+  private class ImportStatsImpl implements AdministrationDao.ImportStats
+  {
+
+    private boolean status;
+
+    private final Map<String, List<Throwable>> exceptions;
+
+    public ImportStatsImpl()
+    {
+      exceptions = new HashMap<String, List<Throwable>>();
+    }
+
+    @Override
+    public boolean getStatus()
+    {
+      return status;
+    }
+
+    @Override
+    public List<Throwable> getExceptions()
+    {
+      List<Throwable> allThrowables = new ArrayList<Throwable>();
+
+      for (List<Throwable> l : exceptions.values())
+      {
+        allThrowables.addAll(l);
+      }
+
+      return allThrowables;
+    }
+
+    @Override
+    public List<Throwable> getExceptions(String corpusName)
+    {
+      return exceptions.get(corpusName);
+    }
+
+    @Override
+    public void addException(String corpusName, Throwable ex)
+    {
+      if (!exceptions.containsKey(corpusName))
+      {
+        exceptions.put(corpusName, new ArrayList<Throwable>());
+      }
+
+      exceptions.get(corpusName).add(ex);
+    }
+
+    @Override
+    public void setStatus(boolean status)
+    {
+      this.status = status;
+    }
+
+    @Override
+    public void add(ImportStats importStats)
+    {
+      if (importStats == null)
+      {
+        return;
+      }
+
+      status &= importStats.getStatus();
+      exceptions.putAll(importStats.getThrowables());
+    }
+
+    @Override
+    public Map<String, List<Throwable>> getThrowables()
+    {
+      return exceptions;
+    }
+  }
+
+  public void sendStatusMail(String adress, String corpusPath,
     ImportJob.Status status, String additionalInfo)
   {
-    if(adress == null || corpusPath == null)
+    if (adress == null || corpusPath == null)
     {
       return;
     }
-    
+
     // check valid properties
-    if(statusMailSender == null || statusMailSender.isEmpty())
+    if (statusMailSender == null || statusMailSender.isEmpty())
     {
       log.warn("Could not send status mail because \"annis.mail-sender\" "
         + "property was not configured in conf/annis-service-properties.");
       return;
     }
-    
+
     try
     {
       SimpleEmail mail = new SimpleEmail();
