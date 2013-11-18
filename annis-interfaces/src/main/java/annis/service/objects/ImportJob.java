@@ -19,6 +19,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipFile;
 import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
@@ -87,7 +88,8 @@ public class ImportJob
     this.status = status;
   }
 
-  @XmlElement(name = "messages")
+  @XmlElementWrapper(name = "messages")
+  @XmlElement(name="m")
   public List<String> getMessages()
   {
     return messages;
