@@ -147,7 +147,8 @@ public class AdminServiceImpl
   @Consumes({"application/zip"})
   public Response importCorpus(@Context HttpServletRequest request, 
   @QueryParam("overwrite") String overwriteRaw,
-  @QueryParam("statusMail") String statusMail)
+  @QueryParam("statusMail") String statusMail,
+  @QueryParam("alias") String alias)
   {
     Subject user = SecurityUtils.getSubject();
     
@@ -186,6 +187,7 @@ public class AdminServiceImpl
             job.setStatus(ImportJob.Status.WAITING);
             job.setOverwrite(overwrite);
             job.setStatusEmail(statusMail);
+            job.setAlias(alias);
             
             corpusAdmin.sendStatusMail(statusMail, corpusName,
               ImportJob.Status.WAITING, null);

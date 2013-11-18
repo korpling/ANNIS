@@ -41,6 +41,7 @@ public class ImportJob
   private Status status;
   private List<String> messages = new LinkedList<String>();
   private boolean overwrite;
+  private String alias;
   private String statusEmail;
 
   public String getUuid()
@@ -108,6 +109,16 @@ public class ImportJob
   public void setStatusEmail(String statusEmail)
   {
     this.statusEmail = statusEmail;
+  }
+
+  public String getAlias()
+  {
+    return alias;
+  }
+
+  public void setAlias(String alias)
+  {
+    this.alias = alias;
   }
   
   
