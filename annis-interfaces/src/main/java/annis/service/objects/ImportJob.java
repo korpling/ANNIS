@@ -37,7 +37,7 @@ public class ImportJob
   
   private String uuid;
   private ZipFile inZip;
-  private String corpusName;
+  private String caption;
   private Status status;
   private List<String> messages = new LinkedList<String>();
   private boolean overwrite;
@@ -65,16 +65,18 @@ public class ImportJob
     this.inZip = inZip;
   }
 
-  public String getCorpusName()
+  public String getCaption()
   {
-    return corpusName;
+    return caption;
   }
 
-  public void setCorpusName(String corpusName)
+  public void setCaption(String caption)
   {
-    this.corpusName = corpusName;
+    this.caption = caption;
   }
 
+  
+  
   public Status getStatus()
   {
     return status;

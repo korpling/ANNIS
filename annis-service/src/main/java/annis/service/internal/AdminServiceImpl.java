@@ -21,11 +21,13 @@ import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
 import annis.security.AnnisUserConfig;
 import annis.utils.RelANNISHelper;
+import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.UUID;
@@ -166,30 +168,40 @@ public class AdminServiceImpl
       ZipFile zip = new ZipFile(tmpZip);
       
       // find the directory containing the real relannis tab files
-      ZipEntry corpusTab = RelANNISHelper.getRelANNISEntry(zip, "corpus", "tab");
-      if(corpusTab != null)
+      List<ZipEntry> corpusTabEntries = RelANNISHelper.getRelANNISEntry(zip, "corpus", "tab");
+      if(!corpusTabEntries.isEmpty())
       {
-        String corpusName = RelANNISHelper.extractToplevelCorpusName(zip.getInputStream(corpusTab));
-        if(corpusName != null)
+        List<String> allNames = new ArrayList<String>();
+        for(ZipEntry corpusTab : corpusTabEntries)
         {
-          user.checkPermission("admin:import:" + corpusName);
+          String corpusName = RelANNISHelper.extractToplevelCorpusNames(zip.getInputStream(corpusTab));
+          if(corpusName != null)
+          {
+            user.checkPermission("admin:import:" + corpusName);
+            allNames.add(corpusName);
+          }
+        }
+        
+        
+        if(!allNames.isEmpty())
+        {
           
-          List<String> asList = new LinkedList<String>();
-          asList.add(corpusName);
-          List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(asList);
+          String caption = Joiner.on(", ").join(allNames);
+        
+          List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(allNames);
           if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
           {
             ImportJob job = new ImportJob();
             UUID uuid = UUID.randomUUID();
             job.setUuid(uuid.toString());
-            job.setCorpusName(corpusName);
+            job.setCaption(caption);
             job.setInZip(zip);
             job.setStatus(ImportJob.Status.WAITING);
             job.setOverwrite(overwrite);
             job.setStatusEmail(statusMail);
             job.setAlias(alias);
             
-            corpusAdmin.sendStatusMail(statusMail, corpusName,
+            corpusAdmin.sendStatusMail(statusMail, caption,
               ImportJob.Status.WAITING, null);
             
             try
