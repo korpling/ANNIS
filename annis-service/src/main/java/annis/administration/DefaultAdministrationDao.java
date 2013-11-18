@@ -117,7 +117,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     for (String s : rawTexts)
     {
-      log.info("check {}", s);
+
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
         // deactivate doc browsing if no corpus config is present.

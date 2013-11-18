@@ -269,9 +269,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
     long id = mapCorpusNameToId(topLevelCorpus);
     String sql = rawTextHelper.createSQL(id);
-    log.info("raw text sql {}", sql);
-    return (List<String>) getJdbcTemplate().query(sql,
-      rawTextHelper);
+    return (List<String>) getJdbcTemplate().query(sql, rawTextHelper);
   }
 
   /**
