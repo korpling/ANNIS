@@ -74,7 +74,7 @@ public class SchemeFixer
           "CREATE TABLE corpus_alias\n"
           + "(\n"
           + "  alias text,\n"
-          + "  corpus_ref bigint references corpus(id),\n"
+          + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
           + "  PRIMARY KEY (alias, corpus_ref)\n"
           + ");");
       }

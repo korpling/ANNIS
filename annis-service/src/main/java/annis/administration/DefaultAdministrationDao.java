@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -397,7 +396,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-
+    
     // remove conflicting top level corpora, when override is set to true.
     if (override)
     {
@@ -455,6 +454,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
 
     generateExampleQueries(corpusID);
+    
+    if(aliasName != null && !aliasName.isEmpty())
+    {
+      addCorpusAlias(corpusID, aliasName);
+    }
     
 
     return true;
@@ -1148,6 +1152,20 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
+
+  @Override
+  public void addCorpusAlias(long corpusID, String alias)
+  {
+    jdbcTemplate.update(
+      "INSERT INTO corpus_alias (alias, corpus_ref)\n"
+      + "VALUES(\n"
+      + "  ?, \n"
+      + "  ?\n"
+      + ");", 
+      alias, corpusID);
+  }
+  
+  
 
   ///// Helpers
   private List<String> importedAndCreatedTables()

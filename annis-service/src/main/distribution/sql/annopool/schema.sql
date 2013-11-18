@@ -42,11 +42,11 @@ COMMENT ON COLUMN corpus_annotation.value IS 'annotation value';
 DROP TABLE IF EXISTS text CASCADE;
 CREATE TABLE text
 (
-  corpus_ref integer REFERENCES corpus(id),
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   id    integer,
   name  varchar,
   text  text,
-  toplevel_corpus integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   PRIMARY KEY(corpus_ref, id)
 );
 COMMENT ON COLUMN text.id IS 'primary key';
@@ -59,7 +59,7 @@ CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
 DROP TABLE IF EXISTS annotation_pool CASCADE;
 CREATE TABLE annotation_pool (
   id bigserial,
-  toplevel_corpus integer REFERENCES corpus(id),
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   namespace varchar,
   "name" varchar,
   val varchar,
@@ -74,8 +74,8 @@ CREATE TABLE facts (
   fid bigserial,
   id bigint,
   text_ref integer,
-  corpus_ref integer REFERENCES corpus(id),
-  toplevel_corpus integer REFERENCES corpus(id),
+  corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
+  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   node_namespace varchar,
   node_name varchar,
   "left" integer,

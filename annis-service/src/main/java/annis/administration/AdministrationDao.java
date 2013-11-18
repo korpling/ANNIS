@@ -73,6 +73,8 @@ public interface AdministrationDao
 
   public void registerGUICancelThread(StatementController statementCon);
 
+  public void addCorpusAlias(long corpusID, String alias);
+  
   /**
    * Provides a interface to cancel {@link PreparedStatement} via a gui.
    */
