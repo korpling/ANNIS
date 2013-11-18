@@ -83,6 +83,12 @@ public class CorpusAdministration
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
+    
+    // create tables and other stuff that is handled by the scheme fixer
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
   }
 
   /**
