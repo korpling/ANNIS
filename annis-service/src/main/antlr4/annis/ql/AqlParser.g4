@@ -51,11 +51,16 @@ edgeSpec
 	: BRACKET_OPEN edgeAnno+ BRACKET_CLOSE
 	;
 
+refOrNode
+  : REF # ReferenceRef
+  | VAR_DEF? variableExpr # ReferenceNode
+  ;
+
 
 precedence
-	: left=REF PRECEDENCE (layer=ID)? right=REF # DirectPrecedence
-	| left=REF PRECEDENCE (layer=ID)? STAR right=REF # IndirectPrecedence
-	| left=REF PRECEDENCE (layer=ID COMMA?)? rangeSpec right=REF   #RangePrecedence
+	: left=refOrNode PRECEDENCE (layer=ID)? right=refOrNode # DirectPrecedence
+	| left=refOrNode PRECEDENCE (layer=ID)? STAR right=refOrNode # IndirectPrecedence
+	| left=refOrNode PRECEDENCE (layer=ID COMMA?)? rangeSpec right=refOrNode   #RangePrecedence
 	;
 
 dominance
@@ -106,8 +111,8 @@ variableExpr
   ;
 
 expr
-  : VAR_DEF variableExpr # VariableTermExpr
-  | variableExpr # NoVariableTermExpr
+  : VAR_DEF variableExpr # NamedVariableTermExpr
+  | variableExpr # VariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	binary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 

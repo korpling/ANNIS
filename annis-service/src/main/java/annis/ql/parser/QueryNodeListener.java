@@ -48,7 +48,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
-  private final Map<Interval, Long> tokenposition2NodeID = Maps.newHashMap();
+  private final Map<Interval, QueryNode> tokenPositionToNode = Maps.newHashMap();
   
   private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
@@ -162,7 +162,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   }
 
   @Override
-  public void enterVariableTermExpr(AqlParser.VariableTermExprContext ctx)
+  public void enterNamedVariableTermExpr(AqlParser.NamedVariableTermExprContext ctx)
   {
     lastVariableDefinition = null;
     if(ctx != null)
@@ -179,6 +179,28 @@ public class QueryNodeListener extends AqlParserBaseListener
       }
     }
   }
+
+  @Override
+  public void enterReferenceNode(AqlParser.ReferenceNodeContext ctx)
+  {
+    if(ctx != null && ctx.VAR_DEF() != null)
+    {
+      lastVariableDefinition = null;
+    
+      String text = ctx.VAR_DEF().getText();
+      // remove the trailing "#"
+      if(text.endsWith("#"))
+      {
+        lastVariableDefinition = text.substring(0, text.length()-1);
+      }
+      else
+      {
+        lastVariableDefinition = text;
+      }
+    
+    }
+  }
+  
   
   
 
@@ -215,14 +237,10 @@ public class QueryNodeListener extends AqlParserBaseListener
     return null;
   }
 
-  private Collection<QueryNode> nodesByRef(Token ref)
-  {
-    return localNodes.get("" + ref.getText().substring(1));
-  }
-
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    Long existingID = tokenposition2NodeID.get(ctx.getSourceInterval());
+    QueryNode existingNode = tokenPositionToNode.get(ctx.getSourceInterval());
+    Long existingID = existingNode == null ? null : existingNode.getId();
     
     if(existingID == null)
     {
@@ -242,9 +260,17 @@ public class QueryNodeListener extends AqlParserBaseListener
     
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
-    tokenposition2NodeID.put(ctx.getSourceInterval(), n.getId());
+    tokenPositionToNode.put(ctx.getSourceInterval(), n);
     
     return n;
   }
+
+  public Map<Interval, QueryNode> getTokenPositionToNode()
+  {
+    return tokenPositionToNode;
+  }
+  
+  
+
   
 }

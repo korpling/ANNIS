@@ -96,7 +96,8 @@ public class AnnisParserAntlr
       data.setCorpusList(corpusList);
       data.addMetaAnnotations(nodeListener.getMetaData());
 
-      JoinListener joinListener = new JoinListener(data, precedenceBound);
+      JoinListener joinListener = new JoinListener(data, precedenceBound, 
+        nodeListener.getTokenPositionToNode());
       walker.walk(joinListener, treeDNF);
 
       if (postProcessors != null)

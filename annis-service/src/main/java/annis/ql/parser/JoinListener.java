@@ -38,14 +38,17 @@ import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Lists;
 import com.google.common.collect.Multimap;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
+import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,17 +66,22 @@ public class JoinListener extends AqlParserBaseListener
    *  Each entry maps node variables to a collection of query nodes.
    */
   private final Multimap<String, QueryNode>[] alternativeNodes;
+  /** Maps a token interval to a query nodes.
+   */
+  private final Map<Interval, QueryNode> tokenPositionToNode;
   private int alternativeIndex;
   
   /**
    * Constructor.
    * @param data The {@link QueryData} containing the already parsed nodes.
    * @param precedenceBound  maximal range of precedence
+   * @param tokenPositionToNode maps a token interval to a query nodes
    */
-  public JoinListener(QueryData data, int precedenceBound)
+  public JoinListener(QueryData data, int precedenceBound, Map<Interval, QueryNode> tokenPositionToNode)
   {
     this.precedenceBound = precedenceBound;
     this.alternativeNodes = new Multimap[data.getAlternatives().size()];
+    this.tokenPositionToNode = tokenPositionToNode;
     
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -143,8 +151,8 @@ public class JoinListener extends AqlParserBaseListener
   public void enterDirectPrecedence(
     AqlParser.DirectPrecedenceContext ctx)
   {
-    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
-    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Collection<QueryNode> nodesLeft = nodes(ctx.left);
+    Collection<QueryNode> nodesRight = nodes(ctx.right);
     Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
       + ": " + ctx.getText());
     Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence")
@@ -164,12 +172,13 @@ public class JoinListener extends AqlParserBaseListener
     }
   }
 
+
   @Override
   public void enterIndirectPrecedence(
     AqlParser.IndirectPrecedenceContext ctx)
   {
-    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
-    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Collection<QueryNode> nodesLeft = nodes(ctx.left);
+    Collection<QueryNode> nodesRight = nodes(ctx.right);
     Preconditions.checkArgument(!nodesLeft.isEmpty(), errorLHS("precendence") 
       + ": " + ctx.getText());
     Preconditions.checkNotNull(!nodesRight.isEmpty(), errorRHS("precendence")
@@ -201,8 +210,8 @@ public class JoinListener extends AqlParserBaseListener
   @Override
   public void enterRangePrecedence(AqlParser.RangePrecedenceContext ctx)
   {
-    Collection<QueryNode> nodesLeft = nodesByRef(ctx.left);
-    Collection<QueryNode> nodesRight = nodesByRef(ctx.right);
+    Collection<QueryNode> nodesLeft = nodes(ctx.left);
+    Collection<QueryNode> nodesRight = nodes(ctx.right);
     Preconditions.checkNotNull(!nodesLeft.isEmpty(), errorLHS("precendence") 
       + ": " + ctx.getText());
     Preconditions.checkArgument(!nodesRight.isEmpty(), errorRHS("precendence") 
@@ -571,6 +580,45 @@ public class JoinListener extends AqlParserBaseListener
       
     }
     return annos;
+  }
+  
+  private Collection<QueryNode> nodes(AqlParser.RefOrNodeContext ctx)
+  {
+    if(ctx instanceof AqlParser.ReferenceNodeContext)
+    {
+      return nodesByDef((AqlParser.ReferenceNodeContext) ctx);
+    }
+    else if(ctx instanceof AqlParser.ReferenceRefContext)
+    {
+      return nodesByRef(((AqlParser.ReferenceRefContext) ctx).REF().getSymbol());
+    }
+    else
+    {
+      return new LinkedList<QueryNode>();
+    }
+  }
+  
+  private Collection<QueryNode> nodesByDef(AqlParser.ReferenceNodeContext ctx)
+  {
+    if(ctx.VAR_DEF() == null)
+    {
+      QueryNode result = tokenPositionToNode.get(ctx.variableExpr().getSourceInterval());
+      if(result == null)
+      {
+        return new LinkedList<QueryNode>();
+      }
+      else
+      {
+        return Lists.newArrayList(result);
+      }
+    }
+    else
+    {
+      String varDefText = ctx.VAR_DEF().getText();
+      // remove trailing #
+      varDefText = varDefText.substring(0, varDefText.length()-1);
+      return alternativeNodes[alternativeIndex].get(varDefText);
+    }
   }
   
   private Collection<QueryNode> nodesByRef(Token ref)
