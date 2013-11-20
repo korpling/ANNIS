@@ -352,6 +352,7 @@ public class SearchUI extends AnnisBaseUI
 
     getSession().addRequestHandler(new CitationRequestHandler());
     getSession().addRequestHandler(new ResourceRequestHandler());
+    getSession().addRequestHandler(new LoginServletRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
 

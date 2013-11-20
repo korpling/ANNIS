@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets;
+package annis.gui;
 
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
@@ -25,14 +25,14 @@ import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.StringReader;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -41,22 +41,42 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class LoginServlet extends HttpServlet
+public class LoginServletRequestHandler implements RequestHandler
 {
 
   private final static Logger log = LoggerFactory.getLogger(
-    LoginServlet.class);
+    LoginServletRequestHandler.class);
 
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+  public boolean handleRequest(VaadinSession session, VaadinRequest request,
+    VaadinResponse response) throws IOException
   {
-    
+    if("/login".equals(request.getPathInfo()))
+    {
+      if("GET".equalsIgnoreCase(request.getMethod()))
+      {
+        doGet(session, request, response);
+        return true;
+      }
+      else if("POST".equalsIgnoreCase(request.getMethod()))
+      {
+        doPost(session, request, response);
+        return true;
+      }
+    }
+    return false; 
+  }
+  
+  private void doGet(VaadinSession session, VaadinRequest request,
+    VaadinResponse response)
+  {
     response.setContentType("text/html");
-    
-    OutputStream out = response.getOutputStream();
+    OutputStream out = null;
     try
     {
-      String htmlSource = Resources.toString(LoginServlet.class.
+      out = response.getOutputStream();
+
+      String htmlSource = Resources.toString(LoginServletRequestHandler.class.
         getResource(
         "login.html"), Charsets.UTF_8);
 
@@ -71,20 +91,35 @@ public class LoginServlet extends HttpServlet
       OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8);
       CharStreams.copy(new StringReader(htmlSource), writer);
       writer.close();
+      out.flush();
     }
-    catch (Exception ex)
+    catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    catch(Exception ex)
     {
       log.error(null, ex);
     }
     finally
     {
       response.setStatus(200);
-      out.close();
+      if(out != null)
+      {
+        try
+        {
+          out.close();
+        }
+        catch (IOException ex)
+        {
+          log.error("closing OutputStream filed", ex);
+        }
+      }
     }
   }
 
-  @Override
-  protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException
+  private void doPost(VaadinSession session, VaadinRequest request,
+    VaadinResponse response) throws IOException
   {
     
     response.setContentType("text/html");
@@ -95,11 +130,11 @@ public class LoginServlet extends HttpServlet
     if (username != null && password != null)
     {
       // forget any old user information
-      request.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
-      request.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
+      session.getSession().removeAttribute(AnnisBaseUI.USER_KEY);
+      session.getSession().removeAttribute(AnnisBaseUI.USER_LOGIN_ERROR);
 
       // get the URL for the REST service
-      Object annisServiceURLObject = request.getSession().getAttribute(
+      Object annisServiceURLObject = session.getSession().getAttribute(
         AnnisBaseUI.WEBSERVICEURL_KEY);
 
       if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
@@ -123,7 +158,7 @@ public class LoginServlet extends HttpServlet
       }
       catch (ClientHandlerException ex)
       {
-        request.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Authentification error: " + ex.getMessage());
       }
       catch (UniformInterfaceException ex)
@@ -131,27 +166,20 @@ public class LoginServlet extends HttpServlet
         if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
           getStatusCode())
         {
-          request.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
         }
         else
         {
           log.error(null, ex);
-          request.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Unexpected exception: " + ex.getMessage());
         }
       }
-      catch (Exception ex)
-      {
-        log.error(null, ex);
-        request.setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
-          "Unexpected exception: " + ex.getMessage());
-      }
-
 
       OutputStreamWriter writer = new OutputStreamWriter(response.
         getOutputStream(), Charsets.UTF_8);
-      String html = Resources.toString(LoginServlet.class.getResource(
+      String html = Resources.toString(LoginServletRequestHandler.class.getResource(
         "closelogin.html"), Charsets.UTF_8);
       CharStreams.copy(new StringReader(html), writer);
       writer.close();

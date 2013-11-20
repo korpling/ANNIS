@@ -95,10 +95,6 @@
     <servlet-name>BinaryServlet</servlet-name>
     <url-pattern>/Binary/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
     
   <filter-mapping>>
     <filter-name>Push_Mime</filter-name>
