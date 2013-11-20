@@ -7,6 +7,10 @@
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 		
 	<util:map id="exampleSyntaxTrees">
+    <entry key="tok=/abc/ . pos . node">
+      <value><![CDATA[tok=/abc/ & pos & node & #1 . #2 & #1 .* #3 & #2 . #3]]>
+      </value>
+    </entry>
     <entry key="tok=/abc/ . right#pos">
       <value><![CDATA[tok=/abc/ & right#pos & #1 . #right]]>
       </value>
