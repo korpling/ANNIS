@@ -705,7 +705,7 @@ public class CorpusListPanel extends VerticalLayout implements
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
       final String id = (String) itemId;
-      Button l = new Button();
+      final Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
@@ -716,7 +716,8 @@ public class CorpusListPanel extends VerticalLayout implements
         {
           if (controller != null)
           {
-            initCorpusBrowser(id);
+            l.setEnabled(false);
+            initCorpusBrowser(id, l);
           }
         }
       });
@@ -790,7 +791,7 @@ public class CorpusListPanel extends VerticalLayout implements
     return tblCorpora;
   }
 
-  public void initCorpusBrowser(String topLevelCorpusName)
+  public void initCorpusBrowser(String topLevelCorpusName, final Button l)
   {
 
     AnnisCorpus c = corpusContainer.getItem(topLevelCorpusName).getBean();
@@ -810,6 +811,16 @@ public class CorpusListPanel extends VerticalLayout implements
     window.setHeight(40, UNITS_EM);
     window.setResizable(false);
     window.setModal(false);
+
+    window.addCloseListener(new Window.CloseListener()
+    {
+
+      @Override
+      public void windowClose(Window.CloseEvent e)
+      {
+        l.setEnabled(true);
+      }
+    });
 
     UI.getCurrent().addWindow(window);
     window.center();
