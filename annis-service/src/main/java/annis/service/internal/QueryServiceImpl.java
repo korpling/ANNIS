@@ -51,6 +51,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -598,19 +599,29 @@ public class QueryServiceImpl implements QueryService
 
     return result;
   }
-  
+
   @GET
   @Path("corpora/{top}/config")
   @Produces("application/xml")
   public CorpusConfig corpusConfig(@PathParam("top") String toplevelName)
   {
-    Subject user = SecurityUtils.getSubject();
-    user.checkPermission("query:config:" + toplevelName);
-    Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
-    CorpusConfig corpusConfig = new CorpusConfig();
-    corpusConfig.setConfig(tmp);
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      toplevelName = URLDecoder.decode(toplevelName, "UTF-8");
+      user.checkPermission("query:config:" + toplevelName);
+      Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
 
-    return corpusConfig;
+      CorpusConfig corpusConfig = new CorpusConfig();
+      corpusConfig.setConfig(tmp);
+
+      return corpusConfig;
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      log.error("could not decode top level corpus name");
+      throw new WebApplicationException(500);
+    }
   }
 
   @GET
