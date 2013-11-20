@@ -56,6 +56,7 @@ import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.util.ListIterator;
 
 import java.io.IOException;
@@ -64,6 +65,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -80,6 +82,7 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
+import java.util.UUID;
 import javax.ws.rs.core.GenericEntity;
 import org.apache.commons.io.input.BoundedInputStream;
 
@@ -251,9 +254,22 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
 
     long topLevelCorpusId = mapCorpusNameToId(topLevelCorpus);
-    return (List<String>)getJdbcTemplate().query(rawTextHelper.createSQL(
-      topLevelCorpusId, documentName),rawTextHelper);
+    return (List<String>) getJdbcTemplate().query(rawTextHelper.createSQL(
+      topLevelCorpusId, documentName), rawTextHelper);
 
+  }
+
+  @Override
+  public List<String> getRawText(String topLevelCorpus)
+  {
+    if (topLevelCorpus == null)
+    {
+      throw new IllegalArgumentException("corpus name may not be null");
+    }
+
+    long id = mapCorpusNameToId(topLevelCorpus);
+    String sql = rawTextHelper.createSQL(id);
+    return (List<String>) getJdbcTemplate().query(sql, rawTextHelper);
   }
 
   /**
@@ -270,6 +286,70 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public void setRawTextHelper(RawTextSqlHelper rawTextHelper)
   {
     this.rawTextHelper = rawTextHelper;
+  }
+
+  @Override
+  public String mapCorpusIdToName(long corpusId)
+  {
+
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(corpusId);
+    List<String> names = mapCorpusIdsToNames(ids);
+
+    if (names == null || names.isEmpty())
+    {
+      String msg = "corpus is not known to the system";
+      throw new DataAccessException(msg)
+      {
+      };
+    }
+
+    return names.get(0);
+
+  }
+
+  @Override
+  public void setCorpusConfiguration(long corpusID, Properties props)
+  {
+    String sql = "SELECT filename FROM media_files "
+      + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
+    String fileName = getJdbcTemplate().query(sql,
+      new ResultSetExtractor<String>()
+      {
+
+        @Override
+        public String extractData(ResultSet rs) throws SQLException, DataAccessException
+        {
+          while (rs.next())
+          {
+            return rs.getString("filename");
+          }
+
+          return null;
+        }
+      });
+
+    try
+    {
+      File dir = getRealDataDir();
+
+      if (fileName == null)
+      {
+        fileName = "corpus_" + UUID.randomUUID() + ".properties";
+        getJdbcTemplate().update(
+          "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+          + "', 'application/text+plain', 'corpus.properties')");
+      }
+
+      log.info("write config file: " + dir + "/" + fileName);
+      Writer f = new FileWriter(new File(
+        dir.getCanonicalPath() + "/" + fileName));
+      props.store(f, "");
+    }
+    catch (IOException ex)
+    {
+      log.error("error: write back the corpus.properties configuration", ex);
+    }
   }
 
 //	private MatrixSqlGenerator matrixSqlGenerator;
@@ -391,7 +471,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     for (Long id : ids)
     {
-      names.add(corpusNamesById.get(id));
+      if (corpusNamesById.containsKey(id))
+      {
+        names.add(corpusNamesById.get(id));
+      }
     }
     return names;
   }

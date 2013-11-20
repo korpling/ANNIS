@@ -259,10 +259,35 @@ public interface AnnisDao
   public List<String> getRawText(String topLevelCorpus, String documentName);
 
   /**
+   * Returns the raw text fromt the text table of a specific corpus.
+   *
+   * @param topLevelCorpus Specifies the corpus for which the texts are fetched.
+   * @return A list of all texts.
+   */
+  public List<String> getRawText(String topLevelCorpus);
+
+  /**
    * Returns the corpus internal corpus id of a top level corpus.
    *
    * @param topLevelCorpus the name of the corpus
    * @return the corpus id
    */
   public long mapCorpusNameToId(String topLevelCorpus);
+
+  /**
+   * Returns the corpus name for a given corpus id.
+   *
+   * @param corpusId the id of the corpus
+   * @return the name of the corpus. The name of each top level corpus is
+   * unique.
+   */
+  public String mapCorpusIdToName(long corpusId);
+
+  /**
+   * Stores a corpus configuration.
+   *
+   * @param corpusID The id of the corpus, for which the properties are written.
+   * @param props  The properties
+   */
+  public void setCorpusConfiguration(long corpusID, Properties props);
 }

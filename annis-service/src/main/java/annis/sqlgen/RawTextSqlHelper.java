@@ -30,6 +30,25 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 public class RawTextSqlHelper implements ResultSetExtractor<List<String>>
 {
 
+  public String createSQL(long topLevelCorpusId)
+  {
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("SELECT text.corpus_ref, text.text, ids.name, path_name\n");
+    sb.append("FROM (\n");
+    sb.append("\tSELECT children.*\n");
+    sb.append("\tFROM corpus as parent, corpus children\n");
+    sb.append("\tWHERE\n");
+    sb.append("\t\tparent.id = ").append(topLevelCorpusId).append("\n");
+    sb.append("\tAND\tparent.pre < children.pre\n");
+    sb.append("\tAND\tparent.post > children.post\n");
+    sb.append(") AS ids, text\n");
+    sb.append("WHERE\n");
+    sb.append("text.corpus_ref = ids.id");
+
+    return sb.toString();
+  }
+
   public String createSQL(long topLevelCorpusId, String docName)
   {
     StringBuilder sb = new StringBuilder();

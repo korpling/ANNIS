@@ -36,6 +36,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -97,6 +98,48 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private StatementController statementController;
 
+  /**
+   * Searches for textes which are empty or only contains whitespaces. If that
+   * is the case the visualizer and no document visualizer are defined in the
+   * corpus properties file a new file is created and stores a new config which
+   * disables document browsing.
+   *
+   *
+   * @param corpusID The id of the corpus which texts are analyzed.
+   */
+  private void analyzeTextTable(long corpusID)
+  {
+    String name = annisDao.mapCorpusIdToName(corpusID);
+    List<String> rawTexts = annisDao.getRawText(name);
+
+    // pattern for checking the token layer
+    final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
+
+    for (String s : rawTexts)
+    {
+
+      if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
+      {
+        // deactivate doc browsing if no corpus config is present.
+        Properties corpusConfiguration = annisDao.getCorpusConfiguration(name);
+        if (corpusConfiguration == null)
+        {
+          log.info("create new corpus configuration file");
+          corpusConfiguration = new Properties();
+        }
+
+        if (!corpusConfiguration.containsKey("browse-document-visualizers"))
+        {
+          // get real file name and write back the new corpus configuration.
+          corpusConfiguration.put("browse-documents", "false");
+
+          log.info("disable document browser");
+          annisDao.setCorpusConfiguration(corpusID, corpusConfiguration);
+        }
+      }
+    }
+  }
+
   public enum EXAMPLE_QUERIES_CONFIG
   {
 
@@ -132,11 +175,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
   // tables imported from bulk files
   // DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
-
-  /**
-   * The corpus configuration is saved in the media files table.
-   */
-  public static final String CORPUS_CONFIG_FILE = "corpus.properties";
 
   private String[] importedTables =
   {
@@ -266,7 +304,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(scriptPath,
-      FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
+          FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
   }
@@ -445,14 +483,13 @@ public class DefaultAdministrationDao implements AdministrationDao
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
 
-
     if (temporaryStagingArea)
     {
       dropStagingArea();
     }
 
     analyzeFacts(corpusID);
-
+    analyzeTextTable(corpusID);
     generateExampleQueries(corpusID);
     
     if(aliasName != null && !aliasName.isEmpty())
@@ -1911,20 +1948,20 @@ public class DefaultAdministrationDao implements AdministrationDao
       + topLevelCorpusName + "'";
     Integer numberOfCorpora = getJdbcTemplate().query(sql,
       new ResultSetExtractor<Integer>()
-    {
-      @Override
-      public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
       {
-        if (rs.next())
+        @Override
+        public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
         {
-          return rs.getInt("amount");
+          if (rs.next())
+          {
+            return rs.getInt("amount");
+          }
+          else
+          {
+            return 0;
+          }
         }
-        else
-        {
-          return 0;
-        }
-      }
-    });
+      });
 
     return numberOfCorpora > 0;
   }

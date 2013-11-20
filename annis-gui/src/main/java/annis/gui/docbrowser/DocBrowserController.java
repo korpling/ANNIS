@@ -20,6 +20,7 @@ import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
+import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
@@ -333,5 +334,18 @@ public class DocBrowserController implements Serializable
         }
       });
     }
+  }
+
+  public boolean docsAvailable(String id)
+  {
+    CorpusConfig corpusConfig = Helper.getCorpusConfig(id);
+
+    if (corpusConfig != null)
+    {
+      return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
+        "true"));
+    }
+
+    return true;
   }
 }

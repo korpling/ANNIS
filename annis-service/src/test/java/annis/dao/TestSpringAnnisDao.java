@@ -61,6 +61,9 @@ import annis.service.objects.AnnisAttribute;
 import annis.sqlgen.SaltAnnotateExtractor;
 import java.util.LinkedList;
 import javax.annotation.Resource;
+import org.junit.Assert;
+import org.springframework.dao.DataAccessException;
+import org.springframework.test.web.ModelAndViewAssert;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
@@ -258,5 +261,32 @@ public class TestSpringAnnisDao
 
     // verify that nothing has happened
     verifyNoMoreInteractions(simpleJdbcTemplate);
+  }
+
+  /**
+   * Tests only an invalid corpus id.
+   */
+  @Test
+  public void mapCorpusIdsToNames()
+  {
+    long invalidCorpusId = -1;
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(invalidCorpusId);
+    List<String> names = simpleAnnisDao.mapCorpusIdsToNames(ids);
+
+    Assert.assertTrue("list of names must be empty: ", names.isEmpty());
+  }
+
+  /**
+   * Tests only an invalid corpus id.
+   */
+  @Test(expected = DataAccessException.class)
+  public void mapCorpusIdToName()
+  {
+    long invalidCorpusId = -1;
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(invalidCorpusId);
+    when(simpleAnnisDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
+    simpleAnnisDao.mapCorpusIdToName(invalidCorpusId);
   }
 }
