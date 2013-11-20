@@ -338,7 +338,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         fileName = "corpus_" + UUID.randomUUID() + ".properties";
         getJdbcTemplate().update(
           "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-          + "', 'text/plain', 'corpus.properties')");
+          + "', 'application/text+plain', 'corpus.properties')");
       }
 
       log.info("write config file: " + dir + "/" + fileName);
