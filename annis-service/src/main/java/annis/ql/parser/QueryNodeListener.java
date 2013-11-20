@@ -24,6 +24,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -48,7 +49,9 @@ public class QueryNodeListener extends AqlParserBaseListener
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
-  private final Map<Interval, QueryNode> tokenPositionToNode = Maps.newHashMap();
+  
+  private List<Map<Interval, QueryNode>> tokenPositions;
+  private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
   
   private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
@@ -70,7 +73,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
     data = new QueryData();
-    
+    tokenPositions = new ArrayList<Map<Interval, QueryNode>>();
   }
 
   @Override
@@ -78,12 +81,14 @@ public class QueryNodeListener extends AqlParserBaseListener
   {
     currentAlternative.clear();
     localNodes.clear();
+    currentTokenPosition.clear();
   }
 
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
     data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
+    tokenPositions.add(new HashMap<Interval, QueryNode>(currentTokenPosition));
   }
 
   
@@ -239,7 +244,7 @@ public class QueryNodeListener extends AqlParserBaseListener
 
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    QueryNode existingNode = tokenPositionToNode.get(ctx.getSourceInterval());
+    QueryNode existingNode = currentTokenPosition.get(ctx.getSourceInterval());
     Long existingID = existingNode == null ? null : existingNode.getId();
     
     if(existingID == null)
@@ -260,14 +265,14 @@ public class QueryNodeListener extends AqlParserBaseListener
     
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
-    tokenPositionToNode.put(ctx.getSourceInterval(), n);
+    currentTokenPosition.put(ctx.getSourceInterval(), n);
     
     return n;
   }
 
-  public Map<Interval, QueryNode> getTokenPositionToNode()
+  public List<Map<Interval, QueryNode>> getTokenPositions()
   {
-    return tokenPositionToNode;
+    return tokenPositions;
   }
   
   

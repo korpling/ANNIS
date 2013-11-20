@@ -67,7 +67,7 @@ public class JoinListener extends AqlParserBaseListener
   private final Map<String, QueryNode>[] alternativeNodes;
   /** Maps a token interval to a query nodes.
    */
-  private final Map<Interval, QueryNode> tokenPositionToNode;
+  private final List<Map<Interval, QueryNode>> tokenPositions;
   private int alternativeIndex;
   
   private ArrayList<QueryNode> relationChain = new ArrayList<QueryNode>();
@@ -79,11 +79,11 @@ public class JoinListener extends AqlParserBaseListener
    * @param precedenceBound  maximal range of precedence
    * @param tokenPositionToNode maps a token interval to a query nodes
    */
-  public JoinListener(QueryData data, int precedenceBound, Map<Interval, QueryNode> tokenPositionToNode)
+  public JoinListener(QueryData data, int precedenceBound, List<Map<Interval, QueryNode>> tokenPositionToNode)
   {
     this.precedenceBound = precedenceBound;
     this.alternativeNodes = new Map[data.getAlternatives().size()];
-    this.tokenPositionToNode = tokenPositionToNode;
+    this.tokenPositions = tokenPositionToNode;
     
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -507,7 +507,7 @@ public class JoinListener extends AqlParserBaseListener
   {
     if(ctx.VAR_DEF() == null)
     {
-      QueryNode result = tokenPositionToNode.get(ctx.variableExpr().getSourceInterval());
+      QueryNode result = tokenPositions.get(alternativeIndex).get(ctx.variableExpr().getSourceInterval());
       if(result == null)
       {
         return null;
