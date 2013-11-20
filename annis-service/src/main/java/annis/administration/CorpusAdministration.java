@@ -148,6 +148,10 @@ public class CorpusAdministration
         sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.
           getMessage());
       }
+      catch (org.springframework.transaction.CannotCreateTransactionException ex)
+      {
+        log.error("Postgres is not running or misconfigured");
+      }
       catch (Throwable ex)
       {
         importStats.setStatus(false);
