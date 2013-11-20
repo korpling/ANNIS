@@ -451,7 +451,7 @@ public class CorpusBrowserPanel extends Panel
   }
 
   /**
-   * Places a label with the text "none" in the centered middle of the accordion
+   * Places a label with the text "(no metadata)" in the centered middle of the accordion
    * tab.
    *
    * @param accordion the target accordion
@@ -461,7 +461,7 @@ public class CorpusBrowserPanel extends Panel
   {
     VerticalLayout v = new VerticalLayout();
     v.setSizeFull();
-    Label l = new Label("none");
+    Label l = new Label("(no metadata)");
     v.addComponent(l);
     l.setSizeUndefined();
     v.setComponentAlignment(l, Alignment.MIDDLE_CENTER);
