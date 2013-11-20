@@ -637,12 +637,8 @@ public class QueryServiceImpl implements QueryService
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:annotations:" + toplevelCorpus);
 
-
-      List<String> list = new LinkedList<String>();
-      String decode = URLDecoder.decode(toplevelCorpus, "UTF-8");
-      log.info("corpus annotations for {}", decode);
-      list.add(decode);
-      List<Long> corpusList = annisDao.mapCorpusNamesToIds(list);
+      List<Long> corpusList = new ArrayList<Long>();
+      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
 
       return annisDao.listAnnotations(corpusList,
         Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
@@ -651,7 +647,7 @@ public class QueryServiceImpl implements QueryService
     catch (Exception ex)
     {
       log.error("could not get annotations for {}", toplevelCorpus, ex);
-      throw new WebApplicationException(400);
+      throw new WebApplicationException(500);
     }
   }
 
