@@ -93,11 +93,12 @@ public class CorpusConfig implements Serializable
       return null;
     }
   }
-
+  
   /**
    * Returns a configuration from the underlying property object.
    *
    * @param configName The name of the configuration.
+   * @param def the default value, if no config is found.
    * @return Can be null if the config name does not exists.
    */
   public String getConfig(String configName, String def)
