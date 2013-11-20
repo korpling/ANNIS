@@ -48,6 +48,12 @@
   </util:map>
 	
 	<util:list id="good">
+    <value><![CDATA[cat="S" > s#cat="S" &
+((p1#cat = "NP" & p2#cat = "PP")
+|
+(p1#cat = "PP" & p2#cat = "NP"))
+& #s >* #p1
+& #p1 > #p2]]></value>
 		<value><![CDATA[/das/]]></value>
 		<value><![CDATA["Dorf"]]></value>
 		<value><![CDATA[das=/Haus/]]></value>
