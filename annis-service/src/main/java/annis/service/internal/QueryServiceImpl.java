@@ -21,7 +21,6 @@ import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
-import annis.model.AnnisConstants;
 import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -46,16 +45,12 @@ import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
-import com.sun.jersey.core.impl.provider.entity.XMLListElementProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -79,7 +74,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlRootElement;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
@@ -608,7 +602,6 @@ public class QueryServiceImpl implements QueryService
     try
     {
       Subject user = SecurityUtils.getSubject();
-      toplevelName = URLDecoder.decode(toplevelName, "UTF-8");
       user.checkPermission("query:config:" + toplevelName);
       Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
 
@@ -617,7 +610,7 @@ public class QueryServiceImpl implements QueryService
 
       return corpusConfig;
     }
-    catch (UnsupportedEncodingException ex)
+    catch (Exception ex)
     {
       log.error("could not decode top level corpus name");
       throw new WebApplicationException(500);
