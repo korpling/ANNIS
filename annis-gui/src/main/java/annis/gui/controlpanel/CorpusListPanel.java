@@ -675,15 +675,24 @@ public class CorpusListPanel extends VerticalLayout implements
       Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(DOC_ICON);
-      l.setDescription("opens the document browser for " + id);
-      l.addClickListener(new Button.ClickListener()
+
+      if (ui.getDocBrowserController().docsAvailable(id))
       {
-        @Override
-        public void buttonClick(ClickEvent event)
+        l.setDescription("opens the document browser for " + id);
+        l.addClickListener(new Button.ClickListener()
         {
-          ui.getDocBrowserController().openDocBrowser(id);
-        }
-      });
+          @Override
+          public void buttonClick(ClickEvent event)
+          {
+            ui.getDocBrowserController().openDocBrowser(id);
+          }
+        });
+      }
+      else
+      {
+        l.setDescription("document browser is disabled for this corpus");
+        l.setEnabled(false);
+      }
 
       return l;
     }
