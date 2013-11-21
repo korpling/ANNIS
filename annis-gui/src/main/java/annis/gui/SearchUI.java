@@ -85,7 +85,7 @@ import org.vaadin.cssinject.CSSInject;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@Push(value = PushMode.MANUAL, transport = Transport.STREAMING)
+@Push(value = PushMode.MANUAL)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,
