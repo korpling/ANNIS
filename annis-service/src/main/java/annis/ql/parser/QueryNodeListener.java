@@ -23,12 +23,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -52,6 +50,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   
   private List<Map<Interval, QueryNode>> tokenPositions;
   private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
+  private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
   private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
@@ -244,8 +243,7 @@ public class QueryNodeListener extends AqlParserBaseListener
 
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    QueryNode existingNode = currentTokenPosition.get(ctx.getSourceInterval());
-    Long existingID = existingNode == null ? null : existingNode.getId();
+    Long existingID = globalTokenPositions.get(ctx.getSourceInterval());
     
     if(existingID == null)
     {
@@ -266,6 +264,7 @@ public class QueryNodeListener extends AqlParserBaseListener
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
     currentTokenPosition.put(ctx.getSourceInterval(), n);
+    globalTokenPositions.put(ctx.getSourceInterval(), n.getId());
     
     return n;
   }
