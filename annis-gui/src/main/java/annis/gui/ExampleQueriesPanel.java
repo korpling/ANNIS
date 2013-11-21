@@ -28,13 +28,12 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -69,7 +68,7 @@ public class ExampleQueriesPanel extends Table
   /**
    * Bean Container for example queries. Key is the corpus name.
    */
-  private BeanItemContainer<ExampleQuery> egContainer;
+  private final BeanItemContainer<ExampleQuery> egContainer;
 
   // gets the
   private final static Logger log = LoggerFactory.
@@ -79,7 +78,7 @@ public class ExampleQueriesPanel extends Table
   private TabSheet.Tab tab;
 
   // hold the parent tab of annis3
-  private HelpPanel parentTab;
+  private final HelpPanel parentTab;
 
   private static final ThemeResource SEARCH_ICON = new ThemeResource(
     "tango-icons/16x16/system-search.png");
@@ -236,15 +235,10 @@ public class ExampleQueriesPanel extends Table
     }
   }
 
-  private Panel getOpenCorpusPanel(final String corpusName)
+  private Component getOpenCorpusPanel(final String corpusName)
   {
-    Panel p = new Panel();
-    p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-
     final Button btn = new Button(corpusName);
-    final HorizontalLayout l = new HorizontalLayout();
-
-    p.setContent(l);
+   
     btn.setStyleName(BaseTheme.BUTTON_LINK);
     btn.addClickListener(new Button.ClickListener()
     {
@@ -256,9 +250,7 @@ public class ExampleQueriesPanel extends Table
       }
     });
 
-    l.addComponent(btn);
-
-    return p;
+    return btn;
   }
 
   /**
@@ -397,17 +389,13 @@ public class ExampleQueriesPanel extends Table
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       final ExampleQuery eQ = (ExampleQuery) itemId;
-      Panel p = new Panel();
-      p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-      HorizontalLayout l = new HorizontalLayout();
       Button btn = new Button();
       btn.setDescription("show corpus browser for " + eQ.getCorpusName());
       btn.addStyleName(BaseTheme.BUTTON_LINK);
       btn.setIcon(SEARCH_ICON);
       btn.setDescription("show results for \"" + eQ.getExampleQuery()
         + "\" in " + eQ.getCorpusName());
-      p.setContent(l);
-
+      
       btn.addClickListener(new Button.ClickListener()
       {
         @Override
@@ -440,8 +428,7 @@ public class ExampleQueriesPanel extends Table
           }
         }
       });
-      l.addComponent(btn);
-      return p;
+      return btn;
     }
   }
 
