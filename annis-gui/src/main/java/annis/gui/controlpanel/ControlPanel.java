@@ -19,8 +19,7 @@ import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.resultview.ResultViewPanel;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -32,7 +31,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-public class ControlPanel extends CssLayout
+public class ControlPanel extends VerticalLayout
 {
 
   private static final Logger log = LoggerFactory.getLogger(ControlPanel.class);
@@ -55,6 +54,7 @@ public class ControlPanel extends CssLayout
     this.ui = ui;
     
     setSizeFull();
+    setMargin(true);
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
@@ -77,6 +77,8 @@ public class ControlPanel extends CssLayout
    
     addComponent(queryPanel);
     addComponent(optionsTab);
+    
+    setExpandRatio(optionsTab, 1.0f);
   }
   
   public CorpusListPanel getCorpusList()

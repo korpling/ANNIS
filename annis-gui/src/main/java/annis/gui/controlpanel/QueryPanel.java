@@ -39,6 +39,7 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -93,7 +94,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     this.history = new LinkedList<HistoryEntry>();
 
     setSpacing(true);
-    setMargin(true);
+    setMargin(false);
 
     setRowExpandRatio(0, 1.0f);
     setColumnExpandRatio(0, 0.0f);
