@@ -42,6 +42,10 @@ $font-size: 10pt;
   .result-view-css {
     width: 100%;
   }
+  
+  .result-view-no-content {
+    text-align: center;
+  }
 
   .single-result .v-table-cell-content {
     padding: 0px 6px;

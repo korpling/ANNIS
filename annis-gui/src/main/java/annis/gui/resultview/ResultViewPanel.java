@@ -198,10 +198,10 @@ public class ResultViewPanel extends VerticalLayout implements
 
     // nothing to show since we have an empty result
     Label lblNoResult = new Label("No matches found.");
-    lblNoResult.setSizeUndefined();
+    lblNoResult.setWidth("100%");
+    lblNoResult.addStyleName("result-view-no-content");
+    
     resultLayout.addComponent(lblNoResult);
-    setComponentAlignment(lblNoResult, Alignment.MIDDLE_CENTER);
-    setExpandRatio(lblNoResult, 1.0f);
   }
 
   public void showSubgraphSearchInProgress(PagedResultQuery q, float percent)
