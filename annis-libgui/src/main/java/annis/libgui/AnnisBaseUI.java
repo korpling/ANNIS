@@ -48,8 +48,6 @@ import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -57,6 +55,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -225,7 +224,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
             }
             catch (IOException ex)
             {
-              log.warn("could not parsing instance config: " + ex.getMessage());
+              log.warn("could not parse instance config: " + ex.getMessage());
             }
           }
         }
@@ -593,6 +592,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       // the json should be human readable
       jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
         true);
+      jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES , false);
     }
     return jsonMapper;
   }
