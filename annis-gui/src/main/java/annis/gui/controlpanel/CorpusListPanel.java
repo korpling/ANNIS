@@ -124,8 +124,6 @@ public class CorpusListPanel extends VerticalLayout implements
     final CorpusListPanel finalThis = this;
 
     setSizeFull();
-//    setHeight("99%");
-//    setWidth("99%");
 
     HorizontalLayout selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");

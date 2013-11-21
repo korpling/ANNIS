@@ -336,6 +336,7 @@ public class SearchUI extends AnnisBaseUI
 
     controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
+    
     hSplit.setFirstComponent(controlPanel);
 
 
