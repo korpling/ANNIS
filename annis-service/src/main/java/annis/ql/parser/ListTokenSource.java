@@ -33,6 +33,7 @@ public class ListTokenSource implements TokenSource
 {
   private final List<Token> token;
   private TokenFactory factory;
+  private final CommonToken eofToken = new CommonToken(Lexer.EOF, "");
 
   public ListTokenSource(List<Token> token)
   {
@@ -50,6 +51,9 @@ public class ListTokenSource implements TokenSource
     }
     Preconditions.checkNotNull(this.factory, "Internal token list needs a valid TokenSource");
     
+    Token lastToken = token.get(token.size()-1);
+    eofToken.setLine(lastToken.getLine());
+    eofToken.setCharPositionInLine(lastToken.getCharPositionInLine());
   }
 
   @Override
@@ -57,7 +61,7 @@ public class ListTokenSource implements TokenSource
   {
     if(token.isEmpty())
     {
-      return new CommonToken(Lexer.EOF, "");
+      return eofToken;
     }
     else
     {
@@ -68,29 +72,53 @@ public class ListTokenSource implements TokenSource
   @Override
   public int getLine()
   {
-    Preconditions.checkArgument(!token.isEmpty(), "Internal token list must not be empty");
-    return token.get(0).getLine();
+    if(token.isEmpty())
+    {
+      return eofToken.getLine();
+    }
+    else
+    {
+      return token.get(0).getLine();
+    }
   }
 
   @Override
   public int getCharPositionInLine()
   {
-    Preconditions.checkArgument(!token.isEmpty(), "Internal token list must not be empty");
-    return token.get(0).getCharPositionInLine();
+    if(token.isEmpty())
+    {
+      return eofToken.getCharPositionInLine();
+    }
+    else
+    {
+      return token.get(0).getCharPositionInLine();
+    }
   }
 
   @Override
   public CharStream getInputStream()
   {
-    Preconditions.checkArgument(!token.isEmpty(), "Internal token list must not be empty");
-    return token.get(0).getInputStream();
+    if(token.isEmpty())
+    {
+      return eofToken.getInputStream();
+    }
+    else
+    {
+      return token.get(0).getInputStream();
+    }
   }
 
   @Override
   public String getSourceName()
   {
-    Preconditions.checkArgument(!token.isEmpty(), "Internal token list must not be empty");
-    return token.get(0).getInputStream().getSourceName();
+    if(token.isEmpty())
+    {
+      return eofToken.getInputStream().getSourceName();
+    }
+    else
+    {
+      return token.get(0).getInputStream().getSourceName();
+    }
   }
 
   @Override
