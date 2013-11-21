@@ -57,7 +57,7 @@ public class ListTokenSource implements TokenSource
   {
     if(token.isEmpty())
     {
-      return new CommonToken(Lexer.EOF);
+      return new CommonToken(Lexer.EOF, "");
     }
     else
     {

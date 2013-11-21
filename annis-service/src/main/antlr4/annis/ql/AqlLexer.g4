@@ -28,11 +28,13 @@ NODE:'node';
 META:'meta';
 AND:'&';
 OR:'|';
-EQ:'=';
+IDENTITY:'==';
+EQ: '=';
 NEQ:'!=';
 DOMINANCE:'>';
 POINTING:'->';
 PRECEDENCE:'.';
+TEST:'%';
 IDENT_COV:'_=_';
 INCLUSION:'_i_';
 OVERLAP:'_o_';
@@ -58,16 +60,16 @@ DOUBLECOLON:'::';
 
 WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
 
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
-    ;
-    
+VAR_DEF
+	:	('a'..'z'|'A'..'Z') ( '0' .. '9'|'a'..'z'|'A'..'Z')* '#'
+	;
+
 REF
 	:	'#' ( '0' .. '9'|'a'..'z'|'A'..'Z')+
 	;
 
-VAR_DEF
-	:	('a'..'z'|'A'..'Z') ( '0' .. '9'|'a'..'z'|'A'..'Z')* '#'
-	;
+ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
+    ;
 
 DIGITS : ('0'..'9')+;
 

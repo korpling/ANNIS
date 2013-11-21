@@ -23,11 +23,10 @@ import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import java.util.ArrayList;
-import java.util.Collection;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
-import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +47,10 @@ public class QueryNodeListener extends AqlParserBaseListener
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
-  private final Map<Interval, Long> tokenposition2NodeID = Maps.newHashMap();
+  
+  private List<Map<Interval, QueryNode>> tokenPositions;
+  private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
+  private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
   private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
 
@@ -70,7 +72,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
     data = new QueryData();
-    
+    tokenPositions = new ArrayList<Map<Interval, QueryNode>>();
   }
 
   @Override
@@ -78,12 +80,14 @@ public class QueryNodeListener extends AqlParserBaseListener
   {
     currentAlternative.clear();
     localNodes.clear();
+    currentTokenPosition.clear();
   }
 
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
     data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
+    tokenPositions.add(new HashMap<Interval, QueryNode>(currentTokenPosition));
   }
 
   
@@ -162,7 +166,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   }
 
   @Override
-  public void enterVariableTermExpr(AqlParser.VariableTermExprContext ctx)
+  public void enterNamedVariableTermExpr(AqlParser.NamedVariableTermExprContext ctx)
   {
     lastVariableDefinition = null;
     if(ctx != null)
@@ -179,6 +183,28 @@ public class QueryNodeListener extends AqlParserBaseListener
       }
     }
   }
+
+  @Override
+  public void enterReferenceNode(AqlParser.ReferenceNodeContext ctx)
+  {
+    if(ctx != null && ctx.VAR_DEF() != null)
+    {
+      lastVariableDefinition = null;
+    
+      String text = ctx.VAR_DEF().getText();
+      // remove the trailing "#"
+      if(text.endsWith("#"))
+      {
+        lastVariableDefinition = text.substring(0, text.length()-1);
+      }
+      else
+      {
+        lastVariableDefinition = text;
+      }
+    
+    }
+  }
+  
   
   
 
@@ -215,14 +241,9 @@ public class QueryNodeListener extends AqlParserBaseListener
     return null;
   }
 
-  private Collection<QueryNode> nodesByRef(Token ref)
-  {
-    return localNodes.get("" + ref.getText().substring(1));
-  }
-
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    Long existingID = tokenposition2NodeID.get(ctx.getSourceInterval());
+    Long existingID = globalTokenPositions.get(ctx.getSourceInterval());
     
     if(existingID == null)
     {
@@ -242,9 +263,18 @@ public class QueryNodeListener extends AqlParserBaseListener
     
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
-    tokenposition2NodeID.put(ctx.getSourceInterval(), n.getId());
+    currentTokenPosition.put(ctx.getSourceInterval(), n);
+    globalTokenPositions.put(ctx.getSourceInterval(), n.getId());
     
     return n;
   }
+
+  public List<Map<Interval, QueryNode>> getTokenPositions()
+  {
+    return tokenPositions;
+  }
+  
+  
+
   
 }

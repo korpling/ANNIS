@@ -1,1 +1,1 @@
-/das/ & ( (cat=/NP/ & #1 . #2) | (/Haus/ & #1 . #3 ))
+tok=/abc/ . pos . node

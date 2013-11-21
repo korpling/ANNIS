@@ -203,8 +203,8 @@ public class CountTest
     // get token count as reference
     int tokenCount = countPcc2("tok");
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 = #2"));
-    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 = #2"));
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 == #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 == #2"));
 
     assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
