@@ -252,7 +252,7 @@ public class ExampleQueriesPanel extends Table
       public void buttonClick(Button.ClickEvent event)
       {
         CorpusListPanel corpusList = ui.getControlPanel().getCorpusList();
-        corpusList.initCorpusBrowser(corpusName);
+        corpusList.initCorpusBrowser(corpusName, btn);
       }
     });
 
