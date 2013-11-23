@@ -618,7 +618,6 @@ public class VisualizerPanel extends CssLayout
               "Error when creating visualizer " + visPlugin.getShortName(),
               finalException.toString(),
               Notification.Type.WARNING_MESSAGE);
-            UI.getCurrent().push();
           }
         });
       }

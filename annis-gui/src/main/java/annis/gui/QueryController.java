@@ -23,6 +23,7 @@ import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.PollControl;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.collect.BiMap;
@@ -67,7 +68,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
 
   private final SearchUI ui;
 
-  private transient ResultFetchThread lastMatchThread;
+  private transient Future<?> lastMatchFuture;
   private final ListOrderedSet<HistoryEntry> history;
 
   private Future<MatchAndDocumentCount> futureCount;
@@ -165,9 +166,9 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
     {
       futureCount.cancel(true);
     }
-    if (lastMatchThread != null && lastMatchThread.isAlive())
+    if (lastMatchFuture != null && !lastMatchFuture.isDone())
     {
-      lastMatchThread.abort();
+      lastMatchFuture.cancel(true);
     }
 
     futureCount = null;
@@ -306,9 +307,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
 
     getQueryPanels().put(lastQueryUUID, newResultView);
 
-    lastMatchThread = new ResultFetchThread(preparedQuery, newResultView, ui);
-    lastMatchThread.start();
-
+    Future<?> future = PollControl.runInBackground(250, ui, new ResultFetchJob(preparedQuery, newResultView, ui));
+    
     //
     // end execute match fetching
     //
@@ -346,9 +346,9 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       prepareExecuteQuery();
       
       getQueries().put(uuid, newQuery); 
-      lastMatchThread = new ResultFetchThread(newQuery,
-        panel, ui);
-      lastMatchThread.start();
+      lastMatchFuture = PollControl.runInBackground(250, ui, 
+        new ResultFetchJob(newQuery,
+        panel, ui));
     }
   }
 

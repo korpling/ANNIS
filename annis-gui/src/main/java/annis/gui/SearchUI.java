@@ -83,9 +83,8 @@ import org.vaadin.cssinject.CSSInject;
 /**
  * GUI for searching in corpora.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Push(value = PushMode.MANUAL)
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
   implements ScreenshotMaker.ScreenshotCallback,

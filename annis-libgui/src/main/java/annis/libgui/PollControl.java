@@ -101,10 +101,10 @@ public class PollControl
    * @param ui The {@link UI} to access or null of the current one should be used.
    * @param pollTime polling time in milliseconds
    */
-  public static void runInBackground(final int pollTime, UI ui, 
+  public static  Future<?> runInBackground(final int pollTime, UI ui, 
     final Runnable runnable) 
   {
-    callInBackground(pollTime, ui, Executors.callable(runnable));
+    return callInBackground(pollTime, ui, Executors.callable(runnable));
   }
   
   /**
@@ -125,7 +125,7 @@ public class PollControl
       ui = UI.getCurrent();
     }
     
-    if(callable != null)
+    if(ui != null && callable != null)
     {
       final UI finalUI = ui;
       
