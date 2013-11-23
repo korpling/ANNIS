@@ -296,6 +296,8 @@ public class ResultViewPanel extends VerticalLayout implements
         newPanels = createPanels(p, q.getOffset() + currentResults);
         currentResults += newPanels.size();
 
+        progressResult.setValue(((float) currentResults) / (float) (numberOfResults));
+        
         if (currentResults == numberOfResults)
         {
           resetQueryResultQueue();
