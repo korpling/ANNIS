@@ -26,6 +26,7 @@ import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -41,11 +42,7 @@ import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
-import java.util.concurrent.FutureTask;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -229,100 +226,13 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       e.setCorpora(corpusListPanel.getSelectedCorpora());
       e.setQuery(queryPanel.getQuery());
       controller.addHistoryEntry(e);
-
-      Callable<File> callable = new Callable<File>()
-      {
-        @Override
-        public File call() throws Exception
-        {
-          File currentTmpFile = File.createTempFile("annis-export", ".txt");
-          currentTmpFile.deleteOnExit();
-
-          OutputStreamWriter outWriter =
-            new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
-
-          exporter.convertText(queryPanel.getQuery(),
-            (Integer) cbLeftContext.getValue(),
-            (Integer) cbRightContext.getValue(),
-            corpusListPanel.getSelectedCorpora(),
-            txtAnnotationKeys.getValue(),
-            txtParameters.getValue(),
-            Helper.getAnnisWebResource().path("query"),
-            outWriter, eventBus);
-
-          outWriter.close();
-
-          return currentTmpFile;
-        }
-      };
-
-      FutureTask<File> task = new FutureTask<File>(callable)
-      {
-        @Override
-        protected void done()
-        {
-          UI.getCurrent().access(new Runnable() 
-          {
-            @Override
-            public void run()
-            {
-              btExport.setEnabled(true);
-              progressBar.setEnabled(false);
-              progressLabel.setValue("");
-
-              try
-              {
-                // copy the result to the class member in order to delete if
-                // when not longer needed
-                tmpOutputFile = get();
-              }
-              catch (InterruptedException ex)
-              {
-                log.error(null, ex);
-              }
-              catch (ExecutionException ex)
-              {
-                log.error(null, ex);
-              }
-
-              if (tmpOutputFile == null)
-              {
-                Notification.show("Could not create the Exporter",
-                  "The server logs might contain more information about this "
-                  + "so you should contact the provider of this ANNIS installation "
-                  + "for help.", Notification.Type.ERROR_MESSAGE);
-              }
-              else
-              {
-                if (downloader != null && btDownload.getExtensions().contains(
-                  downloader))
-                {
-                  btDownload.removeExtension(downloader);
-                }
-                downloader = new FileDownloader(new FileResource(
-                  tmpOutputFile));
-
-                downloader.extend(btDownload);
-                btDownload.setEnabled(true);
-
-                Notification.show("Export finished",
-                  "Click on the button right to the export button to actually download the file.",
-                  Notification.Type.HUMANIZED_MESSAGE);
-              }
-              
-              UI.getCurrent().push();
-            }
-          });
-          
-        }
-      };
-
       progressBar.setEnabled(true);
       progressLabel.setValue("");
 
-      ExecutorService singleExecutor = Executors.newSingleThreadExecutor();
-      Future<?> future = singleExecutor.submit(task);
-      if(future != null)
+      
+      Future<File> o = PollControl.callInBackground(100, null, 
+        new BackgroundJob(exporter));
+      if(o != null)
       {
         if (exportTime == null)
         {
@@ -406,8 +316,6 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
         {
           progressLabel.setValue("exported " + exports + " items");
         }
-        
-        UI.getCurrent().push();
       }
       
     });
@@ -426,4 +334,79 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       }
     }
   }
+  
+  private class BackgroundJob implements Callable<File>
+  {
+    
+    private final Exporter exporter;
+
+    public BackgroundJob(Exporter exporter)
+    {
+      this.exporter = exporter;
+    }
+    
+    @Override
+    public File call() throws Exception
+    {
+      final File currentTmpFile = File.createTempFile("annis-export", ".txt");
+      currentTmpFile.deleteOnExit();
+
+      OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+
+      exporter.convertText(queryPanel.getQuery(),
+        (Integer) cbLeftContext.getValue(),
+        (Integer) cbRightContext.getValue(),
+        corpusListPanel.getSelectedCorpora(),
+        txtAnnotationKeys.getValue(),
+        txtParameters.getValue(),
+        Helper.getAnnisWebResource().path("query"),
+        outWriter, eventBus);
+
+      outWriter.close();
+
+      UI.getCurrent().access(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          btExport.setEnabled(true);
+          progressBar.setEnabled(false);
+          progressLabel.setValue("");
+
+          // copy the result to the class member in order to delete if
+          // when not longer needed
+          tmpOutputFile = currentTmpFile;
+
+          if (tmpOutputFile == null)
+          {
+            Notification.show("Could not create the Exporter",
+              "The server logs might contain more information about this "
+              + "so you should contact the provider of this ANNIS installation "
+              + "for help.", Notification.Type.ERROR_MESSAGE);
+          }
+          else
+          {
+            if (downloader != null && btDownload.getExtensions().contains(
+              downloader))
+            {
+              btDownload.removeExtension(downloader);
+            }
+            downloader = new FileDownloader(new FileResource(
+              tmpOutputFile));
+
+            downloader.extend(btDownload);
+            btDownload.setEnabled(true);
+
+            Notification.show("Export finished",
+              "Click on the button right to the export button to actually download the file.",
+              Notification.Type.HUMANIZED_MESSAGE);
+          }
+        }
+      });
+      return currentTmpFile;
+    }
+    
+  }
+  
 }

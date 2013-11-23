@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
+import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
@@ -395,8 +396,7 @@ public class VisualizerPanel extends CssLayout
 
       final Future<Component> future = execService.submit(
         new LoadComponentTask());
-      Thread background = new BackgroundThread(future, callback);
-      background.start();
+      PollControl.runInBackground(100, null, new BackgroundJob(future, callback));
 
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
@@ -555,11 +555,11 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private class BackgroundThread extends Thread
+  private class BackgroundJob implements Runnable
   {
     private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
-    public BackgroundThread(
+    public BackgroundJob(
       Future<Component> future, LoadableVisualizer.Callback callback)
     {
       this.future = future;
@@ -577,15 +577,14 @@ public class VisualizerPanel extends CssLayout
         final Component result = future.get(60, TimeUnit.SECONDS);
         
         UI.getCurrent().access(new Runnable()
-           {
-             @Override
-             public void run()
-             {
-               vis = result;
-               updateGUIAfterLoadingVisualizer(callback);
-               UI.getCurrent().push();
-             }
-           });
+        {
+          @Override
+          public void run()
+          {
+            vis = result;
+            updateGUIAfterLoadingVisualizer(callback);
+          }
+        });
       }
       catch (InterruptedException ex)
       {

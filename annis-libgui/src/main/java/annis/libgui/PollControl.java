@@ -17,7 +17,11 @@ package annis.libgui;
 
 import com.google.common.collect.MapMaker;
 import com.vaadin.ui.UI;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
@@ -30,12 +34,12 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PollControl
 {
+  public static final int DEFAULT_TIME = 15000;
   private static final ConcurrentMap<Long, Integer> threadID2Time = new MapMaker().
     makeMap();
-
   private static final Lock calcLock = new ReentrantLock();
   
-  public static final int DEFAULT_TIME = 15000;
+  private static final ExecutorService exec = Executors.newCachedThreadPool();
 
   private static void setTime(UI ui, int newPollingTime)
   {
@@ -84,54 +88,64 @@ public class PollControl
   }
   
   /**
-   * Wraps the {@link UI#access(java.lang.Runnable) } method but includes 
-   * a parameter to control a polling time which is active during the execution 
+   * Starts a thread for background execution and ensures 
+   * a certain polling time which is active during the thread execution 
    * of the {@link Runnable}.
+   * 
    * @param runnable 
-   * @param pollTime 
+   * @param ui The {@link UI} to access or null of the current one should be used.
+   * @param pollTime polling time in milliseconds
    */
-  public static void access(final int pollTime, final Runnable runnable)
+  public static void runInBackground(final int pollTime, UI ui, 
+    final Runnable runnable) 
   {
-    access(pollTime, null, runnable);
+    callInBackground(pollTime, ui, Executors.callable(runnable));
   }
   
   /**
-   * Wraps the {@link UI#access(java.lang.Runnable) } method but includes 
-   * a parameter to control a polling time which is active during the execution 
+   * Starts a thread for background execution and ensures 
+   * a certain polling time which is active during the thread execution 
    * of the {@link Runnable}.
-   * @param runnable 
+   * 
+   * @param callable 
    * @param ui The {@link UI} to access or null of the current one should be used.
-   * @param pollTime 
+   * @param pollTime polling time in milliseconds
+   * @return The {@link Callable} that wraps the real one or null if an error occured
    */
-  public static void access(final int pollTime, UI ui, final Runnable runnable)
+  public static <T> Future<T> callInBackground(final int pollTime, UI ui, 
+    final Callable<T> callable) 
   {
     if(ui == null)
     {
       ui = UI.getCurrent();
     }
     
-    if(runnable != null)
+    if(callable != null)
     {
       final UI finalUI = ui;
       
-      ui.access(new Runnable()
+      return exec.submit(new Callable<T>()
       {
 
         @Override
-        public void run()
+        public T call() throws Exception
         {
+          T result = null;
           try
           {
             setTime(finalUI, pollTime);
-            runnable.run();
+            result = callable.call();
           }
           finally
           {
             unsetTime(finalUI);
           }
+          return result;
         }
       });
     }
+    
+    return null;
   }
 
   
