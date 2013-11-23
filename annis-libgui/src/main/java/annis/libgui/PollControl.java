@@ -24,6 +24,8 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A helper class to manager different polling needs from different background
@@ -34,6 +36,9 @@ import java.util.concurrent.locks.ReentrantLock;
  */
 public class PollControl
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(PollControl.class);
+  
   public static final int DEFAULT_TIME = 15000;
   private static final ConcurrentMap<Long, Integer> threadID2Time = new MapMaker().
     makeMap();
@@ -136,9 +141,15 @@ public class PollControl
             setTime(finalUI, pollTime);
             result = callable.call();
           }
+          catch(Exception ex)
+          {
+            log.error("exception in background job", ex);
+            throw(ex);
+          }
           finally
           {
             unsetTime(finalUI);
+            
           }
           return result;
         }
