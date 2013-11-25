@@ -612,7 +612,7 @@ public class QueryServiceImpl implements QueryService
     }
     catch (Exception ex)
     {
-      log.error("could not decode top level corpus name");
+      log.error("problems with reading config", ex);
       throw new WebApplicationException(500);
     }
   }
