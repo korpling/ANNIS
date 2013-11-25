@@ -391,13 +391,9 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
-      PollControl.runInBackground(100, null, new BackgroundJob(future, callback));
-
+      PollControl.runInBackground(1000, 100, null, 
+        new BackgroundJob(callback));
+      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -557,12 +553,9 @@ public class VisualizerPanel extends CssLayout
 
   private class BackgroundJob implements Runnable
   {
-    private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
-    public BackgroundJob(
-      Future<Component> future, LoadableVisualizer.Callback callback)
+    public BackgroundJob(LoadableVisualizer.Callback callback)
     {
-      this.future = future;
       this.callback = callback;
     }
     
@@ -571,6 +564,10 @@ public class VisualizerPanel extends CssLayout
     @Override
     public void run()
     {
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
       Throwable exception = null;
       try
       {

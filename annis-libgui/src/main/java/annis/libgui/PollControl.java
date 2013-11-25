@@ -20,11 +20,15 @@ import com.vaadin.ui.UI;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,10 +114,27 @@ public class PollControl
    * @param ui The {@link UI} to access or null of the current one should be used.
    * @param pollTime polling time in milliseconds
    */
-  public static  Future<?> runInBackground(final int pollTime, UI ui, 
+  public static  Future<?> runInBackground(int pollTime, UI ui, 
     final Runnable runnable) 
   {
-    return callInBackground(pollTime, ui, Executors.callable(runnable));
+    return callInBackground(pollTime, 0, ui,Executors.callable(runnable));
+  }
+  
+  /**
+   * Starts a thread for background execution and ensures 
+   * a certain polling time which is active during the thread execution 
+   * of the {@link Runnable}.
+   * 
+   * @param runnable 
+   * @param ui The {@link UI} to access or null of the current one should be used.
+   * @param pollTime polling time in milliseconds
+   * @param initialWait The initial maximal time in milliseconds to wait for the 
+   * job to return. If you don't want to wait set this to <= 0.
+   */
+  public static  Future<?> runInBackground(int pollTime, int initialWait, UI ui, 
+    final Runnable runnable) 
+  {
+    return callInBackground(pollTime, initialWait, ui, Executors.callable(runnable));
   }
   
   /**
@@ -126,7 +147,29 @@ public class PollControl
    * @param pollTime polling time in milliseconds
    * @return The {@link Callable} that wraps the real one or null if an error occured
    */
-  public static <T> Future<T> callInBackground(final int pollTime, UI ui, 
+  public static <T> Future<T> callInBackground(
+    final int pollTime, 
+    UI ui, 
+    final Callable<T> callable) 
+  {
+    return callInBackground(pollTime, 0, ui, callable);
+  }
+  
+  /**
+   * Starts a thread for background execution and ensures 
+   * a certain polling time which is active during the thread execution 
+   * of the {@link Runnable}.
+   * 
+   * @param callable 
+   * @param ui The {@link UI} to access or null of the current one should be used.
+   * @param pollTime polling time in milliseconds
+   * @param initialWait The initial maximal time to wait in milliseconds for the job to return. If you don't want to wait set this to <= 0.
+   * @return The {@link Callable} that wraps the real one or null if an error occured
+   */
+  public static <T> Future<T> callInBackground(
+    final int pollTime, 
+    int initialWait,
+    UI ui, 
     final Callable<T> callable) 
   {
     if(ui == null)
@@ -161,6 +204,25 @@ public class PollControl
           return result;
         }
       });
+      try
+      {
+        if(initialWait > 0)
+        {
+          result.get(initialWait, TimeUnit.MILLISECONDS);
+        }
+      }
+      catch (InterruptedException ex)
+      {
+        log.warn("Computation canceled", ex);
+      }
+      catch (ExecutionException ex)
+      {
+        log.error("Computation throw an error", ex);
+      }
+      catch (TimeoutException ex)
+      {
+        // intended behavior, nothing to report
+      }
       
       return result;
     }
