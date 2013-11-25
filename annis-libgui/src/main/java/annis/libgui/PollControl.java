@@ -17,6 +17,7 @@ package annis.libgui;
 
 import com.google.common.collect.MapMaker;
 import com.vaadin.ui.UI;
+import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutorService;
@@ -40,21 +41,29 @@ public class PollControl
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
   public static final int DEFAULT_TIME = 60000;
-  private static final ConcurrentMap<Long, Integer> threadID2Time = new MapMaker().
+  private static final ConcurrentMap<UUID, Integer> id2Time = new MapMaker().
     makeMap();
   private static final Lock calcLock = new ReentrantLock();
   
   private static final ExecutorService exec = Executors.newCachedThreadPool();
 
-  private static void setTime(UI ui, int newPollingTime)
+  private static UUID setTime(UI ui, int newPollingTime)
   {
-    threadID2Time.put(Thread.currentThread().getId(), newPollingTime);
+    UUID id = UUID.randomUUID();
+    // it's really unpropable, but just in case check if this ID was used before
+    while(id2Time.containsKey(id))
+    {
+      id = UUID.randomUUID();
+    }
+    id2Time.put(id, newPollingTime);
     calculateAndSetPollingTime(ui);
+    
+    return id;
   }
 
-  private static void unsetTime(UI ui)
+  private static void unsetTime(UUID id, UI ui)
   {
-    if(threadID2Time.remove(Thread.currentThread().getId()) != null)
+    if(id2Time.remove(id) != null)
     {
       calculateAndSetPollingTime(ui);
     }
@@ -75,7 +84,7 @@ public class PollControl
         
         // get the minimal non-negative time
         int min = DEFAULT_TIME;
-        for (int time : threadID2Time.values())
+        for (int time : id2Time.values())
         {
           if(time >= 0 && time < min)
           {
@@ -128,17 +137,16 @@ public class PollControl
     if(ui != null && callable != null)
     {
       final UI finalUI = ui;
+      final UUID id = setTime(finalUI, pollTime);
       
-      return exec.submit(new Callable<T>()
+      Future<T> result = exec.submit(new Callable<T>()
       {
-
         @Override
         public T call() throws Exception
         {
           T result = null;
           try
           {
-            setTime(finalUI, pollTime);
             result = callable.call();
           }
           catch(Exception ex)
@@ -148,12 +156,13 @@ public class PollControl
           }
           finally
           {
-            unsetTime(finalUI);
-            
+            unsetTime(id, finalUI);
           }
           return result;
         }
       });
+      
+      return result;
     }
     
     return null;
