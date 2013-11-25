@@ -362,16 +362,7 @@ public class SearchUI extends AnnisBaseUI
 
     updateUserInformation();
   }
-
-  @Override
-  public void setPollInterval(int intervalInMillis)
-  {
-    Page.getCurrent().setTitle("Poll time set to: " + intervalInMillis);
-    super.setPollInterval(intervalInMillis); //To change body of generated methods, choose Tools | Templates.
-  }
   
-  
-
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
   {
