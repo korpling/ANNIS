@@ -48,13 +48,13 @@ import org.slf4j.LoggerFactory;
  * A thread that queries for the matches, fetches the the subgraph for the
  * matches and updates the GUI at certain points.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-class ResultFetchThread extends Thread
+class ResultFetchJob implements Runnable
 {
 
   private static final Logger log = LoggerFactory.getLogger(
-    ResultFetchThread.class);
+    ResultFetchJob.class);
 
   private ResultViewPanel resultPanel;
 
@@ -66,7 +66,7 @@ class ResultFetchThread extends Thread
 
   private SearchUI ui;
 
-  public ResultFetchThread(PagedResultQuery query, ResultViewPanel resultPanel,
+  public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel,
     SearchUI ui)
   {
     this.resultPanel = resultPanel;
@@ -83,15 +83,6 @@ class ResultFetchThread extends Thread
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(new MatchListType());
 
-  }
-
-  public void abort()
-  {
-    if (futureMatches != null && !futureMatches.isDone())
-    {
-      futureMatches.cancel(true);
-    }
-    interrupt();
   }
 
   private SaltProject executeQuery(WebResource subgraphRes,
@@ -159,7 +150,7 @@ class ResultFetchThread extends Thread
 
     try
     {
-      if (isInterrupted())
+      if (Thread.interrupted())
       {
         return;
       }
@@ -171,7 +162,6 @@ class ResultFetchThread extends Thread
         public void run()
         {
           resultPanel.showMatchSearchInProgress(query);
-          ui.push();
         }
       });
 
@@ -183,7 +173,7 @@ class ResultFetchThread extends Thread
       {
 
         // check if thread was interrupted
-        if (isInterrupted())
+        if (Thread.interrupted())
         {
           return;
         }
@@ -200,7 +190,7 @@ class ResultFetchThread extends Thread
       }
       else
       {
-        if (isInterrupted())
+        if (Thread.interrupted())
         {
           return;
         }
@@ -212,7 +202,6 @@ class ResultFetchThread extends Thread
           public void run()
           {
             resultPanel.showSubgraphSearchInProgress(query, 0.0f);
-            ui.push();
           }
         });
 
@@ -224,7 +213,7 @@ class ResultFetchThread extends Thread
 
         for (Match m : result)
         {
-          if (isInterrupted())
+          if (Thread.interrupted())
           {
             return;
           }
@@ -244,12 +233,11 @@ class ResultFetchThread extends Thread
               public void run()
               {
                 resultPanel.setQueryResultQueue(queue, query, totalResultSize);
-                ui.push();
               }
             });
           }
 
-          if (isInterrupted())
+          if (Thread.interrupted())
           {
             return;
           }
@@ -258,7 +246,7 @@ class ResultFetchThread extends Thread
         }
       } // end if no results
 
-      if (isInterrupted())
+      if (Thread.interrupted())
       {
         return;
       }
@@ -321,18 +309,10 @@ class ResultFetchThread extends Thread
     }
     finally
     {
-      if (isInterrupted())
+      if (Thread.interrupted())
       {
         return;
       }
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          ui.push();
-        }
-      });
     }
 
   }

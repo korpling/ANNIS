@@ -18,6 +18,7 @@ package annis.gui.docbrowser;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
+import annis.libgui.PollControl;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
@@ -32,6 +33,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
@@ -121,9 +123,10 @@ public class DocBrowserController implements Serializable
       // register visible visHolder
       this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-      new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
-        config, btn).
-        start();
+      PollControl.runInBackground(100, ui, 
+        new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
+          config, btn)
+      );
     }
     catch (JSONException ex)
     {
@@ -260,7 +263,7 @@ public class DocBrowserController implements Serializable
     return namespace;
   }
 
-  private class DocVisualizerFetcher extends Thread
+  private class DocVisualizerFetcher implements Runnable
   {
 
     JSONSerializable config;
@@ -320,7 +323,7 @@ public class DocBrowserController implements Serializable
       }
 
       // after initializing the visualizer update the gui
-      ui.access(new Runnable()
+      UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
@@ -330,7 +333,6 @@ public class DocBrowserController implements Serializable
           visHolder.setContent(vis);
 
           btn.setEnabled(true);
-          ui.push();
         }
       });
     }
