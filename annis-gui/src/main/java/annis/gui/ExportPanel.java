@@ -230,7 +230,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       progressLabel.setValue("");
 
       
-      Future<File> o = PollControl.callInBackground(100, null, 
+      Future<File> o = PollControl.callInBackground(1000, null, 
         new BackgroundJob(exporter));
       if(o != null)
       {

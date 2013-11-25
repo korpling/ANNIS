@@ -307,7 +307,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
 
     getQueryPanels().put(lastQueryUUID, newResultView);
 
-    Future<?> future = PollControl.runInBackground(250, ui, new ResultFetchJob(preparedQuery, newResultView, ui));
+    PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery, newResultView, ui));
     
     //
     // end execute match fetching
@@ -326,7 +326,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       StringUtils.join(preparedQuery.getCorpora(), ",")).get(
       MatchAndDocumentCount.class);
 
-    new CountCallback(lastQueryUUID).start();
+    PollControl.runInBackground(500, ui, new CountCallback(lastQueryUUID));
     
     //
     // end execute count
@@ -346,7 +346,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       prepareExecuteQuery();
       
       getQueries().put(uuid, newQuery); 
-      lastMatchFuture = PollControl.runInBackground(250, ui, 
+      lastMatchFuture = PollControl.runInBackground(500, ui, 
         new ResultFetchJob(newQuery,
         panel, ui));
     }
@@ -491,9 +491,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
     }
   }
 
-  private class CountCallback extends Thread
-  {
-    
+  private class CountCallback implements Runnable
+  { 
     private UUID uuid;
 
     public CountCallback(UUID uuid)
