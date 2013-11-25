@@ -39,7 +39,7 @@ public class PollControl
   
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
-  public static final int DEFAULT_TIME = 15000;
+  public static final int DEFAULT_TIME = 60000;
   private static final ConcurrentMap<Long, Integer> threadID2Time = new MapMaker().
     makeMap();
   private static final Lock calcLock = new ReentrantLock();

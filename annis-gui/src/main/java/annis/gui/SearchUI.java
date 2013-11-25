@@ -40,7 +40,6 @@ import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
@@ -55,9 +54,6 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.shared.communication.PushMode;
-
-import com.vaadin.shared.ui.ui.Transport;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
@@ -107,7 +103,7 @@ public class SearchUI extends AnnisBaseUI
   private HorizontalLayout layoutToolbar;
 
   private Label lblUserName;
-
+  
   private Button btLogin;
 
   private Button btLogout;
@@ -275,7 +271,7 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(btOpenSource);
-
+    
     layoutToolbar.setSpacing(true);
     layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
@@ -364,10 +360,17 @@ public class SearchUI extends AnnisBaseUI
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
 
-    setPollInterval(-1);
-
     updateUserInformation();
   }
+
+  @Override
+  public void setPollInterval(int intervalInMillis)
+  {
+    Page.getCurrent().setTitle("Poll time set to: " + intervalInMillis);
+    super.setPollInterval(intervalInMillis); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  
 
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
