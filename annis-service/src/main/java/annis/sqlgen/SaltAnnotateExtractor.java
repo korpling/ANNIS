@@ -324,25 +324,29 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       Map.Entry<Long, String> e = itToken.next();
       SToken tok = tokenByIndex.get(e.getKey());
       
-      RelannisNodeFeature feat = (RelannisNodeFeature) tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getSValue();
-      
-      if(feat.getTextRef() == textID)
+      SFeature rawFeature = tok.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE);
+      if(rawFeature != null)
       {
-        STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
-        textRel.setSSource(tok);
-        textRel.setSTarget(textDataSource);
-        textRel.setSStart(sbText.length());
-        textRel.setSEnd(sbText.length() + e.getValue().length());
-        
-        textRel.setSName("sTextRel" + textID + "_" + (index++));
+        RelannisNodeFeature feat = (RelannisNodeFeature) rawFeature.getSValue();
 
-        textRel.setSTextualDS(textDataSource);
-        graph.addSRelation(textRel);
-
-        sbText.append(e.getValue());
-        if (itToken.hasNext())
+        if(feat.getTextRef() == textID)
         {
-          sbText.append(" ");
+          STextualRelation textRel = SaltFactory.eINSTANCE.createSTextualRelation();
+          textRel.setSSource(tok);
+          textRel.setSTarget(textDataSource);
+          textRel.setSStart(sbText.length());
+          textRel.setSEnd(sbText.length() + e.getValue().length());
+
+          textRel.setSName("sTextRel" + textID + "_" + (index++));
+
+          textRel.setSTextualDS(textDataSource);
+          graph.addSRelation(textRel);
+
+          sbText.append(e.getValue());
+          if (itToken.hasNext())
+          {
+            sbText.append(" ");
+          }
         }
       }
     }

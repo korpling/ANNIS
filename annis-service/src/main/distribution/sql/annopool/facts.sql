@@ -86,7 +86,6 @@ INSERT INTO facts_:id
   "right",
   token_index,
   is_token,
-  continuous,
   span,
   left_token,
   right_token,
@@ -132,18 +131,17 @@ FROM
     _node.text_ref AS text_ref,
     _node.corpus_ref AS corpus_ref,
     _node.toplevel_corpus AS toplevel_corpus,
-    _node.namespace AS node_namespace,
+    _node.layer AS node_namespace,
     _node.name AS node_name,
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
     (_node.token_index IS NOT NULL AND _node.seg_name IS NULL) AS is_token,
-    _node.continuous AS continuous,
     _node.span AS span,
     _node.left_token AS left_token,
     _node.right_token AS right_token,
     _node.seg_name AS seg_name,
-    _node.seg_left AS seg_index,
+    _node.seg_index AS seg_index,
 
     _rank.pre AS pre,
     _rank.post AS post,
@@ -153,7 +151,7 @@ FROM
 
     _component.id AS component_id,
     _component.type AS edge_type,
-    _component.namespace AS edge_namespace,
+    _component.layer AS edge_namespace,
     _component.name AS edge_name,
 
     (SELECT id FROM annotation_pool_:id AS na 
