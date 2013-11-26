@@ -15,6 +15,8 @@
  */
 package annis.gui;
 
+import annis.gui.requesthandler.ResourceRequestHandler;
+import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
