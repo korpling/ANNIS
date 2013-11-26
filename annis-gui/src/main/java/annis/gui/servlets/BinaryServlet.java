@@ -173,7 +173,7 @@ public class BinaryServlet extends HttpServlet
       response.setStatus(206);
       response.setContentLength(lengthToFetch);
 
-      writeStepByStep(offset, lengthToFetch, binaryRes, out, mimeType);
+      writeFromServiceToClient(offset, lengthToFetch, binaryRes, out, mimeType);
     }
   }
 
@@ -233,29 +233,21 @@ public class BinaryServlet extends HttpServlet
       int offset = 0;
       int length = binaryMeta.getLength();
 
-      writeStepByStep(offset, length, binaryRes, out, mimeType);
+      writeFromServiceToClient(offset, length, binaryRes, out, mimeType);
 
     }
   }
 
-  private void writeStepByStep(int offset, int completeLength,
+  private void writeFromServiceToClient(int offset, int completeLength,
     WebResource binaryRes, ServletOutputStream out, String mimeType) throws IOException
   {
-    int remaining = completeLength;
-    while (remaining > 0)
-    {
-      int stepLength = Math.min(MAX_LENGTH, remaining);
 
-      ClientResponse response = binaryRes.path("" + offset).
-        path("" + stepLength)
-        .accept(mimeType).get(ClientResponse.class);
-      int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
-      Validate.isTrue(copiedBytes == stepLength);
-      out.flush();
-
-      offset += stepLength;
-      remaining = remaining - stepLength;
-    }
+    ClientResponse response = binaryRes.path("" + offset).
+      path("" + completeLength)
+      .accept(mimeType).get(ClientResponse.class);
+    int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
+    Validate.isTrue(copiedBytes == completeLength);
+    out.flush();
   }
 
   private static class AnnisBinaryMetaDataListType extends GenericType<List<AnnisBinaryMetaData>>
