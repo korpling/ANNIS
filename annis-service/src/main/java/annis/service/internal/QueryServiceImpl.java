@@ -77,6 +77,7 @@ import javax.ws.rs.core.UriInfo;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -610,9 +611,14 @@ public class QueryServiceImpl implements QueryService
 
       return corpusConfig;
     }
+    catch (AuthorizationException ex)
+    {
+      log.error("authorization error", ex);
+      throw new WebApplicationException(401);
+    }
     catch (Exception ex)
     {
-      log.error("could not decode top level corpus name");
+      log.error("problems with reading config", ex);
       throw new WebApplicationException(500);
     }
   }

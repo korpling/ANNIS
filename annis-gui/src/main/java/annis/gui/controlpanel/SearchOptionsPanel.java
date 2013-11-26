@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
+import annis.libgui.PollControl;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
@@ -112,7 +113,7 @@ public class SearchOptionsPanel extends FormLayout
 
   public SearchOptionsPanel()
   {
-    setWidth("99%");
+    setWidth("100%");
     setHeight("-1px");
 
     addStyleName("contextsensible-formlayout");
@@ -231,7 +232,7 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora)
   {
-    Thread t = new Thread(new Runnable()
+    PollControl.runInBackground(250, null, new Runnable()
     {
       @Override
       public void run()
@@ -278,7 +279,6 @@ public class SearchOptionsPanel extends FormLayout
         });
       }
     });
-    t.start();
 
 
   }

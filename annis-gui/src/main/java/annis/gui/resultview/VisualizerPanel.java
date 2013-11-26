@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
+import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
@@ -390,14 +391,9 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
-      Thread background = new BackgroundThread(future, callback);
-      background.start();
-
+      PollControl.runInBackground(1000, 100, null, 
+        new BackgroundJob(callback));
+      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -555,14 +551,11 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private class BackgroundThread extends Thread
+  private class BackgroundJob implements Runnable
   {
-    private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
-    public BackgroundThread(
-      Future<Component> future, LoadableVisualizer.Callback callback)
+    public BackgroundJob(LoadableVisualizer.Callback callback)
     {
-      this.future = future;
       this.callback = callback;
     }
     
@@ -571,21 +564,24 @@ public class VisualizerPanel extends CssLayout
     @Override
     public void run()
     {
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
       Throwable exception = null;
       try
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
         
         UI.getCurrent().access(new Runnable()
-           {
-             @Override
-             public void run()
-             {
-               vis = result;
-               updateGUIAfterLoadingVisualizer(callback);
-               UI.getCurrent().push();
-             }
-           });
+        {
+          @Override
+          public void run()
+          {
+            vis = result;
+            updateGUIAfterLoadingVisualizer(callback);
+          }
+        });
       }
       catch (InterruptedException ex)
       {
@@ -619,7 +615,6 @@ public class VisualizerPanel extends CssLayout
               "Error when creating visualizer " + visPlugin.getShortName(),
               finalException.toString(),
               Notification.Type.WARNING_MESSAGE);
-            UI.getCurrent().push();
           }
         });
       }

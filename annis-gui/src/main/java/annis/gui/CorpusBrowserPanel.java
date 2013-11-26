@@ -394,7 +394,7 @@ public class CorpusBrowserPanel extends Panel
         getValue();
       Set<String> corpusNameSet = new HashSet<String>();
       corpusNameSet.add(corpus.getName());
-      if (controller != null)
+      if (controller != null && cbe != null)
       {
         controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
       }

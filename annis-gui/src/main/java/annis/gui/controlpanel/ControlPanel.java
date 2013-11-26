@@ -19,8 +19,7 @@ import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.resultview.ResultViewPanel;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -55,31 +54,31 @@ public class ControlPanel extends VerticalLayout
     this.ui = ui;
     
     setSizeFull();
+    setMargin(true);
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
+    queryPanel = new QueryPanel(ui);
+    queryPanel.setHeight("-1px");
+    queryPanel.setWidth("100%");
+    
     optionsTab = new TabSheet();
-    optionsTab.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    optionsTab.setWidth(100f, Layout.UNITS_PERCENTAGE);
+    optionsTab.setHeight("100%");
+    optionsTab.setWidth("100%");
     optionsTab.addStyleName("blue-tab");
 
     corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
     
     searchOptions = new SearchOptionsPanel();
 
-    queryPanel = new QueryPanel(ui);
-    queryPanel.setHeight("-1px");
-    queryPanel.setWidth("100%");
-    
     optionsTab.addTab(corpusList, "Corpus List", null);
     optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
-
+   
     addComponent(queryPanel);
     addComponent(optionsTab);
-
-    setExpandRatio(optionsTab, 1.0f);
     
+    setExpandRatio(optionsTab, 1.0f);
   }
   
   public CorpusListPanel getCorpusList()

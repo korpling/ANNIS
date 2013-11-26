@@ -17,6 +17,7 @@ package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
@@ -32,8 +33,9 @@ import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.ProgressIndicator;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.ByteArrayInputStream;
@@ -51,9 +53,6 @@ import java.util.ListIterator;
 import java.util.Set;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
-import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -73,20 +72,22 @@ public class FrequencyResultPanel extends VerticalLayout
   private String aql;
   private Set<String> corpora;
   private List<FrequencyTableEntry> freqDefinition;
+  final FrequencyQueryPanel queryPanel;
   
-  private ProgressIndicator pbQuery;
+  private ProgressBar pbQuery;
 
   public FrequencyResultPanel(String aql,
     Set<String> corpora,
-    final List<FrequencyTableEntry> freqDefinition, final FrequencyQueryPanel queryPanel)
+    final List<FrequencyTableEntry> freqDefinition, FrequencyQueryPanel queryPanel)
   {
     this.aql = aql;
     this.corpora = corpora;
     this.freqDefinition = freqDefinition;
+    this.queryPanel = queryPanel;
     
     setSizeFull();
     
-    pbQuery = new ProgressIndicator();
+    pbQuery = new ProgressBar();
     pbQuery.setCaption("Please wait, the frequencies analysis can take some time");
     pbQuery.setIndeterminate(true);
     pbQuery.setEnabled(true);
@@ -116,66 +117,28 @@ public class FrequencyResultPanel extends VerticalLayout
       @Override
       public FrequencyTable call() throws Exception
       {
-        return loadBeans();
+        final FrequencyTable t = loadBeans();
+        
+        UI.getCurrent().access(new Runnable()
+        {
+
+          @Override
+          public void run()
+          {
+            showResult(t);
+          }
+        });
+        
+        return t;
       } 
     };
     
-    FutureTask<FrequencyTable> task = new FutureTask<FrequencyTable>(r)
-    {
-      @Override
-      protected void done()
-      {
-        super.done();
-        try
-        {
-          if(queryPanel != null)
-          {
-            queryPanel.notifiyQueryFinished();
-          }
-          FrequencyTable table = get();
-          recreateTable(table);
-          
-          btDownloadCSV.setVisible(true);
-          FileDownloader downloader = new FileDownloader(
-            new StreamResource(new CSVResource(table, freqDefinition), 
-            "frequency.csv"));
-          downloader.extend(btDownloadCSV);
-          
-          chart.setVisible(true);
-          FrequencyTable clippedTable = table;
-          if(clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
-          {
-            List<FrequencyTable.Entry> entries = 
-              new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
-            
-            clippedTable = new FrequencyTable();
-            clippedTable.setEntries(entries.subList(0,
-              MAX_NUMBER_OF_CHART_ITEMS));
-            clippedTable.setSum(table.getSum());
-            chart.setCaption("Showing historgram of top 500 results, see table below for complete dataset.");
-          }
-          chart.setFrequencyData(clippedTable);
-          
-        }
-        catch (InterruptedException ex)
-        {
-          log.error(null, ex);
-        }
-        catch (ExecutionException ex)
-        {
-          log.error(null, ex);
-        }
-        
-      }
-    };
-    
-    Executor exec = Executors.newSingleThreadExecutor();
-    exec.execute(task);
+    PollControl.callInBackground(1000, null, r);
   }
   
   private FrequencyTable loadBeans()
   {
-  FrequencyTable result = new FrequencyTable();
+    FrequencyTable result = new FrequencyTable();
       
     WebResource annisResource = Helper.getAnnisWebResource();
     try
@@ -211,6 +174,39 @@ public class FrequencyResultPanel extends VerticalLayout
     }
 
     return result;
+  }
+  
+  private void showResult(FrequencyTable table)
+  {
+    if (queryPanel != null)
+    {
+      queryPanel.notifiyQueryFinished();
+    }
+    recreateTable(table);
+
+    btDownloadCSV.setVisible(true);
+    FileDownloader downloader = new FileDownloader(
+      new StreamResource(new CSVResource(table, freqDefinition),
+        "frequency.csv"));
+    downloader.extend(btDownloadCSV);
+
+    chart.setVisible(true);
+    FrequencyTable clippedTable = table;
+    if (clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
+    {
+      List<FrequencyTable.Entry> entries
+        = new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+
+      clippedTable = new FrequencyTable();
+      clippedTable.setEntries(entries.subList(0,
+        MAX_NUMBER_OF_CHART_ITEMS));
+      clippedTable.setSum(table.getSum());
+      chart.setCaption(
+        "Showing historgram of top 500 results, see table below for complete dataset.");
+    }
+    chart.setFrequencyData(clippedTable);
+
+
   }
   
   private String createFieldsString()

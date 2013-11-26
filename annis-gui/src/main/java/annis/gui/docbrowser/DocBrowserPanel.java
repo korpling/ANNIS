@@ -17,12 +17,14 @@ package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
@@ -89,7 +91,7 @@ public class DocBrowserPanel extends Panel
     if (table == null)
     {
       layout.addComponent(progress);
-      (new LoadingDocs()).start();
+      PollControl.runInBackground(100, ui, new LoadingDocs());
     }
   }
 
@@ -167,7 +169,7 @@ public class DocBrowserPanel extends Panel
     ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
 
-  private class LoadingDocs extends Thread
+  private class LoadingDocs implements Runnable
   {
 
     @Override
@@ -180,7 +182,7 @@ public class DocBrowserPanel extends Panel
         get(new Helper.AnnotationListType());
 
 
-      ui.access(new Runnable()
+      UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
@@ -190,7 +192,6 @@ public class DocBrowserPanel extends Panel
           layout.addComponent(table);
 
           table.setDocNames(docs);
-          ui.push();
         }
       });
     }

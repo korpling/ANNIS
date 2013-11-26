@@ -50,6 +50,7 @@ public class AnnisParserAntlr
   {
     final List<String> errors = new LinkedList<String>();
     
+
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
     
     // bring first into DNF
@@ -62,12 +63,14 @@ public class AnnisParserAntlr
     {
       throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
     }
+    //treeRaw.inspect(rawParser);
     
     ParseTreeWalker walkerRaw = new ParseTreeWalker();
     RawAqlListener listenerRaw = new RawAqlListener();
     walkerRaw.walk(listenerRaw, treeRaw);
     
     LogicClause topNode = listenerRaw.getRoot();
+    
     DNFTransformer.toDNF(topNode);
     
     // use the DNF form and parse it again
@@ -77,7 +80,9 @@ public class AnnisParserAntlr
     parserDNF.removeErrorListeners();
     parserDNF.addErrorListener(new StringListErrorListener(errors));
 
-    ParseTree treeDNF = parserDNF.start();
+    AqlParser.StartContext treeDNF = parserDNF.start();
+    
+    //treeDNF.inspect(parserDNF);
     
     if (!errors.isEmpty())
     {
@@ -95,8 +100,9 @@ public class AnnisParserAntlr
 
       data.setCorpusList(corpusList);
       data.addMetaAnnotations(nodeListener.getMetaData());
-
-      JoinListener joinListener = new JoinListener(data, precedenceBound);
+      
+      JoinListener joinListener = new JoinListener(data, precedenceBound, 
+        nodeListener.getTokenPositions());
       walker.walk(joinListener, treeDNF);
 
       if (postProcessors != null)

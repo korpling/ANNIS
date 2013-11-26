@@ -48,10 +48,12 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -124,8 +126,6 @@ public class CorpusListPanel extends VerticalLayout implements
     final CorpusListPanel finalThis = this;
 
     setSizeFull();
-//    setHeight("99%");
-//    setWidth("99%");
 
     HorizontalLayout selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");
@@ -204,9 +204,11 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     txtFilter.setWidth("100%");
+    txtFilter.setHeight("-1px");
     addComponent(txtFilter);
 
     tblCorpora = new Table();
+    
     addComponent(tblCorpora);
 
     corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
@@ -222,8 +224,8 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
       "docs");
     tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
-    tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
-    tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
+    tblCorpora.setHeight("100%");
+    tblCorpora.setWidth("100%");
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
     tblCorpora.setNullSelectionAllowed(false);
@@ -231,7 +233,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.setColumnWidth("info", 19);
-
+    
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
     tblCorpora.addItemClickListener(new ItemClickEvent.ItemClickListener()
