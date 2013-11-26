@@ -20,6 +20,7 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
+import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -30,11 +31,13 @@ import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import org.apache.commons.io.IOUtils;
@@ -72,33 +75,25 @@ public class BinaryRequestHandler implements RequestHandler
     Map<String, String[]> binaryParameter = request.getParameterMap();
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     String documentName = binaryParameter.get("documentName")[0];
-    String mimeType = binaryParameter.get("mime")[0];
-
+    
+    
+    String mimeType = null;
+    if(binaryParameter.containsKey("mime"))
+    {
+      mimeType = binaryParameter.get("mime")[0];
+    }
     try
     {
       OutputStream out = response.getOutputStream();
 
       String range = request.getHeader("Range");
 
-      Object annisServiceURLObject = session.getAttribute(
-        Helper.KEY_WEB_SERVICE_URL);
-
-      if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
-      {
-        throw new IllegalStateException(
-          "AnnisWebService.URL was not set as init parameter in web.xml");
-      }
-
-      String annisServiceURL = (String) annisServiceURLObject;
-
-      WebResource binaryRes = Helper.getAnnisWebResource(annisServiceURL,
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+      WebResource binaryRes = Helper.getAnnisWebResource()
         .path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary");
 
-      WebResource metaBinaryRes = Helper.getAnnisWebResource(annisServiceURL,
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+      WebResource metaBinaryRes = Helper.getAnnisWebResource()
         .path("meta").path("binary")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8"));
@@ -106,6 +101,8 @@ public class BinaryRequestHandler implements RequestHandler
       // tell client that we support byte ranges
       response.setHeader("Accept-Ranges", "bytes");
 
+      Preconditions.checkNotNull(mimeType, "No mime type given (parameter \"mime\"");
+      
       if (range != null)
       {
         responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
@@ -173,7 +170,6 @@ public class BinaryRequestHandler implements RequestHandler
         + (bm.getLength() - 1) + "/" + bm.getLength());
       response.setContentType(bm.getMimeType());
       response.setStatus(206);
-//      response.setHeader(range, range);
       response.setHeader("Content-Length", "" + lengthToFetch);
 
       writeFromServiceToClient(offset, lengthToFetch, binaryRes, out, mimeType);
@@ -186,7 +182,7 @@ public class BinaryRequestHandler implements RequestHandler
   {
 
 
-    List<AnnisBinaryMetaData> allMeta = metaBinaryRes.path("meta")
+    List<AnnisBinaryMetaData> allMeta = metaBinaryRes
       .get(new AnnisBinaryMetaDataListType());
 
     if (allMeta.size() > 0)
@@ -209,35 +205,10 @@ public class BinaryRequestHandler implements RequestHandler
         + "/" + binaryMeta.getLength());
       response.setHeader("Content-Length", "" + binaryMeta.getLength());
 
-      getCompleteFile(binaryRes, mimeType, out);
-    }
-  }
-
-  private void getCompleteFile(WebResource binaryRes, String mimeType,
-    OutputStream out)
-    throws RemoteException, IOException
-  {
-
-    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
-      .get(new AnnisBinaryMetaDataListType());
-
-    if (allMeta.size() > 0)
-    {
-      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
-      {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          binaryMeta = m;
-          break;
-        }
-      }
-
       int offset = 0;
       int length = binaryMeta.getLength();
 
       writeFromServiceToClient(offset, length, binaryRes, out, mimeType);
-
     }
   }
 
@@ -245,18 +216,37 @@ public class BinaryRequestHandler implements RequestHandler
     WebResource binaryRes, OutputStream out, String mimeType)
   {
 
+    InputStream entityStream = null;
     try
     {
       ClientResponse response = binaryRes.path("" + offset).
         path("" + completeLength)
         .accept(mimeType).get(ClientResponse.class);
-      int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
+      
+      entityStream = response.getEntityInputStream();
+      
+      int copiedBytes = IOUtils.copy(entityStream, out);
       Validate.isTrue(copiedBytes == completeLength);
       out.flush();
     }
     catch(IOException ex)
     {
       log.debug("writing to client failed", ex);
+    }
+    finally
+    {
+      if(entityStream != null)
+      {
+        try
+        {
+          // always close the entity stream in order to free resources at the service
+          entityStream.close();
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
     }
     
   }
