@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632
+ * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,89 +13,87 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.servlets;
 
-import annis.libgui.Helper;
+package annis.gui.requesthandler;
+
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
+import com.google.common.base.Preconditions;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.server.RequestHandler;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinSession;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletException;
+import java.util.logging.Level;
 import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * This Servlet provides binary-files with a stream of partial-content. The
- * first GET-request is answered with the status-code 206 Partial Content.
- *
+ * This request handler provides binary-files with a stream of partial-content. 
+ * The first GET-request is answered with the status-code 206 Partial Content.
+ * 
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author benjamin
- *
  */
-public class BinaryServlet extends HttpServlet
+public class BinaryRequestHandler implements RequestHandler
 {
-
-  private final static Logger log = LoggerFactory.getLogger(BinaryServlet.class);
-
-  private static final int MAX_LENGTH = 1024 * 1024; // max portion which is transfered over REST at once: 1MB
+  
+  private final static Logger log = LoggerFactory.getLogger(BinaryRequestHandler.class);
 
   @Override
-  public void init(ServletConfig config) throws ServletException
+  public boolean handleRequest(VaadinSession session, VaadinRequest request,
+    VaadinResponse response) throws IOException
   {
-    super.init(config);
+    if(request.getPathInfo().startsWith("/Binary") 
+      && "GET".equalsIgnoreCase(request.getMethod()))
+    {
+      doGet(session, request, response);
+      return true;
+    }
+    return false;
   }
-
-  @Override
-  public void doGet(HttpServletRequest request, HttpServletResponse response)
-    throws ServletException
+  
+  public void doGet(VaadinSession session, VaadinRequest request, VaadinResponse response)
   {
     Map<String, String[]> binaryParameter = request.getParameterMap();
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     String documentName = binaryParameter.get("documentName")[0];
-    String mimeType = binaryParameter.get("mime")[0];
-
+    
+    
+    String mimeType = null;
+    if(binaryParameter.containsKey("mime"))
+    {
+      mimeType = binaryParameter.get("mime")[0];
+    }
     try
     {
-      ServletOutputStream out = response.getOutputStream();
+      OutputStream out = response.getOutputStream();
 
       String range = request.getHeader("Range");
 
-      HttpSession session = request.getSession();
-      Object annisServiceURLObject = session.getAttribute(
-        AnnisBaseUI.WEBSERVICEURL_KEY);
-
-      if (annisServiceURLObject == null || !(annisServiceURLObject instanceof String))
-      {
-        throw new ServletException(
-          "AnnisWebService.URL was not set as init parameter in web.xml");
-      }
-
-      String annisServiceURL = (String) annisServiceURLObject;
-
-      WebResource binaryRes = Helper.getAnnisWebResource(annisServiceURL,
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+      WebResource binaryRes = Helper.getAnnisWebResource()
         .path("query").path("corpora")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8")).path("binary");
 
-      WebResource metaBinaryRes = Helper.getAnnisWebResource(annisServiceURL,
-        (AnnisUser) session.getAttribute(AnnisBaseUI.USER_KEY))
+      WebResource metaBinaryRes = Helper.getAnnisWebResource()
         .path("meta").path("binary")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"))
         .path(URLEncoder.encode(documentName, "UTF-8"));
@@ -103,6 +101,8 @@ public class BinaryServlet extends HttpServlet
       // tell client that we support byte ranges
       response.setHeader("Accept-Ranges", "bytes");
 
+      Preconditions.checkNotNull(mimeType, "No mime type given (parameter \"mime\"");
+      
       if (range != null)
       {
         responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
@@ -112,12 +112,11 @@ public class BinaryServlet extends HttpServlet
       {
         responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
       }
-
-      out.flush();
     }
     catch (IOException ex)
     {
-      log.debug("IOException in BinaryServlet", ex);
+      log.error("IOException in BinaryRequestHandler", ex);
+      response.setStatus(500);
     }
     catch (ClientHandlerException ex)
     {
@@ -130,10 +129,10 @@ public class BinaryServlet extends HttpServlet
       response.setStatus(500);
     }
   }
-
+  
   private void responseStatus206(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, ServletOutputStream out,
-    HttpServletResponse response, String range) throws RemoteException, IOException
+    WebResource binaryRes, String mimeType, OutputStream out,
+    VaadinResponse response, String range) throws RemoteException
   {
     List<AnnisBinaryMetaData> allMeta = metaBinaryRes.get(
       new AnnisBinaryMetaDataListType());
@@ -171,19 +170,19 @@ public class BinaryServlet extends HttpServlet
         + (bm.getLength() - 1) + "/" + bm.getLength());
       response.setContentType(bm.getMimeType());
       response.setStatus(206);
-      response.setContentLength(lengthToFetch);
+      response.setHeader("Content-Length", "" + lengthToFetch);
 
-      writeStepByStep(offset, lengthToFetch, binaryRes, out, mimeType);
+      writeFromServiceToClient(offset, lengthToFetch, binaryRes, out, mimeType);
     }
   }
 
   private void responseStatus200(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, ServletOutputStream out,
-    HttpServletResponse response) throws RemoteException, IOException
+    WebResource binaryRes, String mimeType, OutputStream out,
+    VaadinResponse response) throws RemoteException, IOException
   {
 
 
-    List<AnnisBinaryMetaData> allMeta = metaBinaryRes.path("meta")
+    List<AnnisBinaryMetaData> allMeta = metaBinaryRes
       .get(new AnnisBinaryMetaDataListType());
 
     if (allMeta.size() > 0)
@@ -204,58 +203,52 @@ public class BinaryServlet extends HttpServlet
       response.setHeader("Content-Range",
         "bytes 0-" + (binaryMeta.getLength() - 1)
         + "/" + binaryMeta.getLength());
-      response.setContentLength(binaryMeta.getLength());
-
-      getCompleteFile(binaryRes, mimeType, out);
-    }
-  }
-
-  private void getCompleteFile(WebResource binaryRes, String mimeType,
-    ServletOutputStream out)
-    throws RemoteException, IOException
-  {
-
-    List<AnnisBinaryMetaData> allMeta = binaryRes.path("meta")
-      .get(new AnnisBinaryMetaDataListType());
-
-    if (allMeta.size() > 0)
-    {
-      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
-      {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          binaryMeta = m;
-          break;
-        }
-      }
+      response.setHeader("Content-Length", "" + binaryMeta.getLength());
 
       int offset = 0;
       int length = binaryMeta.getLength();
 
-      writeStepByStep(offset, length, binaryRes, out, mimeType);
-
+      writeFromServiceToClient(offset, length, binaryRes, out, mimeType);
     }
   }
 
-  private void writeStepByStep(int offset, int completeLength,
-    WebResource binaryRes, ServletOutputStream out, String mimeType) throws IOException
+  private void writeFromServiceToClient(int offset, int completeLength,
+    WebResource binaryRes, OutputStream out, String mimeType)
   {
-    int remaining = completeLength;
-    while (remaining > 0)
+
+    InputStream entityStream = null;
+    try
     {
-      int stepLength = Math.min(MAX_LENGTH, remaining);
-
       ClientResponse response = binaryRes.path("" + offset).
-        path("" + stepLength)
+        path("" + completeLength)
         .accept(mimeType).get(ClientResponse.class);
-      int copiedBytes = IOUtils.copy(response.getEntityInputStream(), out);
-      Validate.isTrue(copiedBytes == stepLength);
+      
+      entityStream = response.getEntityInputStream();
+      
+      int copiedBytes = IOUtils.copy(entityStream, out);
+      Validate.isTrue(copiedBytes == completeLength);
       out.flush();
-
-      offset += stepLength;
-      remaining = remaining - stepLength;
     }
+    catch(IOException ex)
+    {
+      log.debug("writing to client failed", ex);
+    }
+    finally
+    {
+      if(entityStream != null)
+      {
+        try
+        {
+          // always close the entity stream in order to free resources at the service
+          entityStream.close();
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+      }
+    }
+    
   }
 
   private static class AnnisBinaryMetaDataListType extends GenericType<List<AnnisBinaryMetaData>>
@@ -265,4 +258,5 @@ public class BinaryServlet extends HttpServlet
     {
     }
   }
+  
 }

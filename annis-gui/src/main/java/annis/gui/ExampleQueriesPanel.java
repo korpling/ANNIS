@@ -58,8 +58,6 @@ public class ExampleQueriesPanel extends Table
   // first column String
   private final String EXAMPLE_QUERY = "example query";
 
-  private transient ExecutorService executor;
-
   //main ui window
   private final SearchUI ui;
 

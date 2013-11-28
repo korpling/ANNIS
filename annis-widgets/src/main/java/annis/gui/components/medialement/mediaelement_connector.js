@@ -85,7 +85,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
 
   this.pause = function() {
     if (globalPlayer !== null) {
-      globalPlayer[0].play();
+      globalPlayer[0].pause();
     }
   };
 };

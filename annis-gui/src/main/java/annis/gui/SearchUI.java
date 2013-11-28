@@ -15,6 +15,8 @@
  */
 package annis.gui;
 
+import annis.gui.requesthandler.ResourceRequestHandler;
+import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
@@ -30,6 +32,7 @@ import annis.gui.model.Query;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
@@ -349,6 +352,7 @@ public class SearchUI extends AnnisBaseUI
     getSession().addRequestHandler(new CitationRequestHandler());
     getSession().addRequestHandler(new ResourceRequestHandler());
     getSession().addRequestHandler(new LoginServletRequestHandler());
+    getSession().addRequestHandler(new BinaryRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
 
