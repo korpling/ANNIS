@@ -160,8 +160,12 @@ public class QueryNodeListener extends AqlParserBaseListener
     // achvieve that?
     String namespace = ctx.id.namespace == null ? 
       null : ctx.id.namespace.getText();
+    String name = ctx.id.name.getText();
+    String value = textFromSpec(ctx.txt);
+    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, false);
+    
     QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.id.name.getText());
+      name, value, textMatching);
     metaData.add(anno);
   }
 
