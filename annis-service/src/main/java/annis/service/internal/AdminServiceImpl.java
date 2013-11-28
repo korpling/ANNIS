@@ -208,7 +208,6 @@ public class AdminServiceImpl
             {
               importWorker.getImportQueue().put(job);
 
-
               return Response.status(Response.Status.ACCEPTED).header("Location", 
                 request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
                 .build();

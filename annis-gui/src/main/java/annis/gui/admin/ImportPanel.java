@@ -15,16 +15,26 @@
  */
 package annis.gui.admin;
 
-import com.vaadin.ui.Notification;
+import annis.libgui.Helper;
+import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.net.URI;
+import java.text.DecimalFormat;
+import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -38,18 +48,35 @@ public class ImportPanel extends Panel
 {
   
   private static final Logger log = LoggerFactory.getLogger(ImportPanel.class);
-  private VerticalLayout layout;
-  private ProgressBar progress;
-  private TextArea txtMessages;
-  private Upload upload;
+  private final VerticalLayout layout;
+  private final TextArea txtMessages;
+  private final Upload upload;
+  private final TextField txtMail;
+  private final CheckBox cbOverwrite;
+  private final TextField txtAlias;
+  
+  private File temporaryCorpusFile;
   
   public ImportPanel()
   {
     setSizeFull();
     layout = new VerticalLayout();
     layout.setWidth("100%");
-    layout.setHeight("-1px");
+    layout.setHeight("100%");
     setContent(layout);
+    
+    FormLayout form = new FormLayout();
+    layout.addComponent(form);
+    
+    cbOverwrite = new CheckBox("Overwrite existing corpus");
+    form.addComponent(cbOverwrite);
+    
+    txtMail = new TextField("e-mail address for status updates");
+    txtMail.addValidator(new EmailValidator("Must be a valid e-mail address"));
+    form.addComponent(txtMail);
+    
+    txtAlias = new TextField("alias name");
+    form.addComponent(txtAlias);
     
     upload = new Upload("", this);
     upload.setButtonCaption("Upload ZIP file with relANNIS corpus");
@@ -59,15 +86,13 @@ public class ImportPanel extends Panel
     
     layout.addComponent(upload);
     
-    progress = new ProgressBar();
-    progress.setWidth("100%");
-    layout.addComponent(progress);
-    
     txtMessages = new TextArea();
     txtMessages.setSizeFull();
     txtMessages.setValue("Ready.");
     txtMessages.setReadOnly(true);
     layout.addComponent(txtMessages);
+    
+    layout.setExpandRatio(txtMessages, 1.0f);
     
   }
   
@@ -83,19 +108,24 @@ public class ImportPanel extends Panel
     {
       txtMessages.setValue(oldVal + "\n" + message);
     }
+    
+    txtMessages.setCursorPosition(txtMessages.getValue().length()-1);
     txtMessages.setReadOnly(true);
   }
 
   @Override
   public void updateProgress(long readBytes, long contentLength)
   {
-    progress.setValue((float) readBytes / (float) contentLength);
+    float progress = (float) readBytes / (float) contentLength;
+    DecimalFormat format = new DecimalFormat("#0.00");
+    appendMessage("uploaded " + format.format(progress*100.0f) + "%");
   }
 
   @Override
   public void uploadFinished(Upload.FinishedEvent event)
   {
     appendMessage("Finished upload, starting import");
+    startImport();
   }
 
   @Override
@@ -110,14 +140,56 @@ public class ImportPanel extends Panel
   {
     try
     {
-      File tmpFile = File.createTempFile(filename, ".out");
-      return new FileOutputStream(tmpFile);
+      temporaryCorpusFile = File.createTempFile(filename, ".zip");
+      temporaryCorpusFile.deleteOnExit();
+      return new FileOutputStream(temporaryCorpusFile);
     }
     catch (IOException ex)
     {
       log.error(null, ex);
     }
     return null;
+  }
+  
+  private void startImport()
+  {
+    WebResource res = Helper.getAnnisWebResource().path("admin").path("import");
+    String mail = txtMail.getValue();
+    if(txtMail.isValid() && mail != null && !mail.isEmpty())
+    {
+      res = res.queryParam("statusMail", mail);
+    }
+    if(cbOverwrite.getValue() == true)
+    {
+      res = res.queryParam("overwrite", "true");
+    }
+    String alias = txtAlias.getValue();
+    if(alias != null && !alias.isEmpty())
+    {
+      res = res.queryParam("alias", alias);
+    }
+    try
+    {
+      ClientResponse response 
+        = res.entity(new FileInputStream(temporaryCorpusFile)).type(
+          "application/zip").post(ClientResponse.class);
+      
+      if(response.getStatus() == Response.Status.ACCEPTED.getStatusCode())
+      {
+        URI location = response.getLocation();
+        appendMessage("Import requested, update URL is " + location);
+      }
+      else
+      {
+        appendMessage("Error (response code " + response.getStatus() + "): " + response.getEntity(String.class));
+      }
+      
+    }
+    catch (FileNotFoundException ex)
+    {
+      log.error(null, ex);
+    }
+    
   }
   
 }

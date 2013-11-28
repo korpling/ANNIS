@@ -24,9 +24,9 @@ import com.vaadin.ui.VerticalLayout;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Theme("annis")
+@Theme("reindeer")
 public class AdminUI extends AnnisBaseUI
 {
   private VerticalLayout layout;
@@ -34,6 +34,8 @@ public class AdminUI extends AnnisBaseUI
   @Override
   protected void init(VaadinRequest request)
   {
+    super.init(request);
+    
     layout = new VerticalLayout();
     layout.setSizeFull();
     setContent(layout);

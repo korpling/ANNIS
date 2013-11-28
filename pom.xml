@@ -166,7 +166,6 @@
     <module>annis-widgets</module>
     <module>annis-visualizers</module>
     <module>annis-libgui</module>
-    <module>annis-admin</module>
   </modules>
 
 </project>
