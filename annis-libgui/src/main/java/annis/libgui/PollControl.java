@@ -17,6 +17,7 @@ package annis.libgui;
 
 import com.google.common.collect.MapMaker;
 import com.vaadin.ui.UI;
+import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentMap;
@@ -26,9 +27,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,12 +43,14 @@ public class PollControl
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
   public static final int DEFAULT_TIME = 15000;
-  private static final ConcurrentMap<UUID, Integer> id2Time = new MapMaker().
-    makeMap();
-  private static final Lock calcLock = new ReentrantLock();
+  private static final ConcurrentMap<UUID, Integer> id2Time;
   
   private static final ExecutorService exec = Executors.newCachedThreadPool();
 
+  static {
+    id2Time = new MapMaker().makeMap();
+  }
+  
   private static UUID setTime(UI ui, int newPollingTime)
   {
     UUID id = UUID.randomUUID();
@@ -77,9 +77,8 @@ public class PollControl
    * Use the minimal time of all registered time in to determine how frequent
    * polling should be.
    */
-  private static void calculateAndSetPollingTime(UI ui)
+  private static void calculateAndSetPollingTime(final UI ui)
   {
-    calcLock.lock();
     try
     {
       
@@ -88,20 +87,23 @@ public class PollControl
         
         // get the minimal non-negative time
         int min = DEFAULT_TIME;
-        for (int time : id2Time.values())
+        LinkedList<Integer> numbers = new LinkedList<Integer>(id2Time.values());
+        for (int time : numbers)
         {
           if(time >= 0 && time < min)
           {
             min = time;
           }
-        }
-        ui.setPollInterval(min);
+        }        
 
+        ui.setPollInterval(min);
+//        ui.getPage().setTitle(min + "ms currently polling");
+          
       }
     }
     finally
     {
-      calcLock.unlock();
+      
     }
   }
   
@@ -199,7 +201,15 @@ public class PollControl
           }
           finally
           {
-            unsetTime(id, finalUI);
+            finalUI.access(new Runnable()
+            {
+
+              @Override
+              public void run()
+              {
+                unsetTime(id, finalUI);
+              }
+            });
           }
           return result;
         }
