@@ -20,6 +20,7 @@ import com.vaadin.ui.UI;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -43,23 +44,32 @@ public class PollControl
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
   public static final int DEFAULT_TIME = 15000;
-  private static final ConcurrentMap<UUID, Integer> id2Time;
-  
   private static final ExecutorService exec = Executors.newCachedThreadPool();
 
-  static {
-    id2Time = new MapMaker().makeMap();
+  private static TimeMap getId2Time(UI ui)
+  {
+    if(ui != null && ui.getSession() != null)
+    {
+      TimeMap result = ui.getSession().getAttribute(TimeMap.class);
+      if(result == null)
+      {
+        result = new TimeMap();
+        ui.getSession().setAttribute(TimeMap.class, result);
+      }
+      return result;
+    }
+    return new TimeMap();
   }
   
   private static UUID setTime(UI ui, int newPollingTime)
   {
     UUID id = UUID.randomUUID();
     // it's really unpropable, but just in case check if this ID was used before
-    while(id2Time.containsKey(id))
+    while(getId2Time(ui).containsKey(id))
     {
       id = UUID.randomUUID();
     }
-    id2Time.put(id, newPollingTime);
+    getId2Time(ui).put(id, newPollingTime);
     calculateAndSetPollingTime(ui);
     
     return id;
@@ -67,7 +77,7 @@ public class PollControl
 
   private static void unsetTime(UUID id, UI ui)
   {
-    if(id2Time.remove(id) != null)
+    if(getId2Time(ui).remove(id) != null)
     {
       calculateAndSetPollingTime(ui);
     }
@@ -84,10 +94,9 @@ public class PollControl
       
       if(ui != null)
       {
-        
         // get the minimal non-negative time
         int min = DEFAULT_TIME;
-        LinkedList<Integer> numbers = new LinkedList<Integer>(id2Time.values());
+        LinkedList<Integer> numbers = new LinkedList<Integer>(getId2Time(ui).values());
         for (int time : numbers)
         {
           if(time >= 0 && time < min)
@@ -238,6 +247,11 @@ public class PollControl
     }
     
     return null;
+  }
+  
+  public static class TimeMap extends ConcurrentHashMap<UUID, Integer>
+  {
+    
   }
 
   
