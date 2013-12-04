@@ -41,6 +41,7 @@ import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
@@ -824,13 +825,26 @@ public class SearchUI extends AnnisBaseUI
     for (String selectedCorpusName : originalNames)
     {
       // get the real corpus descriptions by the name (which could be an alias)
-      List<AnnisCorpus> corporaByName = 
-        rootRes.path("query").path("corpora").path(selectedCorpusName)
-          .get(new GenericType<List<AnnisCorpus>>(){});
-
-      for(AnnisCorpus c : corporaByName)
+      try
       {
-        mappedNames.add(c.getName());
+        List<AnnisCorpus> corporaByName
+          = rootRes.path("query").path("corpora").path(selectedCorpusName)
+          .get(new GenericType<List<AnnisCorpus>>()
+            {
+          });
+
+        for (AnnisCorpus c : corporaByName)
+        {
+          mappedNames.add(c.getName());
+        }
+      }
+
+      catch (ClientHandlerException ex)
+      {
+        String msg = "alias mapping does not work for alias: "
+          + selectedCorpusName;
+        log.error(msg, ex);
+        Notification.show(msg, Notification.Type.TRAY_NOTIFICATION);
       }
     }
     return mappedNames;
