@@ -79,7 +79,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SDocumentGraph graph = null;
 
       // fn: parent information (pre and component) id to node
-      FastInverseMap<RankID, SNode> nodeByPre = new FastInverseMap<RankID, SNode>();
+      FastInverseMap<Long, SNode> nodeByRankID = new FastInverseMap<Long, SNode>();
 
       TreeSet<Long> allTextIDs = new TreeSet<Long>();
       TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
@@ -89,7 +89,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       // clear mapping functions for this graph
       // assumes that the result set is sorted by key, pre
-      nodeByPre.clear();
+      nodeByRankID.clear();
 
       SDocument document = null;
 
@@ -124,7 +124,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           }
 
           // new match, reset everything        
-          nodeByPre.clear();
+          nodeByRankID.clear();
           tokenTexts.clear();
           tokenByIndex.clear();
           keyNameList = new String[key.getKeySize()];
@@ -168,12 +168,11 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         // get node data
         SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath, key, keyNameList);
-        long pre = longValue(resultSet, RANK_TABLE, "pre");
-        long componentID = longValue(resultSet, RANK_TABLE, "component_id");
+        long rank_id = longValue(resultSet, RANK_TABLE, "id");
         if (!resultSet.wasNull())
         {
-          nodeByPre.put(new RankID(componentID, pre), node);
-          createRelation(resultSet, graph, nodeByPre, node, numberOfEdges);
+          nodeByRankID.put(rank_id, node);
+          createRelation(resultSet, graph, nodeByRankID, node, numberOfEdges);
         }
       } // end while new result row
 
@@ -588,11 +587,11 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
   
   private void updateMapAfterRecreatingNode(SNode oldNode, SNode newNode, 
-    FastInverseMap<RankID, SNode> nodeByPre)
+    FastInverseMap<Long, SNode> nodeByPre)
   {
     // get *all* keys associated with this node
-    List<RankID> keys = nodeByPre.getKeys(oldNode);
-    for(RankID id : keys)
+    List<Long> keys = nodeByPre.getKeys(oldNode);
+    for(Long id : keys)
     {
       nodeByPre.put(id, newNode);
     }
@@ -710,8 +709,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   
   private SRelation createNewRelation(SDocumentGraph graph, SStructuredNode sourceNode, 
     SNode targetNode, String edgeName, String type, long componentID, 
-    SLayer layer, long parent, long pre,
-    FastInverseMap<RankID, SNode> nodeByPre, AtomicInteger numberOfEdges)
+    SLayer layer, long parent, long rank_id, long pre,
+    FastInverseMap<Long, SNode> nodeByRankID, AtomicInteger numberOfEdges)
   {
     SRelation rel = null;
     // create new relation
@@ -728,7 +727,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         log.debug("Mismatched source type: should be SStructure");
         SNode oldNode = sourceNode;
         sourceNode = recreateNode(SStructure.class, sourceNode);
-        updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
+        updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByRankID);
       }
     }
     else if ("c".equals(type))
@@ -744,7 +743,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         log.debug("Mismatched source type: should be SSpan");
         SNode oldNode = sourceNode;
         sourceNode = recreateNode(SSpan.class, sourceNode);
-        updateMapAfterRecreatingNode(oldNode,  sourceNode, nodeByPre);
+        updateMapAfterRecreatingNode(oldNode,  sourceNode, nodeByRankID);
       }
     }
     else if ("p".equals(type))
@@ -773,7 +772,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       sfeatEdge.setValue(featEdge);
       rel.addSFeature(sfeatEdge);
 
-      rel.setSSource((SNode) nodeByPre.get(new RankID(componentID, parent)));
+      rel.setSSource((SNode) nodeByRankID.get(parent));
       if ("c".equals(type) && !(targetNode instanceof SToken))
       {
         log.warn("invalid edge detected: target node ({}) "
@@ -826,7 +825,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
 
   private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
-    FastInverseMap<RankID, SNode> nodeByPre, SNode targetNode, AtomicInteger numberOfEdges) throws
+    FastInverseMap<Long, SNode> nodeByRankID, SNode targetNode, AtomicInteger numberOfEdges) throws
     SQLException
   {
     long parent = longValue(resultSet, RANK_TABLE, "parent");
@@ -835,6 +834,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       return null;
     }
 
+    long rank_id = longValue(resultSet, RANK_TABLE, "id");
     long pre = longValue(resultSet, RANK_TABLE, "pre");
     long componentID = longValue(resultSet, RANK_TABLE, "component_id");
     String edgeNamespace = stringValue(resultSet, COMPONENT_TABLE, "namespace");
@@ -842,7 +842,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     String type = stringValue(resultSet, COMPONENT_TABLE, "type");
 
     SStructuredNode sourceNode = 
-      (SStructuredNode) nodeByPre.get(new RankID(componentID, parent));
+      (SStructuredNode) nodeByRankID.get(parent);
 
     if (sourceNode == null)
     {
@@ -869,7 +869,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (rel == null)
       {
         rel = createNewRelation(graph, sourceNode, targetNode, edgeName, type, 
-          componentID, layer, parent, pre, nodeByPre, numberOfEdges);
+          componentID, layer, parent, rank_id, pre, nodeByRankID, numberOfEdges);
       } // end if no existing relation
 
       // add edge annotations
@@ -993,62 +993,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       key2value.clear();
       values2keys.clear();
     }
-  }
-  
-  public static class RankID
-  {
-    private long componentID;
-    private long pre;
-
-    public RankID(long componentID, long pre)
-    {
-      this.componentID = componentID;
-      this.pre = pre;
-    }
-
-    public long getComponentID()
-    {
-      return componentID;
-    }
-
-    public long getPre()
-    {
-      return pre;
-    }
-
-    @Override
-    public boolean equals(Object obj)
-    {
-      if (obj == null)
-      {
-        return false;
-      }
-      if (getClass() != obj.getClass())
-      {
-        return false;
-      }
-      final RankID other = (RankID) obj;
-      if (this.componentID != other.componentID)
-      {
-        return false;
-      }
-      if (this.pre != other.pre)
-      {
-        return false;
-      }
-      return true;
-    }
-
-    @Override
-    public int hashCode()
-    {
-      int hash = 5;
-      hash = 29 * hash + (int) (this.componentID ^ (this.componentID >>> 32));
-      hash = 29 * hash + (int) (this.pre ^ (this.pre >>> 32));
-      return hash;
-    }
-    
-    
   }
   
 }

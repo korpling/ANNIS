@@ -88,9 +88,10 @@ CREATE TABLE facts (
   right_token integer,
   seg_name varchar,
   seg_index integer,
+  rank_id bigint,
   pre integer, -- pre-order value
   post integer, -- post-order value
-  parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots
+  parent bigint, -- foreign key to rank.id of the parent node, or NULL for roots
   root boolean,
   "level" integer,
   component_id integer, -- component id

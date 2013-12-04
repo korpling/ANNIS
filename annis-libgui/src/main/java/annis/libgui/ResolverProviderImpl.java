@@ -103,7 +103,8 @@ public class ResolverProviderImpl implements ResolverProvider {
                 List<ResolverEntry> tmp;
                 try {
                     String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
-                    String namespace = r.getNamespace();
+                    String namespace = r.getNamespace() == null ? null 
+                      : URLEncoder.encode(r.getNamespace(), "UTF-8");
                     String type = r.getType() == null ? null : r.getType().toString();
                     if (corpusName != null && namespace != null && type != null) {
                         WebResource res = resResolver.path(corpusName).path(namespace).path(type);

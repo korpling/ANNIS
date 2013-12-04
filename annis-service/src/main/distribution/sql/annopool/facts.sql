@@ -91,6 +91,7 @@ INSERT INTO facts_:id
   right_token,
   seg_name,
   seg_index,
+  rank_id,
   pre,
   post,
   parent,
@@ -143,6 +144,7 @@ FROM
     _node.seg_name AS seg_name,
     _node.seg_index AS seg_index,
 
+    _rank.id AS rank_id,
     _rank.pre AS pre,
     _rank.post AS post,
     _rank.parent AS parent,

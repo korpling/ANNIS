@@ -32,7 +32,6 @@ import annis.model.Edge.EdgeType;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import annis.sqlgen.SaltAnnotateExtractor.RankID;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +78,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     edge.setNamespace(stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy));
     edge.setName(stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
     edge.setDestination(new AnnisNode(longValue(resultSet, RANK_TABLE, "node_ref", tableAccessStrategy)));
+    edge.setId(longValue(resultSet, RANK_TABLE, "id", tableAccessStrategy));
     
     // create nodes for src with rank value (parent) as id.
     // this must later be fixed by AnnotationGraphDaoHelper.fixSourceNodeIds().
@@ -133,7 +133,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
 
     // fn: edge pre order value -> edge
-    Map<RankID, Edge> edgeByPre = new HashMap<RankID, Edge>();
+    Map<Long, Edge> edgeByRankID = new HashMap<Long, Edge>();
 
     int rowNum = 0;
     while (resultSet.next())
@@ -161,7 +161,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         // clear mapping functions for this graph
         // assumes that the result set is sorted by key, pre
         nodeById.clear();
-        edgeByPre.clear();
+        edgeByRankID.clear();
 
         // set the matched keys
         for (Long l : key)
@@ -219,13 +219,12 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       Edge edge = mapEdge(resultSet, tableAccessStrategy);
 
       // add edge to graph if it is new, else get known copy
-      long pre = edge.getPre();
-      long componentID = edge.getComponentID();
-      if (!edgeByPre.containsKey(new RankID(componentID, pre)))
+      long rank_id = edge.getId();
+      if (!edgeByRankID.containsKey(rank_id))
       {
         // fix source references in edge
         edge.setDestination(node);
-        fixNodes(edge, edgeByPre, nodeById);
+        fixNodes(edge, edgeByRankID, nodeById);
 
         // add edge to src and dst nodes
         node.addIncomingEdge(edge);
@@ -236,12 +235,12 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         }
 
         log.debug("new edge: " + edge);
-        edgeByPre.put(new RankID(componentID, pre), edge);
+        edgeByRankID.put(edge.getId(), edge);
         graph.addEdge(edge);
       }
       else
       {
-        edge = edgeByPre.get(new RankID(componentID, pre));
+        edge = edgeByRankID.get(rank_id);
       }
 
       // add annotation data
@@ -278,7 +277,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     return graphs;
   }
 
-  protected void fixNodes(Edge edge, Map<RankID, Edge> edgeByPre,
+  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByRankID,
     Map<Long, AnnisNode> nodeById)
   {
     // pull source node from parent edge
@@ -287,8 +286,8 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     {
       return;
     }
-    long pre = source.getId();
-    Edge parentEdge = edgeByPre.get(new RankID(edge.getComponentID(), pre));
+    long nodeID = source.getId();
+    Edge parentEdge = edgeByRankID.get(nodeID);
     AnnisNode parent = parentEdge != null
       ? parentEdge.getDestination() : null;
     // log.debug("looking for node with rank.pre = 
