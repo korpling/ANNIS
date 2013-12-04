@@ -877,16 +877,20 @@ public class SearchUI extends AnnisBaseUI
       {
         // show a warning message that the corpus was not imported yet
         new Notification("Linked corpus does not exist",
-          "The corpus you wanted to access unfortunally does not (yet) exist in ANNIS<br/>"
-          + "A possible reason is that it has not been imported yet. Please ask the "
-          + "responsible person of the site that contained the link to import the corpus.",
+          "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+          + " in ANNIS.</p>"
+          + "<h2>possible reasons are:</h2>"
+          + "<ul><li>that it has not been imported yet.</li>"
+          + "<li>The ANNIS service is not running</li></ul>"
+          + "<p>Please ask the responsible person of the site that contained "
+          + "the link to import the corpus.</p></div>",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
       }
-      
+
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
