@@ -16,11 +16,10 @@
 
 package annis.gui.requesthandler;
 
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -37,10 +36,6 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,6 +52,8 @@ public class BinaryRequestHandler implements RequestHandler
   
   private final static Logger log = LoggerFactory.getLogger(BinaryRequestHandler.class);
 
+  private static final int MAXIMAL_RANGE_SIZE = 1048576; //10 megabyte
+  
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
@@ -103,14 +100,14 @@ public class BinaryRequestHandler implements RequestHandler
 
       Preconditions.checkNotNull(mimeType, "No mime type given (parameter \"mime\"");
       
-      if (range != null)
-      {
-        responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
-          range);
+      if (range == null)
+      { 
+        responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
       }
       else
       {
-        responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
+        responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
+          range);
       }
     }
     catch (IOException ex)
@@ -161,13 +158,16 @@ public class BinaryRequestHandler implements RequestHandler
       }
       else
       {
-        slice = bm.getLength();
+        slice = bm.getLength() -1;
       }
+      
+      int lengthToFetch = (slice+1) - offset;
 
-      int lengthToFetch = slice - offset;
-
+      // don't fetch too large data slices when using range queries
+      //lengthToFetch = Math.min(lengthToFetch, MAXIMAL_RANGE_SIZE);
+      
       response.setHeader("Content-Range", "bytes " + offset + "-"
-        + (bm.getLength() - 1) + "/" + bm.getLength());
+        + (offset + lengthToFetch - 1) + "/" + bm.getLength());
       response.setContentType(bm.getMimeType());
       response.setStatus(206);
       response.setHeader("Content-Length", "" + lengthToFetch);
@@ -225,8 +225,8 @@ public class BinaryRequestHandler implements RequestHandler
       
       entityStream = response.getEntityInputStream();
       
-      int copiedBytes = IOUtils.copy(entityStream, out);
-      Validate.isTrue(copiedBytes == completeLength);
+      long copiedBytes = ByteStreams.copy(entityStream, out);
+      Validate.isTrue(copiedBytes == completeLength, "only copied " + copiedBytes + " bytes instead of " + completeLength);
       out.flush();
     }
     catch(IOException ex)
@@ -239,6 +239,7 @@ public class BinaryRequestHandler implements RequestHandler
       {
         try
         {
+         
           // always close the entity stream in order to free resources at the service
           entityStream.close();
         }

@@ -391,7 +391,7 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      PollControl.runInBackground(1000, 100, null, 
+      PollControl.runInBackground(500, 50, null, 
         new BackgroundJob(callback));
       
       btEntry.setIcon(ICON_COLLAPSE);
@@ -423,10 +423,8 @@ public class VisualizerPanel extends CssLayout
       }
     }
 
-    if (getComponentIndex(progress) > -1)
-    {
-      removeComponent(progress);
-    }
+    progress.setEnabled(false);
+    progress.setVisible(false);
 
     if (vis != null)
     {
@@ -573,7 +571,7 @@ public class VisualizerPanel extends CssLayout
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
         
-        UI.getCurrent().access(new Runnable()
+        UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -606,7 +604,7 @@ public class VisualizerPanel extends CssLayout
       if(exception != null)
       {
         final Throwable finalException = exception;
-        UI.getCurrent().access(new Runnable()
+        UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
           public void run()
