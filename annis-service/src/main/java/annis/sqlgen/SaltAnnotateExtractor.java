@@ -838,6 +838,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     long pre = longValue(resultSet, RANK_TABLE, "pre");
     long componentID = longValue(resultSet, RANK_TABLE, "component_id");
     String edgeNamespace = stringValue(resultSet, COMPONENT_TABLE, "namespace");
+    if(edgeNamespace == null)
+    {
+      edgeNamespace = "default_ns";
+    }
     String edgeName = stringValue(resultSet, COMPONENT_TABLE, "name");
     String type = stringValue(resultSet, COMPONENT_TABLE, "type");
 
