@@ -109,7 +109,8 @@ public class AnnisGraphTools
 
   private boolean includeEdge(Edge e)
   {
-    return hasEdgeSubtype(e, getPrimEdgeSubType());
+    boolean result = hasEdgeSubtype(e, getPrimEdgeSubType());
+    return result;
   }
 
   public boolean hasEdgeSubtype(Edge e, String edgeSubtype)
@@ -127,9 +128,14 @@ public class AnnisGraphTools
       edgeSubtype = input.getMappings().getProperty("secedge") != null
         ? input.getMappings().getProperty("secedge") : getSecEdgeSubType();
     }
-
-    return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.
-      equals(edgeSubtype);
+    
+    boolean result = 
+      e.getEdgeType() == Edge.EdgeType.DOMINANCE && 
+      (
+        (name == null && "null".equals(edgeSubtype)) 
+        || (name != null && name.equals(edgeSubtype))
+      );
+    return result; 
   }
 
   public static HorizontalOrientation detectLayoutDirection(AnnotationGraph ag)
