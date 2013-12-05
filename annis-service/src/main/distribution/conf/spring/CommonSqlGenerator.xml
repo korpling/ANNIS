@@ -101,6 +101,7 @@ limitations under the License.
     </entry>
     <entry key="rank">
       <util:map>
+        <entry key="id" value="rank_id" />
         <entry key="component_ref" value="component_id" />
         <entry key="node_ref" value="id" />
       </util:map>
