@@ -32,7 +32,7 @@ import org.json.JSONException;
  */
 @JavaScript(value =
 {
-  "flotr2.js", "jquery-1.9.1.min.js", "frequencychart.js"
+  "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {

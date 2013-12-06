@@ -16,11 +16,10 @@
 
 package annis.gui.requesthandler;
 
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -29,18 +28,14 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletResponse;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -57,21 +52,38 @@ public class BinaryRequestHandler implements RequestHandler
   
   private final static Logger log = LoggerFactory.getLogger(BinaryRequestHandler.class);
 
+  private static final int BUFFER_SIZE = 0x1000; //4K
+  
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo().startsWith("/Binary") 
-      && "GET".equalsIgnoreCase(request.getMethod()))
+    if(request.getPathInfo().startsWith("/Binary"))
     {
-      doGet(session, request, response);
-      return true;
+      if("GET".equalsIgnoreCase(request.getMethod()))
+      {
+        sendResponse(session, request, response, true);
+        return true;
+      }
+      else if("HEAD".equalsIgnoreCase(request.getMethod()))
+      {
+        sendResponse(session, request, response, false);
+        return true;
+      }
     }
     return false;
   }
   
-  public void doGet(VaadinSession session, VaadinRequest request, VaadinResponse response)
+  public void sendResponse(VaadinSession session, VaadinRequest request, VaadinResponse pureResponse, 
+    boolean sendContent) throws IOException
   {
+    if(!(pureResponse instanceof VaadinServletResponse))
+    {
+      pureResponse.sendError(500, "Binary requests only work with servlets");
+    }
+    
+    VaadinServletResponse response = (VaadinServletResponse) pureResponse;
+    
     Map<String, String[]> binaryParameter = request.getParameterMap();
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     String documentName = binaryParameter.get("documentName")[0];
@@ -84,9 +96,16 @@ public class BinaryRequestHandler implements RequestHandler
     }
     try
     {
+      // always set the buffer size to the same one we will use for coyping, 
+      // otherwise we won't notice any client disconnection
+      response.reset();
+      response.setCacheTime(-1);
+      response.resetBuffer();
+      response.setBufferSize(BUFFER_SIZE); // 4K
+      
       OutputStream out = response.getOutputStream();
 
-      String range = request.getHeader("Range");
+      String requestedRangeRaw = request.getHeader("Range");
 
       WebResource binaryRes = Helper.getAnnisWebResource()
         .path("query").path("corpora")
@@ -103,15 +122,60 @@ public class BinaryRequestHandler implements RequestHandler
 
       Preconditions.checkNotNull(mimeType, "No mime type given (parameter \"mime\"");
       
-      if (range != null)
+      AnnisBinaryMetaData meta = getMatchingMetadataFromService(metaBinaryRes,
+        mimeType);
+      if(meta == null)
       {
-        responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
-          range);
+        response.sendError(404, "Binary file not found");
+        return;
       }
-      else
+      
+      ContentRange fullRange = new ContentRange(0,
+        meta.getLength()-1, meta.getLength());
+      
+      ContentRange r = fullRange;
+      try
       {
-        responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
+        if(requestedRangeRaw != null)
+        {
+          List<ContentRange> requestedRanges = ContentRange.parseFromHeader(
+            requestedRangeRaw, meta.getLength(), 1);
+
+          if(!requestedRanges.isEmpty())
+          {
+            r = requestedRanges.get(0);
+          }
+        }
+       
+        long contentLength = (r.getEnd() - r.getStart()+1);
+
+        boolean useContentRange = !fullRange.equals(r);
+        
+        response.setContentType(meta.getMimeType());
+        if(useContentRange)
+        {
+          response.setHeader("Content-Range", r.toString());
+        }
+        response.setContentLength((int) contentLength);
+        response.setStatus(useContentRange  ? 206 : 200);
+        
+        response.flushBuffer();
+        if(sendContent)
+        {
+          writeFromServiceToClient(
+            r.getStart(), contentLength, binaryRes, out, mimeType);
+        }
+        
+        out.close();
+
       }
+      catch(ContentRange.InvalidRangeException ex)
+      {
+        response.setHeader("Content-Range", "bytes */" + meta.getLength());
+        response.sendError(416, "Requested range not satisfiable: " + ex.getMessage());
+        return;
+      }
+
     }
     catch (IOException ex)
     {
@@ -130,89 +194,26 @@ public class BinaryRequestHandler implements RequestHandler
     }
   }
   
-  private void responseStatus206(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, OutputStream out,
-    VaadinResponse response, String range) throws RemoteException
+  private AnnisBinaryMetaData getMatchingMetadataFromService(
+    WebResource metaBinaryRes, String mimeType)
   {
     List<AnnisBinaryMetaData> allMeta = metaBinaryRes.get(
       new AnnisBinaryMetaDataListType());
 
-    if (allMeta.size() > 0)
+    AnnisBinaryMetaData bm = allMeta.get(0);
+    for (AnnisBinaryMetaData m : allMeta)
     {
-      AnnisBinaryMetaData bm = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
+      if (mimeType != null && mimeType.equals(m.getMimeType()))
       {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          bm = m;
-          break;
-        }
+        bm = m;
+        break;
       }
-
-
-      // Range: byte=x-y | Range: byte=0-
-      String[] rangeTupel = range.split("-");
-      int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
-
-      int slice;
-      if (rangeTupel.length > 1)
-      {
-        slice = Integer.parseInt(rangeTupel[1]);
-      }
-      else
-      {
-        slice = bm.getLength();
-      }
-
-      int lengthToFetch = slice - offset;
-
-      response.setHeader("Content-Range", "bytes " + offset + "-"
-        + (bm.getLength() - 1) + "/" + bm.getLength());
-      response.setContentType(bm.getMimeType());
-      response.setStatus(206);
-      response.setHeader("Content-Length", "" + lengthToFetch);
-
-      writeFromServiceToClient(offset, lengthToFetch, binaryRes, out, mimeType);
     }
+    return bm;
   }
+  
 
-  private void responseStatus200(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, OutputStream out,
-    VaadinResponse response) throws RemoteException, IOException
-  {
-
-
-    List<AnnisBinaryMetaData> allMeta = metaBinaryRes
-      .get(new AnnisBinaryMetaDataListType());
-
-    if (allMeta.size() > 0)
-    {
-      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
-      {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          binaryMeta = m;
-          break;
-        }
-      }
-
-      response.setStatus(200);
-      response.setHeader("Accept-Ranges", "bytes");
-      response.setContentType(binaryMeta.getMimeType());
-      response.setHeader("Content-Range",
-        "bytes 0-" + (binaryMeta.getLength() - 1)
-        + "/" + binaryMeta.getLength());
-      response.setHeader("Content-Length", "" + binaryMeta.getLength());
-
-      int offset = 0;
-      int length = binaryMeta.getLength();
-
-      writeFromServiceToClient(offset, length, binaryRes, out, mimeType);
-    }
-  }
-
-  private void writeFromServiceToClient(int offset, int completeLength,
+  private void writeFromServiceToClient(long offset, long length,
     WebResource binaryRes, OutputStream out, String mimeType)
   {
 
@@ -220,14 +221,13 @@ public class BinaryRequestHandler implements RequestHandler
     try
     {
       ClientResponse response = binaryRes.path("" + offset).
-        path("" + completeLength)
+        path("" + length)
         .accept(mimeType).get(ClientResponse.class);
       
       entityStream = response.getEntityInputStream();
       
-      int copiedBytes = IOUtils.copy(entityStream, out);
-      Validate.isTrue(copiedBytes == completeLength);
-      out.flush();
+      long copiedBytes = copy(entityStream, out);
+      Validate.isTrue(copiedBytes == length, "only copied " + copiedBytes + " bytes instead of " + length);
     }
     catch(IOException ex)
     {
@@ -238,8 +238,7 @@ public class BinaryRequestHandler implements RequestHandler
       if(entityStream != null)
       {
         try
-        {
-          // always close the entity stream in order to free resources at the service
+        { // always close the entity stream in order to free resources at the service
           entityStream.close();
         }
         catch (IOException ex)
@@ -248,7 +247,24 @@ public class BinaryRequestHandler implements RequestHandler
         }
       }
     }
-    
+  }
+  
+  private static long copy(InputStream from, OutputStream to)
+      throws IOException {
+    checkNotNull(from);
+    checkNotNull(to);
+    byte[] buf = new byte[BUFFER_SIZE];
+    long total = 0;
+    while (true) {
+      int r = from.read(buf);
+      if (r == -1) {
+        break;
+      }
+      to.write(buf, 0, r);
+      to.flush();
+      total += r;
+    }
+    return total;
   }
 
   private static class AnnisBinaryMetaDataListType extends GenericType<List<AnnisBinaryMetaData>>
