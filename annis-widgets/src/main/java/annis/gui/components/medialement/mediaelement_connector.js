@@ -23,14 +23,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
     return rootDiv.find(connector.getState().elementType);
   }
   
-  // Handle changes from the server-side
-  this.onStateChange = function() {
-    
-    if (player().length === 0)
-    {
-      // remove all old media elements
-      $(connector.getState().elementType).remove();
-      
+  function initElement() {
       // if the sources are still set, Chrome might not close the connections for
       // streaming and will block in the end
       for (playerIndex in mejs.players) 
@@ -63,6 +56,16 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       };
 
       mediaElement.mediaelementplayer(options);
+  }
+  
+  // Handle changes from the server-side
+  this.onStateChange = function() {
+    
+    if (player().length === 0)
+    {
+      // remove all old media elements
+      $(connector.getState().elementType).remove();
+      $(document).ready(initElement);
     }
   };
 
