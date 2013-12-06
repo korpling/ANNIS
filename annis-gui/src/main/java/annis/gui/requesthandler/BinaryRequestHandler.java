@@ -129,7 +129,7 @@ public class BinaryRequestHandler implements RequestHandler
         mimeType);
       if(meta == null)
       {
-        response.sendError(4040, "Binary file not found");
+        response.sendError(404, "Binary file not found");
         return;
       }
       
