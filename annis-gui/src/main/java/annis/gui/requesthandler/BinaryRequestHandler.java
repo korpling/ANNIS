@@ -154,7 +154,7 @@ public class BinaryRequestHandler implements RequestHandler
 
         response.setHeader("Content-Range", r.toString());
         response.setContentType(meta.getMimeType());
-        response.setStatus(requestedRangeRaw == null ? 200 : 206);
+        response.setStatus(fullRange.equals(r)  ? 200 : 206);
         response.setContentLength((int) contentLength);
         response.setContentType(meta.getMimeType());
 
