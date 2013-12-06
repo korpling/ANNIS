@@ -29,8 +29,8 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       rootDiv.append(mediaElement);
 
       mediaElement.attr("controls", "controls");
-      mediaElement.attr("preload", "metadata");
-
+ 
+ 
       var mediaElementSrc = $(document.createElement("source"));
       mediaElement.append(mediaElementSrc);
 
@@ -43,12 +43,14 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
 
       var options = {};
       options.alwaysShowControls = false;
+      options.pauseOtherPlayers = true;
       options.success = function(media, domObject, internalPlayer) {
         globalPlayer = $(media);
         globalPlayer.on('loadedmetadata', loadedCallback);
       };
 
       mediaElement.mediaelementplayer(options);
+      mediaElement.load();
 
     }
   };

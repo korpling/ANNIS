@@ -29,7 +29,7 @@ import org.json.JSONException;
  */
 @JavaScript(
 {
-  "jquery-1.9.1.min.js", "onloadcallback.js"
+  "vaadin://jquery.js", "onloadcallback.js"
 })
 public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
 {
