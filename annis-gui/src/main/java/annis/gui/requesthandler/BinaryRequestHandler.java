@@ -28,6 +28,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinServletResponse;
 import com.vaadin.server.VaadinSession;
 import java.io.IOException;
 import java.io.InputStream;
@@ -36,6 +37,8 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -75,9 +78,16 @@ public class BinaryRequestHandler implements RequestHandler
     return false;
   }
   
-  public void sendResponse(VaadinSession session, VaadinRequest request, VaadinResponse response, 
-    boolean sendContent)
+  public void sendResponse(VaadinSession session, VaadinRequest request, VaadinResponse pureResponse, 
+    boolean sendContent) throws IOException
   {
+    if(!(pureResponse instanceof VaadinServletResponse))
+    {
+      pureResponse.sendError(500, "Binary requests only work with servlets");
+    }
+    
+    VaadinServletResponse response = (VaadinServletResponse) pureResponse;
+    
     Map<String, String[]> binaryParameter = request.getParameterMap();
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
     String documentName = binaryParameter.get("documentName")[0];
@@ -90,6 +100,12 @@ public class BinaryRequestHandler implements RequestHandler
     }
     try
     {
+      // always set the buffer size to the same one we will use for coyping, 
+      // otherwise we won't notice any client disconnection
+      response.setCacheTime(-1);
+      response.resetBuffer();
+      response.setBufferSize(0x1000); // 4K
+      
       OutputStream out = response.getOutputStream();
 
       String requestedRangeRaw = request.getHeader("Range");
@@ -139,7 +155,8 @@ public class BinaryRequestHandler implements RequestHandler
         response.setHeader("Content-Range", r.toString());
         response.setContentType(meta.getMimeType());
         response.setStatus(requestedRangeRaw == null ? 200 : 206);
-        response.setHeader("Content-Length", "" + contentLength);
+        response.setContentLength((int) contentLength);
+        response.setContentType(meta.getMimeType());
 
         if(sendContent)
         {
@@ -184,10 +201,11 @@ public class BinaryRequestHandler implements RequestHandler
     {
       if (mimeType != null && mimeType.equals(m.getMimeType()))
       {
-        return m;
+        bm = m;
+        break;
       }
     }
-    return null;
+    return bm;
   }
   
 
@@ -217,9 +235,7 @@ public class BinaryRequestHandler implements RequestHandler
       if(entityStream != null)
       {
         try
-        {
-         
-          // always close the entity stream in order to free resources at the service
+        { // always close the entity stream in order to free resources at the service
           entityStream.close();
         }
         catch (IOException ex)

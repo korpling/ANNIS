@@ -51,6 +51,7 @@ import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1160,11 +1161,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         fileSize, offset+length);
 
       FileInputStream fInput = new FileInputStream(dataFile);
-      fInput.skip(offset);
-
-      BoundedInputStream boundedStream = new BoundedInputStream(fInput, length);
-
-      return boundedStream;
+      ByteStreams.skipFully(fInput, offset);
+      return ByteStreams.limit(fInput, length);
     }
     catch (FileNotFoundException ex)
     {
