@@ -19,7 +19,7 @@ package annis.gui.requesthandler;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.google.common.base.Preconditions;
-import com.google.common.io.ByteStreams;
+import static com.google.common.base.Preconditions.checkNotNull;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -34,12 +34,8 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URLEncoder;
-import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -56,7 +52,7 @@ public class BinaryRequestHandler implements RequestHandler
   
   private final static Logger log = LoggerFactory.getLogger(BinaryRequestHandler.class);
 
-  private static final int MAXIMAL_RANGE_SIZE = 1048576; //10 megabyte
+  private static final int BUFFER_SIZE = 0x1000; //4K
   
   @Override
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
@@ -102,9 +98,10 @@ public class BinaryRequestHandler implements RequestHandler
     {
       // always set the buffer size to the same one we will use for coyping, 
       // otherwise we won't notice any client disconnection
+      response.reset();
       response.setCacheTime(-1);
       response.resetBuffer();
-      response.setBufferSize(0x1000); // 4K
+      response.setBufferSize(BUFFER_SIZE); // 4K
       
       OutputStream out = response.getOutputStream();
 
@@ -157,12 +154,15 @@ public class BinaryRequestHandler implements RequestHandler
         response.setStatus(fullRange.equals(r)  ? 200 : 206);
         response.setContentLength((int) contentLength);
         response.setContentType(meta.getMimeType());
-
+        
+        response.flushBuffer();
         if(sendContent)
         {
           writeFromServiceToClient(
             r.getStart(), contentLength, binaryRes, out, mimeType);
         }
+        
+        out.close();
 
       }
       catch(ContentRange.InvalidRangeException ex)
@@ -222,9 +222,8 @@ public class BinaryRequestHandler implements RequestHandler
       
       entityStream = response.getEntityInputStream();
       
-      long copiedBytes = ByteStreams.copy(entityStream, out);
+      long copiedBytes = copy(entityStream, out);
       Validate.isTrue(copiedBytes == length, "only copied " + copiedBytes + " bytes instead of " + length);
-      out.flush();
     }
     catch(IOException ex)
     {
@@ -244,7 +243,24 @@ public class BinaryRequestHandler implements RequestHandler
         }
       }
     }
-    
+  }
+  
+  private static long copy(InputStream from, OutputStream to)
+      throws IOException {
+    checkNotNull(from);
+    checkNotNull(to);
+    byte[] buf = new byte[BUFFER_SIZE];
+    long total = 0;
+    while (true) {
+      int r = from.read(buf);
+      if (r == -1) {
+        break;
+      }
+      to.write(buf, 0, r);
+      to.flush();
+      total += r;
+    }
+    return total;
   }
 
   private static class AnnisBinaryMetaDataListType extends GenericType<List<AnnisBinaryMetaData>>
