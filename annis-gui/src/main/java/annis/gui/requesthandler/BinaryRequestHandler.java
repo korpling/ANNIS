@@ -36,6 +36,7 @@ import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.List;
 import java.util.Map;
+import javax.ws.rs.core.Response;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -58,16 +59,24 @@ public class BinaryRequestHandler implements RequestHandler
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo().startsWith("/Binary") 
-      && "GET".equalsIgnoreCase(request.getMethod()))
+    if(request.getPathInfo().startsWith("/Binary"))
     {
-      doGet(session, request, response);
-      return true;
+      if("GET".equalsIgnoreCase(request.getMethod()))
+      {
+        sendResponse(session, request, response, true);
+        return true;
+      }
+      else if("HEAD".equalsIgnoreCase(request.getMethod()))
+      {
+        sendResponse(session, request, response, false);
+        return true;
+      }
     }
     return false;
   }
   
-  public void doGet(VaadinSession session, VaadinRequest request, VaadinResponse response)
+  public void sendResponse(VaadinSession session, VaadinRequest request, VaadinResponse response, 
+    boolean sendContent)
   {
     Map<String, String[]> binaryParameter = request.getParameterMap();
     String toplevelCorpusName = binaryParameter.get("toplevelCorpusName")[0];
@@ -83,7 +92,7 @@ public class BinaryRequestHandler implements RequestHandler
     {
       OutputStream out = response.getOutputStream();
 
-      String range = request.getHeader("Range");
+      String requestedRangeRaw = request.getHeader("Range");
 
       WebResource binaryRes = Helper.getAnnisWebResource()
         .path("query").path("corpora")
@@ -100,15 +109,52 @@ public class BinaryRequestHandler implements RequestHandler
 
       Preconditions.checkNotNull(mimeType, "No mime type given (parameter \"mime\"");
       
-      if (range == null)
-      { 
-        responseStatus200(metaBinaryRes, binaryRes, mimeType, out, response);
-      }
-      else
+      AnnisBinaryMetaData meta = getMatchingMetadataFromService(metaBinaryRes,
+        mimeType);
+      if(meta == null)
       {
-        responseStatus206(metaBinaryRes, binaryRes, mimeType, out, response,
-          range);
+        response.sendError(4040, "Binary file not found");
+        return;
       }
+      
+      ContentRange fullRange = new ContentRange(0,
+        meta.getLength()-1, meta.getLength());
+      
+      ContentRange r = fullRange;
+      try
+      {
+        if(requestedRangeRaw != null)
+        {
+          List<ContentRange> requestedRanges = ContentRange.parseFromHeader(
+            requestedRangeRaw, meta.getLength(), 1);
+
+          if(!requestedRanges.isEmpty())
+          {
+            r = requestedRanges.get(0);
+          }
+        }
+       
+        long contentLength = (r.getEnd() - r.getStart()+1);
+
+        response.setHeader("Content-Range", r.toString());
+        response.setContentType(meta.getMimeType());
+        response.setStatus(requestedRangeRaw == null ? 200 : 206);
+        response.setHeader("Content-Length", "" + contentLength);
+
+        if(sendContent)
+        {
+          writeFromServiceToClient(
+            r.getStart(), contentLength, binaryRes, out, mimeType);
+        }
+
+      }
+      catch(ContentRange.InvalidRangeException ex)
+      {
+        response.setHeader("Content-Range", "bytes */" + meta.getLength());
+        response.sendError(416, "Requested range not satisfiable: " + ex.getMessage());
+        return;
+      }
+
     }
     catch (IOException ex)
     {
@@ -127,92 +173,25 @@ public class BinaryRequestHandler implements RequestHandler
     }
   }
   
-  private void responseStatus206(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, OutputStream out,
-    VaadinResponse response, String range) throws RemoteException
+  private AnnisBinaryMetaData getMatchingMetadataFromService(
+    WebResource metaBinaryRes, String mimeType)
   {
     List<AnnisBinaryMetaData> allMeta = metaBinaryRes.get(
       new AnnisBinaryMetaDataListType());
 
-    if (allMeta.size() > 0)
+    AnnisBinaryMetaData bm = allMeta.get(0);
+    for (AnnisBinaryMetaData m : allMeta)
     {
-      AnnisBinaryMetaData bm = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
+      if (mimeType != null && mimeType.equals(m.getMimeType()))
       {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          bm = m;
-          break;
-        }
+        return m;
       }
-
-
-      // Range: byte=x-y | Range: byte=0-
-      String[] rangeTupel = range.split("-");
-      int offset = Integer.parseInt(rangeTupel[0].split("=")[1]);
-
-      int slice;
-      if (rangeTupel.length > 1)
-      {
-        slice = Integer.parseInt(rangeTupel[1]);
-      }
-      else
-      {
-        slice = bm.getLength() -1;
-      }
-      
-      int lengthToFetch = (slice+1) - offset;
-
-      // don't fetch too large data slices when using range queries
-      //lengthToFetch = Math.min(lengthToFetch, MAXIMAL_RANGE_SIZE);
-      
-      response.setHeader("Content-Range", "bytes " + offset + "-"
-        + (offset + lengthToFetch - 1) + "/" + bm.getLength());
-      response.setContentType(bm.getMimeType());
-      response.setStatus(206);
-      response.setHeader("Content-Length", "" + lengthToFetch);
-
-      writeFromServiceToClient(offset, lengthToFetch, binaryRes, out, mimeType);
     }
+    return null;
   }
+  
 
-  private void responseStatus200(WebResource metaBinaryRes,
-    WebResource binaryRes, String mimeType, OutputStream out,
-    VaadinResponse response) throws RemoteException, IOException
-  {
-
-
-    List<AnnisBinaryMetaData> allMeta = metaBinaryRes
-      .get(new AnnisBinaryMetaDataListType());
-
-    if (allMeta.size() > 0)
-    {
-      AnnisBinaryMetaData binaryMeta = allMeta.get(0);
-      for (AnnisBinaryMetaData m : allMeta)
-      {
-        if (mimeType.equals(m.getMimeType()))
-        {
-          binaryMeta = m;
-          break;
-        }
-      }
-
-      response.setStatus(200);
-      response.setHeader("Accept-Ranges", "bytes");
-      response.setContentType(binaryMeta.getMimeType());
-      response.setHeader("Content-Range",
-        "bytes 0-" + (binaryMeta.getLength() - 1)
-        + "/" + binaryMeta.getLength());
-      response.setHeader("Content-Length", "" + binaryMeta.getLength());
-
-      int offset = 0;
-      int length = binaryMeta.getLength();
-
-      writeFromServiceToClient(offset, length, binaryRes, out, mimeType);
-    }
-  }
-
-  private void writeFromServiceToClient(int offset, int completeLength,
+  private void writeFromServiceToClient(long offset, long length,
     WebResource binaryRes, OutputStream out, String mimeType)
   {
 
@@ -220,13 +199,13 @@ public class BinaryRequestHandler implements RequestHandler
     try
     {
       ClientResponse response = binaryRes.path("" + offset).
-        path("" + completeLength)
+        path("" + length)
         .accept(mimeType).get(ClientResponse.class);
       
       entityStream = response.getEntityInputStream();
       
       long copiedBytes = ByteStreams.copy(entityStream, out);
-      Validate.isTrue(copiedBytes == completeLength, "only copied " + copiedBytes + " bytes instead of " + completeLength);
+      Validate.isTrue(copiedBytes == length, "only copied " + copiedBytes + " bytes instead of " + length);
       out.flush();
     }
     catch(IOException ex)

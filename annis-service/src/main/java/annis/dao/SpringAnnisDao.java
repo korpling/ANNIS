@@ -50,6 +50,7 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import com.google.common.base.Preconditions;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -1153,9 +1154,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
 
       long fileSize = dataFile.length();
-
-      // do not make the array bigger as necessary
-      length = (int) Math.min(fileSize - (long) offset, (long) length);
+      
+      Preconditions.checkArgument(offset+length <= fileSize, 
+        "Range larger than the actual file size requested. Actual file size is %d bytes, %d bytes were requested.",
+        fileSize, offset+length);
 
       FileInputStream fInput = new FileInputStream(dataFile);
       fInput.skip(offset);
