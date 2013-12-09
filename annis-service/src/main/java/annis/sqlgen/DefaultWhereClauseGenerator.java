@@ -420,8 +420,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       "component_ref"));
     String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
 
+    String rankTableName = tas.partitionTableName(RANK_TABLE, corpusList);
+    
     StringBuffer sb = new StringBuffer();
-    sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE)
+    sb.append("EXISTS (SELECT 1 FROM " + rankTableName
       + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {

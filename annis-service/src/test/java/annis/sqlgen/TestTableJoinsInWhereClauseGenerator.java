@@ -31,12 +31,12 @@ import java.util.Arrays;
 import java.util.Set;
 import java.util.TreeSet;
 
-import org.junit.Before;
 import org.junit.Test;
 import org.mockito.Mock;
 
 import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
+import org.junit.Before;
 
 
 public class TestTableJoinsInWhereClauseGenerator {
@@ -56,7 +56,7 @@ public class TestTableJoinsInWhereClauseGenerator {
 	private static final QueryAnnotation annotation2 = new QueryAnnotation("namespace", "name2");
 	private static final QueryAnnotation annotation3 = new QueryAnnotation("namespace", "name3");
 	private Set<QueryAnnotation> annotations;
-	
+  
 	@Before
 	public void setup() {
 		initMocks(this);
@@ -96,7 +96,7 @@ public class TestTableJoinsInWhereClauseGenerator {
 
 		String expected = 
 			"_node AS _node23, _rank AS _rank23, _component AS _component23";		
-		assertEquals(expected, generator.fromClauseForNode(node23));
+		assertEquals(expected, generator.fromClauseForNode(null, node23));
 		checkWhereCondition("_rank23.node_ref = _node23.id", "_rank23.component_ref = _component23.id");
 	}
 	

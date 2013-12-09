@@ -238,7 +238,8 @@ public class MatrixSqlGenerator
 
     sb.append(indent).append(TABSTOP);
     sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));
+      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
+        null, NODE_TABLE, 1, queryData.getCorpusList()));
 
     sb.append("\n");
 

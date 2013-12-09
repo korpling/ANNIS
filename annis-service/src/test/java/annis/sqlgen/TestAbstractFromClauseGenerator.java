@@ -18,7 +18,7 @@ package annis.sqlgen;
 import annis.model.QueryAnnotation;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
+import static org.mockito.BDDMockito.*;
 import static org.mockito.MockitoAnnotations.initMocks;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueLong;
@@ -35,6 +35,9 @@ import org.mockito.Spy;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.AnnisCorpus;
+import com.google.common.collect.Lists;
+import java.util.LinkedList;
 import java.util.Map;
 
 public class TestAbstractFromClauseGenerator {
@@ -72,8 +75,13 @@ public class TestAbstractFromClauseGenerator {
 		String tableAlias = uniqueString();
 		int count = 1;
 		Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
+    TableAccessStrategy tas = new TableAccessStrategy(node);
+    tas.setTableAliases(tableAliases);
+    
+    
 		// when
-		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tableAliases, node, table, count);
+		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, new LinkedList<Long>());
 		// then
 		String expected = tableAlias + " AS " + tableAlias + id;
 		assertThat(alias, is(expected));
@@ -91,12 +99,118 @@ public class TestAbstractFromClauseGenerator {
 		String tableAlias = uniqueString();
 		int count = uniqueInt(2, 100);
 		Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
+    TableAccessStrategy tas = new TableAccessStrategy(node);
+    tas.setTableAliases(tableAliases);
+    
 		// when
-		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tableAliases, node, table, count);
+		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, new LinkedList<Long>());
 		// then
 		String expected = tableAlias + " AS " + tableAlias + id + "_" + count;
 		assertThat(alias, is(expected));
 	}
+  
+  @Test
+  public void shouldUsePartitions()
+  {
+    // given
+		long id = uniqueLong();
+		QueryNode node = new QueryNode(id);
+		String table = uniqueString();
+		String tableAlias = uniqueString();
+		int count = 1;
+    long corpusID = uniqueInt(0, Integer.MAX_VALUE);
+		List<Long> corpora = Lists.newArrayList(corpusID);
+    
+    Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
+    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    tablePartioned.put(table, Boolean.TRUE);
+    
+    TableAccessStrategy tas = new TableAccessStrategy(node);
+    tas.setTableAliases(tableAliases);
+    tas.setTablePartitioned(tablePartioned);
+    
+    
+		// when
+		String alias = AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corpora);
+		// then
+		String expected = tableAlias + "_" + corpusID + " AS " + tableAlias + id;
+		assertThat(alias, is(expected));
+  }
+  
+  @Test
+  public void shouldNotUsePartitions()
+  {
+    // given
+		long id = uniqueLong();
+		QueryNode node = new QueryNode(id);
+		String table = uniqueString();
+		String tableAlias = uniqueString();
+		int count = 1;
+    long corpusID = uniqueInt(0, Integer.MAX_VALUE);
+		List<Long> corporaNonEmpty = Lists.newArrayList(corpusID);
+    List<Long> multipleCorpora = Lists.newArrayList(uniqueLong(), corpusID, uniqueLong());
+    List<Long> corpusEmpty = new LinkedList<Long>();
+    
+    Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
+    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    tablePartioned.put(table, Boolean.TRUE);
+    
+    TableAccessStrategy tas = new TableAccessStrategy(node);
+    tas.setTableAliases(tableAliases);
+    
+    String expected = tableAlias + " AS " + tableAlias + id;
+
+		assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corpusEmpty), is(expected));
+    
+    // update the partion map to actually dis-allow partitions
+    tablePartioned.put(table, Boolean.FALSE);   
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corporaNonEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corpusEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, multipleCorpora),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, null),
+      is(expected));
+    
+    // remove the entry
+    tablePartioned.remove(table);    
+		assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corporaNonEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corpusEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, multipleCorpora),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, null),
+      is(expected));
+    
+    // remove the whole object
+    tas.setTablePartitioned(null);
+    tablePartioned.remove(table);    
+		assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corporaNonEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, corpusEmpty),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, multipleCorpora),
+      is(expected));
+    assertThat(AbstractFromClauseGenerator.tableAliasDefinition(tas, node, 
+      table, count, null),
+      is(expected));
+  }
 
 	// set up table access strategy to return the requested table alias
 	// simulate that count copies of the table (alias) are required

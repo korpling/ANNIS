@@ -140,7 +140,8 @@ public class FfAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       TableAccessStrategy tas = tables(null);
 
       sb.append(indent).append(TABSTOP).append(
-        AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));
+        AbstractFromClauseGenerator.tableAliasDefinition(tas, 
+          null, NODE_TABLE, 1, queryData.getCorpusList()));
       sb.append(",\n");
       
       sb.append(indent).append(TABSTOP).append(TableAccessStrategy.CORPUS_TABLE);
