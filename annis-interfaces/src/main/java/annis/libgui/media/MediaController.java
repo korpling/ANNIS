@@ -56,4 +56,6 @@ public interface MediaController extends Plugin
    * Unregister all associated {@link MediaPlayer} instances.
    */
   public void clearMediaPlayers();
+
+  void closeOtherPlayers(MediaPlayer doNotCloseThisOne);
 }

@@ -139,6 +139,7 @@ public class MediaControllerImpl implements MediaController, Serializable
     }
   }
 
+  @Override
   public void closeOtherPlayers(MediaPlayer doNotCloseThisOne)
   {
     for (List<MediaPlayer> playersForID : mediaPlayers.values())
