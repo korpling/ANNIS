@@ -416,9 +416,12 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
     String pre = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
     String post = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "post"));
-    String component = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
+    String componentAncestor= TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
       "component_ref"));
-    String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentSource
+      = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentTarget
+      = tables(target).aliasedColumn(RANK_TABLE, "component_ref");
 
     String rankTableName = tas.partitionTableName(RANK_TABLE, corpusList);
     
@@ -427,7 +430,8 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
-      sb.append("\t" + component + " = " + component1 + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentSource + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentTarget + " AND\n");
     }
     sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post
       + " AND\n");
@@ -446,6 +450,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       sb.append(StringUtils.join(corpusList, ","));
       sb.append(")");
     }
+    // even if EXISTS implies that a single row is enought, PostgreSQL still
+    // creates better plans if explicitly limited to one row
+    sb.append("\n\tLIMIT 1");
+    
     sb.append(")");
     conditions.add(sb.toString());
   }
