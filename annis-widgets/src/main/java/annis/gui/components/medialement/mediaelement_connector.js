@@ -30,8 +30,10 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       {
         var p = mejs.players[playerIndex];
         p.setSrc("");
+        // also clean up the global indexes of players, since it can get quite polluted
+        // after some clicks
+        p.remove();
       }
-
       var mediaElement = $(document.createElement(connector.getState().elementType));
       rootDiv.append(mediaElement);
 
@@ -46,6 +48,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
 
       var loadedCallback = function(e) {
         connector.wasLoaded();
+        player().off('loadedmetadata');
       };
 
       var options = {};
@@ -63,9 +66,7 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
     
     if (player().length === 0)
     {
-      // remove all old media elements
-      $(connector.getState().elementType).remove();
-      $(document).ready(initElement);
+      initElement();
     }
   };
 
