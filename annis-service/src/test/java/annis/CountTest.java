@@ -127,7 +127,7 @@ public class CountTest
     assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
     // regression tests:
-    assertEquals(89, countPcc2("ambiguity & complex_np & #1 _=_ #2"));
+    assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
     
   }
 
