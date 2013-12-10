@@ -185,7 +185,7 @@ public class SearchUI extends AnnisBaseUI
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
-    btBugReport = new Button("Report Bug");
+    btBugReport = new Button("Report Problem");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
@@ -400,7 +400,7 @@ public class SearchUI extends AnnisBaseUI
   {
     lastBugReportCause = cause;
     screenshot.makeScreenshot();
-    btBugReport.setCaption("bug report is initialized...");
+    btBugReport.setCaption("problem report is initialized...");
   }
 
   private void loadInstanceFonts()
@@ -702,7 +702,7 @@ public class SearchUI extends AnnisBaseUI
   public void screenshotReceived(byte[] imageData, String mimeType)
   {
     btBugReport.setEnabled(true);
-    btBugReport.setCaption("Report Bug");
+    btBugReport.setCaption("Report Problem");
 
     if (bugEMailAddress != null)
     {
