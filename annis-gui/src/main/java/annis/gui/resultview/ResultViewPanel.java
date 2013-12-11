@@ -307,6 +307,7 @@ public class ResultViewPanel extends VerticalLayout implements
         {
           resultPanelList.add(panel);
           resultLayout.addComponent(panel);
+          panel.setSegmentationLayer(selectedSegmentationLayer);
         }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
