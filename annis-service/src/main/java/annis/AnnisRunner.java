@@ -75,6 +75,8 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 
 // TODO: test AnnisRunner
@@ -674,11 +676,35 @@ public class AnnisRunner extends AnnisBaseRunner
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-
       csv.close();
-
+      
     }
     catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    
+    
+    // property output format for Jenkins Plot plugin
+    try
+    {
+      File outputDir = new File("annis_benchmark_results");
+      if(outputDir.mkdirs())
+      {
+        int i=1;
+        for(AnnisRunner.Benchmark b : benchmarks)
+        {
+          Properties props = new Properties();
+          props.put("YVALUE", "" + b.getMedian());
+          FileWriterWithEncoding writer = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8");
+          props.store(writer, "");
+          writer.close();
+          
+          i++;
+        }
+      }
+    }
+    catch(IOException ex)
     {
       log.error(null, ex);
     }
