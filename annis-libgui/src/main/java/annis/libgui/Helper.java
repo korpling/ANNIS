@@ -32,6 +32,7 @@ import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
@@ -135,16 +136,26 @@ public class Helper
 
   public static AnnisUser getUser()
   {
-    Object o = VaadinSession.getCurrent().getSession().getAttribute(
-      AnnisBaseUI.USER_KEY);
-    if (o instanceof AnnisUser)
+
+    VaadinSession vSession = VaadinSession.getCurrent();
+    WrappedSession wrappedSession = null;
+    
+    
+    if (vSession != null)
+      wrappedSession = vSession.getSession();
+
+    if (wrappedSession != null)
     {
-      return (AnnisUser) o;
+
+      Object o = VaadinSession.getCurrent().getSession().getAttribute(
+        AnnisBaseUI.USER_KEY);
+      if (o != null && o instanceof AnnisUser)
+      {
+        return (AnnisUser) o;
+      }
     }
-    else
-    {
-      return null;
-    }
+
+    return null;
   }
 
   public static void setUser(AnnisUser user)
@@ -694,9 +705,9 @@ public class Helper
       WebResource webResource = getAnnisWebResource();
       webResource = webResource.path("query").path("rawtext").path(corpusName).
         path(documentName);
-      texts = webResource.get(RawTextWrapper.class);      
+      texts = webResource.get(RawTextWrapper.class);
     }
-    
+
     catch (UniformInterfaceException ex)
     {
       Notification.show("can not retrieve raw text", ex.
@@ -707,7 +718,7 @@ public class Helper
       Notification.show("can not retrieve raw text", ex.
         getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
     }
-    
+
     return texts;
   }
 
