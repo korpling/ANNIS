@@ -31,10 +31,14 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -105,13 +109,23 @@ public class DocBrowserTable extends Table
         addContainerProperty(metaDatum.getColName(), String.class, "n/a");
     }
 
+    container.addContainerProperty("corpus path", String.class, "n/a");
     container.addContainerProperty("info", Button.class, null);
     container.addContainerProperty("visualizer", Panel.class, null);
 
     for (Annotation a : docs)
     {
       String doc = a.getName();
-      Item row = container.addItem(doc);
+
+      // reverse path and delete the brackets and set a new separator:
+      // corpus > ... > subcorpus > document
+      List<String> pathList = Arrays.asList(StringUtils.split(a.getCorpusName().
+        substring(1, a.getCorpusName().length() - 2), ","));
+      Collections.reverse(pathList);
+      String path = StringUtils.join(pathList, " > ");
+
+      // use corpus path for row id, since it should be unique by annis db schema
+      Item row = container.addItem(path);
       row.getItemProperty("document name").setValue(doc);
 
       // add the metadata columns. Their number is not fixed
@@ -130,6 +144,7 @@ public class DocBrowserTable extends Table
         }
       }
 
+      row.getItemProperty("corpus path").setValue(path);
       row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
       row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
     }
@@ -147,9 +162,8 @@ public class DocBrowserTable extends Table
       "document name"
     }, metaDataColNames), new Object[]
     {
-      "visualizer", "info"
+      "corpus path", "visualizer", "info"
     });
-
 
     setVisibleColumns(columnNames);
 
@@ -174,7 +188,6 @@ public class DocBrowserTable extends Table
       {
         JSONArray metaArray = docVisualizerConfig.getJSONArray(
           VIS_META_DATA_COLUMNS);
-
 
         for (int i = 0; i < metaArray.length(); i++)
         {
@@ -233,7 +246,6 @@ public class DocBrowserTable extends Table
     {
       log.error("cannot retrieve meta array from doc visualizer config", ex);
     }
-
 
     return metaColumns;
   }
@@ -341,7 +353,6 @@ public class DocBrowserTable extends Table
     }
 
     sort(sortByColumns, ascendingOrDescending);
-
 
   }
 
@@ -511,17 +522,18 @@ public class DocBrowserTable extends Table
         return false;
       }
       final MetaDataCol other = (MetaDataCol) obj;
-      if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.equals(other.namespace))
+      if ((this.namespace == null) ? (other.namespace != null) : !this.namespace.
+        equals(other.namespace))
       {
         return false;
       }
-      if ((this.name == null) ? (other.name != null) : !this.name.equals(other.name))
+      if ((this.name == null) ? (other.name != null) : !this.name.equals(
+        other.name))
       {
         return false;
       }
       return true;
     }
-
 
     @Override
     public int hashCode()

@@ -176,7 +176,6 @@ public class DocBrowserPanel extends Panel
     public void run()
     {
 
-
       WebResource res = Helper.getAnnisWebResource();
       final List<Annotation> docs = res.path("meta/docnames/" + corpus).
         get(new Helper.AnnotationListType());
