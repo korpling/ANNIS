@@ -22,6 +22,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.ComponentSizeValidator;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -79,7 +80,7 @@ public class DocBrowserTable extends Table
   private final String ORDER_BY = "orderBy";
 
   // cache for doc meta data
-  private Map<String, List<Annotation>> docMetaDataCache;
+  private final Map<String, List<Annotation>> docMetaDataCache;
 
   private IndexedContainer container;
 
@@ -119,8 +120,10 @@ public class DocBrowserTable extends Table
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
-      List<String> pathList = Arrays.asList(StringUtils.split(a.getCorpusName().
-        substring(1, a.getCorpusName().length() - 2), ","));
+      List<String> pathList = Arrays.asList(StringUtils.split(
+        a.getAnnotationPath().substring(
+          1, a.getAnnotationPath().length() - 2), ",")
+      );
       Collections.reverse(pathList);
       String path = StringUtils.join(pathList, " > ");
 
@@ -128,10 +131,10 @@ public class DocBrowserTable extends Table
       Item row = container.addItem(path);
       row.getItemProperty("document name").setValue(doc);
 
-      // add the metadata columns. Their number is not fixed
+      // add the metadata columns.
       for (MetaDataCol metaDataCol : metaCols.visibleColumns)
       {
-        String value = generateCell(doc, metaDataCol);
+        String value = generateCell(a.getAnnotationPath(), metaDataCol);
         row.getItemProperty(metaDataCol.getColName()).setValue(value);
       }
 
@@ -139,7 +142,8 @@ public class DocBrowserTable extends Table
       {
         if (!metaCols.visibleColumns.contains(metaDataCol))
         {
-          String value = generateCell(doc, metaDataCol);
+          // corpusName() holds the corpus path
+          String value = generateCell(a.getAnnotationPath(), metaDataCol);
           row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
       }
@@ -423,31 +427,39 @@ public class DocBrowserTable extends Table
    * Retrieves date from the cache or from the annis rest service for a specific
    * document.
    *
-   * @param doc The document the data are fetched for.
+   * @param path The document the data are fetched for.
    * @return The a list of meta data. Can be empty but never null.
    */
-  private List<Annotation> getDocMetaData(String doc)
+  private List<Annotation> getDocMetaData(String path)
   {
     // lookup up meta data in the cache
-    if (docMetaDataCache.containsKey(doc))
+    if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
     {
-      return docMetaDataCache.get(doc);
+      // get the metadata of a specific doc
+      WebResource res = Helper.getAnnisWebResource();
+      res = res.path("meta/corpus/").path(
+          docBrowserPanel.getCorpus()).path("closure");
+      docMetaDataCache.put(docBrowserPanel.getCorpus(),
+        res.get(new Helper.AnnotationListType()));
     }
 
-    // get the metadata of a specific doc
-    WebResource res = Helper.getAnnisWebResource();
-    res = res.path("meta/doc/").path(docBrowserPanel.getCorpus()).path(doc);
-    List<Annotation> annos = res.get(new Helper.AnnotationListType());
+    List<Annotation> annos = new ArrayList<Annotation>();
 
-    // update cache
-    docMetaDataCache.put(doc, annos);
+    // filter the annotations
+    for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
+    {
+      if (a.getAnnotationPath().equals(path))
+      {
+        annos.add(a);
+      }
+    }
 
     return annos;
   }
 
-  private String generateCell(String documentName, MetaDataCol metaDatum)
+  private String generateCell(String path, MetaDataCol metaDatum)
   {
-    List<Annotation> metaData = getDocMetaData(documentName);
+    List<Annotation> metaData = getDocMetaData(path);
 
     // lookup meta data
     for (Annotation a : metaData)
