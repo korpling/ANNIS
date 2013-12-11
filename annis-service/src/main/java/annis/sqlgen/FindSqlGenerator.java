@@ -91,11 +91,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      ids.add("NULL AS id" + i);
-      ids.add("NULL AS node_name" + i);
+      ids.add("NULL::bigint AS id" + i);
+      ids.add("NULL::varchar AS node_name" + i);
       if(outputCorpusPath)
       {
-        ids.add("NULL AS path_name" + i);
+        ids.add("NULL::varchar[] AS path_name" + i);
       }
     }
 
