@@ -158,6 +158,7 @@ public abstract class AnnisBaseRunner
     console.setHistory(history);
     console.setHistoryEnabled(true);
     console.setBellEnabled(true);
+    console.setExpandEvents(false);
 
     List<String> commands = detectAvailableCommands();
     Collections.sort(commands);
