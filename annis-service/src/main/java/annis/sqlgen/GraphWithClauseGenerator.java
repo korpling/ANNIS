@@ -53,84 +53,84 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
-      int i)
+      int nodeNr)
   {
     StringBuilder sb = new StringBuilder();
 
     // factsN.id AS idN
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
-      .append("id").append(i).append(", ");
+      .append("id").append(nodeNr).append(", ");
 
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
-      .append("text").append(i).append(", ");
+      .append("text").append(nodeNr).append(", ");
 
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "left_token"));
 
     if (annotateQueryData.getSegmentationLayer() == null)
     {
       sb.append(" - ").append(annotateQueryData.getLeft());
     }
-    sb.append(" AS ").append("min").append(i).append(", ");
+    sb.append(" AS ").append("min").append(nodeNr).append(", ");
 
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "right_token"));
     if (annotateQueryData.getSegmentationLayer() == null)
     {
       sb.append(" + ").append(annotateQueryData.getRight());
     }
-    sb.append(" AS ").append("max").append(i).append(", ");
+    sb.append(" AS ").append("max").append(nodeNr).append(", ");
 
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "corpus_ref"))
-      .append(" AS ").append("corpus").append(i).append(", ");
+      .append(" AS ").append("corpus").append(nodeNr).append(", ");
 
-    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "node_name"))
-      .append(" AS ").append("name").append(i);
+      .append(" AS ").append("name").append(nodeNr);
 
     return sb.toString();
   }
   
   private String fromForNode(
     TableAccessStrategy tas, String indent,
-      int i)
+      int nodeNr)
   {
     StringBuilder sb = new StringBuilder();
     sb.append(indent)
         .append(tas.tableName(NODE_TABLE)).append(" AS ")
-        .append(tas.tableName(NODE_TABLE)).append(i).append(", ")
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i);
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr);
     
     return sb.toString();
   }
   
   private String whereForNode(URI uri,
     TableAccessStrategy tas, List<Long> corpusList, String indent,
-      int i)
+      int nodeNr)
   {
     StringBuilder sb = new StringBuilder();
     // check for corpus/document by it's path
       sb.append(indent)
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".path_name = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr).append(".path_name = ")
         .append(generatePathName(uri)).append(" AND\n");
 
       // join the found corpus/document to the facts table
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".corpus_ref = ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".id AND\n");
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".corpus_ref = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr).append(".id AND\n");
 
       // filter the node with the right name
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".node_name = ")
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
         .append("'").append(uri.getFragment()).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".toplevel_corpus IN ( ")
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".toplevel_corpus IN ( ")
         .append(StringUtils.join(corpusList, ",")).append(") ");
       return sb.toString();
   }
@@ -149,7 +149,12 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
     for (int i = 1; i <= numOfNodes; i++)
     { 
-      sb.append(selectForNode(tas, annotateQueryData, i));
+      sb.append("id").append(i).append(", ");
+      sb.append("text").append(i).append(", ");
+      sb.append("min").append(i).append(", ");
+      sb.append("max").append(i).append(", ");
+      sb.append("corpus").append(i).append(", ");
+      sb.append("name").append(i);
       if (i == numOfNodes)
       {
         sb.append("\n");
@@ -165,7 +170,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     for (int i = 1; i <= numOfNodes; i++)
     {
       
-      sb.append(fromForNode(tas, indent2, i));
+      sb.append("m_").append(matchNumber).append("_").append(i);
       if (i == numOfNodes)
       {
         sb.append("\n");
@@ -176,28 +181,6 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       }
 
     }
-
-    // WHERE
-    sb.append(indent).append("WHERE\n");
-    for (int i = 1; i <= numOfNodes; i++)
-    {
-      URI uri = saltURIs.get(i - 1);
-
-      sb.append(whereForNode(uri, tas, corpusList, indent2, i));
-
-      if (i < numOfNodes)
-      {
-        sb.append("AND\n");
-      }
-      else
-      {
-        sb.append("\n");
-      }
-    }
-
-    // LIMIT to one row
-    sb.append(indent).append("LIMIT 1\n");
-    
     return sb.toString();
   }
 
@@ -207,9 +190,52 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   {
     List<String> clauses = super.withClauses(queryData, alternative, indent);
     
-    // prepend a with clause for each provided salt ID
+    TableAccessStrategy tas = createTableAccessStrategy();
+
+    
+    List<AnnotateQueryData> extensions =
+      queryData.getExtensions(AnnotateQueryData.class);
+    AnnotateQueryData annotateQueryData = extensions.isEmpty()
+      ? new AnnotateQueryData(5, 5) : extensions.get(0);
+    List<SaltURIGroupSet> listOfSaltURIs = queryData.getExtensions(SaltURIGroupSet.class);
+    // only work with the first element
+    Validate.isTrue(!listOfSaltURIs.isEmpty());
+    
+    
+    
+    SaltURIGroupSet groupSet = listOfSaltURIs.get(0);
+    int matchNr = 1;
+    for(Map.Entry<Integer, SaltURIGroup> match : groupSet.getGroups().entrySet())
+    {
+      List<URI> uriList = match.getValue().getUris();
+      int nodeNr = 1;
+      for(URI uri : uriList)
+      {
+       clauses.add(0,
+        withClauseForSingleMatchedNode(matchNr, nodeNr, uri, tas, annotateQueryData, queryData.getCorpusList(),
+          indent+TABSTOP));
+        nodeNr++;
+      }
+      matchNr++;
+    }
     
     return clauses;
+  }
+  
+  private String withClauseForSingleMatchedNode(int match, int nodeNr, URI uri, 
+    TableAccessStrategy tas, AnnotateQueryData annoQueryData, List<Long> corpusList, 
+    String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append("m_").append(match).append("_").append(nodeNr).append(" AS (\n");
+    
+    sb.append("SELECT ").append(selectForNode(tas, annoQueryData, nodeNr)).append("\n");
+    sb.append("FROM ").append(fromForNode(tas, indent, nodeNr)).append("\n");
+    sb.append("WHERE ").append(whereForNode(uri, tas, corpusList , indent, nodeNr)).append("\n");
+    sb.append("LIMIT 1\n");
+    sb.append(")");
+    return sb.toString();
   }
   
   
