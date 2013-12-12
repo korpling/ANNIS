@@ -50,6 +50,91 @@ import java.util.Map;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
+  
+  private String selectForNode(
+    TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
+      int i)
+  {
+    StringBuilder sb = new StringBuilder();
+
+    // factsN.id AS idN
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
+      .append("id").append(i).append(", ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
+      .append("text").append(i).append(", ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "left_token"));
+
+    if (annotateQueryData.getSegmentationLayer() == null)
+    {
+      sb.append(" - ").append(annotateQueryData.getLeft());
+    }
+    sb.append(" AS ").append("min").append(i).append(", ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "right_token"));
+    if (annotateQueryData.getSegmentationLayer() == null)
+    {
+      sb.append(" + ").append(annotateQueryData.getRight());
+    }
+    sb.append(" AS ").append("max").append(i).append(", ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "corpus_ref"))
+      .append(" AS ").append("corpus").append(i).append(", ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
+      .append(tas.columnName(NODE_TABLE, "node_name"))
+      .append(" AS ").append("name").append(i);
+
+    return sb.toString();
+  }
+  
+  private String fromForNode(
+    TableAccessStrategy tas, String indent,
+      int i)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(" AS ")
+        .append(tas.tableName(NODE_TABLE)).append(i).append(", ")
+        .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
+        .append(tas.tableName(CORPUS_TABLE)).append(i);
+    
+    return sb.toString();
+  }
+  
+  private String whereForNode(URI uri,
+    TableAccessStrategy tas, List<Long> corpusList, String indent,
+      int i)
+  {
+    StringBuilder sb = new StringBuilder();
+    // check for corpus/document by it's path
+      sb.append(indent)
+        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".path_name = ")
+        .append(generatePathName(uri)).append(" AND\n");
+
+      // join the found corpus/document to the facts table
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".corpus_ref = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".id AND\n");
+
+      // filter the node with the right name
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".node_name = ")
+        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
+
+      // use the toplevel partioning
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(i).append(".toplevel_corpus IN ( ")
+        .append(StringUtils.join(corpusList, ",")).append(") ");
+      return sb.toString();
+  }
+  
   private String singleMatchClause(int matchNumber, List<URI> saltURIs, 
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData, 
     List<Long> corpusList, int numOfNodes,
@@ -63,41 +148,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     sb.append(indent2).append(matchNumber).append(" AS n, \n").append(indent2);
 
     for (int i = 1; i <= numOfNodes; i++)
-    {
-      // factsN.id AS idN
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
-        .append("id").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
-        .append("text").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "left_token"));
-        
-      if(annotateQueryData.getSegmentationLayer() == null)
-      {
-        sb.append(" - ").append(annotateQueryData.getLeft());
-      }
-      sb.append(" AS ").append("min").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "right_token"));
-      if(annotateQueryData.getSegmentationLayer() == null)
-      {
-        sb.append(" + ").append(annotateQueryData.getRight());
-      }
-      sb.append(" AS ").append("max").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "corpus_ref"))
-        .append(" AS ").append("corpus").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "node_name"))
-        .append(" AS ").append("name").append(i);
-
+    { 
+      sb.append(selectForNode(tas, annotateQueryData, i));
       if (i == numOfNodes)
       {
         sb.append("\n");
@@ -112,12 +164,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     sb.append(indent).append("FROM\n");
     for (int i = 1; i <= numOfNodes; i++)
     {
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(" AS ")
-        .append(tas.tableName(NODE_TABLE)).append(i).append(", ")
-        .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i);
-
+      
+      sb.append(fromForNode(tas, indent2, i));
       if (i == numOfNodes)
       {
         sb.append("\n");
@@ -135,25 +183,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     {
       URI uri = saltURIs.get(i - 1);
 
-      // check for corpus/document by it's path
-      sb.append(indent2)
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".path_name = ")
-        .append(generatePathName(uri)).append(" AND\n");
-
-      // join the found corpus/document to the facts table
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".corpus_ref = ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".id AND\n");
-
-      // filter the node with the right name
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".node_name = ")
-        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
-
-      // use the toplevel partioning
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".toplevel_corpus IN ( ")
-        .append(StringUtils.join(corpusList, ",")).append(") ");
+      sb.append(whereForNode(uri, tas, corpusList, indent2, i));
 
       if (i < numOfNodes)
       {
@@ -170,6 +200,19 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     return sb.toString();
   }
+
+  @Override
+  public List<String> withClauses(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    List<String> clauses = super.withClauses(queryData, alternative, indent);
+    
+    // prepend a with clause for each provided salt ID
+    
+    return clauses;
+  }
+  
+  
 
   @Override
   protected String getMatchesWithClause(QueryData queryData,
