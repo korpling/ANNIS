@@ -332,7 +332,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     doSet("left to 5");
     doSet("right to 5");
-    doSet("seg to dipl");
+//    doSet("seg to dipl");
     doSql("subgraph salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4769,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sSpan15122,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4771,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4772");
   }
 

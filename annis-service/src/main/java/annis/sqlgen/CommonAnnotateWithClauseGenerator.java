@@ -80,8 +80,7 @@ public class CommonAnnotateWithClauseGenerator
 
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSolutionFromMatchesWithClause(queryData, policy,
-          alternative, "matches", indent));
+        result.add(getSolutionFromMatchesWithClause("matches", indent));
 
       }
       else
@@ -131,60 +130,18 @@ public class CommonAnnotateWithClauseGenerator
    * Breaks down the matches table, so that each node of each match has it's own
    * row.
    */
-  protected String getSolutionFromMatchesWithClause(QueryData queryData,
-    IslandsPolicy.IslandPolicies islandPolicies,
-    List<QueryNode> alternative, String matchesName,
+  protected String getSolutionFromMatchesWithClause(
+    String matchesName,
     String indent)
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append(indent).append("solutions AS\n");
-    sb.append(indent).append("(\n");
+    String indent2 = indent + TABSTOP;
+    return  indent + "solutions AS\n" 
+      + indent + "(\n"
+      + indent2 + "SELECT keys.key AS key, " + matchesName + ".*\n "
+      + indent2 + "FROM " + matchesName + ", keys "
+      + indent2 + "WHERE keys.n =" + matchesName + ".n\n" +
+      indent + ")";
 
-    String innerIndent = indent + TABSTOP;
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
-    {
-      innerIndent = indent + TABSTOP + TABSTOP;
-      sb.append(indent).append("SELECT min(\"key\") AS key, n, text, "
-        + "min(\"min\") AS \"min\", "
-        + "max(\"max\") AS \"max\", min(corpus) AS corpus FROM (\n");
-    }
-
-    SolutionKey<?> key = createSolutionKey();
-    // use copy constructor in order not to mess up the global TableAccessStrategy bean
-    TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
-    tas.addTableAlias("solutions", matchesName);
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.size());
-
-
-    for (int i = 1; i <= alternative.size(); i++)
-    {
-      if (i >= 2)
-      {
-        sb.append(innerIndent).append("UNION ALL\n");
-      }
-      sb.append(innerIndent).append("SELECT ").append(StringUtils.join(
-        keyColumns, ", ")).append(", n,  text").append(i).append(" AS text, min").
-        append(i).append(" AS \"min\", max").append(i).append(
-        " AS \"max\", corpus").append(i).append(" AS corpus ").append("FROM ").
-        append(matchesName).append("\n");
-
-    } // end for all nodes in query
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
-    {
-      sb.append(indent).append(") AS innersolution\n");
-    }
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
-    {
-      sb.append(indent).append("GROUP BY text, n\n");
-    }
-
-    sb.append(indent).append(")");
-
-    return sb.toString();
   }
 
   
