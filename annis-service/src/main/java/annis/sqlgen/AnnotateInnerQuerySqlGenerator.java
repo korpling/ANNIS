@@ -72,12 +72,12 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
 
     List<String> selectClauseForNode = new ArrayList<String>();
     int i=0;
-    List<String> fields = new ArrayList<String>();
+   
     for (QueryNode node : alternative)
     {
       i++;
       TableAccessStrategy tables = tables(node);
-
+      List<String> fields = new ArrayList<String>();
       
       fields.addAll(solutionKey.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
@@ -102,20 +102,22 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
         + i);
       fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
 
+      selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields,
+      ", "));
+      
     }
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      fields.add("NULL::bigint AS id" + i);
-      fields.add("NULL::bigint AS text" + i);
-      fields.add("NULL::int AS min" + i);
-      fields.add("NULL::int AS max" + i);
-      fields.add("NULL::bigint AS corpus" + i);
-      fields.add("NULL::varchar AS name" + i);
+      selectClauseForNode.add("NULL::bigint AS id" + i);
+      selectClauseForNode.add("NULL::bigint AS text" + i);
+      selectClauseForNode.add("NULL::int AS min" + i);
+      selectClauseForNode.add("NULL::int AS max" + i);
+      selectClauseForNode.add("NULL::bigint AS corpus" + i);
+      selectClauseForNode.add("NULL::varchar AS name" + i);
     }
     
 
-    selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields,
-      ", "));
+    
 
     return "DISTINCT" + StringUtils.join(selectClauseForNode, ", ");
   }
