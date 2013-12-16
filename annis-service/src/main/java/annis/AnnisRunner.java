@@ -330,8 +330,10 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doCount("#1 . #2 & #a . #3 & tok & tok & a#tok");
+    doSet("left to 5");
+    doSet("right to 5");
+    doSet("seg to dipl");
+    doSql("subgraph salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4769,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sSpan15122,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4771,salt:/Ridges_Herbology_Version_2.0/Ridges_v2/new.kreuterbuch.1543/#sTok4772");
   }
 
   public void doParse(String annisQuery)

@@ -44,9 +44,6 @@ WITH
       )
     )
   ),
-  keys AS (
-    SELECT n, array_agg(id ORDER BY nodenr DESC) AS "key" FROM matches GROUP BY n
-  ),
   nearestseg AS
   (
     SELECT
@@ -65,9 +62,12 @@ WITH
       facts.text_ref = matches.text AND
       facts.corpus_ref = matches.corpus
   ),
+  keys AS (
+    SELECT n, array_agg(id ORDER BY nodenr DESC) AS "key" FROM matches GROUP BY n
+  ),
   solutions AS
   (
-    SELECT DISTINCT keys.key,
+    SELECT DISTINCT keys.key, nearestseg.n AS n,
                     facts.left_token AS "min", facts.right_token AS "max", 
                     facts.text_ref AS "text", facts.corpus_ref AS "corpus"
     FROM nearestseg, facts_2010 AS facts, keys
@@ -81,7 +81,7 @@ WITH
       facts.seg_index <= nearestseg."max" AND
       facts.seg_index >= nearestseg."min" AND
       (nearestseg.rank_left = 1 OR nearestseg.rank_right = 1)
-      GROUP BY "key", left_token, right_token, text_ref, corpus_ref
+      GROUP BY "key", left_token, right_token, text_ref, corpus_ref,nearestseg.n
   )
   SELECT * FROM solutions
   ;
