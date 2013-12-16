@@ -48,6 +48,7 @@ public interface AnnisDao
     String documentName);
 
   public List<AnnisCorpus> listCorpora();
+
   public List<AnnisCorpus> listCorpora(List<Long> ids);
 
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
@@ -87,7 +88,8 @@ public interface AnnisDao
   /**
    * Gets a complete binary file from annis.
    *
-   * <p>It assumes, that only one binary file is stored with the combination
+   * <p>
+   * It assumes, that only one binary file is stored with the combination
    * <b>toplevelCorpusName</b> and <b>mimeType</b>. If there are mor than one,
    * the first file is taken.</p>
    *
@@ -124,7 +126,7 @@ public interface AnnisDao
    */
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String subCorpusName);
-  
+
   public List<Long> mapCorpusAliasToIds(String alias);
 
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
@@ -142,7 +144,7 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
    * null null null null null null null null null null null null null null null
-   * null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -154,11 +156,10 @@ public interface AnnisDao
 
   String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
     final boolean analyze);
-  
+
   FrequencyTable frequency(QueryData queryData);
 
   public void matrix(final QueryData queryData, final OutputStream out);
-
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
@@ -203,7 +204,8 @@ public interface AnnisDao
   /**
    * Get a specific configuration of a corpus from directory.
    *
-   * <p>The corpus config files are actually stored in the
+   * <p>
+   * The corpus config files are actually stored in the
    * {@code <user>/.annis/data/corpus} directory, decorated with a {@link UUID}.
    * The actual name of a specific corpus property file is stored in the
    * media_file table.<p>
@@ -226,7 +228,7 @@ public interface AnnisDao
    * @param toplevelCorpusName Determines the root corpus.
    * @param withRootCorpus If true, the annotations of the root corpus are
    * included.
-   *
+   * @return list of annotations. It is possible that some values are null.
    */
   public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName,
     boolean withRootCorpus);
@@ -287,7 +289,7 @@ public interface AnnisDao
    * Stores a corpus configuration.
    *
    * @param corpusID The id of the corpus, for which the properties are written.
-   * @param props  The properties
+   * @param props The properties
    */
   public void setCorpusConfiguration(long corpusID, Properties props);
 }

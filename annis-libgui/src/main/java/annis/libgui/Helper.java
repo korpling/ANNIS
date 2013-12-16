@@ -234,9 +234,16 @@ public class Helper
    */
   public static WebResource getAnnisWebResource()
   {
+
+    VaadinSession vSession = VaadinSession.getCurrent();
+
     // get URI used by the application
-    String uri = (String) VaadinSession.getCurrent().getAttribute(
+    String uri = null;
+
+    if (vSession != null) {
+     uri = (String) VaadinSession.getCurrent().getAttribute(
       KEY_WEB_SERVICE_URL);
+    }
 
     // if already authentificated the REST client is set as the "user" property
     AnnisUser user = getUser();
