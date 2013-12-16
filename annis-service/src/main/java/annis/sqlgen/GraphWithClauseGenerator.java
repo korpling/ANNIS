@@ -32,6 +32,7 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
@@ -160,7 +161,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   
 
   @Override
-  protected String getMatchesWithClause(QueryData queryData,
+  protected List<String> getMatchesWithClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
     TableAccessStrategy tas = createTableAccessStrategy();
@@ -198,9 +199,12 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       }
       matchNr++;
     }
-    return indent + "matches AS\n" + indent + "(\n" 
+    String result =
+      indent + "matches AS\n" + indent + "(\n" 
       + Joiner.on("\n" + indent2 +"UNION ALL\n").join(subselects) 
       + "\n" + indent + ")";
+    
+    return Lists.newArrayList(result);
   }
 
   private String generatePathName(URI uri)

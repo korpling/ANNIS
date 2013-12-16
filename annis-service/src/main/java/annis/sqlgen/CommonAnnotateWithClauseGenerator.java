@@ -27,6 +27,7 @@ import org.apache.commons.lang3.StringUtils;
 import static annis.sqlgen.TableAccessStrategy.*;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import com.google.common.collect.Lists;
 
 /**
  *
@@ -75,7 +76,7 @@ public class CommonAnnotateWithClauseGenerator
         // token index based method
 
         // first get the raw matches
-        result.add(getMatchesWithClause(queryData, alternative, indent));
+        result.addAll(getMatchesWithClause(queryData, alternative, indent));
         result.add(getKeyWithClause(indent));
 
         // break the columns down in a way that every matched node has it's own
@@ -87,7 +88,7 @@ public class CommonAnnotateWithClauseGenerator
       {
         // segmentation layer based method
 
-        result.add(getMatchesWithClause(queryData, alternative, indent));
+        result.addAll(getMatchesWithClause(queryData, alternative, indent));
         result.add(getKeyWithClause(indent));
         result.add(getNearestSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
@@ -103,17 +104,48 @@ public class CommonAnnotateWithClauseGenerator
   /**
    * Uses the inner SQL generator and provides an ordered and limited view on
    * the matches with a match number.
+   * @param queryData
+   * @param alternative
+   * @param indent
+   * @return 
    */
-  protected String getMatchesWithClause(QueryData queryData, List<QueryNode> alternative,  String indent)
+  protected List<String> getMatchesWithClause(QueryData queryData, List<QueryNode> alternative,  String indent)
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append(indent).append("matches AS\n");
-    sb.append(indent).append("(\n");
-    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent
-      + TABSTOP));
-    sb.append("\n").append(indent).append(")");
+    String indent2= indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+    
+    StringBuilder sbRaw = new StringBuilder();
+    sbRaw.append(indent).append("matchesRaw AS\n");
+    sbRaw.append(indent).append("(\n");
+    sbRaw.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent2));
+    sbRaw.append("\n").append(indent).append(")");
+    
+    StringBuilder sbMatches = new StringBuilder();
+    sbMatches.append(indent).append("matches AS\n");
+    sbMatches.append(indent).append("(\n");
+    
+    int numOfNodes = alternative.size();
+    for(int i=1; i <= numOfNodes; i++)
+    {
+      sbMatches.append(indent2)
+        .append("SELECT\n");
+      sbMatches.append(indent3).append("n").append(" AS n,\n");
+      sbMatches.append(indent3).append(i).append(" AS nodeNr,\n");
+      sbMatches.append(indent3).append("id").append(i).append(" AS id,\n");
+      sbMatches.append(indent3).append("text").append(i).append(" AS \"text\",\n");
+      sbMatches.append(indent3).append("min").append(i).append(" AS min,\n");
+      sbMatches.append(indent3).append("max").append(i).append(" AS max,\n");
+      sbMatches.append(indent3).append("corpus").append(i).append(" AS corpus,\n");
+      sbMatches.append(indent3).append("name").append(i).append(" AS name\n");
+      sbMatches.append(indent2).append("FROM matchesRaw\n");
+      if(i < numOfNodes)
+      {
+        sbMatches.append(indent2).append("\n").append(indent2).append("UNION ALL\n\n");
+      }
+    }
+    sbMatches.append("\n").append(indent).append(")");
 
-    return sb.toString();
+    return Lists.newArrayList(sbRaw.toString(), sbMatches.toString());
   }
   
   protected String getKeyWithClause(String indent)
