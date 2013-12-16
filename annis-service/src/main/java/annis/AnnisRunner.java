@@ -330,8 +330,12 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
+    doSet("left to 5");
+    doSet("right to 5");
+//    doSet("seg to dipl");
     doCorpus("pcc2");
-    doCount("#1 . #2 & #a . #3 & tok & tok & a#tok");
+    doSql("annotate \"der\" | (\"wollen\" . \"ein\")");
+    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
   }
 
   public void doParse(String annisQuery)

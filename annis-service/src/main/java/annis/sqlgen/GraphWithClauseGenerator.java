@@ -31,6 +31,8 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
+import com.google.common.base.Joiner;
+import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.Map;
@@ -50,170 +52,159 @@ import java.util.Map;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
-  private String singleMatchClause(int matchNumber, List<URI> saltURIs, 
-    TableAccessStrategy tas, AnnotateQueryData annotateQueryData, 
-    List<Long> corpusList, int numOfNodes,
+  
+  private String selectForNode(
+    TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
+    int match,
+    int nodeNr, 
     String indent)
   {
-    String indent2 = indent + TABSTOP;
     StringBuilder sb = new StringBuilder();
+
     
-    // SELECT
-    sb.append(indent).append("SELECT\n");
-    sb.append(indent2).append(matchNumber).append(" AS n, \n").append(indent2);
+    sb.append(match).append(" AS n, ");
+    sb.append(nodeNr).append(" AS nodeNr,\n").append(indent);
+    
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
+      .append("id, ");
 
-    for (int i = 1; i <= numOfNodes; i++)
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
+      .append("text, ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "left_token"));
+
+    if (annotateQueryData.getSegmentationLayer() == null)
     {
-      // factsN.id AS idN
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "id")).append(" AS ")
-        .append("id").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "text_ref")).append(" AS ")
-        .append("text").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "left_token"));
-        
-      if(annotateQueryData.getSegmentationLayer() == null)
-      {
-        sb.append(" - ").append(annotateQueryData.getLeft());
-      }
-      sb.append(" AS ").append("min").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "right_token"));
-      if(annotateQueryData.getSegmentationLayer() == null)
-      {
-        sb.append(" + ").append(annotateQueryData.getRight());
-      }
-      sb.append(" AS ").append("max").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "corpus_ref"))
-        .append(" AS ").append("corpus").append(i).append(", ");
-
-      sb.append(tas.tableName(NODE_TABLE)).append(i).append(".")
-        .append(tas.columnName(NODE_TABLE, "node_name"))
-        .append(" AS ").append("name").append(i);
-
-      if (i == numOfNodes)
-      {
-        sb.append("\n");
-      }
-      else
-      {
-        sb.append(", \n").append(indent2);
-      }
+      sb.append(" - ").append(annotateQueryData.getLeft());
     }
+    sb.append(" AS ").append("min, ");
 
-    // FROM
-    sb.append(indent).append("FROM\n");
-    for (int i = 1; i <= numOfNodes; i++)
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "right_token"));
+    if (annotateQueryData.getSegmentationLayer() == null)
     {
-      sb.append(indent2)
+      sb.append(" + ").append(annotateQueryData.getRight());
+    }
+    sb.append(" AS ").append("max, ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "corpus_ref"))
+      .append(" AS ").append("corpus, ");
+
+    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
+      .append(tas.columnName(NODE_TABLE, "node_name"))
+      .append(" AS ").append("name");
+
+    return sb.toString();
+  }
+  
+  private String fromForNode(
+    TableAccessStrategy tas, String indent,
+      int nodeNr)
+  {
+    StringBuilder sb = new StringBuilder();
+    sb.append(indent)
         .append(tas.tableName(NODE_TABLE)).append(" AS ")
-        .append(tas.tableName(NODE_TABLE)).append(i).append(", ")
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i);
-
-      if (i == numOfNodes)
-      {
-        sb.append("\n");
-      }
-      else
-      {
-        sb.append(",\n").append(indent2);
-      }
-
-    }
-
-    // WHERE
-    sb.append(indent).append("WHERE\n");
-    for (int i = 1; i <= numOfNodes; i++)
-    {
-      URI uri = saltURIs.get(i - 1);
-
-      // check for corpus/document by it's path
-      sb.append(indent2)
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".path_name = ")
-        .append(generatePathName(uri)).append(" AND\n");
-
-      // join the found corpus/document to the facts table
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".corpus_ref = ")
-        .append(tas.tableName(CORPUS_TABLE)).append(i).append(".id AND\n");
-
-      // filter the node with the right name
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".node_name = ")
-        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
-
-      // use the toplevel partioning
-      sb.append(indent2)
-        .append(tas.tableName(NODE_TABLE)).append(i).append(".toplevel_corpus IN ( ")
-        .append(StringUtils.join(corpusList, ",")).append(") ");
-
-      if (i < numOfNodes)
-      {
-        sb.append("AND\n");
-      }
-      else
-      {
-        sb.append("\n");
-      }
-    }
-
-    // LIMIT to one row
-    sb.append(indent).append("LIMIT 1\n");
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr);
     
     return sb.toString();
   }
+  
+  private String whereForNode(URI uri,
+    TableAccessStrategy tas, List<Long> corpusList, String indent,
+      int nodeNr)
+  {
+    StringBuilder sb = new StringBuilder();
+    // check for corpus/document by it's path
+      sb.append(indent)
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr).append(".path_name = ")
+        .append(generatePathName(uri)).append(" AND\n");
+
+      // join the found corpus/document to the facts table
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".corpus_ref = ")
+        .append(tas.tableName(CORPUS_TABLE)).append(nodeNr).append(".id AND\n");
+
+      // filter the node with the right name
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
+        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
+
+      // use the toplevel partioning
+      sb.append(indent)
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".toplevel_corpus IN ( ")
+        .append(StringUtils.join(corpusList, ",")).append(") ");
+      return sb.toString();
+  }
+  
+  
+  private String subselectForMatch(int match, int nodeNr, URI uri, 
+    TableAccessStrategy tas, AnnotateQueryData annoQueryData, List<Long> corpusList, 
+    String indent)
+  {
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append(indent).append("SELECT ").append(
+      selectForNode(tas, annoQueryData, match, nodeNr, indent+TABSTOP)).append("\n");
+    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("WHERE\n").append(whereForNode(uri, tas, corpusList , indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("LIMIT 1\n");
+  
+    return sb.toString();
+  }
+  
+  
 
   @Override
-  protected String getMatchesWithClause(QueryData queryData,
+  protected List<String> getMatchesWithClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
     TableAccessStrategy tas = createTableAccessStrategy();
-
-    StringBuilder sb = new StringBuilder();
-
-    String indent2 = indent + TABSTOP;
-
+    
     List<AnnotateQueryData> extensions =
       queryData.getExtensions(AnnotateQueryData.class);
     AnnotateQueryData annotateQueryData = extensions.isEmpty()
       ? new AnnotateQueryData(5, 5) : extensions.get(0);
-
     List<SaltURIGroupSet> listOfSaltURIs = queryData.getExtensions(SaltURIGroupSet.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
-
-    SaltURIGroupSet saltURIs = listOfSaltURIs.get(0);
-
-    sb.append(indent).append("matches AS\n");
-    sb.append(indent).append("(\n");
-
-    LinkedList<String> clauses = new LinkedList<String>();
-   
-    for(Map.Entry<Integer, SaltURIGroup> e : saltURIs.getGroups().entrySet())
+    
+    List<String> subselects = new LinkedList<String>();
+    
+    
+    String indent2 = indent + TABSTOP;
+    
+    SaltURIGroupSet groupSet = listOfSaltURIs.get(0);
+    int matchNr = 1;
+    for(Map.Entry<Integer, SaltURIGroup> match : groupSet.getGroups().entrySet())
     {
-      clauses.add(
-        indent2 + "(\n"+
-        singleMatchClause(e.getKey(), e.getValue().getUris(), tas, annotateQueryData,
-          queryData.getCorpusList(),alternative.size(), indent2 + TABSTOP)
-        + indent2 + ")\n"
-      );
-    }
-    
-    String seperator =indent2 + "UNION ALL\n";
-    sb.append(StringUtils.join(clauses, seperator));
-    
-    // end WITH inner select
-    sb.append(indent).append(")");
+      List<URI> uriList = match.getValue().getUris();
+      int nodeNr = 1;
+      for (URI uri : uriList)
+      {
+        String sub
+          = indent2 + "(\n"
+          + subselectForMatch(matchNr, nodeNr, uri, tas, annotateQueryData,
+            queryData.getCorpusList(),
+            indent2)
+          + indent2 + ")";
 
-    return sb.toString();
+        subselects.add(0, sub);
+        nodeNr++;
+      }
+      matchNr++;
+    }
+    String result =
+      indent + "matches AS\n" + indent + "(\n" 
+      + Joiner.on("\n" + indent2 +"UNION ALL\n").join(subselects) 
+      + "\n" + indent + ")";
+    
+    return Lists.newArrayList(result);
   }
 
   private String generatePathName(URI uri)
