@@ -332,9 +332,9 @@ public abstract class AnnisBaseRunner
 
     consoleAppender.setLayout(new ConsoleLayout());
 
-    ThresholdFilter consoleFilter = new ThresholdFilter();
-    consoleFilter.setLevel(console ? "INFO" : "WARN");
+    ThresholdFilter consoleFilter = new ConsoleFilter();
 
+    consoleFilter.setLevel(console ? "INFO" : "WARN");
     consoleFilter.start();
 
     consoleAppender.addFilter(consoleFilter);
@@ -367,12 +367,32 @@ public abstract class AnnisBaseRunner
       long m = s / 60;
       long h = m / 60;
 
-      sb.append(h).append("h").append(m % 60).append("m").append(s % 60).append(
-        "s");
+      sb.append(h).append("h").append(m % 60).append("m").append(s % 60).
+        append("s");
       sb.append(CoreConstants.LINE_SEPARATOR);
       return sb.toString();
     }
 
+  }
+
+  /**
+   * Filters the jdbc message at the beginning of all annis console commands.
+   */
+  public static class ConsoleFilter extends ThresholdFilter
+  {
+
+    @Override
+    public FilterReply decide(ILoggingEvent event)
+    {
+
+      if (event.getLoggerName() != null && event.getLoggerName().equals(
+        annis.utils.SSLEnabledDataSource.class.getCanonicalName()))
+      {
+        return FilterReply.DENY;
+      }
+
+      return super.decide(event);
+    }
   }
 
   ///// Getter / Setter
