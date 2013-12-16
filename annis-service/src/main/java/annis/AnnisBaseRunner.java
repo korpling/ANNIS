@@ -44,6 +44,8 @@ import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
+import ch.qos.logback.core.CoreConstants;
+import ch.qos.logback.core.LayoutBase;
 import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
@@ -328,23 +330,16 @@ public abstract class AnnisBaseRunner
     consoleAppender.setContext(loggerContext);
     consoleAppender.setName("CONSOLE");
 
-    PatternLayoutEncoder consoleEncoder = new PatternLayoutEncoder();
-    consoleEncoder.setContext(loggerContext);
-    consoleEncoder.setPattern("%p\t - %msg - %r ms %n");
-    consoleEncoder.start();
+    consoleAppender.setLayout(new ConsoleLayout());
 
     ThresholdFilter consoleFilter = new ThresholdFilter();
     consoleFilter.setLevel(console ? "INFO" : "WARN");
 
     consoleFilter.start();
 
-
-    consoleAppender.setEncoder(consoleEncoder);
     consoleAppender.addFilter(consoleFilter);
     consoleAppender.setTarget("System.err");
     consoleAppender.start();
-
-
 
     ch.qos.logback.classic.Logger logbackLogger = loggerContext.getLogger(
       Logger.ROOT_LOGGER_NAME);
@@ -353,6 +348,31 @@ public abstract class AnnisBaseRunner
 
     SLF4JBridgeHandler.removeHandlersForRootLogger();;
     SLF4JBridgeHandler.install();
+  }
+
+  public static class ConsoleLayout extends LayoutBase<ILoggingEvent>
+  {
+
+    @Override
+    public String doLayout(ILoggingEvent e)
+    {
+      StringBuilder sb = new StringBuilder();
+      sb.append("[").append(e.getLevel()).append("]\t");
+      sb.append(e.getMessage());
+      sb.append(" - ");
+
+      long t = e.getTimeStamp() - e.getLoggerContextVO().getBirthTime();
+
+      long s = t / 1000;
+      long m = s / 60;
+      long h = m / 60;
+
+      sb.append(h).append("h").append(m % 60).append("m").append(s % 60).append(
+        "s");
+      sb.append(CoreConstants.LINE_SEPARATOR);
+      return sb.toString();
+    }
+
   }
 
   ///// Getter / Setter
