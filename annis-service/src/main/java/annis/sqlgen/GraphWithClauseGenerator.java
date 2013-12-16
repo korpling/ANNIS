@@ -151,8 +151,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     sb.append(indent).append("SELECT ").append(
       selectForNode(tas, annoQueryData, match, nodeNr, indent+TABSTOP)).append("\n");
-    sb.append(indent).append("FROM ").append(fromForNode(tas, indent, nodeNr)).append("\n");
-    sb.append(indent).append("WHERE ").append(whereForNode(uri, tas, corpusList , indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("WHERE\n").append(whereForNode(uri, tas, corpusList , indent+TABSTOP, nodeNr)).append("\n");
     sb.append(indent).append("LIMIT 1\n");
   
     return sb.toString();
