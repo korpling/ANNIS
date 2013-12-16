@@ -66,8 +66,6 @@ public class MatrixSqlGenerator
 
   private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
 
-  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
-
   private AnnotatedSpanExtractor spanExtractor;
 
   /**
@@ -428,16 +426,6 @@ public class MatrixSqlGenerator
     this.innerQuerySqlGenerator = innerQuerySqlGenerator;
   }
 
-  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
-  {
-    return tableJoinsInFromClauseGenerator;
-  }
-
-  public void setTableJoinsInFromClauseGenerator(
-    TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
-  {
-    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
-  }
 
   public AnnotatedSpanExtractor getSpanExtractor()
   {
