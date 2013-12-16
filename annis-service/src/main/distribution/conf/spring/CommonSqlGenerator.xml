@@ -52,9 +52,6 @@ limitations under the License.
   </bean>
 
 	<!-- FROM clause generator -->
-  <bean id="tableJoinsInFromClauseSqlGenerator" class="annis.sqlgen.TableJoinsInFromClauseSqlGenerator"
-        parent="tableAccessStrategyFactory"  lazy-init="true"/>
-
   <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
         parent="tableAccessStrategyFactory"  lazy-init="true"/>
 
