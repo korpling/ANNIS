@@ -334,7 +334,8 @@ public class AnnisRunner extends AnnisBaseRunner
     doSet("right to 5");
 //    doSet("seg to dipl");
     doCorpus("pcc2");
-    doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
+    doSql("annotate \"der\" | (\"wollen\" . \"ein\")");
+    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
   }
 
   public void doParse(String annisQuery)

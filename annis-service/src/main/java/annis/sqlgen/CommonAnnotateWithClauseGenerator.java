@@ -124,7 +124,7 @@ public class CommonAnnotateWithClauseGenerator
     sbMatches.append(indent).append("matches AS\n");
     sbMatches.append(indent).append("(\n");
     
-    int numOfNodes = alternative.size();
+    int numOfNodes = queryData.getMaxWidth();
     for(int i=1; i <= numOfNodes; i++)
     {
       sbMatches.append(indent2)
