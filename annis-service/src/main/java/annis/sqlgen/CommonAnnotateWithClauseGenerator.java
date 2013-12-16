@@ -121,7 +121,7 @@ public class CommonAnnotateWithClauseGenerator
     String indent2 = indent + TABSTOP;
     
     return indent + "keys AS (\n" +
-     indent2 + "SELECT n, array_agg(id ORDER BY nodenr DESC) AS \"key\" FROM matches\n" +
+     indent2 + "SELECT n, array_agg(id ORDER BY nodenr ASC) AS \"key\" FROM matches\n" +
      indent2 + "GROUP BY n\n" +
      indent + ")";
   }
