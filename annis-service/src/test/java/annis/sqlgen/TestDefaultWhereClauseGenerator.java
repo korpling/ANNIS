@@ -395,7 +395,8 @@ public class TestDefaultWhereClauseGenerator
     checkEdgeConditions(componentPredicate, "d", null,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
+            "\n\tLIMIT 1)",
         join("<>", "_node23.id", "_node42.id"));
   }
   
@@ -413,7 +414,8 @@ public class TestDefaultWhereClauseGenerator
     checkEdgeConditions(componentPredicate, "d", null,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)");
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
+            "\n\tLIMIT 1)");
   }
   
   /**
@@ -433,7 +435,8 @@ public class TestDefaultWhereClauseGenerator
     checkEdgeConditions(componentPredicate, "d", null,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post AND toplevel_corpus IN(" + corpusId + "))",
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post AND toplevel_corpus IN(" + corpusId + ")" + "\n\t" +
+            "LIMIT 1)",
             join("<>", "_node23.id", "_node42.id"));
   }  
 
@@ -453,7 +456,8 @@ public class TestDefaultWhereClauseGenerator
     checkEdgeConditions(componentPredicate, "d", null,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" +
+            "\n\tLIMIT 1)",
             join("<>", "_node23.id", "_node42.id"));
   }  
 
@@ -473,7 +477,8 @@ public class TestDefaultWhereClauseGenerator
     checkEdgeConditions(componentPredicate, "d", null,
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post" + "\n\t" + 
+            "LIMIT 1)",
             join("<>", "_node23.id", "_node42.id"));
   }  
 
@@ -495,8 +500,10 @@ public class TestDefaultWhereClauseGenerator
         join("=", "_rank23.component_ref", "_rank42.component_ref"),
         "EXISTS (SELECT 1 FROM _rank AS ancestor WHERE" + "\n\t" +
             "ancestor.component_ref = _rank23.component_ref AND" + "\n\t" +
+            "ancestor.component_ref = _rank42.component_ref AND" + "\n\t" +
             "ancestor.pre < _rank23.pre AND _rank23.pre < ancestor.post AND" + "\n\t" +
-            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post)",
+            "ancestor.pre < _rank42.pre AND _rank42.pre < ancestor.post\n\t" +
+            "LIMIT 1)",
             join("<>", "_node23.id", "_node42.id"));
   }  
 

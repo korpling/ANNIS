@@ -20,6 +20,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.VisualizerInput;
@@ -391,7 +392,8 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      PollControl.runInBackground(1000, 100, null, 
+      // run the actual code to load the visualizer
+      PollControl.runInBackground(500, 50, null, 
         new BackgroundJob(callback));
       
       btEntry.setIcon(ICON_COLLAPSE);
@@ -423,10 +425,8 @@ public class VisualizerPanel extends CssLayout
       }
     }
 
-    if (getComponentIndex(progress) > -1)
-    {
-      removeComponent(progress);
-    }
+    progress.setEnabled(false);
+    progress.setVisible(false);
 
     if (vis != null)
     {
@@ -435,6 +435,17 @@ public class VisualizerPanel extends CssLayout
       if (vis instanceof PDFViewer)
       {
         ((PDFViewer) vis).openPDFPage("-1");
+      }
+      if(vis instanceof MediaPlayer)
+      {
+        // if this is a media player visualizer, close all other media players
+        // since some browsers (e.g. Chrome) have problems if there are multiple
+        // audio/video elements on one page
+        MediaController mediaController = VaadinSession.getCurrent().
+          getAttribute(
+            MediaController.class);
+        mediaController.closeOtherPlayers((MediaPlayer) vis);
+
       }
       // add if not already added
       if (getComponentIndex(vis) < 0)
@@ -573,7 +584,7 @@ public class VisualizerPanel extends CssLayout
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
         
-        UI.getCurrent().access(new Runnable()
+        UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -606,7 +617,7 @@ public class VisualizerPanel extends CssLayout
       if(exception != null)
       {
         final Throwable finalException = exception;
-        UI.getCurrent().access(new Runnable()
+        UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
           public void run()

@@ -30,7 +30,7 @@ import org.json.JSONException;
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 @StyleSheet({"keyboard.css"})
-@JavaScript({"jquery-1.9.1.min.js","keyboard.js", "virtualkeyboard.js"})
+@JavaScript({"vaadin://jquery.js","keyboard.js", "virtualkeyboard.js"})
 public class VirtualKeyboard extends AbstractJavaScriptExtension
 {
   public VirtualKeyboard()

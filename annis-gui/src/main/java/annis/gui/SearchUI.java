@@ -41,6 +41,7 @@ import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
@@ -184,7 +185,7 @@ public class SearchUI extends AnnisBaseUI
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 
-    btBugReport = new Button("Report Bug");
+    btBugReport = new Button("Report Problem");
     btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
@@ -399,7 +400,7 @@ public class SearchUI extends AnnisBaseUI
   {
     lastBugReportCause = cause;
     screenshot.makeScreenshot();
-    btBugReport.setCaption("bug report is initialized...");
+    btBugReport.setCaption("problem report is initialized...");
   }
 
   private void loadInstanceFonts()
@@ -701,7 +702,7 @@ public class SearchUI extends AnnisBaseUI
   public void screenshotReceived(byte[] imageData, String mimeType)
   {
     btBugReport.setEnabled(true);
-    btBugReport.setCaption("Report Bug");
+    btBugReport.setCaption("Report Problem");
 
     if (bugEMailAddress != null)
     {
@@ -824,13 +825,26 @@ public class SearchUI extends AnnisBaseUI
     for (String selectedCorpusName : originalNames)
     {
       // get the real corpus descriptions by the name (which could be an alias)
-      List<AnnisCorpus> corporaByName = 
-        rootRes.path("query").path("corpora").path(selectedCorpusName)
-          .get(new GenericType<List<AnnisCorpus>>(){});
-
-      for(AnnisCorpus c : corporaByName)
+      try
       {
-        mappedNames.add(c.getName());
+        List<AnnisCorpus> corporaByName
+          = rootRes.path("query").path("corpora").path(selectedCorpusName)
+          .get(new GenericType<List<AnnisCorpus>>()
+            {
+          });
+
+        for (AnnisCorpus c : corporaByName)
+        {
+          mappedNames.add(c.getName());
+        }
+      }
+
+      catch (ClientHandlerException ex)
+      {
+        String msg = "alias mapping does not work for alias: "
+          + selectedCorpusName;
+        log.error(msg, ex);
+        Notification.show(msg, Notification.Type.TRAY_NOTIFICATION);
       }
     }
     return mappedNames;
@@ -863,16 +877,20 @@ public class SearchUI extends AnnisBaseUI
       {
         // show a warning message that the corpus was not imported yet
         new Notification("Linked corpus does not exist",
-          "The corpus you wanted to access unfortunally does not (yet) exist in ANNIS<br/>"
-          + "A possible reason is that it has not been imported yet. Please ask the "
-          + "responsible person of the site that contained the link to import the corpus.",
+          "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+          + " in ANNIS.</p>"
+          + "<h2>possible reasons are:</h2>"
+          + "<ul><li>that it has not been imported yet.</li>"
+          + "<li>The ANNIS service is not running</li></ul>"
+          + "<p>Please ask the responsible person of the site that contained "
+          + "the link to import the corpus.</p></div>",
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       }
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
       }
-      
+
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {

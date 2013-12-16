@@ -91,6 +91,16 @@ limitations under the License.
     <entry key="edge_annotation" value="facts" />
     <entry key="annotation_pool" value="annotation_pool" />
   </util:map>
+  
+  <util:map id="factsTablePartitioned">
+    <entry key="node" value="true" />
+    <entry key="node_annotation" value="true" />
+    <entry key="rank" value="true" />
+    <entry key="component" value="true" />
+    <entry key="edge_annotation" value="true" />
+    <entry key="edge_annotation" value="true" />
+    <entry key="annotation_pool" value="true" />
+  </util:map>
 
   <util:map id="factsColumnAliases">
     <entry key="node">
@@ -192,6 +202,7 @@ limitations under the License.
         scope="prototype" lazy-init="true">
     <property name="tableAliases" ref="factsTableAliases" />
     <property name="columnAliases" ref="factsColumnAliases" />
+    <property name="tablePartitioned" ref="factsTablePartitioned" />
   </bean>
 
   <bean id="tableAccessStrategyFactory" class="annis.sqlgen.TableAccessStrategyFactory" lazy-init="true">

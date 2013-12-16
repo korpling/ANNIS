@@ -18,14 +18,23 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
   var connector = this;
   var rootDiv = $(this.getElement(this.getConnectorId()));
 
-  var mediaElement = null;
-  var globalPlayer = null;
 
-  // Handle changes from the server-side
-  this.onStateChange = function() {
-    if (!mediaElement)
-    {
-      mediaElement = $(document.createElement(this.getState().elementType));
+  function player() {
+    return rootDiv.find(connector.getState().elementType);
+  }
+  
+  function initElement() {
+      // if the sources are still set, Chrome might not close the connections for
+      // streaming and will block in the end
+      for (playerIndex in mejs.players) 
+      {
+        var p = mejs.players[playerIndex];
+        p.setSrc("");
+        // also clean up the global indexes of players, since it can get quite polluted
+        // after some clicks
+        p.remove();
+      }
+      var mediaElement = $(document.createElement(connector.getState().elementType));
       rootDiv.append(mediaElement);
 
       mediaElement.attr("controls", "controls");
@@ -34,58 +43,66 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       var mediaElementSrc = $(document.createElement("source"));
       mediaElement.append(mediaElementSrc);
 
-      mediaElementSrc.attr("type", this.getState().mimeType);
-      mediaElementSrc.attr("src", this.getState().resourceURL);
+      mediaElementSrc.attr("type", connector.getState().mimeType);
+      mediaElementSrc.attr("src", connector.getState().resourceURL);
 
       var loadedCallback = function(e) {
         connector.wasLoaded();
+        player().off('loadedmetadata');
       };
 
       var options = {};
       options.alwaysShowControls = false;
-      options.success = function(media, domObject, internalPlayer) {
-        globalPlayer = $(media);
-        globalPlayer.on('loadedmetadata', loadedCallback);
+      options.pauseOtherPlayers = true;
+      options.success = function(media, domObject) {
+        player().on('loadedmetadata', loadedCallback);
       };
 
       mediaElement.mediaelementplayer(options);
-
+  }
+  
+  // Handle changes from the server-side
+  this.onStateChange = function() {
+    
+    if (player().length === 0)
+    {
+      initElement();
     }
   };
 
   this.play = function(start) {
-    if (globalPlayer) {
-      globalPlayer[0].pause();
-      globalPlayer[0].setCurrentTime(start);
-      globalPlayer[0].play();
+    if (player().length) {
+      player()[0].pause();
+      player()[0].setCurrentTime(start);
+      player()[0].play();
     }
   };
 
   this.playRange = function(start, end) {
-    if (globalPlayer) {
-      globalPlayer[0].pause();
-      globalPlayer[0].setCurrentTime(start);
+    if (player().length) {
+      player()[0].pause();
+      player()[0].setCurrentTime(start);
 
       var timeHandler = function()
       {
-        if (end !== null && globalPlayer[0].currentTime >= end)
+        if (end !== null && player()[0].currentTime >= end)
         {
-          globalPlayer[0].pause();
+          player()[0].pause();
         }
       };
-      globalPlayer.on("timeupdate", timeHandler);
-      globalPlayer.on("pause", function()
+      player().on("timeupdate", timeHandler);
+      player().on("pause", function()
       {
-        globalPlayer.off();
+        player().off("timeupdate", timeHandler);
       });
 
-      globalPlayer[0].play();
+      player()[0].play();
     }
   };
 
   this.pause = function() {
-    if (globalPlayer !== null) {
-      globalPlayer[0].pause();
+    if (player().length) {
+      player()[0].pause();
     }
   };
 };

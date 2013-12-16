@@ -17,8 +17,10 @@ package annis.libgui;
 
 import com.google.common.collect.MapMaker;
 import com.vaadin.ui.UI;
+import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -26,9 +28,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,21 +44,32 @@ public class PollControl
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
   public static final int DEFAULT_TIME = 15000;
-  private static final ConcurrentMap<UUID, Integer> id2Time = new MapMaker().
-    makeMap();
-  private static final Lock calcLock = new ReentrantLock();
-  
   private static final ExecutorService exec = Executors.newCachedThreadPool();
 
+  private static TimeMap getId2Time(UI ui)
+  {
+    if(ui != null && ui.getSession() != null)
+    {
+      TimeMap result = ui.getSession().getAttribute(TimeMap.class);
+      if(result == null)
+      {
+        result = new TimeMap();
+        ui.getSession().setAttribute(TimeMap.class, result);
+      }
+      return result;
+    }
+    return new TimeMap();
+  }
+  
   private static UUID setTime(UI ui, int newPollingTime)
   {
     UUID id = UUID.randomUUID();
     // it's really unpropable, but just in case check if this ID was used before
-    while(id2Time.containsKey(id))
+    while(getId2Time(ui).containsKey(id))
     {
       id = UUID.randomUUID();
     }
-    id2Time.put(id, newPollingTime);
+    getId2Time(ui).put(id, newPollingTime);
     calculateAndSetPollingTime(ui);
     
     return id;
@@ -67,7 +77,7 @@ public class PollControl
 
   private static void unsetTime(UUID id, UI ui)
   {
-    if(id2Time.remove(id) != null)
+    if(getId2Time(ui).remove(id) != null)
     {
       calculateAndSetPollingTime(ui);
     }
@@ -77,31 +87,32 @@ public class PollControl
    * Use the minimal time of all registered time in to determine how frequent
    * polling should be.
    */
-  private static void calculateAndSetPollingTime(UI ui)
+  private static void calculateAndSetPollingTime(final UI ui)
   {
-    calcLock.lock();
     try
     {
       
       if(ui != null)
       {
-        
         // get the minimal non-negative time
         int min = DEFAULT_TIME;
-        for (int time : id2Time.values())
+        LinkedList<Integer> numbers = new LinkedList<Integer>(getId2Time(ui).values());
+        for (int time : numbers)
         {
           if(time >= 0 && time < min)
           {
             min = time;
           }
-        }
-        ui.setPollInterval(min);
+        }        
 
+        ui.setPollInterval(min);
+//        ui.getPage().setTitle(min + "ms currently polling");
+          
       }
     }
     finally
     {
-      calcLock.unlock();
+      
     }
   }
   
@@ -199,7 +210,15 @@ public class PollControl
           }
           finally
           {
-            unsetTime(id, finalUI);
+            finalUI.access(new Runnable()
+            {
+
+              @Override
+              public void run()
+              {
+                unsetTime(id, finalUI);
+              }
+            });
           }
           return result;
         }
@@ -228,6 +247,11 @@ public class PollControl
     }
     
     return null;
+  }
+  
+  public static class TimeMap extends ConcurrentHashMap<UUID, Integer>
+  {
+    
   }
 
   

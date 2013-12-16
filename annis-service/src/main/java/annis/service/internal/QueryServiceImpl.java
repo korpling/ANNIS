@@ -43,6 +43,8 @@ import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.io.ByteStreams;
+import com.google.common.primitives.Bytes;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -832,8 +834,8 @@ public class QueryServiceImpl implements QueryService
       {
         try
         {
-          IOUtils.copy(stream, output);
-          output.flush();
+          ByteStreams.copy(stream, output);
+          output.close();
         }
         finally
         {
