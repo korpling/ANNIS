@@ -452,6 +452,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
+  @Transactional(readOnly = true)
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator)
   {
@@ -501,7 +502,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
-  @Transactional
+  @Transactional(readOnly = true)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator,
