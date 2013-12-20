@@ -76,10 +76,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       TableAccessStrategy tblAccessStr = tables(node);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-        + " AS node_name" + i);
       if(outputCorpusPath)
       {
+        ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+          + " AS node_name" + i);
+      
         ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
           + " AS path_name" + i);
       }
@@ -99,12 +100,14 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
     }
 
-    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-      "toplevel_corpus"));
-
+    if(outputCorpusPath)
+    {
+      ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "toplevel_corpus"));
+    }
+    
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
-
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(ids, ", ");
