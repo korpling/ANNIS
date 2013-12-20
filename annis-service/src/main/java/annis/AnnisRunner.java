@@ -1024,7 +1024,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+    out.println(annisDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
   }
 
   public void doMatrix(String annisQuery)

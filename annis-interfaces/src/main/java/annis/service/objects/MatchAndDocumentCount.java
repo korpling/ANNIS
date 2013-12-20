@@ -51,6 +51,13 @@ public class MatchAndDocumentCount implements Serializable
   {
     this.documentCount = documentsMatched;
   }
+
+  @Override
+  public String toString()
+  {
+    return "" + matchCount + " matches in " + documentCount + " documents";
+  }
+  
   
   
 }
