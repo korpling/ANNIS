@@ -235,7 +235,7 @@ limitations under the License.
   <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
     
-    <property name="innerQuerySqlGenerator" ref="noCorpusPathFindSqlGenerator" />
+    <property name="innerQuerySqlGenerator" ref="frequencyFindSqlGenerator" />
 
     <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
     <property name="fromClauseSqlGenerators">
@@ -369,6 +369,7 @@ limitations under the License.
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
     <property name="outputCorpusPath" value="true" />
+    <property name="outputToplevelCorpus" value="true" />
 
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
@@ -378,12 +379,28 @@ limitations under the License.
     <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
   </bean>
   
+  <bean id="frequencyFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
+          parent="tableAccessStrategyFactory" lazy-init="true">
+
+    <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
+    <property name="sortSolutions" value="false" />
+    <property name="outputCorpusPath" value="false" />
+    <property name="outputToplevelCorpus" value="true" />
+
+    <property name="selectClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+    <property name="orderByClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
+  </bean>
+  
   <bean id="noCorpusPathFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
     <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
     <property name="outputCorpusPath" value="false" />
+    <property name="outputToplevelCorpus" value="false" />
 
     <property name="selectClauseSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
     <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />

@@ -56,6 +56,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   private boolean optimizeDistinct;
   private boolean sortSolutions;
   private boolean outputCorpusPath;
+  private boolean outputToplevelCorpus;
   private CorpusPathExtractor corpusPathExtractor;
 
   @Override
@@ -100,7 +101,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
     }
 
-    if(outputCorpusPath)
+    if(outputToplevelCorpus)
     {
       ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
         "toplevel_corpus"));
@@ -276,6 +277,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setOutputCorpusPath(boolean outputCorpusPath)
   {
     this.outputCorpusPath = outputCorpusPath;
+  }
+
+  public boolean isOutputToplevelCorpus()
+  {
+    return outputToplevelCorpus;
+  }
+
+  public void setOutputToplevelCorpus(boolean outputToplevelCorpus)
+  {
+    this.outputToplevelCorpus = outputToplevelCorpus;
   }
   
   
