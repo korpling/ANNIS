@@ -387,7 +387,27 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
-    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    
+    TableAccessStrategy tasSource = tables(node);
+    TableAccessStrategy tasTarget = tables(target);
+    
+    String spanLengthSource = 
+      "("
+      + tasSource.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasSource.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    String spanLengthTarget = 
+      "("
+      + tasTarget.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasTarget.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    conditions.add(spanLengthSource + " = " + spanLengthTarget);
+    
+    //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
 
   @Override

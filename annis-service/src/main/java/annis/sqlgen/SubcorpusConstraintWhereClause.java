@@ -56,8 +56,7 @@ public class SubcorpusConstraintWhereClause
   {
     LinkedList<String> conditions = new LinkedList<String>();
 
-    conditions.add("-- annotations can always only be inside a subcorpus/document");
-
+    // annotations can always only be inside a subcorpus/document
     QueryNode[] copyNodes = nodes.toArray(new QueryNode[0]);
 
     for (int left = 0; left < copyNodes.length; left++)
