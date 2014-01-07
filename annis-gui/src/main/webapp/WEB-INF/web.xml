@@ -60,14 +60,6 @@
     <servlet-name>ResourceServlet</servlet-name>
     <servlet-class>annis.gui.servlets.ResourceServlet</servlet-class>
   </servlet>
-  <servlet>
-    <servlet-name>BinaryServlet</servlet-name>
-    <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>annis.gui.servlets.LoginServlet</servlet-class>
-  </servlet>
 
   <servlet-mapping>
     <servlet-name>Search</servlet-name>
@@ -87,10 +79,5 @@
     <servlet-name>ResourceServlet</servlet-name>
     <url-pattern>/Resource/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>BinaryServlet</servlet-name>
-    <url-pattern>/Binary/*</url-pattern>
-  </servlet-mapping>
-    
-    
+  
 </web-app>

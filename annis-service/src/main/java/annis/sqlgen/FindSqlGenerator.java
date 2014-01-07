@@ -56,6 +56,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   private boolean optimizeDistinct;
   private boolean sortSolutions;
   private boolean outputCorpusPath;
+  private boolean outputToplevelCorpus;
   private CorpusPathExtractor corpusPathExtractor;
 
   @Override
@@ -76,10 +77,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       TableAccessStrategy tblAccessStr = tables(node);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-        + " AS node_name" + i);
       if(outputCorpusPath)
       {
+        ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+          + " AS node_name" + i);
+      
         ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
           + " AS path_name" + i);
       }
@@ -91,20 +93,22 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      ids.add("NULL AS id" + i);
-      ids.add("NULL AS node_name" + i);
+      ids.add("NULL::bigint AS id" + i);
+      ids.add("NULL::varchar AS node_name" + i);
       if(outputCorpusPath)
       {
-        ids.add("NULL AS path_name" + i);
+        ids.add("NULL::varchar[] AS path_name" + i);
       }
     }
 
-    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-      "toplevel_corpus"));
-
+    if(outputToplevelCorpus)
+    {
+      ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "toplevel_corpus"));
+    }
+    
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
-
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(ids, ", ");
@@ -273,6 +277,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setOutputCorpusPath(boolean outputCorpusPath)
   {
     this.outputCorpusPath = outputCorpusPath;
+  }
+
+  public boolean isOutputToplevelCorpus()
+  {
+    return outputToplevelCorpus;
+  }
+
+  public void setOutputToplevelCorpus(boolean outputToplevelCorpus)
+  {
+    this.outputToplevelCorpus = outputToplevelCorpus;
   }
   
   

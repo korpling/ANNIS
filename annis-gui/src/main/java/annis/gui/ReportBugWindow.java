@@ -63,7 +63,7 @@ public class ReportBugWindow extends Window
     this.cause = cause;
     
     setSizeUndefined();
-    setCaption("Report Bug");
+    setCaption("Report Problem");
           
     ReportFormLayout layout = new ReportFormLayout();
     setContent(layout);
@@ -76,7 +76,7 @@ public class ReportBugWindow extends Window
     form.setBuffered(true);
     
     final ReportBugWindow finalThis = this;
-    btSubmit = new Button("Submit bug report", new Button.ClickListener()
+    btSubmit = new Button("Submit problem report", new Button.ClickListener()
     {
 
       @Override
@@ -88,8 +88,8 @@ public class ReportBugWindow extends Window
 
           if(sendBugReport(bugEMailAddress, screenImage, imageMimeType))
           {
-            Notification.show("Bug report was sent",
-              "We will answer your bug report as soon as possible",
+            Notification.show("Problem report was sent",
+              "We will answer your problem report as soon as possible",
               Notification.Type.HUMANIZED_MESSAGE);
           }
           
@@ -218,7 +218,7 @@ public class ReportBugWindow extends Window
         try
         {
           mail.attach(new ByteArrayDataSource(screenImage, imageMimeType),
-            "screendump.png", "Screenshot of the browser content at time of bug report");
+            "screendump.png", "Screenshot of the browser content at time of problem report");
         }
         catch (IOException ex)
         {
@@ -238,7 +238,7 @@ public class ReportBugWindow extends Window
         {
           mail.attach(new ByteArrayDataSource(Helper.convertExceptionToMessage(
             cause), "text/plain"), "exception.txt", 
-          "Exception that caused the user to report the bug");
+          "Exception that caused the user to report the problem");
         }
         catch (IOException ex)
         {
@@ -256,7 +256,7 @@ public class ReportBugWindow extends Window
         "If this is no Kickstarter version please ask the administrator (" 
         + bugEMailAddress 
         + ") of this ANNIS-instance for assistance. "
-        + "Bug reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);
+        + "Problem reports are not available for ANNIS Kickstarter", Notification.Type.ERROR_MESSAGE);
       log.error(null,
         ex);
       return false;

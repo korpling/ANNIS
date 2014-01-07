@@ -66,8 +66,6 @@ public class MatrixSqlGenerator
 
   private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
 
-  private TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator;
-
   private AnnotatedSpanExtractor spanExtractor;
 
   /**
@@ -238,7 +236,8 @@ public class MatrixSqlGenerator
 
     sb.append(indent).append(TABSTOP);
     sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));
+      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
+        null, NODE_TABLE, 1, queryData.getCorpusList()));
 
     sb.append("\n");
 
@@ -427,16 +426,6 @@ public class MatrixSqlGenerator
     this.innerQuerySqlGenerator = innerQuerySqlGenerator;
   }
 
-  public TableJoinsInFromClauseSqlGenerator getTableJoinsInFromClauseGenerator()
-  {
-    return tableJoinsInFromClauseGenerator;
-  }
-
-  public void setTableJoinsInFromClauseGenerator(
-    TableJoinsInFromClauseSqlGenerator tableJoinsInFromClauseGenerator)
-  {
-    this.tableJoinsInFromClauseGenerator = tableJoinsInFromClauseGenerator;
-  }
 
   public AnnotatedSpanExtractor getSpanExtractor()
   {

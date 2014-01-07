@@ -43,7 +43,7 @@ public class TableJoinsInWhereClauseGenerator
 			String indent) {
 		List<String> tables = new ArrayList<String>();
 		for (QueryNode node : alternative)
-			tables.add(fromClauseForNode(node, false));
+			tables.add(fromClauseForNode(queryData.getCorpusList(), node, false));
 		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
 	}
 
@@ -59,31 +59,36 @@ public class TableJoinsInWhereClauseGenerator
 		return conditions;
 	}
 	
-	public String fromClauseForNode(QueryNode node) {
-		return fromClauseForNode(node, false);
+  public String fromClauseForNode(QueryNode node) {
+		return fromClauseForNode(null, node, false);
+	}
+  
+	public String fromClauseForNode(List<Long> corpusList, QueryNode node) {
+		return fromClauseForNode(corpusList, node, false);
 	}
 
-	public String fromClauseForNode(QueryNode node, boolean leftJoin) {
+	public String fromClauseForNode(List<Long> corpusList, 
+    QueryNode node, boolean leftJoin) {
 		List<String> tables = new ArrayList<String>();
 
 		// every node uses the node table
-		tables.add(tableAliasDefinition(node, NODE_TABLE, 1));
+		tables.add(tableAliasDefinition(node, NODE_TABLE, 1, corpusList));
 
 		// rank table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(RANK_TABLE, NODE_TABLE)) {
-			tables.add(tableAliasDefinition(node, RANK_TABLE, 1));
+			tables.add(tableAliasDefinition(node, RANK_TABLE, 1, corpusList));
 		}
 
 		// component table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(COMPONENT_TABLE, RANK_TABLE)) {
-			tables.add(tableAliasDefinition(node, COMPONENT_TABLE, 1));
+			tables.add(tableAliasDefinition(node, COMPONENT_TABLE, 1, corpusList));
 		}
 
 		// node annotations
 		if (tables(node).usesNodeAnnotationTable()) {
 			int start = tables(node).isMaterialized(NODE_ANNOTATION_TABLE, NODE_TABLE) ? 2 : 1;
 			for (int i = start; i <= node.getNodeAnnotations().size(); ++i) {
-				tables.add(tableAliasDefinition(node, NODE_ANNOTATION_TABLE, i));
+				tables.add(tableAliasDefinition(node, NODE_ANNOTATION_TABLE, i, corpusList));
 			}
 		}
 
@@ -91,7 +96,7 @@ public class TableJoinsInWhereClauseGenerator
 		if (tables(node).usesEdgeAnnotationTable()) {
 			int start = tables(node).isMaterialized(EDGE_ANNOTATION_TABLE, RANK_TABLE) ? 2 : 1;
 			for (int i = start; i <= node.getEdgeAnnotations().size(); ++i) {
-				tables.add(tableAliasDefinition(node, EDGE_ANNOTATION_TABLE, i));
+				tables.add(tableAliasDefinition(node, EDGE_ANNOTATION_TABLE, i, corpusList));
 			}
 		}
 

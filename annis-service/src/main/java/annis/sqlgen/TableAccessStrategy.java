@@ -23,21 +23,22 @@ import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
 
 import annis.model.QueryNode;
+import java.util.List;
 
 
 public class TableAccessStrategy {
 
 	// default table names
 	public final static String NODE_TABLE = "node";
-	public final static String RANK_TABLE = "rank";
-	public final static String COMPONENT_TABLE = "component";
-	public final static String NODE_ANNOTATION_TABLE = "node_annotation";
-	public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
-   public final static String ANNOTATION_POOL_TABLE = "annotation_pool";
-	public final static String FACTS_TABLE = "facts";
-  	public final static String CORPUS_TABLE = "corpus";
-  	public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";
-  	public final static String TEXT_TABLE = "text";
+  public final static String RANK_TABLE = "rank";
+  public final static String COMPONENT_TABLE = "component";
+  public final static String NODE_ANNOTATION_TABLE = "node_annotation";
+  public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
+  public final static String ANNOTATION_POOL_TABLE = "annotation_pool";
+  public final static String FACTS_TABLE = "facts";
+  public final static String CORPUS_TABLE = "corpus";
+  public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";
+  public final static String TEXT_TABLE = "text";
 
 	// the wrapped node
 	private QueryNode node;
@@ -47,6 +48,8 @@ public class TableAccessStrategy {
 	
 	// aliased column names
 	private Map<String, Map<String, String>> columnAliases;
+  
+  private Map<String, Boolean> tablePartitioned;
 	
 	public TableAccessStrategy() {
 		this.tableAliases = new HashMap<String, String>();
@@ -64,6 +67,7 @@ public class TableAccessStrategy {
   {
     this.tableAliases = new HashMap<String, String>(tas.getTableAliases());
     this.columnAliases = new HashMap<String, Map<String, String>>(tas.getColumnAliases());
+    this.tablePartitioned = new HashMap<String, Boolean>();
     this.node = tas.getNode();
   }
 
@@ -74,10 +78,31 @@ public class TableAccessStrategy {
     return tableName(tableAliases, table);
 	}
   
+  public String partitionTableName(String table, List<Long> corpusList) 
+  {
+    return partitionTableName(tableAliases, tablePartitioned, table, corpusList);
+	}
+  
   public static String tableName(Map<String, String> tableAliases, String table)
   {
     return tableAliases.containsKey(table) ? tableAliases.get(table) : table;
   }
+  
+   public static String  partitionTableName(Map<String, String> tableAliases,
+     Map<String, Boolean> tablePartitioned,
+     String table, List<Long> corpusList) 
+  {
+    String result = tableName(tableAliases, table);
+    
+    /* when we only have one corpus and the table partitions are used, 
+     optimize the query by directly querying the partition table */
+    if(corpusList != null && corpusList.size() == 1 && isPartitioned(tablePartitioned, table))
+    {
+      result = result + "_" + corpusList.get(0);
+    }
+    return result;
+	}
+  
 
   public String columnName(String table, String column) 
   {
@@ -285,6 +310,25 @@ public class TableAccessStrategy {
   {
 		return tableName(tableAliases, table).equals(tableName(tableAliases, otherTable));
 	}
+  
+  public boolean isPartitioned(String table)
+  {
+    return isPartitioned(tablePartitioned, table);
+  }
+  
+  public static boolean isPartitioned(Map<String, Boolean> tablePartitioned, 
+    String table)
+  {
+    if(tablePartitioned != null)
+    {
+      Boolean result = tablePartitioned.get(table);
+      if(result != null)
+      {
+        return result;
+      }
+    }
+    return false;
+  }
 	
 	///// delegates
 	
@@ -327,4 +371,14 @@ public class TableAccessStrategy {
 		this.columnAliases = columnAliases;
 	}
 
+  public Map<String, Boolean> getTablePartitioned()
+  {
+    return tablePartitioned;
+  }
+
+  public void setTablePartitioned(Map<String, Boolean> tablePartitioned)
+  {
+    this.tablePartitioned = tablePartitioned;
+  }
+  
 }

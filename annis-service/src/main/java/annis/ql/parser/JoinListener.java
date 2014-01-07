@@ -35,6 +35,7 @@ import annis.sqlgen.model.Precedence;
 import annis.sqlgen.model.RightAlignment;
 import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
+import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Maps;
@@ -239,7 +240,7 @@ public class JoinListener extends AqlParserBaseListener
   @Override
   public void enterIdenticalCoverage(AqlParser.IdenticalCoverageContext ctx)
   {
-    join(ctx, Identical.class);
+    join(ctx, SameSpan.class);
   }
 
   @Override

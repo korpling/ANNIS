@@ -25,11 +25,13 @@ import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
+import annis.libgui.VisibleTokenAnnoChanger;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -61,7 +63,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class ResultViewPanel extends VerticalLayout implements
-  OnLoadCallbackExtension.Callback
+  OnLoadCallbackExtension.Callback, VisibleTokenAnnoChanger
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -167,6 +169,7 @@ public class ResultViewPanel extends VerticalLayout implements
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
 
+    VaadinSession.getCurrent().setAttribute(VisibleTokenAnnoChanger.class.getName(), this);
   }
 
   /**
@@ -307,6 +310,7 @@ public class ResultViewPanel extends VerticalLayout implements
         {
           resultPanelList.add(panel);
           resultLayout.addComponent(panel);
+          panel.setSegmentationLayer(selectedSegmentationLayer);
         }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
@@ -361,7 +365,7 @@ public class ResultViewPanel extends VerticalLayout implements
       getTokenAnnotationLevelSet(p));
 
     updateSegmentationLayer(segmentationLayerSet);
-    updateTokenAnnos(tokenAnnotationLevelSet);
+    updateVisibleToken(tokenAnnotationLevelSet);
   }
 
   public void setCount(int count)
@@ -460,7 +464,7 @@ public class ResultViewPanel extends VerticalLayout implements
     } // end iterate for segmentation layer
   }
 
-  private void updateTokenAnnos(Set<String> tokenAnnotationLevelSet)
+  public void updateVisibleToken(Set<String> tokenAnnotationLevelSet)
   {
     // if no token annotations are there, do not show this mneu
     if (tokenAnnotationLevelSet == null

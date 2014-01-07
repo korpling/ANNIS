@@ -28,7 +28,7 @@ import org.json.JSONException;
  *
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
-@JavaScript({"jquery-1.9.1.min.js","css_render_info.js"})
+@JavaScript({"vaadin://jquery.js","css_render_info.js"})
 public class CssRenderInfo extends AbstractJavaScriptExtension
 {
   public CssRenderInfo(final Callback callback)

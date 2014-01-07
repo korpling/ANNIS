@@ -22,6 +22,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.libgui.VisibleTokenAnnoChanger;
 import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
 import annis.visualizers.component.grid.EventExtractor;
@@ -39,7 +40,6 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
@@ -186,46 +186,80 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     private transient Map<SNode, Long> markedAndCovered;
     private transient MediaController mediaController;
     // only used for media files
-    private String[] media_annotations =
-    {
-      "time"
-    };
+    private String[] media_annotations
+            = {
+              "time"
+            };
     private List<Object> generatedColumns;
     private transient VisualizerInput visInput;
     private transient STextualDS text;
     private transient PDFController pdfController;
-    
+
     /**
-     * Specifies if html tags are shown as text or if the browser should render them.
+     * Specifies if html tags are shown as text or if the browser should render
+     * them.
      */
     private boolean escapeHTML;
 
+    private Set<String> hiddenTokenAnnos = null;
+
+    private Set<String> visibleTokenAnnos = new HashSet<String>();
+
+    private final String HIDDEN_ANN0S = "hidden_annos";
+
     public KWICPanelImpl(VisualizerInput visInput,
-      MediaController mediaController, PDFController pdfController,
-      STextualDS text)
-    {
+            MediaController mediaController, PDFController pdfController,
+            STextualDS text) {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
       this.mediaController = mediaController;
       this.pdfController = pdfController;
       this.text = text;
 
-      if (visInput != null)
-      {
-        escapeHTML = Boolean.parseBoolean(visInput.getMappings().getProperty("escape_html", "true"));
+      if (visInput != null) {
+        escapeHTML = Boolean.parseBoolean(visInput.getMappings().getProperty(
+                "escape_html", "true"));
+
+        if (visInput.getMappings().containsKey(HIDDEN_ANN0S)) {
+          hiddenTokenAnnos = new HashSet<String>(
+                  Arrays.asList(
+                          StringUtils.split(
+                                  visInput.getMappings().getProperty(
+                                          "hidden_annos"), ",")
+                  )
+          );
+        }
+
+        if (hiddenTokenAnnos != null) {
+          VaadinSession s = VaadinSession.getCurrent();
+
+          if (s != null) {
+            VisibleTokenAnnoChanger v = s.getAttribute(
+                    VisibleTokenAnnoChanger.class);
+
+            for (String tokenAnnos : visInput.getVisibleTokenAnnos()) {
+              if (!hiddenTokenAnnos.contains(tokenAnnos)) {
+                visibleTokenAnnos.add(tokenAnnos);
+              }
+            }
+
+            v.updateVisibleToken(visibleTokenAnnos);
+
+          }
+        }
+
         baseAnnoSet = EventExtractor.computeDisplayAnnotations(visInput,
-          SToken.class);
+                SToken.class);
         initKWICPanel(visInput.getSResult(),
-          visInput.getVisibleTokenAnnos(),
-          visInput.getMarkedAndCovered(),
-          visInput.getSegmentationName());
+                visibleTokenAnnos,
+                visInput.getMarkedAndCovered(),
+                visInput.getSegmentationName());
       }
     }
 
     private void initKWICPanel(SDocument result,
-      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
-      String segmentationName)
-    {
+            Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
+            String segmentationName) {
       this.result = result;
       this.markedAndCovered = markedAndCovered;
       this.addListener((ItemClickEvent.ItemClickListener) this);

@@ -75,6 +75,8 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
+import java.io.FileOutputStream;
+import java.util.Properties;
 
 
 // TODO: test AnnisRunner
@@ -328,8 +330,12 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
+    doSet("left to 5");
+    doSet("right to 5");
+//    doSet("seg to dipl");
     doCorpus("pcc2");
-    doCount("#1 . #2 & #a . #3 & tok & tok & a#tok");
+    doSql("annotate \"der\" | (\"wollen\" . \"ein\")");
+    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
   }
 
   public void doParse(String annisQuery)
@@ -674,11 +680,35 @@ public class AnnisRunner extends AnnisBaseRunner
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-
       csv.close();
-
+      
     }
     catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    
+    
+    // property output format for Jenkins Plot plugin
+    try
+    {
+      File outputDir = new File("annis_benchmark_results");
+      if(outputDir.mkdirs())
+      {
+        int i=1;
+        for(AnnisRunner.Benchmark b : benchmarks)
+        {
+          Properties props = new Properties();
+          props.put("YVALUE", "" + b.getMedian());
+          FileWriterWithEncoding writer = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8");
+          props.store(writer, "");
+          writer.close();
+          
+          i++;
+        }
+      }
+    }
+    catch(IOException ex)
     {
       log.error(null, ex);
     }
@@ -994,7 +1024,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+    out.println(annisDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
   }
 
   public void doMatrix(String annisQuery)
