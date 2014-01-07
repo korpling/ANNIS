@@ -20,7 +20,12 @@ import java.util.Map;
 import java.util.Properties;
 
 /**
- *
+ * Matched nodes that are too far apart to be shown in the same context 
+ * (distance > context_left+context_right) normally create islands 
+ * ("..." is displayed between the tokens).
+ * 
+ * This class contains an enum which is used to configure the behavior of
+ * ANNIS in this case.
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class IslandsPolicy
@@ -28,10 +33,19 @@ public class IslandsPolicy
 
   private String defaultIslandsPolicy;
 
+  /**
+   * Define behavior for matched nodes that are too far away.
+   */
   public enum IslandPolicies
   {
-
-    context, none
+    
+    /** 
+     * Use the context as the base to determine how far a node can be away from
+     * a matched node in order to be included in the result.
+     */
+    context,
+    /** Never produce islands, always include all nodes between the matched nodes. */
+    none
   }
 
   public IslandPolicies getMostRestrictivePolicy(List<Long> corpora,

@@ -156,8 +156,6 @@ public abstract class AnnotateSqlGenerator<T>
     sb.append(overlap);
     sb.append("\n");
 
-
-
     // corpus constriction
     sb.append(" AND\n");
     sb.append(indent).append(TABSTOP);

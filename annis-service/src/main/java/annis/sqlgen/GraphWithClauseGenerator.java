@@ -92,11 +92,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
     sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
       .append(tas.columnName(NODE_TABLE, "corpus_ref"))
-      .append(" AS ").append("corpus, ");
-
-    sb.append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".")
-      .append(tas.columnName(NODE_TABLE, "node_name"))
-      .append(" AS ").append("name");
+      .append(" AS ").append("corpus");
 
     return sb.toString();
   }

@@ -81,7 +81,7 @@ public class CommonAnnotateWithClauseGenerator
 
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSolutionFromMatchesWithClause("matches", indent));
+        result.add(getSolutionFromMatchesWithClause(policy, "matches", indent));
 
       }
       else
@@ -135,8 +135,7 @@ public class CommonAnnotateWithClauseGenerator
       sbMatches.append(indent3).append("text").append(i).append(" AS \"text\",\n");
       sbMatches.append(indent3).append("min").append(i).append(" AS min,\n");
       sbMatches.append(indent3).append("max").append(i).append(" AS max,\n");
-      sbMatches.append(indent3).append("corpus").append(i).append(" AS corpus,\n");
-      sbMatches.append(indent3).append("name").append(i).append(" AS name\n");
+      sbMatches.append(indent3).append("corpus").append(i).append(" AS corpus\n");
       sbMatches.append(indent2).append("FROM matchesRaw\n");
       if(i < numOfNodes)
       {
@@ -161,18 +160,67 @@ public class CommonAnnotateWithClauseGenerator
   /**
    * Breaks down the matches table, so that each node of each match has it's own
    * row.
+   * @param islandPolicy
+   * @param islandPolicies
+   * @param matchesName
+   * @param indent
+   * @return 
    */
   protected String getSolutionFromMatchesWithClause(
+    IslandsPolicy.IslandPolicies islandPolicy,
     String matchesName,
     String indent)
   {
     String indent2 = indent + TABSTOP;
-    return  indent + "solutions AS\n" 
-      + indent + "(\n"
-      + indent2 + "SELECT keys.key AS key, " + matchesName + ".*\n "
-      + indent2 + "FROM " + matchesName + ", keys "
-      + indent2 + "WHERE keys.n =" + matchesName + ".n\n" +
-      indent + ")";
+    
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append(indent).append("solutions AS\n");
+    sb.append(indent).append("(\n");
+    
+    sb.append(indent2).append("SELECT ");
+   
+    
+    if(islandPolicy == IslandsPolicy.IslandPolicies.none)
+    {
+      sb.append("min(keys.key) AS key, ")
+        .append(matchesName).append(".n AS n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus, ");
+      sb.append("min(").append(matchesName).append(".min").append("), ");
+      sb.append("max(").append(matchesName).append(".max").append(")");
+    }
+    else if(islandPolicy == IslandsPolicy.IslandPolicies.context)
+    {
+      sb.append("keys.key AS key, ")
+        .append(matchesName).append(".n AS n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus, ");
+      sb.append(matchesName).append(".min, ");
+      sb.append(matchesName).append(".max");
+    }
+    else
+    {
+      throw new UnsupportedOperationException(
+        "No implementation for island policy "
+        + islandsPolicy.toString());
+    }
+    
+    sb.append("\n").append(indent2);
+    sb.append("FROM ").append(matchesName).append(", keys\n").append(indent2);
+    sb.append("WHERE keys.n = ").append(matchesName).append(".n\n");
+    if(islandPolicy == IslandsPolicy.IslandPolicies.none)
+    {
+      sb.append(indent2)
+        .append("GROUP BY ")
+        .append(matchesName).append(".n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus").append("\n");
+    }
+    
+    sb.append(indent).append(")");
+    
+    return sb.toString();
 
   }
 
@@ -223,14 +271,18 @@ public class CommonAnnotateWithClauseGenerator
     // +1 is there to ensure that positive equal values (thus dist=0) are not ignored
     sb.append(indent3).append("row_number() OVER (PARTITION BY ")
       .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-      .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+      .append(matchesName).append(".n").append(", ")
+      .append(matchesName).append(".nodeNr")
       .append(" ORDER BY NULLIF(")
       .append(distLeft).append("+ 1, -abs(").append(distLeft)
       .append(" + 1)) ASC) AS rank_left,\n");
 
     sb.append(indent3).append("row_number() OVER (PARTITION BY ")
       .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-      .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+      .append(matchesName).append(".n").append(", ")
+      .append(matchesName).append(".nodeNr")
       .append(" ORDER BY NULLIF(")
       .append(distRight).append(" + 1, -abs(").append(distRight)
       .append(" + 1)) ASC) AS rank_right\n");
@@ -294,29 +346,14 @@ public class CommonAnnotateWithClauseGenerator
 
     sb.append(indent2).append("SELECT DISTINCT ");
 
-    if (islandsPolicy == IslandsPolicy.IslandPolicies.none)
-    {
-      sb.append("min(").append("keys.key) AS key, ")
-        .append(coveredName).append(".n AS n, ")
-        .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
-        .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
-    }
-    else if (islandsPolicy == IslandsPolicy.IslandPolicies.context)
-    {
-      sb.append("keys.key AS key, ")
-        .append(coveredName).append(".n AS n, ")
-        .append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(" AS \"min\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(" AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
-    }
-    else
-    {
-      throw new UnsupportedOperationException("No implementation for island policy "
-        + islandsPolicy.toString());
-    }
+
+    sb.append("min(").append("keys.key) AS key, ")
+      .append(coveredName).append(".n AS n, ")
+      .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
+      .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
+
 
     sb.append(indent2).append("FROM ")
       .append(coveredName).append(", ")
@@ -357,8 +394,22 @@ public class CommonAnnotateWithClauseGenerator
     {
       sb.append(indent2).append("GROUP BY ")
         .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(", n\n");
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+        .append(coveredName).append(".n\n");
+    }
+    else if(islandsPolicy == IslandsPolicy.IslandPolicies.context)
+    {
+      sb.append(indent2).append("GROUP BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+        .append(coveredName).append(".n, ")
+        .append(coveredName).append(".nodeNr\n");
+    }
+    else
+    {
+      throw new UnsupportedOperationException(
+        "No implementation for island policy "
+        + islandsPolicy.toString());
     }
 
     sb.append(indent).append(")\n");
