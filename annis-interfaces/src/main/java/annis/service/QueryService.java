@@ -15,6 +15,12 @@
  */
 package annis.service;
 
+import java.io.IOException;
+import javax.ws.rs.DefaultValue;
+import javax.ws.rs.GET;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -28,6 +34,95 @@ import javax.ws.rs.core.Response;
  */
 public interface QueryService
 {
+  
+  /**
+   * Count matches of an AQL query.
+   * 
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET annis/query/search/count</li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * produces:
+   * <code>application/xml</code>:<br />
+   * {@code
+   * <matchAndDocumentCount>
+   *   <!-- the number of documents that contain matches -->
+   *   <documentCount>2</documentCount>
+   *   <!-- total number of matches -->
+   *   <matchCount>399</matchCount>
+   * </matchAndDocumentCount>
+   * }
+   * 
+   * @param q The AQL query
+   * @param corpora A comma separated list of corpus names
+   * @return A XML represenation of the total matches and the number of documents that contain matches.
+   */
+  @GET
+  @Path("search/count")
+  @Produces("application/xml")
+  public Response count(String q,String corpora);
+  
+  /**
+   * Find matches for a given AQL query.
+   * 
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET annis/query/search/find</li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * produces:
+   * <code>application/xml</code>:<br />
+   * {@code
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <matches>
+   *   <!-- each match in enclosed in an match tag -->
+   *   <match>
+   *    <!-- list of IDs for each matched node of the single match -->
+   *    <salt-ids>
+   *      <!-- ID of first matched node of match 1 -->
+   *      <id>salt:/pcc2/11299/#tok_1</id>
+   *      <!-- ID of second matched noded  of match 1 -->
+   *      <id>salt:/pcc2/11299/#tok_2</id>
+   *      <!-- more IDs if necessary -->
+   *     </salt-ids>
+   *   </match>
+   *   <match>
+   *   <salt-ids>
+   *     <!-- ID of first matched noded of match 2 -->
+   *     <id>salt:/pcc2/11299/#tok_3</id>
+   *     <!-- ID of second matched noded of match 2-->
+   *     <id>salt:/pcc2/11299/#tok_4</id>
+   *   </salt-ids>
+   *   </match>
+   *   <!-- and so on -->
+   * </matches>
+   * }
+   * 
+   * <i>or</i> produces:
+   * <code>plain/text</code>:<br />
+   * {@code
+   * salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2,salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3,salt:/pcc2/11299/#tok_4
+   * }
+   * One line per match, each ID is separated by comma.
+   * 
+   * @param q The AQL query
+   * @param corpora A comma separated list of corpus names
+   * @param offset Optional offset from where to start the matches. Default is 0.
+   * @param limit Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1.
+   * @return
+   * @throws IOException 
+   */
+  Response find(
+    String q,
+    String corpora,
+    String offset,
+    String limit) throws IOException;
+  
   /**
    * Get the content an ANNIS binary object for a specific document.
    *
@@ -71,4 +166,6 @@ public interface QueryService
    * @see #binaryMeta(java.lang.String, java.lang.String)
    */
   public Response binary(String top, String document, String offset, String length, String file);
+
+  
 }

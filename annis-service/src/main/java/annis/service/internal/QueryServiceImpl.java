@@ -43,6 +43,7 @@ import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.common.primitives.Bytes;
 import com.google.mimeparse.MIMEParse;
@@ -72,6 +73,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
@@ -139,6 +141,7 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("search/count")
   @Produces("application/xml")
+  @Override
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
@@ -206,33 +209,10 @@ public class QueryServiceImpl implements QueryService
     return p;
 
   }
-
-  @GET
-  @Path("search/find")
-  @Produces("text/plain")
-  public StreamingOutput findRaw(@QueryParam("q") final String query,
-    @QueryParam("corpora") final String rawCorpusNames,
-    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
+  
+  private StreamingOutput findRaw(final QueryData data, 
+    final String rawCorpusNames, final String query) throws IOException
   {
-    requiredParameter(query, "q", "AnnisQL query");
-    requiredParameter(rawCorpusNames, "corpora",
-      "comma separated list of corpus names");
-
-    Subject user = SecurityUtils.getSubject();
-    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
-    for (String c : corpusNames)
-    {
-      user.checkPermission("query:find:" + c);
-    }
-
-    int offset = Integer.parseInt(offsetRaw);
-    int limit = Integer.parseInt(limitRaw);
-
-    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    data.addExtension(new LimitOffsetQueryData(offset, limit));
-
     return new StreamingOutput()
     {
       @Override
@@ -248,10 +228,23 @@ public class QueryServiceImpl implements QueryService
 
   }
 
+  private List<Match> findXml(QueryData data,
+    final String rawCorpusNames, final String query) throws IOException
+  {
+    long start = new Date().getTime();
+    List<Match> result = annisDao.find(data);
+    long end = new Date().getTime();
+    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    return result;
+  }
+  
+  
+  
   @GET
   @Path("search/find")
-  @Produces("application/xml")
-  public List<Match> findXml(@QueryParam("q") String query,
+  @Produces({"application/xml", "text/plain"})
+  @Override
+  public Response find(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
@@ -267,21 +260,37 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:find:" + c);
     }
 
-
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-
-    long start = new Date().getTime();
-    List<Match> matches = annisDao.find(data);
-    long end = new Date().getTime();
-    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
-
-    return matches;
+    
+    String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    if (acceptHeader == null || acceptHeader.trim().isEmpty())
+    {
+      acceptHeader = "*/*";
+    }
+    
+    List<String> knownTypes = Lists.newArrayList("text/plain", "application/xml");
+    
+    // find the best matching mime type
+    String bestMediaTypeMatch =
+      MIMEParse.bestMatch(knownTypes, acceptHeader);
+    
+    if("text/plain".equals(bestMediaTypeMatch))
+    {
+      return Response.ok(findRaw(data, rawCorpusNames, query), "text/plain").build();
+    }
+    else
+    {
+      List<Match> result = findXml(data, rawCorpusNames, query);
+      return Response.ok().type("application/xml").entity(new GenericEntity<List<Match>>(result) {}).build();
+    }
+    
   }
+
 
   /**
    * Get result as matrix in WEKA (ARFF) format.
@@ -748,8 +757,8 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
-    String acceptHeader = request.getHeader("Accept");
-    if (acceptHeader == null || acceptHeader.isEmpty())
+    String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    if (acceptHeader == null || acceptHeader.trim().isEmpty())
     {
       acceptHeader = "*/*";
     }

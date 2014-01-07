@@ -18,9 +18,6 @@ package annis.service;
 
 import annis.service.objects.ImportJob;
 import java.util.List;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 
 /**
@@ -37,49 +34,29 @@ import javax.ws.rs.core.Response;
  */
 public interface AdminService
 {
-  /**
-   * List all currently running import jobs.
-   *
+    /**
+   * Import one or more corpora from an uploaded ZIP file.
+   * 
+   * <h3>MIME</h3>
+   * consumes:
+   * <code>application/zip</code>:<br/>
+   * A ZIP file which containes one or more corpora in seperate sub-folders.
+   * 
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>GET annis/admin/import/status/</li>
+   * <li>POST annis/admin/import</b></li>
    * </ol>
-   *
-   * <h3>MIME</h3>
-   * produces:
-   * <code>application/xml</code>:
-   * {@code
-   * <importJobs>
-   *   <!-- an importJob tag for each running import -->
-   *   <importJob>
-   *     <!-- visible caption, e.g. corpus name  -->
-   *     <caption>MyNewCorpus</caption>
-   *     <!-- A list of output messages from the import process-->
-   *     <messages>
-   *       <m>first message</m>
-   *       <m>second message</m>
-   *       <m>just another message</m>
-   *     </messages>
-   *     <!-- true if the corpus will be overwritten -->
-   *     <overwrite>true</overwrite>
-   *     <!-- current status, can be WAITING, RUNNING, SUCCESS or ERROR -->
-   *     <status>RUNNING</status>
-   *     <!-- an unique identifier for this import job -->
-   *     <uuid>7799322d-83ec-4900-83b0-c542e2ca2137</uuid>
-   *     <!-- a mail address to which status reports should be send -->
-   *     <statusMail>mail@example.com</statusMail>
-   *     <!-- alias name of the corpus as defined by the import request -->
-   *     <alias>CorpusAlias</alias>
-   *  </importJob>
-   * </importJobs>
-   * }
    * 
-   * @return The XML representation of a list wich contains {@link annis.service.objects.ImportJob}
-   * objects. The root element has the name "importJobs" and there is an 
-   * "importJob" element for each element of the list.
+   * @param overwrite Set to "true" if the the corpus should be overwritten.
+   * @param statusMail An e-mail address to which status reports are sent.
+   * @param alias An internal alias name of the corpus.
+   * @return 
    */
-  public List<ImportJob> currentImports();
-
+  public Response importCorpus(
+    String overwrite,
+    String statusMail,
+    String alias);
+  
   /**
    * Shows information about a specific job after the import was finished.
    * 
@@ -97,6 +74,7 @@ public interface AdminService
    * produces:
    * <code>application/xml</code>:
    * {@code
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <importJob>
    *   <!-- visible caption, e.g. corpus name  -->
    *   <caption>MyNewCorpus</caption>
@@ -127,25 +105,47 @@ public interface AdminService
     String uuid);
 
   /**
-   * Import one or more corpora from an uploaded ZIP file.
-   * 
-   * <h3>MIME</h3>
-   * consumes:
-   * <code>application/zip</code>:<br/>
-   * A ZIP file which containes one or more corpora in seperate sub-folders.
-   * 
+   * List all currently running import jobs.
+   *
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>POST annis/admin/import</b></li>
+   * <li>GET annis/admin/import/status/</li>
    * </ol>
+   *
+   * <h3>MIME</h3>
+   * produces:
+   * <code>application/xml</code>:
+   * {@code
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <importJobs>
+   *   <!-- an importJob tag for each running import -->
+   *   <importJob>
+   *     <!-- visible caption, e.g. corpus name  -->
+   *     <caption>MyNewCorpus</caption>
+   *     <!-- A list of output messages from the import process-->
+   *     <messages>
+   *       <m>first message</m>
+   *       <m>second message</m>
+   *       <m>just another message</m>
+   *     </messages>
+   *     <!-- true if the corpus will be overwritten -->
+   *     <overwrite>true</overwrite>
+   *     <!-- current status, can be WAITING, RUNNING, SUCCESS or ERROR -->
+   *     <status>RUNNING</status>
+   *     <!-- an unique identifier for this import job -->
+   *     <uuid>7799322d-83ec-4900-83b0-c542e2ca2137</uuid>
+   *     <!-- a mail address to which status reports should be send -->
+   *     <statusMail>mail@example.com</statusMail>
+   *     <!-- alias name of the corpus as defined by the import request -->
+   *     <alias>CorpusAlias</alias>
+   *  </importJob>
+   * </importJobs>
+   * }
    * 
-   * @param overwrite Set to "true" if the the corpus should be overwritten.
-   * @param statusMail An e-mail address to which status reports are sent.
-   * @param alias An internal alias name of the corpus.
-   * @return 
+   * @return The XML representation of a list wich contains {@link annis.service.objects.ImportJob}
+   * objects. The root element has the name "importJobs" and there is an 
+   * "importJob" element for each element of the list.
    */
-  public Response importCorpus(
-    String overwrite,
-    String statusMail,
-    String alias);
+  public List<ImportJob> currentImports();
+  
 }
