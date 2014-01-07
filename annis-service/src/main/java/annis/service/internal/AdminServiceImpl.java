@@ -20,6 +20,7 @@ import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
 import annis.security.AnnisUserConfig;
+import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
@@ -57,7 +58,7 @@ import org.springframework.stereotype.Component;
  */
 @Component
 @Path("annis/admin")
-public class AdminServiceImpl
+public class AdminServiceImpl implements AdminService
 {
   private final static Logger log = LoggerFactory.getLogger(AdminServiceImpl.class);
   
@@ -65,6 +66,8 @@ public class AdminServiceImpl
   private CorpusAdministration corpusAdmin;
   private AnnisDao annisDao;
   private ImportWorker importWorker;
+  
+  @Context HttpServletRequest request;
   
   
   public void init()
@@ -113,6 +116,7 @@ public class AdminServiceImpl
   
   @GET
   @Path("import/status")
+  @Override
   public List<ImportJob> currentImports()
   {
     Subject user = SecurityUtils.getSubject();
@@ -131,6 +135,7 @@ public class AdminServiceImpl
   
   @GET
   @Path("import/status/finished/{uuid}")
+  @Override
   public ImportJob finishedImport(@PathParam("uuid") String uuid)
   {
     Subject user = SecurityUtils.getSubject();
@@ -147,7 +152,8 @@ public class AdminServiceImpl
   @POST
   @Path("import")
   @Consumes({"application/zip"})
-  public Response importCorpus(@Context HttpServletRequest request, 
+  @Override
+  public Response importCorpus( 
   @QueryParam("overwrite") String overwriteRaw,
   @QueryParam("statusMail") String statusMail,
   @QueryParam("alias") String alias)

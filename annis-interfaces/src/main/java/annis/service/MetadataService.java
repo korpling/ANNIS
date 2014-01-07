@@ -50,14 +50,14 @@ public interface MetadataService
    *
    * <h3>MIME</h3>
    *
-   * accept:
+   * produces:
    * <code>application/xml</code>
    *
    * @param topLevelCorpus Determines the corpus, for which the annotations are
    * retrieved.
    * @param closure if true, all annotations of all subcorpora or documents
    * contained by the toplevel corpus are also fetched.
-   * @return The xml representation of a list wich contains {@link Annotation}
+   * @return The XML representation of a list wich contains {@link Annotation}
    * objects.
    */
   public List<Annotation> getMetadata(String topLevelCorpus, boolean closure);
