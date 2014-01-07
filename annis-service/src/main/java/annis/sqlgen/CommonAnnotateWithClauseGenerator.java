@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CommonAnnotateWithClauseGenerator
   extends TableAccessStrategyFactory

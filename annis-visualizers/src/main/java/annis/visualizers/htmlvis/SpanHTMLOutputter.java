@@ -30,7 +30,7 @@ import java.util.TreeSet;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SpanHTMLOutputter
 {

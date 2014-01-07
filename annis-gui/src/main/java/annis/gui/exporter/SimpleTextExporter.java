@@ -19,7 +19,7 @@ import annis.service.objects.SubgraphFilter;
 
 /**
  * Simple text exporter.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SimpleTextExporter extends GeneralTextExporter
 {

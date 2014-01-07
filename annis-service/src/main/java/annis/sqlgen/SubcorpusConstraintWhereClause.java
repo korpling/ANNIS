@@ -30,7 +30,7 @@ import annis.ql.parser.QueryData;
  * Adds the constraint that all nodes are always inside one document as
  * WHERE clause elements.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SubcorpusConstraintWhereClause 
   extends TableAccessStrategyFactory

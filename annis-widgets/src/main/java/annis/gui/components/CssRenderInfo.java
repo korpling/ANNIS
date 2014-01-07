@@ -26,7 +26,7 @@ import org.json.JSONException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript({"vaadin://jquery.js","css_render_info.js"})
 public class CssRenderInfo extends AbstractJavaScriptExtension

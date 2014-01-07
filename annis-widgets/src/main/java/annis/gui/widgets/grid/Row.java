@@ -24,7 +24,7 @@ import java.util.Set;
 /**
  * Represents one row in the grid view
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Row implements Serializable
 {

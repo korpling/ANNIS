@@ -30,7 +30,7 @@ import org.eclipse.emf.common.util.EList;
 /**
  * Helper class for getting time annotations on {@link SSpan} from
  * the covered token.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class TimeHelper
 {

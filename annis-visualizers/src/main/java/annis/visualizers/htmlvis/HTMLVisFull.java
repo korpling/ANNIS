@@ -19,7 +19,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class HTMLVisFull extends HTMLVis

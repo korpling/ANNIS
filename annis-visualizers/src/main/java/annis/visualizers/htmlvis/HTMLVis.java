@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * <li>visconfigpath - path of the visualization configuration file</li>
  * </ul>
  * </p>
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class HTMLVis extends AbstractVisualizer<Panel>

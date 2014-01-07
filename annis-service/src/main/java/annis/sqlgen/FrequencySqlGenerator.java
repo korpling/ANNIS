@@ -42,7 +42,7 @@ import org.springframework.dao.DataAccessException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   implements WhereClauseSqlGenerator<QueryData>, SelectClauseSqlGenerator<QueryData>,

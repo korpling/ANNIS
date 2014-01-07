@@ -47,7 +47,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Utilities class for non-gui operations on Salt.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class CommonHelper

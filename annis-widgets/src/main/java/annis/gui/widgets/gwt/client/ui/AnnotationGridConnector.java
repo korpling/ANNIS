@@ -21,7 +21,7 @@ import com.vaadin.shared.ui.Connect;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Connect(AnnotationGrid.class)
 public class AnnotationGridConnector extends LegacyConnector

@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.PreparedStatementCallback;
  * real data are store in a simple file directory.</p>
  *
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <p.pixeldrama@gmail.com>
  */
 public class BinaryImportHelper implements

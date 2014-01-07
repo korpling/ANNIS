@@ -21,7 +21,7 @@ import java.util.Set;
 
 /**
  * A POJO representing a query
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Query implements Serializable
 {

@@ -34,7 +34,7 @@ import org.slf4j.LoggerFactory;
  * A component that can make pure JavaScript based "screenshots".
  * 
  * Uses the http://html2canvas.hertzen.com/ library.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript({"vaadin://jquery.js", "html2canvas.js", "screenshotmaker.js"})
 public class ScreenshotMaker extends AbstractJavaScriptExtension

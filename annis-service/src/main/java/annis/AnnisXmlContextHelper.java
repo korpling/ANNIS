@@ -28,7 +28,7 @@ import org.springframework.core.io.support.ResourcePropertySource;
  * Helper class to allow loading the property files for the ANNIS service from
  * different locations.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnisXmlContextHelper
 {

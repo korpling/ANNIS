@@ -20,7 +20,7 @@ import org.springframework.jdbc.datasource.DriverManagerDataSource;
 
 /**
  * A datasource that is able to configure the usage of SSL for PostgreSQL.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SSLEnabledDataSource extends DriverManagerDataSource
 {

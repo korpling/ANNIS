@@ -46,7 +46,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Component
 public class ImportWorker extends Thread

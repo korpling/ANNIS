@@ -53,7 +53,7 @@ import org.springframework.stereotype.Component;
 
 /**
  * Methods for adminstration.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Component
 @Path("annis/admin")

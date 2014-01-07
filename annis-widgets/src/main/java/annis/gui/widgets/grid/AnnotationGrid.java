@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {

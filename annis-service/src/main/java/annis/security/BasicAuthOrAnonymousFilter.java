@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
  * parent class. The default value for password and user name are "anonymous".
  * You can change them with the {@link #anonymousUser} and {@link #anonymousPassword}
  * properties.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class BasicAuthOrAnonymousFilter extends BasicHttpAuthenticationFilter
 {

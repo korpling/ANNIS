@@ -50,7 +50,7 @@ import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {

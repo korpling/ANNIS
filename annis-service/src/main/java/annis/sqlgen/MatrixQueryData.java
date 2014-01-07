@@ -19,7 +19,7 @@ import java.util.List;
 
 /**
  * Defines how to execute a matrix query.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class MatrixQueryData
 {

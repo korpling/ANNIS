@@ -45,7 +45,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * similarly the edge labels using <b>edge_key:func</b> for an edge label called 
  * <b>func</b> (the default). Instructions are separated using semicolons.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class TigerTreeVisualizer extends AbstractImageVisualizer

@@ -19,7 +19,7 @@ import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface CorpusSelectionChangeListener
 {

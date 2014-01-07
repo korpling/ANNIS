@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Searches for relANNIS corpora in file system locations.
- * @author Thomas Krause<thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Search
 {

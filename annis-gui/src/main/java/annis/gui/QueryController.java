@@ -58,7 +58,7 @@ import org.slf4j.LoggerFactory;
  * context, either implicitly (e.g. from a component constructor or a handler
  * callback) or explicitly with {@link VaadinSession#lock() }.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryController implements TabSheet.SelectedTabChangeListener, Serializable
 {

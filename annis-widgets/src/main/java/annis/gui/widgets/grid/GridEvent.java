@@ -23,7 +23,7 @@ import java.util.List;
  * An event has a right and left border (but might have holes)
  *
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GridEvent implements Serializable
 {

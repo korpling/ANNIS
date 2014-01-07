@@ -72,7 +72,7 @@ import org.slf4j.LoggerFactory;
  * </li>
  * </ul>
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class GridVisualizer extends AbstractVisualizer<GridVisualizer.GridVisualizerComponent> {

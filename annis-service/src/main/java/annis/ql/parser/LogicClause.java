@@ -26,7 +26,7 @@ import java.util.List;
 import org.antlr.v4.runtime.Token;
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class LogicClause
 {

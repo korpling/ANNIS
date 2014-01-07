@@ -22,7 +22,7 @@ import java.io.Serializable;
  * the GUI.
  * Only functions relevant for ANNIS are implemented, this is not a general media
  * player interface.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface MediaPlayer extends Serializable
 {

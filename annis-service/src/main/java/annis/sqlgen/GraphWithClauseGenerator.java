@@ -48,7 +48,7 @@ import java.util.Map;
  * authorities are currently not supported.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {

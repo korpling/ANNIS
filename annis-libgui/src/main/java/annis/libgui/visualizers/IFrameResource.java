@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * Hold the data and meta information for a resource needed by an iframe
  * based visualizer.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class IFrameResource implements Serializable
 {

@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * Controls the visibility of visualizer plugins and provides some control
  * methods for the media visualizers.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */

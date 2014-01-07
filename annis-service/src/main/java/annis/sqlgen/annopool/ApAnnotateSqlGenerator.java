@@ -32,7 +32,7 @@ import static annis.sqlgen.SqlConstraints.sqlString;
 
 /**
  *
- *  @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ *  @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {

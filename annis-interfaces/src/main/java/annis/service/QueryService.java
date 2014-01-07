@@ -24,7 +24,7 @@ import javax.ws.rs.core.Response;
  * <div>
  * All paths for this part of the service start with <pre>annis/query/</pre>
  * </div>
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface QueryService
 {
