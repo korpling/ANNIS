@@ -15,12 +15,12 @@
  */
 package annis.service;
 
+import annis.service.objects.SubgraphQuery;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -122,6 +122,28 @@ public interface QueryService
     String corpora,
     String offset,
     String limit) throws IOException;
+  
+  /**
+   * Get a graph as {@link SaltProject} from a set of Salt IDs.
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>POST annis/query/search/subgraph</li>
+   * </ol>
+   * 
+   * @param query
+   * @return the graph of this hit.
+   */
+  SaltProject subgraph(final SubgraphQuery query);
+  
+  /**
+   * 
+   * @param top
+   * @param doc
+   * @return 
+   */
+  public SaltProject graph(
+    String top,
+    String doc);
   
   /**
    * Get the content an ANNIS binary object for a specific document.

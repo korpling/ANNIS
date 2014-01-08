@@ -410,10 +410,7 @@ public class QueryServiceImpl implements QueryService
   /**
    * Get a graph as {@link SaltProject} of a set of Salt IDs.
    *
-   * @param saltIDs saltIDs must have at least one saltId, more than one id are
-   * separated by + or space
-   * @param leftRaw left context parameter
-   * @param rightRaw right context parameter
+   * @param query
    * @return the graph of this hit.
    */
   @POST
@@ -422,6 +419,7 @@ public class QueryServiceImpl implements QueryService
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
+  @Override
   public SaltProject subgraph(final SubgraphQuery query)
   {
     // some robustness stuff
@@ -484,6 +482,7 @@ public class QueryServiceImpl implements QueryService
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
+  @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
