@@ -16,6 +16,7 @@
 package annis;
 
 import annis.model.AnnisConstants;
+import annis.service.objects.Match;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -365,33 +366,32 @@ public class CommonHelper
     return result;
   }
 
-  public static SNode[] getMatchedNodes(SDocument doc)
-  {
-    SNode[] result = new SNode[0];
-
-    // get the matched node IDs
-    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDIDS);
-    if (feat != null)
-    {
-      String[] ids = feat.getSValueSTEXT().split(",");
-      result = new SNode[ids.length];
-
-      for (int i = 0; i < ids.length; i++)
-      {
-        String id = ids[i].trim();
-        if (!id.isEmpty())
-        {
-          // get the specific node
-          SNode node = doc.getSDocumentGraph().getSNode(id);
-          if (node != null)
-          {
-            result[i] = node;
-          }
-        }
-      }
-    }
-
-    return result;
-  }
+  // TODO: remove if really not needed
+//  public static SNode[] getMatchedNodes(SDocument doc)
+//  {
+//    SNode[] result = new SNode[0];
+//
+//    // get the matched node IDs
+//    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
+//      AnnisConstants.FEAT_MATCHEDIDS);
+//    if (feat != null)
+//    {
+//      Match m = Match.parseFromString(feat.getSValueSTEXT());
+//      result = new SNode[m.getSaltIDs().size()];
+//
+//      int i = 0;
+//      for(URI u : m.getSaltIDs())
+//      {
+//        // get the specific node
+//        SNode node = doc.getSDocumentGraph().getSNode(u.toASCIIString());
+//        if (node != null)
+//        {
+//          result[i] = node;
+//        }
+//        i++;
+//      }
+//    }
+//
+//    return result;
+//  }
 }

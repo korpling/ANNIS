@@ -20,6 +20,7 @@ import java.io.Serializable;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
@@ -46,6 +47,11 @@ public class Match implements Serializable
   public Match()
   {
     saltIDs = new ArrayList<URI>();
+  }
+  
+  public Match(Collection<URI> original)
+  {
+    saltIDs = new ArrayList<URI>(original);
   }
 
   public void addSaltId(URI id)
