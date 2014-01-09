@@ -54,7 +54,7 @@ class ResultFetchJob implements Runnable
 
   private ResultViewPanel resultPanel;
 
-  private Future<List<Match>> futureMatches;
+  private Future<MatchGroup> futureMatches;
 
   private AsyncWebResource res;
 
@@ -77,7 +77,7 @@ class ResultFetchJob implements Runnable
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
       .accept(MediaType.APPLICATION_XML_TYPE)
-      .get(new MatchListType());
+      .get(MatchGroup.class);
 
   }
 
@@ -114,7 +114,7 @@ class ResultFetchJob implements Runnable
       = Helper.getAnnisWebResource().path("query/search/subgraph");
 
     // holds the ids of the matches.
-    List<Match> result;
+    MatchGroup result;
 
     try
     {
@@ -137,7 +137,7 @@ class ResultFetchJob implements Runnable
       result = futureMatches.get(60, TimeUnit.SECONDS);
 
       // get the subgraph for each match, when the result is not empty
-      if (result.isEmpty())
+      if (result.getMatches().isEmpty())
       {
 
         // check if thread was interrupted
@@ -174,12 +174,12 @@ class ResultFetchJob implements Runnable
         });
 
         // prepare fetching subgraphs
-        final int totalResultSize = result.size();
+        final int totalResultSize = result.getMatches().size();
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
           3);
         int current = 0;
 
-        for (Match m : result)
+        for (Match m : result.getOrderedMatches())
         {
           if (Thread.interrupted())
           {
@@ -285,13 +285,5 @@ class ResultFetchJob implements Runnable
       }
     }
 
-  }
-
-  private static class MatchListType extends GenericType<List<Match>>
-  {
-
-    public MatchListType()
-    {
-    }
   }
 }
