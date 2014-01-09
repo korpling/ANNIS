@@ -117,7 +117,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private String segmentationLayer = null;
   
-  private SubgraphFilter filter = SubgraphFilter.All;
+  private SubgraphFilter filter = SubgraphFilter.all;
 
   private List<Long> corpusList;
 
@@ -1043,32 +1043,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doFind(String annisQuery)
   {
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
-    JAXBContext jc = null;
-    try
-    {
-      jc = JAXBContext.newInstance(annis.service.objects.Match.class);
-    }
-    catch (JAXBException ex)
-    {
-      log.error("Problems with writing XML", ex);
-    }
-
-
-    for (int i = 0; i < matches.size(); i++)
-    {
-
-      try
-      {
-
-        jc.createMarshaller().marshal(matches.get(i), out);
-      }
-      catch (JAXBException ex)
-      {
-        log.error("Problems with writing XML", ex);
-      }
-
-      out.println();
-    }
+    MatchGroup group = new MatchGroup(matches);
+    out.println(group.toString());
   }
 
   public void doSubgraph(String saltIds)

@@ -36,8 +36,9 @@ import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
-import annis.service.objects.SubgraphQuery;
+import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
@@ -61,6 +62,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -283,7 +285,7 @@ public class QueryServiceImpl implements QueryService
     else
     {
       List<Match> result = findXml(data, rawCorpusNames, query);
-      return Response.ok().type("application/xml").entity(new GenericEntity<List<Match>>(result) {}).build();
+      return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {}).build();
     }
     
   }
@@ -403,39 +405,43 @@ public class QueryServiceImpl implements QueryService
     return freqTable;
   }
   
-
-  /**
-   * Get a graph as {@link SaltProject} of a set of Salt IDs.
-   *
-   * @param query
-   * @return the graph of this hit.
-   */
   @POST
   @Path("search/subgraph")
+  @Consumes({"application/xml", "text/plain"})
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
   @Override
-  public SaltProject subgraph(final SubgraphQuery query)
+  public SaltProject subgraph(
+    MatchGroup matches,
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
+    
     // some robustness stuff
-    if (query == null)
+    if (matches == null)
     {
       throw new WebApplicationException(
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
         "missing required request body").build());
     }
+    
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+    SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
     QueryData data = new QueryData();
 
-    data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer(), query.getFilter()));
+    data.addExtension(new AnnotateQueryData(left, right,
+      segmentation, filter));
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    for (Match singleMatch : query.getMatches().getOrderedMatches())
+    for (Match singleMatch : matches.getOrderedMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
       List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.
@@ -464,7 +470,7 @@ public class QueryServiceImpl implements QueryService
     }
 
     data.setCorpusList(corpusIDs);
-    data.addExtension(query.getMatches());
+    data.addExtension(matches);
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();

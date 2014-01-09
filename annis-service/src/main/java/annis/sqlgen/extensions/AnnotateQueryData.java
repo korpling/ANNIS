@@ -40,7 +40,7 @@ public class AnnotateQueryData
 
   public AnnotateQueryData(int left, int right, String segmentationLayer)
   {
-    this(left, right, segmentationLayer, SubgraphFilter.All);
+    this(left, right, segmentationLayer, SubgraphFilter.all);
   }
   
   public AnnotateQueryData(int left, int right, String segmentationLayer, SubgraphFilter filter)

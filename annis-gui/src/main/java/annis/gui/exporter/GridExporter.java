@@ -173,7 +173,7 @@ public class GridExporter extends GeneralTextExporter
   @Override
   public SubgraphFilter getSubgraphFilter()
   {
-    return SubgraphFilter.All;
+    return SubgraphFilter.all;
   }
   
   

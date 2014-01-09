@@ -19,6 +19,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -49,6 +50,17 @@ public class MatchGroup implements Serializable
   public MatchGroup()
   {
     matches = new TreeMap<Integer, Match>();
+  }
+  
+  public MatchGroup(Collection<Match> orig)
+  {
+    matches = new TreeMap<Integer, Match>();
+    int i=0; 
+    for(Match m : orig)
+    {
+      matches.put(i, m);
+      i++;
+    }
   }
 
   public Map<Integer, Match> getMatches()

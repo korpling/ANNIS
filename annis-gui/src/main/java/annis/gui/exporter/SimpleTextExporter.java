@@ -27,7 +27,7 @@ public class SimpleTextExporter extends GeneralTextExporter
   @Override
   public SubgraphFilter getSubgraphFilter()
   {
-    return SubgraphFilter.Token;
+    return SubgraphFilter.token;
   }
   
 }

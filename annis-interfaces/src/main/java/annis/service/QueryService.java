@@ -15,7 +15,7 @@
  */
 package annis.service;
 
-import annis.service.objects.SubgraphQuery;
+import annis.service.objects.MatchGroup;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
 import javax.ws.rs.GET;
@@ -133,7 +133,9 @@ public interface QueryService
    * @param query
    * @return the graph of this hit.
    */
-  SaltProject subgraph(final SubgraphQuery query);
+  SaltProject subgraph(
+    MatchGroup matches,
+    String segmentation, String left, String right, String filter);
   
   /**
    * 
