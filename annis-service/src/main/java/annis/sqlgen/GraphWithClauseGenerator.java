@@ -15,10 +15,11 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.MatchGroup;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
 import java.net.URI;
 import java.util.List;
@@ -166,7 +167,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       queryData.getExtensions(AnnotateQueryData.class);
     AnnotateQueryData annotateQueryData = extensions.isEmpty()
       ? new AnnotateQueryData(5, 5) : extensions.get(0);
-    List<SaltURIGroupSet> listOfSaltURIs = queryData.getExtensions(SaltURIGroupSet.class);
+    List<MatchGroup> listOfSaltURIs = queryData.getExtensions(MatchGroup.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
     
@@ -175,11 +176,11 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     String indent2 = indent + TABSTOP;
     
-    SaltURIGroupSet groupSet = listOfSaltURIs.get(0);
+    MatchGroup groupSet = listOfSaltURIs.get(0);
     int matchNr = 1;
-    for(Map.Entry<Integer, SaltURIGroup> match : groupSet.getGroups().entrySet())
+    for(Match match : groupSet.getOrderedMatches())
     {
-      List<URI> uriList = match.getValue().getUris();
+      List<URI> uriList = match.getSaltIDs();
       int nodeNr = 1;
       for (URI uri : uriList)
       {

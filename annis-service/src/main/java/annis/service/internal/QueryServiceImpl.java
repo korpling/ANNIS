@@ -438,12 +438,12 @@ public class QueryServiceImpl implements QueryService
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    for (SaltURIGroup singleMatch : query.getMatches().getGroups().values())
+    for (Match singleMatch : query.getMatches().getOrderedMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
       List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.
-        getUris().size());
-      for (java.net.URI u : singleMatch.getUris())
+        getSaltIDs().size());
+      for (java.net.URI u : singleMatch.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));

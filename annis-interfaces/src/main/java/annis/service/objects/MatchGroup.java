@@ -1,0 +1,130 @@
+/*
+ * Copyright 2012 SFB 632.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package annis.service.objects;
+
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
+import java.util.Map;
+import java.util.TreeMap;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+/**
+ * Describes a group of matches for an AQL query.
+ *
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
+ */
+@XmlRootElement
+public class MatchGroup implements Serializable
+{
+  private static final Logger log = LoggerFactory.getLogger(MatchGroup.class);
+  
+  private Map<Integer, Match> matches;
+  
+  public final static Splitter lineSplitter = Splitter.on('\n').trimResults().omitEmptyStrings();
+  
+  private final static Joiner lineJoiner = Joiner.on('\n');
+  
+  public MatchGroup()
+  {
+    matches = new TreeMap<Integer, Match>();
+  }
+
+  public Map<Integer, Match> getMatches()
+  {
+    return matches;
+  }
+  
+  /**
+   * Get an ordered list of all matches.
+   * @return 
+   */
+  @XmlTransient
+  public List<Match> getOrderedMatches()
+  {
+    if(matches instanceof TreeMap)
+    {
+      return new ArrayList<Match>(matches.values());
+    }
+    else
+    {
+      TreeMap<Integer, Match> sorted = new TreeMap<Integer, Match>(matches);
+      return new ArrayList<Match>(sorted.values());
+    }
+  }
+
+  public void setMatches(Map<Integer, Match> matches)
+  {
+    this.matches = matches;
+  }
+
+  
+  
+  /**
+   * Parses a string representation of a {@link MatchGroup}. 
+   * Each group is separated with a new line and each Salt ID with a space.
+   * Example: 
+   * {@code 
+   * salt://id1,salt://id2 salt://id3
+   * salt://id4
+   * salt://id5 salt://id6
+   * }
+   * 
+   * @param raw
+   * @return 
+   */
+  public static MatchGroup parseString(String raw)
+  {
+    MatchGroup saltIDs = new MatchGroup();
+    int i = 0;
+    for (String group : lineSplitter.split(raw))
+    {
+      saltIDs.matches.put(++i, Match.parseFromString(group));
+    }
+    
+    return saltIDs;
+  }
+
+  /**
+   * Generates a string where each group is separated by new line  and each ID inside a group by space.
+   * This string can be parsed by {@link #parseString(java.lang.String) }.
+   * @return 
+   */
+  @Override
+  public String toString()
+  {
+    List<String> lines = new LinkedList<String>();
+    
+    for(Match m : this.matches.values())
+    {
+      lines.add(m.toString());
+    }
+    
+    return lineJoiner.join(lines);
+  }
+  
+  
+  
+  
+}

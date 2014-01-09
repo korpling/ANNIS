@@ -28,7 +28,7 @@ public class SubgraphQuery implements Serializable
   private String segmentationLayer;
   private int left;
   private int right;
-  private SaltURIGroupSet matches;
+  private MatchGroup matches;
   private SubgraphFilter filter = SubgraphFilter.All;
 
   public String getSegmentationLayer()
@@ -61,12 +61,12 @@ public class SubgraphQuery implements Serializable
     this.right = right;
   }
 
-  public SaltURIGroupSet getMatches()
+  public MatchGroup getMatches()
   {
     return matches;
   }
 
-  public void setMatches(SaltURIGroupSet matches)
+  public void setMatches(MatchGroup matches)
   {
     this.matches = matches;
   }

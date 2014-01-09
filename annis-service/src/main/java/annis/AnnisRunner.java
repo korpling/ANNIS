@@ -59,7 +59,7 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -1360,53 +1360,28 @@ public class AnnisRunner extends AnnisBaseRunner
   private QueryData extractSaltIds(String param)
   {
     QueryData queryData = new QueryData();
-    SaltURIGroupSet saltIDs = new SaltURIGroupSet();
+    MatchGroup matchGroup = MatchGroup.parseString(param);
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    int i = 0;
-    for (String group : param.split("\\s*;\\s*"))
+    for(Match m : matchGroup.getOrderedMatches())
     {
-      SaltURIGroup urisForGroup = new SaltURIGroup();
-
-      for (String id : group.split("[,\\s]+"))
-      {
-        java.net.URI uri;
-        try
-        {
-          uri = new java.net.URI(id);
-
-          if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
-          {
-            throw new URISyntaxException("not a salt id", uri.toString());
-          }
-        }
-        catch (URISyntaxException ex)
-        {
-          log.error(null, ex);
-          continue;
-        }
-        urisForGroup.getUris().add(uri);
-      }
-
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.
-        getUris().size());
-      for (java.net.URI u : urisForGroup.getUris())
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(m.getSaltIDs().size());
+      for (java.net.URI u : m.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
       queryData.addAlternative(pseudoNodes);
-      saltIDs.getGroups().put(++i, urisForGroup);
     }
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(
       corpusNames));
 
     queryData.setCorpusList(corpusIDs);
 
-    log.debug(saltIDs.toString());
-    queryData.addExtension(saltIDs);
+    log.debug(matchGroup.toString());
+    queryData.addExtension(matchGroup);
     return queryData;
   }
 }

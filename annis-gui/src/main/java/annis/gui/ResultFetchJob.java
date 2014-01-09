@@ -21,7 +21,7 @@ import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
@@ -112,27 +112,14 @@ class ResultFetchJob implements Runnable
       subgraphQuery.setSegmentationLayer(query.getSegmentation());
     }
 
-    SaltURIGroupSet saltURIs = new SaltURIGroupSet();
+    MatchGroup saltURIs = new MatchGroup();
 
     ListIterator<Match> it = matchesToPrepare.listIterator();
     int i = 0;
     while (it.hasNext())
     {
       Match m = it.next();
-      SaltURIGroup urisForMatch = new SaltURIGroup();
-
-      for (String s : m.getSaltIDs())
-      {
-        try
-        {
-          urisForMatch.getUris().add(new URI(s));
-        }
-        catch (URISyntaxException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-      saltURIs.getGroups().put(++i, urisForMatch);
+      saltURIs.getMatches().put(++i, m);
     }
 
     subgraphQuery.setMatches(saltURIs);
