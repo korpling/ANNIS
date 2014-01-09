@@ -20,7 +20,6 @@ import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
-import annis.service.objects.SaltURIGroup;
 import java.net.URI;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -36,7 +35,6 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.

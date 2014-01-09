@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -58,7 +57,6 @@ import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
-import annis.service.objects.SaltURIGroup;
 import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
@@ -75,7 +73,6 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
-import java.io.FileOutputStream;
 import java.util.Properties;
 
 
