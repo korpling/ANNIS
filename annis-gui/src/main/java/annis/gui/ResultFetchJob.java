@@ -53,18 +53,18 @@ import org.slf4j.LoggerFactory;
 class ResultFetchJob implements Runnable
 {
 
-  private static final Logger log = LoggerFactory.getLogger(
+  protected static final Logger log = LoggerFactory.getLogger(
     ResultFetchJob.class);
 
-  private ResultViewPanel resultPanel;
+  protected ResultViewPanel resultPanel;
 
-  private Future<List<Match>> futureMatches;
+  protected Future<List<Match>> futureMatches;
 
-  private AsyncWebResource res;
+  protected AsyncWebResource res;
 
-  private PagedResultQuery query;
+  protected PagedResultQuery query;
 
-  private SearchUI ui;
+  protected SearchUI ui;
 
   public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel,
     SearchUI ui)
@@ -85,7 +85,7 @@ class ResultFetchJob implements Runnable
 
   }
 
-  private SaltProject executeQuery(WebResource subgraphRes,
+  final protected SaltProject executeQuery(WebResource subgraphRes,
     SubgraphQuery query)
   {
     SaltProject p = null;
@@ -101,7 +101,7 @@ class ResultFetchJob implements Runnable
     return p;
   }
 
-  private SubgraphQuery prepareQuery(List<Match> matchesToPrepare)
+  final protected SubgraphQuery prepareQuery(List<Match> matchesToPrepare)
   {
     SubgraphQuery subgraphQuery = new SubgraphQuery();
 
@@ -314,7 +314,6 @@ class ResultFetchJob implements Runnable
         return;
       }
     }
-
   }
 
   private static class MatchListType extends GenericType<List<Match>>

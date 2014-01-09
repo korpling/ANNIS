@@ -595,8 +595,32 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
   }
 
   
-  
-  
+  /**
+   * Repeats a query in order to increase the context of a single result.
+   *
+   * Obviously this only works, if a complete query was sent before.
+   *
+   * @param queryID
+   * @param offset
+   * @param context
+   */
+  public void increaseCtx(UUID queryID, int offset, int context)
+  {
 
+    if (queries.containsKey(queryID) && queryPanels.containsKey(queryID))
+    {
+      PagedResultQuery query = queries.get(queryID);
+      query.setContextLeft(context);
+      query.setContextRight(context);
 
+      // TODO do not delete queries
+      PollControl.runInBackground(500, ui, new SingleResultFetchJob(query,
+         queryPanels.get(queryID), ui));
+    }
+    else
+    {
+      log.warn("no query with {} found");
+      return;
+    }
+  }
 }
