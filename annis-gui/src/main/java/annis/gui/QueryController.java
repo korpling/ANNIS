@@ -612,6 +612,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       PagedResultQuery query = queries.get(queryID);
       query.setContextLeft(context);
       query.setContextRight(context);
+      query.setOffset(offset);
+      query.setLimit(1);
 
       // TODO do not delete queries
       PollControl.runInBackground(500, ui, new SingleResultFetchJob(query,
