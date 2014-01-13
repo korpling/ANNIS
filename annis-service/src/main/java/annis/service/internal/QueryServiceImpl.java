@@ -441,7 +441,7 @@ public class QueryServiceImpl implements QueryService
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    for (Match singleMatch : matches.getOrderedMatches())
+    for (Match singleMatch : matches.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
       List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.

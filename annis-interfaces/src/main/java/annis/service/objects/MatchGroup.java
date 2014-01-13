@@ -22,11 +22,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlElement;
 
-import java.util.Map;
-import java.util.TreeMap;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,12 +34,12 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@XmlRootElement
+@XmlRootElement(name = "match-group")
 public class MatchGroup implements Serializable
 {
   private static final Logger log = LoggerFactory.getLogger(MatchGroup.class);
   
-  private Map<Integer, Match> matches;
+  private List<Match> matches;
   
   public final static Splitter lineSplitter = Splitter.on('\n').trimResults().omitEmptyStrings();
   
@@ -49,44 +47,23 @@ public class MatchGroup implements Serializable
   
   public MatchGroup()
   {
-    matches = new TreeMap<Integer, Match>();
+    matches = new ArrayList<Match>();
   }
   
   public MatchGroup(Collection<Match> orig)
   {
-    matches = new TreeMap<Integer, Match>();
-    int i=0; 
-    for(Match m : orig)
-    {
-      matches.put(i, m);
-      i++;
-    }
+    matches = new ArrayList<Match>(orig);
   }
-
-  public Map<Integer, Match> getMatches()
+  
+  @XmlElement(name = "match")
+  public List<Match> getMatches()
   {
     return matches;
   }
   
-  /**
-   * Get an ordered list of all matches.
-   * @return 
-   */
-  @XmlTransient
-  public List<Match> getOrderedMatches()
-  {
-    if(matches instanceof TreeMap)
-    {
-      return new ArrayList<Match>(matches.values());
-    }
-    else
-    {
-      TreeMap<Integer, Match> sorted = new TreeMap<Integer, Match>(matches);
-      return new ArrayList<Match>(sorted.values());
-    }
-  }
+ 
 
-  public void setMatches(Map<Integer, Match> matches)
+  public void setMatches(List<Match> matches)
   {
     this.matches = matches;
   }
@@ -109,10 +86,9 @@ public class MatchGroup implements Serializable
   public static MatchGroup parseString(String raw)
   {
     MatchGroup saltIDs = new MatchGroup();
-    int i = 0;
     for (String group : lineSplitter.split(raw))
     {
-      saltIDs.matches.put(++i, Match.parseFromString(group));
+      saltIDs.matches.add(Match.parseFromString(group));
     }
     
     return saltIDs;
@@ -128,7 +104,7 @@ public class MatchGroup implements Serializable
   {
     List<String> lines = new LinkedList<String>();
     
-    for(Match m : this.matches.values())
+    for(Match m : this.matches)
     {
       lines.add(m.toString());
     }

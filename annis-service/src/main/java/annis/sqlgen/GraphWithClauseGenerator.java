@@ -176,7 +176,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     MatchGroup groupSet = listOfSaltURIs.get(0);
     int matchNr = 1;
-    for(Match match : groupSet.getOrderedMatches())
+    for(Match match : groupSet.getMatches())
     {
       List<URI> uriList = match.getSaltIDs();
       int nodeNr = 1;

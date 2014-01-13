@@ -179,7 +179,7 @@ class ResultFetchJob implements Runnable
           3);
         int current = 0;
 
-        for (Match m : result.getOrderedMatches())
+        for (Match m : result.getMatches())
         {
           if (Thread.interrupted())
           {

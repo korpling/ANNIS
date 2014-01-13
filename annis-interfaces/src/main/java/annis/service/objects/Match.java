@@ -62,7 +62,6 @@ public class Match implements Serializable
     }
   }
 
-  @XmlElementWrapper(name="salt-ids")
   @XmlElement(name="id")
   public List<URI> getSaltIDs()
   {

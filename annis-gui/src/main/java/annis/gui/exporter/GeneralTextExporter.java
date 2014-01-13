@@ -139,7 +139,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       {
         Match match = Match.parseFromString(currentLine);
         
-        currentMatches.getMatches().put(offset, match);
+        currentMatches.getMatches().add(match);
         
         if(currentMatches.getMatches().size() >= stepSize)
         {

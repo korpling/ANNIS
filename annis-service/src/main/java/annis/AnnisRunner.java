@@ -1337,7 +1337,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    for(Match m : matchGroup.getOrderedMatches())
+    for(Match m : matchGroup.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
       List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(m.getSaltIDs().size());

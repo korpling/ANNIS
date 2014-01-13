@@ -76,6 +76,40 @@ public interface QueryService
    * produces:
    * <code>application/xml</code>:<br />
    * {@code
+   * 
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <matchGroup>
+   *   <matches>
+   *     <entry>
+   *       <key>0</key>
+   *       <value>
+   *         <salt-ids>
+   *         <id>salt:/pcc2/11299/#tok_1</id>
+   * <id>salt:/pcc2/11299/#tok_2</id>
+   * </salt-ids>
+   * </value>
+   * </entry>
+   * <entry>
+   * <key>1</key>
+   * <value>
+   * <salt-ids>
+   * <id>salt:/pcc2/11299/#tok_2</id>
+   * <id>salt:/pcc2/11299/#tok_3</id>
+   * </salt-ids>
+   * </value>
+   * </entry>
+   * <entry>
+   * <key>2</key>
+   * <value>
+   * <salt-ids>
+   * <id>salt:/pcc2/11299/#tok_3</id>
+   * <id>salt:/pcc2/11299/#tok_4</id>
+   * </salt-ids>
+   * </value>
+   * </entry>
+   * </matches>
+   * </matchGroup>
+   * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <matches>
    *   <!-- each match in enclosed in an match tag -->
@@ -130,11 +164,25 @@ public interface QueryService
    * <li>POST annis/query/search/subgraph</li>
    * </ol>
    * 
-   * @param query
+   * <h3>MIME</h3>
+   * 
+   * accepts:<br/>
+   * <code></code>
+   * 
+   * produces:<br />
+   * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
+   * A representation of the Salt graph with in the EMF XMI format.
+   * 
+   * @param requestBody 
+   * @param segmentation Optional parameter for segmentation layer on which the context is applied. Leave empty for token layer (which is default).
+   * @param left Optional parameter for the left context size, default is 0.
+   * @param right Optional parameter for the right context size, default is 0.
+   * @param filter Optional parameter with value "all" or "token". 
+   *  If "token" only token will be fetched. Default is "all".
    * @return the graph of this hit.
    */
   SaltProject subgraph(
-    MatchGroup matches,
+    MatchGroup requestBody,
     String segmentation, String left, String right, String filter);
   
   /**
