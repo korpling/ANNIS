@@ -96,10 +96,6 @@ public class RelANNISHelper
       }
     }
     
-    if(d.isDirectory())
-    {
-    }
-    
     return result;
   }
   
