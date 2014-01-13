@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import java.io.File;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.zip.ZipFile;
@@ -54,7 +55,7 @@ public class ImportJob
   }
   
   private String uuid;
-  private ZipFile inZip;
+  private File importRootDirectory;
   private String caption;
   private Status status;
   private final List<String> messages = new LinkedList<String>();
@@ -81,23 +82,25 @@ public class ImportJob
   }
 
   /**
-   * Get the zip file that contains the corpus.
+   * Get the directory where the corpora to import are located
    * @return 
    */
   @XmlTransient
-  public ZipFile getInZip()
+  public File getImportRootDirectory()
   {
-    return inZip;
+    return importRootDirectory;
   }
 
   /**
-   * @see #getInZip() 
-   * @param inZip 
+   * @see #getImportRootDirectory() 
+   * @param importRootDirectory 
    */
-  public void setInZip(ZipFile inZip)
+  public void setImportRootDirectory(File importRootDirectory)
   {
-    this.inZip = inZip;
+    this.importRootDirectory = importRootDirectory;
   }
+  
+  
 
   /**
    * Get the visible caption of the import job.

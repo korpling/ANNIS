@@ -16,6 +16,10 @@
 package annis.utils;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.collect.FluentIterable;
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -23,7 +27,6 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.zip.ZipEntry;
@@ -41,10 +44,70 @@ public class RelANNISHelper
   private static final Logger log = LoggerFactory.
     getLogger(RelANNISHelper.class);
 
+  
+  /**
+   * List all corpora of a ZIP file and their paths.
+   * 
+   * @param zip
+   * @return
+   * @throws IOException 
+   */
+  public static Map<String, ZipEntry> corporaInZipfile(ZipFile zip) throws IOException
+  {
+    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
+    
+    for(ZipEntry e : getRelANNISEntry(zip, "corpus", "tab"))
+    {
+      String name = extractToplevelCorpusNames(zip.getInputStream(e));
+      result.put(name, e);
+    }
+    
+    return result;
+  }
+  
+  public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException
+  {
+    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
+    ZipFile zip = new ZipFile(f);
+    try
+    {
+      result = corporaInZipfile(zip);
+    }
+    finally
+    {
+      zip.close();
+    }
+    
+    return result;
+  }
+  
+  public static Map<String, File> corporaInDirectory(File d) throws IOException
+  {
+    Map<String, File> result = new HashMap<String, File>();
+    
+
+    FluentIterable<File> it = Files.fileTreeTraverser().postOrderTraversal(d);
+    for(File f : it)
+    {
+      if("corpus.tab".equalsIgnoreCase(f.getName()))
+      {
+        String toplevelName = extractToplevelCorpusNames(new FileInputStream(f));
+        result.put(toplevelName, f.getParentFile());
+      }
+    }
+    
+    if(d.isDirectory())
+    {
+    }
+    
+    return result;
+  }
+  
   /**
    * Extract the name of the toplevel corpus from the content of the
    * corpus.tab file.
    *
+   * @param corpusTabContent
    * @return
    */
   public static String extractToplevelCorpusNames(InputStream corpusTabContent)
