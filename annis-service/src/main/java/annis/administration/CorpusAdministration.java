@@ -139,18 +139,7 @@ public class CorpusAdministration
     {
       File f = new File(path);
       
-      if(f.isDirectory())
-      {
-        try
-        {
-          roots.addAll(RelANNISHelper.corporaInDirectory(f).values());
-        }
-        catch(IOException ex)
-        {
-          log.error("Could not find any corpus in " + f.getPath(), ex);
-        }
-      }
-      else
+      if(f.isFile())
       {
         // might be a ZIP-file
         ZipFile zip = null;
@@ -189,6 +178,17 @@ public class CorpusAdministration
               log.error(null, ex);
             }
           }
+        }
+      }
+      else
+      {
+        try
+        {
+          roots.addAll(RelANNISHelper.corporaInDirectory(f).values());
+        }
+        catch(IOException ex)
+        {
+          log.error("Could not find any corpus in " + f.getPath(), ex);
         }
       }
     } // end for each given path
