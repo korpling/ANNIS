@@ -418,7 +418,7 @@ public class ImportDialog extends javax.swing.JDialog
       {
         if (event.getLevel().isGreaterOrEqual(Level.INFO))
         {
-          lblStatus.setText(event.getMessage());
+          lblStatus.setText(event.getFormattedMessage());
         }
       }
     };
