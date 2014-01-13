@@ -100,11 +100,11 @@ public interface QueryService
    * <i>or</i> produces:
    * <code>plain/text</code>:<br />
    * {@code
-   * salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2
-   * salt:/pcc2/11299/#tok_2,salt:/pcc2/11299/#tok_3
-   * salt:/pcc2/11299/#tok_3,salt:/pcc2/11299/#tok_4
+   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
    * }
-   * One line per match, each ID is separated by comma.
+   * One line per match, each ID is separated by space.
    * 
    * @param q The AQL query
    * @param corpora A comma separated list of corpus names
@@ -154,11 +154,11 @@ public interface QueryService
    * <i>or</i> accepts:
    * <code>plain/text</code>:<br />
    * {@code
-   * salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2
-   * salt:/pcc2/11299/#tok_2,salt:/pcc2/11299/#tok_3
-   * salt:/pcc2/11299/#tok_3,salt:/pcc2/11299/#tok_4
+   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
    * }
-   * One line per match, each ID is separated by comma.
+   * One line per match, each ID is separated by space.
    * 
    * produces:<br />
    * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
