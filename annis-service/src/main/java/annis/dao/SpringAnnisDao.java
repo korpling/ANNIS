@@ -134,8 +134,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private int timeout;
   // fn: corpus id -> corpus name
 
-  private Map<Long, String> corpusNamesById;
-
   @Override
   @Transactional
   public SaltProject graph(QueryData data)
@@ -463,15 +461,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
     List<String> names = new ArrayList<String>();
-    if (corpusNamesById == null)
+   
+    Map<Long, String> corpusNamesById = new TreeMap<Long, String>();
+    List<AnnisCorpus> corpora = listCorpora();
+    for (AnnisCorpus corpus : corpora)
     {
-      corpusNamesById = new TreeMap<Long, String>();
-      List<AnnisCorpus> corpora = listCorpora();
-      for (AnnisCorpus corpus : corpora)
-      {
-        corpusNamesById.put(corpus.getId(), corpus.getName());
-      }
+      corpusNamesById.put(corpus.getId(), corpus.getName());
     }
+
     for (Long id : ids)
     {
       if (corpusNamesById.containsKey(id))
