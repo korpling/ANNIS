@@ -23,7 +23,9 @@ import annis.security.AnnisUserConfig;
 import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
+import com.google.common.collect.FluentIterable;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -31,9 +33,9 @@ import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.zip.ZipEntry;
-import java.util.zip.ZipFile;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -170,76 +172,57 @@ public class AdminServiceImpl implements AdminService
       tmpZip.deleteOnExit();
       
       tmpOut = new FileOutputStream(tmpZip);
-      ByteStreams.copy(request.getInputStream(), tmpOut);      
-      ZipFile zip = new ZipFile(tmpZip);
+      ByteStreams.copy(request.getInputStream(), tmpOut); 
       
-      // find the directory containing the real relannis tab files
-      List<ZipEntry> corpusTabEntries = RelANNISHelper.getRelANNISEntry(zip, "corpus", "tab");
-      if(!corpusTabEntries.isEmpty())
+      Set<String> allNames = RelANNISHelper.corporaInZipfile(tmpZip).keySet();
+      
+      if(!allNames.isEmpty())
       {
-        List<String> allNames = new ArrayList<String>();
-        for(ZipEntry corpusTab : corpusTabEntries)
+        for(String corpusName : allNames)
         {
-          String corpusName = RelANNISHelper.extractToplevelCorpusNames(zip.getInputStream(corpusTab));
-          if(corpusName != null)
-          {
-            user.checkPermission("admin:import:" + corpusName);
-            allNames.add(corpusName);
-          }
+          user.checkPermission("admin:import:" + corpusName);
         }
-        
-        
-        if(!allNames.isEmpty())
+        String caption = Joiner.on(", ").join(allNames);
+
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(allNames));
+        if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
-          
-          String caption = Joiner.on(", ").join(allNames);
-        
-          List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(allNames);
-          if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
+          ImportJob job = new ImportJob();
+          UUID uuid = UUID.randomUUID();
+          job.setUuid(uuid.toString());
+          job.setCaption(caption);
+          job.setImportRootDirectory(tmpZip);
+          job.setStatus(ImportJob.Status.WAITING);
+          job.setOverwrite(overwrite);
+          job.setStatusEmail(statusMail);
+          job.setAlias(alias);
+
+          corpusAdmin.sendStatusMail(statusMail, caption,
+            ImportJob.Status.WAITING, null);
+
+          try
           {
-            ImportJob job = new ImportJob();
-            UUID uuid = UUID.randomUUID();
-            job.setUuid(uuid.toString());
-            job.setCaption(caption);
-            job.setInZip(zip);
-            job.setStatus(ImportJob.Status.WAITING);
-            job.setOverwrite(overwrite);
-            job.setStatusEmail(statusMail);
-            job.setAlias(alias);
-            
-            corpusAdmin.sendStatusMail(statusMail, caption,
-              ImportJob.Status.WAITING, null);
-            
-            try
-            {
-              importWorker.getImportQueue().put(job);
+            importWorker.getImportQueue().put(job);
 
 
-              return Response.status(Response.Status.ACCEPTED).header("Location", 
-                request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
-                .build();
-            }
-            catch(InterruptedException ex)
-            {
-              log.error("Could not add job to import queue", ex);
-              return Response.serverError().entity("Could not add job to "
-                + "import queue. There might be more information in the server "
-                + "log files. Contact the administrator if necessary.").build();
-            }
+            return Response.status(Response.Status.ACCEPTED).header("Location", 
+              request.getContextPath() + "/annis/admin/import/status/finished/" + uuid.toString())
+              .build();
           }
-          else
+          catch(InterruptedException ex)
           {
-            return Response.status(Response.Status.BAD_REQUEST)
-              .entity("The corpus already exists").build();
+            log.error("Could not add job to import queue", ex);
+            return Response.serverError().entity("Could not add job to "
+              + "import queue. There might be more information in the server "
+              + "log files. Contact the administrator if necessary.").build();
           }
         }
         else
         {
-          return
-            Response.status(Response.Status.BAD_REQUEST)
-            .entity("corpus name not found inside corpus.tab")
-            .build();
+          return Response.status(Response.Status.BAD_REQUEST)
+            .entity("The corpus already exists").build();
         }
+
       }
       else
       {
