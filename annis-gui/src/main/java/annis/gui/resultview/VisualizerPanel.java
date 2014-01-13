@@ -358,7 +358,7 @@ public class VisualizerPanel extends CssLayout
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
+      txt = annisResource.path("query").path("graph").path(toplevelCorpusName).
         path(documentName).get(SaltProject.class);
     }
     catch (RuntimeException e)

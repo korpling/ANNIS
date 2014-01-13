@@ -402,7 +402,7 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldAddIsTokenOnFilter()
   {
-    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.Token);
+    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.token);
     
     String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
     

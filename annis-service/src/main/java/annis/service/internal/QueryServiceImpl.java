@@ -36,16 +36,15 @@ import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
-import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SubgraphQuery;
+import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -63,6 +62,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -78,7 +78,6 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
@@ -286,7 +285,7 @@ public class QueryServiceImpl implements QueryService
     else
     {
       List<Match> result = findXml(data, rawCorpusNames, query);
-      return Response.ok().type("application/xml").entity(new GenericEntity<List<Match>>(result) {}).build();
+      return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {}).build();
     }
     
   }
@@ -406,46 +405,48 @@ public class QueryServiceImpl implements QueryService
     return freqTable;
   }
   
-
-  /**
-   * Get a graph as {@link SaltProject} of a set of Salt IDs.
-   *
-   * @param saltIDs saltIDs must have at least one saltId, more than one id are
-   * separated by + or space
-   * @param leftRaw left context parameter
-   * @param rightRaw right context parameter
-   * @return the graph of this hit.
-   */
   @POST
   @Path("search/subgraph")
+  @Consumes({"application/xml", "text/plain"})
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
-  public SaltProject subgraph(final SubgraphQuery query)
+  @Override
+  public SaltProject subgraph(
+    MatchGroup matches,
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
+    
     // some robustness stuff
-    if (query == null)
+    if (matches == null)
     {
       throw new WebApplicationException(
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
         "missing required request body").build());
     }
+    
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+    SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
     QueryData data = new QueryData();
 
-    data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer(), query.getFilter()));
+    data.addExtension(new AnnotateQueryData(left, right,
+      segmentation, filter));
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    for (SaltURIGroup singleMatch : query.getMatches().getGroups().values())
+    for (Match singleMatch : matches.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
       List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.
-        getUris().size());
-      for (java.net.URI u : singleMatch.getUris())
+        getSaltIDs().size());
+      for (java.net.URI u : singleMatch.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
@@ -469,7 +470,7 @@ public class QueryServiceImpl implements QueryService
     }
 
     data.setCorpusList(corpusIDs);
-    data.addExtension(query.getMatches());
+    data.addExtension(matches);
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();
@@ -479,11 +480,12 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
-  @Path("graphs/{top}/{doc}")
+  @Path("graph/{top}/{doc}")
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
+  @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {

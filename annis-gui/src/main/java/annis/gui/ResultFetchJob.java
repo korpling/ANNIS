@@ -20,19 +20,15 @@ import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
-import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SaltURIGroupSet;
-import annis.service.objects.SubgraphQuery;
+import annis.service.objects.MatchGroup;
+import annis.service.objects.SubgraphFilter;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.concurrent.ArrayBlockingQueue;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutionException;
@@ -58,7 +54,7 @@ class ResultFetchJob implements Runnable
 
   private ResultViewPanel resultPanel;
 
-  private Future<List<Match>> futureMatches;
+  private Future<MatchGroup> futureMatches;
 
   private AsyncWebResource res;
 
@@ -81,17 +77,27 @@ class ResultFetchJob implements Runnable
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
       .accept(MediaType.APPLICATION_XML_TYPE)
-      .get(new MatchListType());
+      .get(MatchGroup.class);
 
   }
 
   private SaltProject executeQuery(WebResource subgraphRes,
-    SubgraphQuery query)
+    MatchGroup matches, int left, int right, String segmentation, SubgraphFilter filter)
   {
     SaltProject p = null;
+    WebResource res = subgraphRes.queryParam("left", "" + left).queryParam(
+      "right", "" + right);
     try
     {
-      p = subgraphRes.post(SaltProject.class, query);
+      if(segmentation != null)
+      {
+        res = res.queryParam("segmentation", segmentation);
+      }
+      if(filter != null)
+      {
+        res = res.queryParam("filter", filter.name());
+      }
+      p = res.post(SaltProject.class, matches);
     }
     catch (UniformInterfaceException ex)
     {
@@ -101,44 +107,6 @@ class ResultFetchJob implements Runnable
     return p;
   }
 
-  private SubgraphQuery prepareQuery(List<Match> matchesToPrepare)
-  {
-    SubgraphQuery subgraphQuery = new SubgraphQuery();
-
-    subgraphQuery.setLeft(query.getContextLeft());
-    subgraphQuery.setRight(query.getContextRight());
-    if (query.getSegmentation() != null)
-    {
-      subgraphQuery.setSegmentationLayer(query.getSegmentation());
-    }
-
-    SaltURIGroupSet saltURIs = new SaltURIGroupSet();
-
-    ListIterator<Match> it = matchesToPrepare.listIterator();
-    int i = 0;
-    while (it.hasNext())
-    {
-      Match m = it.next();
-      SaltURIGroup urisForMatch = new SaltURIGroup();
-
-      for (String s : m.getSaltIDs())
-      {
-        try
-        {
-          urisForMatch.getUris().add(new URI(s));
-        }
-        catch (URISyntaxException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-      saltURIs.getGroups().put(++i, urisForMatch);
-    }
-
-    subgraphQuery.setMatches(saltURIs);
-    return subgraphQuery;
-  }
-
   @Override
   public void run()
   {
@@ -146,7 +114,7 @@ class ResultFetchJob implements Runnable
       = Helper.getAnnisWebResource().path("query/search/subgraph");
 
     // holds the ids of the matches.
-    List<Match> result;
+    MatchGroup result;
 
     try
     {
@@ -169,7 +137,7 @@ class ResultFetchJob implements Runnable
       result = futureMatches.get(60, TimeUnit.SECONDS);
 
       // get the subgraph for each match, when the result is not empty
-      if (result.isEmpty())
+      if (result.getMatches().isEmpty())
       {
 
         // check if thread was interrupted
@@ -206,12 +174,12 @@ class ResultFetchJob implements Runnable
         });
 
         // prepare fetching subgraphs
-        final int totalResultSize = result.size();
+        final int totalResultSize = result.getMatches().size();
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
           3);
         int current = 0;
 
-        for (Match m : result)
+        for (Match m : result.getMatches())
         {
           if (Thread.interrupted())
           {
@@ -220,8 +188,10 @@ class ResultFetchJob implements Runnable
 
           List<Match> subList = new LinkedList<Match>();
           subList.add(m);
-          SubgraphQuery subgraphQuery = prepareQuery(subList);
-          final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
+          final SaltProject p = executeQuery(subgraphRes, 
+            new MatchGroup(subList), 
+            query.getContextLeft(), query.getContextRight(),
+            query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);
 
@@ -315,13 +285,5 @@ class ResultFetchJob implements Runnable
       }
     }
 
-  }
-
-  private static class MatchListType extends GenericType<List<Match>>
-  {
-
-    public MatchListType()
-    {
-    }
   }
 }

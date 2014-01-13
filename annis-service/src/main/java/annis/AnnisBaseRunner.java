@@ -37,18 +37,18 @@ import org.slf4j.bridge.SLF4JBridgeHandler;
 import org.springframework.context.support.GenericXmlApplicationContext;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.LayoutBase;
-import ch.qos.logback.core.filter.Filter;
 import ch.qos.logback.core.joran.spi.JoranException;
 import ch.qos.logback.core.spi.FilterReply;
+import com.google.common.base.Splitter;
+import com.google.common.collect.Lists;
+import java.util.ArrayList;
 
 public abstract class AnnisBaseRunner
 {
@@ -166,14 +166,28 @@ public abstract class AnnisBaseRunner
     Collections.sort(commands);
     console.addCompleter(new StringsCompleter(commands));
 
+    Splitter argSplitter = Splitter.on(' ').limit(2);
     String line;
+    StringBuilder input = new StringBuilder();
     prompt = "no corpus>";
-    while ((line = console.readLine(prompt + " ")) != null)
+    console.setPrompt(prompt + " ");
+    while ((line = console.readLine()) != null)
     {
-      try
+      if(line.endsWith("\\"))
       {
-
-        String command = line.split(" ")[0];
+        // multi-line input
+        input.append(line.substring(0, line.length()-1)).append("\n");
+        // notifiy user by changing the prompt
+        console.setPrompt("> ");
+      }
+      else
+      {
+        // input finished, run command
+        input.append(line);
+        
+        ArrayList<String> splitted = Lists.newArrayList(argSplitter.split(input.toString()));
+        String command = splitted.get(0);
+        String args = "";
 
         if ("help".equalsIgnoreCase(command))
         {
@@ -182,18 +196,26 @@ public abstract class AnnisBaseRunner
         }
         else
         {
-          String args = StringUtils.join(Arrays.asList(line.split(" ")).subList(
-            1, line.split(" ").length), " ");
-          runCommand(command, args);
+          if (splitted.size() > 1)
+          {
+            args = splitted.get(1);
+          }
         }
-      }
-      catch (IndexOutOfBoundsException e)
-      {
-        continue;
-      }
-      catch (UsageException e)
-      {
-        error(e);
+        try
+        {
+          if(!command.isEmpty())
+          {
+            runCommand(command, args);
+          }
+        }
+        catch (UsageException e)
+        {
+          error(e);
+        }
+        // reset the current prompt
+        console.setPrompt(prompt + " ");
+        // empty input
+        input = new StringBuilder();
       }
     } // end while
   }

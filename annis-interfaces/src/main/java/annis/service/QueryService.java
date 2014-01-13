@@ -15,12 +15,12 @@
  */
 package annis.service;
 
+import annis.service.objects.MatchGroup;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Response;
 
 /**
@@ -76,39 +76,35 @@ public interface QueryService
    * produces:
    * <code>application/xml</code>:<br />
    * {@code
+   * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-   * <matches>
+   * <match-group>
    *   <!-- each match in enclosed in an match tag -->
    *   <match>
-   *    <!-- list of IDs for each matched node of the single match -->
-   *    <salt-ids>
-   *      <!-- ID of first matched node of match 1 -->
-   *      <id>salt:/pcc2/11299/#tok_1</id>
-   *      <!-- ID of second matched noded  of match 1 -->
-   *      <id>salt:/pcc2/11299/#tok_2</id>
-   *      <!-- more IDs if necessary -->
-   *     </salt-ids>
+   *     <!-- ID of first matched node of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_1</id>
+   *     <!-- ID of second matched noded  of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_2</id>
+   *     <!-- more IDs if necessary -->
    *   </match>
    *   <match>
-   *   <salt-ids>
    *     <!-- ID of first matched noded of match 2 -->
    *     <id>salt:/pcc2/11299/#tok_3</id>
    *     <!-- ID of second matched noded of match 2-->
    *     <id>salt:/pcc2/11299/#tok_4</id>
-   *   </salt-ids>
    *   </match>
    *   <!-- and so on -->
-   * </matches>
+   * </match-group>
    * }
    * 
    * <i>or</i> produces:
    * <code>plain/text</code>:<br />
    * {@code
-   * salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2
-   * salt:/pcc2/11299/#tok_2,salt:/pcc2/11299/#tok_3
-   * salt:/pcc2/11299/#tok_3,salt:/pcc2/11299/#tok_4
+   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
    * }
-   * One line per match, each ID is separated by comma.
+   * One line per match, each ID is separated by space.
    * 
    * @param q The AQL query
    * @param corpora A comma separated list of corpus names
@@ -122,6 +118,88 @@ public interface QueryService
     String corpora,
     String offset,
     String limit) throws IOException;
+  
+  /**
+   * Get a graph as {@link SaltProject} from a set of (matched) Salt IDs.
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>POST annis/query/search/subgraph</li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * 
+   * accepts:<br/>
+   * <code>application/xml</code>:<br />
+   * {@code
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <match-group>
+   *   <!-- each match in enclosed in an match tag -->
+   *   <match>
+   *     <!-- ID of first matched node of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_1</id>
+   *     <!-- ID of second matched noded  of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_2</id>
+   *     <!-- more IDs if necessary -->
+   *   </match>
+   *   <match>
+   *     <!-- ID of first matched noded of match 2 -->
+   *     <id>salt:/pcc2/11299/#tok_3</id>
+   *     <!-- ID of second matched noded of match 2-->
+   *     <id>salt:/pcc2/11299/#tok_4</id>
+   *   </match>
+   *   <!-- and so on -->
+   * </match-group>
+   * }
+   * 
+   * <i>or</i> accepts:
+   * <code>plain/text</code>:<br />
+   * {@code
+   * salt:/pcc2/11299/#tok_1 salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2 salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3 salt:/pcc2/11299/#tok_4
+   * }
+   * One line per match, each ID is separated by space.
+   * 
+   * produces:<br />
+   * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
+   * A representation of the Salt graph in the EMF XMI format.
+   * 
+   * 
+   * @see #find(java.lang.String, java.lang.String, java.lang.String, java.lang.String) The output of find can be directly used by this function.
+   * 
+   * @param requestBody 
+   * @param segmentation Optional parameter for segmentation layer on which the context is applied. Leave empty for token layer (which is default).
+   * @param left Optional parameter for the left context size, default is 0.
+   * @param right Optional parameter for the right context size, default is 0.
+   * @param filter Optional parameter with value "all" or "token". 
+   *  If "token" only token will be fetched. Default is "all".
+   * @return the graph of this hit.
+   */
+  SaltProject subgraph(
+    MatchGroup requestBody,
+    String segmentation, String left, String right, String filter);
+  
+  /**
+   * Get the annotation graph of a complete document.
+   * 
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET annis/query/search/graph/<b>{top}</b>/<b>{doc}</b></li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * 
+   * produces:<br />
+   * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
+   * A representation of the Salt graph in the EMF XMI format.
+   * 
+   * @param top The toplevel corpus
+   * @param doc The document.
+   * @return 
+   */
+  public SaltProject graph(
+    String top,
+    String doc);
   
   /**
    * Get the content an ANNIS binary object for a specific document.

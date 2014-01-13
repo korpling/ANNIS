@@ -15,57 +15,110 @@
  */
 package annis.service.objects;
 
+import com.google.common.base.Splitter;
 import java.io.Serializable;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlTransient;
-import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
-@SuppressWarnings("serial")
+/**
+ * Represents a single match of an AQL query.
+ * 
+ * @author Thomas Krause <krauseto@hu-berlin.de>
+ */
 @XmlRootElement
 public class Match implements Serializable
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(Match.class);
 
-  private List<String> saltIDs;
+  private final static Splitter matchSplitter = Splitter.on(" ").trimResults().omitEmptyStrings();
+  
+  private List<URI> saltIDs;
 
   public Match()
   {
-    saltIDs = new ArrayList<String>();
+    saltIDs = new ArrayList<URI>();
   }
-
-  public void setSaltId(String id)
+  
+  public Match(Collection<URI> original)
   {
-    saltIDs.add(id);
+    saltIDs = new ArrayList<URI>(original);
   }
 
-  public String getSaltId(int i)
+  public void addSaltId(URI id)
   {
-    return saltIDs.get(i);
+    if(id != null)
+    {
+      saltIDs.add(id);
+    }
   }
 
-  @XmlElementWrapper(name="salt-ids")
   @XmlElement(name="id")
-  public List<String> getSaltIDs()
+  public List<URI> getSaltIDs()
   {
     return saltIDs;
   }
 
-  public void setSaltIDs(List<String> saltIDs)
+  public void setSaltIDs(List<URI> saltIDs)
   {
     this.saltIDs = saltIDs;
   }
+  
+  public static Match parseFromString(String raw)
+  {
+    Match match = new Match();
+
+    for (String id : matchSplitter.split(raw))
+    {
+      URI uri;
+      try
+      {
+        uri = new java.net.URI(id);
+
+        if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
+        {
+          throw new URISyntaxException("not a Salt id", uri.toString());
+        }
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error("Invalid syntax for ID " + id, ex);
+        continue;
+      }
+      match.addSaltId(uri);
+    }
+
+    return match;
+  }
 
   /**
-   * Returns a comma seperated list of all Salt IDs.
+   * Returns a space seperated list of all Salt IDs.
    * @return 
    */
   @Override
   public String toString()
   {
-    return StringUtils.join(saltIDs, ",");
+    StringBuilder sb = new StringBuilder();
+    Iterator<URI> it = saltIDs.iterator();
+    while(it.hasNext())
+    {
+      URI u = it.next();
+      sb.append(u.toASCIIString());
+      if(it.hasNext())
+      {
+        sb.append(" ");
+      }
+    }
+    return sb.toString();
   }
   
   

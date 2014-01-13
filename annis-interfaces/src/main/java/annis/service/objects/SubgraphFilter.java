@@ -24,6 +24,6 @@ import javax.xml.bind.annotation.XmlEnum;
 @XmlEnum(String.class)
 public enum SubgraphFilter
 {
-  All,
-  Token
+  all,
+  token
 }

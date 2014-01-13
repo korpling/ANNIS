@@ -121,7 +121,7 @@ public abstract class AnnotateSqlGenerator<T>
     {
       AnnotateQueryData annoExt = annoExtList.get(0);
 
-      if(annoExt.getFilter() == SubgraphFilter.Token)
+      if(annoExt.getFilter() == SubgraphFilter.token)
       {
         result.add(tables.aliasedColumn(NODE_TABLE, "is_token") + " IS TRUE");
       }
