@@ -162,6 +162,7 @@ public class CorpusAdministration
           Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
           
           // unzip and add all resulting corpora to import list
+          log.info("Unzipping " + f.getPath());
           File outDir = createZIPOutputDir(Joiner.on(", ").join(corpora.keySet()));
           roots.addAll(unzipCorpus(outDir, zip));
           
@@ -214,7 +215,7 @@ public class CorpusAdministration
       {
         importStats.setStatus(false);
         importStats.addException(r.getPath(), ex);
-        log.error("Error on conflicting top level corpus name");
+        log.error("Error on conflicting top level corpus name for {}", r.getPath());
         sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.
           getMessage());
       }
