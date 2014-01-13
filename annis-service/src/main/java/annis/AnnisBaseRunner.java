@@ -380,7 +380,7 @@ public abstract class AnnisBaseRunner
     {
       StringBuilder sb = new StringBuilder();
       sb.append("[").append(e.getLevel()).append("]\t");
-      sb.append(e.getMessage());
+      sb.append(e.getFormattedMessage());
       sb.append(" - ");
 
       long t = e.getTimeStamp() - e.getLoggerContextVO().getBirthTime();
