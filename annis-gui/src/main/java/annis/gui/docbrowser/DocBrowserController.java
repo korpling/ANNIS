@@ -186,7 +186,7 @@ public class DocBrowserController implements Serializable
         String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
         docName = URLEncoder.encode(docName, "UTF-8");
         WebResource annisResource = Helper.getAnnisWebResource();
-        txt = annisResource.path("query").path("graphs").
+        txt = annisResource.path("query").path("graph").
           path(topLevelCorpusName).
           path(docName).get(SaltProject.class);
 

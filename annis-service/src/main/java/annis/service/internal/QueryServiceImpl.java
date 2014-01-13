@@ -480,7 +480,7 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
-  @Path("graphs/{top}/{doc}")
+  @Path("graph/{top}/{doc}")
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"

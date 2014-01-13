@@ -78,61 +78,23 @@ public interface QueryService
    * {@code
    * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-   * <matchGroup>
-   *   <matches>
-   *     <entry>
-   *       <key>0</key>
-   *       <value>
-   *         <salt-ids>
-   *         <id>salt:/pcc2/11299/#tok_1</id>
-   * <id>salt:/pcc2/11299/#tok_2</id>
-   * </salt-ids>
-   * </value>
-   * </entry>
-   * <entry>
-   * <key>1</key>
-   * <value>
-   * <salt-ids>
-   * <id>salt:/pcc2/11299/#tok_2</id>
-   * <id>salt:/pcc2/11299/#tok_3</id>
-   * </salt-ids>
-   * </value>
-   * </entry>
-   * <entry>
-   * <key>2</key>
-   * <value>
-   * <salt-ids>
-   * <id>salt:/pcc2/11299/#tok_3</id>
-   * <id>salt:/pcc2/11299/#tok_4</id>
-   * </salt-ids>
-   * </value>
-   * </entry>
-   * </matches>
-   * </matchGroup>
-   * 
-   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-   * <matches>
+   * <match-group>
    *   <!-- each match in enclosed in an match tag -->
    *   <match>
-   *    <!-- list of IDs for each matched node of the single match -->
-   *    <salt-ids>
-   *      <!-- ID of first matched node of match 1 -->
-   *      <id>salt:/pcc2/11299/#tok_1</id>
-   *      <!-- ID of second matched noded  of match 1 -->
-   *      <id>salt:/pcc2/11299/#tok_2</id>
-   *      <!-- more IDs if necessary -->
-   *     </salt-ids>
+   *     <!-- ID of first matched node of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_1</id>
+   *     <!-- ID of second matched noded  of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_2</id>
+   *     <!-- more IDs if necessary -->
    *   </match>
    *   <match>
-   *   <salt-ids>
    *     <!-- ID of first matched noded of match 2 -->
    *     <id>salt:/pcc2/11299/#tok_3</id>
    *     <!-- ID of second matched noded of match 2-->
    *     <id>salt:/pcc2/11299/#tok_4</id>
-   *   </salt-ids>
    *   </match>
    *   <!-- and so on -->
-   * </matches>
+   * </match-group>
    * }
    * 
    * <i>or</i> produces:
@@ -158,7 +120,7 @@ public interface QueryService
     String limit) throws IOException;
   
   /**
-   * Get a graph as {@link SaltProject} from a set of Salt IDs.
+   * Get a graph as {@link SaltProject} from a set of (matched) Salt IDs.
    * <h3>Path(s)</h3>
    * <ol>
    * <li>POST annis/query/search/subgraph</li>
@@ -167,11 +129,43 @@ public interface QueryService
    * <h3>MIME</h3>
    * 
    * accepts:<br/>
-   * <code></code>
+   * <code>application/xml</code>:<br />
+   * {@code
+   * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+   * <match-group>
+   *   <!-- each match in enclosed in an match tag -->
+   *   <match>
+   *     <!-- ID of first matched node of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_1</id>
+   *     <!-- ID of second matched noded  of match 1 -->
+   *     <id>salt:/pcc2/11299/#tok_2</id>
+   *     <!-- more IDs if necessary -->
+   *   </match>
+   *   <match>
+   *     <!-- ID of first matched noded of match 2 -->
+   *     <id>salt:/pcc2/11299/#tok_3</id>
+   *     <!-- ID of second matched noded of match 2-->
+   *     <id>salt:/pcc2/11299/#tok_4</id>
+   *   </match>
+   *   <!-- and so on -->
+   * </match-group>
+   * }
+   * 
+   * <i>or</i> accepts:
+   * <code>plain/text</code>:<br />
+   * {@code
+   * salt:/pcc2/11299/#tok_1,salt:/pcc2/11299/#tok_2
+   * salt:/pcc2/11299/#tok_2,salt:/pcc2/11299/#tok_3
+   * salt:/pcc2/11299/#tok_3,salt:/pcc2/11299/#tok_4
+   * }
+   * One line per match, each ID is separated by comma.
    * 
    * produces:<br />
    * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
-   * A representation of the Salt graph with in the EMF XMI format.
+   * A representation of the Salt graph in the EMF XMI format.
+   * 
+   * 
+   * @see #find(java.lang.String, java.lang.String, java.lang.String, java.lang.String) The output of find can be directly used by this function.
    * 
    * @param requestBody 
    * @param segmentation Optional parameter for segmentation layer on which the context is applied. Leave empty for token layer (which is default).
@@ -186,9 +180,21 @@ public interface QueryService
     String segmentation, String left, String right, String filter);
   
   /**
+   * Get the annotation graph of a complete document.
    * 
-   * @param top
-   * @param doc
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET annis/query/search/graph/<b>{top}</b>/<b>{doc}</b></li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * 
+   * produces:<br />
+   * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
+   * A representation of the Salt graph in the EMF XMI format.
+   * 
+   * @param top The toplevel corpus
+   * @param doc The document.
    * @return 
    */
   public SaltProject graph(
