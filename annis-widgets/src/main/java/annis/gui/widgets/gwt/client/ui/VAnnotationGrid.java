@@ -187,17 +187,22 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   private void addRow(UIDL row, int rowNumber)
   {
+    
+    
     String caption = row.getStringAttribute("caption");
     String[] captionSplit = caption.split("::");
     String name = captionSplit[captionSplit.length - 1];
     
     boolean showCaption = row.getBooleanAttribute("show-caption");
 
+    int startColumn = 0;
+    
     if(showCaption)
     {
       VLabel lblCaption = new VLabel(name);
       table.setWidget(rowNumber, 0, lblCaption);
       formatter.addStyleName(rowNumber, 0, "header");
+      startColumn = 1;
     }
     
     int colspanOffset = 0;
@@ -224,7 +229,7 @@ public class VAnnotationGrid extends Composite implements Paintable
 
       // +1 because we also have a caption column, subtract columns we
       // jumped over by using colspan
-      int col = left + 1 - colspanOffset;
+      int col = left + startColumn - colspanOffset;
 
       // add table cell
       table.setWidget(rowNumber, col, label);
