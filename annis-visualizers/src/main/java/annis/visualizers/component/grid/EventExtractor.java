@@ -25,8 +25,8 @@ import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNOS_KEY;
-import static annis.visualizers.component.grid.GridVisualizer.GridVisualizerComponent.MAPPING_ANNO_REGEX_KEY;
+import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
+import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
@@ -68,6 +68,7 @@ public class EventExtractor {
    * Converts Salt document graph to rows.
    *
    * @param input
+   * @param showSpanAnnos
    * @param showTokenAnnos
    * @param annotationNames
    * @param startTokenIndex token index of the first token in the match
@@ -77,7 +78,7 @@ public class EventExtractor {
    * @return
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
-          VisualizerInput input, boolean showTokenAnnos,
+          VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, long startTokenIndex, long endTokenIndex,
           PDFController pdfController) {
 
@@ -95,12 +96,15 @@ public class EventExtractor {
 
     PDFPageHelper pageNumberHelper = new PDFPageHelper(input);
 
-    for (SSpan span : graph.getSSpans())
+    if(showSpanAnnos)
     {
-      addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
-        pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
-    } // end for each span
-
+      for (SSpan span : graph.getSSpans())
+      {
+        addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
+          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
+      } // end for each span
+    }
+    
     if(showTokenAnnos)
     {
       for(SToken tok : graph.getSTokens())
