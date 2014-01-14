@@ -80,7 +80,8 @@ public class EventExtractor {
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, long startTokenIndex, long endTokenIndex,
-          PDFController pdfController) {
+          PDFController pdfController) 
+  {
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
 
@@ -101,7 +102,7 @@ public class EventExtractor {
       for (SSpan span : graph.getSSpans())
       {
         addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
-          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
+          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, true);
       } // end for each span
     }
     
@@ -110,7 +111,7 @@ public class EventExtractor {
       for(SToken tok : graph.getSTokens())
       {
         addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
-          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation);
+          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false);
       }
     }
 
@@ -140,7 +141,8 @@ public class EventExtractor {
     long startTokenIndex, long endTokenIndex,
     PDFController pdfController, PDFPageHelper pageNumberHelper,
     AtomicInteger eventCounter,
-    LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation)
+    LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
+    boolean addMatch)
   {
 
     // calculate the left and right values of a span
@@ -180,8 +182,10 @@ public class EventExtractor {
         SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
         Long match = featMatched == null ? null : featMatched.
           getSValueSNUMERIC();
-        event.setMatch(match);
-
+        if(addMatch)
+        {
+          event.setMatch(match);
+        }
         if(node instanceof SSpan)
         {
           // calculate overlapped SToken
