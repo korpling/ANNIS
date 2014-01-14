@@ -64,7 +64,7 @@ public class GridComponent extends Panel
   private final transient MediaController mediaController;
   private final transient PDFController pdfController;
   private final VerticalLayout layout;
-
+  
   public enum ElementType
   {
 
@@ -108,7 +108,7 @@ public class GridComponent extends Panel
   {
     String resultID = input.getId();
     grid = new AnnotationGrid(mediaController, pdfController, resultID);
-    grid.addStyleName("partitur_table");
+    grid.addStyleName(getMainStyle());
     grid.addStyleName("corpus-font-force");
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty("escape_html", "true")));
@@ -279,6 +279,11 @@ public class GridComponent extends Panel
   protected boolean isTokenFirst()
   {
     return false;
+  }
+  
+  protected String getMainStyle()
+  {
+    return "partitur_table";
   }
   
   /**

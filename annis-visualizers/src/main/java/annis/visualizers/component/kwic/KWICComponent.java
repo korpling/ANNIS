@@ -61,6 +61,12 @@ public class KWICComponent extends GridComponent
   {
     return true;
   }
+
+  @Override
+  protected String getMainStyle()
+  {
+    return "kwic";
+  }
   
   
   
