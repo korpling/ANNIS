@@ -19,6 +19,7 @@ import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
+import annis.gui.QueryController;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
@@ -30,10 +31,12 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.*;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
@@ -51,6 +54,7 @@ import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.UUID;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -97,17 +101,39 @@ public class SingleResultPanel extends CssLayout implements
 
   private String documentName;
 
+  private UUID queryId;
+
+  private QueryController queryController;
+
+  private Button incCtx;
+
+  private Button decCtx;
+  
+  private int resultNumber;
+
+  private ResolverProvider resolverProvider;
+
+  private Set<String> visibleTokenAnnos;
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
+  private InstanceConfig instanceConfig;
+
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName,
-    InstanceConfig instanceConfig)
+    Set<String> visibleTokenAnnos, String segmentationName, UUID queryId,
+    QueryController controller, InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;
     this.segmentationName = segmentationName;
+    this.queryController = controller;
+    this.resultNumber = resultNumber;
+    this.queryId = queryId;
+    this.resolverProvider = resolverProvider;
+    this.visibleTokenAnnos = visibleTokenAnnos;
+    this.instanceConfig = instanceConfig;
 
     calculateHelperVariables();
 
@@ -154,66 +180,15 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
+    incCtx = new Button("inc context", this);
+    decCtx = new Button("dec context", this);
+    infoBar.addComponent(incCtx);
+    infoBar.addComponent(decCtx);
+
     // THIS WAS in attach()
     addComponent(infoBar);
 
-    try
-    {
-      ResolverEntry[] entries =
-        resolverProvider.getResolverEntries(result);
-      visualizers = new LinkedList<VisualizerPanel>();
-      List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-
-      token = result.getSDocumentGraph().getSortedSTokenByText();
-
-      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
-        segmentationName,
-        result.getSDocumentGraph());
-
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-      calulcateColorsForMarkedAndCoverd();
-
-      String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
-
-      for (int i = 0; i < entries.length; i++)
-      {
-        String htmlID = "resolver-" + resultNumber + "_" + i;
-
-        VisualizerPanel p = new VisualizerPanel(
-          entries[i], result, corpusName, documentName,
-          token, visibleTokenAnnos, markedAndCovered,
-          markedCoveredMap, markedExactMap,
-          htmlID, resultID, this,
-          segmentationName, ps, instanceConfig);
-
-        visualizers.add(p);
-        Properties mappings = entries[i].getMappings();
-        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
-        {
-          openVisualizers.add(p);
-        }
-
-      } // for each resolver entry
-
-      for (VisualizerPanel p : visualizers)
-      {
-        addComponent(p);
-      }
-
-      for (VisualizerPanel p : openVisualizers)
-      {
-        p.toggleVisualizer(true, null);
-      }
-
-    }
-    catch (RuntimeException ex)
-    {
-      log.error("problems with initializing Visualizer Panel", ex);
-    }
-    catch (Exception ex)
-    {
-      log.error("problems with initializing Visualizer Panel", ex);
-    }
+    initVisualizer();
   }
 
   public void setSegmentationLayer(String segmentationName)
@@ -321,7 +296,6 @@ public class SingleResultPanel extends CssLayout implements
       getSDocumentGraph(), initialCovered);
     Map<SNode, Long> covered = cmc.getMatchedAndCovered();
 
-
     if (segmentationName != null)
     {
       // filter token
@@ -380,6 +354,77 @@ public class SingleResultPanel extends CssLayout implements
 
       UI.getCurrent().addWindow(infoWindow);
     }
+
+    if (event.getButton() == incCtx && result != null)
+    {
+      queryController.increaseCtx(queryId, resultNumber, 5, this);
+    }
+    
+    if (event.getButton() == decCtx && result != null)
+    {
+      queryController.increaseCtx(queryId, resultNumber, -5, this);
+    }
+  }
+
+  private void initVisualizer()
+  {
+    try
+    {
+      ResolverEntry[] entries
+        = resolverProvider.getResolverEntries(result);
+      visualizers = new LinkedList<VisualizerPanel>();
+      List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
+
+      token = result.getSDocumentGraph().getSortedSTokenByText();
+
+      List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
+        segmentationName,
+        result.getSDocumentGraph());
+
+      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      calulcateColorsForMarkedAndCoverd();
+
+      String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
+
+      for (int i = 0; i < entries.length; i++)
+      {
+        String htmlID = "resolver-" + resultNumber + "_" + i;
+
+        VisualizerPanel p = new VisualizerPanel(
+          entries[i], result, corpusName, documentName,
+          token, visibleTokenAnnos, markedAndCovered,
+          markedCoveredMap, markedExactMap,
+          htmlID, resultID, this,
+          segmentationName, ps, instanceConfig);
+
+        visualizers.add(p);
+        Properties mappings = entries[i].getMappings();
+        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+        {
+          openVisualizers.add(p);
+        }
+
+      } // for each resolver entry
+
+      for (VisualizerPanel p : visualizers)
+      {
+        addComponent(p);
+      }
+
+      for (VisualizerPanel p : openVisualizers)
+      {
+        p.toggleVisualizer(true, null);
+      }
+
+    }
+    catch (RuntimeException ex)
+    {
+      log.error("problems with initializing Visualizer Panel", ex);
+    }
+    catch (Exception ex)
+    {
+      log.error("problems with initializing Visualizer Panel", ex);
+    }
   }
 
   /**
@@ -411,41 +456,41 @@ public class SingleResultPanel extends CssLayout implements
 
       Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<SNode, Long>(
         new Comparator<SNode>()
-      {
-        @Override
-        public int compare(SNode o1, SNode o2)
         {
-          RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(
-            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(
-            ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+          @Override
+          public int compare(SNode o1, SNode o2)
+          {
+            RelannisNodeFeature feat1 = (RelannisNodeFeature) o1.getSFeature(
+              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+            RelannisNodeFeature feat2 = (RelannisNodeFeature) o2.getSFeature(
+              ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-          long leftTokIdxO1 = feat1.getLeftToken();
-          long rightTokIdxO1 = feat1.getRightToken();
-          long leftTokIdxO2 = feat2.getLeftToken();
-          long rightTokIdxO2 = feat2.getRightToken();
+            long leftTokIdxO1 = feat1.getLeftToken();
+            long rightTokIdxO1 = feat1.getRightToken();
+            long leftTokIdxO2 = feat2.getLeftToken();
+            long rightTokIdxO2 = feat2.getRightToken();
 
-          int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
-          int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
+            int intervallO1 = (int) Math.abs(leftTokIdxO1 - rightTokIdxO1);
+            int intervallO2 = (int) Math.abs(leftTokIdxO2 - rightTokIdxO2);
 
-          if (intervallO1 - intervallO2 != 0)
-          {
-            return intervallO1 - intervallO2;
+            if (intervallO1 - intervallO2 != 0)
+            {
+              return intervallO1 - intervallO2;
+            }
+            else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
+            {
+              return (int) (feat1.getLeftToken() - feat2.getRightToken());
+            }
+            else if (feat1.getRightToken() - feat2.getRightToken() != 0)
+            {
+              return (int) (feat1.getRightToken() - feat2.getRightToken());
+            }
+            else
+            {
+              return (int) (feat1.getInternalID() - feat2.getInternalID());
+            }
           }
-          else if (feat1.getLeftToken() - feat2.getRightToken() != 0)
-          {
-            return (int) (feat1.getLeftToken() - feat2.getRightToken());
-          }
-          else if (feat1.getRightToken() - feat2.getRightToken() != 0)
-          {
-            return (int) (feat1.getRightToken() - feat2.getRightToken());
-          }
-          else
-          {
-            return (int) (feat1.getInternalID() - feat2.getInternalID());
-          }
-        }
-      });
+        });
 
       for (Map.Entry<SNode, Long> entry : initialMatches.entrySet())
       {
@@ -522,7 +567,6 @@ public class SingleResultPanel extends CssLayout implements
     minMax.min = Long.MAX_VALUE;
     minMax.max = Long.MIN_VALUE;
 
-
     if (segmentationName == null)
     {
       minMax.segName = "tokens";
@@ -570,5 +614,23 @@ public class SingleResultPanel extends CssLayout implements
     }
 
     return minMax;
+  }
+
+  /**
+   * Reinit all registered visualizer with a new salt project.
+   *
+   * @param p the project, all visualizer are updated with.
+   */
+  // TODO deactivate context buttons
+  public void updateResult(SaltProject p)
+  {
+    this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
+
+    for (VisualizerPanel v : visualizers)
+    {
+      this.removeComponent(v);
+    }
+
+    initVisualizer();
   }
 }

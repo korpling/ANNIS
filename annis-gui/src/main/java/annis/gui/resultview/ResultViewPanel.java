@@ -54,6 +54,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.slf4j.LoggerFactory;
@@ -111,14 +112,17 @@ public class ResultViewPanel extends VerticalLayout implements
   private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
+  
+  private UUID queryId;
 
   private PagedResultQuery currentQuery;
 
   public ResultViewPanel(QueryController controller,
-    PluginSystem ps, InstanceConfig instanceConfig)
+    PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
   {
     this.tokenAnnoVisible = new TreeMap<String, Boolean>();
     this.ps = ps;
+    this.queryId = queryId;
     this.controller = controller;
     this.selectedSegmentationLayer = controller.getPreparedQuery().
       getSegmentation();
@@ -344,8 +348,9 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        tokenAnnotationLevelSet, segmentationName,
+        tokenAnnotationLevelSet, segmentationName, queryId, controller,
         instanceConfig);
+      
       i++;
 
       panel.setWidth("100%");

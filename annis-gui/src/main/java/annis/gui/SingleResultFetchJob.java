@@ -19,6 +19,7 @@ import static annis.gui.ResultFetchJob.log;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
+import annis.gui.resultview.SingleResultPanel;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.SubgraphQuery;
@@ -38,10 +39,14 @@ import java.util.concurrent.TimeoutException;
 public class SingleResultFetchJob extends ResultFetchJob
 {
 
+  private SingleResultPanel singleResultPanel;
+
   public SingleResultFetchJob(PagedResultQuery query,
-    ResultViewPanel resultPanel, SearchUI ui)
+    ResultViewPanel resultPanel, SearchUI ui,
+    SingleResultPanel singleResultPanel)
   {
     super(query, resultPanel, ui);
+    this.singleResultPanel = singleResultPanel;
   }
 
   @Override
@@ -68,20 +73,17 @@ public class SingleResultFetchJob extends ResultFetchJob
         return;
       }
 
+      List<Match> subList = new LinkedList<Match>();
+      subList.add(result.get(0)); //only one result is possible
+      SubgraphQuery subgraphQuery = prepareQuery(subList);
+      final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
 
-      
-        List<Match> subList = new LinkedList<Match>();
-        subList.add(result.get(0)); //only one result is possible
-        SubgraphQuery subgraphQuery = prepareQuery(subList);
-        final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
-       
-        // TODO put p into result panel
-        // resultPanel.updateSingleResultPanel();
+      singleResultPanel.updateResult(p);
 
       if (Thread.interrupted())
       {
         return;
-      }      
+      }
     }
 
     catch (TimeoutException ex)
