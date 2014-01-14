@@ -199,8 +199,7 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     if(showCaption)
     {
-      VLabel lblCaption = new VLabel(name);
-      table.setWidget(rowNumber, 0, lblCaption);
+      table.setHTML(rowNumber, 0, Util.escapeHTML(name));
       formatter.addStyleName(rowNumber, 0, "header");
       startColumn = 1;
     }
@@ -215,24 +214,30 @@ public class VAnnotationGrid extends Composite implements Paintable
       int left = event.getIntAttribute("left");
       int right = event.getIntAttribute("right");
       String value = event.getStringAttribute("value");
-
-      VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
-
-      if (event.hasAttribute("tooltip"))
+      if(escapeHTML)
       {
-        label.setTitle(event.getStringAttribute("tooltip"));
+        value = Util.escapeHTML(value);
       }
-      else
-      {
-        label.setTitle(caption);
-      }
+      
 
       // +1 because we also have a caption column, subtract columns we
       // jumped over by using colspan
       int col = left + startColumn - colspanOffset;
 
-      // add table cell
-      table.setWidget(rowNumber, col, label);
+      if (event.hasAttribute("tooltip"))
+      {
+        VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
+        label.setTitle(event.getStringAttribute("tooltip"));
+
+        // add a label with a title as table cell
+        table.setWidget(rowNumber, col, label);
+      }
+      else
+      {
+        // don't use label since it will produce an extra "div"
+        table.setHTML(rowNumber, col, value);
+      }
+      
       position2id.put(new Position(rowNumber, col), id);
 
       int colspan = right - left + 1;

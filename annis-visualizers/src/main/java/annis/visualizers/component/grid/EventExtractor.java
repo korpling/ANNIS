@@ -177,6 +177,7 @@ public class EventExtractor {
         String id = "event_" + eventCounter.incrementAndGet();
         GridEvent event = new GridEvent(id, left, right,
           anno.getSValueSTEXT());
+        event.setTooltip(anno.getQName());
 
         // check if the span is a matched node
         SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
