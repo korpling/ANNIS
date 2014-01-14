@@ -78,7 +78,7 @@ public class SingleResultFetchJob extends ResultFetchJob
       SubgraphQuery subgraphQuery = prepareQuery(subList);
       final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
 
-      singleResultPanel.updateResult(p);
+      singleResultPanel.updateResult(p, query);
 
       if (Thread.interrupted())
       {
@@ -135,7 +135,7 @@ public class SingleResultFetchJob extends ResultFetchJob
       });
     }
     finally
-    {
+    {      
       if (Thread.interrupted())
       {
         return;

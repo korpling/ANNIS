@@ -636,9 +636,13 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       } else {      
         query = updatedQueries.get(queryID).get(offset);
       }     
+
+      int lftCtx = query.getContextLeft() + context;
+      int rghtCtx = query.getContextRight() + context;
       
-      query.setContextLeft(query.getContextLeft() + context);
-      query.setContextRight(query.getContextRight() + context);
+      query.setContextLeft(lftCtx < 0 ? 0 : lftCtx);
+      query.setContextRight(rghtCtx < 0 ? 0 : rghtCtx);
+      
       query.setOffset(offset);
       query.setLimit(1);
 

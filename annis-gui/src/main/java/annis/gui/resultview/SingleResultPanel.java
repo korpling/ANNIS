@@ -20,6 +20,8 @@ import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
+import annis.gui.model.PagedResultQuery;
+import annis.gui.model.Query;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
@@ -31,7 +33,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -108,12 +110,14 @@ public class SingleResultPanel extends CssLayout implements
   private Button incCtx;
 
   private Button decCtx;
-  
+
   private int resultNumber;
 
   private ResolverProvider resolverProvider;
 
   private Set<String> visibleTokenAnnos;
+
+  private ProgressBar reloadVisualizer;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -357,13 +361,33 @@ public class SingleResultPanel extends CssLayout implements
 
     if (event.getButton() == incCtx && result != null)
     {
+      showReloadingProgress();
       queryController.increaseCtx(queryId, resultNumber, 5, this);
+      incCtx.setEnabled(false);
     }
-    
+
     if (event.getButton() == decCtx && result != null)
     {
-      queryController.increaseCtx(queryId, resultNumber, -5, this);
+      showReloadingProgress();
+      this.queryController.increaseCtx(queryId, resultNumber, -5, this);
+      decCtx.setEnabled(false);
     }
+  }
+
+  private void showReloadingProgress()
+  {
+    //remove the old visualizer
+    for (VisualizerPanel v : visualizers)
+    {
+      this.removeComponent(v);
+    }
+
+    // first set loading indicator
+    reloadVisualizer = new ProgressBar(1.0f);
+    reloadVisualizer.setIndeterminate(true);
+    reloadVisualizer.setSizeFull();
+    reloadVisualizer.setHeight(150, Unit.PIXELS);
+    addComponent(reloadVisualizer);
   }
 
   private void initVisualizer()
@@ -622,15 +646,26 @@ public class SingleResultPanel extends CssLayout implements
    * @param p the project, all visualizer are updated with.
    */
   // TODO deactivate context buttons
-  public void updateResult(SaltProject p)
+  public void updateResult(SaltProject p, PagedResultQuery query)
   {
-    this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
-
-    for (VisualizerPanel v : visualizers)
+    if (p != null
+      && p.getSCorpusGraphs() != null
+      && !p.getSCorpusGraphs().isEmpty()
+      && p.getSCorpusGraphs().get(0) != null
+      && p.getSCorpusGraphs().get(0).getSDocuments() != null
+      && !p.getSCorpusGraphs().get(0).getSDocuments().isEmpty())
     {
-      this.removeComponent(v);
+      this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
+    }
+    
+    // activate decrease context button if there is context left.
+    if (!(query.getContextLeft() == 0 && query.getContextRight() == 0))
+    {
+      decCtx.setEnabled(true);
     }
 
+    incCtx.setEnabled(true);
+    removeComponent(reloadVisualizer);
     initVisualizer();
   }
 }
