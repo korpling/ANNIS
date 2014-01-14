@@ -64,6 +64,7 @@ public class GridComponent extends Panel
   private final transient MediaController mediaController;
   private final transient PDFController pdfController;
   private final VerticalLayout layout;
+  private Set<String> manuallySelectedTokenAnnos;
   
   public enum ElementType
   {
@@ -247,6 +248,10 @@ public class GridComponent extends Panel
     {
       List<String> tokenAnnos
         = EventExtractor.computeDisplayAnnotations(input, SToken.class);
+      if(manuallySelectedTokenAnnos != null)
+      {
+        tokenAnnos.retainAll(manuallySelectedTokenAnnos);
+      }
       annos.addAll(tokenAnnos);
     }
     
@@ -257,6 +262,17 @@ public class GridComponent extends Panel
     
     return rowsByAnnotation;
   }
+  
+  
+  public void setVisibleTokenAnnos(Set<String> annos)
+  {
+    this.manuallySelectedTokenAnnos = annos;
+    // complete recreation of the grid
+    layout.removeComponent(grid);
+    createAnnotationGrid();
+    
+  }
+
   
   protected boolean isShowingTokenAnnotations()
   {

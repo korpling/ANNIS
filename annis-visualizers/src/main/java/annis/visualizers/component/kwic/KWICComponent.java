@@ -20,6 +20,7 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
+import java.util.Set;
 
 /**
  * A component to visualize matched token and their context as "Keyword in context"
@@ -35,7 +36,7 @@ public class KWICComponent extends GridComponent
    
     getGrid().setShowCaption(false);
   }
-
+  
   @Override
   protected boolean isShowingTokenAnnotations()
   {
@@ -66,6 +67,13 @@ public class KWICComponent extends GridComponent
   protected String getMainStyle()
   {
     return "kwic";
+  }
+
+  @Override
+  public void setVisibleTokenAnnos(Set<String> annos)
+  {
+    super.setVisibleTokenAnnos(annos);
+    getGrid().setShowCaption(false);
   }
   
   

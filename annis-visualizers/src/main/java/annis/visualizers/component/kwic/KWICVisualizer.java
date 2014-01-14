@@ -22,6 +22,7 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
 import com.vaadin.server.VaadinSession;
+import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,4 +64,13 @@ public class KWICVisualizer extends AbstractVisualizer<KWICComponent>
     return component;
   }
 
+  @Override
+  public void setVisibleTokenAnnosVisible(KWICComponent component,
+    Set<String> annos)
+  {
+    component.setVisibleTokenAnnos(annos);
+  }
+
+  
+  
 }
