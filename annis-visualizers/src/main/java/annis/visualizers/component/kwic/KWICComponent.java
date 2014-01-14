@@ -47,6 +47,19 @@ public class KWICComponent extends GridComponent
     // never show span annotations
     return false;
   }
+
+  @Override
+  protected boolean isHidingToken()
+  {
+    return false;
+  }
+
+  @Override
+  protected boolean isTokenFirst()
+  {
+    return true;
+  }
+  
   
   
   

@@ -15,38 +15,13 @@
  */
 package annis.visualizers.component.grid;
 
-import annis.CommonHelper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.gui.widgets.grid.AnnotationGrid;
-import annis.gui.widgets.grid.GridEvent;
-import annis.gui.widgets.grid.Row;
 import annis.libgui.media.PDFController;
-import static annis.model.AnnisConstants.*;
-import annis.model.RelannisNodeFeature;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

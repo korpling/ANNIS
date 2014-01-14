@@ -42,6 +42,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -129,6 +130,37 @@ public class GridComponent extends Panel
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation = 
       computeAnnotationRows(startIndex, endIndex);
     
+    // add tokens as row
+    AtomicInteger tokenOffsetForText = new AtomicInteger(-1);
+    ArrayList<Row> tokenRowList = computeTokenRow(tokens, graph,
+      rowsByAnnotation, startIndex, tokenOffsetForText);
+    if (isHidingToken() == false)
+    {
+      
+      if(isTokenFirst())
+      {
+        // copy original list but add token row at the beginning
+        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<String, ArrayList<Row>>();
+        
+        newList.put("tok", tokenRowList);
+        newList.putAll(rowsByAnnotation);
+        rowsByAnnotation = newList;
+        
+      }
+      else
+      {
+        // just add the token row to the end of the list
+        rowsByAnnotation.put("tok", tokenRowList);
+      }
+    }
+    grid.setRowsByAnnotation(rowsByAnnotation);
+    grid.setTokenIndexOffset(tokenOffsetForText.get());
+  }
+  
+  private ArrayList<Row> computeTokenRow(EList<SToken> tokens, 
+    SDocumentGraph graph, LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
+    long startIndex, AtomicInteger tokenOffsetForText)
+  {
     /* we will only add tokens of one texts which is mentioned by any
       included annotation. */
     Set<String> validTextIDs = new HashSet<String>();
@@ -151,8 +183,7 @@ public class GridComponent extends Panel
     {
       validTextIDs.add(allTexts.get(0).getSId());
     }
-    int tokenOffsetForText = -1;
-    // add tokens as row
+    
     Row tokenRow = new Row();
     for (SToken t : tokens)
     {
@@ -178,10 +209,10 @@ public class GridComponent extends Panel
           = (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
             AnnisConstants.FEAT_RELANNIS_NODE).getValue();
         long idx = feat.getTokenIndex() - startIndex;
-        if (tokenOffsetForText < 0)
+        if (tokenOffsetForText.get() < 0)
         {
           // set the token offset by assuming the first idx must be zero
-          tokenOffsetForText = Math.abs((int) idx);
+          tokenOffsetForText.set(Math.abs((int) idx));
         }
         String text = CommonHelper.getSpannedText(t);
         GridEvent event
@@ -195,13 +226,8 @@ public class GridComponent extends Panel
     } // end token row
     ArrayList<Row> tokenRowList = new ArrayList<Row>();
     tokenRowList.add(tokenRow);
-    if (Boolean.parseBoolean(input.getMappings().
-      getProperty(MAPPING_HIDE_TOK_KEY, "false")) == false)
-    {
-      rowsByAnnotation.put("tok", tokenRowList);
-    }
-    grid.setRowsByAnnotation(rowsByAnnotation);
-    grid.setTokenIndexOffset(tokenOffsetForText);
+    
+    return tokenRowList;
   }
   
   private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(
@@ -242,7 +268,19 @@ public class GridComponent extends Panel
   {
     return true;
   }
-
+  
+  protected boolean isHidingToken()
+  {
+    return Boolean.parseBoolean(input.getMappings().
+      getProperty(MAPPING_HIDE_TOK_KEY, "false"));
+    
+  }
+  
+  protected boolean isTokenFirst()
+  {
+    return false;
+  }
+  
   /**
    * Checks if a token is covered by a matched node but not a match by it self.
    *
