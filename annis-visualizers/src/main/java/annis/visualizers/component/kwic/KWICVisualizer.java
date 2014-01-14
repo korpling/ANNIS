@@ -31,9 +31,9 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
-public class KWICGridVisualizer extends AbstractVisualizer<KWICComponent>
+public class KWICVisualizer extends AbstractVisualizer<KWICComponent>
 {
-  private static final Logger log = LoggerFactory.getLogger(KWICGridVisualizer.class);
+  private static final Logger log = LoggerFactory.getLogger(KWICVisualizer.class);
   
   @Override
   public String getShortName()
