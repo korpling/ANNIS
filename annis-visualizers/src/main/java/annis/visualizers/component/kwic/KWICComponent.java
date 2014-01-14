@@ -32,6 +32,8 @@ public class KWICComponent extends GridComponent
     MediaController mediaController, PDFController pdfController)
   {
     super(input, mediaController, pdfController);
+   
+    getGrid().setShowCaption(false);
   }
 
   @Override

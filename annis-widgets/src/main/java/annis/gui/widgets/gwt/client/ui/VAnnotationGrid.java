@@ -190,11 +190,16 @@ public class VAnnotationGrid extends Composite implements Paintable
     String caption = row.getStringAttribute("caption");
     String[] captionSplit = caption.split("::");
     String name = captionSplit[captionSplit.length - 1];
+    
+    boolean showCaption = row.getBooleanAttribute("show-caption");
 
-    VLabel lblCaption = new VLabel(name);
-    table.setWidget(rowNumber, 0, lblCaption);
-    formatter.addStyleName(rowNumber, 0, "header");
-
+    if(showCaption)
+    {
+      VLabel lblCaption = new VLabel(name);
+      table.setWidget(rowNumber, 0, lblCaption);
+      formatter.addStyleName(rowNumber, 0, "header");
+    }
+    
     int colspanOffset = 0;
 
     UIDL events = row.getChildByTagName("events");

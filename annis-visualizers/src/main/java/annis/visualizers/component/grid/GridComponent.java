@@ -305,4 +305,11 @@ public class GridComponent extends Panel
     return input;
   }
 
+  public AnnotationGrid getGrid()
+  {
+    return grid;
+  }
+  
+  
+
 } // end GridVisualizerComponent
