@@ -344,7 +344,7 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        tokenAnnotationLevelSet, segmentationName,
+        getVisibleTokenAnnos(), segmentationName,
         instanceConfig);
       i++;
 

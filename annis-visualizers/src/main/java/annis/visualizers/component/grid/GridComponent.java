@@ -88,6 +88,8 @@ public class GridComponent extends Panel
     
     if (input != null)
     {
+      this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
+      
       EList<STextualDS> texts
         = input.getDocument().getSDocumentGraph().getSTextualDSs();
       if (texts != null && texts.size() > 0)
