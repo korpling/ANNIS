@@ -50,6 +50,7 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
@@ -233,7 +234,7 @@ public class SingleResultPanel extends CssLayout implements
     }
   }
 
-  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  public void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     for (VisualizerPanel p : visualizers)
     {

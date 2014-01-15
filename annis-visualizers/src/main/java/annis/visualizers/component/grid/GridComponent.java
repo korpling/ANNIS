@@ -59,6 +59,7 @@ public class GridComponent extends Panel
   public static final String MAPPING_ANNO_REGEX_KEY = "anno_regex";
   public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
   public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
+  public static final String MAPPING_ESCAPE_HTML = "escape_html";
   private AnnotationGrid grid;
   private final transient VisualizerInput input;
   private final transient MediaController mediaController;
@@ -114,7 +115,7 @@ public class GridComponent extends Panel
     grid.addStyleName(getMainStyle());
     grid.addStyleName("corpus-font-force");
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
-      getProperty("escape_html", "true")));
+      getProperty(MAPPING_ESCAPE_HTML, "true")));
     layout.addComponent(grid);
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
     
@@ -274,7 +275,6 @@ public class GridComponent extends Panel
     createAnnotationGrid();
     
   }
-
   
   protected boolean isShowingTokenAnnotations()
   {

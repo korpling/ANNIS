@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -374,7 +375,7 @@ public class ResultViewPanel extends VerticalLayout implements
     paging.setStartNumber(controller.getPreparedQuery().getOffset());
   }
 
-  public Set<String> getVisibleTokenAnnos()
+  public SortedSet<String> getVisibleTokenAnnos()
   {
     TreeSet<String> result = new TreeSet<String>();
 
@@ -464,6 +465,7 @@ public class ResultViewPanel extends VerticalLayout implements
     } // end iterate for segmentation layer
   }
 
+  @Override
   public void updateVisibleToken(Set<String> tokenAnnotationLevelSet)
   {
     // if no token annotations are there, do not show this mneu
@@ -541,7 +543,7 @@ public class ResultViewPanel extends VerticalLayout implements
     return true;
   }
 
-  private void setVisibleTokenAnnosVisible(Set<String> annos)
+  private void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     for (SingleResultPanel p : resultPanelList)
     {
