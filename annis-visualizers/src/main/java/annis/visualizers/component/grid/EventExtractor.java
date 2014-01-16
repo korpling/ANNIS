@@ -15,6 +15,7 @@
  */
 package annis.visualizers.component.grid;
 
+import annis.CommonHelper;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
 import annis.libgui.PDFPageHelper;
@@ -31,6 +32,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -75,12 +77,13 @@ public class EventExtractor {
    * @param endTokenIndex token index of the last token in the match
    * @param pdfController makes status of all pdfviewer available for the
    * events.
+   * @param text If non-null only include annotations for nodes of the specified text.
    * @return
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, long startTokenIndex, long endTokenIndex,
-          PDFController pdfController) 
+          PDFController pdfController, STextualDS text) 
   {
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
@@ -101,8 +104,12 @@ public class EventExtractor {
     {
       for (SSpan span : graph.getSSpans())
       {
-        addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
-          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, true);
+        if(text == null || text == CommonHelper.getTextualDSForNode(span, graph))
+        {
+          addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
+            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
+            true);
+        }
       } // end for each span
     }
     
@@ -110,8 +117,11 @@ public class EventExtractor {
     {
       for(SToken tok : graph.getSTokens())
       {
-        addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
-          pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false);
+        if(text == null || text == CommonHelper.getTextualDSForNode(tok, graph))
+        {
+          addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
+            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false);
+        }
       }
     }
 

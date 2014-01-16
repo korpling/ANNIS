@@ -34,6 +34,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -66,7 +67,8 @@ public class GridComponent extends Panel
   private final VerticalLayout layout;
   private Set<String> manuallySelectedTokenAnnos;
   private String segmentationName;
-  private Map<SNode, Long> markedAndCovered;
+  private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
+  private transient STextualDS enforcedText;
   
   public enum ElementType
   {
@@ -75,11 +77,12 @@ public class GridComponent extends Panel
   }
 
   public GridComponent(VisualizerInput input, MediaController mediaController,
-    PDFController pdfController, boolean forceToken)
+    PDFController pdfController, boolean forceToken, STextualDS enforcedText)
   {
     this.input = input;
     this.mediaController = mediaController;
     this.pdfController = pdfController;
+    this.enforcedText = enforcedText;
     
     setWidth("100%");
     setHeight("-1");
@@ -172,34 +175,42 @@ public class GridComponent extends Panel
     /* we will only add tokens of one texts which is mentioned by any
       included annotation. */
     Set<String> validTextIDs = new HashSet<String>();
-    Iterator<ArrayList<Row>> itAllRows = rowsByAnnotation.values().iterator();
-    while (itAllRows.hasNext())
+    
+    if(enforcedText == null)
     {
-      ArrayList<Row> rowsForAnnotation = itAllRows.next();
-      for (Row r : rowsForAnnotation)
+      Iterator<ArrayList<Row>> itAllRows = rowsByAnnotation.values().iterator();
+      while (itAllRows.hasNext())
       {
-        validTextIDs.addAll(r.getTextIDs());
+        ArrayList<Row> rowsForAnnotation = itAllRows.next();
+        for (Row r : rowsForAnnotation)
+        {
+          validTextIDs.addAll(r.getTextIDs());
+        }
+      }
+      /**
+       * we want to show all token if no valid text was found and we have only one
+       * text and the first one if there are more than one text.
+       */
+      EList<STextualDS> allTexts = graph.getSTextualDSs();
+      if (validTextIDs.isEmpty() && allTexts != null && (allTexts.size() == 1
+        || allTexts.size() == 2))
+      {
+        validTextIDs.add(allTexts.get(0).getSId());
       }
     }
-    /**
-     * we want to show all token if no valid text was found and we have only one
-     * text and the first one if there are more than one text.
-     */
-    EList<STextualDS> allTexts = graph.getSTextualDSs();
-    if (validTextIDs.isEmpty() && allTexts != null && (allTexts.size() == 1
-      || allTexts.size() == 2))
+    else
     {
-      validTextIDs.add(allTexts.get(0).getSId());
+      validTextIDs.add(enforcedText.getSId());
     }
     
     Row tokenRow = new Row();
     for (SNode t : tokens)
     {
       // get the Salt ID of the STextualDS of this token
-      String tokenTextID = CommonHelper.getTextIDForNode(t);
+      STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
       // only add token if text ID matches the valid one
-      if (tokenTextID != null && validTextIDs.contains(tokenTextID))
+      if (tokenText != null && validTextIDs.contains(tokenText.getSId()))
       {
         RelannisNodeFeature feat
           = (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
@@ -213,7 +224,7 @@ public class GridComponent extends Panel
         String text = extractTextForToken(t, segmentationName);
         GridEvent event
           = new GridEvent(t.getSId(), (int) idx, (int) idx, text);
-        event.setTextID(tokenTextID);
+        event.setTextID(tokenText.getSId());
         // check if the token is a matched node
         Long match = markCoveredTokens(markedAndCovered, t);
         event.setMatch(match);
@@ -272,7 +283,7 @@ public class GridComponent extends Panel
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
         showTokenAnnotations, annos,
-        (int) startIndex, (int) endIndex, pdfController);
+        (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
   }

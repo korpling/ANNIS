@@ -21,6 +21,7 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
 import com.vaadin.server.VaadinSession;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Arrays;
 import java.util.HashSet;
@@ -44,9 +45,9 @@ public class KWICComponent extends GridComponent implements KWICInterface
   private Set<String> hiddenTokenAnnos = null;
 
   public KWICComponent(VisualizerInput input,
-    MediaController mediaController, PDFController pdfController)
+    MediaController mediaController, PDFController pdfController, STextualDS text)
   {
-    super(input, mediaController, pdfController, false);
+    super(input, mediaController, pdfController, false, text);
 
     getGrid().setShowCaption(false);
 

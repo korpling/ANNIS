@@ -76,7 +76,7 @@ public class GridVisualizer extends AbstractVisualizer<GridComponent>
     try
     {
       component = new GridComponent(visInput,
-        mediaController, pdfController, true);
+        mediaController, pdfController, true, null);
     }
     catch (Exception ex)
     {

@@ -295,24 +295,7 @@ public class LegacyKWICPanel extends AbstractVisualizer<KWICInterface>
 
       for (SNode t : token)
       {
-        STextualDS tokenText = null;
-        EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
-        types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-
-        EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
-          t,
-          types);
-        if (dataSources != null)
-        {
-          for (SDataSourceSequence seq : dataSources)
-          {
-            if (seq.getSSequentialDS() instanceof STextualDS)
-            {
-              tokenText = (STextualDS) seq.getSSequentialDS();
-              break;
-            }
-          }
-        }
+        STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
         Long tokenIndex = null;
         RelannisNodeFeature featRelannis = (RelannisNodeFeature) t.getSFeature(

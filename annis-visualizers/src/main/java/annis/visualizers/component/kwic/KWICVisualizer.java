@@ -62,7 +62,7 @@ public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
     {
       // directly return the single non-nested KWIC panel
       return new KWICComponent(visInput,
-        mediaController, pdfController);
+        mediaController, pdfController, texts.get(0));
     }
     else
     {

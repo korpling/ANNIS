@@ -24,10 +24,12 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDominanceRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpanningRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
@@ -368,79 +370,35 @@ public class CommonHelper
   }
 
   /**
-   * Finds the ID of the {@link STextualDS} for a given node. The node must
+   * Finds the {@link STextualDS} for a given node. The node must
    * dominate a token of this text.
    *
    * @param node
    * @return
    */
-  public static String getTextIDForNode(SNode node)
+  public static STextualDS getTextualDSForNode(SNode node, SDocumentGraph graph)
   {
     if (node != null)
     {
-      SGraph graph = node.getSGraph();
-      BasicEList<SNode> start = new BasicEList<SNode>();
-      start.add(node);
-      TextualDSTraverseHandler handler = new TextualDSTraverseHandler();
-      graph.traverse(start, GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST,
-        "textidof-" + node.getSId(), handler);
-      if(handler.getResult() != null)
+      STextualDS tokenText = null;
+      EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
+      types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
+
+      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
+        node,
+        types);
+      if (dataSources != null)
       {
-        return handler.getResult().getSId();
+        for (SDataSourceSequence seq : dataSources)
+        {
+          if (seq.getSSequentialDS() instanceof STextualDS)
+          {
+            return (STextualDS) seq.getSSequentialDS();
+          }
+        }
       }
     }
     return null;
-  }
-
-  private static class TextualDSTraverseHandler implements SGraphTraverseHandler
-  {
-    
-    private STextualDS result;
-
-    @Override
-    public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-      String traversalId, SNode currNode, SRelation sRelation,
-      SNode fromNode, long order)
-    {
-      if (currNode instanceof STextualDS)
-      {
-        result = (STextualDS) currNode;
-      }
-    }
-
-    @Override
-    public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-      String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-      long order)
-    {
-    }
-
-    @Override
-    public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-      String traversalId, SRelation edge, SNode currNode, long order)
-    {
-      if (currNode instanceof STextualDS)
-      {
-        return true;
-      }
-      else if(edge == null)
-      {
-        return true;
-      }
-      else
-      {
-        return (edge instanceof SSpanningRelation
-          || edge instanceof SDominanceRelation
-          || edge instanceof STextualRelation);
-      }
-    }
-
-    public STextualDS getResult()
-    {
-      return result;
-    }
-    
-    
   }
 
   // TODO: remove if really not needed

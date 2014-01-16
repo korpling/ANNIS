@@ -48,7 +48,7 @@ public class KWICMultipleTextComponent extends CssLayout implements KWICInterfac
       for (STextualDS t : texts)
       {
         KWICComponent kwic
-          = new KWICComponent(visInput, mediaController, pdfController);
+          = new KWICComponent(visInput, mediaController, pdfController, t);
         kwicPanels.add(kwic);
         addComponent(kwic);
       }
