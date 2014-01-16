@@ -176,11 +176,20 @@ public class EventExtractor {
       }
       gap = Range.closed(gapStart, gapEnd-1);
       gaps.add(gap);
+      
+      
     }
     
     int gapID =0;
-    for(Range<Integer> g : gaps)
+    int totalOffset = 0;
+    for(Range<Integer> gRaw : gaps)
     {
+      // adjust the space range itself
+      Range<Integer> g = 
+        Range.closed(gRaw.lowerEndpoint() - totalOffset, gRaw.upperEndpoint() - totalOffset);
+      int offset = g.upperEndpoint() - g.lowerEndpoint();
+      totalOffset += offset;
+      
       for(Entry<String, ArrayList<Row>> rowEntry : rowsByAnnotation.entrySet())
       {
         ArrayList<Row> rows = rowEntry.getValue();
@@ -191,7 +200,8 @@ public class EventExtractor {
           {
             if(e.getLeft() >= g.upperEndpoint())
             {
-              int offset = g.upperEndpoint() - g.lowerEndpoint();
+              
+              
               r.removeEvent(e);
               e.setLeft(e.getLeft() - offset);
               e.setRight(e.getRight() - offset);
@@ -212,11 +222,7 @@ public class EventExtractor {
         }
       }
     }
-    
-    
-    // TODO
   }
-
   private static void addAnnotationsForNode(SNode node,
     SDocumentGraph graph,
     long startTokenIndex, long endTokenIndex,
