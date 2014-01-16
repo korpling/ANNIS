@@ -205,7 +205,11 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   {
     ArrayList<String> styles = new ArrayList<String>();
 
-    if (tokRowKey.equals(annoName))
+    if(event.isSpace())
+    {
+      styles.add("space");
+    }
+    else if (tokRowKey.equals(annoName))
     {
       styles.add("token");
     }
@@ -213,14 +217,12 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("gap");
     }
-    else if(event.isSpace())
-    {
-      styles.add("space");
-    }
     else
     {
       styles.add("single_event");
     }
+    
+    
 
     if (event.getMatch() != null)
     {
