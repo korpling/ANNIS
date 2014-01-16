@@ -28,7 +28,6 @@ import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
-import com.google.common.collect.Lists;
 import com.google.common.collect.Range;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -50,6 +49,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import java.util.Map.Entry;
 import java.util.Random;
 import java.util.Set;
 import java.util.TreeSet;
@@ -181,8 +181,9 @@ public class EventExtractor {
     int gapID =0;
     for(Range<Integer> g : gaps)
     {
-      for(ArrayList<Row> rows : rowsByAnnotation.values())
+      for(Entry<String, ArrayList<Row>> rowEntry : rowsByAnnotation.entrySet())
       {
+        ArrayList<Row> rows = rowEntry.getValue();
         for(Row r : rows)
         {
           List<GridEvent> eventsCopy = new LinkedList<GridEvent>(r.getEvents());
@@ -199,7 +200,12 @@ public class EventExtractor {
           }
           
           // add a special space event
-          GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), "");
+          String spaceCaption ="";
+          if("tok".equalsIgnoreCase(rowEntry.getKey()))
+          {
+            spaceCaption = "(...)";
+          }
+          GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), spaceCaption);
           spaceEvent.setSpace(true);
           r.addEvent(spaceEvent);
           gapID++;
