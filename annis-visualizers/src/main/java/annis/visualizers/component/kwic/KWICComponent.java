@@ -21,8 +21,10 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
 import com.vaadin.server.VaadinSession;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Arrays;
 import java.util.HashSet;
+import java.util.Map;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -92,6 +94,16 @@ public class KWICComponent extends GridComponent
       }
     }
   }
+
+  @Override
+  public void setSegmentationLayer(String segmentationName,
+    Map<SNode, Long> markedAndCovered)
+  {
+    super.setSegmentationLayer(segmentationName, markedAndCovered);
+    getGrid().setShowCaption(false);
+  }
+  
+  
 
   @Override
   protected boolean isShowingTokenAnnotations()

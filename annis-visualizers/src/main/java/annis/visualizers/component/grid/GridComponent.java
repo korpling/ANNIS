@@ -27,12 +27,11 @@ import annis.model.RelannisNodeFeature;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -66,6 +65,8 @@ public class GridComponent extends Panel
   private final transient PDFController pdfController;
   private final VerticalLayout layout;
   private Set<String> manuallySelectedTokenAnnos;
+  private String segmentationName;
+  private Map<SNode, Long> markedAndCovered;
   
   public enum ElementType
   {
@@ -90,6 +91,8 @@ public class GridComponent extends Panel
     if (input != null)
     {
       this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
+      this.segmentationName = input.getSegmentationName();
+      this.markedAndCovered = input.getMarkedAndCovered();
       
       EList<STextualDS> texts
         = input.getDocument().getSDocumentGraph().getSTextualDSs();
@@ -119,7 +122,8 @@ public class GridComponent extends Panel
     layout.addComponent(grid);
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
     
-    EList<SToken> tokens = graph.getSortedSTokenByText();
+    List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
+      graph);
     RelannisNodeFeature featTokStart
       = (RelannisNodeFeature) tokens.get(0).
       getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
@@ -161,7 +165,7 @@ public class GridComponent extends Panel
     grid.setTokenIndexOffset(tokenOffsetForText.get());
   }
   
-  private ArrayList<Row> computeTokenRow(EList<SToken> tokens, 
+  private ArrayList<Row> computeTokenRow(List<SNode> tokens, 
     SDocumentGraph graph, LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     long startIndex, AtomicInteger tokenOffsetForText)
   {
@@ -189,41 +193,29 @@ public class GridComponent extends Panel
     }
     
     Row tokenRow = new Row();
-    for (SToken t : tokens)
+    for (SNode t : tokens)
     {
       // get the Salt ID of the STextualDS of this token
-      String tokenTextID = null;
-      EList<Edge> tokenOutEdges = graph.getOutEdges(t.getSId());
-      if (tokenOutEdges != null)
-      {
-        for (Edge tokEdge : tokenOutEdges)
-        {
-          if (tokEdge instanceof STextualRelation)
-          {
-            tokenTextID
-              = ((STextualRelation) tokEdge).getSTextualDS().getSId();
-            break;
-          }
-        }
-      }
+      String tokenTextID = CommonHelper.getTextIDForNode(t);
+
       // only add token if text ID matches the valid one
       if (tokenTextID != null && validTextIDs.contains(tokenTextID))
       {
         RelannisNodeFeature feat
           = (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
             AnnisConstants.FEAT_RELANNIS_NODE).getValue();
-        long idx = feat.getTokenIndex() - startIndex;
+        long idx = feat.getLeftToken() - startIndex;
         if (tokenOffsetForText.get() < 0)
         {
           // set the token offset by assuming the first idx must be zero
           tokenOffsetForText.set(Math.abs((int) idx));
         }
-        String text = CommonHelper.getSpannedText(t);
+        String text = extractTextForToken(t, segmentationName);
         GridEvent event
           = new GridEvent(t.getSId(), (int) idx, (int) idx, text);
         event.setTextID(tokenTextID);
         // check if the token is a matched node
-        Long match = markCoveredTokens(input.getMarkedAndCovered(), t);
+        Long match = markCoveredTokens(markedAndCovered, t);
         event.setMatch(match);
         tokenRow.addEvent(event);
       }
@@ -232,6 +224,25 @@ public class GridComponent extends Panel
     tokenRowList.add(tokenRow);
     
     return tokenRowList;
+  }
+  
+  private String extractTextForToken(SNode t, String segmentation)
+  {
+    if(t instanceof SToken)
+    {
+      return CommonHelper.getSpannedText((SToken) t);
+    }
+    else if(segmentation != null)
+    {
+      for(SAnnotation anno : t.getSAnnotations())
+      {
+        if(anno.getSName().equals(segmentation))
+        {
+          return anno.getSValueSTEXT();
+        }
+      }
+    }
+    return "";
   }
   
   private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(
@@ -276,6 +287,16 @@ public class GridComponent extends Panel
     
   }
   
+  public void setSegmentationLayer(String segmentationName, 
+    Map<SNode, Long> markedAndCovered)
+  {
+    this.segmentationName = segmentationName;
+    this.markedAndCovered = markedAndCovered;
+    // complete recreation of the grid
+    layout.removeComponent(grid);
+    createAnnotationGrid();
+  }
+  
   protected boolean isShowingTokenAnnotations()
   {
     return Boolean.parseBoolean(input.getMappings().
@@ -312,7 +333,7 @@ public class GridComponent extends Panel
    * @param tok the checked token.
    * @return Returns null, if token is not covered neither marked.
    */
-  private Long markCoveredTokens(Map<SNode, Long> markedAndCovered, SToken tok)
+  private Long markCoveredTokens(Map<SNode, Long> markedAndCovered, SNode tok)
   {
     RelannisNodeFeature f = RelannisNodeFeature.extract(tok);
     if (markedAndCovered.containsKey(tok) && f != null && f.getMatchedNode()

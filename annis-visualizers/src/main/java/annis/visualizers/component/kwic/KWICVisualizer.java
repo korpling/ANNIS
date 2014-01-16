@@ -22,6 +22,8 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
 import com.vaadin.server.VaadinSession;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.Map;
 import java.util.Set;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
@@ -71,6 +73,15 @@ public class KWICVisualizer extends AbstractVisualizer<KWICComponent>
     component.setVisibleTokenAnnos(annos);
   }
 
+  
+  @Override
+  public void setSegmentationLayer(KWICComponent visualizerImplementation,
+    String segmentationName, Map<SNode, Long> markedAndCovered)
+  {
+    visualizerImplementation.setSegmentationLayer(segmentationName,
+      markedAndCovered);
+  }
+  
   
   
 }
