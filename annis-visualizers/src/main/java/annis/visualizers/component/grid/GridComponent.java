@@ -164,6 +164,9 @@ public class GridComponent extends Panel
         rowsByAnnotation.put("tok", tokenRowList);
       }
     }
+    
+    EventExtractor.removeEmptySpace(rowsByAnnotation);
+    
     grid.setRowsByAnnotation(rowsByAnnotation);
     grid.setTokenIndexOffset(tokenOffsetForText.get());
   }

@@ -213,6 +213,10 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("gap");
     }
+    else if(event.isSpace())
+    {
+      styles.add("space");
+    }
     else
     {
       styles.add("single_event");

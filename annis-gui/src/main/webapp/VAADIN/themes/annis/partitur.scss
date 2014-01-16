@@ -36,6 +36,12 @@
     border-style: solid;
     border-color: black;
   }
+  
+  .partitur_table td.space {
+    background-image: url("space.png");
+    background-repeat: repeat-y;
+    border-style: none;
+  }
 
 
   .partitur_table td {

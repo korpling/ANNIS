@@ -48,6 +48,7 @@ public class GridEvent implements Serializable
   private Double endTime;
 
   private boolean gap;
+  private boolean space;
 
   private String textID;
 
@@ -207,4 +208,16 @@ public class GridEvent implements Serializable
   {
     this.tooltip = tooltip;
   }
+
+  public boolean isSpace()
+  {
+    return space;
+  }
+
+  public void setSpace(boolean space)
+  {
+    this.space = space;
+  }
+  
+  
 }

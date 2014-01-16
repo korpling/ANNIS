@@ -28,6 +28,8 @@ import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Range;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
@@ -40,6 +42,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedHashMap;
@@ -143,7 +146,69 @@ public class EventExtractor {
         splitRowsOnGaps(r, graph, startTokenIndex, endTokenIndex);
       }
     }
+    
     return rowsByAnnotation;
+  }
+  
+  public static void removeEmptySpace(LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation)
+  {
+    List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
+//    Row gapRow = new Row();
+//    rowsByAnnotation.put("annis::gap", Lists.newArrayList(gapRow));
+//    
+    BitSet totalOccupancyGrid = new BitSet();
+    for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
+    {
+      for(Row r : layer.getValue())
+      {
+        totalOccupancyGrid.or(r.getOccupancyGridCopy());
+      }
+    }
+    
+    Range<Integer> gap = Range.closed(-1, 0);
+    while(true)
+    {
+      int gapStart = totalOccupancyGrid.nextClearBit(gap.upperEndpoint()+1);
+      int gapEnd = totalOccupancyGrid.nextSetBit(gapStart);
+      if(gapEnd <= 0)
+      {
+        break;
+      }
+      gap = Range.closed(gapStart, gapEnd-1);
+      gaps.add(gap);
+    }
+    
+    int gapID =0;
+    for(Range<Integer> g : gaps)
+    {
+      for(ArrayList<Row> rows : rowsByAnnotation.values())
+      {
+        for(Row r : rows)
+        {
+          List<GridEvent> eventsCopy = new LinkedList<GridEvent>(r.getEvents());
+          for(GridEvent e : eventsCopy)
+          {
+            if(e.getLeft() >= g.upperEndpoint())
+            {
+              int offset = g.upperEndpoint() - g.lowerEndpoint();
+              r.removeEvent(e);
+              e.setLeft(e.getLeft() - offset);
+              e.setRight(e.getRight() - offset);
+              r.addEvent(e);
+            }
+          }
+          
+          // add a special space event
+          GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), "");
+          spaceEvent.setSpace(true);
+          r.addEvent(spaceEvent);
+          gapID++;
+        }
+      }
+    }
+    
+    
+    // TODO
   }
 
   private static void addAnnotationsForNode(SNode node,
