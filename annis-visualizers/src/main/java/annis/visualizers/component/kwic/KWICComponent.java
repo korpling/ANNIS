@@ -46,7 +46,7 @@ public class KWICComponent extends GridComponent
   public KWICComponent(VisualizerInput input,
     MediaController mediaController, PDFController pdfController)
   {
-    super(input, mediaController, pdfController);
+    super(input, mediaController, pdfController, false);
 
     getGrid().setShowCaption(false);
 

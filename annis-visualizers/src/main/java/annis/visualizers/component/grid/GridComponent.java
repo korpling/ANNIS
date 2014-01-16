@@ -75,7 +75,7 @@ public class GridComponent extends Panel
   }
 
   public GridComponent(VisualizerInput input, MediaController mediaController,
-    PDFController pdfController)
+    PDFController pdfController, boolean forceToken)
   {
     this.input = input;
     this.mediaController = mediaController;
@@ -91,7 +91,7 @@ public class GridComponent extends Panel
     if (input != null)
     {
       this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
-      this.segmentationName = input.getSegmentationName();
+      this.segmentationName = forceToken ? null :  input.getSegmentationName();
       this.markedAndCovered = input.getMarkedAndCovered();
       
       EList<STextualDS> texts
