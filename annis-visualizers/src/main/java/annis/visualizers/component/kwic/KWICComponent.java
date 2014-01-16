@@ -36,7 +36,7 @@ import org.apache.commons.lang3.StringUtils;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class KWICComponent extends GridComponent
+public class KWICComponent extends GridComponent implements KWICInterface
 {
 
   public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
