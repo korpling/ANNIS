@@ -399,6 +399,9 @@ public class ResultViewPanel extends VerticalLayout implements
     @Override
     public void menuSelected(MenuItem selectedItem)
     {
+      // remember old value
+      String oldSegmentationLayer = selectedSegmentationLayer;
+      
       // set the new selected item
       selectedSegmentationLayer = selectedItem.getText();
 
@@ -410,8 +413,19 @@ public class ResultViewPanel extends VerticalLayout implements
       {
         mi.setChecked(mi == selectedItem);
       }
-
-      setSegmentationLayer(selectedSegmentationLayer);
+      
+      if(oldSegmentationLayer != null)
+      {
+        if(!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        {
+          setSegmentationLayer(selectedSegmentationLayer);
+        }
+      }
+      else if(selectedSegmentationLayer != null)
+      {
+        // oldSegmentation is null, but selected is not
+        setSegmentationLayer(selectedSegmentationLayer);
+      }
     }
   }
 
