@@ -364,23 +364,53 @@ public class SearchUI extends AnnisBaseUI
       public void buttonClick(ClickEvent event)
       {
         btSidebar.setEnabled(true);
-        
+      
         // decide new state
-        switch(sidebarState)
+        switch (sidebarState)
         {
           case VISIBLE:
-            
-            sidebarState = SidebarState.HIDDEN;
-            
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.AUTO_HIDDEN;
+            }
+            else
+            {
+              sidebarState = SidebarState.HIDDEN;
+            }
             break;
           case HIDDEN:
-            sidebarState = SidebarState.VISIBLE;
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.AUTO_VISIBLE;
+            }
+            else
+            {
+              sidebarState = SidebarState.VISIBLE;
+            }
+            break;
+
+          case AUTO_VISIBLE:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.HIDDEN;
+            }
+            else
+            {
+              sidebarState = SidebarState.AUTO_HIDDEN;
+            }
+            break;
+          case AUTO_HIDDEN:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.VISIBLE;
+            }
+            else
+            {
+              sidebarState = SidebarState.AUTO_VISIBLE;
+            }
             break;
         }
-        
-        // update controls according to new state
-        controlPanel.setVisible(sidebarState.isSidebarVisible());
-        btSidebar.setIcon(sidebarState.getIcon());
+        updateControlsForSidebarState();
       }
     });
     
@@ -656,6 +686,18 @@ public class SearchUI extends AnnisBaseUI
     }
 
   }
+  
+  /**
+   * update controls according to new state
+   */
+  private void updateControlsForSidebarState()
+  {
+    if(controlPanel != null && sidebarState != null && btSidebar != null)
+    {
+      controlPanel.setVisible(sidebarState.isSidebarVisible());
+      btSidebar.setIcon(sidebarState.getIcon());
+    }
+  }
 
   public void updateUserInformation()
   {
@@ -831,6 +873,15 @@ public class SearchUI extends AnnisBaseUI
         Notification.Type.WARNING_MESSAGE);
     }
 
+  }
+  
+  public void notifiyQueryStarted()
+  {
+    if(sidebarState == SidebarState.AUTO_VISIBLE)
+    {
+      sidebarState = SidebarState.AUTO_HIDDEN;
+    }
+    updateControlsForSidebarState();
   }
 
   @Override

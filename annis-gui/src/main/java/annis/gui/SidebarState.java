@@ -28,7 +28,7 @@ public enum SidebarState
   VISIBLE(new ThemeResource("menu_left.png"), true), 
   HIDDEN(new ThemeResource("menu_right.png"), false), 
   AUTO_VISIBLE(new ThemeResource("menu_auto.png"), true),
-  AUTO_HIDDEN(new ThemeResource("menu_auto.png"), true);
+  AUTO_HIDDEN(new ThemeResource("menu_auto.png"), false);
   
   private final Resource icon;
   private final boolean sidebarVisible;
