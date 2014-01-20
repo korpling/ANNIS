@@ -75,8 +75,9 @@ public class EventExtractor {
    * @param input
    * @param showSpanAnnos
    * @param showTokenAnnos
-   * @param addTimeToAllLayer If true the time information will be added to all events, if false only to the ones that have the name "time"
+   * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
    * @param annotationNames
+   * @param unsetValueForMedia
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
    * @param pdfController makes status of all pdfviewer available for the
@@ -86,8 +87,9 @@ public class EventExtractor {
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
-          boolean addTimeToAllLayer,
-          List<String> annotationNames, long startTokenIndex, long endTokenIndex,
+          List<String> annotationNames, 
+          Set<String> mediaLayer, boolean unsetValueForMedia,
+          long startTokenIndex, long endTokenIndex,
           PDFController pdfController, STextualDS text) 
   {
 
@@ -113,7 +115,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true, addTimeToAllLayer ? null : Pattern.compile("(annis::)?time"));
+            true, mediaLayer, unsetValueForMedia);
         }
       } // end for each span
     }
@@ -126,7 +128,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
-            addTimeToAllLayer ? null : Pattern.compile("(annis::)?time"));
+            mediaLayer, unsetValueForMedia);
         }
       }
     }
@@ -233,7 +235,7 @@ public class EventExtractor {
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     boolean addMatch,
-    Pattern timeLayerPattern)
+    Set<String> mediaLayer, boolean unsetValueForMedia)
   {
 
     // calculate the left and right values of a span
@@ -316,18 +318,31 @@ public class EventExtractor {
 
 
         // try to get time annotations
-        if(timeLayerPattern == null || timeLayerPattern.matcher(anno.getSName()).matches())
+        if(mediaLayer == null || mediaLayer.contains(anno.getQName()))
         {
+          
           double[] startEndTime = TimeHelper.getOverlappedTime(node);
           if (startEndTime.length == 1)
           {
+            if (unsetValueForMedia)
+            {
+              event.setValue(" ");
+              event.setTooltip("play excerpt " + event.getStartTime());
+            }
             event.setStartTime(startEndTime[0]);
           }
           else if (startEndTime.length == 2)
           {
             event.setStartTime(startEndTime[0]);
             event.setEndTime(startEndTime[1]);
+            if (unsetValueForMedia)
+            {
+              event.setValue(" ");
+              event.setTooltip("play excerpt " + event.getStartTime() + "-"
+                + event.getEndTime());
+            }
           }
+          
         }
 
         r.addEvent(event);

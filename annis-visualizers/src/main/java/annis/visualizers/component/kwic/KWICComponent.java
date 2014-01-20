@@ -95,7 +95,7 @@ public class KWICComponent extends GridComponent implements KWICInterface
           setVisibleTokenAnnos(newAnnos);
 
         }
-      }      
+      }
     } // end if visualizer input not null
     
   }
@@ -137,9 +137,15 @@ public class KWICComponent extends GridComponent implements KWICInterface
   }
 
   @Override
-  protected boolean isAddingTimeInformationToAllLayer()
+  protected boolean isFilteringMediaLayer()
   {
-    return false;
+    return true;
+  }
+
+  @Override
+  protected boolean isUnsettingValueForMedia()
+  {
+    return true;
   }
   
   

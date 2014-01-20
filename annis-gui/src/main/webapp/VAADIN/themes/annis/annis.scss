@@ -73,8 +73,10 @@ $font-size: 10pt;
     td.token {
       color: black;
     }
-    .speaker {
-      background: url("speaker.png") no-repeat right;
+    .speaker div {
+      /* we need enough space for the speaker logo */
+      min-width: 32px;
+      min-height: 32px;
     }
     
   }

@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.regex.Pattern;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
@@ -283,14 +284,29 @@ public class GridComponent extends Panel
       annos.addAll(tokenAnnos);
     }
     
+     // search for media annotations
+    Set<String> mediaAnnotations = null;
+    
+    if(isFilteringMediaLayer())
+    {
+      mediaAnnotations = new HashSet<String>();
+      Pattern patternMedia = Pattern.compile("(annis::)?time");
+      for (String qname : annos)
+      {
+        if(patternMedia.matcher(qname).matches())
+        {
+          mediaAnnotations.add(qname);
+        }
+      }
+    }
+    
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
-        showTokenAnnotations, isAddingTimeInformationToAllLayer(), annos,
+        showTokenAnnotations, annos, mediaAnnotations, isUnsettingValueForMedia(),
         (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
   }
-  
   
   public void setVisibleTokenAnnos(Set<String> annos)
   {
@@ -334,9 +350,14 @@ public class GridComponent extends Panel
     return false;
   }
   
-  protected boolean isAddingTimeInformationToAllLayer()
+  protected boolean isFilteringMediaLayer()
   {
-    return true;
+    return false;
+  }
+  
+  protected boolean isUnsettingValueForMedia()
+  {
+    return false;
   }
   
   protected String getMainStyle()
