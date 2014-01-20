@@ -169,12 +169,14 @@ public class SearchUI extends AnnisBaseUI
     // always get the resize events directly
     setImmediate(true);
 
-    VerticalLayout mainLayout = new VerticalLayout();
+    GridLayout mainLayout = new GridLayout(2,2);
     setContent(mainLayout);
-
+    
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
-
+    mainLayout.setRowExpandRatio(1, 1.0f);
+    mainLayout.setColumnExpandRatio(1, 1.0f);
+    
     screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
 
@@ -184,7 +186,7 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.setWidth("100%");
     layoutToolbar.setHeight("-1px");
 
-    mainLayout.addComponent(layoutToolbar);
+    mainLayout.addComponent(layoutToolbar, 0,0, 1, 0);
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
 
@@ -303,18 +305,6 @@ public class SearchUI extends AnnisBaseUI
 
     layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
 
-    HorizontalLayout hLayout = new HorizontalLayout();
-    hLayout.setSizeFull();
-    mainLayout.addComponent(hLayout);
-    mainLayout.setExpandRatio(hLayout, 1.0f);
-    
-    
-//    final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
-//    hSplit.setSizeFull();
-//
-//    mainLayout.addComponent(hSplit);
-//    mainLayout.setExpandRatio(hSplit, 1.0f);
-
     final HelpPanel help = new HelpPanel(this);
 
     mainTab = new TabSheet();
@@ -326,41 +316,14 @@ public class SearchUI extends AnnisBaseUI
     Tab helpTab = mainTab.addTab(help, "Help");
     helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
-
-//    hSplit.setSecondComponent(mainTab);
-//    hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
-//    hSplit.addSplitterClickListener(
-//      new AbstractSplitPanel.SplitterClickListener()
-//    {
-//      @Override
-//      public void splitterClick(AbstractSplitPanel.SplitterClickEvent event)
-//      {
-//        if (event.isDoubleClick())
-//        {
-//          if (hSplit.getSplitPosition() == CONTROL_PANEL_WIDTH)
-//          {
-//            // make small
-//            hSplit.setSplitPosition(0.0f, Unit.PIXELS);
-//          }
-//          else
-//          {
-//            // reset to default width
-//            hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
-//          }
-//        }
-//      }
-//    });
-//    hLayout.setExpandRatio(mainTab, 1.0f);
-
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     
-    hLayout.addComponent(controlPanel);
-    hLayout.addComponent(mainTab);
-    hLayout.setExpandRatio(mainTab, 1.0f);
+    mainLayout.addComponent(controlPanel, 0, 1);
+    mainLayout.addComponent(mainTab, 1,1);
     
     btSidebar.addClickListener(new ClickListener()
     {
@@ -418,10 +381,6 @@ public class SearchUI extends AnnisBaseUI
       }
     });
     
-    
-//    hSplit.setFirstComponent(controlPanel);
-
-
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
