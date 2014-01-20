@@ -111,8 +111,6 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
         visToggle.toggleVisualizer(true, null);
       }
 
-      Notification.show(
-              PAGE_NO_VALID_NUMBER.equals(page) ? "opening full pdf" : "opening page " + page);
     }
 
     private void initPDFPanel(String page) {
