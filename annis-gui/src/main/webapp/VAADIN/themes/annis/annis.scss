@@ -73,15 +73,9 @@ $font-size: 10pt;
     td.token {
       color: black;
     }
-    /*
-    td.space {
-      background-image: url("space.png");
-      background-repeat: repeat-y;
-      border-style: none;
-      min-width: 20px;
-      min-height: 30px;
+    .speaker {
+      background: url("speaker.png") no-repeat right;
     }
-    */
     
   }
 

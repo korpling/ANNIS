@@ -15,6 +15,8 @@
  */
 package annis.visualizers.component.kwic;
 
+import annis.gui.widgets.grid.GridEvent;
+import annis.gui.widgets.grid.Row;
 import annis.libgui.VisibleTokenAnnoChanger;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
@@ -23,6 +25,7 @@ import annis.visualizers.component.grid.GridComponent;
 import com.vaadin.server.VaadinSession;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Map;
@@ -92,8 +95,9 @@ public class KWICComponent extends GridComponent implements KWICInterface
           setVisibleTokenAnnos(newAnnos);
 
         }
-      }
-    }
+      }      
+    } // end if visualizer input not null
+    
   }
 
   @Override
@@ -131,6 +135,14 @@ public class KWICComponent extends GridComponent implements KWICInterface
   {
     return true;
   }
+
+  @Override
+  protected boolean isAddingTimeInformationToAllLayer()
+  {
+    return false;
+  }
+  
+  
 
   @Override
   protected String getMainStyle()

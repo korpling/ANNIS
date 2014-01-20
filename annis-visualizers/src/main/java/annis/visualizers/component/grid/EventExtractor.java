@@ -75,6 +75,7 @@ public class EventExtractor {
    * @param input
    * @param showSpanAnnos
    * @param showTokenAnnos
+   * @param addTimeToAllLayer If true the time information will be added to all events, if false only to the ones that have the name "time"
    * @param annotationNames
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
@@ -85,6 +86,7 @@ public class EventExtractor {
    */
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
+          boolean addTimeToAllLayer,
           List<String> annotationNames, long startTokenIndex, long endTokenIndex,
           PDFController pdfController, STextualDS text) 
   {
@@ -111,7 +113,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true);
+            true, addTimeToAllLayer ? null : Pattern.compile("(annis::)?time"));
         }
       } // end for each span
     }
@@ -123,7 +125,8 @@ public class EventExtractor {
         if(text == null || text == CommonHelper.getTextualDSForNode(tok, graph))
         {
           addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
-            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false);
+            pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
+            addTimeToAllLayer ? null : Pattern.compile("(annis::)?time"));
         }
       }
     }
@@ -229,7 +232,8 @@ public class EventExtractor {
     PDFController pdfController, PDFPageHelper pageNumberHelper,
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
-    boolean addMatch)
+    boolean addMatch,
+    Pattern timeLayerPattern)
   {
 
     // calculate the left and right values of a span
@@ -312,15 +316,18 @@ public class EventExtractor {
 
 
         // try to get time annotations
-        double[] startEndTime = TimeHelper.getOverlappedTime(node);
-        if (startEndTime.length == 1)
+        if(timeLayerPattern == null || timeLayerPattern.matcher(anno.getSName()).matches())
         {
-          event.setStartTime(startEndTime[0]);
-        }
-        else if (startEndTime.length == 2)
-        {
-          event.setStartTime(startEndTime[0]);
-          event.setEndTime(startEndTime[1]);
+          double[] startEndTime = TimeHelper.getOverlappedTime(node);
+          if (startEndTime.length == 1)
+          {
+            event.setStartTime(startEndTime[0]);
+          }
+          else if (startEndTime.length == 2)
+          {
+            event.setStartTime(startEndTime[0]);
+            event.setEndTime(startEndTime[1]);
+          }
         }
 
         r.addEvent(event);

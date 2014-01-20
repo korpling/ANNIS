@@ -285,7 +285,7 @@ public class GridComponent extends Panel
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
-        showTokenAnnotations, annos,
+        showTokenAnnotations, isAddingTimeInformationToAllLayer(), annos,
         (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
@@ -332,6 +332,11 @@ public class GridComponent extends Panel
   protected boolean isTokenFirst()
   {
     return false;
+  }
+  
+  protected boolean isAddingTimeInformationToAllLayer()
+  {
+    return true;
   }
   
   protected String getMainStyle()

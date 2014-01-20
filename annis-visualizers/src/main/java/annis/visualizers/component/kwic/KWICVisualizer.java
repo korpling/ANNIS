@@ -31,8 +31,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
+ * Key words in context visualizer (KWIC).
  *
- * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @author Thomas Krause <krause@informatik.hu-berlin.>
+ * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
 public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
