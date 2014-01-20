@@ -17,36 +17,50 @@ package annis.gui;
 
 import static annis.gui.ResultFetchJob.log;
 import annis.gui.model.PagedResultQuery;
-import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
+import annis.service.objects.SaltURIGroup;
+import annis.service.objects.SaltURIGroupSet;
 import annis.service.objects.SubgraphQuery;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
+ * Fetches a result which contains only one subgraph. This single query always
+ * follows a normal ResultFetchJob and so it is assuming that there already
+ * exists a list of matches. That is the reason for not needing to execute the
+ * find command and hopefully this query is bit faster.
+ *
+ * @see ResultFetchJob
+ * @see QueryController
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class SingleResultFetchJob extends ResultFetchJob
+public class SingleResultFetchJob implements Runnable
 {
 
   private VisualizerContextChanger visContextChanger;
 
-  public SingleResultFetchJob(PagedResultQuery query,
-    ResultViewPanel resultPanel, SearchUI ui,
-    VisualizerContextChanger visContextChanger)
+  private Match match;
+
+  private PagedResultQuery query;
+
+  private ResultViewPanel resultPanel;
+
+  private SearchUI ui;
+
+  public SingleResultFetchJob(Match match, PagedResultQuery query, SearchUI ui,
+    ResultViewPanel resultPanel, VisualizerContextChanger visContextChanger)
   {
-    super(query, resultPanel, ui);
+    this.match = match;
+    this.query = query;
+    this.ui = ui;
+    this.resultPanel = resultPanel;
     this.visContextChanger = visContextChanger;
   }
 
@@ -56,92 +70,72 @@ public class SingleResultFetchJob extends ResultFetchJob
     WebResource subgraphRes
       = Helper.getAnnisWebResource().path("query/search/subgraph");
 
-    // holds the ids of the matches.
-    List<Match> result;
-
-    try
+    if (Thread.interrupted())
     {
-      if (Thread.interrupted())
-      {
-        return;
-      }
-
-      // get the matches
-      result = futureMatches.get(60, TimeUnit.SECONDS);
-
-      if (Thread.interrupted())
-      {
-        return;
-      }
-
-      List<Match> subList = new LinkedList<Match>();
-      subList.add(result.get(0)); //only one result is possible
-      SubgraphQuery subgraphQuery = prepareQuery(subList);
-      final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
-
-      visContextChanger.updateResult(p, query);
-
-      if (Thread.interrupted())
-      {
-        return;
-      }
+      return;
     }
 
-    catch (TimeoutException ex)
+    if (Thread.interrupted())
     {
-      log.info(null, ex);
+      return;
     }
-    catch (InterruptedException ex)
-    {
-      log.warn(null, ex);
-    }
-    catch (final ExecutionException root)
-    {
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          if (resultPanel != null && resultPanel.getPaging() != null)
-          {
-            PagingComponent paging = resultPanel.getPaging();
-            Throwable cause = root.getCause();
-            if (cause instanceof UniformInterfaceException)
-            {
-              UniformInterfaceException ex = (UniformInterfaceException) cause;
-              if (ex.getResponse().getStatus() == 400)
-              {
-                paging.setInfo("parsing error: " + ex.getResponse().
-                  getEntity(String.class));
-              }
-              else if (ex.getResponse().getStatus() == 504)
-              {
-                paging.setInfo("Timeout: query exeuction took too long");
-              }
-              else
-              {
-                paging.setInfo("unknown error: " + ex);
-              }
-            }
-            else
-            {
-              log.error("Unexcepted ExecutionException cause",
-                root);
-            }
 
-            resultPanel.showFinishedSubgraphSearch();
+    SubgraphQuery subgraphQuery = prepareQuery();
+    final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
 
-          }
-        }
-      });
-    }
-    finally
-    {      
-      if (Thread.interrupted())
-      {
-        return;
-      }
+    visContextChanger.updateResult(p, query);
+
+    if (Thread.interrupted())
+    {
+      return;
     }
   }
 
+  public SubgraphQuery prepareQuery()
+  {
+    SubgraphQuery subgraphQuery = new SubgraphQuery();
+
+    subgraphQuery.setLeft(query.getContextLeft());
+    subgraphQuery.setRight(query.getContextRight());
+    if (query.getSegmentation() != null)
+    {
+      subgraphQuery.setSegmentationLayer(query.getSegmentation());
+    }
+
+    SaltURIGroupSet saltURIs = new SaltURIGroupSet();
+
+    SaltURIGroup urisForMatch = new SaltURIGroup();
+
+    for (String s : match.getSaltIDs())
+    {
+      try
+      {
+        urisForMatch.getUris().add(new URI(s));
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+
+    saltURIs.getGroups().put(1, urisForMatch);
+    subgraphQuery.setMatches(saltURIs);
+    return subgraphQuery;
+  }
+
+  final protected SaltProject executeQuery(WebResource subgraphRes,
+    SubgraphQuery query)
+  {
+    SaltProject p = null;
+    try
+    {
+      p = subgraphRes.post(SaltProject.class, query);
+    }
+    catch (UniformInterfaceException ex)
+    {
+      log.error(ex.getMessage(), ex);
+    }
+
+    return p;
+  }
 }

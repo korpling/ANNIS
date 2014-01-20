@@ -527,7 +527,7 @@ public class SingleResultPanel extends CssLayout implements
     boolean left)
   {
     //delegates the task to the query controller.
-    queryController.changeCtx(queryId, resultNumber, context,(VisualizerContextChanger) this, left);
+    queryController.changeCtx(queryId, resultNumber, context, (VisualizerContextChanger) this, left);
   }
 
   private class ContextChangeListener implements

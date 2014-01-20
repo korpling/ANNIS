@@ -65,13 +65,15 @@ class ResultFetchJob implements Runnable
   protected PagedResultQuery query;
 
   protected SearchUI ui;
+  private QueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel,
-    SearchUI ui)
+    SearchUI ui, QueryController controller)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
+    this.queryController = controller;
 
     res = Helper.getAnnisAsyncWebResource();
 
@@ -82,7 +84,6 @@ class ResultFetchJob implements Runnable
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(new MatchListType());
-
   }
 
   final protected SaltProject executeQuery(WebResource subgraphRes,
@@ -167,6 +168,9 @@ class ResultFetchJob implements Runnable
 
       // get the matches
       result = futureMatches.get(60, TimeUnit.SECONDS);
+      
+      // store the matches for later purposes
+      queryController.setMatches(result);
 
       // get the subgraph for each match, when the result is not empty
       if (result.isEmpty())

@@ -23,11 +23,10 @@ import annis.gui.model.PagedResultQuery;
 import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.resultview.SingleResultPanel;
 import annis.gui.resultview.VisualizerContextChanger;
-import annis.gui.resultview.VisualizerPanel;
 import annis.libgui.PollControl;
 import annis.libgui.visualizers.IFrameResourceMap;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -36,7 +35,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import java.io.Serializable;
@@ -89,7 +87,17 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private transient Map<UUID, MatchAndDocumentCount> counts;
 
+  /**
+   * Stores updated queries. They are created when single results are queried
+   * again with a different context.
+   */
   private Map<UUID, Map<Integer, PagedResultQuery>> updatedQueries;
+
+  /**
+   * Holds the matches from the last query. Useful for repeated queries in order
+   * to change the context.
+   */
+  private List<Match> matches;
 
   private int maxShortID;
 
@@ -321,7 +329,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     getQueryPanels().put(lastQueryUUID, newResultView);
 
     PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
-      newResultView, ui));
+      newResultView, ui, this));
 
     //
     // end execute match fetching
@@ -358,8 +366,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
       getQueries().put(uuid, newQuery);
       lastMatchFuture = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery,
-          panel, ui));
+        new ResultFetchJob(newQuery, panel, ui, this));
     }
   }
 
@@ -643,14 +650,27 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       query.setOffset(offset);
       query.setLimit(1);
 
-      // TODO do not delete queries     
-      PollControl.runInBackground(500, ui, new SingleResultFetchJob(query,
-        queryPanels.get(queryID), ui, visCtxChange));
+      if (matches != null && !matches.isEmpty())
+      {
+        // The size is the match list corresponds to the page size of the 
+        // result view, thus we can make an index shift to the right position of 
+        // match in the match list via modulo of size of the match list.
+        Match m = matches.get(offset % matches.size());
+
+        PollControl.runInBackground(500, ui,
+          new SingleResultFetchJob(m, query, ui, queryPanels.get(queryID),
+            visCtxChange));
+      }
     }
     else
     {
       log.warn("no query with {} found");
       return;
     }
+  }
+
+  public void setMatches(List<Match> matches)
+  {
+    this.matches = matches;
   }
 }
