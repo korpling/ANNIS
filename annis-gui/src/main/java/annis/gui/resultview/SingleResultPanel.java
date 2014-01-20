@@ -257,19 +257,16 @@ public class SingleResultPanel extends CssLayout implements
     rghtCtxCombo.addValueChangeListener(
       new ContextChangeListener(queryId, resultNumber, false));
 
-    Label leftCtxLabel = new Label("left context:");
-    leftCtxLabel.setWidth(100, Unit.PIXELS);
-    infoBar.addComponent(leftCtxLabel);
-    infoBar.addComponent(lftCtxCombo);
+    Label leftCtxLabel = new Label("left context: ");
+    Label rightCtxLabel = new Label("right context: ");
 
-    Label rightCtxLabel = new Label("right context:");
-    rightCtxLabel.setWidth(100, Unit.PIXELS);
-    infoBar.addComponent(rightCtxLabel);
-    infoBar.addComponent(rghtCtxCombo);
+    HorizontalLayout ctxLayout = new HorizontalLayout();
+    ctxLayout.setSpacing(true);
+    ctxLayout.addComponents(leftCtxLabel, lftCtxCombo, rightCtxLabel,
+      rghtCtxCombo);
+    infoBar.addComponent(ctxLayout);
 
-    // THIS WAS in attach()
     addComponent(infoBar);
-
     initVisualizer();
   }
 
