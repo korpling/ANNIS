@@ -609,14 +609,15 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
    * @param queryID
    * @param offset
    * @param context
-   * @param panel
+   * @param singleResultPanel 
+   * @param left if true the left context is changed.
    */
-  public void increaseCtx(UUID queryID, int offset, int context,
-    SingleResultPanel singleResultPanel)
+  public void changeCtx(UUID queryID, int offset, int context,
+    SingleResultPanel singleResultPanel, boolean left)
   {
-    
-    PagedResultQuery query;    
-    
+
+    PagedResultQuery query;
+
     if (queries.containsKey(queryID) && queryPanels.containsKey(queryID))
     {
       if (updatedQueries == null)
@@ -628,21 +629,26 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       {
         updatedQueries.put(queryID, new HashMap<Integer, PagedResultQuery>());
       }
-      
+
       if (!updatedQueries.get(queryID).containsKey(offset))
       {
         query = (PagedResultQuery) queries.get(queryID).clone();
         updatedQueries.get(queryID).put(offset, query);
-      } else {      
+      }
+      else
+      {
         query = updatedQueries.get(queryID).get(offset);
-      }     
+      }
 
-      int lftCtx = query.getContextLeft() + context;
-      int rghtCtx = query.getContextRight() + context;
-      
-      query.setContextLeft(lftCtx < 0 ? 0 : lftCtx);
-      query.setContextRight(rghtCtx < 0 ? 0 : rghtCtx);
-      
+      if (left)
+      {
+        query.setContextLeft(context);
+      }
+      else
+      {
+        query.setContextRight(context);
+      }
+
       query.setOffset(offset);
       query.setLimit(1);
 

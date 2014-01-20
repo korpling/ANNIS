@@ -21,15 +21,17 @@ import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
 import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -107,10 +109,6 @@ public class SingleResultPanel extends CssLayout implements
 
   private QueryController queryController;
 
-  private Button incCtx;
-
-  private Button decCtx;
-
   private int resultNumber;
 
   private ResolverProvider resolverProvider;
@@ -118,6 +116,10 @@ public class SingleResultPanel extends CssLayout implements
   private Set<String> visibleTokenAnnos;
 
   private ProgressBar reloadVisualizer;
+
+  private ComboBox lftCtxCombo;
+
+  private ComboBox rghtCtxCombo;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -184,10 +186,70 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    incCtx = new Button("inc context", this);
-    decCtx = new Button("dec context", this);
-    infoBar.addComponent(incCtx);
-    infoBar.addComponent(decCtx);
+    // init context combox
+    lftCtxCombo = new ComboBox();
+    rghtCtxCombo = new ComboBox();
+
+    lftCtxCombo.setWidth(50, Unit.PIXELS);
+    rghtCtxCombo.setWidth(50, Unit.PIXELS);
+
+    lftCtxCombo.setNullSelectionAllowed(false);
+    rghtCtxCombo.setNullSelectionAllowed(false);
+
+    IndexedContainer lftCtxContainer = new IndexedContainer();
+    IndexedContainer rghtCtxContainer = new IndexedContainer();
+
+    // and a property for sorting
+    lftCtxContainer.addContainerProperty("number", Integer.class, 0);
+    rghtCtxContainer.addContainerProperty("number", Integer.class, 0);
+
+    for (int i = 0; i < 30; i += 5)
+    {
+      lftCtxContainer.addItem(i).getItemProperty("number").setValue(i);
+      rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
+    }
+
+    int lftContextIdx = queryController.getPreparedQuery().getContextLeft();
+    lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
+    lftCtxContainer.sort(new Object[]
+    {
+      "number"
+    }, new boolean[]
+    {
+      true
+    });
+
+    int rghtCtxIdx = queryController.getPreparedQuery().getContextRight();
+    rghtCtxContainer.addItem(rghtCtxIdx);
+
+    rghtCtxContainer.sort(new Object[]
+    {
+      "number"
+    }, new boolean[]
+    {
+      true
+    });
+
+    lftCtxCombo.setContainerDataSource(lftCtxContainer);
+    rghtCtxCombo.setContainerDataSource(rghtCtxContainer);
+
+    lftCtxCombo.select(lftContextIdx);
+    rghtCtxCombo.select(rghtCtxIdx);
+
+    lftCtxCombo.addValueChangeListener(
+      new ContextChangeListener(queryId, resultNumber, true));
+    rghtCtxCombo.addValueChangeListener(
+      new ContextChangeListener(queryId, resultNumber, false));
+
+    Label leftCtxLabel = new Label("left context: ");
+    leftCtxLabel.setWidth(100, Unit.PIXELS);
+    infoBar.addComponent(leftCtxLabel);
+    infoBar.addComponent(lftCtxCombo);
+
+    Label rightCtxLabel = new Label("right context: ");
+    rightCtxLabel.setWidth(100, Unit.PIXELS);
+    infoBar.addComponent(rightCtxLabel);
+    infoBar.addComponent(rghtCtxCombo);
 
     // THIS WAS in attach()
     addComponent(infoBar);
@@ -358,20 +420,6 @@ public class SingleResultPanel extends CssLayout implements
 
       UI.getCurrent().addWindow(infoWindow);
     }
-
-    if (event.getButton() == incCtx && result != null)
-    {
-      showReloadingProgress();
-      queryController.increaseCtx(queryId, resultNumber, 5, this);
-      incCtx.setEnabled(false);
-    }
-
-    if (event.getButton() == decCtx && result != null)
-    {
-      showReloadingProgress();
-      this.queryController.increaseCtx(queryId, resultNumber, -5, this);
-      decCtx.setEnabled(false);
-    }
   }
 
   private void showReloadingProgress()
@@ -448,6 +496,36 @@ public class SingleResultPanel extends CssLayout implements
     catch (Exception ex)
     {
       log.error("problems with initializing Visualizer Panel", ex);
+    }
+  }
+
+  private class ContextChangeListener implements
+    Property.ValueChangeListener
+  {
+
+    int resultNumber;
+
+    boolean left;
+
+    UUID queryId;
+
+    public ContextChangeListener(UUID queryId, int resultNumber,
+      boolean left)
+    {
+      this.queryId = queryId;
+      this.resultNumber = resultNumber;
+      this.left = left;
+    }
+
+    @Override
+    public void valueChange(Property.ValueChangeEvent event)
+    {
+      showReloadingProgress();
+      lftCtxCombo.setEnabled(false);
+      rghtCtxCombo.setEnabled(false);
+      int ctx = Integer.parseInt(event.getProperty().getValue().toString());
+      queryController.changeCtx(queryId, resultNumber, ctx,
+        SingleResultPanel.this, left);
     }
   }
 
@@ -644,6 +722,7 @@ public class SingleResultPanel extends CssLayout implements
    * Reinit all registered visualizer with a new salt project.
    *
    * @param p the project, all visualizer are updated with.
+   * @param q originally query, for determine the current context
    */
   // TODO deactivate context buttons
   public void updateResult(SaltProject p, PagedResultQuery query)
@@ -657,15 +736,11 @@ public class SingleResultPanel extends CssLayout implements
     {
       this.result = p.getSCorpusGraphs().get(0).getSDocuments().get(0);
     }
-    
-    // activate decrease context button if there is context left.
-    if (!(query.getContextLeft() == 0 && query.getContextRight() == 0))
-    {
-      decCtx.setEnabled(true);
-    }
 
-    incCtx.setEnabled(true);
     removeComponent(reloadVisualizer);
     initVisualizer();
+
+    lftCtxCombo.setEnabled(true);
+    rghtCtxCombo.setEnabled(true);
   }
 }
