@@ -16,11 +16,38 @@
 
 package annis.gui;
 
+import com.vaadin.server.Resource;
+import com.vaadin.server.ThemeResource;
+
 /**
  * The current behavior state of the side bar.
  * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
  */
 public enum SidebarState
 {
-  ALWAYS_VISIBLE, HIDDEN, AUTO
+  VISIBLE(new ThemeResource("menu_left.png"), true), 
+  HIDDEN(new ThemeResource("menu_right.png"), false), 
+  AUTO_VISIBLE(new ThemeResource("menu_auto.png"), true),
+  AUTO_HIDDEN(new ThemeResource("menu_auto.png"), true);
+  
+  private final Resource icon;
+  private final boolean sidebarVisible;
+  
+  SidebarState(Resource icon, boolean sidebarVisible)
+  {
+    this.icon = icon;
+    this.sidebarVisible = sidebarVisible;
+  }
+
+  public Resource getIcon()
+  {
+    return icon;
+  }
+
+  public boolean isSidebarVisible()
+  {
+    return sidebarVisible;
+  }
+
+  
 }

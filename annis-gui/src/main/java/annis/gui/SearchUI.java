@@ -140,6 +140,8 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  private SidebarState sidebarState;
+  
   @Override
   protected void init(VaadinRequest request)
   {
@@ -181,14 +183,14 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
 
+    sidebarState = SidebarState.VISIBLE;
     btSidebar = new Button();
     btSidebar.setDisableOnClick(true);
     btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btSidebar.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btSidebar.setDescription("Show and hide search sidebar");
-    btSidebar.setIcon(new ThemeResource("menu_16.png"));
+    btSidebar.setIcon(sidebarState.getIcon());
     btSidebar.setIconAlternateText(btSidebar.getDescription());
-    
     
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -362,7 +364,23 @@ public class SearchUI extends AnnisBaseUI
       public void buttonClick(ClickEvent event)
       {
         btSidebar.setEnabled(true);
-        controlPanel.setVisible(!controlPanel.isVisible());
+        
+        // decide new state
+        switch(sidebarState)
+        {
+          case VISIBLE:
+            
+            sidebarState = SidebarState.HIDDEN;
+            
+            break;
+          case HIDDEN:
+            sidebarState = SidebarState.VISIBLE;
+            break;
+        }
+        
+        // update controls according to new state
+        controlPanel.setVisible(sidebarState.isSidebarVisible());
+        btSidebar.setIcon(sidebarState.getIcon());
       }
     });
     
