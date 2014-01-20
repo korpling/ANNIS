@@ -165,7 +165,7 @@ public class EventExtractor {
       }
     }
     
-    Range<Integer> gap = Range.closed(-1, 0);
+    Range<Integer> gap = Range.closed(-1, totalOccupancyGrid.nextSetBit(0));
     while(true)
     {
       int gapStart = totalOccupancyGrid.nextClearBit(gap.upperEndpoint()+1);
