@@ -47,6 +47,9 @@ import org.slf4j.LoggerFactory;
  * <li>
  * <b>hide_tok:true</b> switches the line with the token value off.
  * </li>
+ * <li>
+ * <code>pdf_page_key: name of the annotation that contains the pdf page number</code>
+ * </li>
  * </ul>
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
