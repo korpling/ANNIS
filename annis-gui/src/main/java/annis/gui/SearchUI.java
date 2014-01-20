@@ -57,6 +57,7 @@ import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 
@@ -73,6 +74,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.Cookie;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
@@ -141,7 +143,7 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
-  private SidebarState sidebarState;
+  private SidebarState sidebarState = SidebarState.VISIBLE;
   
   @Override
   protected void init(VaadinRequest request)
@@ -150,7 +152,9 @@ public class SearchUI extends AnnisBaseUI
     setErrorHandler(this);
 
     this.instanceConfig = getInstanceConfig(request);
-
+    
+    regenerateStateFromCookies();
+    
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
@@ -184,7 +188,6 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
 
-    sidebarState = SidebarState.VISIBLE;
     btSidebar = new Button();
     btSidebar.setDisableOnClick(true);
     btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
@@ -446,6 +449,35 @@ public class SearchUI extends AnnisBaseUI
     evaluateFragment(getPage().getUriFragment());
 
     updateUserInformation();
+    updateControlsForSidebarState();
+  }
+  
+  public void regenerateStateFromCookies()
+  {
+    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
+    for(Cookie c : cookies )
+    {
+      if("annis-sidebar-state".equals(c.getName()))
+      {
+        try
+        {
+          sidebarState = SidebarState.valueOf(c.getValue());
+          // don't be invisible
+          if(sidebarState == SidebarState.AUTO_HIDDEN)
+          {
+            sidebarState = SidebarState.AUTO_VISIBLE;
+          }
+          else if(sidebarState == SidebarState.HIDDEN)
+          {
+            sidebarState = SidebarState.VISIBLE;
+          }
+        }
+        catch(IllegalArgumentException ex)
+        {
+          log.debug("Invalid cookie for sidebar state", ex);
+        }
+      }
+    }
   }
   
   @Override
@@ -683,7 +715,7 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
-      showNotification("Invalid citation", Notification.Type.WARNING_MESSAGE);
+      Notification.show("Invalid citation", Notification.Type.WARNING_MESSAGE);
     }
 
   }
@@ -697,6 +729,12 @@ public class SearchUI extends AnnisBaseUI
     {
       controlPanel.setVisible(sidebarState.isSidebarVisible());
       btSidebar.setIcon(sidebarState.getIcon());
+      
+      // set cookie
+      Cookie c = new Cookie("annis-sidebar-state", sidebarState.name());
+      c.setMaxAge(30*24*60*60); // 30 days
+      c.setPath(VaadinService.getCurrentRequest().getContextPath());
+      VaadinService.getCurrentResponse().addCookie(c);
     }
   }
 
