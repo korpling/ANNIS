@@ -131,7 +131,7 @@ public class VisualizerPanel extends CssLayout
 
   private InstanceConfig instanceConfig;
 
-  private SingleResultPanel singleResultPanel;
+  private VisualizerContextChanger visCtxChanger;
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -162,7 +162,7 @@ public class VisualizerPanel extends CssLayout
     this.markersExact = markedExactMap;
     this.markersCovered = markedAndCoveredMap;
 
-    this.singleResultPanel = parent;
+    this.visCtxChanger = parent;
 
     this.result = result;
     this.corpusName = corpusName;
@@ -377,10 +377,12 @@ public class VisualizerPanel extends CssLayout
   @Override
   public void buttonClick(ClickEvent event)
   {
+
+    boolean isVisible = !visualizerIsVisible();
+
     // register new state by the parent SingleResultPanel, so the state will be
     // still available, after a reload
-    boolean isVisible = !visualizerIsVisible();
-    singleResultPanel.registerState(entry.getDisplayName(), isVisible);
+    visCtxChanger.registerVisibilityStatus(entry.getId(), isVisible);
 
     // start the toogle process.
     toggleVisualizer(isVisible, null);

@@ -24,6 +24,8 @@ import annis.gui.model.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.SingleResultPanel;
+import annis.gui.resultview.VisualizerContextChanger;
+import annis.gui.resultview.VisualizerPanel;
 import annis.libgui.PollControl;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.MatchAndDocumentCount;
@@ -601,19 +603,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     }
   }
 
-  /**
-   * Repeats a query in order to increase the context of a single result.
-   *
-   * Obviously this only works, if a complete query was sent before.
-   *
-   * @param queryID
-   * @param offset
-   * @param context
-   * @param singleResultPanel 
-   * @param left if true the left context is changed.
-   */
   public void changeCtx(UUID queryID, int offset, int context,
-    SingleResultPanel singleResultPanel, boolean left)
+    VisualizerContextChanger visCtxChange, boolean left)
   {
 
     PagedResultQuery query;
@@ -654,7 +645,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
       // TODO do not delete queries     
       PollControl.runInBackground(500, ui, new SingleResultFetchJob(query,
-        queryPanels.get(queryID), ui, singleResultPanel));
+        queryPanels.get(queryID), ui, visCtxChange));
     }
     else
     {

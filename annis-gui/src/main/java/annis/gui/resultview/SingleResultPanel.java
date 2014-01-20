@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class SingleResultPanel extends CssLayout implements
-  Button.ClickListener
+  Button.ClickListener, VisualizerContextChanger
 {
 
   private static final String HIDE_KWIC = "hide_kwic";
@@ -122,7 +122,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private ComboBox rghtCtxCombo;
 
-  private Map<String, Boolean> visualizerState;
+  private Map<Long, Boolean> visualizerState;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -189,7 +189,7 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    this.visualizerState = new HashMap<String, Boolean>();
+    this.visualizerState = new HashMap<Long, Boolean>();
 
     // init context combox
     lftCtxCombo = new ComboBox();
@@ -471,8 +471,7 @@ public class SingleResultPanel extends CssLayout implements
           entries[i], result, corpusName, documentName,
           token, visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
-          htmlID, resultID, this,
-          segmentationName, ps, instanceConfig);
+          htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
         visualizers.add(p);
         Properties mappings = entries[i].getMappings();
@@ -480,9 +479,9 @@ public class SingleResultPanel extends CssLayout implements
         // check if there is the visibility of a visualizer changed
         // since it the whole result panel was loaded. If not the entry of the
         // resovler entry is used, for determine the visibility status
-        if (visualizerState.containsKey(entries[i].getDisplayName()))
+        if (visualizerState.containsKey(entries[i].getId()))
         {
-          if (visualizerState.get(entries[i].getDisplayName()))
+          if (visualizerState.get(entries[i].getId()))
           {
             openVisualizers.add(p);
           }
@@ -517,6 +516,20 @@ public class SingleResultPanel extends CssLayout implements
     }
   }
 
+  @Override
+  public void registerVisibilityStatus(long entryId, boolean status)
+  {
+    visualizerState.put(entryId, status);
+  }
+
+  @Override
+  public void changeContext(UUID queryId, int resultNumber, int context,
+    boolean left)
+  {
+    //delegates the task to the query controller.
+    queryController.changeCtx(queryId, resultNumber, context,(VisualizerContextChanger) this, left);
+  }
+
   private class ContextChangeListener implements
     Property.ValueChangeListener
   {
@@ -527,8 +540,7 @@ public class SingleResultPanel extends CssLayout implements
 
     UUID queryId;
 
-    public ContextChangeListener(UUID queryId, int resultNumber,
-      boolean left)
+    public ContextChangeListener(UUID queryId, int resultNumber, boolean left)
     {
       this.queryId = queryId;
       this.resultNumber = resultNumber;
@@ -542,8 +554,7 @@ public class SingleResultPanel extends CssLayout implements
       lftCtxCombo.setEnabled(false);
       rghtCtxCombo.setEnabled(false);
       int ctx = Integer.parseInt(event.getProperty().getValue().toString());
-      queryController.changeCtx(queryId, resultNumber, ctx,
-        SingleResultPanel.this, left);
+      changeContext(queryId, resultNumber, ctx, left);
     }
   }
 
@@ -736,13 +747,7 @@ public class SingleResultPanel extends CssLayout implements
     return minMax;
   }
 
-  /**
-   * Reinit all registered visualizer with a new salt project.
-   *
-   * @param p the project, all visualizer are updated with.
-   * @param q originally query, for determine the current context
-   */
-  // TODO deactivate context buttons
+  @Override
   public void updateResult(SaltProject p, PagedResultQuery query)
   {
     if (p != null
@@ -760,10 +765,5 @@ public class SingleResultPanel extends CssLayout implements
 
     lftCtxCombo.setEnabled(true);
     rghtCtxCombo.setEnabled(true);
-  }
-
-  public void registerState(String visualizerName, boolean isVisible)
-  {
-    visualizerState.put(visualizerName, isVisible);
   }
 }

@@ -20,6 +20,7 @@ import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.SingleResultPanel;
+import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.SubgraphQuery;
@@ -39,14 +40,14 @@ import java.util.concurrent.TimeoutException;
 public class SingleResultFetchJob extends ResultFetchJob
 {
 
-  private SingleResultPanel singleResultPanel;
+  private VisualizerContextChanger visContextChanger;
 
   public SingleResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel, SearchUI ui,
-    SingleResultPanel singleResultPanel)
+    VisualizerContextChanger visContextChanger)
   {
     super(query, resultPanel, ui);
-    this.singleResultPanel = singleResultPanel;
+    this.visContextChanger = visContextChanger;
   }
 
   @Override
@@ -78,7 +79,7 @@ public class SingleResultFetchJob extends ResultFetchJob
       SubgraphQuery subgraphQuery = prepareQuery(subList);
       final SaltProject p = executeQuery(subgraphRes, subgraphQuery);
 
-      singleResultPanel.updateResult(p, query);
+      visContextChanger.updateResult(p, query);
 
       if (Thread.interrupted())
       {
