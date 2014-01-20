@@ -28,13 +28,16 @@ import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
@@ -59,7 +62,6 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
-import org.apache.commons.lang3.BitField;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -241,17 +243,26 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.select(lftContextIdx);
     rghtCtxCombo.select(rghtCtxIdx);
 
+    lftCtxCombo.setNewItemsAllowed(true);
+    rghtCtxCombo.setNewItemsAllowed(true);
+
+    lftCtxCombo.setImmediate(true);
+    rghtCtxCombo.setImmediate(true);
+
+    lftCtxCombo.setNewItemHandler(new AddNewItemHandler(lftCtxCombo));
+    rghtCtxCombo.setNewItemHandler(new AddNewItemHandler(rghtCtxCombo));
+
     lftCtxCombo.addValueChangeListener(
       new ContextChangeListener(queryId, resultNumber, true));
     rghtCtxCombo.addValueChangeListener(
       new ContextChangeListener(queryId, resultNumber, false));
 
-    Label leftCtxLabel = new Label("left context: ");
+    Label leftCtxLabel = new Label("left context:");
     leftCtxLabel.setWidth(100, Unit.PIXELS);
     infoBar.addComponent(leftCtxLabel);
     infoBar.addComponent(lftCtxCombo);
 
-    Label rightCtxLabel = new Label("right context: ");
+    Label rightCtxLabel = new Label("right context:");
     rightCtxLabel.setWidth(100, Unit.PIXELS);
     infoBar.addComponent(rightCtxLabel);
     infoBar.addComponent(rghtCtxCombo);
@@ -527,7 +538,64 @@ public class SingleResultPanel extends CssLayout implements
     boolean left)
   {
     //delegates the task to the query controller.
-    queryController.changeCtx(queryId, resultNumber, context, (VisualizerContextChanger) this, left);
+    queryController.changeCtx(queryId, resultNumber, context,
+      (VisualizerContextChanger) this, left);
+  }
+
+  private class AddNewItemHandler implements AbstractSelect.NewItemHandler
+  {
+
+    final private ComboBox combobox;
+
+    public AddNewItemHandler(ComboBox comboBox)
+    {
+      this.combobox = comboBox;
+    }
+
+    @Override
+    public void addNewItem(String newValue)
+    {
+
+      String ERROR_MESSAGE_HEADER = "Illegal value";
+
+      try
+      {
+        int i = Integer.parseInt(newValue);
+
+        if (i < 0)
+        {
+          new Notification(ERROR_MESSAGE_HEADER,
+            "<div><p>context &lt; 0 makes no sense</p></div>",
+            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+        }
+        else
+        {
+
+          combobox.getContainerDataSource().addItem(i).
+            getItemProperty("number").setValue(i);
+
+          if (combobox.getContainerDataSource() instanceof IndexedContainer)
+          {
+            ((IndexedContainer) combobox.getContainerDataSource()).sort(
+              new Object[]
+              {
+                "number"
+              }, new boolean[]
+              {
+                true
+              });
+          }
+
+          combobox.select(i);
+        }
+      }
+      catch (NumberFormatException ex)
+      {
+        new Notification(ERROR_MESSAGE_HEADER,
+          "<div><p>Only numbers are allowed.</p></div>",
+          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      }
+    }
   }
 
   private class ContextChangeListener implements
