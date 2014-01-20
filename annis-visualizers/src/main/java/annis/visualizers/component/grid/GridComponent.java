@@ -219,15 +219,16 @@ public class GridComponent extends Panel
         RelannisNodeFeature feat
           = (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
             AnnisConstants.FEAT_RELANNIS_NODE).getValue();
-        long idx = feat.getLeftToken() - startIndex;
+        long idxLeft = feat.getLeftToken() - startIndex;
+        long idxRight = feat.getRightToken() - startIndex;
         if (tokenOffsetForText.get() < 0)
         {
           // set the token offset by assuming the first idx must be zero
-          tokenOffsetForText.set(Math.abs((int) idx));
+          tokenOffsetForText.set(Math.abs((int) idxLeft));
         }
         String text = extractTextForToken(t, segmentationName);
         GridEvent event
-          = new GridEvent(t.getSId(), (int) idx, (int) idx, text);
+          = new GridEvent(t.getSId(), (int) idxLeft, (int) idxRight, text);
         event.setTextID(tokenText.getSId());
         // check if the token is a matched node
         Long match = markCoveredTokens(markedAndCovered, t);
