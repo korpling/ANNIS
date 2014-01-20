@@ -46,6 +46,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
@@ -371,7 +372,7 @@ public class SearchUI extends AnnisBaseUI
           case VISIBLE:
             if (event.isCtrlKey())
             {
-              sidebarState = SidebarState.AUTO_HIDDEN;
+              sidebarState = SidebarState.AUTO_VISIBLE;
             }
             else
             {
@@ -381,7 +382,7 @@ public class SearchUI extends AnnisBaseUI
           case HIDDEN:
             if (event.isCtrlKey())
             {
-              sidebarState = SidebarState.AUTO_VISIBLE;
+              sidebarState = SidebarState.AUTO_HIDDEN;
             }
             else
             {
@@ -392,7 +393,7 @@ public class SearchUI extends AnnisBaseUI
           case AUTO_VISIBLE:
             if (event.isCtrlKey())
             {
-              sidebarState = SidebarState.HIDDEN;
+              sidebarState = SidebarState.VISIBLE;
             }
             else
             {
@@ -402,7 +403,7 @@ public class SearchUI extends AnnisBaseUI
           case AUTO_HIDDEN:
             if (event.isCtrlKey())
             {
-              sidebarState = SidebarState.VISIBLE;
+              sidebarState = SidebarState.HIDDEN;
             }
             else
             {
