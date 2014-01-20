@@ -107,6 +107,8 @@ public class SearchUI extends AnnisBaseUI
   private HorizontalLayout layoutToolbar;
 
   private Label lblUserName;
+
+  private Button btSidebar; 
   
   private Button btLogin;
 
@@ -179,7 +181,8 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
 
-    Button btSidebar = new Button();
+    btSidebar = new Button();
+    btSidebar.setDisableOnClick(true);
     btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btSidebar.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btSidebar.setDescription("Show and hide search sidebar");
@@ -358,6 +361,7 @@ public class SearchUI extends AnnisBaseUI
       @Override
       public void buttonClick(ClickEvent event)
       {
+        btSidebar.setEnabled(true);
         controlPanel.setVisible(!controlPanel.isVisible());
       }
     });
