@@ -59,6 +59,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.TreeMap;
 import java.util.UUID;
+import org.apache.commons.lang3.BitField;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -120,6 +121,8 @@ public class SingleResultPanel extends CssLayout implements
   private ComboBox lftCtxCombo;
 
   private ComboBox rghtCtxCombo;
+
+  private Map<String, Boolean> visualizerState;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
@@ -185,6 +188,8 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.addComponent(lblPath);
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
+
+    this.visualizerState = new HashMap<String, Boolean>();
 
     // init context combox
     lftCtxCombo = new ComboBox();
@@ -471,13 +476,27 @@ public class SingleResultPanel extends CssLayout implements
 
         visualizers.add(p);
         Properties mappings = entries[i].getMappings();
-        if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
-        {
-          openVisualizers.add(p);
-        }
 
+        // check if there is the visibility of a visualizer changed
+        // since it the whole result panel was loaded. If not the entry of the
+        // resovler entry is used, for determine the visibility status
+        if (visualizerState.containsKey(entries[i].getDisplayName()))
+        {
+          if (visualizerState.get(entries[i].getDisplayName()))
+          {
+            openVisualizers.add(p);
+          }
+        }
+        else
+        {
+          if (Boolean.parseBoolean(mappings.getProperty(INITIAL_OPEN, "false")))
+          {
+            openVisualizers.add(p);
+          }
+        }
       } // for each resolver entry
 
+      // attach visualizer
       for (VisualizerPanel p : visualizers)
       {
         addComponent(p);
@@ -487,7 +506,6 @@ public class SingleResultPanel extends CssLayout implements
       {
         p.toggleVisualizer(true, null);
       }
-
     }
     catch (RuntimeException ex)
     {
@@ -742,5 +760,10 @@ public class SingleResultPanel extends CssLayout implements
 
     lftCtxCombo.setEnabled(true);
     rghtCtxCombo.setEnabled(true);
+  }
+
+  public void registerState(String visualizerName, boolean isVisible)
+  {
+    visualizerState.put(visualizerName, isVisible);
   }
 }

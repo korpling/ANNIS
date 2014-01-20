@@ -51,6 +51,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.sql.ParameterMetaData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -130,6 +131,8 @@ public class VisualizerPanel extends CssLayout
 
   private InstanceConfig instanceConfig;
 
+  private SingleResultPanel singleResultPanel;
+
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -159,6 +162,7 @@ public class VisualizerPanel extends CssLayout
     this.markersExact = markedExactMap;
     this.markersCovered = markedAndCoveredMap;
 
+    this.singleResultPanel = parent;
 
     this.result = result;
     this.corpusName = corpusName;
@@ -231,7 +235,6 @@ public class VisualizerPanel extends CssLayout
             ex);
         }
 
-
         if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
@@ -287,7 +290,6 @@ public class VisualizerPanel extends CssLayout
     {
       input.setFont(instanceConfig.getFont());
     }
-
 
     if (entry != null)
     {
@@ -375,7 +377,13 @@ public class VisualizerPanel extends CssLayout
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(!visualizerIsVisible(), null);
+    // register new state by the parent SingleResultPanel, so the state will be
+    // still available, after a reload
+    boolean isVisible = !visualizerIsVisible();
+    singleResultPanel.registerState(entry.getDisplayName(), isVisible);
+
+    // start the toogle process.
+    toggleVisualizer(isVisible, null);
   }
 
   @Override
@@ -393,9 +401,9 @@ public class VisualizerPanel extends CssLayout
     if (visPlugin != null)
     {
       // run the actual code to load the visualizer
-      PollControl.runInBackground(500, 50, null, 
+      PollControl.runInBackground(500, 50, null,
         new BackgroundJob(callback));
-      
+
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
@@ -436,7 +444,7 @@ public class VisualizerPanel extends CssLayout
       {
         ((PDFViewer) vis).openPDFPage("-1");
       }
-      if(vis instanceof MediaPlayer)
+      if (vis instanceof MediaPlayer)
       {
         // if this is a media player visualizer, close all other media players
         // since some browsers (e.g. Chrome) have problems if there are multiple
@@ -479,8 +487,8 @@ public class VisualizerPanel extends CssLayout
       }
 
       btEntry.setIcon(ICON_EXPAND);
-    }
 
+    }
   }
 
   public String getHtmlID()
@@ -564,26 +572,26 @@ public class VisualizerPanel extends CssLayout
 
   private class BackgroundJob implements Runnable
   {
+
     private final LoadableVisualizer.Callback callback;
+
     public BackgroundJob(LoadableVisualizer.Callback callback)
     {
       this.callback = callback;
     }
-    
-    
-    
+
     @Override
     public void run()
     {
       ExecutorService execService = Executors.newSingleThreadExecutor();
       final Future<Component> future = execService.submit(
         new LoadComponentTask());
-      
+
       Throwable exception = null;
       try
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
-        
+
         UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
@@ -613,8 +621,8 @@ public class VisualizerPanel extends CssLayout
           ex);
         exception = ex;
       }
-      
-      if(exception != null)
+
+      if (exception != null)
       {
         final Throwable finalException = exception;
         UI.getCurrent().accessSynchronously(new Runnable()
@@ -629,7 +637,6 @@ public class VisualizerPanel extends CssLayout
           }
         });
       }
-      
 
     }
   }
@@ -675,6 +682,19 @@ public class VisualizerPanel extends CssLayout
         return null;
       }
       return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+  }
+
+  public String getVisualizerShortName()
+  {
+    if (visPlugin != null)
+    {
+      return visPlugin.getShortName();
+    }
+
+    else
+    {
+      return null;
     }
   }
 }
