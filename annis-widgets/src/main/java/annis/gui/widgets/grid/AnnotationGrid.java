@@ -45,6 +45,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private int tokenIndexOffset;
 
   private String tokRowKey = "tok";
+  
+  private boolean showCaption = true;
 
   /**
    * when true, all html tags are rendered as text and are shown in grid cells.
@@ -136,6 +138,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
         {
           target.startTag("row");
           target.addAttribute("caption", anno.getKey());
+          target.addAttribute("show-caption", showCaption);
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order
@@ -206,6 +209,10 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("token");
     }
+    else if(event.isSpace())
+    {
+      styles.add("space");
+    }
     else if (event.isGap())
     {
       styles.add("gap");
@@ -214,6 +221,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("single_event");
     }
+    
+    
 
     if (event.getMatch() != null)
     {
@@ -262,4 +271,24 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   {
     this.escapeHTML = escapeHTML;
   }
+
+  /**
+   * Defines if the caption column should be shown.
+   * @return 
+   */
+  public boolean isShowCaption()
+  {
+    return showCaption;
+  }
+
+  /**
+   * Defines if the caption column should be shown.
+   * @param showCaption 
+   */
+  public void setShowCaption(boolean showCaption)
+  {
+    this.showCaption = showCaption;
+  }
+  
+  
 }

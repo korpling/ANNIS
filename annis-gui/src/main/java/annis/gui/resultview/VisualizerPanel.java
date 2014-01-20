@@ -56,6 +56,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
@@ -329,7 +330,7 @@ public class VisualizerPanel extends CssLayout
     return input;
   }
 
-  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  public void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     this.visibleTokenAnnos = annos;
     if (visPlugin != null && vis != null)

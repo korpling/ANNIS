@@ -52,6 +52,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
@@ -344,7 +345,7 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        tokenAnnotationLevelSet, segmentationName,
+        getVisibleTokenAnnos(), segmentationName,
         instanceConfig);
       i++;
 
@@ -374,7 +375,7 @@ public class ResultViewPanel extends VerticalLayout implements
     paging.setStartNumber(controller.getPreparedQuery().getOffset());
   }
 
-  public Set<String> getVisibleTokenAnnos()
+  public SortedSet<String> getVisibleTokenAnnos()
   {
     TreeSet<String> result = new TreeSet<String>();
 
@@ -398,6 +399,9 @@ public class ResultViewPanel extends VerticalLayout implements
     @Override
     public void menuSelected(MenuItem selectedItem)
     {
+      // remember old value
+      String oldSegmentationLayer = selectedSegmentationLayer;
+      
       // set the new selected item
       selectedSegmentationLayer = selectedItem.getText();
 
@@ -409,8 +413,19 @@ public class ResultViewPanel extends VerticalLayout implements
       {
         mi.setChecked(mi == selectedItem);
       }
-
-      setSegmentationLayer(selectedSegmentationLayer);
+      
+      if(oldSegmentationLayer != null)
+      {
+        if(!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        {
+          setSegmentationLayer(selectedSegmentationLayer);
+        }
+      }
+      else if(selectedSegmentationLayer != null)
+      {
+        // oldSegmentation is null, but selected is not
+        setSegmentationLayer(selectedSegmentationLayer);
+      }
     }
   }
 
@@ -464,6 +479,7 @@ public class ResultViewPanel extends VerticalLayout implements
     } // end iterate for segmentation layer
   }
 
+  @Override
   public void updateVisibleToken(Set<String> tokenAnnotationLevelSet)
   {
     // if no token annotations are there, do not show this mneu
@@ -541,7 +557,7 @@ public class ResultViewPanel extends VerticalLayout implements
     return true;
   }
 
-  private void setVisibleTokenAnnosVisible(Set<String> annos)
+  private void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     for (SingleResultPanel p : resultPanelList)
     {

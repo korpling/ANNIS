@@ -15,6 +15,7 @@
  */
 package annis.visualizers.component;
 
+import annis.visualizers.component.kwic.KWICInterface;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.VisualizationToggle;
@@ -57,13 +58,13 @@ import org.slf4j.LoggerFactory;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation
-public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
+public class LegacyKWICPanel extends AbstractVisualizer<KWICInterface>
 {
 
   @Override
   public String getShortName()
   {
-    return "kwic";
+    return "legacy_kwic";
   }
 
   @Override
@@ -88,7 +89,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     else
     {
       // return a more complicated implementation which can handle several texts
-      return new KWICMultipleTextImpl(visInput, mediaController, pdfController);
+      return new KWICMultipleTextPanel(visInput, mediaController, pdfController);
     }
   }
 
@@ -96,7 +97,7 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
   public void setVisibleTokenAnnosVisible(KWICInterface visualizerImplementation,
     Set<String> annos)
   {
-    visualizerImplementation.setVisibleTokenAnnosVisible(annos);
+    visualizerImplementation.setVisibleTokenAnnos(annos);
   }
 
   @Override
@@ -108,54 +109,41 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
   }
 
   /**
-   * A KWIC (Keyword in context) visualization shows the token of the match and
-   * their context in a table like view. This is the basic interface for
-   * different variants of the KWIC panel implementation.
-   */
-  public interface KWICInterface extends Component
-  {
-
-    public void setVisibleTokenAnnosVisible(Set<String> annos);
-
-    public void setSegmentationLayer(String segmentationName,
-      Map<SNode, Long> markedAndCovered);
-  }
-
-  /**
    * Implementation that can display several texts but has slower rendering due
    * to an extra div.
    */
-  public static class KWICMultipleTextImpl extends CssLayout
-    implements KWICInterface
+  public static class KWICMultipleTextPanel extends CssLayout implements
+    KWICInterface
   {
 
-    private List<KWICPanelImpl> kwicPanels;
+    List<LegacyKWICPanel.KWICPanelImpl> kwicPanels;
 
-    public KWICMultipleTextImpl(VisualizerInput visInput,
+    public KWICMultipleTextPanel(VisualizerInput visInput,
       MediaController mediaController, PDFController pdfController)
     {
-      this.kwicPanels = new LinkedList<KWICPanelImpl>();
+      this.kwicPanels = new LinkedList<LegacyKWICPanel.KWICPanelImpl>();
       if (visInput != null)
       {
-        EList<STextualDS> texts = visInput.getDocument().getSDocumentGraph().
-          getSTextualDSs();
+        EList<STextualDS> texts
+          = visInput.getDocument().getSDocumentGraph().getSTextualDSs();
         for (STextualDS t : texts)
         {
-          KWICPanelImpl kwic = new KWICPanelImpl(visInput, mediaController,
-            pdfController, t);
+          LegacyKWICPanel.KWICPanelImpl kwic
+            = new LegacyKWICPanel.KWICPanelImpl(visInput, mediaController,
+              pdfController,
+              t);
           kwicPanels.add(kwic);
-
           addComponent(kwic);
         }
       }
     }
 
     @Override
-    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    public void setVisibleTokenAnnos(Set<String> annos)
     {
-      for (KWICPanelImpl kwic : kwicPanels)
+      for (LegacyKWICPanel.KWICPanelImpl kwic : kwicPanels)
       {
-        kwic.setVisibleTokenAnnosVisible(annos);
+        kwic.setVisibleTokenAnnos(annos);
       }
     }
 
@@ -163,11 +151,12 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     public void setSegmentationLayer(String segmentationName,
       Map<SNode, Long> markedAndCovered)
     {
-      for (KWICPanelImpl kwic : kwicPanels)
+      for (LegacyKWICPanel.KWICPanelImpl kwic : kwicPanels)
       {
         kwic.setSegmentationLayer(segmentationName, markedAndCovered);
       }
     }
+
   } // end class KWICMultipleTextImpl
 
   /**
@@ -179,21 +168,22 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 
     private final org.slf4j.Logger log = LoggerFactory.getLogger(
       KWICPanelImpl.class);
-    private transient SDocument result;
+    transient SDocument result;
     private static final String DUMMY_COLUMN = "dummyColumn";
     private BeanItemContainer<String> containerAnnos;
     private List<String> baseAnnoSet;
-    private transient Map<SNode, Long> markedAndCovered;
-    private transient MediaController mediaController;
+    transient Map<SNode, Long> markedAndCovered;
+    transient MediaController mediaController;
     // only used for media files
     private String[] media_annotations
-            = {
-              "time"
-            };
-    private List<Object> generatedColumns;
-    private transient VisualizerInput visInput;
-    private transient STextualDS text;
-    private transient PDFController pdfController;
+      =
+      {
+        "time"
+      };
+    List<Object> generatedColumns;
+    transient VisualizerInput visInput;
+    transient STextualDS text;
+    transient PDFController pdfController;
 
     /**
      * Specifies if html tags are shown as text or if the browser should render
@@ -208,37 +198,44 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
     private final String HIDDEN_ANN0S = "hidden_annos";
 
     public KWICPanelImpl(VisualizerInput visInput,
-            MediaController mediaController, PDFController pdfController,
-            STextualDS text) {
+      MediaController mediaController, PDFController pdfController,
+      STextualDS text)
+    {
       this.generatedColumns = new LinkedList<Object>();
       this.visInput = visInput;
       this.mediaController = mediaController;
       this.pdfController = pdfController;
       this.text = text;
 
-      if (visInput != null) {
+      if (visInput != null)
+      {
         escapeHTML = Boolean.parseBoolean(visInput.getMappings().getProperty(
-                "escape_html", "true"));
+          "escape_html", "true"));
 
-        if (visInput.getMappings().containsKey(HIDDEN_ANN0S)) {
+        if (visInput.getMappings().containsKey(HIDDEN_ANN0S))
+        {
           hiddenTokenAnnos = new HashSet<String>(
-                  Arrays.asList(
-                          StringUtils.split(
-                                  visInput.getMappings().getProperty(
-                                          "hidden_annos"), ",")
-                  )
+            Arrays.asList(
+              StringUtils.split(
+                visInput.getMappings().getProperty(
+                  "hidden_annos"), ",")
+            )
           );
         }
 
-        if (hiddenTokenAnnos != null) {
+        if (hiddenTokenAnnos != null)
+        {
           VaadinSession s = VaadinSession.getCurrent();
 
-          if (s != null) {
+          if (s != null)
+          {
             VisibleTokenAnnoChanger v = s.getAttribute(
-                    VisibleTokenAnnoChanger.class);
+              VisibleTokenAnnoChanger.class);
 
-            for (String tokenAnnos : visInput.getVisibleTokenAnnos()) {
-              if (!hiddenTokenAnnos.contains(tokenAnnos)) {
+            for (String tokenAnnos : visInput.getVisibleTokenAnnos())
+            {
+              if (!hiddenTokenAnnos.contains(tokenAnnos))
+              {
                 visibleTokenAnnos.add(tokenAnnos);
               }
             }
@@ -249,17 +246,18 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         }
 
         baseAnnoSet = EventExtractor.computeDisplayAnnotations(visInput,
-                SToken.class);
+          SToken.class);
         initKWICPanel(visInput.getSResult(),
-                visibleTokenAnnos,
-                visInput.getMarkedAndCovered(),
-                visInput.getSegmentationName());
+          visibleTokenAnnos,
+          visInput.getMarkedAndCovered(),
+          visInput.getSegmentationName());
       }
     }
 
     private void initKWICPanel(SDocument result,
-            Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
-            String segmentationName) {
+      Set<String> tokenAnnos, Map<SNode, Long> markedAndCovered,
+      String segmentationName)
+    {
       this.result = result;
       this.markedAndCovered = markedAndCovered;
       this.addListener((ItemClickEvent.ItemClickListener) this);
@@ -297,29 +295,11 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
 
       for (SNode t : token)
       {
-        STextualDS tokenText = null;
-        EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
-        types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
-
-
-        EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
-          t,
-          types);
-        if (dataSources != null)
-        {
-          for (SDataSourceSequence seq : dataSources)
-          {
-            if (seq.getSSequentialDS() instanceof STextualDS)
-            {
-              tokenText = (STextualDS) seq.getSSequentialDS();
-              break;
-            }
-          }
-        }
+        STextualDS tokenText = CommonHelper.getTextualDSForNode(t, graph);
 
         Long tokenIndex = null;
-        RelannisNodeFeature featRelannis =
-          (RelannisNodeFeature) t.getSFeature(AnnisConstants.ANNIS_NS,
+        RelannisNodeFeature featRelannis = (RelannisNodeFeature) t.getSFeature(
+          AnnisConstants.ANNIS_NS,
           AnnisConstants.FEAT_RELANNIS_NODE).getValue();
 
         if (featRelannis != null)
@@ -358,7 +338,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
           }
           visible.add(t.getSId());
 
-
           if (tokenIndex != null)
           {
             lastTokenIndex = tokenIndex;
@@ -388,14 +367,13 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       setContainerDataSource(containerAnnos);
       setVisibleColumns(visible.toArray());
 
-
       setCellStyleGenerator(new KWICPanelImpl.KWICStyleGenerator());
       setItemDescriptionGenerator(new KWICPanelImpl.TooltipGenerator());
 
     }
 
     @Override
-    public void setVisibleTokenAnnosVisible(Set<String> annos)
+    public void setVisibleTokenAnnos(Set<String> annos)
     {
       if (containerAnnos != null)
       {
@@ -422,7 +400,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       }
 
       // re-init the complete KWIC
-
       generatedColumns = new LinkedList<Object>();
       if (visInput != null)
       {
@@ -593,16 +570,17 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
         textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
         SDocumentGraph docGraph = result.getSDocumentGraph();
 
-
         if ("tok".equals(layer))
         {
           if (segmentationName == null)
           {
             SDataSourceSequence seq = docGraph.getOverlappedDSSequences(token,
               textualRelation).get(0);
-            
-            return new Label(((String) seq.getSSequentialDS().getSData()).substring(seq.
-              getSStart(), seq.getSEnd()), escapeHTML ? ContentMode.TEXT : ContentMode.HTML);
+
+            return new Label(((String) seq.getSSequentialDS().getSData()).
+              substring(seq.
+                getSStart(), seq.getSEnd()), escapeHTML ? ContentMode.TEXT
+              : ContentMode.HTML);
 
           }
           else
@@ -729,7 +707,6 @@ public class KWICPanel extends AbstractVisualizer<KWICPanel.KWICInterface>
       {
 
         String[] split = time.split("-");
-
 
         if (split.length == 1)
         {

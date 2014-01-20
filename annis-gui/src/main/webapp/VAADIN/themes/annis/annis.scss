@@ -7,6 +7,16 @@
 
 $font-size: 10pt;
 
+
+@mixin match-color($nr, $color) {
+  .v-table-cell-content-match_#{$nr}  {
+    color: $color;
+  }
+  .kwic td.v-table-cell-content-match_#{$nr}  {
+    color: $color;
+  }
+}
+
 @mixin annis {
   @include chameleon;
   @include annis-base;
@@ -53,6 +63,22 @@ $font-size: 10pt;
 
   .v-table-cell-content-kwic-anno {
     color: grey;
+  }
+  
+  .kwic {
+    td {
+      color: grey;
+      padding: 0px 6px;
+    }
+    td.token {
+      color: black;
+    }
+    .speaker div {
+      /* we need enough space for the speaker logo */
+      min-width: 32px;
+      min-height: 32px;
+    }
+    
   }
 
   .v-table-cell-content-kwic-clickable {
@@ -167,33 +193,16 @@ $font-size: 10pt;
     background-image: url(../chameleon/img/grad-light-top.png);
     background-origin: padding-box;
     background-size: auto;
-  }
-
-  /* matched node colors by match index*/
-  .v-table-cell-content-match_1 {
-    color: rgb(255,0,0);
-  }
-  .v-table-cell-content-match_2 {
-    color: rgb(199,21,133);
-  }
-  .v-table-cell-content-match_3 {
-    color: rgb(50, 205, 50);
-  }
-  .v-table-cell-content-match_4 {
-    color: rgb(205,133,63);
-  }
-  .v-table-cell-content-match_5 {
-    color: rgb(205,92,92);
-  }
-  .v-table-cell-content-match_6 {
-    color: rgb(173,255,47);
-  }
-  .v-table-cell-content-match_7 {
-    color: rgb(139,0,0);
-  }
-  .v-table-cell-content-match_8 {
-    color: rgb(255,69,0);
-  }
+  } 
+  
+  @include match-color(1, rgb(255,0,0));
+  @include match-color(2, rgb(199,21,133));
+  @include match-color(3, rgb(50, 205, 50));
+  @include match-color(4, rgb(205,133,63));
+  @include match-color(5, rgb(205,92,92));
+  @include match-color(6, rgb(173,255,47));
+  @include match-color(7, rgb(139,0,0));
+  @include match-color(8, rgb(255,69,0));
 
   .v-form-errormessage {
     color: red;
