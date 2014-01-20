@@ -301,6 +301,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener, Seri
       newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
     }
     ui.getMainTab().setSelectedTab(newResultView);
+    ui.notifiyQueryStarted();
     
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       lastQueryUUID));

@@ -46,6 +46,7 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
@@ -56,6 +57,7 @@ import com.vaadin.server.RequestHandler;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
+import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 
@@ -72,6 +74,7 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.servlet.http.Cookie;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
@@ -98,7 +101,7 @@ public class SearchUI extends AnnisBaseUI
 
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
-  private Pattern citationPattern =
+  private final Pattern citationPattern =
     Pattern.
     compile(
     "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
@@ -107,6 +110,8 @@ public class SearchUI extends AnnisBaseUI
   private HorizontalLayout layoutToolbar;
 
   private Label lblUserName;
+
+  private Button btSidebar; 
   
   private Button btLogin;
 
@@ -138,6 +143,8 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
+  private SidebarState sidebarState = SidebarState.VISIBLE;
+  
   @Override
   protected void init(VaadinRequest request)
   {
@@ -145,7 +152,9 @@ public class SearchUI extends AnnisBaseUI
     setErrorHandler(this);
 
     this.instanceConfig = getInstanceConfig(request);
-
+    
+    regenerateStateFromCookies();
+    
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
@@ -179,6 +188,14 @@ public class SearchUI extends AnnisBaseUI
     layoutToolbar.addStyleName("toolbar");
     layoutToolbar.addStyleName("border-layout");
 
+    btSidebar = new Button();
+    btSidebar.setDisableOnClick(true);
+    btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btSidebar.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btSidebar.setDescription("Show and hide search sidebar");
+    btSidebar.setIcon(sidebarState.getIcon());
+    btSidebar.setIconAlternateText(btSidebar.getDescription());
+    
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
@@ -272,6 +289,7 @@ public class SearchUI extends AnnisBaseUI
     });
 
 
+    layoutToolbar.addComponent(btSidebar);
     layoutToolbar.addComponent(btAboutAnnis);
     layoutToolbar.addComponent(btBugReport);
     layoutToolbar.addComponent(btOpenSource);
@@ -285,12 +303,17 @@ public class SearchUI extends AnnisBaseUI
 
     layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
 
-    //HorizontalLayout hLayout = new HorizontalLayout();
-    final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
-    hSplit.setSizeFull();
-
-    mainLayout.addComponent(hSplit);
-    mainLayout.setExpandRatio(hSplit, 1.0f);
+    HorizontalLayout hLayout = new HorizontalLayout();
+    hLayout.setSizeFull();
+    mainLayout.addComponent(hLayout);
+    mainLayout.setExpandRatio(hLayout, 1.0f);
+    
+    
+//    final HorizontalSplitPanel hSplit = new HorizontalSplitPanel();
+//    hSplit.setSizeFull();
+//
+//    mainLayout.addComponent(hSplit);
+//    mainLayout.setExpandRatio(hSplit, 1.0f);
 
     final HelpPanel help = new HelpPanel(this);
 
@@ -304,39 +327,99 @@ public class SearchUI extends AnnisBaseUI
     helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
 
-
-    hSplit.setSecondComponent(mainTab);
-    hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
-    hSplit.addSplitterClickListener(
-      new AbstractSplitPanel.SplitterClickListener()
-    {
-      @Override
-      public void splitterClick(AbstractSplitPanel.SplitterClickEvent event)
-      {
-        if (event.isDoubleClick())
-        {
-          if (hSplit.getSplitPosition() == CONTROL_PANEL_WIDTH)
-          {
-            // make small
-            hSplit.setSplitPosition(0.0f, Unit.PIXELS);
-          }
-          else
-          {
-            // reset to default width
-            hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
-          }
-        }
-      }
-    });
+//    hSplit.setSecondComponent(mainTab);
+//    hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
+//    hSplit.addSplitterClickListener(
+//      new AbstractSplitPanel.SplitterClickListener()
+//    {
+//      @Override
+//      public void splitterClick(AbstractSplitPanel.SplitterClickEvent event)
+//      {
+//        if (event.isDoubleClick())
+//        {
+//          if (hSplit.getSplitPosition() == CONTROL_PANEL_WIDTH)
+//          {
+//            // make small
+//            hSplit.setSplitPosition(0.0f, Unit.PIXELS);
+//          }
+//          else
+//          {
+//            // reset to default width
+//            hSplit.setSplitPosition(CONTROL_PANEL_WIDTH, Unit.PIXELS);
+//          }
+//        }
+//      }
+//    });
 //    hLayout.setExpandRatio(mainTab, 1.0f);
 
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);
 
-    controlPanel.setWidth(100f, Layout.Unit.PERCENTAGE);
+    controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
     
-    hSplit.setFirstComponent(controlPanel);
+    hLayout.addComponent(controlPanel);
+    hLayout.addComponent(mainTab);
+    hLayout.setExpandRatio(mainTab, 1.0f);
+    
+    btSidebar.addClickListener(new ClickListener()
+    {
+      @Override
+      public void buttonClick(ClickEvent event)
+      {
+        btSidebar.setEnabled(true);
+      
+        // decide new state
+        switch (sidebarState)
+        {
+          case VISIBLE:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.AUTO_VISIBLE;
+            }
+            else
+            {
+              sidebarState = SidebarState.HIDDEN;
+            }
+            break;
+          case HIDDEN:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.AUTO_HIDDEN;
+            }
+            else
+            {
+              sidebarState = SidebarState.VISIBLE;
+            }
+            break;
+
+          case AUTO_VISIBLE:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.VISIBLE;
+            }
+            else
+            {
+              sidebarState = SidebarState.AUTO_HIDDEN;
+            }
+            break;
+          case AUTO_HIDDEN:
+            if (event.isCtrlKey())
+            {
+              sidebarState = SidebarState.HIDDEN;
+            }
+            else
+            {
+              sidebarState = SidebarState.AUTO_VISIBLE;
+            }
+            break;
+        }
+        updateControlsForSidebarState();
+      }
+    });
+    
+    
+//    hSplit.setFirstComponent(controlPanel);
 
 
     addAction(new ShortcutListener("Tutor^eial")
@@ -366,6 +449,35 @@ public class SearchUI extends AnnisBaseUI
     evaluateFragment(getPage().getUriFragment());
 
     updateUserInformation();
+    updateControlsForSidebarState();
+  }
+  
+  public void regenerateStateFromCookies()
+  {
+    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
+    for(Cookie c : cookies )
+    {
+      if("annis-sidebar-state".equals(c.getName()))
+      {
+        try
+        {
+          sidebarState = SidebarState.valueOf(c.getValue());
+          // don't be invisible
+          if(sidebarState == SidebarState.AUTO_HIDDEN)
+          {
+            sidebarState = SidebarState.AUTO_VISIBLE;
+          }
+          else if(sidebarState == SidebarState.HIDDEN)
+          {
+            sidebarState = SidebarState.VISIBLE;
+          }
+        }
+        catch(IllegalArgumentException ex)
+        {
+          log.debug("Invalid cookie for sidebar state", ex);
+        }
+      }
+    }
   }
   
   @Override
@@ -603,9 +715,27 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
-      showNotification("Invalid citation", Notification.Type.WARNING_MESSAGE);
+      Notification.show("Invalid citation", Notification.Type.WARNING_MESSAGE);
     }
 
+  }
+  
+  /**
+   * update controls according to new state
+   */
+  private void updateControlsForSidebarState()
+  {
+    if(controlPanel != null && sidebarState != null && btSidebar != null)
+    {
+      controlPanel.setVisible(sidebarState.isSidebarVisible());
+      btSidebar.setIcon(sidebarState.getIcon());
+      
+      // set cookie
+      Cookie c = new Cookie("annis-sidebar-state", sidebarState.name());
+      c.setMaxAge(30*24*60*60); // 30 days
+      c.setPath(VaadinService.getCurrentRequest().getContextPath());
+      VaadinService.getCurrentResponse().addCookie(c);
+    }
   }
 
   public void updateUserInformation()
@@ -782,6 +912,15 @@ public class SearchUI extends AnnisBaseUI
         Notification.Type.WARNING_MESSAGE);
     }
 
+  }
+  
+  public void notifiyQueryStarted()
+  {
+    if(sidebarState == SidebarState.AUTO_VISIBLE)
+    {
+      sidebarState = SidebarState.AUTO_HIDDEN;
+    }
+    updateControlsForSidebarState();
   }
 
   @Override
