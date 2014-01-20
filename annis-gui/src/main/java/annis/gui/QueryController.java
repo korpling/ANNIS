@@ -286,7 +286,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
     if (replaceOldTab && oldQueryUUID != null && oldPanel != null)
     {
-      //removeQuery(oldQueryUUID);
+      removeQuery(oldQueryUUID);
     }
 
     // create a short ID for display
