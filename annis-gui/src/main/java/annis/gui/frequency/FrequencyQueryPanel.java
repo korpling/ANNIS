@@ -145,8 +145,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     updateQueryInfo(controller.getQueryDraft());
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
-    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
-    tblFrequencyDefinition.setColumnExpandRatio("comment", 0.2f);
+    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
+    tblFrequencyDefinition.setColumnExpandRatio("comment", 0.5f);
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
