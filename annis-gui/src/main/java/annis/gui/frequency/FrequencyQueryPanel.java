@@ -45,6 +45,7 @@ import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -208,6 +209,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       {
         manuallyChanged = false;
         btShowFrequencies.setEnabled(true);
+        tblFrequencyDefinition.removeAllItems();
         createAutomaticEntriesForQuery(controller.getQueryDraft());
       }
     });
@@ -387,6 +389,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   private List<QueryNode> parseQuery(String query)
   {
+    if(query == null || query.isEmpty())
+    {
+      return new LinkedList<QueryNode>();
+    }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
     List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
