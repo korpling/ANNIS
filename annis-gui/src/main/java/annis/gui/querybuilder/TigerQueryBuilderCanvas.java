@@ -257,8 +257,8 @@ public class TigerQueryBuilderCanvas extends Panel
       if (valid)
       {
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
-        e.setWidth("150px");
-        e.setHeight("50px");
+        e.setWidth("170px");
+        e.setHeight("80px");
         e.addStyleName("tigerquery-builder-overlay");
         edges.add(e);
         area.addComponent(e);
