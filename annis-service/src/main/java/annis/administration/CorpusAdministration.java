@@ -23,6 +23,7 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.CommonHelper;
 import annis.administration.AdministrationDao.ImportStats;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
@@ -308,7 +309,7 @@ public class CorpusAdministration
   {
     File outDir = new File(System.getProperty("user.home"),
       ".annis/zip-imports/"
-      + getSafeDirName(corpusName));
+      + CommonHelper.getSafeFileName(corpusName));
     if (outDir.exists())
     {
       try
@@ -329,23 +330,6 @@ public class CorpusAdministration
     return outDir;
   }
   
-  /**
-   * Returns a directory name for an import job that is safe to use as a file name.
-   * @param job
-   * @return 
-   */
-  private String getSafeDirName(String jobName)
-  {
-    if(jobName != null)
-    {
-      return jobName.replaceAll("[^0-9A-Za-z.-]", "_");
-    }
-    else
-    {
-      return UUID.randomUUID().toString();
-    }
-  }
-
   private class ImportStatsImpl implements AdministrationDao.ImportStats
   {
 

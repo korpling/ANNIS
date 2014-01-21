@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import annis.CommonHelper;
 import java.io.File;
 import java.io.IOException;
 import java.sql.PreparedStatement;
@@ -55,18 +56,34 @@ public class BinaryImportHelper implements
 
   private long corpusRef;
 
-  public BinaryImportHelper(File f, File dataDir, long corpusRef,
+  public BinaryImportHelper(File f, File dataDir, String toplevelCorpusName, 
+    long corpusRef,
     Map<String, String> mimeTypeMapping)
   {
     this.fileSource = f;
 
-    // create a file-name in the form of "filename-UUID.ending", thus we
+    // create a file-name in the form of "filename_toplevelcorpus_UUID.ending", thus we
     // need to split the file name into its components
     String baseName = FilenameUtils.getBaseName(fileSource.getName());
     String extension = FilenameUtils.getExtension(fileSource.getName());
     UUID uuid = UUID.randomUUID();
-    fileDestination = new File(dataDir, baseName + "_" + uuid.toString()
-      + (extension.isEmpty() ? "" : "." + extension));
+    
+    String outputName = "";
+    if(toplevelCorpusName == null)
+    {
+      outputName = baseName 
+        + "_" + uuid.toString()
+        + (extension.isEmpty() ? "" : "." + extension);
+    }
+    else
+    {
+      outputName = baseName 
+        + "_" + CommonHelper.getSafeFileName(toplevelCorpusName)
+        + "_" + uuid.toString()
+        + (extension.isEmpty() ? "" : "." + extension);
+    }
+    
+    fileDestination = new File(dataDir, outputName);
 
 
     String fileEnding = FilenameUtils.getExtension(f.getName());
@@ -86,13 +103,15 @@ public class BinaryImportHelper implements
    *
    * @param file Specifies path to the file, including the filename.
    * @param dataDir Specifies the directory, where the file is copied to.
+   * @param toplevelCorpusName Name of the toplevel corpus..
    * @param corpusRef Assigns the file to a specific corpus in the database.
    * @param mimeTypeMapping A map of default mime types.
    */
   public BinaryImportHelper(String file, File dataDir,
+    String toplevelCorpusName,
     long corpusRef, Map<String, String> mimeTypeMapping)
   {
-    this(new File(file), dataDir, corpusRef, mimeTypeMapping);
+    this(new File(file), dataDir, toplevelCorpusName, corpusRef, mimeTypeMapping);
   }
 
   @Override

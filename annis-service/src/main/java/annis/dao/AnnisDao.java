@@ -210,12 +210,13 @@ public interface AnnisDao
    * The actual name of a specific corpus property file is stored in the
    * media_file table.<p>
    *
+   * @param topLevelCorpus
    * @return The corpus configuration is represented as Key-Value-Pairs.
    *
    * @see BinaryImportHelper
    *
    */
-  public Properties getCorpusConfiguration(String corpusName);
+  public Properties getCorpusConfiguration(String topLevelCorpus);
 
   /**
    * Called to check if the database management program has the right version
@@ -291,5 +292,5 @@ public interface AnnisDao
    * @param corpusID The id of the corpus, for which the properties are written.
    * @param props The properties
    */
-  public void setCorpusConfiguration(long corpusID, Properties props);
+  public void setCorpusConfiguration(String topLevelCorpus, Properties props);
 }

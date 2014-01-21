@@ -36,7 +36,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
-import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -107,10 +106,9 @@ public class DefaultAdministrationDao implements AdministrationDao
    *
    * @param corpusID The id of the corpus which texts are analyzed.
    */
-  private void analyzeTextTable(long corpusID)
+  private void analyzeTextTable(String toplevelCorpusName)
   {
-    String name = annisDao.mapCorpusIdToName(corpusID);
-    List<String> rawTexts = annisDao.getRawText(name);
+    List<String> rawTexts = annisDao.getRawText(toplevelCorpusName);
 
     // pattern for checking the token layer
     final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -121,7 +119,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
         // deactivate doc browsing if no corpus config is present.
-        Properties corpusConfiguration = annisDao.getCorpusConfiguration(name);
+        Properties corpusConfiguration = annisDao.getCorpusConfiguration(toplevelCorpusName);
         if (corpusConfiguration == null)
         {
           log.info("create new corpus configuration file");
@@ -134,7 +132,7 @@ public class DefaultAdministrationDao implements AdministrationDao
           corpusConfiguration.put("browse-documents", "false");
 
           log.info("disable document browser");
-          annisDao.setCorpusConfiguration(corpusID, corpusConfiguration);
+          annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConfiguration);
         }
       }
     }
@@ -154,6 +152,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private String schemaVersion;
 
+  /**
+   * A mapping for file-endings to mime types.
+   */
   private Map<String, String> mimeTypeMapping;
 
   private Map<String, String> tableInsertSelect;
@@ -435,6 +436,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
     
+    String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
+    
     // remove conflicting top level corpora, when override is set to true.
     if (override)
     {
@@ -456,7 +459,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     adjustTextId();
     long corpusID = updateIds();
 
-    importBinaryData(path);
+    importBinaryData(path, toplevelCorpusName);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -489,7 +492,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
 
     analyzeFacts(corpusID);
-    analyzeTextTable(corpusID);
+    analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
     
     if(aliasName != null && !aliasName.isEmpty())
@@ -682,7 +685,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("toplevel_corpus.sql");
   }
 
-  void importBinaryData(String path)
+  void importBinaryData(String path, String toplevelCorpusName)
   {
     log.info("importing all binary data from ExtData");
     File extData = new File(path + "/ExtData");
@@ -704,7 +707,7 @@ public class DefaultAdministrationDao implements AdministrationDao
               "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
             long corpusID = jdbcTemplate.queryForLong(sqlScript);
 
-            importSingleFile(data.getCanonicalPath(), corpusID);
+            importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
           }
           else
           {
@@ -742,7 +745,7 @@ public class DefaultAdministrationDao implements AdministrationDao
                 long corpusID = jdbcTemplate.queryForLong(sqlScript, doc.
                   getName());
 
-                importSingleFile(data.getCanonicalPath(), corpusID);
+                importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
               }
               else
               {
@@ -766,11 +769,13 @@ public class DefaultAdministrationDao implements AdministrationDao
    *
    * @param file Specifies the file to be imported.
    * @param corpusRef Assigns the file this corpus.
+   * @param toplevelCorpusName The toplevel corpus name
    */
-  private void importSingleFile(String file, long corpusRef)
+  private void importSingleFile(String file, String toplevelCorpusName, long corpusRef)
   {
 
     BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
+      toplevelCorpusName,
       corpusRef, mimeTypeMapping);
     jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
 
@@ -876,7 +881,6 @@ public class DefaultAdministrationDao implements AdministrationDao
    */
   long updateIds()
   {
-    log.info("updating IDs in staging area");
 
     int numOfEntries = jdbcTemplate.queryForInt(
       "SELECT COUNT(*) from corpus_stats");
@@ -889,7 +893,8 @@ public class DefaultAdministrationDao implements AdministrationDao
         "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
     }
-
+    
+    log.info("updating IDs in staging area");
     MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
     executeSqlFromScript("update_ids.sql", args);
 

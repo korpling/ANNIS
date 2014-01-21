@@ -50,7 +50,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utilities class for non-gui operations on Salt.
+ * Utilities class for non-gui operations.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
@@ -399,6 +399,23 @@ public class CommonHelper
       }
     }
     return null;
+  }
+  
+  /**
+   * Returns a file name that is safe to use and does not have any invalid characters.
+   * @param orig
+   * @return 
+   */
+  public static String getSafeFileName(String orig)
+  {
+    if(orig != null)
+    {
+      return orig.replaceAll("[^0-9A-Za-z-]", "_");
+    }
+    else
+    {
+      return UUID.randomUUID().toString();
+    }
   }
 
   // TODO: remove if really not needed

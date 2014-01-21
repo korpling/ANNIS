@@ -74,7 +74,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -85,15 +84,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
-import javax.ws.rs.core.GenericEntity;
-import org.apache.commons.io.input.BoundedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
@@ -309,8 +305,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public void setCorpusConfiguration(long corpusID, Properties props)
+  public void setCorpusConfiguration(String toplevelCorpusName, Properties props)
   {
+    long corpusID = mapCorpusNameToId(toplevelCorpusName);
+    
     String sql = "SELECT filename FROM media_files "
       + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
     String fileName = getJdbcTemplate().query(sql,
@@ -335,7 +333,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
       if (fileName == null)
       {
-        fileName = "corpus_" + UUID.randomUUID() + ".properties";
+        fileName = "corpus_" + toplevelCorpusName +  "_" + UUID.randomUUID() + ".properties";
         getJdbcTemplate().update(
           "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
           + "', 'application/text+plain', 'corpus.properties')");
