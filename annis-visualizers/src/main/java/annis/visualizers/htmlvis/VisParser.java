@@ -90,7 +90,12 @@ public class VisParser extends HTMLVisConfigBaseListener
   @Override
   public void enterConditionName(HTMLVisConfigParser.ConditionNameContext ctx)
   {
-    currentMatcher = new AnnotationNameMatcher(ctx.ID().getText());
+    String namespace = null;
+    if(ctx.qName().namespace != null)
+    {
+      namespace = ctx.qName().namespace.getText();
+    }
+    currentMatcher = new AnnotationNameMatcher(namespace, ctx.qName().name.getText());
   }
 
   @Override
@@ -109,7 +114,12 @@ public class VisParser extends HTMLVisConfigBaseListener
   public void enterConditionNameAndValue(
     HTMLVisConfigParser.ConditionNameAndValueContext ctx)
   {
-    currentMatcher = new AnnotationNameAndValueMatcher(ctx.ID().getText(), 
+    String namespace = null;
+    if(ctx.qName().namespace != null)
+    {
+      namespace = ctx.qName().namespace.getText();
+    }
+    currentMatcher = new AnnotationNameAndValueMatcher(namespace, ctx.qName().name.getText(), 
       ctx.value().innervalue().getText());
   }
 

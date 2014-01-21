@@ -29,10 +29,17 @@ public class AnnotationNameMatcher implements SpanMatcher
 {
   private String annotationName;
 
-  public AnnotationNameMatcher(String annotationName)
+  public AnnotationNameMatcher(String annotationNamespace, String annotationName)
   {
     Validate.notNull(annotationName, "The annotation name parameter must never be null.");
-    this.annotationName = annotationName;
+    if(annotationNamespace == null || annotationNamespace.isEmpty())
+    {
+      this.annotationName = annotationName;
+    }
+    else
+    {
+      this.annotationName = annotationNamespace + "::" + annotationName;
+    }
   }
   
   @Override
