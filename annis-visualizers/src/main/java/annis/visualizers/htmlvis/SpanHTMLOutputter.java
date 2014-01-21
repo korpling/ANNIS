@@ -36,6 +36,8 @@ public class SpanHTMLOutputter
 {
   public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT};
   
+  public static final String NULL_VAL = "NULL";
+  
   private Type type = Type.EMPTY;
   private String element = "div";
   private String attribute;
@@ -162,6 +164,13 @@ public class SpanHTMLOutputter
       outputEndTags.put(right, new TreeSet<OutputItem>());
     }
     
+    if(NULL_VAL.equals(element))
+    {
+      // reset both start and end tag since we won't use it
+      startTag = "";
+      endTag = "";
+    }
+    
     // <tag>|inner| ... | </tag>
     if(!inner.isEmpty())
     {
@@ -174,7 +183,14 @@ public class SpanHTMLOutputter
     itemStart.setqName(matchedQName);
     
     OutputItem itemEnd = new OutputItem();
-    itemEnd.setOutputString(endTag + "<!-- end of \"" + style + "\" -->");
+    if(endTag.isEmpty())
+    {
+      itemEnd.setOutputString(endTag+ "<!-- end of non-span output -->");
+    }
+    else
+    {
+      itemEnd.setOutputString(endTag + "<!-- end of \"" + style + "\" -->");
+    }
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
     
