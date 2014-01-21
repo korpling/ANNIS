@@ -133,6 +133,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
           log.info("disable document browser");
           annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConfiguration);
+          
+          // once disabled don't search in further texts
+          break;
         }
       }
     }
