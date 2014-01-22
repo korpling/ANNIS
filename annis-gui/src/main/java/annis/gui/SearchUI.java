@@ -41,6 +41,9 @@ import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -98,6 +101,9 @@ public class SearchUI extends AnnisBaseUI
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
+  
+  
+  private transient Cache<String, CorpusConfig> corpusConfigCache;
 
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
@@ -145,6 +151,22 @@ public class SearchUI extends AnnisBaseUI
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
   
+  private void initTransients()
+  {
+    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
+  }
+  
+  public SearchUI()
+  {
+    initTransients();
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
+  }
+    
   @Override
   protected void init(VaadinRequest request)
   {
@@ -565,6 +587,34 @@ public class SearchUI extends AnnisBaseUI
 
     // default to an empty instance config
     return new InstanceConfig();
+  }
+  
+  /**
+   * Get a cached version of the {@link CorpusConfig} for a corpus.
+   * @param corpus
+   * @return 
+   */
+  public CorpusConfig getCorpusConfigWithCache(String corpus)
+  {
+    CorpusConfig config = new CorpusConfig();
+    if(corpusConfigCache != null)
+    {
+      config = corpusConfigCache.getIfPresent(corpus);
+      if(config == null)
+      {
+        config = Helper.getCorpusConfig(corpus);
+        corpusConfigCache.put(corpus, config);
+      }
+    }
+    return config;
+  }
+  
+  public void clearCorpusConfigCache()
+  {
+    if(corpusConfigCache != null)
+    {
+      corpusConfigCache.invalidateAll();
+    }
   }
 
   @Override

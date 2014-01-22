@@ -25,6 +25,10 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -110,7 +114,7 @@ public class CorpusListPanel extends VerticalLayout implements
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
 
   private InstanceConfig instanceConfig;
-
+  
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
@@ -281,6 +285,11 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void updateCorpusSetList(boolean showLoginMessage)
   {
+    if(ui != null)
+    {
+      ui.clearCorpusConfigCache();
+    }
+    
     if (queryServerForCorpusList() && userConfig != null)
     {
       if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
@@ -609,7 +618,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     }
   }
-
+  
   public static class CorpusSorter extends DefaultItemSorter
   {
 

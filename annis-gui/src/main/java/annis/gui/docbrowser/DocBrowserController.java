@@ -340,14 +340,16 @@ public class DocBrowserController implements Serializable
 
   public boolean docsAvailable(String id)
   {
-    CorpusConfig corpusConfig = Helper.getCorpusConfig(id);
-
-    if (corpusConfig != null)
+    if (ui != null)
     {
-      return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
-        "true"));
-    }
+      CorpusConfig corpusConfig = ui.getCorpusConfigWithCache(id);
 
+      if (corpusConfig != null)
+      {
+        return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
+          "true"));
+      }
+    }
     return true;
   }
 }
