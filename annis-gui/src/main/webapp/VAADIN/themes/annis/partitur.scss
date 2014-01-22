@@ -15,10 +15,6 @@
     background-color:#faf755;
   }
 
-  .partitur_table .highlight-source {
-    background-color:rgb(200,200,200);
-  }
-
   .partitur_table td.header {
 
     margin:0px;
@@ -64,6 +60,10 @@
     border-color:rgb(0,0,0);
     border-style:solid;
     border-width:1px;
+  }
+  
+  .partitur_table td.highlight-source {
+    background-color:rgb(200,200,200);
   }
 
   .checkedItem:before {
