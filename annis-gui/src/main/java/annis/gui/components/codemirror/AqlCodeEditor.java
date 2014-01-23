@@ -47,6 +47,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   public AqlCodeEditor()
   {
     addFunction("textChanged", new TextChangedFunction());
+    
+    addStyleName("aql-code-editor");
   }
   
   private class TextChangedFunction implements JavaScriptFunction

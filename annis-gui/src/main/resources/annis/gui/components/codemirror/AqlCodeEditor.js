@@ -25,7 +25,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
 
     var cmTextArea = CodeMirror(rootDiv,
     {
-      mode: 'aql'
+      mode: 'aql', 
+      lineNumbers: true
     });
     
     function sendTextIfNecessary () 
