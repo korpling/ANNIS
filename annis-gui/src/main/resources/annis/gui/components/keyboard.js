@@ -1383,8 +1383,16 @@ var VKI_attach, VKI_show, VKI_close;
             span.appendChild(document.createTextNode(this.VKI_i18n['07']));
             span.title = this.VKI_i18n['08'];
           VKI_addListener(span, 'click', function() {
-            self.VKI_target.value = "";
-            self.VKI_target.focus();
+            if(self.VKI_target.CodeMirror)
+            {
+              self.VKI_target.CodeMirror.setValue("");
+              self.VKI_target.CodeMirror.focus();
+            }
+            else
+            {
+              self.VKI_target.value = "";
+              self.VKI_target.focus();
+            }
             return false;
           }, false);
           VKI_mouseEvents(span);
@@ -1698,7 +1706,7 @@ var VKI_attach, VKI_show, VKI_close;
       // we don't have a real textarea. but a CodeMirror code editor
       var cm = this.VKI_target.CodeMirror;
       cm.getDoc().replaceRange(text, cm.getCursor());
-      this.VKI_target.focus();
+      cm.focus();
     }
     else
     {
