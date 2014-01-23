@@ -52,7 +52,14 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     this.onStateChange = function() 
     {
-      cmTextArea.setValue(connector.getState().text);
+      var cursor = cmTextArea.getCursor();
+      if(cmTextArea.getValue() !== connector.getState().text)
+      {
+        cmTextArea.setValue(connector.getState().text);
+
+        // restore the cursor position
+        cmTextArea.setCursor(cursor);
+      }
     };
     
     this.setChangeDelayTime = function(newDelayTime) {
