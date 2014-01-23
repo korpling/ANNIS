@@ -15,10 +15,6 @@
     background-color:#faf755;
   }
 
-  .partitur_table .highlight-source {
-    background-color:rgb(200,200,200);
-  }
-
   .partitur_table td.header {
 
     margin:0px;
@@ -36,6 +32,13 @@
     border-style: solid;
     border-color: black;
   }
+  
+  .partitur_table td.space {
+    background-image: url("space.png");
+    background-repeat: repeat-y;
+    border-style: none;
+    background-position: center;
+  }
 
 
   .partitur_table td {
@@ -52,11 +55,15 @@
     font-family: arial, tahoma, helvetica, sans-serif;
   }
 
-  td.single_event {
+  .partitur_table td.single_event {
     background-color:rgb(230,230,230);
     border-color:rgb(0,0,0);
     border-style:solid;
     border-width:1px;
+  }
+  
+  .partitur_table td.highlight-source {
+    background-color:rgb(200,200,200);
   }
 
   .checkedItem:before {

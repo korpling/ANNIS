@@ -67,7 +67,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
    * this empty label is currently use for empty metadata list on the left side
    * of the corpusbrowser
    */
-  private Label emptyLabel = new Label("none");
+  private Label emptyLabel = new Label("(no metadata)");
 
   public MetaDataPanel(String toplevelCorpusName)
   {
@@ -251,7 +251,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     {
       res = res.path("meta").path("docnames")
         .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      docs = res.get(new AnnotationListType());
+      docs = res.get(new Helper.AnnotationListType());
     }
     catch (UniformInterfaceException ex)
     {
@@ -356,15 +356,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     {
       layout.removeComponent(emptyLabel);
     }
-  }
-
-  private static class AnnotationListType extends GenericType<List<Annotation>>
-  {
-
-    public AnnotationListType()
-    {
-    }
-  }
+  }  
 
   private static class MetaTableNameGenerator implements ColumnGenerator
   {

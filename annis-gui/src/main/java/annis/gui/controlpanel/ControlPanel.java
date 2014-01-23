@@ -18,7 +18,10 @@ package annis.gui.controlpanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
+import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
+import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ChameleonTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This panel allows the user to control and execute queries.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ControlPanel extends VerticalLayout
 {
@@ -36,41 +39,48 @@ public class ControlPanel extends VerticalLayout
   private static final long serialVersionUID = -2220211539424865671L;
 
   private QueryPanel queryPanel;
-
   private CorpusListPanel corpusList;
 
   private SearchOptionsPanel searchOptions;
+  
+  private Tab optionTab;
+  private TabSheet optionsTab;
+  private SearchUI ui;
+
 
   public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
-    ExampleQueriesPanel autoGenQueries)
+    ExampleQueriesPanel autoGenQueries, SearchUI ui)
   {
+    this.ui = ui;
+    
     setSizeFull();
+    setMargin(true);
 
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
-    Accordion accordion = new Accordion();
-    accordion.setHeight(100f, Layout.UNITS_PERCENTAGE);
-    accordion.setWidth(100f, Layout.UNITS_PERCENTAGE);
-
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries);
-
-    searchOptions = new SearchOptionsPanel();
-
-    queryPanel = new QueryPanel(controller, instanceConfig);
+    queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
     queryPanel.setWidth("100%");
+    
+    optionsTab = new TabSheet();
+    optionsTab.setHeight("100%");
+    optionsTab.setWidth("100%");
+    optionsTab.addStyleName("blue-tab");
 
-    accordion.addTab(corpusList, "Corpus List", null);
-    accordion.addTab(searchOptions, "Search Options", null);
-    accordion.addTab(new ExportPanel(queryPanel, corpusList, controller), "Export", null);
+    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
+    
+    searchOptions = new SearchOptionsPanel();
 
+    optionsTab.addTab(corpusList, "Corpus List", null);
+    optionTab = optionsTab.addTab(searchOptions, "Search Options", null);
+   
     addComponent(queryPanel);
-    addComponent(accordion);
-
-    setExpandRatio(accordion, 1.0f);
+    addComponent(optionsTab);
+    
+    setExpandRatio(optionsTab, 1.0f);
   }
-
+  
   public CorpusListPanel getCorpusList()
   {
     return corpusList;
@@ -84,5 +94,5 @@ public class ControlPanel extends VerticalLayout
   public SearchOptionsPanel getSearchOptions()
   {
     return searchOptions;
-  }
+  }  
 }

@@ -51,6 +51,9 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
   {
   }
   
-  
-
+  @Override
+  public boolean isUsingRawText()
+  {
+    return false;
+  }
 }

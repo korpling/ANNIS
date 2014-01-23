@@ -1,5 +1,6 @@
   package annis.sqlgen;
 
+import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
 import java.sql.ResultSet;
@@ -51,6 +52,10 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
+    int maxWidth = queryData.getMaxWidth();
+    Validate.isTrue(alternative.size() <= maxWidth,
+      "BUG: nodes.size() > maxWidth");
+    
     List<AnnotateQueryData> extensions =
       queryData.getExtensions(AnnotateQueryData.class);
     AnnotateQueryData annotateQueryData = null;
@@ -66,12 +71,14 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
     }
 
     List<String> selectClauseForNode = new ArrayList<String>();
-    for (int i = 1; i <= alternative.size(); ++i)
+    int i=0;
+   
+    for (QueryNode node : alternative)
     {
-      QueryNode node = alternative.get(i - 1);
+      i++;
       TableAccessStrategy tables = tables(node);
-
       List<String> fields = new ArrayList<String>();
+      
       fields.addAll(solutionKey.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
       
@@ -96,8 +103,21 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
       fields.add(tables.aliasedColumn(NODE_TABLE, "name") + " AS name" + i);
 
       selectClauseForNode.add("\n" + indent + TABSTOP + StringUtils.join(fields,
-        ", "));
+      ", "));
+      
     }
+    for (i = alternative.size() + 1; i <= maxWidth; ++i)
+    {
+      selectClauseForNode.add("NULL::bigint AS id" + i);
+      selectClauseForNode.add("NULL::bigint AS text" + i);
+      selectClauseForNode.add("NULL::int AS min" + i);
+      selectClauseForNode.add("NULL::int AS max" + i);
+      selectClauseForNode.add("NULL::bigint AS corpus" + i);
+      selectClauseForNode.add("NULL::varchar AS name" + i);
+    }
+    
+
+    
 
     return "DISTINCT" + StringUtils.join(selectClauseForNode, ", ");
   }

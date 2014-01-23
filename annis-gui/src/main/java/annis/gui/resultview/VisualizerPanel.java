@@ -18,7 +18,9 @@ package annis.gui.resultview;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
+import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
+import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
 import annis.libgui.visualizers.VisualizerInput;
@@ -41,6 +43,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
@@ -52,13 +55,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.Random;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Executor;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.FutureTask;
+import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.slf4j.Logger;
@@ -68,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * Controls the visibility of visualizer plugins and provides some control
  * methods for the media visualizers.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  *
  */
@@ -84,6 +87,10 @@ public class VisualizerPanel extends CssLayout
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
     "icon-expand.gif");
 
+  private String corpusName;
+
+  private String documentName;
+
   private Component vis;
 
   private transient SDocument result;
@@ -91,8 +98,6 @@ public class VisualizerPanel extends CssLayout
   private transient PluginSystem ps;
 
   private ResolverEntry entry;
-
-  private Random rand = new Random();
 
   private transient Map<SNode, Long> markedAndCovered;
 
@@ -134,6 +139,8 @@ public class VisualizerPanel extends CssLayout
   public VisualizerPanel(
     final ResolverEntry entry,
     SDocument result,
+    String corpusName,
+    String documentName,
     List<SToken> token,
     Set<String> visibleTokenAnnos,
     Map<SNode, Long> markedAndCovered,
@@ -155,6 +162,8 @@ public class VisualizerPanel extends CssLayout
 
 
     this.result = result;
+    this.corpusName = corpusName;
+    this.documentName = documentName;
     this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
@@ -260,8 +269,7 @@ public class VisualizerPanel extends CssLayout
   {
     VisualizerInput input = new VisualizerInput();
     input.setAnnisWebServiceURL((String) VaadinSession.getCurrent().
-      getAttribute(
-      "AnnisWebService.URL"));
+      getAttribute("AnnisWebService.URL"));
     input.setContextPath(Helper.getContext());
     input.
       setDotPath((String) VaadinSession.getCurrent().getAttribute("DotPath"));
@@ -300,12 +308,12 @@ public class VisualizerPanel extends CssLayout
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
         get(0).getSName(), result.getSName());
 
-      SDocument wholeDocument = p.getSCorpusGraphs().get(0).
-        getSDocuments().get(0);
+      SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
+        .get(0);
 
       input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
-        input.
-        getDocument(), wholeDocument));
+        input.getDocument(), wholeDocument));
+
       input.setDocument(wholeDocument);
     }
     else
@@ -313,10 +321,16 @@ public class VisualizerPanel extends CssLayout
       input.setDocument(result);
     }
 
+    // getting the raw text, when the visualizer wants to have it
+    if (visPlugin != null && visPlugin.isUsingRawText())
+    {
+      input.setRawText(Helper.getRawText(corpusName, documentName));
+    }
+
     return input;
   }
 
-  public void setVisibleTokenAnnosVisible(Set<String> annos)
+  public void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     this.visibleTokenAnnos = annos;
     if (visPlugin != null && vis != null)
@@ -345,7 +359,7 @@ public class VisualizerPanel extends CssLayout
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
       WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graphs").path(toplevelCorpusName).
+      txt = annisResource.path("query").path("graph").path(toplevelCorpusName).
         path(documentName).get(SaltProject.class);
     }
     catch (RuntimeException e)
@@ -379,110 +393,68 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      Executor exec = Executors.newSingleThreadExecutor();
-      FutureTask<Component> future = new FutureTask<Component>(
-        new LoadComponentTask())
-      {
-        @Override
-        public void run()
-        {
-          VaadinSession session = VaadinSession.getCurrent();
-          try
-          {
-            super.run();
-            // wait maximum 60 seconds
-            vis = get(60, TimeUnit.SECONDS);
-            session.lock();
-            try
-            {
-              if (callback != null && vis instanceof LoadableVisualizer)
-              {
-                LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
-                if (loadableVis.isLoaded())
-                {
-                  // direct call callback since the visualizer is already ready
-                  if (vis instanceof LoadableVisualizer)
-                  {
-                    callback.visualizerLoaded((LoadableVisualizer) vis);
-                  }
-                }
-                else
-                {
-                  loadableVis.clearCallbacks();
-                  // add listener when player was fully loaded
-                  loadableVis.addOnLoadCallBack(callback);
-                }
-              }
-
-              if (getComponentIndex(progress) > -1)
-              {
-                removeComponent(progress);
-              }
-
-              if (vis != null)
-              {
-                btEntry.setEnabled(true);
-                vis.setVisible(true);
-                if (vis instanceof PDFViewer)
-                {
-                  ((PDFViewer)vis).openPDFPage("-1");
-                }
-                // add if not already added
-                if(getComponentIndex(vis) < 0)
-                {
-                  addComponent(vis);
-                }
-              }
-            }
-            finally
-            {
-              session.unlock();
-            }
-          }
-          catch (InterruptedException ex)
-          {
-            log.error("Visualizer creation interrupted " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (ExecutionException ex)
-          {
-            log.error("Exception when creating visualizer " + visPlugin.
-              getShortName(), ex);
-          }
-          catch (TimeoutException ex)
-          {
-            log.
-              error(
-              "Could create visualizer " + visPlugin.getShortName() + " in 60 seconds: Timeout",
-              ex);
-            session.lock();
-            try
-            {
-              Notification.show(
-                "Could not create visualizer " + visPlugin.getShortName(),
-                ex.toString(),
-                Notification.Type.WARNING_MESSAGE);
-            }
-            finally
-            {
-              session.unlock();
-            }
-            cancel(true);
-          }
-        }
-      };
-      exec.execute(future);
-
+      // run the actual code to load the visualizer
+      PollControl.runInBackground(500, 50, null, 
+        new BackgroundJob(callback));
+      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       addComponent(progress);
-    }
-    // end if create input was needed
+    } // end if create input was needed
 
   } // end loadVisualizer
+
+  private void updateGUIAfterLoadingVisualizer(
+    LoadableVisualizer.Callback callback)
+  {
+    if (callback != null && vis instanceof LoadableVisualizer)
+    {
+      LoadableVisualizer loadableVis = (LoadableVisualizer) vis;
+      if (loadableVis.isLoaded())
+      {
+        // direct call callback since the visualizer is already ready
+        callback.visualizerLoaded(loadableVis);
+      }
+      else
+      {
+        loadableVis.clearCallbacks();
+        // add listener when player was fully loaded
+        loadableVis.addOnLoadCallBack(callback);
+      }
+    }
+
+    progress.setEnabled(false);
+    progress.setVisible(false);
+
+    if (vis != null)
+    {
+      btEntry.setEnabled(true);
+      vis.setVisible(true);
+      if (vis instanceof PDFViewer)
+      {
+        ((PDFViewer) vis).openPDFPage("-1");
+      }
+      if(vis instanceof MediaPlayer)
+      {
+        // if this is a media player visualizer, close all other media players
+        // since some browsers (e.g. Chrome) have problems if there are multiple
+        // audio/video elements on one page
+        MediaController mediaController = VaadinSession.getCurrent().
+          getAttribute(
+            MediaController.class);
+        mediaController.closeOtherPlayers((MediaPlayer) vis);
+
+      }
+      // add if not already added
+      if (getComponentIndex(vis) < 0)
+      {
+        addComponent(vis);
+      }
+    }
+  }
 
   @Override
   public void toggleVisualizer(boolean visible,
@@ -588,6 +560,78 @@ public class VisualizerPanel extends CssLayout
           sfeature.
           getValueString());
       }
+    }
+  }
+
+  private class BackgroundJob implements Runnable
+  {
+    private final LoadableVisualizer.Callback callback;
+    public BackgroundJob(LoadableVisualizer.Callback callback)
+    {
+      this.callback = callback;
+    }
+    
+    
+    
+    @Override
+    public void run()
+    {
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
+      Throwable exception = null;
+      try
+      {
+        final Component result = future.get(60, TimeUnit.SECONDS);
+        
+        UI.getCurrent().accessSynchronously(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            vis = result;
+            updateGUIAfterLoadingVisualizer(callback);
+          }
+        });
+      }
+      catch (InterruptedException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (ExecutionException ex)
+      {
+        log.error(null, ex);
+        exception = ex;
+      }
+      catch (TimeoutException ex)
+      {
+        future.cancel(true);
+        log.error(
+          "Could create visualizer " + visPlugin.getShortName()
+          + " in 60 seconds: Timeout",
+          ex);
+        exception = ex;
+      }
+      
+      if(exception != null)
+      {
+        final Throwable finalException = exception;
+        UI.getCurrent().accessSynchronously(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Notification.show(
+              "Error when creating visualizer " + visPlugin.getShortName(),
+              finalException.toString(),
+              Notification.Type.WARNING_MESSAGE);
+          }
+        });
+      }
+      
+
     }
   }
 

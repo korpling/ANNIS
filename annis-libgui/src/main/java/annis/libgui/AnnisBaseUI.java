@@ -21,10 +21,14 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.hash.Hashing;
+import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
+import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
 import java.text.DateFormat;
@@ -46,6 +50,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
@@ -95,6 +100,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private transient TreeSet<String> alreadyAddedCSS;
   
+  
   @Override
   protected void init(VaadinRequest request)
   {  
@@ -124,9 +130,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
     
     initPlugins();
+    
+    checkIfRemoteLoggedIn(request);
+    getSession().addRequestHandler(new RemoteUserRequestHandler());
   }
-  
-  
+ 
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -205,7 +213,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
             }
             catch (IOException ex)
             {
-              log.warn("could not parsing instance config: " + ex.getMessage());
+              log.warn("could not parse instance config: " + ex.getMessage());
             }
           }
         }
@@ -427,7 +435,22 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       resourceAddedDate.put(vis.getShortName(), new Date());
     }
   }
+  
+  private void checkIfRemoteLoggedIn(VaadinRequest request)
+  {
+     // check if we are logged in using an external authentification mechanism
+      // like Schibboleth
+      String remoteUser = request.getRemoteUser();
+      if(remoteUser != null)
+      { 
+        // treat as anonymous user
+        Client client = Helper.createRESTClient();;
+        Helper.setUser(new AnnisUser(remoteUser, client, true));
+      }
+  }
 
+      
+  
   @Override
   public void close()
   {
@@ -460,7 +483,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     }
   }
 
-
+  
   @Override
   public PluginManager getPluginManager()
   {
@@ -488,7 +511,22 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       // the json should be human readable
       jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
         true);
+      jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES , false);
     }
     return jsonMapper;
+  }
+  
+  private class RemoteUserRequestHandler implements RequestHandler
+  {
+
+    @Override
+    public boolean handleRequest(VaadinSession session, VaadinRequest request,
+      VaadinResponse response) throws IOException
+    {
+      checkIfRemoteLoggedIn(request);
+      // we never write any information in this handler
+      return false;
+    }
+    
   }
 }

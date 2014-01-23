@@ -16,6 +16,7 @@
 package annis.ql.parser;
 
 import annis.model.QueryNode;
+import annis.sqlgen.model.Join;
 import annis.sqlgen.model.Precedence;
 import java.util.LinkedList;
 import java.util.List;
@@ -30,7 +31,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
@@ -66,7 +67,7 @@ public class TransitivePrecedenceOptimizerTest
     System.out.println("addTransitivePrecedenceOperatorsWithBound");
     
     // query to extend
-    String aql = "node & node & node & node "
+    String aql = "tok & tok & tok & tok "
       + "& #1 .3 #2 "
       + "& #2 .5,10 #3 "
       + "& #3 .* #4 "
@@ -172,7 +173,7 @@ public class TransitivePrecedenceOptimizerTest
     System.out.println("addTransitivePrecedenceOperatorsWithoutBound");
     
     // query to extend
-    String aql = "node & node & node & node "
+    String aql = "tok & tok & tok & tok "
       + "& #1 .3 #2 "
       + "& #2 .5,10 #3 "
       + "& #3 .* #4 "
@@ -306,7 +307,7 @@ public class TransitivePrecedenceOptimizerTest
     System.out.println("dontFollowSegmentationFromTok");
     
     // query to extend
-    String aql = "node & node & node & #1 . #2 & #2 .abc #3";
+    String aql = "tok & tok & tok & #1 . #2 & #2 .abc #3";
     
     // perform the initial parsing
     QueryData data = parser.parse(aql, new LinkedList<Long>());
@@ -316,5 +317,37 @@ public class TransitivePrecedenceOptimizerTest
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
     assertEquals(1, nodes.get(0).getJoins().size());
+  }
+  
+  @Test
+  public void testDontUseRangedPrecendenceOnSpans()
+  {
+    System.out.println("dontUseRangedPrecendenceOnSpans");
+    
+    // query to extend
+    String aql = "node & node & node & #1 . #2 & #2 . #3";
+    
+    // optimizer is applied on the fly by the query anaylsis (as injected by Spring)
+    QueryData data = parser.parse(aql, new LinkedList<Long>());
+    
+    assertEquals(1, data.getAlternatives().size());
+    List<QueryNode> nodes = data.getAlternatives().get(0);
+    
+    assertEquals(2, nodes.get(0).getJoins().size());
+    Join j0 = nodes.get(0).getJoins().get(0);
+    Join j1 = nodes.get(0).getJoins().get(1);
+    
+    assertTrue(j0 instanceof Precedence);
+    assertTrue(j1 instanceof Precedence);
+    
+    Precedence p0 = (Precedence) j0;
+    Precedence p1 = (Precedence) j1;
+    
+    assertEquals(1, p0.getMinDistance());
+    assertEquals(1, p0.getMaxDistance());
+    
+    assertEquals(0, p1.getMinDistance());
+    assertEquals(0, p1.getMaxDistance());
+    
   }
 }

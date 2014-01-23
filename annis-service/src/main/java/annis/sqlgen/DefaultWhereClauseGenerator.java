@@ -25,7 +25,6 @@ import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
@@ -53,7 +52,6 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
-import java.util.LinkedList;
 import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
@@ -389,7 +387,27 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
-    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    
+    TableAccessStrategy tasSource = tables(node);
+    TableAccessStrategy tasTarget = tables(target);
+    
+    String spanLengthSource = 
+      "("
+      + tasSource.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasSource.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    String spanLengthTarget = 
+      "("
+      + tasTarget.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasTarget.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    conditions.add(spanLengthSource + " = " + spanLengthTarget);
+    
+    //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
 
   @Override
@@ -416,18 +434,24 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     TableAccessStrategy tas = tables(null);
     String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
-    String pre = tas.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
-    String post = tas.column("ancestor", tas.columnName(RANK_TABLE, "post"));
-    String component = tas.column("ancestor", tas.columnName(RANK_TABLE,
+    String pre = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
+    String post = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "post"));
+    String componentAncestor= TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
       "component_ref"));
-    String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentSource
+      = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentTarget
+      = tables(target).aliasedColumn(RANK_TABLE, "component_ref");
 
+    String rankTableName = tas.partitionTableName(RANK_TABLE, corpusList);
+    
     StringBuffer sb = new StringBuffer();
-    sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE)
+    sb.append("EXISTS (SELECT 1 FROM " + rankTableName
       + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
-      sb.append("\t" + component + " = " + component1 + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentSource + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentTarget + " AND\n");
     }
     sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post
       + " AND\n");
@@ -446,6 +470,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       sb.append(StringUtils.join(corpusList, ","));
       sb.append(")");
     }
+    // even if EXISTS implies that a single row is enought, PostgreSQL still
+    // creates better plans if explicitly limited to one row
+    sb.append("\n\tLIMIT 1");
+    
     sb.append(")");
     conditions.add(sb.toString());
   }

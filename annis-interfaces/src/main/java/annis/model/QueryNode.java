@@ -29,8 +29,10 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
 import java.util.LinkedList;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
-@SuppressWarnings("serial")
+@XmlRootElement
 public class QueryNode implements Serializable
 {
   public enum Type {NODE, AND, OR};
@@ -62,6 +64,7 @@ public class QueryNode implements Serializable
   private Range arity;
   private Range tokenArity;
   private Long matchedNodeInQuery;
+  private boolean artificial;
   
   public enum TextMatching
   {
@@ -111,6 +114,11 @@ public class QueryNode implements Serializable
     private int min;
     private int max;
 
+    public Range()
+    {
+      this(0,0);
+    }
+    
     public Range(int _min, int _max)
     {
       min = _min;
@@ -126,6 +134,14 @@ public class QueryNode implements Serializable
     {
       return max;
     }
+
+    @Override
+    public String toString()
+    {
+      return min + "," + max;
+    }
+    
+    
 
     @Override
     public int hashCode()
@@ -360,7 +376,14 @@ public class QueryNode implements Serializable
       QueryAnnotation anno=nodeAnnotations
         .toArray(new QueryAnnotation[nodeAnnotations.size()])[0];
 
-      sb.append(anno.getQualifiedName());
+      if(anno.getNamespace() == null || "".equals(anno.getNamespace()))
+      {
+        sb.append(anno.getName());
+      }
+      else
+      {
+        sb.append(anno.getQualifiedName());
+      }
       
       if(anno.getTextMatching() != null && anno.getValue() != null)
       {
@@ -382,6 +405,17 @@ public class QueryNode implements Serializable
     {
       frags.add(join.toAQLFragment(this));
     }
+    
+    if(isRoot())
+    {
+      frags.add("#" + getVariable() + ":root");
+    }
+    
+    if(getArity() != null)
+    {
+      frags.add("#" + getVariable() + ":arity=" + getArity().toString());
+    }
+    
     return Joiner.on(" & ").join(frags);
   }
 
@@ -628,7 +662,13 @@ public class QueryNode implements Serializable
   {
     return id;
   }
+  
+  public void setId(long id)
+  {
+    this.id = id;
+  }
 
+  @XmlTransient // currently not supported, might be added later
   public List<Join> getJoins()
   {
     return joins;
@@ -753,6 +793,20 @@ public class QueryNode implements Serializable
   public void setMatchedNodeInQuery(Long matchedNodeInQuery)
   {
     this.matchedNodeInQuery = matchedNodeInQuery;
+  }
+
+  /**
+   * Returns if this query node was artificially created by some normalization process.
+   * @return 
+   */
+  public boolean isArtificial()
+  {
+    return artificial;
+  }
+
+  public void setArtificial(boolean artificial)
+  {
+    this.artificial = artificial;
   }
 
   

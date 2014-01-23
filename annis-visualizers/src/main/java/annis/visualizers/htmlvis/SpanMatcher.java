@@ -19,7 +19,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface SpanMatcher
 {

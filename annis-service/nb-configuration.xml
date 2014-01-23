@@ -90,5 +90,7 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>1</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>
+        <netbeans.compile.on.save>all</netbeans.compile.on.save>
+        <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
     </properties>
 </project-shared-configuration>

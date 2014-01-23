@@ -23,21 +23,22 @@ import org.apache.commons.collections.Bag;
 import org.apache.commons.collections.bag.HashBag;
 
 import annis.model.QueryNode;
+import java.util.List;
 
 
 public class TableAccessStrategy {
 
 	// default table names
 	public final static String NODE_TABLE = "node";
-	public final static String RANK_TABLE = "rank";
-	public final static String COMPONENT_TABLE = "component";
-	public final static String NODE_ANNOTATION_TABLE = "node_annotation";
-	public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
-   public final static String ANNOTATION_POOL_TABLE = "annotation_pool";
-	public final static String FACTS_TABLE = "facts";
-  	public final static String CORPUS_TABLE = "corpus";
-  	public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";
-  	public final static String TEXT_TABLE = "text";
+  public final static String RANK_TABLE = "rank";
+  public final static String COMPONENT_TABLE = "component";
+  public final static String NODE_ANNOTATION_TABLE = "node_annotation";
+  public final static String EDGE_ANNOTATION_TABLE = "edge_annotation";
+  public final static String ANNOTATION_POOL_TABLE = "annotation_pool";
+  public final static String FACTS_TABLE = "facts";
+  public final static String CORPUS_TABLE = "corpus";
+  public final static String CORPUS_ANNOTATION_TABLE = "corpus_annotation";
+  public final static String TEXT_TABLE = "text";
 
 	// the wrapped node
 	private QueryNode node;
@@ -47,6 +48,8 @@ public class TableAccessStrategy {
 	
 	// aliased column names
 	private Map<String, Map<String, String>> columnAliases;
+  
+  private Map<String, Boolean> tablePartitioned;
 	
 	public TableAccessStrategy() {
 		this.tableAliases = new HashMap<String, String>();
@@ -64,17 +67,53 @@ public class TableAccessStrategy {
   {
     this.tableAliases = new HashMap<String, String>(tas.getTableAliases());
     this.columnAliases = new HashMap<String, Map<String, String>>(tas.getColumnAliases());
+    this.tablePartitioned = new HashMap<String, Boolean>();
     this.node = tas.getNode();
   }
 
 	///// table and column aliases
 	
-	public String tableName(String table) {
-		return tableAliases.containsKey(table) ? tableAliases.get(table) : table;
+	public String tableName(String table) 
+  {
+    return tableName(tableAliases, table);
 	}
+  
+  public String partitionTableName(String table, List<Long> corpusList) 
+  {
+    return partitionTableName(tableAliases, tablePartitioned, table, corpusList);
+	}
+  
+  public static String tableName(Map<String, String> tableAliases, String table)
+  {
+    return tableAliases.containsKey(table) ? tableAliases.get(table) : table;
+  }
+  
+   public static String  partitionTableName(Map<String, String> tableAliases,
+     Map<String, Boolean> tablePartitioned,
+     String table, List<Long> corpusList) 
+  {
+    String result = tableName(tableAliases, table);
+    
+    /* when we only have one corpus and the table partitions are used, 
+     optimize the query by directly querying the partition table */
+    if(corpusList != null && corpusList.size() == 1 && isPartitioned(tablePartitioned, table))
+    {
+      result = result + "_" + corpusList.get(0);
+    }
+    return result;
+	}
+  
 
-	public String columnName(String table, String column) {
-		if (columnAliases.containsKey(table)) {
+  public String columnName(String table, String column) 
+  {
+    return columnName(columnAliases, table, column);
+  }
+  
+	public static String columnName(Map<String, Map<String,String>> columnAliases, 
+    String table, String column) 
+  {
+		if (columnAliases.containsKey(table)) 
+    {
 			Map<String, String> columns = columnAliases.get(table);
 			if (columns.containsKey(column)) {
 				return columns.get(column);
@@ -83,8 +122,10 @@ public class TableAccessStrategy {
 		return column;
 	}
 	
-	public String aliasedTable(String table, int count) {
-		if (node != null) {
+	public String aliasedTable(String table, int count) 
+  {
+		if (node != null) 
+    {
 			// sanity checks
 //			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
 //				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
@@ -105,7 +146,7 @@ public class TableAccessStrategy {
 		}
 		
 		// compute table counts
-		Bag tables = computeSourceTables();
+		Bag tables = computeSourceTables(node, tableAliases);
 
 		String aliasedName = tableName(table);
 		String aliasCount = node != null ? String.valueOf(node.getId()) : "";
@@ -113,22 +154,90 @@ public class TableAccessStrategy {
 
 		return aliasedName + aliasCount + countSuffix;
 	}
+  
+  public static String aliasedTable(QueryNode node, Map<String, String> tableAliases, 
+    String table, int count)
+  {
+    if (node != null)
+    {
+      // sanity checks
+//			if (table.equals(NODE_ANNOTATION_TABLE) && count > node.getNodeAnnotations().size())
+//				throw new IllegalArgumentException("access to node annotation table out of range: " + count);
+      if (table.equals(EDGE_ANNOTATION_TABLE) && count > node.getEdgeAnnotations().size())
+      {
+        throw new IllegalArgumentException("access to edge annotation table out of range: " + count);
+      }
+      if (table.equals(NODE_TABLE) && count > 1)
+      {
+        throw new IllegalArgumentException("access to struct table out of range: " + count);
+      }
+      if (table.equals(RANK_TABLE) && count > 1)
+      {
+        throw new IllegalArgumentException("access to rank table out of range: " + count);
+      }
 
-	public String aliasedColumn(String table, String column) {
-		return aliasedColumn(table, column, 1);
+      // offset table count for edge annotations if node and edge annotations are the same table
+      if (table.equals(EDGE_ANNOTATION_TABLE) && isMaterialized(tableAliases, 
+        EDGE_ANNOTATION_TABLE, NODE_ANNOTATION_TABLE))
+      {
+        count = count + node.getNodeAnnotations().size() - 1;
+      }
+    }
+
+    if (count == 0)
+    {
+      count = 1;
+    }
+
+    // compute table counts
+    Bag tables = computeSourceTables(node, tableAliases);
+
+    String aliasedName = tableName(tableAliases, table);
+    String aliasCount = node != null ? String.valueOf(node.getId()) : "";
+    String countSuffix = tables.getCount(aliasedName) > 1 ? "_" + count : "";
+
+		return aliasedName + aliasCount + countSuffix;
+  }
+
+  public String aliasedColumn(String table, String column) 
+  {
+    return aliasedColumn(tableAliases, columnAliases, node, table, column);
+  }
+  
+  public String aliasedColumn(String table, String column, int count) 
+  {
+    return aliasedColumn(tableAliases, columnAliases, node, table, column, count);
+  }
+  
+  
+	public static String aliasedColumn(Map<String, String> tableAliases,
+    Map<String, Map<String,String>> columnAliases, QueryNode node, String table, String column) 
+  {
+		return aliasedColumn(tableAliases, columnAliases, node, table, column, 1);
 	}
 	
-	public String aliasedColumn(String table, String column, int count) {
-		return column(aliasedTable(table, count), columnName(table, column));
+	public static String aliasedColumn(Map<String, String> tableAliases, 
+    Map<String, Map<String,String>> columnAliases,
+    QueryNode node, 
+    String table, String column, int count) 
+  {
+		return column(aliasedTable(node, tableAliases, table, count), 
+      columnName(columnAliases, table, column));
 	}
 	
-	protected String column(String table, String column) {
+	protected static String column(String table, String column) 
+  {
 		return table + "." + column;
 	}
 	
 	///// table usage
 	
-	protected Bag computeSourceTables() {
+  protected Bag computeSourceTables() 
+  {
+    return computeSourceTables(node, tableAliases);
+  }
+  
+	protected static Bag computeSourceTables(QueryNode node, Map<String, String> tableAliases) {
 		Bag tables = new HashBag();
 		
 		// hack to support table selections for ANNOTATE query
@@ -139,42 +248,87 @@ public class TableAccessStrategy {
 			return tables;
 		}
 		
-		tables.add(tableName(NODE_ANNOTATION_TABLE), node.getNodeAnnotations().size());
+		tables.add(tableName(tableAliases, NODE_ANNOTATION_TABLE), node.getNodeAnnotations().size());
 		if (node.getNodeAnnotations().isEmpty() && node.getNodeAnnotations().size() > 0)
-			tables.add(tableName(NODE_ANNOTATION_TABLE));
+			tables.add(tableName(tableAliases, NODE_ANNOTATION_TABLE));
 		
-		tables.add(tableName(EDGE_ANNOTATION_TABLE), node.getEdgeAnnotations().size());
+		tables.add(tableName(tableAliases, EDGE_ANNOTATION_TABLE), node.getEdgeAnnotations().size());
 		
-		if ( tables.getCount(tableName(RANK_TABLE)) == 0 && usesRankTable() )
-			tables.add(tableName(RANK_TABLE));
-		if ( tables.getCount(tableName(COMPONENT_TABLE)) == 0 && usesRankTable() )
-			tables.add(tableName(COMPONENT_TABLE));
+		if ( tables.getCount(tableName(tableAliases, RANK_TABLE)) == 0 && usesRankTable(node) )
+			tables.add(tableName(tableAliases, RANK_TABLE));
+		if ( tables.getCount(tableName(tableAliases, COMPONENT_TABLE)) == 0 && usesRankTable(node) )
+			tables.add(tableName(tableAliases, COMPONENT_TABLE));
 		
-		if (tables.getCount(tableName(NODE_TABLE)) == 0)
-			tables.add(tableName(NODE_TABLE));
+		if (tables.getCount(tableName(tableAliases, NODE_TABLE)) == 0)
+			tables.add(tableName(tableAliases, NODE_TABLE));
 		
 		return tables;
 	}
 	
-	public boolean usesNodeAnnotationTable() {
+	public boolean usesNodeAnnotationTable() 
+  {
+    return usesNodeAnnotationTable(node);
+	}
+  
+  public static boolean usesNodeAnnotationTable(QueryNode node) {
 		return node == null || ! node.getNodeAnnotations().isEmpty();
 	}
 	
-	public boolean usesRankTable() {
-		return node == null || usesComponentTable() || node.isRoot() || node.getArity() != null;
+	public boolean usesRankTable() 
+  {
+    return usesRankTable(node);
 	}
+  
+  public static boolean usesRankTable(QueryNode node)
+  {
+    return node == null || usesComponentTable(node) || node.isRoot() || node.getArity() != null;
+  }
 	
 	public boolean usesComponentTable() {
 		return node == null || node.isPartOfEdge() || usesEdgeAnnotationTable();
+	}
+  
+  public static boolean usesComponentTable(QueryNode node) {
+		return node == null || node.isPartOfEdge() || usesEdgeAnnotationTable(node);
 	}
 	
 	public boolean usesEdgeAnnotationTable() {
 		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
-	
-	public boolean isMaterialized(String table, String otherTable) {
-		return tableName(table).equals(tableName(otherTable));
+  
+  public static boolean usesEdgeAnnotationTable(QueryNode node) {
+		return node == null || ! node.getEdgeAnnotations().isEmpty();
 	}
+	
+  public boolean isMaterialized(String table, String otherTable) 
+  {
+    return isMaterialized(tableAliases, table, otherTable);
+  }
+  
+	public static boolean isMaterialized(Map<String, String> tableAliases, 
+    String table, String otherTable) 
+  {
+		return tableName(tableAliases, table).equals(tableName(tableAliases, otherTable));
+	}
+  
+  public boolean isPartitioned(String table)
+  {
+    return isPartitioned(tablePartitioned, table);
+  }
+  
+  public static boolean isPartitioned(Map<String, Boolean> tablePartitioned, 
+    String table)
+  {
+    if(tablePartitioned != null)
+    {
+      Boolean result = tablePartitioned.get(table);
+      if(result != null)
+      {
+        return result;
+      }
+    }
+    return false;
+  }
 	
 	///// delegates
 	
@@ -217,4 +371,14 @@ public class TableAccessStrategy {
 		this.columnAliases = columnAliases;
 	}
 
+  public Map<String, Boolean> getTablePartitioned()
+  {
+    return tablePartitioned;
+  }
+
+  public void setTablePartitioned(Map<String, Boolean> tablePartitioned)
+  {
+    this.tablePartitioned = tablePartitioned;
+  }
+  
 }

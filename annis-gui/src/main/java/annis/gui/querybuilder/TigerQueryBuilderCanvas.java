@@ -200,7 +200,7 @@ public class TigerQueryBuilderCanvas extends Panel
       posEdge.setTopValue(yM - e.getHeight() / 2.0f);
     }
 
-    canvas.requestRepaint();
+    canvas.markAsDirty();
   }
 
   private List<Line2D> createArrow(double x, double y, double direction,
@@ -257,8 +257,8 @@ public class TigerQueryBuilderCanvas extends Panel
       if (valid)
       {
         EdgeWindow e = new EdgeWindow(this, preparedEdgeSource, target);
-        e.setWidth("150px");
-        e.setHeight("50px");
+        e.setWidth("170px");
+        e.setHeight("70px");
         e.addStyleName("tigerquery-builder-overlay");
         edges.add(e);
         area.addComponent(e);
@@ -286,10 +286,10 @@ public class TigerQueryBuilderCanvas extends Panel
     final NodeWindow n = new NodeWindow(number++, this);
    
     GripDragComponent panel = new GripDragComponent(n);
-    panel.setWidth(NodeWindow.WIDTH, Layout.UNITS_PIXELS);
-    panel.setHeight(NodeWindow.HEIGHT, Layout.UNITS_PIXELS);
+    panel.setWidth(NodeWindow.WIDTH, Layout.Unit.PIXELS);
+    panel.setHeight(NodeWindow.HEIGHT, Layout.Unit.PIXELS);
     nodes.put(n, panel);
-    area.addComponent(panel, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
+    area.addComponent(panel, "top:" + (10 + ((NodeWindow.HEIGHT+20) * (number-1))) + "px;left:10px");
 //    area.addComponent(wrapper, "top:" + (10 + (120 * (number-1))) + "px;left:10px");
     updateQuery();
   }

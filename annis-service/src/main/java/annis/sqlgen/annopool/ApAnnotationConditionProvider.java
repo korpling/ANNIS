@@ -20,13 +20,10 @@ import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
-import static annis.sqlgen.SqlConstraints.join;
 import annis.sqlgen.TableAccessStrategy;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 
 /**
  *
@@ -38,12 +35,13 @@ public class ApAnnotationConditionProvider implements
 
   @Override
   public void addAnnotationConditions(List<String> conditions, QueryNode node,
-    int index, QueryAnnotation annotation, String table, QueryData queryData, TableAccessStrategy tas)
+    int index, QueryAnnotation annotation, String table, QueryData queryData,
+    TableAccessStrategy tas)
   {
     TextMatching tm = annotation.getTextMatching();
 
     StringBuilder sbFunc = new StringBuilder("getAnno");
-    
+
     if (tm == TextMatching.EXACT_NOT_EQUAL || tm
       == TextMatching.REGEXP_NOT_EQUAL)
     {
@@ -61,7 +59,7 @@ public class ApAnnotationConditionProvider implements
     {
       params.add("NULL");
     }
-    
+
     if (annotation.getName() != null)
     {
       params.add("'" + annotation.getName() + "'");
@@ -70,7 +68,7 @@ public class ApAnnotationConditionProvider implements
     {
       params.add("NULL");
     }
-    
+
     if (annotation.getValue() != null)
     {
       if (tm == TextMatching.REGEXP_EQUAL
@@ -81,7 +79,8 @@ public class ApAnnotationConditionProvider implements
       }
       else
       {
-        params.add("'" + annotation.getValue() + "'");
+        String escapeQuote = annotation.getValue().replaceAll("'", "''");
+        params.add("'" + escapeQuote + "'");
         params.add("NULL");
       }
     }
@@ -106,8 +105,7 @@ public class ApAnnotationConditionProvider implements
       tas.aliasedColumn(table, "anno_ref", index)
       + "= ANY(" + sbFunc.toString() + ")";
 
-    
+
     conditions.add(cond);
   }
-  
 }

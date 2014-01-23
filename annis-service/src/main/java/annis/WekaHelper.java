@@ -15,8 +15,8 @@
  */
 package annis;
 
-import annis.dao.AnnotatedMatch;
-import annis.dao.AnnotatedSpan;
+import annis.dao.objects.AnnotatedMatch;
+import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
 import java.io.IOException;
 import java.io.OutputStream;
@@ -156,32 +156,7 @@ public class WekaHelper
       w.append("\n");
     }
   }
-  
-  public static void exportAsArff(List<AnnotatedMatch> annotatedMatches, OutputStream out)
-  {
-    PrintWriter w = null;
-    try
-    {
-      w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-      SortedMap<Integer, SortedSet<String>> columnsByNodePos =
-        exportArffHeader(annotatedMatches.iterator(), w);
-
-      exportArffData(annotatedMatches.iterator(), columnsByNodePos, w);
-
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-    }
-    finally
-    {
-      if(w != null)
-      {
-        w.flush();
-      }
-    }
-  }
-
+ 
   private static String fullColumnName(int i, String name)
   {
     return "#" + i + "_" + name;

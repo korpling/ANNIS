@@ -13,7 +13,7 @@
   <description>Base project for a Vaadin based GUI.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.1.1</vaadin.version>
+    <vaadin.version>7.1.10</vaadin.version>
   </properties>
   
     
@@ -41,12 +41,6 @@
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-theme-compiler</artifactId>
-      <version>${vaadin.version}</version>
-    </dependency>
-    
-    <dependency>
-      <groupId>com.vaadin</groupId>
-      <artifactId>vaadin-push</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
     

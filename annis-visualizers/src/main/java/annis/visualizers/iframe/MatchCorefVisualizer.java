@@ -19,7 +19,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 /**
  * A {@link CorefVisualizer} that is only using the match (not the document).
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class MatchCorefVisualizer extends CorefVisualizer

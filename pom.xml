@@ -40,8 +40,8 @@
 
   <distributionManagement>
     <site>
-      <id>launchpad</id>
-      <url>https://launchpad.net/annis</url>
+      <id>github</id>
+      <url>https://github.com/korpling/ANNIS</url>
     </site>
     
     <repository>

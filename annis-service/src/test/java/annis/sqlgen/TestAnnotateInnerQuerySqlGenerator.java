@@ -1,5 +1,6 @@
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.test.TestUtils.newSet;
@@ -71,6 +72,7 @@ public class TestAnnotateInnerQuerySqlGenerator
     given(annotateQueryData.getRight()).willReturn(right);
     given(queryData.getExtensions(AnnotateQueryData.class)).willReturn(
       extensions);    
+    given(queryData.getMaxWidth()).willReturn(alternative.size());
     
     String key1Column1 = uniqueAlphaString();
     String key1Column2 = uniqueAlphaString();

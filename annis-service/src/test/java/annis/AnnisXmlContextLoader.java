@@ -27,7 +27,7 @@ import org.springframework.test.context.support.GenericXmlContextLoader;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnisXmlContextLoader extends GenericXmlContextLoader
 {

@@ -24,7 +24,7 @@ import net.xeoh.plugins.base.Plugin;
  * The real playback is done by implementations of {@link MediaPlayer} which
  * are registered to this controller.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface MediaController extends Plugin
 {
@@ -56,4 +56,6 @@ public interface MediaController extends Plugin
    * Unregister all associated {@link MediaPlayer} instances.
    */
   public void clearMediaPlayers();
+
+  void closeOtherPlayers(MediaPlayer doNotCloseThisOne);
 }

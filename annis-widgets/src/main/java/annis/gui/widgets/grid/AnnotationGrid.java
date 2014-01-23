@@ -29,7 +29,7 @@ import java.util.Map;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 {
@@ -45,6 +45,14 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private int tokenIndexOffset;
 
   private String tokRowKey = "tok";
+  
+  private boolean showCaption = true;
+
+  /**
+   * when true, all html tags are rendered as text and are shown in grid cells.
+   * Does not effect row captions.
+   */
+  private boolean escapeHTML = true;
 
   /**
    * Returns a generic Grid-Object.
@@ -117,6 +125,9 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   @Override
   public void paintContent(PaintTarget target) throws PaintException
   {
+
+    target.addAttribute("escapeHTML", escapeHTML);
+
     if (rowsByAnnotation != null)
     {
       target.startTag("rows");
@@ -127,6 +138,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
         {
           target.startTag("row");
           target.addAttribute("caption", anno.getKey());
+          target.addAttribute("show-caption", showCaption);
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order
@@ -197,6 +209,10 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("token");
     }
+    else if(event.isSpace())
+    {
+      styles.add("space");
+    }
     else if (event.isGap())
     {
       styles.add("gap");
@@ -205,6 +221,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
     {
       styles.add("single_event");
     }
+    
+    
 
     if (event.getMatch() != null)
     {
@@ -243,4 +261,34 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   {
     this.tokenIndexOffset = tokenIndexOffset;
   }
+
+  /**
+   * Defines, if the grid visualization render html as text.
+   *
+   * @param escapeHTML the escapeHTML to set
+   */
+  public void setEscapeHTML(boolean escapeHTML)
+  {
+    this.escapeHTML = escapeHTML;
+  }
+
+  /**
+   * Defines if the caption column should be shown.
+   * @return 
+   */
+  public boolean isShowCaption()
+  {
+    return showCaption;
+  }
+
+  /**
+   * Defines if the caption column should be shown.
+   * @param showCaption 
+   */
+  public void setShowCaption(boolean showCaption)
+  {
+    this.showCaption = showCaption;
+  }
+  
+  
 }

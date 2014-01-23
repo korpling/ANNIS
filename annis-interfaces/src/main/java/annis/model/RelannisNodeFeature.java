@@ -23,7 +23,7 @@ import java.io.Serializable;
 
 /**
  * Common Features included in the Salt graph that are available
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class RelannisNodeFeature implements Serializable
 {

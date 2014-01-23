@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicLong;
  * & #1 = #3 & #2 = #4
  * </pre> in order to actually get the results the user expects.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ComponentSearchRelationNormalizer implements QueryDataTransformer
 {
@@ -105,6 +105,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     List<QueryNode> nodes, AtomicLong maxID)
   {
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
+    newNode.setArtificial(true);
     newNode.getJoins().clear();
     newNode.setVariable("x" + node.getVariable());
     

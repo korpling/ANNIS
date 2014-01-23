@@ -24,14 +24,19 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.util.ArrayList;
 import java.util.List;
 
-class AnnisGraphTools
+public class AnnisGraphTools
 {
 
-  public static final String PRIMEDGE_SUBTYPE = "edge";
-  public static final String SECEDGE_SUBTYPE = "secedge";
+  private static final String PRIMEDGE_SUBTYPE = "edge";
+  private static final String SECEDGE_SUBTYPE = "secedge";
+  private final VisualizerInput input;
 
-  public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs(
-    VisualizerInput input)
+  public AnnisGraphTools(VisualizerInput input)
+  {
+      this.input = input;
+  }
+
+  public List<DirectedGraph<AnnisNode, Edge>> getSyntaxGraphs()
   {
     AnnotationGraph ag = input.getResult().getGraph();
     String namespace = input.getMappings().getProperty("node_ns", input.
@@ -41,21 +46,20 @@ class AnnisGraphTools
 
     for (AnnisNode n : ag.getNodes())
     {
-      if (isRootNode(n, namespace, input))
+      if (isRootNode(n, namespace))
       {
-        resultGraphs.add(extractGraph(ag, n, input));
+        resultGraphs.add(extractGraph(ag, n));
       }
     }
     return resultGraphs;
   }
 
-  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
-    VisualizerInput input)
+  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n)
   {
     boolean addToGraph = n.isToken();
     for (Edge e : n.getOutgoingEdges())
     {
-      if (includeEdge(e, input) && copyNode(graph, e.getDestination(), input))
+      if (includeEdge(e) && copyNode(graph, e.getDestination()))
       {
         addToGraph |= true;
         graph.addEdge(e, n, e.getDestination());
@@ -68,8 +72,7 @@ class AnnisGraphTools
     return addToGraph;
   }
 
-  private boolean isRootNode(AnnisNode n, String namespace,
-    VisualizerInput input)
+  private boolean isRootNode(AnnisNode n, String namespace)
   {
     if (!n.getNamespace().equals(namespace))
     {
@@ -77,8 +80,7 @@ class AnnisGraphTools
     }
     for (Edge e : n.getIncomingEdges())
     {
-      if (hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input) && e.
-        getSource()
+      if (hasEdgeSubtype(e, getPrimEdgeSubType()) && e.getSource()
         != null)
       {
         return false;
@@ -88,14 +90,14 @@ class AnnisGraphTools
   }
 
   private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n, VisualizerInput input)
+    AnnisNode n)
   {
     DirectedGraph<AnnisNode, Edge> graph =
       new DirectedSparseGraph<AnnisNode, Edge>();
-    copyNode(graph, n, input);
+    copyNode(graph, n);
     for (Edge e : ag.getEdges())
     {
-      if (hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input) && graph.
+      if (hasEdgeSubtype(e, getSecEdgeSubType()) && graph.
         containsVertex(e.getDestination())
         && graph.containsVertex(e.getSource()))
       {
@@ -105,26 +107,25 @@ class AnnisGraphTools
     return graph;
   }
 
-  private boolean includeEdge(Edge e, VisualizerInput input)
+  private boolean includeEdge(Edge e)
   {
-    return hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input);
+    return hasEdgeSubtype(e, getPrimEdgeSubType());
   }
 
-  public static boolean hasEdgeSubtype(Edge e, String edgeSubtype,
-    VisualizerInput input)
+  public boolean hasEdgeSubtype(Edge e, String edgeSubtype)
   {
     String name = e.getName();
 
-    if (PRIMEDGE_SUBTYPE.equals(edgeSubtype))
+    if (getPrimEdgeSubType().equals(edgeSubtype))
     {
       edgeSubtype = input.getMappings().getProperty("edge") != null
-        ? input.getMappings().getProperty("edge") : PRIMEDGE_SUBTYPE;
+        ? input.getMappings().getProperty("edge") : getPrimEdgeSubType();
     }
 
-    if (SECEDGE_SUBTYPE.equals(edgeSubtype))
+    if (getSecEdgeSubType().equals(edgeSubtype))
     {
       edgeSubtype = input.getMappings().getProperty("secedge") != null
-        ? input.getMappings().getProperty("secedge") : SECEDGE_SUBTYPE;
+        ? input.getMappings().getProperty("secedge") : getSecEdgeSubType();
     }
 
     return e.getEdgeType() == Edge.EdgeType.DOMINANCE && name != null && name.
@@ -158,5 +159,25 @@ class AnnisGraphTools
       }
     }
     return false;
+  }
+
+  /**
+   * Gets the edge type and takes into account the user defined mappings.
+   *
+   * @return the name of the edge type. Is never null.
+   */
+  public String getPrimEdgeSubType()
+  {
+    return input.getMappings().getProperty("edge_type", PRIMEDGE_SUBTYPE);
+  }
+
+  /**
+   * Gets the secedge type and takes into account the user defined mappings.
+   *
+   * @return the name of the secedge type. Is never null.
+   */
+  public String getSecEdgeSubType()
+  {
+    return input.getMappings().getProperty("secedge_type", SECEDGE_SUBTYPE);
   }
 }

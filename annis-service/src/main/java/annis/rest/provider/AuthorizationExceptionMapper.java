@@ -22,7 +22,7 @@ import org.apache.shiro.authz.AuthorizationException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Provider
 public class AuthorizationExceptionMapper implements ExceptionMapper<AuthorizationException>

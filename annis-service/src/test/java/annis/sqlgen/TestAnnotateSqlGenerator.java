@@ -1,5 +1,7 @@
 package annis.sqlgen;
 
+import annis.sqlgen.extensions.LimitOffsetQueryData;
+import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
@@ -400,7 +402,7 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldAddIsTokenOnFilter()
   {
-    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.Token);
+    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.token);
     
     String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
     

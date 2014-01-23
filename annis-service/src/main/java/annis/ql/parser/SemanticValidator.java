@@ -40,7 +40,7 @@ import java.util.Set;
  * <li>every node variable name should be given only once in an alternative</li>
  * </ul>
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SemanticValidator implements QueryDataTransformer
 {

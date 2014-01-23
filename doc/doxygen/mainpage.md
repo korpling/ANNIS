@@ -9,6 +9,6 @@ edges, span annotations and associated multi-modal data (audio/video).
 
 This documentation is targeted to developers or administrators.
 
-- \subpage admin
-- \subpage dev
-
+- \ref admin
+- \ref dev
+- \ref api

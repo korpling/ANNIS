@@ -45,7 +45,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * similarly the edge labels using <b>edge_key:func</b> for an edge label called 
  * <b>func</b> (the default). Instructions are separated using semicolons.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class TigerTreeVisualizer extends AbstractImageVisualizer
@@ -54,10 +54,10 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private static final int SIDE_MARGIN = 20;
   private static final int TOP_MARGIN = 40;
   private static final int TREE_DISTANCE = 40;
-  private final Java2dBackend backend;
+  private transient Java2dBackend backend;
   private final DefaultLabeler labeler;
   private final DefaultStyler styler;
-  private final AnnisGraphTools graphtools;
+  private AnnisGraphTools graphtools;
 
   public class DefaultStyler implements TreeElementStyler
   {
@@ -143,7 +143,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public Shape getShape(Edge e, VisualizerInput input)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
+      if(graphtools.hasEdgeSubtype(e, graphtools.getSecEdgeSubType()))
       {
         return new Shape.Rectangle(getEdgeColor(e, input), Color.WHITE, DEFAULT_PEN_STYLE, getLabelPadding());
       }
@@ -181,7 +181,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public Color getEdgeColor(Edge e, VisualizerInput input)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
+      if(graphtools.hasEdgeSubtype(e, graphtools.getSecEdgeSubType()))
       {
         return new Color(0.5f, 0.5f, 0.8f, 0.7f);
       }
@@ -206,7 +206,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public Stroke getStroke(Edge e, VisualizerInput input)
     {
-      if(AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input))
+      if(graphtools.hasEdgeSubtype(e, graphtools.getSecEdgeSubType()))
       {
         return new BasicStroke(2, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10, new float[]
           {
@@ -266,10 +266,8 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
 
   public TigerTreeVisualizer()
   {
-    backend = new Java2dBackend();
     labeler = new DefaultLabeler();
-    styler = new DefaultStyler(backend);
-    graphtools = new AnnisGraphTools();
+    styler = new DefaultStyler(getBackend());
   }
 
   @Override
@@ -284,18 +282,19 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   public void writeOutput(VisualizerInput input, OutputStream outstream)
   {
     AnnisResult result = input.getResult();
+    graphtools = new AnnisGraphTools(input);
     List<AbstractImageGraphicsItem> layouts = new LinkedList<AbstractImageGraphicsItem>();
 
     double width = 0;
     double maxheight = 0;
 
-    for(DirectedGraph<AnnisNode, Edge> g : graphtools.getSyntaxGraphs(input))
+    for(DirectedGraph<AnnisNode, Edge> g : graphtools.getSyntaxGraphs())
     {
       if(g.getEdgeCount() > 0 && g.getVertexCount() > 0)
       {
       
         ConstituentLayouter<AbstractImageGraphicsItem> cl = new ConstituentLayouter<AbstractImageGraphicsItem>(
-          g, backend, labeler, styler, input);
+          g, getBackend(), labeler, styler, input, graphtools);
 
         AbstractImageGraphicsItem item = cl.createLayout(
           new LayoutOptions(VerticalOrientation.TOP_ROOT, AnnisGraphTools.
@@ -370,5 +369,16 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   {
     return "image/png";
   }
+
+  private Java2dBackend getBackend()
+  {
+    if(backend == null)
+    {
+      backend = new Java2dBackend();
+    }
+    return backend;
+  }
+  
+  
   
 }

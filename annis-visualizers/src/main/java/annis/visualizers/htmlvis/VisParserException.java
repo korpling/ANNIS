@@ -17,7 +17,7 @@ package annis.visualizers.htmlvis;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class VisParserException extends Exception
 {

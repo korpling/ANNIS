@@ -52,7 +52,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   {
     return new TigerQueryBuilder(controller);
   }
-
+  
   public static class TigerQueryBuilder extends Panel implements Button.ClickListener
   {
 

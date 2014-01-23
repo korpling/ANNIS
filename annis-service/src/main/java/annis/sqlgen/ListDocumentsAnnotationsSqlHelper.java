@@ -35,7 +35,7 @@ public class ListDocumentsAnnotationsSqlHelper implements
 
   public String createSqlQuery(String toplevelCorpusName, boolean listRootCorpus)
   {
-    String template = "SELECT DISTINCT docs.name as corpus_name, docs.pre, meta.namespace, meta.name, meta.value, docs.type\n"
+    String template = "SELECT DISTINCT docs.name as corpus_name, docs.path_name as path_name, docs.pre, meta.namespace, meta.name, meta.value, docs.type\n"
       + "from corpus this, corpus docs \n"
       + "FULL JOIN corpus_annotation meta \n"
       + "ON docs.id=meta.corpus_ref \n"
@@ -66,6 +66,8 @@ public class ListDocumentsAnnotationsSqlHelper implements
     String namespace = rs.getString("namespace");
     String name = rs.getString("name");
     String value = rs.getString("value");
-    return new Annotation(namespace, name, value, type, corpusName, pre);
+    String annotationPath = rs.getString("path_name");
+    return new Annotation(namespace, name, value, type, corpusName, pre,
+      annotationPath);
   }
 }

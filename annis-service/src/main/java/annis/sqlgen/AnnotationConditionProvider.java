@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Implements method to allow different modes to have different behavior
  * how to add annotation constraints to the generated SQL.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface AnnotationConditionProvider
 {

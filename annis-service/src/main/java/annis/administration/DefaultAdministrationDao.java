@@ -97,6 +97,50 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private StatementController statementController;
 
+  /**
+   * Searches for textes which are empty or only contains whitespaces. If that
+   * is the case the visualizer and no document visualizer are defined in the
+   * corpus properties file a new file is created and stores a new config which
+   * disables document browsing.
+   *
+   *
+   * @param corpusID The id of the corpus which texts are analyzed.
+   */
+  private void analyzeTextTable(String toplevelCorpusName)
+  {
+    List<String> rawTexts = annisDao.getRawText(toplevelCorpusName);
+
+    // pattern for checking the token layer
+    final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
+
+    for (String s : rawTexts)
+    {
+
+      if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
+      {
+        // deactivate doc browsing if no corpus config is present.
+        Properties corpusConfiguration = annisDao.getCorpusConfiguration(toplevelCorpusName);
+        if (corpusConfiguration == null)
+        {
+          log.info("create new corpus configuration file");
+          corpusConfiguration = new Properties();
+        }
+
+        if (!corpusConfiguration.containsKey("browse-document-visualizers"))
+        {
+          // get real file name and write back the new corpus configuration.
+          corpusConfiguration.put("browse-documents", "false");
+
+          log.info("disable document browser");
+          annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConfiguration);
+          
+          // once disabled don't search in further texts
+          break;
+        }
+      }
+    }
+  }
+
   public enum EXAMPLE_QUERIES_CONFIG
   {
 
@@ -111,6 +155,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private String schemaVersion;
 
+  /**
+   * A mapping for file-endings to mime types.
+   */
   private Map<String, String> mimeTypeMapping;
 
   private Map<String, String> tableInsertSelect;
@@ -118,13 +165,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   private Map<String, String> tableInsertFrom;
 
   // all files have to carry this suffix.
-  private final String REL_ANNIS_FILE_SUFFIX = ".tab";
+  private static final String REL_ANNIS_FILE_SUFFIX = ".tab";
 
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
    */
-  private final String EXAMPLE_QUERIES_TAB = "example_queries";
+  private static final String EXAMPLE_QUERIES_TAB = "example_queries";
 
   /**
    * The name of the file and the relation containing the resolver information.
@@ -132,11 +179,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   private static final String FILE_RESOLVER_VIS_MAP = "resolver_vis_map";
   // tables imported from bulk files
   // DO NOT CHANGE THE ORDER OF THIS LIST!  Doing so may cause foreign key failures during import.
-
-  /**
-   * The corpus configuration is saved in the media files table.
-   */
-  public final String CORPUS_CONFIG_FILE = "corpus.properties";
 
   private String[] importedTables =
   {
@@ -266,7 +308,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(scriptPath,
-      FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
+          FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
   }
@@ -379,7 +421,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  public boolean importCorpus(String path, boolean override, boolean waitForOtherTasks)
+  public boolean importCorpus(String path, 
+    String aliasName,
+    boolean override, 
+    boolean waitForOtherTasks)
   {
 
     // check schema version first
@@ -393,7 +438,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-
+    
+    String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
+    
     // remove conflicting top level corpora, when override is set to true.
     if (override)
     {
@@ -415,7 +462,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     adjustTextId();
     long corpusID = updateIds();
 
-    importBinaryData(path);
+    importBinaryData(path, toplevelCorpusName);
 
     extendStagingText(corpusID);
     extendStagingExampleQueries(corpusID);
@@ -442,15 +489,19 @@ public class DefaultAdministrationDao implements AdministrationDao
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
 
-
     if (temporaryStagingArea)
     {
       dropStagingArea();
     }
 
     analyzeFacts(corpusID);
-
+    analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
+    
+    if(aliasName != null && !aliasName.isEmpty())
+    {
+      addCorpusAlias(corpusID, aliasName);
+    }
     
 
     return true;
@@ -637,7 +688,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("toplevel_corpus.sql");
   }
 
-  void importBinaryData(String path)
+  void importBinaryData(String path, String toplevelCorpusName)
   {
     log.info("importing all binary data from ExtData");
     File extData = new File(path + "/ExtData");
@@ -659,7 +710,7 @@ public class DefaultAdministrationDao implements AdministrationDao
               "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
             long corpusID = jdbcTemplate.queryForLong(sqlScript);
 
-            importSingleFile(data.getCanonicalPath(), corpusID);
+            importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
           }
           else
           {
@@ -697,7 +748,7 @@ public class DefaultAdministrationDao implements AdministrationDao
                 long corpusID = jdbcTemplate.queryForLong(sqlScript, doc.
                   getName());
 
-                importSingleFile(data.getCanonicalPath(), corpusID);
+                importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
               }
               else
               {
@@ -721,11 +772,13 @@ public class DefaultAdministrationDao implements AdministrationDao
    *
    * @param file Specifies the file to be imported.
    * @param corpusRef Assigns the file this corpus.
+   * @param toplevelCorpusName The toplevel corpus name
    */
-  private void importSingleFile(String file, long corpusRef)
+  private void importSingleFile(String file, String toplevelCorpusName, long corpusRef)
   {
 
     BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
+      toplevelCorpusName,
       corpusRef, mimeTypeMapping);
     jdbcTemplate.execute(BinaryImportHelper.SQL, preStat);
 
@@ -831,7 +884,6 @@ public class DefaultAdministrationDao implements AdministrationDao
    */
   long updateIds()
   {
-    log.info("updating IDs in staging area");
 
     int numOfEntries = jdbcTemplate.queryForInt(
       "SELECT COUNT(*) from corpus_stats");
@@ -844,7 +896,8 @@ public class DefaultAdministrationDao implements AdministrationDao
         "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
     }
-
+    
+    log.info("updating IDs in staging area");
     MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
     executeSqlFromScript("update_ids.sql", args);
 
@@ -1036,7 +1089,10 @@ public class DefaultAdministrationDao implements AdministrationDao
         File f = new File(dataDir, fileName);
         if (f.exists())
         {
-          f.delete();
+          if(!f.delete())
+          {
+            log.warn("Could not delete {}", f.getAbsolutePath());
+          }
         }
       }
 
@@ -1141,6 +1197,20 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.error("Cannot serialize user config JSON for database.", ex);
     }
   }
+
+  @Override
+  public void addCorpusAlias(long corpusID, String alias)
+  {
+    jdbcTemplate.update(
+      "INSERT INTO corpus_alias (alias, corpus_ref)\n"
+      + "VALUES(\n"
+      + "  ?, \n"
+      + "  ?\n"
+      + ");", 
+      alias, corpusID);
+  }
+  
+  
 
   ///// Helpers
   private List<String> importedAndCreatedTables()
@@ -1614,6 +1684,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       // count cols for detecting old resolver_vis_map table format
       File resolver_vis_tab = new File(path, table + REL_ANNIS_FILE_SUFFIX);
 
+      if(!resolver_vis_tab.isFile())
+      {
+        return;
+      }
+      
       BufferedReader bReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
       String firstLine = bReader.readLine();
@@ -1827,7 +1902,10 @@ public class DefaultAdministrationDao implements AdministrationDao
   private String getTopLevelCorpusFromTmpArea()
   {
     String sql = "SELECT name FROM " + tableInStagingArea("corpus")
-      + " WHERE type='CORPUS'";
+      + " WHERE type='CORPUS'\n"
+      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus") +")\n"
+      + "AND post = (SELECT max(post) FROM " + tableInStagingArea("corpus") + ")";
+
     return jdbcTemplate.query(sql, new ResultSetExtractor<String>()
     {
       @Override
@@ -1878,25 +1956,25 @@ public class DefaultAdministrationDao implements AdministrationDao
       + topLevelCorpusName + "'";
     Integer numberOfCorpora = getJdbcTemplate().query(sql,
       new ResultSetExtractor<Integer>()
-    {
-      @Override
-      public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
       {
-        if (rs.next())
+        @Override
+        public Integer extractData(ResultSet rs) throws SQLException, DataAccessException
         {
-          return rs.getInt("amount");
+          if (rs.next())
+          {
+            return rs.getInt("amount");
+          }
+          else
+          {
+            return 0;
+          }
         }
-        else
-        {
-          return 0;
-        }
-      }
-    });
+      });
 
     return numberOfCorpora > 0;
   }
 
-  public class ConflictingCorpusException extends AnnisException
+  public static class ConflictingCorpusException extends AnnisException
   {
 
     public ConflictingCorpusException(String msg)

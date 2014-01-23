@@ -6,11 +6,19 @@
   <!-- automatically generated or external code that we can't influence -->
   <Match>
     <Or>
-      <Class name="annis.ql.parser.Parser"/>
-      <Class name="de.deutschdiachrondigital.dddquery.parser.Parser"/>
-      <Class name="annis.ql.lexer.Lexer"/>
-      <Class name="de.deutschdiachrondigital.dddquery.lexer.Lexer"/>
+      <Class name="annis.ql.AqlLexer"/>
+      <Class name="annis.ql.AqlParser"/>
+      <Class name="annis.ql.RawAqlPreParser"/>
+      <Class name="com.google.mimeparse.MIMEParse" />
+      <Class name="com.google.mimeparse.MIMEParse$FitnessAndQuality" />
     </Or>
+  </Match>
+  
+  <Match>
+    <And>
+      <Class name="annis.AnnisRunner" />
+      <Bug pattern="DM_EXIT" />
+    </And>
   </Match>
   
   <Match>

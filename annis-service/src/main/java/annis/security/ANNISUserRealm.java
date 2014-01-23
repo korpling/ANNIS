@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * A realm for the property based user authentification and authorization pattern
  * used by ANNIS.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionResolverAware
 {

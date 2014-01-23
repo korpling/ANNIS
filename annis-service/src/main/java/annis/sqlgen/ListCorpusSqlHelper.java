@@ -21,6 +21,9 @@ import java.sql.SQLException;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.service.objects.AnnisCorpus;
+import com.google.common.base.Joiner;
+import java.util.ArrayList;
+import java.util.List;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -29,9 +32,22 @@ public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus>
   
   private static final Logger log = LoggerFactory.getLogger(ListCorpusSqlHelper.class);
 
+  
   public String createSqlQuery()
   {
     return "SELECT * FROM corpus_stats";
+  }
+  
+  public String createSqlQueryWithList(int numberOfIds)
+  {
+    List<String> questionMarks = new ArrayList<String>();
+    for(int i=0; i < numberOfIds; i++)
+    {
+      questionMarks.add("?");
+    }
+    return "SELECT * FROM corpus_stats WHERE id IN (" 
+      + (questionMarks.isEmpty() ? "NULL" : Joiner.on(",").join(questionMarks)) 
+      + ")";
   }
   
   public AnnisCorpus mapRow(ResultSet rs, int rowNum) throws SQLException

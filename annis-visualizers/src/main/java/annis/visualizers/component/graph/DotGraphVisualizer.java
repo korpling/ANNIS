@@ -33,7 +33,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * causes only nodes and edges of the namespace <b>tiger</b> to be visualized 
  * (i.e. only a subgraph of all annotations).
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class DotGraphVisualizer extends AbstractDotVisualizer

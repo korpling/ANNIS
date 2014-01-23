@@ -22,7 +22,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 /**
  * A configuration for an external web-font.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
 public class FontConfig implements Serializable

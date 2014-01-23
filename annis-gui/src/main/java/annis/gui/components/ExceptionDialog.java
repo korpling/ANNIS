@@ -36,7 +36,7 @@ import com.vaadin.ui.themes.BaseTheme;
  * A dialog that displays the message of an exception and allows to show
  * the stack trace if requested.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ExceptionDialog extends Window implements Button.ClickListener
 {
@@ -79,8 +79,12 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     layout.addComponent(lblInfo);
     lblInfo.addStyleName("exception-message-caption");
     
-    
-    Label lblMessage = new Label(ex.getMessage());
+    String message = ex.getMessage();
+    if(message == null || message.isEmpty())
+    {
+      message = "<no message>";
+    }
+    Label lblMessage = new Label(message);
     lblMessage.addStyleName("exception-message-content");
     lblMessage.setHeight("-1px");
     lblMessage.setWidth("100%");
@@ -96,7 +100,7 @@ public class ExceptionDialog extends Window implements Button.ClickListener
     btDetails.setStyleName(BaseTheme.BUTTON_LINK);
     actionsLayout.addComponent(btDetails);
     
-    btReportBug = new Button("Report Bug", this);
+    btReportBug = new Button("Report Problem", this);
     btReportBug.setStyleName(BaseTheme.BUTTON_LINK);
     btReportBug.setVisible(false);
     btReportBug.setIcon(new ThemeResource("../runo/icons/16/email.png"));

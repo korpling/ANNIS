@@ -37,10 +37,6 @@ import org.slf4j.LoggerFactory;
  *
  * <p>There are mappings available:
  * <ul>
- * <li>
- * For the page annotation:
- * <code>node_key:&lt;annotation_name&gt;</code>
- * </li>
  * <li> Setting a fixed height (recommended for the
  * {@link PDFFullVisualizer}):height:&lt;height in px&gt;</li>
  * </ul></p>
@@ -115,8 +111,6 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
         visToggle.toggleVisualizer(true, null);
       }
 
-      Notification.show(
-              PAGE_NO_VALID_NUMBER.equals(page) ? "opening full pdf" : "opening page " + page);
     }
 
     private void initPDFPanel(String page) {

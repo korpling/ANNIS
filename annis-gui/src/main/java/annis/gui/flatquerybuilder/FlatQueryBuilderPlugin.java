@@ -28,7 +28,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 
 @PluginImplementation
 public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuilder>
-{
+{  
   @Override
   public String getShortName()
   {
@@ -44,6 +44,7 @@ public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuild
   @Override
   public FlatQueryBuilder createComponent(QueryController controlPanel)
   {
-    return new FlatQueryBuilder(controlPanel);
+    FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
+    return qb;
   }
 }

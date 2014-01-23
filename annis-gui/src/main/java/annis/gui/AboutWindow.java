@@ -15,10 +15,12 @@
  */
 package annis.gui;
 
+import com.vaadin.annotations.VaadinServletConfiguration;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.Version;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickEvent;
 import java.io.File;
@@ -75,9 +77,10 @@ public class AboutWindow extends Window
     layout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Homepage: "
-      + "<a href=\"http://www.sfb632.uni-potsdam.de/d1/annis/\">"
-      + "http://www.sfb632.uni-potsdam.de/d1/annis/</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://www.sfb632.uni-potsdam.de/annis/\">"
+      + "http://www.sfb632.uni-potsdam.de/annis/</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Version: " + VaadinSession.getCurrent().getAttribute("annis-version")));
+    layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     
     TextArea txtThirdParty = new TextArea();
     txtThirdParty.setSizeFull();
