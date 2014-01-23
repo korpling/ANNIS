@@ -23,9 +23,9 @@ import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditorExtension;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -40,8 +40,6 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
@@ -72,8 +70,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   public static final String NAME = "query";
   public static final String OK_STATUS = "Status: Ok";
 
-  private CssLayout txtQueryContainer;
-  private TextArea txtQuery;
+  private AqlCodeEditor txtQuery;
   private TextArea txtStatus;
   private Button btShowResult;
   //private Button btShowResultNewTab;
@@ -106,14 +103,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
-    // HACK: without the container the sizing does not work,
-    // include this in an extra component that holds the TextArea itself
-    txtQueryContainer = new CssLayout();
-    txtQueryContainer.setWidth("100%");
-    txtQueryContainer.setHeight(10f, Unit.EM);
     
-    
-    txtQuery = new TextArea();
+    txtQuery = new AqlCodeEditor();
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
@@ -127,12 +118,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setRows(10);
     txtQuery.addTextChangeListener((TextChangeListener) this);
-    
-    txtQueryExt = new AqlCodeEditorExtension();
-    txtQueryExt.extend(txtQuery);
-    txtQueryContainer.addComponent(txtQuery);
    
-
     final VirtualKeyboard virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
@@ -143,7 +129,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       virtualKeyboard = new VirtualKeyboard();
 
       virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
-      virtualKeyboard.extend(txtQuery);
+      
+      // TODO: virtualKeyboard.extend(txtQuery);
     }
 
     txtStatus = new TextArea();
@@ -283,7 +270,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * --+-----+-----+-----+-----
      * 3 | STAT| STAT| STAT| STAT
      */
-    addComponent(txtQueryContainer, 0, 0, 2, 1);
+    addComponent(txtQuery, 0, 0, 2, 1);
 //    addComponent(txtQuery, 0, 0, 2, 1);
     addComponent(txtStatus, 0, 3, 3, 3);
     addComponent(btShowResult, 0, 2);
