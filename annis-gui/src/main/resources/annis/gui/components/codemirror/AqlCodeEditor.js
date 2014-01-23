@@ -66,10 +66,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTime = newDelayTime;
     };
     
-    this.updateText = function(newText) {
-      
-    };
-    
     cmTextArea.on("change", function(instance, changeObj)
     {
       if(changeDelayTimerID)
