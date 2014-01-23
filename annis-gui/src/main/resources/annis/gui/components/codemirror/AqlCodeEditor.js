@@ -17,25 +17,48 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
   
     var connector = this;
     var rootDiv = this.getElement(this.getConnectorId());
+    
+    var changeDelayTimerID = null;
+    var lastSentText = null;
+    
+    var changeDelayTime = 500;
 
     var cmTextArea = CodeMirror(rootDiv,
     {
       mode: 'aql'
     });
     
-    cmTextArea.on("change", function(instance, changeObj)
+    
+    function changeDelayCallback () 
     {
-      connector.textChanged(cmTextArea.getValue());
-    });
+      var current = cmTextArea.getValue();
+      if(lastSentText !== current)
+      {      
+        connector.textChanged(cmTextArea.getValue());
+        lastSentText = current;
+      }
+    };
 
     
     this.onStateChange = function() {
     };
     
+    this.setChangeDelayTime = function(newDelayTime) {
+      changeDelayTime = newDelayTime;
+    };
+    
     this.updateText = function(newText) {
       cmTextArea.setValue(newText);
-    }
+    };
     
+    cmTextArea.on("change", function(instance, changeObj)
+    {
+      if(changeDelayTimerID)
+      {
+        window.clearTimeout(changeDelayTimerID);
+      }
+      changeDelayTimerID = window.setTimeout(changeDelayCallback, changeDelayTime);
+    });
     
 };
 

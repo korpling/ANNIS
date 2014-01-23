@@ -115,8 +115,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
     txtQuery.setWidth("100%");
-//    txtQuery.setHeight(10f, Unit.EM);
-    txtQuery.setRows(10);
+    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.addTextChangeListener((TextChangeListener) this);
    
     final VirtualKeyboard virtualKeyboard;

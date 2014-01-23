@@ -19,7 +19,9 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.TextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -41,6 +43,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 {
   
   private String value;
+  private int timeout;
   
   public AqlCodeEditor()
   {
@@ -53,7 +56,22 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     public void call(JSONArray args) throws JSONException
     {
       value = args.getString(0);
-      // TODO: notifiy text change listener
+      final String valueCopy = value;
+      fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
+      {
+        
+        @Override
+        public String getText()
+        {
+          return valueCopy;
+        }
+        
+        @Override
+        public int getCursorPosition()
+        {
+          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        }
+      });
     }
   }
   
@@ -64,12 +82,13 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   
   public void setTextChangeTimeout(int timeout)
   {
-    // TODO
+    callFunction("setChangeDelayTime", timeout);
+    this.timeout = timeout;
   }
   
-  public void setRows(int rows)
+  public int getTextChangeTimeout()
   {
-    // TODO
+    return this.timeout;
   }
 
   @Override
