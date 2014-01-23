@@ -23,7 +23,7 @@ import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
-import annis.gui.components.codemirror.AqlCodeEditor;
+import annis.gui.components.codemirror.AqlCodeEditorExtension;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
@@ -84,7 +84,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
-  private AqlCodeEditor txtQueryExt;
+  private AqlCodeEditorExtension txtQueryExt;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
 
@@ -128,7 +128,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setRows(10);
     txtQuery.addTextChangeListener((TextChangeListener) this);
     
-    txtQueryExt = new AqlCodeEditor();
+    txtQueryExt = new AqlCodeEditorExtension();
     txtQueryExt.extend(txtQuery);
     txtQueryContainer.addComponent(txtQuery);
    

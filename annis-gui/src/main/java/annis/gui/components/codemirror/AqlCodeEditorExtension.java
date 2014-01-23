@@ -29,22 +29,31 @@ import com.vaadin.ui.TextArea;
  */
 @JavaScript(
 {
-  "lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditor.js"
+  "lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditorExtension.js"
 })
 @StyleSheet(
 {
   "lib/codemirror.css", "AqlCodeEditor.css"
 })
-public class AqlCodeEditor extends AbstractJavaScriptExtension
+public class AqlCodeEditorExtension extends AbstractJavaScriptExtension
 {
 
-  public AqlCodeEditor()
+  public AqlCodeEditorExtension()
   {
   }
 
   public void extend(TextArea target)
   {
     super.extend(target);
+    target.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        boolean b = false;
+      }
+    });
     target.addValueChangeListener(new Property.ValueChangeListener()
     {
 

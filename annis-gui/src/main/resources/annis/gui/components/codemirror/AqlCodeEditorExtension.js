@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-window.annis_gui_components_codemirror_AqlCodeEditor = function() {
+window.annis_gui_components_codemirror_AqlCodeEditorExtension = function() {
     var component = this;
     
     var origTextArea = this.getElement(this.getParentId());
@@ -29,14 +29,15 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       var element = instance.getTextArea();
       if ("createEvent" in document) {
         var evt = document.createEvent("HTMLEvents");
-        evt.initEvent("change", false, true);
+        evt.initEvent("change", true, false);
         element.dispatchEvent(evt);
       }
       else {
         element.fireEvent("onchange");
       }
-    });
 
+     });
+//
 //    var componentDiv = this.getElement(this.getConnectorId());
 //    
 //    var codemirrorTextArea = CodeMirror(componentDiv, 
