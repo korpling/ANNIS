@@ -28,8 +28,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       mode: 'aql'
     });
     
-    
-    function changeDelayCallback () 
+    function sendTextIfNecessary () 
     {
       var current = cmTextArea.getValue();
       if(lastSentText !== current)
@@ -72,7 +71,16 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       {
         window.clearTimeout(changeDelayTimerID);
       }
-      changeDelayTimerID = window.setTimeout(changeDelayCallback, changeDelayTime);
+      changeDelayTimerID = window.setTimeout(sendTextIfNecessary, changeDelayTime);
+    });
+    
+    cmTextArea.on("blur", function(instance)
+    {
+      if(changeDelayTimerID)
+      {
+        window.clearTimeout(changeDelayTimerID);
+      }
+      sendTextIfNecessary();
     });
     
 };
