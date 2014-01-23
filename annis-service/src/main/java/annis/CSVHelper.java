@@ -18,12 +18,9 @@ package annis;
 import annis.dao.objects.AnnotatedMatch;
 import annis.dao.objects.AnnotatedSpan;
 import annis.model.Annotation;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.OutputStreamWriter;
+import au.com.bytecode.opencsv.CSVWriter;
+import com.google.common.collect.Collections2;
 import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -41,17 +38,14 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class WekaHelper
+public class CSVHelper
 {
   
-  private static final Logger log = LoggerFactory.getLogger(WekaHelper.class);
+  private static final Logger log = LoggerFactory.getLogger(CSVHelper.class);
   
-  public static SortedMap<Integer, SortedSet<String>> exportArffHeader(
+  public static SortedMap<Integer, SortedSet<String>> exportCSVHeder(
     Iterator<AnnotatedMatch> matches, PrintWriter w)
   {
-    // header: relation name (unused)
-    w.append("@relation name\n");
-    w.append("\n");
     // figure out what annotations are used at each match position
     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
       new TreeMap<Integer, SortedSet<String>>();
@@ -77,28 +71,33 @@ public class WekaHelper
 
       }
     }
+    
+    CSVWriter csvWriter = new CSVWriter(w, ',', '\'');
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
+    ArrayList<String> headerLine = new ArrayList<String>();
+    
     for(int j = 0; j < count; ++j)
     {
-      w.append("@attribute ").append(fullColumnName(j + 1, "id")).append(" string\n");
-      w.append("@attribute ").append(fullColumnName(j + 1, "span")).append(" string\n");
+      headerLine.add(fullColumnName(j + 1, "id"));
+      headerLine.add(fullColumnName(j + 1, "span"));
+      
       SortedSet<String> annotationNames = columnsByNodePos.get(j);
       for(String name : annotationNames)
       {
-        w.append("@attribute ").append(fullColumnName(j + 1, name)).append(" string\n");
+        headerLine.add(fullColumnName(j + 1, name));
       }
     }
-    
+    csvWriter.writeNext(headerLine.toArray(new String[headerLine.size()]));
+        
     return columnsByNodePos;
   }
   
-  public static void exportArffData(Iterator<AnnotatedMatch> matches,
+  public static void exportCSVData(Iterator<AnnotatedMatch> matches,
     SortedMap<Integer, SortedSet<String>> columnsByNodePos, PrintWriter w)
   {
     int count = columnsByNodePos.keySet().size();
       
-    w.append("\n@data\n\n");
     // print values
     while(matches.hasNext())
     {
@@ -156,9 +155,11 @@ public class WekaHelper
       w.append("\n");
     }
   }
+  
  
+
   private static String fullColumnName(int i, String name)
   {
-    return "#" + i + "_" + name;
+    return i + "_" + name;
   }
 }

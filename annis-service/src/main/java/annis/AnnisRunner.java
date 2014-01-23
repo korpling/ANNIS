@@ -1028,7 +1028,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 //    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
 //      "matrix"));
-    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), System.out);
+    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), false, System.out);
 //    if (matches.isEmpty())
 //    {
 //      out.println("(empty");

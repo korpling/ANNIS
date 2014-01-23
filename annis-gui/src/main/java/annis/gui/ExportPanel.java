@@ -20,6 +20,7 @@ import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
@@ -63,6 +64,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private static final Exporter[] EXPORTER = new Exporter[]
   {
     new WekaExporter(),
+    new CSVExporter(),
     new TextExporter(),
     new GridExporter(),
     new SimpleTextExporter()
@@ -257,12 +259,21 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       + "Parameters: <br/>"
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)");
-
+    
     help4Exporter.put(EXPORTER[1].getClass().getSimpleName(),
+      "The CSV Exporter exports only the "
+      + "values of the elements searched for by the user, ignoring the context "
+      + "around search results. The values for all annotations of each of the "
+      + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
+      + "Parameters: <br/>"
+      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
+      + "<code>metakeys=title,documentname</code>)");
+
+    help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
       "The Text Exporter exports just the plain text of every search result and "
       + "its context, one line per result.");
 
-    help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
+    help4Exporter.put(EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
       + "context. Each annotation layer is represented in a separate line, and the "
       + "tokens covered by each annotation are given as number ranges after each "
