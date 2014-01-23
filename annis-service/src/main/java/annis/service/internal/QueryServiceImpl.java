@@ -293,6 +293,11 @@ public class QueryServiceImpl implements QueryService
 
   /**
    * Get result as matrix in WEKA (ARFF) format.
+   * @param query
+   * @param rawCorpusNames
+   * @param rawMetaKeys
+   * @param rawCsv
+   * @return 
    */
   @GET
   @Path("search/matrix")
@@ -300,12 +305,15 @@ public class QueryServiceImpl implements QueryService
   public StreamingOutput matrix(
     final @QueryParam("q") String query,
     final @QueryParam("corpora") String rawCorpusNames,
-    @QueryParam("metakeys") String rawMetaKeys)
+    @QueryParam("metakeys") String rawMetaKeys,
+    @DefaultValue("false") @QueryParam("csv") String rawCsv)
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
       "comma separated list of corpus names");
 
+    final boolean outputCsv = Boolean.parseBoolean(rawCsv);
+    
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
     for (String c : corpusNames)
@@ -333,7 +341,7 @@ public class QueryServiceImpl implements QueryService
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        annisDao.matrix(data, output);
+        annisDao.matrix(data, outputCsv, output);
         long end = new Date().getTime();
         logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);

@@ -159,7 +159,7 @@ public interface AnnisDao
 
   FrequencyTable frequency(QueryData queryData);
 
-  public void matrix(final QueryData queryData, final OutputStream out);
+  public void matrix(final QueryData queryData, boolean outputCSV, final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);

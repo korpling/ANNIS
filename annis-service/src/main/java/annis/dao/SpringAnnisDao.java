@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.CSVHelper;
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
@@ -627,7 +628,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public void matrix(final QueryData queryData, final OutputStream out)
+  public void matrix(final QueryData queryData, final boolean outputCsv, final OutputStream out)
   {
     prepareTransaction(queryData);
 
@@ -646,13 +647,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
           // write the header to the output stream
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-          SortedMap<Integer, SortedSet<String>> columnsByNodePos =
-            WekaHelper.exportArffHeader(itMatches, w);
-          w.flush();
+          
+          if(outputCsv)
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = CSVHelper.exportCSVHeder(itMatches, w);
+            w.flush();
 
-          // go back to the beginning and print the actual data
-          itMatches.reset();
-          WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            CSVHelper.exportCSVData(itMatches, columnsByNodePos, w);
+          }
+          else
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = WekaHelper.exportArffHeader(itMatches, w);
+            w.flush();
+
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+          }
           w.flush();
 
           rs.close();
