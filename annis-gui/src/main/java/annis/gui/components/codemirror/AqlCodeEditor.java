@@ -57,6 +57,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     {
       value = args.getString(0);
       final String valueCopy = value;
+      final int cursorPos = args.getInt(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
       {
         
@@ -69,7 +70,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
         @Override
         public int getCursorPosition()
         {
-          throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+          return cursorPos;
         }
       });
     }

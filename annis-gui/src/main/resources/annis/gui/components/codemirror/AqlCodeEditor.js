@@ -33,8 +33,18 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       var current = cmTextArea.getValue();
       if(lastSentText !== current)
-      {      
-        connector.textChanged(cmTextArea.getValue());
+      {
+        var cursor = cmTextArea.getCursor();
+        // calculate the absolute cursor position
+        var absPos = 0;
+        for(i=0; i < cursor.line; i++)
+        {
+          absPos += cmTextArea.getLine(i).length;
+          absPos++; // add one for the newline
+        }
+        absPos += cursor.ch;
+        
+        connector.textChanged(cmTextArea.getValue(), absPos);
         lastSentText = current;
       }
     };
