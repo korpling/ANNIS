@@ -19,7 +19,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var rootDiv = this.getElement(this.getConnectorId());
     
     var changeDelayTimerID = null;
-    var lastSentText = null;
+    var lastSentText = "";
     
     var changeDelayTime = 500;
 
@@ -50,7 +50,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
 
     
-    this.onStateChange = function() {
+    this.onStateChange = function() 
+    {
+      cmTextArea.setValue(connector.getState().text);
     };
     
     this.setChangeDelayTime = function(newDelayTime) {
@@ -58,7 +60,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
     
     this.updateText = function(newText) {
-      cmTextArea.setValue(newText);
+      
     };
     
     cmTextArea.on("change", function(instance, changeObj)

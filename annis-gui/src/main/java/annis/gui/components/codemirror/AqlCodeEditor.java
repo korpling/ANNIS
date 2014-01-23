@@ -18,6 +18,7 @@ package annis.gui.components.codemirror;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.shared.ui.JavaScriptComponentState;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.JavaScriptFunction;
@@ -41,8 +42,6 @@ import org.json.JSONException;
 public class AqlCodeEditor extends AbstractJavaScriptComponent
   implements FieldEvents.TextChangeNotifier
 {
-  
-  private String value;
   private int timeout;
   
   public AqlCodeEditor()
@@ -55,8 +54,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     @Override
     public void call(JSONArray args) throws JSONException
     {
-      value = args.getString(0);
-      final String valueCopy = value;
+      getState().text = args.getString(0);
+      final String textCopy = getState().text;
       final int cursorPos = args.getInt(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
       {
@@ -64,7 +63,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
         @Override
         public String getText()
         {
-          return valueCopy;
+          return textCopy;
         }
         
         @Override
@@ -75,6 +74,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       });
     }
   }
+  
   
   public void setInputPrompt(String prompt)
   {
@@ -122,14 +122,22 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
   public String getValue()
   {
-    return value;
+    return getState().text;
   }
 
   public void setValue(String value)
   {
-    this.value = value;
-    callFunction("updateText", value);
+    getState().text = value;
+    markAsDirty();
   }
+
+  @Override
+  protected AqlCodeEditorState getState()
+  {
+    return (AqlCodeEditorState) super.getState();
+  }
+  
+  
 
   
 }
