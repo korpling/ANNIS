@@ -25,7 +25,6 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
-import annis.gui.components.codemirror.AqlCodeEditorExtension;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
@@ -82,7 +81,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
-  private AqlCodeEditorExtension txtQueryExt;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
 
