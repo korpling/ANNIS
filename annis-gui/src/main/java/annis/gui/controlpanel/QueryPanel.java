@@ -23,6 +23,7 @@ import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditorExtension;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -118,18 +119,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtQuery.setHeight(11f, Unit.EM);
     txtQuery.addTextChangeListener((TextChangeListener) this);
    
-    final VirtualKeyboard virtualKeyboard;
+    final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
       virtualKeyboard = null;
     }
     else
     {
-      virtualKeyboard = new VirtualKeyboard();
+      virtualKeyboard = new VirtualKeyboardCodeEditor();
 
       virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
       
-      // TODO: virtualKeyboard.extend(txtQuery);
+      virtualKeyboard.extend(txtQuery);
     }
 
     txtStatus = new TextArea();
@@ -499,9 +500,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
-    private final VirtualKeyboard virtualKeyboard;
+    private final VirtualKeyboardCodeEditor virtualKeyboard;
 
-    public ShowKeyboardClickListener(VirtualKeyboard virtualKeyboard)
+    public ShowKeyboardClickListener(VirtualKeyboardCodeEditor virtualKeyboard)
     {
       this.virtualKeyboard = virtualKeyboard;
     }

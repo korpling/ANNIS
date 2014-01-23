@@ -1692,28 +1692,39 @@ var VKI_attach, VKI_show, VKI_close;
    */
   this.VKI_insert = function(text) {
     this.VKI_target.focus();
-    if (this.VKI_target.maxLength) this.VKI_target.maxlength = this.VKI_target.maxLength;
-    if (typeof this.VKI_target.maxlength == "undefined" ||
-        this.VKI_target.maxlength < 0 ||
-        this.VKI_target.value.length < this.VKI_target.maxlength) {
-      if (this.VKI_target.setSelectionRange && !this.VKI_target.readOnly && !this.VKI_isIE) {
-        var rng = [this.VKI_target.selectionStart, this.VKI_target.selectionEnd];
-        this.VKI_target.value = this.VKI_target.value.substr(0, rng[0]) + text + this.VKI_target.value.substr(rng[1]);
-        if (text == "\n" && this.VKI_isOpera) rng[0]++;
-        this.VKI_target.setSelectionRange(rng[0] + text.length, rng[0] + text.length);
-      } else if (this.VKI_target.createTextRange && !this.VKI_target.readOnly) {
-        try {
-          this.VKI_target.range.select();
-        } catch(e) { this.VKI_target.range = document.selection.createRange(); }
-        this.VKI_target.range.text = text;
-        this.VKI_target.range.collapse(true);
-        this.VKI_target.range.select();
-      } else this.VKI_target.value += text;
-      if (this.VKI_shift) this.VKI_modify("Shift");
-      if (this.VKI_altgr) this.VKI_modify("AltGr");
+    
+    if(this.VKI_target.CodeMirror)
+    {
+      // we don't have a real textarea. but a CodeMirror code editor
+      var cm = this.VKI_target.CodeMirror;
+      cm.getDoc().replaceRange(text, cm.getCursor());
       this.VKI_target.focus();
-    } else if (this.VKI_target.createTextRange && this.VKI_target.range)
-      this.VKI_target.range.select();
+    }
+    else
+    {
+      if (this.VKI_target.maxLength) this.VKI_target.maxlength = this.VKI_target.maxLength;
+      if (typeof this.VKI_target.maxlength == "undefined" ||
+          this.VKI_target.maxlength < 0 ||
+          this.VKI_target.value.length < this.VKI_target.maxlength) {
+        if (this.VKI_target.setSelectionRange && !this.VKI_target.readOnly && !this.VKI_isIE) {
+          var rng = [this.VKI_target.selectionStart, this.VKI_target.selectionEnd];
+          this.VKI_target.value = this.VKI_target.value.substr(0, rng[0]) + text + this.VKI_target.value.substr(rng[1]);
+          if (text == "\n" && this.VKI_isOpera) rng[0]++;
+          this.VKI_target.setSelectionRange(rng[0] + text.length, rng[0] + text.length);
+        } else if (this.VKI_target.createTextRange && !this.VKI_target.readOnly) {
+          try {
+            this.VKI_target.range.select();
+          } catch(e) { this.VKI_target.range = document.selection.createRange(); }
+          this.VKI_target.range.text = text;
+          this.VKI_target.range.collapse(true);
+          this.VKI_target.range.select();
+        } else this.VKI_target.value += text;
+        if (this.VKI_shift) this.VKI_modify("Shift");
+        if (this.VKI_altgr) this.VKI_modify("AltGr");
+        this.VKI_target.focus();
+      } else if (this.VKI_target.createTextRange && this.VKI_target.range)
+        this.VKI_target.range.select();
+    }
   };
 
 
