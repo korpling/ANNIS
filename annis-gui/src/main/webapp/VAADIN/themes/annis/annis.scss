@@ -87,6 +87,10 @@ $font-size: 10pt;
     border-left-color: rgb(163, 173, 185);
     border-right-color: rgb(163, 173, 185);
   }
+  
+  .aql-code-prompt .cm-def {
+    color: grey;
+  }
 
   .v-table-cell-content-kwic-clickable {
     color: grey;

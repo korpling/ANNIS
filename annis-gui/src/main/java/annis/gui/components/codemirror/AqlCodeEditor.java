@@ -18,11 +18,8 @@ package annis.gui.components.codemirror;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.shared.ui.JavaScriptComponentState;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.TextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
 
@@ -33,7 +30,8 @@ import org.json.JSONException;
  */
 @JavaScript(
 {
-  "lib/codemirror.js", "mode/properties/properties.js", "mode/aql/aql.js", "AqlCodeEditor.js"
+  "vaadin://jquery.js", "lib/codemirror.js", "mode/properties/properties.js", 
+  "mode/aql/aql.js", "AqlCodeEditor.js"
 })
 @StyleSheet(
 {
@@ -80,7 +78,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   
   public void setInputPrompt(String prompt)
   {
-    //TODO
+    getState().inputPrompt = prompt;
+    markAsDirty();
   }
   
   public void setTextChangeTimeout(int timeout)

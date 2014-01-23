@@ -22,6 +22,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var lastSentText = "";
     
     var changeDelayTime = 500;
+    
+    var promptIsShown = false;
 
     var cmTextArea = CodeMirror(rootDiv,
     {
@@ -29,9 +31,33 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       lineNumbers: true
     });
     
+    function setPrompt(forceNoFocus)
+    {
+      if((forceNoFocus || !cmTextArea.hasFocus()) && cmTextArea.getValue() === "")
+      {
+        cmTextArea.setValue(connector.getState().inputPrompt);
+        promptIsShown = true;
+        $(rootDiv).addClass("aql-code-prompt");
+        return true;
+      }
+      return false;
+    }
+    
+    function unsetPrompt()
+    {
+      cmTextArea.setValue(connector.getState().text);
+      $(rootDiv).removeClass("aql-code-prompt");
+      promptIsShown = false;
+    }
+    
+    
     function sendTextIfNecessary () 
     {
       var current = cmTextArea.getValue();
+      if(promptIsShown)
+      {
+        current = "";
+      }
       if(lastSentText !== current)
       {
         var cursor = cmTextArea.getCursor();
@@ -53,6 +79,12 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     this.onStateChange = function() 
     {
       var cursor = cmTextArea.getCursor();
+      
+      if(connector.getState().text !== "")
+      {
+        unsetPrompt();
+      }
+      
       if(cmTextArea.getValue() !== connector.getState().text)
       {
         cmTextArea.setValue(connector.getState().text);
@@ -60,6 +92,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         // restore the cursor position
         cmTextArea.setCursor(cursor);
       }
+      setPrompt(false);
     };
     
     this.setChangeDelayTime = function(newDelayTime) {
@@ -67,12 +100,17 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
     
     cmTextArea.on("change", function(instance, changeObj)
-    {
+    {      
       if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);
       }
       changeDelayTimerID = window.setTimeout(sendTextIfNecessary, changeDelayTime);
+    });
+    
+    cmTextArea.on("focus", function(instance)
+    {
+      unsetPrompt();
     });
     
     cmTextArea.on("blur", function(instance)
@@ -82,6 +120,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         window.clearTimeout(changeDelayTimerID);
       }
       sendTextIfNecessary();
+      setPrompt(true);
     });
     
 };

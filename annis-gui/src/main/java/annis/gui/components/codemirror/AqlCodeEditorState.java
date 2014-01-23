@@ -24,5 +24,6 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
  */
 public class AqlCodeEditorState extends JavaScriptComponentState
 {
-  public String text; 
+  public String text = ""; 
+  public String inputPrompt = "";
 }
