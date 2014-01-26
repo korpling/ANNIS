@@ -84,7 +84,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
-import org.vaadin.cssinject.CSSInject;
 
 /**
  * GUI for searching in corpora.
@@ -143,8 +142,6 @@ public class SearchUI extends AnnisBaseUI
 
   private InstanceConfig instanceConfig;
 
-  private CSSInject css;
-
   private DocBrowserController docBrowserController;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
@@ -201,8 +198,6 @@ public class SearchUI extends AnnisBaseUI
     
     screenshot = new ScreenshotMaker(this);
     addExtension(screenshot);
-
-    css = new CSSInject(this);
 
     layoutToolbar = new HorizontalLayout();
     layoutToolbar.setWidth("100%");
@@ -498,13 +493,13 @@ public class SearchUI extends AnnisBaseUI
 
   private void loadInstanceFonts()
   {
-    if (instanceConfig != null && css != null && instanceConfig.getFont() != null)
+    if (instanceConfig != null && instanceConfig.getFont() != null)
     {
       FontConfig cfg = instanceConfig.getFont();
 
       if (cfg.getSize() == null || cfg.getSize().isEmpty())
       {
-        css.setStyles(
+        injectUniqueCSS(
           "@import url(" + cfg.getUrl() + ");\n"
           + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
           + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
@@ -515,7 +510,7 @@ public class SearchUI extends AnnisBaseUI
       }
       else
       {
-        css.setStyles(
+        injectUniqueCSS(
           "@import url(" + cfg.getUrl() + ");\n"
           + "." + CORPUS_FONT_FORCE + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
@@ -536,7 +531,7 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
-      css.setStyles(
+      injectUniqueCSS(
         // use original font definition from keyboard.css if no font given
         "#keyboardInputMaster tbody tr td table tbody tr td {\n"
         + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
