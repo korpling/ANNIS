@@ -13,9 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
+package annis.gui.resultfetch;
 
-import static annis.gui.ResultFetchJob.log;
+import annis.gui.SearchUI;
+import static annis.gui.resultfetch.ResultFetchJob.log;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
@@ -40,7 +41,8 @@ import java.util.List;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class SingleResultFetchJob implements Runnable
+public class SingleResultFetchJob extends AbstractResultFetchJob implements
+  Runnable
 {
 
   private VisualizerContextChanger visContextChanger;
@@ -79,13 +81,12 @@ public class SingleResultFetchJob implements Runnable
       return;
     }
 
-      List<Match> subList = new LinkedList<Match>();
-          subList.add(match);
-           SaltProject p = executeQuery(subgraphRes, 
-            new MatchGroup(subList), 
-            query.getContextLeft(), query.getContextRight(),
-            query.getSegmentation(), SubgraphFilter.all);
- 
+    List<Match> subList = new LinkedList<Match>();
+    subList.add(match);
+    SaltProject p = executeQuery(subgraphRes,
+      new MatchGroup(subList),
+      query.getContextLeft(), query.getContextRight(),
+      query.getSegmentation(), SubgraphFilter.all);
 
     visContextChanger.updateResult(p, query);
 
@@ -93,31 +94,5 @@ public class SingleResultFetchJob implements Runnable
     {
       return;
     }
-  }
-  
-  private SaltProject executeQuery(WebResource subgraphRes,
-    MatchGroup matches, int left, int right, String segmentation, SubgraphFilter filter)
-  {
-    SaltProject p = null;
-    WebResource res = subgraphRes.queryParam("left", "" + left).queryParam(
-      "right", "" + right);
-    try
-    {
-      if(segmentation != null)
-      {
-        res = res.queryParam("segmentation", segmentation);
-      }
-      if(filter != null)
-      {
-        res = res.queryParam("filter", filter.name());
-      }
-      p = res.post(SaltProject.class, matches);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.error(ex.getMessage(), ex);
-    }
-
-    return p;
   }
 }

@@ -13,8 +13,10 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
+package annis.gui.resultfetch;
 
+import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
@@ -46,7 +48,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-class ResultFetchJob implements Runnable
+public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 {
 
   protected static final Logger log = LoggerFactory.getLogger(
@@ -81,32 +83,6 @@ class ResultFetchJob implements Runnable
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 
-  }
-
-  private SaltProject executeQuery(WebResource subgraphRes,
-    MatchGroup matches, int left, int right, String segmentation, SubgraphFilter filter)
-  {
-    SaltProject p = null;
-    WebResource res = subgraphRes.queryParam("left", "" + left).queryParam(
-      "right", "" + right);
-    try
-    {
-      if(segmentation != null)
-      {
-        res = res.queryParam("segmentation", segmentation);
-      }
-      if(filter != null)
-      {
-        res = res.queryParam("filter", filter.name());
-      }
-      p = res.post(SaltProject.class, matches);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.error(ex.getMessage(), ex);
-    }
-
-    return p;
   }
 
   @Override

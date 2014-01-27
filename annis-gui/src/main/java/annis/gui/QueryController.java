@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
@@ -25,6 +26,7 @@ import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.PollControl;
+import annis.gui.resultfetch.ResultFetchJob;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
@@ -324,7 +326,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();
-    
+
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       lastQueryUUID));
 
@@ -652,7 +654,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       query.setOffset(offset);
       query.setLimit(1);
 
-      if (matches != null && matches.getMatches()!=null 
+      if (matches != null && matches.getMatches() != null
         && !matches.getMatches().isEmpty())
       {
         // The size is the match list corresponds to the page size of the 
