@@ -29,5 +29,19 @@ public class EqualValue extends Join
   {
     super(target);
   }
+
+  @Override
+  public String toAqlOperator()
+  {
+    return "==";
+  }
+
+  @Override
+  public String toString()
+  {
+    return "equal value " + target.getId();
+  }
+  
+  
   
 }
