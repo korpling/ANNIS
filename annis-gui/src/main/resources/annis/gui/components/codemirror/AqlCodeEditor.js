@@ -33,8 +33,13 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     function setPrompt(forceNoFocus)
     {
-      if((forceNoFocus || !cmTextArea.hasFocus()) && cmTextArea.getValue() === "")
+      if(connector.getState().inputPrompt !== ""
+         &&
+         (forceNoFocus || !cmTextArea.hasFocus()) && cmTextArea.getValue() === "")
       {
+        // hack: the setValue should not trigger and onChange event
+        // which will unset the prompt again
+        promptIsShown = false; 
         cmTextArea.setValue(connector.getState().inputPrompt);
         promptIsShown = true;
         $(rootDiv).addClass("aql-code-prompt");
@@ -45,9 +50,13 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     function unsetPrompt()
     {
-      cmTextArea.setValue(connector.getState().text);
-      $(rootDiv).removeClass("aql-code-prompt");
-      promptIsShown = false;
+      if(promptIsShown)
+      {
+        promptIsShown = false;
+        cmTextArea.setValue(connector.getState().text);
+        $(rootDiv).removeClass("aql-code-prompt");
+        
+      }
     }
     
     
@@ -100,7 +109,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
     
     cmTextArea.on("change", function(instance, changeObj)
-    {      
+    { 
+      unsetPrompt();
+      
       if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);

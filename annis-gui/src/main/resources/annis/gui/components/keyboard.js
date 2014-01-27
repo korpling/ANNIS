@@ -1705,8 +1705,9 @@ var VKI_attach, VKI_show, VKI_close;
     {
       // we don't have a real textarea. but a CodeMirror code editor
       var cm = this.VKI_target.CodeMirror;
-      cm.getDoc().replaceRange(text, cm.getCursor());
       cm.focus();
+      cm.getDoc().replaceRange(text, cm.getCursor());
+     // cm.focus();
     }
     else
     {
