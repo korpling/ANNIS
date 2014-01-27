@@ -119,7 +119,7 @@ public class ApAnnotationConditionProvider implements
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "span") 
         + " = " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
     }
-    else if(!node.isToken() && !node.isToken())
+    else if(!node.isToken() && !target.isToken())
     {
       // join on node_anno_ref
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "node_anno_ref") 
