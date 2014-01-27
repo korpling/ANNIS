@@ -16,11 +16,12 @@
 CodeMirror.defineMode("aql", function() {
   return {
     token: function(stream, state) {
-      var ch = stream.next();
-
+      
+      while(stream.eatSpace());
+      
       if(state.position === "string")
       {
-        if(ch === "\"")
+        if(stream.match("\""))
         {
           state.position = "def";
           // the closing quote character should be still highlighted as such
@@ -29,7 +30,7 @@ CodeMirror.defineMode("aql", function() {
       }
       else if(state.position === "string-2")
       {
-        if(ch === "/")
+        if(stream.match("/"))
         {
           state.position = "def";
           // the closing quote character should be still highlighted as such
@@ -38,27 +39,40 @@ CodeMirror.defineMode("aql", function() {
       }
       else
       {
-        if(ch === "\"")
+        if(stream.match("\""))
         {
           state.position = "string"
+          return "string";
         }
-        else if (ch === "/")
+        else if (stream.match("/"))
         {
           state.position = "string-2";
+          return "string-2";
         }
-        else if(ch === "&" || ch === "|")
+        else if(stream.match("&") || stream.match("|"))
         {
           return "operator"
         }
-        else if(ch === "(" || ch === ")")
+        else if(stream.match("(") || stream.match(")"))
         {
           return "bracket";
         }
-        else if(stream.match(/(\.)|(\.\*)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->)|(>@l)|(>@r)|(>\*)|(>)|(\$\*)|(\$)/))
+        else if(stream.match("tok") || stream.match("node"))
+        {
+          return "keyword";
+        }
+        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->)|(>@l)|(>@r)|(>\*)|(>)|(\$\*)|(\$)/))
         {
           return "operator";
         }
+        else if(stream.match(/#[0-9a-zA-Z]+/))
+        {
+          return "variable-2";
+        }
       }
+      
+      // always go to th next character per default
+      stream.next();
 
       return state.position;
     },
