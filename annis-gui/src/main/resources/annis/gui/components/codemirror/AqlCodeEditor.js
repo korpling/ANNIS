@@ -29,6 +29,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       mode: 'aql', 
       lineNumbers: true,
+      lineWrapping: true,
       matchBrackets: true
     });
     
