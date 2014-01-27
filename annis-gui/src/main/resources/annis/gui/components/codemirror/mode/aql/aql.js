@@ -16,46 +16,24 @@
 CodeMirror.defineMode("aql", function() {
   return {
     token: function(stream, state) {
-      var sol = stream.sol() || state.afterSection;
-      var eol = stream.eol();
-
-      state.afterSection = false;
-
-      if (sol) {
-        if (state.nextMultiline) {
-          state.inMultiline = true;
-          state.nextMultiline = false;
-        } else {
-          state.position = "def";
-        }
-      }
-
-      if (eol && ! state.nextMultiline) {
-        state.inMultiline = false;
-        state.position = "def";
-      }
-
-      if (sol) {
-        while(stream.eatSpace());
-      }
-
       var ch = stream.next();
 
-      if (sol && (ch === "%" || ch === "!" || ch === ";")) {
-        state.position = "comment";
-        stream.skipToEnd();
-        return "comment";
-      } else if (sol && ch === "[") {
-        state.afterSection = true;
-        stream.skipTo("]"); stream.eat("]");
-        return "header";
-      } else if (ch === "=" || ch === ":") {
-        state.position = "quote";
-        return null;
-      } else if (ch === "\\" && state.position === "quote") {
-        if (stream.next() !== "u") {    // u = Unicode sequence \u1234
-          // Multiline value
-          state.nextMultiline = true;
+      if (ch === "\"" || ch === "/") 
+      {
+        if(state.position === "quote" && state.quoteChar === ch)
+        {
+          state.quoteChar = null;
+          state.position = "def";
+          // the closing quote character should be still highlighted as such
+          return "quote";
+        }
+        else
+        {
+          if(!state.quoteChar)
+          {
+            state.quoteChar = ch;
+          }
+          state.position = "quote";
         }
       }
 
@@ -64,10 +42,8 @@ CodeMirror.defineMode("aql", function() {
 
     startState: function() {
       return {
-        position : "def",       // Current position, "def", "quote" or "comment"
-        nextMultiline : false,  // Is the next line multiline value
-        inMultiline : false,    // Is the current line a multiline value
-        afterSection : false    // Did we just open a section
+        position : "def",       // Current position, "def" or "quote"
+        quoteChar : null      // starting quote character used if position is inside quote
       };
     }
 
