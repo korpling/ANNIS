@@ -28,7 +28,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var cmTextArea = CodeMirror(rootDiv,
     {
       mode: 'aql', 
-      lineNumbers: true
+      lineNumbers: true,
+      matchBrackets: true
     });
     
     function setPrompt(forceNoFocus)

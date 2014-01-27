@@ -30,7 +30,7 @@ import org.json.JSONException;
  */
 @JavaScript(
 {
-  "vaadin://jquery.js", "lib/codemirror.js", "mode/properties/properties.js", 
+  "vaadin://jquery.js", "lib/codemirror.js", "lib/edit/matchbrackets.js",
   "mode/aql/aql.js", "AqlCodeEditor.js"
 })
 @StyleSheet(

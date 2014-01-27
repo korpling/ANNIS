@@ -50,10 +50,11 @@ CodeMirror.defineMode("aql", function() {
         {
           return "operator"
         }
+        else if(ch === "(" || ch === ")")
+        {
+          return "bracket";
+        }
       }
-      
-      
-      
 
       return state.position;
     },
