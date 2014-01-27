@@ -43,8 +43,8 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  *
  * <p>
  * <strong>Mappings</strong>: <code>vertical: true | false</code> - Defines the
- * alignment of multiple text, e. g. for parralel corpora it is convenient
- * way.</p>
+ * alignment of multiple text, e. g. for parralel corpora it is a convenient
+ * visualization<./p>
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
