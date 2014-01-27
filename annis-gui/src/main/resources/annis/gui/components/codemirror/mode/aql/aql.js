@@ -54,6 +54,10 @@ CodeMirror.defineMode("aql", function() {
         {
           return "bracket";
         }
+        else if(stream.match(/(\.)|(\.\*)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->)|(>@l)|(>@r)|(>\*)|(>)|(\$\*)|(\$)/))
+        {
+          return "operator";
+        }
       }
 
       return state.position;
