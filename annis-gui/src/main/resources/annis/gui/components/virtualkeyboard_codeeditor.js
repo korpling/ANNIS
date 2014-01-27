@@ -16,17 +16,21 @@
 
 window.annis_gui_components_VirtualKeyboardCodeEditor = function() {
     var component = this;
-    var elem = this.getElement(this.getParentId()).children[0];
-        
-    $(elem).bind("langchanged", function(e, newlang) {
+  
+    function getElem()
+    {
+      return component.getElement(component.getParentId()).children[0];
+    }
+  
+    $(getElem()).bind("langchanged", function(e, newlang) {
       component.updateLang(newlang);
     });
     
     this.onStateChange = function() {
-      elem.lang = this.getState().keyboardLayout;
+      getElem().lang = this.getState().keyboardLayout;
     }
     
     this.show = function () {
-      VKI_show(elem);
+      VKI_show(getElem());
     }
 }
