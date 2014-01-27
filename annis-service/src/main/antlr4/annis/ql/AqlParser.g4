@@ -96,6 +96,10 @@ identity
   : IDENTITY 
   ;
 
+equalvalue
+  : EQ_VAL 
+  ;
+
 operator
   : precedence
   | spanrelation
@@ -104,6 +108,7 @@ operator
   | commonparent
   | commonancestor
   | identity
+  | equalvalue
   ;
 
 

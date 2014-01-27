@@ -13,6 +13,7 @@ import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -135,6 +136,9 @@ public abstract class AbstractWhereClauseGenerator extends
         {
           addPointingRelationConditions(conditions, node, target,
               (PointingRelation) join, queryData);
+        } else if (join instanceof EqualValue)
+        {
+          addEqualValueConditions(conditions, node, target, (EqualValue) join, queryData);
         }
       }
 
@@ -234,5 +238,9 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addPointingRelationConditions(
       List<String> conditions, QueryNode node, QueryNode target,
       PointingRelation join, QueryData queryData);
+  
+  protected abstract void addEqualValueConditions(
+      List<String> conditions, QueryNode node, QueryNode target,
+      EqualValue join, QueryData queryData);
 
 }

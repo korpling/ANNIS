@@ -23,6 +23,7 @@ import annis.ql.AqlParser;
 import annis.ql.AqlParserBaseListener;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -185,6 +186,17 @@ public class JoinListener extends AqlParserBaseListener
     left.addJoin(new Precedence(right, 1, segmentationName));
     
   }
+
+  @Override
+  public void enterEqualvalue(AqlParser.EqualvalueContext ctx)
+  {
+    QueryNode left = relationChain.get(relationIdx);
+    QueryNode right = relationChain.get(relationIdx+1);
+    
+    left.addJoin(new EqualValue(right));
+  }
+  
+  
 
 
   @Override

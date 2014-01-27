@@ -37,6 +37,7 @@ import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
@@ -409,6 +410,15 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
+
+  @Override
+  protected void addEqualValueConditions(List<String> conditions, QueryNode node,
+    QueryNode target, EqualValue join, QueryData queryData)
+  {
+    annoCondition.addEqualValueConditions(conditions, node, target, tables(node), tables(
+          target));
+  }
+  
 
   @Override
   protected void addCommonAncestorConditions(List<String> conditions,

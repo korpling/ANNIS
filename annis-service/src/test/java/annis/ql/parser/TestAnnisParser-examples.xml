@@ -79,6 +79,8 @@
     <value><![CDATA[Inf-Stat="new" & PP & #1 _o_ #2]]></value>
     <value><![CDATA[Topic="ab" & Inf-Stat="new" & #1 _i_ #2]]></value>
     <value><![CDATA[( (tok))]]></value>
+    <value><![CDATA[node _id_ node _id_ pos="NN"]]></value>
+    <value><![CDATA[pos . lemma . pos & #1 == #2]]></value>
     <!-- corner cases of OR -->
     <value><![CDATA["das" | "die" | "der"]]></value>
     <value><![CDATA["das" | ("die" & pos="NN" & #2 . #3) | "der"]]></value>

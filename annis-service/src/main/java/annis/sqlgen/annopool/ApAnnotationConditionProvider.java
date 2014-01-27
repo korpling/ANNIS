@@ -24,7 +24,7 @@ import annis.sqlgen.TableAccessStrategy;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 /**
  *
  * @author thomas
@@ -108,4 +108,53 @@ public class ApAnnotationConditionProvider implements
 
     conditions.add(cond);
   }
+
+  @Override
+  public void addEqualValueConditions(List<String> conditions, QueryNode node,
+    QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget)
+  {
+    if(node.isToken() && target.isToken())
+    {
+      // join on span
+      conditions.add(tasNode.aliasedColumn(NODE_TABLE, "span") 
+        + " = " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
+    }
+    else if(!node.isToken() && !node.isToken())
+    {
+      // join on node_anno_ref
+      conditions.add(tasNode.aliasedColumn(NODE_TABLE, "node_anno_ref") 
+        + " = " + tasTarget.aliasedColumn(NODE_TABLE, "node_anno_ref"));
+    }
+    else
+    {
+      // most complex query, join on the actual value
+      String left;
+      if(node.isToken())
+      {
+        left = tasNode.aliasedColumn(NODE_TABLE, "span");
+      }
+      else
+      {
+        left = "getAnnoValue(" 
+          + tasNode.aliasedColumn(NODE_TABLE, "node_anno_ref") + ", "
+          + tasNode.aliasedColumn(NODE_TABLE, "toplevel_corpus") + ", "
+          + "'node')";
+      }
+      String right;
+      if(target.isToken())
+      {
+        right = tasTarget.aliasedColumn(NODE_TABLE, "span");
+      }
+      else
+      {
+        right = "getAnnoValue(" 
+          + tasTarget.aliasedColumn(NODE_TABLE, "node_anno_ref") + ", "
+          + tasTarget.aliasedColumn(NODE_TABLE, "toplevel_corpus") + ", "
+          + "'node')";
+      }
+      conditions.add(left + " = " + right);
+    }
+  }
+  
+  
 }
