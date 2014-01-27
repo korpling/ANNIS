@@ -43,6 +43,7 @@ public interface AnnotationConditionProvider
     QueryData queryData, TableAccessStrategy tas);
   
   public void addEqualValueConditions(List<String> conditions,
-    QueryNode node, QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget);
+    QueryNode node, QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget, 
+    boolean equal);
   
 }

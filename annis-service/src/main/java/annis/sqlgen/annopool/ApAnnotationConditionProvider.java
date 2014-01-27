@@ -111,19 +111,23 @@ public class ApAnnotationConditionProvider implements
 
   @Override
   public void addEqualValueConditions(List<String> conditions, QueryNode node,
-    QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget)
+    QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget,
+    boolean equal)
   {
+    
+    String op = equal ? "=" : "<>";
+    
     if(node.isToken() && target.isToken())
     {
       // join on span
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "span") 
-        + " = " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
+        + " " + op + " " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
     }
     else if(!node.isToken() && !target.isToken())
     {
       // join on node_anno_ref
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "node_anno_ref") 
-        + " = " + tasTarget.aliasedColumn(NODE_TABLE, "node_anno_ref"));
+        + " " + op + " " + tasTarget.aliasedColumn(NODE_TABLE, "node_anno_ref"));
     }
     else
     {
@@ -152,7 +156,7 @@ public class ApAnnotationConditionProvider implements
           + tasTarget.aliasedColumn(NODE_TABLE, "toplevel_corpus") + ", "
           + "'node')";
       }
-      conditions.add(left + " = " + right);
+      conditions.add(left + " " + op + " " + right);
     }
   }
   
