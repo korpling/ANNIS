@@ -46,6 +46,10 @@ CodeMirror.defineMode("aql", function() {
         {
           state.position = "string-2";
         }
+        else if(ch === "&" || ch === "|")
+        {
+          return "operator"
+        }
       }
       
       
