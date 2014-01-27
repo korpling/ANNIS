@@ -18,32 +18,45 @@ CodeMirror.defineMode("aql", function() {
     token: function(stream, state) {
       var ch = stream.next();
 
-      if (ch === "\"" || ch === "/") 
+      if(state.position === "string")
       {
-        if(state.position === "quote" && state.quoteChar === ch)
+        if(ch === "\"")
         {
-          state.quoteChar = null;
           state.position = "def";
           // the closing quote character should be still highlighted as such
-          return "quote";
-        }
-        else
-        {
-          if(!state.quoteChar)
-          {
-            state.quoteChar = ch;
-          }
-          state.position = "quote";
+          return "string";
         }
       }
+      else if(state.position === "string-2")
+      {
+        if(ch === "/")
+        {
+          state.position = "def";
+          // the closing quote character should be still highlighted as such
+          return "string-2";
+        }
+      }
+      else
+      {
+        if(ch === "\"")
+        {
+          state.position = "string"
+        }
+        else if (ch === "/")
+        {
+          state.position = "string-2";
+        }
+      }
+      
+      
+      
 
       return state.position;
     },
 
     startState: function() {
       return {
-        position : "def",       // Current position, "def" or "quote"
-        quoteChar : null      // starting quote character used if position is inside quote
+        position : "def"       // Current position, "def" or "quote"
       };
     }
 
