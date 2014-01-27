@@ -100,6 +100,10 @@ equalvalue
   : EQ_VAL 
   ;
 
+notequalvalue
+  : NEQ 
+  ;
+
 operator
   : precedence
   | spanrelation
@@ -109,6 +113,7 @@ operator
   | commonancestor
   | identity
   | equalvalue
+  | notequalvalue
   ;
 
 

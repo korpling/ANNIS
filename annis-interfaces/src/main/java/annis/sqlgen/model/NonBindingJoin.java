@@ -19,29 +19,15 @@ package annis.sqlgen.model;
 import annis.model.QueryNode;
 
 /**
- * A join that means that two nodes have the same annotation/span value.
+ * Superclass of joins that don't bind two variables
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class EqualValue extends NonBindingJoin
+public abstract class NonBindingJoin extends Join
 {
 
-  public EqualValue(QueryNode target)
+  public NonBindingJoin(QueryNode target)
   {
     super(target);
   }
-
-  @Override
-  public String toAqlOperator()
-  {
-    return "==";
-  }
-
-  @Override
-  public String toString()
-  {
-    return "equal value " + target.getId();
-  }
-  
-  
   
 }

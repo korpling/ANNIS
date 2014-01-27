@@ -19,13 +19,13 @@ package annis.sqlgen.model;
 import annis.model.QueryNode;
 
 /**
- * A join that means that two nodes have the same annotation/span value.
+ * A join that means that two nodes don't have the same annotation/span value.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class EqualValue extends NonBindingJoin
+public class NotEqualValue extends NonBindingJoin
 {
 
-  public EqualValue(QueryNode target)
+  public NotEqualValue(QueryNode target)
   {
     super(target);
   }
@@ -33,13 +33,13 @@ public class EqualValue extends NonBindingJoin
   @Override
   public String toAqlOperator()
   {
-    return "==";
+    return "!=";
   }
 
   @Override
   public String toString()
   {
-    return "equal value " + target.getId();
+    return "not equal value " + target.getId();
   }
   
   

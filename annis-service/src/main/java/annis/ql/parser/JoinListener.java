@@ -30,6 +30,7 @@ import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
@@ -194,6 +195,15 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode right = relationChain.get(relationIdx+1);
     
     left.addJoin(new EqualValue(right));
+  }
+
+  @Override
+  public void enterNotequalvalue(annis.ql.AqlParser.NotequalvalueContext arg0)
+  {
+    QueryNode left = relationChain.get(relationIdx);
+    QueryNode right = relationChain.get(relationIdx+1);
+    
+    left.addJoin(new NotEqualValue(right));
   }
   
   
