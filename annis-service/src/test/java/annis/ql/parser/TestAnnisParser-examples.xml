@@ -98,6 +98,7 @@
     <value><![CDATA[tok & tok & #1 .1,norm #2]]></value>
     <value><![CDATA[tok & tok & #1 .3,norm,4 #2]]></value>
     <value><![CDATA[tok & tok & #1 .2, #2]]></value>
+    <value><![CDATA[pos == lemma]]></value>
 	</util:list>
 	
 </beans>
