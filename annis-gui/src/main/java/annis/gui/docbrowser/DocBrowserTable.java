@@ -447,8 +447,8 @@ public class DocBrowserTable extends Table
 
     // filter the annotations
     for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
-    {
-      if (a.getAnnotationPath().equals(path))
+    { 
+     if (a.getAnnotationPath().equals(path))
       {
         annos.add(a);
       }

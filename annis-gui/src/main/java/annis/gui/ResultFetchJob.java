@@ -49,25 +49,27 @@ import org.slf4j.LoggerFactory;
 class ResultFetchJob implements Runnable
 {
 
-  private static final Logger log = LoggerFactory.getLogger(
+  protected static final Logger log = LoggerFactory.getLogger(
     ResultFetchJob.class);
 
-  private ResultViewPanel resultPanel;
+  protected ResultViewPanel resultPanel;
 
   private Future<MatchGroup> futureMatches;
 
-  private AsyncWebResource res;
+  protected AsyncWebResource res;
 
-  private PagedResultQuery query;
+  protected PagedResultQuery query;
 
-  private SearchUI ui;
+  protected SearchUI ui;
+  private QueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query, ResultViewPanel resultPanel,
-    SearchUI ui)
+    SearchUI ui, QueryController controller)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
+    this.queryController = controller;
 
     res = Helper.getAnnisAsyncWebResource();
 
@@ -135,6 +137,9 @@ class ResultFetchJob implements Runnable
 
       // get the matches
       result = futureMatches.get(60, TimeUnit.SECONDS);
+      
+      // store the matches for later purposes
+      queryController.setMatches(result);
 
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty())
@@ -284,6 +289,5 @@ class ResultFetchJob implements Runnable
         return;
       }
     }
-
   }
 }
