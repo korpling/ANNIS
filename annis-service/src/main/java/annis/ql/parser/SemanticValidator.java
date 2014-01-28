@@ -17,7 +17,9 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.QueryNode;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Join;
+import annis.sqlgen.model.NonBindingJoin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
@@ -151,7 +153,7 @@ public class SemanticValidator implements QueryDataTransformer
     {
       for(Join j : n.getJoins())
       {
-        if(j.getTarget() != null)
+        if(j.getTarget() != null && !(j instanceof NonBindingJoin))
         {
           long left = n.getId();
           long right = j.getTarget().getId();

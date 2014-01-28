@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2014 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,35 +13,35 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package annis.sqlgen.model;
 
 import annis.model.QueryNode;
 
 /**
- *
- * @author thomas
+ * A join that means that two nodes have the same annotation/span value.
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class Identical extends Join
+public class EqualValue extends NonBindingJoin
 {
 
-  public Identical(QueryNode target)
+  public EqualValue(QueryNode target)
   {
     super(target);
   }
 
   @Override
-  public String toString()
+  public String toAqlOperator()
   {
-    return "identical node " + target.getId();
+    return "==";
   }
 
   @Override
-  public String toAqlOperator()
+  public String toString()
   {
-    return "_id_";
+    return "equal value " + target.getId();
   }
   
   
   
-
 }

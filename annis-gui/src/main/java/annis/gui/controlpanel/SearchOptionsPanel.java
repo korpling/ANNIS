@@ -121,7 +121,6 @@ public class SearchOptionsPanel extends FormLayout
     // init the config cache
     lastSelection = new HashMap<String, CorpusConfig>();
 
-
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
     cbResultsPerPage = new ComboBox("Results Per Page");

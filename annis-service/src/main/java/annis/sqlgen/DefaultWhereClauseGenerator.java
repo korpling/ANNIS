@@ -37,12 +37,14 @@ import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
@@ -409,6 +411,25 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
+
+  @Override
+  protected void addEqualValueConditions(List<String> conditions, QueryNode node,
+    QueryNode target, EqualValue join, QueryData queryData)
+  {
+    annoCondition.addEqualValueConditions(conditions, node, target, tables(node), tables(
+          target), true);
+  }
+
+  @Override
+  protected void addNotEqualValueConditions(List<String> conditions,
+    QueryNode node, QueryNode target, NotEqualValue join, QueryData queryData)
+  {
+    annoCondition.addEqualValueConditions(conditions, node, target, tables(node), tables(
+          target), false);
+  }
+  
+  
+  
 
   @Override
   protected void addCommonAncestorConditions(List<String> conditions,

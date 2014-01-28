@@ -96,6 +96,14 @@ identity
   : IDENTITY 
   ;
 
+equalvalue
+  : EQ_VAL 
+  ;
+
+notequalvalue
+  : NEQ 
+  ;
+
 operator
   : precedence
   | spanrelation
@@ -104,6 +112,8 @@ operator
   | commonparent
   | commonancestor
   | identity
+  | equalvalue
+  | notequalvalue
   ;
 
 

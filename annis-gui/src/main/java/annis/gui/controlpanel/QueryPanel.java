@@ -26,6 +26,7 @@ import annis.gui.components.VirtualKeyboard;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -40,6 +41,8 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
@@ -83,9 +86,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private Window historyWindow;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
-
-
-  public QueryPanel(final SearchUI ui)
+  
+  public QueryPanel(SearchUI ui)
   {
     super(4,5);
     
@@ -102,21 +104,16 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
-    
     txtQuery = new AqlCodeEditor();
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
-
-    txtQuery.setSizeFull();
+    txtQuery.setWidth("100%");
+    txtQuery.setHeight(11f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
     txtQuery.addTextChangeListener((TextChangeListener) this);
 
-    txtQuery.setWidth("100%");
-    txtQuery.setHeight(11f, Unit.EM);
-    txtQuery.addTextChangeListener((TextChangeListener) this);
-   
     final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
@@ -125,9 +122,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     else
     {
       virtualKeyboard = new VirtualKeyboardCodeEditor();
-
       virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
-      
       virtualKeyboard.extend(txtQuery);
     }
 
@@ -269,7 +264,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * 3 | STAT| STAT| STAT| STAT
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-//    addComponent(txtQuery, 0, 0, 2, 1);
     addComponent(txtStatus, 0, 3, 3, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);

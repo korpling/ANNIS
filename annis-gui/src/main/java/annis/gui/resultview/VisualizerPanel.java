@@ -51,6 +51,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
+import java.sql.ParameterMetaData;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -131,6 +132,8 @@ public class VisualizerPanel extends CssLayout
 
   private InstanceConfig instanceConfig;
 
+  private VisualizerContextChanger visCtxChanger;
+
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
    * Visualizer.
@@ -160,6 +163,7 @@ public class VisualizerPanel extends CssLayout
     this.markersExact = markedExactMap;
     this.markersCovered = markedAndCoveredMap;
 
+    this.visCtxChanger = parent;
 
     this.result = result;
     this.corpusName = corpusName;
@@ -172,6 +176,9 @@ public class VisualizerPanel extends CssLayout
     this.resultID = resultID;
 
     this.progress = new ProgressBar();
+    this.progress.setIndeterminate(true);
+    this.progress.setVisible(false);
+    this.progress.setEnabled(false);
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -195,7 +202,9 @@ public class VisualizerPanel extends CssLayout
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addClickListener((Button.ClickListener) this);
         btEntry.setDisableOnClick(true);
+        
         addComponent(btEntry);
+        addComponent(progress);
       }
       else
       {
@@ -211,6 +220,8 @@ public class VisualizerPanel extends CssLayout
           btEntry.addClickListener((Button.ClickListener) this);
           addComponent(btEntry);
         }
+        
+        addComponent(progress);
 
         // create the visualizer and calc input
         try
@@ -232,8 +243,7 @@ public class VisualizerPanel extends CssLayout
             ex);
         }
 
-
-        if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        if (btEntry != null && PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
           if (vis != null)
@@ -288,7 +298,6 @@ public class VisualizerPanel extends CssLayout
     {
       input.setFont(instanceConfig.getFont());
     }
-
 
     if (entry != null)
     {
@@ -376,7 +385,15 @@ public class VisualizerPanel extends CssLayout
   @Override
   public void buttonClick(ClickEvent event)
   {
-    toggleVisualizer(!visualizerIsVisible(), null);
+
+    boolean isVisible = !visualizerIsVisible();
+
+    // register new state by the parent SingleResultPanel, so the state will be
+    // still available, after a reload
+    visCtxChanger.registerVisibilityStatus(entry.getId(), isVisible);
+
+    // start the toogle process.
+    toggleVisualizer(isVisible, null);
   }
 
   @Override
@@ -393,16 +410,16 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      // run the actual code to load the visualizer
-      PollControl.runInBackground(500, 50, null, 
-        new BackgroundJob(callback));
-      
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      addComponent(progress);
+      
+      // run the actual code to load the visualizer
+      PollControl.runInBackground(500, 150, null,
+        new BackgroundJob(callback));
+
     } // end if create input was needed
 
   } // end loadVisualizer
@@ -437,7 +454,7 @@ public class VisualizerPanel extends CssLayout
       {
         ((PDFViewer) vis).openPDFPage("-1");
       }
-      if(vis instanceof MediaPlayer)
+      if (vis instanceof MediaPlayer)
       {
         // if this is a media player visualizer, close all other media players
         // since some browsers (e.g. Chrome) have problems if there are multiple
@@ -480,8 +497,8 @@ public class VisualizerPanel extends CssLayout
       }
 
       btEntry.setIcon(ICON_EXPAND);
-    }
 
+    }
   }
 
   public String getHtmlID()
@@ -565,26 +582,26 @@ public class VisualizerPanel extends CssLayout
 
   private class BackgroundJob implements Runnable
   {
+
     private final LoadableVisualizer.Callback callback;
+
     public BackgroundJob(LoadableVisualizer.Callback callback)
     {
       this.callback = callback;
     }
-    
-    
-    
+
     @Override
     public void run()
     {
       ExecutorService execService = Executors.newSingleThreadExecutor();
       final Future<Component> future = execService.submit(
         new LoadComponentTask());
-      
+
       Throwable exception = null;
       try
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
-        
+
         UI.getCurrent().accessSynchronously(new Runnable()
         {
           @Override
@@ -614,8 +631,8 @@ public class VisualizerPanel extends CssLayout
           ex);
         exception = ex;
       }
-      
-      if(exception != null)
+
+      if (exception != null)
       {
         final Throwable finalException = exception;
         UI.getCurrent().accessSynchronously(new Runnable()
@@ -630,7 +647,6 @@ public class VisualizerPanel extends CssLayout
           }
         });
       }
-      
 
     }
   }
@@ -676,6 +692,19 @@ public class VisualizerPanel extends CssLayout
         return null;
       }
       return new ByteArrayInputStream(byteStream.toByteArray());
+    }
+  }
+
+  public String getVisualizerShortName()
+  {
+    if (visPlugin != null)
+    {
+      return visPlugin.getShortName();
+    }
+
+    else
+    {
+      return null;
     }
   }
 }

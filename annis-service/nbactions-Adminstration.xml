@@ -8,7 +8,7 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner delete pcc-3, pcc-11</exec.args>
+                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner import --overwrite /home/thomas/projekte/korpling/korpora/pcc2_v2_relAnnis/</exec.args>
                 <exec.executable>java</exec.executable>
             </properties>
         </action>
@@ -20,7 +20,7 @@
             </goals>
             <properties>
                 <exec.classpathScope>runtime</exec.classpathScope>
-                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner delete pcc-3, pcc-11</exec.args>
+                <exec.args>-Xdebug -Xrunjdwp:transport=dt_socket,server=n,address=${jpda.address} -Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner import --overwrite /home/thomas/projekte/korpling/korpora/pcc2_v2_relAnnis/</exec.args>
                 <jpda.listen>true</jpda.listen>
                 <exec.executable>java</exec.executable>
             </properties>
@@ -32,7 +32,7 @@
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
             </goals>
             <properties>
-                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner delete pcc-3, pcc-11</exec.args>
+                <exec.args>-Dannis.home=src/main/distribution/ -classpath %classpath annis.administration.AnnisAdminRunner import --overwrite /home/thomas/projekte/korpling/korpora/pcc2_v2_relAnnis/</exec.args>
                 <profiler.action>profile</profiler.action>
                 <exec.executable>${profiler.java}</exec.executable>
             </properties>

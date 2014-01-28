@@ -1,11 +1,11 @@
 /*
- * Copyright 2009-2011 Collaborative Research Centre SFB 632 
+ * Copyright 2013 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- *    http://www.apache.org/licenses/LICENSE-2.0
+ *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -13,35 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.model;
 
-import annis.model.QueryNode;
+parser grammar RawAqlPreParser;
 
-/**
- *
- * @author thomas
- */
-public class Identical extends Join
+options
 {
-
-  public Identical(QueryNode target)
-  {
-    super(target);
-  }
-
-  @Override
-  public String toString()
-  {
-    return "identical node " + target.getId();
-  }
-
-  @Override
-  public String toAqlOperator()
-  {
-    return "_id_";
-  }
-  
-  
-  
-
+  language=Java;
+  tokenVocab=AqlLexer;
 }
+
+start
+  : expr EOF
+  ;
+
+expr
+  : expr AND expr # AndExpr
+  | expr OR expr # OrExpr
+  | BRACE_OPEN expr BRACE_CLOSE # BraceExpr
+  | ~(AND | OR | BRACE_OPEN | BRACE_CLOSE)+ # LeafExpr
+  ;
