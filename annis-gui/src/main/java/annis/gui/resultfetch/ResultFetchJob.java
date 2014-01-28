@@ -112,7 +112,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       });
 
       // get the matches
-      result = futureMatches.get(60, TimeUnit.SECONDS);
+      result = futureMatches.get();
       
       // store the matches for later purposes
       queryController.setMatches(result);
@@ -209,10 +209,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           resultPanel.showFinishedSubgraphSearch();
         }
       });
-    }
-    catch (TimeoutException ex)
-    {
-      log.info(null, ex);
     }
     catch (InterruptedException ex)
     {
