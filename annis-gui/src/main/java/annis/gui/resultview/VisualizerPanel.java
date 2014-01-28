@@ -176,6 +176,9 @@ public class VisualizerPanel extends CssLayout
     this.resultID = resultID;
 
     this.progress = new ProgressBar();
+    this.progress.setIndeterminate(true);
+    this.progress.setVisible(false);
+    this.progress.setEnabled(false);
 
     this.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     this.setWidth("100%");
@@ -199,7 +202,9 @@ public class VisualizerPanel extends CssLayout
           + ChameleonTheme.BUTTON_SMALL);
         btEntry.addClickListener((Button.ClickListener) this);
         btEntry.setDisableOnClick(true);
+        
         addComponent(btEntry);
+        addComponent(progress);
       }
       else
       {
@@ -215,6 +220,8 @@ public class VisualizerPanel extends CssLayout
           btEntry.addClickListener((Button.ClickListener) this);
           addComponent(btEntry);
         }
+        
+        addComponent(progress);
 
         // create the visualizer and calc input
         try
@@ -236,7 +243,7 @@ public class VisualizerPanel extends CssLayout
             ex);
         }
 
-        if (PRELOADED.equalsIgnoreCase(entry.getVisibility()))
+        if (btEntry != null && PRELOADED.equalsIgnoreCase(entry.getVisibility()))
         {
           btEntry.setIcon(ICON_EXPAND);
           if (vis != null)
@@ -403,16 +410,16 @@ public class VisualizerPanel extends CssLayout
   {
     if (visPlugin != null)
     {
-      // run the actual code to load the visualizer
-      PollControl.runInBackground(500, 50, null,
-        new BackgroundJob(callback));
-
       btEntry.setIcon(ICON_COLLAPSE);
       progress.setIndeterminate(true);
       progress.setVisible(true);
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
-      addComponent(progress);
+      
+      // run the actual code to load the visualizer
+      PollControl.runInBackground(500, 150, null,
+        new BackgroundJob(callback));
+
     } // end if create input was needed
 
   } // end loadVisualizer
