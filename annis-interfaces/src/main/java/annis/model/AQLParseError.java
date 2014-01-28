@@ -1,5 +1,5 @@
 /*
- * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2014 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,21 +14,18 @@
  * limitations under the License.
  */
 
-package annis.gui.components.codemirror;
-
-import annis.model.AQLParseError;
-import com.vaadin.shared.ui.JavaScriptComponentState;
-import java.util.LinkedList;
-import java.util.List;
+package annis.model;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class AqlCodeEditorState extends JavaScriptComponentState
+public class AQLParseError
 {
-  public String text = ""; 
-  public String inputPrompt = "";
-  public List<AQLParseError> errors = new LinkedList<AQLParseError>();
-
+  public int startLine;
+  public int startColumn;
+  public int endLine;
+  public int endColumn;
+  
+  public String message;
 }

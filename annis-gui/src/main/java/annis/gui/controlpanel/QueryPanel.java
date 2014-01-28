@@ -26,9 +26,10 @@ import annis.gui.components.VirtualKeyboard;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.model.AQLParseError;
+import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -41,8 +42,6 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
@@ -339,9 +338,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     frequencyPanel = null;
   }
 
-
   private void validateQuery(String query)
   {
+    txtQuery.setErrors(null);
     txtStatus.setReadOnly(false);
     
     if(query.isEmpty())
@@ -358,7 +357,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           .get(String.class);
 
         // wait for maximal one seconds
-
         try
         {
           String result = future.get(1, TimeUnit.SECONDS);
@@ -370,6 +368,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           else
           {
             txtStatus.setValue(result);
+            AQLParseError testError = new AQLParseError();
+            testError.startLine = 0;
+            testError.endLine = 0;
+            testError.startColumn = 0;
+            testError.endColumn = 4;
+            testError.message = result;
+            txtQuery.setErrors(Lists.newArrayList(testError));
           }
         }
         catch (InterruptedException ex)
@@ -385,6 +390,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
             if (cause.getResponse().getStatus() == 400)
             {
               txtStatus.setValue(cause.getResponse().getEntity(String.class));
+              
+              AQLParseError testError = new AQLParseError();
+              testError.startLine = 0;
+              testError.endLine = 0;
+              testError.startColumn = 1;
+              testError.endColumn = 4;
+              testError.message = cause.getResponse().getEntity(String.class);
+              txtQuery.setErrors(Lists.newArrayList(testError));
             }
             else
             {

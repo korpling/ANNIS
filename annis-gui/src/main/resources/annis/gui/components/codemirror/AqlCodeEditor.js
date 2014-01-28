@@ -24,13 +24,21 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var changeDelayTime = 500;
     
     var promptIsShown = false;
+    
+    var errorList = [];
 
+    CodeMirror.registerHelper("lint", "aql", function(text) {
+      return errorList;
+    });
+    
     var cmTextArea = CodeMirror(rootDiv,
     {
       mode: 'aql', 
       lineNumbers: true,
       lineWrapping: true,
-      matchBrackets: true
+      matchBrackets: true,
+      gutters: ["CodeMirror-lint-markers"],
+      lint: true
     });
     
     function setPrompt(forceNoFocus)
@@ -61,10 +69,15 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       }
     }
     
-    
-    function sendTextIfNecessary () 
+    this.sendTextIfNecessary = function() 
     {
       var current = cmTextArea.getValue();
+            
+      if(changeDelayTimerID)
+      {
+        window.clearTimeout(changeDelayTimerID);
+      }
+      
       if(promptIsShown)
       {
         current = "";
@@ -74,7 +87,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         var cursor = cmTextArea.getCursor();
         // calculate the absolute cursor position
         var absPos = 0;
-        for(i=0; i < cursor.line; i++)
+        for(var i=0; i < cursor.line; i++)
         {
           absPos += cmTextArea.getLine(i).length;
           absPos++; // add one for the newline
@@ -85,7 +98,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         lastSentText = current;
       }
     };
-
     
     this.onStateChange = function() 
     {
@@ -104,6 +116,21 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         cmTextArea.setCursor(cursor);
       }
       setPrompt(false);
+      
+      // copy all error messages
+      errorList = [];
+      for(var i=0; i < connector.getState().errors.length; i++)
+      {
+        var err = connector.getState().errors[i];
+        errorList.push({
+          from: CodeMirror.Pos(err.startLine, err.startColumn),
+          to: CodeMirror.Pos(err.endLine, err.endColumn),
+          message: err.message
+        });
+      }
+      // hack: re-initialize the lint by re-setting the option
+      cmTextArea.setOption("lint", false);
+      cmTextArea.setOption("lint", true);
     };
     
     this.setChangeDelayTime = function(newDelayTime) {
@@ -118,7 +145,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       {
         window.clearTimeout(changeDelayTimerID);
       }
-      changeDelayTimerID = window.setTimeout(sendTextIfNecessary, changeDelayTime);
+      changeDelayTimerID = window.setTimeout(connector.sendTextIfNecessary, changeDelayTime);
     });
     
     cmTextArea.on("focus", function(instance)
@@ -128,11 +155,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     cmTextArea.on("blur", function(instance)
     {
-      if(changeDelayTimerID)
-      {
-        window.clearTimeout(changeDelayTimerID);
-      }
-      sendTextIfNecessary();
+      connector.sendTextIfNecessary();
       setPrompt(true);
     });
     
