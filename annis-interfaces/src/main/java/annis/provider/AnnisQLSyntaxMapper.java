@@ -16,6 +16,9 @@
 package annis.provider;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
+import java.util.List;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -33,6 +36,7 @@ public class AnnisQLSyntaxMapper implements
   public Response toResponse(AnnisQLSyntaxException exception)
   {
     return Response.status(Response.Status.BAD_REQUEST).entity(
-      exception.getMessage()).type("text/plain").build();
+      new GenericEntity<List<AqlParseError>>(exception.getErrors()) {})
+      .type("application/xml").build();
   }
 }

@@ -16,6 +16,9 @@
 package annis.provider;
 
 import annis.exceptions.AnnisQLSemanticsException;
+import annis.model.AqlParseError;
+import java.util.List;
+import javax.ws.rs.core.GenericEntity;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.ext.ExceptionMapper;
 import javax.ws.rs.ext.Provider;
@@ -32,7 +35,8 @@ public class AnnisQLSemanticsMapper implements
   @Override
   public Response toResponse(AnnisQLSemanticsException exception)
   {
-    return Response.status(Response.Status.BAD_REQUEST).entity("Semantic error: "
-      + exception.getMessage()).type("text/plain").build();
+    return Response.status(Response.Status.BAD_REQUEST).entity(
+      new GenericEntity<List<AqlParseError>>(exception.getErrors()) {})
+      .type("application/xml").build();
   }
 }

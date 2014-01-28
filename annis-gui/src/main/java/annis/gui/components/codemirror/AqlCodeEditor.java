@@ -17,7 +17,7 @@ package annis.gui.components.codemirror;
 
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.Helper;
-import annis.model.AQLParseError;
+import annis.model.AqlParseError;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -115,7 +115,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
         if (!"ok".equalsIgnoreCase(result))
         {
-          AQLParseError testError = new AQLParseError();
+          AqlParseError testError = new AqlParseError();
           testError.startLine = 0;
           testError.endLine = 0;
           testError.startColumn = 0;
@@ -135,7 +135,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
             getCause();
           if (cause.getResponse().getStatus() == 400)
           {
-            AQLParseError testError = new AQLParseError();
+            AqlParseError testError = new AqlParseError();
             testError.startLine = 0;
             testError.endLine = 0;
             testError.startColumn = 1;
@@ -216,15 +216,15 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     return (AqlCodeEditorState) super.getState();
   }
 
-  public void setErrors(List<AQLParseError> errors)
+  public void setErrors(List<AqlParseError> errors)
   {
     if (errors == null)
     {
-      getState().errors = new LinkedList<AQLParseError>();
+      getState().errors = new LinkedList<AqlParseError>();
     }
     else
     {
-      getState().errors = new ArrayList<AQLParseError>(errors);
+      getState().errors = new ArrayList<AqlParseError>(errors);
     }
     markAsDirty();
   }

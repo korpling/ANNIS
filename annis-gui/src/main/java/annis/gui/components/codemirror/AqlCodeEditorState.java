@@ -16,7 +16,7 @@
 
 package annis.gui.components.codemirror;
 
-import annis.model.AQLParseError;
+import annis.model.AqlParseError;
 import com.vaadin.shared.ui.JavaScriptComponentState;
 import java.util.LinkedList;
 import java.util.List;
@@ -29,6 +29,6 @@ public class AqlCodeEditorState extends JavaScriptComponentState
 {
   public String text = ""; 
   public String inputPrompt = "";
-  public List<AQLParseError> errors = new LinkedList<AQLParseError>();
+  public List<AqlParseError> errors = new LinkedList<AqlParseError>();
 
 }

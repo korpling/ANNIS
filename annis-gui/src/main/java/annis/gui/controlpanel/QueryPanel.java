@@ -28,10 +28,12 @@ import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.model.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import annis.model.AQLParseError;
+import annis.model.AqlParseError;
+import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
@@ -53,6 +55,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import javax.ws.rs.core.GenericEntity;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -361,21 +364,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
         {
           String result = future.get(1, TimeUnit.SECONDS);
 
-          if ("ok".equalsIgnoreCase(result))
-          {
-            txtStatus.setValue(lastPublicStatus);
-          }
-          else
-          {
-            txtStatus.setValue(result);
-            AQLParseError testError = new AQLParseError();
-            testError.startLine = 0;
-            testError.endLine = 0;
-            testError.startColumn = 0;
-            testError.endColumn = 4;
-            testError.message = result;
-            txtQuery.setErrors(Lists.newArrayList(testError));
-          }
+          txtStatus.setValue(lastPublicStatus);
+          
         }
         catch (InterruptedException ex)
         {
@@ -389,15 +379,13 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
               getCause();
             if (cause.getResponse().getStatus() == 400)
             {
-              txtStatus.setValue(cause.getResponse().getEntity(String.class));
+          
+              List<AqlParseError> errors = 
+                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
               
-              AQLParseError testError = new AQLParseError();
-              testError.startLine = 0;
-              testError.endLine = 0;
-              testError.startColumn = 1;
-              testError.endColumn = 4;
-              testError.message = cause.getResponse().getEntity(String.class);
-              txtQuery.setErrors(Lists.newArrayList(testError));
+              txtStatus.setValue(Joiner.on("\n").join(errors));
+
+              txtQuery.setErrors(errors);
             }
             else
             {
