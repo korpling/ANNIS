@@ -91,7 +91,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     for(AQLOperator o : AQLOperator.values())
     {
       cbOperator.addItem(o);
-      cbOperator.setItemCaption(o, o.getOp() +  " (" + o.getDescription() + ")");
+      cbOperator.setItemCaption(o, o.getDescription() +  " (" + o.getOp() + ")");
     }
     cbOperator.setValue(null);
     cbOperator.addValueChangeListener(new ValueChangeListener()
