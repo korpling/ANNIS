@@ -113,6 +113,14 @@ public class CorpusConfig implements Serializable
     }
   }
 
+  /**
+   * Checks whether a key exists in the properties.
+   *
+   */
+  public boolean containsKey(String key)
+  {
+    return (config == null) ? false : config.containsKey(key);
+  }
 
   public boolean isEmpty()
   {

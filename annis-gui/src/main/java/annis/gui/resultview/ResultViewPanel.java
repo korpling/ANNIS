@@ -25,7 +25,6 @@ import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
-import annis.libgui.VisibleTokenAnnoChanger;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
@@ -44,6 +43,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +58,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -65,7 +66,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class ResultViewPanel extends VerticalLayout implements
-  OnLoadCallbackExtension.Callback, VisibleTokenAnnoChanger
+  OnLoadCallbackExtension.Callback
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -77,6 +78,8 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+
+  public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
   private PagingComponent paging;
 
@@ -173,8 +176,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
-
-    VaadinSession.getCurrent().setAttribute(VisibleTokenAnnoChanger.class.getName(), this);
   }
 
   /**
@@ -367,8 +368,37 @@ public class ResultViewPanel extends VerticalLayout implements
   private void updateVariables(SaltProject p)
   {
     segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
-    tokenAnnotationLevelSet.addAll(CommonHelper.
-      getTokenAnnotationLevelSet(p));
+    tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+    Set<String> hiddenTokenAnnos = null;
+
+    Set<String> corpusNames = CommonHelper.getCorpusNames(p);
+
+    for (String corpusName : corpusNames)
+    {
+
+      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName);
+
+      if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS))
+      {
+        hiddenTokenAnnos = new HashSet<String>(
+          Arrays.asList(
+            StringUtils.split(
+              corpusConfig.getConfig(MAPPING_HIDDEN_ANNOS), ",")
+          )
+        );
+      }
+    }
+
+    if (hiddenTokenAnnos != null)
+    {
+      for (String tokenLevel : hiddenTokenAnnos)
+      {
+        if (tokenAnnotationLevelSet.contains(tokenLevel))
+        {
+          tokenAnnotationLevelSet.remove(tokenLevel);
+        }
+      }
+    }
 
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
@@ -484,7 +514,6 @@ public class ResultViewPanel extends VerticalLayout implements
     } // end iterate for segmentation layer
   }
 
-  @Override
   public void updateVisibleToken(Set<String> tokenAnnotationLevelSet)
   {
     // if no token annotations are there, do not show this mneu
