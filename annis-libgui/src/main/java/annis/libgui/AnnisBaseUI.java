@@ -20,6 +20,7 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
@@ -476,7 +477,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     {
       alreadyAddedCSS = new TreeSet<String>();
     }
-    String hashForCssContent = Hashing.md5().hashString(cssContent).toString();
+    String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
       Page.getCurrent().getStyles().add(cssContent);
