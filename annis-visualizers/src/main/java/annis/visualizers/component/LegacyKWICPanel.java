@@ -23,7 +23,6 @@ import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.VisibleTokenAnnoChanger;
 import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
 import annis.visualizers.component.grid.EventExtractor;
@@ -191,8 +190,6 @@ public class LegacyKWICPanel extends AbstractVisualizer<KWICInterface>
      */
     private boolean escapeHTML;
 
-    private Set<String> hiddenTokenAnnos = null;
-
     private Set<String> visibleTokenAnnos = new HashSet<String>();
 
     private final String HIDDEN_ANN0S = "hidden_annos";
@@ -212,38 +209,6 @@ public class LegacyKWICPanel extends AbstractVisualizer<KWICInterface>
         escapeHTML = Boolean.parseBoolean(visInput.getMappings().getProperty(
           "escape_html", "true"));
 
-        if (visInput.getMappings().containsKey(HIDDEN_ANN0S))
-        {
-          hiddenTokenAnnos = new HashSet<String>(
-            Arrays.asList(
-              StringUtils.split(
-                visInput.getMappings().getProperty(
-                  "hidden_annos"), ",")
-            )
-          );
-        }
-
-        if (hiddenTokenAnnos != null)
-        {
-          VaadinSession s = VaadinSession.getCurrent();
-
-          if (s != null)
-          {
-            VisibleTokenAnnoChanger v = s.getAttribute(
-              VisibleTokenAnnoChanger.class);
-
-            for (String tokenAnnos : visInput.getVisibleTokenAnnos())
-            {
-              if (!hiddenTokenAnnos.contains(tokenAnnos))
-              {
-                visibleTokenAnnos.add(tokenAnnos);
-              }
-            }
-
-            v.updateVisibleToken(visibleTokenAnnos);
-
-          }
-        }
 
         baseAnnoSet = EventExtractor.computeDisplayAnnotations(visInput,
           SToken.class);
