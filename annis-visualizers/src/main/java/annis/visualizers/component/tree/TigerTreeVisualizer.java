@@ -31,6 +31,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.Serializable;
 import java.util.List;
 import java.util.*;
 import javax.imageio.ImageIO;
@@ -56,7 +57,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private static final int TREE_DISTANCE = 40;
   private transient Java2dBackend backend;
   private final DefaultLabeler labeler;
-  private final DefaultStyler styler;
+  private transient DefaultStyler styler;
   private AnnisGraphTools graphtools;
 
   public class DefaultStyler implements TreeElementStyler
@@ -220,7 +221,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
   }
 
-  private class DefaultLabeler implements TreeElementLabeler
+  private class DefaultLabeler implements TreeElementLabeler, Serializable
   {
 
     @Override
@@ -267,7 +268,18 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   public TigerTreeVisualizer()
   {
     labeler = new DefaultLabeler();
+    initTransients();
+  }
+  
+  private void initTransients()
+  {
     styler = new DefaultStyler(getBackend());
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
   }
 
   @Override

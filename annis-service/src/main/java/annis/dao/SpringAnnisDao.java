@@ -51,14 +51,17 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import com.google.common.base.Charsets;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ListIterator;
 
@@ -328,22 +331,39 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         }
       });
 
+    Closer closer = Closer.create();
     try
     {
-      File dir = getRealDataDir();
-
-      if (fileName == null)
+      try
       {
-        fileName = "corpus_" + toplevelCorpusName +  "_" + UUID.randomUUID() + ".properties";
-        getJdbcTemplate().update(
-          "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-          + "', 'application/text+plain', 'corpus.properties')");
-      }
+        File dir = getRealDataDir();
 
-      log.info("write config file: " + dir + "/" + fileName);
-      Writer f = new FileWriter(new File(
-        dir.getCanonicalPath() + "/" + fileName));
-      props.store(f, "");
+        if (fileName == null)
+        {
+          fileName = "corpus_" + toplevelCorpusName + "_" + UUID.randomUUID() + ".properties";
+          getJdbcTemplate().update(
+            "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+            + "', 'application/text+plain', 'corpus.properties')");
+        }
+
+        log.info("write config file: " + dir + "/" + fileName);
+        FileOutputStream fStream = new FileOutputStream(new File(
+          dir.getCanonicalPath() + "/" + fileName));
+
+        closer.register(fStream);
+
+        OutputStreamWriter writer = new OutputStreamWriter(fStream,
+          Charsets.UTF_8);
+        props.store(writer, "");
+      }
+      catch (Throwable ex)
+      {
+        closer.rethrow(ex);
+      }
+      finally
+      {
+        closer.close();
+      }
     }
     catch (IOException ex)
     {
