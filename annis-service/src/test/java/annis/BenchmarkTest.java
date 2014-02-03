@@ -54,7 +54,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool

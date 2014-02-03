@@ -19,7 +19,7 @@ import com.vaadin.shared.communication.ServerRpc;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface AutoHeightIFrameServerRpc extends ServerRpc
 {

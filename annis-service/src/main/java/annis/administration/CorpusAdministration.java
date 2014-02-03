@@ -23,10 +23,26 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.CommonHelper;
+import annis.administration.AdministrationDao.ImportStats;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
+import annis.utils.RelANNISHelper;
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.util.ArrayList;
+import java.util.Enumeration;
+import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 import javax.mail.internet.InternetAddress;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
@@ -34,12 +50,13 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private SchemeFixer schemeFixer;
   private String statusMailSender;
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -79,6 +96,12 @@ public class CorpusAdministration
 
     // write database information to property file
     writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
+    
+    // create tables and other stuff that is handled by the scheme fixer
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
   }
 
   /**
@@ -86,68 +109,316 @@ public class CorpusAdministration
    * {@link DefaultAdministrationDao.ConflictingCorpusException} when the
    * overwrite flag is set to false.
    *
-   * @param paths Valid pathes to corpora.
+   *
    * @param overwrite If set to false, a conflicting corpus is not silently
    * reimported.
-   * @param waitForOtherTasks If true wait for other imports to finish, 
-   * if false abort the import.
+   * @param aliasName An common alias name for all imported corpora or null
+   * @param statusEmailAdress an email adress for informating the admin about
+   * statuses
+   * @param waitForOtherTasks If true wait for other imports to finish, if false
+   * abort the import.
+   * @param paths Valid pathes to corpora.
    * @return True if all corpora where imported successfully.
-   */
-  public boolean importCorporaSave(boolean overwrite, 
+   */  
+  public ImportStats importCorporaSave(boolean overwrite,
+    String aliasName,
     String statusEmailAdress, boolean waitForOtherTasks, List<String> paths)
   {
-    boolean result = true;
+
+    // init the import stats. From the beginning everything is ok
+    ImportStats importStats = new ImportStatsImpl();
+    importStats.setStatus(true);
+
+    // check if database scheme is ok
+    if(schemeFixer != null)
+    {
+      schemeFixer.checkAndFix();
+    }
     
-    // import each corpus
-    for (String path : paths)
+    List<File> roots = new LinkedList<File>();
+    for(String path : paths)
+    {
+      File f = new File(path);
+      
+      if(f.isFile())
+      {
+        // might be a ZIP-file
+        ZipFile zip = null;
+        try
+        {
+          zip = new ZipFile(f);          
+          // get the names of all corpora included in the ZIP file
+          // in order to get a folder name
+          Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
+          
+          // unzip and add all resulting corpora to import list
+          log.info("Unzipping " + f.getPath());
+          File outDir = createZIPOutputDir(Joiner.on(", ").join(corpora.keySet()));
+          roots.addAll(unzipCorpus(outDir, zip));
+          
+          zip.close();
+        }
+        catch(ZipException ex)
+        {
+          log.error("" + f.getAbsolutePath() + " might not be a valid ZIP file and will be ignored", ex);
+        }
+        catch(IOException ex)
+        {
+          log.error("IOException when importing file " + f.getAbsolutePath() + ", will be ignored", ex);
+        }
+        finally
+        {
+          if(zip != null)
+          {
+            try
+            {
+              zip.close();
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
+      }
+      else
+      {
+        try
+        {
+          roots.addAll(RelANNISHelper.corporaInDirectory(f).values());
+        }
+        catch(IOException ex)
+        {
+          log.error("Could not find any corpus in " + f.getPath(), ex);
+        }
+      }
+    } // end for each given path
+    
+    // import each corpus separately
+    for (File r : roots)
     {
       try
       {
-        log.info("Importing corpus from: " + path);
-        if(administrationDao.importCorpus(path, overwrite, waitForOtherTasks))
+        log.info("Importing corpus from: " + r.getPath());
+        if(administrationDao.importCorpus(r.getPath(), aliasName,
+          overwrite, waitForOtherTasks))
         {
-          log.info("Finished import from: " + path);
-          sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
+          log.info("Finished import from: " + r.getPath());
+          sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.SUCCESS, null);
         }
         else
         {
-          result = false;
-          sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, null);
+          importStats.setStatus(false);
+          sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, null);
         }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
-        result = false;
-        log.error(ex.getMessage());
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
+        importStats.setStatus(false);
+        importStats.addException(r.getPath(), ex);
+        log.error("Error on conflicting top level corpus name for {}", r.getPath());
+        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.
+          getMessage());
       }
-      catch(Throwable ex)
+      catch (org.springframework.transaction.CannotCreateTransactionException ex)
       {
-        result = false;
+        log.error("Postgres is not running or misconfigured");
+      }
+      catch (Throwable ex)
+      {
+        importStats.setStatus(false);
+        importStats.addException(r.getPath(), ex);
         log.error("Error on importing corpus", ex);
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.getMessage());
+        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.
+          getMessage());
       }
     }
-    
-    return result;
+
+    return importStats;
   }
   
-  public void sendStatusMail(String adress, String corpusPath, 
+  /**
+   * Extract the zipped relANNIS corpus files to an output directory.
+   * 
+   * @param outDir The ouput directory.
+   * @param zip ZIP-file to extract.
+   * @return A list of root directories where the tab-files are located if found, null otherwise.
+   */
+  private List<File> unzipCorpus(File outDir, ZipFile zip)
+  {
+    List<File> rootDirs = new ArrayList<File>();
+
+    Enumeration<? extends ZipEntry> zipEnum = zip.entries();
+    while (zipEnum.hasMoreElements())
+    {
+      ZipEntry e = zipEnum.nextElement();
+      File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
+      outFile.deleteOnExit();
+
+      if (e.isDirectory())
+      {
+        if (!outFile.mkdirs())
+        {
+          log.warn("Could not create temporary directory " + outFile.
+            getAbsolutePath());
+        }
+      } // end if directory
+      else
+      {
+        if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
+          outFile.getName()))
+        {
+          rootDirs.add(outFile.getParentFile());
+        }
+
+        FileOutputStream outStream = null;
+        try
+        {
+          outStream = new FileOutputStream(outFile);
+          ByteStreams.copy(zip.getInputStream(e), outStream);
+        }
+        catch (FileNotFoundException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+        finally
+        {
+          if (outStream != null)
+          {
+            try
+            {
+              outStream.close();
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
+      } // end else is file
+    } // end for each entry in zip file
+
+    return rootDirs;
+  }
+  
+  public File createZIPOutputDir(String corpusName)
+  {
+    File outDir = new File(System.getProperty("user.home"),
+      ".annis/zip-imports/"
+      + CommonHelper.getSafeFileName(corpusName));
+    if (outDir.exists())
+    {
+      try
+      {
+        // delete old data inside the corpus directory
+        FileUtils.deleteDirectory(outDir);
+      }
+      catch (IOException ex)
+      {
+        log.warn("Could not recursivly delete the output directory", ex);
+      }
+    }
+    if (!outDir.mkdirs())
+    {
+      throw new IllegalStateException("Could not create directory "
+        + outDir.getAbsolutePath());
+    }
+    return outDir;
+  }
+  
+  private class ImportStatsImpl implements AdministrationDao.ImportStats
+  {
+
+    private boolean status;
+
+    private final Map<String, List<Throwable>> exceptions;
+
+    public ImportStatsImpl()
+    {
+      exceptions = new HashMap<String, List<Throwable>>();
+    }
+
+    @Override
+    public boolean getStatus()
+    {
+      return status;
+    }
+
+    @Override
+    public List<Throwable> getExceptions()
+    {
+      List<Throwable> allThrowables = new ArrayList<Throwable>();
+
+      for (List<Throwable> l : exceptions.values())
+      {
+        allThrowables.addAll(l);
+      }
+
+      return allThrowables;
+    }
+
+    @Override
+    public List<Throwable> getExceptions(String corpusName)
+    {
+      return exceptions.get(corpusName);
+    }
+
+    @Override
+    public void addException(String corpusName, Throwable ex)
+    {
+      if (!exceptions.containsKey(corpusName))
+      {
+        exceptions.put(corpusName, new ArrayList<Throwable>());
+      }
+
+      exceptions.get(corpusName).add(ex);
+    }
+
+    @Override
+    public void setStatus(boolean status)
+    {
+      this.status = status;
+    }
+
+    @Override
+    public void add(ImportStats importStats)
+    {
+      if (importStats == null)
+      {
+        return;
+      }
+
+      status &= importStats.getStatus();
+      exceptions.putAll(importStats.getThrowables());
+    }
+
+    @Override
+    public Map<String, List<Throwable>> getThrowables()
+    {
+      return exceptions;
+    }
+  }
+
+  public void sendStatusMail(String adress, String corpusPath,
     ImportJob.Status status, String additionalInfo)
   {
-    if(adress == null || corpusPath == null)
+    if (adress == null || corpusPath == null)
     {
       return;
     }
-    
+
     // check valid properties
-    if(statusMailSender == null || statusMailSender.isEmpty())
+    if (statusMailSender == null || statusMailSender.isEmpty())
     {
       log.warn("Could not send status mail because \"annis.mail-sender\" "
         + "property was not configured in conf/annis-service-properties.");
       return;
     }
-    
+
     try
     {
       SimpleEmail mail = new SimpleEmail();
@@ -235,6 +506,7 @@ public class CorpusAdministration
    *
    * @param overwrite if false, a conflicting top level corpus is silently
    * skipped.
+   * @param aliasName An common alias name for all imported corpora or null
    * @param statusEmailAdress If not null the email adress of the user who 
    * started the import.
    * @param waitForOtherTasks If true wait for other imports to finish, 
@@ -242,11 +514,12 @@ public class CorpusAdministration
    * @param paths the paths to the corpora
    * @return True if all corpora where imported successfully.
    */
-  public boolean importCorporaSave(boolean overwrite, String statusEmailAdress, 
-    boolean waitForOtherTasks, String... paths)
+  public ImportStats importCorporaSave(boolean overwrite,
+  	String aliasName,
+    String statusEmailAdress, boolean waitForOtherTasks, String... paths)
   {
-    return importCorporaSave(overwrite, statusEmailAdress,
-      waitForOtherTasks,
+    return importCorporaSave(overwrite, aliasName, 
+      statusEmailAdress, waitForOtherTasks,
       Arrays.asList(paths));
   }
 
@@ -325,6 +598,17 @@ public class CorpusAdministration
   {
     this.statusMailSender = statusMailSender;
   }
+
+  public SchemeFixer getSchemeFixer()
+  {
+    return schemeFixer;
+  }
+
+  public void setSchemeFixer(SchemeFixer schemeFixer)
+  {
+    this.schemeFixer = schemeFixer;
+  }
+  
   
   
   

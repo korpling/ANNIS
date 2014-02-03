@@ -23,7 +23,7 @@ import org.apache.commons.lang3.Validate;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotationNameAndValueMatcher implements SpanMatcher
 {
@@ -32,15 +32,17 @@ public class AnnotationNameAndValueMatcher implements SpanMatcher
 
   /**
    * 
+   * @param annotationNamespace
    * @param annotationName 
    * @param annotationValue
    */
-  public AnnotationNameAndValueMatcher(String annotationName, String annotationValue)
+  public AnnotationNameAndValueMatcher(String annotationNamespace, 
+    String annotationName, String annotationValue)
   {
     Validate.notNull(annotationName, "The annotation name parameter must never be null.");
     Validate.notNull(annotationValue, "The annotation value parameter must never be null.");
     
-    this.nameMatcher = new AnnotationNameMatcher(annotationName);
+    this.nameMatcher = new AnnotationNameMatcher(annotationNamespace, annotationName);
     this.annotationValue = annotationValue;
   }
   

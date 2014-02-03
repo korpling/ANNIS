@@ -35,10 +35,6 @@
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
   </servlet>
-  <filter>
-    <filter-name>Push_Mime</filter-name>
-    <filter-class>annis.gui.FixPushMimeFilter</filter-class>
-  </filter>
   <!--
   <servlet>
     <servlet-name>Admin</servlet-name>
@@ -64,14 +60,6 @@
     <servlet-name>ResourceServlet</servlet-name>
     <servlet-class>annis.gui.servlets.ResourceServlet</servlet-class>
   </servlet>
-  <servlet>
-    <servlet-name>BinaryServlet</servlet-name>
-    <servlet-class>annis.gui.servlets.BinaryServlet</servlet-class>
-  </servlet>
-  <servlet>
-    <servlet-name>LoginServlet</servlet-name>
-    <servlet-class>annis.gui.servlets.LoginServlet</servlet-class>
-  </servlet>
 
   <servlet-mapping>
     <servlet-name>Search</servlet-name>
@@ -91,18 +79,5 @@
     <servlet-name>ResourceServlet</servlet-name>
     <url-pattern>/Resource/*</url-pattern>
   </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>BinaryServlet</servlet-name>
-    <url-pattern>/Binary/*</url-pattern>
-  </servlet-mapping>
-  <servlet-mapping>
-    <servlet-name>LoginServlet</servlet-name>
-    <url-pattern>/login</url-pattern>
-  </servlet-mapping>
-    
-  <filter-mapping>>
-    <filter-name>Push_Mime</filter-name>
-    <url-pattern>/PUSH/*</url-pattern>
-  </filter-mapping>
-    
+  
 </web-app>

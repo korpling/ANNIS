@@ -32,7 +32,7 @@ import org.apache.commons.lang3.Validate;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class HelpButton<T> extends CustomComponent implements Field<T>,
   Button.ClickListener

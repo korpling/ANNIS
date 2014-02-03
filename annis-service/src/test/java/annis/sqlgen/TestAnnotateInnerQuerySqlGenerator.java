@@ -72,6 +72,7 @@ public class TestAnnotateInnerQuerySqlGenerator
     given(annotateQueryData.getRight()).willReturn(right);
     given(queryData.getExtensions(AnnotateQueryData.class)).willReturn(
       extensions);    
+    given(queryData.getMaxWidth()).willReturn(alternative.size());
     
     String key1Column1 = uniqueAlphaString();
     String key1Column2 = uniqueAlphaString();

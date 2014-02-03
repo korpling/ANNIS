@@ -17,26 +17,39 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import annis.service.objects.AnnisCorpus;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 public abstract class AbstractFromClauseGenerator 
 	extends TableAccessStrategyFactory 
 	implements FromClauseSqlGenerator<QueryData>
 {
+  
+    protected String tableAliasDefinition(QueryNode node, String table,
+      int count)
+    {
+      return tableAliasDefinition(node, table, count, new LinkedList<Long>());
+    }
 
-    protected String tableAliasDefinition(QueryNode node, String table, int count)
+    protected String tableAliasDefinition(QueryNode node, String table, 
+      int count, List<Long> corpora)
 	  {
-      return tableAliasDefinition(tables(node).getTableAliases(), node, table, count);
+      TableAccessStrategy tas = tables(node);
+      return tableAliasDefinition(tas, node, table, 
+        count, corpora);
     }
   
-	  public static String tableAliasDefinition(
-      Map<String, String> tableAliases, QueryNode node, String table, int count)
+	  public static String tableAliasDefinition(TableAccessStrategy tas, 
+      QueryNode node, String table, 
+      int count, List<Long> corpora)
 	  {
 	    StringBuilder sb = new StringBuilder();
 
-	    sb.append(TableAccessStrategy.tableName(tableAliases, table));
+	    sb.append(tas.partitionTableName(table, corpora));
 	    sb.append(" AS ");
-	    sb.append(TableAccessStrategy.aliasedTable(node, tableAliases, table, count));
+	    sb.append(TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), table, count));
 
 	    return sb.toString();
 	  }

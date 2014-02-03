@@ -24,7 +24,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 
 /**
  * Panel that displays an image.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ImagePanel extends Panel
 {

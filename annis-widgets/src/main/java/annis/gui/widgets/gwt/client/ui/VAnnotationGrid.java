@@ -27,6 +27,7 @@ import com.google.gwt.user.client.ui.HTMLTable.Cell;
 import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
+import com.vaadin.client.Util;
 import com.vaadin.client.VConsole;
 import com.vaadin.client.ui.VLabel;
 
@@ -69,6 +70,12 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   // build maps row and col to a pdf page number
   private Map<Position, String> pdfPageNumbers;
+
+  /**
+   * when true, all html tags are rendered as text and are shown in grid cells.
+   * Does not effect row captions.
+   */
+  private boolean escapeHTML = true;
 
   /**
    * The constructor should first call super() to initialize the component and
@@ -121,6 +128,10 @@ public class VAnnotationGrid extends Composite implements Paintable
 
     try
     {
+      if (uidl.hasAttribute("escapeHTML")){
+        this.escapeHTML = uidl.getBooleanAttribute("escapeHTML");
+      }
+
       UIDL rows = uidl.getChildByTagName("rows");
       if (rows != null)
       {
@@ -176,14 +187,23 @@ public class VAnnotationGrid extends Composite implements Paintable
 
   private void addRow(UIDL row, int rowNumber)
   {
+    
+    
     String caption = row.getStringAttribute("caption");
     String[] captionSplit = caption.split("::");
     String name = captionSplit[captionSplit.length - 1];
+    
+    boolean showCaption = row.getBooleanAttribute("show-caption");
 
-    VLabel lblCaption = new VLabel(name);
-    table.setWidget(rowNumber, 0, lblCaption);
-    formatter.addStyleName(rowNumber, 0, "header");
-
+    int startColumn = 0;
+    
+    if(showCaption)
+    {
+      table.setHTML(rowNumber, 0, Util.escapeHTML(name));
+      formatter.addStyleName(rowNumber, 0, "header");
+      startColumn = 1;
+    }
+    
     int colspanOffset = 0;
 
     UIDL events = row.getChildByTagName("events");
@@ -194,24 +214,30 @@ public class VAnnotationGrid extends Composite implements Paintable
       int left = event.getIntAttribute("left");
       int right = event.getIntAttribute("right");
       String value = event.getStringAttribute("value");
-
-      VLabel label = new VLabel(value);
-
-      if (event.hasAttribute("tooltip"))
+      if(escapeHTML)
       {
-        label.setTitle(event.getStringAttribute("tooltip"));
+        value = Util.escapeHTML(value);
       }
-      else
-      {
-        label.setTitle(caption);
-      }
+      
 
       // +1 because we also have a caption column, subtract columns we
       // jumped over by using colspan
-      int col = left + 1 - colspanOffset;
+      int col = left + startColumn - colspanOffset;
 
-      // add table cell
-      table.setWidget(rowNumber, col, label);
+      if (event.hasAttribute("tooltip"))
+      {
+        VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
+        label.setTitle(event.getStringAttribute("tooltip"));
+
+        // add a label with a title as table cell
+        table.setWidget(rowNumber, col, label);
+      }
+      else
+      {
+        // don't use label since it will produce an extra "div"
+        table.setHTML(rowNumber, col, value);
+      }
+      
       position2id.put(new Position(rowNumber, col), id);
 
       int colspan = right - left + 1;
@@ -291,7 +317,6 @@ public class VAnnotationGrid extends Composite implements Paintable
       }
 
     }
-
 
     if (pdfPageNumbers.containsKey(pos))
     {

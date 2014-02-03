@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.CSVHelper;
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
@@ -46,15 +47,19 @@ import annis.sqlgen.ListCorpusSqlHelper;
 import annis.sqlgen.ListExampleQueriesHelper;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.MetaByteHelper;
+import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.util.ListIterator;
 
 import java.io.IOException;
@@ -63,6 +68,7 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
@@ -78,7 +84,7 @@ import java.util.Properties;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import org.apache.commons.io.input.BoundedInputStream;
+import java.util.UUID;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -115,6 +121,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private FrequencySqlGenerator frequencySqlGenerator;
 
+  // reads the raw text entries of relannis format, originally placed in text.tab
+  private RawTextSqlHelper rawTextHelper;
 
   private String externalFilesPath;
 
@@ -122,8 +130,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private int timeout;
   // fn: corpus id -> corpus name
-
-  private Map<Long, String> corpusNamesById;
 
   @Override
   @Transactional
@@ -235,6 +241,116 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return corpusConfiguration;
   }
 
+  @Override
+  public List<String> getRawText(String topLevelCorpus, String documentName)
+  {
+    if (topLevelCorpus == null || documentName == null)
+    {
+      throw new IllegalArgumentException(
+        "top level corpus and document name may not be null");
+    }
+
+    long topLevelCorpusId = mapCorpusNameToId(topLevelCorpus);
+    return (List<String>) getJdbcTemplate().query(rawTextHelper.createSQL(
+      topLevelCorpusId, documentName), rawTextHelper);
+
+  }
+
+  @Override
+  public List<String> getRawText(String topLevelCorpus)
+  {
+    if (topLevelCorpus == null)
+    {
+      throw new IllegalArgumentException("corpus name may not be null");
+    }
+
+    long id = mapCorpusNameToId(topLevelCorpus);
+    String sql = rawTextHelper.createSQL(id);
+    return (List<String>) getJdbcTemplate().query(sql, rawTextHelper);
+  }
+
+  /**
+   * @return the rawTextHelper
+   */
+  public RawTextSqlHelper getRawTextHelper()
+  {
+    return rawTextHelper;
+  }
+
+  /**
+   * @param rawTextHelper the rawTextHelper to set
+   */
+  public void setRawTextHelper(RawTextSqlHelper rawTextHelper)
+  {
+    this.rawTextHelper = rawTextHelper;
+  }
+
+  @Override
+  public String mapCorpusIdToName(long corpusId)
+  {
+
+    List<Long> ids = new ArrayList<Long>();
+    ids.add(corpusId);
+    List<String> names = mapCorpusIdsToNames(ids);
+
+    if (names == null || names.isEmpty())
+    {
+      String msg = "corpus is not known to the system";
+      throw new DataAccessException(msg)
+      {
+      };
+    }
+
+    return names.get(0);
+
+  }
+
+  @Override
+  public void setCorpusConfiguration(String toplevelCorpusName, Properties props)
+  {
+    long corpusID = mapCorpusNameToId(toplevelCorpusName);
+    
+    String sql = "SELECT filename FROM media_files "
+      + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
+    String fileName = getJdbcTemplate().query(sql,
+      new ResultSetExtractor<String>()
+      {
+
+        @Override
+        public String extractData(ResultSet rs) throws SQLException, DataAccessException
+        {
+          while (rs.next())
+          {
+            return rs.getString("filename");
+          }
+
+          return null;
+        }
+      });
+
+    try
+    {
+      File dir = getRealDataDir();
+
+      if (fileName == null)
+      {
+        fileName = "corpus_" + toplevelCorpusName +  "_" + UUID.randomUUID() + ".properties";
+        getJdbcTemplate().update(
+          "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+          + "', 'application/text+plain', 'corpus.properties')");
+      }
+
+      log.info("write config file: " + dir + "/" + fileName);
+      Writer f = new FileWriter(new File(
+        dir.getCanonicalPath() + "/" + fileName));
+      props.store(f, "");
+    }
+    catch (IOException ex)
+    {
+      log.error("error: write back the corpus.properties configuration", ex);
+    }
+  }
+
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
@@ -333,6 +449,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
+  @Transactional(readOnly = true)
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator)
   {
@@ -343,18 +460,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
     List<String> names = new ArrayList<String>();
-    if (corpusNamesById == null)
+   
+    Map<Long, String> corpusNamesById = new TreeMap<Long, String>();
+    List<AnnisCorpus> corpora = listCorpora();
+    for (AnnisCorpus corpus : corpora)
     {
-      corpusNamesById = new TreeMap<Long, String>();
-      List<AnnisCorpus> corpora = listCorpora();
-      for (AnnisCorpus corpus : corpora)
-      {
-        corpusNamesById.put(corpus.getId(), corpus.getName());
-      }
+      corpusNamesById.put(corpus.getId(), corpus.getName());
     }
+
     for (Long id : ids)
     {
-      names.add(corpusNamesById.get(id));
+      if (corpusNamesById.containsKey(id))
+      {
+        names.add(corpusNamesById.get(id));
+      }
     }
     return names;
   }
@@ -379,7 +498,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
-  @Transactional
+  @Transactional(readOnly = true)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator,
@@ -509,7 +628,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public void matrix(final QueryData queryData, final OutputStream out)
+  public void matrix(final QueryData queryData, final boolean outputCsv, final OutputStream out)
   {
     prepareTransaction(queryData);
 
@@ -528,13 +647,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
           // write the header to the output stream
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-          SortedMap<Integer, SortedSet<String>> columnsByNodePos =
-            WekaHelper.exportArffHeader(itMatches, w);
-          w.flush();
+          
+          if(outputCsv)
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = CSVHelper.exportCSVHeder(itMatches, w);
+            w.flush();
 
-          // go back to the beginning and print the actual data
-          itMatches.reset();
-          WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            CSVHelper.exportCSVData(itMatches, columnsByNodePos, w);
+          }
+          else
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = WekaHelper.exportArffHeader(itMatches, w);
+            w.flush();
+
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+          }
           w.flush();
 
           rs.close();
@@ -600,6 +733,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     return (List<AnnisCorpus>) getJdbcTemplate().query(
       listCorpusSqlHelper.createSqlQuery(), listCorpusSqlHelper);
+  }
+  
+  @Override
+  @Transactional(readOnly = true)
+  public List<AnnisCorpus> listCorpora(List<Long> ids)
+  { 
+    return (List<AnnisCorpus>) getJdbcTemplate().query(
+      listCorpusSqlHelper.createSqlQueryWithList(ids.size()),
+      listCorpusSqlHelper, ids.toArray());
   }
 
   @Override
@@ -1024,16 +1166,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
 
       long fileSize = dataFile.length();
-
-      // do not make the array bigger as necessary
-      length = (int) Math.min(fileSize - (long) offset, (long) length);
+      
+      Preconditions.checkArgument(offset+length <= fileSize, 
+        "Range larger than the actual file size requested. Actual file size is %d bytes, %d bytes were requested.",
+        fileSize, offset+length);
 
       FileInputStream fInput = new FileInputStream(dataFile);
-      fInput.skip(offset);
-
-      BoundedInputStream boundedStream = new BoundedInputStream(fInput, length);
-
-      return boundedStream;
+      ByteStreams.skipFully(fInput, offset);
+      return ByteStreams.limit(fInput, length);
     }
     catch (FileNotFoundException ex)
     {
@@ -1065,6 +1205,20 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       singleEntry.setLength((int) f.length());
     }
     return metaData;
+  }
+  
+  @Override
+  public List<Long> mapCorpusAliasToIds(String alias)
+  {
+    try
+    {
+      return getJdbcTemplate().queryForList("SELECT corpus_ref FROM corpus_alias WHERE alias=?", 
+        Long.class, alias);
+    }
+    catch(DataAccessException ex)
+    {
+      return new LinkedList<Long>();
+    }
   }
 
   public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
@@ -1132,5 +1286,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     ListExampleQueriesHelper listExampleQueriesHelper)
   {
     this.listExampleQueriesHelper = listExampleQueriesHelper;
+  }
+
+  @Override
+  public long mapCorpusNameToId(String topLevelCorpus)
+  {
+    if (topLevelCorpus == null)
+    {
+      throw new IllegalArgumentException("corpus name may not be null");
+    }
+
+    List<String> corpusNames = new ArrayList<String>();
+    corpusNames.add(topLevelCorpus);
+    List<Long> corpusIds =  mapCorpusNamesToIds(corpusNames);
+
+    if (corpusIds == null || corpusIds.isEmpty())
+    {
+      throw new IllegalArgumentException("corpus name \"" +topLevelCorpus+"\" is not known to the system");
+    }
+
+    // corpus names of top level corpora are unique.
+    return corpusIds.get(0);
   }
 }

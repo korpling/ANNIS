@@ -17,7 +17,7 @@ package annis.service.objects;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public enum FrequencyTableEntryType
 {

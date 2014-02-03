@@ -17,7 +17,6 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.CorpusBrowserPanel;
-import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
 import annis.security.AnnisUserConfig;
@@ -26,6 +25,10 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -111,7 +114,7 @@ public class CorpusListPanel extends VerticalLayout implements
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
 
   private InstanceConfig instanceConfig;
-
+  
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
@@ -124,8 +127,6 @@ public class CorpusListPanel extends VerticalLayout implements
     final CorpusListPanel finalThis = this;
 
     setSizeFull();
-//    setHeight("99%");
-//    setWidth("99%");
 
     HorizontalLayout selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");
@@ -204,9 +205,11 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     txtFilter.setWidth("100%");
+    txtFilter.setHeight("-1px");
     addComponent(txtFilter);
 
     tblCorpora = new Table();
+    
     addComponent(tblCorpora);
 
     corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
@@ -222,8 +225,8 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "info",
       "docs");
     tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "", "");
-    tblCorpora.setHeight(100f, UNITS_PERCENTAGE);
-    tblCorpora.setWidth(100f, UNITS_PERCENTAGE);
+    tblCorpora.setHeight("100%");
+    tblCorpora.setWidth("100%");
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
     tblCorpora.setNullSelectionAllowed(false);
@@ -231,7 +234,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.setColumnWidth("info", 19);
-
+    
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
     tblCorpora.addItemClickListener(new ItemClickEvent.ItemClickListener()
@@ -247,6 +250,7 @@ public class CorpusListPanel extends VerticalLayout implements
         }
       }
     });
+    tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
 
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
@@ -281,6 +285,11 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void updateCorpusSetList(boolean showLoginMessage)
   {
+    if(ui != null)
+    {
+      ui.clearCorpusConfigCache();
+    }
+    
     if (queryServerForCorpusList() && userConfig != null)
     {
       if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
@@ -609,7 +618,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     }
   }
-
+  
   public static class CorpusSorter extends DefaultItemSorter
   {
 
@@ -675,15 +684,24 @@ public class CorpusListPanel extends VerticalLayout implements
       Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(DOC_ICON);
-      l.setDescription("opens the document browser for " + id);
-      l.addClickListener(new Button.ClickListener()
+
+      if (ui.getDocBrowserController().docsAvailable(id))
       {
-        @Override
-        public void buttonClick(ClickEvent event)
+        l.setDescription("opens the document browser for " + id);
+        l.addClickListener(new Button.ClickListener()
         {
-          ui.getDocBrowserController().openDocBrowser(id);
-        }
-      });
+          @Override
+          public void buttonClick(ClickEvent event)
+          {
+            ui.getDocBrowserController().openDocBrowser(id);
+          }
+        });
+      }
+      else
+      {
+        l.setDescription("document browser is disabled for this corpus");
+        l.setEnabled(false);
+      }
 
       return l;
     }
@@ -696,7 +714,7 @@ public class CorpusListPanel extends VerticalLayout implements
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
       final String id = (String) itemId;
-      Button l = new Button();
+      final Button l = new Button();
       l.setStyleName(BaseTheme.BUTTON_LINK);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
@@ -707,7 +725,8 @@ public class CorpusListPanel extends VerticalLayout implements
         {
           if (controller != null)
           {
-            initCorpusBrowser(id);
+            l.setEnabled(false);
+            initCorpusBrowser(id, l);
           }
         }
       });
@@ -781,7 +800,7 @@ public class CorpusListPanel extends VerticalLayout implements
     return tblCorpora;
   }
 
-  public void initCorpusBrowser(String topLevelCorpusName)
+  public void initCorpusBrowser(String topLevelCorpusName, final Button l)
   {
 
     AnnisCorpus c = corpusContainer.getItem(topLevelCorpusName).getBean();
@@ -802,7 +821,32 @@ public class CorpusListPanel extends VerticalLayout implements
     window.setResizable(false);
     window.setModal(false);
 
+    window.addCloseListener(new Window.CloseListener()
+    {
+
+      @Override
+      public void windowClose(Window.CloseEvent e)
+      {
+        l.setEnabled(true);
+      }
+    });
+
     UI.getCurrent().addWindow(window);
     window.center();
+  }
+  
+  public static class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
+  {
+    @Override
+    public String generateDescription(Component source, Object itemId,
+      Object propertyId)
+    {
+      if("name".equals(propertyId))
+      {
+        return (String) itemId;
+      }
+      return null;
+    }
+    
   }
 }

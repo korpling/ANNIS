@@ -22,7 +22,7 @@ import java.util.ArrayList;
 
 /**
  * This is an extension to be used as argument for {@link FrequencySqlGenerator}
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
 {

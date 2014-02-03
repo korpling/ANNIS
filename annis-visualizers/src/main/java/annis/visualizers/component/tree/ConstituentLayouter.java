@@ -29,6 +29,7 @@ import java.util.*;
 
 
 public class ConstituentLayouter<T extends GraphicsItem> {
+    private final AnnisGraphTools GRAPH_TOOLS;
 	private class TreeLayoutData {
 		private double baseline;
 		private double ntStart;
@@ -123,12 +124,13 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	
 	public ConstituentLayouter(DirectedGraph<AnnisNode, Edge> graph_, 
       GraphicsBackend<T> backend_, TreeElementLabeler labeler_, TreeElementStyler styler_,
-      VisualizerInput input_) {
+      VisualizerInput input_, AnnisGraphTools graphTools) {
 		this.backend = backend_;
 		this.labeler = labeler_;
 		this.graph = graph_;
 		this.styler = styler_;
-        this.input = input_;
+                this.input = input_;
+                GRAPH_TOOLS  = graphTools;
 		root = findRoot();
 		
 		dataMap = new HashMap<AnnisNode, NodeStructureData>();
@@ -415,7 +417,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 	private List<Edge> getOutgoingEdges(final AnnisNode current) {
 		List<Edge> outEdges = new ArrayList<Edge>();
 		for (Edge e: graph.getOutEdges(current)) {
-			if (AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.PRIMEDGE_SUBTYPE, input)) {
+			if (GRAPH_TOOLS.hasEdgeSubtype(e, GRAPH_TOOLS.getPrimEdgeSubType())) {
 				outEdges.add(e);
 			}
 		}
@@ -479,7 +481,7 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 
 	private void addSecEdges(TreeLayoutData treeLayout, LayoutOptions options) {
 		for (Edge e: graph.getEdges()) {
-			if (!AnnisGraphTools.hasEdgeSubtype(e, AnnisGraphTools.SECEDGE_SUBTYPE, input)) {
+			if (!GRAPH_TOOLS.hasEdgeSubtype(e, GRAPH_TOOLS.getSecEdgeSubType())) {
 				continue;
 			}
 			Rectangle2D sourceRect = treeLayout.getRect(e.getSource());

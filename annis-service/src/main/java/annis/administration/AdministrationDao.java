@@ -20,6 +20,7 @@ import annis.security.AnnisUserConfig;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -42,12 +43,16 @@ public interface AdministrationDao
    * Reads relAnnis files from several directories.
    *
    * @param path Specifies the path to the corpora, which should be imported.
+   * @param aliasName An alias name for this corpus. Can be null.
    * @param overwrite If set to true conflicting top level corpora are deleted.
    * @param waitForOtherTasks If true wait for other tasks to finish, if false abort.
    * 
    * @return true if successful
    */
-  public boolean importCorpus(String path, boolean overwrite, boolean waitForOtherTasks);
+  public boolean importCorpus(String path, 
+    String aliasName,
+    boolean overwrite, 
+    boolean waitForOtherTasks);
   
   public List<Map<String, Object>> listCorpusStats();
 
@@ -68,6 +73,8 @@ public interface AdministrationDao
 
   public void registerGUICancelThread(StatementController statementCon);
 
+  public void addCorpusAlias(long corpusID, String alias);
+  
   /**
    * Provides a interface to cancel {@link PreparedStatement} via a gui.
    */
@@ -105,6 +112,62 @@ public interface AdministrationDao
      * anymore.
      */
     public boolean isCancelled();
+  }
+
+  /**
+   * Collects the exceptions (throwables) from an import process and provides
+   * several methods for extracting them.
+   */
+  public interface ImportStats
+  {
+
+    /**
+     * Set status of import
+     *
+     * @param status true, if everything is fine.
+     */
+    public void setStatus(boolean status);
+
+    /**
+     * Identifies the general success of an import. When at least one corpus
+     * import fails, this returns false.
+     *
+     * @return the import status.
+     */
+    public boolean getStatus();
+
+    /**
+     * Returns all excecptions.
+     *
+     * @return empty if no exceptions occurs.
+     */
+    public List<Throwable> getExceptions();
+
+    /**
+     * Returns all exceptions of a specific corpus.
+     *
+     * @param corpusName the name of the corpus
+     * @return null if no error occured with this corpus.
+     */
+    public List<Throwable> getExceptions(String corpusName);
+
+    /**
+     * Assigns every Exception to a corpus.
+     *
+     * @param corpusName the name of the corpus
+     * @param ex the exception
+     */
+    public void addException(String corpusName, Throwable ex);
+
+    /**
+     * Makes an conjuction of the {@link ImportStats}, which means that if at
+     * least one import failed the status is set to false.
+     *
+     * @param importStats The imported statistics which are connected.
+     */
+    public void add(ImportStats importStats);
+
+    public Map<String, List<Throwable>> getThrowables();
   }
 
   public void storeUserConfig(AnnisUserConfig config);

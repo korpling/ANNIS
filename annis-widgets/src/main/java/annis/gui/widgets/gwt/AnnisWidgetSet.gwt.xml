@@ -35,7 +35,7 @@
    <!-- enable SuperDevMode -->
    <add-linker name="xsiframe" />
 
-    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
+    
 
     
     

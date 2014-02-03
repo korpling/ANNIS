@@ -7,6 +7,7 @@ package annis.sqlgen;
 import annis.model.RelannisNodeFeature;
 import static annis.model.AnnisConstants.*;
 import annis.model.RelannisEdgeFeature;
+import annis.service.objects.Match;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -22,7 +23,6 @@ import java.util.TreeMap;
 
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
-import org.eclipse.emf.common.util.URI;
 import org.springframework.dao.DataAccessException;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
@@ -42,17 +42,22 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.net.URI;
+import java.net.URISyntaxException;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 {
@@ -93,7 +98,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
       SDocument document = null;
 
-      String[] keyNameList = new String[0];
+      URI[] keyNameList = new URI[0];
       
       AtomicInteger numberOfEdges = new AtomicInteger();
       int match_index = 0;
@@ -119,7 +124,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           {
             removeArtificialDominancesEdges(graph);
             createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
-            setMatchedIDs(document, keyNameList);
+            setMatchedIDs(document, new Match(Arrays.asList(keyNameList)));
             addOrderingRelations(graph, nodeBySegmentationPath);
           }
 
@@ -127,7 +132,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           nodeByPre.clear();
           tokenTexts.clear();
           tokenByIndex.clear();
-          keyNameList = new String[key.getKeySize()];
+          keyNameList = new URI[key.getKeySize()];
 
 
           Integer matchstart = resultSet.getInt("matchstart");
@@ -182,7 +187,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       {
         removeArtificialDominancesEdges(graph);
         createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
-        setMatchedIDs(document, keyNameList);
+        setMatchedIDs(document, new Match(Arrays.asList(keyNameList)));
         addOrderingRelations(graph, nodeBySegmentationPath);
       }
     }
@@ -296,14 +301,14 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
   }
 
-  private void setMatchedIDs(SDocument document, String[] keyNameList)
+  private void setMatchedIDs(SDocument document, Match match)
   {
+    
     // set the matched keys
     SFeature feature = SaltFactory.eINSTANCE.createSFeature();
     feature.setSNS(ANNIS_NS);
     feature.setSName(FEAT_MATCHEDIDS);
-    String val = StringUtils.join(keyNameList, ",");
-    feature.setSValue(val);
+    feature.setSValue(match.toString());
     document.addSFeature(feature);
 
   }
@@ -366,7 +371,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
     SolutionKey<?> key,
-    String[] keyNameList) throws SQLException
+    URI[] keyNameList) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
@@ -374,7 +379,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
     boolean isToken = !resultSet.wasNull();
 
-    URI nodeURI = graph.getSElementPath();
+    org.eclipse.emf.common.util.URI nodeURI = graph.getSElementPath();
     nodeURI = nodeURI.appendFragment(name);
     SStructuredNode node = (SStructuredNode) graph.getSNode(nodeURI.toString());
     if (node == null)
@@ -395,14 +400,23 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       
       Object nodeId = key.getNodeId(resultSet,
         outerQueryTableAccessStrategy);
+      
+
+      graph.addNode(node);
       Integer matchedNode = key.getMatchedNodeIndex(nodeId);
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        keyNameList[matchedNode-1] = node.getSName();
+        try
+        {
+          keyNameList[matchedNode-1] = new URI(node.getSId());
+        }
+        catch (URISyntaxException ex)
+        {
+          log.error("" + node.getId() + " is not a valid URI", ex);
+        }
       }
-
-      graph.addNode(node);
+      
       mapLayer(node, graph, resultSet);
       
       long textRef = longValue(resultSet, NODE_TABLE, "text_ref");

@@ -394,7 +394,7 @@ public class CorpusBrowserPanel extends Panel
         getValue();
       Set<String> corpusNameSet = new HashSet<String>();
       corpusNameSet.add(corpus.getName());
-      if (controller != null)
+      if (controller != null && cbe != null)
       {
         controller.setQuery(new Query(cbe.getExample(), corpusNameSet));
       }
@@ -451,7 +451,7 @@ public class CorpusBrowserPanel extends Panel
   }
 
   /**
-   * Places a label with the text "none" in the centered middle of the accordion
+   * Places a label with the text "(No <caption>)" in the centered middle of the accordion
    * tab.
    *
    * @param accordion the target accordion
@@ -461,11 +461,11 @@ public class CorpusBrowserPanel extends Panel
   {
     VerticalLayout v = new VerticalLayout();
     v.setSizeFull();
-    Label l = new Label("none");
+    Label l = new Label("(No " + caption + ")");
     v.addComponent(l);
     l.setSizeUndefined();
     v.setComponentAlignment(l, Alignment.MIDDLE_CENTER);
-    accordion.addTab(v, "Meta Annotations", null);
+    accordion.addTab(v, caption, null);
     l.setSizeUndefined();
   }
 }

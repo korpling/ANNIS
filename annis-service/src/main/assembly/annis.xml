@@ -29,7 +29,8 @@
     <fileSet>
       <directory>src/main/distribution/bin/</directory>
       <outputDirectory>bin/</outputDirectory>
-      <fileMode>0774</fileMode>
+      <directoryMode>0755</directoryMode>
+      <fileMode>0544</fileMode>
     </fileSet>
   </fileSets>
   <dependencySets>

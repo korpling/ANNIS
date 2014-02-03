@@ -16,13 +16,19 @@
 package annis.utils;
 
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.collect.FluentIterable;
+import com.google.common.io.Files;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Enumeration;
-import java.util.LinkedList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.slf4j.Logger;
@@ -30,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class RelANNISHelper
 {
@@ -38,13 +44,69 @@ public class RelANNISHelper
   private static final Logger log = LoggerFactory.
     getLogger(RelANNISHelper.class);
 
+  
   /**
-   * Extract the name of the toplevel corpus name from the content of the
+   * List all corpora of a ZIP file and their paths.
+   * 
+   * @param zip
+   * @return
+   * @throws IOException 
+   */
+  public static Map<String, ZipEntry> corporaInZipfile(ZipFile zip) throws IOException
+  {
+    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
+    
+    for(ZipEntry e : getRelANNISEntry(zip, "corpus", "tab"))
+    {
+      String name = extractToplevelCorpusNames(zip.getInputStream(e));
+      result.put(name, e);
+    }
+    
+    return result;
+  }
+  
+  public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException
+  {
+    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
+    ZipFile zip = new ZipFile(f);
+    try
+    {
+      result = corporaInZipfile(zip);
+    }
+    finally
+    {
+      zip.close();
+    }
+    
+    return result;
+  }
+  
+  public static Map<String, File> corporaInDirectory(File d) throws IOException
+  {
+    Map<String, File> result = new HashMap<String, File>();
+    
+
+    FluentIterable<File> it = Files.fileTreeTraverser().postOrderTraversal(d);
+    for(File f : it)
+    {
+      if("corpus.tab".equalsIgnoreCase(f.getName()))
+      {
+        String toplevelName = extractToplevelCorpusNames(new FileInputStream(f));
+        result.put(toplevelName, f.getParentFile());
+      }
+    }
+    
+    return result;
+  }
+  
+  /**
+   * Extract the name of the toplevel corpus from the content of the
    * corpus.tab file.
    *
+   * @param corpusTabContent
    * @return
    */
-  public static String extractToplevelCorpusName(InputStream corpusTabContent)
+  public static String extractToplevelCorpusNames(InputStream corpusTabContent)
   {
     String result = null;
 
@@ -84,7 +146,7 @@ public class RelANNISHelper
   }
 
   /**
-   * Find the directory containing the real relannis tab files for a zip file.
+   * Find the directories containing the real relannis tab files for a zip file.
    *
    * @param file
    * @param table The table to search for.
@@ -92,9 +154,11 @@ public class RelANNISHelper
    * default.
    * @return
    */
-  public static ZipEntry getRelANNISEntry(ZipFile file, String table,
+  public static List<ZipEntry> getRelANNISEntry(ZipFile file, String table,
     String fileEnding)
   {
+    List<ZipEntry> allMatchingEntries = new ArrayList<ZipEntry>();
+    
     if (fileEnding == null)
     {
       fileEnding = "tab";
@@ -115,49 +179,12 @@ public class RelANNISHelper
           if (fullName.equalsIgnoreCase(name) || entry.getName().endsWith(
             "/" + fullName))
           {
-            return entry;
+            allMatchingEntries.add(entry);
           }
         }
       }
     }
-    return null;
-  }
-  
-  /**
-   * Search the folder containing a special tab-file file in the zip file and return all
-   * other zip entries that are subelements of the folder.
-   * @param file
-   * @param table The table name which should be used as indicator.
-   * @param fileEnding The file ending of the file to search for
-   * @return A list containing all zip entries that belong the the relANNIS folder
-   */
-  public static List<ZipEntry> getRelANNISContent(ZipFile file, String table,
-    String fileEnding)
-  {
-    List<ZipEntry> result = new LinkedList<ZipEntry>(); 
-    ZipEntry entry = getRelANNISEntry(file, table, fileEnding);
-    
-    if(entry != null)
-    {
-      // replace all "\" with "/" in case a bogus zip programm did it wrong
-      String completeEntryName = entry.getName().replaceAll("\\/", "/");
-      // "navigate" one level up
-      String prefix = completeEntryName.substring(0, ("/" + table + "." + fileEnding).length()-1);
-      
-      // find all entries that match the prefix
-      Enumeration<? extends ZipEntry> zipEnum = file.entries();
-      while(zipEnum.hasMoreElements())
-      {
-        ZipEntry e = zipEnum.nextElement();
-        if(e.getName().replaceAll("\\/", "/").startsWith(prefix))
-        {
-          result.add(zipEnum.nextElement());
-        }
-      }
-       
-    }
-    
-    return result;
+    return allMatchingEntries;
   }
   
 }

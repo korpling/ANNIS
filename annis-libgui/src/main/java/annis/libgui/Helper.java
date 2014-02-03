@@ -16,10 +16,10 @@
 package annis.libgui;
 
 import annis.model.Annotation;
-import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -29,8 +29,10 @@ import com.sun.jersey.api.client.WebResource;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import java.io.UnsupportedEncodingException;
@@ -39,7 +41,7 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -65,10 +67,31 @@ public class Helper
 
   public final static String DEFAULT_CONFIG = "default-config";
 
+  // the name of the web font class, the css class contains !important.
+  public final static String CORPUS_FONT_FORCE = "corpus-font-force";
+
+  // the name of the web font class.
+  public final static String CORPUS_FONT = "corpus-font";
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
 
   private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
+
+  private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER
+    = "Corpus properties does not exist";
+
+  private static final String ERROR_MESSAGE_CORPUS_PROPS
+    = "<div><p><strong>ANNIS can not access the corpus properties</strong></p>"
+    + "<h2>possible reasons are:</h2>"
+    + "<ul>"
+    + "<li>the ANNIS service is not running</li>"
+    + "<li>the corpus properties are not well defined</li></ul>"
+    + "<p>Please ask the responsible admin or consult the ANNIS "
+    + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
+
+  // caches the config configuration, should saves rest requests. Hopefully.
+  private static final Map<String, CorpusConfig> corpusConfigCache = new HashMap<String, CorpusConfig>();
 
   /**
    * Creates an authentificiated REST client
@@ -117,16 +140,26 @@ public class Helper
 
   public static AnnisUser getUser()
   {
-    Object o = VaadinSession.getCurrent().getSession().getAttribute(
-      AnnisBaseUI.USER_KEY);
-    if (o instanceof AnnisUser)
+
+    VaadinSession vSession = VaadinSession.getCurrent();
+    WrappedSession wrappedSession = null;
+    
+    
+    if (vSession != null)
+      wrappedSession = vSession.getSession();
+
+    if (wrappedSession != null)
     {
-      return (AnnisUser) o;
+
+      Object o = VaadinSession.getCurrent().getSession().getAttribute(
+        AnnisBaseUI.USER_KEY);
+      if (o != null && o instanceof AnnisUser)
+      {
+        return (AnnisUser) o;
+      }
     }
-    else
-    {
-      return null;
-    }
+
+    return null;
   }
 
   public static void setUser(AnnisUser user)
@@ -205,9 +238,16 @@ public class Helper
    */
   public static WebResource getAnnisWebResource()
   {
+
+    VaadinSession vSession = VaadinSession.getCurrent();
+
     // get URI used by the application
-    String uri = (String) VaadinSession.getCurrent().getAttribute(
+    String uri = null;
+
+    if (vSession != null) {
+     uri = (String) VaadinSession.getCurrent().getAttribute(
       KEY_WEB_SERVICE_URL);
+    }
 
     // if already authentificated the REST client is set as the "user" property
     AnnisUser user = getUser();
@@ -478,7 +518,12 @@ public class Helper
       return null;
     }
 
+    if (corpusConfigCache.containsKey(corpus)) {
+      return corpusConfigCache.get(corpus);
+    }
+
     CorpusConfig corpusConfig = new CorpusConfig();
+
 
     try
     {
@@ -488,25 +533,38 @@ public class Helper
     }
     catch (UnsupportedEncodingException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.TRAY_NOTIFICATION);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
     catch (UniformInterfaceException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
     catch (ClientHandlerException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
+
+    //update cache
+    corpusConfigCache.put(corpus, corpusConfig);
 
     return corpusConfig;
   }
 
   public static CorpusConfig getDefaultCorpusConfig()
   {
+
+    final String DEFAULT_CORPUS_CONFIG = "default-config";
+
+    if (corpusConfigCache.containsKey(DEFAULT_CORPUS_CONFIG))
+    {
+      return corpusConfigCache.get(DEFAULT_CORPUS_CONFIG);
+    }
 
     CorpusConfig defaultCorpusConfig = new CorpusConfig();
 
@@ -517,14 +575,19 @@ public class Helper
     }
     catch (UniformInterfaceException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
     catch (ClientHandlerException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
+
+    // update cache
+    corpusConfigCache.put(DEFAULT_CORPUS_CONFIG, defaultCorpusConfig);
 
     return defaultCorpusConfig;
   }
@@ -550,13 +613,15 @@ public class Helper
     }
     catch (UniformInterfaceException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
     catch (ClientHandlerException ex)
     {
-      Notification.show("can not retrieve corpus configuration", ex.
-        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
     }
 
     if (corpusConfigurations == null)
@@ -659,6 +724,31 @@ public class Helper
       sb.append("\n");
     }
     return sb.toString();
+  }
+
+  public static RawTextWrapper getRawText(String corpusName, String documentName)
+  {
+    RawTextWrapper texts = null;
+    try
+    {
+      WebResource webResource = getAnnisWebResource();
+      webResource = webResource.path("query").path("rawtext").path(corpusName).
+        path(documentName);
+      texts = webResource.get(RawTextWrapper.class);
+    }
+
+    catch (UniformInterfaceException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+    catch (ClientHandlerException ex)
+    {
+      Notification.show("can not retrieve raw text", ex.
+        getLocalizedMessage(), Notification.Type.WARNING_MESSAGE);
+    }
+
+    return texts;
   }
 
   /**

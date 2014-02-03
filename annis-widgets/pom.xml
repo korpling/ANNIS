@@ -16,7 +16,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.1.7</vaadin.version>
+    <vaadin.version>7.1.10</vaadin.version>
   </properties>
 
   <build>
@@ -186,7 +186,7 @@
     <dependency>
       <groupId>commons-codec</groupId>
       <artifactId>commons-codec</artifactId>
-      <version>1.7</version>
+      <version>1.9</version>
       <scope>compile</scope>
     </dependency>
 
@@ -199,16 +199,9 @@
     <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
-      <version>14.0.1</version>
+      <version>16.0</version>
       <scope>compile</scope>
     </dependency>
-  
-    <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>cssinject</artifactId>
-      <version>2.0.3</version>
-    </dependency>
-    
   </dependencies>
 
 </project>

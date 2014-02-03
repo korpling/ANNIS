@@ -30,7 +30,7 @@ import java.util.concurrent.locks.ReentrantReadWriteLock;
 /**
  * Default {@link MediaController} implementation
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class MediaControllerImpl implements MediaController, Serializable
 {
@@ -139,6 +139,7 @@ public class MediaControllerImpl implements MediaController, Serializable
     }
   }
 
+  @Override
   public void closeOtherPlayers(MediaPlayer doNotCloseThisOne)
   {
     for (List<MediaPlayer> playersForID : mediaPlayers.values())

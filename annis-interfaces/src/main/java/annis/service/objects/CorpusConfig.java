@@ -93,6 +93,34 @@ public class CorpusConfig implements Serializable
       return null;
     }
   }
+  
+  /**
+   * Returns a configuration from the underlying property object.
+   *
+   * @param configName The name of the configuration.
+   * @param def the default value, if no config is found.
+   * @return Can be null if the config name does not exists.
+   */
+  public String getConfig(String configName, String def)
+  {
+    if (config != null)
+    {
+      return config.getProperty(configName, def);
+    }
+    else
+    {
+      return def;
+    }
+  }
+
+  /**
+   * Checks whether a key exists in the properties.
+   *
+   */
+  public boolean containsKey(String key)
+  {
+    return (config == null) ? false : config.containsKey(key);
+  }
 
   public boolean isEmpty()
   {

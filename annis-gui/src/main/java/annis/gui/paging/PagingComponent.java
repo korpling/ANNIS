@@ -18,28 +18,29 @@ package annis.gui.paging;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
-import com.vaadin.event.ShortcutAction.KeyCode;
-import com.vaadin.event.ShortcutListener;
+import com.vaadin.event.Action;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextField;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.concurrent.atomic.AtomicInteger;
+import org.apache.commons.lang3.StringEscapeUtils;
 import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author thomas
  */
-public class PagingComponent extends CustomComponent implements
+public class PagingComponent extends Panel implements
   Button.ClickListener
 {
 
@@ -111,8 +112,8 @@ public class PagingComponent extends CustomComponent implements
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(false, true, false, true));
 
-    setCompositionRoot(layout);
-
+    setContent(layout);
+    addStyleName(ChameleonTheme.PANEL_LIGHT);
 
     lblInfo = new Label();
     lblInfo.setContentMode(ContentMode.HTML);
@@ -156,9 +157,9 @@ public class PagingComponent extends CustomComponent implements
     Validator pageValidator = new PageValidator(
       "must be an integer greater than zero");
     txtPage.addValidator(pageValidator);
-    txtPage.addShortcutListener(new EnterListener(txtPage));
-
-
+    addActionHandler(new EnterHandler(txtPage));
+    
+    
     lblMaxPages = new Label();
     lblMaxPages.setDescription("maximal pages");
     lblMaxPages.setSizeUndefined();
@@ -307,33 +308,42 @@ public class PagingComponent extends CustomComponent implements
     return val;
   }
 
-  public class EnterListener extends ShortcutListener
+  public class EnterHandler implements Action.Handler
   {
+    private final Action enterKeyShortcutAction 
+      = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
 
-    private Object registeredTarget;
+    private final Object registeredTarget;
 
-    public EnterListener(Object registeredTarget)
+    public EnterHandler(Object registeredTarget)
     {
-      super("set page", KeyCode.ENTER, null);
       this.registeredTarget = registeredTarget;
     }
 
     @Override
-    public void handleAction(Object sender, Object target)
+    public Action[] getActions(Object target, Object sender)
     {
-      if (target != registeredTarget)
+      return new Action[]
       {
-        return;
-      }
-      try
+        enterKeyShortcutAction
+      };
+    }
+    
+    @Override
+    public void handleAction(Action action, Object sender, Object target)
+    {
+      if(action == enterKeyShortcutAction && target == registeredTarget)
       {
-        int newPage = Integer.parseInt((String) txtPage.getValue());
-        currentPage = sanitizePage(newPage);
-        update(true);
-      }
-      catch (Exception ex)
-      {
-        log.error(null, ex);
+        try
+        {
+          int newPage = Integer.parseInt((String) txtPage.getValue());
+          currentPage = sanitizePage(newPage);
+          update(true);
+        }
+        catch (NumberFormatException ex)
+        {
+          log.error(null, ex);
+        }
       }
     }
   }
@@ -350,8 +360,9 @@ public class PagingComponent extends CustomComponent implements
     {
       String prefix = "Result for: <span class=\"corpus-font-force\">";
       lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
-      lblInfo.setValue(text.length() < 50 ? prefix + text.substring(0, text.
-        length()) : prefix + text.substring(0, 50) + " ... </span>");
+      lblInfo.setValue(text.length() < 50 ? prefix + StringEscapeUtils.
+        escapeHtml4(text.substring(0, text.length())) : prefix + StringEscapeUtils.
+        escapeHtml4(text.substring(0, 50)) + " ... </span>");
     }
   }
 

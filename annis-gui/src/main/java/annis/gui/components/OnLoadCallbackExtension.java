@@ -25,11 +25,11 @@ import org.json.JSONException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript(
 {
-  "jquery-1.9.1.min.js", "onloadcallback.js"
+  "vaadin://jquery.js", "onloadcallback.js"
 })
 public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
 {

@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * A frequency table holds the result of a frequency analysis on a specific result.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
 public class FrequencyTable implements Serializable

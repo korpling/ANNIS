@@ -30,11 +30,11 @@ import org.json.JSONException;
  * An video/audio player based on the medialement.js library
  * ({@link http://mediaelementjs.com/})
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript(
 {
-  "vaadin://mediaelement/jquery.js", "vaadin://mediaelement/mediaelement-and-player.js", "mediaelement_connector.js"
+  "vaadin://jquery.js", "vaadin://mediaelement/mediaelement-and-player.js", "mediaelement_connector.js"
 })
 @StyleSheet(
 {

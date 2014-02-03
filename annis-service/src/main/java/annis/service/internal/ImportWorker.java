@@ -32,7 +32,10 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Enumeration;
+import java.util.List;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
@@ -43,7 +46,7 @@ import org.springframework.stereotype.Component;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Component
 public class ImportWorker extends Thread
@@ -53,11 +56,11 @@ public class ImportWorker extends Thread
 
   private CorpusAdministration corpusAdmin;
 
-  private BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
+  private final BlockingQueue<ImportJob> importQueue = Queues.newLinkedBlockingDeque();
 
   private ImportJob currentJob;
 
-  private Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().
+  private final Cache<String, ImportJob> finishedJobs = CacheBuilder.newBuilder().
     maximumSize(100).build();
 
   public ImportWorker()
@@ -73,7 +76,7 @@ public class ImportWorker extends Thread
       try
       {
         currentJob = importQueue.take();
-        importSingleCorpus(currentJob);
+        importSingleCorpusFile(currentJob);
       }
       catch (InterruptedException ex)
       {
@@ -109,127 +112,38 @@ public class ImportWorker extends Thread
     appender.start();
   }
 
-  /**
-   * Extract the zipped relANNIS corpus files to an output directory.
-   * 
-   * @param outDir The ouput directory.
-   * @param zip ZIP-file to extract.
-   * @return The root directory where the tab-files are located if found, null otherwise.
-   */
-  private File unzipCorpus(File outDir, ZipFile zip)
-  {
-    File rootDir = null;
-
-    Enumeration<? extends ZipEntry> zipEnum = zip.entries();
-    while (zipEnum.hasMoreElements())
-    {
-      ZipEntry e = zipEnum.nextElement();
-      File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
-      outFile.deleteOnExit();
-
-      if (e.isDirectory())
-      {
-        if (!outFile.mkdirs())
-        {
-          log.warn("Could not create temporary directory " + outFile.
-            getAbsolutePath());
-        }
-      } // end if directory
-      else
-      {
-        if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
-          outFile.getName()))
-        {
-          rootDir = outFile.getParentFile();
-        }
-
-        FileOutputStream outStream = null;
-        try
-        {
-          outStream = new FileOutputStream(outFile);
-          ByteStreams.copy(zip.getInputStream(e), outStream);
-        }
-        catch (FileNotFoundException ex)
-        {
-          log.error(null, ex);
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-        finally
-        {
-          if (outStream != null)
-          {
-            try
-            {
-              outStream.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
-        }
-      } // end else is file
-    } // end for each entry in zip file
-
-    return rootDir;
-  }
-
-  private void importSingleCorpus(ImportJob job)
+  private void importSingleCorpusFile(ImportJob job)
   {
     currentJob.setStatus(ImportJob.Status.RUNNING);
     corpusAdmin.sendStatusMail(currentJob.getStatusEmail(), 
-          currentJob.getCorpusName(), ImportJob.Status.RUNNING, null);
+          job.getCaption(), ImportJob.Status.RUNNING, null);
     
-    File outDir = new File(System.getProperty("user.home"), ".annis/zip-imports/"
-      + job.getCorpusName());
-    if(outDir.exists())
+   
+    boolean success = true;
+    
+    // do the actual import
+    if(job.getImportRootDirectory() != null)
     {
-      if(job.isOverwrite())
+      AdministrationDao.ImportStats importStats = corpusAdmin.importCorporaSave(
+        job.isOverwrite(), job.getAlias(), job.getStatusEmail(), true, job.getImportRootDirectory().getAbsolutePath());
+    
+      if (!importStats.getStatus())
       {
-        try
-        {
-          // delete old data inside the corpus directory
-          FileUtils.deleteDirectory(outDir);
-        }
-        catch (IOException ex)
-        {
-          log.warn("Could not recursivly delete the output directory", ex);
-        }
-      }
-      else
-      {
-        throw new IllegalStateException("Target directory for corpus already "
-          + "exist. You attempt to import a corpus which was already "
-          + "imported before without setting the \"overwrite\" parameter");
+        success = false; 
       }
     }
-    if(!outDir.mkdirs())
-    {
-      throw new IllegalStateException("Could not create directory " 
-        + outDir.getAbsolutePath());
-    }
-    
-    // unzip
-    File rootDir = unzipCorpus(outDir, job.getInZip());
-    
-    if (rootDir != null)
-    {
-      if (corpusAdmin.importCorporaSave(job.isOverwrite(), 
-        job.getStatusEmail(), true, rootDir.getAbsolutePath()))
-      {
-        currentJob.setStatus(ImportJob.Status.SUCCESS);
-      }
-      else
-      {
-        currentJob.setStatus(ImportJob.Status.ERROR);
-      }
-      finishedJobs.put(currentJob.getUuid(), currentJob);
-    }
-  }
 
+    if(success)
+    {
+      currentJob.setStatus(ImportJob.Status.SUCCESS);
+    }
+    else
+    {
+      currentJob.setStatus(ImportJob.Status.ERROR);
+    }
+    finishedJobs.put(currentJob.getUuid(), currentJob);
+  }
+  
   public ImportJob getFinishedJob(String uuid)
   {
     ImportJob job = finishedJobs.getIfPresent(uuid);

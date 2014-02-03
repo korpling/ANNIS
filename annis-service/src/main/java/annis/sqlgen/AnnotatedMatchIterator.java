@@ -28,7 +28,7 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * Implements an {@link Iterator} for a {@link AnnotatedMatch} from
  * a JDBC {@link ResultSet}.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
 {

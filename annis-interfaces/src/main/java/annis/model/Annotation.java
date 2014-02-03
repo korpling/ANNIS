@@ -31,6 +31,14 @@ public class Annotation implements Comparable<Annotation>, Serializable
   private String value;
   private String type;
   private String corpusName;
+
+  /**
+   * is the path of the annotation in brackets: {x, y, z}. The first value x is
+   * the corpus/document which is annotated. Tho following names represents the
+   * parents of x.
+   */
+  private String annotationPath;
+
   private int pre; // determine the order
 
   public Annotation()
@@ -65,6 +73,16 @@ public class Annotation implements Comparable<Annotation>, Serializable
   {
     this(namespace, name, value, type, corpusName);
     this.pre = pre;
+  }
+
+  /**
+   * With the constructor we could determine the order of the pre parameter
+   */
+  public Annotation(String namespace, String name, String value, String type,
+    String corpusName, int pre, String annotationPath)
+  {
+    this(namespace, name, value, type, corpusName, pre);
+    this.annotationPath = annotationPath;
   }
 
   @Override
@@ -175,5 +193,21 @@ public class Annotation implements Comparable<Annotation>, Serializable
   public int getPre()
   {
     return pre;
+  }
+
+  /**
+   * @return the annotationPath
+   */
+  public String getAnnotationPath()
+  {
+    return annotationPath;
+  }
+
+  /**
+   * @param annotationPath the annotationPath to set
+   */
+  public void setAnnotationPath(String annotationPath)
+  {
+    this.annotationPath = annotationPath;
   }
 }

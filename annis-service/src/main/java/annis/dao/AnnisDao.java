@@ -49,6 +49,8 @@ public interface AnnisDao
 
   public List<AnnisCorpus> listCorpora();
 
+  public List<AnnisCorpus> listCorpora(List<Long> ids);
+
   public List<AnnisAttribute> listAnnotations(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValues);
 
@@ -86,7 +88,8 @@ public interface AnnisDao
   /**
    * Gets a complete binary file from annis.
    *
-   * <p>It assumes, that only one binary file is stored with the combination
+   * <p>
+   * It assumes, that only one binary file is stored with the combination
    * <b>toplevelCorpusName</b> and <b>mimeType</b>. If there are mor than one,
    * the first file is taken.</p>
    *
@@ -124,6 +127,8 @@ public interface AnnisDao
   public List<AnnisBinaryMetaData> getBinaryMeta(String toplevelCorpusName,
     String subCorpusName);
 
+  public List<Long> mapCorpusAliasToIds(String alias);
+
   public List<ResolverEntry> getResolverEntries(SingleResolverRequest request);
 
   public QueryData parseAQL(String aql, List<Long> corpusList);
@@ -139,7 +144,7 @@ public interface AnnisDao
   /**
    * Returns a part of a salt document according the saltIDs, we get with null
    * null null null null null null null null null null null null null null null
-   * null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * null null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -151,11 +156,10 @@ public interface AnnisDao
 
   String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
     final boolean analyze);
-  
+
   FrequencyTable frequency(QueryData queryData);
 
-  public void matrix(final QueryData queryData, final OutputStream out);
-
+  public void matrix(final QueryData queryData, boolean outputCSV, final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator);
@@ -200,17 +204,19 @@ public interface AnnisDao
   /**
    * Get a specific configuration of a corpus from directory.
    *
-   * <p>The corpus config files are actually stored in the
+   * <p>
+   * The corpus config files are actually stored in the
    * {@code <user>/.annis/data/corpus} directory, decorated with a {@link UUID}.
    * The actual name of a specific corpus property file is stored in the
    * media_file table.<p>
    *
+   * @param topLevelCorpus
    * @return The corpus configuration is represented as Key-Value-Pairs.
    *
    * @see BinaryImportHelper
    *
    */
-  public Properties getCorpusConfiguration(String corpusName);
+  public Properties getCorpusConfiguration(String topLevelCorpus);
 
   /**
    * Called to check if the database management program has the right version
@@ -223,7 +229,7 @@ public interface AnnisDao
    * @param toplevelCorpusName Determines the root corpus.
    * @param withRootCorpus If true, the annotations of the root corpus are
    * included.
-   *
+   * @return list of annotations. It is possible that some values are null.
    */
   public List<Annotation> listDocumentsAnnotations(String toplevelCorpusName,
     boolean withRootCorpus);
@@ -245,4 +251,46 @@ public interface AnnisDao
    * ids are specified.
    */
   public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
+
+  /**
+   * Returns the raw text from the text.tab file of the relAnnis format.
+   *
+   * @param topLevelCorpus The name of the corpus.
+   * @param documentName The name of the document
+   * @return "" if no text.tab is empty
+   */
+  public List<String> getRawText(String topLevelCorpus, String documentName);
+
+  /**
+   * Returns the raw text fromt the text table of a specific corpus.
+   *
+   * @param topLevelCorpus Specifies the corpus for which the texts are fetched.
+   * @return A list of all texts.
+   */
+  public List<String> getRawText(String topLevelCorpus);
+
+  /**
+   * Returns the corpus internal corpus id of a top level corpus.
+   *
+   * @param topLevelCorpus the name of the corpus
+   * @return the corpus id
+   */
+  public long mapCorpusNameToId(String topLevelCorpus);
+
+  /**
+   * Returns the corpus name for a given corpus id.
+   *
+   * @param corpusId the id of the corpus
+   * @return the name of the corpus. The name of each top level corpus is
+   * unique.
+   */
+  public String mapCorpusIdToName(long corpusId);
+
+  /**
+   * Stores a corpus configuration.
+   *
+   * @param corpusID The id of the corpus, for which the properties are written.
+   * @param props The properties
+   */
+  public void setCorpusConfiguration(String topLevelCorpus, Properties props);
 }

@@ -27,10 +27,11 @@ import org.apache.commons.lang3.StringUtils;
 import static annis.sqlgen.TableAccessStrategy.*;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import com.google.common.collect.Lists;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CommonAnnotateWithClauseGenerator
   extends TableAccessStrategyFactory
@@ -75,19 +76,20 @@ public class CommonAnnotateWithClauseGenerator
         // token index based method
 
         // first get the raw matches
-        result.add(getMatchesWithClause(queryData, alternative, indent));
+        result.addAll(getMatchesWithClause(queryData, alternative, indent));
+        result.add(getKeyWithClause(indent));
 
         // break the columns down in a way that every matched node has it's own
         // row
-        result.add(getSolutionFromMatchesWithClause(queryData, policy,
-          alternative, "matches", indent));
+        result.add(getSolutionFromMatchesWithClause(policy, "matches", indent));
 
       }
       else
       {
         // segmentation layer based method
 
-        result.add(getMatchesWithClause(queryData, alternative, indent));
+        result.addAll(getMatchesWithClause(queryData, alternative, indent));
+        result.add(getKeyWithClause(indent));
         result.add(getNearestSeqWithClause(queryData, annoQueryData, alternative,
           "matches", indent));
         result.add(getSolutionFromNearestSegWithClause(queryData, annoQueryData,
@@ -102,77 +104,124 @@ public class CommonAnnotateWithClauseGenerator
   /**
    * Uses the inner SQL generator and provides an ordered and limited view on
    * the matches with a match number.
+   * @param queryData
+   * @param alternative
+   * @param indent
+   * @return 
    */
-  protected String getMatchesWithClause(QueryData queryData, List<QueryNode> alternative,  String indent)
+  protected List<String> getMatchesWithClause(QueryData queryData, List<QueryNode> alternative,  String indent)
   {
-    StringBuilder sb = new StringBuilder();
-    sb.append(indent).append("matches AS\n");
-    sb.append(indent).append("(\n");
-    sb.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent
-      + TABSTOP));
-    sb.append("\n").append(indent).append(")");
+    String indent2= indent + TABSTOP;
+    String indent3 = indent2 + TABSTOP;
+    
+    StringBuilder sbRaw = new StringBuilder();
+    sbRaw.append(indent).append("matchesRaw AS\n");
+    sbRaw.append(indent).append("(\n");
+    sbRaw.append(indent).append(getInnerQuerySqlGenerator().toSql(queryData, indent2));
+    sbRaw.append("\n").append(indent).append(")");
+    
+    StringBuilder sbMatches = new StringBuilder();
+    sbMatches.append(indent).append("matches AS\n");
+    sbMatches.append(indent).append("(\n");
+    
+    int numOfNodes = queryData.getMaxWidth();
+    for(int i=1; i <= numOfNodes; i++)
+    {
+      sbMatches.append(indent2)
+        .append("SELECT\n");
+      sbMatches.append(indent3).append("n").append(" AS n,\n");
+      sbMatches.append(indent3).append(i).append(" AS nodeNr,\n");
+      sbMatches.append(indent3).append("id").append(i).append(" AS id,\n");
+      sbMatches.append(indent3).append("text").append(i).append(" AS \"text\",\n");
+      sbMatches.append(indent3).append("min").append(i).append(" AS min,\n");
+      sbMatches.append(indent3).append("max").append(i).append(" AS max,\n");
+      sbMatches.append(indent3).append("corpus").append(i).append(" AS corpus\n");
+      sbMatches.append(indent2).append("FROM matchesRaw\n");
+      if(i < numOfNodes)
+      {
+        sbMatches.append(indent2).append("\n").append(indent2).append("UNION ALL\n\n");
+      }
+    }
+    sbMatches.append("\n").append(indent).append(")");
 
-    return sb.toString();
+    return Lists.newArrayList(sbRaw.toString(), sbMatches.toString());
+  }
+  
+  protected String getKeyWithClause(String indent)
+  {
+    String indent2 = indent + TABSTOP;
+    
+    return indent + "keys AS (\n" +
+     indent2 + "SELECT n, array_agg(id ORDER BY nodenr ASC) AS \"key\" FROM matches\n" +
+     indent2 + "GROUP BY n\n" +
+     indent + ")";
   }
 
   /**
    * Breaks down the matches table, so that each node of each match has it's own
    * row.
+   * @param islandPolicy
+   * @param islandPolicies
+   * @param matchesName
+   * @param indent
+   * @return 
    */
-  protected String getSolutionFromMatchesWithClause(QueryData queryData,
-    IslandsPolicy.IslandPolicies islandPolicies,
-    List<QueryNode> alternative, String matchesName,
+  protected String getSolutionFromMatchesWithClause(
+    IslandsPolicy.IslandPolicies islandPolicy,
+    String matchesName,
     String indent)
   {
+    String indent2 = indent + TABSTOP;
+    
     StringBuilder sb = new StringBuilder();
+    
     sb.append(indent).append("solutions AS\n");
     sb.append(indent).append("(\n");
-
-    String innerIndent = indent + TABSTOP;
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
+    
+    sb.append(indent2).append("SELECT ");
+   
+    
+    if(islandPolicy == IslandsPolicy.IslandPolicies.none)
     {
-      innerIndent = indent + TABSTOP + TABSTOP;
-      sb.append(indent).append("SELECT min(\"key\") AS key, n, text, "
-        + "min(\"min\") AS \"min\", "
-        + "max(\"max\") AS \"max\", min(corpus) AS corpus FROM (\n");
+      sb.append("min(keys.key) AS key, ")
+        .append(matchesName).append(".n AS n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus, ");
+      sb.append("min(").append(matchesName).append(".min").append("), ");
+      sb.append("max(").append(matchesName).append(".max").append(")");
     }
-
-    SolutionKey<?> key = createSolutionKey();
-    // use copy constructor in order not to mess up the global TableAccessStrategy bean
-    TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
-    tas.addTableAlias("solutions", matchesName);
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.size());
-
-
-    for (int i = 1; i <= alternative.size(); i++)
+    else if(islandPolicy == IslandsPolicy.IslandPolicies.context)
     {
-      if (i >= 2)
-      {
-        sb.append(innerIndent).append("UNION ALL\n");
-      }
-      sb.append(innerIndent).append("SELECT ").append(StringUtils.join(
-        keyColumns, ", ")).append(", n,  text").append(i).append(" AS text, min").
-        append(i).append(" AS \"min\", max").append(i).append(
-        " AS \"max\", corpus").append(i).append(" AS corpus ").append("FROM ").
-        append(matchesName).append("\n");
-
-    } // end for all nodes in query
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
-    {
-      sb.append(indent).append(") AS innersolution\n");
+      sb.append("keys.key AS key, ")
+        .append(matchesName).append(".n AS n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus, ");
+      sb.append(matchesName).append(".min, ");
+      sb.append(matchesName).append(".max");
     }
-
-    if (islandPolicies == IslandsPolicy.IslandPolicies.none)
+    else
     {
-      sb.append(indent).append("GROUP BY text, n\n");
+      throw new UnsupportedOperationException(
+        "No implementation for island policy "
+        + islandsPolicy.toString());
     }
-
+    
+    sb.append("\n").append(indent2);
+    sb.append("FROM ").append(matchesName).append(", keys\n").append(indent2);
+    sb.append("WHERE keys.n = ").append(matchesName).append(".n\n");
+    if(islandPolicy == IslandsPolicy.IslandPolicies.none)
+    {
+      sb.append(indent2)
+        .append("GROUP BY ")
+        .append(matchesName).append(".n, ")
+        .append(matchesName).append(".text, ")
+        .append(matchesName).append(".corpus").append("\n");
+    }
+    
     sb.append(indent).append(")");
-
+    
     return sb.toString();
+
   }
 
   
@@ -187,90 +236,79 @@ public class CommonAnnotateWithClauseGenerator
     // use copy constructor in order not to mess up the global TableAccessStrategy bean
     TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
     tas.addTableAlias("solutions", matchesName);
-    List<String> keyColumns =
-      key.generateOuterQueryColumns(tas, alternative.size());
-
+   
     StringBuilder sb = new StringBuilder();
     sb.append(indent).append("nearestseg AS\n");
     sb.append(indent).append("(\n");
 
-    for(int i=1; i <= alternative.size(); i++)
-    {
     
-      sb.append(indent2).append("SELECT\n");
-      
-      sb.append(indent3);
-      for (String k : keyColumns)
-      {
-        sb.append(k);
-      }
-      sb.append(", matches.n,\n");
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_index")).append(" - ").append(annoQueryData.
-        getLeft()).append(" AS \"min\",\n");
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE,
-        "seg_index")).append(" + ").append(annoQueryData.getRight()).append(
-        " AS \"max\",\n");
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
-        " AS \"text\", \n");
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(
-        " AS \"corpus\", \n");
+    sb.append(indent2).append("SELECT\n");
 
-      String distLeft = "min" + i 
-        + " - " 
-        + tas.aliasedColumn(NODE_TABLE, "left_token");
-      String distRight = tas.aliasedColumn(NODE_TABLE, "right_token") 
-        + " - max" 
-        + i;
+    sb.append(indent3);
+    sb.append("matches.nodeNr AS nodeNr");
+    sb.append(", matches.n AS n");
+    sb.append(", matches.id AS id,\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_index")).append(" - ").append(annoQueryData.
+      getLeft()).append(" AS \"min\",\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE,
+      "seg_index")).append(" + ").append(annoQueryData.getRight()).append(
+      " AS \"max\",\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(
+      " AS \"text\", \n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(
+      " AS \"corpus\", \n");
 
-      // create ordered window partition
-      // values are ordered by their distance to the min or max token index
-      // NULLIF( dist+1, -abs(dist+1) will give negative entries NULL which means
-      // their are put last in the ordered list
-      // +1 is there to ensure that positive equal values (thus dist=0) are not ignored
-      sb.append(indent3).append("row_number() OVER (PARTITION BY ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(" ORDER BY NULLIF(")
-        .append(distLeft).append("+ 1, -abs(").append(distLeft)
-        .append(" + 1)) ASC) AS rank_left,\n");
+    String distLeft = "min"
+      + " - " 
+      + tas.aliasedColumn(NODE_TABLE, "left_token");
+    String distRight = tas.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - max" ;
 
-      sb.append(indent3).append("row_number() OVER (PARTITION BY ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(" ORDER BY NULLIF(")
-        .append(distRight).append(" + 1, -abs(").append(distRight)
-        .append(" + 1)) ASC) AS rank_right\n");
+    // create ordered window partition
+    // values are ordered by their distance to the min or max token index
+    // NULLIF( dist+1, -abs(dist+1) will give negative entries NULL which means
+    // their are put last in the ordered list
+    // +1 is there to ensure that positive equal values (thus dist=0) are not ignored
+    sb.append(indent3).append("row_number() OVER (PARTITION BY ")
+      .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+      .append(matchesName).append(".n").append(", ")
+      .append(matchesName).append(".nodeNr")
+      .append(" ORDER BY NULLIF(")
+      .append(distLeft).append("+ 1, -abs(").append(distLeft)
+      .append(" + 1)) ASC) AS rank_left,\n");
+
+    sb.append(indent3).append("row_number() OVER (PARTITION BY ")
+      .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+      .append(matchesName).append(".n").append(", ")
+      .append(matchesName).append(".nodeNr")
+      .append(" ORDER BY NULLIF(")
+      .append(distRight).append(" + 1, -abs(").append(distRight)
+      .append(" + 1)) ASC) AS rank_right\n");
 
 
-      sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(
-        ", matches\n");
-      sb.append(indent2).append("WHERE\n");
+    sb.append(indent2).append("FROM ").append(tas.tableName(NODE_TABLE)).append(
+      ", matches\n");
+    sb.append(indent2).append("WHERE\n");
 
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
-        append(" IN (").append(StringUtils.join(queryData.getCorpusList(), ",")).
-        append(") AND\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
+      append(" IN (").append(StringUtils.join(queryData.getCorpusList(), ",")).
+      append(") AND\n");
 
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
-        " IS TRUE AND\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "n_sample")).append(
+      " IS TRUE AND\n");
 
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_name"))
-        .append(" = ").append(sqlString(annoQueryData.getSegmentationLayer()))
-        .append(" AND\n");
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "seg_name"))
+      .append(" = ").append(sqlString(annoQueryData.getSegmentationLayer()))
+      .append(" AND\n");
 
-      sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(" = matches.text").append(i).append(" AND\n");
-      
-       sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"))
-        .append(" = matches.corpus").append(i).append("\n");
-      
-      
-      // put subqueries together with an UNION ALL
-      if(i < alternative.size())
-      {
-        sb.append("\n").append(indent2).append("UNION ALL").append("\n\n");
-      }
-      
-    }
+    sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
+      .append(" = matches.text").append(" AND\n");
+
+     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"))
+      .append(" = matches.corpus").append("\n");
+
     sb.append(indent).append(")");
 
     return sb.toString();
@@ -308,34 +346,24 @@ public class CommonAnnotateWithClauseGenerator
 
     sb.append(indent2).append("SELECT DISTINCT ");
 
-    if (islandsPolicy == IslandsPolicy.IslandPolicies.none)
-    {
-      sb.append("min(").append(coveredName).append(".key) AS key, ")
-        .append(coveredName).append(".n AS n, ")
-        .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
-        .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
-    }
-    else if (islandsPolicy == IslandsPolicy.IslandPolicies.context)
-    {
-      sb.append(coveredName).append(".key AS key, ")
-        .append(coveredName).append(".n AS n, ")
-        .append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(" AS \"min\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(" AS \"max\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
-    }
-    else
-    {
-      throw new UnsupportedOperationException("No implementation for island policy "
-        + islandsPolicy.toString());
-    }
 
-    sb.append(indent2).append("FROM ").append(coveredName).append(", ").append(tas.
-      tableName(NODE_TABLE)).append("\n");
+    sb.append("min(").append("keys.key) AS key, ")
+      .append(coveredName).append(".n AS n, ")
+      .append("min(").append(tas.aliasedColumn(NODE_TABLE, "left_token")).append(") AS \"min\", ")
+      .append("max(").append(tas.aliasedColumn(NODE_TABLE, "right_token")).append(") AS \"max\", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(" AS \"text\", ")
+      .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(" AS \"corpus\"\n");
+
+
+    sb.append(indent2).append("FROM ")
+      .append(coveredName).append(", ")
+      .append(tas.tableName(NODE_TABLE)).append(", ")
+      .append("keys")
+      .append("\n");
 
     sb.append(indent2).append("WHERE\n");
+    
+    sb.append(indent3).append("keys.n = ").append(coveredName).append(".n AND\n");
 
     sb.append(indent3).append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus")).
       append(" IN (").append(StringUtils.join(corpusList, ",")).append(") AND\n");
@@ -366,8 +394,22 @@ public class CommonAnnotateWithClauseGenerator
     {
       sb.append(indent2).append("GROUP BY ")
         .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
-        .append(tas.aliasedColumn(NODE_TABLE, "text_ref"))
-        .append(", n\n");
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+        .append(coveredName).append(".n\n");
+    }
+    else if(islandsPolicy == IslandsPolicy.IslandPolicies.context)
+    {
+      sb.append(indent2).append("GROUP BY ")
+        .append(tas.aliasedColumn(NODE_TABLE, "corpus_ref")).append(", ")
+        .append(tas.aliasedColumn(NODE_TABLE, "text_ref")).append(", ")
+        .append(coveredName).append(".n, ")
+        .append(coveredName).append(".nodeNr\n");
+    }
+    else
+    {
+      throw new UnsupportedOperationException(
+        "No implementation for island policy "
+        + islandsPolicy.toString());
     }
 
     sb.append(indent).append(")\n");

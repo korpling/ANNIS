@@ -28,11 +28,13 @@ NODE:'node';
 META:'meta';
 AND:'&';
 OR:'|';
-EQ:'=';
+EQ_VAL:'==';
+EQ: '=';
 NEQ:'!=';
 DOMINANCE:'>';
 POINTING:'->';
 PRECEDENCE:'.';
+TEST:'%';
 IDENT_COV:'_=_';
 INCLUSION:'_i_';
 OVERLAP:'_o_';
@@ -43,6 +45,7 @@ RIGHT_OVERLAP:'_or_';
 LEFT_CHILD:'@l';
 RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
+IDENTITY:'_id_';
 ROOT:':root';
 ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
@@ -58,16 +61,16 @@ DOUBLECOLON:'::';
 
 WS  :   ( ' ' | '\t' | '\r' | '\n' )+ -> skip ;  
 
-ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
-    ;
-    
+VAR_DEF
+	:	('a'..'z'|'A'..'Z') ( '0' .. '9'|'a'..'z'|'A'..'Z')* '#'
+	;
+
 REF
 	:	'#' ( '0' .. '9'|'a'..'z'|'A'..'Z')+
 	;
 
-VAR_DEF
-	:	('a'..'z'|'A'..'Z') ( '0' .. '9'|'a'..'z'|'A'..'Z')* '#'
-	;
+ID  :	('a'..'z'|'A'..'Z'|'_') ('a'..'z'|'A'..'Z'|'0'..'9'|'_'|'-')*
+    ;
 
 DIGITS : ('0'..'9')+;
 

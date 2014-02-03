@@ -135,12 +135,15 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 - `hidden` - the visualizer is hidden, but expandable
 - `visible` - the visualizer is visible and closeable
 - `preloaded` - behaviour is the same as `hidden`, but the visualizer starts to be rendered in the background
-- `removed` - this visualizer is disabled, useful to deactivate a visualizer that is always shown (like [KWIC](@ref annis.visualizers.component.KWICPanel)
+- `removed` - this visualizer is disabled, useful to deactivate a visualizer that is always shown (like [KWIC](@ref annis.visualizers.component.KWICPanel))
 
 ## Visualizer list ## {#admin-configure-vislist}
 
+
+
 short name| Description | Java class | Screenshot
 ----------|-------------|------------|-----------
+`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.KWICPanel) | ![kwic](kwic_vis.png)
 `tree` | constituent syntax tree | [TigerTreeVisualizer](@ref annis.visualizers.component.tree.TigerTreeVisualizer) | ![tree](tiger_tree_vis.png)
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
 `grid_tree` | a grid visualizing hierarchical tree annotations as ordered grid layers | [GridTreeVisualizer](@ref annis.visualizers.iframe.gridtree.GridTreeVisualizer ) | ![grid_tree](grid_tree_vis.png)
@@ -153,6 +156,8 @@ short name| Description | Java class | Screenshot
 `video` | a linked video file | [VideoVisualizer](@ref annis.visualizers.component.VideoVisualizer) | ![video](video.png)
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
 `rst` and `rstdoc` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
+`raw_text` | simple and default visualizer for the document browser, shows the content of the text.tab file for a specific document.| [RawTextVisualizer](@ref annis.visualizers.component.RawTextVisualizer) | ![raw text](raw_text_vis.png)
+
 
 
 ## Visualizations with Software Requirements ## {#admin-configure-visibility}
@@ -167,7 +172,27 @@ your local machine for Kickstarter) and make sure it is available in your system
 path (check this by calling e.g. the program `dot` on the command line).
 
 
-# Document Browsing # {#document-visualizer}
+# Document Browser # {#document-visualizer}
+
+The default configuration for the document browser is stored in the
+`annis-service.properties` file. It can be overwritten by the
+`corpus.properties` file. Available keys:
+
+	browse-documents=true|false
+	browse-document-visualizers= {...}
+
+Note that the `browse-documents` configuration has only an effect,
+when it is set within `corpus.properties`.
+
+## automatic switch on/off ##
+
+The ANNIS importer tries to detect an artificial token
+segmentation. If the text.tab contains only artificial token (which
+means there are only white spaces) the document browser is
+disabled. In the case there exists a corpus.properties file which
+configures the document browser it will never be disabled by ANNIS.
+
+## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
 It is also possible to use a custom visualizer for browsing a whole
 document. The configuration is in JSON-Syntax and placed in the
@@ -176,8 +201,7 @@ each corpus.
 
 
 \code{.json}
-{
-	vis : [
+	browse-document-visualizers = vis : [
 		{type : 'htmldoc', displayName : 'diplomatic view'},
 		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
 	],
@@ -188,7 +212,6 @@ each corpus.
 		{ namespace : 'annis', name :'Titel', ascending : 'false'}
 	]
 
-}
 \endcode
 
 Explanation in detail:
@@ -205,6 +228,8 @@ Explanation in detail:
   document name. But it's also possible to define a custom sort by the
   metadata fields, even if the column is not visible. 'namespace' and
   'ascending' is optional. 'ascending' its default setting is 'true'.
+
+
 
 # Web fonts # {#web-fonts}
 
@@ -247,4 +272,3 @@ und is reachable under the defined link in the instance config:
 
 Further explantation about the `@font-face` rule is availabe on the [W3C
 websites](http://www.w3.org/TR/css-fonts-3/#font-face-rule).
-

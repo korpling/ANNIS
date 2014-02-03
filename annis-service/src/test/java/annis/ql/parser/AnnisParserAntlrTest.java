@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(value= Parameterized.class)
 public class AnnisParserAntlrTest

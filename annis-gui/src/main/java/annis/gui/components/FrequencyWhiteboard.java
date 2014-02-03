@@ -20,7 +20,6 @@ import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.Notification;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
@@ -29,15 +28,16 @@ import org.json.JSONException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript(value =
 {
-  "flotr2.js", "jquery-1.9.1.min.js", "frequencychart.js"
+  "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
   public final int PIXEL_PER_VALUE = 45;
+  public final int ADDTIONAL_PIXEL_WIDTH = 100;
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");
@@ -89,10 +89,10 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 
     for (FrequencyTable.Entry e : table.getEntries())
     {
-      labels.add(StringUtils.join(e.getTupel(), "/"));
+      labels.add(StringUtils.join(e.getTupel(), "/") + " (" + e.getCount() + ")");
       values.add(e.getCount());
     }
-    setWidth(PIXEL_PER_VALUE * values.size(), Unit.PIXELS);
+    setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
     lastScale = scale;
     
 //    callFunction("showData", labels, values, scale.desc);

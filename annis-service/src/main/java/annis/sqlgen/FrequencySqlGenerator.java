@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.service.objects.FrequencyTable;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -41,7 +42,7 @@ import org.springframework.dao.DataAccessException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   implements WhereClauseSqlGenerator<QueryData>, SelectClauseSqlGenerator<QueryData>,
@@ -115,7 +116,14 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
       // specificly join on top level corpus
       conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus" );
       // join on node ID
-      conditions.add("v" + i + ".id = solutions.id" + idxNodeVariables.get(e.getReferencedNode()).getId());
+      QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
+      if(referencedNode == null)
+      {
+        throw new AnnisQLSemanticsException("No such node \"" 
+          + e.getReferencedNode() + "\". "
+          + "Your query contains " + alternative.size() + " node(s), make sure no node definition numbers are greater than this number");
+      }
+      conditions.add("v" + i + ".id = solutions.id" + referencedNode.getId());
       
       if(e.getType() == FrequencyTableEntryType.span)
       {

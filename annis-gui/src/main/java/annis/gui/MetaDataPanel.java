@@ -67,7 +67,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
    * this empty label is currently use for empty metadata list on the left side
    * of the corpusbrowser
    */
-  private Label emptyLabel = new Label("none");
+  private Label emptyLabel = new Label("(no metadata)");
 
   public MetaDataPanel(String toplevelCorpusName)
   {

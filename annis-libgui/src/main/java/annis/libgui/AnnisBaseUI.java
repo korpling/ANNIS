@@ -20,11 +20,14 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
+import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -41,15 +44,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
-import java.util.Timer;
-import java.util.TimerTask;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -57,12 +53,12 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 import org.apache.commons.io.filefilter.SuffixFileFilter;
 import org.apache.commons.lang3.StringUtils;
 import org.codehaus.jackson.map.AnnotationIntrospector;
+import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.vaadin.cssinject.CSSInject;
 
 /**
  * Basic UI functionality.
@@ -105,13 +101,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
+  private transient TreeSet<String> alreadyAddedCSSResources;
   
-  private final Lock pushThrottleLock = new ReentrantLock();
-  private transient Timer pushTimer;
-  private long lastPushTime;
-  public static final long MINIMUM_PUSH_WAIT_TIME = 1000;
-  private AtomicInteger pushCounter = new AtomicInteger();
-  private transient TimerTask pushTask;
   
   @Override
   protected void init(VaadinRequest request)
@@ -225,7 +216,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
             }
             catch (IOException ex)
             {
-              log.warn("could not parsing instance config: " + ex.getMessage());
+              log.warn("could not parse instance config: " + ex.getMessage());
             }
           }
         }
@@ -461,76 +452,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       }
   }
 
-  @Override
-  public void push()
-  {
-    pushThrottleLock.lock();
-    try
-    {
-      long currentTime = System.currentTimeMillis();
-      long timeSinceLastPush = currentTime - lastPushTime;
-      
-      if (pushTask == null)
-      {
-
-        if (timeSinceLastPush >= MINIMUM_PUSH_WAIT_TIME)
-        {
-          // push directly
-          super.push();
-          lastPushTime = System.currentTimeMillis();
-          log.debug("direct push #{} executed", pushCounter.getAndIncrement());
-        }
-        else
-        {
-          
-          // schedule a new task
-          long waitTime = Math.max(0, MINIMUM_PUSH_WAIT_TIME - timeSinceLastPush);
-          pushTask = new TimerTask()
-          {
-            @Override
-            public void run()
-            {
-              pushThrottleLock.lock();
-              try
-              {
-                AnnisBaseUI.super.push();
-                lastPushTime = System.currentTimeMillis();
-                pushTask = null;
-                log.debug("Throttled push #{} executed", pushCounter.
-                  getAndIncrement());
-              }
-              finally
-              {
-                pushThrottleLock.unlock();
-              }
-
-            }
-          };
-          getPushTimer().schedule(pushTask, waitTime);
-          log.debug("Push scheduled to be executed in {} ms", waitTime);
-        }
-      }
-      else
-      {
-        log.debug("no push executed since another one is already running");
-      }
-    }
-    finally
-    {
-      pushThrottleLock.unlock();
-    }
-  }
-
-  public Timer getPushTimer()
-  {
-    if(pushTimer == null)
-    {
-      pushTimer = new Timer("Push Timer");
-    }
-    return pushTimer;
-  }
-  
-
       
   
   @Override
@@ -556,15 +477,14 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     {
       alreadyAddedCSS = new TreeSet<String>();
     }
-    String hashForCssContent = Hashing.md5().hashString(cssContent).toString();
+    String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-      CSSInject cssInject = new CSSInject(UI.getCurrent());
-      cssInject.setStyles(cssContent);
+      Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
   }
-
+  
   
   @Override
   public PluginManager getPluginManager()
@@ -593,6 +513,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       // the json should be human readable
       jsonMapper.configure(SerializationConfig.Feature.INDENT_OUTPUT,
         true);
+      jsonMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES , false);
     }
     return jsonMapper;
   }

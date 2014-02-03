@@ -17,13 +17,16 @@ package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -36,7 +39,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private transient SearchUI ui;
+  private SearchUI ui;
 
   private VerticalLayout layout;
 
@@ -70,6 +73,7 @@ public class DocBrowserPanel extends Panel
     layout = new VerticalLayout();
     setContent(layout);
     layout.setSizeFull();
+    layout.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
     setSizeFull();
 
@@ -87,7 +91,7 @@ public class DocBrowserPanel extends Panel
     if (table == null)
     {
       layout.addComponent(progress);
-      (new LoadingDocs()).start();
+      PollControl.runInBackground(100, ui, new LoadingDocs());
     }
   }
 
@@ -165,20 +169,19 @@ public class DocBrowserPanel extends Panel
     ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
 
-  private class LoadingDocs extends Thread
+  private class LoadingDocs implements Runnable
   {
 
     @Override
     public void run()
     {
 
-
       WebResource res = Helper.getAnnisWebResource();
       final List<Annotation> docs = res.path("meta/docnames/" + corpus).
         get(new Helper.AnnotationListType());
 
 
-      ui.access(new Runnable()
+      UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
@@ -188,7 +191,6 @@ public class DocBrowserPanel extends Panel
           layout.addComponent(table);
 
           table.setDocNames(docs);
-          ui.push();
         }
       });
     }

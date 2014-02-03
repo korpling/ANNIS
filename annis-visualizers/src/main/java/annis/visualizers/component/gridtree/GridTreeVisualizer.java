@@ -102,6 +102,10 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
             // init an empty grid
             AnnotationGrid grid = new AnnotationGrid(input.getId(), getTokKey());
 
+            // set config for escaping html tags
+            String escapeHTML = visInput.getMappings().getProperty("escape_html", "true");
+            grid.setEscapeHTML(Boolean.parseBoolean(escapeHTML));
+
             // get all roots for having a start point for the traversal
             EList<SNode> roots = graph.getSRoots();
 
@@ -112,7 +116,6 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
              * integer. The would only work up to 10 rows.
              */
             final Map<String, ArrayList<Row>> table = new TreeMap<String, ArrayList<Row>>();
-
 
             /**
              * Get a list of sorted token for retrieving the token index of the
