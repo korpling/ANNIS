@@ -223,6 +223,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
 
+    addScrollbar();
+
   }
 
   public void addExtension(CssRenderInfo renderInfo) {
@@ -717,9 +719,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-
-    addScrollbar();
-
   }
 
   private boolean hasRSTType(SRelation e) {
