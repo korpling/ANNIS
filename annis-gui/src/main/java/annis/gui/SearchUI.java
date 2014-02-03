@@ -890,21 +890,29 @@ public class SearchUI extends AnnisBaseUI
         && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.
         contains(mimeType))
       {
+        Notification n =
         new Notification("Media file type unsupported by your browser",
           "Please install the WebM plugin for Internet Explorer 9 from "
-          + "<a href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
+          + "<a target=\"_blank\" href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
           + " or use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
-          + browserList,
-          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+          + browserList
+          + "<br/><br /><strong>Click on this message to hide it</strong>",
+          Notification.Type.WARNING_MESSAGE, true);
+        n.setDelayMsec(-1);
+        
+        n.show(Page.getCurrent());
       }
       else
       {
-        new Notification("Media file type unsupported by your browser",
+        Notification n = new Notification("Media file type unsupported by your browser",
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
-          + browserList,
-          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+          + browserList
+          + "<br/><br /><strong>Click on this message to hide it</strong>",
+          Notification.Type.WARNING_MESSAGE, true);
+        n.setDelayMsec(-1);
+        n.show(Page.getCurrent());
       }
     }
     else

@@ -16,11 +16,13 @@
 package annis.gui.components.medialement;
 
 import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.MimeTypeErrorListener;
 import annis.visualizers.LoadableVisualizer;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.UI;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONArray;
@@ -71,7 +73,22 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
         }
       }
     });
+    addFunction("cannotPlay", new CannotPlayFunction());
 
+  }
+  
+  private static class CannotPlayFunction implements JavaScriptFunction
+  {
+
+    @Override
+    public void call(JSONArray arguments) throws JSONException
+    {
+      if(UI.getCurrent() instanceof MimeTypeErrorListener)
+      {
+        ((MimeTypeErrorListener) UI.getCurrent()).notifyCannotPlayMimeType(arguments.getString(0));
+      }
+    }
+    
   }
 
   @Override

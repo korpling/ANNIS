@@ -43,6 +43,14 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       var mediaElementSrc = $(document.createElement("source"));
       mediaElement.append(mediaElementSrc);
 
+      if(connector.getState().mimeType)
+      {
+        // check if the media player can play the mime type
+        if(mediaElement[0].canPlayType(connector.getState().mimeType) === "")
+        {
+          connector.cannotPlay(connector.getState().mimeType);
+        }
+      }
       mediaElementSrc.attr("type", connector.getState().mimeType);
       mediaElementSrc.attr("src", connector.getState().resourceURL);
 
