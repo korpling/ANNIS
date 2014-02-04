@@ -15,13 +15,14 @@
  */
 package annis.gui;
 
+import java.io.Serializable;
 import java.util.Set;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface CorpusSelectionChangeListener
+public interface CorpusSelectionChangeListener extends Serializable
 {
   public void onCorpusSelectionChanged(Set<String> selectedCorpora);
 }

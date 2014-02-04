@@ -40,6 +40,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -104,7 +105,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private int maxShortID;
 
-  private transient List<CorpusSelectionChangeListener> corpusSelChangeListeners
+  private List<CorpusSelectionChangeListener> corpusSelChangeListeners
     = new LinkedList<CorpusSelectionChangeListener>();
 
   public QueryController(SearchUI ui)
@@ -112,6 +113,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     this.ui = ui;
     this.history = new ListOrderedSet<HistoryEntry>();
   }
+  
 
   public void updateCorpusSetList()
   {
