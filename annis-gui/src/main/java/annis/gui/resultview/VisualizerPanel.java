@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
@@ -267,30 +268,14 @@ public class VisualizerPanel extends CssLayout
   {
     out.defaultWriteObject();
     
-    XMIResourceImpl res = new XMIResourceImpl();
-    res.getContents().add(result);
-    res.save(out, res.getDefaultSaveOptions());
+    CommonHelper.writeSDocument(result, out);
   }
   
   private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
   {
     in.defaultReadObject();
     
-    XMIResourceImpl res = new XMIResourceImpl();
-    res.load(in, res.getDefaultLoadOptions());
-    
-    this.result = SaltCommonFactory.eINSTANCE.createSDocument();
-    
-    TreeIterator<EObject> itContents = res.getAllContents();
-    while(itContents.hasNext())
-    {
-      EObject o = itContents.next();
-      if(o instanceof SDocument)
-      {
-        this.result = (SDocument) o;
-        break;
-      }
-    }
+   this.result = CommonHelper.readSDocument(in);
   }
   
   private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)

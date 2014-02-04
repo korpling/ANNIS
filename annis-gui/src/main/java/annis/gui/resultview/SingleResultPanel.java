@@ -50,6 +50,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -84,8 +87,6 @@ public class SingleResultPanel extends CssLayout implements
     "info.gif");
 
   private transient SDocument result;
-
-  private transient Map<SNode, Long> markedAndCovered;
 
   private Map<String, String> markedCoveredMap;
 
@@ -268,6 +269,20 @@ public class SingleResultPanel extends CssLayout implements
     addComponent(infoBar);
     initVisualizer();
   }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+    
+    CommonHelper.writeSDocument(result, out);
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    
+   this.result = CommonHelper.readSDocument(in);
+  }
 
   public void setSegmentationLayer(String segmentationName)
   {
@@ -278,7 +293,7 @@ public class SingleResultPanel extends CssLayout implements
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getSDocumentGraph());
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      Map<SNode, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -328,7 +343,7 @@ public class SingleResultPanel extends CssLayout implements
     } // end if result not null
   }
 
-  private void calulcateColorsForMarkedAndCovered()
+  private void calulcateColorsForMarkedAndCovered(Map<SNode, Long> markedAndCovered)
   {
     if (markedAndCovered != null)
     {
@@ -463,8 +478,8 @@ public class SingleResultPanel extends CssLayout implements
         segmentationName,
         result.getSDocumentGraph());
 
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-      calulcateColorsForMarkedAndCovered();
+      Map<SNode, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      calulcateColorsForMarkedAndCovered(markedAndCovered);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 

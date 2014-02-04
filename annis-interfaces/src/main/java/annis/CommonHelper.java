@@ -18,6 +18,7 @@ package annis;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -34,6 +35,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHand
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -41,6 +45,9 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -436,6 +443,33 @@ public class CommonHelper
 
 
     return names;
+  }
+  
+  public static void writeSDocument(SDocument doc, ObjectOutputStream out) 
+    throws IOException
+  {
+    XMIResourceImpl res = new XMIResourceImpl();
+    res.getContents().add(doc);
+    res.save(out, res.getDefaultSaveOptions());
+  }
+  
+  public static SDocument readSDocument(ObjectInputStream in) 
+    throws IOException
+  {
+     XMIResourceImpl res = new XMIResourceImpl();
+    res.load(in, res.getDefaultLoadOptions());
+    
+    
+    TreeIterator<EObject> itContents = res.getAllContents();
+    while(itContents.hasNext())
+    {
+      EObject o = itContents.next();
+      if(o instanceof SDocument)
+      {
+        return (SDocument) o;
+      }
+    }
+    return SaltCommonFactory.eINSTANCE.createSDocument();
   }
 
   // TODO: remove if really not needed
