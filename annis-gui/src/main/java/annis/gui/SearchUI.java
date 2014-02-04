@@ -899,7 +899,7 @@ public class SearchUI extends AnnisBaseUI
           + browserList
           + "<br/><br /><strong>Click on this message to hide it</strong>",
           Notification.Type.WARNING_MESSAGE, true);
-        n.setDelayMsec(-1);
+        n.setDelayMsec(15000);
         
         n.show(Page.getCurrent());
       }
@@ -911,7 +911,7 @@ public class SearchUI extends AnnisBaseUI
           + browserList
           + "<br/><br /><strong>Click on this message to hide it</strong>",
           Notification.Type.WARNING_MESSAGE, true);
-        n.setDelayMsec(-1);
+        n.setDelayMsec(15000);
         n.show(Page.getCurrent());
       }
     }

@@ -29,10 +29,21 @@ window.annis_gui_components_medialement_MediaElementPlayer = function() {
       for (playerIndex in mejs.players) 
       {
         var p = mejs.players[playerIndex];
-        p.setSrc("");
+        if(p.setSrc && p.media.setSrc)
+        {
+          p.setSrc("");
+        }
         // also clean up the global indexes of players, since it can get quite polluted
         // after some clicks
-        p.remove();
+        if(p.remove && p.media.remove) // there is a bug in IE, check if removing works
+        {
+          p.remove();
+        }
+        else
+        {
+          // just delete from the list
+          delete mejs.players[playerIndex];
+        }
       }
       var mediaElement = $(document.createElement(connector.getState().elementType));
       rootDiv.append(mediaElement);
