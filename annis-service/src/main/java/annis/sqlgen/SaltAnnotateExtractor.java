@@ -621,7 +621,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     from.getSLayers().clear();
  
-    List<Edge> inEdges =  graph.getInEdges(from.getSId());
+    List<Edge> inEdges =  new LinkedList<Edge>(graph.getInEdges(from.getSId()));
     for(Edge e : inEdges)
     {
       if(e instanceof SRelation)
@@ -629,7 +629,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         Validate.isTrue(graph.removeEdge(e));
       }
     }
-    List<Edge> outEdges = graph.getOutEdges(from.getSId());
+    List<Edge> outEdges = new LinkedList<Edge>(graph.getOutEdges(from.getSId()));
     for(Edge e : outEdges)
     {
       if(e instanceof SRelation)

@@ -1083,7 +1083,7 @@ public class CorefVisualizer extends WriterVisualizer
     {
       SPointingRelation rel = (SPointingRelation) e;
       if(componentNameForRelation(rel) != null && rel.getSSource() != null && rel.getSTarget() != null
-        && rel.getSLayers() != null && namespace.equals(rel.getSLayers().get(0).getSName()))
+        && rel.getSLayers() != null && !rel.getSLayers().isEmpty() && namespace.equals(rel.getSLayers().get(0).getSName()))
       {
         return true;
       }
