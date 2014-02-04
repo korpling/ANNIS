@@ -41,7 +41,6 @@ import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -89,9 +88,6 @@ public class Helper
     + "<li>the corpus properties are not well defined</li></ul>"
     + "<p>Please ask the responsible admin or consult the ANNIS "
     + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
-
-  // caches the config configuration, should saves rest requests. Hopefully.
-  private static final Map<String, CorpusConfig> corpusConfigCache = new HashMap<String, CorpusConfig>();
 
   /**
    * Creates an authentificiated REST client
@@ -518,12 +514,7 @@ public class Helper
       return null;
     }
 
-    if (corpusConfigCache.containsKey(corpus)) {
-      return corpusConfigCache.get(corpus);
-    }
-
     CorpusConfig corpusConfig = new CorpusConfig();
-
 
     try
     {
@@ -550,21 +541,11 @@ public class Helper
         .show(Page.getCurrent());
     }
 
-    //update cache
-    corpusConfigCache.put(corpus, corpusConfig);
-
     return corpusConfig;
   }
 
   public static CorpusConfig getDefaultCorpusConfig()
   {
-
-    final String DEFAULT_CORPUS_CONFIG = "default-config";
-
-    if (corpusConfigCache.containsKey(DEFAULT_CORPUS_CONFIG))
-    {
-      return corpusConfigCache.get(DEFAULT_CORPUS_CONFIG);
-    }
 
     CorpusConfig defaultCorpusConfig = new CorpusConfig();
 
@@ -585,9 +566,6 @@ public class Helper
         ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
         .show(Page.getCurrent());
     }
-
-    // update cache
-    corpusConfigCache.put(DEFAULT_CORPUS_CONFIG, defaultCorpusConfig);
 
     return defaultCorpusConfig;
   }
