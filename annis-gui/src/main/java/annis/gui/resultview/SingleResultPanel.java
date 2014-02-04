@@ -91,7 +91,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private Map<String, String> markedExactMap;
 
-  private transient PluginSystem ps;
+  private PluginSystem ps;
 
   private List<VisualizerPanel> visualizers;
 
