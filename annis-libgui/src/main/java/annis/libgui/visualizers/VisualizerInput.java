@@ -65,7 +65,7 @@ public class VisualizerInput implements Serializable
 
   private String resourcePathTemplate = "%s";
 
-  private List<SToken> token;
+  private transient List<SToken> token;
 
   private Set<String> tokenAnnos;
 
@@ -335,22 +335,18 @@ public class VisualizerInput implements Serializable
   /**
    * should contains a list of all token of a the which is available with
    * {@link VisualizerInput#getSResult()}.
-   */
-  public void setToken(List<SToken> token)
-  {
-    this.token = token;
-  }
-
-  /**
-   * should contains a list of all token of a the which is available with
-   * {@link VisualizerInput#getSResult()}.
    *
    * @return TODO at the moment it's not certain, that token are nodes of the
    * {@link VisualizerInput#getSResult()}.
    *
    */
+  @Deprecated
   public List<SToken> getToken()
   {
+    if(this.token == null)
+    {
+      this.token = getSResult().getSDocumentGraph().getSortedSTokenByText();
+    }
     return this.token;
   }
 

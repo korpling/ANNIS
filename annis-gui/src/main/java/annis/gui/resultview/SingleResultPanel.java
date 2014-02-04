@@ -101,8 +101,6 @@ public class SingleResultPanel extends CssLayout implements
 
   private String segmentationName;
 
-  private transient List<SToken> token;
-
   private HorizontalLayout infoBar;
 
   private String corpusName;
@@ -330,7 +328,7 @@ public class SingleResultPanel extends CssLayout implements
     } // end if result not null
   }
 
-  private void calulcateColorsForMarkedAndCoverd()
+  private void calulcateColorsForMarkedAndCovered()
   {
     if (markedAndCovered != null)
     {
@@ -461,14 +459,12 @@ public class SingleResultPanel extends CssLayout implements
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
 
-      token = result.getSDocumentGraph().getSortedSTokenByText();
-
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getSDocumentGraph());
 
       markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-      calulcateColorsForMarkedAndCoverd();
+      calulcateColorsForMarkedAndCovered();
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
@@ -478,7 +474,7 @@ public class SingleResultPanel extends CssLayout implements
 
         VisualizerPanel p = new VisualizerPanel(
           entries[i], result, corpusName, documentName,
-          token, visibleTokenAnnos, markedAndCovered,
+          visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
 

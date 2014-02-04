@@ -44,15 +44,20 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
-import java.sql.ParameterMetaData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -65,6 +70,9 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,6 +87,7 @@ import org.slf4j.LoggerFactory;
 public class VisualizerPanel extends CssLayout
   implements Button.ClickListener, VisualizationToggle
 {
+  public static final long serialVersionUID = 1L;
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
@@ -96,13 +105,11 @@ public class VisualizerPanel extends CssLayout
 
   private transient SDocument result;
 
-  private transient PluginSystem ps;
+  private PluginSystem ps;
 
   private ResolverEntry entry;
 
   private transient Map<SNode, Long> markedAndCovered;
-
-  private transient List<SToken> token;
 
   private Map<String, String> markersExact;
 
@@ -114,7 +121,7 @@ public class VisualizerPanel extends CssLayout
 
   private String resultID;
 
-  private transient VisualizerPlugin visPlugin;
+  private VisualizerPlugin visPlugin;
 
   private Set<String> visibleTokenAnnos;
 
@@ -144,7 +151,6 @@ public class VisualizerPanel extends CssLayout
     SDocument result,
     String corpusName,
     String documentName,
-    List<SToken> token,
     Set<String> visibleTokenAnnos,
     Map<SNode, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
@@ -168,7 +174,6 @@ public class VisualizerPanel extends CssLayout
     this.result = result;
     this.corpusName = corpusName;
     this.documentName = documentName;
-    this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
     this.segmentationName = segmentationName;
@@ -257,6 +262,54 @@ public class VisualizerPanel extends CssLayout
     } // end if entry not null
 
   }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+    
+    XMIResourceImpl res = new XMIResourceImpl();
+    res.getContents().add(result);
+    res.save(out, res.getDefaultSaveOptions());
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    
+    XMIResourceImpl res = new XMIResourceImpl();
+    res.load(in, res.getDefaultLoadOptions());
+    
+    this.result = SaltCommonFactory.eINSTANCE.createSDocument();
+    
+    TreeIterator<EObject> itContents = res.getAllContents();
+    while(itContents.hasNext())
+    {
+      EObject o = itContents.next();
+      if(o instanceof SDocument)
+      {
+        this.result = (SDocument) o;
+        break;
+      }
+    }
+  }
+  
+  private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
+  {
+    if(tokenIDs == null || graph == null)
+    {
+      return new LinkedList<SToken>();
+    }
+    ArrayList<SToken> r = new ArrayList<SToken>(tokenIDs.size());
+    for(String t : tokenIDs)
+    {
+      SNode n = graph.getSNode(t);
+      if(n instanceof SToken)
+      {
+        r.add((SToken) n);
+      }
+    }
+    return r;
+  }
 
   private Component createComponent()
   {
@@ -291,7 +344,6 @@ public class VisualizerPanel extends CssLayout
     input.setMarkedAndCovered(markedAndCovered);
 
     input.setResult(result);
-    input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
     if (instanceConfig != null && instanceConfig.getFont() != null)
