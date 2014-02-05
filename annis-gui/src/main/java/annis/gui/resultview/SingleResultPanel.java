@@ -216,7 +216,7 @@ public class SingleResultPanel extends CssLayout implements
       rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
     }
 
-    int lftContextIdx = queryController.getPreparedQuery().getContextLeft();
+    int lftContextIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextLeft();
     lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
@@ -226,7 +226,7 @@ public class SingleResultPanel extends CssLayout implements
       true
     });
 
-    int rghtCtxIdx = queryController.getPreparedQuery().getContextRight();
+    int rghtCtxIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextRight();
     rghtCtxContainer.addItem(rghtCtxIdx);
 
     rghtCtxContainer.sort(new Object[]
@@ -469,8 +469,9 @@ public class SingleResultPanel extends CssLayout implements
   {
     try
     {
-      ResolverEntry[] entries
-        = resolverProvider.getResolverEntries(result);
+      ResolverEntry[] entries 
+        = resolverProvider == null ? new ResolverEntry[0] 
+        : resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
 
@@ -783,17 +784,21 @@ public class SingleResultPanel extends CssLayout implements
       {
         for (SToken t : sTokens)
         {
-          RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(ANNIS_NS,
-            FEAT_RELANNIS_NODE).getValue();
-
-          if (minMax.min > f.getTokenIndex())
+          SFeature feature = t.getSFeature(ANNIS_NS,
+            FEAT_RELANNIS_NODE);
+          if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
           {
-            minMax.min = f.getTokenIndex();
-          }
+            RelannisNodeFeature f = (RelannisNodeFeature) feature.getValue();
 
-          if (minMax.max < f.getTokenIndex())
-          {
-            minMax.max = f.getTokenIndex();
+            if (minMax.min > f.getTokenIndex())
+            {
+              minMax.min = f.getTokenIndex();
+            }
+
+            if (minMax.max < f.getTokenIndex())
+            {
+              minMax.max = f.getTokenIndex();
+            }
           }
         }
       }
@@ -843,4 +848,11 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.setEnabled(true);
     rghtCtxCombo.setEnabled(true);
   }
+
+  protected SDocument getResult()
+  {
+    return result;
+  }
+  
+  
 }

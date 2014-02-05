@@ -450,6 +450,10 @@ public class CommonHelper
   {
     XMIResourceImpl res = new XMIResourceImpl();
     res.getContents().add(doc);
+    
+    // also add the SDocumentGraph of the document
+    res.getContents().add(doc.getSDocumentGraph());
+    
     res.save(out, res.getDefaultSaveOptions());
   }
   
