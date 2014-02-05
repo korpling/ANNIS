@@ -259,8 +259,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
           if (currNode instanceof SStructure
-                  && isSegment(currNode)
-                  && CommonHelper.checkSLayer(namespace, fromNode)) {
+                  && isSegment(currNode)) {
             sentences.add((SStructure) currNode);
           }
         }
