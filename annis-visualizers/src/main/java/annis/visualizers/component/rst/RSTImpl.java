@@ -285,7 +285,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       });
 
       //decorate segments with sentence number
-      int i = 0;
+      int i = 1;
       for (SStructure sentence : sentences) {
         sentence.createSProcessingAnnotation(
                 SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
