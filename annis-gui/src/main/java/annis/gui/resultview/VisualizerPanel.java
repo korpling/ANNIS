@@ -744,4 +744,11 @@ public class VisualizerPanel extends CssLayout
       return null;
     }
   }
+
+  protected SDocument getResult()
+  {
+    return result;
+  }
+  
+  
 }
