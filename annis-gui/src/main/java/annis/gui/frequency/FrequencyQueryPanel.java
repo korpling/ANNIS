@@ -142,8 +142,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
-    createAutomaticEntriesForQuery(controller.getQueryDraft());
-    updateQueryInfo(controller.getQueryDraft());
+    if(controller != null)
+    {
+      createAutomaticEntriesForQuery(controller.getQueryDraft());
+      updateQueryInfo(controller.getQueryDraft());
+    }
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
@@ -176,10 +179,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             // was not a number but a named node
           }
         }
-        List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
-        nr = Math.min(nr, nodes.size()-1);
-        tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-          FrequencyTableEntryType.span, "", ""), counter++);
+        if(controller != null)
+        {
+          List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
+          nr = Math.min(nr, nodes.size()-1);
+          tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
+            FrequencyTableEntryType.span, "", ""), counter++);
+        }
       }
     });
     layoutButtons.addComponent(btAdd);
@@ -210,7 +216,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         manuallyChanged = false;
         btShowFrequencies.setEnabled(true);
         tblFrequencyDefinition.removeAllItems();
-        createAutomaticEntriesForQuery(controller.getQueryDraft());
+        if(controller != null)
+        {
+          createAutomaticEntriesForQuery(controller.getQueryDraft());
+        }
       }
     });
     layoutButtons.addComponent(btReset);
