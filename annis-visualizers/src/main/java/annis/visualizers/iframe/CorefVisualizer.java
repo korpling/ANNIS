@@ -125,7 +125,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
   
-  private static class SerializableAnnotation
+  private static class SerializableAnnotation implements Serializable
   {
     private String name;
     private String value;
