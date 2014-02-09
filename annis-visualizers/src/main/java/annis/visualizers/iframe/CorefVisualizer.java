@@ -93,7 +93,7 @@ public class CorefVisualizer extends WriterVisualizer
   LinkedList<TComponenttype> componenttype; //used to save which Node (with outgoing "P"-Edge) gelongs to which component
   private HashMap<Integer, Integer> colorlist;
 
-  static class TComponenttype
+  static class TComponenttype implements Serializable
   {
 
     String type;
