@@ -24,9 +24,11 @@ import annis.service.objects.RawTextWrapper;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
@@ -77,6 +79,20 @@ public class VisualizerInput implements Serializable
   private FontConfig font;
 
   private RawTextWrapper rawText;
+
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+
+    CommonHelper.writeSDocument(document, out);
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+
+    this.document = CommonHelper.readSDocument(in);
+  }
 
   public String getAnnisWebServiceURL()
   {
