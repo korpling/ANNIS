@@ -359,22 +359,22 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Collection<String> values = mb.getValues();
     if(!values.isEmpty())
     {
-      String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+      StringBuilder result = new StringBuilder("\n& meta::"+mb.getMetaDatum()+" = ");
       if(values.size()==1)
       {
-        result += "\""+values.iterator().next().replace("\"", "\\x22")+"\"";
+        result.append("\""+values.iterator().next().replace("\"", "\\x22")+"\"");
       }
       else
       {      
         Iterator<String> itValues = values.iterator();
-        result += "/(" + escapeRegexCharacters(itValues.next())+")";
+        result.append("/(" + escapeRegexCharacters(itValues.next())+")");
         while(itValues.hasNext())
         {
-          result+= "|("+escapeRegexCharacters(itValues.next())+")";
+          result.append("|("+escapeRegexCharacters(itValues.next())+")");
         }
-        result += "/";
+        result.append("/");
       }   
-      return result;
+      return result.toString();
     }
     return "";
   }
@@ -429,7 +429,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private String getAQLQuery()
   {
     int count = 1;    
-    String ql = "", edgeQuery = "", sentenceQuery = "";
+    StringBuilder ql = new StringBuilder();
+    StringBuilder edgeQuery = new StringBuilder();
+    String sentenceQuery = "";
     Collection<Integer> sentenceVars = new ArrayList<Integer>();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
     for (VerticalNode v : vnodes)
@@ -437,23 +439,23 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       Collection<SearchBox> sboxes = v.getSearchBoxes();
       for (SearchBox s : sboxes)
       {
-        ql += " & " + getAQLFragment(s);
+        ql.append(" & " + getAQLFragment(s));
       }
       if (sboxes.isEmpty())
       {
         //not sure we want to do it this way:
-        ql += "\n& /.*/";
+        ql.append("\n& /.*/");
       }
       sentenceVars.add(Integer.valueOf(count));
       for(int i=1; i < sboxes.size(); i++)
       {
         String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
-        edgeQuery += addQuery;
+        edgeQuery.append(addQuery);
       }
       count++;
       String edgeQueryAdds = (itEboxes.hasNext()) ? "\n& #"+(count-1)+" "
         +itEboxes.next().getValue()+" #"+count : "";
-      edgeQuery += edgeQueryAdds;
+      edgeQuery.append(edgeQueryAdds);
     }
     String addQuery = "";
     try
@@ -470,7 +472,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       if (spb.getValue().isEmpty()){
         addQuery = "\n&" + spb.getAttribute();
       }
-      ql += addQuery;
+      ql.append(addQuery);
       for(Integer i : sentenceVars)
       {
         sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
@@ -484,7 +486,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       metaQuery += getMetaQueryFragment(itMetaBoxes.next());
     }
-    String fullQuery = (ql+edgeQuery+sentenceQuery+metaQuery);
+    String fullQuery = (ql.toString() + edgeQuery+sentenceQuery+metaQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
     this.query = fullQuery;
