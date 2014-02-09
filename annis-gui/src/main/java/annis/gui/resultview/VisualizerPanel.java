@@ -45,7 +45,6 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
@@ -71,9 +70,6 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.eclipse.emf.common.util.TreeIterator;
-import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,7 +106,7 @@ public class VisualizerPanel extends CssLayout
 
   private ResolverEntry entry;
 
-  private transient Map<SNode, Long> markedAndCovered;
+  private Map<String, Long> markedAndCovered;
 
   private Map<String, String> markersExact;
 
@@ -153,7 +149,7 @@ public class VisualizerPanel extends CssLayout
     String corpusName,
     String documentName,
     Set<String> visibleTokenAnnos,
-    Map<SNode, Long> markedAndCovered,
+    Map<String, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
     @Deprecated Map<String, String> markedExactMap,
     String htmlID,
@@ -357,9 +353,6 @@ public class VisualizerPanel extends CssLayout
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
         .get(0);
 
-      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
-        input.getDocument(), wholeDocument));
-
       input.setDocument(wholeDocument);
     }
     else
@@ -386,7 +379,7 @@ public class VisualizerPanel extends CssLayout
   }
 
   public void setSegmentationLayer(String segmentationName,
-    Map<SNode, Long> markedAndCovered)
+    Map<String, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;
@@ -541,41 +534,6 @@ public class VisualizerPanel extends CssLayout
   public String getHtmlID()
   {
     return htmlID;
-  }
-
-  /**
-   * Rebuild the map of marked and covered matches with new object references.
-   * If a visualizer uses the whole document, the {@link VisualizerInput} gets a
-   * new result object, with new SNode objects, so we have to update these
-   * references.
-   *
-   * @param markedAndCovered the original map calculated with the partial
-   * document graph
-   * @param document the partial document or subgraph
-   * @param wholeDocucment the new complete document
-   * @return a new map, with updated object/node references. The salt ids of the
-   * node objects remains the same.
-   */
-  private Map<SNode, Long> rebuildMarkedAndConvered(
-    Map<SNode, Long> markedAndCovered,
-    SDocument document, SDocument wholeDocument)
-  {
-    Map<SNode, Long> newMarkedAndCovered = new HashMap<SNode, Long>();
-    SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
-    SNode wholeNode;
-
-    for (Entry<SNode, Long> e : markedAndCovered.entrySet())
-    {
-      wholeNode = wholeSGraph.getSNode(e.getKey().getSId());
-      newMarkedAndCovered.put(wholeNode, e.getValue());
-
-      // copy the annis features, which are not set by the annis service
-      copyAnnisFeature(e.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE, false);
-    }
-
-    // copy the annis features, which are not set by the annis service
-    copyAnnisFeature(document, wholeDocument, ANNIS_NS, FEAT_MATCHEDIDS, true);
-    return newMarkedAndCovered;
   }
 
   /**

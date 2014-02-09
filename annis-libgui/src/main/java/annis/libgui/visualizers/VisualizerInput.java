@@ -23,6 +23,7 @@ import annis.service.objects.RawTextWrapper;
 import annis.utils.LegacyGraphConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.Serializable;
@@ -45,8 +46,9 @@ public class VisualizerInput implements Serializable
 
   private String namespace = "";
 
-  private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
-
+  private Map<String, Long> markedAndCovered = new HashMap<String, Long>();
+  private transient Map<SNode, Long> cachedMarkedAndCoveredNodes;
+  
   private Map<String, String> markableMap = new HashMap<String, String>();
 
   private Map<String, String> markableExactMap = new HashMap<String, String>();
@@ -65,7 +67,7 @@ public class VisualizerInput implements Serializable
 
   private String resourcePathTemplate = "%s";
 
-  private transient List<SToken> token;
+  private transient List<SToken> cachedToken;
 
   private Set<String> tokenAnnos;
 
@@ -180,7 +182,7 @@ public class VisualizerInput implements Serializable
 
   /**
    * Same as {@link #getMarkableMap() } except that this only includes the
-   * really matched nodes and not covered token.
+ really matched nodes and not covered cachedToken.
    *
    * @return
    */
@@ -198,10 +200,10 @@ public class VisualizerInput implements Serializable
 
   /**
    * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of
-   * this map must be the corresponding node id of annotations or tokens. The
-   * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to
-   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
+ this map must be the corresponding node id of annotations or cachedTokens. The
+ values must be HTML compatible color definitions like #000000 or red. For
+ detailed information on HTML color definition refer to
+ {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @return
    */
@@ -213,10 +215,10 @@ public class VisualizerInput implements Serializable
 
   /**
    * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of
-   * this map must be the corresponding node id of annotations or tokens. The
-   * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to
-   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
+ this map must be the corresponding node id of annotations or cachedTokens. The
+ values must be HTML compatible color definitions like #000000 or red. For
+ detailed information on HTML color definition refer to
+ {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @param markableMap
    */
@@ -234,8 +236,9 @@ public class VisualizerInput implements Serializable
    * {@link MatchedNodeColors}.
    *
    */
-  public void setMarkedAndCovered(Map<SNode, Long> markedAndCovered)
+  public void setMarkedAndCovered(Map<String, Long> markedAndCovered)
   {
+    this.cachedMarkedAndCoveredNodes = null;
     this.markedAndCovered = markedAndCovered;
   }
 
@@ -249,7 +252,27 @@ public class VisualizerInput implements Serializable
    */
   public Map<SNode, Long> getMarkedAndCovered()
   {
-    return markedAndCovered;
+    if(cachedMarkedAndCoveredNodes == null)
+    {
+      // calculate the SNodes from their ID and the graph
+      
+      cachedMarkedAndCoveredNodes = new HashMap<SNode, Long>();
+      
+      if(markedAndCovered != null && document != null)
+      {
+        SDocumentGraph graph = document.getSDocumentGraph();
+        for(Map.Entry<String, Long> e : markedAndCovered.entrySet())
+        {
+          SNode n = graph.getSNode(e.getKey());
+          if(n != null)
+          {
+            cachedMarkedAndCoveredNodes.put(n, e.getValue());
+          }
+        }
+      }
+    }
+    
+    return cachedMarkedAndCoveredNodes;
   }
 
   /**
@@ -333,26 +356,26 @@ public class VisualizerInput implements Serializable
   }
 
   /**
-   * should contains a list of all token of a the which is available with
-   * {@link VisualizerInput#getSResult()}.
+   * should contains a list of all cachedToken of a the which is available with
+ {@link VisualizerInput#getSResult()}.
    *
-   * @return TODO at the moment it's not certain, that token are nodes of the
-   * {@link VisualizerInput#getSResult()}.
+   * @return TODO at the moment it's not certain, that cachedToken are nodes of the
+ {@link VisualizerInput#getSResult()}.
    *
    */
   @Deprecated
   public List<SToken> getToken()
   {
-    if(this.token == null)
+    if(this.cachedToken == null)
     {
-      this.token = getSResult().getSDocumentGraph().getSortedSTokenByText();
+      this.cachedToken = getSResult().getSDocumentGraph().getSortedSTokenByText();
     }
-    return this.token;
+    return this.cachedToken;
   }
 
   /**
-   * Set all token annotations which should be displayed by the visualizer and
-   * correspondands to the annos choosen by the user in the annis gui.
+   * Set all cachedToken annotations which should be displayed by the visualizer and
+ correspondands to the annos choosen by the user in the annis gui.
    */
   public void setVisibleTokenAnnos(Set<String> tokenAnnos)
   {
@@ -360,8 +383,8 @@ public class VisualizerInput implements Serializable
   }
 
   /**
-   * This token annotation should displayed by the visualizer and is selected by
-   * the user in the annis gui.
+   * This cachedToken annotation should displayed by the visualizer and is selected by
+ the user in the annis gui.
    */
   public Set<String> getVisibleTokenAnnos()
   {
@@ -410,8 +433,8 @@ public class VisualizerInput implements Serializable
    * @return <ul><li>null - if the {@link VisualizerPlugin#isUsingRawText()}
    * method false for this visualizer.</li>
    *
-   * <li>empty list - if there are only segmentations and the token layer is
-   * empty</li>
+   * <li>empty list - if there are only segmentations and the cachedToken layer is
+ empty</li>
    *
    */
   public RawTextWrapper getRawText()

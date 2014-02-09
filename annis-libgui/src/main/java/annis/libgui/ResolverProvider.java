@@ -17,12 +17,13 @@ package annis.libgui;
 
 import annis.resolver.ResolverEntry;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import java.io.Serializable;
 
 /**
  *
  * @author thomas
  */
-public interface ResolverProvider
+public interface ResolverProvider extends Serializable
 {
   public ResolverEntry[] getResolverEntries(SDocument result);
   

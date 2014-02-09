@@ -293,7 +293,7 @@ public class SingleResultPanel extends CssLayout implements
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getSDocumentGraph());
-      Map<SNode, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -343,18 +343,18 @@ public class SingleResultPanel extends CssLayout implements
     } // end if result not null
   }
 
-  private void calulcateColorsForMarkedAndCovered(Map<SNode, Long> markedAndCovered)
+  private void calulcateColorsForMarkedAndCovered(Map<String, Long> markedAndCovered)
   {
     if (markedAndCovered != null)
     {
-      for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
+      for (Entry<String, Long> markedEntry : markedAndCovered.entrySet())
       {
         int color = Math.max(0, Math.min((int) markedEntry.getValue().
           longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        RelannisNodeFeature feat = RelannisNodeFeature.extract(markedEntry.
-          getKey());
+        SNode n = result.getSDocumentGraph().getSNode(markedEntry.getKey());
+        RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
 
         if (feat != null)
         {
@@ -365,10 +365,10 @@ public class SingleResultPanel extends CssLayout implements
     } // end if markedAndCovered not null
   }
 
-  private Map<SNode, Long> calculateMarkedAndCoveredIDs(
+  private Map<String, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
+    Map<String, Long> initialCovered = new HashMap<String, Long>();
 
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
@@ -379,7 +379,7 @@ public class SingleResultPanel extends CssLayout implements
 
       if (match != null)
       {
-        initialCovered.put(n, match);
+        initialCovered.put(n.getSId(), match);
       }
     }
 
@@ -387,17 +387,18 @@ public class SingleResultPanel extends CssLayout implements
     SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(
       doc.
       getSDocumentGraph(), initialCovered);
-    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
+    Map<String, Long> covered = cmc.getMatchedAndCovered();
 
     if (segmentationName != null)
     {
       // filter token
       Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
-      for (Map.Entry<SNode, Long> e : covered.entrySet())
+      for (Map.Entry<String, Long> e : covered.entrySet())
       {
-        if (e.getKey() instanceof SToken)
+        SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
+        if (n instanceof SToken)
         {
-          coveredToken.put((SToken) e.getKey(), e.getValue());
+          coveredToken.put((SToken) n, e.getValue());
         }
       }
 
@@ -406,7 +407,7 @@ public class SingleResultPanel extends CssLayout implements
         RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
           getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        if (!covered.containsKey(segNode))
+        if (!covered.containsKey(segNode.getSId()))
         {
           long leftTok = featSegNode.getLeftToken();
           long rightTok = featSegNode.getRightToken();
@@ -420,7 +421,7 @@ public class SingleResultPanel extends CssLayout implements
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
-              covered.put(segNode, e.getValue());
+              covered.put(segNode.getSId(), e.getValue());
               break;
             }
           } // end for each covered token
@@ -479,7 +480,7 @@ public class SingleResultPanel extends CssLayout implements
         segmentationName,
         result.getSDocumentGraph());
 
-      Map<SNode, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       calulcateColorsForMarkedAndCovered(markedAndCovered);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
@@ -654,12 +655,12 @@ public class SingleResultPanel extends CssLayout implements
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
 
-    private Map<SNode, Long> matchedAndCovered;
+    private Map<String, Long> matchedAndCovered;
 
     private long currentMatchPos;
 
     public CoveredMatchesCalculator(SDocumentGraph graph,
-      Map<SNode, Long> initialMatches)
+      Map<String, Long> initialMatches)
     {
       this.matchedAndCovered = initialMatches;
 
@@ -701,9 +702,10 @@ public class SingleResultPanel extends CssLayout implements
           }
         });
 
-      for (Map.Entry<SNode, Long> entry : initialMatches.entrySet())
+      for (Map.Entry<String, Long> entry : initialMatches.entrySet())
       {
-        sortedByOverlappedTokenIntervall.put(entry.getKey(), entry.getValue());
+        SNode n = graph.getSNode(entry.getKey());
+        sortedByOverlappedTokenIntervall.put(n, entry.getValue());
       }
 
       currentMatchPos = 1;
@@ -721,11 +723,13 @@ public class SingleResultPanel extends CssLayout implements
       String traversalId, SNode currNode, SRelation edge, SNode fromNode,
       long order)
     {
-      if (matchedAndCovered.containsKey(fromNode) && !matchedAndCovered.
-        containsKey(currNode))
+      if (fromNode != null
+        && matchedAndCovered.containsKey(fromNode.getSId()) 
+        && currNode != null
+        && !matchedAndCovered.containsKey(currNode.getSId()))
       {
-        currentMatchPos = matchedAndCovered.get(fromNode);
-        matchedAndCovered.put(currNode, currentMatchPos);
+        currentMatchPos = matchedAndCovered.get(fromNode.getSId());
+        matchedAndCovered.put(currNode.getSId(), currentMatchPos);
       }
 
     }
@@ -751,7 +755,7 @@ public class SingleResultPanel extends CssLayout implements
       }
     }
 
-    public Map<SNode, Long> getMatchedAndCovered()
+    public Map<String, Long> getMatchedAndCovered()
     {
       return matchedAndCovered;
     }
