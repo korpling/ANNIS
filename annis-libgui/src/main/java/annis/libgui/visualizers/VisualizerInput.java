@@ -15,6 +15,7 @@
  */
 package annis.libgui.visualizers;
 
+import annis.CommonHelper;
 import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
@@ -249,26 +250,16 @@ public class VisualizerInput implements Serializable
    * HEX-values according to html or css standards, it is possible to use
    * {@link MatchedNodeColors}.
    *
+   * @return 
    */
   public Map<SNode, Long> getMarkedAndCovered()
   {
     if(cachedMarkedAndCoveredNodes == null)
-    {
-      // calculate the SNodes from their ID and the graph
-      
-      cachedMarkedAndCoveredNodes = new HashMap<SNode, Long>();
-      
-      if(markedAndCovered != null && document != null)
+    {      
+      if (document != null)
       {
-        SDocumentGraph graph = document.getSDocumentGraph();
-        for(Map.Entry<String, Long> e : markedAndCovered.entrySet())
-        {
-          SNode n = graph.getSNode(e.getKey());
-          if(n != null)
-          {
-            cachedMarkedAndCoveredNodes.put(n, e.getValue());
-          }
-        }
+        cachedMarkedAndCoveredNodes = CommonHelper.createSNodeMapFromIDs(
+          markedAndCovered, document.getSDocumentGraph());
       }
     }
     

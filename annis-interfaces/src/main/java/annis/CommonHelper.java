@@ -475,6 +475,33 @@ public class CommonHelper
     }
     return SaltCommonFactory.eINSTANCE.createSDocument();
   }
+  
+  /**
+   * Takes a map of salt node IDs to a value and return a new map that
+   * uses the SNodes as keys instead of the IDs.
+   * @param <V>
+   * @param map
+   * @param graph
+   * @return 
+   */
+  public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph)
+  {
+    HashMap<SNode, V> result = new LinkedHashMap<SNode, V>();
+    
+    if(map != null && graph != null)
+    {
+      for(Map.Entry<String, V> e : map.entrySet())
+      {
+        SNode n = graph.getSNode(e.getKey());
+        if (n != null)
+        {
+          result.put(n, e.getValue());
+        }
+      }
+    }
+    
+    return result;
+  }
 
   // TODO: remove if really not needed
 //  public static SNode[] getMatchedNodes(SDocument doc)

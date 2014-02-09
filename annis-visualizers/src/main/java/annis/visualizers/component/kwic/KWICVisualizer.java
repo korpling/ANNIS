@@ -84,7 +84,7 @@ public class KWICVisualizer extends AbstractVisualizer<KWICInterface>
   
   @Override
   public void setSegmentationLayer(KWICInterface visualizerImplementation,
-    String segmentationName, Map<SNode, Long> markedAndCovered)
+    String segmentationName, Map<String, Long> markedAndCovered)
   {
     visualizerImplementation.setSegmentationLayer(segmentationName,
       markedAndCovered);

@@ -383,7 +383,7 @@ public class VisualizerPanel extends CssLayout
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;
-
+    
     if (visPlugin != null && vis != null)
     {
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
