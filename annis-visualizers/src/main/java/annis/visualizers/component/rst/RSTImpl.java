@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONArray;
@@ -129,7 +131,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
    */
-  private static int count = 0;
+  private final UUID uniqueID = UUID.randomUUID();
 
   // unique id for every instance of RSTImpl
   private final String visId;
@@ -206,12 +208,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     namespace = visInput.getNamespace();
 
-    /**
-     * build id and increase count for every instance, so we receive an unique
-     * id
-     */
-    visId = "rst_" + count;
-    count++;
+    visId = "rst_" + uniqueID.toString();
 
     jit = new JITWrapper();
     jit.setWidth("100%");

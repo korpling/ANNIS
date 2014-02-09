@@ -25,6 +25,7 @@ import com.vaadin.client.ApplicationConnection;
 import com.vaadin.client.Paintable;
 import com.vaadin.client.UIDL;
 import com.vaadin.client.ValueMap;
+import java.util.UUID;
 
 /**
  *
@@ -35,11 +36,6 @@ public class VJITWrapper extends Widget implements Paintable
 
   private Document doc = Document.get();
 
-  /**
-   * The infovis has to be injected to an html element, so we create an an
-   * unique element identifier from this count value.
-   */
-  private static int count = 0;
 
   private final String elementID;
 
@@ -63,10 +59,7 @@ public class VJITWrapper extends Widget implements Paintable
     super();
 
     // build the html id
-    elementID = "jit_wrapper_" + count;
-
-    // count the JITWrapper objects
-    count++;
+    elementID =  Document.get().createUniqueId();
 
     // init container
     DivElement wrapper = doc.createDivElement();
