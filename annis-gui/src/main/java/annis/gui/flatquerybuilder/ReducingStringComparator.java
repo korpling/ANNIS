@@ -64,33 +64,36 @@ public class ReducingStringComparator
   {	  
     ALLOGRAPHS = new HashMap<String, HashMap>();
     ClassResource cr = new ClassResource(ReducingStringComparator.class, MAPPING_FILE); 
-    Document mappingD = null;
     try{
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
       DocumentBuilder db = dbf.newDocumentBuilder();        
-      mappingD = db.parse(cr.getStream().getStream());
+      Document mappingD = db.parse(cr.getStream().getStream());
+      
+      NodeList mappings = mappingD.getElementsByTagName("mapping");
+      for (int i = 0; i < mappings.getLength(); i++)
+      {
+        Element mapping = (Element) mappings.item(i);
+        String mappingName = mapping.getAttribute("name");
+        HashMap mappingMap = initAlphabet();
+        NodeList variants = mapping.getElementsByTagName("variant");
+        for (int j = 0; j < variants.getLength(); j++)
+        {
+          Element var = (Element) variants.item(j);
+          char varvalue = var.getAttribute("value").charAt(0);
+          Element character = (Element) var.getParentNode();
+          char charactervalue = character.getAttribute("value").charAt(0);
+          mappingMap.put(varvalue, charactervalue);
+        }
+        ALLOGRAPHS.put(mappingName, mappingMap);
+      }
+      
     } catch(Exception e)
     {
       e = null;
       Notification.show(READING_ERROR_MESSAGE);
     }   
     
-    NodeList mappings = mappingD.getElementsByTagName("mapping");
-    for (int i=0; i<mappings.getLength(); i++){
-      Element mapping = (Element) mappings.item(i);
-      String mappingName = mapping.getAttribute("name");
-      HashMap mappingMap = initAlphabet();
-      NodeList variants = mapping.getElementsByTagName("variant");
-      for(int j=0; j<variants.getLength(); j++)
-      {
-        Element var = (Element) variants.item(j);
-        char varvalue = var.getAttribute("value").charAt(0);
-        Element character = (Element) var.getParentNode();
-        char charactervalue = character.getAttribute("value").charAt(0);
-        mappingMap.put(varvalue, charactervalue);        
-      }
-      ALLOGRAPHS.put(mappingName, mappingMap);
-    }   
+
   }
     
   private String removeCombiningCharacters(String s)
