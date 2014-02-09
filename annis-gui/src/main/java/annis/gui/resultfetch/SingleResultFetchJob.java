@@ -51,17 +51,11 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
 
   private PagedResultQuery query;
 
-  private ResultViewPanel resultPanel;
-
-  private SearchUI ui;
-
-  public SingleResultFetchJob(Match match, PagedResultQuery query, SearchUI ui,
-    ResultViewPanel resultPanel, VisualizerContextChanger visContextChanger)
+  public SingleResultFetchJob(Match match, PagedResultQuery query,
+    VisualizerContextChanger visContextChanger)
   {
     this.match = match;
     this.query = query;
-    this.ui = ui;
-    this.resultPanel = resultPanel;
     this.visContextChanger = visContextChanger;
   }
 

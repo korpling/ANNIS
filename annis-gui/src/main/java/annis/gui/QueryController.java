@@ -665,7 +665,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
         Match m = extractMatches.get(offset % extractMatches.size());
 
         PollControl.runInBackground(500, ui,
-          new SingleResultFetchJob(m, query, ui, queryPanels.get(queryID),
+          new SingleResultFetchJob(m, query,
             visCtxChange));
       }
     }
