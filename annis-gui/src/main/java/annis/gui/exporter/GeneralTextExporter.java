@@ -173,7 +173,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           
           if(eventBus != null)
           {
-            eventBus.post(new Integer(offset+1));
+            eventBus.post(Integer.valueOf(offset+1));
           }
         }
         offset++;

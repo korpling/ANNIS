@@ -444,7 +444,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         //not sure we want to do it this way:
         ql += "\n& /.*/";
       }
-      sentenceVars.add(new Integer(count));
+      sentenceVars.add(Integer.valueOf(count));
       for(int i=1; i < sboxes.size(); i++)
       {
         String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
