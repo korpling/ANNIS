@@ -36,8 +36,8 @@ import org.json.JSONException;
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
-  public final int PIXEL_PER_VALUE = 45;
-  public final int ADDTIONAL_PIXEL_WIDTH = 100;
+  public static final int PIXEL_PER_VALUE = 45;
+  public static final int ADDTIONAL_PIXEL_WIDTH = 100;
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");

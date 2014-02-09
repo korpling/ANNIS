@@ -51,15 +51,15 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 @PluginImplementation
 public class RawTextVisualizer extends AbstractVisualizer<Panel> {
     
-    private final String NO_TEXT = "no text available";
+    private static final String NO_TEXT = "no text available";
 
     // pattern for checking the token layer
     private final Pattern whiteSpaceMatcher = Pattern.compile("^\\s+$");
 
     // 
-    private final String PANEL_CLASS = "raw_text";
+    private static final String PANEL_CLASS = "raw_text";
     
-    private final String LABEL_CLASS = "raw_text_label";
+    private static final String LABEL_CLASS = "raw_text_label";
     
     @Override
     public String getShortName() {

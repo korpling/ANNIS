@@ -52,11 +52,11 @@ public class VJITWrapper extends Widget implements Paintable
   private JITConf config;
 
   // some css properties
-  protected final String background = "#ECF0F6";
+  protected static final String background = "#ECF0F6";
 
-  protected final String width = "900px";
+  protected static final String width = "900px";
 
-  protected final String height = "600px";
+  protected static final String height = "600px";
 
   public VJITWrapper()
   {
