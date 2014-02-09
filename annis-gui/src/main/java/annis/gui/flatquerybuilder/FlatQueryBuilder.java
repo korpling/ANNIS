@@ -503,8 +503,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
-    final FlatQueryBuilder sq = this; 
-    if (cp.getSelectedCorpora().isEmpty()){
+    if (cp.getSelectedCorpora().isEmpty())
+    {
       Notification.show(NO_CORPORA_WARNING);
     }
     else
@@ -526,8 +526,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         {
           loadQuery();
         }
-        catch(Exception e)
+        catch(EmptyReferenceException e)
         {          
+          log.error(null, e);
+        }
+        catch (EqualityConstraintException e)
+        {
+          log.error(null, e);
+        }
+        catch (InvalidCharacterSequenceException e)
+        {
+          log.error(null, e);
+        }
+        catch (MultipleAssignmentException e)
+        {
+          log.error(null, e);
+        }
+        catch (UnknownLevelException e)
+        {
+          log.error(null, e);
         }
       }
       if (event.getComponent() == btInitMeta || event.getComponent() == btInitSpan || event.getComponent() == btInitLanguage){

@@ -86,7 +86,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    TableAccessStrategy tas = tables(null);
     Set<String> conditions = new LinkedHashSet<String>();
     
     FrequencyTableQueryData ext;

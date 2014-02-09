@@ -71,7 +71,7 @@ public class RelANNISHelper
     ZipFile zip = new ZipFile(f);
     try
     {
-      result = corporaInZipfile(zip);
+      result.putAll(corporaInZipfile(zip));
     }
     finally
     {
