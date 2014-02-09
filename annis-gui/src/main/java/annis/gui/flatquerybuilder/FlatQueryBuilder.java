@@ -40,13 +40,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
  * @author tom ruette (tom.ruette@hu-berlin.de)
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
-  {
+{
+  private static final Logger log = LoggerFactory.getLogger(FlatQueryBuilder.class);
+  
   private Button btGo;
   private Button btClear;
   private Button btInverse;
@@ -234,7 +238,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       language.removeComponent(addMenu);
       span.removeComponent(addMenuSpan);
       meta.removeComponent(addMenuMeta);
-    } catch (Exception e) { }
+    } catch (Exception e) 
+    {
+      log.error(null, e);
+    }
     
     //init variables:
     final FlatQueryBuilder sq = this;
