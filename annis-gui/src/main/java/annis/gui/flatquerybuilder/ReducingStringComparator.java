@@ -29,13 +29,13 @@ import org.w3c.dom.NodeList;
  * @author klotzmaz
  * @author tom
  */
-public class reducingStringComparator
+public class ReducingStringComparator
 {
   private HashMap<String, HashMap> ALLOGRAPHS;
   private static final String READING_ERROR_MESSAGE = "ERROR: Unable to load mapping file(s)!";
   private static String MAPPING_FILE = "mapfile.fqb";
   
-  public reducingStringComparator()
+  public ReducingStringComparator()
   {
     initAlphabet();
     readMappings();
@@ -63,7 +63,7 @@ public class reducingStringComparator
   private void readMappings()
   {	  
     ALLOGRAPHS = new HashMap<String, HashMap>();
-    ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE); 
+    ClassResource cr = new ClassResource(ReducingStringComparator.class, MAPPING_FILE); 
     Document mappingD = null;
     try{
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

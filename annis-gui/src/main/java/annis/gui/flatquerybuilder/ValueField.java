@@ -122,7 +122,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   @Override
   public void textChange(TextChangeEvent event)
   {
-    reducingStringComparator rsc = sq.getRSC();
+    ReducingStringComparator rsc = sq.getRSC();
     String fm = sq.getFilterMechanism();
     if (!"generic".equals(fm))
     {

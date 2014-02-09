@@ -79,7 +79,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private SpanBox spbox;
   private String query;
   private MenuBar.MenuItem spanMenu;
-  private reducingStringComparator rsc;
+  private ReducingStringComparator rsc;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -123,7 +123,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private void launch(QueryController cp)
   {
     this.cp = cp;
-    rsc = new reducingStringComparator();
+    rsc = new ReducingStringComparator();
     this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
@@ -146,7 +146,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     btInitMeta.setDescription(INFO_INIT_META);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
-    reducingStringComparator rdc = new reducingStringComparator();
+    ReducingStringComparator rdc = new ReducingStringComparator();
     Set mappings = rdc.getMappings().keySet();
     int i;
     for (i=0; i<mappings.size(); i++){
@@ -868,7 +868,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     return values;
 	}
   
-  public reducingStringComparator getRSC()
+  public ReducingStringComparator getRSC()
   {
     return rsc;
   }
