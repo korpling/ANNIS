@@ -22,6 +22,7 @@ import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +55,11 @@ public class SchemeFixer
   
   protected void corpusAlias()
   {
+    ResultSet result = null;
     try
     {
       DatabaseMetaData dbMeta = dataSource.getConnection().getMetaData();
-      ResultSet result = dbMeta.getColumns(null, null, "corpus_alias", null);
+      result = dbMeta.getColumns(null, null, "corpus_alias", null);
       
       Map<String, Integer> columnType = new HashMap<String,Integer>();
       
@@ -89,6 +91,17 @@ public class SchemeFixer
     catch (SQLException ex)
     {
       log.error("Could not get the metadata for the database", ex);
+      if(result != null)
+      {
+        try
+        {
+          result.close();
+        }
+        catch (SQLException ex1)
+        {
+          log.error("Could not close the result set", ex1);
+        }
+      }
     }
   }
 
