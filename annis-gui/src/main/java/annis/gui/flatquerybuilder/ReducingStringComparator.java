@@ -17,12 +17,15 @@ package annis.gui.flatquerybuilder;
 
 import com.vaadin.server.ClassResource;
 import com.vaadin.ui.Notification;
+import java.io.IOException;
 import java.util.HashMap;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
+import org.xml.sax.SAXException;
 
 
 /**
@@ -87,11 +90,21 @@ public class ReducingStringComparator
         ALLOGRAPHS.put(mappingName, mappingMap);
       }
       
-    } catch(Exception e)
+    } catch(SAXException e)
     {
       e = null;
       Notification.show(READING_ERROR_MESSAGE);
-    }   
+    } 
+    catch(IOException e)
+    {
+      e = null;
+      Notification.show(READING_ERROR_MESSAGE);
+    }
+    catch(ParserConfigurationException e)
+    {
+      e = null;
+      Notification.show(READING_ERROR_MESSAGE);
+    } 
     
 
   }
