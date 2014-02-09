@@ -223,6 +223,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
 
+    addScrollbar();
+
   }
 
   public void addExtension(CssRenderInfo renderInfo) {
@@ -257,8 +259,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
           if (currNode instanceof SStructure
-                  && isSegment(currNode)
-                  && CommonHelper.checkSLayer(namespace, fromNode)) {
+                  && isSegment(currNode)) {
             sentences.add((SStructure) currNode);
           }
         }
@@ -284,7 +285,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       });
 
       //decorate segments with sentence number
-      int i = 0;
+      int i = 1;
       for (SStructure sentence : sentences) {
         sentence.createSProcessingAnnotation(
                 SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
@@ -717,9 +718,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-
-    addScrollbar();
-
   }
 
   private boolean hasRSTType(SRelation e) {
