@@ -21,7 +21,9 @@ import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -657,8 +659,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     result.add("tok");
@@ -697,8 +704,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -743,8 +755,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -782,8 +799,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -1110,17 +1132,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         }
         query = tq.substring(0, tq.length()-1);
       }
-      catch(Exception e)
+      catch(EmptyReferenceException e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException) | (e instanceof EmptyReferenceException))
-        {
-          Notification.show(e.getMessage());
-          //LATER: maybe highlight the critical character sequence          
-        }
-        else
-        {
-          Notification.show(QUERY_ERROR_WARNING);
-        }    
+        Notification.show(e.getMessage());
+      }
+      catch (EqualityConstraintException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (InvalidCharacterSequenceException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (MultipleAssignmentException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (UnknownLevelException e)
+      {
+        Notification.show(e.getMessage());
       }
     }    
   }
