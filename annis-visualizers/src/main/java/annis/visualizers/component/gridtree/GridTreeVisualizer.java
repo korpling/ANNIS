@@ -81,7 +81,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         return new GridTreePanel(visInput, visToggle);
     }
 
-    private class GridTreePanel extends Panel {
+    private static class GridTreePanel extends Panel {
 
         private VisualizerInput input;
         private SDocumentGraph graph;
