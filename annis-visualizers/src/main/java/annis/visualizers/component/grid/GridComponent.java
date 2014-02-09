@@ -68,7 +68,6 @@ public class GridComponent extends Panel
   private final VerticalLayout layout;
   private Set<String> manuallySelectedTokenAnnos;
   private String segmentationName;
-  private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
   private transient STextualDS enforcedText;
   
   public enum ElementType
@@ -96,7 +95,6 @@ public class GridComponent extends Panel
     {
       this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
       this.segmentationName = forceToken ? null :  input.getSegmentationName();
-      this.markedAndCovered = input.getMarkedAndCovered();
       
       EList<STextualDS> texts
         = input.getDocument().getSDocumentGraph().getSTextualDSs();
@@ -231,7 +229,7 @@ public class GridComponent extends Panel
           = new GridEvent(t.getSId(), (int) idxLeft, (int) idxRight, text);
         event.setTextID(tokenText.getSId());
         // check if the token is a matched node
-        Long match = markCoveredTokens(markedAndCovered, t);
+        Long match = markCoveredTokens(input.getMarkedAndCovered(), t);
         event.setMatch(match);
         tokenRow.addEvent(event);
       }
@@ -319,10 +317,10 @@ public class GridComponent extends Panel
   }
   
   public void setSegmentationLayer(String segmentationName, 
-    Map<SNode, Long> markedAndCovered)
+    Map<String, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
-    this.markedAndCovered = markedAndCovered;
+    this.input.setMarkedAndCovered(markedAndCovered);
     // complete recreation of the grid
     layout.removeComponent(grid);
     createAnnotationGrid();

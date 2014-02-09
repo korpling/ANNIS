@@ -44,7 +44,7 @@ public class KWICComponent extends GridComponent implements KWICInterface
 
   @Override
   public void setSegmentationLayer(String segmentationName,
-    Map<SNode, Long> markedAndCovered)
+    Map<String, Long> markedAndCovered)
   {
     super.setSegmentationLayer(segmentationName, markedAndCovered);
     getGrid().setShowCaption(false);

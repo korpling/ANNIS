@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.gui.model.PagedResultQuery;
 import annis.libgui.ResolverProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.Serializable;
 import java.util.UUID;
 
 /**
@@ -29,7 +30,7 @@ import java.util.UUID;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public interface VisualizerContextChanger
+public interface VisualizerContextChanger extends Serializable
 {
 
   /**

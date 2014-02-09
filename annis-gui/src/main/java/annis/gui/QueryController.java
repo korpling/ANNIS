@@ -40,7 +40,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
-import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -85,11 +84,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private PagedResultQuery preparedQuery;
 
-  private transient Map<UUID, PagedResultQuery> queries;
+  private Map<UUID, PagedResultQuery> queries;
 
-  private transient BiMap<UUID, ResultViewPanel> queryPanels;
+  private BiMap<UUID, ResultViewPanel> queryPanels;
 
-  private transient Map<UUID, MatchAndDocumentCount> counts;
+  private Map<UUID, MatchAndDocumentCount> counts;
 
   /**
    * Stores updated queries. They are created when single results are queried
