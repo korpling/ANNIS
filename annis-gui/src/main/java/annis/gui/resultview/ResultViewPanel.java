@@ -528,39 +528,45 @@ public class ResultViewPanel extends VerticalLayout implements
     }
 
     // add new annotations
-    for (String s : tokenAnnotationLevelSet)
+    if(tokenAnnotationLevelSet != null)
     {
-      if (!tokenAnnoVisible.containsKey(s))
+      for (String s : tokenAnnotationLevelSet)
       {
-        tokenAnnoVisible.put(s, Boolean.TRUE);
+        if (!tokenAnnoVisible.containsKey(s))
+        {
+          tokenAnnoVisible.put(s, Boolean.TRUE);
+        }
       }
     }
 
     miTokAnnos.removeChildren();
 
-    for (String a : tokenAnnotationLevelSet)
+    if (tokenAnnotationLevelSet != null)
     {
-      MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+      for (String a : tokenAnnotationLevelSet)
       {
-        @Override
-        public void menuSelected(MenuItem selectedItem)
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
         {
-
-          if (selectedItem.isChecked())
+          @Override
+          public void menuSelected(MenuItem selectedItem)
           {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
-          }
-          else
-          {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
-          }
 
-          setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
-        }
-      });
+            if (selectedItem.isChecked())
+            {
+              tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
+            }
+            else
+            {
+              tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
+            }
 
-      miSingleTokAnno.setCheckable(true);
-      miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+            setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
+          }
+        });
+
+        miSingleTokAnno.setCheckable(true);
+        miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+      }
     }
   }
 
