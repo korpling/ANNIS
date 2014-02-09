@@ -53,7 +53,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   private Properties confProps;
 
-  private StatementController statementController = new StatementControllerImpl();
+  private transient StatementController statementController;
 
   private static class Status
   {
@@ -295,6 +295,7 @@ public class ImportDialog extends javax.swing.JDialog
     CorpusAdministration corpusAdmin, List<Map<String, Object>> corpora)
   {
     super(parent, modal);
+    initTransients();
 
     this.corpusAdministration = corpusAdmin;
     this.corpora = corpora;
@@ -338,6 +339,17 @@ public class ImportDialog extends javax.swing.JDialog
       startImport();
     }
 
+  }
+  
+  private void initTransients()
+  {
+    statementController = new StatementControllerImpl();
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
   }
 
   private void storeProperties()

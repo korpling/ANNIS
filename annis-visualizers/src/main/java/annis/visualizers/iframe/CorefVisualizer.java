@@ -44,6 +44,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -105,7 +106,7 @@ public class CorefVisualizer extends WriterVisualizer
     }
   }
 
-  static class TComponent
+  static class TComponent implements Serializable
   {
 
     List<String> tokenList;
@@ -123,17 +124,57 @@ public class CorefVisualizer extends WriterVisualizer
       type = t;
     }
   }
+  
+  private static class SerializableAnnotation
+  {
+    private String name;
+    private String value;
 
-  static class TReferent
+    public SerializableAnnotation(String name, String value)
+    {
+      this.name = name;
+      this.value = value;
+    }
+    
+    public SerializableAnnotation(SAnnotation orig)
+    {
+      this.value = orig.getSName();
+      this.value = orig.getSValueSTEXT();
+    }
+
+    public String getName()
+    {
+      return name;
+    }
+
+    public void setName(String name)
+    {
+      this.name = name;
+    }
+
+    public String getValue()
+    {
+      return value;
+    }
+
+    public void setValue(String value)
+    {
+      this.value = value;
+    }
+    
+    
+  }
+
+  static class TReferent implements Serializable
   {
 
-    Set<SAnnotation> annotations;
+    Set<SerializableAnnotation> annotations;
     long component;
 
     TReferent()
     {
       component = -1;
-      annotations = new HashSet<SAnnotation>();
+      annotations = new HashSet<SerializableAnnotation>();
     }
   }
 
@@ -270,8 +311,11 @@ public class CorefVisualizer extends WriterVisualizer
             currentComponenttype.nodeList.add(rel.getSStructuredSource().getSId());
           }
           TReferent ref = new TReferent();
-          ref.annotations = new HashSet<SAnnotation>();
-          ref.annotations.addAll(rel.getSAnnotations());
+          ref.annotations = new HashSet<SerializableAnnotation>();
+          for(SAnnotation anno : rel.getSAnnotations())
+          {
+            ref.annotations.add(new SerializableAnnotation(anno));
+          }
           ref.component = componentnr;
           referentList.add(ref);
 
@@ -933,7 +977,7 @@ public class CorefVisualizer extends WriterVisualizer
           int num = referentOfToken.get(id).get(l);
           if (num == 0 || num == 2)
           {
-            for (SAnnotation an : referentList.get((int) l).annotations)
+            for (SerializableAnnotation an : referentList.get((int) l).annotations)
             {
               if (nri == 1)
               {
@@ -948,16 +992,16 @@ public class CorefVisualizer extends WriterVisualizer
           }
           if (num == 1 || num == 2)
           {
-            for (SAnnotation an : referentList.get((int) (long) l).annotations)
+            for (SerializableAnnotation an : referentList.get((int) (long) l).annotations)
             {
               if (nro == 1)
               {
-                outgoing = ", &lt;b&gt;outgoing Annotations&lt;/b&gt;: " + an.getSName() + "=" + an.getValueString();
+                outgoing = ", &lt;b&gt;outgoing Annotations&lt;/b&gt;: " + an.getName() + "=" + an.getValue();
                 nro--; // remove l+"- "+
               }
               else
               {
-                outgoing += ", " + an.getSName() + "=" + an.getValueString();
+                outgoing += ", " + an.getName() + "=" + an.getValue();
               }
             }
           }

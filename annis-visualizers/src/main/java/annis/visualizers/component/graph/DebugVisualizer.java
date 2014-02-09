@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 public class DebugVisualizer extends AbstractDotVisualizer implements Serializable
 {
 
-  private final Logger log = LoggerFactory.getLogger(DebugVisualizer.class);
+  private final static Logger log = LoggerFactory.getLogger(DebugVisualizer.class);
   
   @Override
   public void createDotContent(VisualizerInput input, StringBuilder sb)
