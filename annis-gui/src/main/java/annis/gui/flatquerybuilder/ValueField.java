@@ -202,7 +202,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   
   public void setValue(String value)
   {
-    if((vm.equals(ValueMode.REGEX))&(!scb.containsId(value)))
+    if((vm.equals(ValueMode.REGEX))&&(!scb.containsId(value)))
     {
       scb.addItem(value);
       scb.setItemCaption(value, value+" (user defined)");

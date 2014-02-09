@@ -1167,12 +1167,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         level = l;
         value = v;
       }
-      else if( ((s.charAt(0)=='\"')&(s.charAt(s.length()-1)=='\"')) | ((s.charAt(0)=='/')&(s.charAt(s.length()-1)=='/')))
+      else if( ((s.charAt(0)=='\"') && 
+        (s.charAt(s.length()-1)=='\"')) || ((s.charAt(0)=='/') && (s.charAt(s.length()-1)=='/')))
       {
         level = "tok";
         value = s.substring(1, s.length()-1);
       }
-      else if((s.contains("\""))|(s.contains("/")))
+      else if((s.contains("\""))||(s.contains("/")))
       {
         throw new InvalidCharacterSequenceException(s);
       }
@@ -1264,7 +1265,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       {
        type = RelationType.PRECEDENCE; 
       }
-      else if((op.equals("=")) | (op.equals("_=_")))
+      else if((op.equals("=")) || (op.equals("_=_")))
       {
         type = RelationType.EQUALITY;
         if(o1>o2)

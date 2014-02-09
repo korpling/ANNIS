@@ -64,7 +64,6 @@ public class reducingStringComparator
   {	  
     ALLOGRAPHS = new HashMap<String, HashMap>();
     ClassResource cr = new ClassResource(reducingStringComparator.class, MAPPING_FILE); 
-    HashMap<Character, Character> h = new HashMap<Character, Character>();
     Document mappingD = null;
     try{
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
