@@ -285,7 +285,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
     }
 
-    private class Traverse implements SGraphTraverseHandler {
+    private static class Traverse implements SGraphTraverseHandler {
 
         /**
          * Tracks the depth of the traversal. Steps are counted, when the node

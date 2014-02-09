@@ -330,7 +330,7 @@ public class CorpusAdministration
     return outDir;
   }
   
-  private class ImportStatsImpl implements AdministrationDao.ImportStats
+  private static class ImportStatsImpl implements AdministrationDao.ImportStats
   {
 
     private boolean status;

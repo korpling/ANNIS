@@ -64,7 +64,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   }
 
-  private class StatementControllerImpl implements StatementController
+  private static class StatementControllerImpl implements StatementController
   {
 
     PreparedStatement statement = null;

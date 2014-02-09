@@ -553,7 +553,7 @@ public class SingleResultPanel extends CssLayout implements
       (VisualizerContextChanger) this, left);
   }
 
-  private class AddNewItemHandler implements AbstractSelect.NewItemHandler
+  private static class AddNewItemHandler implements AbstractSelect.NewItemHandler
   {
 
     final private ComboBox combobox;
@@ -761,7 +761,7 @@ public class SingleResultPanel extends CssLayout implements
     }
   }
 
-  private class MinMax
+  private static class MinMax
   {
 
     String segName = "tokens";

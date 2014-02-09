@@ -482,7 +482,7 @@ public class DocBrowserTable extends Table
     return "n/a";
   }
 
-  private class MetaColumns
+  private static class MetaColumns
   {
 
     List<MetaDataCol> visibleColumns;
@@ -496,7 +496,7 @@ public class DocBrowserTable extends Table
     }
   }
 
-  private class MetaDataCol
+  private static class MetaDataCol
   {
 
     String namespace;

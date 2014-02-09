@@ -221,7 +221,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     }
   }
 
-  private class DefaultLabeler implements TreeElementLabeler, Serializable
+  private static class DefaultLabeler implements TreeElementLabeler, Serializable
   {
 
     @Override
