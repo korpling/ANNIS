@@ -16,6 +16,7 @@
 package annis.administration;
 
 import com.google.common.base.Preconditions;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -56,9 +57,11 @@ public class SchemeFixer
   protected void corpusAlias()
   {
     ResultSet result = null;
+    Connection conn = null;
     try
     {
-      DatabaseMetaData dbMeta = dataSource.getConnection().getMetaData();
+      conn = dataSource.getConnection();
+      DatabaseMetaData dbMeta = conn.getMetaData();
       result = dbMeta.getColumns(null, null, "corpus_alias", null);
       
       Map<String, Integer> columnType = new HashMap<String,Integer>();
@@ -96,6 +99,17 @@ public class SchemeFixer
         try
         {
           result.close();
+        }
+        catch (SQLException ex1)
+        {
+          log.error("Could not close the result set", ex1);
+        }
+      }
+      if(conn != null)
+      {
+        try
+        {
+          conn.close();
         }
         catch (SQLException ex1)
         {
