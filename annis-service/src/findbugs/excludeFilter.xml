@@ -13,6 +13,12 @@
       <Class name="com.google.mimeparse.MIMEParse$FitnessAndQuality" />
     </Or>
   </Match>
+  <Match>
+    <And>
+      <Class name="annis.ql.AqlParser" />
+      <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+    </And>
+  </Match>
   
   <Match>
     <And>
