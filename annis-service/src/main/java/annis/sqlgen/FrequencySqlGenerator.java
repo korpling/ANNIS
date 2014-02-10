@@ -42,7 +42,7 @@ import org.springframework.dao.DataAccessException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   implements WhereClauseSqlGenerator<QueryData>, SelectClauseSqlGenerator<QueryData>,
@@ -86,7 +86,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    TableAccessStrategy tas = tables(null);
     Set<String> conditions = new LinkedHashSet<String>();
     
     FrequencyTableQueryData ext;

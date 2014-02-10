@@ -27,7 +27,7 @@ COLON : ':';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
-ID: [a-zA-Z\_\-*?]+;// [a-zA-Z_\-*?0-9.]*;
+ID: [a-zA-Z\_\-*?]+;
 TXT : (.)+?;
 
 innervalue: ~(QUOTE)+;
@@ -47,10 +47,13 @@ element
   | ID COLON ID SEMICOLON WS? STYLE EQUALS value # elementWithStyleAttribute
   ;
 
+qName
+  : (namespace=ID COLON)? name=ID;
+
 condition
-  : ID # conditionName
+  : qName # conditionName
   | TOK # conditionTok
-  | ID EQUALS value # conditionNameAndValue
+  | qName EQUALS value # conditionNameAndValue
   | EQUALS value # conditionValue
   ;
 

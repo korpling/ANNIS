@@ -41,7 +41,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 /**
  * This will execute tests on a real database and check if the counts are OK.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
@@ -126,6 +126,9 @@ public class CountTest
     // that cover more than one token
     assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
+    // regression tests:
+    assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
+    
   }
 
   @Test
@@ -203,8 +206,8 @@ public class CountTest
     // get token count as reference
     int tokenCount = countPcc2("tok");
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 == #2"));
-    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 == #2"));
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 _id_ #2"));
+    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _id_ #2"));
 
     assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));

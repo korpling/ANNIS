@@ -35,7 +35,7 @@ import org.springframework.jdbc.core.RowMapper;
 
 /**
  * Maps a {@link ResultSet} row to an {@link AnnotatedSpan}
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
 {

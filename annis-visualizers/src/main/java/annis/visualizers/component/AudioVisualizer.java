@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class AudioVisualizer extends AbstractVisualizer<MediaElementPlayer>

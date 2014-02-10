@@ -15,7 +15,6 @@
  */
 package annis.libgui.visualizers;
 
-import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.VisualizationToggle;
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -81,7 +80,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin,
    * @param segmentationName
    */
   public void setSegmentationLayer(I visualizerImplementation,
-    String segmentationName, Map<SNode, Long> markedAndCovered);
+    String segmentationName, Map<String, Long> markedAndCovered);
 
   /**
    * Determines if this visaulizer wants to use the original text.

@@ -1,0 +1,18 @@
+set clear-caches to false
+record
+corpus tiger2
+
+count cat="NP" & cat="NP" & #1 >[func="AG"] #2
+count cat="NP" & node & #1 >[func="AG"] #2
+count cat="CS" & cat="S" & #1 > #2
+count pos="APPR" & /.*ung/ & #1 . #2
+count pos="KOUS" & tok="man" & "sich" & #1 . #2 & #2 . #3
+count cat="S" & cat="PP" & #1 >[func !="MO"] #2
+count /[Jj]e/ & "desto" & #1 .* #2
+count cat="S" & cat="NP" & #1 $ #2
+count pos="VVFIN" & /[A-ZÖÜÄ].*/ & cat="S" & #3 >@l #1 & #1 _=_ #2
+count cat="CS" & cat="S" & #1 >* #2
+count pos="ART" & pos="NN" & pos="VAPP" & #1 . #2 & #2 .1,30 #3
+count pos="ART" & pos="NN" & pos="VAPP" & cat="NP" &  #1 . #2 & #2 .1,30 #3 & #4 >* #3
+
+benchmark 20

@@ -30,7 +30,7 @@ import annis.ql.parser.QueryData;
  * Adds the constraint that all nodes are always inside one document as
  * WHERE clause elements.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SubcorpusConstraintWhereClause 
   extends TableAccessStrategyFactory
@@ -56,8 +56,7 @@ public class SubcorpusConstraintWhereClause
   {
     LinkedList<String> conditions = new LinkedList<String>();
 
-    conditions.add("-- annotations can always only be inside a subcorpus/document");
-
+    // annotations can always only be inside a subcorpus/document
     QueryNode[] copyNodes = nodes.toArray(new QueryNode[0]);
 
     for (int left = 0; left < copyNodes.length; left++)

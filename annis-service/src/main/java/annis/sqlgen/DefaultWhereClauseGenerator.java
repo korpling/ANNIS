@@ -37,12 +37,14 @@ import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
@@ -387,8 +389,47 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
     joinOnNode(conditions, node, target, "=", "left_token", "left_token");
-    joinOnNode(conditions, node, target, "=", "right_token", "right_token");
+    
+    TableAccessStrategy tasSource = tables(node);
+    TableAccessStrategy tasTarget = tables(target);
+    
+    String spanLengthSource = 
+      "("
+      + tasSource.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasSource.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    String spanLengthTarget = 
+      "("
+      + tasTarget.aliasedColumn(NODE_TABLE, "right_token") 
+      + " - " 
+      + tasTarget.aliasedColumn(NODE_TABLE, "left_token")
+      + ")";
+    
+    conditions.add(spanLengthSource + " = " + spanLengthTarget);
+    
+    //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
+
+  @Override
+  protected void addEqualValueConditions(List<String> conditions, QueryNode node,
+    QueryNode target, EqualValue join, QueryData queryData)
+  {
+    annoCondition.addEqualValueConditions(conditions, node, target, tables(node), tables(
+          target), true);
+  }
+
+  @Override
+  protected void addNotEqualValueConditions(List<String> conditions,
+    QueryNode node, QueryNode target, NotEqualValue join, QueryData queryData)
+  {
+    annoCondition.addEqualValueConditions(conditions, node, target, tables(node), tables(
+          target), false);
+  }
+  
+  
+  
 
   @Override
   protected void addCommonAncestorConditions(List<String> conditions,
@@ -416,16 +457,22 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     String pre2 = tables(target).aliasedColumn(RANK_TABLE, "pre");
     String pre = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "pre"));
     String post = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE, "post"));
-    String component = TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
+    String componentAncestor= TableAccessStrategy.column("ancestor", tas.columnName(RANK_TABLE,
       "component_ref"));
-    String component1 = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentSource
+      = tables(node).aliasedColumn(RANK_TABLE, "component_ref");
+    String componentTarget
+      = tables(target).aliasedColumn(RANK_TABLE, "component_ref");
 
+    String rankTableName = tas.partitionTableName(RANK_TABLE, corpusList);
+    
     StringBuffer sb = new StringBuffer();
-    sb.append("EXISTS (SELECT 1 FROM " + tas.tableName(RANK_TABLE)
+    sb.append("EXISTS (SELECT 1 FROM " + rankTableName
       + " AS ancestor WHERE\n");
     if (useComponentRefPredicateInCommonAncestorSubquery)
     {
-      sb.append("\t" + component + " = " + component1 + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentSource + " AND\n");
+      sb.append("\t" + componentAncestor + " = " + componentTarget + " AND\n");
     }
     sb.append("\t" + pre + " < " + pre1 + " AND " + pre1 + " < " + post
       + " AND\n");
@@ -444,6 +491,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       sb.append(StringUtils.join(corpusList, ","));
       sb.append(")");
     }
+    // even if EXISTS implies that a single row is enought, PostgreSQL still
+    // creates better plans if explicitly limited to one row
+    sb.append("\n\tLIMIT 1");
+    
     sb.append(")");
     conditions.add(sb.toString());
   }

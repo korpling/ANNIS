@@ -113,43 +113,19 @@ public class DataObject implements Serializable
 		final EqualsBuilder equalsBuilder = new EqualsBuilder();
 		
 		final Object _this = this;
-		forEachFieldDo(new FieldCallBack() {
-
-			public void doForField(Field field) throws IllegalAccessException {
-				Object thisValue = field.get(_this);
-				Object otherValue = field.get(obj);
-				if (log.isDebugEnabled()) {
-					String fieldName = field.getDeclaringClass().getSimpleName() + "." + field.getName();
-					try {
-						boolean equal = thisValue != null && thisValue.equals(otherValue) || thisValue == null && otherValue == null;
-						log.debug(fieldName + ": " + thisValue + " " + (equal ? "=" : "!=") + " " + otherValue);
-					} catch (RuntimeException e) {
-						log.error("Exception while comparing " + fieldName + "(" + thisValue + ", " + otherValue + ")");
-						throw e;
-					}
-				}
-				equalsBuilder.append(thisValue, otherValue);
-			}
-			
-		});
+		forEachFieldDo(new FieldCallBackEqualsImpl(_this, obj, equalsBuilder));
 		
 		return equalsBuilder.isEquals();
 	
 	}
-
+  
 	@Override
 	public int hashCode() {
 		// sort fields by name for predictable results
 		final SortedMap<String, Object> fieldValues = new TreeMap<String, Object>();
 		
 		final Object _this = this;
-		forEachFieldDo(new FieldCallBack() {
-
-			public void doForField(Field field) throws IllegalAccessException {
-				fieldValues.put(field.getName(), field.get(_this));
-			}
-			
-		});
+		forEachFieldDo(new FieldCallBackHashImpl(fieldValues, _this));
 		
 		HashCodeBuilder hashCodeBuilder = new HashCodeBuilder();
 		
@@ -158,5 +134,60 @@ public class DataObject implements Serializable
 		
 		return hashCodeBuilder.toHashCode();
 	}
+
+  private static class FieldCallBackEqualsImpl implements FieldCallBack
+  {
+
+    private final Object _this;
+
+    private final Object obj;
+
+    private final EqualsBuilder equalsBuilder;
+
+    public FieldCallBackEqualsImpl(Object _this, Object obj,
+      EqualsBuilder equalsBuilder)
+    {
+      this._this = _this;
+      this.obj = obj;
+      this.equalsBuilder = equalsBuilder;
+    }
+
+    @Override
+    public void doForField(Field field) throws IllegalAccessException {
+      Object thisValue = field.get(_this);
+      Object otherValue = field.get(obj);
+      if (log.isDebugEnabled()) {
+        String fieldName = field.getDeclaringClass().getSimpleName() + "." + field.getName();
+        try {
+          boolean equal = thisValue != null && thisValue.equals(otherValue) || thisValue == null && otherValue == null;
+          log.debug(fieldName + ": " + thisValue + " " + (equal ? "=" : "!=") + " " + otherValue);
+        } catch (RuntimeException e) {
+          log.error("Exception while comparing " + fieldName + "(" + thisValue + ", " + otherValue + ")");
+          throw e;
+        }
+      }
+      equalsBuilder.append(thisValue, otherValue);
+    }
+  }
+
+  private static class FieldCallBackHashImpl implements FieldCallBack
+  {
+
+    private final SortedMap<String, Object> fieldValues;
+
+    private final Object _this;
+
+    public FieldCallBackHashImpl(SortedMap<String, Object> fieldValues, Object _this)
+    {
+      this.fieldValues = fieldValues;
+      this._this = _this;
+    }
+
+    @Override
+    public void doForField(Field field) throws IllegalAccessException 
+    {
+      fieldValues.put(field.getName(), field.get(_this));
+    }
+  }
 	
 }

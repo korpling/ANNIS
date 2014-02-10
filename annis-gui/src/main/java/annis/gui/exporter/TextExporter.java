@@ -72,7 +72,7 @@ public class TextExporter extends GeneralTextExporter
   @Override
   public SubgraphFilter getSubgraphFilter()
   {
-    return SubgraphFilter.Token;
+    return SubgraphFilter.token;
   }
   
   

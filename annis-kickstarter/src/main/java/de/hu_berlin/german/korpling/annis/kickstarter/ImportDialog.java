@@ -53,7 +53,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   private Properties confProps;
 
-  private StatementController statementController = new StatementControllerImpl();
+  private transient StatementController statementController;
 
   private static class Status
   {
@@ -64,7 +64,7 @@ public class ImportDialog extends javax.swing.JDialog
 
   }
 
-  private class StatementControllerImpl implements StatementController
+  private static class StatementControllerImpl implements StatementController
   {
 
     PreparedStatement statement = null;
@@ -109,8 +109,7 @@ public class ImportDialog extends javax.swing.JDialog
     }
   }
 
-  private class ImportDialogWorker extends SwingWorker<Status, Void> implements
-    Serializable
+  private class ImportDialogWorker extends SwingWorker<Status, Void>
   {
 
     StatementController statementController;
@@ -276,7 +275,7 @@ public class ImportDialog extends javax.swing.JDialog
   }
   private CorpusAdministration corpusAdministration;
 
-  private SwingWorker<Status, Void> worker;
+  private transient SwingWorker<Status, Void> worker;
 
   private boolean isImporting;
 
@@ -295,6 +294,7 @@ public class ImportDialog extends javax.swing.JDialog
     CorpusAdministration corpusAdmin, List<Map<String, Object>> corpora)
   {
     super(parent, modal);
+    initTransients();
 
     this.corpusAdministration = corpusAdmin;
     this.corpora = corpora;
@@ -328,8 +328,7 @@ public class ImportDialog extends javax.swing.JDialog
     getRootPane().setDefaultButton(btOk);
 
     isImporting = false;
-    worker = new ImportDialogWorker(statementController);
-
+    
     addAppender();
 
     // directly start import if we were called from outside
@@ -338,6 +337,18 @@ public class ImportDialog extends javax.swing.JDialog
       startImport();
     }
 
+  }
+  
+  private void initTransients()
+  {
+    statementController = new StatementControllerImpl();
+    worker = new ImportDialogWorker(statementController);
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
   }
 
   private void storeProperties()
@@ -418,7 +429,7 @@ public class ImportDialog extends javax.swing.JDialog
       {
         if (event.getLevel().isGreaterOrEqual(Level.INFO))
         {
-          lblStatus.setText(event.getMessage());
+          lblStatus.setText(event.getFormattedMessage());
         }
       }
     };

@@ -19,7 +19,7 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 
 /**
  * A state of the {@link MediaElementPlayer}
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class MediaState extends JavaScriptComponentState
 {

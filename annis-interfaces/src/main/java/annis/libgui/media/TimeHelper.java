@@ -30,7 +30,7 @@ import org.eclipse.emf.common.util.EList;
 /**
  * Helper class for getting time annotations on {@link SSpan} from
  * the covered token.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class TimeHelper
 {
@@ -50,32 +50,48 @@ public class TimeHelper
     final List<Double> startTimes = new LinkedList<Double>();
     final List<Double> endTimes = new  LinkedList<Double>();
     
-    EList<Edge> outEdges = graph.getOutEdges(node.getSId());
-    if(outEdges != null)
+    List<SToken> token = new LinkedList<SToken>();
+    if(node instanceof SToken)
     {
-      for(Edge e : outEdges)
+      token.add((SToken) node);
+    }
+    else
+    {
+      EList<Edge> outEdges = graph.getOutEdges(node.getSId());
+      if (outEdges != null)
       {
-        if(e instanceof SSpanningRelation)
+        for (Edge e : outEdges)
         {
-          SToken tok = ((SSpanningRelation) e).getSToken();
-          
-          SAnnotation anno = tok.getSAnnotation("annis::time");
-          if(anno != null && !anno.getSValueSTEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
+          if (e instanceof SSpanningRelation)
           {
-            String[] split = anno.getSValueSTEXT().split("-");
-            if(split.length == 1)
-            {
-              startTimes.add(Double.parseDouble(split[0]));
-            }
-            if(split.length == 2)
-            {
-              startTimes.add(Double.parseDouble(split[0]));
-              endTimes.add(Double.parseDouble(split[1]));
-            }
+            SToken tok = ((SSpanningRelation) e).getSToken();
+            token.add(tok);
           }
         }
+      } // end for each out edges
+    }
+
+    for (SToken tok : token)
+    {
+
+      SAnnotation anno = tok.getSAnnotation("annis::time");
+      if (anno != null && !anno.getSValueSTEXT().matches(
+        "\\-[0-9]*(\\.[0-9]*)?"))
+      {
+        String[] split = anno.getSValueSTEXT().split("-");
+        if (split.length == 1)
+        {
+          startTimes.add(Double.parseDouble(split[0]));
+        }
+        if (split.length == 2)
+        {
+          startTimes.add(Double.parseDouble(split[0]));
+          endTimes.add(Double.parseDouble(split[1]));
+        }
       }
-    } // end for each out edges
+
+
+    } // end for each token
     
     if(startTimes.size() > 0 && endTimes.size() > 0)
     {

@@ -3,6 +3,15 @@
 <!-- False positive Filter for FindBugs -->
 
 <FindBugsFilter>
+  
+  <!-- automatically generated or external code that we can't influence -->
+  <Match>
+    <Or>
+      <Class name="annis.visualizers.htmlvis.HTMLVisConfigLexer"/>
+      <Class name="annis.visualizers.htmlvis.HTMLVisConfigParser"/>
+    </Or>
+  </Match>
+  
   <Match>
     <Bug category="EXPERIMENTAL" />
   </Match>

@@ -31,7 +31,7 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
   {
     StringBuilder sb = new StringBuilder();
     sb.append(
-      "SELECT docs.name as name, docs.pre as pre FROM corpus this, corpus docs\n");
+      "SELECT docs.name as name, docs.pre as pre, docs.path_name as path_name FROM corpus this, corpus docs\n");
     sb.append("WHERE").append("	this.name = ':toplevel'\n")
       .append("AND	this.pre < docs.pre\n")
       .append("AND	this.post > docs.post\n")
@@ -46,6 +46,7 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
     Annotation annotation = new Annotation();
     annotation.setName(rs.getString("name"));
     annotation.setPre(rs.getInt("pre"));
+    annotation.setAnnotationPath(rs.getString("path_name"));
     return annotation;
   }
 }

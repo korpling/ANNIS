@@ -23,7 +23,7 @@ import java.util.List;
  * An event has a right and left border (but might have holes)
  *
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GridEvent implements Serializable
 {
@@ -48,6 +48,7 @@ public class GridEvent implements Serializable
   private Double endTime;
 
   private boolean gap;
+  private boolean space;
 
   private String textID;
 
@@ -207,4 +208,16 @@ public class GridEvent implements Serializable
   {
     this.tooltip = tooltip;
   }
+
+  public boolean isSpace()
+  {
+    return space;
+  }
+
+  public void setSpace(boolean space)
+  {
+    this.space = space;
+  }
+  
+  
 }

@@ -28,16 +28,16 @@ import org.json.JSONException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript(value =
 {
-  "flotr2.js", "jquery-1.9.1.min.js", "frequencychart.js"
+  "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
 })
 public class FrequencyWhiteboard extends AbstractJavaScriptComponent
 {
-  public final int PIXEL_PER_VALUE = 45;
-  public final int ADDTIONAL_PIXEL_WIDTH = 100;
+  public static final int PIXEL_PER_VALUE = 45;
+  public static final int ADDTIONAL_PIXEL_WIDTH = 100;
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");

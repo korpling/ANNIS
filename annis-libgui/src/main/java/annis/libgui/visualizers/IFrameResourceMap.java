@@ -20,7 +20,7 @@ import java.util.UUID;
 
 /**
  * A map that holds all the iframe related resources.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class IFrameResourceMap extends HashMap<UUID, IFrameResource>
 {

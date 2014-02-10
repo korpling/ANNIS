@@ -51,6 +51,7 @@ public class PDFPageHelper {
 
   private static final Logger log = LoggerFactory.getLogger(PDFPageHelper.class);
 
+  public static final String MAPPING_PAGE_KEY = "pdf_page_key";
   public static final String DEFAULT_PAGE_NUMBER_ANNOTATION_NAME = "page";
 
   public static final String PAGE_NUMBER_SEPERATOR = "-";
@@ -208,7 +209,7 @@ public class PDFPageHelper {
     Properties mappings = input.getMappings();
 
     if (mappings != null) {
-      return mappings.getProperty("node_key",
+      return mappings.getProperty(MAPPING_PAGE_KEY,
               DEFAULT_PAGE_NUMBER_ANNOTATION_NAME);
     }
 

@@ -21,10 +21,11 @@ import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnnisGraphTools
+public class AnnisGraphTools implements Serializable
 {
 
   private static final String PRIMEDGE_SUBTYPE = "edge";

@@ -23,7 +23,7 @@ import com.vaadin.ui.TextField;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ExportOptionsPanel extends FormLayout
 {

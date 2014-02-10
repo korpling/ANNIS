@@ -23,13 +23,26 @@ import java.util.List;
 import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
+import annis.CommonHelper;
 import annis.administration.AdministrationDao.ImportStats;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
+import annis.utils.RelANNISHelper;
+import com.google.common.base.Joiner;
+import com.google.common.io.ByteStreams;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.UUID;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
+import java.util.zip.ZipFile;
 import javax.mail.internet.InternetAddress;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
@@ -122,30 +135,89 @@ public class CorpusAdministration
       schemeFixer.checkAndFix();
     }
     
-    // import each corpus
-    for (String path : paths)
+    List<File> roots = new LinkedList<File>();
+    for(String path : paths)
+    {
+      File f = new File(path);
+      
+      if(f.isFile())
+      {
+        // might be a ZIP-file
+        ZipFile zip = null;
+        try
+        {
+          zip = new ZipFile(f);          
+          // get the names of all corpora included in the ZIP file
+          // in order to get a folder name
+          Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
+          
+          // unzip and add all resulting corpora to import list
+          log.info("Unzipping " + f.getPath());
+          File outDir = createZIPOutputDir(Joiner.on(", ").join(corpora.keySet()));
+          roots.addAll(unzipCorpus(outDir, zip));
+          
+          zip.close();
+        }
+        catch(ZipException ex)
+        {
+          log.error("" + f.getAbsolutePath() + " might not be a valid ZIP file and will be ignored", ex);
+        }
+        catch(IOException ex)
+        {
+          log.error("IOException when importing file " + f.getAbsolutePath() + ", will be ignored", ex);
+        }
+        finally
+        {
+          if(zip != null)
+          {
+            try
+            {
+              zip.close();
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
+      }
+      else
+      {
+        try
+        {
+          roots.addAll(RelANNISHelper.corporaInDirectory(f).values());
+        }
+        catch(IOException ex)
+        {
+          log.error("Could not find any corpus in " + f.getPath(), ex);
+        }
+      }
+    } // end for each given path
+    
+    // import each corpus separately
+    for (File r : roots)
     {
       try
       {
-        log.info("Importing corpus from: " + path);
-        if(administrationDao.importCorpus(path, aliasName,
+        log.info("Importing corpus from: " + r.getPath());
+        if(administrationDao.importCorpus(r.getPath(), aliasName,
           overwrite, waitForOtherTasks))
         {
-          log.info("Finished import from: " + path);
-          sendStatusMail(statusEmailAdress, path, ImportJob.Status.SUCCESS, null);
+          log.info("Finished import from: " + r.getPath());
+          sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.SUCCESS, null);
         }
         else
         {
           importStats.setStatus(false);
-          sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, null);
+          sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, null);
         }
       }
       catch (DefaultAdministrationDao.ConflictingCorpusException ex)
       {
         importStats.setStatus(false);
-        importStats.addException(path, ex);
-        log.error("Error on conflicting top level corpus name");
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.
+        importStats.addException(r.getPath(), ex);
+        log.error("Error on conflicting top level corpus name for {}", r.getPath());
+        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.
           getMessage());
       }
       catch (org.springframework.transaction.CannotCreateTransactionException ex)
@@ -155,17 +227,110 @@ public class CorpusAdministration
       catch (Throwable ex)
       {
         importStats.setStatus(false);
-        importStats.addException(path, ex);
+        importStats.addException(r.getPath(), ex);
         log.error("Error on importing corpus", ex);
-        sendStatusMail(statusEmailAdress, path, ImportJob.Status.ERROR, ex.
+        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR, ex.
           getMessage());
       }
     }
 
     return importStats;
   }
+  
+  /**
+   * Extract the zipped relANNIS corpus files to an output directory.
+   * 
+   * @param outDir The ouput directory.
+   * @param zip ZIP-file to extract.
+   * @return A list of root directories where the tab-files are located if found, null otherwise.
+   */
+  private List<File> unzipCorpus(File outDir, ZipFile zip)
+  {
+    List<File> rootDirs = new ArrayList<File>();
 
-  private class ImportStatsImpl implements AdministrationDao.ImportStats
+    Enumeration<? extends ZipEntry> zipEnum = zip.entries();
+    while (zipEnum.hasMoreElements())
+    {
+      ZipEntry e = zipEnum.nextElement();
+      File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
+      outFile.deleteOnExit();
+
+      if (e.isDirectory())
+      {
+        if (!outFile.mkdirs())
+        {
+          log.warn("Could not create temporary directory " + outFile.
+            getAbsolutePath());
+        }
+      } // end if directory
+      else
+      {
+        if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
+          outFile.getName()))
+        {
+          rootDirs.add(outFile.getParentFile());
+        }
+
+        FileOutputStream outStream = null;
+        try
+        {
+          outStream = new FileOutputStream(outFile);
+          ByteStreams.copy(zip.getInputStream(e), outStream);
+        }
+        catch (FileNotFoundException ex)
+        {
+          log.error(null, ex);
+        }
+        catch (IOException ex)
+        {
+          log.error(null, ex);
+        }
+        finally
+        {
+          if (outStream != null)
+          {
+            try
+            {
+              outStream.close();
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
+      } // end else is file
+    } // end for each entry in zip file
+
+    return rootDirs;
+  }
+  
+  public File createZIPOutputDir(String corpusName)
+  {
+    File outDir = new File(System.getProperty("user.home"),
+      ".annis/zip-imports/"
+      + CommonHelper.getSafeFileName(corpusName));
+    if (outDir.exists())
+    {
+      try
+      {
+        // delete old data inside the corpus directory
+        FileUtils.deleteDirectory(outDir);
+      }
+      catch (IOException ex)
+      {
+        log.warn("Could not recursivly delete the output directory", ex);
+      }
+    }
+    if (!outDir.mkdirs())
+    {
+      throw new IllegalStateException("Could not create directory "
+        + outDir.getAbsolutePath());
+    }
+    return outDir;
+  }
+  
+  private static class ImportStatsImpl implements AdministrationDao.ImportStats
   {
 
     private boolean status;

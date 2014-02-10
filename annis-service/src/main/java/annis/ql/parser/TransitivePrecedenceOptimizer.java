@@ -42,7 +42,7 @@ import java.util.TreeSet;
  * "normal" AQL queries will satisfiy this condition. And in the end, even
  * a "is after this token somewhere in the text" condition is a huge improvement.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class TransitivePrecedenceOptimizer implements QueryDataTransformer
 {

@@ -26,7 +26,7 @@ import org.slf4j.LoggerFactory;
 /**
  * A window displaying an invitation to participate in the development of ANNIS.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class HelpUsWindow extends Window
 {

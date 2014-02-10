@@ -34,7 +34,10 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.internal.QueryServiceImpl;
 import java.io.UnsupportedEncodingException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -56,6 +59,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   private boolean optimizeDistinct;
   private boolean sortSolutions;
   private boolean outputCorpusPath;
+  private boolean outputToplevelCorpus;
   private CorpusPathExtractor corpusPathExtractor;
 
   @Override
@@ -76,10 +80,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       TableAccessStrategy tblAccessStr = tables(node);
       ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-        + " AS node_name" + i);
       if(outputCorpusPath)
       {
+        ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+          + " AS node_name" + i);
+      
         ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
           + " AS path_name" + i);
       }
@@ -91,20 +96,22 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      ids.add("NULL AS id" + i);
-      ids.add("NULL AS node_name" + i);
+      ids.add("NULL::bigint AS id" + i);
+      ids.add("NULL::varchar AS node_name" + i);
       if(outputCorpusPath)
       {
-        ids.add("NULL AS path_name" + i);
+        ids.add("NULL::varchar[] AS path_name" + i);
       }
     }
 
-    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-      "toplevel_corpus"));
-
+    if(outputToplevelCorpus)
+    {
+      ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "toplevel_corpus"));
+    }
+    
     ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
-
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(ids, ", ");
@@ -204,7 +211,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       if (outputCorpusPath && node_name != null)
       {
-        match.setSaltId(buildSaltId(corpus_path, node_name));
+        match.addSaltId(buildSaltId(corpus_path, node_name));
+        
         node_name = null;
       }
     }
@@ -223,7 +231,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     this.optimizeDistinct = optimizeDistinct;
   }
 
-  private String buildSaltId(List<String> path, String node_name)
+  private URI buildSaltId(List<String> path, String node_name)
   {
     StringBuilder sb = new StringBuilder("salt:/");
 
@@ -240,9 +248,20 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
         sb.append(dir).append("/");
       }
     }
+    sb.append("#").append(node_name);
 
-
-    return sb.append("#").append(node_name).toString();
+    URI result;
+    try
+    {
+      result = new URI(sb.toString());
+      return result;
+    }
+    catch (URISyntaxException ex)
+    {
+      log.error("Could not generate valid ID from path " 
+        + path.toString() + " and node name " + node_name, ex);
+    }
+    return null;
   }
 
   public CorpusPathExtractor getCorpusPathExtractor()
@@ -273,6 +292,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setOutputCorpusPath(boolean outputCorpusPath)
   {
     this.outputCorpusPath = outputCorpusPath;
+  }
+
+  public boolean isOutputToplevelCorpus()
+  {
+    return outputToplevelCorpus;
+  }
+
+  public void setOutputToplevelCorpus(boolean outputToplevelCorpus)
+  {
+    this.outputToplevelCorpus = outputToplevelCorpus;
   }
   
   

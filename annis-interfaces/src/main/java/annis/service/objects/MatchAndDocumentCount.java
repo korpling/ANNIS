@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * It provides the number of query matches and the number of distinct
  * documents where these matches occurred.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
 public class MatchAndDocumentCount implements Serializable
@@ -51,6 +51,13 @@ public class MatchAndDocumentCount implements Serializable
   {
     this.documentCount = documentsMatched;
   }
+
+  @Override
+  public String toString()
+  {
+    return "" + matchCount + " matches in " + documentCount + " documents";
+  }
+  
   
   
 }

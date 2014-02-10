@@ -16,12 +16,14 @@
 package annis.administration;
 
 import com.google.common.base.Preconditions;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -54,10 +56,13 @@ public class SchemeFixer
   
   protected void corpusAlias()
   {
+    ResultSet result = null;
+    Connection conn = null;
     try
     {
-      DatabaseMetaData dbMeta = dataSource.getConnection().getMetaData();
-      ResultSet result = dbMeta.getColumns(null, null, "corpus_alias", null);
+      conn = dataSource.getConnection();
+      DatabaseMetaData dbMeta = conn.getMetaData();
+      result = dbMeta.getColumns(null, null, "corpus_alias", null);
       
       Map<String, Integer> columnType = new HashMap<String,Integer>();
       
@@ -89,6 +94,31 @@ public class SchemeFixer
     catch (SQLException ex)
     {
       log.error("Could not get the metadata for the database", ex);
+    }
+    finally
+    {
+      if(result != null)
+      {
+        try
+        {
+          result.close();
+        }
+        catch (SQLException ex1)
+        {
+          log.error("Could not close the result set", ex1);
+        }
+      }
+      if(conn != null)
+      {
+        try
+        {
+          conn.close();
+        }
+        catch (SQLException ex1)
+        {
+          log.error("Could not close the result set", ex1);
+        }
+      }
     }
   }
 

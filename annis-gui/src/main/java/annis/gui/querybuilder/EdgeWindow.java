@@ -30,19 +30,15 @@ import com.vaadin.ui.themes.ChameleonTheme;
 public class EdgeWindow extends Panel implements Button.ClickListener
 {
   
-  private static final String[] EDGE_OPERATORS = new String[]
-  {
-    ".",".*", ".*",">",">*", ">@l", ">@r", "$", "$*", "->", "_=_", "_i_",
-    "_l_", "_r_", "_o_", "_ol_", "_or_"
-  };
-    
   private TigerQueryBuilderCanvas parent;
   
   private ComboBox cbOperator;
   private Button btClose;
   private NodeWindow source;
   private NodeWindow target;
+  private TextField txtOperator; 
   
+  private final static String CUSTOM = "custom";
   
   public EdgeWindow(final TigerQueryBuilderCanvas parent, NodeWindow source, NodeWindow target)
   {
@@ -66,7 +62,13 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     toolbar.setWidth("100%");
     toolbar.setHeight("-1px");
     vLayout.addComponent(toolbar);
-        
+    
+    Label lblTitle = new Label("AQL Operator");
+    lblTitle.setWidth("100%");
+    
+    toolbar.addComponent(lblTitle);
+    toolbar.setComponentAlignment(lblTitle, Alignment.MIDDLE_LEFT);
+    
     btClose = new Button();
     btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -77,19 +79,45 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
     
     cbOperator = new ComboBox();
-    cbOperator.setNewItemsAllowed(true);
+    cbOperator.setNewItemsAllowed(false);
+    cbOperator.setNullSelectionAllowed(true);
+    cbOperator.addItem(CUSTOM);
+    cbOperator.setItemCaption(CUSTOM, "custom");
+    cbOperator.setNullSelectionItemId(CUSTOM);
     cbOperator.setNewItemHandler(new SimpleNewItemHandler(cbOperator));
     cbOperator.setImmediate(true);
+    cbOperator.setValue(null);
     vLayout.addComponent(cbOperator);
-    for(String o : EDGE_OPERATORS)
+    for(AQLOperator o : AQLOperator.values())
     {
       cbOperator.addItem(o);
+      cbOperator.setItemCaption(o, o.getDescription() +  " (" + o.getOp() + ")");
     }
-    cbOperator.setValue(EDGE_OPERATORS[0]);
-    cbOperator.addValueChangeListener(new OperatorValueChangeListener(parent));
+    cbOperator.setValue(null);
+    cbOperator.addValueChangeListener(new ValueChangeListener()
+    {
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      {
+        
+        Object val = event.getProperty().getValue();
+        if(val instanceof AQLOperator)
+        {
+          txtOperator.setValue(((AQLOperator) val).getOp());
+        }
+      }
+    });
     
     cbOperator.setWidth("100%");
     cbOperator.setHeight("20px");
+    
+    txtOperator = new TextField();
+    txtOperator.setInputPrompt("select operator definition");
+    txtOperator.setSizeFull();
+    txtOperator.addValueChangeListener(new OperatorValueChangeListener(parent));
+    txtOperator.setImmediate(true);
+    
+    vLayout.addComponent(txtOperator);
     
     vLayout.setExpandRatio(cbOperator, 1.0f);
     
@@ -114,12 +142,32 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     return target;
   }
   
+  private AQLOperator findAQLOperatorForText(String txt)
+  {
+    for(AQLOperator op : AQLOperator.values())
+    {
+      if(op.getOp().equals(txt))
+      {
+        return op;
+      }
+    }
+    return null;
+  }
+  
   public String getOperator()
   {
-    return (String) cbOperator.getValue();
+    String val = txtOperator.getValue();
+    if(val == null || val.isEmpty())
+    {
+      return "SET_OPERATOR";
+    }
+    else
+    {
+      return val;
+    }
   }
 
-  private static class OperatorValueChangeListener implements ValueChangeListener
+  private class OperatorValueChangeListener implements ValueChangeListener
   {
 
     private final TigerQueryBuilderCanvas parent;
@@ -132,13 +180,22 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     @Override
     public void valueChange(ValueChangeEvent event)
     {
+      
+      Object oldVal = cbOperator.getValue();
+      if(CUSTOM.equals(oldVal))
+      {
+        oldVal = null;
+      }
+      AQLOperator newVal = findAQLOperatorForText((String) event.getProperty().getValue());
+      if(oldVal != newVal)
+      {
+        cbOperator.setValue(newVal);
+      }
       if(parent != null)
       {
         parent.updateQuery();
       }
     }
   }
-  
-  
   
 }

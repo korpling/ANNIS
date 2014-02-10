@@ -32,7 +32,7 @@ import static annis.sqlgen.SqlConstraints.sqlString;
 
 /**
  *
- *  @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ *  @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 {
@@ -49,7 +49,8 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
 
     sb.append(indent).append(TABSTOP);
     sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1));;
+      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
+        null, NODE_TABLE, 1, queryData.getCorpusList()));
     sb.append("\n");
     sb.append(indent).append(TABSTOP);
     sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (")
@@ -180,7 +181,7 @@ public class ApAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
       + "edge_anno.\"name\" AS edge_annotation_name, "
       + "edge_anno.val AS edge_annotation_value\n"
       + "FROM\n"
-      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas.getTableAliases(), null, NODE_TABLE, 1) + "\n"
+      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + "\n"
       + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
         + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
       + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")

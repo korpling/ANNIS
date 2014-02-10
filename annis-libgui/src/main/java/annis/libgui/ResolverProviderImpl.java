@@ -44,9 +44,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ResolverProviderImpl implements ResolverProvider {
+public class ResolverProviderImpl implements ResolverProvider, Serializable
+{
 
-    private Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
+    
     private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
     public ResolverProviderImpl(Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver) {

@@ -45,12 +45,13 @@ import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {
@@ -141,12 +142,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
-    createAutomaticEntriesForQuery(controller.getQueryDraft());
-    updateQueryInfo(controller.getQueryDraft());
+    if(controller != null)
+    {
+      createAutomaticEntriesForQuery(controller.getQueryDraft());
+      updateQueryInfo(controller.getQueryDraft());
+    }
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
-    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.65f);
-    tblFrequencyDefinition.setColumnExpandRatio("comment", 0.2f);
+    tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
+    tblFrequencyDefinition.setColumnExpandRatio("comment", 0.5f);
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
@@ -175,10 +179,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             // was not a number but a named node
           }
         }
-        List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
-        nr = Math.min(nr, nodes.size()-1);
-        tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-          FrequencyTableEntryType.span, "", ""), counter++);
+        if(controller != null)
+        {
+          List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
+          nr = Math.min(nr, nodes.size()-1);
+          tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
+            FrequencyTableEntryType.span, "", ""), counter++);
+        }
       }
     });
     layoutButtons.addComponent(btAdd);
@@ -208,7 +215,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       {
         manuallyChanged = false;
         btShowFrequencies.setEnabled(true);
-        createAutomaticEntriesForQuery(controller.getQueryDraft());
+        tblFrequencyDefinition.removeAllItems();
+        if(controller != null)
+        {
+          createAutomaticEntriesForQuery(controller.getQueryDraft());
+        }
       }
     });
     layoutButtons.addComponent(btReset);
@@ -387,6 +398,10 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   private List<QueryNode> parseQuery(String query)
   {
+    if(query == null || query.isEmpty())
+    {
+      return new LinkedList<QueryNode>();
+    }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
     List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)

@@ -8,12 +8,16 @@
     <Or>
       <Class name="annis.ql.AqlLexer"/>
       <Class name="annis.ql.AqlParser"/>
+      <Class name="annis.ql.AqlParser$IndirectPointingContext" />
+      <Class name="annis.ql.AqlParser$RangePointingContext" />
+      <Class name="annis.ql.AqlParser$AnnoEqTextExprContext" />
+      <Class name="annis.ql.AqlParser$TokTextExprContext" />
+      <Class name="annis.ql.AqlParser$MetaTermExprContext" />
       <Class name="annis.ql.RawAqlPreParser"/>
       <Class name="com.google.mimeparse.MIMEParse" />
       <Class name="com.google.mimeparse.MIMEParse$FitnessAndQuality" />
     </Or>
   </Match>
-  
   <Match>
     <And>
       <Class name="annis.AnnisRunner" />

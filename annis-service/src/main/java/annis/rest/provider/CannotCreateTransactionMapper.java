@@ -22,7 +22,7 @@ import org.springframework.transaction.CannotCreateTransactionException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Provider
 public class CannotCreateTransactionMapper

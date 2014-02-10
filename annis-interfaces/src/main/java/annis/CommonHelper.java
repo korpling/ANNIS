@@ -15,25 +15,29 @@
  */
 package annis;
 
-import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltCommonFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URLDecoder;
@@ -41,13 +45,16 @@ import java.util.*;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.xmi.impl.XMIResourceImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * Utilities class for non-gui operations on Salt.
+ * Utilities class for non-gui operations.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public class CommonHelper
@@ -97,7 +104,8 @@ public class CommonHelper
   /**
    * Calculates a {@link SOrderRelation} node chain of a {@link SDocumentGraph}.
    *
-   * <p>If no segmentation name is set, a list of sorted {@link SToken} will be
+   * <p>
+   * If no segmentation name is set, a list of sorted {@link SToken} will be
    * returned.<p>
    *
    * @param segName The segmentation name, for which the chain is computed.
@@ -122,8 +130,8 @@ public class CommonHelper
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
 
-      Map<SNode, SOrderRelation> outRelationForNode =
-        new HashMap<SNode, SOrderRelation>();
+      Map<SNode, SOrderRelation> outRelationForNode
+        = new HashMap<SNode, SOrderRelation>();
       for (SOrderRelation rel : graph.getSOrderRelations())
       {
         if (rel.getSTypes() != null && rel.getSTypes().contains(segName))
@@ -148,7 +156,6 @@ public class CommonHelper
           }
         } // end if type is segName
       } // end for all order relations of graph
-
 
       // add all nodes on the order relation chain beginning from the start node
       for (SNode s : startNodes)
@@ -312,29 +319,29 @@ public class CommonHelper
     corpusGraph.traverse(cAsList, GRAPH_TRAVERSE_TYPE.BOTTOM_UP_DEPTH_FIRST,
       "getRootCorpora",
       new SGraphTraverseHandler()
-    {
-      @Override
-      public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
-        String traversalId, SNode currNode, SRelation edge, SNode fromNode,
-        long order)
       {
-        result.add(currNode.getSName());
-      }
+        @Override
+        public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SNode currNode, SRelation edge, SNode fromNode,
+          long order)
+        {
+          result.add(currNode.getSName());
+        }
 
-      @Override
-      public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
-        String traversalId,
-        SNode currNode, SRelation edge, SNode fromNode, long order)
-      {
-      }
+        @Override
+        public void nodeLeft(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId,
+          SNode currNode, SRelation edge, SNode fromNode, long order)
+        {
+        }
 
-      @Override
-      public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
-        String traversalId, SRelation edge, SNode currNode, long order)
-      {
-        return true;
-      }
-    });
+        @Override
+        public boolean checkConstraint(GRAPH_TRAVERSE_TYPE traversalType,
+          String traversalId, SRelation edge, SNode currNode, long order)
+        {
+          return true;
+        }
+      });
     return result;
   }
 
@@ -344,7 +351,6 @@ public class CommonHelper
 
     // split on raw path (so "/" in corpus names are still encoded)
     String[] path = rawPath.split("/");
-
 
     // decode every single part by itself
     ArrayList<String> result = new ArrayList<String>(path.length);
@@ -365,33 +371,164 @@ public class CommonHelper
     return result;
   }
 
-  public static SNode[] getMatchedNodes(SDocument doc)
+  /**
+   * Finds the {@link STextualDS} for a given node. The node must
+   * dominate a token of this text.
+   *
+   * @param node
+   * @return
+   */
+  public static STextualDS getTextualDSForNode(SNode node, SDocumentGraph graph)
   {
-    SNode[] result = new SNode[0];
-
-    // get the matched node IDs
-    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
-      AnnisConstants.FEAT_MATCHEDIDS);
-    if (feat != null)
+    if (node != null)
     {
-      String[] ids = feat.getSValueSTEXT().split(",");
-      result = new SNode[ids.length];
+      STextualDS tokenText = null;
+      EList<STYPE_NAME> types = new BasicEList<STYPE_NAME>();
+      types.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
 
-      for (int i = 0; i < ids.length; i++)
+      EList<SDataSourceSequence> dataSources = graph.getOverlappedDSSequences(
+        node,
+        types);
+      if (dataSources != null)
       {
-        String id = ids[i].trim();
-        if (!id.isEmpty())
+        for (SDataSourceSequence seq : dataSources)
         {
-          // get the specific node
-          SNode node = doc.getSDocumentGraph().getSNode(id);
-          if (node != null)
+          if (seq.getSSequentialDS() instanceof STextualDS)
           {
-            result[i] = node;
+            return (STextualDS) seq.getSSequentialDS();
           }
         }
       }
     }
+    return null;
+  }
+  
+  /**
+   * Returns a file name that is safe to use and does not have any invalid characters.
+   * @param orig
+   * @return 
+   */
+  public static String getSafeFileName(String orig)
+  {
+    if(orig != null)
+    {
+      return orig.replaceAll("[^0-9A-Za-z-]", "_");
+    }
+    else
+    {
+      return UUID.randomUUID().toString();
+    }
+  }
 
+  /**
+   * Gets all names of a corpus from a salt project.
+   *
+   * @param p
+   * @return returns an empty list if project is empty or null.
+   */
+  public static Set<String> getCorpusNames(SaltProject p)
+  {
+    Set<String> names = new HashSet<String>();
+
+    if (p != null && p.getSCorpusGraphs() != null)
+    {
+      for (SCorpusGraph g : p.getSCorpusGraphs())
+      {
+        for (SCorpus c : g.getSCorpora())
+        {
+          names.add(c.getSName());
+        }
+      }
+    }
+
+
+    return names;
+  }
+  
+  public static void writeSDocument(SDocument doc, ObjectOutputStream out) 
+    throws IOException
+  {
+    XMIResourceImpl res = new XMIResourceImpl();
+    res.getContents().add(doc);
+    
+    // also add the SDocumentGraph of the document
+    res.getContents().add(doc.getSDocumentGraph());
+    
+    res.save(out, res.getDefaultSaveOptions());
+  }
+  
+  public static SDocument readSDocument(ObjectInputStream in) 
+    throws IOException
+  {
+     XMIResourceImpl res = new XMIResourceImpl();
+    res.load(in, res.getDefaultLoadOptions());
+    
+    
+    TreeIterator<EObject> itContents = res.getAllContents();
+    while(itContents.hasNext())
+    {
+      EObject o = itContents.next();
+      if(o instanceof SDocument)
+      {
+        return (SDocument) o;
+      }
+    }
+    return SaltCommonFactory.eINSTANCE.createSDocument();
+  }
+  
+  /**
+   * Takes a map of salt node IDs to a value and return a new map that
+   * uses the SNodes as keys instead of the IDs.
+   * @param <V>
+   * @param map
+   * @param graph
+   * @return 
+   */
+  public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph)
+  {
+    HashMap<SNode, V> result = new LinkedHashMap<SNode, V>();
+    
+    if(map != null && graph != null)
+    {
+      for(Map.Entry<String, V> e : map.entrySet())
+      {
+        SNode n = graph.getSNode(e.getKey());
+        if (n != null)
+        {
+          result.put(n, e.getValue());
+        }
+      }
+    }
+    
     return result;
   }
+
+  // TODO: remove if really not needed
+//  public static SNode[] getMatchedNodes(SDocument doc)
+//  {
+//    SNode[] result = new SNode[0];
+//
+//    // get the matched node IDs
+//    SFeature feat = doc.getSFeature(AnnisConstants.ANNIS_NS,
+//      AnnisConstants.FEAT_MATCHEDIDS);
+//    if (feat != null)
+//    {
+//      Match m = Match.parseFromString(feat.getSValueSTEXT());
+//      result = new SNode[m.getSaltIDs().size()];
+//
+//      int i = 0;
+//      for(URI u : m.getSaltIDs())
+//      {
+//        // get the specific node
+//        SNode node = doc.getSDocumentGraph().getSNode(u.toASCIIString());
+//        if (node != null)
+//        {
+//          result[i] = node;
+//        }
+//        i++;
+//      }
+//    }
+//
+//    return result;
+//  }
 }

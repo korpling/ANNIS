@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryNodeListener extends AqlParserBaseListener
 {
@@ -160,8 +160,12 @@ public class QueryNodeListener extends AqlParserBaseListener
     // achvieve that?
     String namespace = ctx.id.namespace == null ? 
       null : ctx.id.namespace.getText();
+    String name = ctx.id.name.getText();
+    String value = textFromSpec(ctx.txt);
+    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, false);
+    
     QueryAnnotation anno = new QueryAnnotation(namespace,
-      ctx.id.name.getText());
+      name, value, textMatching);
     metaData.add(anno);
   }
 

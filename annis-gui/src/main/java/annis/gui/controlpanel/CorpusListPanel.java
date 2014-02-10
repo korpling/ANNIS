@@ -17,7 +17,6 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.gui.CorpusBrowserPanel;
-import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
 import annis.security.AnnisUserConfig;
@@ -26,6 +25,10 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.CorpusConfig;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
+import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -48,12 +51,10 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
-import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -113,7 +114,7 @@ public class CorpusListPanel extends VerticalLayout implements
   private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
 
   private InstanceConfig instanceConfig;
-
+  
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
@@ -249,6 +250,7 @@ public class CorpusListPanel extends VerticalLayout implements
         }
       }
     });
+    tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
 
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
@@ -283,6 +285,11 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void updateCorpusSetList(boolean showLoginMessage)
   {
+    if(ui != null)
+    {
+      ui.clearCorpusConfigCache();
+    }
+    
     if (queryServerForCorpusList() && userConfig != null)
     {
       if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
@@ -611,7 +618,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     }
   }
-
+  
   public static class CorpusSorter extends DefaultItemSorter
   {
 
@@ -826,5 +833,20 @@ public class CorpusListPanel extends VerticalLayout implements
 
     UI.getCurrent().addWindow(window);
     window.center();
+  }
+  
+  public static class TooltipGenerator implements AbstractSelect.ItemDescriptionGenerator
+  {
+    @Override
+    public String generateDescription(Component source, Object itemId,
+      Object propertyId)
+    {
+      if("name".equals(propertyId))
+      {
+        return (String) itemId;
+      }
+      return null;
+    }
+    
   }
 }

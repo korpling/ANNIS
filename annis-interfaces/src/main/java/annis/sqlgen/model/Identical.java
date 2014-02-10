@@ -38,7 +38,7 @@ public class Identical extends Join
   @Override
   public String toAqlOperator()
   {
-    return "=";
+    return "_id_";
   }
   
   

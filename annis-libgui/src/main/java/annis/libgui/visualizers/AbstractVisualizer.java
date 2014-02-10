@@ -42,7 +42,7 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
 
   @Override
   public void setSegmentationLayer(I visualizerImplementation, 
-    String segmentationName, Map<SNode, Long> markedAndCovered)
+    String segmentationName, Map<String, Long> markedAndCovered)
   {
   }
 

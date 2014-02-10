@@ -4,7 +4,9 @@
  */
 package annis.corpuspathsearch;
 
+import annis.utils.RelANNISHelper;
 import au.com.bytecode.opencsv.CSVReader;
+import com.google.common.base.Charsets;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -19,15 +21,15 @@ import org.slf4j.LoggerFactory;
 
 /**
  * Searches for relANNIS corpora in file system locations.
- * @author Thomas Krause<thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Search
 {
   
   private static final Logger log = LoggerFactory.getLogger(Search.class);
 
-  private List<File> rootPaths;
-  private Map<String, File> corpusPaths;
+  private final List<File> rootPaths;
+  private final Map<String, File> corpusPaths;
   private boolean wasSearched;
 
   public Search(List<File> rootPaths)
@@ -65,34 +67,10 @@ public class Search
       {
         try
         {
-          // open the file
-          CSVReader csv = new CSVReader(new InputStreamReader(new FileInputStream(path), "UTF-8"), '\t');
-          String[] line;
-          int maxPost = Integer.MIN_VALUE;
-          int minPre = Integer.MAX_VALUE;
-
-          while ((line = csv.readNext()) != null)
-          {
-            if (line.length >= 6 && "CORPUS".equalsIgnoreCase(line[2]))
-            {
-              int pre = Integer.parseInt(line[4]);
-              int post = Integer.parseInt(line[5]);
-
-              if (pre <= minPre && post >= maxPost)
-              {
-                minPre = pre;
-                maxPost = post;
-                corpusPaths.put(line[1], path);
-              }
-
-            }
-          }
+          String toplevel = RelANNISHelper.extractToplevelCorpusNames(new FileInputStream(path));
+          corpusPaths.put(toplevel, path);
         }
         catch (FileNotFoundException ex)
-        {
-          log.error(null, ex);
-        }
-        catch (IOException ex)
         {
           log.error(null, ex);
         }

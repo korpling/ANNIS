@@ -16,11 +16,13 @@
 package annis.gui.components.medialement;
 
 import annis.libgui.media.MediaPlayer;
+import annis.libgui.media.MimeTypeErrorListener;
 import annis.visualizers.LoadableVisualizer;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.UI;
 import java.util.HashSet;
 import java.util.Set;
 import org.json.JSONArray;
@@ -30,11 +32,11 @@ import org.json.JSONException;
  * An video/audio player based on the medialement.js library
  * ({@link http://mediaelementjs.com/})
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @JavaScript(
 {
-  "vaadin://mediaelement/jquery.js", "vaadin://mediaelement/mediaelement-and-player.js", "mediaelement_connector.js"
+  "vaadin://jquery.js", "vaadin://mediaelement/mediaelement-and-player.js", "mediaelement_connector.js"
 })
 @StyleSheet(
 {
@@ -71,7 +73,22 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
         }
       }
     });
+    addFunction("cannotPlay", new CannotPlayFunction());
 
+  }
+  
+  private static class CannotPlayFunction implements JavaScriptFunction
+  {
+
+    @Override
+    public void call(JSONArray arguments) throws JSONException
+    {
+      if(UI.getCurrent() instanceof MimeTypeErrorListener)
+      {
+        ((MimeTypeErrorListener) UI.getCurrent()).notifyCannotPlayMimeType(arguments.getString(0));
+      }
+    }
+    
   }
 
   @Override

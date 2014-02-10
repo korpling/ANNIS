@@ -23,7 +23,7 @@ import java.util.List;
 /**
  * Implements method to allow different modes to have different behavior
  * how to add annotation constraints to the generated SQL.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface AnnotationConditionProvider
 {
@@ -41,5 +41,9 @@ public interface AnnotationConditionProvider
   public void addAnnotationConditions(List<String> conditions,
     QueryNode node, int index, QueryAnnotation annotation, String table,
     QueryData queryData, TableAccessStrategy tas);
+  
+  public void addEqualValueConditions(List<String> conditions,
+    QueryNode node, QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget, 
+    boolean equal);
   
 }

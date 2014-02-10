@@ -22,6 +22,7 @@ import annis.gui.controlpanel.QueryPanel;
 import annis.gui.model.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -57,10 +58,8 @@ public class ExampleQueriesPanel extends Table
   // first column String
   private final String EXAMPLE_QUERY = "example query";
 
-  private transient ExecutorService executor;
-
   //main ui window
-  private SearchUI ui;
+  private final SearchUI ui;
 
   // holds the current examples
   private List<ExampleQuery> examples;
@@ -349,7 +348,7 @@ public class ExampleQueriesPanel extends Table
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    Thread t = new Thread(new Runnable()
+    PollControl.runInBackground(100, ui, new Runnable()
     {
       @Override
       public void run()
@@ -367,7 +366,6 @@ public class ExampleQueriesPanel extends Table
             {
               removeAllItems();
               addItems();
-              ui.push();
             }
             catch (Exception ex)
             {
@@ -378,7 +376,6 @@ public class ExampleQueriesPanel extends Table
         });
       }
     });
-    t.start();
 
   }
 

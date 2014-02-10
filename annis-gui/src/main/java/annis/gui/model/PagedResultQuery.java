@@ -15,20 +15,24 @@
  */
 package annis.gui.model;
 
-import java.io.Serializable;
 import java.util.Set;
+import org.slf4j.Logger;
+
+import org.slf4j.LoggerFactory;
 
 /**
  * Parameters for a query that shows the result to the user
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * 
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class PagedResultQuery extends Query
+public class PagedResultQuery extends Query implements Cloneable
 {
   private int contextLeft;
   private int contextRight;
   private int offset;
   private int limit;
   private String segmentation;
+  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
 
   public PagedResultQuery()
   {
@@ -97,4 +101,19 @@ public class PagedResultQuery extends Query
     this.segmentation = segmentation;
   }
   
+  @Override
+  public PagedResultQuery clone()
+  {
+    PagedResultQuery c = null;    
+    try
+    {
+      c = (PagedResultQuery) super.clone();
+    }
+    catch (CloneNotSupportedException ex)
+    {
+      log.error("cloning of {} failed", PagedResultQuery.class.getName());
+    }
+    
+    return c;
+  }
 }

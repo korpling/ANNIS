@@ -30,11 +30,13 @@ import java.util.TreeSet;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SpanHTMLOutputter
 {
   public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT};
+  
+  public static final String NULL_VAL = "NULL";
   
   private Type type = Type.EMPTY;
   private String element = "div";
@@ -74,7 +76,7 @@ public class SpanHTMLOutputter
     
     SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
     
-    String value = "";
+    String value;
     // output to an inner text node
     switch(type)
     {
@@ -86,6 +88,9 @@ public class SpanHTMLOutputter
         break;
       case ANNO_NAME:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        break;
+      default:
+        value = "";
         break;
     }
     outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags);
@@ -101,7 +106,7 @@ public class SpanHTMLOutputter
     
     long index = feat.getTokenIndex();
     
-    String value = "";
+    String value;
     
     switch(type)
     {
@@ -113,6 +118,9 @@ public class SpanHTMLOutputter
         break;
       case ANNO_NAME:
         value = "tok";
+        break;
+      default:
+        value = "";
         break;
     }
     outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
@@ -162,6 +170,13 @@ public class SpanHTMLOutputter
       outputEndTags.put(right, new TreeSet<OutputItem>());
     }
     
+    if(NULL_VAL.equals(element))
+    {
+      // reset both start and end tag since we won't use it
+      startTag = "";
+      endTag = "";
+    }
+    
     // <tag>|inner| ... | </tag>
     if(!inner.isEmpty())
     {
@@ -174,7 +189,14 @@ public class SpanHTMLOutputter
     itemStart.setqName(matchedQName);
     
     OutputItem itemEnd = new OutputItem();
-    itemEnd.setOutputString(endTag + "<!-- end of \"" + style + "\" -->");
+    if(endTag.isEmpty())
+    {
+      itemEnd.setOutputString(endTag+ "<!-- end of non-span output -->");
+    }
+    else
+    {
+      itemEnd.setOutputString(endTag + "<!-- end of \"" + style + "\" -->");
+    }
     itemEnd.setLength(right-left);
     itemEnd.setqName(matchedQName);
     

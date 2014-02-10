@@ -20,7 +20,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.File;
 import java.io.IOException;
 import java.io.Writer;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
@@ -58,8 +57,7 @@ import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.Match;
-import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
@@ -75,6 +73,7 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
+import java.util.Properties;
 
 
 // TODO: test AnnisRunner
@@ -118,7 +117,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private String segmentationLayer = null;
   
-  private SubgraphFilter filter = SubgraphFilter.All;
+  private SubgraphFilter filter = SubgraphFilter.all;
 
   private List<Long> corpusList;
 
@@ -328,8 +327,12 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
+    doSet("left to 5");
+    doSet("right to 5");
+//    doSet("seg to dipl");
     doCorpus("pcc2");
-    doCount("#1 . #2 & #a . #3 & tok & tok & a#tok");
+    doSql("count lemma=\"der\" == tok & #1 _id_ #2");
+    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
   }
 
   public void doParse(String annisQuery)
@@ -674,11 +677,35 @@ public class AnnisRunner extends AnnisBaseRunner
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-
       csv.close();
-
+      
     }
     catch (IOException ex)
+    {
+      log.error(null, ex);
+    }
+    
+    
+    // property output format for Jenkins Plot plugin
+    try
+    {
+      File outputDir = new File("annis_benchmark_results");
+      if(outputDir.mkdirs())
+      {
+        int i=1;
+        for(AnnisRunner.Benchmark b : benchmarks)
+        {
+          Properties props = new Properties();
+          props.put("YVALUE", "" + b.getMedian());
+          FileWriterWithEncoding writer = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8");
+          props.store(writer, "");
+          writer.close();
+          
+          i++;
+        }
+      }
+    }
+    catch(IOException ex)
     {
       log.error(null, ex);
     }
@@ -994,14 +1021,14 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCount(String annisQuery)
   {
-    out.println(annisDao.count(analyzeQuery(annisQuery, "count")));
+    out.println(annisDao.countMatchesAndDocuments(analyzeQuery(annisQuery, "count")));
   }
 
   public void doMatrix(String annisQuery)
   {
 //    List<AnnotatedMatch> matches = annisDao.matrix(analyzeQuery(annisQuery,
 //      "matrix"));
-    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), System.out);
+    annisDao.matrix(analyzeQuery(annisQuery, "matrix"), false, System.out);
 //    if (matches.isEmpty())
 //    {
 //      out.println("(empty");
@@ -1016,32 +1043,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doFind(String annisQuery)
   {
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
-    JAXBContext jc = null;
-    try
-    {
-      jc = JAXBContext.newInstance(annis.service.objects.Match.class);
-    }
-    catch (JAXBException ex)
-    {
-      log.error("Problems with writing XML", ex);
-    }
-
-
-    for (int i = 0; i < matches.size(); i++)
-    {
-
-      try
-      {
-
-        jc.createMarshaller().marshal(matches.get(i), out);
-      }
-      catch (JAXBException ex)
-      {
-        log.error("Problems with writing XML", ex);
-      }
-
-      out.println();
-    }
+    MatchGroup group = new MatchGroup(matches);
+    out.println(group.toString());
   }
 
   public void doSubgraph(String saltIds)
@@ -1330,53 +1333,28 @@ public class AnnisRunner extends AnnisBaseRunner
   private QueryData extractSaltIds(String param)
   {
     QueryData queryData = new QueryData();
-    SaltURIGroupSet saltIDs = new SaltURIGroupSet();
+    MatchGroup matchGroup = MatchGroup.parseString(param);
 
     Set<String> corpusNames = new TreeSet<String>();
 
-    int i = 0;
-    for (String group : param.split("\\s*;\\s*"))
+    for(Match m : matchGroup.getMatches())
     {
-      SaltURIGroup urisForGroup = new SaltURIGroup();
-
-      for (String id : group.split("[,\\s]+"))
-      {
-        java.net.URI uri;
-        try
-        {
-          uri = new java.net.URI(id);
-
-          if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
-          {
-            throw new URISyntaxException("not a salt id", uri.toString());
-          }
-        }
-        catch (URISyntaxException ex)
-        {
-          log.error(null, ex);
-          continue;
-        }
-        urisForGroup.getUris().add(uri);
-      }
-
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(urisForGroup.
-        getUris().size());
-      for (java.net.URI u : urisForGroup.getUris())
+      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(m.getSaltIDs().size());
+      for (java.net.URI u : m.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
       queryData.addAlternative(pseudoNodes);
-      saltIDs.getGroups().put(++i, urisForGroup);
     }
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(
       corpusNames));
 
     queryData.setCorpusList(corpusIDs);
 
-    log.debug(saltIDs.toString());
-    queryData.addExtension(saltIDs);
+    log.debug(matchGroup.toString());
+    queryData.addExtension(matchGroup);
     return queryData;
   }
 }

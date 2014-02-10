@@ -27,3 +27,13 @@ SELECT ARRAY(
     "type" = $6::annotype
 );
 $f$ LANGUAGE SQL IMMUTABLE;
+
+CREATE OR REPLACE FUNCTION getAnnoValue(anno_ref bigint, toplevel_corpus bigint, "type" varchar) 
+RETURNS varchar AS $f$
+SELECT val
+FROM annotation_pool
+WHERE
+  id = $1 AND 
+  toplevel_corpus = $2 AND
+  "type" = $3::annotype
+$f$ LANGUAGE SQL STABLE;

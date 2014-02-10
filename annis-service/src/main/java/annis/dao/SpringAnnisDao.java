@@ -15,6 +15,7 @@
  */
 package annis.dao;
 
+import annis.CSVHelper;
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
@@ -50,12 +51,17 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import com.google.common.base.Charsets;
+import com.google.common.base.Preconditions;
+import com.google.common.io.ByteStreams;
+import com.google.common.io.Closer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.util.ListIterator;
 
@@ -72,7 +78,6 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
-import java.sql.Types;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -83,15 +88,12 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
-import javax.ws.rs.core.GenericEntity;
-import org.apache.commons.io.input.BoundedInputStream;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ConnectionCallback;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
@@ -131,8 +133,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private int timeout;
   // fn: corpus id -> corpus name
-
-  private Map<Long, String> corpusNamesById;
 
   @Override
   @Transactional
@@ -309,8 +309,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public void setCorpusConfiguration(long corpusID, Properties props)
+  public void setCorpusConfiguration(String toplevelCorpusName, Properties props)
   {
+    long corpusID = mapCorpusNameToId(toplevelCorpusName);
+    
     String sql = "SELECT filename FROM media_files "
       + "WHERE corpus_ref=" + corpusID + " AND title = " + "'corpus.properties'";
     String fileName = getJdbcTemplate().query(sql,
@@ -329,22 +331,41 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         }
       });
 
+    Closer closer = Closer.create();
     try
     {
-      File dir = getRealDataDir();
-
-      if (fileName == null)
+      try
       {
-        fileName = "corpus_" + UUID.randomUUID() + ".properties";
-        getJdbcTemplate().update(
-          "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-          + "', 'application/text+plain', 'corpus.properties')");
-      }
+        File dir = getRealDataDir();
 
-      log.info("write config file: " + dir + "/" + fileName);
-      Writer f = new FileWriter(new File(
-        dir.getCanonicalPath() + "/" + fileName));
-      props.store(f, "");
+        if (fileName == null)
+        {
+          fileName = "corpus_" + toplevelCorpusName + "_" + UUID.randomUUID() + ".properties";
+          getJdbcTemplate().update(
+            "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+            + "', 'application/text+plain', 'corpus.properties')");
+        }
+
+        log.info("write config file: " + dir + "/" + fileName);
+        FileOutputStream fStream = new FileOutputStream(new File(
+          dir.getCanonicalPath() + "/" + fileName));
+
+        closer.register(fStream);
+
+        OutputStreamWriter writer = new OutputStreamWriter(fStream,
+          Charsets.UTF_8);
+        closer.register(writer);
+        
+        props.store(writer, "");
+      }
+      catch (Throwable ex)
+      {
+        closer.rethrow(ex);
+      }
+      finally
+      {
+        closer.close();
+      }
     }
     catch (IOException ex)
     {
@@ -450,6 +471,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
+  @Transactional(readOnly = true)
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator)
   {
@@ -460,15 +482,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
     List<String> names = new ArrayList<String>();
-    if (corpusNamesById == null)
+   
+    Map<Long, String> corpusNamesById = new TreeMap<Long, String>();
+    List<AnnisCorpus> corpora = listCorpora();
+    for (AnnisCorpus corpus : corpora)
     {
-      corpusNamesById = new TreeMap<Long, String>();
-      List<AnnisCorpus> corpora = listCorpora();
-      for (AnnisCorpus corpus : corpora)
-      {
-        corpusNamesById.put(corpus.getId(), corpus.getName());
-      }
+      corpusNamesById.put(corpus.getId(), corpus.getName());
     }
+
     for (Long id : ids)
     {
       if (corpusNamesById.containsKey(id))
@@ -499,7 +520,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
-  @Transactional
+  @Transactional(readOnly = true)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator,
@@ -629,7 +650,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   @Transactional(readOnly = true)
   @Override
-  public void matrix(final QueryData queryData, final OutputStream out)
+  public void matrix(final QueryData queryData, final boolean outputCsv, final OutputStream out)
   {
     prepareTransaction(queryData);
 
@@ -648,13 +669,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
           // write the header to the output stream
           PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-          SortedMap<Integer, SortedSet<String>> columnsByNodePos =
-            WekaHelper.exportArffHeader(itMatches, w);
-          w.flush();
+          
+          if(outputCsv)
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = CSVHelper.exportCSVHeder(itMatches, w);
+            w.flush();
 
-          // go back to the beginning and print the actual data
-          itMatches.reset();
-          WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            CSVHelper.exportCSVData(itMatches, columnsByNodePos, w);
+          }
+          else
+          {
+            SortedMap<Integer, SortedSet<String>> columnsByNodePos
+              = WekaHelper.exportArffHeader(itMatches, w);
+            w.flush();
+
+            // go back to the beginning and print the actual data
+            itMatches.reset();
+            WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
+          }
           w.flush();
 
           rs.close();
@@ -1153,16 +1188,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       File dataFile = new File(getRealDataDir(), binary.getLocalFileName());
 
       long fileSize = dataFile.length();
-
-      // do not make the array bigger as necessary
-      length = (int) Math.min(fileSize - (long) offset, (long) length);
+      
+      Preconditions.checkArgument(offset+length <= fileSize, 
+        "Range larger than the actual file size requested. Actual file size is %d bytes, %d bytes were requested.",
+        fileSize, offset+length);
 
       FileInputStream fInput = new FileInputStream(dataFile);
-      fInput.skip(offset);
-
-      BoundedInputStream boundedStream = new BoundedInputStream(fInput, length);
-
-      return boundedStream;
+      ByteStreams.skipFully(fInput, offset);
+      return ByteStreams.limit(fInput, length);
     }
     catch (FileNotFoundException ex)
     {

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This panel allows the user to control and execute queries.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ControlPanel extends VerticalLayout
 {

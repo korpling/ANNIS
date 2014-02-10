@@ -28,7 +28,7 @@ import org.springframework.jdbc.core.RowMapper;
  * A wrapper for a {@link ResultSet} and a {@link RowMapper} and combines them
  * in order to provide the {@link Iterator} interface.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ResultSetTypedIterator<T> implements Iterator<T>
 {
