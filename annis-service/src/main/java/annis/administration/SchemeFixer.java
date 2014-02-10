@@ -94,6 +94,9 @@ public class SchemeFixer
     catch (SQLException ex)
     {
       log.error("Could not get the metadata for the database", ex);
+    }
+    finally
+    {
       if(result != null)
       {
         try
