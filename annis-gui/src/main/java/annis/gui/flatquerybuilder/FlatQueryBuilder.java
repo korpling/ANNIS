@@ -480,13 +480,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     } catch (Exception ex){
       ex = null;
     }
-    String metaQuery = "";
+    StringBuilder metaQuery = new StringBuilder();
     Iterator<MetaBox> itMetaBoxes = mboxes.iterator();
     while(itMetaBoxes.hasNext())
     {
-      metaQuery += getMetaQueryFragment(itMetaBoxes.next());
+      metaQuery.append(getMetaQueryFragment(itMetaBoxes.next()));
     }
-    String fullQuery = (ql.toString() + edgeQuery.toString()+sentenceQuery.toString()+metaQuery);
+    String fullQuery = (ql.toString() + edgeQuery.toString()+sentenceQuery.toString()+metaQuery.toString());
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
     this.query = fullQuery;
@@ -1285,9 +1285,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     public Relation(String in) throws EqualityConstraintException
     {
       
-      String op = "";
-      String o1str = "";
-      String o2str = "";
+      StringBuilder op = new StringBuilder();
+      StringBuilder o1str = new StringBuilder();
+      StringBuilder o2str = new StringBuilder();
       
       int i=1;
       char c = in.charAt(1);
@@ -1295,13 +1295,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       
       while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$')&(c!='='))
       {
-        o1str+=c;
+        o1str.append(c);
         i++;
         c = in.charAt(i);
       }     
       while(c!='#')
       {
-        op+=c;
+        op.append(c);
         i++;
         c = in.charAt(i);
       }
@@ -1309,15 +1309,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       while((i<in.length()))
       {
         c = in.charAt(i);
-        o2str+=c;
+        o2str.append(c);
         i++;
       }
       
-      operator = op;
-      o1 = Integer.parseInt(o1str);
-      o2 = Integer.parseInt(o2str);
+      operator = op.toString();
+      o1 = Integer.parseInt(o1str.toString());
+      o2 = Integer.parseInt(o2str.toString());
       
-      if(op.startsWith("."))
+      if(operator.startsWith("."))
       {
        type = RelationType.PRECEDENCE; 
       }
