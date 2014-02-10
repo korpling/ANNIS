@@ -354,6 +354,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
         OutputStreamWriter writer = new OutputStreamWriter(fStream,
           Charsets.UTF_8);
+        closer.register(writer);
+        
         props.store(writer, "");
       }
       catch (Throwable ex)
