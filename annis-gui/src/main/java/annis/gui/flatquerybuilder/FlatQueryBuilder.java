@@ -431,7 +431,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     int count = 1;    
     StringBuilder ql = new StringBuilder();
     StringBuilder edgeQuery = new StringBuilder();
-    String sentenceQuery = "";
+    StringBuilder sentenceQuery = new StringBuilder();
     Collection<Integer> sentenceVars = new ArrayList<Integer>();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
     for (VerticalNode v : vnodes)
@@ -475,7 +475,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       ql.append(addQuery);
       for(Integer i : sentenceVars)
       {
-        sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
+        sentenceQuery.append("\n& #").append(count).append("_i_#").append(i.toString());
       }
     } catch (Exception ex){
       ex = null;
@@ -486,7 +486,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       metaQuery += getMetaQueryFragment(itMetaBoxes.next());
     }
-    String fullQuery = (ql.toString() + edgeQuery+sentenceQuery+metaQuery);
+    String fullQuery = (ql.toString() + edgeQuery.toString()+sentenceQuery.toString()+metaQuery);
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
     this.query = fullQuery;
