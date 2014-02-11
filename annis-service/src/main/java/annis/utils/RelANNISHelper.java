@@ -96,6 +96,11 @@ public class RelANNISHelper
       }
     }
     
+    if (result.isEmpty())
+    {
+      throw new IOException("no corpus found");
+    }
+
     return result;
   }
   

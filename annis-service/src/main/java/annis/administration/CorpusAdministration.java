@@ -190,6 +190,8 @@ public class CorpusAdministration
         catch(IOException ex)
         {
           log.error("Could not find any corpus in " + f.getPath(), ex);
+          importStats.setStatus(false);
+          importStats.addException(f.getAbsolutePath(), ex);
         }
       }
     } // end for each given path
