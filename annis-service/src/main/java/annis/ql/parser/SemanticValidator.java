@@ -17,12 +17,10 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.QueryNode;
-import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.NonBindingJoin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;

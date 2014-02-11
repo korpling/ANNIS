@@ -85,6 +85,16 @@
     <!-- corner cases of OR -->
     <value><![CDATA["das" | "die" | "der"]]></value>
     <value><![CDATA["das" | ("die" & pos="NN" & #2 . #3) | "der"]]></value>
+    <value><![CDATA[""]]></value>
+    <value><![CDATA[//]]></value>
+    <value><![CDATA[tok=""]]></value>
+    <value><![CDATA[tok=//]]></value>
+    <value><![CDATA[pos=""]]></value>
+    <value><![CDATA[pos=//]]></value>
+    <value><![CDATA[pos!=""]]></value>
+    <value><![CDATA[pos!=//]]></value>
+    <value><![CDATA[tok !=""]]></value>
+    <value><![CDATA[tok!=//]]></value>
 	</util:list>
 	
 	<util:list id="bad">
