@@ -287,9 +287,15 @@ public interface AnnisDao
   public String mapCorpusIdToName(long corpusId);
 
   /**
-   * Stores a corpus configuration.
+   * Stores a corpus configuration. If the properties object is empty, an empty
+   * file is written in the annis data directory.
    *
-   * @param corpusID The id of the corpus, for which the properties are written.
+   * <p>The name of the corpus properties file follows the schema:<br>
+   *  <pre>corpus_&lt;toplevelCorpusName&gt;_&lt;UUID&gt;.properties</pre>
+   * </p>
+   *
+   * @param topLevelCorpus The name of the corpus, for which the properties are
+   * written.
    * @param props The properties
    */
   public void setCorpusConfiguration(String topLevelCorpus, Properties props);
