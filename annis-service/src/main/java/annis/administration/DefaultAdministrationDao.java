@@ -494,6 +494,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       dropStagingArea();
     }
 
+    // create empty corpus properties file
+    if (annisDao.getCorpusConfiguration(toplevelCorpusName) == null)
+    {
+      annisDao.setCorpusConfiguration(toplevelCorpusName, new Properties());
+    }
+
     analyzeFacts(corpusID);
     analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
