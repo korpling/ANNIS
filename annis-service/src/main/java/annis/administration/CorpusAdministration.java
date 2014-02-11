@@ -276,6 +276,17 @@ public class CorpusAdministration
         FileOutputStream outStream = null;
         try
         {
+          if (!outFile.getParentFile().isDirectory())
+          {
+            if (!outFile.getParentFile().mkdirs())
+            {
+              {
+                log.warn(
+                  "Could not create output directory for file " + outFile.
+                  getAbsolutePath());
+              }
+            }
+          }
           outStream = new FileOutputStream(outFile);
           ByteStreams.copy(zip.getInputStream(e), outStream);
         }
