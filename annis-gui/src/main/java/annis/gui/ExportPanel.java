@@ -44,6 +44,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -102,7 +103,7 @@ public class ExportPanel extends FormLayout
   private transient Stopwatch exportTime = new Stopwatch();
 
   private final QueryController controller;
-  
+
   private transient Future<File> exportFuture = null;
 
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
@@ -324,12 +325,12 @@ public class ExportPanel extends FormLayout
         }
       }
       tmpOutputFile = null;
-      if(exportFuture != null && !exportFuture.isDone())
+      if (exportFuture != null && !exportFuture.isDone())
       {
         exportFuture.cancel(true);
       }
       exportFuture = null;
-      
+
       String exporterName = (String) cbExporter.getValue();
       final Exporter exporter = exporterMap.get(exporterName);
       if (exporter != null)
@@ -349,12 +350,12 @@ public class ExportPanel extends FormLayout
         progressBar.setEnabled(true);
         progressLabel.setValue("");
 
-        if(exporter.isCancelable())
+        if (exporter.isCancelable())
         {
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
-        
+
         exportFuture = PollControl.callInBackground(1000, null,
           new BackgroundJob(exporter));
         if (exportFuture != null)
@@ -369,22 +370,22 @@ public class ExportPanel extends FormLayout
       }
     }
   }
-  
+
   private class CancelButtonListener implements Button.ClickListener
   {
 
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(exportFuture != null)
+      if (exportFuture != null)
       {
-        if(!exportFuture.cancel(true))
+        if (!exportFuture.cancel(true))
         {
           log.warn("Could not cancel export");
         }
       }
     }
-    
+
   }
 
   private class BackgroundJob implements Callable<File>
@@ -406,6 +407,7 @@ public class ExportPanel extends FormLayout
       OutputStreamWriter outWriter
         = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
 
+      final AtomicBoolean success = new AtomicBoolean(false);
       try
       {
         exporter.convertText(queryPanel.getQuery(),
@@ -416,6 +418,7 @@ public class ExportPanel extends FormLayout
           txtParameters.getValue(),
           Helper.getAnnisWebResource().path("query"),
           outWriter, eventBus);
+        success.set(true);
       }
       finally
       {
@@ -427,10 +430,11 @@ public class ExportPanel extends FormLayout
           public void run()
           {
             btExport.setEnabled(true);
+            btCancel.setEnabled(false);
             progressBar.setEnabled(false);
             progressLabel.setValue("");
 
-          // copy the result to the class member in order to delete if
+            // copy the result to the class member in order to delete if
             // when not longer needed
             tmpOutputFile = currentTmpFile;
 
@@ -440,6 +444,12 @@ public class ExportPanel extends FormLayout
                 "The server logs might contain more information about this "
                 + "so you should contact the provider of this ANNIS installation "
                 + "for help.", Notification.Type.ERROR_MESSAGE);
+            }
+            else if (!success.get())
+            {
+              // we were aborted, don't do anything
+              Notification.show("Export cancelled",
+                Notification.Type.WARNING_MESSAGE);
             }
             else
             {
