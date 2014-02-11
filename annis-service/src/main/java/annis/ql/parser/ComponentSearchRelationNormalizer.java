@@ -126,6 +126,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     newNode.getJoins().clear();
     newNode.setVariable("x" + node.getVariable());
     newNode.addJoin(join);
+    newNode.setArtificial(true);
     
     Identical identJoin = new Identical(newNode);
     node.addJoin(identJoin);
