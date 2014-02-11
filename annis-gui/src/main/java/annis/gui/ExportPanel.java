@@ -134,7 +134,7 @@ public class ExportPanel extends FormLayout
       cbExporter.addItem(name);
     }
     cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
-    cbExporter.addListener(new ExporterSelectionHelpListener());
+    cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
     addComponent(new HelpButton(cbExporter));
@@ -187,6 +187,11 @@ public class ExportPanel extends FormLayout
     btCancel.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
+    Exporter exporter = exporterMap.get((String) cbExporter.getValue());
+    if(exporter != null)
+    {
+      btCancel.setVisible(exporter.isCancelable());
+    }
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
@@ -270,6 +275,13 @@ public class ExportPanel extends FormLayout
       {
         cbExporter.setDescription("No help available for this exporter");
       }
+      
+      Exporter exporter = exporterMap.get((String) event.getProperty().getValue());
+      if(exporter != null)
+      {
+        btCancel.setVisible(exporter.isCancelable());
+      }
+      
     }
   }
 
