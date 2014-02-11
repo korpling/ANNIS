@@ -77,6 +77,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
   private final Button btDownload;
 
   private final Button btExport;
+  private final Button btCancel;
 
   private final Map<String, Exporter> exporterMap;
 
@@ -176,7 +177,12 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
       "tango-icons/16x16/media-playback-start.png"));
     btExport.setDisableOnClick(true);
     btExport.addClickListener((Button.ClickListener) this);
-
+    
+    btCancel = new Button("Cancel Export");
+    btCancel.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btCancel.setEnabled(false);
+    btCancel.addClickListener((Button.ClickListener) this);
+    
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
     btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
@@ -184,6 +190,7 @@ public class ExportPanel extends FormLayout implements Button.ClickListener
     btDownload.setEnabled(false);
 
     HorizontalLayout layoutExportButtons = new HorizontalLayout(btExport,
+      btCancel,
       btDownload);
     addComponent(layoutExportButtons);
 
