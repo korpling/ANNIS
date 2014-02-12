@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -37,7 +38,7 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 @ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
 public class TransitivePrecedenceOptimizerTest
 {
-  
+  private boolean postProcessorExists = false;
 
  	@Autowired private AnnisParserAntlr parser;
   public TransitivePrecedenceOptimizerTest()
@@ -49,6 +50,15 @@ public class TransitivePrecedenceOptimizerTest
   public void setUp()
   {
     parser.setPrecedenceBound(0);
+    postProcessorExists = false;
+    for(QueryDataTransformer t : parser.getPostProcessors())
+    {
+      if(t instanceof TransitivePrecedenceOptimizer)
+      {
+        postProcessorExists = true;
+        break;
+      }
+    }
   }
 
   @After
@@ -64,6 +74,8 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithBound()
   {
+    assumeTrue(postProcessorExists);
+    
     System.out.println("addTransitivePrecedenceOperatorsWithBound");
     
     // query to extend
@@ -170,6 +182,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithoutBound()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("addTransitivePrecedenceOperatorsWithoutBound");
     
     // query to extend
@@ -268,6 +281,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testFollowSegmentation()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("followSegmentation");
     
     // query to extend
@@ -286,6 +300,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testDontFollowSegmentation()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontFollowSegmentation");
     
     // query to extend
@@ -304,6 +319,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testDontFollowSegmentationFromTok()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontFollowSegmentationFromTok");
     
     // query to extend
@@ -322,6 +338,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testDontUseRangedPrecendenceOnSpans()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontUseRangedPrecendenceOnSpans");
     
     // query to extend
