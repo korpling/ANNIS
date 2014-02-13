@@ -15,6 +15,7 @@
  */
 package annis.sqlgen.annopool;
 
+import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
@@ -25,6 +26,8 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import com.google.common.base.Objects;
+import java.util.Set;
 /**
  *
  * @author thomas
@@ -117,13 +120,15 @@ public class ApAnnotationConditionProvider implements
     
     String op = equal ? "=" : "<>";
     
+    
     if(node.isToken() && target.isToken())
     {
       // join on span
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "span") 
         + " " + op + " " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
     }
-    else if(!node.isToken() && !target.isToken())
+    else if(haveSameNodeAnnotationDefinitions(
+      node.getNodeAnnotations(), target.getNodeAnnotations()))
     {
       // join on node_anno_ref
       conditions.add(tasNode.aliasedColumn(NODE_TABLE, "node_anno_ref") 
@@ -160,5 +165,22 @@ public class ApAnnotationConditionProvider implements
     }
   }
   
-  
+  private boolean haveSameNodeAnnotationDefinitions(Set<QueryAnnotation> sourceAnnos, 
+    Set<QueryAnnotation> targetAnnos)
+  {
+    if(sourceAnnos != null && targetAnnos != null 
+      && sourceAnnos.size() == 1 && targetAnnos.size() == 1)
+    {
+      QueryAnnotation anno1 = sourceAnnos.iterator().next();
+      QueryAnnotation anno2 = targetAnnos.iterator().next();
+      
+      if(Objects.equal(anno1.getNamespace(), anno2.getNamespace()) 
+        && Objects.equal(anno1.getName(), anno2.getName()))
+      {
+        return true;
+      }
+    }
+    
+    return false;
+  }
 }
