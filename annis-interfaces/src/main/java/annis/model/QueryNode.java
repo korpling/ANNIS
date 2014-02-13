@@ -65,6 +65,7 @@ public class QueryNode implements Serializable
   private Range tokenArity;
   private Long matchedNodeInQuery;
   private boolean artificial;
+  private Integer alternativeNumber;
   
   public enum TextMatching
   {
@@ -807,6 +808,20 @@ public class QueryNode implements Serializable
   public void setArtificial(boolean artificial)
   {
     this.artificial = artificial;
+  }
+
+  /**
+   * If set return the number of the (normalized) alternative this node belongs to.
+   * @return 
+   */
+  public Integer getAlternativeNumber()
+  {
+    return alternativeNumber;
+  }
+
+  public void setAlternativeNumber(Integer alternativeNumber)
+  {
+    this.alternativeNumber = alternativeNumber;
   }
 
   

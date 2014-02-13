@@ -699,9 +699,15 @@ public class QueryServiceImpl implements QueryService
   {
     QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
     List<QueryNode> nodes = new LinkedList<QueryNode>();
+    int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
     {
-      nodes.addAll(alternative);
+      for(QueryNode n : alternative)
+      {
+        n.setAlternativeNumber(i);
+        nodes.add(n);
+      }
+      i++;
     }
     return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
