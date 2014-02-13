@@ -24,6 +24,7 @@ import annis.model.QueryNode;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -44,6 +45,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -424,11 +427,24 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
       counter = 0;
       List<QueryNode> nodes = parseQuery(query);
+      Collections.sort(nodes, new Comparator<QueryNode>()
+      {
+
+        @Override
+        public int compare(QueryNode o1, QueryNode o2)
+        {
+          if(o1.getVariable() == null)
+          {
+            return o2 == null ? 0 : -1;
+          }
+          return o1.getVariable().compareTo(o2.getVariable());
+        }
+      });
+      
       for(QueryNode n : nodes)
       {
         if(!n.isArtificial())
         {
-          n.getId();
           if(n.getNodeAnnotations().isEmpty())
           {
             tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
