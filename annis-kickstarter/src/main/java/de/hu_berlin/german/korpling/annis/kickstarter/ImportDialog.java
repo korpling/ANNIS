@@ -231,7 +231,10 @@ public class ImportDialog extends javax.swing.JDialog
       if (!importStats.getStatus())
       {
         status.ok = false;
-        status.ex = (Exception) importStats.getExceptions().get(importStats.getExceptions().size() -1);
+        if(importStats.getExceptions() != null && !importStats.getExceptions().isEmpty())
+        {
+          status.ex = (Exception) importStats.getExceptions().get(importStats.getExceptions().size() -1);
+        }
         return status;
       }
 
