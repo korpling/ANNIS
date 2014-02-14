@@ -431,26 +431,29 @@ public class SearchUI extends AnnisBaseUI
   public void regenerateStateFromCookies()
   {
     Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
-    for(Cookie c : cookies )
+    if(cookies != null)
     {
-      if("annis-sidebar-state".equals(c.getName()))
+      for(Cookie c : cookies )
       {
-        try
+        if("annis-sidebar-state".equals(c.getName()))
         {
-          sidebarState = SidebarState.valueOf(c.getValue());
-          // don't be invisible
-          if(sidebarState == SidebarState.AUTO_HIDDEN)
+          try
           {
-            sidebarState = SidebarState.AUTO_VISIBLE;
+            sidebarState = SidebarState.valueOf(c.getValue());
+            // don't be invisible
+            if(sidebarState == SidebarState.AUTO_HIDDEN)
+            {
+              sidebarState = SidebarState.AUTO_VISIBLE;
+            }
+            else if(sidebarState == SidebarState.HIDDEN)
+            {
+              sidebarState = SidebarState.VISIBLE;
+            }
           }
-          else if(sidebarState == SidebarState.HIDDEN)
+          catch(IllegalArgumentException ex)
           {
-            sidebarState = SidebarState.VISIBLE;
+            log.debug("Invalid cookie for sidebar state", ex);
           }
-        }
-        catch(IllegalArgumentException ex)
-        {
-          log.debug("Invalid cookie for sidebar state", ex);
         }
       }
     }
