@@ -227,24 +227,17 @@ public class DefaultAdministrationDao implements AdministrationDao
   ///// Subtasks of creating the database
   protected void dropDatabase(String database)
   {
-    String sql = "SELECT count(*) FROM pg_database WHERE datname = ?";
-    int count = jdbcTemplate.queryForInt(sql, database);
-    if (count != 0)
-    {
-      log.debug("dropping existing database");
-      jdbcTemplate.execute("DROP DATABASE " + database);
-    }
+    
+    log.debug("dropping possible existing database");
+    jdbcTemplate.execute("DROP DATABASE IF EXISTS " + database);
+
   }
 
   protected void dropUser(String username)
   {
-    String sql = "SELECT count(*) FROM pg_user WHERE usename = ?";
-    int count = jdbcTemplate.queryForInt(sql, username);
-    if (count != 0)
-    {
-      log.debug("dropping existing user");
-      jdbcTemplate.execute("DROP USER " + username);
-    }
+    log.debug("dropping possible existing user");
+    jdbcTemplate.execute("DROP USER IF EXISTS " + username);
+
   }
 
   protected void createUser(String username, String password)
@@ -389,7 +382,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   }
   
-  //@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   private void createDatabaseAndUserInTransaction(String database,
     String user, String password)
   {
@@ -401,7 +394,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     installPlPgSql();
   }
   
-  //@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   private void createSchemaInTransaction()
   {
     createFunctionUniqueToplevelCorpusName();
