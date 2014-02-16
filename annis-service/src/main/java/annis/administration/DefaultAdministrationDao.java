@@ -22,6 +22,8 @@ import annis.exceptions.AnnisException;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
+import annis.utils.DynamicDataSource;
+import annis.utils.SSLEnabledDataSource;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -38,7 +40,6 @@ import java.util.Map.Entry;
 import java.util.Properties;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.sql.DataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -47,7 +48,6 @@ import org.codehaus.jackson.map.AnnotationIntrospector;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
-import org.postgresql.Driver;
 import org.postgresql.PGConnection;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,10 +61,13 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
+import org.springframework.jdbc.datasource.ConnectionHolder;
+import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
-import org.springframework.jdbc.datasource.SimpleDriverDataSource;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
@@ -86,16 +89,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   // use Spring's JDBC support
   private JdbcTemplate jdbcTemplate;
 
-  /**
-   * Private JdbcOperations jdbcOperations; save the datasource to manually
-   * retrieve connections (needed for bulk-import).
-   */
-  private DataSource dataSource;
-
   // if this is true, the staging area is not deleted
   private boolean temporaryStagingArea;
 
   private StatementController statementController;
+  
+  private DynamicDataSource dataSource;
 
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
@@ -255,12 +254,12 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "'");
   }
 
-  protected void createDatabase(String database)
+  protected void createDatabase(String database, String owner)
   {
     log.info("creating database: " + database
-      + " ENCODING = 'UTF8' TEMPLATE template0");
+      + " OWNER " + owner + " ENCODING = 'UTF8'");
     jdbcTemplate.execute("CREATE DATABASE " + database
-      + " ENCODING = 'UTF8' TEMPLATE template0");
+      + " OWNER " + owner + " ENCODING = 'UTF8'");
   }
 
   protected void installPlPgSql()
@@ -367,6 +366,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
   
 
+  @Transactional(readOnly = false, propagation = Propagation.NEVER)
   @Override
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
@@ -374,33 +374,47 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // connect as super user to the default database to create new user and database
     if (superPassword != null)
-    {
+    {      
       log.info("Creating Annis database and user.");
-      setDataSource(createDataSource(host, port,
-        defaultDatabase, superUser, superPassword, useSSL));
-
-      dropDatabase(database);
-      dropUser(user);
-      createUser(user, password);
-      createDatabase(database);
-
-      installPlPgSql();
+      dataSource.setInnerDataSource(createDataSource(host, port,
+       defaultDatabase, superUser, superPassword, useSSL));
+      
+      createDatabaseAndUserInTransaction(database, user, password);
     }
-
     // switch to new database as new user for the rest
-    setDataSource(createDataSource(host, port, database,
+    dataSource.setInnerDataSource(createDataSource(host, port, database,
       user, password, useSSL));
+    
+    createSchemaInTransaction();
 
+  }
+  
+  //@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  private void createDatabaseAndUserInTransaction(String database,
+    String user, String password)
+  {
+    dropDatabase(database);
+    dropUser(user);
+    createUser(user, password);
+    createDatabase(database, user);
+
+    installPlPgSql();
+  }
+  
+  //@Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  private void createSchemaInTransaction()
+  {
     createFunctionUniqueToplevelCorpusName();
     createSchema();
     createSchemaIndexes();
     populateSchema();
   }
 
-  private DataSource createDataSource(String host, String port,
+  private SSLEnabledDataSource createDataSource(String host, String port,
     String database,
     String user, String password, boolean useSSL)
   {
+    
     Properties props = new Properties();
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
 
@@ -414,13 +428,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     props.put("user", user);
     props.put("password", password);
 
-    // why is this better?
-    // XXX: how to construct the datasource?
-    return new SimpleDriverDataSource(new Driver(), url, props);
+    SSLEnabledDataSource result = new SSLEnabledDataSource();
+    result.setUrl(url);
+    result.setUseSSL(useSSL);
+    result.setUsername(user);
+    result.setPassword(password);
+    
+    
+    
+    result.setDriverClassName("org.postgresql.Driver");
+    
+    return result;
   }
 
   @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, 
+    isolation = Isolation.READ_COMMITTED)
   public boolean importCorpus(String path, 
     String aliasName,
     boolean override, 
@@ -508,8 +531,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       addCorpusAlias(corpusID, aliasName);
     }
-    
-
     return true;
   }
 
@@ -1517,7 +1538,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   }
 
   ///// Getter / Setter
-  public void setDataSource(DataSource dataSource)
+  public void setDataSource(DynamicDataSource dataSource)
   {
     this.dataSource = dataSource;
     jdbcTemplate = new JdbcTemplate(dataSource);
@@ -2009,4 +2030,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.statementController = statementCon;
   }
+  
+  
 }
