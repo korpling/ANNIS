@@ -82,13 +82,13 @@ public class TestQueryNode {
 		assertThat(node.isPartOfEdge(), is(false));
 		
 		// add a join that uses the rank table
-		QueryNode target = mock(QueryNode.class);
+		QueryNode target = new QueryNode(1);
 		RankTableJoin rankTableJoin = new RankTableJoin(target, "foo", 0, 0) { };
-		node.addJoin(rankTableJoin);
+		node.addOutgoingJoin(rankTableJoin);
 		
 		// assert both node and target know about the edge
 		assertThat(node.isPartOfEdge(), is(true));
-		verify(target).setPartOfEdge(true);
+    assertThat(target.isPartOfEdge(), is(true));
 	}
 
 	@Test

@@ -74,7 +74,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
 
       // node joins
-      for (Join join : node.getJoins())
+      for (Join join : node.getOutgoingJoins())
       {
         QueryNode target = join.getTarget();
         if (join instanceof SameSpan)

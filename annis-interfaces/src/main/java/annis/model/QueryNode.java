@@ -28,6 +28,7 @@ import org.apache.commons.lang3.builder.HashCodeBuilder;
 import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
+import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -58,7 +59,8 @@ public class QueryNode implements Serializable
   private boolean root;
   private boolean token;
   private TextMatching spanTextMatching;
-  private List<Join> joins;
+  private List<Join> ingoingJoins;
+  private List<Join> outgoingJoins;
   private String variable;
   private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
@@ -168,7 +170,8 @@ public class QueryNode implements Serializable
   {
     nodeAnnotations = new TreeSet<QueryAnnotation>();
     edgeAnnotations = new TreeSet<QueryAnnotation>();
-    joins = new ArrayList<Join>();
+    outgoingJoins = new ArrayList<Join>();
+    ingoingJoins = new ArrayList<Join>();
   }
 
   public QueryNode(long id)
@@ -187,7 +190,8 @@ public class QueryNode implements Serializable
     this.corpus = other.corpus;
     this.edgeAnnotations = new TreeSet<QueryAnnotation>(other.edgeAnnotations);
     this.id = other.id;
-    this.joins = new ArrayList<Join>(other.joins);
+    this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
+    this.ingoingJoins = new ArrayList<Join>(other.ingoingJoins);
     this.left = other.left;
     this.leftToken = other.leftToken;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
@@ -322,7 +326,7 @@ public class QueryNode implements Serializable
       sb.append(edgeAnnotations);
     }
 
-    for (Join join : joins)
+    for (Join join : outgoingJoins)
     {
       sb.append("; ");
       sb.append(join);
@@ -402,7 +406,7 @@ public class QueryNode implements Serializable
   public String toAQLEdgeFragment()
   {
     List<String> frags = new LinkedList<String>();
-    for (Join join : joins)
+    for (Join join : outgoingJoins)
     {
       frags.add(join.toAQLFragment(this));
     }
@@ -430,10 +434,14 @@ public class QueryNode implements Serializable
     return nodeAnnotations.add(annotation);
   }
   
-  public boolean addJoin(Join join)
+  public boolean addOutgoingJoin(Join join)
   {
-    boolean result = joins.add(join);
-
+    boolean result = outgoingJoins.add(join);
+    if(join.getTarget() != null)
+    {
+      join.getTarget().ingoingJoins.add(join);
+    }
+    
     if (join instanceof RankTableJoin)
     {
       this.setPartOfEdge(true);
@@ -523,8 +531,8 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.joins != other.joins
-      && (this.joins == null || !this.joins.equals(other.joins)))
+    if (this.outgoingJoins != other.outgoingJoins
+      && (this.outgoingJoins == null || !this.outgoingJoins.equals(other.outgoingJoins)))
     {
       return false;
     }
@@ -575,7 +583,7 @@ public class QueryNode implements Serializable
   // .append(this.root, other.root)
   // .append(this.token, other.token)
   // .append(this.spanTextMatching, other.spanTextMatching)
-  // .append(this.joins, other.joins)
+  // .append(this.outgoingJoins, other.outgoingJoins)
   // .append(this.variable, other.variable)
   // .append(this.edgeAnnotations, other.edgeAnnotations)
   // .append(this.marker, other.marker)
@@ -586,6 +594,27 @@ public class QueryNode implements Serializable
   public int hashCode()
   {
     return (int) id;
+  }
+  
+  public void clearOutgoingJoins()
+  {
+    for(Join j : outgoingJoins)
+    {
+      if(j.getTarget() != null)
+      {
+        j.getTarget().ingoingJoins.remove(j);
+      }
+    }
+    outgoingJoins.clear();
+  }
+  
+  public boolean removeOutgoingJoin(Join j)
+  {
+    if(j.getTarget() != null)
+    {
+      j.getTarget().ingoingJoins.remove(j);
+    }
+    return outgoingJoins.remove(j);
   }
 
   // /// Getter / Setter
@@ -670,10 +699,17 @@ public class QueryNode implements Serializable
   }
 
   @XmlTransient // currently not supported, might be added later
-  public List<Join> getJoins()
+  public List<Join> getOutgoingJoins()
   {
-    return joins;
+    return Collections.unmodifiableList(outgoingJoins);
   }
+  
+  @XmlTransient // currently not supported, might be added later
+  public List<Join> getIngoingJoins()
+  {
+    return Collections.unmodifiableList(ingoingJoins);
+  }
+  
   public boolean isToken()
   {
     return token;

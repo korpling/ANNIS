@@ -69,7 +69,7 @@ public class SemanticValidator implements QueryDataTransformer
     if (alternative.size() == 1)
     {
       QueryNode n = alternative.get(0);
-      for (Join j : n.getJoins())
+      for (Join j : n.getOutgoingJoins())
       {
         if (j.getTarget() != null)
         {
@@ -149,7 +149,7 @@ public class SemanticValidator implements QueryDataTransformer
     
     for(QueryNode n : nodes)
     {
-      for(Join j : n.getJoins())
+      for(Join j : n.getOutgoingJoins())
       {
         if(j.getTarget() != null && !(j instanceof NonBindingJoin))
         {

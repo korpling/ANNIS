@@ -106,13 +106,13 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
   {
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
     newNode.setArtificial(true);
-    newNode.getJoins().clear();
+    newNode.clearOutgoingJoins();
     newNode.setVariable("x" + node.getVariable());
     
     join.setTarget(newNode);
     
     Identical identJoin = new Identical(newNode);
-    node.addJoin(identJoin);
+    node.addOutgoingJoin(identJoin);
     
     nodes.add(newNode);
   }
@@ -120,16 +120,16 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
   private void replicateFromJoinSource(Join join, QueryNode node,
     List<QueryNode> nodes, AtomicLong maxID)
   {
-    Preconditions.checkState(node.getJoins().remove(join), "The join was not attached to the source node.");
+    Preconditions.checkState(node.removeOutgoingJoin(join), "The join was not attached to the source node.");
     
     QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node);
-    newNode.getJoins().clear();
+    newNode.clearOutgoingJoins();
     newNode.setVariable("x" + node.getVariable());
-    newNode.addJoin(join);
+    newNode.addOutgoingJoin(join);
     newNode.setArtificial(true);
     
     Identical identJoin = new Identical(newNode);
-    node.addJoin(identJoin);
+    node.addOutgoingJoin(identJoin);
     
     nodes.add(newNode);
   }
@@ -139,7 +139,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Multimap<QueryNode, Join> result = HashMultimap.create();
     for (QueryNode n : nodes)
     {
-      for (Join j : n.getJoins())
+      for (Join j : n.getOutgoingJoins())
       {
         if (j instanceof Dominance || j instanceof PointingRelation)
         {

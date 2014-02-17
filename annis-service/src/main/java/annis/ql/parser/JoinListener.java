@@ -184,7 +184,7 @@ public class JoinListener extends AqlParserBaseListener
     {
       segmentationName=ctx.layer.getText();
     }
-    left.addJoin(new Precedence(right, 1, segmentationName));
+    left.addOutgoingJoin(new Precedence(right, 1, segmentationName));
     
   }
 
@@ -194,7 +194,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    left.addJoin(new EqualValue(right));
+    left.addOutgoingJoin(new EqualValue(right));
   }
 
   @Override
@@ -203,7 +203,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    left.addJoin(new NotEqualValue(right));
+    left.addOutgoingJoin(new NotEqualValue(right));
   }
   
   
@@ -224,12 +224,12 @@ public class JoinListener extends AqlParserBaseListener
     
     if (precedenceBound > 0)
     {
-      left.addJoin(
+      left.addOutgoingJoin(
         new Precedence(right, 1, precedenceBound, segmentationName));
     }
     else
     {
-      left.addJoin(new Precedence(right, segmentationName));
+      left.addOutgoingJoin(new Precedence(right, segmentationName));
     }
   }
 
@@ -252,7 +252,7 @@ public class JoinListener extends AqlParserBaseListener
         segmentationName=ctx.layer.getText();
       }
       
-      left.addJoin(
+      left.addOutgoingJoin(
             new Precedence(right, range.getMin(), range.getMax(),
             segmentationName));
       
@@ -320,15 +320,15 @@ public class JoinListener extends AqlParserBaseListener
 
     if(ctx.LEFT_CHILD() != null)
     {
-      left.addJoin(new LeftDominance(right, layer));
+      left.addOutgoingJoin(new LeftDominance(right, layer));
     }
     else if(ctx.RIGHT_CHILD() != null)
     {
-      left.addJoin(new RightDominance(right, layer));
+      left.addOutgoingJoin(new RightDominance(right, layer));
     }
     else
     {
-      left.addJoin(new Dominance(right, layer, 1));
+      left.addOutgoingJoin(new Dominance(right, layer, 1));
     }
 
   }
@@ -341,7 +341,7 @@ public class JoinListener extends AqlParserBaseListener
 
     String layer = ctx.layer == null ? null : ctx.layer.getText();
    
-    left.addJoin(new Dominance(right, layer));
+    left.addOutgoingJoin(new Dominance(right, layer));
   }
 
   @Override
@@ -356,7 +356,7 @@ public class JoinListener extends AqlParserBaseListener
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
-    left.addJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
+    left.addOutgoingJoin(new Dominance(right, layer, range.getMin(), range.getMax()));
   }
 
   @Override
@@ -376,7 +376,7 @@ public class JoinListener extends AqlParserBaseListener
       }
     }
 
-    left.addJoin(new PointingRelation(right, label, 1));
+    left.addOutgoingJoin(new PointingRelation(right, label, 1));
 
   }
 
@@ -388,7 +388,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
    
-    left.addJoin(new PointingRelation(right, label));
+    left.addOutgoingJoin(new PointingRelation(right, label));
     
   }
 
@@ -404,7 +404,7 @@ public class JoinListener extends AqlParserBaseListener
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
     Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
     
-    left.addJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
+    left.addOutgoingJoin(new PointingRelation(right, label, range.getMin(), range.getMax()));
   }
 
   @Override
@@ -415,7 +415,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addJoin(new Sibling(right, label));
+    left.addOutgoingJoin(new Sibling(right, label));
   }
 
   @Override
@@ -426,7 +426,7 @@ public class JoinListener extends AqlParserBaseListener
     
     String label = ctx.label == null ? null : ctx.label.getText();
     
-    left.addJoin(new CommonAncestor(right, label));
+    left.addOutgoingJoin(new CommonAncestor(right, label));
   }
   
   @Override
@@ -453,7 +453,7 @@ public class JoinListener extends AqlParserBaseListener
     {
       Constructor<? extends Join> c = type.getConstructor(QueryNode.class);
       Join newJoin = c.newInstance(right);
-      left.addJoin(newJoin);
+      left.addOutgoingJoin(newJoin);
     }
     catch (NoSuchMethodException ex)
     {
