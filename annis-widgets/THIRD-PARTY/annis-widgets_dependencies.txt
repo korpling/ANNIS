@@ -33,5 +33,5 @@ Lists of 35 third-party dependencies.
      (The MIT License) jsoup (org.jsoup:jsoup:1.6.3 - http://jsoup.org/)
      (LGPL) textcat (org.knallgrau:textcat:1.0.1 - no url defined)
      (MIT License) SLF4J API Module (org.slf4j:slf4j-api:1.7.5 - http://www.slf4j.org)
-     (Unknown license) popupbutton (org.vaadin.addons:popupbutton:2.2.1 - no url defined)
+     (Apache License Version 2.0) popupbutton (org.vaadin.addons:popupbutton:2.2.1 - no url defined)
      (The W3C Software License) Simple API for CSS (org.w3c.css:sac:1.3 - http://www.w3.org/Style/CSS/SAC/)
