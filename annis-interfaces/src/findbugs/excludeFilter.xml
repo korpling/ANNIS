@@ -6,4 +6,14 @@
   <Match>
     <Bug pattern="SE_NO_SERIALVERSIONID" />
   </Match>
+  
+  
+  <!-- We deprecated the old Join class in order to avoid confusion and we possible need the backwards compatibility -->
+  <Match>
+    <And>
+      <Bug pattenr="NM_SAME_SIMPLE_NAME_AS_SUPERCLASS" />
+      <Class name="annis.sqlgen.model.Join"/>
+    </And>
+  </Match>
+  
 </FindBugsFilter>
