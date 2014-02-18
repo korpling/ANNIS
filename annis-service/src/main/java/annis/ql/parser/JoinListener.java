@@ -309,26 +309,29 @@ public class JoinListener extends AqlParserBaseListener
     
     String layer = ctx.layer == null ? null : ctx.layer.getText();    
 
+    Join j;
+    
+
+    if(ctx.LEFT_CHILD() != null)
+    {
+      j = new LeftDominance(right, layer);
+    }
+    else if(ctx.RIGHT_CHILD() != null)
+    {
+      j = new RightDominance(right, layer);
+    }
+    else
+    {
+      j = new Dominance(right, layer, 1);
+    }
+    left.addOutgoingJoin(j);
     if(ctx.anno != null)
     {
       LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
-        right.addEdgeAnnotation(a);
+        j.addEdgeAnnotation(a);
       }
-    }
-
-    if(ctx.LEFT_CHILD() != null)
-    {
-      left.addOutgoingJoin(new LeftDominance(right, layer));
-    }
-    else if(ctx.RIGHT_CHILD() != null)
-    {
-      left.addOutgoingJoin(new RightDominance(right, layer));
-    }
-    else
-    {
-      left.addOutgoingJoin(new Dominance(right, layer, 1));
     }
 
   }
@@ -366,17 +369,18 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode right = relationChain.get(relationIdx+1);
     
     String label = ctx.label == null ? null : ctx.label.getText();
-
+    
+    Join j = new PointingRelation(right, label, 1);
     if (ctx.anno != null)
     {
       LinkedList<QueryAnnotation> annotations = fromEdgeAnnotation(ctx.anno);
       for (QueryAnnotation a : annotations)
       {
-        right.addEdgeAnnotation(a);
+        j.addEdgeAnnotation(a);
       }
     }
 
-    left.addOutgoingJoin(new PointingRelation(right, label, 1));
+    left.addOutgoingJoin(j);
 
   }
 

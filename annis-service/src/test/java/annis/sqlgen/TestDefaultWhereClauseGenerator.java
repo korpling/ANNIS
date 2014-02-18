@@ -35,7 +35,6 @@ import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.matchers.JUnitMatchers.hasItem;
 import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
 
 import java.util.ArrayList;
@@ -59,6 +58,7 @@ import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
+import annis.sqlgen.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -220,8 +220,9 @@ public class TestDefaultWhereClauseGenerator
   {
     // given
     String componentName = uniqueString();
-    node23.addOutgoingJoin(new Dominance(node42, componentName, 1));
-    node42.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
+    Join j = new Dominance(node42, componentName, 1);
+    node23.addOutgoingJoin(j);
+    j.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
     // then
     checkEdgeConditions(componentPredicate, "d", componentName,
@@ -678,11 +679,14 @@ public class TestDefaultWhereClauseGenerator
   @Test
   public void whereClauseForNodeEdgeAnnotation()
   {
-    node23.addEdgeAnnotation(new QueryAnnotation("namespace1", "name1"));
-    node23.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2",
+    Dominance j = new Dominance(node23);
+    
+    j.addEdgeAnnotation(new QueryAnnotation("namespace1", "name1"));
+    j.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2",
         "value2", TextMatching.EXACT_EQUAL));
-    node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
+    j.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_EQUAL));
+    node42.addOutgoingJoin(j);
     checkWhereConditions(
       "_rank_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'edge'))",
       "_rank_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
@@ -693,10 +697,15 @@ public class TestDefaultWhereClauseGenerator
   @Test
   public void whereClauseForNodeEdgeAnnotationNot()
   {
-    node23.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2",
+    Dominance j = new Dominance(node23);
+    
+    j.addEdgeAnnotation(new QueryAnnotation("namespace2", "name2",
         "value2", TextMatching.EXACT_NOT_EQUAL));
-    node23.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
+    j.addEdgeAnnotation(new QueryAnnotation("namespace3", "name3",
         "value3", TextMatching.REGEXP_NOT_EQUAL));
+    
+    node42.addOutgoingJoin(j);
+    
     checkWhereConditions(
       "_rank_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
       "_rank_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"

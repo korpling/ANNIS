@@ -17,14 +17,19 @@ package annis.sqlgen.model;
 
 import annis.model.QueryNode;
 import annis.model.DataObject;
+import annis.model.QueryAnnotation;
+import java.util.Set;
+import java.util.TreeSet;
 
 @SuppressWarnings("serial")
 public abstract class Join extends DataObject {
 
 	protected QueryNode target;
+  private Set<QueryAnnotation> edgeAnnotations;
 
 	public Join(QueryNode target) {
 		this.target = target;
+    this.edgeAnnotations = new TreeSet<QueryAnnotation>();
 	}
 
 	public QueryNode getTarget() {
@@ -34,7 +39,22 @@ public abstract class Join extends DataObject {
 	public void setTarget(QueryNode target) {
 		this.target = target;
 	}
-	
+  
+  public boolean addEdgeAnnotation(QueryAnnotation anno)
+  {
+    return edgeAnnotations.add(anno);
+  }
+
+  public Set<QueryAnnotation> getEdgeAnnotations()
+  {
+    return edgeAnnotations;
+  }
+
+  public void setEdgeAnnotations(Set<QueryAnnotation> edgeAnnotations)
+  {
+    this.edgeAnnotations = edgeAnnotations;
+  }
+  
   public String toAQLFragment(QueryNode source)
   {
     return "#" + source.getVariable() +" " + toAqlOperator() + " #" + target.getVariable();

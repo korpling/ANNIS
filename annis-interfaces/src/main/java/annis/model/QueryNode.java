@@ -62,7 +62,6 @@ public class QueryNode implements Serializable
   private List<Join> ingoingJoins;
   private List<Join> outgoingJoins;
   private String variable;
-  private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
   private Range tokenArity;
   private Long matchedNodeInQuery;
@@ -169,7 +168,6 @@ public class QueryNode implements Serializable
   public QueryNode()
   {
     nodeAnnotations = new TreeSet<QueryAnnotation>();
-    edgeAnnotations = new TreeSet<QueryAnnotation>();
     outgoingJoins = new ArrayList<Join>();
     ingoingJoins = new ArrayList<Join>();
   }
@@ -188,7 +186,6 @@ public class QueryNode implements Serializable
   {
     this.arity = other.arity;
     this.corpus = other.corpus;
-    this.edgeAnnotations = new TreeSet<QueryAnnotation>(other.edgeAnnotations);
     this.id = other.id;
     this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
     this.ingoingJoins = new ArrayList<Join>(other.ingoingJoins);
@@ -320,6 +317,7 @@ public class QueryNode implements Serializable
       sb.append(nodeAnnotations);
     }
 
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
     if (!edgeAnnotations.isEmpty())
     {
       sb.append("; edge labes: ");
@@ -422,11 +420,6 @@ public class QueryNode implements Serializable
     }
     
     return Joiner.on(" & ").join(frags);
-  }
-
-  public boolean addEdgeAnnotation(QueryAnnotation annotation)
-  {
-    return edgeAnnotations.add(annotation);
   }
 
   public boolean addNodeAnnotation(QueryAnnotation annotation)
@@ -541,9 +534,11 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.edgeAnnotations != other.edgeAnnotations
-      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(
-      other.edgeAnnotations)))
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
+    Set<QueryAnnotation> otherEdgeAnnotations = other.getEdgeAnnotations();
+    if (edgeAnnotations != otherEdgeAnnotations
+      && (edgeAnnotations == null || !edgeAnnotations.equals(
+      otherEdgeAnnotations)))
     {
       return false;
     }
@@ -618,14 +613,17 @@ public class QueryNode implements Serializable
   }
 
   // /// Getter / Setter
+  @XmlTransient
   public Set<QueryAnnotation> getEdgeAnnotations()
   {
-    return edgeAnnotations;
-  }
-
-  public void setEdgeAnnotations(Set<QueryAnnotation> edgeAnnotations)
-  {
-    this.edgeAnnotations = edgeAnnotations;
+    Set<QueryAnnotation> edgeAnnotations = new TreeSet<QueryAnnotation>();
+    
+    for(Join j : ingoingJoins)
+    {
+      edgeAnnotations.addAll(j.getEdgeAnnotations());
+    }
+    
+    return Collections.unmodifiableSet(edgeAnnotations);
   }
 
   public boolean isRoot()
