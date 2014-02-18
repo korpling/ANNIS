@@ -73,7 +73,14 @@ public class InitDialog extends javax.swing.JDialog
         propStream = new FileInputStream(propFile);
         Properties prop = new Properties();
         InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8);
-        prop.load(propReader);
+        try
+        {
+          prop.load(propReader);
+        }
+        finally
+        {
+          propReader.close();
+        }
         
         String rawDataSourceURI = prop.getProperty("datasource.url", 
           "jdbc:postgresql://localhost:5432/anniskickstart").trim();
