@@ -18,7 +18,7 @@ package annis.ql.parser;
 import annis.model.QueryNode;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
 import annis.sqlgen.model.PointingRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;
@@ -52,6 +52,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
   @Override
   public QueryData transform(QueryData data)
   {
+    String originalAQL = data.toAQL();
     AtomicLong maxID = new AtomicLong();
     for (List<QueryNode> alternative : data.getAlternatives())
     {
@@ -62,9 +63,13 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     }
     for (List<QueryNode> alternative : data.getAlternatives())
     {
+      int disasterCounter = 0;
       while(checkForViolation(alternative, maxID))
       {
         // repeat
+        disasterCounter++;
+        Preconditions.checkArgument(disasterCounter < 5000, 
+          "Possible endless loop in component search relation normalization for query " + originalAQL);
       }
       data.setMaxWidth(Math.max(data.getMaxWidth(), alternative.size()));
     }
@@ -101,35 +106,36 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     return false;
   }
   
-  private void replicateFromJoinTarget(Join join, QueryNode node, 
+  private void replicateFromJoinTarget(Join join, QueryNode targetNode, 
     List<QueryNode> nodes, AtomicLong maxID)
   {
-    QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node); 
-    newNode.setArtificial(true);
-    newNode.getJoins().clear();
-    newNode.setVariable("x" + node.getVariable());
     
-    join.setTarget(newNode);
+    QueryNode newTargetNode = new QueryNode(maxID.incrementAndGet(), targetNode); 
+    newTargetNode.setArtificial(true);
+    newTargetNode.clearOutgoingJoins();
+    newTargetNode.setVariable("x" + targetNode.getVariable());
     
-    Identical identJoin = new Identical(newNode);
-    node.addJoin(identJoin);
+    newTargetNode.setThisNodeAsTarget(join);
     
-    nodes.add(newNode);
+    Identical identJoin = new Identical(newTargetNode);
+    targetNode.addOutgoingJoin(identJoin);
+    
+    nodes.add(newTargetNode);
   }
   
-  private void replicateFromJoinSource(Join join, QueryNode node,
+  private void replicateFromJoinSource(Join join, QueryNode sourceNode,
     List<QueryNode> nodes, AtomicLong maxID)
   {
-    Preconditions.checkState(node.getJoins().remove(join), "The join was not attached to the source node.");
+    Preconditions.checkState(sourceNode.removeOutgoingJoin(join), "The join was not attached to the source node.");
     
-    QueryNode newNode = new QueryNode(maxID.incrementAndGet(), node);
-    newNode.getJoins().clear();
-    newNode.setVariable("x" + node.getVariable());
-    newNode.addJoin(join);
+    QueryNode newNode = new QueryNode(maxID.incrementAndGet(), sourceNode);
+    newNode.clearOutgoingJoins();
+    newNode.setVariable("x" + sourceNode.getVariable());
+    newNode.addOutgoingJoin(join);
     newNode.setArtificial(true);
     
     Identical identJoin = new Identical(newNode);
-    node.addJoin(identJoin);
+    sourceNode.addOutgoingJoin(identJoin);
     
     nodes.add(newNode);
   }
@@ -139,7 +145,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
     Multimap<QueryNode, Join> result = HashMultimap.create();
     for (QueryNode n : nodes)
     {
-      for (Join j : n.getJoins())
+      for (Join j : n.getOutgoingJoins())
       {
         if (j instanceof Dominance || j instanceof PointingRelation)
         {

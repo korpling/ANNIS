@@ -16,6 +16,7 @@
 
 package annis.sqlgen.model;
 
+import annis.model.Join;
 import annis.model.QueryNode;
 
 /**
