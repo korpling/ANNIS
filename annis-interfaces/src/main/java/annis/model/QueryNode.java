@@ -25,7 +25,6 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
 import java.util.Collections;
@@ -188,7 +187,10 @@ public class QueryNode implements Serializable
     this.corpus = other.corpus;
     this.id = other.id;
     this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
-    this.ingoingJoins = new ArrayList<Join>(other.ingoingJoins);
+    // do not copy the ingoing join since this is a property of the joins itself
+    // only if they change their target it is allowed to change the state of 
+    // the ingoing joins of the query node
+    this.ingoingJoins = new ArrayList<Join>();
     this.left = other.left;
     this.leftToken = other.leftToken;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
@@ -444,6 +446,15 @@ public class QueryNode implements Serializable
     }
 
     return result;
+  }
+  
+  public void setThisNodeAsTarget(Join j)
+  {
+    
+    j.target.ingoingJoins.remove(j);
+    j.target = this;
+    ingoingJoins.add(j);
+
   }
   
   public String getQualifiedName()
