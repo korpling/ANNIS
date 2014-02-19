@@ -35,7 +35,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class PartiturVisualizer extends WriterVisualizer

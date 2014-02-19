@@ -23,7 +23,7 @@ import net.xeoh.plugins.base.PluginManager;
  * ANNIS plugin system interface for getting plugins or specific 
  * visualizers.
  * 
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface PluginSystem extends Serializable
 {

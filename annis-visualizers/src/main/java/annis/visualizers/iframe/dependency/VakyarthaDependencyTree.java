@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * nodes which carry this annotation are searched for pointing relations and
  * instead token the annotation value is used.
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
  * @author Kim Gerdes
  */

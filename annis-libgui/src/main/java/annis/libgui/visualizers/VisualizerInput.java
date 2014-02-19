@@ -40,7 +40,7 @@ import java.util.Set;
 /**
  * Contains all needed data for a visualizer to perform the visualization.
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class VisualizerInput implements Serializable
 {
