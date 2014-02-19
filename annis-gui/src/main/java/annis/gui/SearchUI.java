@@ -73,6 +73,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -982,7 +983,7 @@ public class SearchUI extends AnnisBaseUI
       try
       {
         List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(selectedCorpusName)
+          = rootRes.path("query").path("corpora").path(URLEncoder.encode(selectedCorpusName, "UTF-8"))
           .get(new GenericType<List<AnnisCorpus>>()
             {
           });
@@ -992,7 +993,11 @@ public class SearchUI extends AnnisBaseUI
           mappedNames.add(c.getName());
         }
       }
-
+      catch(UnsupportedEncodingException ex)
+      {
+        log.
+          error("UTF-8 encoding is not supported on server, this is weird", ex);
+      }
       catch (ClientHandlerException ex)
       {
         String msg = "alias mapping does not work for alias: "

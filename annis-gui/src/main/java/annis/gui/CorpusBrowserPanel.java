@@ -335,7 +335,7 @@ public class CorpusBrowserPanel extends Panel
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error(null, ex);
+      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
       Notification.show(
         "UTF-8 encoding is not supported on server, this is weird: " + ex.
         getLocalizedMessage(),

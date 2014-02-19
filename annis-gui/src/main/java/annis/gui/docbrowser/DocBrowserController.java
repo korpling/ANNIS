@@ -171,10 +171,13 @@ public class DocBrowserController implements Serializable
 
     try
     {
+      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
+      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
       if (isUsingRawText)
       {
         WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext").path(corpus).path(docName);
+        w = w.path("query").path("rawtext")
+          .path(encodedToplevelCorpus).path(encodedDocument);
         RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
         input.setRawText(rawTextWrapper);
       }
@@ -183,12 +186,10 @@ public class DocBrowserController implements Serializable
         // get the whole document wrapped in a salt project
         SaltProject txt = null;
 
-        String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
-        docName = URLEncoder.encode(docName, "UTF-8");
         WebResource annisResource = Helper.getAnnisWebResource();
         txt = annisResource.path("query").path("graph").
-          path(topLevelCorpusName).
-          path(docName).get(SaltProject.class);
+          path(encodedToplevelCorpus).
+          path(encodedDocument).get(SaltProject.class);
 
         if (txt != null)
         {
