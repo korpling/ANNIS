@@ -260,7 +260,7 @@ und is reachable under the defined link in the instance config:
 \code{.css}
 
 @font-face {
-  font-family: 'bar;
+  font-family: 'bar';
   font-style: normal;
   font-weight: normal;
   font-size: larger;
