@@ -143,7 +143,7 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 
 short name| Description | Java class | Screenshot
 ----------|-------------|------------|-----------
-`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.KWICPanel) | ![kwic](kwic_vis.png)
+`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.kwic.KWICVisualizer) | ![kwic](kwic_vis.png)
 `tree` | constituent syntax tree | [TigerTreeVisualizer](@ref annis.visualizers.component.tree.TigerTreeVisualizer) | ![tree](tiger_tree_vis.png)
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
 `grid_tree` | a grid visualizing hierarchical tree annotations as ordered grid layers | [GridTreeVisualizer](@ref annis.visualizers.iframe.gridtree.GridTreeVisualizer ) | ![grid_tree](grid_tree_vis.png)
