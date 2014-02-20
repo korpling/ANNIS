@@ -53,5 +53,5 @@ public class AnnisConstants
    * A marker feature for the first node of a segmentation chain. The value is the name of the segmentation. 
    */
   public static final String FEAT_FIRST_NODE_SEGMENTATION_CHAIN = "first_node_segmentation_chain";
-
+  
 }

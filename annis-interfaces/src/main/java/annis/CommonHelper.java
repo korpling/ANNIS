@@ -215,35 +215,6 @@ public class CommonHelper
     return result;
   }
 
-  public static Set<String> getOrderingTypes(SaltProject p)
-  {
-    Set<String> result = new TreeSet<String>();
-
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
-    {
-      for (SDocument doc : corpusGraphs.getSDocuments())
-      {
-        SDocumentGraph g = doc.getSDocumentGraph();
-        if (g != null)
-        {
-          EList<SOrderRelation> orderRelations = g.getSOrderRelations();
-          if (orderRelations != null)
-          {
-            for (SOrderRelation rel : orderRelations)
-            {
-              if (rel.getSTypes() != null)
-              {
-                result.addAll(rel.getSTypes());
-              }
-            }
-          }
-        }
-      }
-    }
-
-    return result;
-  }
-
   /**
    * Gets the spannend/covered text for a token. This will get all
    * {@link STextualRelation} edges for a {@link SToken} from the

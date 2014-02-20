@@ -25,6 +25,7 @@ import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
+import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
@@ -43,6 +44,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -59,6 +65,7 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
+import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -367,7 +374,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void updateVariables(SaltProject p)
   {
-    segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
+    segmentationLayerSet.addAll(getSegmentationNames(p));
     tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
     Set<String> hiddenTokenAnnos = null;
 
@@ -402,6 +409,35 @@ public class ResultViewPanel extends VerticalLayout implements
 
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
+  }
+  
+  private Set<String> getSegmentationNames(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        if (g != null)
+        {
+          // collect the start nodes of a segmentation chain of length 1
+          for (SNode n : g.getSNodes())
+          {
+            SFeature feat
+              = n.getSFeature(AnnisConstants.ANNIS_NS,
+                AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+            if (feat != null && feat.getSValueSTEXT() != null)
+            {
+              result.add(feat.getSValueSTEXT());
+            }
+          }
+        } // end if graph not null
+      }
+    }
+    
+    return result;
   }
 
   public void setCount(int count)
