@@ -160,7 +160,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
     tblFrequencyDefinition.addContainerProperty("comment", String.class, "manually created");
     
-    tblFrequencyDefinition.setColumnHeader("nr", "Node definition");
+    tblFrequencyDefinition.setColumnHeader("nr", "Node number/name");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
     tblFrequencyDefinition.setColumnHeader("comment", "Comment");
     
@@ -207,8 +207,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
           nr = Math.min(nr, nodes.size()-1);
-          tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-            FrequencyTableEntryType.span, "", ""), counter++);
+          int id = counter++;
+          tblFrequencyDefinition.addItem(createNewTableRow(
+            tblFrequencyDefinition, id,
+            "" +(nr+1),
+            FrequencyTableEntryType.span, "", ""), id);
         }
       }
     });
@@ -372,13 +375,27 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
   }
   
-  private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, 
+  private Object[] createNewTableRow(
+    final Table tbl, final Object rowID,
+    String nodeVariable, FrequencyTableEntryType type, 
     String annotation, String comment)
   {
     TextField txtNode = new TextField();
     txtNode.setValue(nodeVariable);
     txtNode.addValidator(new IntegerValidator("Node reference must be a valid number"));
     txtNode.setWidth("100%");
+    if(tbl != null && rowID != null)
+    {
+      txtNode.addFocusListener(new FieldEvents.FocusListener()
+      {
+        @Override
+        public void focus(FieldEvents.FocusEvent event)
+        {
+          tbl.setValue(null);
+          tbl.select(rowID);
+        }
+      });
+    }
     
     final TextField txtAnno = new TextField();
     
@@ -393,6 +410,18 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     txtAnno.setWidth("100%");
+    if(tbl != null && rowID != null)
+    {
+      txtAnno.addFocusListener(new FieldEvents.FocusListener()
+      {
+        @Override
+        public void focus(FieldEvents.FocusEvent event)
+        {
+          tbl.setValue(null);
+          tbl.select(rowID);
+        }
+      });
+    }
     
     return new Object[] {txtNode, txtAnno, comment == null ? ""  : comment};
   }
@@ -516,18 +545,26 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if(n.getNodeAnnotations().isEmpty())
           {
-            tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.span, "", 
-              "automatically created from " + n.toAQLNodeFragment()),
-              counter++);
+            int id = counter++;
+            tblFrequencyDefinition.addItem(
+              createNewTableRow(
+                tblFrequencyDefinition, id,
+                n.getVariable(),
+                FrequencyTableEntryType.span, "",
+                "automatically created from " + n.toAQLNodeFragment()),
+              id);
           }
           else
           {
+            int id = counter++;
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
-            tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.annotation, firstAnno.getName(), 
-              "automatically created from " + n.toAQLNodeFragment()), 
-              counter++);
+            tblFrequencyDefinition.addItem(
+              createNewTableRow(
+                tblFrequencyDefinition, id,
+                n.getVariable(),
+                FrequencyTableEntryType.annotation, firstAnno.getName(),
+                "automatically created from " + n.toAQLNodeFragment()),
+              id);
 
           }
         }
