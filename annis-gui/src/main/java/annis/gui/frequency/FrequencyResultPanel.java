@@ -187,7 +187,7 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setVisible(true);
     FileDownloader downloader = new FileDownloader(
       new StreamResource(new CSVResource(table, freqDefinition),
-        "frequency.csv"));
+        "frequency.txt"));
     downloader.extend(btDownloadCSV);
 
     chart.setVisible(true);
@@ -313,11 +313,11 @@ public class FrequencyResultPanel extends VerticalLayout
     {
       try
       {
-        File tmpFile = File.createTempFile("annis-frequency", ".csv");
+        File tmpFile = File.createTempFile("annis-frequency", ".txt");
         tmpFile.deleteOnExit();
         Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
         
-        CSVWriter csv = new CSVWriter(writer);
+        CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
         
         // write headers
         ArrayList<String> header = new ArrayList<String>();
