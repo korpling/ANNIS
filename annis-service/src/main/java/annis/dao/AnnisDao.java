@@ -56,6 +56,8 @@ public interface AnnisDao
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
 
+  public List<String> listSegmentationNames(List<Long> corpusList);
+  
   /**
    * Creates sql for getting annotations of corpora.
    *

@@ -22,6 +22,7 @@ import annis.libgui.PollControl;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -236,7 +237,7 @@ public class SearchOptionsPanel extends FormLayout
       @Override
       public void run()
       {
-        final List<AnnisAttribute> attributes = getAttributesFromService(corpora);
+        final List<String> segNames = getSegmentationNamesFromService(corpora);
 
         UI.getCurrent().access(new Runnable()
         {
@@ -273,7 +274,7 @@ public class SearchOptionsPanel extends FormLayout
             updateContext(cbRightContext, rightCtx, ctxSteps, defaultCtx, false);
             updateResultsPerPage(resultsPerPage, false);
 
-            updateSegmentations(segment, attributes);
+            updateSegmentations(segment, segNames);
           }
         });
       }
@@ -282,10 +283,10 @@ public class SearchOptionsPanel extends FormLayout
 
   }
 
-  private static List<AnnisAttribute> getAttributesFromService(
+  private static List<String> getSegmentationNamesFromService(
     Set<String> corpora)
   {
-    List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+    List<String> segNames = new ArrayList<String>();
     WebResource service = Helper.getAnnisWebResource();
     if (service != null)
     {
@@ -293,14 +294,13 @@ public class SearchOptionsPanel extends FormLayout
       {
         try
         {
-          attributes.addAll(
-            service.path("query").path("corpora").path(URLEncoder.encode(
-            corpus,
-            "UTF-8"))
-            .path("annotations").queryParam(
-            "fetchvalues", "true").
-            queryParam("onlymostfrequentvalues", "true").
-            get(new AnnisAttributeListType()));
+          SegmentationList segList
+            = service.path("query").path("corpora").path(URLEncoder.encode(
+                corpus,
+                "UTF-8"))
+            .path("segmentation-names")
+            .get(SegmentationList.class);
+          segNames.addAll(segList.getSegmentatioNames());
         }
         catch (UnsupportedEncodingException ex)
         {
@@ -311,11 +311,11 @@ public class SearchOptionsPanel extends FormLayout
 
     }
 
-    return attributes;
+    return segNames;
   }
 
   private void updateSegmentations(String segment,
-    List<AnnisAttribute> attributes)
+    List<String> segNames)
   {
 
     cbSegmentation.removeAllItems();
@@ -332,15 +332,13 @@ public class SearchOptionsPanel extends FormLayout
       cbSegmentation.setValue(segment);
     }
 
-    if (attributes != null && !attributes.isEmpty())
+    if (segNames != null && !segNames.isEmpty())
     {
-      for (AnnisAttribute att : attributes)
+      for (String s : segNames)
       {
-        if (AnnisAttribute.Type.segmentation == att.getType()
-          && att.getName() != null
-          && !att.getName().equalsIgnoreCase(segment))
+        if (!s.equalsIgnoreCase(segment))
         {
-          cbSegmentation.addItem(att.getName());
+          cbSegmentation.addItem(s);
         }
       }
     }
@@ -659,15 +657,6 @@ public class SearchOptionsPanel extends FormLayout
   }
 
   
-  
-  
-  private static class AnnisAttributeListType extends GenericType<List<AnnisAttribute>>
-  {
-
-    public AnnisAttributeListType()
-    {
-    }
-  }
 
   /**
    * Builds a Key for {@link #lastSelection} of multiple corpus selections.

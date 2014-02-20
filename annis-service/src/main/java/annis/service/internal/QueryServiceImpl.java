@@ -38,6 +38,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
+import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
@@ -667,6 +668,29 @@ public class QueryServiceImpl implements QueryService
     catch (Exception ex)
     {
       log.error("could not get annotations for {}", toplevelCorpus, ex);
+      throw new WebApplicationException(500);
+    }
+  }
+  
+  @GET
+  @Path("corpora/{top}/segmentation-names")
+  @Produces("application/xml")
+  public SegmentationList segmentationNames(
+    @PathParam("top") String toplevelCorpus) throws WebApplicationException
+  {
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      user.checkPermission("query:annotations:" + toplevelCorpus);
+
+      List<Long> corpusList = new ArrayList<Long>();
+      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+    }
+    catch (Exception ex)
+    {
+      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
       throw new WebApplicationException(500);
     }
   }

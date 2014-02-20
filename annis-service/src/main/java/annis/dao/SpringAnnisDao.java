@@ -52,6 +52,7 @@ import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
 import com.google.common.base.Charsets;
+import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
 import com.google.common.io.Closer;
@@ -774,6 +775,21 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return (List<AnnisAttribute>) getJdbcTemplate().query(
       listAnnotationsSqlHelper.createSqlQuery(corpusList, listValues,
       onlyMostFrequentValues), listAnnotationsSqlHelper);
+  }
+  
+  @Override
+  @Transactional(readOnly = true)
+  public List<String> listSegmentationNames(List<Long> corpusList)
+  {
+    String corpusListStr = corpusList == null || corpusList.isEmpty() ? 
+      "NULL" : Joiner.on(", ").join(corpusList);
+    
+    String sql = "SELECT DISTINCT \"name\"\n"
+      + "FROM annotations\n"
+      + "WHERE\n"
+      + "  toplevel_corpus IN (" + corpusListStr + ")\n"
+      + "  AND type='segmentation'";
+    return getJdbcTemplate().queryForList(sql, String.class);
   }
 
   @Override

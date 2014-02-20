@@ -61,7 +61,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
     }
 
     // fetch corpus annotations
-    sql += "UNION"
+    sql += "\nUNION"
       + "\nSELECT distinct"
       + "\nm.namespace, m.name, :value, 'meta' as \"type\", 'm' as subtype, "
       + "\n'' as edge_namespace, '' as ege_name"
