@@ -280,7 +280,23 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     
     for(Map.Entry<String, TreeMap<Long, String>> e : nodeBySegmentationPath.entrySet())
     {
+      String segName = e.getKey();
       TreeMap<Long, String> nodeBySegIndex = e.getValue();
+      
+      // mark the first node in the chain
+      if(!nodeBySegIndex.isEmpty())
+      {
+        String idOfFirstNode = nodeBySegIndex.firstEntry().getValue();
+        SNode firstNodeInSegChain = graph.getSNode(idOfFirstNode);
+        if(firstNodeInSegChain != null)
+        {
+          SFeature featFistSegInChain = SaltFactory.eINSTANCE.createSFeature();
+          featFistSegInChain.setSNS(ANNIS_NS);
+          featFistSegInChain.setSName(FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+          featFistSegInChain.setSValue(segName);
+          firstNodeInSegChain.addSFeature(featFistSegInChain);
+        }
+      }
       
       SNode lastNode = null;
       for(String nodeID : nodeBySegIndex.values())
@@ -292,7 +308,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           SOrderRelation orderRel = SaltFactory.eINSTANCE.createSOrderRelation();
           orderRel.setSSource(lastNode);
           orderRel.setSTarget(n);
-          orderRel.addSType(e.getKey());
+          orderRel.addSType(segName);
           orderRel.setSName("sOrderRel" + numberOfSOrderRels.getAndIncrement());
           graph.addSRelation(orderRel);
         }

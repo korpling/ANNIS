@@ -24,6 +24,7 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
+import com.google.common.base.Preconditions;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -34,7 +35,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -126,6 +126,7 @@ public class GridComponent extends Panel
     
     List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
       graph);
+    Preconditions.checkArgument(!tokens.isEmpty(), "Token list must be non-empty");
     RelannisNodeFeature featTokStart
       = (RelannisNodeFeature) tokens.get(0).
       getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).

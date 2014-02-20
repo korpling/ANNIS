@@ -15,6 +15,7 @@
  */
 package annis;
 
+import annis.model.AnnisConstants;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -31,6 +32,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
@@ -129,33 +131,19 @@ public class CommonHelper
     {
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
-
-      Map<SNode, SOrderRelation> outRelationForNode
-        = new HashMap<SNode, SOrderRelation>();
-      for (SOrderRelation rel : graph.getSOrderRelations())
+      
+      for(SNode n : graph.getSNodes())
       {
-        if (rel.getSTypes() != null && rel.getSTypes().contains(segName))
+        SFeature feat = 
+          n.getSFeature(AnnisConstants.ANNIS_NS, 
+            AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+        if(feat != null && segName.equalsIgnoreCase(feat.getSValueSTEXT()))
         {
-          SNode node = rel.getSSource();
-          outRelationForNode.put(node, rel);
-
-          EList<Edge> inEdgesForSource = graph.getInEdges(node.getSId());
-          boolean hasInOrderEdge = false;
-          for (Edge e : inEdgesForSource)
-          {
-            if (e instanceof SOrderRelation)
-            {
-              hasInOrderEdge = true;
-              break;
-            }
-          } // for each ingoing edge
-
-          if (!hasInOrderEdge)
-          {
-            startNodes.add(rel.getSSource());
-          }
-        } // end if type is segName
-      } // end for all order relations of graph
+          startNodes.add(n);
+        }
+      }
+      
+      Set<String> alreadyAdded = new HashSet<String>();
 
       // add all nodes on the order relation chain beginning from the start node
       for (SNode s : startNodes)
@@ -164,13 +152,27 @@ public class CommonHelper
         while (current != null)
         {
           token.add(current);
-          if (outRelationForNode.containsKey(current))
+          EList<Edge> out = graph.getOutEdges(current.getSId());
+          current = null;
+          if(out != null)
           {
-            current = outRelationForNode.get(current).getSTarget();
-          }
-          else
-          {
-            current = null;
+            for(Edge e : out)
+            {
+              if(e instanceof SOrderRelation)
+              {
+                current = ((SOrderRelation) e).getSTarget();
+                if(alreadyAdded.contains(current.getSId()))
+                {
+                  // abort if cycle detected
+                  current = null;
+                }
+                else
+                {
+                  alreadyAdded.add(current.getSId());
+                }
+                break;
+              }
+            }
           }
         }
       }
