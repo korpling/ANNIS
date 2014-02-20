@@ -25,10 +25,6 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfig;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
-import com.google.common.collect.Maps;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -681,12 +677,14 @@ public class CorpusListPanel extends VerticalLayout implements
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       final String id = (String) itemId;
-      Button l = new Button();
-      l.setStyleName(BaseTheme.BUTTON_LINK);
-      l.setIcon(DOC_ICON);
-
+      
+      
       if (ui.getDocBrowserController().docsAvailable(id))
       {
+        Button l = new Button();
+        l.setStyleName(BaseTheme.BUTTON_LINK);
+        l.setIcon(DOC_ICON);
+
         l.setDescription("opens the document browser for " + id);
         l.addClickListener(new Button.ClickListener()
         {
@@ -696,14 +694,10 @@ public class CorpusListPanel extends VerticalLayout implements
             ui.getDocBrowserController().openDocBrowser(id);
           }
         });
-      }
-      else
-      {
-        l.setDescription("document browser is disabled for this corpus");
-        l.setEnabled(false);
+        return l;
       }
 
-      return l;
+      return "";
     }
   }
 
