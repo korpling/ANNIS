@@ -22,6 +22,11 @@ import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 import annis.model.Annotation;
 import static annis.sqlgen.SqlConstraints.sqlString;
+import java.sql.Array;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  * Lists all annotations of all sub documents of a specific corpus. Optionally
@@ -66,7 +71,12 @@ public class ListDocumentsAnnotationsSqlHelper implements
     String namespace = rs.getString("namespace");
     String name = rs.getString("name");
     String value = rs.getString("value");
-    String annotationPath = rs.getString("path_name");
+    Array annotationPathArray = rs.getArray("path_name");
+    List<String> annotationPath = new LinkedList<String>();
+    if(annotationPathArray.getBaseType() == Types.VARCHAR)
+    {
+      annotationPath = Arrays.asList((String[]) annotationPathArray.getArray());
+    }
     return new Annotation(namespace, name, value, type, corpusName, pre,
       annotationPath);
   }
