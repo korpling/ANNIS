@@ -24,9 +24,17 @@ import annis.service.objects.FrequencyTableEntryType;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.collect.Ordering;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
+import com.vaadin.data.util.AbstractBeanContainer;
+import com.vaadin.data.util.DefaultItemSorter;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
@@ -45,14 +53,17 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStreamWriter;
+import java.io.Serializable;
 import java.io.Writer;
+import java.text.Collator;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
+import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutionException;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -290,12 +301,51 @@ public class FrequencyResultPanel extends VerticalLayout
       }
     };
     tblResult.addContainerProperty(pbQuery, null, table);
+    addLexicalSort(tblResult.getContainerDataSource());
     
     addComponent(tblResult);
     setExpandRatio(tblResult, 1.0f);
     
     pbQuery.setEnabled(true);
     removeComponent(pbQuery);
+  }
+  
+  private void addLexicalSort(Container container)
+  {
+    ItemSorter sorter = new DefaultItemSorter(new IgnoreCaseComparator());
+    
+    if(container instanceof IndexedContainer)
+    {
+      ((IndexedContainer) container).setItemSorter(sorter);
+    }
+    else if(container instanceof AbstractBeanContainer)
+    {
+      ((AbstractBeanContainer) container).setItemSorter(sorter);
+    }
+  }
+  
+  public static class IgnoreCaseComparator implements
+    Comparator<Object>, Serializable
+  {
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public int compare(Object o1, Object o2)
+    {
+      if(o1 instanceof String && o2 instanceof String)
+      {
+        String s1 = (String) o1;
+        String s2 = (String) o2;
+        
+        Collator collator = Collator.getInstance(Locale.ENGLISH);
+        collator.setStrength(Collator.PRIMARY);
+        return collator.compare(s1, s2);
+      }
+      else
+      {
+        return Ordering.natural().compare((Comparable) o1, (Comparable) o2);
+      }
+    }
   }
   
   public static class CSVResource implements StreamResource.StreamSource
