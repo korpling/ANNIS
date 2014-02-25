@@ -1053,6 +1053,9 @@ public class SearchUI extends AnnisBaseUI
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
+      // do not change the manually selected search options
+      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+      
       // full query with given context
       queryController.setQuery(new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
@@ -1064,6 +1067,9 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
+      // do not change the manually selected search options
+      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+      
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
       queryController.executeQuery();
