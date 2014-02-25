@@ -155,12 +155,11 @@ public class EventExtractor {
     return rowsByAnnotation;
   }
   
-  public static void removeEmptySpace(LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation)
+  public static void removeEmptySpace(LinkedHashMap<String, 
+    ArrayList<Row>> rowsByAnnotation, Row tokenRow)
   {
     List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
-//    Row gapRow = new Row();
-//    rowsByAnnotation.put("annis::gap", Lists.newArrayList(gapRow));
-//    
+
     BitSet totalOccupancyGrid = new BitSet();
     for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
     {
@@ -169,7 +168,20 @@ public class EventExtractor {
         totalOccupancyGrid.or(r.getOccupancyGridCopy());
       }
     }
+    // We always include the token row in the occupancy grid since it is not
+    // a gap. Otherwise empty token would trigger gaps if the token list
+    // is included in the visualizer output.
+    // See https://github.com/korpling/ANNIS/issues/281 for the corresponding
+    // bug report.
+    if(tokenRow != null)
+    {
+      totalOccupancyGrid.or(tokenRow.getOccupancyGridCopy());
+    }
     
+    
+    // The Range class can give us the next bit that is not set. Use this
+    // to detect gaps. A gap starts from the next non-set bit and goes to
+    // the next set bit.
     Range<Integer> gap = Range.closed(-1, totalOccupancyGrid.nextSetBit(0));
     while(true)
     {
