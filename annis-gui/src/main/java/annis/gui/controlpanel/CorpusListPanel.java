@@ -25,6 +25,8 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -38,17 +40,21 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.ExternalResource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
@@ -64,6 +70,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -801,19 +808,32 @@ public class CorpusListPanel extends VerticalLayout implements
     MetaDataPanel meta = new MetaDataPanel(c.getName());
 
     CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controller);
-    HorizontalLayout layout = new HorizontalLayout();
-    layout.addComponent(meta);
-    layout.addComponent(browse);
-    layout.setSizeFull();
-    layout.setExpandRatio(meta, 0.5f);
-    layout.setExpandRatio(browse, 0.5f);
-
+    GridLayout infoLayout = new GridLayout(2, 2);
+    infoLayout.setSizeFull();
+    
+    String corpusURL =  Helper.generateCorpusLink(Sets.newHashSet(topLevelCorpusName));
+    Label lblLink = new Label("Link to corpus: <a href=\"" + corpusURL + "\">"
+      + corpusURL + "</a>", ContentMode.HTML);
+    lblLink.setHeight("-1px");
+    lblLink.setWidth("-1px");
+    
+    
+    infoLayout.addComponent(meta, 0, 0);
+    infoLayout.addComponent(browse, 1, 0);
+    infoLayout.addComponent(lblLink, 0,1,1, 1);
+    
+    infoLayout.setRowExpandRatio(0, 1.0f);
+    infoLayout.setColumnExpandRatio(0, 0.5f);
+    infoLayout.setColumnExpandRatio(1, 0.5f);
+    infoLayout.setComponentAlignment(lblLink, Alignment.MIDDLE_CENTER);
+    
     Window window = new Window("Corpus information for " + c.getName()
-      + " (ID: " + c.getId() + ")", layout);
+      + " (ID: " + c.getId() + ")", infoLayout);
     window.setWidth(70, UNITS_EM);
-    window.setHeight(40, UNITS_EM);
-    window.setResizable(false);
+    window.setHeight(45, UNITS_EM);
+    window.setResizable(true);
     window.setModal(false);
+    window.setResizeLazy(true);
 
     window.addCloseListener(new Window.CloseListener()
     {

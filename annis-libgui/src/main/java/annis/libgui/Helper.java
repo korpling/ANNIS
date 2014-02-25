@@ -357,6 +357,28 @@ public class Helper
     }
     return "ERROR";
   }
+  
+  public static String generateCorpusLink(Set<String> corpora)
+  {
+    try
+    {
+      URI appURI = UI.getCurrent().getPage().getLocation();
+      
+      String fragment = "_c="
+        + encodeBase64URL(StringUtils.join(corpora, ","));
+      
+      return new URI(appURI.getScheme(), null,
+        appURI.getHost(), appURI.getPort(),
+        getContext(), null,
+        fragment)
+        .toASCIIString();
+    }
+    catch (URISyntaxException ex)
+    {
+      log.error(null, ex);
+    }
+    return "ERROR";
+  }
 
   public static String generateClassicCitation(String aql,
     List<String> corpora,
