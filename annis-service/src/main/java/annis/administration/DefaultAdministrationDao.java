@@ -140,6 +140,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
   }
 
+  @Override
+  public ImportStatus initImportStatus()
+  {
+    return new CorpusAdministration.ImportStatsImpl();
+  }
+
   public enum EXAMPLE_QUERIES_CONFIG
   {
 

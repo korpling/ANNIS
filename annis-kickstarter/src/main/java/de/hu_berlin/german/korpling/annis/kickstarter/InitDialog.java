@@ -15,12 +15,12 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao.ImportStatus;
 import annis.administration.CorpusAdministration;
 import com.google.common.base.Charsets;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
@@ -102,7 +102,9 @@ public class InitDialog extends javax.swing.JDialog
       catch (Exception ex)
       { 
         parent.setVisible(false);
-        ExceptionDialog dlg = new ExceptionDialog(parent, ex);
+        ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
+        importStatus.addException("init database exception:", ex);
+        ExceptionDialog dlg = new ExceptionDialog(parent, importStatus);
         dlg.setVisible(true);
       }
       finally
