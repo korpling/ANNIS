@@ -169,7 +169,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           if(currentUI instanceof AnnisBaseUI)
           {
             // do not add identical CSS files
-            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent);
+            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent, "annis-wrapped-htmlvis");
           }
           
         }
@@ -223,6 +223,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     {
       scrollPanel.setContent(lblResult);
     }
+    
+    scrollPanel.addStyleName("annis-wrapped-htmlvis");
     
     return scrollPanel;
   }

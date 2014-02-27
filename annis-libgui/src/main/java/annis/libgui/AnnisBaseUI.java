@@ -22,8 +22,11 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
+import com.vaadin.sass.SassCompiler;
+import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
@@ -46,6 +49,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -473,16 +478,64 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    */
   public void injectUniqueCSS(String cssContent)
   {
+    injectUniqueCSS(cssContent, null);
+  }
+  
+  /**
+   * Inject CSS into the UI. 
+   * This function will not add multiple style-elements if the
+   * exact CSS string was already added.
+   * @param cssContent 
+   * @param wrapperClass Name of the wrapper class (a CSS class that is applied to a parent element)
+   */
+  public void injectUniqueCSS(String cssContent, String wrapperClass)
+  {
     if(alreadyAddedCSS == null)
     {
       alreadyAddedCSS = new TreeSet<String>();
     }
+    
+    if(wrapperClass != null)
+    {
+      cssContent = wrapCSS(cssContent, wrapperClass);
+    }
+    
     String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
       Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
+  }
+  
+  private String wrapCSS(String cssContent, String wrapperClass)
+  {
+    try
+    {
+      
+      String wrappedContent
+        = wrapperClass == null ? cssContent
+        : "." + wrapperClass + "{\n"
+        + cssContent
+        + "\n}";
+      
+      File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
+      Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
+      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath(), "UTF-8");
+      styleSheet.compile();
+      
+      return styleSheet.toString();
+      
+    }
+    catch (IOException ex)
+    {
+      log.error("IOException when compiling wrapped CSS", ex);
+    }
+    catch (Exception ex)
+    {
+      log.error("Could not compile wrapped CSS", ex);
+    }
+    return null;
   }
   
   
