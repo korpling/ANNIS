@@ -144,8 +144,15 @@ public class EventExtractor {
         sortEventsByTokenIndex(r);
       }
     }
+    
+    // 4. split up events if they cover islands
+    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+      for (Row r : e.getValue()) {
+        splitRowsOnIslands(r, graph, text, startTokenIndex, endTokenIndex);
+      }
+    }
 
-    // 4. split up events if they have gaps
+    // 5. split up events if they have gaps
     for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
       for (Row r : e.getValue()) {
         splitRowsOnGaps(r, graph, startTokenIndex, endTokenIndex);
@@ -235,8 +242,8 @@ public class EventExtractor {
           GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), spaceCaption);
           spaceEvent.setSpace(true);
           r.addEvent(spaceEvent);
-          gapID++;
-        }
+          gapID++; 
+       }
       }
     }
   }
@@ -581,6 +588,83 @@ public class EventExtractor {
       }
     });
   }
+  
+  /**
+   * Splits events of a row if they overlap an island.  Islands are areas between
+   * the token which are included in the result.
+   *
+   * @param row
+   * @param graph
+   * @param text
+   * @param startTokenIndex token index of the first token in the match
+   * @param endTokenIndex token index of the last token in the match
+   */
+  private static void splitRowsOnIslands(Row row, 
+    final SDocumentGraph graph,
+    STextualDS text,
+    long startTokenIndex, long endTokenIndex)
+  {
+    
+    BitSet tokenCoverage = new BitSet();
+    // get the sorted token
+    List<SToken> sortedTokenList = graph.getSortedSTokenByText();
+    // add all token belonging to the right text to the bit set
+    ListIterator<SToken> itToken = sortedTokenList.listIterator();
+    while (itToken.hasNext())
+    {
+      SToken t = itToken.next();
+      if (text == null || text == CommonHelper.getTextualDSForNode(t, graph))
+      {
+        RelannisNodeFeature feat = (RelannisNodeFeature) t.getSFeature(
+          ANNIS_NS,
+          FEAT_RELANNIS_NODE).getValue();
+        long tokenIndexRaw = feat.getTokenIndex();
+
+        tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
+        int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
+        tokenCoverage.set(tokenIndex);
+      }
+    }
+
+    ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+    while (itEvents.hasNext())
+    {
+      GridEvent event = itEvents.next();
+      BitSet eventBitSet = new BitSet();
+      eventBitSet.set(event.getLeft(), event.getRight()+1);
+      
+      // restrict event bitset on the locations where token are present
+      eventBitSet.and(tokenCoverage);
+      
+      // if there is is any 0 bit before the right border there is a break in the event
+      // and we need to split it
+      if(eventBitSet.nextClearBit(event.getLeft()) <= event.getRight())
+      {
+        // remove the original event
+        row.removeEvent(itEvents);
+        
+        // The event bitset now marks all the locations which the event should
+        // cover.
+        // Make a list of new events for each connected range in the bitset
+        int subElement = 0;
+        int offset = eventBitSet.nextSetBit(0);
+        while(offset >= 0)
+        {
+          int end = eventBitSet.nextClearBit(offset)-1;
+          if(offset < end)
+          {
+            GridEvent newEvent = new GridEvent(event);
+            newEvent.setId(event.getId() + "_islandsplit_" +  subElement++);
+            newEvent.setLeft(offset);
+            newEvent.setRight(end);
+            row.addEvent(itEvents, newEvent);
+          }
+          offset = eventBitSet.nextSetBit(end+1);
+        }
+      } // end if we need to split
+
+    }
+  }
 
   /**
    * Splits events of a row if they contain a gap. Gaps are found using the
@@ -600,7 +684,7 @@ public class EventExtractor {
     {
       GridEvent event = itEvents.next();
 
-      int lastTokenIndex = Integer.MIN_VALUE;
+      int lastTokenIndex = -1;
 
       // sort the coveredIDs
       LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.
@@ -654,18 +738,29 @@ public class EventExtractor {
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
 
         int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
-        int diff = tokenIndex - lastTokenIndex;
-
-        if (lastTokenIndex >= 0 && diff > 1)
+        
+        // sanity check
+        if(tokenIndex >= event.getLeft() && tokenIndex <= event.getRight())
         {
-          // we detected a gap
-          GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
-            lastTokenIndex + 1, tokenIndex - 1, "");
-          gap.setGap(true);
-          gaps.add(gap);
-        }
+          int diff = tokenIndex - lastTokenIndex;
 
-        lastTokenIndex = tokenIndex;
+          if (lastTokenIndex >= 0 && diff > 1)
+          {
+            // we detected a gap
+            GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
+              lastTokenIndex + 1, tokenIndex - 1, "");
+            gap.setGap(true);
+            gaps.add(gap);
+          }
+
+          lastTokenIndex = tokenIndex;
+        }
+        else
+        {
+          // reset gap search when discovered there were token we use for 
+          // hightlighting but do not actually cover
+          lastTokenIndex = -1;
+        }
       } // end for each covered token id
 
       ListIterator<GridEvent> itGaps = gaps.listIterator();
@@ -698,10 +793,11 @@ public class EventExtractor {
 
         }
         // insert a new event node that covers the rest of the event
-        GridEvent after = new GridEvent(event.getId() + "_after_" + gapNr,
-          gap.getRight() + 1, rightBorder, event.getValue());
-        
-        after.getCoveredIDs().addAll(event.getCoveredIDs());
+        GridEvent after = new GridEvent(event);
+          
+        after.setId(event.getId() + "_after_" + gapNr);
+        after.setLeft(gap.getRight() + 1);
+        after.setRight(rightBorder);
         
         itEvents.add(after);
         gapNr++;
