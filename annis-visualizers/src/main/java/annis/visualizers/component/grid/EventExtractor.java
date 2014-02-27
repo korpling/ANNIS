@@ -641,7 +641,7 @@ public class EventExtractor {
       if(eventBitSet.nextClearBit(event.getLeft()) <= event.getRight())
       {
         // remove the original event
-        itEvents.remove();
+        row.removeEvent(itEvents);
         
         // The event bitset now marks all the locations which the event should
         // cover.
@@ -657,7 +657,7 @@ public class EventExtractor {
             newEvent.setId(event.getId() + "_islandsplit_" +  subElement++);
             newEvent.setLeft(offset);
             newEvent.setRight(end);
-            itEvents.add(newEvent);
+            row.addEvent(itEvents, newEvent);
           }
           offset = eventBitSet.nextSetBit(end+1);
         }
