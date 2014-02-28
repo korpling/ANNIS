@@ -339,13 +339,4 @@ public interface AnnisDao
    * @param props The properties
    */
   public void setCorpusConfiguration(String topLevelCorpus, Properties props);
-
-//  /**
-//   * Stores a config of the document browser. The document browser needs one
-//   * configuration written as json for each corpus. If no
-//   *
-//   * @param corpus
-//   * @param config
-//   */
-//  public void writeDocumentBrowserConfig(String corpus, JSONSerializable config);
 }

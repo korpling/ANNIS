@@ -131,12 +131,18 @@ public class DefaultAdministrationDao implements AdministrationDao
             return;
           }
 
-          // get real file name and write back the new corpus configuration.
-          // TODO check if this property was explicit set to true before.
-          corpusConf.put("browse-documents", "false");
+          // disable document browsing if it is not explicit switch on by the
+          // user in the corpus.properties
+          boolean hasKey = corpusConf.containsKey("browse-documents");
+          boolean isActive = Boolean.parseBoolean(corpusConf.getProperty(
+            "browse-documents"));
 
-          log.info("disable document browser");
-          annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConf);
+          if (!(hasKey && isActive))
+          {
+            log.info("disable document browser");
+            corpusConf.put("browse-documents", "false");
+            annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConf);
+          }
 
           // once disabled don't search in further texts
           return;
