@@ -117,7 +117,6 @@ public class DefaultAdministrationDao implements AdministrationDao
         // deactivate doc browsing if no document browser configuration is exists
         if (annisDao.getDocBrowserConfiguration(toplevelCorpusName) == null)
         {
-          log.info("here");
           // should exists anyway
           Properties corpusConf;
           try
