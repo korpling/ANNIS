@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;

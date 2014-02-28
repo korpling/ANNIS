@@ -19,6 +19,7 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.JSONSerializable;
 import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -53,6 +54,7 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -88,6 +90,12 @@ public class Helper
     + "<li>the corpus properties are not well defined</li></ul>"
     + "<p>Please ask the responsible admin or consult the ANNIS "
     + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
+
+  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER
+    = "Problems with parsing the document browser configuration.";
+
+  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY
+    = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
 
   /**
    * Creates an authentificiated REST client
@@ -139,10 +147,11 @@ public class Helper
 
     VaadinSession vSession = VaadinSession.getCurrent();
     WrappedSession wrappedSession = null;
-    
-    
+
     if (vSession != null)
+    {
       wrappedSession = vSession.getSession();
+    }
 
     if (wrappedSession != null)
     {
@@ -240,9 +249,10 @@ public class Helper
     // get URI used by the application
     String uri = null;
 
-    if (vSession != null) {
-     uri = (String) VaadinSession.getCurrent().getAttribute(
-      KEY_WEB_SERVICE_URL);
+    if (vSession != null)
+    {
+      uri = (String) VaadinSession.getCurrent().getAttribute(
+        KEY_WEB_SERVICE_URL);
     }
 
     // if already authentificated the REST client is set as the "user" property
@@ -357,16 +367,16 @@ public class Helper
     }
     return "ERROR";
   }
-  
+
   public static String generateCorpusLink(Set<String> corpora)
   {
     try
     {
       URI appURI = UI.getCurrent().getPage().getLocation();
-      
+
       String fragment = "_c="
         + encodeBase64URL(StringUtils.join(corpora, ","));
-      
+
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
         getContext(), null,
@@ -515,6 +525,47 @@ public class Helper
         Notification.Type.WARNING_MESSAGE);
     }
     return result;
+  }
+
+  public static JSONSerializable getDocBrowserConfig(String corpus)
+  {
+    JSONSerializable docBrowserConfig = null;
+
+    try
+    {
+      String js = Helper.getAnnisWebResource().path("query")
+        .path("corpora").path("doc_browser_config")
+        .path(URLEncoder.encode(corpus, "UTF-8"))
+        .get(String.class);
+
+      docBrowserConfig = new JSONSerializable(js);
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
+    }
+    catch (UniformInterfaceException ex)
+    {
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
+    }
+    catch (ClientHandlerException ex)
+    {
+      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+        .show(Page.getCurrent());
+    }
+    catch (JSONException ex)
+    {
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true).show(Page.getCurrent());
+    }
+
+    return docBrowserConfig;
   }
 
   /**

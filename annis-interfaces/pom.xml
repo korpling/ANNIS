@@ -72,12 +72,21 @@
     </dependency>
     
     <dependency>
+      <groupId>org.json</groupId>
+      <artifactId>json</artifactId>
+      <version>20140107</version>
+      <scope>compile</scope>
+    </dependency>
+
+    <dependency>
       <groupId>net.xeoh.plugins</groupId>
       <artifactId>jspf-core</artifactId>
       <version>1.0.2</version>
       <scope>compile</scope>
     </dependency>
     
+
+
 
     
   </dependencies>

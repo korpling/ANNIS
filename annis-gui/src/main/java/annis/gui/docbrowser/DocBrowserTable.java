@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -30,6 +31,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -188,6 +190,11 @@ public class DocBrowserTable extends Table
 
     try
     {
+      if(docVisualizerConfig == null)
+      {
+        return metaColumns;
+      }
+
       if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
       {
         JSONArray metaArray = docVisualizerConfig.getJSONArray(

@@ -35,6 +35,7 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.JSONSerializable;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
@@ -1208,5 +1209,20 @@ public class QueryServiceImpl implements QueryService
     RawTextWrapper result = new RawTextWrapper();
     result.setTexts(annisDao.getRawText(top, docname));
     return result;
+  }
+
+  @GET
+  @Path("corpora/doc_browser_config/{corpus}")
+  @Produces(MediaType.APPLICATION_JSON)
+  public String getDocumentBrowserConfig(
+    @PathParam("corpus") String corpus)
+  {
+    JSONSerializable config = annisDao.getDocBrowserConfiguration(corpus);
+    if(config == null)
+    {
+      config = annisDao.getDefaultDocBrowserConfiguration();
+
+    }
+      return (config != null) ? config.toString() : null;
   }
 }

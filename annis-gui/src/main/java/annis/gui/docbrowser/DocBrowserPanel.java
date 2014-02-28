@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
@@ -129,29 +130,7 @@ public class DocBrowserPanel extends Panel
 
   public JSONSerializable getDocBrowserConfig()
   {
-    // check first, if the a config is already fetched.
-    if (corpusConfig == null)
-    {
-      corpusConfig = Helper.getCorpusConfig(corpus);
-    }
-
-    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
-      DOC_BROWSER_CONFIG_KEY))
-    {
-      corpusConfig = Helper.getDefaultCorpusConfig();
-    }
-
-    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
-    try
-    {
-      return new JSONSerializable(c);
-    }
-    catch (JSONException ex)
-    {
-      log.error("could not read the doc browser config", ex);
-    }
-
-    return null;
+    return Helper.getDocBrowserConfig(corpus);
   }
 
   /**
