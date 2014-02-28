@@ -176,10 +176,7 @@ path (check this by calling e.g. the program `dot` on the command line).
 
 The default configuration for the document browser is stored in the
 `annis-service.properties` file. It can be overwritten by the
-`corpus.properties` file. Available keys:
-
-	browse-documents=true|false
-	browse-document-visualizers= {...}
+`document-browser.json` file.
 
 Note that the `browse-documents` configuration has only an effect,
 when it is set within `corpus.properties`.
@@ -189,8 +186,10 @@ when it is set within `corpus.properties`.
 The ANNIS importer tries to detect an artificial token
 segmentation. If the text.tab contains only artificial token (which
 means there are only white spaces) the document browser is
-disabled. In the case there exists a corpus.properties file which
-configures the document browser it will never be disabled by ANNIS.
+disabled. In the case there exists a document-browser.json file which
+configures the document browser it will never be disabled by
+ANNIS. Also if in the `corpus.properties` the `browse-documents` prop
+is set to true, the document browser will stay active.
 
 ## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
@@ -201,17 +200,17 @@ each corpus.
 
 
 \code{.json}
-	browse-document-visualizers = vis : [
-		{type : 'htmldoc', displayName : 'diplomatic view'},
-		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
-	],
-	metaDataColumns : [
-		{namespace : 'annis', name : 'Genre'} // optional
-	],
-	orderBy : [
-		{ namespace : 'annis', name :'Titel', ascending : 'false'}
-	]
-
+	{
+		vis : [
+		    {type : 'htmldoc', displayName : 'diplomatic view'},
+		    {type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
+		    ],
+		metaDataColumns : [
+				{namespace : 'annis', name : 'Genre'} // optional
+                    ],
+		orderBy : [
+			{namespace : 'annis', name :'Titel', ascending : 'false'}		     ]
+	}
 \endcode
 
 Explanation in detail:
