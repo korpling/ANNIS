@@ -447,7 +447,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         try
         {
-          input.close();
+          if (input != null)
+          {
+            input.close();
+          }
         }
         catch (IOException ex)
         {
