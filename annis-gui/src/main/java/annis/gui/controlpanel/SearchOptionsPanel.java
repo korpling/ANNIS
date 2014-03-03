@@ -416,8 +416,7 @@ public class SearchOptionsPanel extends FormLayout
           break;
         }
 
-        int tmp = Integer.parseInt(corpusConfigurations.get(corpus).getConfig().
-          getProperty(key));
+        int tmp = Integer.parseInt(c.getConfig().getProperty(key));
         if (value < 0)
         {
           value = tmp;
