@@ -580,7 +580,20 @@ public class SearchOptionsPanel extends FormLayout
     String segmentation = null;
     for (String corpus : corpora)
     {
-      String tmpSegment = corpusConfigurations.get(corpus).getConfig(key);
+
+      CorpusConfig c = null;
+
+      if (!corpusConfigurations.containsConfig(corpus))
+      {
+        c = corpusConfigurations.get(DEFAULT_CONFIG);
+      }
+
+      if (c == null)
+      {
+        continue;
+      }
+
+      String tmpSegment = c.getConfig(key);
 
       /**
        * If no segment is set in the corpus config use always the tok segment.
