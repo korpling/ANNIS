@@ -390,7 +390,7 @@ public class SearchOptionsPanel extends FormLayout
 
     for (String corpus : corpora)
     {
-
+      CorpusConfig c = null;
       try
       {
         if (corpus.equals(Helper.DEFAULT_CONFIG))
@@ -398,7 +398,17 @@ public class SearchOptionsPanel extends FormLayout
           continue;
         }
 
-        if (!corpusConfigurations.get(corpus).getConfig().containsKey(key))
+        if (corpusConfigurations.get(corpus) == null)
+        {
+          c = corpusConfigurations.get(DEFAULT_CONFIG);
+        }
+
+        if (c == null)
+        {
+          continue;
+        }
+
+        if (!c.getConfig().containsKey(key))
         {
           value = Integer.parseInt(
             corpusConfigurations.get(Helper.DEFAULT_CONFIG).getConfig().
