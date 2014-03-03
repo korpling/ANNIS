@@ -124,6 +124,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       doDeleteExampleQueries(commandArgs);
     }
+    else if("cleanup-data".equals(command))
+    {
+      doCleanupData(commandArgs);
+    }
     else
     {
       throw new UsageException("Unknown command: " + command);
@@ -453,6 +457,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       queriesGenerator.delExampleQueries(commandArgs);
     }
+  }
+  
+  private void doCleanupData(List<String> commandArgs)
+  {
+    corpusAdministration.cleanupData();
   }
 
   private void doGenerateExampleQueries(List<String> commandArgs)

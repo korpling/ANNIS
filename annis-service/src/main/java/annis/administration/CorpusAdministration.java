@@ -84,6 +84,11 @@ public class CorpusAdministration
     administrationDao.deleteCorpora(ids, true);
     log.info("Finished deleting corpora: " + ids);
   }
+  
+  public void cleanupData()
+  {
+    administrationDao.cleanupData();
+  }
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,

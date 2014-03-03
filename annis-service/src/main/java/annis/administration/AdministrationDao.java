@@ -20,7 +20,6 @@ import annis.security.AnnisUserConfig;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -34,6 +33,11 @@ public interface AdministrationDao
   public List<Long> listToplevelCorpora();
 
   public void deleteCorpora(List<Long> ids, boolean acquireLock);
+  
+  /**
+   * Delete files not used by this instance in the data directory.
+   */
+  public void cleanupData();
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,

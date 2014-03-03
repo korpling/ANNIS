@@ -33,11 +33,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -1142,6 +1144,39 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
   }
+
+  @Transactional(readOnly = true)
+  @Override
+  public void cleanupData()
+  {
+    
+    List<String> allFilesList = jdbcTemplate.queryForList(
+        "SELECT filename FROM media_files AS m", String.class);
+    
+    File dataDir = getRealDataDir();
+    
+    Set<File> allFiles = new HashSet<File>();
+    for(String singleFileName : allFilesList)
+    {
+      allFiles.add(new File(dataDir, singleFileName));
+    }
+    
+    
+    log.info("Cleaning up the data directory");
+    // go through each file of the folder and check if it is not included
+    for(File f : dataDir.listFiles())
+    {
+      if(f.isFile() && !allFiles.contains(f))
+      {
+        if(!f.delete())
+        {
+          log.warn("Could not delete {}", f.getAbsolutePath());
+        }
+      }
+    }
+  }
+  
+  
 
   @Override
   public List<Map<String, Object>> listCorpusStats()
