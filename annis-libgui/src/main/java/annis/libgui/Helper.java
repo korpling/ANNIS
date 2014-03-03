@@ -542,20 +542,22 @@ public class Helper
     }
     catch (UnsupportedEncodingException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true)
         .show(Page.getCurrent());
     }
     catch (UniformInterfaceException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true).show(Page.getCurrent());
     }
     catch (ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true)
         .show(Page.getCurrent());
     }
     catch (JSONException ex)
@@ -625,7 +627,7 @@ public class Helper
     try
     {
       defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
-        .path("corpora").path("default-config").get(CorpusConfig.class);
+        .path("corpora").path(DEFAULT_CONFIG).get(CorpusConfig.class);
     }
     catch (UniformInterfaceException ex)
     {
