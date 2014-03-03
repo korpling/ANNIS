@@ -579,38 +579,48 @@ public class SearchUI extends AnnisBaseUI
       // just return any existing config as a fallback
       log.
         warn(
-        "Instance config {} not found or null and default config is not available.",
-        instance);
+          "Instance config {} not found or null and default config is not available.",
+          instance);
       return allConfigs.values().iterator().next();
     }
 
     // default to an empty instance config
     return new InstanceConfig();
   }
-  
+
   /**
    * Get a cached version of the {@link CorpusConfig} for a corpus.
+   *
    * @param corpus
-   * @return 
+   * @return
    */
   public CorpusConfig getCorpusConfigWithCache(String corpus)
   {
     CorpusConfig config = new CorpusConfig();
-    if(corpusConfigCache != null)
+    if (corpusConfigCache != null)
     {
       config = corpusConfigCache.getIfPresent(corpus);
-      if(config == null)
+      if (config == null)
       {
-        config = Helper.getCorpusConfig(corpus);
+        if (corpus.equals(DEFAULT_CONFIG))
+        {
+          config = Helper.getDefaultCorpusConfig();
+        }
+        else
+        {
+          config = Helper.getCorpusConfig(corpus);
+        }
+
         corpusConfigCache.put(corpus, config);
       }
     }
+
     return config;
   }
-  
+
   public void clearCorpusConfigCache()
   {
-    if(corpusConfigCache != null)
+    if (corpusConfigCache != null)
     {
       corpusConfigCache.invalidateAll();
     }
