@@ -25,12 +25,10 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
-import com.vaadin.sass.SassCompiler;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
-import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -49,8 +47,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import net.xeoh.plugins.base.Plugin;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.impl.PluginManagerFactory;
@@ -64,7 +60,7 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
+import org.vaadin.cssinject.CSSInject;
 /**
  * Basic UI functionality.
  * 
@@ -106,12 +102,13 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private transient ObjectMapper jsonMapper;
   
   private transient TreeSet<String> alreadyAddedCSS;
-  private transient TreeSet<String> alreadyAddedCSSResources;
   
   
   @Override
   protected void init(VaadinRequest request)
   {  
+    alreadyAddedCSS = new TreeSet<String>();
+    
     initLogging();
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
@@ -141,6 +138,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     checkIfRemoteLoggedIn(request);
     getSession().addRequestHandler(new RemoteUserRequestHandler());
+    
   }
  
 
@@ -503,7 +501,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-      Page.getCurrent().getStyles().add(cssContent);
+      CSSInject cssInject = new CSSInject(UI.getCurrent());
+      cssInject.setStyles(cssContent);
+//      Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
   }
