@@ -89,9 +89,7 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
-import java.util.logging.Level;
 import org.apache.commons.io.IOUtils;
-import org.codehaus.jettison.json.JSONException;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -408,6 +406,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         log.error("probably syntax error in document_browser.json file", ex);
       }
+    } else {
+      return getDefaultDocBrowserConfiguration();
     }
 
     return documentBrowserConfig;
