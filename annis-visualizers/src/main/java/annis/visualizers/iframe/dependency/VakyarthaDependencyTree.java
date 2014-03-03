@@ -287,12 +287,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("</script>", writer);
 
       println("</head>", writer);
-      println("<body>", writer);
+      println("<body id=\"holder\">", writer);
 
       // the div to render the javascript to
-      println(
-        "<div id=\"holder\" style=\"background:white; position:relative;\"> </div>", 
-        writer);
+//      println(
+//        "<div id=\"holder\"> </div>", 
+//        writer);
 
       println("</body>", writer);
       println("</html>", writer);

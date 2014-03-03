@@ -210,7 +210,7 @@ function drawDependenceTree()
   paper=Raphael("holder",window.innerWidth-100,100);
   svgpos=$("svg").offset();
   makewords();
-  $("#holder").attr("style","width:99%;");
+  $("#holder").attr("style","background:white; position:relative;margin:0px; padding:0px");
   $("svg")[0].setAttribute("width",svgwi);
   $("svg")[0].setAttribute("height",dependencyspace+shownfeatures.length*line);
   drawalldeps();
