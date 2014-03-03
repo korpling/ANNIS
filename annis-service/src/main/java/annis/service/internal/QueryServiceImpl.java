@@ -627,7 +627,7 @@ public class QueryServiceImpl implements QueryService
     {
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:config:" + toplevelName);
-      Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
+      Properties tmp = annisDao.getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
       corpusConfig.setConfig(tmp);
