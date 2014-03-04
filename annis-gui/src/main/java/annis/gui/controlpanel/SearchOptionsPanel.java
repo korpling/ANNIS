@@ -402,7 +402,13 @@ public class SearchOptionsPanel extends FormLayout
         {
           c = corpusConfigurations.get(DEFAULT_CONFIG);
         }
-
+        else
+        {
+          c = corpusConfigurations.get(corpus);
+        }
+        
+        
+        // do nothing if not even default config is set
         if (c == null)
         {
           continue;
@@ -583,11 +589,16 @@ public class SearchOptionsPanel extends FormLayout
 
       CorpusConfig c = null;
 
-      if (!corpusConfigurations.containsConfig(corpus))
+      if (corpusConfigurations.containsConfig(corpus))
+      {
+        c = corpusConfigurations.get(corpus);
+      }
+      else
       {
         c = corpusConfigurations.get(DEFAULT_CONFIG);
       }
 
+      // do nothing if not even default config is set
       if (c == null)
       {
         continue;
