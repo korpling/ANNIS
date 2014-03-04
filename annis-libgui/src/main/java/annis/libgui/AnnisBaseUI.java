@@ -119,6 +119,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
+    getSession().setAttribute(CSS_ADDED_KEY, null);
     
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
