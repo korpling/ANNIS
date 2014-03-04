@@ -84,6 +84,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String USER_LOGIN_ERROR = "annis.gui.AnnisBaseUI:USER_LOGIN_ERROR";
   public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
+  public final static String CSS_ADDED_KEY = "annis.gui.AnnisBaseUI:CSS_ADDED_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
@@ -101,13 +102,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private transient ObjectMapper jsonMapper;
   
-  private transient TreeSet<String> alreadyAddedCSS;
+//  private transient TreeSet<String> alreadyAddedCSS = new TreeSet<String>();<
   
   
   @Override
   protected void init(VaadinRequest request)
   {  
-    alreadyAddedCSS = new TreeSet<String>();
     
     initLogging();
     // load some additional properties from our ANNIS configuration
@@ -116,11 +116,10 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
     getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     
-
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
     versionProperties = new Properties();
@@ -140,7 +139,30 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     getSession().addRequestHandler(new RemoteUserRequestHandler());
     
   }
- 
+
+  @Override
+  public void attach()
+  {
+    
+    super.attach();
+    getSession().setAttribute(CSS_ADDED_KEY, null);
+
+  }
+  
+  
+
+  @Override
+  public void close()
+  {
+    if (pluginManager != null)
+    {
+      pluginManager.shutdown();
+    }
+    super.close(); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  
+
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -454,19 +476,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         Helper.setUser(new AnnisUser(remoteUser, client, true));
       }
   }
-
-      
-  
-  @Override
-  public void close()
-  {
-    if (pluginManager != null)
-    {
-      pluginManager.shutdown();
-    }
-
-    super.close();
-  }
   
   /**
    * Inject CSS into the UI. 
@@ -488,9 +497,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    */
   public void injectUniqueCSS(String cssContent, String wrapperClass)
   {
+    TreeSet<String> alreadyAddedCSS = (TreeSet<String>) getSession().getAttribute(CSS_ADDED_KEY);
     if(alreadyAddedCSS == null)
     {
-      alreadyAddedCSS = new TreeSet<String>();
+      alreadyAddedCSS = new TreeSet<String>(); 
+      getSession().setAttribute(CSS_ADDED_KEY, alreadyAddedCSS);
     }
     
     if(wrapperClass != null)
