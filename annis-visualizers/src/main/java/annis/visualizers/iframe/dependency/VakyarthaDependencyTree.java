@@ -28,7 +28,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.IOException;
 import java.io.Writer;
@@ -80,11 +79,7 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
   private Properties mappings;
 
-  /**
-   * Contains only token, if mappings does not contain "node_key".
-   */
-  private Map<SNode, Integer> selectedNodes;
-
+  
   @Override
   public String getShortName()
   {
@@ -102,8 +97,10 @@ public class VakyarthaDependencyTree extends WriterVisualizer
      * same left token index, but the probability of this is small and it seem's
      * not to make much sense to visualize this. Mabye we should use the node
      * id.
+     *
+     * Contains only token, if mappings does not contain "node_key".
      */
-    this.selectedNodes = new TreeMap<SNode, Integer>(
+    Map<SNode, Integer> selectedNodes = new TreeMap<SNode, Integer>(
       new Comparator<SNode>()
       {
         private int getIdx(SNode snode)
@@ -145,10 +142,11 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         }
       });
 
-    printHTMLOutput(input, writer);
+    printHTMLOutput(input, writer, selectedNodes);
   }
 
-  public void printHTMLOutput(VisualizerInput input, Writer writer)
+  public void printHTMLOutput(VisualizerInput input, Writer writer,
+    Map<SNode, Integer> selectedNodes)
   {
     SDocumentGraph sDocumentGraph = input.getSResult().getSDocumentGraph();
 
