@@ -26,6 +26,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -179,6 +180,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
     tblMeta.setSortContainerPropertyId("name");
+    tblMeta.addStyleName(ChameleonTheme.TABLE_STRIPED);
     return tblMeta;
   }
 

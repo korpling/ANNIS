@@ -22,12 +22,13 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
+import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
-import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -59,7 +60,7 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-
+import org.vaadin.cssinject.CSSInject;
 /**
  * Basic UI functionality.
  * 
@@ -83,6 +84,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String USER_LOGIN_ERROR = "annis.gui.AnnisBaseUI:USER_LOGIN_ERROR";
   public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
+  public final static String CSS_ADDED_KEY = "annis.gui.AnnisBaseUI:CSS_ADDED_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
@@ -100,13 +102,13 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private transient ObjectMapper jsonMapper;
   
-  private transient TreeSet<String> alreadyAddedCSS;
-  private transient TreeSet<String> alreadyAddedCSSResources;
+//  private transient TreeSet<String> alreadyAddedCSS = new TreeSet<String>();<
   
   
   @Override
   protected void init(VaadinRequest request)
   {  
+    
     initLogging();
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
@@ -114,11 +116,11 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
     getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
+    getSession().setAttribute(CSS_ADDED_KEY, null);
     
-
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
     versionProperties = new Properties();
@@ -136,8 +138,32 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     checkIfRemoteLoggedIn(request);
     getSession().addRequestHandler(new RemoteUserRequestHandler());
+    
   }
- 
+
+  @Override
+  public void attach()
+  {
+    
+    super.attach();
+    getSession().setAttribute(CSS_ADDED_KEY, null);
+
+  }
+  
+  
+
+  @Override
+  public void close()
+  {
+    if (pluginManager != null)
+    {
+      pluginManager.shutdown();
+    }
+    super.close(); //To change body of generated methods, choose Tools | Templates.
+  }
+  
+  
+
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -451,19 +477,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         Helper.setUser(new AnnisUser(remoteUser, client, true));
       }
   }
-
-      
-  
-  @Override
-  public void close()
-  {
-    if (pluginManager != null)
-    {
-      pluginManager.shutdown();
-    }
-
-    super.close();
-  }
   
   /**
    * Inject CSS into the UI. 
@@ -473,16 +486,68 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    */
   public void injectUniqueCSS(String cssContent)
   {
+    injectUniqueCSS(cssContent, null);
+  }
+  
+  /**
+   * Inject CSS into the UI. 
+   * This function will not add multiple style-elements if the
+   * exact CSS string was already added.
+   * @param cssContent 
+   * @param wrapperClass Name of the wrapper class (a CSS class that is applied to a parent element)
+   */
+  public void injectUniqueCSS(String cssContent, String wrapperClass)
+  {
+    TreeSet<String> alreadyAddedCSS = (TreeSet<String>) getSession().getAttribute(CSS_ADDED_KEY);
     if(alreadyAddedCSS == null)
     {
-      alreadyAddedCSS = new TreeSet<String>();
+      alreadyAddedCSS = new TreeSet<String>(); 
+      getSession().setAttribute(CSS_ADDED_KEY, alreadyAddedCSS);
     }
+    
+    if(wrapperClass != null)
+    {
+      cssContent = wrapCSS(cssContent, wrapperClass);
+    }
+    
     String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-      Page.getCurrent().getStyles().add(cssContent);
+      CSSInject cssInject = new CSSInject(UI.getCurrent());
+      cssInject.setStyles(cssContent);
+//      Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
+  }
+  
+  private String wrapCSS(String cssContent, String wrapperClass)
+  {
+    try
+    {
+      
+      String wrappedContent
+        = wrapperClass == null ? cssContent
+        : "." + wrapperClass + "{\n"
+        + cssContent
+        + "\n}";
+      
+      File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
+      Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
+      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath(), "UTF-8");
+      styleSheet.compile();
+      
+      return styleSheet.toString();
+      
+    }
+    catch (IOException ex)
+    {
+      log.error("IOException when compiling wrapped CSS", ex);
+    }
+    catch (Exception ex)
+    {
+      log.error("Could not compile wrapped CSS", ex);
+    }
+    return null;
   }
   
   

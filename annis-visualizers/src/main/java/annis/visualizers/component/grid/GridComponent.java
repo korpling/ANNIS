@@ -24,6 +24,8 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
+import com.google.common.base.Preconditions;
+import com.google.common.collect.Lists;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -34,7 +36,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
@@ -126,6 +127,7 @@ public class GridComponent extends Panel
     
     List<SNode> tokens = CommonHelper.getSortedSegmentationNodes(segmentationName,
       graph);
+    Preconditions.checkArgument(!tokens.isEmpty(), "Token list must be non-empty");
     RelannisNodeFeature featTokStart
       = (RelannisNodeFeature) tokens.get(0).
       getSFeature(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE).
@@ -142,7 +144,7 @@ public class GridComponent extends Panel
     
     // add tokens as row
     AtomicInteger tokenOffsetForText = new AtomicInteger(-1);
-    ArrayList<Row> tokenRowList = computeTokenRow(tokens, graph,
+    Row tokenRow = computeTokenRow(tokens, graph,
       rowsByAnnotation, startIndex, tokenOffsetForText);
     if (isHidingToken() == false)
     {
@@ -152,7 +154,7 @@ public class GridComponent extends Panel
         // copy original list but add token row at the beginning
         LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<String, ArrayList<Row>>();
         
-        newList.put("tok", tokenRowList);
+        newList.put("tok", Lists.newArrayList(tokenRow));
         newList.putAll(rowsByAnnotation);
         rowsByAnnotation = newList;
         
@@ -160,17 +162,17 @@ public class GridComponent extends Panel
       else
       {
         // just add the token row to the end of the list
-        rowsByAnnotation.put("tok", tokenRowList);
+        rowsByAnnotation.put("tok", Lists.newArrayList(tokenRow));
       }
     }
     
-    EventExtractor.removeEmptySpace(rowsByAnnotation);
+    EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
     
     grid.setRowsByAnnotation(rowsByAnnotation);
     grid.setTokenIndexOffset(tokenOffsetForText.get());
   }
   
-  private ArrayList<Row> computeTokenRow(List<SNode> tokens, 
+  private Row computeTokenRow(List<SNode> tokens, 
     SDocumentGraph graph, LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     long startIndex, AtomicInteger tokenOffsetForText)
   {
@@ -234,10 +236,8 @@ public class GridComponent extends Panel
         tokenRow.addEvent(event);
       }
     } // end token row
-    ArrayList<Row> tokenRowList = new ArrayList<Row>();
-    tokenRowList.add(tokenRow);
     
-    return tokenRowList;
+    return tokenRow;
   }
   
   private String extractTextForToken(SNode t, String segmentation)

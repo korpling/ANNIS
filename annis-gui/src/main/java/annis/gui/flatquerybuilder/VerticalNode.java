@@ -43,7 +43,7 @@ public class VerticalNode extends Panel implements Button.ClickListener
   
   public VerticalNode(String level, FlatQueryBuilder sq)
   {
-    this(level, null, sq, false, false);
+    this(level, null, sq, true, false);
   }
   
   public VerticalNode(String ebene, String value, FlatQueryBuilder sq, boolean isRegex, boolean negativeSearch)

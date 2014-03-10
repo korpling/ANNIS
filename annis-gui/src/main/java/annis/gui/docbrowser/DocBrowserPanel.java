@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
@@ -22,11 +23,14 @@ import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -126,29 +130,7 @@ public class DocBrowserPanel extends Panel
 
   public JSONSerializable getDocBrowserConfig()
   {
-    // check first, if the a config is already fetched.
-    if (corpusConfig == null)
-    {
-      corpusConfig = Helper.getCorpusConfig(corpus);
-    }
-
-    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
-      DOC_BROWSER_CONFIG_KEY))
-    {
-      corpusConfig = Helper.getDefaultCorpusConfig();
-    }
-
-    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
-    try
-    {
-      return new JSONSerializable(c);
-    }
-    catch (JSONException ex)
-    {
-      log.error("could not read the doc browser config", ex);
-    }
-
-    return null;
+    return Helper.getDocBrowserConfig(corpus);
   }
 
   /**
@@ -177,22 +159,41 @@ public class DocBrowserPanel extends Panel
     {
 
       WebResource res = Helper.getAnnisWebResource();
-      final List<Annotation> docs = res.path("meta/docnames/" + corpus).
-        get(new Helper.AnnotationListType());
-
-
-      UI.getCurrent().access(new Runnable()
+      try
       {
-        @Override
-        public void run()
-        {
-          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-          layout.removeComponent(progress);
-          layout.addComponent(table);
+        final List<Annotation> docs = res.path("meta/docnames/"
+          + URLEncoder.encode(corpus, "UTF-8")).
+          get(new Helper.AnnotationListType());
 
-          table.setDocNames(docs);
-        }
-      });
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+            layout.removeComponent(progress);
+            layout.addComponent(table);
+
+            table.setDocNames(docs);
+          }
+        });
+      }
+      catch (final UnsupportedEncodingException ex)
+      {
+        log.
+          error("UTF-8 encoding is not supported on server, this is weird", ex);
+        UI.getCurrent().access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Notification.show(
+              "UTF-8 encoding is not supported on server, this is weird: " + ex.
+              getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+          }
+        });
+      }
     }
   }
 

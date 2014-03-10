@@ -96,6 +96,11 @@ public class InitDialog extends javax.swing.JDialog
           txtAdminUsername.getText(), 
           new String(txtAdminPassword.getPassword()), 
           prop.getProperty("datasource.ssl", "false").trim().equalsIgnoreCase("true"));
+        
+        // also perform a cleanup of the data directory
+        // when using kickstarter you are either using just the default one instance
+        // or you can change the service settings defining where to put the data files to
+        corpusAdministration.cleanupData();
 
         return "";
       }

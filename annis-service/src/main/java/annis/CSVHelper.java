@@ -72,7 +72,7 @@ public class CSVHelper
       }
     }
     
-    CSVWriter csvWriter = new CSVWriter(w, ',', '\'');
+    CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
     ArrayList<String> headerLine = new ArrayList<String>();
@@ -127,15 +127,15 @@ public class CSVHelper
             }
           }
 
-          line.add("'" + span.getId() + "'");
-          line.add("'" + span.getCoveredText().replace("'", "\\'") + "'");
+          line.add("" + span.getId());
+          line.add(span.getCoveredText().replace("\t", "\\t"));
         }
 
         for(String name : columnsByNodePos.get(k))
         {
           if(valueByName.containsKey(name))
           {
-            line.add("'" + valueByName.get(name).replace("'", "\\'") + "'");
+            line.add(valueByName.get(name).replace("\t", "\\t"));
           }
           else
           {
@@ -151,7 +151,7 @@ public class CSVHelper
           line.add("'NULL'");
         }
       }
-      w.append(StringUtils.join(line, ","));
+      w.append(StringUtils.join(line, "\t"));
       w.append("\n");
     }
   }

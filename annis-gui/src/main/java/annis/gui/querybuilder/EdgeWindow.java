@@ -80,20 +80,20 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     cbOperator = new ComboBox();
     cbOperator.setNewItemsAllowed(false);
+    cbOperator.setTextInputAllowed(false);
     cbOperator.setNullSelectionAllowed(true);
     cbOperator.addItem(CUSTOM);
     cbOperator.setItemCaption(CUSTOM, "custom");
     cbOperator.setNullSelectionItemId(CUSTOM);
     cbOperator.setNewItemHandler(new SimpleNewItemHandler(cbOperator));
     cbOperator.setImmediate(true);
-    cbOperator.setValue(null);
     vLayout.addComponent(cbOperator);
     for(AQLOperator o : AQLOperator.values())
     {
       cbOperator.addItem(o);
       cbOperator.setItemCaption(o, o.getDescription() +  " (" + o.getOp() + ")");
     }
-    cbOperator.setValue(null);
+    cbOperator.setValue(AQLOperator.DIRECT_PRECEDENCE);
     cbOperator.addValueChangeListener(new ValueChangeListener()
     {
       @Override
@@ -112,6 +112,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     cbOperator.setHeight("20px");
     
     txtOperator = new TextField();
+    txtOperator.setValue(".");
     txtOperator.setInputPrompt("select operator definition");
     txtOperator.setSizeFull();
     txtOperator.addValueChangeListener(new OperatorValueChangeListener(parent));

@@ -33,11 +33,13 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Properties;
+import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.io.FilenameUtils;
@@ -61,13 +63,10 @@ import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
-import org.springframework.jdbc.datasource.ConnectionHolder;
-import org.springframework.jdbc.datasource.DataSourceTransactionManager;
 import org.springframework.jdbc.datasource.DataSourceUtils;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.transaction.support.TransactionSynchronizationManager;
 
 /**
  * - Transaktionen - Datenbank-Zugriffsrechte für verschiedene Methoden -
@@ -93,7 +92,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private boolean temporaryStagingArea;
 
   private StatementController statementController;
-  
+
   private DynamicDataSource dataSource;
 
   /**
@@ -117,24 +116,38 @@ public class DefaultAdministrationDao implements AdministrationDao
 
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
-        // deactivate doc browsing if no corpus config is present.
-        Properties corpusConfiguration = annisDao.getCorpusConfiguration(toplevelCorpusName);
-        if (corpusConfiguration == null)
+        // deactivate doc browsing if no document browser configuration is exists
+        if (annisDao.getDocBrowserConfiguration(toplevelCorpusName) == null)
         {
-          log.info("create new corpus configuration file");
-          corpusConfiguration = new Properties();
-        }
+          // should exists anyway
+          Properties corpusConf;
+          try
+          {
+            corpusConf = annisDao.getCorpusConfiguration(toplevelCorpusName);
+          }
+          catch (FileNotFoundException ex)
+          {
+            log.error(
+              "not found a corpus configuration, so skip analyzing the text table",
+              ex);
+            return;
+          }
 
-        if (!corpusConfiguration.containsKey("browse-document-visualizers"))
-        {
-          // get real file name and write back the new corpus configuration.
-          corpusConfiguration.put("browse-documents", "false");
+          // disable document browsing if it is not explicit switch on by the
+          // user in the corpus.properties
+          boolean hasKey = corpusConf.containsKey("browse-documents");
+          boolean isActive = Boolean.parseBoolean(corpusConf.getProperty(
+            "browse-documents"));
 
-          log.info("disable document browser");
-          annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConfiguration);
-          
+          if (!(hasKey && isActive))
+          {
+            log.info("disable document browser");
+            corpusConf.put("browse-documents", "false");
+            annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConf);
+          }
+
           // once disabled don't search in further texts
-          break;
+          return;
         }
       }
     }
@@ -233,7 +246,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   ///// Subtasks of creating the database
   protected void dropDatabase(String database)
   {
-    
+
     log.debug("dropping possible existing database");
     jdbcTemplate.execute("DROP DATABASE IF EXISTS " + database);
 
@@ -320,10 +333,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
       List<Map<String, Object>> result = jdbcTemplate.
         queryForList(
-        "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'");
+          "SELECT \"value\" FROM repository_metadata WHERE \"name\"='schema-version'");
 
-      String schema =
-        result.size() > 0 ? (String) result.get(0).get("value") : "";
+      String schema
+        = result.size() > 0 ? (String) result.get(0).get("value") : "";
       return schema;
     }
     catch (DataAccessException ex)
@@ -348,22 +361,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
     return true;
   }
-  
+
   @Transactional(propagation = Propagation.MANDATORY)
   private boolean lockCorpusTable(boolean waitForOtherTasks)
   {
     try
     {
       log.info("Locking corpus table to ensure no other import is running");
-      jdbcTemplate.execute("LOCK TABLE corpus IN EXCLUSIVE MODE" + (waitForOtherTasks ? "" : " NOWAIT"));
+      jdbcTemplate.execute(
+        "LOCK TABLE corpus IN EXCLUSIVE MODE" + (waitForOtherTasks ? "" : " NOWAIT"));
       return true;
     }
-    catch(DataAccessException ex)
+    catch (DataAccessException ex)
     {
       return false;
     }
   }
-  
 
   @Transactional(readOnly = false, propagation = Propagation.NEVER)
   @Override
@@ -373,21 +386,21 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // connect as super user to the default database to create new user and database
     if (superPassword != null)
-    {      
+    {
       log.info("Creating Annis database and user.");
       dataSource.setInnerDataSource(createDataSource(host, port,
-       defaultDatabase, superUser, superPassword, useSSL));
-      
+        defaultDatabase, superUser, superPassword, useSSL));
+
       createDatabaseAndUserInTransaction(database, user, password);
     }
     // switch to new database as new user for the rest
     dataSource.setInnerDataSource(createDataSource(host, port, database,
       user, password, useSSL));
-    
+
     createSchemaInTransaction();
 
   }
-  
+
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   private void createDatabaseAndUserInTransaction(String database,
     String user, String password)
@@ -399,7 +412,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     installPlPgSql();
   }
-  
+
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
   private void createSchemaInTransaction()
   {
@@ -413,7 +426,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     String database,
     String user, String password, boolean useSSL)
   {
-    
+
     Properties props = new Properties();
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
 
@@ -432,27 +445,25 @@ public class DefaultAdministrationDao implements AdministrationDao
     result.setUseSSL(useSSL);
     result.setUsername(user);
     result.setPassword(password);
-    
-    
-    
+
     result.setDriverClassName("org.postgresql.Driver");
-    
+
     return result;
   }
 
   @Override
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW, 
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
     isolation = Isolation.READ_COMMITTED)
-  public boolean importCorpus(String path, 
+  public boolean importCorpus(String path,
     String aliasName,
-    boolean override, 
+    boolean override,
     boolean waitForOtherTasks)
   {
 
     // check schema version first
     checkDatabaseSchemaVersion();
-    
-    if(!lockCorpusTable(waitForOtherTasks))
+
+    if (!lockCorpusTable(waitForOtherTasks))
     {
       log.error("Another import is currently running");
       return false;
@@ -460,9 +471,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
-    
+
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
-    
+
     // remove conflicting top level corpora, when override is set to true.
     if (override)
     {
@@ -517,16 +528,17 @@ public class DefaultAdministrationDao implements AdministrationDao
     }
 
     // create empty corpus properties file
-    if (annisDao.getCorpusConfiguration(toplevelCorpusName) == null)
+    if (annisDao.getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
+      log.info("creating new corpus.properties file");
       annisDao.setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
     analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
-    
-    if(aliasName != null && !aliasName.isEmpty())
+
+    if (aliasName != null && !aliasName.isEmpty())
     {
       addCorpusAlias(corpusID, aliasName);
     }
@@ -577,7 +589,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   void bulkImport(String path)
   {
     log.info("bulk-loading data");
-
 
     for (String table : importedTables)
     {
@@ -630,11 +641,10 @@ public class DefaultAdministrationDao implements AdministrationDao
       // check column number by reading first line
       File nodeTabFile = new File(path, "node.tab");
 
-      reader =
-        new BufferedReader(new InputStreamReader(
-        new FileInputStream(nodeTabFile), "UTF-8"));
+      reader
+        = new BufferedReader(new InputStreamReader(
+            new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
-
 
       int columnNumber = firstLine == null ? 13
         : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
@@ -732,11 +742,12 @@ public class DefaultAdministrationDao implements AdministrationDao
             log.info("import " + data.getCanonicalPath() + " to staging area");
 
             // search for corpus_ref
-            String sqlScript =
-              "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
+            String sqlScript
+              = "SELECT id FROM _corpus WHERE top_level IS TRUE LIMIT 1";
             long corpusID = jdbcTemplate.queryForLong(sqlScript);
 
-            importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
+            importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
+              corpusID);
           }
           else
           {
@@ -769,18 +780,19 @@ public class DefaultAdministrationDao implements AdministrationDao
                   "import " + data.getCanonicalPath() + " to staging area");
 
                 // search for corpus_ref
-                String sqlScript =
-                  "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
+                String sqlScript
+                  = "SELECT id FROM _corpus WHERE \"name\" = ? LIMIT 1";
                 long corpusID = jdbcTemplate.queryForLong(sqlScript, doc.
                   getName());
 
-                importSingleFile(data.getCanonicalPath(), toplevelCorpusName, corpusID);
+                importSingleFile(data.getCanonicalPath(), toplevelCorpusName,
+                  corpusID);
               }
               else
               {
                 log.
                   warn(
-                  "not importing " + data.getCanonicalPath() + " since file type is unknown");
+                    "not importing " + data.getCanonicalPath() + " since file type is unknown");
               }
             }
             catch (IOException ex)
@@ -800,7 +812,8 @@ public class DefaultAdministrationDao implements AdministrationDao
    * @param corpusRef Assigns the file this corpus.
    * @param toplevelCorpusName The toplevel corpus name
    */
-  private void importSingleFile(String file, String toplevelCorpusName, long corpusRef)
+  private void importSingleFile(String file, String toplevelCorpusName,
+    long corpusRef)
   {
 
     BinaryImportHelper preStat = new BinaryImportHelper(file, getRealDataDir(),
@@ -922,7 +935,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
     }
-    
+
     log.info("updating IDs in staging area");
     MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
     executeSqlFromScript("update_ids.sql", args);
@@ -960,15 +973,14 @@ public class DefaultAdministrationDao implements AdministrationDao
       int numOfEntries = jdbcTemplate.queryForInt("SELECT COUNT(*) from "
         + tableInStagingArea(table));
 
-
       if (numOfEntries > 0)
       {
         StringBuilder sql = new StringBuilder();
 
-        String predefinedFrom =
-          tableInsertFrom == null ? null : tableInsertFrom.get(table);
-        String predefinedSelect =
-          tableInsertSelect == null ? null : tableInsertSelect.get(table);
+        String predefinedFrom
+          = tableInsertFrom == null ? null : tableInsertFrom.get(table);
+        String predefinedSelect
+          = tableInsertSelect == null ? null : tableInsertSelect.get(table);
 
         if (predefinedFrom != null || predefinedSelect != null)
         {
@@ -1083,7 +1095,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     String sql = "SELECT id FROM corpus WHERE top_level = 'y'";
 
-
     return jdbcTemplate.query(sql, ParameterizedSingleColumnRowMapper.
       newInstance(Long.class));
   }
@@ -1092,12 +1103,12 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void deleteCorpora(List<Long> ids, boolean acquireLock)
   {
-    if(acquireLock && !lockCorpusTable(false))
+    if (acquireLock && !lockCorpusTable(false))
     {
       log.error("Another import is currently running");
       return;
     }
-    
+
     File dataDir = getRealDataDir();
 
     for (long l : ids)
@@ -1115,7 +1126,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         File f = new File(dataDir, fileName);
         if (f.exists())
         {
-          if(!f.delete())
+          if (!f.delete())
           {
             log.warn("Could not delete {}", f.getAbsolutePath());
           }
@@ -1139,6 +1150,39 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("delete_corpus.sql", makeArgs().addValue(":ids",
       StringUtils.join(ids, ", ")));
   }
+
+  @Transactional(readOnly = true)
+  @Override
+  public void cleanupData()
+  {
+    
+    List<String> allFilesList = jdbcTemplate.queryForList(
+        "SELECT filename FROM media_files AS m", String.class);
+    
+    File dataDir = getRealDataDir();
+    
+    Set<File> allFiles = new HashSet<File>();
+    for(String singleFileName : allFilesList)
+    {
+      allFiles.add(new File(dataDir, singleFileName));
+    }
+    
+    
+    log.info("Cleaning up the data directory");
+    // go through each file of the folder and check if it is not included
+    for(File f : dataDir.listFiles())
+    {
+      if(f.isFile() && !allFiles.contains(f))
+      {
+        if(!f.delete())
+        {
+          log.warn("Could not delete {}", f.getAbsolutePath());
+        }
+      }
+    }
+  }
+  
+  
 
   @Override
   public List<Map<String, Object>> listCorpusStats()
@@ -1171,33 +1215,33 @@ public class DefaultAdministrationDao implements AdministrationDao
       userName
     },
       new ResultSetExtractor<AnnisUserConfig>()
-    {
-      @Override
-      public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
       {
-
-        // default to empty config
-        AnnisUserConfig c = new AnnisUserConfig();
-        c.setName(userName);
-
-        if (rs.next())
+        @Override
+        public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
         {
-          try
+
+          // default to empty config
+          AnnisUserConfig c = new AnnisUserConfig();
+          c.setName(userName);
+
+          if (rs.next())
           {
-            c = jsonMapper.readValue(rs.getString("config"),
-              AnnisUserConfig.class);
-          }
-          catch (IOException ex)
-          {
-            log.
+            try
+            {
+              c = jsonMapper.readValue(rs.getString("config"),
+                AnnisUserConfig.class);
+            }
+            catch (IOException ex)
+            {
+              log.
               error(
-              "Could not parse JSON that is stored in database (user configuration)",
-              ex);
+                "Could not parse JSON that is stored in database (user configuration)",
+                ex);
+            }
           }
+          return c;
         }
-        return c;
-      }
-    });
+      });
 
     return config;
   }
@@ -1232,11 +1276,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       + "VALUES(\n"
       + "  ?, \n"
       + "  ?\n"
-      + ");", 
+      + ");",
       alias, corpusID);
   }
-  
-  
 
   ///// Helpers
   private List<String> importedAndCreatedTables()
@@ -1286,8 +1328,8 @@ public class DefaultAdministrationDao implements AdministrationDao
       reader = new BufferedReader(new InputStreamReader(new FileInputStream(
         resource.
         getFile()), "UTF-8"));
-      for (String line = reader.readLine(); line != null; line =
-        reader.readLine())
+      for (String line = reader.readLine(); line != null; line
+        = reader.readLine())
       {
         sqlBuf.append(line).append("\n");
       }
@@ -1359,7 +1401,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
 
       statement = con.prepareCall(sqlQuery);
-      if(statementController != null)
+      if (statementController != null)
       {
         statementController.registerStatement(statement);
       }
@@ -1462,8 +1504,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   // exploits the fact that the index has the same name as the constraint
   private List<String> listIndexesOnTables(List<String> tables)
   {
-    String sql =
-      ""
+    String sql
+      = ""
       + "SELECT indexname "
       + "FROM pg_indexes "
       + "WHERE tablename IN (" + StringUtils.repeat("?", ",", tables.size()) + ") "
@@ -1489,8 +1531,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   public List<String> listIndexDefinitions(boolean used, List<String> tables)
   {
     String scansOp = used ? "!=" : "=";
-    String sql =
-      "SELECT pg_get_indexdef(x.indexrelid) AS indexdef "
+    String sql
+      = "SELECT pg_get_indexdef(x.indexrelid) AS indexdef "
       + "FROM pg_index x, pg_class c "
       + "WHERE x.indexrelid = c.oid "
       + "AND c.relname IN ( " + StringUtils.repeat("?", ",", tables.size()) + ") "
@@ -1710,11 +1752,11 @@ public class DefaultAdministrationDao implements AdministrationDao
       // count cols for detecting old resolver_vis_map table format
       File resolver_vis_tab = new File(path, table + REL_ANNIS_FILE_SUFFIX);
 
-      if(!resolver_vis_tab.isFile())
+      if (!resolver_vis_tab.isFile())
       {
         return;
       }
-      
+
       BufferedReader bReader = new BufferedReader(
         new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
       String firstLine = bReader.readLine();
@@ -1797,15 +1839,15 @@ public class DefaultAdministrationDao implements AdministrationDao
     // read the example queries from the staging area
     List<ExampleQuery> exampleQueries = jdbcTemplate.query(
       "SELECT * FROM _" + EXAMPLE_QUERIES_TAB, new RowMapper<ExampleQuery>()
-    {
-      @Override
-      public ExampleQuery mapRow(ResultSet rs, int i) throws SQLException
       {
-        ExampleQuery eQ = new ExampleQuery();
-        eQ.setExampleQuery(rs.getString("example_query"));
-        return eQ;
-      }
-    });
+        @Override
+        public ExampleQuery mapRow(ResultSet rs, int i) throws SQLException
+        {
+          ExampleQuery eQ = new ExampleQuery();
+          eQ.setExampleQuery(rs.getString("example_query"));
+          return eQ;
+        }
+      });
 
     // count the nodes of the aql Query
     countExampleQueryNodes(exampleQueries);
@@ -1920,7 +1962,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   /**
    * Retrieves the name of the top level corpus in the corpus.tab file.
    *
-   * <p>At this point, the tab files must be in the staging area.</p>
+   * <p>
+   * At this point, the tab files must be in the staging area.</p>
    *
    * @return The name of the toplevel corpus or an empty String if no top level
    * corpus is found.
@@ -1929,7 +1972,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     String sql = "SELECT name FROM " + tableInStagingArea("corpus")
       + " WHERE type='CORPUS'\n"
-      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus") +")\n"
+      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus") + ")\n"
       + "AND post = (SELECT max(post) FROM " + tableInStagingArea("corpus") + ")";
 
     return jdbcTemplate.query(sql, new ResultSetExtractor<String>()
@@ -1963,8 +2006,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     String corpusName = getTopLevelCorpusFromTmpArea();
     if (existConflictingTopLevelCorpus(corpusName))
     {
-      String msg =
-        "There already exists a top level corpus with the name: " + corpusName;
+      String msg
+        = "There already exists a top level corpus with the name: " + corpusName;
       throw new ConflictingCorpusException(msg);
     }
   }
@@ -2029,6 +2072,5 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.statementController = statementCon;
   }
-  
-  
+
 }

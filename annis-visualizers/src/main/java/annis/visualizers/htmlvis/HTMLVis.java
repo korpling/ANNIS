@@ -102,6 +102,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
     }
     
+    String wrapperClassName = "annis-wrapped-htmlvis-" 
+      + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
+    
+    scrollPanel.addStyleName(wrapperClassName);
     
     InputStream inStreamConfig = null;
     InputStream inStreamCSS = null;
@@ -169,7 +173,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           if(currentUI instanceof AnnisBaseUI)
           {
             // do not add identical CSS files
-            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent);
+            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent, wrapperClassName);
           }
           
         }

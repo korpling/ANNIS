@@ -1,5 +1,5 @@
 
-Lists of 80 third-party dependencies.
+Lists of 81 third-party dependencies.
      (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
      (Public Domain) ASM Core (asm:asm:3.1 - http://asm.objectweb.org/asm/)
      (ASF 2.0) Code Generation Library (cglib:cglib-nodep:2.2.2 - http://cglib.sourceforge.net/)
@@ -67,6 +67,7 @@ Lists of 80 third-party dependencies.
      (Apache Software License - Version 2.0) (Eclipse Public License - Version 1.0) Jetty :: XML utilities (org.eclipse.jetty:jetty-xml:8.1.14.v20131031 - http://www.eclipse.org/jetty)
      (Apache Software License - Version 2.0) (Eclipse Public License - Version 1.0) Jetty Orbit :: Servlet API (org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016 - http://www.eclipse.org/jetty/jetty-orbit/javax.servlet)
      (BSD style) Hamcrest Core (org.hamcrest:hamcrest-core:1.1 - no url defined)
+     (The JSON License) JSON in Java (org.json:json:20140107 - https://github.com/douglascrockford/JSON-java)
      (LGPL) textcat (org.knallgrau:textcat:1.0.1 - no url defined)
      (MIT License) JCL 1.1.1 implemented over SLF4J (org.slf4j:jcl-over-slf4j:1.7.5 - http://www.slf4j.org)
      (MIT License) JUL to SLF4J bridge (org.slf4j:jul-to-slf4j:1.7.5 - http://www.slf4j.org)

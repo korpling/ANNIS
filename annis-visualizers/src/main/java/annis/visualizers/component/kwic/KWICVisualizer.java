@@ -33,7 +33,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Key words in context visualizer (KWIC).
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @PluginImplementation

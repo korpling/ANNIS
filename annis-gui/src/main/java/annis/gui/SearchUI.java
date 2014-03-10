@@ -73,6 +73,7 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
+import java.net.URLEncoder;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -330,7 +331,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addSelectedTabChangeListener(queryController);
     mainTab.addStyleName("blue-tab");
 
-    Tab helpTab = mainTab.addTab(help, "Help");
+    Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
     controlPanel = new ControlPanel(queryController, instanceConfig,
@@ -578,38 +579,48 @@ public class SearchUI extends AnnisBaseUI
       // just return any existing config as a fallback
       log.
         warn(
-        "Instance config {} not found or null and default config is not available.",
-        instance);
+          "Instance config {} not found or null and default config is not available.",
+          instance);
       return allConfigs.values().iterator().next();
     }
 
     // default to an empty instance config
     return new InstanceConfig();
   }
-  
+
   /**
    * Get a cached version of the {@link CorpusConfig} for a corpus.
+   *
    * @param corpus
-   * @return 
+   * @return
    */
   public CorpusConfig getCorpusConfigWithCache(String corpus)
   {
     CorpusConfig config = new CorpusConfig();
-    if(corpusConfigCache != null)
+    if (corpusConfigCache != null)
     {
       config = corpusConfigCache.getIfPresent(corpus);
-      if(config == null)
+      if (config == null)
       {
-        config = Helper.getCorpusConfig(corpus);
+        if (corpus.equals(DEFAULT_CONFIG))
+        {
+          config = Helper.getDefaultCorpusConfig();
+        }
+        else
+        {
+          config = Helper.getCorpusConfig(corpus);
+        }
+
         corpusConfigCache.put(corpus, config);
       }
     }
+
     return config;
   }
-  
+
   public void clearCorpusConfigCache()
   {
-    if(corpusConfigCache != null)
+    if (corpusConfigCache != null)
     {
       corpusConfigCache.invalidateAll();
     }
@@ -982,7 +993,7 @@ public class SearchUI extends AnnisBaseUI
       try
       {
         List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(selectedCorpusName)
+          = rootRes.path("query").path("corpora").path(URLEncoder.encode(selectedCorpusName, "UTF-8"))
           .get(new GenericType<List<AnnisCorpus>>()
             {
           });
@@ -992,7 +1003,11 @@ public class SearchUI extends AnnisBaseUI
           mappedNames.add(c.getName());
         }
       }
-
+      catch(UnsupportedEncodingException ex)
+      {
+        log.
+          error("UTF-8 encoding is not supported on server, this is weird", ex);
+      }
       catch (ClientHandlerException ex)
       {
         String msg = "alias mapping does not work for alias: "
@@ -1048,6 +1063,9 @@ public class SearchUI extends AnnisBaseUI
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
+      // do not change the manually selected search options
+      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+      
       // full query with given context
       queryController.setQuery(new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
@@ -1059,6 +1077,9 @@ public class SearchUI extends AnnisBaseUI
     }
     else
     {
+      // do not change the manually selected search options
+      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+      
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
       queryController.executeQuery();

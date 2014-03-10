@@ -15,14 +15,14 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.server.ComponentSizeValidator;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -32,14 +32,15 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -120,10 +121,12 @@ public class DocBrowserTable extends Table
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
-      List<String> pathList = Arrays.asList(StringUtils.split(
-        a.getAnnotationPath().substring(
-          1, a.getAnnotationPath().length() - 2), ",")
-      );
+      List<String> pathList = a.getAnnotationPath();
+      if (pathList == null)
+      {
+        pathList = new LinkedList<String>();
+      }
+
       Collections.reverse(pathList);
       String path = StringUtils.join(pathList, " > ");
 
@@ -188,6 +191,11 @@ public class DocBrowserTable extends Table
 
     try
     {
+      if (docVisualizerConfig == null)
+      {
+        return metaColumns;
+      }
+
       if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
       {
         JSONArray metaArray = docVisualizerConfig.getJSONArray(
@@ -289,16 +297,39 @@ public class DocBrowserTable extends Table
 
           List<Annotation> annos = getDocMetaData(docName);
 
+          /**
+           * Transforms to a list of key value pairs. The values concates the
+           * namespace and ordinary value. Namespaces "NULL" are ignored.
+           */
           // create datasource and bind it to a table
-          BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
-            Annotation.class, annos);
+          IndexedContainer container = new IndexedContainer();
+          container.addContainerProperty("key", String.class, "");
+          container.addContainerProperty("value", String.class, "");
+
+          for (Annotation a : annos)
+          {
+            String key = a.getQualifiedName();
+            String value = a.getValue();
+            Item row = container.addItem(key);
+            row.getItemProperty("key").setValue(key);
+            row.getItemProperty("value").setValue(value);
+          }
+
           Table metaTable = new Table();
-          metaTable.setContainerDataSource(dataSource);
+          metaTable.setContainerDataSource(container);
+
+          metaTable.sort(new Object[]
+          {
+            "key"
+          }, new boolean[]
+          {
+            true
+          });
 
           // style the table
           metaTable.setVisibleColumns(new Object[]
           {
-            "name", "value"
+            "key", "value"
           });
           metaTable.setColumnHeaders("name", "value");
           metaTable.setSizeFull();
@@ -427,10 +458,10 @@ public class DocBrowserTable extends Table
    * Retrieves date from the cache or from the annis rest service for a specific
    * document.
    *
-   * @param path The document the data are fetched for.
+   * @param document The document the data are fetched for.
    * @return The a list of meta data. Can be empty but never null.
    */
-  private List<Annotation> getDocMetaData(String path)
+  private List<Annotation> getDocMetaData(String document)
   {
     // lookup up meta data in the cache
     if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
@@ -438,7 +469,7 @@ public class DocBrowserTable extends Table
       // get the metadata of a specific doc
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
-          docBrowserPanel.getCorpus()).path("closure");
+        docBrowserPanel.getCorpus()).path("closure");
       docMetaDataCache.put(docBrowserPanel.getCorpus(),
         res.get(new Helper.AnnotationListType()));
     }
@@ -447,8 +478,10 @@ public class DocBrowserTable extends Table
 
     // filter the annotations
     for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
-    { 
-     if (a.getAnnotationPath().equals(path))
+    {
+      if (a.getAnnotationPath() != null
+        && !a.getAnnotationPath().isEmpty()
+        && a.getAnnotationPath().get(0).equals(document))
       {
         annos.add(a);
       }
@@ -457,9 +490,13 @@ public class DocBrowserTable extends Table
     return annos;
   }
 
-  private String generateCell(String path, MetaDataCol metaDatum)
+  private String generateCell(List<String> path, MetaDataCol metaDatum)
   {
-    List<Annotation> metaData = getDocMetaData(path);
+    List<Annotation> metaData = new LinkedList<Annotation>();
+    if (path != null && !path.isEmpty())
+    {
+      metaData = getDocMetaData(path.get(0));
+    }
 
     // lookup meta data
     for (Annotation a : metaData)

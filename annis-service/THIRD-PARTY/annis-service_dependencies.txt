@@ -1,5 +1,5 @@
 
-Lists of 81 third-party dependencies.
+Lists of 82 third-party dependencies.
      (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
      (Public Domain) ASM Core (asm:asm:3.1 - http://asm.objectweb.org/asm/)
      (ASF 2.0) Code Generation Library (cglib:cglib-nodep:2.2.2 - http://cglib.sourceforge.net/)
@@ -65,6 +65,7 @@ Lists of 81 third-party dependencies.
      (Apache Software License - Version 2.0) (Eclipse Public License - Version 1.0) Jetty Orbit :: Servlet API (org.eclipse.jetty.orbit:javax.servlet:3.0.0.v201112011016 - http://www.eclipse.org/jetty/jetty-orbit/javax.servlet)
      (New BSD License) Hamcrest All (org.hamcrest:hamcrest-all:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-all)
      (New BSD License) Hamcrest Core (org.hamcrest:hamcrest-core:1.3 - https://github.com/hamcrest/JavaHamcrest/hamcrest-core)
+     (The JSON License) JSON in Java (org.json:json:20140107 - https://github.com/douglascrockford/JSON-java)
      (LGPL) textcat (org.knallgrau:textcat:1.0.1 - no url defined)
      (The MIT License) Mockito (org.mockito:mockito-core:1.9.5 - http://www.mockito.org)
      (MIT License) Objenesis (org.objenesis:objenesis:1.0 - http://objenesis.googlecode.com/svn/docs/index.html)

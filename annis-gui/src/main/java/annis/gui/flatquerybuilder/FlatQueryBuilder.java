@@ -138,11 +138,11 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener) this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
+    btInitLanguage = new Button("Initialize", (Button.ClickListener) this);
     btInitLanguage.setDescription(INFO_INIT_LANG);
-    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
+    btInitSpan = new Button("Initialize", (Button.ClickListener) this);
     btInitSpan.setDescription(INFO_INIT_SPAN);
-    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
+    btInitMeta = new Button("Initialize", (Button.ClickListener) this);
     btInitMeta.setDescription(INFO_INIT_META);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
@@ -252,8 +252,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitLanguage:    
     addMenu = new MenuBar();
-    addMenu.setDescription(INFO_INIT_LANG);
-    addMenu.setAutoOpen(true);
+    //addMenu.setDescription(INFO_INIT_LANG);
+    addMenu.setAutoOpen(false);
     final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -278,8 +278,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitSpan:    
     addMenuSpan = new MenuBar();
-    addMenuSpan.setDescription(INFO_INIT_SPAN);
-    addMenuSpan.setAutoOpen(true);
+    //addMenuSpan.setDescription(INFO_INIT_SPAN);
+    addMenuSpan.setAutoOpen(false);
     final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -298,8 +298,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitMeta:    
     addMenuMeta = new MenuBar();
-    addMenuMeta.setDescription(INFO_INIT_META);  
-    addMenuMeta.setAutoOpen(true);
+    //addMenuMeta.setDescription(INFO_INIT_META);  
+    addMenuMeta.setAutoOpen(false);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
     int i = 0;
     for (final String annoname : metanames)

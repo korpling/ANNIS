@@ -163,6 +163,11 @@
       <version>${vaadin.version}</version>
     </dependency>
     <dependency>
+      <groupId>com.vaadin</groupId>
+      <artifactId>vaadin-client-compiler</artifactId>
+      <version>${vaadin.version}</version>
+    </dependency>
+    <dependency>
       <groupId>javax.validation</groupId>
       <artifactId>validation-api</artifactId>
       <version>1.0.0.GA</version>
@@ -201,6 +206,11 @@
       <artifactId>guava-gwt</artifactId>
       <version>16.0</version>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.vaadin.addons</groupId>
+      <artifactId>cssinject</artifactId>
+      <version>2.0.3</version>
     </dependency>
   </dependencies>
 

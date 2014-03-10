@@ -143,6 +143,12 @@
       <artifactId>jetty-websocket</artifactId>
       <version>8.1.14.v20131031</version>
     </dependency>
+    
+    <dependency>
+      <groupId>javax.servlet.jsp</groupId>
+      <artifactId>jsp-api</artifactId>
+      <version>2.2</version>
+    </dependency>
   </dependencies>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>

@@ -29,7 +29,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Base class for all iframe visualizer plugins
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 public abstract class AbstractIFrameVisualizer extends AbstractVisualizer implements ResourcePlugin

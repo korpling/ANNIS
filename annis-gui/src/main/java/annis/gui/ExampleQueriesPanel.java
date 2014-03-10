@@ -400,7 +400,6 @@ public class ExampleQueriesPanel extends Table
         {
           ControlPanel controlPanel = ui.getControlPanel();
           QueryPanel queryPanel;
-          QueryController qController;
 
           if (controlPanel == null)
           {

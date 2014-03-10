@@ -143,7 +143,7 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 
 short name| Description | Java class | Screenshot
 ----------|-------------|------------|-----------
-`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.KWICPanel) | ![kwic](kwic_vis.png)
+`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.kwic.KWICVisualizer) | ![kwic](kwic_vis.png)
 `tree` | constituent syntax tree | [TigerTreeVisualizer](@ref annis.visualizers.component.tree.TigerTreeVisualizer) | ![tree](tiger_tree_vis.png)
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
 `grid_tree` | a grid visualizing hierarchical tree annotations as ordered grid layers | [GridTreeVisualizer](@ref annis.visualizers.iframe.gridtree.GridTreeVisualizer ) | ![grid_tree](grid_tree_vis.png)
@@ -176,10 +176,7 @@ path (check this by calling e.g. the program `dot` on the command line).
 
 The default configuration for the document browser is stored in the
 `annis-service.properties` file. It can be overwritten by the
-`corpus.properties` file. Available keys:
-
-	browse-documents=true|false
-	browse-document-visualizers= {...}
+`document-browser.json` file.
 
 Note that the `browse-documents` configuration has only an effect,
 when it is set within `corpus.properties`.
@@ -189,8 +186,10 @@ when it is set within `corpus.properties`.
 The ANNIS importer tries to detect an artificial token
 segmentation. If the text.tab contains only artificial token (which
 means there are only white spaces) the document browser is
-disabled. In the case there exists a corpus.properties file which
-configures the document browser it will never be disabled by ANNIS.
+disabled. In the case there exists a document-browser.json file which
+configures the document browser it will never be disabled by
+ANNIS. Also if in the `corpus.properties` the `browse-documents` prop
+is set to true, the document browser will stay active.
 
 ## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
@@ -201,17 +200,17 @@ each corpus.
 
 
 \code{.json}
-	browse-document-visualizers = vis : [
-		{type : 'htmldoc', displayName : 'diplomatic view'},
-		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
-	],
-	metaDataColumns : [
-		{namespace : 'annis', name : 'Genre'} // optional
-	],
-	orderBy : [
-		{ namespace : 'annis', name :'Titel', ascending : 'false'}
-	]
-
+	{
+		vis : [
+		    {type : 'htmldoc', displayName : 'diplomatic view'},
+		    {type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
+		    ],
+		metaDataColumns : [
+				{namespace : 'annis', name : 'Genre'} // optional
+                    ],
+		orderBy : [
+			{namespace : 'annis', name :'Titel', ascending : 'false'}		     ]
+	}
 \endcode
 
 Explanation in detail:
@@ -260,7 +259,7 @@ und is reachable under the defined link in the instance config:
 \code{.css}
 
 @font-face {
-  font-family: 'bar;
+  font-family: 'bar';
   font-style: normal;
   font-weight: normal;
   font-size: larger;

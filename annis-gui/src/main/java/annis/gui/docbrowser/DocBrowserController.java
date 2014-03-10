@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.service.objects.JSONSerializable;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
@@ -171,10 +172,13 @@ public class DocBrowserController implements Serializable
 
     try
     {
+      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
+      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
       if (isUsingRawText)
       {
         WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext").path(corpus).path(docName);
+        w = w.path("query").path("rawtext")
+          .path(encodedToplevelCorpus).path(encodedDocument);
         RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
         input.setRawText(rawTextWrapper);
       }
@@ -183,12 +187,10 @@ public class DocBrowserController implements Serializable
         // get the whole document wrapped in a salt project
         SaltProject txt = null;
 
-        String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
-        docName = URLEncoder.encode(docName, "UTF-8");
         WebResource annisResource = Helper.getAnnisWebResource();
         txt = annisResource.path("query").path("graph").
-          path(topLevelCorpusName).
-          path(docName).get(SaltProject.class);
+          path(encodedToplevelCorpus).
+          path(encodedDocument).get(SaltProject.class);
 
         if (txt != null)
         {
@@ -346,10 +348,23 @@ public class DocBrowserController implements Serializable
 
       if (corpusConfig != null)
       {
-        return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
-          "true"));
+        if (corpusConfig.containsKey("browse-documents"))
+        {
+          return Boolean.
+            parseBoolean(corpusConfig.getConfig("browse-documents"));
+        }
+
+        // get the default config
+        else
+        {
+          corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
+          boolean browseDocuments = Boolean.parseBoolean(
+            corpusConfig.getConfig("browse-documents", "true"));
+          return browseDocuments;
+        }
       }
     }
+
     return true;
   }
 }

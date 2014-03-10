@@ -40,4 +40,11 @@
     
     
     <set-configuration-property name="devModeRedirectEnabled" value="true" />
+    
+    <!-- optimize widget set -->
+    <generate-with class="OptimizedConnectorBundleLoaderFactory">
+      <when-type-assignable class="com.vaadin.client.metadata.ConnectorBundleLoader" />
+    </generate-with>
+
+    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
 </module>

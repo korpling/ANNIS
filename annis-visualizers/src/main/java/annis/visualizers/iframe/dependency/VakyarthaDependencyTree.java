@@ -61,7 +61,7 @@ import org.slf4j.LoggerFactory;
  * nodes which carry this annotation are searched for pointing relations and
  * instead token the annotation value is used.
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
  * @author Kim Gerdes
  */
@@ -287,12 +287,12 @@ public class VakyarthaDependencyTree extends WriterVisualizer
       println("</script>", writer);
 
       println("</head>", writer);
-      println("<body>", writer);
+      println("<body id=\"holder\">", writer);
 
       // the div to render the javascript to
-      println(
-        "<div id=\"holder\" style=\"background:white; position:relative;\"> </div>", 
-        writer);
+//      println(
+//        "<div id=\"holder\"> </div>", 
+//        writer);
 
       println("</body>", writer);
       println("</html>", writer);
