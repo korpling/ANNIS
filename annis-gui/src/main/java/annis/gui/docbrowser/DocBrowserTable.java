@@ -20,8 +20,8 @@ import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -31,7 +31,6 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -40,6 +39,8 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -121,11 +122,11 @@ public class DocBrowserTable extends Table
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
       List<String> pathList = a.getAnnotationPath();
-      if(pathList == null)
+      if (pathList == null)
       {
         pathList = new LinkedList<String>();
       }
-     
+
       Collections.reverse(pathList);
       String path = StringUtils.join(pathList, " > ");
 
@@ -190,7 +191,7 @@ public class DocBrowserTable extends Table
 
     try
     {
-      if(docVisualizerConfig == null)
+      if (docVisualizerConfig == null)
       {
         return metaColumns;
       }
@@ -296,16 +297,39 @@ public class DocBrowserTable extends Table
 
           List<Annotation> annos = getDocMetaData(docName);
 
+          /**
+           * Transforms to a list of key value pairs. The values concates the
+           * namespace and ordinary value. Namespaces "NULL" are ignored.
+           */
           // create datasource and bind it to a table
-          BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
-            Annotation.class, annos);
+          IndexedContainer container = new IndexedContainer();
+          container.addContainerProperty("key", String.class, "");
+          container.addContainerProperty("value", String.class, "");
+
+          for (Annotation a : annos)
+          {
+            String key = a.getQualifiedName();
+            String value = a.getValue();
+            Item row = container.addItem(key);
+            row.getItemProperty("key").setValue(key);
+            row.getItemProperty("value").setValue(value);
+          }
+
           Table metaTable = new Table();
-          metaTable.setContainerDataSource(dataSource);
+          metaTable.setContainerDataSource(container);
+
+          metaTable.sort(new Object[]
+          {
+            "key"
+          }, new boolean[]
+          {
+            true
+          });
 
           // style the table
           metaTable.setVisibleColumns(new Object[]
           {
-            "name", "value"
+            "key", "value"
           });
           metaTable.setColumnHeaders("name", "value");
           metaTable.setSizeFull();
@@ -445,7 +469,7 @@ public class DocBrowserTable extends Table
       // get the metadata of a specific doc
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
-          docBrowserPanel.getCorpus()).path("closure");
+        docBrowserPanel.getCorpus()).path("closure");
       docMetaDataCache.put(docBrowserPanel.getCorpus(),
         res.get(new Helper.AnnotationListType()));
     }
@@ -454,10 +478,10 @@ public class DocBrowserTable extends Table
 
     // filter the annotations
     for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
-    { 
-     if (a.getAnnotationPath() != null 
-       && !a.getAnnotationPath().isEmpty()
-       && a.getAnnotationPath().get(0).equals(document))
+    {
+      if (a.getAnnotationPath() != null
+        && !a.getAnnotationPath().isEmpty()
+        && a.getAnnotationPath().get(0).equals(document))
       {
         annos.add(a);
       }
@@ -469,7 +493,7 @@ public class DocBrowserTable extends Table
   private String generateCell(List<String> path, MetaDataCol metaDatum)
   {
     List<Annotation> metaData = new LinkedList<Annotation>();
-    if(path != null && !path.isEmpty())
+    if (path != null && !path.isEmpty())
     {
       metaData = getDocMetaData(path.get(0));
     }
