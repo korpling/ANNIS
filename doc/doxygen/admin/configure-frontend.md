@@ -192,8 +192,8 @@ properties is set to true, the document browser will stay active.
 ## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
 It is also possible to use a custom visualizer for browsing a whole
-document. The configuration is in JSON-Syntax and placed in the
-corpus.properties file, which can be add to the ExtData directory of
+document. The configuration is in JSON-Syntax file named
+document_browser.json, which can be add to the ExtData directory of
 each corpus.
 
 
