@@ -16,7 +16,6 @@
 package annis.dao;
 
 import annis.administration.BinaryImportHelper;
-import annis.dao.objects.AnnotatedMatch;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
@@ -33,7 +32,7 @@ import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.JSONSerializable;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -41,7 +40,6 @@ import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
-import org.codehaus.jettison.json.JSONObject;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 public interface AnnisDao
@@ -199,15 +197,15 @@ public interface AnnisDao
    *
    * @return A JSONObject which holds the configuration.
    */
-  public JSONSerializable getDocBrowserConfiguration(String topLevelCorpusName);
+  public DocumentBrowserConfig getDocBrowserConfiguration(String topLevelCorpusName);
 
   /**
    * Reads the document browser configuration which is configure system wide in
    * ${annis.home}/conf/document-browser.json
    *
-   * @return A JSONObject which holds the configuration.
+   * @return An pojo which holds the configuration.
    */
-  public JSONSerializable getDefaultDocBrowserConfiguration();
+  public DocumentBrowserConfig getDefaultDocBrowserConfiguration();
 
   public void setCorpusConfiguration(
     HashMap<Long, Properties> corpusConfiguration);

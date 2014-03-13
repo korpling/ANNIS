@@ -1,9 +1,9 @@
 {
-    vis: [
+    "visualizers": [
         {
-          type  : 'raw_text', 
-          displayName :  'full text', 
-          mappings : 'vertical:true'
+          "type"  : "raw_text", 
+          "displayName" :  "full text", 
+          "mappings" : "vertical:true"
         }
     ]
 }

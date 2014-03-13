@@ -19,7 +19,7 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.JSONSerializable;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -54,7 +54,6 @@ import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.CredentialsProvider;
 import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -527,47 +526,40 @@ public class Helper
     return result;
   }
 
-  public static JSONSerializable getDocBrowserConfig(String corpus)
+  public static DocumentBrowserConfig getDocBrowserConfig(String corpus)
   {
-    JSONSerializable docBrowserConfig = null;
-
     try
     {
-      String js = Helper.getAnnisWebResource().path("query")
+      DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query")
         .path("corpora").path("doc_browser_config")
         .path(URLEncoder.encode(corpus, "UTF-8"))
-        .get(String.class);
-
-      docBrowserConfig = new JSONSerializable(js);
+        .get(DocumentBrowserConfig.class);
+      
+      return docBrowserConfig;
     }
     catch (UnsupportedEncodingException ex)
     {
       new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
         ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true)
-        .show(Page.getCurrent());
+        true).show(Page.getCurrent());
+      log.error("problems with fetching document browsing", ex);
     }
     catch (UniformInterfaceException ex)
     {
       new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
         ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
         true).show(Page.getCurrent());
+      log.error("problems with fetching document browsing", ex);
     }
     catch (ClientHandlerException ex)
     {
       new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
         ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true)
-        .show(Page.getCurrent());
-    }
-    catch (JSONException ex)
-    {
-      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
-        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
         true).show(Page.getCurrent());
-    }
+      log.error("problems with fetching document browsing", ex);
+    }    
 
-    return docBrowserConfig;
+    return null;
   }
 
   /**

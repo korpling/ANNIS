@@ -15,12 +15,14 @@
  */
 package annis.gui.docbrowser;
 
-import annis.service.objects.JSONSerializable;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Visualizer;
+import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -32,7 +34,6 @@ import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.List;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,9 +52,6 @@ public class DocBrowserPanel extends Panel
   private String corpus;
 
   private DocBrowserTable table;
-
-  // the key for the json config of the doc visualization
-  private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
 
   private Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
 
@@ -99,36 +97,7 @@ public class DocBrowserPanel extends Panel
     }
   }
 
-  /**
-   * Normally get the page size from annis-service.properties for the paging
-   * component. If something went wrong this value or the amount of documents
-   * within the corpus is used:
-   *
-   * <code>min(configValue, min(pageSize, amountOf(documents)))</code>
-   *
-   * @param docSize The amount of documents with this corpus.
-   *
-   * @return the page size, which is never bigger than the doc size.
-   */
-  public int getPageSize(int docSize)
-  {
-    int result = Math.min(PAGE_SIZE, docSize);
-    try
-    {
-      result = Math.min(result, getDocBrowserConfig().getInt(
-        "pageSize"));
-    }
-    catch (JSONException ex)
-    {
-      log.warn(
-        "cannot read the docvisualizer pageSize, so it's set to " + PAGE_SIZE,
-        ex);
-
-    }
-    return result;
-  }
-
-  public JSONSerializable getDocBrowserConfig()
+  public DocumentBrowserConfig getDocBrowserConfig()
   {
     return Helper.getDocBrowserConfig(corpus);
   }
@@ -146,7 +115,7 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc, JSONSerializable config, Button btn)
+  public void openVis(String doc, Visualizer config, Button btn)
   {
     ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
