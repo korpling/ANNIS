@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2014 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,28 +13,39 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+
 package annis.service.objects;
 
-import java.io.Serializable;
-import org.json.JSONException;
-import org.json.JSONObject;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class JSONSerializable extends JSONObject implements Serializable
-{
+@XmlRootElement
+public class OrderBy extends MetaDataColumn {
 
-  private static final long serialVersionUID = 1L;
+  boolean ascending;
 
-  public JSONSerializable(String source) throws JSONException
+  public OrderBy()
   {
-    super(source);
+
   }
 
-  public JSONSerializable(JSONObject o) throws JSONException
+  /**
+   * @return the ascending
+   */
+  public boolean isAscending()
   {
-    super(o.toString());
+    return ascending;
   }
+
+  /**
+   * @param ascending the ascending to set
+   */
+  public void setAscending(boolean ascending)
+  {
+    this.ascending = ascending;
+  }
+
 }

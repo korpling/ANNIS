@@ -30,7 +30,7 @@ import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.JSONSerializable;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.AnnotateSqlGenerator;
@@ -90,6 +90,9 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.UUID;
 import org.apache.commons.io.IOUtils;
+import org.codehaus.jackson.map.DeserializationConfig;
+import org.codehaus.jackson.map.JsonMappingException;
+import org.codehaus.jackson.map.ObjectMapper;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +138,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private int timeout;
 
   //Caches the document browser configuration.
-  private JSONSerializable documentBrowserConfig = null;
+  private DocumentBrowserConfig documentBrowserConfig = null;
 
   @Override
   @Transactional
@@ -377,7 +380,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public JSONSerializable getDocBrowserConfiguration(String topLevelCorpusName)
+  public DocumentBrowserConfig getDocBrowserConfiguration(String topLevelCorpusName)
   {
 
     if (documentBrowserConfig != null)
@@ -395,7 +398,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(binaryComplete, stringWriter, "utf-8");
-        documentBrowserConfig = new JSONSerializable(stringWriter.toString());
+
+        // map json to pojo
+        ObjectMapper objectMapper = new ObjectMapper();
+        documentBrowserConfig = objectMapper.readValue(
+          stringWriter.toString(), DocumentBrowserConfig.class);
       }
       catch (IOException ex)
       {
@@ -414,7 +421,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  public JSONSerializable getDefaultDocBrowserConfiguration()
+  public DocumentBrowserConfig getDefaultDocBrowserConfiguration()
   {
 
       InputStream input = null;
@@ -422,20 +429,16 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
         input = new FileInputStream(path);
-        StringWriter stringWriter = new StringWriter();
-        IOUtils.copy(input, stringWriter, "utf-8");
-        return new JSONSerializable(stringWriter.toString());
+
+         // map json to pojo
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
+        return objectMapper.readValue(input, DocumentBrowserConfig.class);
       }
       catch (FileNotFoundException ex)
       {
         log.error(
           "file \"${annis.home}/conf/document-browser.json\" does not exists",
-          ex);
-      }
-      catch (org.json.JSONException ex)
-      {
-        log.error(
-          "probably syntax error in ${annis.home}/conf/document-browser.json",
           ex);
       }
       catch (IOException ex)

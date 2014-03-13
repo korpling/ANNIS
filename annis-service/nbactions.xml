@@ -5,9 +5,9 @@
             <goals>
                 <goal>install</goal>
             </goals>
-            <properties>
+<!--            <properties>
                 <maven.test.skip>true</maven.test.skip>
-            </properties>
+            </properties>-->
         </action>
         <action>
             <actionName>rebuild</actionName>
@@ -15,9 +15,9 @@
                 <goal>clean</goal>
                 <goal>install</goal>
             </goals>
-            <properties>
+<!--            <properties>
                 <maven.test.skip>true</maven.test.skip>
-            </properties>
+            </properties>-->
         </action>
         <action>
             <actionName>run</actionName>

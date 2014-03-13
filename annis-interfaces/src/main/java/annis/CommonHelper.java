@@ -433,7 +433,7 @@ public class CommonHelper
   public static SDocument readSDocument(ObjectInputStream in) 
     throws IOException
   {
-     XMIResourceImpl res = new XMIResourceImpl();
+    XMIResourceImpl res = new XMIResourceImpl();
     res.load(in, res.getDefaultLoadOptions());
     
     

@@ -35,7 +35,7 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
-import annis.service.objects.JSONSerializable;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
@@ -1213,16 +1213,16 @@ public class QueryServiceImpl implements QueryService
 
   @GET
   @Path("corpora/doc_browser_config/{corpus}")
-  @Produces(MediaType.APPLICATION_JSON)
-  public String getDocumentBrowserConfig(
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public DocumentBrowserConfig getDocumentBrowserConfig(
     @PathParam("corpus") String corpus)
   {
-    JSONSerializable config = annisDao.getDocBrowserConfiguration(corpus);
+    DocumentBrowserConfig config = annisDao.getDocBrowserConfiguration(corpus);
     if(config == null)
     {
       config = annisDao.getDefaultDocBrowserConfiguration();
-
     }
-      return (config != null) ? config.toString() : null;
+
+    return (config != null) ? config : null;
   }
 }

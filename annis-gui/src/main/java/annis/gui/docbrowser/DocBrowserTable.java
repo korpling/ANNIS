@@ -15,12 +15,14 @@
  */
 package annis.gui.docbrowser;
 
-import annis.service.objects.JSONSerializable;
 import annis.libgui.Helper;
 import annis.model.Annotation;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.MetaDataColumn;
+import annis.service.objects.OrderBy;
+import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
@@ -39,10 +41,6 @@ import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,25 +58,11 @@ public class DocBrowserTable extends Table
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
-  // the key for the visualizer json array list
-  public final String VIS_CONFIG_KEY = "vis";
-
   /**
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
-  private JSONSerializable docVisualizerConfig;
-
-  // the key for the meta cols, which are generated in the main table
-  private final String VIS_META_DATA_COLUMNS = "metaDataColumns";
-
-  // the key for the meta data namespace
-  public final String VIS_META_CONFIG_NAMESPACE = "namespace";
-
-  // the key for the meta data name
-  private final String VIS_META_CONFIG_NAME = "name";
-
-  private final String ORDER_BY = "orderBy";
+  private DocumentBrowserConfig docVisualizerConfig;
 
   // cache for doc meta data
   private final Map<String, List<Annotation>> docMetaDataCache;
@@ -189,74 +173,30 @@ public class DocBrowserTable extends Table
 
     MetaColumns metaColumns = new MetaColumns();
 
-    try
+    if (docVisualizerConfig == null)
     {
-      if (docVisualizerConfig == null)
+      return metaColumns;
+    }
+
+    if (docVisualizerConfig.getMetaDataColumns() != null)
+    {
+      MetaDataColumn[] metaDataCols = docVisualizerConfig.getMetaDataColumns();
+      for (MetaDataColumn metaDataCol : metaDataCols)
       {
-        return metaColumns;
-      }
-
-      if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
-      {
-        JSONArray metaArray = docVisualizerConfig.getJSONArray(
-          VIS_META_DATA_COLUMNS);
-
-        for (int i = 0; i < metaArray.length(); i++)
-        {
-          JSONSerializable c = new JSONSerializable(metaArray.getJSONObject(i));
-          String namespace = null;
-          String name = null;
-
-          if (c.has(VIS_META_CONFIG_NAMESPACE))
-          {
-            namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
-          }
-
-          if (c.has(VIS_META_CONFIG_NAME))
-          {
-            name = c.getString(VIS_META_CONFIG_NAME);
-          }
-
-          metaColumns.visibleColumns.add(new MetaDataCol(namespace, name));
-        }
-
-      }
-
-      if (docVisualizerConfig.has(ORDER_BY))
-      {
-
-        JSONArray sortColumns = docVisualizerConfig.getJSONArray(ORDER_BY);
-
-        for (int i = 0; i < sortColumns.length(); i++)
-        {
-          JSONSerializable c = new JSONSerializable(sortColumns.getJSONObject(i));
-          String nameSpace = null;
-          String name = null;
-          boolean ascending = true;
-
-          if (c.has(VIS_META_CONFIG_NAMESPACE))
-          {
-            nameSpace = c.getString(VIS_META_CONFIG_NAMESPACE);
-          }
-
-          if (c.has(VIS_META_CONFIG_NAME))
-          {
-            name = c.getString(VIS_META_CONFIG_NAME);
-          }
-
-          if (c.has("ascending"))
-          {
-            ascending = c.getBoolean("ascending");
-          }
-
-          metaColumns.sortColumns.add(
-            new MetaDataCol(nameSpace, name, ascending));
-        }
+        metaColumns.visibleColumns.add(new MetaDataCol(metaDataCol.
+          getNamespace(),
+          metaDataCol.getName()));
       }
     }
-    catch (JSONException ex)
+
+    if (docVisualizerConfig.getOrderBy() != null)
     {
-      log.error("cannot retrieve meta array from doc visualizer config", ex);
+      OrderBy[] orderBys = docVisualizerConfig.getOrderBy();
+      for (OrderBy orderBy : orderBys)
+      {
+        metaColumns.sortColumns.add(new MetaDataCol(orderBy.getNamespace(),
+          orderBy.getName(), orderBy.isAscending()));
+      }
     }
 
     return metaColumns;
@@ -396,27 +336,20 @@ public class DocBrowserTable extends Table
     Panel p = new Panel();
     VerticalLayout l = new VerticalLayout();
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    try
-    {
-      JSONArray configArray = docVisualizerConfig.getJSONArray(VIS_CONFIG_KEY);
 
-      for (int i = 0; i < configArray.length(); i++)
-      {
-        JSONSerializable config = new JSONSerializable(configArray.
-          getJSONObject(i));
-        Button openVis = new Button(config.getString("displayName"));
-        openVis.setDescription(
-          "open visualizer with the full text of " + docName);
-        openVis.addClickListener(new OpenVisualizerWindow(docName, config,
-          openVis));
-        openVis.setStyleName(BaseTheme.BUTTON_LINK);
-        openVis.setDisableOnClick(true);
-        l.addComponent(openVis);
-      }
-    }
-    catch (JSONException ex)
+    Visualizer[] visualizers = docVisualizerConfig.
+      getVisualizers();
+
+    for (Visualizer visualizer : visualizers)
     {
-      log.error("cannnot retrieve json object", ex);
+      Button openVis = new Button(visualizer.getDisplayName());
+      openVis.setDescription(
+        "open visualizer with the full text of " + docName);
+      openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
+        openVis));
+      openVis.setStyleName(BaseTheme.BUTTON_LINK);
+      openVis.setDisableOnClick(true);
+      l.addComponent(openVis);
     }
 
     p.setContent(l);
@@ -434,11 +367,11 @@ public class DocBrowserTable extends Table
 
     private String docName;
 
-    private JSONSerializable config;
+    private Visualizer config;
 
     private final Button button;
 
-    public OpenVisualizerWindow(String docName, JSONSerializable config,
+    public OpenVisualizerWindow(String docName, Visualizer config,
       Button btn)
     {
       this.button = btn;
@@ -449,7 +382,6 @@ public class DocBrowserTable extends Table
     @Override
     public void buttonClick(Button.ClickEvent event)
     {
-
       docBrowserPanel.openVis(docName, config, button);
     }
   }
