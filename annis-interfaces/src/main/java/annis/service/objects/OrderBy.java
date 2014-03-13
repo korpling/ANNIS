@@ -23,9 +23,13 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
-public class OrderBy extends MetaDataColumn {
+public class OrderBy {
 
-  boolean ascending;
+  private boolean ascending;
+
+  private String namespace;
+
+  private String name;
 
   public OrderBy()
   {
@@ -46,6 +50,38 @@ public class OrderBy extends MetaDataColumn {
   public void setAscending(boolean ascending)
   {
     this.ascending = ascending;
+  }
+
+  /**
+   * @return the namespace
+   */
+  public String getNamespace()
+  {
+    return namespace;
+  }
+
+  /**
+   * @param namespace the namespace to set
+   */
+  public void setNamespace(String namespace)
+  {
+    this.namespace = namespace;
+  }
+
+  /**
+   * @return the name
+   */
+  public String getName()
+  {
+    return name;
+  }
+
+  /**
+   * @param name the name to set
+   */
+  public void setName(String name)
+  {
+    this.name = name;
   }
 
 }
