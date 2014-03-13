@@ -175,21 +175,19 @@ path (check this by calling e.g. the program `dot` on the command line).
 # Document Browser # {#document-visualizer}
 
 The default configuration for the document browser is stored in the
-`annis-service.properties` file. It can be overwritten by the
-`document-browser.json` file.
-
-Note that the `browse-documents` configuration has only an effect,
-when it is set within `corpus.properties`.
+`conf/document_browser.json` file. It can be overwritten by a custom
+the `document_browser.json` file placed in the `ExtData` directory of
+a corpus.
 
 ## automatic switch on/off ##
 
 The ANNIS importer tries to detect an artificial token
 segmentation. If the text.tab contains only artificial token (which
 means there are only white spaces) the document browser is
-disabled. In the case there exists a document-browser.json file which
-configures the document browser it will never be disabled by
-ANNIS. Also if in the `corpus.properties` the `browse-documents` prop
-is set to true, the document browser will stay active.
+disabled. In the case there exists a `document_browser.json` file
+which configures the document browser it will never be disabled by
+ANNIS. Also if in the `corpus.properties` the `browse-documents`
+properties is set to true, the document browser will stay active.
 
 ## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
@@ -200,23 +198,37 @@ each corpus.
 
 
 \code{.json}
+{
+    "visualizers": [
+        {
+            "type"  : "raw_text",
+            "displayName" :  "full text",
+            "mappings" : "vertical:true"
+        }
+    ],
+
+    "metaDataColumns" : [
 	{
-		vis : [
-		    {type : 'htmldoc', displayName : 'diplomatic view'},
-		    {type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
-		    ],
-		metaDataColumns : [
-				{namespace : 'annis', name : 'Genre'} // optional
-                    ],
-		orderBy : [
-			{namespace : 'annis', name :'Titel', ascending : 'false'}		     ]
+	    "namespace" : "annis",
+	    "name" : "Genre"
 	}
+    ],
+
+    "orderBy" : [
+	{
+	    "namespace" : "annis",
+	    "name" :"Titel",
+	    "ascending" : "false"}
+    ]
+}
+
 \endcode
 
 Explanation in detail:
 
-* vis: All visualizer from the list above with the suffix "doc" in
-  their name are suitable for using as doc visualizer.
+* visualizers: Defines which document visualizers are available for a
+   corpus. All visualizer from the list above with the suffix "doc" in
+   their name are suitable for using as doc visualizer.
 
 * metaDataColumns (optional): For every defined metadata object an
   additional column is generated with the metadata key as column
