@@ -137,9 +137,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   // configuration
   private int timeout;
 
-  //Caches the document browser configuration.
-  private DocumentBrowserConfig documentBrowserConfig = null;
-
   @Override
   @Transactional
   public SaltProject graph(QueryData data)
@@ -383,11 +380,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public DocumentBrowserConfig getDocBrowserConfiguration(String topLevelCorpusName)
   {
 
-    if (documentBrowserConfig != null)
-    {
-      return documentBrowserConfig;
-    }
-
     // try to get the corpus wise configuration
     InputStream binaryComplete = getBinaryComplete(topLevelCorpusName,
       "application/json", "document_browser.json");
@@ -401,8 +393,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
         // map json to pojo
         ObjectMapper objectMapper = new ObjectMapper();
-        documentBrowserConfig = objectMapper.readValue(
+        DocumentBrowserConfig documentBrowserConfig = objectMapper.readValue(
           stringWriter.toString(), DocumentBrowserConfig.class);
+        return documentBrowserConfig;
       }
       catch (IOException ex)
       {
@@ -417,7 +410,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       return getDefaultDocBrowserConfiguration();
     }
 
-    return documentBrowserConfig;
+    return null;
   }
 
   @Override
