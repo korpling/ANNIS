@@ -91,7 +91,6 @@ import java.util.TreeMap;
 import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import org.slf4j.Logger;
@@ -402,10 +401,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         log.error("cannot read the document_browser.json file", ex);
       }
 
-      catch (org.json.JSONException ex)
-      {
-        log.error("probably syntax error in document_browser.json file", ex);
-      }
+      
     } else {
       return getDefaultDocBrowserConfiguration();
     }
