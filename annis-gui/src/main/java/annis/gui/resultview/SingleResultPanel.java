@@ -86,7 +86,7 @@ public class SingleResultPanel extends CssLayout implements
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
     "info.gif");
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 
