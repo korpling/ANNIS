@@ -16,6 +16,7 @@
 
 package annis.service.objects;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -23,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
-public class Visualizer {
+public class Visualizer implements Serializable {
 
   private String type;
 
