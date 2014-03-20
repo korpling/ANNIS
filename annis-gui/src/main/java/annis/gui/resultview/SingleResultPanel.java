@@ -830,6 +830,9 @@ public class SingleResultPanel extends CssLayout implements
       }
     }
 
+    minMax.min++;
+    minMax.max++;
+    
     return minMax;
   }
 
