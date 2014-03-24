@@ -446,9 +446,14 @@ public class VisualizerPanel extends CssLayout
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
       // run the actual code to load the visualizer
       PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(callback));
+        new BackgroundJob(future, callback));
 
     } // end if create input was needed
 
@@ -578,19 +583,19 @@ public class VisualizerPanel extends CssLayout
   private class BackgroundJob implements Runnable
   {
 
+    private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
 
-    public BackgroundJob(LoadableVisualizer.Callback callback)
+    public BackgroundJob(
+      Future<Component> future, LoadableVisualizer.Callback callback)
     {
+      this.future = future;
       this.callback = callback;
     }
 
     @Override
     public void run()
     {
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
 
       Throwable exception = null;
       try
