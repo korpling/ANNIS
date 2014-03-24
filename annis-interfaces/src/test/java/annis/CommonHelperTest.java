@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package annis.libgui.visualizers;
+package annis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -31,15 +31,16 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import static org.junit.Assert.*;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class VisualizerInputTest
+public class CommonHelperTest
 {
   
-  public VisualizerInputTest()
+  public CommonHelperTest()
   {
   }
   
@@ -64,30 +65,33 @@ public class VisualizerInputTest
   }
 
   @Test
-  public void testSerializationOfSDocument() throws IOException, ClassNotFoundException
+  public void testEmbeddedSerializationOfSDocument() throws IOException, ClassNotFoundException
   {
     SaltProject project = SampleGenerator.createCompleteSaltproject();
     SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
     
-    VisualizerInput visInput = new VisualizerInput();
-    visInput.setDocument(doc);
-    visInput.setContextPath("anypath");
     
     File tmpFile = File.createTempFile("testSingeResultPanel", ".salt");
     FileOutputStream fOut = new FileOutputStream(tmpFile);
     ObjectOutputStream oOut = new ObjectOutputStream(fOut);
     
-    oOut.writeObject(visInput);
+    int firstObject = 567;
+    int lastObject = 1234;
+    
+    oOut.writeInt(firstObject);
+    CommonHelper.writeSDocument(doc, oOut);
+    oOut.writeInt(lastObject);
     oOut.close();
     
     FileInputStream fIn = new FileInputStream(tmpFile);
     ObjectInputStream oIn = new ObjectInputStream(fIn);
     
-    VisualizerInput restored = (VisualizerInput) oIn.readObject();
+    Assert.assertEquals(firstObject, oIn.readInt());
+    SDocument restored = CommonHelper.readSDocument(oIn);
     
-    // compare
-    Assert.assertTrue(doc.equals(restored.getDocument()));
-    Assert.assertEquals("anypath", restored.getContextPath());
+    Assert.assertTrue(doc.equals(restored));
+    
+    Assert.assertEquals(lastObject, oIn.readInt());
   }
   
   
