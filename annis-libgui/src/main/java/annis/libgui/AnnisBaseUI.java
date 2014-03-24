@@ -60,7 +60,6 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.vaadin.cssinject.CSSInject;
 /**
  * Basic UI functionality.
  * 
@@ -509,9 +508,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-      CSSInject cssInject = new CSSInject(UI.getCurrent());
-      cssInject.setStyles(cssContent);
-//      Page.getCurrent().getStyles().add(cssContent);
+//      CSSInject cssInject = new CSSInject(UI.getCurrent());
+//      cssInject.setStyles(cssContent);
+      Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
   }

@@ -46,5 +46,5 @@
       <when-type-assignable class="com.vaadin.client.metadata.ConnectorBundleLoader" />
     </generate-with>
 
-    <inherits name="org.vaadin.cssinject.Cssinject_addonWidgetset" />
+    
 </module>

@@ -62,7 +62,6 @@ public class OptimizedConnectorBundleLoaderFactory extends
     eagerConnectors.add(
       org.vaadin.hene.popupbutton.widgetset.client.ui.PopupButtonConnector.class.
       getName());
-    eagerConnectors.add(org.vaadin.cssinject.client.CSSInjectConnector.class.getName());
   }
 
   @Override
