@@ -369,7 +369,7 @@ public class ExportPanel extends FormLayout
         }
 
         exportFuture = PollControl.callInBackground(1000, null,
-          new BackgroundJob(exporter));
+          new BackgroundJob(exporter, UI.getCurrent()));
         if (exportFuture != null)
         {
           if (exportTime == null)
@@ -404,10 +404,12 @@ public class ExportPanel extends FormLayout
   {
 
     private final Exporter exporter;
+    private final UI ui;
 
-    public BackgroundJob(Exporter exporter)
+    public BackgroundJob(Exporter exporter, UI ui)
     {
       this.exporter = exporter;
+      this.ui = ui;
     }
 
     @Override
@@ -436,7 +438,7 @@ public class ExportPanel extends FormLayout
       {
         outWriter.close();
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
