@@ -109,6 +109,7 @@ public class FrequencyResultPanel extends VerticalLayout
     chart = new FrequencyChart(this);
     chart.setHeight("350px");
     chart.setVisible(false);
+    chart.addStyleName("corpus-font-force");
     addComponent(chart);
     
     
@@ -266,6 +267,7 @@ public class FrequencyResultPanel extends VerticalLayout
     
     tblResult.setSelectable(true);
     tblResult.setMultiSelect(false);
+    tblResult.addStyleName("corpus-font-force");
     
     if(!table.getEntries().isEmpty())
     {
