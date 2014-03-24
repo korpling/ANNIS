@@ -1,0 +1,36 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+  <title>Frequency analysis in
+ANNIS - Search and Visualization in Multilevel Linguistic Corpora</title>
+  <link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+</head>
+<body>
+<div id="tutorialcontent">
+<h2>Frequency Analysis</h2>
+<p>
+To perform a frequency analysis, enter the query whose results you want to analyze as usual in the AQL box. Note that you <strong>do not need to carry out the query first</strong>. Next, open the menu “More” between the Search and History buttons and select “Frequency Analysis”:
+
+</p>
+<img src="export.png">
+<p>The interface will open the frequency analysis tab shown below. Initially, rows will be generated for the nodes present in the query. For example, two rows are automatically generated for the following query, which finds any pair of consecutive tokens: </p>
+<div class="indent">
+<tt>tok . tok</tt><br><br>
+</div>
+<img src="freq.png">
+
+<p>
+Clicking on “Perform frequency analysis” will produce a breakdown of all consecutive token bigrams in the corpus. The frequency graph will only show the first 500 elements, but the table below it will give the entire list of values, which can also be <strong>exported as a CSV file</strong>.
+</p>
+<img src="freq2.png">
+<p>
+To edit the analysis or analyze a new query, click the <strong>New Analysis</strong> button. It is also possible to <strong>add annotations</strong> to the analysis that were not in the original query, provided that these are expected to belong to some other node in the query. For example, the tokens in the pcc2 corpus also have part-of-speech, lemma and morphological information. We can replace the lines in the analysis specifying that tok values should be counted with pos values, which gives us part-of-speech bigrams. We can also add a lemma annotation belonging to the first search element, by clicking the Add button and entering the node definition number and annotation name we are interested in:
+</p>
+<img src="freq3.png">
+<p>
+As a result, we will get a count for each combination of values grouped by the first and second tokens parts-of-speech, as well as the first token’s lemma.
+</p>
+</div>
+</body>
+</html>

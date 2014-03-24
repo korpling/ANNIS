@@ -19,8 +19,10 @@ following query searches for two <tt>np_form</tt> annotations, which
 specify for example whether a nominal phrase is pronominal, definite
 or indefinite.
 </p>
-<tt>mmax:np_form="pper" & <br>mmax:np_form="defnp" & <br>#1
-->anaphor_antecedent #2</tt>
+	<div class="indent">
+	<tt>mmax:np_form="pper" & <br>mmax:np_form="defnp" & <br>#1
+	-&gt;anaphor_antecedent #2</tt>
+	</div>
 <p>
 Using the pointing relation operator <tt>-&gt;</tt> with the
 type <tt>anaphor_antecedent</tt>, the first <tt>np_form</tt>, which
@@ -46,7 +48,12 @@ be viewed by hovering of the appropriate underline.
 <p>
 Another way to use pointing relations is found in syntactic dependency trees. The queries in this case can use both pointing relation types and annotations, as in the following query:
 </p>
-<tt>pos="VVFIN" & tok & #1 ->dep[func="obja"] #2</tt>
+
+<div class="indent">
+<tt>pos="VVFIN" & tok & #1 -&gt;dep[func="obja"] #2</tt>
+<p>OR (using a shortcut):</p>
+<tt>pos="VVFIN" -&gt;dep[func="obja"] tok</tt>
+</div>
 
 <p>
 This query searches for a finite verb (with the part-of-speech VVFIN)
