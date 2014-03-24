@@ -84,7 +84,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   public final static String USER_LOGIN_ERROR = "annis.gui.AnnisBaseUI:USER_LOGIN_ERROR";
   public final static String CONTEXT_PATH = "annis.gui.AnnisBaseUI:CONTEXT_PATH";
   public final static String WEBSERVICEURL_KEY = "annis.gui.AnnisBaseUI:WEBSERVICEURL_KEY";
-  public final static String CSS_ADDED_KEY = "annis.gui.AnnisBaseUI:CSS_ADDED_KEY";
 
   public final static String CITATION_KEY = "annis.gui.AnnisBaseUI:CITATION_KEY";
 
@@ -102,7 +101,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   private transient ObjectMapper jsonMapper;
   
-//  private transient TreeSet<String> alreadyAddedCSS = new TreeSet<String>();<
+  private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
   
   @Override
@@ -119,7 +118,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
-    getSession().setAttribute(CSS_ADDED_KEY, null);
+    alreadyAddedCSS.clear();
     
     // get version of ANNIS
     ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
@@ -146,8 +145,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   {
     
     super.attach();
-    getSession().setAttribute(CSS_ADDED_KEY, null);
-
+    alreadyAddedCSS.clear();
   }
   
   
@@ -159,7 +157,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     {
       pluginManager.shutdown();
     }
-    super.close(); //To change body of generated methods, choose Tools | Templates.
+    super.close();
   }
   
   
@@ -498,11 +496,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    */
   public void injectUniqueCSS(String cssContent, String wrapperClass)
   {
-    TreeSet<String> alreadyAddedCSS = (TreeSet<String>) getSession().getAttribute(CSS_ADDED_KEY);
     if(alreadyAddedCSS == null)
     {
       alreadyAddedCSS = new TreeSet<String>(); 
-      getSession().setAttribute(CSS_ADDED_KEY, alreadyAddedCSS);
     }
     
     if(wrapperClass != null)
