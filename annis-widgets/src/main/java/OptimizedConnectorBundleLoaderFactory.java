@@ -17,7 +17,6 @@
 import java.util.HashSet;
 import java.util.Set;
 import com.google.gwt.core.ext.typeinfo.JClassType;
-import com.vaadin.client.ui.ui.UIConnector;
 import com.vaadin.server.widgetsetutils.ConnectorBundleLoaderFactory;
 import com.vaadin.shared.ui.Connect.LoadStyle;
 
