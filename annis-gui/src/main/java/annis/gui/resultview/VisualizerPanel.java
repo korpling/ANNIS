@@ -84,7 +84,7 @@ import org.slf4j.LoggerFactory;
 public class VisualizerPanel extends CssLayout
   implements Button.ClickListener, VisualizationToggle
 {
-  public static final long serialVersionUID = 1L;
+  public static final long serialVersionUID = 2L;
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
