@@ -453,7 +453,7 @@ public class VisualizerPanel extends CssLayout
       
       // run the actual code to load the visualizer
       PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(future, callback));
+        new BackgroundJob(future, callback, UI.getCurrent()));
 
     } // end if create input was needed
 
@@ -585,12 +585,14 @@ public class VisualizerPanel extends CssLayout
 
     private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
+    private final UI ui;
 
     public BackgroundJob(
-      Future<Component> future, LoadableVisualizer.Callback callback)
+      Future<Component> future, LoadableVisualizer.Callback callback, UI ui)
     {
       this.future = future;
       this.callback = callback;
+      this.ui = ui;
     }
 
     @Override
@@ -602,7 +604,7 @@ public class VisualizerPanel extends CssLayout
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
 
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -635,7 +637,7 @@ public class VisualizerPanel extends CssLayout
       if (exception != null)
       {
         final Throwable finalException = exception;
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()

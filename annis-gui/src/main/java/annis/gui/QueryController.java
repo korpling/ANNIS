@@ -381,7 +381,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     ui.getControlPanel().getSearchOptions()
       .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
         getCorpusList().
-        getSelectedCorpora());
+        getSelectedCorpora(), ui);
 
     // Since there is a serious lag when selecting the corpus don't update
     // the corpus fragment any longer.
