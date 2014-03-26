@@ -1,3 +1,45 @@
+Version 3.1.0
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=8&state=closed
+
+[Bugs]
+ #297 notification when export is finished will be given to wrong user
+ #295 browser fonts are broken
+ #292 Match position in segmentations should count from 1, not 0
+ #287 css styles from HTML vis are appended instead of replaced
+ #286 metadata not sorted and no namespaces in document browser
+ #284 Reference URL settings reset
+ #273 Display error message when importing empty corpora
+ #271 Search for empty values should be allowed
+ #270 RST-Visualizer sentence numbers are shifted by -2
+ #263 Inefficent subgraph retrievial
+ #261 Document Browser produces NullPointerException, if the same document name is added twice to the document table
+ #259 Workaround for bad statistics on partitioned tables in PostgreSQL
+ #254 Annis import overwrite flag does not work with Ridges corpus
+ #253 Kickstarter import dialog says "imported corpus xy", but is not.
+ #252 Corpus metadata display crashes on special characters in corpus name
+
+[Enhancements]
+ #289 Embedded fonts don't work in statistics output
+ #288 test and fix CommentHelper.readSDocument()
+ #281 Empty tokens trigger island visualization in KWIC
+ #280 Query builder operator behavior
+ #279 Islands may cause spans not covering any tokens in grid
+ #278 Empty space under arch dependency
+ #274 Configure the doc browser via a json file, not in the corpus.properties file
+ #269 Allow to abort exporters
+ #266 CSV exporter
+ #265 Hidden token annotations should be configurable corpus wide via the corpus.properties
+ #264 corpus.properties files should have a more meaningful name
+ #262 Annis import: measure progress in hours/minutes/seconds instead of milliseconds
+ #255 AQL shortcut: allow to write operators directly between node definitions
+ #250 Message for more that 500 bars in freq analysis
+
+[Other]
+ #267 MD5 passwords don't work any longer in 3.1.0-SNAPSHOT
+
+
 Version 3.0.1
 =============
 
