@@ -36,6 +36,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -794,6 +795,27 @@ public class Helper
     }
 
     return texts;
+  }
+  
+  /**
+   * Get the qualified name seperated by a single ":" when a namespace exists.
+   * @param anno
+   * @return 
+   */
+  public static String getQualifiedName(SAnnotation anno)
+  {
+    if(anno != null)
+    {
+      if(anno.getSNS() == null || anno.getSNS().isEmpty())
+      {
+        return anno.getSName();
+      }
+      else
+      {
+        return anno.getSNS() + ":" + anno.getSName();
+      }
+    }
+    return "";
   }
 
   /**

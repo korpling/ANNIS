@@ -579,9 +579,9 @@ public class ResultViewPanel extends VerticalLayout implements
 
     if (tokenAnnotationLevelSet != null)
     {
-      for (String a : tokenAnnotationLevelSet)
+      for (final String a : tokenAnnotationLevelSet)
       {
-        MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
         {
           @Override
           public void menuSelected(MenuItem selectedItem)
@@ -589,11 +589,11 @@ public class ResultViewPanel extends VerticalLayout implements
 
             if (selectedItem.isChecked())
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
+              tokenAnnoVisible.put(a, Boolean.TRUE);
             }
             else
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
+              tokenAnnoVisible.put(a, Boolean.FALSE);
             }
 
             setVisibleTokenAnnosVisible(getVisibleTokenAnnos());

@@ -18,6 +18,7 @@ package annis.visualizers.component.grid;
 import annis.CommonHelper;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
 import annis.libgui.PDFPageHelper;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
@@ -289,7 +290,7 @@ public class EventExtractor {
         String id = "event_" + eventCounter.incrementAndGet();
         GridEvent event = new GridEvent(id, left, right,
           anno.getSValueSTEXT());
-        event.setTooltip(anno.getQName());
+        event.setTooltip(Helper.getQualifiedName(anno));
 
         // check if the span is a matched node
         SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
