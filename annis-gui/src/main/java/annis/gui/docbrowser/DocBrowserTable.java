@@ -427,7 +427,7 @@ public class DocBrowserTable extends Table
     List<Annotation> metaData = new LinkedList<Annotation>();
     if (path != null && !path.isEmpty())
     {
-      metaData = getDocMetaData(path.get(0));
+      metaData = getDocMetaData(path.get(path.size()-1));
     }
 
     // lookup meta data

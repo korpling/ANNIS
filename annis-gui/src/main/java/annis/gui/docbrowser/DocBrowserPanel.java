@@ -134,7 +134,7 @@ public class DocBrowserPanel extends Panel
           + URLEncoder.encode(corpus, "UTF-8")).
           get(new Helper.AnnotationListType());
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -151,7 +151,7 @@ public class DocBrowserPanel extends Panel
       {
         log.
           error("UTF-8 encoding is not supported on server, this is weird", ex);
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
