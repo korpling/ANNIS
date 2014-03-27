@@ -85,7 +85,7 @@ public class DocBrowserController implements Serializable
   {
 
     final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + visConfig.
-      getType();
+      getDisplayName();
     final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
     if (visibleVisHolder.containsKey(canonicalTitle))
