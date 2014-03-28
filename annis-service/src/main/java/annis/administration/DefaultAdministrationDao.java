@@ -1150,27 +1150,31 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void cleanupData()
   {
     
-    List<String> allFilesList = jdbcTemplate.queryForList(
+    List<String> allFilesInDatabaseList = jdbcTemplate.queryForList(
         "SELECT filename FROM media_files AS m", String.class);
     
     File dataDir = getRealDataDir();
     
-    Set<File> allFiles = new HashSet<File>();
-    for(String singleFileName : allFilesList)
+    Set<File> allFilesInDatabase = new HashSet<File>();
+    for(String singleFileName : allFilesInDatabaseList)
     {
-      allFiles.add(new File(dataDir, singleFileName));
+      allFilesInDatabase.add(new File(dataDir, singleFileName));
     }
     
     
     log.info("Cleaning up the data directory");
     // go through each file of the folder and check if it is not included
-    for(File f : dataDir.listFiles())
+    File[] childFiles = dataDir.listFiles();
+    if(childFiles != null)
     {
-      if(f.isFile() && !allFiles.contains(f))
+      for(File f : childFiles)
       {
-        if(!f.delete())
+        if(f.isFile() && !allFilesInDatabase.contains(f))
         {
-          log.warn("Could not delete {}", f.getAbsolutePath());
+          if(!f.delete())
+          {
+            log.warn("Could not delete {}", f.getAbsolutePath());
+          }
         }
       }
     }
