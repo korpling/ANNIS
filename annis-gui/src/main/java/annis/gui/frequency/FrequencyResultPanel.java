@@ -109,7 +109,6 @@ public class FrequencyResultPanel extends VerticalLayout
     chart = new FrequencyChart(this);
     chart.setHeight("350px");
     chart.setVisible(false);
-    chart.addStyleName("corpus-font-force");
     addComponent(chart);
     
     
@@ -123,6 +122,7 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
     btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
     
+    final UI ui = UI.getCurrent();
     // actually start query
     Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
     {
@@ -131,7 +131,7 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         final FrequencyTable t = loadBeans();
         
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
 
           @Override

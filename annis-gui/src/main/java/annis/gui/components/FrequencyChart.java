@@ -15,12 +15,14 @@
  */
 package annis.gui.components;
 
+import annis.gui.SearchUI;
 import annis.gui.frequency.FrequencyResultPanel;
+import annis.libgui.InstanceConfig;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.data.Property;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
@@ -79,9 +81,20 @@ public class FrequencyChart extends VerticalLayout
 
   public void setFrequencyData(FrequencyTable table)
   {
+    String font = "sans-serif";
+    UI ui = UI.getCurrent();
+    if(ui instanceof SearchUI)
+    {
+      InstanceConfig cfg = ((SearchUI) ui).getInstanceConfig();
+      if(cfg != null && cfg.getFont() != null)
+      {
+        font = cfg.getFont().getName();
+      }
+    }
+    
     lastTable = table;
     whiteboard.setFrequencyData(table, (FrequencyWhiteboard.Scale) options.
-      getValue());
+      getValue(), font);
   }
 
   /**
@@ -96,12 +109,13 @@ public class FrequencyChart extends VerticalLayout
     {
       setSizeFull();
       layout = new VerticalLayout();
-      layout.setHeight("90%");
+      layout.setHeight("85%");
       layout.setWidth("-1px");
 
       setContent(layout);
-
+      
       whiteboard = new FrequencyWhiteboard(freqPanel);
+      whiteboard.addStyleName("corpus-font-force");
       layout.addComponent(whiteboard);
     }
   }

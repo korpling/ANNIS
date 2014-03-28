@@ -52,6 +52,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
   private List<String> labels;
   private List<Long> values;
   private Scale lastScale;
+  private String lastFont;
   
   public FrequencyWhiteboard(final FrequencyResultPanel freqPanel)
   {  
@@ -74,15 +75,15 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
   public void beforeClientResponse(boolean initial)
   {
     super.beforeClientResponse(initial);
-    if(labels != null && values != null && lastScale != null)
+    if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc);
+      callFunction("showData", labels, values, lastScale.desc, lastFont);
     }
   }
   
   
   
-  public void setFrequencyData(FrequencyTable table, Scale scale)
+  public void setFrequencyData(FrequencyTable table, Scale scale, String font)
   {
     labels = new LinkedList<String>();
     values = new LinkedList<Long>();
@@ -94,6 +95,7 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
     }
     setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
     lastScale = scale;
+    lastFont = font;
     
 //    callFunction("showData", labels, values, scale.desc);
   }

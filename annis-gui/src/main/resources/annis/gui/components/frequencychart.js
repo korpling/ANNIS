@@ -21,19 +21,22 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   
   var lastValues = null;
   var lastLabels = null;
+  var lastFontFamily = null;
+  var lastScale = null;
   
   // always resize the canvas to the size of the parent div
   $(window).resize(function() {    
-    if (lastValues !== null && lastLabels !== null)
+    if (lastValues !== null && lastLabels !== null
+            && lastScale !== null && lastFontFamily !== null)
     {
-      theThis.showData(lastLabels, lastValues);
+      theThis.showData(lastLabels, lastValues, lastScale, lastFontFamily);
     }
   });
 
   this.onStateChange = function() {    
   };
   
-  this.showData = function(labels, values, scale) {
+  this.showData = function(labels, values, scale, fontFamily) {
   
     var predefinedYTicks = null;
     // the list is ordered
@@ -73,6 +76,7 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
         },
         yaxis : {
           scaling: scale,
+          
           ticks: predefinedYTicks,
           min: 0
         },
@@ -82,8 +86,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           tickFormatter: function(i){
 
             var l = labels[i];
-            if(l.length > 25) {
-              l = l.substring(0,24)+"...";
+            if(l.length > 20) {
+              l = l.substring(0,19)+"...";
             }
 
             return l;
@@ -97,7 +101,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           }
         },
         HtmlText : false,
-        fontSize : 10.0
+        fontSize : 10.0,
+        fontFamily: fontFamily
       }
     );
     
@@ -108,6 +113,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
     
     lastLabels = labels;
     lastValues = values;
+    lastScale = scale;
+    lastFontFamily = fontFamily;
     
   };
 };
