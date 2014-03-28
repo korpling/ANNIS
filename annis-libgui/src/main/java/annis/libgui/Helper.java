@@ -817,6 +817,18 @@ public class Helper
     }
     return "";
   }
+  
+  /**
+   * Returns true if the right-to-left heuristic should be disabled.
+   * @return 
+   */
+  public static boolean isRTLDisabled()
+  {
+    String disableRtl = (String) VaadinSession.getCurrent().getAttribute(
+      "disable-rtl");
+    return "true".equalsIgnoreCase(
+        disableRtl);
+  }
 
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
