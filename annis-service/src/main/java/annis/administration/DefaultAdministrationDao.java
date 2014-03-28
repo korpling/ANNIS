@@ -1334,8 +1334,7 @@ public class DefaultAdministrationDao implements AdministrationDao
         String value = placeHolderEntry.getValue().toString();
         log.debug("substitution for parameter '" + key + "' in SQL script: "
           + value);
-
-        sql = sql.replaceAll(key, value);
+        sql = sql.replaceAll(key, Matcher.quoteReplacement(value));
       }
       return sql;
     }
