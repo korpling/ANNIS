@@ -98,7 +98,7 @@ public class RelANNISHelper
     
     if (result.isEmpty())
     {
-      throw new IOException("no corpus found");
+      throw new IOException("no corpus found in " + d.getCanonicalPath());
     }
 
     return result;
