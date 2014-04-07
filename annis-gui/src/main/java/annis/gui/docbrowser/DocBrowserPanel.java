@@ -44,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private SearchUI ui;
+  private final SearchUI ui;
 
   private VerticalLayout layout;
 

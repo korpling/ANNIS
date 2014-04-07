@@ -337,19 +337,25 @@ public class DocBrowserTable extends Table
     VerticalLayout l = new VerticalLayout();
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    Visualizer[] visualizers = docVisualizerConfig.
-      getVisualizers();
-
-    for (Visualizer visualizer : visualizers)
+    if(docVisualizerConfig != null)
     {
-      Button openVis = new Button(visualizer.getDisplayName());
-      openVis.setDescription(
-        "open visualizer with the full text of " + docName);
-      openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
-        openVis));
-      openVis.setStyleName(BaseTheme.BUTTON_LINK);
-      openVis.setDisableOnClick(true);
-      l.addComponent(openVis);
+      Visualizer[] visualizers = docVisualizerConfig.
+        getVisualizers();
+
+      if(visualizers != null)
+      {
+        for (Visualizer visualizer : visualizers)
+        {
+          Button openVis = new Button(visualizer.getDisplayName());
+          openVis.setDescription(
+            "open visualizer with the full text of " + docName);
+          openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
+            openVis));
+          openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          openVis.setDisableOnClick(true);
+          l.addComponent(openVis);
+        }
+      }
     }
 
     p.setContent(l);
