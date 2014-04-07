@@ -21,22 +21,23 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   
   var lastValues = null;
   var lastLabels = null;
-  var lastFontFamily = null;
+  var lastFontFamily = "sans-serif";
   var lastScale = null;
+  var lastFontSize = 10.0;
   
   // always resize the canvas to the size of the parent div
   $(window).resize(function() {    
     if (lastValues !== null && lastLabels !== null
-            && lastScale !== null && lastFontFamily !== null)
+            && lastScale !== null)
     {
-      theThis.showData(lastLabels, lastValues, lastScale, lastFontFamily);
+      theThis.showData(lastLabels, lastValues, lastScale, lastFontFamily, lastFontSize);
     }
   });
 
   this.onStateChange = function() {    
   };
   
-  this.showData = function(labels, values, scale, fontFamily) {
+  this.showData = function(labels, values, scale, fontFamily, fontSize) {
   
     var predefinedYTicks = null;
     // the list is ordered
@@ -101,11 +102,11 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           }
         },
         HtmlText : false,
-        fontSize : 10.0,
+        fontSize : fontSize,
         fontFamily: fontFamily
       }
     );
-    
+        
     // bind click event
     graph.observe(div, 'flotr:click', function (position) {
       theThis.selectRow(position.hit.index);
@@ -115,6 +116,7 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
     lastValues = values;
     lastScale = scale;
     lastFontFamily = fontFamily;
+    lastFontSize = fontSize;
     
   };
 };

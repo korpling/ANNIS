@@ -82,19 +82,50 @@ public class FrequencyChart extends VerticalLayout
   public void setFrequencyData(FrequencyTable table)
   {
     String font = "sans-serif";
+    float fontSize = 7.0f; // in pixel
     UI ui = UI.getCurrent();
     if(ui instanceof SearchUI)
     {
       InstanceConfig cfg = ((SearchUI) ui).getInstanceConfig();
       if(cfg != null && cfg.getFont() != null)
       {
-        font = cfg.getFont().getName();
+        if(cfg.getFrequencyFont() != null)
+        {
+          font = cfg.getFrequencyFont().getName();
+          // only use the font size if given in pixel (since flotr2 can only use this kind of information)
+          String size = cfg.getFrequencyFont().getSize();
+          if(size != null && size.trim().endsWith("px"))
+          {
+            fontSize = Float.parseFloat(size.replace("px", "").trim());
+            // the label sizes will be multiplied by 1.3 in the Flotr2 library, thus
+            // divide here to get the correct size
+            fontSize = fontSize/1.3f;
+          }
+          else
+          {
+            log.warn("No valid font size (must in in \"px\" unit) given for frequency font configuration. "
+              + "The value is {}", fontSize);
+          }
+        }
+        else if(cfg.getFont() != null)
+        {
+          font = cfg.getFont().getName();
+          // only use the font size if given in pixel (since flotr2 can only use this kind of information)
+          String size = cfg.getFont().getSize();
+          if(size != null && size.trim().endsWith("px"))
+          {
+            fontSize = Float.parseFloat(size.replace("px", "").trim());
+            // the label sizes will be multiplied by 1.3 in the Flotr2 library, thus
+            // divide here to get the correct size
+            fontSize = fontSize/1.3f;
+          }
+        }
       }
     }
     
     lastTable = table;
     whiteboard.setFrequencyData(table, (FrequencyWhiteboard.Scale) options.
-      getValue(), font);
+      getValue(), font, fontSize);
   }
 
   /**
