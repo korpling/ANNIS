@@ -75,7 +75,7 @@ public class FrequencyResultPanel extends VerticalLayout
 {
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(FrequencyResultPanel.class);
   
-  public static final int MAX_NUMBER_OF_CHART_ITEMS = 500;
+  public static final int MAX_NUMBER_OF_CHART_ITEMS = 100;
   
   private Table tblResult;
   private Button btDownloadCSV;
@@ -214,7 +214,7 @@ public class FrequencyResultPanel extends VerticalLayout
         MAX_NUMBER_OF_CHART_ITEMS));
       clippedTable.setSum(table.getSum());
       chart.setCaption(
-        "Showing historgram of top 500 results, see table below for complete dataset.");
+        "Showing historgram of top " + MAX_NUMBER_OF_CHART_ITEMS + " results, see table below for complete dataset.");
     }
     chart.setFrequencyData(clippedTable);
 
