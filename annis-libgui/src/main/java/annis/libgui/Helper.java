@@ -356,7 +356,7 @@ public class Helper
 
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
-        getContext(), null,
+        appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
             contextLeft, contextRight, segmentation, start, limit), "&"))
         .toASCIIString();
@@ -379,7 +379,7 @@ public class Helper
 
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
-        getContext(), null,
+        appURI.getPath(), null,
         fragment)
         .toASCIIString();
     }
