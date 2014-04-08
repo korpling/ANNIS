@@ -650,8 +650,20 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Select the corpora
+   * @param corpora Corpora to select
+   */
   public void selectCorpora(Set<String> corpora)
   {
+    // if the corpus to select is not contained in the corpus set, 
+    // reset to the "All corpora" corpus set
+    Set<String> visibleCorpora = getVisibleCorpora();
+    if(!visibleCorpora.containsAll(corpora))
+    {
+       setCorpusSet(CorpusListPanel.ALL_CORPORA);
+    }
+
     if (tblCorpora != null)
     {
       tblCorpora.setValue(corpora);

@@ -1058,16 +1058,7 @@ public class SearchUI extends AnnisBaseUI
       }
       else
       {
-        CorpusListPanel listPanel = getControlPanel().getCorpusList();
-        
-        // if the corpus to select is not contained in the corpus set, 
-        // reset to the "All corpora" corpus set
-        Set<String> visibleCorpora = listPanel.getVisibleCorpora();
-        if(!visibleCorpora.containsAll(corpora))
-        {
-          listPanel.setCorpusSet(CorpusListPanel.ALL_CORPORA);
-        }
-        listPanel.selectCorpora(corpora);
+        getControlPanel().getCorpusList().selectCorpora(corpora);
         
       }
 
