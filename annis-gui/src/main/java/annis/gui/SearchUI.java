@@ -23,6 +23,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -1058,6 +1059,7 @@ public class SearchUI extends AnnisBaseUI
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
+        
       }
 
     }

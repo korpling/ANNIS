@@ -26,6 +26,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
+@SuppressWarnings("serial")
 public class DocumentBrowserConfig implements Serializable
 {
 
@@ -45,7 +46,12 @@ public class DocumentBrowserConfig implements Serializable
    */
   public Visualizer[] getVisualizers()
   {
-    return visualizers;
+    if (this.visualizers != null)
+    {
+      return this.visualizers.clone();
+    }
+
+    return null;
   }
 
   /**
@@ -53,7 +59,12 @@ public class DocumentBrowserConfig implements Serializable
    */
   public void setVisualizers(Visualizer[] visualizers)
   {
-    this.visualizers = visualizers;
+    if (visualizers != null)
+    {
+      this.visualizers = visualizers.clone();
+    } else {
+      this.visualizers = null;
+    }
   }
 
   /**
@@ -61,7 +72,12 @@ public class DocumentBrowserConfig implements Serializable
    */
   public MetaDataColumn[] getMetaDataColumns()
   {
-    return metaDataColumns;
+    if (metaDataColumns != null)
+    {
+      return ((MetaDataColumn[]) metaDataColumns.clone());
+    }
+
+    return null;
   }
 
   /**
@@ -69,7 +85,15 @@ public class DocumentBrowserConfig implements Serializable
    */
   public void setMetaDataColumns(MetaDataColumn[] metaDataColumns)
   {
-    this.metaDataColumns = metaDataColumns;
+    if (metaDataColumns != null)
+    {
+      this.metaDataColumns = metaDataColumns.clone();
+    }
+    else
+    {
+      this.metaDataColumns = null;
+    }
+
   }
 
   /**
@@ -77,15 +101,26 @@ public class DocumentBrowserConfig implements Serializable
    */
   public OrderBy[] getOrderBy()
   {
-    return orderBy;
+    if (orderBy != null)
+    {
+      return (OrderBy[]) orderBy.clone();
+    }
+
+    return null;
   }
 
   /**
    * @param orderBy the orderBy to set
    */
-  public void setOrderBy(
-    OrderBy[] orderBy)
+  public void setOrderBy(OrderBy[] orderBy)
   {
-    this.orderBy = orderBy;
+    if (orderBy != null)
+    {
+      this.orderBy = orderBy.clone();
+    }
+    else
+    {
+      this.orderBy = null;
+    }
   }
 }

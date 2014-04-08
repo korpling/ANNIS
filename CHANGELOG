@@ -1,3 +1,44 @@
+Version 3.1.0
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=8&state=closed
+
+[Bugs]
+ #304 Corpus migration on upgrade of kickstarter in windows fails
+ #302 metadata in document browser doesn't work
+ #301 Caching bug with document browser
+ #297 notification when export is finished will be given to wrong user
+ #295 browser fonts are broken
+ #292 Match position in segmentations should count from 1, not 0
+ #287 css styles from HTML vis are appended instead of replaced
+ #286 metadata not sorted and no namespaces in document browser
+ #284 Reference URL settings reset
+ #273 Display error message when importing empty corpora
+ #271 Search for empty values should be allowed
+ #270 RST-Visualizer sentence numbers are shifted by -2
+ #263 Inefficent subgraph retrievial
+ #261 Document Browser produces NullPointerException, if the same document name is added twice to the document table
+
+[Enhancements]
+ #305 Global option to disable right-to-left heuristic
+ #299 Single colons for namespaces in grid/kwic  tooltip when hovering over an annotation
+ #289 Embedded fonts don't work in statistics output
+ #288 test and fix CommentHelper.readSDocument()
+ #281 Empty tokens trigger island visualization in KWIC
+ #280 Query builder operator behavior
+ #279 Islands may cause spans not covering any tokens in grid
+ #278 Empty space under arch dependency
+ #274 Configure the doc browser via a json file, not in the corpus.properties file
+ #269 Allow to abort exporters
+ #266 CSV exporter
+ #265 Hidden token annotations should be configurable corpus wide via the corpus.properties
+ #264 corpus.properties files should have a more meaningful name
+ #262 Annis import: measure progress in hours/minutes/seconds instead of milliseconds
+
+[Other]
+ #303 What is the syntax for null namespace for metadata to display in document browser?
+ #267 MD5 passwords don't work any longer in 3.1.0-SNAPSHOT
+
 Version 3.0.1
 =============
 

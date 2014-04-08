@@ -148,7 +148,7 @@ public class CorpusListPanel extends VerticalLayout implements
     cbSelection.setNewItemsAllowed(true);
     cbSelection.setNewItemHandler((AbstractSelect.NewItemHandler) this);
     cbSelection.setImmediate(true);
-    cbSelection.addListener(new ValueChangeListener()
+    cbSelection.addValueChangeListener(new ValueChangeListener()
     {
       @Override
       public void valueChange(ValueChangeEvent event)
@@ -650,8 +650,20 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Select the corpora
+   * @param corpora Corpora to select
+   */
   public void selectCorpora(Set<String> corpora)
   {
+    // if the corpus to select is not contained in the corpus set, 
+    // reset to the "All corpora" corpus set
+    Set<String> visibleCorpora = getVisibleCorpora();
+    if(!visibleCorpora.containsAll(corpora))
+    {
+       setCorpusSet(CorpusListPanel.ALL_CORPORA);
+    }
+
     if (tblCorpora != null)
     {
       tblCorpora.setValue(corpora);
@@ -662,6 +674,10 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Get the names of the corpora that are currently selected.
+   * @return 
+   */
   public Set<String> getSelectedCorpora()
   {
     Set<String> result = new HashSet<String>();
@@ -675,6 +691,25 @@ public class CorpusListPanel extends VerticalLayout implements
     }
 
     return result;
+  }
+  
+  /**
+   * Get the names of the corpora that are currently visible and can be choosen
+   * by the user.
+   * @return 
+   */
+  public Set<String> getVisibleCorpora()
+  {
+    return new HashSet<String>(corpusContainer.getItemIds());
+  }
+  
+  /**
+   * Set the currently displayed corpus set.
+   * @param corpusSet 
+   */
+  public void setCorpusSet(String corpusSet)
+  {
+    cbSelection.select(corpusSet);
   }
 
   public class DocLinkGenerator implements Table.ColumnGenerator

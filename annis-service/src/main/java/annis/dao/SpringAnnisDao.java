@@ -91,7 +91,6 @@ import java.util.TreeMap;
 import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
-import org.codehaus.jackson.map.JsonMappingException;
 import org.codehaus.jackson.map.ObjectMapper;
 
 import org.slf4j.Logger;
@@ -390,7 +389,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         StringWriter stringWriter = new StringWriter();
         IOUtils.copy(binaryComplete, stringWriter, "utf-8");
-        
+
         // map json to pojo
         ObjectMapper objectMapper = new ObjectMapper();
         DocumentBrowserConfig documentBrowserConfig = objectMapper.readValue(
@@ -402,10 +401,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         log.error("cannot read the document_browser.json file", ex);
       }
 
-      catch (org.json.JSONException ex)
-      {
-        log.error("probably syntax error in document_browser.json file", ex);
-      }
+      
     } else {
       return getDefaultDocBrowserConfiguration();
     }
@@ -422,7 +418,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
         input = new FileInputStream(path);
-        
+
          // map json to pojo
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.configure(DeserializationConfig.Feature.FAIL_ON_UNKNOWN_PROPERTIES, false);
@@ -433,12 +429,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         log.error(
           "file \"${annis.home}/conf/document-browser.json\" does not exists",
           ex);
-      }      
+      }
       catch (IOException ex)
       {
         log.error(
           "problems with reading ${annis.home}/conf/document-browser.json", ex);
-      }      
+      }
       finally
       {
         try

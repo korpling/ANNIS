@@ -1222,7 +1222,7 @@ public class QueryServiceImpl implements QueryService
     {
       config = annisDao.getDefaultDocBrowserConfiguration();
     }
-    
+
     return (config != null) ? config : null;
   }
 }

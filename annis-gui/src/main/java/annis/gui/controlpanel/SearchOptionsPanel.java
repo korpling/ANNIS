@@ -226,7 +226,7 @@ public class SearchOptionsPanel extends FormLayout
   }
 
   public void updateSearchPanelConfigurationInBackground(
-    final Set<String> corpora)
+    final Set<String> corpora, final UI ui)
   {
     PollControl.runInBackground(250, null, new Runnable()
     {
@@ -235,7 +235,7 @@ public class SearchOptionsPanel extends FormLayout
       {
         final List<String> segNames = getSegmentationNamesFromService(corpora);
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()

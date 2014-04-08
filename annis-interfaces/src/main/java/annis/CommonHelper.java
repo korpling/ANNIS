@@ -16,6 +16,7 @@
 package annis;
 
 import annis.model.AnnisConstants;
+import com.google.common.base.Charsets;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -37,6 +38,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHand
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -427,14 +430,22 @@ public class CommonHelper
     // also add the SDocumentGraph of the document
     res.getContents().add(doc.getSDocumentGraph());
     
-    res.save(out, res.getDefaultSaveOptions());
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    
+    res.save(byteOut, res.getDefaultSaveOptions());
+    
+    out.writeUTF(byteOut.toString("UTF-8"));
   }
   
   public static SDocument readSDocument(ObjectInputStream in) 
     throws IOException
   {
     XMIResourceImpl res = new XMIResourceImpl();
-    res.load(in, res.getDefaultLoadOptions());
+    
+    byte[] asBytes = in.readUTF().getBytes(Charsets.UTF_8);
+    ByteArrayInputStream byteIn = new ByteArrayInputStream(asBytes);
+    
+    res.load(byteIn, res.getDefaultLoadOptions());
     
     
     TreeIterator<EObject> itContents = res.getAllContents();

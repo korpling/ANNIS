@@ -31,7 +31,6 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -46,7 +45,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SOrderRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Arrays;
@@ -65,7 +63,6 @@ import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
-import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -579,9 +576,9 @@ public class ResultViewPanel extends VerticalLayout implements
 
     if (tokenAnnotationLevelSet != null)
     {
-      for (String a : tokenAnnotationLevelSet)
+      for (final String a : tokenAnnotationLevelSet)
       {
-        MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
         {
           @Override
           public void menuSelected(MenuItem selectedItem)
@@ -589,11 +586,11 @@ public class ResultViewPanel extends VerticalLayout implements
 
             if (selectedItem.isChecked())
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
+              tokenAnnoVisible.put(a, Boolean.TRUE);
             }
             else
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
+              tokenAnnoVisible.put(a, Boolean.FALSE);
             }
 
             setVisibleTokenAnnosVisible(getVisibleTokenAnnos());

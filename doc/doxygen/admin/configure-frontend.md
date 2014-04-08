@@ -74,14 +74,16 @@ Thus the file `instances/falko.json` defines the instance named "falko".
 		"falko-summary-l2"
 		]
 	}
-	]
+	],
+	"keyboard-layout" : "de"
 }
 \endcode
 
 Each instance configuration can have a verbose display-name which is
 displayed in the title of the browser window. `default-querybuilder` defines the
-short name of the query builder you want to use. Currently only "tigersearch" is
+short name of the query builder you want to use. Currently only "tigersearch" and "flatquerybuilder" are
 available, see [here](@ref dev-querybuilder) if you want to add your own query builder.
+The `keyboard-layout` variable is used as the default value for the virtual keyboard of the AQL query box.
 
 While any user can group corpora into corpus sets for their own, you can define
 corpus sets for the whole instance. Each corpus set is an JSON-object with a
@@ -192,8 +194,8 @@ properties is set to true, the document browser will stay active.
 ## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
 It is also possible to use a custom visualizer for browsing a whole
-document. The configuration is in JSON-Syntax and placed in the
-corpus.properties file, which can be add to the ExtData directory of
+document. The configuration is in JSON-Syntax file named
+document_browser.json, which can be add to the ExtData directory of
 each corpus.
 
 
@@ -283,3 +285,6 @@ und is reachable under the defined link in the instance config:
 
 Further explantation about the `@font-face` rule is availabe on the [W3C
 websites](http://www.w3.org/TR/css-fonts-3/#font-face-rule).
+
+If you need to have a different font configuration for the frequency chart
+just add a `frequency-font` entry. It has the same structure as `font`.

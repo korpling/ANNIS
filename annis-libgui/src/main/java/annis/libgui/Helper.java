@@ -36,6 +36,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -355,7 +356,7 @@ public class Helper
 
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
-        getContext(), null,
+        appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
             contextLeft, contextRight, segmentation, start, limit), "&"))
         .toASCIIString();
@@ -378,7 +379,7 @@ public class Helper
 
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
-        getContext(), null,
+        appURI.getPath(), null,
         fragment)
         .toASCIIString();
     }
@@ -534,7 +535,7 @@ public class Helper
         .path("corpora").path("doc_browser_config")
         .path(URLEncoder.encode(corpus, "UTF-8"))
         .get(DocumentBrowserConfig.class);
-      
+
       return docBrowserConfig;
     }
     catch (UnsupportedEncodingException ex)
@@ -557,7 +558,7 @@ public class Helper
         ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
         true).show(Page.getCurrent());
       log.error("problems with fetching document browsing", ex);
-    }    
+    }
 
     return null;
   }
@@ -794,6 +795,39 @@ public class Helper
     }
 
     return texts;
+  }
+  
+  /**
+   * Get the qualified name seperated by a single ":" when a namespace exists.
+   * @param anno
+   * @return 
+   */
+  public static String getQualifiedName(SAnnotation anno)
+  {
+    if(anno != null)
+    {
+      if(anno.getSNS() == null || anno.getSNS().isEmpty())
+      {
+        return anno.getSName();
+      }
+      else
+      {
+        return anno.getSNS() + ":" + anno.getSName();
+      }
+    }
+    return "";
+  }
+  
+  /**
+   * Returns true if the right-to-left heuristic should be disabled.
+   * @return 
+   */
+  public static boolean isRTLDisabled()
+  {
+    String disableRtl = (String) VaadinSession.getCurrent().getAttribute(
+      "disable-rtl");
+    return "true".equalsIgnoreCase(
+        disableRtl);
   }
 
   /**

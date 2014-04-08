@@ -78,6 +78,7 @@ import org.slf4j.LoggerFactory;
 public class SingleResultPanel extends CssLayout implements
   Button.ClickListener, VisualizerContextChanger
 {
+  private static final long serialVersionUID = 2L;
 
   private static final String HIDE_KWIC = "hide_kwic";
 
@@ -830,6 +831,9 @@ public class SingleResultPanel extends CssLayout implements
       }
     }
 
+    minMax.min++;
+    minMax.max++;
+    
     return minMax;
   }
 

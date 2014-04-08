@@ -1546,14 +1546,15 @@ Flotr = {
       textAlign: 'left',
       textBaseline: 'bottom',
       weight: 1,
-      angle: 0
+      angle: 0,
+      fontFamily: 'sans-serif'
     }, style);
     
     ctx.save();
     ctx.translate(x, y);
     ctx.rotate(style.angle);
     ctx.fillStyle = style.color;
-    ctx.font = (style.weight > 1 ? "bold " : "") + (style.size*1.3) + "px sans-serif";
+    ctx.font = (style.weight > 1 ? "bold " : "") + (style.size*1.3) + "px " + style.fontFamily;
     ctx.textAlign = style.textAlign;
     ctx.textBaseline = style.textBaseline;
     ctx.fillText(text, 0, 0);
@@ -1608,6 +1609,7 @@ Flotr.defaultOptions = {
   HtmlText: true,          // => wether to draw the text using HTML or on the canvas
   fontColor: '#545454',    // => default font color
   fontSize: 7.5,           // => canvas' text font size
+  fontFamily: "sans-serif", // => canvas text font family
   resolution: 1,           // => resolution of the graph, to have printer-friendly graphs !
   parseFloat: true,        // => whether to preprocess data for floats (ie. if input is string)
   preventDefault: true,    // => preventDefault by default for mobile events.  Turn off to enable scroll.
@@ -2298,11 +2300,12 @@ Text.prototype = {
     style = _.extend({
       size: F.defaultOptions.fontSize,
       weight: 1,
-      angle: 0
+      angle: 0,
+      fontFamiliy: 'sans-serif'
     }, style);
 
     context.save();
-    context.font = (style.weight > 1 ? "bold " : "") + (style.size*1.3) + "px sans-serif";
+    context.font = (style.weight > 1 ? "bold " : "") + (style.size*1.3) + "px " + style.fontFamily;
     metrics = context.measureText(text);
     context.restore();
 
@@ -3261,14 +3264,14 @@ Axis.prototype = {
 
     this.maxLabel = T.dimensions(
       maxLabel,
-      {size:options.fontSize, angle: Flotr.toRad(this.options.labelsAngle)},
+      {size:options.fontSize, fontFamily: options.fontFamily, angle: Flotr.toRad(this.options.labelsAngle)},
       'font-size:smaller;',
       'flotr-grid-label'
     );
 
     this.titleSize = T.dimensions(
       this.options.title, 
-      {size:options.fontSize*1.2, angle: Flotr.toRad(this.options.titleAngle)},
+      {size:options.fontSize*1.2, fontFamily: options.fontFamily, angle: Flotr.toRad(this.options.titleAngle)},
       'font-weight:bold;',
       'flotr-axis-title'
     );
@@ -3584,8 +3587,10 @@ Flotr.addType('lines', {
         y1 = yScale(data[i][1] + stack1);
         y2 = yScale(data[i+1][1] + stack2);
         if (incStack) {
+          data[i].y0 = stack1;
           stack.values[data[i][0]] = data[i][1] + stack1;
           if (i == length-1) {
+            data[i+1].y0 = stack2;
             stack.values[data[i+1][0]] = data[i+1][1] + stack2;
           }
         }
@@ -4204,7 +4209,6 @@ Flotr.addType('candles', {
     upFillColor: '#00A8F0',// => up sticks fill color
     downFillColor: '#CB4B4B',// => down sticks fill color
     fillOpacity: 0.5,      // => opacity of the fill color, set to 1 for a solid fill, 0 hides the fill
-    // TODO Test this barcharts option.
     barcharts: false       // => draw as barcharts (not standard bars but financial barcharts)
   },
 
@@ -4239,7 +4243,7 @@ Flotr.addType('candles', {
       color,
       datum, x, y,
       open, high, low, close,
-      left, right, bottom, top, bottom2, top2,
+      left, right, bottom, top, bottom2, top2, reverseLines,
       i;
 
     if (data.length < 1) return;
@@ -4267,7 +4271,6 @@ Flotr.addType('candles', {
       color = options[open > close ? 'downFillColor' : 'upFillColor'];
 
       // Fill the candle.
-      // TODO Test the barcharts option
       if (options.fill && !options.barcharts) {
         context.fillStyle = 'rgba(0,0,0,0.05)';
         context.fillRect(left + shadowSize, top2 + shadowSize, right - left, bottom2 - top2);
@@ -4286,19 +4289,15 @@ Flotr.addType('candles', {
         context.strokeStyle = color;
         context.beginPath();
 
-        // TODO Again with the bartcharts
         if (options.barcharts) {
-          
-          context.moveTo(x, Math.floor(top + width));
-          context.lineTo(x, Math.floor(bottom + width));
-          
-          y = Math.floor(open + width) + 0.5;
-          context.moveTo(Math.floor(left) + pixelOffset, y);
-          context.lineTo(x, y);
-          
-          y = Math.floor(close + width) + 0.5;
-          context.moveTo(Math.floor(right) + pixelOffset, y);
-          context.lineTo(x, y);
+          context.moveTo(x, Math.floor(top + lineWidth));
+          context.lineTo(x, Math.floor(bottom + lineWidth));
+
+          reverseLines = open < close;
+          context.moveTo(reverseLines ? right : left, Math.floor(top2 + lineWidth));
+          context.lineTo(x, Math.floor(top2 + lineWidth));
+          context.moveTo(x, Math.floor(bottom2 + lineWidth));
+          context.lineTo(reverseLines ? left : right, Math.floor(bottom2 + lineWidth));
         } else {
           context.strokeRect(left, top2 + lineWidth, right - left, bottom2 - top2);
           context.moveTo(x, Math.floor(top2 + lineWidth));
@@ -4747,7 +4746,7 @@ Flotr.addType('markers', {
     if (isImage(label))
       context.drawImage(label, parseInt(left+margin, 10), parseInt(top+margin, 10));
     else
-      Flotr.drawText(context, label, left+margin, top+margin, {textBaseline: 'top', textAlign: 'left', size: options.fontSize, color: options.color});
+      Flotr.drawText(context, label, left+margin, top+margin, {textBaseline: 'top', textAlign: 'left', size: options.fontSize, color: options.color, fontFamily: options.fontFamily});
   }
 });
 
@@ -4851,7 +4850,8 @@ Flotr.addType('pie', {
     style = {
       size : options.fontSize * 1.2,
       color : options.fontColor,
-      weight : 1.5
+      weight : 1.5,
+      fontFamily: options.fontFamily
     };
 
     if (label) {
@@ -5890,6 +5890,8 @@ Flotr.addPlugin('hit', {
 
         x = data[j][0];
         y = data[j][1];
+        // Add stack offset if exists
+        if (data[j].y0) y += data[j].y0;
 
         if (x === null || y === null) continue;
 
@@ -6400,7 +6402,8 @@ Flotr.addPlugin('labels', {
       style = {
         color        : axis.options.color || options.grid.color,
         angle        : Flotr.toRad(axis.options.labelsAngle),
-        textBaseline : 'middle'
+        textBaseline : 'middle',
+        fontFamily: options.fontFamily
       };
 
       for (i = 0; i < ticks.length &&
@@ -6433,7 +6436,9 @@ Flotr.addPlugin('labels', {
         color        : axis.options.color || options.grid.color,
         textAlign    : textAlign,
         textBaseline : textBaseline,
-        angle : Flotr.toRad(axis.options.labelsAngle)
+        angle : Flotr.toRad(axis.options.labelsAngle),
+        fontFamily: options.fontFamily,
+        size: options.fontSize
       };
       style = Flotr.getBestTextAlign(style.angle, style);
 
@@ -6603,7 +6608,8 @@ Flotr.addPlugin('legend', {
           labelMaxWidth = 0,
           style = {
             size: options.fontSize*1.1,
-            color: options.grid.color
+            color: options.grid.color,
+            fontFamily: options.fontFamily
           };
 
       // We calculate the labels' max width
@@ -7054,7 +7060,8 @@ Flotr.addPlugin('titles', {
       var style = {
         size: options.fontSize,
         color: options.grid.color,
-        textAlign: 'center'
+        textAlign: 'center',
+        fontFamily: options.fontFamily
       };
       
       // Add subtitle

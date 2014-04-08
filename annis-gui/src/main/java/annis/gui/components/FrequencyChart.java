@@ -15,12 +15,14 @@
  */
 package annis.gui.components;
 
+import annis.gui.SearchUI;
 import annis.gui.frequency.FrequencyResultPanel;
+import annis.libgui.InstanceConfig;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.data.Property;
-import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import org.slf4j.LoggerFactory;
 
@@ -37,13 +39,12 @@ public class FrequencyChart extends VerticalLayout
   public static final int MAX_ITEMS = 25;
 
   private FrequencyWhiteboard whiteboard;
-  private OptionGroup options;
+  private final OptionGroup options;
   private FrequencyTable lastTable;
 
   public FrequencyChart(FrequencyResultPanel freqPanel)
   {
     setSizeFull();
-
 
     options = new OptionGroup();
     options.setSizeUndefined();
@@ -54,7 +55,7 @@ public class FrequencyChart extends VerticalLayout
     options.setHtmlContentAllowed(true);
     options.setImmediate(true);
     options.setValue(FrequencyWhiteboard.Scale.LINEAR);
-    options.addStyleName("horizontal");
+    //options.addStyleName("horizontal");
     
     options.addValueChangeListener(new Property.ValueChangeListener()
     {
@@ -79,9 +80,51 @@ public class FrequencyChart extends VerticalLayout
 
   public void setFrequencyData(FrequencyTable table)
   {
+    String font = "sans-serif";
+    float fontSize = 7.0f; // in pixel
+    UI ui = UI.getCurrent();
+    if(ui instanceof SearchUI)
+    {
+      InstanceConfig cfg = ((SearchUI) ui).getInstanceConfig();
+      if(cfg != null && cfg.getFont() != null)
+      {
+        if(cfg.getFrequencyFont() != null)
+        {
+          font = cfg.getFrequencyFont().getName();
+          // only use the font size if given in pixel (since flotr2 can only use this kind of information)
+          String size = cfg.getFrequencyFont().getSize();
+          if(size != null && size.trim().endsWith("px"))
+          {
+            fontSize = Float.parseFloat(size.replace("px", "").trim());
+            // the label sizes will be multiplied by 1.3 in the Flotr2 library, thus
+            // divide here to get the correct size
+            fontSize = fontSize/1.3f;
+          }
+          else
+          {
+            log.warn("No valid font size (must in in \"px\" unit) given for frequency font configuration. "
+              + "The value is {}", fontSize);
+          }
+        }
+        else if(cfg.getFont() != null)
+        {
+          font = cfg.getFont().getName();
+          // only use the font size if given in pixel (since flotr2 can only use this kind of information)
+          String size = cfg.getFont().getSize();
+          if(size != null && size.trim().endsWith("px"))
+          {
+            fontSize = Float.parseFloat(size.replace("px", "").trim());
+            // the label sizes will be multiplied by 1.3 in the Flotr2 library, thus
+            // divide here to get the correct size
+            fontSize = fontSize/1.3f;
+          }
+        }
+      }
+    }
+    
     lastTable = table;
     whiteboard.setFrequencyData(table, (FrequencyWhiteboard.Scale) options.
-      getValue());
+      getValue(), font, fontSize);
   }
 
   /**
@@ -90,19 +133,14 @@ public class FrequencyChart extends VerticalLayout
   private class InnerPanel extends Panel
   {
 
-    private VerticalLayout layout;
-
     public InnerPanel(FrequencyResultPanel freqPanel)
     {
       setSizeFull();
-      layout = new VerticalLayout();
-      layout.setHeight("90%");
-      layout.setWidth("-1px");
-
-      setContent(layout);
-
+      
       whiteboard = new FrequencyWhiteboard(freqPanel);
-      layout.addComponent(whiteboard);
+      whiteboard.addStyleName("corpus-font-force");
+      
+      setContent(whiteboard);
     }
   }
 }

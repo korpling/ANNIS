@@ -16,6 +16,7 @@
 package annis.visualizers.iframe.partitur;
 
 import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.iframe.WriterVisualizer;
 import annis.model.AnnisNode;
@@ -455,6 +456,11 @@ public class PartiturVisualizer extends WriterVisualizer
 
   private boolean checkRTL(List<AnnisToken> tokenList)
   {
+    if(Helper.isRTLDisabled())
+    {
+      return false;
+    }
+    
     Iterator<AnnisToken> itToken = tokenList.listIterator();
     while (itToken.hasNext())
     {

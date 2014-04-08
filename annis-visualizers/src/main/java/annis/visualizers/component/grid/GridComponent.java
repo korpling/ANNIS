@@ -19,6 +19,7 @@ import annis.CommonHelper;
 import annis.gui.widgets.grid.AnnotationGrid;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
@@ -99,7 +100,7 @@ public class GridComponent extends Panel
       
       EList<STextualDS> texts
         = input.getDocument().getSDocumentGraph().getSTextualDSs();
-      if (texts != null && texts.size() > 0)
+      if (texts != null && texts.size() > 0 && !Helper.isRTLDisabled())
       {
         if (CommonHelper.containsRTLText(texts.get(0).getSText()))
         {

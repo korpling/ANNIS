@@ -24,6 +24,7 @@ import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -116,28 +117,31 @@ public class DocBrowserTable extends Table
 
       // use corpus path for row id, since it should be unique by annis db schema
       Item row = container.addItem(path);
-      row.getItemProperty("document name").setValue(doc);
-
-      // add the metadata columns.
-      for (MetaDataCol metaDataCol : metaCols.visibleColumns)
+      if(row != null)
       {
-        String value = generateCell(a.getAnnotationPath(), metaDataCol);
-        row.getItemProperty(metaDataCol.getColName()).setValue(value);
-      }
+        row.getItemProperty("document name").setValue(doc);
 
-      for (MetaDataCol metaDataCol : metaCols.sortColumns)
-      {
-        if (!metaCols.visibleColumns.contains(metaDataCol))
+        // add the metadata columns.
+        for (MetaDataCol metaDataCol : metaCols.visibleColumns)
         {
-          // corpusName() holds the corpus path
           String value = generateCell(a.getAnnotationPath(), metaDataCol);
           row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
-      }
 
-      row.getItemProperty("corpus path").setValue(path);
-      row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
-      row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+        for (MetaDataCol metaDataCol : metaCols.sortColumns)
+        {
+          if (!metaCols.visibleColumns.contains(metaDataCol))
+          {
+            // corpusName() holds the corpus path
+            String value = generateCell(a.getAnnotationPath(), metaDataCol);
+            row.getItemProperty(metaDataCol.getColName()).setValue(value);
+          }
+        }
+
+        row.getItemProperty("corpus path").setValue(path);
+        row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
+        row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+      }
     }
 
     setContainerDataSource(container);
@@ -337,19 +341,25 @@ public class DocBrowserTable extends Table
     VerticalLayout l = new VerticalLayout();
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
 
-    Visualizer[] visualizers = docVisualizerConfig.
-      getVisualizers(); 
-
-    for (Visualizer visualizer : visualizers)
+    if(docVisualizerConfig != null)
     {
-      Button openVis = new Button(visualizer.getDisplayName());
-      openVis.setDescription(
-        "open visualizer with the full text of " + docName);
-      openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
-        openVis));
-      openVis.setStyleName(BaseTheme.BUTTON_LINK);
-      openVis.setDisableOnClick(true);
-      l.addComponent(openVis);
+      Visualizer[] visualizers = docVisualizerConfig.
+        getVisualizers();
+
+      if(visualizers != null)
+      {
+        for (Visualizer visualizer : visualizers)
+        {
+          Button openVis = new Button(visualizer.getDisplayName());
+          openVis.setDescription(
+            "open visualizer with the full text of " + docName);
+          openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
+            openVis));
+          openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          openVis.setDisableOnClick(true);
+          l.addComponent(openVis);
+        }
+      }
     }
 
     p.setContent(l);
@@ -427,7 +437,7 @@ public class DocBrowserTable extends Table
     List<Annotation> metaData = new LinkedList<Annotation>();
     if (path != null && !path.isEmpty())
     {
-      metaData = getDocMetaData(path.get(0));
+      metaData = getDocMetaData(path.get(path.size()-1));
     }
 
     // lookup meta data

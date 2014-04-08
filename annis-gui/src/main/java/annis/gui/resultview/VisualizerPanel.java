@@ -84,7 +84,7 @@ import org.slf4j.LoggerFactory;
 public class VisualizerPanel extends CssLayout
   implements Button.ClickListener, VisualizationToggle
 {
-  public static final long serialVersionUID = 1L;
+  public static final long serialVersionUID = 2L;
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
@@ -446,9 +446,14 @@ public class VisualizerPanel extends CssLayout
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
       // run the actual code to load the visualizer
       PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(callback));
+        new BackgroundJob(future, callback, UI.getCurrent()));
 
     } // end if create input was needed
 
@@ -578,26 +583,28 @@ public class VisualizerPanel extends CssLayout
   private class BackgroundJob implements Runnable
   {
 
+    private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
+    private final UI ui;
 
-    public BackgroundJob(LoadableVisualizer.Callback callback)
+    public BackgroundJob(
+      Future<Component> future, LoadableVisualizer.Callback callback, UI ui)
     {
+      this.future = future;
       this.callback = callback;
+      this.ui = ui;
     }
 
     @Override
     public void run()
     {
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
 
       Throwable exception = null;
       try
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
 
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -630,7 +637,7 @@ public class VisualizerPanel extends CssLayout
       if (exception != null)
       {
         final Throwable finalException = exception;
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()

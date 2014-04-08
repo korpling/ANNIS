@@ -106,6 +106,8 @@ public class ExportPanel extends FormLayout
 
   private transient Future<File> exportFuture = null;
 
+  private UI ui;
+  
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
     QueryController controller)
   {
@@ -115,7 +117,7 @@ public class ExportPanel extends FormLayout
 
     this.eventBus = new EventBus();
     this.eventBus.register(this);
-
+    
     setWidth("99%");
     setHeight("-1px");
     addStyleName("contextsensible-formlayout");
@@ -216,6 +218,15 @@ public class ExportPanel extends FormLayout
     vLayout.addComponent(progressLabel);
   }
 
+  @Override
+  public void attach()
+  {
+    super.attach();
+    this.ui = UI.getCurrent();
+  }
+  
+  
+
   private void initHelpMessages()
   {
     help4Exporter.put(EXPORTER[0].getClass().getSimpleName(),
@@ -288,25 +299,27 @@ public class ExportPanel extends FormLayout
   @Subscribe
   public void handleExportProgress(final Integer exports)
   {
-    UI.getCurrent().access(new Runnable()
+    if(ui != null)
     {
-
-      @Override
-      public void run()
+      ui.access(new Runnable()
       {
-        if (exportTime != null && exportTime.isRunning())
-        {
-          progressLabel.setValue(
-            "exported " + exports + " items in " + exportTime.toString());
-        }
-        else
-        {
-          progressLabel.setValue("exported " + exports + " items");
-        }
-      }
 
-    });
+        @Override
+        public void run()
+        {
+          if (exportTime != null && exportTime.isRunning())
+          {
+            progressLabel.setValue(
+              "exported " + exports + " items in " + exportTime.toString());
+          }
+          else
+          {
+            progressLabel.setValue("exported " + exports + " items");
+          }
+        }
 
+      });
+    }
   }
 
   @Override
@@ -369,7 +382,7 @@ public class ExportPanel extends FormLayout
         }
 
         exportFuture = PollControl.callInBackground(1000, null,
-          new BackgroundJob(exporter));
+          new BackgroundJob(exporter, ui));
         if (exportFuture != null)
         {
           if (exportTime == null)
@@ -404,10 +417,12 @@ public class ExportPanel extends FormLayout
   {
 
     private final Exporter exporter;
+    private final UI ui;
 
-    public BackgroundJob(Exporter exporter)
+    public BackgroundJob(Exporter exporter, UI ui)
     {
       this.exporter = exporter;
+      this.ui = ui;
     }
 
     @Override
@@ -436,7 +451,7 @@ public class ExportPanel extends FormLayout
       {
         outWriter.close();
 
-        UI.getCurrent().access(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()

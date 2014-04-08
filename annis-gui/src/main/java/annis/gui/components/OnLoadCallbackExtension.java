@@ -71,7 +71,7 @@ public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
   @Override
   public void extend(AbstractClientConnector target)
   {
-    super.extend(target); //To change body of generated methods, choose Tools | Templates.
+    super.extend(target);
     this.target = target;
   }
 

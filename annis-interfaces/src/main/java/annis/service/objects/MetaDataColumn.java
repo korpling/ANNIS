@@ -16,6 +16,8 @@
 
 package annis.service.objects;
 
+import java.io.Serializable;
+import java.util.Arrays;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -23,8 +25,8 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
-public class MetaDataColumn {
-  
+public class MetaDataColumn implements Serializable {
+
   private String namespace;
 
   private String name;

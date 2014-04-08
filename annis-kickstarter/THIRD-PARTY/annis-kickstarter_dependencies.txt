@@ -1,5 +1,5 @@
 
-Lists of 81 third-party dependencies.
+Lists of 82 third-party dependencies.
      (Public Domain) AOP alliance (aopalliance:aopalliance:1.0 - http://aopalliance.sourceforge.net)
      (Public Domain) ASM Core (asm:asm:3.1 - http://asm.objectweb.org/asm/)
      (ASF 2.0) Code Generation Library (cglib:cglib-nodep:2.2.2 - http://cglib.sourceforge.net/)
@@ -27,6 +27,7 @@ Lists of 81 third-party dependencies.
      (The Apache Software License, Version 2.0) salt-saltCore (de.hu_berlin.german.korpling.saltnpepper:salt-saltCore:1.1.7 - https://korpling.german.hu-berlin.de/p/projects/salt/salt-saltCore)
      (COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) JavaBeans(TM) Activation Framework (javax.activation:activation:1.1.1 - http://java.sun.com/javase/technologies/desktop/javabeans/jaf/index.jsp)
      (CDDL) (GPLv2+CE) JavaMail API (compat) (javax.mail:mail:1.4.5 - http://kenai.com/projects/javamail/mail)
+     (CDDL + GPLv2 with classpath exception) JavaServer Pages(TM) API (javax.servlet.jsp:jsp-api:2.2 - https://jsp.dev.java.net/jsp-api)
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
      (CDDL 1.1) (GPL2 w/ CPE) JAXB API bundle for GlassFish V3 (javax.xml.bind:jaxb-api:2.2.2 - https://jaxb.dev.java.net/)
      (COMMON DEVELOPMENT AND DISTRIBUTION LICENSE (CDDL) Version 1.0) (GNU General Public Library) Streaming API for XML (javax.xml.stream:stax-api:1.0-2 - no url defined)

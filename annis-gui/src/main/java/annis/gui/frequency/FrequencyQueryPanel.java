@@ -106,6 +106,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     lblAQL = new Label("");
     lblAQL.setCaption("query to analyze:");
     lblAQL.setWidth("100%");
+    lblAQL.addStyleName("corpus-font-force");
     
     queryDescriptionLayout.addComponent(lblCorpusList);
     queryDescriptionLayout.addComponent(lblAQL);
@@ -163,6 +164,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setColumnHeader("nr", "Node number/name");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
     tblFrequencyDefinition.setColumnHeader("comment", "Comment");
+    
+    tblFrequencyDefinition.addStyleName("corpus-font-force");
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     

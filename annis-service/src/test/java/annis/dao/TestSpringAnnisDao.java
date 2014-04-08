@@ -291,13 +291,13 @@ public class TestSpringAnnisDao
     when(simpleAnnisDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
     simpleAnnisDao.mapCorpusIdToName(invalidCorpusId);
   }
-  
+
   @Test
   public void getDefaultDocBrowserConfiguration()
   {
-    DocumentBrowserConfig docBrowseConfig = 
+    DocumentBrowserConfig docBrowseConfig =
       simpleAnnisDao.getDefaultDocBrowserConfiguration();
-    
+
     Assert.assertNotNull("default document browser config may not be null", docBrowseConfig);
     Assert.assertNotNull(docBrowseConfig.getVisualizers());
     Assert.assertTrue(docBrowseConfig.getVisualizers().length > 0);
