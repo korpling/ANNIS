@@ -63,9 +63,12 @@ public class ExceptionDialog extends javax.swing.JDialog
       lblCaption.setText(caption + ":");
     }
 
-    this.lblType.setText(importStatus.printType());
-    this.txtMessage.setText(importStatus.printMessages());
-    this.txtDetails.setText(importStatus.printDetails());
+    if(importStatus != null)
+    {
+      this.lblType.setText(importStatus.printType());
+      this.txtMessage.setText(importStatus.printMessages());
+      this.txtDetails.setText(importStatus.printDetails());
+    }
     txtMessage.setCaretPosition(0);
   }
 
