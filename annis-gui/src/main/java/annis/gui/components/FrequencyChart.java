@@ -39,13 +39,12 @@ public class FrequencyChart extends VerticalLayout
   public static final int MAX_ITEMS = 25;
 
   private FrequencyWhiteboard whiteboard;
-  private OptionGroup options;
+  private final OptionGroup options;
   private FrequencyTable lastTable;
 
   public FrequencyChart(FrequencyResultPanel freqPanel)
   {
     setSizeFull();
-
 
     options = new OptionGroup();
     options.setSizeUndefined();
@@ -56,7 +55,7 @@ public class FrequencyChart extends VerticalLayout
     options.setHtmlContentAllowed(true);
     options.setImmediate(true);
     options.setValue(FrequencyWhiteboard.Scale.LINEAR);
-    options.addStyleName("horizontal");
+    //options.addStyleName("horizontal");
     
     options.addValueChangeListener(new Property.ValueChangeListener()
     {
@@ -134,20 +133,14 @@ public class FrequencyChart extends VerticalLayout
   private class InnerPanel extends Panel
   {
 
-    private VerticalLayout layout;
-
     public InnerPanel(FrequencyResultPanel freqPanel)
     {
       setSizeFull();
-      layout = new VerticalLayout();
-      layout.setHeight("85%");
-      layout.setWidth("-1px");
-
-      setContent(layout);
       
       whiteboard = new FrequencyWhiteboard(freqPanel);
       whiteboard.addStyleName("corpus-font-force");
-      layout.addComponent(whiteboard);
+      
+      setContent(whiteboard);
     }
   }
 }

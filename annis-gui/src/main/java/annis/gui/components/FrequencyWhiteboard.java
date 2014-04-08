@@ -18,6 +18,7 @@ package annis.gui.components;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import java.util.LinkedList;
@@ -34,10 +35,11 @@ import org.json.JSONException;
 {
   "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
 })
-public class FrequencyWhiteboard extends AbstractJavaScriptComponent
+public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements OnLoadCallbackExtension.Callback
 {
   public static final int PIXEL_PER_VALUE = 45;
   public static final int ADDTIONAL_PIXEL_WIDTH = 100;
+
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");
@@ -70,8 +72,11 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
       }
     });
     
+    
+    OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
+    ext.extend((FrequencyWhiteboard) this);
+    
   }
-  
   @Override
   public void beforeClientResponse(boolean initial)
   {
@@ -100,7 +105,18 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
     lastFont = font;
     lastFontSize = fontSize;
     
-//    callFunction("showData", labels, values, scale.desc);
+//    callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+  }
+  
+  
+  @Override
+  public boolean onCompononentLoaded(AbstractClientConnector source)
+  {
+    if(labels != null && values != null && lastScale != null && lastFont != null)
+    {
+      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+    }
+    return true;
   }
   
   
