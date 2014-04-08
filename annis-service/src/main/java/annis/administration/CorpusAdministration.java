@@ -369,7 +369,7 @@ public class CorpusAdministration
 
     private boolean status;
 
-    private final String SEPERATOR = "--------------------------\n";
+    private final static String SEPERATOR = "--------------------------\n";
 
     private final Map<String, List<Throwable>> exceptions;
 
