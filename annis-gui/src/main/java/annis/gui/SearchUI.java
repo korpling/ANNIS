@@ -23,6 +23,7 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
+import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -1057,7 +1058,17 @@ public class SearchUI extends AnnisBaseUI
       }
       else
       {
-        getControlPanel().getCorpusList().selectCorpora(corpora);
+        CorpusListPanel listPanel = getControlPanel().getCorpusList();
+        
+        // if the corpus to select is not contained in the corpus set, 
+        // reset to the "All corpora" corpus set
+        Set<String> visibleCorpora = listPanel.getVisibleCorpora();
+        if(!visibleCorpora.containsAll(corpora))
+        {
+          listPanel.setCorpusSet(CorpusListPanel.ALL_CORPORA);
+        }
+        listPanel.selectCorpora(corpora);
+        
       }
 
     }
