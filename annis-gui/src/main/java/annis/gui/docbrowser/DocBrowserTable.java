@@ -24,6 +24,7 @@ import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -116,28 +117,31 @@ public class DocBrowserTable extends Table
 
       // use corpus path for row id, since it should be unique by annis db schema
       Item row = container.addItem(path);
-      row.getItemProperty("document name").setValue(doc);
-
-      // add the metadata columns.
-      for (MetaDataCol metaDataCol : metaCols.visibleColumns)
+      if(row != null)
       {
-        String value = generateCell(a.getAnnotationPath(), metaDataCol);
-        row.getItemProperty(metaDataCol.getColName()).setValue(value);
-      }
+        row.getItemProperty("document name").setValue(doc);
 
-      for (MetaDataCol metaDataCol : metaCols.sortColumns)
-      {
-        if (!metaCols.visibleColumns.contains(metaDataCol))
+        // add the metadata columns.
+        for (MetaDataCol metaDataCol : metaCols.visibleColumns)
         {
-          // corpusName() holds the corpus path
           String value = generateCell(a.getAnnotationPath(), metaDataCol);
           row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
-      }
 
-      row.getItemProperty("corpus path").setValue(path);
-      row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
-      row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+        for (MetaDataCol metaDataCol : metaCols.sortColumns)
+        {
+          if (!metaCols.visibleColumns.contains(metaDataCol))
+          {
+            // corpusName() holds the corpus path
+            String value = generateCell(a.getAnnotationPath(), metaDataCol);
+            row.getItemProperty(metaDataCol.getColName()).setValue(value);
+          }
+        }
+
+        row.getItemProperty("corpus path").setValue(path);
+        row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
+        row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+      }
     }
 
     setContainerDataSource(container);
