@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.1.1</version>
+    <version>3.1.2</version>
   </parent>
 
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
