@@ -402,7 +402,7 @@ public class CommonHelper
    * @param p
    * @return returns an empty list if project is empty or null.
    */
-  public static Set<String> getCorpusNames(SaltProject p)
+  public static Set<String> getToplevelCorpusNames(SaltProject p)
   {
     Set<String> names = new HashSet<String>();
 
@@ -410,9 +410,12 @@ public class CommonHelper
     {
       for (SCorpusGraph g : p.getSCorpusGraphs())
       {
-        for (SCorpus c : g.getSCorpora())
+        if(g.getSRootCorpus() != null)
         {
-          names.add(c.getSName());
+          for (SCorpus c : g.getSRootCorpus())
+          {
+            names.add(c.getSName());
+          }
         }
       }
     }

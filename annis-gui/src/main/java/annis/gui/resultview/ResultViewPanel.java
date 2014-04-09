@@ -375,7 +375,7 @@ public class ResultViewPanel extends VerticalLayout implements
     tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
     Set<String> hiddenTokenAnnos = null;
 
-    Set<String> corpusNames = CommonHelper.getCorpusNames(p);
+    Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
 
     for (String corpusName : corpusNames)
     {

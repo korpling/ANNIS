@@ -1,3 +1,11 @@
+Version 3.1.1
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=11&state=closed
+
+[Bugs]
+ #308 corpus properties are fetched for sub-corpus
+
 Version 3.1.0
 =============
 Changelog is also available on GitHub:
