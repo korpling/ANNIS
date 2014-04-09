@@ -38,6 +38,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -113,15 +114,19 @@ public class CorpusBrowserPanel extends Panel
 
     tblNodeAnno = new ExampleTable(citationGenerator, containerNodeAnno);
     tblNodeAnno.addValueChangeListener(new ExampleListener());
+    tblNodeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
     tblEdgeTypes.addValueChangeListener(new ExampleListener());
+    tblEdgeTypes.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblEdgeAnno = new ExampleTable(citationGenerator, containerEdgeAnno);
     tblEdgeAnno.addValueChangeListener(new ExampleListener());
+    tblEdgeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
+    tblMetaAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
@@ -335,7 +340,7 @@ public class CorpusBrowserPanel extends Panel
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error(null, ex);
+      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
       Notification.show(
         "UTF-8 encoding is not supported on server, this is weird: " + ex.
         getLocalizedMessage(),

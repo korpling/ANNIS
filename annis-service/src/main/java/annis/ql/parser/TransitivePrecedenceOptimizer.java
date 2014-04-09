@@ -17,7 +17,7 @@ package annis.ql.parser;
 
 import annis.model.QueryNode;
 import annis.model.QueryNode.Range;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
 import annis.sqlgen.model.Precedence;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -85,7 +85,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   {
     Set<String> result = new TreeSet<String>();
     
-    for(Join j : node.getJoins())
+    for(Join j : node.getOutgoingJoins())
     {
       if(j instanceof Precedence)
       {
@@ -108,7 +108,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
     {
       Set<Precedence> joinList = new HashSet<Precedence>();
       
-      for(Join j : node.getJoins())
+      for(Join j : node.getOutgoingJoins())
       {
         if(j instanceof Precedence)
         {
@@ -132,7 +132,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
     Map<QueryNode, Range> nextNodes = new HashMap<QueryNode, Range>();
     
     // iterator over all outgoing precedence joins
-    List<Join> originalJoins = new LinkedList<Join>(currentNode.getJoins());
+    List<Join> originalJoins = new LinkedList<Join>(currentNode.getOutgoingJoins());
     for(Join join : originalJoins)
     {
       if(join instanceof Precedence)
@@ -196,7 +196,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
             if (moreRestrictive)
             {
               // add newly created discovered transitive precedence
-              initialNode.addJoin(newJoin);
+              initialNode.addOutgoingJoin(newJoin);
               existingJoins.add(newJoin);
             }
 

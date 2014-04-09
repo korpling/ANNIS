@@ -25,12 +25,12 @@ import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
+import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -43,6 +43,10 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -367,11 +371,11 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void updateVariables(SaltProject p)
   {
-    segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
+    segmentationLayerSet.addAll(getSegmentationNames(p));
     tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
     Set<String> hiddenTokenAnnos = null;
 
-    Set<String> corpusNames = CommonHelper.getCorpusNames(p);
+    Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
 
     for (String corpusName : corpusNames)
     {
@@ -402,6 +406,35 @@ public class ResultViewPanel extends VerticalLayout implements
 
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
+  }
+  
+  private Set<String> getSegmentationNames(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        if (g != null)
+        {
+          // collect the start nodes of a segmentation chain of length 1
+          for (SNode n : g.getSNodes())
+          {
+            SFeature feat
+              = n.getSFeature(AnnisConstants.ANNIS_NS,
+                AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+            if (feat != null && feat.getSValueSTEXT() != null)
+            {
+              result.add(feat.getSValueSTEXT());
+            }
+          }
+        } // end if graph not null
+      }
+    }
+    
+    return result;
   }
 
   public void setCount(int count)
@@ -543,9 +576,9 @@ public class ResultViewPanel extends VerticalLayout implements
 
     if (tokenAnnotationLevelSet != null)
     {
-      for (String a : tokenAnnotationLevelSet)
+      for (final String a : tokenAnnotationLevelSet)
       {
-        MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
         {
           @Override
           public void menuSelected(MenuItem selectedItem)
@@ -553,11 +586,11 @@ public class ResultViewPanel extends VerticalLayout implements
 
             if (selectedItem.isChecked())
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
+              tokenAnnoVisible.put(a, Boolean.TRUE);
             }
             else
             {
-              tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
+              tokenAnnoVisible.put(a, Boolean.FALSE);
             }
 
             setVisibleTokenAnnosVisible(getVisibleTokenAnnos());

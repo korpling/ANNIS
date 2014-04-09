@@ -164,6 +164,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       getContextRight());
     ui.getControlPanel().getSearchOptions().setSegmentationLayer(query.
       getSegmentation());
+    ui.getControlPanel().getSearchOptions().setResultsPerPage(query.getLimit());
 
     if (query.getCorpora() != null)
     {
@@ -380,9 +381,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     ui.getControlPanel().getSearchOptions()
       .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
         getCorpusList().
-        getSelectedCorpora());
+        getSelectedCorpora(), ui);
 
-    ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
+    // Since there is a serious lag when selecting the corpus don't update
+    // the corpus fragment any longer.
+    // The user can manually get the corpus link with the corpus explorer.
+    //ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
 
     if (corpusSelChangeListeners != null)
     {

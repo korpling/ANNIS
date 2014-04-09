@@ -19,8 +19,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
@@ -62,6 +61,33 @@ public class Row implements Serializable
     // set all bits to true that are covered by the other event
     occupancySet.or(eventOccupance);
     events.add(e);
+
+    if(e.getTextID() != null && !e.getTextID().isEmpty())
+    {
+      textIDs.add(e.getTextID());
+    }
+
+    return true;
+  }
+  
+  /**
+   * Adds an event to this row using {@link ListIterator#add(java.lang.Object) }
+   * @param e
+   * @return False if could not be added because the event is overlapping an
+   *          other event in the row.
+   */
+  public boolean addEvent(ListIterator<GridEvent> iterator, GridEvent e)
+  {
+    
+    BitSet eventOccupance = new BitSet(e.getRight());
+    eventOccupance.set(e.getLeft(), e.getRight()+1, true);
+    if(occupancySet.intersects(eventOccupance))
+    {
+      return false;
+    }
+    // set all bits to true that are covered by the other event
+    occupancySet.or(eventOccupance);
+    iterator.add(e);
 
     if(e.getTextID() != null && !e.getTextID().isEmpty())
     {
@@ -126,6 +152,28 @@ public class Row implements Serializable
     }
     
     return success;
+  }
+  
+  /**
+   * Call {@link ListIterator#remove() } and update internal occupancy grid.
+   * @param iterator
+   * @return 
+   */
+  public void removeEvent(ListIterator<GridEvent> iterator)
+  {
+    if(iterator != null)
+    {
+      // go one step back
+      iterator.previous();
+      // get the element again
+      GridEvent event = iterator.next();
+      if(event != null)
+      {
+        iterator.remove();
+        // we never allow overlapping events in a row, so we can set the area to unoccupied
+        occupancySet.set(event.getLeft(), event.getRight() + 1, false);
+      }
+    }
   }
   
   /**

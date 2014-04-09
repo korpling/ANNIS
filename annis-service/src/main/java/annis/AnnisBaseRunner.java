@@ -38,9 +38,11 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 import annis.exceptions.AnnisQLSyntaxException;
 import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.classic.spi.IThrowableProxy;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.CoreConstants;
 import ch.qos.logback.core.LayoutBase;
@@ -378,10 +380,22 @@ public abstract class AnnisBaseRunner
     @Override
     public String doLayout(ILoggingEvent e)
     {
+      IThrowableProxy tp = e.getThrowableProxy();
+
       StringBuilder sb = new StringBuilder();
       sb.append("[").append(e.getLevel()).append("]\t");
-      sb.append(e.getFormattedMessage());
-      sb.append(" - ");
+      if(e.getFormattedMessage() != null)
+      {
+        sb.append(e.getFormattedMessage());
+        sb.append(" ");
+      }
+      if(tp != null)
+      {
+        sb.append(tp.getClassName())
+          .append(": ").append(tp.getMessage());
+        sb.append(" ");
+      }
+      sb.append("- ");
 
       long t = e.getTimeStamp() - e.getLoggerContextVO().getBirthTime();
 

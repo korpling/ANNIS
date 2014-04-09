@@ -82,4 +82,12 @@ public class WekaExporter implements Exporter, Serializable
       log.error(null, ex);
     }
   }
+
+  @Override
+  public boolean isCancelable()
+  {
+    return false;
+  }
+  
+  
 }

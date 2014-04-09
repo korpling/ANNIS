@@ -138,6 +138,13 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         // 2. iterate over all matches and get the sub-graph for a group of matches
         while((currentLine = inReader.readLine()) != null)
         {
+          
+          if(Thread.currentThread().isInterrupted())
+          {
+            // return from loop and abort export
+            break;
+          }
+          
           Match match = Match.parseFromString(currentLine);
 
           currentMatches.getMatches().add(match);
@@ -274,6 +281,14 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
     }
   }
+
+  @Override
+  public boolean isCancelable()
+  {
+    return true;
+  }
+  
+  
   
   public abstract SubgraphFilter getSubgraphFilter();
 

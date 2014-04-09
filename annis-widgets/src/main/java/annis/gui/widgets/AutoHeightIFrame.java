@@ -15,7 +15,7 @@ public class AutoHeightIFrame extends AbstractComponent
 
   private boolean heightWasSet = false;
 
-  public static final int ADDITIONAL_HEIGHT = 25;
+  public static final int ADDITIONAL_HEIGHT = -1;
 
   public final static String RES_KEY = "iframe-vis-res";
 

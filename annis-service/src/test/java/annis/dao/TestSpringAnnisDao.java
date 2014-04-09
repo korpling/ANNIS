@@ -58,12 +58,14 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.sqlgen.SaltAnnotateExtractor;
 import java.util.LinkedList;
 import javax.annotation.Resource;
 import org.junit.Assert;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.web.ModelAndViewAssert;
+import org.springframework.validation.BindingResultUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
@@ -288,5 +290,18 @@ public class TestSpringAnnisDao
     ids.add(invalidCorpusId);
     when(simpleAnnisDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
     simpleAnnisDao.mapCorpusIdToName(invalidCorpusId);
+  }
+
+  @Test
+  public void getDefaultDocBrowserConfiguration()
+  {
+    DocumentBrowserConfig docBrowseConfig =
+      simpleAnnisDao.getDefaultDocBrowserConfiguration();
+
+    Assert.assertNotNull("default document browser config may not be null", docBrowseConfig);
+    Assert.assertNotNull(docBrowseConfig.getVisualizers());
+    Assert.assertTrue(docBrowseConfig.getVisualizers().length > 0);
+    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getType() != null);
+    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getDisplayName() != null);
   }
 }

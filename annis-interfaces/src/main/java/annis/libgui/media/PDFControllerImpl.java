@@ -29,6 +29,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
+@SuppressWarnings("serial")
 public class PDFControllerImpl implements PDFController, Serializable
 {
 

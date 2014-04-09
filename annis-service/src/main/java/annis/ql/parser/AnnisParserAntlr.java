@@ -117,7 +117,7 @@ public class AnnisParserAntlr
     }
     catch(NullPointerException ex)
     {
-      log.warn(null, ex);
+      log.warn("Null pointer exception occured during parsing", ex);
       throw new AnnisQLSemanticsException(ex.getMessage());
     }
     catch(IllegalArgumentException ex)

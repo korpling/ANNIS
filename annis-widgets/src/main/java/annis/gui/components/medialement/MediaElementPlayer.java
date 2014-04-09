@@ -100,12 +100,19 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
   @Override
   public void play(double start)
   {
+    // we get the time in seconds with fractions but the HTML5 players
+    // only have a resolution of seconds
+    start = Math.floor(start);
     callFunction("play", start);
   }
 
   @Override
   public void play(double start, double end)
   {
+    // we get the time in seconds with fractions but the HTML5 players
+    // only have a resolution of seconds
+    start = Math.floor(start);
+    end = Math.ceil(end);
     callFunction("playRange", start, end);
   }
 

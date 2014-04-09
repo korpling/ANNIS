@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.administration.AdministrationDao;
+import static annis.administration.AdministrationDao.ImportStatus;
 import annis.administration.AdministrationDao.StatementController;
 import annis.administration.CorpusAdministration;
 import ch.qos.logback.classic.Level;
@@ -27,7 +28,6 @@ import ch.qos.logback.core.AppenderBase;
 import java.io.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
@@ -55,14 +55,6 @@ public class ImportDialog extends javax.swing.JDialog
 
   private transient StatementController statementController;
 
-  private static class Status
-  {
-
-    public boolean ok = true;
-
-    public Exception ex = new Exception();
-
-  }
 
   private static class StatementControllerImpl implements StatementController
   {
@@ -80,7 +72,6 @@ public class ImportDialog extends javax.swing.JDialog
       {
         cancelStatements();
       }
-
     }
 
     @Override
@@ -109,7 +100,7 @@ public class ImportDialog extends javax.swing.JDialog
     }
   }
 
-  private class ImportDialogWorker extends SwingWorker<Status, Void>
+  private class ImportDialogWorker extends SwingWorker<ImportStatus, Void>
   {
 
     StatementController statementController;
@@ -125,10 +116,8 @@ public class ImportDialog extends javax.swing.JDialog
     }
 
     @Override
-    protected Status doInBackground() throws Exception
+    protected ImportStatus doInBackground() throws Exception
     {
-      Status status = new Status();
-      AdministrationDao.ImportStats importStats = null;
       StringBuilder errorMessages = new StringBuilder();
 
       if (corpora == null)
@@ -151,15 +140,14 @@ public class ImportDialog extends javax.swing.JDialog
           corpusAdministration.getAdministrationDao().registerGUICancelThread(
             statementController);
 
-          importStats = corpusAdministration.importCorporaSave(
-            jCheckBox1.isSelected(), null, null, false, txtInputDir.getText());
+          importStatus.add(corpusAdministration.importCorporaSave(
+            jCheckBox1.isSelected(), null, null, false, txtInputDir.getText()));
 
         }
         catch (Exception ex)
         {
-          status.ok = false;
-          status.ex = ex;
-          return status;
+          importStatus.addException("unknown error: ", ex);
+          return importStatus;
         }
       }
       else
@@ -180,8 +168,7 @@ public class ImportDialog extends javax.swing.JDialog
         {
           if (isCancelled())
           {
-            status.ok = true;
-            return status;
+            return importStatus;
           }
 
           if (corpus.containsKey("source_path"))
@@ -201,21 +188,14 @@ public class ImportDialog extends javax.swing.JDialog
               }
             });
 
-
             try
             {
 
               corpusAdministration.getAdministrationDao().
                 registerGUICancelThread(statementController);
 
-              if (importStats == null)
-              {
-              importStats = corpusAdministration.importCorporaSave(
-                jCheckBox1.isSelected(), null, null, false, path);
-              } else {
-                importStats.add(corpusAdministration.importCorporaSave(
-                  jCheckBox1.isSelected(), null, null, false, path));
-              }
+              importStatus.add(corpusAdministration.importCorporaSave(
+                jCheckBox1.isSelected(), null, null, false, path));
             }
             catch (Exception ex)
             {
@@ -228,14 +208,7 @@ public class ImportDialog extends javax.swing.JDialog
         }
       }
 
-      if (!importStats.getStatus())
-      {
-        status.ok = false;
-        status.ex = (Exception) importStats.getExceptions().get(importStats.getExceptions().size() -1);
-        return status;
-      }
-
-      return status;
+      return importStatus;
     }
 
     @Override
@@ -253,8 +226,8 @@ public class ImportDialog extends javax.swing.JDialog
       {
         if (!isCancelled())
         {
-          Status status = this.get();
-          if (status.ok)
+          ImportStatus importStatus = this.get();
+          if (importStatus.getStatus())
           {
             JOptionPane.showMessageDialog(null,
               "Corpus imported.", "INFO", JOptionPane.INFORMATION_MESSAGE);
@@ -262,7 +235,7 @@ public class ImportDialog extends javax.swing.JDialog
           }
           else
           {
-            new ExceptionDialog(status.ex, "Import failed").setVisible(true);
+            new ExceptionDialog(importStatus, "Import failed").setVisible(true);
             setVisible(false);
           }
         }
@@ -275,7 +248,9 @@ public class ImportDialog extends javax.swing.JDialog
   }
   private CorpusAdministration corpusAdministration;
 
-  private transient SwingWorker<Status, Void> worker;
+  private ImportStatus importStatus;
+
+  private transient SwingWorker<ImportStatus, Void> worker;
 
   private boolean isImporting;
 
@@ -297,6 +272,8 @@ public class ImportDialog extends javax.swing.JDialog
     initTransients();
 
     this.corpusAdministration = corpusAdmin;
+    this.importStatus =  this.corpusAdministration.getAdministrationDao()
+      .initImportStatus();
     this.corpora = corpora;
 
     confProps = new Properties();

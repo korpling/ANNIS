@@ -62,3 +62,5 @@ usage:
 * delexamples: Delete example queries.
     Specify a corpus name as an argument, otherwise all example queries
     will be deleted.
+
+* cleanup-data: Delete files not used by this instance in the data directory.

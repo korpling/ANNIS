@@ -12,27 +12,49 @@
 <h2>Searching for Trees</h2>
 <p>In corpora containing hierarchical structures, annotations such as syntax trees can be searched for by defining terminal or none-terminal node annotations and their values.
 A simple search for prepostional phrases in the small PCC2 demo corpus looks like this:</p>
-<tt>tiger:cat="PP"</tt>
+<div class="indent">
+	<tt>tiger:cat="PP"</tt>
+</div>
 <p>If the corpus contains no more than one annotation called <tt>cat</tt>, the optional namespace, in this case <tt>tiger:</tt>, may be dropped. This finds all PP nodes in the corpus. To find all PP nodes directly dominating a proper name, a second element can be specified with the appropriate part-of-speech (pos) value:</p>
-<tt>cat="PP" &amp; pos="NE" &amp; #1 &gt; #2</tt>
+<div class="indent">
+	<tt>cat="PP" &amp; pos="NE" &amp; #1 &gt; #2</tt>
+	<p>OR (using a shortcut):</p>
+	<tt>cat="PP" &gt; pos="NE"</tt>
+</div>
 <p>The operator <strong>&gt;</strong> signifies <strong>direct dominance</strong>, which must hold between the first and the second element.
-Once the Result Window is shown you may open the "tiger" annotation level to see the corresponding tree.
+Once the Result Tab is shown you may open the "tiger" annotation level to see the corresponding tree.
 </p>
 <img src="tree_expanded.png">
 <p>
 Note that since the context is set to a number of tokens left and right of the search term, the tree for the whole sentence may not be retrieved. To do this, you may want to specifically search for the
 sentence dominating the PP. To do so, specify the sentence in another element and use the <strong>indirect dominance </strong>( <strong>&gt;* </strong>) operator:</p>
-<tt>cat="S" &amp; cat="PP" &amp; pos="NE" &amp; #1 &gt;* #2 &amp; #2 &gt; #3</tt>
+<div class="indent">
+	<tt>cat="S" &amp; cat="PP" &amp; pos="NE" &amp; #1 &gt;* #2 &amp; #2 &gt; #3</tt>
+	<p>OR (using a shortcut):</p>
+	<tt>cat="S" &gt;* cat="PP" &gt; pos="NE"</tt>
+</div>
+
 <p>If the annotations in the corpus support it, you may also look for edge labels. Using the following query will find all adjunct modifiers of a VP, dominated by the VP node through an edge labeled MO.
 Since we do not know anything about the modifying node, whether it is a non-terminal node or a token, we simply use the <tt>node</tt> element as a place holder.
 This element can match any node or annotation in the graph:</p>
-<tt>cat="VP" &amp; node &amp; #1 >[tiger:func="MO"] #2</tt>
+
+<div class="indent">
+	<tt>cat="VP" &amp; node &amp; #1 &gt;[tiger:func="MO"] #2</tt>
+	<p>OR (using a shortcut):</p>
+	<tt>cat="VP" &gt;[tiger:func="MO"] node</tt>
+	</div>
 <p>
 It is also possible to negate the label of the dominance edge as in the following query:
 </p>
-<tt>
-cat="VP" & node & #1 >[tiger:func!="MO"] #2
-</tt>
+<div class="indent">
+	<tt>
+	cat="VP" & node & #1 >[tiger:func!="MO"] #2
+	</tt>
+	<p>OR (using a shortcut):</p>
+	<tt>
+	cat="VP" &gt;[tiger:func!="MO"] node
+	</tt>
+</div>
 <p>
 which finds all VPs dominating a node with a label other than MO.
 </p>

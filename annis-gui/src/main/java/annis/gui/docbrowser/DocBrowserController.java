@@ -23,6 +23,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
+import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.Sizeable.Unit;
@@ -42,7 +43,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,57 +81,50 @@ public class DocBrowserController implements Serializable
     this.visibleVisHolder = new HashMap<String, Panel>();
   }
 
-  public void openDocVis(String corpus, String doc, JSONSerializable config,
-    Button btn)
+  public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn)
   {
-    try
-    {
-      final String type = config.getString("type");
-      final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
-      final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
-      if (visibleVisHolder.containsKey(canonicalTitle))
+    final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + visConfig.
+      getDisplayName();
+    final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
+
+    if (visibleVisHolder.containsKey(canonicalTitle))
+    {
+      Panel visHolder = visibleVisHolder.get(canonicalTitle);
+      ui.getTabSheet().setSelectedTab(visHolder);
+      return;
+    }
+
+    Panel visHolder = new Panel();
+    visHolder.setSizeFull();
+    visHolder.addDetachListener(new ClientConnector.DetachListener()
+    {
+      @Override
+      public void detach(ClientConnector.DetachEvent event)
       {
-        Panel visHolder = visibleVisHolder.get(canonicalTitle);
-        ui.getTabSheet().setSelectedTab(visHolder);
-        return;
+        visibleVisHolder.remove(canonicalTitle);
       }
+    });
 
-      Panel visHolder = new Panel();
-      visHolder.setSizeFull();
-      visHolder.addDetachListener(new ClientConnector.DetachListener()
-      {
-        @Override
-        public void detach(ClientConnector.DetachEvent event)
-        {
-          visibleVisHolder.remove(canonicalTitle);
-        }
-      });
+    // first set loading indicator
+    ProgressBar progressBar = new ProgressBar(1.0f);
+    progressBar.setIndeterminate(true);
+    progressBar.setSizeFull();
+    visHolder.setContent(progressBar);
 
-      // first set loading indicator
-      ProgressBar progressBar = new ProgressBar(1.0f);
-      progressBar.setIndeterminate(true);
-      progressBar.setSizeFull();
-      visHolder.setContent(progressBar);
+    Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+    visTab.setDescription(canonicalTitle);
+    visTab.setIcon(EYE_ICON);
+    visTab.setClosable(true);
+    ui.getTabSheet().setSelectedTab(visTab);
 
-      Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
-      visTab.setDescription(canonicalTitle);
-      visTab.setIcon(EYE_ICON);
-      visTab.setClosable(true);
-      ui.getTabSheet().setSelectedTab(visTab);
+    // register visible visHolder
+    this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-      // register visible visHolder
-      this.visibleVisHolder.put(canonicalTitle, visHolder);
-
-      PollControl.runInBackground(100, ui, 
-        new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
-          config, btn)
-      );
-    }
-    catch (JSONException ex)
-    {
-      log.error("problems with reading document visualizer config", ex);
-    }
+    PollControl.runInBackground(100, ui,
+      new DocVisualizerFetcher(corpus, doc, canonicalTitle,
+        visConfig.getType(), visHolder, visConfig, btn)
+    );
   }
 
   public void openDocBrowser(String corpus)
@@ -165,16 +158,19 @@ public class DocBrowserController implements Serializable
    * whole document.
    */
   private VisualizerInput createInput(String corpus, String docName,
-    JSONSerializable config, boolean isUsingRawText)
+    Visualizer config, boolean isUsingRawText)
   {
     VisualizerInput input = new VisualizerInput();
 
     try
     {
+      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
+      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
       if (isUsingRawText)
       {
         WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext").path(corpus).path(docName);
+        w = w.path("query").path("rawtext")
+          .path(encodedToplevelCorpus).path(encodedDocument);
         RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
         input.setRawText(rawTextWrapper);
       }
@@ -183,12 +179,10 @@ public class DocBrowserController implements Serializable
         // get the whole document wrapped in a salt project
         SaltProject txt = null;
 
-        String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
-        docName = URLEncoder.encode(docName, "UTF-8");
         WebResource annisResource = Helper.getAnnisWebResource();
         txt = annisResource.path("query").path("graph").
-          path(topLevelCorpusName).
-          path(docName).get(SaltProject.class);
+          path(encodedToplevelCorpus).
+          path(encodedDocument).get(SaltProject.class);
 
         if (txt != null)
         {
@@ -208,29 +202,20 @@ public class DocBrowserController implements Serializable
 
     // set mappings and namespaces. some visualizer do not survive without   
     input.setMappings(parseMappings(config));
-    input.setNamespace(getNamespace(config));
+    input.setNamespace(config.getNamespace());
 
     return input;
   }
 
-  private Properties parseMappings(JSONSerializable config)
+  private Properties parseMappings(Visualizer config)
   {
     Properties mappings = new Properties();
-    String mappingsAsString = null;
 
-    try
-    {
-      mappingsAsString = config.getString("mappings");
-    }
-    catch (JSONException ex)
-    {
-      log.debug("no mappings defined", ex);
-    }
 
-    if (mappingsAsString != null)
+    if (config.getMappings() != null)
     {
       // split the entrys
-      String[] entries = mappingsAsString.split(";");
+      String[] entries = config.getMappings().split(";");
       for (String e : entries)
       {
         // split key-value
@@ -245,28 +230,10 @@ public class DocBrowserController implements Serializable
     return mappings;
   }
 
-  private String getNamespace(JSONSerializable config)
-  {
-    String namespace = null;
-    try
-    {
-      if (config.has("namespace"))
-      {
-        namespace = config.getString("namespace");
-      }
-    }
-    catch (JSONException ex)
-    {
-      log.error("no namespace retrieved for doc visualizer", ex);
-    }
-
-    return namespace;
-  }
-
   private class DocVisualizerFetcher implements Runnable
   {
 
-    JSONSerializable config;
+    Visualizer config;
 
     String corpus;
 
@@ -283,7 +250,7 @@ public class DocBrowserController implements Serializable
     public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
       String type,
       Panel visHolder,
-      JSONSerializable config,
+      Visualizer config,
       Button btn)
     {
       this.corpus = corpus;
@@ -346,10 +313,23 @@ public class DocBrowserController implements Serializable
 
       if (corpusConfig != null)
       {
-        return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
-          "true"));
+        if (corpusConfig.containsKey("browse-documents"))
+        {
+          return Boolean.
+            parseBoolean(corpusConfig.getConfig("browse-documents"));
+        }
+
+        // get the default config
+        else
+        {
+          corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
+          boolean browseDocuments = Boolean.parseBoolean(
+            corpusConfig.getConfig("browse-documents", "true"));
+          return browseDocuments;
+        }
       }
     }
+
     return true;
   }
 }

@@ -11,7 +11,9 @@
 
 	pre {text-indent: 30px}
 
-
+	img {   padding:1px;
+   border:1px solid #021a40;
+   background-color:#ffffff;}
 
 	#tabmenu {
 		color: #000000;
@@ -78,9 +80,7 @@
 		z-index: 1;
 		padding-bottom: 10px }
 
-	#tutorialmenu img {
-	border:0;}
-	
+		
 	#tutorialmenu li {
 		display: inline;
 		overflow: hidden;
@@ -136,3 +136,4 @@
 
 
 
+div.indent{padding-left:20px}

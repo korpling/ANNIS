@@ -25,9 +25,9 @@ import org.apache.commons.lang3.Validate;
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 
-import annis.sqlgen.model.Join;
 import annis.sqlgen.model.RankTableJoin;
 import com.google.common.base.Joiner;
+import java.util.Collections;
 import java.util.LinkedList;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -58,13 +58,14 @@ public class QueryNode implements Serializable
   private boolean root;
   private boolean token;
   private TextMatching spanTextMatching;
-  private List<Join> joins;
+  private List<Join> ingoingJoins;
+  private List<Join> outgoingJoins;
   private String variable;
-  private Set<QueryAnnotation> edgeAnnotations;
   private Range arity;
   private Range tokenArity;
   private Long matchedNodeInQuery;
   private boolean artificial;
+  private Integer alternativeNumber;
   
   public enum TextMatching
   {
@@ -166,8 +167,8 @@ public class QueryNode implements Serializable
   public QueryNode()
   {
     nodeAnnotations = new TreeSet<QueryAnnotation>();
-    edgeAnnotations = new TreeSet<QueryAnnotation>();
-    joins = new ArrayList<Join>();
+    outgoingJoins = new ArrayList<Join>();
+    ingoingJoins = new ArrayList<Join>();
   }
 
   public QueryNode(long id)
@@ -184,9 +185,12 @@ public class QueryNode implements Serializable
   {
     this.arity = other.arity;
     this.corpus = other.corpus;
-    this.edgeAnnotations = new TreeSet<QueryAnnotation>(other.edgeAnnotations);
     this.id = other.id;
-    this.joins = new ArrayList<Join>(other.joins);
+    this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
+    // do not copy the ingoing join since this is a property of the joins itself
+    // only if they change their target it is allowed to change the state of 
+    // the ingoing joins of the query node
+    this.ingoingJoins = new ArrayList<Join>();
     this.left = other.left;
     this.leftToken = other.leftToken;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
@@ -315,13 +319,14 @@ public class QueryNode implements Serializable
       sb.append(nodeAnnotations);
     }
 
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
     if (!edgeAnnotations.isEmpty())
     {
       sb.append("; edge labes: ");
       sb.append(edgeAnnotations);
     }
 
-    for (Join join : joins)
+    for (Join join : outgoingJoins)
     {
       sb.append("; ");
       sb.append(join);
@@ -401,7 +406,7 @@ public class QueryNode implements Serializable
   public String toAQLEdgeFragment()
   {
     List<String> frags = new LinkedList<String>();
-    for (Join join : joins)
+    for (Join join : outgoingJoins)
     {
       frags.add(join.toAQLFragment(this));
     }
@@ -419,20 +424,19 @@ public class QueryNode implements Serializable
     return Joiner.on(" & ").join(frags);
   }
 
-  public boolean addEdgeAnnotation(QueryAnnotation annotation)
-  {
-    return edgeAnnotations.add(annotation);
-  }
-
   public boolean addNodeAnnotation(QueryAnnotation annotation)
   {
     return nodeAnnotations.add(annotation);
   }
   
-  public boolean addJoin(Join join)
+  public boolean addOutgoingJoin(Join join)
   {
-    boolean result = joins.add(join);
-
+    boolean result = outgoingJoins.add(join);
+    if(join.getTarget() != null)
+    {
+      join.getTarget().ingoingJoins.add(join);
+    }
+    
     if (join instanceof RankTableJoin)
     {
       this.setPartOfEdge(true);
@@ -442,6 +446,15 @@ public class QueryNode implements Serializable
     }
 
     return result;
+  }
+  
+  public void setThisNodeAsTarget(Join j)
+  {
+    
+    j.target.ingoingJoins.remove(j);
+    j.target = this;
+    ingoingJoins.add(j);
+
   }
   
   public String getQualifiedName()
@@ -522,8 +535,8 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.joins != other.joins
-      && (this.joins == null || !this.joins.equals(other.joins)))
+    if (this.outgoingJoins != other.outgoingJoins
+      && (this.outgoingJoins == null || !this.outgoingJoins.equals(other.outgoingJoins)))
     {
       return false;
     }
@@ -532,9 +545,11 @@ public class QueryNode implements Serializable
     {
       return false;
     }
-    if (this.edgeAnnotations != other.edgeAnnotations
-      && (this.edgeAnnotations == null || !this.edgeAnnotations.equals(
-      other.edgeAnnotations)))
+    Set<QueryAnnotation> edgeAnnotations = getEdgeAnnotations();
+    Set<QueryAnnotation> otherEdgeAnnotations = other.getEdgeAnnotations();
+    if (edgeAnnotations != otherEdgeAnnotations
+      && (edgeAnnotations == null || !edgeAnnotations.equals(
+      otherEdgeAnnotations)))
     {
       return false;
     }
@@ -574,7 +589,7 @@ public class QueryNode implements Serializable
   // .append(this.root, other.root)
   // .append(this.token, other.token)
   // .append(this.spanTextMatching, other.spanTextMatching)
-  // .append(this.joins, other.joins)
+  // .append(this.outgoingJoins, other.outgoingJoins)
   // .append(this.variable, other.variable)
   // .append(this.edgeAnnotations, other.edgeAnnotations)
   // .append(this.marker, other.marker)
@@ -586,16 +601,40 @@ public class QueryNode implements Serializable
   {
     return (int) id;
   }
-
-  // /// Getter / Setter
-  public Set<QueryAnnotation> getEdgeAnnotations()
+  
+  public void clearOutgoingJoins()
   {
-    return edgeAnnotations;
+    for(Join j : outgoingJoins)
+    {
+      if(j.getTarget() != null)
+      {
+        j.getTarget().ingoingJoins.remove(j);
+      }
+    }
+    outgoingJoins.clear();
+  }
+  
+  public boolean removeOutgoingJoin(Join j)
+  {
+    if(j.getTarget() != null)
+    {
+      j.getTarget().ingoingJoins.remove(j);
+    }
+    return outgoingJoins.remove(j);
   }
 
-  public void setEdgeAnnotations(Set<QueryAnnotation> edgeAnnotations)
+  // /// Getter / Setter
+  @XmlTransient
+  public Set<QueryAnnotation> getEdgeAnnotations()
   {
-    this.edgeAnnotations = edgeAnnotations;
+    Set<QueryAnnotation> edgeAnnotations = new TreeSet<QueryAnnotation>();
+    
+    for(Join j : ingoingJoins)
+    {
+      edgeAnnotations.addAll(j.getEdgeAnnotations());
+    }
+    
+    return Collections.unmodifiableSet(edgeAnnotations);
   }
 
   public boolean isRoot()
@@ -669,10 +708,17 @@ public class QueryNode implements Serializable
   }
 
   @XmlTransient // currently not supported, might be added later
-  public List<Join> getJoins()
+  public List<Join> getOutgoingJoins()
   {
-    return joins;
+    return Collections.unmodifiableList(outgoingJoins);
   }
+  
+  @XmlTransient // currently not supported, might be added later
+  public List<Join> getIngoingJoins()
+  {
+    return Collections.unmodifiableList(ingoingJoins);
+  }
+  
   public boolean isToken()
   {
     return token;
@@ -807,6 +853,20 @@ public class QueryNode implements Serializable
   public void setArtificial(boolean artificial)
   {
     this.artificial = artificial;
+  }
+
+  /**
+   * If set return the number of the (normalized) alternative this node belongs to.
+   * @return 
+   */
+  public Integer getAlternativeNumber()
+  {
+    return alternativeNumber;
+  }
+
+  public void setAlternativeNumber(Integer alternativeNumber)
+  {
+    this.alternativeNumber = alternativeNumber;
   }
 
   

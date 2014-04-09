@@ -15,6 +15,8 @@
  */
 package annis;
 
+import annis.model.AnnisConstants;
+import com.google.common.base.Charsets;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -31,10 +33,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualRelation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
@@ -129,33 +134,19 @@ public class CommonHelper
     {
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
-
-      Map<SNode, SOrderRelation> outRelationForNode
-        = new HashMap<SNode, SOrderRelation>();
-      for (SOrderRelation rel : graph.getSOrderRelations())
+      
+      for(SNode n : graph.getSNodes())
       {
-        if (rel.getSTypes() != null && rel.getSTypes().contains(segName))
+        SFeature feat = 
+          n.getSFeature(AnnisConstants.ANNIS_NS, 
+            AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+        if(feat != null && segName.equalsIgnoreCase(feat.getSValueSTEXT()))
         {
-          SNode node = rel.getSSource();
-          outRelationForNode.put(node, rel);
-
-          EList<Edge> inEdgesForSource = graph.getInEdges(node.getSId());
-          boolean hasInOrderEdge = false;
-          for (Edge e : inEdgesForSource)
-          {
-            if (e instanceof SOrderRelation)
-            {
-              hasInOrderEdge = true;
-              break;
-            }
-          } // for each ingoing edge
-
-          if (!hasInOrderEdge)
-          {
-            startNodes.add(rel.getSSource());
-          }
-        } // end if type is segName
-      } // end for all order relations of graph
+          startNodes.add(n);
+        }
+      }
+      
+      Set<String> alreadyAdded = new HashSet<String>();
 
       // add all nodes on the order relation chain beginning from the start node
       for (SNode s : startNodes)
@@ -164,13 +155,27 @@ public class CommonHelper
         while (current != null)
         {
           token.add(current);
-          if (outRelationForNode.containsKey(current))
+          EList<Edge> out = graph.getOutEdges(current.getSId());
+          current = null;
+          if(out != null)
           {
-            current = outRelationForNode.get(current).getSTarget();
-          }
-          else
-          {
-            current = null;
+            for(Edge e : out)
+            {
+              if(e instanceof SOrderRelation)
+              {
+                current = ((SOrderRelation) e).getSTarget();
+                if(alreadyAdded.contains(current.getSId()))
+                {
+                  // abort if cycle detected
+                  current = null;
+                }
+                else
+                {
+                  alreadyAdded.add(current.getSId());
+                }
+                break;
+              }
+            }
           }
         }
       }
@@ -207,35 +212,6 @@ public class CommonHelper
       {
         SDocumentGraph g = doc.getSDocumentGraph();
         result.addAll(getTokenAnnotationLevelSet(g));
-      }
-    }
-
-    return result;
-  }
-
-  public static Set<String> getOrderingTypes(SaltProject p)
-  {
-    Set<String> result = new TreeSet<String>();
-
-    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
-    {
-      for (SDocument doc : corpusGraphs.getSDocuments())
-      {
-        SDocumentGraph g = doc.getSDocumentGraph();
-        if (g != null)
-        {
-          EList<SOrderRelation> orderRelations = g.getSOrderRelations();
-          if (orderRelations != null)
-          {
-            for (SOrderRelation rel : orderRelations)
-            {
-              if (rel.getSTypes() != null)
-              {
-                result.addAll(rel.getSTypes());
-              }
-            }
-          }
-        }
       }
     }
 
@@ -426,7 +402,7 @@ public class CommonHelper
    * @param p
    * @return returns an empty list if project is empty or null.
    */
-  public static Set<String> getCorpusNames(SaltProject p)
+  public static Set<String> getToplevelCorpusNames(SaltProject p)
   {
     Set<String> names = new HashSet<String>();
 
@@ -434,9 +410,12 @@ public class CommonHelper
     {
       for (SCorpusGraph g : p.getSCorpusGraphs())
       {
-        for (SCorpus c : g.getSCorpora())
+        if(g.getSRootCorpus() != null)
         {
-          names.add(c.getSName());
+          for (SCorpus c : g.getSRootCorpus())
+          {
+            names.add(c.getSName());
+          }
         }
       }
     }
@@ -454,14 +433,22 @@ public class CommonHelper
     // also add the SDocumentGraph of the document
     res.getContents().add(doc.getSDocumentGraph());
     
-    res.save(out, res.getDefaultSaveOptions());
+    ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
+    
+    res.save(byteOut, res.getDefaultSaveOptions());
+    
+    out.writeUTF(byteOut.toString("UTF-8"));
   }
   
   public static SDocument readSDocument(ObjectInputStream in) 
     throws IOException
   {
-     XMIResourceImpl res = new XMIResourceImpl();
-    res.load(in, res.getDefaultLoadOptions());
+    XMIResourceImpl res = new XMIResourceImpl();
+    
+    byte[] asBytes = in.readUTF().getBytes(Charsets.UTF_8);
+    ByteArrayInputStream byteIn = new ByteArrayInputStream(asBytes);
+    
+    res.load(byteIn, res.getDefaultLoadOptions());
     
     
     TreeIterator<EObject> itContents = res.getAllContents();

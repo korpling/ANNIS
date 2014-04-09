@@ -18,6 +18,7 @@ package annis.visualizers.component.grid;
 import annis.CommonHelper;
 import annis.gui.widgets.grid.GridEvent;
 import annis.gui.widgets.grid.Row;
+import annis.libgui.Helper;
 import annis.libgui.PDFPageHelper;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.TimeHelper;
@@ -144,8 +145,15 @@ public class EventExtractor {
         sortEventsByTokenIndex(r);
       }
     }
+    
+    // 4. split up events if they cover islands
+    for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
+      for (Row r : e.getValue()) {
+        splitRowsOnIslands(r, graph, text, startTokenIndex, endTokenIndex);
+      }
+    }
 
-    // 4. split up events if they have gaps
+    // 5. split up events if they have gaps
     for (Map.Entry<String, ArrayList<Row>> e : rowsByAnnotation.entrySet()) {
       for (Row r : e.getValue()) {
         splitRowsOnGaps(r, graph, startTokenIndex, endTokenIndex);
@@ -155,12 +163,11 @@ public class EventExtractor {
     return rowsByAnnotation;
   }
   
-  public static void removeEmptySpace(LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation)
+  public static void removeEmptySpace(LinkedHashMap<String, 
+    ArrayList<Row>> rowsByAnnotation, Row tokenRow)
   {
     List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
-//    Row gapRow = new Row();
-//    rowsByAnnotation.put("annis::gap", Lists.newArrayList(gapRow));
-//    
+
     BitSet totalOccupancyGrid = new BitSet();
     for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
     {
@@ -169,7 +176,20 @@ public class EventExtractor {
         totalOccupancyGrid.or(r.getOccupancyGridCopy());
       }
     }
+    // We always include the token row in the occupancy grid since it is not
+    // a gap. Otherwise empty token would trigger gaps if the token list
+    // is included in the visualizer output.
+    // See https://github.com/korpling/ANNIS/issues/281 for the corresponding
+    // bug report.
+    if(tokenRow != null)
+    {
+      totalOccupancyGrid.or(tokenRow.getOccupancyGridCopy());
+    }
     
+    
+    // The Range class can give us the next bit that is not set. Use this
+    // to detect gaps. A gap starts from the next non-set bit and goes to
+    // the next set bit.
     Range<Integer> gap = Range.closed(-1, totalOccupancyGrid.nextSetBit(0));
     while(true)
     {
@@ -223,8 +243,8 @@ public class EventExtractor {
           GridEvent spaceEvent = new GridEvent("gap-" + gapID, g.lowerEndpoint(), g.lowerEndpoint(), spaceCaption);
           spaceEvent.setSpace(true);
           r.addEvent(spaceEvent);
-          gapID++;
-        }
+          gapID++; 
+       }
       }
     }
   }
@@ -270,7 +290,7 @@ public class EventExtractor {
         String id = "event_" + eventCounter.incrementAndGet();
         GridEvent event = new GridEvent(id, left, right,
           anno.getSValueSTEXT());
-        event.setTooltip(anno.getQName());
+        event.setTooltip(Helper.getQualifiedName(anno));
 
         // check if the span is a matched node
         SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
@@ -569,6 +589,83 @@ public class EventExtractor {
       }
     });
   }
+  
+  /**
+   * Splits events of a row if they overlap an island.  Islands are areas between
+   * the token which are included in the result.
+   *
+   * @param row
+   * @param graph
+   * @param text
+   * @param startTokenIndex token index of the first token in the match
+   * @param endTokenIndex token index of the last token in the match
+   */
+  private static void splitRowsOnIslands(Row row, 
+    final SDocumentGraph graph,
+    STextualDS text,
+    long startTokenIndex, long endTokenIndex)
+  {
+    
+    BitSet tokenCoverage = new BitSet();
+    // get the sorted token
+    List<SToken> sortedTokenList = graph.getSortedSTokenByText();
+    // add all token belonging to the right text to the bit set
+    ListIterator<SToken> itToken = sortedTokenList.listIterator();
+    while (itToken.hasNext())
+    {
+      SToken t = itToken.next();
+      if (text == null || text == CommonHelper.getTextualDSForNode(t, graph))
+      {
+        RelannisNodeFeature feat = (RelannisNodeFeature) t.getSFeature(
+          ANNIS_NS,
+          FEAT_RELANNIS_NODE).getValue();
+        long tokenIndexRaw = feat.getTokenIndex();
+
+        tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
+        int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
+        tokenCoverage.set(tokenIndex);
+      }
+    }
+
+    ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
+    while (itEvents.hasNext())
+    {
+      GridEvent event = itEvents.next();
+      BitSet eventBitSet = new BitSet();
+      eventBitSet.set(event.getLeft(), event.getRight()+1);
+      
+      // restrict event bitset on the locations where token are present
+      eventBitSet.and(tokenCoverage);
+      
+      // if there is is any 0 bit before the right border there is a break in the event
+      // and we need to split it
+      if(eventBitSet.nextClearBit(event.getLeft()) <= event.getRight())
+      {
+        // remove the original event
+        row.removeEvent(itEvents);
+        
+        // The event bitset now marks all the locations which the event should
+        // cover.
+        // Make a list of new events for each connected range in the bitset
+        int subElement = 0;
+        int offset = eventBitSet.nextSetBit(0);
+        while(offset >= 0)
+        {
+          int end = eventBitSet.nextClearBit(offset)-1;
+          if(offset < end)
+          {
+            GridEvent newEvent = new GridEvent(event);
+            newEvent.setId(event.getId() + "_islandsplit_" +  subElement++);
+            newEvent.setLeft(offset);
+            newEvent.setRight(end);
+            row.addEvent(itEvents, newEvent);
+          }
+          offset = eventBitSet.nextSetBit(end+1);
+        }
+      } // end if we need to split
+
+    }
+  }
 
   /**
    * Splits events of a row if they contain a gap. Gaps are found using the
@@ -581,38 +678,45 @@ public class EventExtractor {
    * @param endTokenIndex token index of the last token in the match
    */
   private static void splitRowsOnGaps(Row row, final SDocumentGraph graph,
-          long startTokenIndex, long endTokenIndex) {
+    long startTokenIndex, long endTokenIndex)
+  {
     ListIterator<GridEvent> itEvents = row.getEvents().listIterator();
-    while (itEvents.hasNext()) {
+    while (itEvents.hasNext())
+    {
       GridEvent event = itEvents.next();
 
-      int lastTokenIndex = Integer.MIN_VALUE;
+      int lastTokenIndex = -1;
 
       // sort the coveredIDs
       LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.
-              getCoveredIDs());
-      Collections.sort(sortedCoveredToken, new Comparator<String>() {
+        getCoveredIDs());
+      Collections.sort(sortedCoveredToken, new Comparator<String>()
+      {
         @Override
-        public int compare(String o1, String o2) {
+        public int compare(String o1, String o2)
+        {
           SNode node1 = graph.getSNode(o1);
           SNode node2 = graph.getSNode(o2);
 
-          if (node1 == node2) {
+          if (node1 == node2)
+          {
             return 0;
           }
-          if (node1 == null) {
+          if (node1 == null)
+          {
             return -1;
           }
-          if (node2 == null) {
+          if (node2 == null)
+          {
             return +1;
           }
 
-          RelannisNodeFeature feat1 =
-                  (RelannisNodeFeature) node1.getSFeature(ANNIS_NS,
-                  FEAT_RELANNIS_NODE).getValue();
-          RelannisNodeFeature feat2 =
-                  (RelannisNodeFeature) node2.getSFeature(ANNIS_NS,
-                  FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat1 = (RelannisNodeFeature) node1.getSFeature(
+            ANNIS_NS,
+            FEAT_RELANNIS_NODE).getValue();
+          RelannisNodeFeature feat2 = (RelannisNodeFeature) node2.getSFeature(
+            ANNIS_NS,
+            FEAT_RELANNIS_NODE).getValue();
 
           long tokenIndex1 = feat1.getTokenIndex();
           long tokenIndex2 = feat2.getTokenIndex();
@@ -623,45 +727,81 @@ public class EventExtractor {
 
       // first calculate all gaps
       List<GridEvent> gaps = new LinkedList<GridEvent>();
-      for (String id : sortedCoveredToken) {
+      for (String id : sortedCoveredToken)
+      {
 
         SNode node = graph.getSNode(id);
-        RelannisNodeFeature feat =
-                (RelannisNodeFeature) node.getSFeature(ANNIS_NS,
-                FEAT_RELANNIS_NODE).getValue();
+        RelannisNodeFeature feat = (RelannisNodeFeature) node.getSFeature(
+          ANNIS_NS,
+          FEAT_RELANNIS_NODE).getValue();
         long tokenIndexRaw = feat.getTokenIndex();
 
         tokenIndexRaw = clip(tokenIndexRaw, startTokenIndex, endTokenIndex);
 
         int tokenIndex = (int) (tokenIndexRaw - startTokenIndex);
-        int diff = tokenIndex - lastTokenIndex;
+        
+        // sanity check
+        if(tokenIndex >= event.getLeft() && tokenIndex <= event.getRight())
+        {
+          int diff = tokenIndex - lastTokenIndex;
 
-        if (lastTokenIndex >= 0 && diff > 1) {
-          // we detected a gap
-          GridEvent gap = new GridEvent(event.getId() + "_gap",
-                  lastTokenIndex + 1, tokenIndex - 1, "");
-          gap.setGap(true);
-          gaps.add(gap);
+          if (lastTokenIndex >= 0 && diff > 1)
+          {
+            // we detected a gap
+            GridEvent gap = new GridEvent(event.getId() + "_gap_" + gaps.size(),
+              lastTokenIndex + 1, tokenIndex - 1, "");
+            gap.setGap(true);
+            gaps.add(gap);
+          }
+
+          lastTokenIndex = tokenIndex;
         }
-
-        lastTokenIndex = tokenIndex;
+        else
+        {
+          // reset gap search when discovered there were token we use for 
+          // hightlighting but do not actually cover
+          lastTokenIndex = -1;
+        }
       } // end for each covered token id
 
-      for (GridEvent gap : gaps) {
-        // remember the old right value
-        int oldRight = event.getRight();
-
-        // shorten last event
-        event.setRight(gap.getLeft() - 1);
-
+      ListIterator<GridEvent> itGaps = gaps.listIterator();
+      // remember the old right value
+      int oldRight = event.getRight();
+      
+      int gapNr = 0;
+      while(itGaps.hasNext())
+      {
+        GridEvent gap = itGaps.next();
+      
+        if(gapNr == 0)
+        {
+          // shorten original event
+          event.setRight(gap.getLeft() - 1);
+        }
+        
         // insert the real gap
         itEvents.add(gap);
 
+        int rightBorder = oldRight;
+        if(itGaps.hasNext())
+        {
+          // don't use the old event right border since the gap should only go until
+          // the next event
+          GridEvent nextGap = itGaps.next();
+          itGaps.previous();
+
+          rightBorder = nextGap.getLeft()-1;
+
+        }
         // insert a new event node that covers the rest of the event
-        GridEvent after = new GridEvent(event.getId() + "_after",
-                gap.getRight() + 1, oldRight, event.getValue());
-        after.getCoveredIDs().addAll(event.getCoveredIDs());
+        GridEvent after = new GridEvent(event);
+          
+        after.setId(event.getId() + "_after_" + gapNr);
+        after.setLeft(gap.getRight() + 1);
+        after.setRight(rightBorder);
+        
         itEvents.add(after);
+        gapNr++;
       }
 
     }

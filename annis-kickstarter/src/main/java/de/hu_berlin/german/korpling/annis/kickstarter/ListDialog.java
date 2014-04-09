@@ -15,6 +15,7 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao.ImportStatus;
 import annis.administration.CorpusAdministration;
 import java.util.LinkedList;
 import java.util.List;
@@ -207,7 +208,9 @@ public class ListDialog extends javax.swing.JDialog
     }
     catch(Exception ex)
     {
-      new ExceptionDialog(ex).setVisible(true);
+      ImportStatus importStatus = corpusAdmin.getAdministrationDao().initImportStatus();
+      importStatus.addException("list corpora exception", ex);
+      new ExceptionDialog(importStatus).setVisible(true);
     }
   }
     // Variables declaration - do not modify//GEN-BEGIN:variables

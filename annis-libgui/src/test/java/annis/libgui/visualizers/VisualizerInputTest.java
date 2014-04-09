@@ -31,7 +31,6 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import static org.junit.Assert.*;
 
 /**
  *
@@ -90,5 +89,6 @@ public class VisualizerInputTest
     Assert.assertTrue(doc.equals(restored.getDocument()));
     Assert.assertEquals("anypath", restored.getContextPath());
   }
+  
   
 }

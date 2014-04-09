@@ -13,6 +13,41 @@ Without this configuration present, some functionality in the IDE may be limited
             <configuration id="ServiceFastRun" profiles=""/>
         </configurations>
     </config-data>
+    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
+        <config-files>
+            <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
+            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+        </config-files>
+        <config-file-groups>
+            <config-file-group name="annopool">
+                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
+            </config-file-group>
+            <config-file-group name="fullfacts">
+                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+            </config-file-group>
+        </config-file-groups>
+    </spring-data>
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!--
 Properties that influence various parts of the IDE, especially code formatting and the like.
@@ -49,42 +84,7 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>1</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>
-        <netbeans.compile.on.save>all</netbeans.compile.on.save>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
         <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
     </properties>
-    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
-        <config-files>
-            <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
-            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-        </config-files>
-        <config-file-groups>
-            <config-file-group name="annopool">
-                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
-            </config-file-group>
-            <config-file-group name="fullfacts">
-                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-            </config-file-group>
-        </config-file-groups>
-    </spring-data>
 </project-shared-configuration>

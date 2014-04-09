@@ -24,6 +24,10 @@ import annis.model.QueryNode;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.google.common.base.Joiner;
+import com.google.common.base.Objects;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.LinkedHashMultimap;
+import com.google.common.collect.Multimap;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -32,10 +36,13 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.event.FieldEvents;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -44,9 +51,13 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -58,6 +69,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private Table tblFrequencyDefinition;
   private final Button btAdd;
   private final Button btReset;
+  private final CheckBox cbAutomaticMode;
   private Button btDeleteRow;
   private Button btShowFrequencies;
   private int counter;
@@ -65,9 +77,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private Button btShowQuery;
   private VerticalLayout queryLayout;
   private final QueryController controller;
-  private boolean manuallyChanged;
   private final Label lblCorpusList;
   private final Label lblAQL;
+  private final Label lblErrorOrMsg;
   
   public FrequencyQueryPanel(final QueryController controller)
   {
@@ -76,8 +88,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     setWidth("99%");
     setHeight("99%");
     setMargin(true);
-    
-    manuallyChanged = false;
     
     queryLayout = new VerticalLayout();
     queryLayout.setWidth("100%");
@@ -96,6 +106,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     lblAQL = new Label("");
     lblAQL.setCaption("query to analyze:");
     lblAQL.setWidth("100%");
+    lblAQL.addStyleName("corpus-font-force");
     
     queryDescriptionLayout.addComponent(lblCorpusList);
     queryDescriptionLayout.addComponent(lblAQL);
@@ -128,6 +139,20 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       }
     });
     
+    lblErrorOrMsg = new Label(
+      "No node with explicit name in OR expression found! "
+      + "When using OR expression you need to explicitly name the nodes "
+      + "you want to include in the frequency analysis with \"#\", "
+      + "like e.g. in <br />"
+      + "<pre>"
+      + "(n1#tok=\"fun\" | n1#tok=\"severity\")"
+      + "</pre>");
+    lblErrorOrMsg.setContentMode(ContentMode.HTML);
+    lblErrorOrMsg.addStyleName("warning");
+    lblErrorOrMsg.setWidth("100%");
+    lblErrorOrMsg.setVisible(false);
+    queryLayout.addComponent(lblErrorOrMsg);
+    
     tblFrequencyDefinition.setWidth("100%");
     tblFrequencyDefinition.setHeight("-1px");
     
@@ -136,9 +161,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
     tblFrequencyDefinition.addContainerProperty("comment", String.class, "manually created");
     
-    tblFrequencyDefinition.setColumnHeader("nr", "Node definition");
+    tblFrequencyDefinition.setColumnHeader("nr", "Node number/name");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
     tblFrequencyDefinition.setColumnHeader("comment", "Comment");
+    
+    tblFrequencyDefinition.addStyleName("corpus-font-force");
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
@@ -162,7 +189,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        manuallyChanged = true;
+        cbAutomaticMode.setValue(Boolean.FALSE);
         
         int nr = 1;
         // get the highest number of values from the existing defitions
@@ -183,8 +210,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
           nr = Math.min(nr, nodes.size()-1);
-          tblFrequencyDefinition.addItem(createNewTableRow("" +(nr+1),
-            FrequencyTableEntryType.span, "", ""), counter++);
+          int id = counter++;
+          tblFrequencyDefinition.addItem(createNewTableRow(
+            tblFrequencyDefinition, id,
+            "" +(nr+1),
+            FrequencyTableEntryType.span, "", ""), id);
         }
       }
     });
@@ -200,12 +230,32 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         Set<Object> selected = new HashSet((Set<Object>) tblFrequencyDefinition.getValue());
         for(Object o : selected)
         {
-          manuallyChanged = true;
+          cbAutomaticMode.setValue(Boolean.FALSE);
           tblFrequencyDefinition.removeItem(o);
         }
       }
     });
     layoutButtons.addComponent(btDeleteRow);
+    
+    cbAutomaticMode = new CheckBox("Automatic mode", true);
+    cbAutomaticMode.setImmediate(true);
+    cbAutomaticMode.addValueChangeListener(new Property.ValueChangeListener()
+    {
+      @Override
+      public void valueChange(ValueChangeEvent event)
+      {
+        btShowFrequencies.setEnabled(true);
+        if(cbAutomaticMode.getValue())
+        {
+          tblFrequencyDefinition.removeAllItems();
+          if(controller != null)
+          {
+            createAutomaticEntriesForQuery(controller.getQueryDraft());
+          }
+        }
+      }
+    });
+    layoutButtons.addComponent(cbAutomaticMode);
     
     btReset = new Button("Reset to default");
     btReset.addClickListener(new Button.ClickListener() 
@@ -213,7 +263,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        manuallyChanged = false;
+        cbAutomaticMode.setValue(Boolean.TRUE);
         btShowFrequencies.setEnabled(true);
         tblFrequencyDefinition.removeAllItems();
         if(controller != null)
@@ -222,14 +272,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
       }
     });
-    layoutButtons.addComponent(btReset);
+    //layoutButtons.addComponent(btReset);
     
     layoutButtons.setComponentAlignment(btAdd, Alignment.MIDDLE_LEFT);
     layoutButtons.setComponentAlignment(btDeleteRow, Alignment.MIDDLE_LEFT);
-    layoutButtons.setComponentAlignment(btReset, Alignment.MIDDLE_RIGHT);
+    layoutButtons.setComponentAlignment(cbAutomaticMode, Alignment.MIDDLE_RIGHT);
     layoutButtons.setExpandRatio(btAdd, 0.0f);
     layoutButtons.setExpandRatio(btDeleteRow, 0.0f);
-    layoutButtons.setExpandRatio(btReset, 1.0f);
+    layoutButtons.setExpandRatio(cbAutomaticMode, 1.0f);
     
     layoutButtons.setMargin(true);
     layoutButtons.setSpacing(true);
@@ -318,7 +368,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         @Override
         public void onCorpusSelectionChanged(Set<String> selectedCorpora)
         {
-          if (!manuallyChanged)
+          if (cbAutomaticMode.getValue())
           {
             createAutomaticEntriesForQuery(controller.getQueryDraft());
           }
@@ -328,13 +378,27 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
   }
   
-  private Object[] createNewTableRow(String nodeVariable, FrequencyTableEntryType type, 
+  private Object[] createNewTableRow(
+    final Table tbl, final Object rowID,
+    String nodeVariable, FrequencyTableEntryType type, 
     String annotation, String comment)
   {
     TextField txtNode = new TextField();
     txtNode.setValue(nodeVariable);
     txtNode.addValidator(new IntegerValidator("Node reference must be a valid number"));
     txtNode.setWidth("100%");
+    if(tbl != null && rowID != null)
+    {
+      txtNode.addFocusListener(new FieldEvents.FocusListener()
+      {
+        @Override
+        public void focus(FieldEvents.FocusEvent event)
+        {
+          tbl.setValue(null);
+          tbl.select(rowID);
+        }
+      });
+    }
     
     final TextField txtAnno = new TextField();
     
@@ -349,6 +413,18 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     
     txtAnno.setWidth("100%");
+    if(tbl != null && rowID != null)
+    {
+      txtAnno.addFocusListener(new FieldEvents.FocusListener()
+      {
+        @Override
+        public void focus(FieldEvents.FocusEvent event)
+        {
+          tbl.setValue(null);
+          tbl.select(rowID);
+        }
+      });
+    }
     
     return new Object[] {txtNode, txtAnno, comment == null ? ""  : comment};
   }
@@ -356,7 +432,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   @Override
   public void textChange(FieldEvents.TextChangeEvent event)
   {
-    if(!manuallyChanged)
+    if(cbAutomaticMode.getValue())
     {
       createAutomaticEntriesForQuery(event.getText());
     }
@@ -421,28 +497,77 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     { 
 
       tblFrequencyDefinition.removeAllItems();
-
+      lblErrorOrMsg.setVisible(false);
+      
       counter = 0;
       List<QueryNode> nodes = parseQuery(query);
+      Collections.sort(nodes, new Comparator<QueryNode>()
+      {
+
+        @Override
+        public int compare(QueryNode o1, QueryNode o2)
+        {
+          if(o1.getVariable() == null)
+          {
+            return o2 == null ? 0 : -1;
+          }
+          return o1.getVariable().compareTo(o2.getVariable());
+        }
+      });
+      
+      // calculate the nodes that are part of every alternative
+      Multimap<String, Integer> alternativesOfVariable = LinkedHashMultimap.create();
+      int maxAlternative = 0;
       for(QueryNode n : nodes)
       {
-        if(!n.isArtificial())
+        if(n.getAlternativeNumber() != null)
         {
-          n.getId();
+          maxAlternative = Math.max(n.getAlternativeNumber(), maxAlternative);
+          alternativesOfVariable.put(n.getVariable(), n.getAlternativeNumber());
+        }
+      }
+      Set<String> allowedVariables = new LinkedHashSet<String>();
+      for(QueryNode n : nodes)
+      {
+        // we assume that the alternative numbering is continuous and without gaps
+        if(alternativesOfVariable.get(n.getVariable()).size() == (maxAlternative+1))
+        {
+          allowedVariables.add(n.getVariable());
+        }
+      }
+      
+      if(maxAlternative > 0 && allowedVariables.isEmpty())
+      {
+        lblErrorOrMsg.setVisible(true);
+      }
+      
+      
+      for(QueryNode n : nodes)
+      {
+        if(!n.isArtificial() && allowedVariables.contains(n.getVariable()))
+        {
           if(n.getNodeAnnotations().isEmpty())
           {
-            tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.span, "", 
-              "automatically created from " + n.toAQLNodeFragment()),
-              counter++);
+            int id = counter++;
+            tblFrequencyDefinition.addItem(
+              createNewTableRow(
+                tblFrequencyDefinition, id,
+                n.getVariable(),
+                FrequencyTableEntryType.span, "",
+                "automatically created from " + n.toAQLNodeFragment()),
+              id);
           }
           else
           {
+            int id = counter++;
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
-            tblFrequencyDefinition.addItem(createNewTableRow(n.getVariable(),
-              FrequencyTableEntryType.annotation, firstAnno.getName(), 
-              "automatically created from " + n.toAQLNodeFragment()), 
-              counter++);
+            tblFrequencyDefinition.addItem(
+              createNewTableRow(
+                tblFrequencyDefinition, id,
+                n.getVariable(),
+                FrequencyTableEntryType.annotation, firstAnno.getName(),
+                "automatically created from " + n.toAQLNodeFragment()),
+              id);
 
           }
         }

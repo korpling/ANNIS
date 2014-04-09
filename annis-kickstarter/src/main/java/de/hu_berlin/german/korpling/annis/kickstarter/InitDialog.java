@@ -15,13 +15,20 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
+import annis.administration.AdministrationDao.ImportStatus;
 import annis.administration.CorpusAdministration;
+import com.google.common.base.Charsets;
 import java.awt.Frame;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.Serializable;
+import java.net.URI;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
@@ -57,26 +64,64 @@ public class InitDialog extends javax.swing.JDialog
     @Override
     protected String doInBackground() throws Exception
     {
+      InputStream propStream = null;
       try
       {
-        corpusAdministration.initializeDatabase("localhost", "5432",
-          "anniskickstart",
-          "anniskickstart", "annisKickstartPassword", "postgres",
-          txtAdminUsername.getText(), new String(txtAdminPassword.getPassword()), 
-          false);
+        // get the values from the installation
+        File propFile = new File(System.getProperty("annis.home") + "/conf",
+          "database.properties");
+        propStream = new FileInputStream(propFile);
+        Properties prop = new Properties();
+        InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8);
+        try
+        {
+          prop.load(propReader);
+        }
+        finally
+        {
+          propReader.close();
+        }
+        
+        String rawDataSourceURI = prop.getProperty("datasource.url", 
+          "jdbc:postgresql://localhost:5432/anniskickstart").trim();
+        
+        URI uri = new URI(rawDataSourceURI.substring("jdbc:".length()));
+        
+        corpusAdministration.initializeDatabase(
+          uri.getHost(), "" + uri.getPort(),
+          uri.getPath().substring(1), // remove / at beginning
+          prop.getProperty("datasource.username", "anniskickstart").trim(), 
+          prop.getProperty("datasource.password", "annisKickstartPassword").trim(), 
+          "postgres",
+          txtAdminUsername.getText(), 
+          new String(txtAdminPassword.getPassword()), 
+          prop.getProperty("datasource.ssl", "false").trim().equalsIgnoreCase("true"));
+        
+        // also perform a cleanup of the data directory
+        // when using kickstarter you are either using just the default one instance
+        // or you can change the service settings defining where to put the data files to
+        corpusAdministration.cleanupData();
 
         return "";
       }
       catch (Exception ex)
-      {
+      { 
         parent.setVisible(false);
-        ExceptionDialog dlg = new ExceptionDialog(parent, ex);
+        ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
+        importStatus.addException("init database exception:", ex);
+        ExceptionDialog dlg = new ExceptionDialog(parent, importStatus);
         dlg.setVisible(true);
+      }
+      finally
+      {
+        if(propStream != null)
+        {
+          propStream.close();
+        }
       }
 
       return "ERROR";
     }
-
     @Override
     protected void done()
     {
