@@ -1,3 +1,11 @@
+Version 3.1.2
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=11&state=closed
+
+[Bugs]
+ #309 corpora with token which have the same left or right text boundaries can't be imported
+
 Version 3.1.1
 =============
 Changelog is also available on GitHub:
