@@ -108,7 +108,7 @@ public class TestCorpusAdministration
     root.mkdirs();
     
     Files.append("0\t" + corpusName  + "\tCORPUS\tNULL\t0\t1", 
-      new File(root, "corpus.tab"), Charsets.UTF_8);
+      new File(root, "corpus.relannis"), Charsets.UTF_8);
     
     return root;
   }

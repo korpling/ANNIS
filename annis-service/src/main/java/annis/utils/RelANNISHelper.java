@@ -89,7 +89,7 @@ public class RelANNISHelper
     FluentIterable<File> it = Files.fileTreeTraverser().postOrderTraversal(d);
     for(File f : it)
     {
-      if("corpus.tab".equalsIgnoreCase(f.getName()))
+      if("corpus.relannis".equalsIgnoreCase(f.getName()))
       {
         String toplevelName = extractToplevelCorpusNames(new FileInputStream(f));
         result.put(toplevelName, f.getParentFile());

@@ -183,7 +183,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private Map<String, String> tableInsertFrom;
 
   // all files have to carry this suffix.
-  private static final String REL_ANNIS_FILE_SUFFIX = ".tab";
+  private static final String REL_ANNIS_FILE_SUFFIX = ".relannis";
 
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
@@ -494,6 +494,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 //    adjustRankPrePost();
 //    adjustTextId();
     long corpusID = updateIds();
+//    if(true)
+//      return false;
 
     importBinaryData(path, toplevelCorpusName);
 
@@ -639,7 +641,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       // check column number by reading first line
-      File nodeTabFile = new File(path, "node.tab");
+      File nodeTabFile = new File(path, "node" + REL_ANNIS_FILE_SUFFIX);
 
       reader
         = new BufferedReader(new InputStreamReader(
@@ -688,7 +690,8 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
       else
       {
-        throw new RuntimeException("Illegal number of columns in node.tab, "
+        throw new RuntimeException("Illegal number of columns in node" 
+          + REL_ANNIS_FILE_SUFFIX +  ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
     }
@@ -935,6 +938,9 @@ public class DefaultAdministrationDao implements AdministrationDao
         "SELECT max(id) FROM corpus_stats");
       log.info("the id from recently imported corpus:" + recentCorpusId);
     }
+    
+//    if(true)
+//      return 0;
 
     log.info("updating IDs in staging area");
     MapSqlParameterSource args = makeArgs().addValue(":id", recentCorpusId);
