@@ -116,10 +116,10 @@ public class SaltAnnotateExtractorTest
     assertEquals(6, layers.size());
     assertEquals("dep", layers.get(0).getSName());
     assertEquals("exmaralda", layers.get(1).getSName());
-    assertEquals("mmax", layers.get(2).getSName());
-    assertEquals("tiger", layers.get(3).getSName());
-    assertEquals("token_merged", layers.get(4).getSName());
-    assertEquals("urml", layers.get(5).getSName());
+    assertEquals("merged", layers.get(2).getSName());
+    assertEquals("mmax", layers.get(3).getSName());
+    assertEquals("rst", layers.get(4).getSName());
+    assertEquals("tiger", layers.get(5).getSName());
   }
 
   @Test
@@ -134,24 +134,24 @@ public class SaltAnnotateExtractorTest
     EList<SNode> n = g.getSLayerByName("exmaralda").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
     assertEquals(9, n.size());
-    assertEquals("sSpan10", n.get(0).getSName());
-    assertEquals("sSpan40", n.get(1).getSName());
-    assertEquals("sSpan41", n.get(2).getSName());
-    assertEquals("sSpan74", n.get(3).getSName());
-    assertEquals("sSpan75", n.get(4).getSName());
-    assertEquals("sSpan86", n.get(5).getSName());
-    assertEquals("sSpan9", n.get(6).getSName());
-    assertEquals("sSpan97", n.get(7).getSName());
-    assertEquals("sSpan98", n.get(8).getSName());
+    assertEquals("Focus_newInfSeg_10", n.get(0).getSName());
+    assertEquals("Focus_newInfSeg_9", n.get(1).getSName());
+    assertEquals("Inf-StatSeg_29", n.get(2).getSName());
+    assertEquals("Inf-StatSeg_30", n.get(3).getSName());
+    assertEquals("NPSeg_29", n.get(4).getSName());
+    assertEquals("NPSeg_30", n.get(5).getSName());
+    assertEquals("PPSeg_7", n.get(6).getSName());
+    assertEquals("SentSeg_10", n.get(7).getSName());
+    assertEquals("SentSeg_9", n.get(8).getSName());
 
     n = g.getSLayerByName("mmax").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
     assertEquals(5, n.size());
-    assertEquals("sSpan121", n.get(0).getSName());
-    assertEquals("sSpan124", n.get(1).getSName());
-    assertEquals("sSpan151", n.get(2).getSName());
-    assertEquals("sSpan152", n.get(3).getSName());
-    assertEquals("sSpan153", n.get(4).getSName());
+    assertEquals("primmarkSeg_1000154", n.get(0).getSName());
+    assertEquals("primmarkSeg_60", n.get(1).getSName());
+    assertEquals("sentenceSeg_50010", n.get(2).getSName());
+    assertEquals("sentenceSeg_50011", n.get(3).getSName());
+    assertEquals("sentenceSeg_5009", n.get(4).getSName());
 
     n = g.getSLayerByName("tiger").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
@@ -167,7 +167,7 @@ public class SaltAnnotateExtractorTest
     assertEquals("const_60", n.get(8).getSName());
     assertEquals("const_61", n.get(9).getSName());
 
-    n = g.getSLayerByName("token_merged").get(0).getSNodes();
+    n = g.getSLayerByName("merged").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
     assertEquals(12, n.size());
     assertEquals("tok_150", n.get(0).getSName());
@@ -183,12 +183,19 @@ public class SaltAnnotateExtractorTest
     assertEquals("tok_160", n.get(10).getSName());
     assertEquals("tok_161", n.get(11).getSName());
 
-    n = g.getSLayerByName("urml").get(0).getSNodes();
+    n = g.getSLayerByName("rst").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
-    assertEquals(2, n.size());
-    assertEquals("sSpan166", n.get(0).getSName());
-    assertEquals("sSpan167", n.get(1).getSName());
-
+    assertEquals(9, n.size());
+    assertEquals("u0", n.get(0).getSName());
+    assertEquals("u10", n.get(1).getSName());
+    assertEquals("u11", n.get(2).getSName());
+    assertEquals("u12", n.get(3).getSName());
+    assertEquals("u20", n.get(4).getSName());
+    assertEquals("u23", n.get(5).getSName());
+    assertEquals("u24", n.get(6).getSName());
+    assertEquals("u27", n.get(7).getSName());
+    assertEquals("u28", n.get(8).getSName());
+    
     assertEquals(0, g.getSLayerByName("dep").get(0).getSNodes().size());
   }
 
@@ -241,85 +248,87 @@ public class SaltAnnotateExtractorTest
 
     assertEquals(30, e.size());
 
-    assertEquals("sSpan10", e.get(0).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(0).getSSource().getSName());
     assertEquals("tok_154", e.get(0).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(1).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(1).getSSource().getSName());
     assertEquals("tok_155", e.get(1).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(2).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(2).getSSource().getSName());
     assertEquals("tok_156", e.get(2).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(3).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(3).getSSource().getSName());
     assertEquals("tok_157", e.get(3).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(4).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(4).getSSource().getSName());
     assertEquals("tok_158", e.get(4).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(5).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(5).getSSource().getSName());
     assertEquals("tok_159", e.get(5).getSTarget().getSName());
-    assertEquals("sSpan10", e.get(6).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_10", e.get(6).getSSource().getSName());
     assertEquals("tok_160", e.get(6).getSTarget().getSName());
 
-    assertEquals("sSpan40", e.get(7).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_9", e.get(7).getSSource().getSName());
     assertEquals("tok_150", e.get(7).getSTarget().getSName());
-    assertEquals("sSpan40", e.get(8).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_9", e.get(8).getSSource().getSName());
     assertEquals("tok_151", e.get(8).getSTarget().getSName());
-
-    assertEquals("sSpan41", e.get(9).getSSource().getSName());
-    assertEquals("tok_155", e.get(9).getSTarget().getSName());
-
-    assertEquals("sSpan74", e.get(10).getSSource().getSName());
+    assertEquals("Focus_newInfSeg_9", e.get(9).getSSource().getSName());
+    assertEquals("tok_152", e.get(9).getSTarget().getSName());
+    
+    assertEquals("Inf-StatSeg_29", e.get(10).getSSource().getSName());
     assertEquals("tok_150", e.get(10).getSTarget().getSName());
-    assertEquals("sSpan74", e.get(11).getSSource().getSName());
+    assertEquals("Inf-StatSeg_29", e.get(11).getSSource().getSName());
     assertEquals("tok_151", e.get(11).getSTarget().getSName());
-
-    assertEquals("sSpan75", e.get(12).getSSource().getSName());
+    
+    assertEquals("Inf-StatSeg_30", e.get(12).getSSource().getSName());
     assertEquals("tok_155", e.get(12).getSTarget().getSName());
 
-    assertEquals("sSpan86", e.get(13).getSSource().getSName());
+    assertEquals("NPSeg_29", e.get(13).getSSource().getSName());
     assertEquals("tok_150", e.get(13).getSTarget().getSName());
-    assertEquals("sSpan86", e.get(14).getSSource().getSName());
+    assertEquals("NPSeg_29", e.get(14).getSSource().getSName());
     assertEquals("tok_151", e.get(14).getSTarget().getSName());
+    
+    assertEquals("NPSeg_30", e.get(15).getSSource().getSName());
+    assertEquals("tok_155", e.get(15).getSTarget().getSName());
+    
+    assertEquals("PPSeg_7", e.get(16).getSSource().getSName());
+    assertEquals("tok_150", e.get(16).getSTarget().getSName());
+    assertEquals("PPSeg_7", e.get(17).getSSource().getSName());
+    assertEquals("tok_151", e.get(17).getSTarget().getSName());
 
-    assertEquals("sSpan9", e.get(15).getSSource().getSName());
-    assertEquals("tok_150", e.get(15).getSTarget().getSName());
-    assertEquals("sSpan9", e.get(16).getSSource().getSName());
-    assertEquals("tok_151", e.get(16).getSTarget().getSName());
-    assertEquals("sSpan9", e.get(17).getSSource().getSName());
-    assertEquals("tok_152", e.get(17).getSTarget().getSName());
 
-    assertEquals("sSpan97", e.get(18).getSSource().getSName());
-    assertEquals("tok_150", e.get(18).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(19).getSSource().getSName());
-    assertEquals("tok_151", e.get(19).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(20).getSSource().getSName());
-    assertEquals("tok_152", e.get(20).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(21).getSSource().getSName());
-    assertEquals("tok_153", e.get(21).getSTarget().getSName());
-
-    assertEquals("sSpan98", e.get(22).getSSource().getSName());
-    assertEquals("tok_154", e.get(22).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(23).getSSource().getSName());
-    assertEquals("tok_155", e.get(23).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(24).getSSource().getSName());
-    assertEquals("tok_156", e.get(24).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(25).getSSource().getSName());
-    assertEquals("tok_157", e.get(25).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(26).getSSource().getSName());
-    assertEquals("tok_158", e.get(26).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(27).getSSource().getSName());
-    assertEquals("tok_159", e.get(27).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(28).getSSource().getSName());
-    assertEquals("tok_160", e.get(28).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(29).getSSource().getSName());
-    assertEquals("tok_161", e.get(29).getSTarget().getSName());
-
+    assertEquals("SentSeg_10", e.get(18).getSSource().getSName());
+    assertEquals("tok_154", e.get(18).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(19).getSSource().getSName());
+    assertEquals("tok_155", e.get(19).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(20).getSSource().getSName());
+    assertEquals("tok_156", e.get(20).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(21).getSSource().getSName());
+    assertEquals("tok_157", e.get(21).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(22).getSSource().getSName());
+    assertEquals("tok_158", e.get(22).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(23).getSSource().getSName());
+    assertEquals("tok_159", e.get(23).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(24).getSSource().getSName());
+    assertEquals("tok_160", e.get(24).getSTarget().getSName());
+    assertEquals("SentSeg_10", e.get(25).getSSource().getSName());
+    assertEquals("tok_161", e.get(25).getSTarget().getSName());
+    
+    
+    assertEquals("SentSeg_9", e.get(26).getSSource().getSName());
+    assertEquals("tok_150", e.get(26).getSTarget().getSName());
+    assertEquals("SentSeg_9", e.get(27).getSSource().getSName());
+    assertEquals("tok_151", e.get(27).getSTarget().getSName());
+    assertEquals("SentSeg_9", e.get(28).getSSource().getSName());
+    assertEquals("tok_152", e.get(28).getSTarget().getSName());
+    assertEquals("SentSeg_9", e.get(29).getSSource().getSName());
+    assertEquals("tok_153", e.get(29).getSTarget().getSName());
+    
     // mmax, only control samples //
     e = g.getSLayerByName("mmax").get(0).getSRelations();
     ECollections.sort(e, new EdgeComparator());
 
     assertEquals(14, e.size());
 
-    assertEquals("sSpan151", e.get(2).getSSource().getSName());
-    assertEquals("tok_150", e.get(2).getSTarget().getSName());
-    assertEquals("sSpan151", e.get(3).getSSource().getSName());
-    assertEquals("tok_151", e.get(3).getSTarget().getSName());
+    assertEquals("primmarkSeg_60", e.get(1).getSSource().getSName());
+    assertEquals("tok_150", e.get(1).getSTarget().getSName());
+    assertEquals("sentenceSeg_50010", e.get(7).getSSource().getSName());
+    assertEquals("tok_158", e.get(7).getSTarget().getSName());
 
     // tiger, only control samples //
     e = g.getSLayerByName("tiger").get(0).getSRelations();
@@ -333,15 +342,15 @@ public class SaltAnnotateExtractorTest
     assertEquals("tok_156", e.get(16).getSTarget().getSName());
 
     // urml, only control samples //
-    e = g.getSLayerByName("urml").get(0).getSRelations();
+    e = g.getSLayerByName("rst").get(0).getSRelations();
     ECollections.sort(e, new EdgeComparator());
 
-    assertEquals(12, e.size());
+    assertEquals(20, e.size());
 
-    assertEquals("sSpan166", e.get(0).getSSource().getSName());
-    assertEquals("tok_150", e.get(0).getSTarget().getSName());
-    assertEquals("sSpan167", e.get(6).getSSource().getSName());
-    assertEquals("tok_156", e.get(6).getSTarget().getSName());
+    assertEquals("u0", e.get(0).getSSource().getSName());
+    assertEquals("u28", e.get(0).getSTarget().getSName());
+    assertEquals("u11", e.get(5).getSSource().getSName());
+    assertEquals("tok_153", e.get(5).getSTarget().getSName());
 
   }
 

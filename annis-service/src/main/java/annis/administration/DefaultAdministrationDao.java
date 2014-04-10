@@ -493,9 +493,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
 //    adjustRankPrePost();
 //    adjustTextId();
-    long corpusID = updateIds();
 //    if(true)
-//      return false;
+//      return true;
+    long corpusID = updateIds();
+
 
     importBinaryData(path, toplevelCorpusName);
 

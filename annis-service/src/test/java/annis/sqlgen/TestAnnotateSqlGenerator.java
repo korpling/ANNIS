@@ -118,6 +118,7 @@ public class TestAnnotateSqlGenerator
 
     Map<String, String> edgeColumns = new HashMap<String, String>();
     edgeColumns.put("node_ref", "id");
+    edgeColumns.put("id", "rank_id");
 
     Map<String, String> componentColumns = new HashMap<String, String>();
     componentColumns.put("id", "component_id");
