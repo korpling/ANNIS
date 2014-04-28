@@ -11,7 +11,7 @@ SELECT ARRAY(
     toplevel_corpus = ANY($5) AND 
     "type" = $6::annotype
 );
-$f$ LANGUAGE SQL IMMUTABLE;
+$f$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION getAnnoNot(namespace varchar, "name" varchar, val varchar, valRegex varchar, toplevel_corpus integer[], "type" varchar) 
 RETURNS bigint[] AS $f$
@@ -26,7 +26,7 @@ SELECT ARRAY(
     toplevel_corpus = ANY($5) AND 
     "type" = $6::annotype
 );
-$f$ LANGUAGE SQL IMMUTABLE;
+$f$ LANGUAGE SQL STABLE;
 
 CREATE OR REPLACE FUNCTION getAnnoValue(anno_ref bigint, toplevel_corpus bigint, "type" varchar) 
 RETURNS varchar AS $f$

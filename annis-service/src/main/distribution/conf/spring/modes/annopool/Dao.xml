@@ -33,6 +33,7 @@
   </bean>
   
   <bean id="schemeFixer" class="annis.administration.SchemeFixer" parent="schemeFixerBase" lazy-init="true">
+    
   </bean>
 
   <!-- END EXPORTS -->
