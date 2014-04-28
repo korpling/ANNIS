@@ -184,7 +184,7 @@ public interface QueryService
    * 
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>GET annis/query/search/graph/<b>{top}</b>/<b>{doc}</b></li>
+   * <li>GET annis/query/graph/<b>{top}</b>/<b>{doc}</b></li>
    * </ol>
    * 
    * <h3>MIME</h3>
@@ -241,7 +241,7 @@ public interface QueryService
    * is used only a subset of the file is returned. Path variant 2 and 4 always
    * return the complete file.
    *
-   * @see #binaryMeta(java.lang.String, java.lang.String)
+   * @see MetadataService#binaryMeta(java.lang.String, java.lang.String)
    */
   public Response binary(String top, String document, String offset, String length, String file);
 
