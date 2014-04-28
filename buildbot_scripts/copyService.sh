@@ -4,7 +4,7 @@
 export ANNIS_HOME=$1
 export ANNIS_PORT=$2
 
-ANNIS_VERSION=3.1.2
+ANNIS_VERSION=3.1.3
 DIST_DIR=annis-service/target/annis-service-$ANNIS_VERSION-distribution/annis-service-$ANNIS_VERSION
 
 #code
