@@ -192,9 +192,7 @@
   </bean>
   
   <bean id="schemeFixerBase" class="annis.administration.SchemeFixer" lazy-init="true">
-    <property name="adminDao" ref="administrationDao" />
     <property name="dataSource" ref="dataSource" />
-    <property name="dbLayout" value="${annis.mode}" />
   </bean>
 
   <!-- END EXPORTS -->

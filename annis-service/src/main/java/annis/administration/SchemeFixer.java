@@ -27,16 +27,12 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 /**
  * A helper class that allows you to fix the database scheme.
  * 
  * Currently it can
  * - create an corpus_alias table
- * - recreate the getter functions if they are marked as "immutable" and not "stable"
- * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SchemeFixer
@@ -46,19 +42,14 @@ public class SchemeFixer
   // use Spring's JDBC support
   private DataSource dataSource;
   private JdbcTemplate jdbcTemplate;
-  private String dbLayout;
-  private AdministrationDao adminDao;
-  
+
   /**
    *  Execute all fixes that are available.
    */
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
   public void checkAndFix()
   {
     corpusAlias();
-    stableFunctionsInsteadOfImmutable();
   }
-  
   
   protected void corpusAlias()
   {
@@ -127,31 +118,6 @@ public class SchemeFixer
       }
     }
   }
-  
-  /**
-   * In former versions of ANNIS the getter functions where immutable, which
-   * is wrong (they use the information from the tables). Marking them
-   * as "STABLE" is semantically better and also gives us the same
-   * optimization advantages as "IMMUTABLE".
-   */
-  protected void stableFunctionsInsteadOfImmutable()
-  {
-    String findImmutableSQL = 
-      "SELECT  count(*)\n" +
-      "FROM    pg_catalog.pg_namespace n\n" +
-      "JOIN    pg_catalog.pg_proc p\n" +
-      "ON      pronamespace = n.oid\n" +
-      "WHERE   nspname = 'public' AND provolatile='i' AND proname IN ('getanno', 'getannonot', 'getannovalue')";
-    
-    int numOfImmutable = 
-      jdbcTemplate.queryForObject(findImmutableSQL, Integer.class);
-    if(numOfImmutable > 0)
-    {
-      log.info(
-        "creating functions for getting annotations from the annotation pool");
-      adminDao.executeSqlFromScript(getDbLayout() + "/functions_get.sql");
-    }
-  }
 
   public JdbcTemplate getJdbcTemplate()
   {
@@ -173,27 +139,6 @@ public class SchemeFixer
     this.dataSource = dataSource;
     this.jdbcTemplate = new JdbcTemplate(dataSource);
   }
-
-  public String getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(String dbLayout)
-  {
-    this.dbLayout = dbLayout;
-  }
-
-  public AdministrationDao getAdminDao()
-  {
-    return adminDao;
-  }
-
-  public void setAdminDao(AdministrationDao adminDao)
-  {
-    this.adminDao = adminDao;
-  }
-  
   
   
   
