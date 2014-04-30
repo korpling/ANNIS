@@ -4,7 +4,7 @@ import json
 import io
 from subprocess import call
 
-milestone_id = "12"
+milestone_id = "13"
 
 call(["curl", "-H", "Accept: application/vnd.github.beta.full+json", "-o", "issues.json", "https://api.github.com/repos/korpling/ANNIS/issues?state=closed&milestone=" + milestone_id + "&sort=created"])
 

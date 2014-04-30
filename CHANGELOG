@@ -1,3 +1,20 @@
+Version 3.1.3
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=13&state=closed
+
+[Bugs]
+ #314 Frequency query needs statistics workaround, too
+ #313 incorrect documentation for "graph" and "binary"
+ #310 corpus.properties is not created if corpus has  "/" in name
+
+[Enhancements]
+ #315 avoid joining the corpus table in "find"
+
+[Other]
+ #312 Slash in corpus name causes config file not to be found
+
+
 Version 3.1.2
 =============
 Changelog is also available on GitHub:
