@@ -79,7 +79,7 @@ public interface QueryService
    * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <match-group>
-   *   <!-- each match in enclosed in an match tag -->
+   *   <!-- each match is enclosed in an match tag -->
    *   <match>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
@@ -133,7 +133,7 @@ public interface QueryService
    * {@code
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <match-group>
-   *   <!-- each match in enclosed in an match tag -->
+   *   <!-- each match is enclosed in an match tag -->
    *   <match>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
