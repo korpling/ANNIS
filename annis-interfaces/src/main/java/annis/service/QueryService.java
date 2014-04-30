@@ -79,7 +79,7 @@ public interface QueryService
    * 
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <match-group>
-   *   <!-- each match in enclosed in an match tag -->
+   *   <!-- each match is enclosed in an match tag -->
    *   <match>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
@@ -133,7 +133,7 @@ public interface QueryService
    * {@code
    * <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
    * <match-group>
-   *   <!-- each match in enclosed in an match tag -->
+   *   <!-- each match is enclosed in an match tag -->
    *   <match>
    *     <!-- ID of first matched node of match 1 -->
    *     <id>salt:/pcc2/11299/#tok_1</id>
@@ -184,7 +184,7 @@ public interface QueryService
    * 
    * <h3>Path(s)</h3>
    * <ol>
-   * <li>GET annis/query/search/graph/<b>{top}</b>/<b>{doc}</b></li>
+   * <li>GET annis/query/graph/<b>{top}</b>/<b>{doc}</b></li>
    * </ol>
    * 
    * <h3>MIME</h3>
@@ -241,7 +241,7 @@ public interface QueryService
    * is used only a subset of the file is returned. Path variant 2 and 4 always
    * return the complete file.
    *
-   * @see #binaryMeta(java.lang.String, java.lang.String)
+   * @see MetadataService#binaryMeta(java.lang.String, java.lang.String)
    */
   public Response binary(String top, String document, String offset, String length, String file);
 

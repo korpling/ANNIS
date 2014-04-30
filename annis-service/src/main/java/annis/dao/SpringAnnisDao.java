@@ -16,6 +16,7 @@
 package annis.dao;
 
 import annis.CSVHelper;
+import annis.CommonHelper;
 import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
@@ -342,7 +343,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
         if (fileName == null)
         {
-          fileName = "corpus_" + toplevelCorpusName + "_" + UUID.randomUUID() + ".properties";
+          fileName = "corpus_" 
+            + CommonHelper.getSafeFileName(toplevelCorpusName) 
+            + "_" + UUID.randomUUID() + ".properties";
           getJdbcTemplate().update(
             "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
             + "', 'application/text+plain', 'corpus.properties')");
