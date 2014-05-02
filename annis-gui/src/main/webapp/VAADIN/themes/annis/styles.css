@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.13";
+	content: "7.1.14";
 }
 
 .v-generated-body {
@@ -1703,7 +1703,7 @@ body .annis.v-app .v-app-loading {
 	border: 1px solid #ddd;
 }
 
-.annis .v-disabled .v-datefield-calendarpanel-day, .annis .v-disabled .v-datefield-calendarpanel-day-today {
+.annis .v-disabled .v-datefield-calendarpanel-day, .annis .v-disabled .v-datefield-calendarpanel-day-today, .annis .v-disabled.v-datefield-popupcalendar .v-datefield-button {
 	cursor: default;
 }
 
@@ -1815,7 +1815,7 @@ body .annis.v-app .v-app-loading {
 	border: 1px solid #ddd;
 }
 
-.annis .v-disabled .v-inline-datefield-calendarpanel-day, .annis .v-disabled .v-inline-datefield-calendarpanel-day-today {
+.annis .v-disabled .v-inline-datefield-calendarpanel-day, .annis .v-disabled .v-inline-datefield-calendarpanel-day-today, .annis .v-disabled.v-inline-datefield-popupcalendar .v-inline-datefield-button {
 	cursor: default;
 }
 
