@@ -54,12 +54,12 @@ public class AtAnnotationConditionProvider implements
     String column = annotation.getNamespace() == null
        ? "annotext" : "qannotext";
     
-    Escaper escaper = tm.isRegex() ? regexEscaper : likeEscaper;
+    Escaper escaper = tm != null && tm.isRegex() ? regexEscaper : likeEscaper;
     
     String val;
-    if(annotation.getValue() == null)
+    if(tm == null)
     {
-      val = tm.isRegex() ? ".*" : "%";
+      val = "%";
     }
     else
     {
@@ -77,7 +77,7 @@ public class AtAnnotationConditionProvider implements
         + ":" + escaper.escape(annotation.getName()) + ":";
     }
     
-    if(tm == TextMatching.EXACT_EQUAL)
+    if(tm == null || tm == TextMatching.EXACT_EQUAL)
     {
       conditions.add(tas.aliasedColumn(table, column) 
         + " LIKE '" + prefix + val + "'");
