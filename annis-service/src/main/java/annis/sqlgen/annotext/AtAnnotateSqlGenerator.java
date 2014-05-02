@@ -133,8 +133,13 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
     
-    addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "qannotext");
-    addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "qannotext");
+    fields.add("(splitanno(node_qannotext))[1] as node_annotation_namespace");
+    fields.add("(splitanno(node_qannotext))[2] as node_annotation_name");
+    fields.add("(splitanno(node_qannotext))[3] as node_annotation_value");
+    
+    fields.add("(splitanno(edge_qannotext))[1] as edge_annotation_namespace");
+    fields.add("(splitanno(edge_qannotext))[2] as edge_annotation_name");
+    fields.add("(splitanno(edge_qannotext))[3] as edge_annotation_value");
 
     
     return fields;

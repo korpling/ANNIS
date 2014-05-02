@@ -24,7 +24,7 @@
    <!-- BEGIN EXPORTS -->
    
 	<!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao" parent="administrationDaoBase" lazy-init="true">
+  <bean id="administrationDao" class="annis.administration.AtAdministrationDao" parent="administrationDaoBase" lazy-init="true">
     <property name="schemaVersion" value="annotext-v1"/>
   </bean>
   
