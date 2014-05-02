@@ -38,41 +38,15 @@ public class AtMatrixSqlGenerator extends MatrixSqlGenerator
     // get all the original outer joins
     super.addFromOuterJoins(sb, queryData, tas, indent);
 
-
-    List<Long> corpusList = queryData.getCorpusList();
-
-    // add join to annotation pool  tables
-
-    // node annopool
-    sb.append(indent).append(TABSTOP);
-    sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (").append(tas.
-      aliasedColumn(NODE_TABLE, "node_anno_ref")).append(
-      " = node_anno.id AND ").append(tas.aliasedColumn(NODE_TABLE,
-      "toplevel_corpus")).append(
-      " = node_anno.toplevel_corpus AND node_anno.toplevel_corpus IN (").append(StringUtils.
-      join(corpusList, ", ")).append("))");
-
-    sb.append("\n");
-
-    // edge annopool
-//    sb.append(indent).append(TABSTOP);
-//    sb.append(
-//      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (").append(tas.
-//      aliasedColumn(RANK_TABLE, "edge_anno_ref")).append(" = edge_anno.id AND ").
-//      append(tas.aliasedColumn(RANK_TABLE, "toplevel_corpus")).append(" = edge_anno.toplevel_corpus AND "
-//      + "edge_anno.toplevel_corpus IN (").append(StringUtils.join(corpusList,
-//      ", ")).append("))");
-
+    // TODO: implement matrix outer join definition for annotext
 
   }
 
   @Override
   protected String selectAnnotationsString(TableAccessStrategy tas)
   {
-    return "array_agg(DISTINCT coalesce(" 
-      + "node_anno.\"namespace\"" + " || ':', '') || "
-      + "node_anno.\"name\"" + " || ':' || encode("
-      + "node_anno.\"val\"" + "::bytea, 'base64')) AS annotations";
+    // TODO: implement matrix select for annotext
+    return "TODO";
   }
 
   

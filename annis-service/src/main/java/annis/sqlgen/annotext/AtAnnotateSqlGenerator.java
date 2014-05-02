@@ -16,7 +16,9 @@
 package annis.sqlgen.annotext;
 
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -51,28 +53,6 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     sb.append(
       AbstractFromClauseGenerator.tableAliasDefinition(tas, 
         null, NODE_TABLE, 1, queryData.getCorpusList()));
-    sb.append("\n");
-    sb.append(indent).append(TABSTOP);
-    sb.append("LEFT OUTER JOIN annotation_pool AS node_anno ON  (")
-      .append(tas.aliasedColumn(NODE_TABLE, "node_anno_ref")).append(
-      " = node_anno.id AND ")
-      .append(tas.aliasedColumn(NODE_TABLE, "toplevel_corpus"))
-      .append(" = node_anno.toplevel_corpus AND node_anno.toplevel_corpus IN (")
-      .append(StringUtils.join(corpusList, ", "))
-      .append("))");
-    
-    sb.append("\n");
-    sb.append(indent).append(TABSTOP);
-    sb.append(
-      "LEFT OUTER JOIN annotation_pool AS edge_anno ON (")
-      .append(tas.aliasedColumn(RANK_TABLE, "edge_anno_ref"))
-      .append(" = edge_anno.id AND ")
-      .append(tas.aliasedColumn(RANK_TABLE, "toplevel_corpus"))
-      .append(" = edge_anno.toplevel_corpus AND "
-      + "edge_anno.toplevel_corpus IN (")
-      .append(StringUtils.join(corpusList, ", "))
-      .append("))");
-
     sb.append(",\n");
 
     sb.append(indent).append(TABSTOP);
@@ -152,13 +132,10 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
     addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
+    
+    addSelectClauseAttribute(fields, NODE_ANNOTATION_TABLE, "qannotext");
+    addSelectClauseAttribute(fields, EDGE_ANNOTATION_TABLE, "qannotext");
 
-    fields.add("node_anno.\"namespace\" AS node_annotation_namespace");
-    fields.add("node_anno.\"name\" AS node_annotation_name");
-    fields.add("node_anno.\"val\" AS node_annotation_value");
-    fields.add("edge_anno.\"namespace\" AS edge_annotation_namespace");
-    fields.add("edge_anno.\"name\" AS edge_annotation_name");
-    fields.add("edge_anno.\"val\" AS edge_annotation_value");
     
     return fields;
   }
@@ -169,30 +146,8 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     TableAccessStrategy tas = createTableAccessStrategy();
     List<String> fields = getSelectFields();
     
-    String template = "SELECT DISTINCT \n"
-      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, "
-      +  StringUtils.join(fields, ", ") +", "
-      + "c.path_name as path, c.path_name[1] as document_name, "
-      + "node_anno.namespace AS node_annotation_namespace, "
-      + "node_anno.\"name\" AS node_annotation_name, "
-      + "node_anno.val AS node_annotation_value,\n"
-      + "edge_anno.namespace AS edge_annotation_namespace, "
-      + "edge_anno.\"name\" AS edge_annotation_name, "
-      + "edge_anno.val AS edge_annotation_value\n"
-      + "FROM\n"
-      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + "\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS node_anno ON (" + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") 
-        + " = node_anno.id AND " + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = node_anno.toplevel_corpus)\n"
-      + "\tLEFT OUTER JOIN annotation_pool AS edge_anno ON (" + tas.aliasedColumn(RANK_TABLE, "edge_anno_ref")
-        + " = edge_anno.id AND " + tas.aliasedColumn(RANK_TABLE, "toplevel_corpus") + " = edge_anno.toplevel_corpus),\n"
-      + "\tcorpus as c, corpus as toplevel\n"
-      + "WHERE\n"
-      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
-      + "\tAND toplevel.top_level IS TRUE\n"
-      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-      + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
-    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
-      .replace(":document_name", sqlString(documentName));
-    return sql;
+    //TODO: implement document query for annotext
+    
+    return "TODO";
   }
 }

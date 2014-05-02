@@ -25,21 +25,21 @@ limitations under the License.
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
         parent="defaultWhereClauseGeneratorBase" lazy-init="true">
     <property name="annoCondition">
-      <bean class="annis.sqlgen.annopool.ApAnnotationConditionProvider" />
+      <bean class="annis.sqlgen.annotext.AtAnnotationConditionProvider" />
     </property>
   </bean>
   
   
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator"
+  <bean id="annotateSqlGenerator" class="annis.sqlgen.annotext.AtAnnotateSqlGenerator"
         parent="annotateSqlGeneratorBase" lazy-init="true">
   </bean>
   
   
-  <bean id="graphSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator" parent="annotateSqlGenerator" lazy-init="true">
+  <bean id="graphSqlGenerator" class="annis.sqlgen.annotext.AtAnnotateSqlGenerator" parent="annotateSqlGenerator" lazy-init="true">
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
   </bean>
 
-  <bean id="matrixSqlGenerator" class="annis.sqlgen.annopool.ApMatrixSqlGenerator"
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.annotext.AtMatrixSqlGenerator"
         parent="matrixSqlGeneratorBase" lazy-init="true">
   </bean>
   
