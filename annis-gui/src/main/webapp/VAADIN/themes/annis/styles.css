@@ -6343,6 +6343,18 @@ body .annis.v-app .v-app-loading {
 	border-style: none;
 }
 
+.annis .aql-code-editor {
+	border-style: solid;
+	border-width: 1px;
+	border-bottom-color: rgb(163, 173, 185);
+	border-left-color: rgb(163, 173, 185);
+	border-right-color: rgb(163, 173, 185);
+}
+
+.annis .aql-code-prompt .cm-def {
+	color: grey;
+}
+
 .annis .v-table-cell-content-kwic-clickable {
 	color: grey;
 }
@@ -6432,7 +6444,7 @@ body .annis.v-app .v-app-loading {
 .annis textarea.border-layout {
 	border-width: 1px;
 	border-style: solid;
-	border-color: #b3b3b3;
+	border-colkwor: #b3b3b3;
 }
 
 .annis .border-layout {

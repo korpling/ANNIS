@@ -102,8 +102,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
-  
-  
   @Override
   protected void init(VaadinRequest request)
   {  

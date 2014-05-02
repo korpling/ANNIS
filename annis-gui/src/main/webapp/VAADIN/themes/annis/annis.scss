@@ -78,7 +78,13 @@ $font-size: 10pt;
       min-width: 32px;
       min-height: 32px;
     }
-  }
+  
+  .partitur_table td.single_event {
+      background-color: white;
+      border-style:none;
+    }
+    
+  } // end kwic
   
   .aql-code-editor {
     border-style: solid;
@@ -90,11 +96,6 @@ $font-size: 10pt;
   
   .aql-code-prompt .cm-def {
     color: grey;
-    .partitur_table td.single_event {
-      background-color: white;
-      border-style:none;
-    }
-    
   }
 
   .v-table-cell-content-kwic-clickable {
@@ -189,7 +190,7 @@ $font-size: 10pt;
   textarea.border-layout {
     border-width: 1px;
     border-style: solid;
-    border-color: #b3b3b3;
+    border-colkwor: #b3b3b3;
   }
   
   .border-layout {
