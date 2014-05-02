@@ -43,10 +43,10 @@ INSERT INTO facts_:id
   edge_type,
   edge_namespace,
   edge_name,
-  node_anno,
-  q_node_anno,
-  edge_anno,
-  q_edge_anno,
+  node_annotext,
+  node_qannotext,
+  edge_annotext,
+  edge_qannotext,
   n_sample,
   n_na_sample,
   n_r_c_ea_sample,
@@ -57,18 +57,18 @@ INSERT INTO facts_:id
 SELECT
   *,
   (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
-  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample,
+  (row_number() OVER (PARTITION BY id, node_qannotext) = 1) AS n_na_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
+                                  edge_qannotext) = 1) AS n_r_c_ea_rownum,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id) = 1) AS n_r_c_rownum,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_rownum
+                                  node_qannotext) = 1) AS n_r_c_na_rownum
 FROM
 (
   SELECT
@@ -104,23 +104,23 @@ FROM
       CASE WHEN _node_annotation.name IS NULL THEN NULL
       ELSE concat(_node_annotation.name, ':', _node_annotation.value)
       END
-    ) AS node_anno,
+    ) AS node_annotext,
     (
       CASE WHEN _node_annotation.name IS NULL THEN NULL
       ELSE concat(_node_annotation.namespace,':', _node_annotation.name, ':', _node_annotation.value)
       END
-    ) AS q_node_anno,
+    ) AS node_qannotext,
 
     (
       CASE WHEN _edge_annotation.name IS NULL THEN NULL
       ELSE concat(_edge_annotation.name, ':', _edge_annotation.value)
       END
-    ) AS edge_anno,
+    ) AS edge_annotext,
     (
       CASE WHEN _edge_annotation.name IS NULL THEN NULL
       ELSE concat(_edge_annotation.namespace,':', _edge_annotation.name, ':', _edge_annotation.value)
       END
-    ) AS q_edge_anno
+    ) AS edge_qannotext
   FROM
     _node
     JOIN _rank ON (_rank.node_ref = _node.id)

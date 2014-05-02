@@ -53,25 +53,25 @@ CREATE INDEX idx__facts_level__:id
   USING btree
   ("level", corpus_ref);
 
-CREATE INDEX idx__facts_node_anno__:id
+CREATE INDEX idx__facts_node_annotext__:id
   ON facts_:id
   USING btree
-  (node_anno varchar_pattern_ops, corpus_ref);
+  (node_annotext varchar_pattern_ops, corpus_ref);
 
-CREATE INDEX idx__facts__q_node_anno__:id
+CREATE INDEX idx__facts__q_node_qannotext__:id
   ON facts_:id
   USING btree
-  (q_node_anno varchar_pattern_ops, corpus_ref);
+  (node_qannotext varchar_pattern_ops, corpus_ref);
 
-CREATE INDEX idx__facts_node_anno__:id
+CREATE INDEX idx__facts_edge_annotext__:id
   ON facts_:id
   USING btree
-  (edge_anno varchar_pattern_ops, corpus_ref);
+  (edge_annotext varchar_pattern_ops, corpus_ref);
 
-CREATE INDEX idx__facts__q_node_anno__:id
+CREATE INDEX idx__facts__edge_qannotext__:id
   ON facts_:id
   USING btree
-  (q_edge_anno varchar_pattern_ops, corpus_ref);
+  (edge_annotext varchar_pattern_ops, corpus_ref);
 
 CREATE INDEX idx__facts_node_name__:id
   ON facts_:id

@@ -81,10 +81,10 @@ CREATE TABLE facts (
   edge_type character(1), -- edge type of this component
   edge_namespace varchar, -- optional namespace of the edges’ names
   edge_name varchar, -- name of the edges in this component
-  node_anno varchar, -- the combined name and value of the annotation, separated by ":"
-  q_node_anno varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
-  edge_anno varchar, -- the combined name and value of the annotation, separated by ":"
-  q_edge_anno varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
+  node_annotext varchar, -- the combined name and value of the annotation, separated by ":"
+  node_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
+  edge_annotext varchar, -- the combined name and value of the annotation, separated by ":"
+  edge_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
   n_r_c_ea_sample boolean,
