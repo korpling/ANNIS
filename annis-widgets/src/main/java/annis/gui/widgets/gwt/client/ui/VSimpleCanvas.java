@@ -34,9 +34,9 @@ public class VSimpleCanvas extends Composite implements Paintable
   /** Set the CSS class name to allow styling. */
   public static final String CLASSNAME = "v-simplecanvas";
   /** The client side widget identifier */
-  protected String paintableId;
+  //protected String paintableId;
   /** Reference to the server connection object. */
-  ApplicationConnection gClient;
+  //ApplicationConnection gClient;
   
   static final int height = 2000;
   static final int width = 2000;
@@ -96,10 +96,10 @@ public class VSimpleCanvas extends Composite implements Paintable
 
     // Save reference to server connection object to be able to send
     // user interaction later
-    this.gClient = client;
+    //this.gClient = client;
 
     // Save the client side identifier (paintable id) for the widget
-    paintableId = uidl.getId();
+    //paintableId = uidl.getId();
 
     if(context != null)
     {

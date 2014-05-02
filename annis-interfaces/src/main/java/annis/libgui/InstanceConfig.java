@@ -44,6 +44,7 @@ public class InstanceConfig implements Serializable
   private List<CorpusSet> corpusSets;
   private String defaultCorpusSet;
   private FontConfig font;
+  private FontConfig frequencyFont;
   private String keyboardLayout;
   
   public InstanceConfig()
@@ -173,6 +174,27 @@ public class InstanceConfig implements Serializable
   public void setKeyboardLayout(String keyboardLayout)
   {
     this.keyboardLayout = keyboardLayout;
+  }
+
+  /**
+   * Get a special font config that should be used in the frequency chart.
+   * Might return {@code null}, in this case you should use the default font
+   * from {@link #getFont() }.
+   * @return 
+   */
+  @XmlElement(name = "frequency-font")
+  public FontConfig getFrequencyFont()
+  {
+    return frequencyFont;
+  }
+
+  /**
+   * @see #getFrequencyFont() 
+   * @param frequencyFont 
+   */
+  public void setFrequencyFont(FontConfig frequencyFont)
+  {
+    this.frequencyFont = frequencyFont;
   }
   
   

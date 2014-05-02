@@ -29,4 +29,7 @@ public interface Exporter
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight, 
    Set<String> corpora, String keysAsString, String argsAsString, 
    WebResource annisResource, Writer out, EventBus eventBus);
+  
+  public boolean isCancelable();
+  
 }

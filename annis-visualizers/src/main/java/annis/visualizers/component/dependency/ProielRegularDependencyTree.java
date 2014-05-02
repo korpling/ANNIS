@@ -29,7 +29,7 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
  * with dependencies between non terminal nodes.
  * 
  * Requires GraphViz.
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
 public class ProielRegularDependencyTree extends AbstractDotVisualizer

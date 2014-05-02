@@ -20,6 +20,7 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinService;
@@ -205,6 +206,7 @@ public class ReportBugWindow extends Window
         "\n");
       sbMsg.append("Vaadin Version: ").append(Version.getFullVersion()).append(
         "\n");
+      sbMsg.append("Browser: ").append(Page.getCurrent().getWebBrowser().getBrowserApplication()).append("\n");
       sbMsg.append("URL: ").append(UI.getCurrent().getPage().getLocation().toASCIIString()).append(
         "\n");
 

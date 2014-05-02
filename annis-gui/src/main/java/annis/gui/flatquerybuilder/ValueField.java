@@ -122,7 +122,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   @Override
   public void textChange(TextChangeEvent event)
   {
-    reducingStringComparator rsc = sq.getRSC();
+    ReducingStringComparator rsc = sq.getRSC();
     String fm = sq.getFilterMechanism();
     if (!"generic".equals(fm))
     {
@@ -202,7 +202,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   
   public void setValue(String value)
   {
-    if((vm.equals(ValueMode.REGEX))&(!scb.containsId(value)))
+    if((vm.equals(ValueMode.REGEX))&&(!scb.containsId(value)))
     {
       scb.addItem(value);
       scb.setItemCaption(value, value+" (user defined)");

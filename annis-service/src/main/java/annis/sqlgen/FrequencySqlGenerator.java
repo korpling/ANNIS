@@ -86,7 +86,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    TableAccessStrategy tas = tables(null);
     Set<String> conditions = new LinkedHashSet<String>();
     
     FrequencyTableQueryData ext;
@@ -232,7 +231,10 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
       FrequencyTableEntry e = itEntry.next();
       
       sb.append(indent).append(TABSTOP);
-      sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), NODE_TABLE));
+      
+      sb.append(TableAccessStrategy.partitionTableName(
+        tas.getTableAliases(), tas.getTablePartitioned(), 
+        NODE_TABLE, queryData.getCorpusList()));
       sb.append(" AS v").append(i);
       
       if(e.getType() == FrequencyTableEntryType.annotation)
@@ -240,7 +242,9 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
         sb.append(",\n");
         sb.append(indent).append(TABSTOP);
         // TODO: this only works for annopool scheme
-        sb.append(TableAccessStrategy.tableName(tas.getTableAliases(), ANNOTATION_POOL_TABLE));
+        sb.append(TableAccessStrategy.partitionTableName(
+          tas.getTableAliases(), tas.getTablePartitioned(), 
+          ANNOTATION_POOL_TABLE, queryData.getCorpusList()));
         sb.append(" AS a").append(i);
       }
       

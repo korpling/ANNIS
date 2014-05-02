@@ -71,7 +71,7 @@ public class RelANNISHelper
     ZipFile zip = new ZipFile(f);
     try
     {
-      result = corporaInZipfile(zip);
+      result.putAll(corporaInZipfile(zip));
     }
     finally
     {
@@ -96,6 +96,11 @@ public class RelANNISHelper
       }
     }
     
+    if (result.isEmpty())
+    {
+      throw new IOException("no corpus found in " + d.getCanonicalPath());
+    }
+
     return result;
   }
   

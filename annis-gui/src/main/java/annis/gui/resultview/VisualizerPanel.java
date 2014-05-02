@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
@@ -44,15 +45,19 @@ import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URLEncoder;
-import java.sql.ParameterMetaData;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -79,6 +84,7 @@ import org.slf4j.LoggerFactory;
 public class VisualizerPanel extends CssLayout
   implements Button.ClickListener, VisualizationToggle
 {
+  public static final long serialVersionUID = 2L;
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
@@ -96,13 +102,11 @@ public class VisualizerPanel extends CssLayout
 
   private transient SDocument result;
 
-  private transient PluginSystem ps;
+  private PluginSystem ps;
 
   private ResolverEntry entry;
 
-  private transient Map<SNode, Long> markedAndCovered;
-
-  private transient List<SToken> token;
+  private Map<String, Long> markedAndCovered;
 
   private Map<String, String> markersExact;
 
@@ -114,7 +118,7 @@ public class VisualizerPanel extends CssLayout
 
   private String resultID;
 
-  private transient VisualizerPlugin visPlugin;
+  private VisualizerPlugin visPlugin;
 
   private Set<String> visibleTokenAnnos;
 
@@ -144,9 +148,8 @@ public class VisualizerPanel extends CssLayout
     SDocument result,
     String corpusName,
     String documentName,
-    List<SToken> token,
     Set<String> visibleTokenAnnos,
-    Map<SNode, Long> markedAndCovered,
+    Map<String, Long> markedAndCovered,
     @Deprecated Map<String, String> markedAndCoveredMap,
     @Deprecated Map<String, String> markedExactMap,
     String htmlID,
@@ -168,7 +171,6 @@ public class VisualizerPanel extends CssLayout
     this.result = result;
     this.corpusName = corpusName;
     this.documentName = documentName;
-    this.token = token;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.markedAndCovered = markedAndCovered;
     this.segmentationName = segmentationName;
@@ -257,6 +259,38 @@ public class VisualizerPanel extends CssLayout
     } // end if entry not null
 
   }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+    
+    CommonHelper.writeSDocument(result, out);
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    
+   this.result = CommonHelper.readSDocument(in);
+  }
+  
+  private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
+  {
+    if(tokenIDs == null || graph == null)
+    {
+      return new LinkedList<SToken>();
+    }
+    ArrayList<SToken> r = new ArrayList<SToken>(tokenIDs.size());
+    for(String t : tokenIDs)
+    {
+      SNode n = graph.getSNode(t);
+      if(n instanceof SToken)
+      {
+        r.add((SToken) n);
+      }
+    }
+    return r;
+  }
 
   private Component createComponent()
   {
@@ -291,7 +325,6 @@ public class VisualizerPanel extends CssLayout
     input.setMarkedAndCovered(markedAndCovered);
 
     input.setResult(result);
-    input.setToken(token);
     input.setVisibleTokenAnnos(visibleTokenAnnos);
     input.setSegmentationName(segmentationName);
     if (instanceConfig != null && instanceConfig.getFont() != null)
@@ -320,9 +353,6 @@ public class VisualizerPanel extends CssLayout
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
         .get(0);
 
-      input.setMarkedAndCovered(rebuildMarkedAndConvered(markedAndCovered,
-        input.getDocument(), wholeDocument));
-
       input.setDocument(wholeDocument);
     }
     else
@@ -349,11 +379,11 @@ public class VisualizerPanel extends CssLayout
   }
 
   public void setSegmentationLayer(String segmentationName,
-    Map<SNode, Long> markedAndCovered)
+    Map<String, Long> markedAndCovered)
   {
     this.segmentationName = segmentationName;
     this.markedAndCovered = markedAndCovered;
-
+    
     if (visPlugin != null && vis != null)
     {
       visPlugin.setSegmentationLayer(vis, segmentationName, markedAndCovered);
@@ -416,9 +446,14 @@ public class VisualizerPanel extends CssLayout
       progress.setEnabled(true);
       progress.setDescription("Loading visualizer" + visPlugin.getShortName());
       
+      ExecutorService execService = Executors.newSingleThreadExecutor();
+
+      final Future<Component> future = execService.submit(
+        new LoadComponentTask());
+      
       // run the actual code to load the visualizer
       PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(callback));
+        new BackgroundJob(future, callback, UI.getCurrent()));
 
     } // end if create input was needed
 
@@ -507,41 +542,6 @@ public class VisualizerPanel extends CssLayout
   }
 
   /**
-   * Rebuild the map of marked and covered matches with new object references.
-   * If a visualizer uses the whole document, the {@link VisualizerInput} gets a
-   * new result object, with new SNode objects, so we have to update these
-   * references.
-   *
-   * @param markedAndCovered the original map calculated with the partial
-   * document graph
-   * @param document the partial document or subgraph
-   * @param wholeDocucment the new complete document
-   * @return a new map, with updated object/node references. The salt ids of the
-   * node objects remains the same.
-   */
-  private Map<SNode, Long> rebuildMarkedAndConvered(
-    Map<SNode, Long> markedAndCovered,
-    SDocument document, SDocument wholeDocument)
-  {
-    Map<SNode, Long> newMarkedAndCovered = new HashMap<SNode, Long>();
-    SGraph wholeSGraph = wholeDocument.getSDocumentGraph();
-    SNode wholeNode;
-
-    for (Entry<SNode, Long> e : markedAndCovered.entrySet())
-    {
-      wholeNode = wholeSGraph.getSNode(e.getKey().getSId());
-      newMarkedAndCovered.put(wholeNode, e.getValue());
-
-      // copy the annis features, which are not set by the annis service
-      copyAnnisFeature(e.getKey(), wholeNode, ANNIS_NS, FEAT_MATCHEDNODE, false);
-    }
-
-    // copy the annis features, which are not set by the annis service
-    copyAnnisFeature(document, wholeDocument, ANNIS_NS, FEAT_MATCHEDIDS, true);
-    return newMarkedAndCovered;
-  }
-
-  /**
    * Since there is a bug in the annis-service some ANNIS Features are not set
    * when the whole document is requested, we have to copy it manually from the
    * old nodes
@@ -583,26 +583,28 @@ public class VisualizerPanel extends CssLayout
   private class BackgroundJob implements Runnable
   {
 
+    private final Future<Component> future;
     private final LoadableVisualizer.Callback callback;
+    private final UI ui;
 
-    public BackgroundJob(LoadableVisualizer.Callback callback)
+    public BackgroundJob(
+      Future<Component> future, LoadableVisualizer.Callback callback, UI ui)
     {
+      this.future = future;
       this.callback = callback;
+      this.ui = ui;
     }
 
     @Override
     public void run()
     {
-      ExecutorService execService = Executors.newSingleThreadExecutor();
-      final Future<Component> future = execService.submit(
-        new LoadComponentTask());
 
       Throwable exception = null;
       try
       {
         final Component result = future.get(60, TimeUnit.SECONDS);
 
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -635,7 +637,7 @@ public class VisualizerPanel extends CssLayout
       if (exception != null)
       {
         final Throwable finalException = exception;
-        UI.getCurrent().accessSynchronously(new Runnable()
+        ui.accessSynchronously(new Runnable()
         {
           @Override
           public void run()
@@ -707,4 +709,11 @@ public class VisualizerPanel extends CssLayout
       return null;
     }
   }
+
+  protected SDocument getResult()
+  {
+    return result;
+  }
+  
+  
 }

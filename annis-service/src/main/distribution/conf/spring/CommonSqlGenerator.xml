@@ -332,13 +332,6 @@ limitations under the License.
     <ref bean="tableJoinsInWhereClauseGenerator" />
   </util:list>
 
-  <util:list id="findPathFromClauseGenerators">
-    <ref bean="tableJoinsInWhereClauseGenerator" />
-    <ref bean="corpusPathWhereClauseGenerator" />
-  </util:list>
-
-  <bean id="corpusPathWhereClauseGenerator" class="annis.sqlgen.CorpusPathWhereClauseGenerator"   parent="tableAccessStrategyFactory" lazy-init="true"/>
-
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
     <ref bean="defaultWhereClauseGenerator" />
@@ -346,22 +339,6 @@ limitations under the License.
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />
   </util:list>
-
-  <!--
-  This is the same list as defaultWhereClauseGenerators, but extended with one
-  generator for query the corpus path, but the util:list do not support a kind
-  of heredity for lists of beans.
-  -->
-  <util:list id="findWhereClauseGenerators">
-    <ref bean="tableJoinsInWhereClauseGenerator" />
-    <ref bean="defaultWhereClauseGenerator" />
-    <ref bean="subcorpusConstraintWhereClause" />
-    <ref bean="metaDataAndCorpusWhereClauseGenerator" />
-    <ref bean="sampleWhereClause" />
-    <ref bean="corpusPathWhereClauseGenerator" />
-<!--    <ref bean="transitivePrecedence" /> -->
-  </util:list>
-
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
@@ -374,8 +351,8 @@ limitations under the License.
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
     <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="findPathFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="findWhereClauseGenerators" />
+    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
   </bean>
   

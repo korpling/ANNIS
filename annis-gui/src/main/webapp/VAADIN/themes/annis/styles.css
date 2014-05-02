@@ -1,0 +1,6581 @@
+.v-assistive-device-only {
+	position: absolute;
+	top: -2000px;
+	left: -2000px;
+	width: 10px;
+	overflow: hidden;
+}
+
+.v-vaadin-version:after {
+	content: "7.1.14";
+}
+
+.v-generated-body {
+	width: 100%;
+	height: 100%;
+	border: 0;
+	margin: 0;
+	overflow: hidden;
+}
+
+.v-modal-window-open {
+	overflow: hidden;
+}
+
+.v-debug-console {
+	background: #fff;
+	opacity: 0.9;
+	border: 1px solid #000;
+	font-family: sans-serif;
+}
+
+.v-debug-console-caption {
+	background: #000;
+	border-bottom: 1px solid grey;
+	color: white;
+	font-weight: bold;
+}
+
+.v-debug-console-content {
+	font-size: x-small;
+	overflow: auto;
+	white-space: pre;
+}
+
+.v-debug-console-content input {
+	font-size: xx-small;
+}
+
+.v-app .invalidlayout, .v-app .invalidlayout * {
+	background: #f99 !important;
+}
+
+@font-face {
+	font-family: "vdebugfont";
+	src: url(../base/debug/fonts/font.eot);
+	src: url(../base/debug/fonts/font.eot?#iefix) format("embedded-opentype"), url(../base/debug/fonts/font.woff) format("woff"), url(../base/debug/fonts/font.ttf) format("truetype"), url(../base/debug/fonts/font.svg#fontawesome) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.v-debugwindow [data-icon]:before, .v-debugwindow-menu [data-icon]:before {
+	font-family: "vdebugfont";
+	content: attr(data-icon);
+	speak: none;
+	font-weight: normal;
+	font-variant: normal;
+	text-transform: none;
+	line-height: 1;
+	-webkit-font-smoothing: antialiased;
+	font-style: normal;
+	vertical-align: text-bottom;
+}
+
+.v-debugwindow {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	-moz-opacity: 0.8;
+	-webkit-opacity: 0.8;
+	opacity: 0.8;
+	color: #666;
+	font-family: Arial, Helvetica, Tahoma, Verdana, sans-serif;
+	font-size: 13px;
+}
+
+.v-debugwindow .v-debugwindow-handle {
+	position: absolute;
+	bottom: 0;
+	background-color: #fff;
+	-moz-opacity: 0;
+	-webkit-opacity: 0;
+	opacity: 0;
+	z-index: 1000;
+}
+
+.v-debugwindow .v-debugwindow-handle-sw {
+	width: 7px;
+	height: 7px;
+}
+
+.v-debugwindow .v-debugwindow-handle-se {
+	right: 0;
+	width: 14px;
+	height: 14px;
+}
+
+.v-debugwindow:hover {
+	-moz-opacity: 1;
+	-webkit-opacity: 1;
+	opacity: 1;
+}
+
+.v-debugwindow * {
+	font-size: inherit !important;
+}
+
+.v-debugwindow-size0, .v-debugwindow-menu .v-debugwindow-button-size0 {
+	font-size: 10px;
+}
+
+.v-debugwindow-size1, .v-debugwindow-menu .v-debugwindow-button-size1 {
+	font-size: 13px;
+}
+
+.v-debugwindow-size2, .v-debugwindow-menu .v-debugwindow-button-size2 {
+	font-size: 16px;
+}
+
+.v-debugwindow-head {
+	text-align: right;
+	background-color: transparent;
+}
+
+.v-debugwindow-tabs {
+	display: inline-block;
+	background-color: #fff;
+}
+
+.v-debugwindow-tab, .v-debugwindow-controls > * {
+	width: 2em;
+	border: none;
+	margin: 0;
+	line-height: 1.5em;
+	background-color: #fff;
+	color: #666;
+}
+
+.v-debugwindow-tab {
+	position: relative;
+	top: 1px;
+	border-width: 1px 0 1px 1px;
+	border-style: solid;
+	border-color: #666;
+	border-radius: 2px 2px 0 0;
+}
+
+.v-debugwindow-tab-selected {
+	color: #666;
+	background-color: #fff;
+	border-bottom: 1px solid #fff;
+}
+
+.v-debugwindow-controls {
+	position: relative;
+	top: 1px;
+	display: inline-block;
+	background-color: #fff;
+	border: 1px solid #666;
+	border-radius: 2px 2px 0 0;
+}
+
+.v-debugwindow-section-head {
+	text-align: left;
+	background-color: #fff;
+	border: 1px solid #666;
+	border-bottom: 1px solid #999;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+	min-height: 1.5em;
+	line-height: 1.5em;
+	padding-left: 5px;
+}
+
+.v-debugwindow-button {
+	border: none;
+	background-color: transparent;
+	color: #666;
+}
+
+.v-debugwindow-button:hover {
+	color: #000;
+	text-decoration: underline;
+}
+
+.v-debugwindow-button-active {
+	color: #666;
+	box-shadow: 1px 1px 3px 0 inset;
+}
+
+.v-debugwindow-content {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+	background-color: #fff;
+	border: 1px solid #666;
+	border-top: none;
+}
+
+.v-debugwindow-menu {
+	background-color: #fff;
+	padding: 4px;
+	border: 1px solid #999;
+	border-top: none;
+	border-radius: 0 0 5px 5px;
+	box-shadow: 0px 0px 7px 0 rgba(55, 55, 55, 0.6);
+}
+
+.v-debugwindow-menu-content {
+	min-width: 100px;
+}
+
+.v-debugwindow-menu-content .v-debugwindow-button {
+	line-height: 22px;
+}
+
+.v-debugwindow-menu-content > div > .v-debugwindow-button {
+	width: 33%;
+}
+
+.v-debugwindow-row {
+	display: table-row;
+}
+
+.v-debugwindow-row:nth-child(odd) {
+	background-color: rgba(0, 61, 255, 0.11);
+}
+
+.v-debugwindow-row > span {
+	display: table-cell;
+	padding: 4px;
+}
+
+.v-debugwindow-row.SEVERE {
+	color: #550000;
+	background-color: #FFC5C5;
+}
+
+.v-debugwindow-row.WARNING {
+	background-color: #FFFF99;
+}
+
+.v-debugwindow-row.FINE {
+	color: #777;
+}
+
+.v-debugwindow-row.FINER {
+	color: #888;
+}
+
+.v-debugwindow-row.FINEST {
+	color: #888;
+}
+
+.v-debugwindow-row > span.caption {
+	color: #999;
+	text-align: right;
+	white-space: nowrap;
+}
+
+.v-debugwindow-row > span.value {
+	width: 100%;
+}
+
+.v-debugwindow-log {
+	font-family: monospace;
+}
+
+.v-debugwindow-log .v-debugwindow-reset {
+	color: #fff;
+	background-color: #4C92ED;
+	padding: 4px;
+}
+
+.v-debugwindow-log .v-debugwindow-time {
+	text-align: right;
+	color: #999;
+}
+
+.v-debugwindow-log .v-debugwindow-message {
+	white-space: nowrap;
+	width: 100%;
+}
+
+.v-debugwindow-log .v-debugwindow-message:hover {
+	white-space: normal;
+	word-wrap: break-word;
+}
+
+.v-debugwindow-log .v-debugwindow-message em {
+	background-color: #C4E6F8;
+}
+
+.v-debugwindow-hierarchy .v-debugwindow-info {
+	padding: 1em;
+}
+
+.v-debugwindow-network .v-debugwindow-row {
+	display: block !important;
+}
+
+.v-debugwindow-network .v-debugwindow-row > span {
+	display: inline;
+}
+
+.pdf-panel, .pdf-wrapper {
+	background: #ECF0F6;
+}
+
+.pdf-panel {
+	display: block !important;
+	margin: 0px auto;
+	padding: 15px 0;
+}
+
+.pdf-panel canvas {
+	display: block;
+	margin: 15px auto;
+	padding: 2px;
+	border: 1px dotted grey;
+}
+
+.v-caption-raw_text_label .v-captiontext {
+	margin: auto 5px;
+	text-align: center;
+	font-weight: bold;
+}
+
+.raw_text_label {
+	display: block;
+	margin: 0 0 20px 0;
+	padding: 5px;
+	border: 1px dotted grey;
+}
+
+.v-slot-linguistics-panel {
+	padding: 10px;
+}
+
+.v-caption-linguistics-panel .v-captiontext {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.v-slot-span-panel {
+	background: #ecf0f6;
+	padding: 10px;
+}
+
+.v-caption-span-panel .v-captiontext {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.v-slot-meta-panel {
+	padding: 10px;
+}
+
+.v-caption-meta-panel .v-captiontext {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.v-slot-toolbar-panel {
+	background: #ecf0f6;
+	padding: 10px;
+}
+
+.v-caption-toolbar-panel .v-captiontext {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.v-slot-advanced-panel {
+	padding: 10px;
+}
+
+.v-caption-advanced-panel .v-captiontext {
+	font-size: 110%;
+	font-weight: bold;
+}
+
+.v-app {
+	width: 100%;
+	height: 100%;
+}
+
+.annis .v-widget {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	text-align: left;
+	display: inline-block;
+	white-space: normal;
+	vertical-align: bottom;
+	font-size: 10pt;
+	line-height: 1.4;
+}
+
+.annis .v-absolutelayout-wrapper {
+	position: absolute;
+	overflow: hidden;
+}
+
+.annis .v-absolutelayout-margin, .annis .v-absolutelayout-canvas {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-absolutelayout.v-has-height > div, .annis .v-absolutelayout.v-has-height > div > div {
+	height: 100%;
+}
+
+.annis .v-absolutelayout.v-has-width > div, .annis .v-absolutelayout.v-has-width > div > div {
+	width: 100%;
+}
+
+.annis .v-accordion {
+	position: relative;
+	outline: none;
+	overflow: visible;
+	text-align: left;
+	font-size: 0;
+}
+
+.annis .v-accordion-item {
+	position: relative;
+	display: inline-block;
+	width: 100%;
+}
+
+.annis .v-accordion-item-caption {
+	overflow: visible;
+	white-space: nowrap;
+	background: #eee;
+	border-bottom: 1px solid #ddd;
+}
+
+.annis .v-accordion-item-caption .v-caption {
+	cursor: pointer;
+	font-size: 10pt;
+}
+
+.annis .v-accordion-item-open .v-accordion-item-caption .v-caption {
+	cursor: default;
+}
+
+.annis .v-accordion-item-content {
+	position: absolute;
+	width: 100%;
+}
+
+.annis .v-browserframe {
+	font-size: 0;
+}
+
+.annis .v-browserframe > span {
+	font-size: 10pt;
+}
+
+.annis .v-button {
+	display: inline-block;
+	zoom: 1;
+	text-align: center !important;
+	text-decoration: none;
+	border: 2px outset #ddd;
+	background: #eee;
+	cursor: pointer;
+	white-space: nowrap;
+	margin: 0;
+	padding: 0.2em 1em;
+	color: inherit;
+	font: inherit;
+	font-size: 10pt;
+	line-height: normal;
+	-webkit-touch-callout: none;
+	-webkit-user-select: none;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	user-select: none;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-button.v-disabled {
+	cursor: default;
+}
+
+.annis .v-button-wrap, .annis .v-button-caption {
+	vertical-align: baseline;
+	white-space: nowrap;
+	font: inherit;
+	color: inherit;
+	line-height: normal;
+}
+
+.annis .v-button .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+	border: none;
+}
+
+.annis .v-button .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	vertical-align: middle;
+	float: none;
+}
+
+.annis .v-button-link {
+	border: none;
+	text-align: left !important;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ie-user-select: text;
+	user-select: text;
+}
+
+.v-sa .annis .v-button-link:focus {
+	outline-offset: -3px;
+}
+
+.annis .v-button-link .v-button-caption {
+	text-decoration: underline;
+	color: inherit;
+	text-align: left;
+}
+
+.annis .v-nativebutton .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+	border: none;
+}
+
+.annis .v-nativebutton .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	vertical-align: middle;
+	float: none;
+}
+
+.annis .v-nativebutton-link {
+	border: none;
+	text-align: left !important;
+	background: transparent;
+	padding: 0;
+	color: inherit;
+	-khtml-user-select: text;
+	-moz-user-select: text;
+	-ie-user-select: text;
+	user-select: text;
+}
+
+.annis .v-nativebutton-link .v-nativebutton-caption {
+	text-decoration: underline;
+	color: inherit;
+	text-align: left;
+}
+
+.annis .v-nativebutton {
+	text-align: center !important;
+	cursor: pointer;
+	white-space: nowrap;
+	margin: 0;
+	color: inherit;
+	font: inherit;
+	line-height: normal;
+}
+
+.annis .v-nativebutton .v-nativebutton-caption {
+	vertical-align: middle;
+	white-space: nowrap;
+	font: inherit;
+	color: inherit;
+}
+
+.annis .v-nativebutton .v-icon {
+	vertical-align: middle;
+	margin-right: 3px;
+}
+
+.annis .v-nativebutton .v-errorindicator {
+	display: inline-block;
+	zoom: 1;
+	float: none;
+}
+
+.v-ie .annis .v-nativebutton {
+	overflow: visible;
+	padding-left: 1em;
+	padding-right: 1em;
+}
+
+.v-ie .annis .v-nativebutton-link {
+	padding: 0;
+}
+
+.annis .v-checkbox {
+	display: block;
+}
+
+.annis .v-checkbox, .annis .v-checkbox label, .annis .v-checkbox input, .annis .v-checkbox .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.annis .v-checkbox .v-icon {
+	margin: 0 2px;
+}
+
+.annis .v-checkbox .v-errorindicator {
+	float: none;
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+}
+
+.annis .v-captionwrapper {
+	text-align: left;
+}
+
+.annis .v-caption {
+	overflow: hidden;
+	white-space: nowrap;
+	font-size: 10pt;
+}
+
+.annis .v-errorindicator {
+	display: inline-block;
+}
+
+.annis .v-caption .v-icon {
+	display: inline-block;
+	padding-right: 2px;
+	vertical-align: middle;
+}
+
+.annis .v-caption .v-captiontext {
+	display: inline-block;
+	overflow: hidden;
+	vertical-align: middle;
+}
+
+.annis .v-caption .v-required-field-indicator {
+	display: inline-block;
+}
+
+.annis .v-colorpicker {
+	text-align: center;
+}
+
+.annis .v-colorpicker-button-color {
+	border: 1px solid silver;
+	float: left;
+	width: 10px;
+	height: 10px;
+	margin-top: 2px;
+	margin-right: 5px;
+}
+
+.annis .v-colorpicker-area {
+	border: 1px solid silver;
+	margin: 1px auto;
+}
+
+.annis .v-colorpicker-history {
+	margin: 5px;
+}
+
+.annis .v-colorpicker-history td {
+	border: 1px solid silver !important;
+}
+
+.annis .v-colorpicker-history td {
+	line-height: 15px;
+}
+
+.annis .v-colorpicker-popup {
+	width: 244px;
+}
+
+.annis .v-colorpicker-popup .v-scrollable {
+	background-color: #dddddd;
+}
+
+.annis .v-colorpicker-popup .v-tabsheet-content .v-scrollable {
+	background-color: #eaeaea;
+}
+
+.annis .v-colorpicker-popup .v-tabsheet-content .v-tabsheet-tabsheetpanel {
+	background: transparent;
+}
+
+.annis .v-colorpicker-popup .resize-button {
+	border: 0px solid silver;
+	background: url(../base/colorpicker/images/resizebg.png);
+	margin-top: 5px;
+}
+
+.annis .v-colorpicker-popup .resize-button-caption {
+	display: none;
+}
+
+.annis .v-colorpicker-popup .resize-button:hover {
+	background: url(../base/colorpicker/images/resizebg-selected.png);
+}
+
+.annis .v-colorpicker-popup .resize-button:focus {
+	outline: none;
+}
+
+.annis .v-colorpicker-gradient {
+	width: 220px;
+	height: 220px;
+	padding-left: 10px;
+	margin-top: 0px;
+}
+
+.annis .v-colorpicker-gradient .v-colorpicker-gradient-clicklayer {
+	background-color: white;
+	filter: alpha(opacity = 0);
+	opacity: 0;
+}
+
+.annis .v-colorpicker-popup .rgb-gradient .v-colorpicker-gradient-background {
+	width: 220px;
+	height: 220px;
+	background: url(../base/colorpicker/images/gradient2.png);
+}
+
+.annis .v-colorpicker-popup .hsv-gradient .v-colorpicker-gradient-foreground {
+	background: url(../base/colorpicker/images/gradient.png);
+}
+
+.annis .v-colorpicker-popup .v-colorpicker-gradient-lowerbox {
+	border-right: 1px solid white;
+	border-top: 1px solid white;
+}
+
+.annis .v-colorpicker-popup .v-colorpicker-gradient-higherbox {
+	border-left: 1px solid white;
+	border-bottom: 1px solid white;
+}
+
+.annis .v-colorpicker-popup .rgb-sliders {
+	width: 227px;
+	padding-left: 10px;
+	color: #444444;
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+.annis .v-colorpicker-popup .rgb-sliders .red .v-slider-base {
+	background-color: red;
+}
+
+.annis .v-colorpicker-popup .rgb-sliders .green .v-slider-base {
+	background-color: green;
+}
+
+.annis .v-colorpicker-popup .rgb-sliders .blue .v-slider-base {
+	background-color: blue;
+}
+
+.annis .v-colorpicker-popup .hsv-sliders {
+	padding-left: 10px;
+	color: #444444;
+	text-shadow: 0 1px 0 #FFFFFF;
+}
+
+.annis .v-colorpicker-popup .hue-slider {
+	height: 10px;
+	border: 0px solid silver;
+	background-image: url(../base/colorpicker/images/slider_hue_bg.png);
+	background-color: transparent;
+	background-repeat: no-repeat;
+	background-position: 0 3px;
+	margin-top: 0px;
+}
+
+.annis .v-colorpicker-popup .hue-slider .v-slider-handle {
+	margin-top: -2px;
+}
+
+.annis .v-colorpicker-popup .hue-slider .v-slider-base {
+	border: 0px none;
+	height: 0px;
+	background-color: transparent;
+}
+
+.annis .v-colorpicker-popup .v-colorpicker-preview {
+	margin-top: 5px;
+	padding-left: 11px;
+	padding-right: 10px;
+	margin-bottom: 0px;
+}
+
+.annis .v-colorpicker-popup .v-absolutelayout-wrapper {
+	width: 100%;
+	height: 100%;
+}
+
+.annis .v-colorpicker-popup .v-colorpicker-preview-textfield {
+	background: none;
+	overflow: hidden;
+	overflow-y: hidden;
+	overflow-x: hidden;
+}
+
+.annis .v-colorpicker-popup .v-textfield-dark {
+	color: #FFFFFF;
+}
+
+.annis .v-colorpicker-popup .v-textfield-light {
+	color: #000000;
+}
+
+.annis .v-colorpicker-popup .colorselect {
+	margin-top: 5px;
+	padding-left: 10px;
+	padding-right: 10px;
+}
+
+.annis .v-colorpicker-popup .v-tabsheet .v-colorpicker-grid {
+	height: 319px;
+}
+
+.annis .v-colorpicker-popup .colorselect td {
+	line-height: 15px;
+}
+
+.annis .v-colorpicker-popup .v-filterselect {
+	padding-right: 16px;
+}
+
+.annis .v-calendar-nresize DIV DIV {
+	cursor: n-resize !important;
+}
+
+.annis .v-calendar-sresize DIV DIV {
+	cursor: s-resize !important;
+}
+
+.annis .v-calendar {
+	background-color: #fff;
+}
+
+.annis .v-calendar-header-month, .annis .v-calendar-header-week {
+	border-bottom: 1px solid #c1c1c1;
+}
+
+.annis .v-calendar-header-day {
+	text-align: center;
+	color: #666;
+	font-size: 12px;
+	line-height: normal;
+}
+
+.annis .v-calendar-header-week .v-calendar-header-day:hover {
+	cursor: pointer;
+	color: #222;
+}
+
+.annis .v-calendar-header-day-today {
+	font-weight: bold;
+	color: #444;
+}
+
+.annis .v-calendar-header-month td:first-child {
+	padding-left: 19px;
+}
+
+.annis .v-calendar-header-week .v-calendar-back, .annis .v-calendar-header-week .v-calendar-next {
+	border: none;
+	padding: 0;
+	margin: 0;
+	height: 12px;
+	width: 12px;
+	overflow: hidden;
+	background: transparent url(../base/calendar/img/arrows.png) no-repeat 50% 0;
+	opacity: 0.3;
+	filter: alpha(opacity = 30);
+	cursor: default;
+}
+
+.annis .v-calendar-header-week .v-calendar-back:hover, .annis .v-calendar-header-week .v-calendar-next:hover {
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.annis .v-calendar-header-week .v-calendar-back:active, .annis .v-calendar-header-week .v-calendar-next:active {
+	opacity: 1;
+	filter: alpha(opacity = 100);
+}
+
+.annis .v-calendar-header-week .v-calendar-next {
+	background-position: 50% -12px;
+}
+
+.annis .v-calendar-month {
+	outline: none;
+}
+
+.annis .v-calendar-week-numbers {
+	width: 20px;
+	border-right: 1px solid #ccc;
+}
+
+.annis .v-calendar-week-number {
+	border: none;
+	background: transparent;
+	padding: 0;
+	margin: 0;
+	cursor: pointer;
+	opacity: 0.5;
+	width: 20px;
+	text-align: center;
+	border-bottom: 1px solid #ddd;
+}
+
+.annis .v-calendar-week-number:hover {
+	opacity: 1;
+}
+
+.annis .v-calendar-month-day {
+	border-bottom: 1px solid #ccc;
+	border-right: 1px solid #ccc;
+	outline: none;
+}
+
+.annis .v-calendar-month-day-today {
+	background-color: #e7f0f5;
+}
+
+.annis .v-calendar-month-day-selected {
+	background-color: #fffee7;
+}
+
+.annis .v-calendar-month-day-dragemphasis {
+	background-color: #a8a8a8;
+}
+
+.annis .v-calendar-month-day-scrollable {
+	overflow-y: scroll;
+}
+
+.annis .v-calendar-day-number {
+	height: 18px;
+	line-height: 18px;
+	font-size: 12px;
+	text-align: right;
+	padding-right: 3px;
+	white-space: nowrap;
+}
+
+.annis .v-calendar-day-number:hover {
+	cursor: pointer;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.annis .v-calendar-month .v-calendar-spacer, .annis .v-calendar-month .v-calendar-bottom-spacer, .annis .v-calendar-month .v-calendar-bottom-spacer-empty {
+	height: 15px;
+	font-size: 11px;
+}
+
+.annis .v-calendar-month .v-calendar-bottom-spacer:hover {
+	cursor: pointer;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+}
+
+.annis .v-calendar-event {
+	line-height: 14px;
+	font-size: 11px;
+	padding: 0 0 0 4px;
+	cursor: pointer;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	outline: none;
+}
+
+.annis .v-calendar-event-month {
+	margin-bottom: 1px;
+	white-space: nowrap;
+}
+
+.annis .v-calendar-event-month:hover {
+	text-decoration: underline;
+}
+
+.annis .v-calendar-event-all-day {
+	background: #999;
+	display: block;
+	margin-left: -2px;
+}
+
+.annis div.v-calendar-event-all-day {
+	color: #fff;
+	height: 14px;
+}
+
+.annis .v-calendar-event-continued-from {
+	margin-left: 0;
+}
+
+.annis .v-calendar-event-start {
+	-webkit-border-top-left-radius: 6px;
+	-webkit-border-bottom-left-radius: 6px;
+	-moz-border-radius-topleft: 6px;
+	-moz-border-radius-bottomleft: 6px;
+	border-top-left-radius: 6px;
+	border-bottom-left-radius: 6px;
+	margin-left: 0;
+}
+
+.annis .v-calendar-event-end {
+	-webkit-border-top-right-radius: 6px;
+	-webkit-border-bottom-right-radius: 6px;
+	-moz-border-radius-topright: 6px;
+	-moz-border-radius-bottomright: 6px;
+	border-top-right-radius: 6px;
+	border-bottom-right-radius: 6px;
+}
+
+.annis .v-calendar-week-wrapper {
+	position: relative;
+}
+
+.annis .v-calendar-times {
+	width: 51px;
+}
+
+.annis .v-calendar-time {
+	padding: 0 8px 7px 0;
+	margin-top: -7px;
+	text-align: right;
+	font-size: 11px;
+	color: #666;
+	border-right: 1px solid #ccc;
+}
+
+.annis .v-calendar-weekly-longevents {
+	border-left: 1px solid #ccc;
+	border-bottom: 2px solid #bbb;
+	margin-left: 50px;
+}
+
+.annis .v-calendar-weekly-longevents .v-calendar-datecell {
+	border-right: 1px solid #ccc;
+	padding: 1px 0 0;
+}
+
+.annis .v-calendar-weekly-longevents .v-calendar-event {
+	height: 14px;
+	margin-bottom: 1px;
+}
+
+.annis .v-calendar-weekly-longevents .v-calendar-event:hover {
+	text-decoration: underline;
+}
+
+.annis .v-calendar-day-times {
+	border-right: 1px solid #ccc;
+	outline: none;
+}
+
+.annis .v-calendar-day-times .v-datecellslot, .annis .v-calendar-day-times .v-datecellslot-even {
+	border-bottom: 1px solid #ccc;
+}
+
+.annis .v-calendar-day-times .v-datecellslot-even {
+	border-bottom-color: #eee;
+}
+
+.annis .v-calendar-day-times .v-daterange {
+	background-color: #a8a8a8;
+}
+
+.annis .v-calendar-day-times .v-reserved {
+	background-color: #FF3333;
+}
+
+.annis .v-calendar-day-times .dragemphasis {
+	background-color: #a8a8a8;
+}
+
+.annis .v-calendar-week-wrapper .v-calendar-event {
+	padding: 0;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	margin-top: -1px;
+}
+
+.annis .v-calendar-event-caption {
+	position: absolute;
+	z-index: 1;
+	top: 2px;
+	left: 4px;
+	width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	line-height: normal;
+}
+
+.annis .v-calendar-event-content {
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	border-radius: 4px;
+	border: 1px solid #777;
+	background: #eee;
+	opacity: 0.8;
+	filter: alpha(opacity = 80);
+	height: 14px;
+}
+
+.annis .v-calendar-current-time {
+	position: absolute;
+	left: 0;
+	width: 100%;
+	height: 1px;
+	overflow: hidden;
+	background: #5a6c86;
+	opacity: 0.6;
+	filter: alpha(opacity = 60);
+	z-index: 2;
+}
+
+.annis .v-calendar-event-resizetop {
+	position: absolute;
+	cursor: n-resize;
+	height: 5%;
+	min-height: 3px;
+	top: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+.annis .v-calendar-event-resizebottom {
+	position: absolute;
+	cursor: s-resize;
+	height: 5%;
+	min-height: 3px;
+	bottom: 0;
+	width: 100%;
+	z-index: 1;
+}
+
+.annis .v-calendar-month-sizedheight .v-calendar-month-day {
+	height: 100px;
+}
+
+.annis .v-calendar-month-sizedwidth .v-calendar-month-day {
+	width: 100px;
+}
+
+.annis .v-calendar-header-month-Hsized .v-calendar-header-day {
+	width: 101px;
+}
+
+.annis .v-calendar-header-month-Hsized td:first-child {
+	padding-left: 21px;
+}
+
+.annis .v-calendar-header-day-Hsized {
+	width: 200px;
+}
+
+.annis .v-calendar-week-numbers-Vsized .v-calendar-week-number {
+	height: 100px;
+	line-height: 100px;
+}
+
+.annis .v-calendar-week-wrapper-Vsized {
+	height: 400px;
+	overflow-x: hidden !important;
+}
+
+.annis .v-calendar-times-Vsized .v-calendar-time {
+	height: 38px;
+}
+
+.annis .v-calendar-times-Hsized .v-calendar-time {
+	width: 42px;
+}
+
+.annis .v-calendar-day-times-Vsized .v-datecellslot, .annis .v-calendar-day-times-Vsized .v-datecellslot-even {
+	height: 18px;
+}
+
+.annis .v-calendar-day-times-Hsized, .annis .v-calendar-day-times-Hsized .v-datecellslot, .annis .v-calendar-day-times-Hsized .v-datecellslot-even {
+	width: 200px;
+}
+
+.annis.v-app {
+	height: 100%;
+}
+
+.annis.v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-label, .annis .v-caption {
+	cursor: default;
+}
+
+body .annis.v-app .v-app-loading {
+	background-image: url(../base/common/img/loading-indicator.gif);
+	background-repeat: no-repeat;
+	background-position: 50%;
+	width: 100%;
+	height: 100%;
+}
+
+.annis .v-ui {
+	height: 100%;
+	width: 100%;
+	outline: none;
+	position: relative;
+}
+
+.annis .v-ui.v-ui-embedded {
+	margin-top: -1px;
+	border-top: 1px solid transparent;
+}
+
+.annis .v-ui:active, .annis .v-ui:focus {
+	outline: none;
+}
+
+.annis.v-app select, .annis .v-window select {
+	margin: 0;
+}
+
+.annis .v-disabled {
+	opacity: 0.3;
+	filter: alpha(opacity=30);
+	cursor: default;
+}
+
+.annis .v-disabled * {
+	cursor: default;
+}
+
+* html .annis .v-disabled {
+	zoom: 1;
+}
+
+* + html .annis .v-disabled {
+	zoom: 1;
+}
+
+.annis .v-disabled .v-disabled {
+	opacity: 1;
+}
+
+.annis .v-required-field-indicator {
+	padding-left: 2px;
+	color: red;
+}
+
+.annis .v-form fieldset {
+	border: none;
+	padding: 0;
+	margin: 0;
+	height: 100%;
+}
+
+.annis .v-form-content {
+	height: 100%;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-tooltip {
+	cursor: default;
+	background: #fff;
+}
+
+.annis .v-tooltip-text {
+	overflow: auto;
+}
+
+.annis .v-tooltip .v-errormessage {
+	overflow: auto;
+}
+
+.annis .v-contextmenu {
+	background: #fff;
+}
+
+.annis .v-contextmenu .gwt-MenuItem {
+	cursor: pointer;
+	vertical-align: middle;
+	padding: 0;
+	border: 0;
+	margin: 0;
+}
+
+.annis .v-contextmenu .gwt-MenuItem div {
+	cursor: pointer;
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.annis .v-contextmenu .gwt-MenuItem-selected div {
+	background: #aaa;
+	color: #fff;
+}
+
+.annis .v-contextmenu table {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+}
+
+.annis .v-contextmenu .gwt-MenuItem img {
+	margin-right: 1em;
+	vertical-align: middle;
+}
+
+.annis .v-label pre {
+	margin: 0;
+}
+
+.annis .v-label-undef-w {
+	white-space: nowrap;
+}
+
+.annis .v-label h1, .annis .v-label h2, .annis .v-label h3, .annis .v-label h4, .annis .v-label h5, .annis .v-label h6 {
+	line-height: normal;
+}
+
+.annis .v-loading-indicator, .annis .v-loading-indicator-delay, .annis .v-loading-indicator-wait {
+	position: absolute;
+	top: 0;
+	right: 0;
+	z-index: 30000;
+	width: 31px;
+	height: 31px;
+	background: transparent url(../base/common/img/loading-indicator.gif);
+	margin-right: 5px;
+	margin-top: 5px;
+}
+
+.annis .v-loading-indicator-delay {
+	background-image: url(../base/common/img/loading-indicator-delay.gif);
+}
+
+.annis .v-loading-indicator-wait {
+	background-image: url(../base/common/img/loading-indicator-wait.gif);
+}
+
+.annis.v-app input[type="text"], .annis.v-app input[type="password"], .annis.v-app input[type="reset"], .annis.v-app select, .annis.v-app textarea, .annis .v-window input[type="text"], .annis .v-window input[type="password"], .annis .v-window input[type="reset"], .annis .v-window select, .annis .v-window textarea {
+	padding: 2px;
+}
+
+.annis input::-ms-clear {
+	display: none;
+}
+
+.annis .v-drag-element {
+	z-index: 60000;
+	position: absolute !important;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	cursor: default;
+}
+
+.annis .v-clip {
+	overflow: hidden;
+}
+
+.annis .v-scrollable {
+	overflow: auto;
+	font-size: 0;
+	line-height: normal;
+}
+
+.v-ff .annis .v-scrollable {
+	font-size: 10pt;
+}
+
+.v-ios.v-webkit .annis .v-scrollable {
+	-webkit-overflow-scrolling: touch;
+}
+
+.v-ios5.v-webkit .annis .v-scrollable {
+	-webkit-overflow-scrolling: none;
+}
+
+.annis.v-overlay-container {
+	width: 0;
+	height: 0;
+}
+
+.annis .v-vertical.v-margin-top, .annis .v-horizontal.v-margin-top {
+	padding-top: 12px;
+}
+
+.annis .v-vertical.v-margin-right, .annis .v-horizontal.v-margin-right {
+	padding-right: 12px;
+}
+
+.annis .v-vertical.v-margin-bottom, .annis .v-horizontal.v-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.annis .v-vertical.v-margin-left, .annis .v-horizontal.v-margin-left {
+	padding-left: 12px;
+}
+
+.annis .v-gridlayout.v-layout-margin-top {
+	padding-top: 24px;
+}
+
+.annis .v-gridlayout, .annis .v-verticallayout, .annis .v-horizontallayout {
+	font-size: 0;
+	line-height: normal;
+}
+
+.annis .v-gridlayout.v-layout-margin-bottom {
+	padding-bottom: 24px;
+}
+
+.annis .v-gridlayout.v-layout-margin-left {
+	padding-left: 24px;
+}
+
+.annis .v-gridlayout.v-layout-margin-right {
+	padding-right: 24px;
+}
+
+.annis .v-gridlayout .v-layout-spacing-on {
+	padding-left: 12px;
+	padding-top: 12px;
+}
+
+.annis .v-spacing {
+	width: 6px;
+	height: 6px;
+}
+
+.annis .v-vertical, .annis .v-horizontal {
+	display: inline-block;
+}
+
+.annis div.v-layout.v-horizontal.v-widget {
+	white-space: nowrap;
+}
+
+.annis .v-layout.v-vertical > .v-expand, .annis .v-layout.v-horizontal > .v-expand {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+	width: 100%;
+	height: 100%;
+}
+
+.annis .v-slot, .annis .v-spacing {
+	display: inline-block;
+	white-space: normal;
+	vertical-align: top;
+}
+
+.annis .v-vertical > .v-slot:after {
+	display: inline-block;
+	clear: both;
+	width: 0;
+	height: 0;
+	overflow: hidden;
+	line-height: 0;
+}
+
+.annis .v-vertical > .v-slot, .annis .v-vertical > .v-expand > .v-slot {
+	display: block;
+	clear: both;
+}
+
+.annis .v-horizontal > .v-slot, .annis .v-horizontal > .v-expand > .v-slot {
+	height: 100%;
+}
+
+.annis .v-horizontal > .v-expand > .v-slot {
+	position: relative;
+}
+
+.annis .v-vertical > .v-spacing, .annis .v-vertical > .v-expand > .v-spacing {
+	width: 0;
+	display: block;
+	clear: both;
+}
+
+.annis .v-horizontal > .v-spacing, .annis .v-horizontal > .v-expand > .v-spacing {
+	height: 0;
+}
+
+.annis .v-align-middle:before, .annis .v-align-bottom:before, .annis .v-expand > .v-align-middle:before, .annis .v-expand > .v-align-bottom:before {
+	content: "";
+	display: inline-block;
+	height: 100%;
+	vertical-align: middle;
+	width: 0;
+}
+
+.annis .v-align-middle, .annis .v-align-bottom {
+	white-space: nowrap;
+}
+
+.annis .v-align-middle > .v-widget, .annis .v-align-bottom > .v-widget {
+	display: inline-block;
+}
+
+.annis .v-align-middle, .annis .v-align-middle > .v-widget {
+	vertical-align: middle;
+}
+
+.annis .v-align-bottom, .annis .v-align-bottom > .v-widget {
+	vertical-align: bottom;
+}
+
+.annis .v-align-center {
+	text-align: center;
+}
+
+.annis .v-align-center > .v-widget {
+	margin-left: auto;
+	margin-right: auto;
+}
+
+.annis .v-align-right {
+	text-align: right;
+}
+
+.annis .v-align-right > .v-widget {
+	margin-left: auto;
+}
+
+.annis .v-has-caption, .annis .v-has-caption > .v-caption {
+	display: inline-block;
+}
+
+.annis .v-caption {
+	overflow: visible;
+	vertical-align: middle;
+}
+
+.annis .v-caption-on-left, .annis .v-caption-on-right {
+	white-space: nowrap;
+}
+
+.annis .v-caption-on-top > .v-caption, .annis .v-caption-on-bottom > .v-caption {
+	display: block;
+}
+
+.annis .v-caption-on-left > .v-caption {
+	padding-right: 0.5em;
+}
+
+.annis .v-caption-on-right > .v-caption {
+	vertical-align: top;
+}
+
+.annis .v-caption-on-left > .v-widget, .annis .v-caption-on-right > .v-widget {
+	display: inline-block;
+	vertical-align: middle;
+}
+
+.annis .v-has-caption.v-has-width > .v-widget {
+	width: 100% !important;
+}
+
+.annis .v-has-caption.v-has-height > .v-widget {
+	height: 100% !important;
+}
+
+.annis .v-errorindicator {
+	vertical-align: middle;
+}
+
+.annis .v-csslayout {
+	overflow: hidden;
+}
+
+.annis div.v-csslayout {
+	display: block;
+}
+
+.annis .v-csslayout-margin, .annis .v-csslayout-container {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-has-width > .v-csslayout-margin, .annis .v-has-width > .v-csslayout-margin > .v-csslayout-container {
+	width: 100%;
+}
+
+.annis .v-has-height > .v-csslayout-margin, .annis .v-has-height > .v-csslayout-margin > .v-csslayout-container {
+	height: 100%;
+}
+
+.annis .v-csslayout-margin-top {
+	padding-top: 12px;
+}
+
+.annis .v-csslayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.annis .v-csslayout-margin-left {
+	padding-left: 12px;
+}
+
+.annis .v-csslayout-margin-right {
+	padding-right: 12px;
+}
+
+.annis .v-customcomponent {
+	overflow: hidden;
+}
+
+.annis .v-customlayout {
+	overflow: hidden;
+}
+
+.annis .v-datefield {
+	white-space: nowrap;
+	display: inline-block;
+}
+
+.annis .v-datefield-textfield {
+	vertical-align: top;
+}
+
+.v-ie .annis .v-datefield-button:after {
+	content: "\200B";
+}
+
+.annis .v-datefield-button {
+	cursor: pointer;
+	vertical-align: top;
+}
+
+.annis .v-has-width > input.v-datefield-textfield {
+	width: 100%;
+}
+
+.annis .v-datefield-prompt .v-datefield-textfield {
+	color: #999;
+	font-style: italic;
+}
+
+.annis .v-datefield .v-datefield-button-readonly {
+	display: none;
+}
+
+.annis .v-datefield-calendarpanel table {
+	width: 100%;
+}
+
+.annis .v-datefield-calendarpanel td {
+	padding: 0;
+	margin: 0;
+}
+
+.annis .v-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.annis .v-datefield-calendarpanel-header td {
+	text-align: center;
+}
+
+.annis .v-datefield-calendarpanel-month {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.annis .v-datefield-calendarpanel-weeknumber {
+	color: #999;
+	border-right: 1px solid #ddd;
+	font-size: 11.7px;
+}
+
+.annis .v-datefield-calendarpanel-day, .annis .v-datefield-calendarpanel-day-today {
+	cursor: pointer;
+}
+
+.annis .v-datefield-calendarpanel-day-today {
+	border: 1px solid #ddd;
+}
+
+.annis .v-disabled .v-datefield-calendarpanel-day, .annis .v-disabled .v-datefield-calendarpanel-day-today, .annis .v-disabled.v-datefield-popupcalendar .v-datefield-button {
+	cursor: default;
+}
+
+.annis .v-datefield-calendarpanel-day-disabled, .annis .v-datefield-calendarpanel-day-outside-range {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.annis .v-datefield-calendarpanel-prevyear button.outside-range, .annis .v-datefield-calendarpanel-nextyear button.outside-range, .annis .v-datefield-calendarpanel-prevmonth button.outside-range, .annis .v-datefield-calendarpanel-nextmonth button.outside-range {
+	opacity: 0.5;
+}
+
+.annis .v-datefield-calendarpanel-day-selected {
+	cursor: default;
+	background: #333;
+	color: #fff;
+}
+
+.annis .v-datefield-calendarpanel-day-focused {
+	outline: 1px dotted black;
+}
+
+.annis .v-datefield-calendarpanel-day-offmonth {
+	color: #666;
+}
+
+.annis .v-datefield-time {
+	white-space: nowrap;
+}
+
+.annis .v-datefield-time .v-label {
+	display: inline;
+}
+
+.annis .v-datefield-popup {
+	background: #fff;
+}
+
+.annis .v-datefield-popupcalendar input.v-datefield-textfield {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-inline-datefield {
+	white-space: nowrap;
+	display: inline-block;
+}
+
+.annis .v-inline-datefield-textfield {
+	vertical-align: top;
+}
+
+.v-ie .annis .v-inline-datefield-button:after {
+	content: "\200B";
+}
+
+.annis .v-inline-datefield-button {
+	cursor: pointer;
+	vertical-align: top;
+}
+
+.annis .v-has-width > input.v-inline-datefield-textfield {
+	width: 100%;
+}
+
+.annis .v-inline-datefield-prompt .v-inline-datefield-textfield {
+	color: #999;
+	font-style: italic;
+}
+
+.annis .v-inline-datefield .v-inline-datefield-button-readonly {
+	display: none;
+}
+
+.annis .v-inline-datefield-calendarpanel table {
+	width: 100%;
+}
+
+.annis .v-inline-datefield-calendarpanel td {
+	padding: 0;
+	margin: 0;
+}
+
+.annis .v-inline-datefield-calendarpanel:focus {
+	outline: none;
+}
+
+.annis .v-inline-datefield-calendarpanel-header td {
+	text-align: center;
+}
+
+.annis .v-inline-datefield-calendarpanel-month {
+	text-align: center;
+	white-space: nowrap;
+}
+
+.annis .v-inline-datefield-calendarpanel-weeknumber {
+	color: #999;
+	border-right: 1px solid #ddd;
+	font-size: 11.7px;
+}
+
+.annis .v-inline-datefield-calendarpanel-day, .annis .v-inline-datefield-calendarpanel-day-today {
+	cursor: pointer;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-today {
+	border: 1px solid #ddd;
+}
+
+.annis .v-disabled .v-inline-datefield-calendarpanel-day, .annis .v-disabled .v-inline-datefield-calendarpanel-day-today, .annis .v-disabled.v-inline-datefield-popupcalendar .v-inline-datefield-button {
+	cursor: default;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-disabled, .annis .v-inline-datefield-calendarpanel-day-outside-range {
+	cursor: default;
+	opacity: 0.5;
+}
+
+.annis .v-inline-datefield-calendarpanel-prevyear button.outside-range, .annis .v-inline-datefield-calendarpanel-nextyear button.outside-range, .annis .v-inline-datefield-calendarpanel-prevmonth button.outside-range, .annis .v-inline-datefield-calendarpanel-nextmonth button.outside-range {
+	opacity: 0.5;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-selected {
+	cursor: default;
+	background: #333;
+	color: #fff;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-focused {
+	outline: 1px dotted black;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-offmonth {
+	color: #666;
+}
+
+.annis .v-inline-datefield-time {
+	white-space: nowrap;
+}
+
+.annis .v-inline-datefield-time .v-label {
+	display: inline;
+}
+
+.annis .v-inline-datefield-popup {
+	background: #fff;
+}
+
+.annis .v-inline-datefield-popupcalendar input.v-inline-datefield-textfield {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-ddwrapper {
+	padding: 2px;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	position: relative;
+}
+
+.annis [draggable=true] {
+	-khtml-user-drag: element;
+	-webkit-user-drag: element;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+.v-ie .annis .v-ddwrapper a.drag-start {
+	display: block;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	width: 100%;
+	height: 100%;
+	opacity: 0;
+	background-color: cyan;
+	filter: alpha(opacity=0);
+}
+
+.annis .v-ddwrapper-over {
+	border: 2px solid #1d9dff;
+	background-color: #bcdcff;
+	padding: 0;
+}
+
+.annis .v-ddwrapper-over {
+	background-color: rgba(169, 209, 255, 0.6);
+}
+
+.annis .no-box-drag-hints .v-ddwrapper-over {
+	border: none;
+	background-color: transparent;
+	padding: 2px;
+}
+
+.annis.v-app .v-ddwrapper-over-top, .annis .v-window .v-ddwrapper-over-top, .annis .v-popupview-popup .v-ddwrapper-over-top {
+	border: none;
+	border-top: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-top: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.annis.v-app .v-ddwrapper-over-bottom, .annis .v-window .v-ddwrapper-over-bottom, .annis .v-popupview-popup .v-ddwrapper-over-bottom {
+	border: none;
+	border-bottom: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-bottom: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.annis.v-app .v-ddwrapper-over-left, .annis .v-window .v-ddwrapper-over-left, .annis .v-popupview-popup .v-ddwrapper-over-left {
+	border: none;
+	border-left: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-left: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.annis.v-app .v-ddwrapper-over-right, .annis .v-window .v-ddwrapper-over-right, .annis .v-popupview-popup .v-ddwrapper-over-right {
+	border: none;
+	border-right: 2px solid #1d9dff;
+	background-color: transparent;
+	padding: 2px;
+	padding-right: 0;
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+}
+
+.annis .v-ddwrapper, .annis .v-ddwrapper-over, .annis.v-app .v-ddwrapper-over-top, .annis .v-window .v-ddwrapper-over-top, .annis .v-popupview-popup .v-ddwrapper-over-top, .annis.v-app .v-ddwrapper-over-bottom, .annis .v-window .v-ddwrapper-over-bottom, .annis .v-popupview-popup .v-ddwrapper-over-bottom, .annis.v-app .v-ddwrapper-over-left, .annis .v-window .v-ddwrapper-over-left, .annis .v-popupview-popup .v-ddwrapper-over-left, .annis.v-app .v-ddwrapper-over-right, .annis .v-window .v-ddwrapper-over-right, .annis .v-popupview-popup .v-ddwrapper-over-right {
+	border-color: rgba(0, 109, 232, 0.6);
+}
+
+.annis .v-ddwrapper-over-top:before, .annis .v-ddwrapper-over-bottom:after, .annis .v-ddwrapper-over-left:before, .annis .v-ddwrapper-over-right:before {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	margin-left: -2px;
+	background: transparent url(../base/common/img/drag-slot-dot.png) no-repeat;
+}
+
+.annis .v-ddwrapper-over-bottom:after {
+	margin-top: -2px;
+}
+
+.annis .v-ddwrapper-over-left:before, .annis .v-ddwrapper-over-right:before {
+	background-position: 0 -6px;
+	margin-top: -2px;
+	margin-left: -4px;
+}
+
+.annis .v-ddwrapper-over-right:before {
+	position: relative;
+	margin-bottom: -4px;
+	margin-right: -4px;
+	margin-left: 0;
+	width: auto;
+	background-position: 100% -6px;
+}
+
+.annis .no-horizontal-drag-hints .v-ddwrapper-over-left {
+	padding-left: 2px;
+	border-left: none;
+}
+
+.annis .no-horizontal-drag-hints .v-ddwrapper-over-right {
+	padding-right: 2px;
+	border-right: none;
+}
+
+.annis .no-vertical-drag-hints .v-ddwrapper-over-top {
+	padding-top: 2px;
+	border-top: none;
+}
+
+.annis .no-vertical-drag-hints .v-ddwrapper-over-bottom {
+	padding-bottom: 2px;
+	border-bottom: none;
+}
+
+.annis .no-horizontal-drag-hints .v-ddwrapper-over-left:before, .annis .no-horizontal-drag-hints .v-ddwrapper-over-right:before, .annis .no-vertical-drag-hints .v-ddwrapper-over-top:before, .annis .no-vertical-drag-hints .v-ddwrapper-over-bottom:after {
+	display: none;
+}
+
+.annis .v-table .v-embedded-image {
+	display: inline-block;
+}
+
+.annis .v-formlayout.v-has-width > table {
+	width: 100%;
+}
+
+.annis .v-formlayout.v-has-height > table {
+	height: 100%;
+}
+
+.annis .v-formlayout-cell .v-errorindicator {
+	display: block;
+}
+
+.annis .v-formlayout-error-indicator {
+	width: 12px;
+}
+
+.annis .v-formlayout-captioncell {
+	text-align: right;
+	white-space: nowrap;
+}
+
+.annis .v-formlayout-errorcell, .annis .v-formlayout-captioncell {
+	width: 1px;
+}
+
+.annis .v-formlayout-captioncell .v-caption {
+	overflow: visible;
+}
+
+.annis .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-captioncell, .annis .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-contentcell, .annis .v-formlayout-spacing > tbody > .v-formlayout-row > .v-formlayout-errorcell {
+	padding-top: 6px;
+}
+
+.annis .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-captioncell, .annis .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-contentcell, .annis .v-formlayout-spacing > tbody > .v-formlayout-firstrow > .v-formlayout-errorcell {
+	padding-top: 0;
+}
+
+.annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-captioncell, .annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-contentcell, .annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow > .v-formlayout-errorcell {
+	padding-top: 12px;
+}
+
+.annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-captioncell, .annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-contentcell, .annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow > .v-formlayout-errorcell {
+	padding-bottom: 12px;
+}
+
+.annis .v-formlayout-margin-left > tbody > .v-formlayout-row > .v-formlayout-captioncell {
+	padding-left: 12px;
+}
+
+.annis .v-formlayout-margin-right > tbody > .v-formlayout-row > .v-formlayout-contentcell {
+	padding-right: 12px;
+}
+
+.annis .v-formlayout-captioncell .v-caption .v-required-field-indicator {
+	float: none;
+}
+
+.annis .v-gridlayout {
+	position: relative;
+}
+
+.annis .v-gridlayout-slot {
+	position: absolute;
+}
+
+.annis .v-gridlayout-margin-top {
+	padding-top: 12px;
+}
+
+.annis .v-gridlayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.annis .v-gridlayout-margin-left {
+	padding-left: 12px;
+}
+
+.annis .v-gridlayout-margin-right {
+	padding-right: 12px;
+}
+
+.annis .v-gridlayout-spacing-on {
+	padding-left: 6px;
+	padding-top: 6px;
+	overflow: hidden;
+}
+
+.annis .v-gridlayout-spacing, .annis .v-gridlayout-spacing-off {
+	padding-left: 0;
+	padding-top: 0;
+}
+
+.annis .v-gridlayout-spacing-off {
+	overflow: hidden;
+}
+
+.annis .v-label {
+	overflow: hidden;
+}
+
+.annis .v-label.v-has-width {
+	white-space: normal;
+}
+
+.annis .v-link {
+	white-space: nowrap;
+}
+
+.annis .v-link a {
+	vertical-align: middle;
+	text-decoration: none;
+}
+
+.annis .v-link span {
+	text-decoration: underline;
+	vertical-align: middle;
+}
+
+.annis .v-disabled a {
+	cursor: default;
+}
+
+.annis .v-link img {
+	vertical-align: middle;
+	border: none;
+}
+
+.annis .v-loginform {
+	height: 140px;
+	width: 200px;
+}
+
+.annis .v-app-loginpage .v-button, .annis .v-app-loginpage .v-button {
+	float: left;
+}
+
+.annis .v-menubar {
+	display: inline-block;
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.annis .v-menubar .v-menubar-menuitem {
+	cursor: default;
+	vertical-align: middle;
+	white-space: nowrap;
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+}
+
+.annis .v-menubar .v-menubar-menuitem-caption .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+}
+
+.annis .v-menubar-submenu {
+	background: #fff;
+}
+
+.annis .v-menubar-menuitem-selected {
+	background: #333;
+	color: #fff;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem {
+	cursor: default;
+	display: block;
+	position: relative;
+	padding-right: 1.5em;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem-caption {
+	display: block;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem *, .annis .v-menubar-submenu .v-menubar-menuitem-caption * {
+	white-space: nowrap;
+}
+
+.annis .v-menubar-submenu-indicator {
+	display: none;
+	font-family: arial, helvetica, sans-serif;
+}
+
+.annis .v-menubar-submenu .v-menubar-submenu-indicator {
+	display: block;
+	position: absolute;
+	right: 0;
+	width: 1em;
+	height: 1em;
+	font-size: 11.7px;
+}
+
+.annis .v-menubar-menuitem-disabled, .annis .v-menubar span.v-menubar-menuitem-disabled:hover, .annis .v-menubar span.v-menubar-menuitem-disabled:focus, .annis .v-menubar span.v-menubar-menuitem-disabled:active {
+	color: #999;
+}
+
+.annis .v-menubar-more-menuitem {
+	font-family: arial, helvetica, sans-serif;
+}
+
+.annis .v-menubar-separator {
+	overflow: hidden;
+}
+
+.annis .v-menubar-separator span {
+	display: block;
+	text-indent: -9999px;
+	font-size: 1px;
+	line-height: 1px;
+	border-top: 1px solid #ddd;
+	margin: 3px 0 2px;
+	overflow: hidden;
+}
+
+.annis .v-menubar .v-icon, .annis .v-menubar-submenu .v-icon {
+	margin-right: 3px;
+}
+
+.annis .v-menubar:focus, .annis .v-menubar-popup:focus, .annis .v-menubar-popup .popupContent:focus, .annis .v-menubar-popup .popupContent .v-menubar-submenu:focus {
+	outline: none;
+}
+
+.annis .v-menubar-submenu-check-column .v-menubar-menuitem {
+	padding-left: 6px;
+}
+
+.annis .v-menubar-submenu-check-column .v-menubar-menuitem-caption {
+	padding-left: 18px;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem-checked .v-menubar-menuitem-caption {
+	background: transparent url(../base/menubar/img/check.gif) no-repeat left;
+}
+
+.annis .v-Notification {
+	background: #999;
+	color: #fff;
+	cursor: pointer;
+	overflow: hidden;
+	padding: 1em;
+	max-width: 85%;
+}
+
+.annis .v-Notification h1, .annis .v-Notification p, .annis .v-Notification-error h1, .annis .v-Notification-error p, .annis .v-Notification-warning h1, .annis .v-Notification-warning p {
+	display: inline;
+	margin: 0 0.5em 0 0;
+}
+
+.annis .v-Notification-warning {
+	background: orange;
+}
+
+.annis .v-Notification-error {
+	background: red;
+}
+
+.annis .v-Notification-tray h1 {
+	display: block;
+}
+
+.annis .v-Notification-tray p {
+	display: block;
+}
+
+.annis .v-Notification-system {
+	background-color: red;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+
+.annis .v-Notification-system h1 {
+	display: block;
+	margin: 0;
+}
+
+.annis .v-orderedlayout, .annis .v-horizontallayout, .annis .v-verticallayout {
+	position: relative;
+}
+
+.annis .v-orderedlayout-margin-top, .annis .v-horizontallayout-margin-top, .annis .v-verticallayout-margin-top {
+	padding-top: 12px;
+}
+
+.annis .v-orderedlayout-margin-right, .annis .v-horizontallayout-margin-right, .annis .v-verticallayout-margin-right {
+	padding-right: 12px;
+}
+
+.annis .v-orderedlayout-margin-bottom, .annis .v-horizontallayout-margin-bottom, .annis .v-verticallayout-margin-bottom {
+	padding-bottom: 12px;
+}
+
+.annis .v-orderedlayout-margin-left, .annis .v-horizontallayout-margin-left, .annis .v-verticallayout-margin-left {
+	padding-left: 12px;
+}
+
+.annis .v-orderedlayout-spacing-on, .annis .v-horizontallayout-spacing-on, .annis .v-verticallayout-spacing-on {
+	padding-top: 6px;
+	padding-left: 6px;
+}
+
+.annis .v-orderedlayout-spacing-off, .annis .v-horizontallayout-spacing-off, .annis .v-verticallayout-spacing-off {
+	padding-top: 0;
+	padding-left: 0;
+}
+
+.annis .v-horizontallayout-slot, .annis .v-verticallayout-slot {
+	position: absolute;
+}
+
+.annis .v-panel, .annis .v-panel-caption, .annis .v-panel-content, .annis .v-panel-deco, .annis .v-panel-light, .annis .v-panel-caption-light, .annis .v-panel-content-light, .annis .v-panel-deco-light {
+	outline: none;
+	text-align: left;
+}
+
+.annis .v-panel-caption .v-errorindicator {
+	float: none;
+	display: inline;
+}
+
+.annis .v-panel-caption .v-icon {
+	display: inline;
+	vertical-align: middle;
+}
+
+.annis .v-panel-caption span {
+	vertical-align: middle;
+}
+
+.annis .v-panel-caption {
+	white-space: nowrap;
+	overflow: hidden;
+	font-weight: bold;
+}
+
+.annis .v-panel-nocaption {
+	overflow: hidden;
+}
+
+.annis .v-panel-content {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-panel.v-has-width > .v-panel-content {
+	width: 100%;
+}
+
+.annis .v-panel.v-has-height > .v-panel-content {
+	height: 100%;
+}
+
+.annis .v-popupview {
+	cursor: pointer;
+	text-decoration: underline;
+	white-space: nowrap;
+}
+
+.annis .v-popupview-popup {
+	overflow: auto;
+}
+
+.annis .v-popupview-loading {
+	width: 30px;
+	height: 30px;
+	background: transparent url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+}
+
+.annis .v-progressbar {
+	width: 150px;
+}
+
+.annis .v-progressbar-wrapper {
+	height: 7px;
+	border: 1px solid #ddd;
+}
+
+.annis .v-progressbar-indicator {
+	height: 7px;
+	background: #ddd;
+}
+
+.annis div.v-progressbar-indeterminate {
+	height: 20px;
+	width: 20px;
+	background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.annis .v-progressbar-indeterminate .v-progressbar-wrapper, .annis .v-progressbar-indeterminate .v-progressbar-indicator, .annis .v-progressbar-indeterminate-disabled .v-progressbar-wrapper, .annis .v-progressbar-indeterminate-disabled .v-progressbar-indicator {
+	display: none;
+}
+
+.annis div.v-progressbar-indeterminate-disabled {
+	height: 20px;
+	width: 20px;
+	background: transparent;
+}
+
+.annis .v-progressindicator {
+	width: 150px;
+}
+
+.annis .v-progressindicator-wrapper {
+	height: 7px;
+	border: 1px solid #ddd;
+}
+
+.annis .v-progressindicator-indicator {
+	height: 7px;
+	background: #ddd;
+}
+
+.annis div.v-progressindicator-indeterminate {
+	height: 20px;
+	width: 20px;
+	background: #fff url(../base/common/img/ajax-loader-medium.gif) no-repeat 50%;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.annis .v-progressindicator-indeterminate .v-progressindicator-wrapper, .annis .v-progressindicator-indeterminate .v-progressindicator-indicator, .annis .v-progressindicator-indeterminate-disabled .v-progressindicator-wrapper, .annis .v-progressindicator-indeterminate-disabled .v-progressindicator-indicator {
+	display: none;
+}
+
+.annis div.v-progressindicator-indeterminate-disabled {
+	height: 20px;
+	width: 20px;
+	background: transparent;
+}
+
+.annis .v-select {
+	text-align: left;
+}
+
+.annis .v-select-optiongroup .v-select-option {
+	display: block;
+	white-space: nowrap;
+}
+
+.annis .v-select-optiongroup .v-icon {
+	vertical-align: middle;
+	white-space: nowrap;
+	margin: 0 2px;
+}
+
+.v-ie .annis .v-select-optiongroup .v-select-option {
+	zoom: 1;
+}
+
+.annis .v-select-select {
+	display: block;
+}
+
+.annis .v-select-twincol {
+	white-space: nowrap;
+}
+
+.annis .v-select-twincol-options {
+	float: left;
+}
+
+.annis .v-select-twincol-caption-left {
+	float: left;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.annis .v-select-twincol-selections {
+	font-weight: bold;
+}
+
+.annis .v-select-twincol-caption-right {
+	float: right;
+	overflow: hidden;
+	text-overflow: ellipsis;
+}
+
+.annis .v-select-twincol-buttons {
+	float: left;
+	text-align: center;
+}
+
+.annis .v-select-twincol-buttons .v-select-twincol-deco {
+	clear: both;
+}
+
+.annis .v-select-twincol .v-textfield {
+	display: block;
+	float: left;
+	clear: left;
+}
+
+.annis .v-select-twincol .v-button {
+	float: left;
+}
+
+.annis .v-select-twincol-buttons .v-button {
+	float: none;
+}
+
+.annis .v-filterselect {
+	white-space: nowrap;
+	text-align: left;
+	display: inline-block;
+	padding-right: 1em;
+}
+
+.annis .v-filterselect .v-icon {
+	float: left;
+}
+
+.annis.v-app .v-filterselect-input, .annis .v-window .v-filterselect-input, .annis .v-popupview-popup .v-filterselect-input {
+	margin: 0;
+	float: left;
+	-webkit-border-radius: 0px;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-filterselect-prompt .v-filterselect-input {
+	color: #999;
+	font-style: italic;
+}
+
+.annis .v-filterselect-button {
+	display: inline-block;
+	cursor: pointer;
+	width: 1em;
+	margin-right: -1em;
+	height: 1em;
+	background: transparent url(../base/common/img/sprites.png) no-repeat -5px -8px;
+}
+
+.annis .v-filterselect.v-readonly .v-filterselect-button {
+	display: none;
+}
+
+.annis .v-filterselect.v-readonly, .annis .v-filterselect.v-readonly .v-filterselect-input {
+	background: transparent;
+}
+
+.annis .v-filterselect-suggestpopup {
+	background: #fff;
+	border: 1px solid #eee;
+}
+
+.annis .v-filterselect-suggestmenu table {
+	border-collapse: collapse;
+	border: none;
+	vertical-align: top;
+}
+
+.annis .v-filterselect-suggestmenu .gwt-MenuItem {
+	white-space: nowrap;
+}
+
+.annis .v-filterselect-suggestmenu .gwt-MenuItem .v-icon {
+	margin-right: 3px;
+	vertical-align: middle;
+}
+
+.annis .v-filterselect-suggestmenu .gwt-MenuItem span {
+	vertical-align: middle;
+}
+
+.annis .v-filterselect-suggestmenu .gwt-MenuItem-selected {
+	background: #333;
+	color: #fff;
+}
+
+.annis .v-filterselect-nextpage, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage-off, .annis .v-filterselect-prevpage {
+	width: 100%;
+	background: #aaa;
+	text-align: center;
+	overflow: hidden;
+	cursor: pointer;
+}
+
+.annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage-off {
+	color: #666;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+	cursor: default;
+}
+
+.annis .v-filterselect-nextpage-off span, .annis .v-filterselect-prevpage-off span {
+	cursor: default;
+}
+
+.annis .v-filterselect-status {
+	white-space: nowrap;
+	text-align: center;
+}
+
+.annis .v-filterselect-no-input .v-filterselect-input {
+	cursor: default;
+}
+
+.annis .v-shadow {
+	position: absolute;
+}
+
+.annis .v-shadow .top-left {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	left: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/top-left.png);
+}
+
+.annis .v-shadow .top {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	left: 5px;
+	height: 10px;
+	right: 5px;
+	background: transparent url(../base/shadow/img/top.png);
+}
+
+.annis .v-shadow .top-right {
+	position: absolute;
+	overflow: hidden;
+	top: -3px;
+	right: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/top-right.png);
+}
+
+.annis .v-shadow .left {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	left: -5px;
+	width: 10px;
+	bottom: 3px;
+	background: transparent url(../base/shadow/img/left.png);
+}
+
+.annis .v-shadow .center {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	left: 5px;
+	bottom: 3px;
+	right: 5px;
+	background: transparent url(../base/shadow/img/center.png);
+}
+
+.annis .v-shadow .right {
+	position: absolute;
+	overflow: hidden;
+	top: 7px;
+	right: -5px;
+	width: 10px;
+	bottom: 3px;
+	background: transparent url(../base/shadow/img/right.png);
+}
+
+.annis .v-shadow .bottom-left {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	left: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom-left.png);
+}
+
+.annis .v-shadow .bottom {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	left: 5px;
+	right: 5px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom.png);
+}
+
+.annis .v-shadow .bottom-right {
+	position: absolute;
+	overflow: hidden;
+	bottom: -7px;
+	right: -5px;
+	width: 10px;
+	height: 10px;
+	background: transparent url(../base/shadow/img/bottom-right.png);
+}
+
+.annis .v-slider {
+	margin: 5px 0;
+}
+
+.annis .v-slider-base {
+	height: 2px;
+	border-top: 1px solid #ddd;
+	background: #eee;
+	border-left: 1px solid #ddd;
+	border-right: 1px solid #eee;
+}
+
+.annis .v-slider-handle {
+	background: #aaa;
+	width: 12px;
+	height: 12px;
+	margin-top: -5px;
+	font-size: 0;
+}
+
+.annis .v-slider-vertical {
+	width: 2px;
+	height: auto;
+	margin: 0 5px;
+	border: none;
+	border-left: 1px solid #cccfd0;
+	border-right: 1px solid #cccfd0;
+}
+
+.annis .v-slider-vertical .v-slider-base {
+	width: 2px;
+	border-bottom: 1px solid #eee;
+	border-right: none;
+}
+
+.annis .v-slider-vertical .v-slider-handle {
+	width: 12px;
+	height: 12px;
+	font-size: 0;
+	margin-left: -5px;
+}
+
+.annis .v-slider-feedback {
+	padding: 2px 5px;
+	background: #444;
+	color: #fff;
+	font-size: 11px;
+	line-height: 13px;
+	font-weight: bold;
+	font-family: Arial, Helvetica, sans-serif;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	margin: -2px 0 0 2px;
+	text-shadow: 0 1px 0 #000;
+}
+
+.annis .v-splitpanel-horizontal, .annis .v-splitpanel-vertical {
+	overflow: hidden;
+}
+
+.annis .v-splitpanel-hsplitter {
+	width: 6px;
+}
+
+.annis .v-splitpanel-hsplitter div {
+	width: 6px;
+	position: absolute;
+	top: 0;
+	bottom: 0;
+	background: #ddd;
+	cursor: e-resize;
+	cursor: col-resize;
+}
+
+.annis .v-disabled .v-splitpanel-hsplitter div {
+	cursor: default;
+}
+
+.annis .v-splitpanel-vsplitter {
+	height: 6px;
+}
+
+.annis .v-splitpanel-vsplitter div {
+	height: 6px;
+	background: #ddd;
+	cursor: s-resize;
+	cursor: row-resize;
+}
+
+.annis .v-disabled .v-splitpanel-vsplitter div {
+	cursor: default;
+}
+
+.annis .v-table {
+	overflow: hidden;
+	text-align: left;
+}
+
+.annis .v-table-header-wrap {
+	overflow: hidden;
+	border: 1px solid #aaa;
+	border-bottom: none;
+	background: #efefef;
+}
+
+.annis .v-table-header table, .annis .v-table-table {
+	border-spacing: 0;
+	border-collapse: separate;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.annis .v-table-table {
+	font-size: 10pt;
+}
+
+.annis .v-table-header td {
+	padding: 0;
+}
+
+.annis .v-table-header-cell, .annis .v-table-header-cell-asc, .annis .v-table-header-cell-desc {
+	cursor: pointer;
+}
+
+.annis .v-table.v-disabled .v-table-header-cell, .annis .v-table.v-disabled .v-table-header-cell-asc, .annis .v-table.v-disabled .v-table-header-cell-desc {
+	cursor: default;
+}
+
+.annis .v-table-footer-wrap {
+	overflow: hidden;
+	border: 1px solid #aaa;
+	border-top: none;
+	background: #efefef;
+}
+
+.annis .v-table-footer table {
+	border-spacing: 0;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	border: 0;
+}
+
+.annis .v-table-footer td {
+	padding: 0;
+	border-right: 1px solid #aaa;
+}
+
+.annis .v-table-footer-cell {
+	cursor: pointer;
+}
+
+.annis .v-table-footer-container {
+	float: right;
+	padding-right: 6px;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.annis .v-table-resizer {
+	display: block;
+	height: 1.2em;
+	float: right;
+	background: #aaa;
+	cursor: e-resize;
+	cursor: col-resize;
+	width: 1px;
+	overflow: hidden;
+}
+
+.annis .v-table.v-disabled .v-table-resizer {
+	cursor: default;
+}
+
+.annis .v-table-caption-container {
+	overflow: hidden;
+	white-space: nowrap;
+	margin-left: 6px;
+}
+
+.annis .v-table-caption-container-align-right {
+	float: right;
+}
+
+.annis .v-table-sort-indicator {
+	width: 0px;
+	height: 1.2em;
+	float: right;
+}
+
+.annis .v-table-header-cell-asc .v-table-sort-indicator, .annis .v-table-header-cell-desc .v-table-sort-indicator {
+	width: 16px;
+	height: 1.2em;
+	float: right;
+}
+
+.annis .v-table-header-cell-asc .v-table-sort-indicator {
+	background: transparent url(../base/common/img/sprites.png) no-repeat right 6px;
+}
+
+.annis .v-table-header-cell-desc .v-table-sort-indicator {
+	background: transparent url(../base/common/img/sprites.png) no-repeat right -10px;
+}
+
+.annis .v-table-caption-container-align-center {
+	text-align: center;
+}
+
+.annis .v-table-caption-container-align-right {
+	text-align: right;
+}
+
+.annis .v-table-caption-container .v-icon, .annis .v-table-header-drag .v-icon {
+	vertical-align: middle;
+}
+
+.annis .v-table-body {
+	border: 1px solid #aaa;
+}
+
+.annis .v-table-row-spacer {
+	height: 10px;
+	overflow: hidden;
+}
+
+.annis .v-table-row, .annis .v-table-row-odd {
+	background: #fff;
+	border: 0;
+	margin: 0;
+	padding: 0;
+	cursor: pointer;
+}
+
+.annis .v-table-generated-row {
+	background: #efefef;
+}
+
+.annis .v-table-body-noselection .v-table-row, .annis .v-table-body-noselection .v-table-row-odd {
+	cursor: default;
+}
+
+.annis .v-table .v-selected {
+	background: #999;
+	color: #fff;
+}
+
+.annis .v-table-cell-content {
+	white-space: nowrap;
+	overflow: hidden;
+	padding: 0 6px;
+	border-right: 1px solid #aaa;
+}
+
+.annis .v-table-cell-wrapper {
+	white-space: nowrap;
+	overflow: hidden;
+}
+
+.annis .v-table-cell-wrapper-align-center {
+	text-align: center;
+}
+
+.annis .v-table-cell-wrapper-align-right {
+	text-align: right;
+}
+
+.annis .v-table-column-selector {
+	float: right;
+	background: transparent url(../base/common/img/sprites.png) no-repeat 4px -37px;
+	margin: -1.2em 0 0 0;
+	height: 1.2em;
+	width: 14px;
+	position: relative;
+	cursor: pointer;
+}
+
+.annis .v-table.v-disabled .v-table-column-selector {
+	cursor: default;
+}
+
+.annis .v-table-focus-slot-left {
+	border-left: 2px solid #999;
+	float: none;
+	margin-bottom: -1.2em;
+	width: auto;
+	background: transparent;
+	border-right: 1px solid #aaa;
+}
+
+.annis .v-table-focus-slot-right {
+	border-right: 2px solid #999;
+	margin-left: -2px;
+}
+
+.annis .v-table-header-drag {
+	position: absolute;
+	background: #efefef;
+	border: 1px solid #eee;
+	opacity: 0.9;
+	filter: alpha(opacity=90);
+	margin-top: 20px;
+	z-index: 30000;
+}
+
+.annis .v-table-header-drag .v-icon {
+	vertical-align: middle;
+}
+
+.annis .v-table-scrollposition {
+	width: 160px;
+	background: #eee;
+	border: 1px solid #aaa;
+}
+
+.annis .v-table-scrollposition span {
+	display: block;
+	text-align: center;
+}
+
+.annis .v-table-body:focus, .annis .v-table-body-wrapper:focus {
+	outline: none;
+}
+
+.annis .v-table-body.focused {
+	border-color: #388ddd;
+}
+
+.annis .v-table-focus .v-table-cell-content {
+	border-top: 1px dotted #0066bd;
+	border-bottom: 1px dotted #0066bd;
+}
+
+.annis .v-table-focus .v-table-cell-wrapper {
+	margin-top: -1px;
+	margin-bottom: -1px;
+}
+
+.annis .v-off {
+	color: #ddd;
+}
+
+.annis .v-table-drag .v-table-body {
+	border-color: #1d9dff;
+}
+
+.annis .v-table-row-drag-middle .v-table-cell-content {
+	background-color: #bcdcff;
+}
+
+.annis .v-table-row-drag-top .v-table-cell-content {
+	border-top: 2px solid #1d9dff;
+}
+
+.annis .v-table-row-drag-top .v-table-cell-wrapper {
+	margin-top: -2px;
+}
+
+.annis .v-table-row-drag-bottom .v-table-cell-content {
+	border-bottom: 2px solid #1d9dff;
+}
+
+.annis .v-table-row-drag-bottom .v-table-cell-wrapper {
+	margin-bottom: -2px;
+}
+
+.annis .v-table-row-drag-top .v-table-cell-content:first-child:before, .annis .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	margin-left: -6px;
+	background: transparent url(../base/common/img/drag-slot-dot.png);
+}
+
+.v-ff .annis .v-table-row-drag-bottom .v-table-cell-content:first-child:after, .v-ie .annis .v-table-row-drag-bottom .v-table-cell-content:first-child:after {
+	margin-top: -2px;
+}
+
+.annis .v-tabsheet, .annis .v-tabsheet-content, .annis .v-tabsheet-deco {
+	outline: none;
+	text-align: left;
+}
+
+.annis .v-tabsheet-tabs {
+	empty-cells: hide;
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	border: 0;
+	width: 100%;
+	overflow: hidden;
+}
+
+.annis .v-tabsheet-tabitemcell:focus {
+	outline: none;
+}
+
+.annis .v-tabsheet-tabitemcell, .annis .v-tabsheet-spacertd {
+	margin: 0;
+	padding: 0;
+	vertical-align: bottom;
+}
+
+.annis .v-tabsheet-spacertd {
+	width: 100%;
+}
+
+.annis .v-tabsheet-spacertd div {
+	border-left: 1px solid #aaa;
+	border-bottom: 1px solid #aaa;
+	height: 1em;
+	padding: 0.2em 0;
+}
+
+.annis .v-tabsheet-hidetabs > .v-tabsheet-tabcontainer {
+	display: none;
+}
+
+.annis .v-tabsheet-scroller {
+	white-space: nowrap;
+	text-align: right;
+	margin-top: -1em;
+}
+
+.annis .v-disabled .v-tabsheet-scroller {
+	display: none;
+}
+
+.annis .v-tabsheet-scrollerPrev, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled {
+	border: 1px solid #aaa;
+	background: #fff;
+	width: 12px;
+	height: 1em;
+	cursor: pointer;
+}
+
+.annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+
+.annis .v-tabsheet-tabs .v-caption, .annis .v-tabsheet-tabs .v-caption span {
+	white-space: nowrap;
+}
+
+.annis .v-tabsheet-caption-close {
+	display: inline;
+	display: inline-block;
+	zoom: 1;
+	width: 16px;
+	height: 16px;
+	text-align: center;
+	font-weight: bold;
+	cursor: pointer;
+	vertical-align: middle;
+	user-select: none;
+	-khtml-user-select: none;
+	-ms-user-select: none;
+	-moz-user-select: none;
+	-webkit-user-select: none;
+}
+
+.annis .v-tabsheet .v-disabled .v-tabsheet-caption-close {
+	cursor: default;
+	visibility: hidden;
+}
+
+.annis .v-tabsheet-tabitem:hover .v-tabsheet-caption-close {
+	visibility: visible;
+}
+
+.annis .v-tabsheet-tabitem {
+	border: 1px solid #aaa;
+	border-right: none;
+	cursor: pointer;
+	padding: 0.2em 0.5em;
+}
+
+.annis .v-tabsheet-tabitem .v-caption {
+	cursor: inherit;
+}
+
+.annis .v-tabsheet.v-disabled .v-tabsheet-tabitem, .annis .v-tabsheet-tabitemcell-disabled .v-tabsheet-tabitem {
+	cursor: default;
+}
+
+.annis .v-tabsheet-tabitem-selected {
+	cursor: default;
+	border-bottom-color: #fff;
+}
+
+.annis .v-tabsheet-tabitem-selected .v-caption {
+	cursor: default;
+}
+
+.annis .v-tabsheet-content {
+	border: 1px solid #aaa;
+	border-top: none;
+	border-bottom: none;
+	position: relative;
+}
+
+.annis .v-tabsheet-deco {
+	height: 1px;
+	background: #aaa;
+	overflow: hidden;
+}
+
+.annis .v-tabsheet-hidetabs .v-tabsheet-content {
+	border: none;
+}
+
+.annis .v-tabsheet-hidetabs .v-tabsheet-deco {
+	height: 0;
+}
+
+.annis .v-textfield {
+	text-align: left;
+}
+
+.annis .v-textarea {
+	resize: none;
+	white-space: pre-wrap;
+}
+
+.annis input.v-textfield-prompt, .annis textarea.v-textarea-prompt {
+	color: #999;
+	font-style: italic;
+}
+
+.annis input.v-textfield-readonly, .annis textarea.v-textarea-readonly {
+	background: transparent;
+	border: none;
+	resize: none;
+}
+
+.annis input.v-disabled, .annis textarea.v-disabled {
+	resize: none;
+}
+
+.annis input.v-textfield-readonly:focus, .annis textarea.v-textarea-readonly:focus {
+	outline: none;
+}
+
+.v-sa .annis input:focus, .v-sa .annis textarea:focus {
+	outline-width: medium;
+}
+
+.annis .v-richtextarea {
+	border: 1px solid #aaa;
+	overflow: hidden;
+}
+
+.annis .v-richtextarea .gwt-RichTextArea {
+	background: #fff;
+	border: none;
+}
+
+.annis .v-richtextarea .gwt-HTML {
+	height: 100%;
+	font-size: 10pt;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar {
+	white-space: nowrap;
+	background: #959595 url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x 0 -42px;
+	border-bottom: 1px solid #7d7d7d;
+	padding: 2px;
+	overflow: hidden;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar-top {
+	padding-bottom: 1px;
+	overflow: hidden;
+	white-space: normal;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar-bottom {
+	clear: left;
+	overflow: hidden;
+	white-space: nowrap;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton, .annis .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton {
+	float: left;
+	display: inline;
+	width: 22px;
+	height: 21px;
+	overflow: hidden;
+	background: transparent url(../base/textfield/img/richtext-toolbar-bg.png) repeat-x;
+	cursor: pointer;
+	margin-right: 2px;
+	text-align: center;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down, .annis .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down, .annis .v-richtextarea .gwt-RichTextToolbar .gwt-ToggleButton-down-hovering, .annis .v-richtextarea .gwt-RichTextToolbar .gwt-PushButton-down-hovering {
+	background-position: 0 -21px;
+}
+
+.annis .v-richtextarea .gwt-RichTextToolbar .gwt-ListBox {
+	width: 24.5%;
+	margin-right: 2px;
+}
+
+.annis .v-richtextarea-readonly {
+	border: none;
+}
+
+.annis .v-tree {
+	text-align: left;
+	padding: 1px 0;
+	outline: none;
+}
+
+.annis .v-tree-node {
+	background: transparent url(../base/common/img/sprites.png) no-repeat 5px -37px;
+	padding: 1px 0;
+}
+
+.annis .v-tree-node-caption:focus {
+	outline: none;
+}
+
+.annis div.v-tree-node-leaf {
+	background: transparent;
+}
+
+.annis .v-tree-node-expanded {
+	background: transparent url(../base/common/img/sprites.png) no-repeat -5px -10px;
+}
+
+.annis .v-tree-node-caption {
+	margin-left: 1em;
+}
+
+.annis .v-tree-node span {
+	cursor: pointer;
+}
+
+.annis .v-tree-node-caption div {
+	white-space: nowrap;
+}
+
+.annis .v-tree-node-caption span, .annis .v-tree-node-caption .v-icon {
+	vertical-align: middle;
+}
+
+.annis .v-tree-node-selected span {
+	background: #999;
+	color: #fff;
+}
+
+.annis .v-tree-node-children {
+	padding-left: 1em;
+}
+
+.annis .v-tree .v-tree-node-drag-top {
+	border-top: 2px solid #1d9dff;
+	margin-top: -1px;
+	padding-top: 0;
+}
+
+.annis .v-tree .v-tree-node-drag-bottom {
+	border-bottom: 2px solid #1d9dff;
+	margin-bottom: -1px;
+	padding-bottom: 0;
+}
+
+.annis .v-tree .v-tree-node-drag-top:before, .annis .v-tree .v-tree-node-drag-bottom:after, .annis .v-tree .v-tree-node-caption-drag-center:after {
+	display: block;
+	position: absolute;
+	width: 6px;
+	height: 6px;
+	margin-top: -4px;
+	background: transparent url(../base/common/img/drag-slot-dot.png);
+}
+
+.annis .v-tree .v-tree-node-drag-bottom:after {
+	margin-top: -2px;
+}
+
+.annis .v-tree .v-tree-node-caption-drag-center:after {
+	margin-left: 14px;
+}
+
+.v-ff .annis .v-tree .v-tree-node-caption-drag-center:after, .v-ie .annis .v-tree .v-tree-node-caption-drag-center:after {
+	margin-top: -2px;
+}
+
+.annis .v-tree .v-tree-node-drag-top {
+	background-position: 5px -38px;
+}
+
+.annis .v-tree .v-tree-node-drag-top.v-tree-node-expanded {
+	background-position: -5px -11px;
+}
+
+.annis .v-tree .v-tree-node-caption-drag-center div {
+	border: 2px solid #1d9dff;
+	-moz-border-radius: 4px;
+	-webkit-border-radius: 4px;
+	border-radius: 4px;
+	margin: -2px 2px -2px -2px;
+	background-color: #bcdcff;
+}
+
+.annis .v-tree .v-tree-node-caption-drag-center div {
+	background-color: rgba(169, 209, 255, 0.6);
+}
+
+.annis .v-tree .v-tree-node-caption-drag-center div, .annis .v-tree .v-tree-node-drag-top, .annis .v-tree .v-tree-node-drag-bottom {
+	border-color: rgba(0, 109, 232, 0.6);
+}
+
+.annis .v-tree-connectors .v-tree-node-caption {
+	padding-top: 1px;
+}
+
+.annis .v-tree-connectors .v-tree-node {
+	background: transparent url(../base/tree/img/connector-expand.png) no-repeat 2px -52px;
+}
+
+.annis .v-tree-connectors .v-tree-node-expanded {
+	background: transparent url(../base/tree/img/connector-collapse.png) no-repeat 2px -52px;
+}
+
+.annis .v-tree-connectors .v-tree-node-last {
+	background: transparent url(../base/tree/img/connector-expand-last.png) no-repeat 2px -52px;
+}
+
+.annis .v-tree-connectors .v-tree-node-expanded.v-tree-node-last {
+	background: transparent url(../base/tree/img/connector-collapse-last.png) no-repeat 2px -52px;
+}
+
+.annis .v-tree-connectors .v-tree-node-leaf {
+	background: transparent url(../base/tree/img/connector-leaf.png) repeat-y 2px 50%;
+}
+
+.annis .v-tree-connectors .v-tree-node-leaf-last {
+	background: transparent url(../base/tree/img/connector-leaf-last.png) repeat-y 2px 50%;
+}
+
+.annis .v-tree-connectors .v-tree-node-children {
+	background: transparent url(../base/tree/img/connector.png) repeat-y 2px 0;
+}
+
+.annis .v-tree-connectors .v-tree-node-children-last {
+	background: transparent;
+}
+
+.annis .v-tree-connectors .v-tree-node-drag-top, .annis .v-tree-connectors .v-tree-node-expanded.v-tree-node-drag-top {
+	background-position: 2px -53px;
+}
+
+.annis .v-tree-connectors .v-tree-node-drag-top.v-tree-node-leaf {
+	background-position: 2px 50%;
+}
+
+.annis .v-treetable-treespacer {
+	display: inline-block;
+	background: transparent;
+	height: 10px;
+	width: 18px;
+	position: absolute;
+	left: 0;
+	top: 5px;
+}
+
+.annis .v-treetable-node-closed {
+	background: url(../base/treetable/img/arrow-right.png) right top no-repeat;
+}
+
+.annis .v-treetable-node-open {
+	background: url(../base/treetable/img/arrow-down.png) right top no-repeat;
+}
+
+.annis .v-treetable .v-checkbox {
+	display: inline-block;
+	padding-bottom: 4px;
+}
+
+.annis .v-treetable .v-table-row .v-table-cell-content, .annis .v-treetable .v-table-row-odd .v-table-cell-content {
+	position: relative;
+	z-index: 10;
+}
+
+.annis .v-treetable .v-table-cell-wrapper {
+	position: relative;
+}
+
+.annis .v-treetable .v-table-body .v-table-table .v-table-row-animating {
+	zoom: 1;
+	z-index: 1;
+}
+
+.annis .v-treetable .v-table-body .v-table-table .v-table-row-animating, .annis .v-treetable .v-table-body .v-table-table .v-table-row-animating .v-table-cell-content {
+	background: transparent;
+}
+
+.annis .v-treetable-animation-clone {
+	border-spacing: 0;
+	zoom: 1;
+}
+
+.annis div.v-treetable-animation-clone-wrapper {
+	position: absolute;
+	z-index: 2;
+	background-color: #fff;
+}
+
+.annis div.v-treetable-animation-clone-wrapper table.v-treetable-animation-clone {
+	background-color: #fff;
+}
+
+.annis div table.v-treetable-animation-clone tr.v-table-row, .annis div table.v-treetable-animation-clone tr.v-table-row-odd, .annis div table.v-treetable-animation-clone tr.v-table-row td.v-table-cell-content, .annis div table.v-treetable-animation-clone tr.v-table-row-odd td.v-table-cell-content {
+	visibility: visible;
+}
+
+.annis .v-upload {
+	white-space: nowrap;
+}
+
+.annis .v-upload-immediate {
+	position: relative;
+	margin: 0;
+	overflow: hidden;
+}
+
+.v-ff .annis .v-upload-immediate, .v-op .annis .v-upload-immediate {
+	display: inline-block;
+}
+
+.annis .v-upload-immediate input {
+	opacity: 0;
+	filter: alpha(opacity=0);
+	z-index: 2;
+	position: absolute;
+	right: 0;
+	height: 21px;
+	text-align: right;
+	border: none;
+	background: transparent;
+}
+
+.annis .v-upload-immediate button {
+	position: relative;
+	left: 0;
+	top: 0;
+	width: 100%;
+	text-align: left;
+}
+
+.annis .v-window {
+	background: #fff;
+}
+
+.annis .v-window-contents {
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-window.v-has-width > div.popupContent, .annis .v-window.v-has-width .v-window-wrap, .annis .v-window.v-has-width .v-window-contents, .annis .v-window.v-has-width .v-window-contents > div {
+	width: 100%;
+}
+
+.annis .v-window.v-has-height > div.popupContent, .annis .v-window.v-has-height .v-window-wrap, .annis .v-window.v-has-height .v-window-contents, .annis .v-window.v-has-height .v-window-contents > div {
+	height: 100%;
+}
+
+.annis .v-window-outerheader {
+	padding: 0.3em 1em;
+	height: 1.6em;
+	position: relative;
+	-webkit-box-sizing: border-box;
+	-moz-box-sizing: border-box;
+	box-sizing: border-box;
+}
+
+.annis .v-window-outerheader, .annis .v-window-draggingCurtain {
+	cursor: move;
+}
+
+.annis .v-window-header {
+	font-weight: bold;
+	-khtml-user-select: none;
+	-moz-user-select: none;
+	-ie-user-select: none;
+	user-select: none;
+}
+
+.annis div.v-window-header {
+	white-space: nowrap;
+	text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+	overflow: hidden;
+	padding: 0;
+}
+
+.annis .v-window-header .v-icon {
+	vertical-align: middle;
+}
+
+.annis .v-window-contents > div {
+	outline: none;
+}
+
+.annis .v-window-footer {
+	overflow: hidden;
+	zoom: 1;
+	height: 10px;
+	position: relative;
+	cursor: move;
+}
+
+.annis .v-window-resizebox {
+	width: 10px;
+	height: 10px;
+	background: #ddd;
+	overflow: hidden;
+	position: absolute;
+	right: 0;
+}
+
+.annis .v-window-resizebox, .annis .v-window-resizingCurtain {
+	cursor: se-resize;
+}
+
+.annis .v-window div.v-window-footer-noresize {
+	height: 0;
+}
+
+.annis .v-window-resizebox-disabled, .annis .v-window-restorebox-disabled, .annis .v-window-maximizebox-disabled {
+	cursor: default;
+	display: none;
+}
+
+.annis .v-window-closebox, .annis .v-window-restorebox, .annis .v-window-maximizebox {
+	position: absolute;
+	top: 0;
+	right: 0;
+	width: 1em;
+	height: 1em;
+	cursor: pointer;
+	overflow: hidden;
+}
+
+.annis .v-window-maximizebox, .annis .v-window-restorebox {
+	right: 1.1em;
+}
+
+.annis .v-window-closebox {
+	background: red;
+}
+
+.annis .v-window-maximizebox {
+	background: blue;
+}
+
+.annis .v-window-restorebox {
+	background: yellow;
+}
+
+.annis .v-window-modalitycurtain {
+	top: 0;
+	left: 0;
+	background: #999;
+	opacity: 0.5;
+	position: fixed;
+	width: 100%;
+	height: 100%;
+	filter: alpha(opacity=50);
+}
+
+.annis .v-shadow-window {
+	position: absolute;
+}
+
+.annis .v-shadow-window .top-left {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	left: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/top-left.png);
+}
+
+.annis .v-shadow-window .top {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	left: 13px;
+	height: 28px;
+	right: 13px;
+	background: transparent url(../base/window/img/shadow/top.png);
+}
+
+.annis .v-shadow-window .top-right {
+	position: absolute;
+	overflow: hidden;
+	top: -10px;
+	right: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/top-right.png);
+}
+
+.annis .v-shadow-window .left {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	left: -15px;
+	width: 28px;
+	bottom: 10px;
+	background: transparent url(../base/window/img/shadow/left.png);
+}
+
+.annis .v-shadow-window .center {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	left: 13px;
+	bottom: 10px;
+	right: 13px;
+	background: transparent url(../base/window/img/shadow/center.png);
+}
+
+.annis .v-shadow-window .right {
+	position: absolute;
+	overflow: hidden;
+	top: 18px;
+	right: -15px;
+	width: 28px;
+	bottom: 10px;
+	background: transparent url(../base/window/img/shadow/right.png);
+}
+
+.annis .v-shadow-window .bottom-left {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	left: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom-left.png);
+}
+
+.annis .v-shadow-window .bottom {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	left: 13px;
+	right: 13px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom.png);
+}
+
+.annis .v-shadow-window .bottom-right {
+	position: absolute;
+	overflow: hidden;
+	bottom: -18px;
+	right: -15px;
+	width: 28px;
+	height: 28px;
+	background: transparent url(../base/window/img/shadow/bottom-right.png);
+}
+
+.annis.v-app {
+	background: transparent;
+	overflow: hidden;
+}
+
+.annis .v-ui {
+	margin-top: 0;
+	border-top: none;
+}
+
+.annis .v-tooltip {
+	background: #fdfdee;
+	border: 1px solid #c0c0b9;
+	padding: 1px 5px;
+	color: #222;
+	font-size: 11.7px;
+	line-height: normal;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.v-sa .annis .v-tooltip {
+	outline: 1px solid rgba(0, 0, 0, 0.2);
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border: none;
+}
+
+.annis.v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-tooltip, .annis.v-app input, .annis.v-app select, .annis.v-app button, .annis.v-app textarea, .annis .v-window input, .annis .v-window select, .annis .v-window button, .annis .v-window textarea, .annis .v-popupview-popup input, .annis .v-popupview-popup select, .annis .v-popupview-popup button, .annis .v-popupview-popup textarea, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-table-header-drag, .annis .v-menubar-submenu, .annis .v-drag-element {
+	font-family: Arial, Helvetica, "Lucida Grande", "Lucida Sans Unicode", Tahoma, Verdana, sans-serif;
+	font-size: 13px;
+	line-height: 1.4;
+	color: #222;
+}
+
+.annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu {
+	background: #fff url(../chameleon/img/grad-light-top.png) repeat-x;
+	background-color: rgba(255, 255, 255, 0.85);
+	border: 1px solid #adadad;
+	border-color: rgba(0, 0, 0, 0.4);
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+	overflow: hidden;
+}
+
+.annis .v-filterselect-suggestpopup, .annis .v-contextmenu, .annis .v-menubar-submenu {
+	padding: 3px 0;
+}
+
+.annis .v-contextmenu .gwt-MenuItem, .annis .v-filterselect-suggestpopup .gwt-MenuItem, .annis .v-menubar-submenu .v-menubar-menuitem {
+	padding: 0.05em 0.7em;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+	cursor: default;
+}
+
+.annis .v-contextmenu td.gwt-MenuItem-selected div, .annis .v-filterselect-suggestpopup td.gwt-MenuItem-selected, .annis .v-table .v-table-body .v-selected, .annis .v-menubar-submenu span.v-menubar-menuitem-selected {
+	text-shadow: none;
+}
+
+.annis .v-contextmenu .gwt-MenuItem-selected, .annis .v-filterselect-suggestpopup .gwt-MenuItem-selected, .annis .v-table .v-selected, .annis .v-menubar-submenu .v-menubar-menuitem-selected {
+	background-color: #333;
+}
+
+.annis .v-contextmenu .gwt-MenuItem-selected div {
+	background: transparent;
+}
+
+.annis .v-tooltip .v-errormessage {
+	color: #b2320b;
+	padding-left: 14px;
+	background: transparent url(../chameleon/img/error-indicator.png) no-repeat 0 50%;
+}
+
+.annis .v-errorindicator {
+	width: 13px;
+	height: 1.4em;
+	background: transparent url(../chameleon/img/error-indicator.png) no-repeat right 50%;
+}
+
+.annis .v-caption-small .v-errorindicator {
+	height: 1.2em;
+}
+
+.annis .v-caption-big .v-errorindicator {
+	height: 1.8em;
+}
+
+.annis .v-accordion {
+	border: 1px solid #b3b3b3;
+}
+
+.annis .v-accordion-item-open {
+	border-bottom: 1px solid #b3b3be;
+}
+
+.annis .v-accordion-item-caption, .annis .v-accordion-item-open .v-accordion-item-caption:active {
+	padding: 0;
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	border-width: 0 0 1px 0;
+	border-style: solid none;
+}
+
+.annis div.v-accordion-item-caption, .annis div.v-accordion-item-open .v-accordion-item-caption:active {
+	background-color: transparent;
+}
+
+.annis .v-accordion-item-caption .v-caption {
+	padding: 0.2em 0.9em;
+}
+
+.annis .v-accordion-item-caption:active {
+	background-image: url(../chameleon/img/grad-dark-bottom.png);
+	background-position: left bottom;
+}
+
+.annis .v-accordion-opaque {
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open {
+	border: none;
+}
+
+.annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open .v-accordion-item-caption:active {
+	background-color: #b8b8b8;
+}
+
+.annis .v-accordion-opaque .v-accordion-item-open {
+	background-color: #fff;
+}
+
+.annis .v-accordion-opaque .v-accordion-item-first, .annis .v-accordion-opaque .v-accordion-item-first .v-accordion-item-caption {
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-topright: 3px;
+	overflow: hidden;
+}
+
+.annis .v-accordion-borderless {
+	border: none;
+}
+
+.annis .v-accordion-opaque.borderless, .annis .v-accordion-opaque.borderless .v-accordion-item-first .v-accordion-item-caption {
+	border-radius: 0;
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+}
+
+.annis .v-button:active, .v-ie8 .annis .v-pressed.v-button, .annis div.v-button-down {
+	background-image: url(../chameleon/img/grad-dark-bottom2.png);
+	background-color: #afafaf;
+}
+
+.annis .v-button:active .v-button-wrap, .v-ie8 .annis .v-pressed.v-button .v-button-wrap, .annis .v-button-down .v-button-wrap {
+	background-image: url(../chameleon/img/grad-dark-top2.png);
+	border: 1px solid #888;
+	padding: 3px 12px;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis div.v-button-down .v-button-wrap {
+	background-image: url(../chameleon/img/grad-dark-top2.png);
+}
+
+.annis .v-button {
+	overflow: hidden;
+}
+
+.annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active {
+	border: 1px solid #8b8b8b;
+	background: #c9c9c9;
+	border-radius: 3px;
+	background: #c9c9c9 url(../chameleon/img/grad-dark-bottom.png) repeat-x left bottom;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+	-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+	text-shadow: 0 1px 0 #fff;
+	padding: 0;
+}
+
+.annis .v-button-wrap, .annis .v-disabled:active .v-button-wrap {
+	display: block;
+	padding: 4px 13px;
+	border: none;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	height: 100%;
+	text-overflow: ellipsis;
+	-ms-text-overflow: ellipsis;
+}
+
+.v-sa .annis .v-button, .v-sa .annis .v-button-wrap, .v-ff .annis .v-button, .v-ff .annis .v-button-wrap {
+	overflow: hidden;
+}
+
+.annis .v-button:focus {
+	outline: none;
+}
+
+.annis .v-button .v-icon {
+	margin-left: -0.5em;
+}
+
+.annis .v-button .v-button-caption {
+	line-height: 1.26;
+}
+
+.annis .v-button-big {
+	font-size: 15.6px;
+}
+
+.annis .v-button-small {
+	font-size: 11.05px;
+	font-weight: normal;
+}
+
+.annis .v-button-small .v-button-wrap {
+	padding: 3px 11px;
+}
+
+.annis .v-button-small:active .v-button-wrap, .v-ie8 .annis .v-button-small.v-pressed .v-button-wrap, .annis .v-button-down.small .v-button-wrap {
+	padding: 2px 10px;
+}
+
+.annis .v-button-small .v-icon {
+	margin-top: -4px;
+	margin-bottom: -4px;
+}
+
+.annis .v-button-wide .v-button-wrap {
+	padding-left: 26px;
+	padding-right: 26px;
+}
+
+.annis .v-button-wide:active .v-button-wrap, .v-ie8 .annis .v-button-wide.v-pressed .v-button-wrap {
+	padding-left: 25px;
+	padding-right: 25px;
+}
+
+.annis .v-button-tall .v-button-wrap {
+	padding-top: 13px;
+	padding-bottom: 13px;
+}
+
+.annis .v-button-tall:active .v-button-wrap, .v-ie8 .annis .v-button-tall.v-pressed .v-button-wrap {
+	padding-top: 12px;
+	padding-bottom: 12px;
+}
+
+.annis .v-button-default, .annis .v-disabled.v-button-default:focus {
+	font-weight: bold;
+}
+
+.annis div.v-button-link, .annis div.v-button-link:focus, .annis .v-button-link:active, .annis div.v-disabled.v-button-link, .annis div.v-disabled.v-button-link:focus, body.v-ie .annis .v-pressed.v-button-link, .annis div.v-button-borderless, .annis div.v-button-borderless:focus, .annis .v-button-borderless:active, .annis div.v-disabled.v-button-borderless, .annis div.v-disabled.v-button-borderless:focus, body.v-ie .annis .v-pressed.v-button-borderless {
+	background: transparent;
+	font-weight: normal;
+	text-shadow: none;
+	border: none;
+	margin: 1px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+}
+
+.annis .v-button-link .v-button-wrap, .annis .v-button-borderless .v-button-wrap {
+	display: inline;
+}
+
+.annis div.v-button-link .v-button-wrap, .annis div.v-button-link:focus .v-button-wrap, .annis .v-button-link:active .v-button-wrap, .annis div.v-disabled.v-button-link .v-button-wrap, .annis div.v-disabled.v-button-link:focus .v-button-wrap, body.v-ie .annis .v-pressed.v-button-link .v-button-wrap, .annis div.v-button-borderless .v-button-wrap, .annis div.v-button-borderless:focus .v-button-wrap, .annis .v-button-borderless:active .v-button-wrap, .annis div.v-disabled.v-button-borderless .v-button-wrap, .annis div.v-disabled.v-button-borderless:focus .v-button-wrap, body.v-ie .annis .v-pressed.v-button-borderless .v-button-wrap {
+	background: transparent;
+	font-weight: normal;
+	text-shadow: none;
+	border: none;
+	padding: 1px;
+	-webkit-box-shadow: none;
+	-moz-box-shadow: none;
+}
+
+.annis .v-button-link:focus .v-button-caption, .annis .v-button-borderless:focus .v-button-caption {
+	border: 1px dotted gray;
+	margin: -1px;
+}
+
+.annis .v-button-link:active .v-button-caption, .annis .v-button-borderless:active .v-button-caption {
+	border: none;
+	margin: 0;
+}
+
+.annis .v-button-borderless:active .v-icon {
+	opacity: 0.6;
+}
+
+.annis .v-button-link .v-icon, .annis .v-button-borderless .v-icon {
+	margin-left: 0;
+}
+
+.annis .v-button-icon-on-top.v-button-borderless:focus .v-button-caption {
+	margin-top: 1px;
+}
+
+.annis .v-button-icon-on-top .v-button-caption, .annis .v-button-icon-on-top:focus .v-button-caption, .annis .v-button-icon-on-top.v-button-borderless:active .v-button-caption {
+	display: block;
+	margin-top: 2px;
+}
+
+.annis .v-button-icon-on-top .v-icon {
+	margin: 0;
+}
+
+.annis .v-button-icon-on-right .v-icon {
+	float: right;
+	margin-left: 3px;
+	margin-right: -0.5em;
+}
+
+.annis .v-button-icon-only .v-button-caption {
+	display: none;
+}
+
+.annis .v-button-icon-only .v-icon {
+	margin-right: -0.5em;
+}
+
+.annis .v-colorpicker-button-color {
+	border: 1px solid #8B8B8B;
+}
+
+.annis .v-colorpicker-popup {
+	width: 248px;
+}
+
+.annis .v-colorpicker-popup .v-tabsheet .v-colorpicker-grid {
+	height: 308px;
+}
+
+.annis .v-label-h1, .annis .v-label h1, .annis .v-label-h2, .annis .v-label h2, .annis .v-label-h3, .annis .v-label h3, .annis .v-label-h4, .annis .v-label h4 {
+	margin: 0;
+	font-weight: bold;
+}
+
+.annis .v-label-h1, .annis .v-label h1 {
+	padding: 0.75em 0 0.5em 0;
+	font-size: 24.05px;
+}
+
+.annis .v-label-h2, .annis .v-label h2 {
+	padding: 0.67em 0 0.33em 0;
+	font-size: 18.2px;
+}
+
+.annis .v-label-h3, .annis .v-label h3 {
+	margin: 0.71em 0 0.29em 0;
+	font-size: 14.3px;
+}
+
+.annis .v-label-h4, .annis .v-label h4 {
+	padding: 0.23em 0;
+	font-size: 13px;
+}
+
+.annis .v-label-big {
+	font-size: 15.6px;
+}
+
+.annis .v-label-small {
+	font-size: 11.7px;
+	line-height: 1.3;
+	opacity: 0.8;
+	filter: alpha(opacity=80);
+}
+
+.annis .v-label-tiny {
+	font-size: 11.05px;
+	line-height: 1.2;
+	opacity: 0.7;
+	filter: alpha(opacity=70);
+}
+
+.annis.v-app .v-label-warning, .annis.v-app .v-label-error {
+	color: #574734;
+	background: #fffec8 url(../chameleon/img/label-warning-icon.png) no-repeat 0.2em 50%;
+	white-space: nowrap;
+	padding: 0.3em 1em 0.3em 2.4em;
+	overflow: hidden;
+	width: auto !important;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	text-shadow: none;
+}
+
+.annis.v-app .v-label-error {
+	color: #fff;
+	font-weight: bold;
+	background: #c22f24 url(../chameleon/img/label-error-icon.png) no-repeat 0.2em 50%;
+	text-shadow: 0 1px 0 #8f2e27;
+}
+
+.annis .v-label-big.v-label-warning, .annis .v-label-big.v-label-error {
+	background-image: url(../chameleon/img/label-warning-icon-big.png);
+	background-position: 0 50%;
+	padding: 0.5em 1em 0.5em 3em;
+}
+
+.annis .v-label-big.v-label-error {
+	background-image: url(../chameleon/img/label-error-icon-big.png);
+}
+
+.annis.v-app .v-label-loading {
+	height: 32px;
+	line-height: 32px;
+	background-image: url(../base/common/img/loading-indicator.gif);
+	background-repeat: no-repeat;
+	background-position: 0 50%;
+	white-space: nowrap;
+	padding: 0.3em 1em 0.3em 36px;
+	overflow: hidden;
+	width: auto !important;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-menubar {
+	padding: 0 0.4em;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x;
+	border: 1px solid #b3b3b3;
+	border-width: 1px 0;
+}
+
+.annis .v-menubar .v-menubar-menuitem {
+	padding: 0.2em 0.5em;
+	line-height: normal;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem {
+	padding-right: 1.5em;
+}
+
+.annis .v-menubar-submenu .v-menubar-submenu-indicator {
+	margin-top: 0.1em;
+	font-size: 11.7px;
+}
+
+.annis .v-menubar-submenu .v-menubar-menuitem-selected {
+	background-image: url(../chameleon/img/grad-light-top2.png);
+	background-position: 0 -1px;
+}
+
+.annis div.v-Notification {
+	-moz-border-radius: 0;
+	-webkit-border-radius: 0;
+	border-radius: 0;
+	font-size: 16px;
+	-webkit-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+	-moz-box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+	box-shadow: 0 2px 5px rgba(0, 0, 0, 0.7);
+}
+
+.annis .v-Notification p {
+	line-height: 1.3;
+}
+
+.annis div.v-Notification-warning {
+	background-color: #fffec8;
+	color: #574734;
+	border: 2px solid #fee3af;
+}
+
+.annis div.v-Notification-warning h1 {
+	padding-left: 44px;
+	background: transparent url(../chameleon/img/label-warning-icon-big.png) no-repeat 0 50%;
+}
+
+.annis div.v-Notification-error {
+	color: #fff;
+	text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+	background: #c22f24 url(../chameleon/img/error-close.png) no-repeat right top;
+	border: 2px solid #ca3030;
+}
+
+.annis div.v-Notification-error h1 {
+	padding-left: 44px;
+	background: transparent url(../chameleon/img/label-error-icon-big.png) no-repeat 0 50%;
+}
+
+.annis div.v-Notification-tray {
+	color: #fff;
+	margin: 0 5px 5px 0;
+	background: #3b3b3b url(../chameleon/img/grad-light-top2.png) repeat-x;
+	border: 1px solid #5b5b5b;
+	padding: 0.8em 0.9em;
+	border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-border-radius: 5px;
+	text-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+}
+
+.annis .v-Notification-tray h1 {
+	font-size: 14px;
+	line-height: 18px;
+}
+
+.annis .v-Notification-tray p {
+	font-size: 12px;
+	font-weight: normal;
+}
+
+.annis div.v-Notification-system {
+	color: #fff;
+	border: none;
+	background-color: #b40000;
+}
+
+.annis .v-panel-caption {
+	background: #b9dcff;
+	font-size: 15.6px;
+	border: 1px solid #b3b3b3;
+	border-bottom: none;
+	padding: 0.2em 0.6em;
+}
+
+.annis .v-panel-nocaption {
+	padding: 0;
+	height: 0;
+	overflow: hidden;
+	border-top: 1px solid #b3b3b3;
+}
+
+.annis .v-panel-content {
+	background: #fff;
+	border: 1px solid #b3b3b3;
+	border-top: none;
+	border-bottom: none;
+}
+
+.annis .v-panel-deco {
+	height: 0;
+	overflow: hidden;
+	border-top: 1px solid #b3b3b3;
+}
+
+.annis div.v-panel-caption-borderless {
+	border: none;
+}
+
+.annis div.v-panel-nocaption-borderless, .annis div.v-panel-content-borderless, .annis div.v-panel-deco-borderless {
+	border: none;
+	background: transparent;
+}
+
+.annis .v-panel-light .v-panel-caption-light {
+	background: transparent;
+	font-weight: normal;
+	border-bottom: 1px solid #b3b3b3;
+}
+
+.annis div.v-panel-content-light {
+	background: transparent;
+}
+
+.annis .v-panel-bubble .v-panel-captionwrap {
+	border: 1px solid #b3b3b3;
+	border-bottom: none;
+	background: #fff;
+	-webkit-border-top-left-radius: 4px;
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+	-moz-border-radius-topright: 4px;
+	padding: 1px 2px;
+	overflow: hidden;
+}
+
+.annis .v-panel-bubble .v-panel-caption-bubble {
+	border: none;
+	background-image: url(../chameleon/img/grad-light-top.png);
+	background-repeat: repeat-x;
+	background-position: 0 -1px;
+	color: #fff;
+	text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.4);
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	margin: 1px 0;
+	font-size: 13px;
+	line-height: 1.2;
+	padding: 0.3em 0.6em;
+}
+
+.annis .v-panel-nocaption-bubble {
+	padding: 0;
+	margin: 0;
+	border: none;
+}
+
+.annis .v-panel-deco-bubble {
+	height: 2px;
+	border: 1px solid #b3b3b3;
+	border-top: none;
+	background: #fff;
+	-webkit-border-bottom-left-radius: 4px;
+	-webkit-border-bottom-right-radius: 4px;
+	-moz-border-radius-bottomleft: 4px;
+	-moz-border-radius-bottomright: 4px;
+}
+
+.annis div.v-panel-borderless .v-panel-captionwrap, .annis div.v-panel-borderless .v-panel-deco-bubble {
+	border: none;
+	padding: 0;
+	background: transparent;
+}
+
+.annis div.v-panel-borderless .v-panel-content-bubble {
+	background: transparent;
+}
+
+.annis .v-popupview-popup {
+	padding: 0.3em 0.4em;
+}
+
+.annis .v-progressbar-wrapper {
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	background: #eee url(../chameleon/img/grad-dark-bottom.png) repeat-x left bottom;
+	overflow: visible;
+	font-size: 1px;
+	line-height: 1px;
+}
+
+.annis .v-progressbar-indicator {
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -10px;
+	margin: -1px;
+	height: 7px;
+	border: 1px solid #b3b3b3;
+}
+
+.annis .v-progressbar-small {
+	width: 110px;
+}
+
+.annis .v-progressbar-small .v-progressbar-wrapper, .annis .v-progressbar-small .v-progressbar-indicator {
+	height: 2px;
+	border-radius: 1px;
+	-webkit-border-radius: 1px;
+	-moz-border-radius: 1px;
+}
+
+.annis .v-progressbar-big {
+	width: 250px;
+}
+
+.annis .v-progressbar-big .v-progressbar-wrapper, .annis .v-progressbar-big .v-progressbar-indicator {
+	height: 14px;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.annis .v-progressbar-indeterminate.v-progressbar-big {
+	width: 42px;
+	height: 42px;
+	background: #fff url(../base/common/img/ajax-loader-big.gif) no-repeat 50%;
+}
+
+.annis .v-progressbar-indeterminate.v-disabled {
+	display: none;
+}
+
+.annis .v-progressbar-indeterminate.v-progressbar-bar {
+	display: block;
+	width: 150px;
+	height: 9px;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-progressbar-indeterminate.bar.v-progressbar-small {
+	width: 110px;
+	height: 4px;
+}
+
+.annis .v-progressbar-indeterminate.bar.v-progressbar-big {
+	width: 200px;
+	height: 16px;
+}
+
+.annis .v-progressbar-indeterminate.bar .v-progressbar-wrapper {
+	display: block;
+	background: #fff url(../chameleon/img/indeterminate-progress.gif);
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	overflow: hidden;
+}
+
+.annis .v-progressbar-indeterminate.bar .v-progressbar-indicator {
+	display: block;
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	border: none;
+	margin: 0;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	overflow: hidden;
+}
+
+.annis .v-progressbar-indeterminate.bar.v-progressbar-small .v-progressbar-indicator {
+	background: transparent;
+}
+
+.annis .v-progressbar-indeterminate.bar.v-disabled .v-progressbar-indicator {
+	background: #fff;
+}
+
+.annis .v-progressindicator-wrapper {
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	background: #eee url(../chameleon/img/grad-dark-bottom.png) repeat-x left bottom;
+	overflow: visible;
+	font-size: 1px;
+	line-height: 1px;
+}
+
+.annis .v-progressindicator-indicator {
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -10px;
+	margin: -1px;
+	height: 7px;
+	border: 1px solid #b3b3b3;
+}
+
+.annis .v-progressindicator-small {
+	width: 110px;
+}
+
+.annis .v-progressindicator-small .v-progressindicator-wrapper, .annis .v-progressindicator-small .v-progressindicator-indicator {
+	height: 2px;
+	border-radius: 1px;
+	-webkit-border-radius: 1px;
+	-moz-border-radius: 1px;
+}
+
+.annis .v-progressindicator-big {
+	width: 250px;
+}
+
+.annis .v-progressindicator-big .v-progressindicator-wrapper, .annis .v-progressindicator-big .v-progressindicator-indicator {
+	height: 14px;
+	border-radius: 4px;
+	-webkit-border-radius: 4px;
+	-moz-border-radius: 4px;
+}
+
+.annis .v-progressindicator-indeterminate.v-progressindicator-big {
+	width: 42px;
+	height: 42px;
+	background: #fff url(../base/common/img/ajax-loader-big.gif) no-repeat 50%;
+}
+
+.annis .v-progressindicator-indeterminate.v-disabled {
+	display: none;
+}
+
+.annis .v-progressindicator-indeterminate.v-progressindicator-bar {
+	display: block;
+	width: 150px;
+	height: 9px;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-progressindicator-indeterminate.bar.v-progressindicator-small {
+	width: 110px;
+	height: 4px;
+}
+
+.annis .v-progressindicator-indeterminate.bar.v-progressindicator-big {
+	width: 200px;
+	height: 16px;
+}
+
+.annis .v-progressindicator-indeterminate.bar .v-progressindicator-wrapper {
+	display: block;
+	background: #fff url(../chameleon/img/indeterminate-progress.gif);
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	overflow: hidden;
+}
+
+.annis .v-progressindicator-indeterminate.bar .v-progressindicator-indicator {
+	display: block;
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	border: none;
+	margin: 0;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	overflow: hidden;
+}
+
+.annis .v-progressindicator-indeterminate.bar.v-progressindicator-small .v-progressindicator-indicator {
+	background: transparent;
+}
+
+.annis .v-progressindicator-indeterminate.bar.v-disabled .v-progressindicator-indicator {
+	background: #fff;
+}
+
+.annis .v-slider {
+	border-top: 1px solid #9a9c9e;
+	border-bottom: 1px solid #bdbfc1;
+	margin: 3px 0;
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+}
+
+.annis .v-slider-base {
+	height: 4px;
+	background: #e0e2e2 url(../chameleon/img/grad-dark-top2.png) repeat-x;
+	border-top: 1px solid #adb0b1;
+	border-left: 1px solid #a0a3a6;
+	border-right: 1px solid #a0a3a6;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-slider-handle {
+	background: #c9c9c9 url(../chameleon/img/grad-dark-bottom2.png) repeat-x left bottom;
+	border: 1px solid #b3b3b3;
+	width: 10px;
+	height: 10px;
+	margin-top: -5px;
+	border-radius: 5px;
+	-webkit-border-radius: 5px;
+	-moz-border-radius: 5px;
+	-webkit-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+	-moz-box-shadow: 0 1px 1px rgba(0, 0, 0, 0.5);
+	cursor: pointer;
+}
+
+.annis .v-slider-handle-active {
+	background-color: #afafaf;
+}
+
+.annis .v-slider-vertical {
+	width: auto;
+	margin: 0 4px;
+	border-width: 0 1px;
+}
+
+.annis .v-slider-vertical .v-slider-base {
+	background-image: none;
+	width: 4px;
+	border-width: 1px 1px 0;
+}
+
+.annis .v-slider-vertical .v-slider-handle {
+	width: 10px;
+	height: 10px;
+	margin: 0;
+	margin-left: -5px;
+}
+
+.annis .v-splitpanel-hsplitter div, .annis .v-splitpanel-vsplitter div {
+	background: transparent url(../chameleon/img/split-handle.png) no-repeat 2px 50%;
+	margin: 0 -1px;
+	width: 9px;
+}
+
+.annis .v-splitpanel-vsplitter div {
+	background-position: 50% 2px;
+	margin: -1px 0;
+	width: auto;
+	height: 9px;
+}
+
+.annis .v-splitpanel-hsplitter, .annis .v-splitpanel-hsplitter-locked {
+	border-style: solid;
+	border-width: 0 1px;
+	border-color: #b0b0b0;
+	width: 7px;
+	background: #b3b3b3 url(../chameleon/img/grad-light-left.png) repeat-y;
+}
+
+.annis .v-splitpanel-vsplitter, .annis .v-splitpanel-vsplitter-locked {
+	border-style: solid;
+	border-width: 1px 0;
+	border-color: #b0b0b0;
+	height: 7px;
+	background: #b3b3b3 url(../chameleon/img/grad-light-top.png) repeat-x;
+}
+
+.annis.v-app .v-splitpanel-hsplitter-small, .annis.v-app .v-splitpanel-hsplitter-small-locked {
+	width: 1px;
+	border: none;
+	background-image: none;
+}
+
+.annis.v-app .v-splitpanel-vsplitter-small, .annis.v-app .v-splitpanel-vsplitter-small-locked {
+	height: 1px;
+	border: none;
+	background-image: none;
+	font-size: 1px;
+	line-height: 1px;
+}
+
+.annis .v-splitpanel-hsplitter-small div {
+	width: 7px;
+	margin-left: -2px;
+	background: transparent;
+}
+
+.annis .v-splitpanel-vsplitter-small div {
+	height: 7px;
+	margin-top: -2px;
+	background: transparent;
+	overflow: hidden;
+}
+
+.annis .v-table-table {
+	line-height: 1.4;
+}
+
+.annis .v-table-header-wrap, .annis .v-table-header-drag {
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x;
+	height: 1.4em;
+	line-height: normal;
+}
+
+.annis .v-table-caption-container, .annis .v-table-header-drag {
+	padding-top: 0.2em;
+	padding-right: 4px;
+}
+
+.annis .v-table-header-drag {
+	padding-left: 0.3em;
+}
+
+.annis .v-table-resizer {
+	background: transparent;
+	border-right: 1px solid #b3b3b3;
+	padding-left: 1px;
+	height: 1.4em;
+}
+
+.annis div.v-table-focus-slot-left {
+	background: transparent;
+	border-left: 2px solid #b3b3b3;
+	border-right: none;
+	padding-left: 0;
+	padding-right: 1px;
+	float: left;
+	margin: 0;
+}
+
+.annis .v-table-row, .annis .v-table-row-odd {
+	background: transparent;
+}
+
+.annis .v-table-generated-row {
+	background: #c9c9c9;
+}
+
+.annis .v-table tr.v-selected {
+	background-image: url(../chameleon/img/grad-light-top2.png);
+	background-position: 0 -1px;
+}
+
+.annis div.v-table-focus-slot-right {
+	background: transparent;
+	border-right: 2px solid #b3b3b3;
+	padding-left: 0;
+	margin: 0;
+}
+
+.annis .v-table-column-selector {
+	margin-top: -1.35em;
+}
+
+.annis .v-table-cell-content {
+	border-right: none;
+	padding-right: 7px;
+}
+
+.annis .v-table-caption-container .v-icon {
+	vertical-align: middle;
+	margin: -0.37em 2px 0 0;
+}
+
+.annis .v-table-header-drag .v-icon {
+	vertical-align: middle;
+}
+
+.annis .v-contextmenu .v-on, .annis .v-contextmenu .v-off {
+	display: block;
+	background: transparent url(../chameleon/icons/bullet.png) no-repeat 0 4px;
+	padding-left: 12px;
+}
+
+.annis .v-contextmenu .v-off {
+	background-image: none;
+	color: #666;
+}
+
+.annis .v-contextmenu .gwt-MenuItem-selected .v-on {
+	background-image: url(../chameleon/icons/bullet-white.png);
+}
+
+.annis .v-table-scrollposition {
+	font-size: 11.7px;
+	opacity: 0.85;
+	filter: alpha(opacity=85);
+}
+
+.annis .v-table-small .v-table-caption-container, .annis .v-table-small .v-table-body {
+	font-size: 11.05px;
+}
+
+.annis .v-table-small .v-table-resizer, .annis .v-table-small .v-table-header-wrap {
+	height: 1.2em;
+}
+
+.annis .v-table-small .v-table-column-selector {
+	margin-top: -1.2em;
+}
+
+.annis .v-table-big .v-table-caption-container, .annis .v-table-big .v-table-body {
+	font-size: 15.6px;
+}
+
+.annis .v-table-big .v-table-caption-container {
+	padding-top: 0.3em;
+}
+
+.annis .v-table-big .v-table-resizer, .annis .v-table-big .v-table-header-wrap {
+	height: 1.8em;
+}
+
+.annis .v-table-big .v-table-column-selector {
+	margin-top: -1.5em;
+}
+
+.annis .v-table-striped .v-table-row-odd {
+	background-color: #e6e6e6;
+}
+
+.annis .v-table-strong .v-table-caption-container {
+	font-weight: bold;
+}
+
+.annis .v-table-borderless .v-table-header-wrap, .annis .v-table-borderless .v-table-body {
+	border: none;
+}
+
+.annis div.v-table-borderless .v-table-body {
+	background: transparent;
+}
+
+.annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
+	line-height: normal;
+	border: 1px solid #b3b3b3;
+	border-top-color: #808080;
+	border-color: rgba(0, 0, 0, 0.3);
+	border-top-color: rgba(0, 0, 0, 0.5);
+	background: #fff url(../chameleon/img/input-bg.png) repeat-x;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+	-webkit-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+	-moz-box-shadow: 0 1px 0 rgba(255, 255, 255, 0.2);
+	margin: 0;
+}
+
+.annis input.v-textfield[type="text"], .annis textarea.v-textarea, .annis .v-filterselect {
+	padding-bottom: 0.1em;
+	padding-top: 0.1em;
+	padding-left: 0.2em;
+	padding-right: 0.2em;
+}
+
+.annis input.v-textfield[type="text"] {
+	height: 1.2em;
+}
+
+.annis input.v-widget.v-textfield[type="text"], .annis .v-filterselect {
+	height: 1.7em;
+}
+
+.annis.v-app input.v-textfield, .annis.v-app textarea.v-textarea, .annis.v-app input.v-filterselect-input {
+	color: #222;
+}
+
+.v-ie .annis input.v-textfield, .v-ie .annis textarea.v-textarea, .v-ie .annis .v-filterselect {
+	border-top-color: #808080;
+}
+
+.annis.v-app input.v-textfield-prompt, .annis.v-app textarea.v-textarea-prompt {
+	font-style: normal;
+	color: #999;
+}
+
+.annis input.v-textfield-focus, .annis textarea.v-textarea-focus {
+	background-color: #fffce1;
+}
+
+.annis input.v-textfield-readonly, .annis textarea.v-textarea-readonly {
+	border: none;
+	background: transparent;
+}
+
+.annis.v-app input.v-textfield-small, .annis.v-app textarea.v-textarea-small, .annis .v-filterselect-small .v-filterselect-input {
+	font-size: 11.05px;
+}
+
+.annis.v-app input.v-textfield-big, .annis.v-app textarea.v-textarea-big, .annis .v-filterselect-big .v-filterselect-input {
+	font-size: 15.6px;
+}
+
+.annis input.v-textfield-big[type=text], .annis .v-datefield-big input.v-datefield-textfield[type=text] {
+	padding: 0.3em;
+}
+
+.annis textarea.v-textarea, .annis .v-filterselect-big {
+	padding: 0.3em;
+}
+
+.annis input.v-textfield-big.v-textfield-search, .annis .v-filterselect-search.v-filterselect-big {
+	background-image: url(../chameleon/img/magnifier-big.png);
+	background-repeat: no-repeat;
+	background-position: 4px 50%;
+}
+
+.annis input.v-textfield-big.v-textfield-search[type=text] {
+	padding-left: 26px;
+}
+
+.annis .v-filterselect-search.v-filterselect-big {
+	padding-left: 26px;
+}
+
+.annis input.v-textfield-search, .annis .v-filterselect-search {
+	background-image: url(../chameleon/img/magnifier.png);
+	background-repeat: no-repeat;
+	background-position: 3px 50%;
+}
+
+.annis input.v-textfield-search[type=text], .annis .v-filterselect-search {
+	padding-left: 17px;
+}
+
+.annis .v-datefield-button {
+	background: #dadada url(../chameleon/img/date-btn.png) repeat-x 50% 0;
+	border: 1px solid gray;
+	-webkit-border-top-right-radius: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-topright: 3px;
+	-moz-border-radius-bottomright: 3px;
+	width: 25px;
+	margin-right: -25px;
+	height: 1.7em;
+	padding: 0.2em 0;
+}
+
+.annis input.v-datefield-textfield[type="text"] {
+	border-right: none;
+	-webkit-border-top-right-radius: 0;
+	-webkit-border-bottom-right-radius: 0;
+	-moz-border-radius-topright: 0;
+	-moz-border-radius-bottomright: 0;
+	height: 1.7em;
+}
+
+.annis .v-datefield-big .v-datefield-button {
+	padding: 0.3em 0;
+	height: 1.9em;
+	width: 32px;
+	background-image: url(../chameleon/img/date-btn-big.png);
+	font-size: 15.6px;
+}
+
+.annis .v-datefield-big input.v-datefield-textfield[type="text"] {
+	height: 1.9em;
+	font-size: 15.6px;
+}
+
+.annis .v-datefield-small .v-datefield-button {
+	height: 1.6em;
+	width: 19px;
+	background-position: 50% -2px;
+	font-size: 11.05px;
+}
+
+.annis .v-datefield-small input.v-datefield-textfield[type="text"] {
+	height: 1.6em;
+	font-size: 11.05px;
+}
+
+.annis .v-datefield-calendarpanel {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	height: auto !important;
+	font-size: 11.7px;
+}
+
+.annis .v-datefield-month .v-datefield-textfield {
+	width: 6.4em;
+}
+
+.annis .v-datefield-year .v-datefield-textfield {
+	width: 4.4em;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel-prevmonth, .annis .v-datefield-year .v-datefield-calendarpanel-nextmonth {
+	display: none;
+}
+
+.annis .v-datefield-calendarpanel-header td {
+	border-bottom: 1px solid #666;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel-header td, .annis .v-datefield-month .v-datefield-calendarpanel-header td {
+	border-bottom: none;
+}
+
+.annis td.v-datefield-calendarpanel-month {
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -1px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.annis span.v-datefield-calendarpanel-month {
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	line-height: 2em;
+	height: 1.8em;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel-month {
+	width: 5.4em;
+}
+
+.annis .v-datefield-month .v-datefield-calendarpanel-month, .annis .v-datefield-day .v-datefield-calendarpanel-month, .annis .v-datefield-full .v-datefield-calendarpanel-month {
+	width: 9.4em;
+}
+
+.annis .v-datefield-popupcalendar {
+	min-width: 0;
+	padding-right: 25px;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel {
+	width: 8.4em;
+}
+
+.annis td.v-datefield-calendarpanel-prevyear {
+	text-align: right;
+}
+
+.annis td.v-datefield-calendarpanel-nextyear {
+	text-align: left;
+}
+
+.annis .v-datefield-calendarpanel-header button {
+	font-size: 13px;
+	line-height: normal;
+	width: 100%;
+	padding: 0 0.8em;
+	height: 1.8em;
+	border: none;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -1px;
+	overflow: hidden;
+	outline: none;
+	cursor: pointer;
+}
+
+.annis .v-datefield-popup .v-datefield-calendarpanel-month, .annis .v-datefield-popup .v-datefield-calendarpanel-header button {
+	background-position: 0 0;
+}
+
+.annis .v-datefield-calendarpanel-header button:active {
+	background-image: url(../chameleon/img/grad-dark-top2.png);
+}
+
+.annis .v-datefield-calendarpanel-prevyear button {
+	-webkit-border-top-left-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+}
+
+.annis .v-datefield-calendarpanel-nextyear button {
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topright: 4px;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel-prevyear button, .annis .v-datefield-month .v-datefield-calendarpanel-prevyear button {
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomleft: 3px;
+}
+
+.annis .v-datefield-year .v-datefield-calendarpanel-nextyear button, .annis .v-datefield-month .v-datefield-calendarpanel-nextyear button {
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+}
+
+.annis .v-datefield-calendarpanel-body, .annis .v-datefield-calendarpanel-time {
+	text-align: center;
+	vertical-align: top;
+}
+
+.annis .v-datefield-calendarpanel-body table {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	margin: 0 auto;
+}
+
+.annis .v-datefield-calendarpanel-weekdays td {
+	width: 14.2%;
+	overflow: hidden;
+	line-height: normal;
+	text-transform: uppercase;
+	vertical-align: top;
+}
+
+.annis .v-datefield-calendarpanel-weeknumbers td {
+	width: 12.5%;
+}
+
+.annis .v-datefield-calendarpanel-weekdays strong {
+	display: block;
+	text-align: right;
+	font-size: 10.4px;
+	padding: 0.3em 0.5em 0.35em 0;
+	height: 1.1em;
+	color: #fff;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+	background: #c9c9c9 url(../chameleon/img/grad-dark-top2.png) repeat-x;
+	margin-bottom: 2px;
+}
+
+.annis .v-datefield-calendarpanel .v-first strong {
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomleft: 3px;
+}
+
+.annis .v-datefield-calendarpanel .v-last strong {
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+}
+
+.annis .v-datefield-popup .v-datefield-calendarpanel .v-first strong, .annis .v-datefield-popup .v-datefield-calendarpanel .v-last strong {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+}
+
+.annis .v-datefield-calendarpanel-body td {
+	text-align: right;
+	height: 1.6em;
+}
+
+.annis .v-datefield-calendarpanel-weeknumber {
+	padding: 0.5em 0.5em 0.35em 0;
+	font-size: 11.7px;
+}
+
+.annis .v-datefield-calendarpanel-day, .annis .v-datefield-calendarpanel-day-today {
+	padding: 0.15em 0.5em 0.15em 0;
+	display: block;
+	margin: 1px 1px 1px 0.3em;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-datefield-calendarpanel-day-focused, .annis .v-datefield-calendarpanel-day:hover {
+	margin: 0 0 0 0.2em;
+	border: 1px solid #b3b3b3;
+	outline: none;
+}
+
+.annis .v-datefield-calendarpanel-day-today {
+	border: none;
+	background: transparent url(../chameleon/img/grad-dark-top2.png) repeat-x;
+	margin: 0 0 0 0.2em;
+	font-weight: bold;
+	border: 1px solid #c9c9c9;
+}
+
+.annis .v-datefield-calendarpanel-day-selected, .annis .v-datefield-calendarpanel-day-selected:hover {
+	margin: 0 0 0 0.3em;
+	border: none;
+}
+
+.annis .v-datefield-calendarpanel-time select {
+	padding: 0;
+	font-size: 11.7px;
+	margin: 0;
+}
+
+.annis .v-inline-datefield-button {
+	background: #dadada url(../chameleon/img/date-btn.png) repeat-x 50% 0;
+	border: 1px solid gray;
+	-webkit-border-top-right-radius: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-topright: 3px;
+	-moz-border-radius-bottomright: 3px;
+	width: 25px;
+	margin-right: -25px;
+	height: 1.7em;
+	padding: 0.2em 0;
+}
+
+.annis input.v-inline-datefield-textfield[type="text"] {
+	border-right: none;
+	-webkit-border-top-right-radius: 0;
+	-webkit-border-bottom-right-radius: 0;
+	-moz-border-radius-topright: 0;
+	-moz-border-radius-bottomright: 0;
+	height: 1.7em;
+}
+
+.annis .v-inline-datefield-big .v-inline-datefield-button {
+	padding: 0.3em 0;
+	height: 1.9em;
+	width: 32px;
+	background-image: url(../chameleon/img/date-btn-big.png);
+	font-size: 15.6px;
+}
+
+.annis .v-inline-datefield-big input.v-inline-datefield-textfield[type="text"] {
+	height: 1.9em;
+	font-size: 15.6px;
+}
+
+.annis .v-inline-datefield-small .v-inline-datefield-button {
+	height: 1.6em;
+	width: 19px;
+	background-position: 50% -2px;
+	font-size: 11.05px;
+}
+
+.annis .v-inline-datefield-small input.v-inline-datefield-textfield[type="text"] {
+	height: 1.6em;
+	font-size: 11.05px;
+}
+
+.annis .v-inline-datefield-calendarpanel {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	height: auto !important;
+	font-size: 11.7px;
+}
+
+.annis .v-inline-datefield-month .v-inline-datefield-textfield {
+	width: 6.4em;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-textfield {
+	width: 4.4em;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-prevmonth, .annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-nextmonth {
+	display: none;
+}
+
+.annis .v-inline-datefield-calendarpanel-header td {
+	border-bottom: 1px solid #666;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-header td, .annis .v-inline-datefield-month .v-inline-datefield-calendarpanel-header td {
+	border-bottom: none;
+}
+
+.annis td.v-inline-datefield-calendarpanel-month {
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -1px;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.annis span.v-inline-datefield-calendarpanel-month {
+	display: block;
+	text-align: center;
+	overflow: hidden;
+	line-height: 2em;
+	height: 1.8em;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-month {
+	width: 5.4em;
+}
+
+.annis .v-inline-datefield-month .v-inline-datefield-calendarpanel-month, .annis .v-inline-datefield-day .v-inline-datefield-calendarpanel-month, .annis .v-inline-datefield-full .v-inline-datefield-calendarpanel-month {
+	width: 9.4em;
+}
+
+.annis .v-inline-datefield-popupcalendar {
+	min-width: 0;
+	padding-right: 25px;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel {
+	width: 8.4em;
+}
+
+.annis td.v-inline-datefield-calendarpanel-prevyear {
+	text-align: right;
+}
+
+.annis td.v-inline-datefield-calendarpanel-nextyear {
+	text-align: left;
+}
+
+.annis .v-inline-datefield-calendarpanel-header button {
+	font-size: 13px;
+	line-height: normal;
+	width: 100%;
+	padding: 0 0.8em;
+	height: 1.8em;
+	border: none;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x 0 -1px;
+	overflow: hidden;
+	outline: none;
+	cursor: pointer;
+}
+
+.annis .v-inline-datefield-popup .v-inline-datefield-calendarpanel-month, .annis .v-inline-datefield-popup .v-inline-datefield-calendarpanel-header button {
+	background-position: 0 0;
+}
+
+.annis .v-inline-datefield-calendarpanel-header button:active {
+	background-image: url(../chameleon/img/grad-dark-top2.png);
+}
+
+.annis .v-inline-datefield-calendarpanel-prevyear button {
+	-webkit-border-top-left-radius: 4px;
+	-moz-border-radius-topleft: 4px;
+}
+
+.annis .v-inline-datefield-calendarpanel-nextyear button {
+	-webkit-border-top-right-radius: 4px;
+	-moz-border-radius-topright: 4px;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-prevyear button, .annis .v-inline-datefield-month .v-inline-datefield-calendarpanel-prevyear button {
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomleft: 3px;
+}
+
+.annis .v-inline-datefield-year .v-inline-datefield-calendarpanel-nextyear button, .annis .v-inline-datefield-month .v-inline-datefield-calendarpanel-nextyear button {
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+}
+
+.annis .v-inline-datefield-calendarpanel-body, .annis .v-inline-datefield-calendarpanel-time {
+	text-align: center;
+	vertical-align: top;
+}
+
+.annis .v-inline-datefield-calendarpanel-body table {
+	border-collapse: collapse;
+	margin: 0;
+	padding: 0;
+	margin: 0 auto;
+}
+
+.annis .v-inline-datefield-calendarpanel-weekdays td {
+	width: 14.2%;
+	overflow: hidden;
+	line-height: normal;
+	text-transform: uppercase;
+	vertical-align: top;
+}
+
+.annis .v-inline-datefield-calendarpanel-weeknumbers td {
+	width: 12.5%;
+}
+
+.annis .v-inline-datefield-calendarpanel-weekdays strong {
+	display: block;
+	text-align: right;
+	font-size: 10.4px;
+	padding: 0.3em 0.5em 0.35em 0;
+	height: 1.1em;
+	color: #fff;
+	text-shadow: 0 1px 0 rgba(0, 0, 0, 0.5);
+	background: #c9c9c9 url(../chameleon/img/grad-dark-top2.png) repeat-x;
+	margin-bottom: 2px;
+}
+
+.annis .v-inline-datefield-calendarpanel .v-first strong {
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-bottomleft: 3px;
+}
+
+.annis .v-inline-datefield-calendarpanel .v-last strong {
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-bottomright: 3px;
+}
+
+.annis .v-inline-datefield-popup .v-inline-datefield-calendarpanel .v-first strong, .annis .v-inline-datefield-popup .v-inline-datefield-calendarpanel .v-last strong {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+}
+
+.annis .v-inline-datefield-calendarpanel-body td {
+	text-align: right;
+	height: 1.6em;
+}
+
+.annis .v-inline-datefield-calendarpanel-weeknumber {
+	padding: 0.5em 0.5em 0.35em 0;
+	font-size: 11.7px;
+}
+
+.annis .v-inline-datefield-calendarpanel-day, .annis .v-inline-datefield-calendarpanel-day-today {
+	padding: 0.15em 0.5em 0.15em 0;
+	display: block;
+	margin: 1px 1px 1px 0.3em;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-focused, .annis .v-inline-datefield-calendarpanel-day:hover {
+	margin: 0 0 0 0.2em;
+	border: 1px solid #b3b3b3;
+	outline: none;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-today {
+	border: none;
+	background: transparent url(../chameleon/img/grad-dark-top2.png) repeat-x;
+	margin: 0 0 0 0.2em;
+	font-weight: bold;
+	border: 1px solid #c9c9c9;
+}
+
+.annis .v-inline-datefield-calendarpanel-day-selected, .annis .v-inline-datefield-calendarpanel-day-selected:hover {
+	margin: 0 0 0 0.3em;
+	border: none;
+}
+
+.annis .v-inline-datefield-calendarpanel-time select {
+	padding: 0;
+	font-size: 11.7px;
+	margin: 0;
+}
+
+.annis .v-inline-datefield, .annis .v-inline-datefield-calendarpanel-day {
+	line-height: 16px;
+}
+
+.annis .v-filterselect {
+	overflow: hidden;
+	padding-right: 16px;
+}
+
+.annis.v-app input.v-filterselect-input {
+	margin: 0;
+	padding: 0;
+	border: none;
+	background: transparent;
+	line-height: normal;
+}
+
+.annis.v-app input.v-filterselect-input[type=text] {
+	padding: 0;
+}
+
+.annis .v-filterselect-focus .v-filterselect-input, .annis .v-filterselect .v-filterselect-input:focus {
+	outline: none;
+}
+
+.annis .v-filterselect-big.v-filterselect-search {
+	padding-left: 22px;
+}
+
+.annis .v-filterselect-button {
+	width: 16px;
+	margin-right: -16px;
+	height: 1.2em;
+	background-position: -5px -11px;
+	opacity: 0.4;
+}
+
+.annis .v-filterselect-button:hover {
+	opacity: 0.7;
+}
+
+.annis .v-filterselect-button:active {
+	opacity: 1;
+}
+
+.annis .v-filterselect-small .v-filterselect-button {
+	height: 0.95em;
+	background-position: -5px -12px;
+}
+
+.annis .v-filterselect-suggestpopup {
+	margin-top: 0.4em;
+}
+
+.annis .v-filterselect-suggestmenu tr {
+	line-height: 1.4em;
+}
+
+.annis.v-app .v-filterselect-suggestpopup-small td {
+	font-size: 11.05px;
+}
+
+.annis.v-app .v-filterselect-suggestpopup-big td {
+	font-size: 14.3px;
+}
+
+.annis .v-filterselect-big .v-filterselect-button {
+	height: 1.4em;
+	background-position: -5px -9px;
+}
+
+.annis .v-filterselect-search .v-filterselect-button {
+	width: 0;
+	overflow: hidden;
+}
+
+.annis .v-filterselect-prompt .v-filterselect-input {
+	font-style: normal;
+}
+
+.annis .v-filterselect-prevpage-off, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage, .annis .v-filterselect-nextpage {
+	border-style: solid;
+	border-width: 1px 0;
+	border-color: #b3b3b3;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x;
+	height: 12px;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
+.annis .v-filterselect-prevpage:active, .annis .v-filterselect-nextpage:active {
+	background-image: #c9c9c9 url(../chameleon/img/grad-dark-bottom2.png);
+	background-position: left bottom;
+}
+
+.annis .v-filterselect-prevpage-off span, .annis .v-filterselect-nextpage-off span, .annis .v-filterselect-prevpage span, .annis .v-filterselect-nextpage span {
+	display: block;
+	text-indent: -9999px;
+	height: 12px;
+	background: transparent url(../base/common/img/sprites.png) no-repeat 50% 3px;
+}
+
+.annis .v-filterselect-nextpage-off span, .annis .v-filterselect-nextpage span {
+	background-position: 50% -12px;
+}
+
+.annis .v-filterselect-status {
+	font-size: 11.05px;
+	margin: 1px 0 -3px;
+	user-select: none;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+	-ms-user-select: none;
+}
+
+.annis .v-filterselect-suggestmenu .gwt-menuItem-selected {
+	background-image: url(../chameleon/img/grad-light-top2.png);
+	background-position: 0 -1px;
+}
+
+.annis .v-filterselect-suggestpopup-small .v-filterselect-status {
+	font-size: 10.4px;
+}
+
+.annis .v-filterselect-suggestpopup-big .v-filterselect-status {
+	font-size: 11.7px;
+}
+
+.annis .v-select-small .v-select-select {
+	font-size: 10.4px;
+}
+
+.annis .v-select-big .v-select-select {
+	font-size: 15.6px;
+}
+
+.annis .v-filterselect-select-button {
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x;
+	position: relative;
+	padding: 0.3em 0.5em;
+}
+
+.annis .v-filterselect-select-button .v-filterselect-input {
+	display: block;
+	width: 100% !important;
+	user-select: none;
+	-khtml-user-select: none;
+	-webkit-user-select: none;
+}
+
+.annis .v-filterselect-select-button .v-filterselect-button {
+	position: absolute;
+	width: 100%;
+	top: 0;
+	left: 0;
+	height: 100%;
+	background-position: 100% -8px;
+}
+
+.annis .v-tabsheet-spacertd div {
+	border-color: #b3b3b3;
+	border-left: none;
+}
+
+.annis .v-tabsheet-tabitem {
+	border: none;
+	border-bottom: 1px solid #b3b3b3;
+	padding: 0;
+}
+
+.annis .v-tabsheet-tabitem .v-caption {
+	padding: 0.2em 0.8em;
+	margin: 1px;
+	margin-bottom: 0;
+}
+
+.annis .v-tabsheet-tabitem-selected {
+	background-color: #c9c9c9;
+	border: 1px solid #b3b3b3;
+	border-bottom: none;
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-top-right-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-topright: 3px;
+	overflow: hidden;
+}
+
+.annis .v-tabsheet-tabitem-selected .v-caption {
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	margin: 0;
+	padding-bottom: 0.25em;
+	-webkit-border-top-left-radius: 2px;
+	-webkit-border-top-right-radius: 2px;
+	-moz-border-radius-topleft: 2px;
+	-moz-border-radius-topright: 2px;
+}
+
+.annis .v-tabsheet-content {
+	background: #fff;
+	border-color: #b3b3b3;
+}
+
+.annis .v-tabsheet-deco {
+	height: 0;
+	background: transparent;
+	border-top: 1px solid #b3b3b3;
+}
+
+.annis .v-tabsheet-caption-close {
+	width: 14px;
+	height: 15px;
+	overflow: hidden;
+	text-indent: -50px;
+	background: transparent url(../chameleon/img/close-btn.png) no-repeat 0.5em 0;
+	vertical-align: middle;
+	padding: 0 0 0 0.5em;
+	margin: 0.2em 0 0 0;
+}
+
+.annis .v-tabsheet-caption-close:hover {
+	background-position: 0.5em -25px;
+}
+
+.annis .v-tabsheet-caption-close:active {
+	background-position: 0.5em -50px;
+}
+
+.annis .v-tabsheet-scroller {
+	height: 14px;
+	margin-top: -1.6em;
+	position: relative;
+	float: right;
+	background: #c9c9c9 url(../chameleon/img/grad-light-top.png) repeat-x;
+	border: 1px solid #b3b3b3;
+	border-radius: 6px;
+	-webkit-border-radius: 6px;
+	-moz-border-radius: 6px;
+}
+
+.annis .v-tabsheet-scrollerPrev, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerPrev-disabled:active, .annis .v-tabsheet-scrollerNext-disabled:active {
+	border: 1px solid #b3b3b3;
+	border-width: 0;
+	background: transparent url(../chameleon/img/tab-arrows.png) no-repeat 6px 50%;
+	width: 16px;
+	height: 14px;
+	overflow: hidden;
+	opacity: 0.5;
+	filter: alpha(opacity=50);
+}
+
+.annis .v-tabsheet-scroller button::-moz-focus-inner {
+	border: none;
+	padding: 0;
+}
+
+.annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerNext-disabled:active {
+	background-position: -10px 50%;
+	border-left-width: 1px;
+}
+
+.annis .v-tabsheet-scrollerPrev:hover, .annis .v-tabsheet-scrollerNext:hover {
+	opacity: 0.75;
+	filter: alpha(opacity=75);
+}
+
+.annis .v-tabsheet-scrollerPrev:active, .annis .v-tabsheet-scrollerNext:active {
+	opacity: 1;
+	filter: none;
+}
+
+.annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerPrev-disabled:active, .annis .v-tabsheet-scrollerNext-disabled:active {
+	opacity: 0.1;
+	filter: alpha(opacity=10);
+}
+
+.annis .v-tabsheet-open-only-closable .v-tabsheet-caption-close {
+	visibility: hidden;
+}
+
+.annis .v-tabsheet-open-only-closable .v-tabsheet-tabitem-selected .v-tabsheet-caption-close {
+	visibility: visible;
+}
+
+.annis .v-tabsheet-borderless .v-tabsheet-content-borderless, .annis .v-tabsheet-deco-borderless {
+	border: none;
+	background: transparent;
+}
+
+.annis .v-tabsheet-tabs-borderless .v-tabsheet-tabitem-selected, .annis .v-tabsheet-tabs-borderless .v-tabsheet-tabitem-selected .v-caption {
+	background-color: transparent;
+}
+
+.annis .v-tree-node-caption {
+	margin-left: 16px;
+}
+
+.annis .v-tree-node span {
+	padding: 0.1em 0.3em;
+	border-radius: 2px;
+	-webkit-border-radius: 2px;
+	-moz-border-radius: 2px;
+}
+
+.annis .v-tree-node-children {
+	padding-left: 16px;
+}
+
+.annis .v-tree-node-selected span {
+	background-color: #333;
+}
+
+.annis .v-tree-connectors .v-tree-node-caption {
+	padding-bottom: 1px;
+}
+
+.annis .v-window-closebox, .annis .v-window-restorebox, .annis .v-window-maximizebox {
+	width: 14px;
+	height: 15px;
+	overflow: hidden;
+	vertical-align: middle;
+	margin: 0;
+	top: 0.3em;
+	z-index: 2;
+}
+
+.annis .v-window-closebox:hover, .annis .v-window-restorebox:hover, .annis .v-window-maximizebox:hover {
+	background-position: 0 -25px;
+}
+
+.annis .v-window-closebox:active, .annis .v-window-restorebox:active, .annis .v-window-maximizebox:active {
+	background-position: 0 -50px;
+}
+
+.annis .v-window-closebox {
+	text-indent: -50px;
+	background: transparent url(../chameleon/img/close-btn.png) no-repeat;
+	right: 0.4em;
+}
+
+.annis .v-window-restorebox, .annis .v-window-maximizebox {
+	right: 1.8em;
+}
+
+.annis .v-window-restorebox {
+	background: transparent url(../chameleon/img/restore.png) no-repeat;
+}
+
+.annis .v-window-maximizebox {
+	background: transparent url(../chameleon/img/maximize.png) no-repeat;
+}
+
+.annis .v-window {
+	background-image: none;
+}
+
+.annis .v-window-wrap {
+	border-radius: 3px;
+	-webkit-border-radius: 3px;
+	-moz-border-radius: 3px;
+	background-image: url(../chameleon/img/grad-light-top.png);
+	background-repeat: repeat-x;
+}
+
+.annis .v-window-outerheader {
+	padding: 0.2em 1.7em 0.5em 1.2em;
+	height: auto;
+	text-align: center;
+}
+
+.annis .v-window-header {
+	font-weight: normal;
+}
+
+.annis .v-window-footer {
+	height: 0;
+	position: static;
+}
+
+.annis .v-window-resizebox {
+	background: transparent url(../chameleon/img/resize.png) no-repeat;
+	width: 14px;
+	height: 14px;
+	bottom: 0;
+}
+
+.annis .v-horizontallayout-segment .v-button {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	border-left-width: 0;
+	zoom: 1;
+	overflow: visible;
+}
+
+.annis .v-horizontallayout-segment .v-button .v-button-wrap {
+	-webkit-border-radius: 0;
+	-moz-border-radius: 0;
+	border-radius: 0;
+	zoom: 1;
+}
+
+.annis .v-horizontallayout-segment .first {
+	-webkit-border-top-left-radius: 3px;
+	-webkit-border-bottom-left-radius: 3px;
+	-moz-border-radius-topleft: 3px;
+	-moz-border-radius-bottomleft: 3px;
+	border-top-left-radius: 3px;
+	border-bottom-left-radius: 3px;
+	border-left-width: 1px;
+}
+
+.annis .v-horizontallayout-segment .first .v-button-wrap {
+	-webkit-border-top-left-radius: 2px;
+	-webkit-border-bottom-left-radius: 2px;
+	-moz-border-radius-topleft: 2px;
+	-moz-border-radius-bottomleft: 2px;
+	border-top-left-radius: 2px;
+	border-bottom-left-radius: 2px;
+}
+
+.annis .v-horizontallayout-segment .last {
+	-webkit-border-top-right-radius: 3px;
+	-webkit-border-bottom-right-radius: 3px;
+	-moz-border-radius-topright: 3px;
+	-moz-border-radius-bottomright: 3px;
+	border-top-right-radius: 3px;
+	border-bottom-right-radius: 3px;
+}
+
+.annis .v-horizontallayout-segment .last .v-button-wrap {
+	-webkit-border-top-right-radius: 2px;
+	-webkit-border-bottom-right-radius: 2px;
+	-moz-border-radius-topright: 2px;
+	-moz-border-radius-bottomright: 2px;
+	border-top-right-radius: 2px;
+	border-bottom-right-radius: 2px;
+}
+
+.annis .sidebar-menu * {
+	white-space: normal;
+}
+
+.annis .sidebar-menu .v-label {
+	font-size: 11.05px;
+	text-transform: uppercase;
+	font-weight: bold;
+	letter-spacing: 0.03em;
+	padding: 1em 0.9em 0.3em;
+	text-shadow: 0 1px 0 rgba(255, 255, 255, 1);
+}
+
+.annis .sidebar-menu .v-nativebutton {
+	width: 100%;
+	padding: 0.1em 1.1em;
+	border: none;
+	background: transparent;
+	text-align: left;
+}
+
+.annis .sidebar-menu .v-nativebutton:focus {
+	outline: none;
+	font-weight: bold;
+}
+
+.annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected {
+	font-weight: bold;
+	background-color: #333;
+	background-image: url(../chameleon/img/grad-light-top2.png);
+	background-position: 0 -1px;
+	color: #fff;
+}
+
+.annis .sidebar-menu .tab-selected:focus, .annis .sidebar-menu .selected:focus {
+	outline: none;
+}
+
+.annis .sidebar-menu .v-nativebutton::-moz-focus-inner {
+	border: none;
+	padding: 0;
+}
+
+.annis .v-csslayout-toolbar {
+	background: transparent url(../chameleon/img/grad-light-top.png) repeat-x;
+	border: 1px solid #b3b3b3;
+	border-width: 1px 0;
+}
+
+.annis .v-csslayout-toolbar .v-csslayout-margin {
+	margin: 3px 0.3em 2px;
+	padding-bottom: 1px;
+	overflow: hidden;
+}
+
+.annis .v-csslayout-toolbar .v-button, .annis .v-csslayout-toolbar .segment {
+	margin-right: 2px;
+	float: left;
+}
+
+.annis .v-csslayout-toolbar .segment .v-button {
+	margin-right: 0;
+}
+
+.annis .v-app {
+	background: rgb(249, 249, 249);
+}
+
+.annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu {
+	background-color: rgb(249, 249, 249);
+}
+
+.annis body.v-ie6 .v-window, .annis body.v-ie7 .v-window, .annis body.v-ie6 .v-popupview-popup, .annis body.v-ie7 .v-popupview-popup, .annis body.v-ie6 .v-filterselect-suggestpopup, .annis body.v-ie7 .v-filterselect-suggestpopup, .annis body.v-ie6 .v-datefield-popup, .annis body.v-ie7 .v-datefield-popup, .annis body.v-ie6 .v-contextmenu, .annis body.v-ie7 .v-contextmenu, .annis body.v-ie6 .v-menubar-submenu, .annis body.v-ie7 .v-menubar-submenu, .annis .v-panel-content, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-content, .annis .v-tabsheet-tabitem-selected, .annis .v-slider-base, .annis .v-window-modalitycurtain, .annis .v-window-opaque, .annis .v-progressindicator-wrapper, .annis .v-accordion-item-caption, .annis .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-accordion-opaque div.v-accordion-item-open, .annis .v-table-scrollposition, .annis .v-table-body {
+	background-color: rgb(249, 249, 249);
+}
+
+.annis .v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-app input, .annis .v-app button, .annis .v-app textarea, .annis .v-window input, .annis .v-window button, .annis .v-window textarea, .annis .v-popupview-popup input, .annis .v-popupview-popup button, .annis .v-popupview-popup textarea, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-datefield-calendarpanel-header button, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-table-header-drag, .annis .v-filterselect-select-button .v-filterselect-input, .annis .v-drag-element {
+	font-size: 12px;
+	color: rgb(34, 34, 34);
+}
+
+.annis .v-app select, .annis .v-window select, .annis .v-popupview-popup select, .annis .v-datefield-popup select {
+	font-size: 12px;
+}
+
+.annis .v-button:active, .annis .v-ie .v-button.v-pressed, .annis div.v-button-down, .annis .v-slider .v-slider-handle-active {
+	background-color: rgb(188, 194, 202);
+	border-color: rgb(120, 124, 130);
+}
+
+.annis div.v-button-down:active {
+	background-color: rgb(150, 155, 162);
+}
+
+.annis .v-button:focus {
+	background-color: rgb(188, 194, 202);
+}
+
+.annis .v-button:active .v-button-wrap, .annis .v-ie .v-button.v-pressed .v-button-wrap, .annis .v-button-down .v-button-wrap, .annis .v-datefield-calendarpanel-header td, .annis .v-slider-base, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerNext-disabled:active, .annis .v-table-header-wrap, .annis .v-table-body, .annis .v-table-resizer, .annis div.v-table-focus-slot-left, .annis div.v-table-focus-slot-right, .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
+	border-color: rgb(150, 155, 162);
+}
+
+.annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
+	border-bottom-color: rgb(188, 194, 202);
+	border-left-color: rgb(188, 194, 202);
+	border-right-color: rgb(188, 194, 202);
+}
+
+.annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-button, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-slider-handle, .annis .v-table-header-wrap, .annis .v-table-header-drag, .annis .v-filterselect-prevpage-off, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage, .annis .v-filterselect-nextpage, .annis .v-filterselect-select-button, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-accordion-opaque, .annis .v-accordion-opaque .v-accordion-item-open, .annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-tabsheet-scroller, .annis .v-csslayout-toolbar, .annis .v-menubar {
+	background-color: rgb(235, 243, 253);
+	border-color: rgb(150, 155, 162);
+}
+
+.annis .v-datefield-calendarpanel-weekdays strong, .annis .v-splitpanel-hsplitter-small, .annis .v-splitpanel-vsplitter-small, .annis .v-splitpanel-hsplitter-small-locked, .annis .v-splitpanel-vsplitter-small-locked {
+	background-color: rgb(188, 194, 202);
+}
+
+.annis .v-progressindicator-wrapper {
+	border-color: rgb(188, 194, 202);
+}
+
+.annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-tabsheet-tabitem-selected .v-caption, .annis .v-window-header, .annis .v-table-caption-container, .annis .v-accordion-item-caption, .annis .v-menubar .v-menubar-menuitem, .annis .v-filterselect-select-button .v-filterselect-input {
+	text-shadow: 0 1px 0 rgb(248, 251, 254);
+}
+
+.annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-panel-caption, .annis .v-panel-nocaption, .annis .v-panel-content, .annis .v-panel-deco, .annis .v-panel-light .v-panel-caption-light, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-content-bubble, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-tabitem-selected, .annis .v-tabsheet-tabitem, .annis .v-tabsheet-spacertd div, .annis .v-tabsheet-content, .annis .v-tabsheet-deco, .annis .v-slider, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-table-scrollposition, .annis .v-accordion, .annis .v-accordion-item-caption, .annis .v-accordion-item-open, .annis .v-menubar-separator span {
+	border-color: rgb(199, 199, 199);
+}
+
+.annis .v-label-color, .annis .v-button-link, .annis .v-button-link:focus, .annis .v-button-link:active, .annis .v-disabled.v-button-link, .annis .v-disabled.v-button-link:focus, .annis .v-app a, .annis .v-popupview-popup a, .annis .v-popupview, .annis .sidebar-menu .v-label {
+	color: rgb(32, 38, 227);
+}
+
+.annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down {
+	border-color: rgb(44, 48, 146);
+}
+
+.annis .v-button-default:focus, .annis .v-horizontallayout-segment-alternate .v-button-down:active {
+	background-color: rgb(41, 46, 182);
+}
+
+.annis .v-button-default:active .v-button-wrap, .annis .v-ie7 .v-button-default.v-pressed .v-button-wrap, .annis .v-ie8 .v-button-default.v-pressed .v-button-wrap, .annis .v-progressindicator-indicator, .annis .v-datefield-calendarpanel-day:hover, .annis .v-horizontallayout-segment-alternate .v-button-down .v-button-wrap {
+	border-color: rgb(41, 46, 182);
+}
+
+.annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .v-panel-bubble .v-panel-caption, .annis .v-datefield-calendarpanel-day-selected, .annis .v-table tr.v-selected, .annis .v-contextmenu .gwt-MenuItem-selected, .annis .v-contextmenu .gwt-MenuItem-selected div, .annis .v-filterselect-suggestpopup .gwt-MenuItem-selected, .annis .v-progressindicator-indicator, .annis .v-tree-node-selected span, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down, .annis .v-menubar .v-menubar-menuitem-selected, .annis .v-menubar-submenu .v-menubar-menuitem-selected {
+	background-color: rgb(32, 38, 227);
+	color: rgb(250, 250, 251);
+	text-shadow: 0 -1px 0 rgb(44, 48, 146);
+}
+
+.annis .v-ie6 .v-progressindicator-indicator {
+	background-color: rgb(32, 38, 227);
+}
+
+.annis .v-panel-caption, .annis .v-table-striped .v-table-row-odd, .annis .sidebar-menu {
+	background: rgb(226, 227, 245);
+}
+
+.annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected {
+	text-shadow: 0 1px 0 rgb(44, 48, 146);
+}
+
+.annis .v-app {
+	background: rgb(255, 255, 255);
+}
+
+.annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu {
+	background-color: rgb(255, 255, 255);
+}
+
+.annis body.v-ie6 .v-window, .annis body.v-ie7 .v-window, .annis body.v-ie6 .v-popupview-popup, .annis body.v-ie7 .v-popupview-popup, .annis body.v-ie6 .v-filterselect-suggestpopup, .annis body.v-ie7 .v-filterselect-suggestpopup, .annis body.v-ie6 .v-datefield-popup, .annis body.v-ie7 .v-datefield-popup, .annis body.v-ie6 .v-contextmenu, .annis body.v-ie7 .v-contextmenu, .annis body.v-ie6 .v-menubar-submenu, .annis body.v-ie7 .v-menubar-submenu, .annis .v-panel-content, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-content, .annis .v-tabsheet-tabitem-selected, .annis .v-slider-base, .annis .v-window-modalitycurtain, .annis .v-window-opaque, .annis .v-progressindicator-wrapper, .annis .v-accordion-item-caption, .annis .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-accordion-opaque div.v-accordion-item-open, .annis .v-table-scrollposition, .annis .v-table-body {
+	background-color: rgb(255, 255, 255);
+}
+
+.annis .v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-app input, .annis .v-app button, .annis .v-app textarea, .annis .v-window input, .annis .v-window button, .annis .v-window textarea, .annis .v-popupview-popup input, .annis .v-popupview-popup button, .annis .v-popupview-popup textarea, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-datefield-calendarpanel-header button, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-table-header-drag, .annis .v-filterselect-select-button .v-filterselect-input, .annis .v-drag-element {
+	font-size: 12px;
+	color: rgb(34, 34, 34);
+}
+
+.annis .v-app select, .annis .v-window select, .annis .v-popupview-popup select, .annis .v-datefield-popup select {
+	font-size: 12px;
+}
+
+.annis .v-button:active, .annis .v-ie .v-button.v-pressed, .annis div.v-button-down, .annis .v-slider .v-slider-handle-active {
+	background-color: rgb(163, 173, 185);
+	border-color: rgb(104, 110, 118);
+}
+
+.annis div.v-button-down:active {
+	background-color: rgb(130, 138, 148);
+}
+
+.annis .v-button:focus {
+	background-color: rgb(163, 173, 185);
+}
+
+.annis .v-button:active .v-button-wrap, .annis .v-ie .v-button.v-pressed .v-button-wrap, .annis .v-button-down .v-button-wrap, .annis .v-datefield-calendarpanel-header td, .annis .v-slider-base, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerNext-disabled:active, .annis .v-table-header-wrap, .annis .v-table-body, .annis .v-table-resizer, .annis div.v-table-focus-slot-left, .annis div.v-table-focus-slot-right, .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
+	border-color: rgb(130, 138, 148);
+}
+
+.annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
+	border-bottom-color: rgb(163, 173, 185);
+	border-left-color: rgb(163, 173, 185);
+	border-right-color: rgb(163, 173, 185);
+}
+
+.annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-button, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-slider-handle, .annis .v-table-header-wrap, .annis .v-table-header-drag, .annis .v-filterselect-prevpage-off, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage, .annis .v-filterselect-nextpage, .annis .v-filterselect-select-button, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-accordion-opaque, .annis .v-accordion-opaque .v-accordion-item-open, .annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-tabsheet-scroller, .annis .v-csslayout-toolbar, .annis .v-menubar {
+	background-color: rgb(204, 216, 231);
+	border-color: rgb(130, 138, 148);
+}
+
+.annis .v-datefield-calendarpanel-weekdays strong, .annis .v-splitpanel-hsplitter-small, .annis .v-splitpanel-vsplitter-small, .annis .v-splitpanel-hsplitter-small-locked, .annis .v-splitpanel-vsplitter-small-locked {
+	background-color: rgb(163, 173, 185);
+}
+
+.annis .v-progressindicator-wrapper {
+	border-color: rgb(163, 173, 185);
+}
+
+.annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-tabsheet-tabitem-selected .v-caption, .annis .v-window-header, .annis .v-table-caption-container, .annis .v-accordion-item-caption, .annis .v-menubar .v-menubar-menuitem, .annis .v-filterselect-select-button .v-filterselect-input {
+	text-shadow: 0 1px 0 rgb(232, 236, 241);
+}
+
+.annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-panel-caption, .annis .v-panel-nocaption, .annis .v-panel-content, .annis .v-panel-deco, .annis .v-panel-light .v-panel-caption-light, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-content-bubble, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-tabitem-selected, .annis .v-tabsheet-tabitem, .annis .v-tabsheet-spacertd div, .annis .v-tabsheet-content, .annis .v-tabsheet-deco, .annis .v-slider, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-table-scrollposition, .annis .v-accordion, .annis .v-accordion-item-caption, .annis .v-accordion-item-open, .annis .v-menubar-separator span {
+	border-color: rgb(204, 204, 204);
+}
+
+.annis .v-label-color, .annis .v-button-link, .annis .v-button-link:focus, .annis .v-button-link:active, .annis .v-disabled.v-button-link, .annis .v-disabled.v-button-link:focus, .annis .v-app a, .annis .v-popupview-popup a, .annis .v-popupview, .annis .sidebar-menu .v-label {
+	color: rgb(49, 55, 245);
+}
+
+.annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down {
+	border-color: rgb(55, 58, 157);
+}
+
+.annis .v-button-default:focus, .annis .v-horizontallayout-segment-alternate .v-button-down:active {
+	background-color: rgb(55, 59, 196);
+}
+
+.annis .v-button-default:active .v-button-wrap, .annis .v-ie7 .v-button-default.v-pressed .v-button-wrap, .annis .v-ie8 .v-button-default.v-pressed .v-button-wrap, .annis .v-progressindicator-indicator, .annis .v-datefield-calendarpanel-day:hover, .annis .v-horizontallayout-segment-alternate .v-button-down .v-button-wrap {
+	border-color: rgb(55, 59, 196);
+}
+
+.annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .v-panel-bubble .v-panel-caption, .annis .v-datefield-calendarpanel-day-selected, .annis .v-table tr.v-selected, .annis .v-contextmenu .gwt-MenuItem-selected, .annis .v-contextmenu .gwt-MenuItem-selected div, .annis .v-filterselect-suggestpopup .gwt-MenuItem-selected, .annis .v-progressindicator-indicator, .annis .v-tree-node-selected span, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down, .annis .v-menubar .v-menubar-menuitem-selected, .annis .v-menubar-submenu .v-menubar-menuitem-selected {
+	background-color: rgb(49, 55, 245);
+	color: rgb(252, 252, 254);
+	text-shadow: 0 -1px 0 rgb(55, 58, 157);
+}
+
+.annis .v-ie6 .v-progressindicator-indicator {
+	background-color: rgb(49, 55, 245);
+}
+
+.annis .v-panel-caption, .annis .v-table-striped .v-table-row-odd, .annis .sidebar-menu {
+	background: #ecf0f6;
+}
+
+.annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected {
+	text-shadow: 0 1px 0 rgb(55, 58, 157);
+}
+
+.annis .example-queries-table table, .annis .example-queries-table .v-table-body-wrapper, .annis .docvis-table .v-table-body td, .annis .docvis-table .v-table-body-wrapper {
+	border-collapse: collapse;
+	border-spacing: 0;
+	overflow-x: hidden !important;
+}
+
+.annis .example-queries-table tr.v-selected {
+	background: grey;
+	color: #ECF0F6;
+}
+
+.annis .example-queries-table .v-table-body td, .annis .docvis-table .v-table-body td {
+	border-collapse: collapse;
+	padding: 5px;
+}
+
+.annis .docviewer .v-panel-captionwrap {
+	border-color: rgb(130, 138, 148);
+	background: #ECF0F6 url(../chameleon/img/grad-light-top.png) repeat-x;
+	line-height: normal;
+}
+
+.annis .docviewer .v-panel-caption {
+	font-size: 10pt;
+	font-weight: normal;
+	text-shadow: 0 1px 0 rgb(232, 236, 241);
+	overflow: hidden;
+	white-space: nowrap;
+	padding-top: 0.2em;
+	padding-bottom: 0.2em;
+	padding-right: 4px;
+}
+
+.annis .docviewer .v-panel-content {
+	padding: 5px;
+}
+
+.annis .partitur_table {
+	margin: 0px;
+	border-collapse: collapse;
+	font-family: arial, tahoma, helvetica, sans-serif;
+	font-style: normal;
+}
+
+.annis .partitur_table .tok {
+	text-align: center;
+}
+
+.annis .partitur_table .highlight-target {
+	background-color: #faf755;
+}
+
+.annis .partitur_table td.header {
+	margin: 0px;
+	padding: 2px;
+	font-weight: bold;
+	border-style: dotted;
+	border-color: rgb(200, 200, 200);
+	border-width: 1px;
+}
+
+.annis .partitur_table td.gap {
+	background-image: url("hatching.png");
+	background-repeat: repeat;
+	border-style: solid;
+	border-color: black;
+}
+
+.annis .partitur_table td.space {
+	background-image: url("space.png");
+	background-repeat: repeat-y;
+	border-style: none;
+	background-position: center;
+}
+
+.annis .partitur_table td {
+	margin: 0px;
+	background-color: rgb(255, 255, 255);
+	border-style: dotted;
+	border-color: rgb(200, 200, 200);
+	border-width: 1px;
+	padding: 0px 10px 0px 10px;
+}
+
+.annis .partitur_table .header {
+	font-family: arial, tahoma, helvetica, sans-serif;
+}
+
+.annis .partitur_table td.single_event {
+	background-color: rgb(230, 230, 230);
+	border-color: rgb(0, 0, 0);
+	border-style: solid;
+	border-width: 1px;
+}
+
+.annis .partitur_table td.highlight-source {
+	background-color: rgb(200, 200, 200);
+}
+
+.annis .checkedItem:before {
+	content: url('check.gif');
+}
+
+.annis .uncheckedItem:before {
+	content: url('empty.gif');
+}
+
+.annis #tooltip {
+	font-size: 9pt;
+}
+
+.annis #tooltip h3 {
+	font-size: 9pt;
+}
+
+.annis .speaker {
+	background: url("speaker.png") no-repeat right;
+}
+
+.annis .pdf {
+	background: url("pdf.png") no-repeat right;
+}
+
+.annis .speaker, .annis .speaker div, .annis .pdf, .annis .pdf div {
+	cursor: pointer;
+}
+
+.annis .hidden {
+	display: none;
+}
+
+.annis .control {
+	background-color: #ecf0f6;
+}
+
+.annis .v-table-cell-wrapper {
+	white-space: normal;
+}
+
+.annis .result-view .v-panel-content {
+	background-color: white;
+}
+
+.annis .result-view .v-table-body {
+	background-color: white;
+}
+
+.annis .result-view .v-table-cell-content {
+	padding: 0px;
+}
+
+.annis .result-view .v-panel-content-result-view {
+	overflow-y: scroll;
+}
+
+.annis .result-view-css {
+	width: 100%;
+}
+
+.annis .result-view-no-content {
+	text-align: center;
+}
+
+.annis .single-result .v-table-cell-content {
+	padding: 0px 6px;
+}
+
+.annis .v-table-cell-content-kwic-anno {
+	color: grey;
+}
+
+.annis .kwic td {
+	color: grey;
+	padding: 0px 6px;
+}
+
+.annis .kwic td.token {
+	color: black;
+}
+
+.annis .kwic .speaker div {
+	min-width: 32px;
+	min-height: 32px;
+}
+
+.annis .kwic .partitur_table td.single_event {
+	background-color: white;
+	border-style: none;
+}
+
+.annis .v-table-cell-content-kwic-clickable {
+	color: grey;
+}
+
+.annis .pointer, .annis .v-table-cell-content-kwic-media, .annis .menu-hover .v-menubar-menuitem {
+	cursor: pointer !important;
+}
+
+.annis .v-table-cell-content-kwic-media {
+	background: url(speaker.png) no-repeat left;
+	width: 32px;
+	height: 32px;
+}
+
+.annis .drag-source-enabled {
+	cursor: move;
+}
+
+.annis .toolbar .v-panel-content {
+	background-color: #ecf0f6;
+}
+
+.annis .toolbar {
+	background-color: #ecf0f6;
+}
+
+.annis .right-aligned-text {
+	text-align: right;
+}
+
+.annis .rtl {
+	direction: rtl;
+}
+
+.annis .v-label-opensource {
+	font-size: 14pt !important;
+}
+
+.annis .vis-content {
+	width: 100%;
+}
+
+.annis .docPath {
+	text-align: left;
+	vertical-align: middle;
+	font-weight: normal;
+	margin: 0 0 4px;
+	padding: 2px 3px;
+	background-color: #ecf0f6;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px 0px 0px 0px;
+}
+
+.annis textarea.citation {
+	background-color: white;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	font-family: monospace;
+}
+
+.annis textarea.license {
+	background-color: white;
+	border-style: solid;
+	border-color: black;
+	border-width: 1px;
+	font-family: monospace;
+}
+
+.annis textarea.query {
+	font-family: monospace;
+}
+
+.annis .tigerquery-builder-canvas {
+	z-index: 0;
+}
+
+.annis .tigerquery-builder-overlay {
+	z-index: 10;
+}
+
+.annis .contextsensible-formlayout .v-filterselect {
+	float: left;
+}
+
+.annis textarea.border-layout {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #b3b3b3;
+}
+
+.annis .border-layout {
+	border-width: 1px;
+	border-style: solid;
+	border-color: #b3b3b3;
+}
+
+.annis .solid-white-background {
+	background-color: rgb(255, 255, 255);
+}
+
+.annis .v-window-outerheader {
+	background-attachment: scroll;
+	background-clip: border-box;
+	background-color: rgb(204, 216, 231);
+	background-image: url(../chameleon/img/grad-light-top.png);
+	background-origin: padding-box;
+	background-size: auto;
+}
+
+.annis .v-table-cell-content-match_1 {
+	color: rgb(255, 0, 0);
+}
+
+.annis .kwic td.v-table-cell-content-match_1 {
+	color: rgb(255, 0, 0);
+}
+
+.annis .v-table-cell-content-match_2 {
+	color: rgb(199, 21, 133);
+}
+
+.annis .kwic td.v-table-cell-content-match_2 {
+	color: rgb(199, 21, 133);
+}
+
+.annis .v-table-cell-content-match_3 {
+	color: rgb(50, 205, 50);
+}
+
+.annis .kwic td.v-table-cell-content-match_3 {
+	color: rgb(50, 205, 50);
+}
+
+.annis .v-table-cell-content-match_4 {
+	color: rgb(205, 133, 63);
+}
+
+.annis .kwic td.v-table-cell-content-match_4 {
+	color: rgb(205, 133, 63);
+}
+
+.annis .v-table-cell-content-match_5 {
+	color: rgb(205, 92, 92);
+}
+
+.annis .kwic td.v-table-cell-content-match_5 {
+	color: rgb(205, 92, 92);
+}
+
+.annis .v-table-cell-content-match_6 {
+	color: rgb(173, 255, 47);
+}
+
+.annis .kwic td.v-table-cell-content-match_6 {
+	color: rgb(173, 255, 47);
+}
+
+.annis .v-table-cell-content-match_7 {
+	color: rgb(139, 0, 0);
+}
+
+.annis .kwic td.v-table-cell-content-match_7 {
+	color: rgb(139, 0, 0);
+}
+
+.annis .v-table-cell-content-match_8 {
+	color: rgb(255, 69, 0);
+}
+
+.annis .kwic td.v-table-cell-content-match_8 {
+	color: rgb(255, 69, 0);
+}
+
+.annis .v-form-errormessage {
+	color: red;
+	font-weight: bold;
+}
+
+.annis .left-button, .annis .right-button {
+	background-position: center;
+	background-repeat: repeat-y;
+}
+
+.annis .left-button {
+	background-image: url(left_rst_arrow.png);
+	background-repeat: repeat-y;
+}
+
+.annis .right-button {
+	background-image: url(right_rst_arrow.png);
+	background-repeat: repeat-y;
+}
+
+.annis .right-button .v-button-wrap {
+	background: none;
+	border: medium none;
+	border-radius: 2px 2px 2px 2px;
+	display: block;
+	height: 100%;
+	padding: 4px 13px;
+	text-overflow: ellipsis;
+}
+
+.annis .exception-message-caption {
+	font-size: 18pt;
+}
+
+.annis .exception-message-content {
+	font-size: 15pt;
+	background-color: #ffcccc;
+	border-style: dashed;
+	border-width: 1px;
+}
+
+.annis .help-tab .v-accordion-item-caption {
+	background-color: #ecffe7;
+}
+
+.annis .blue-tab .v-tabsheet-tabitem {
+	border: 1px solid rgb(204, 204, 204);
+	border-bottom: none;
+}
+
+.annis .v-tabsheet-tabcontainer-blue-tab {
+	background-color: #ecf0f6;
+}
+
+body .annis.v-app .v-app-loading {
+	background-image: url(annisloading.gif);
+	background-repeat: no-repeat;
+	background-position: 50%;
+	width: 100%;
+	height: 100%;
+}

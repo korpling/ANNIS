@@ -129,75 +129,89 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       BufferedReader inReader = new BufferedReader(new InputStreamReader(
         matchStream, "UTF-8"));
-      
-      WebResource subgraphRes = annisResource.path("search/subgraph");
-      MatchGroup currentMatches = new MatchGroup();
-      String currentLine;
-      int offset=0;
-      // 2. iterate over all matches and get the sub-graph for a group of matches
-      while((currentLine = inReader.readLine()) != null)
+      try
       {
-        Match match = Match.parseFromString(currentLine);
+        WebResource subgraphRes = annisResource.path("search/subgraph");
+        MatchGroup currentMatches = new MatchGroup();
+        String currentLine;
+        int offset=0;
+        // 2. iterate over all matches and get the sub-graph for a group of matches
+        while((currentLine = inReader.readLine()) != null)
+        {
+          
+          if(Thread.currentThread().isInterrupted())
+          {
+            // return from loop and abort export
+            break;
+          }
+          
+          Match match = Match.parseFromString(currentLine);
+
+          currentMatches.getMatches().add(match);
+
+          if(currentMatches.getMatches().size() >= stepSize)
+          {
+            WebResource res = subgraphRes
+              .queryParam("left", "" + contextLeft)
+              .queryParam("right","" + contextRight);
+
+            SubgraphFilter filter = getSubgraphFilter();
+            if(filter != null)
+            {
+              res = res.queryParam("filter", filter.name());
+            }
+            // TODO: segmentation?
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.start();
+            SaltProject p = res.post(SaltProject.class, currentMatches);
+            stopwatch.stop();
+
+            // dynamically adjust the number of items to fetch if single subgraph
+            // export was fast enough
+            if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
+            {
+              stepSize += 10;
+            }
+
+            convertText(LegacyGraphConverter.convertToResultSet(p), 
+              keys, args, out, offset-currentMatches.getMatches().size());
+
+            currentMatches.getMatches().clear();
+
+            if(eventBus != null)
+            {
+              eventBus.post(Integer.valueOf(offset+1));
+            }
+          }
+          offset++;
+        } // end for each line
         
-        currentMatches.getMatches().add(match);
-        
-        if(currentMatches.getMatches().size() >= stepSize)
+        // query the left over matches
+        if (!currentMatches.getMatches().isEmpty())
         {
           WebResource res = subgraphRes
             .queryParam("left", "" + contextLeft)
-            .queryParam("right","" + contextRight);
-          
+            .queryParam("right", "" + contextRight);
+
           SubgraphFilter filter = getSubgraphFilter();
-          if(filter != null)
+          if (filter != null)
           {
             res = res.queryParam("filter", filter.name());
           }
-          // TODO: segmentation?
-          
-          Stopwatch stopwatch = new Stopwatch();
-          stopwatch.start();
-          SaltProject p = res.post(SaltProject.class, currentMatches);
-          stopwatch.stop();
-          
-          // dynamically adjust the number of items to fetch if single subgraph
-          // export was fast enough
-          if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
-          {
-            stepSize += 10;
-          }
-          
-          convertText(LegacyGraphConverter.convertToResultSet(p), 
-            keys, args, out, offset-currentMatches.getMatches().size());
-          
-          currentMatches.getMatches().clear();
-          
-          if(eventBus != null)
-          {
-            eventBus.post(new Integer(offset+1));
-          }
-        }
-        offset++;
-      } // end for each line
-      
-      // query the left over matches
-      if(!currentMatches.getMatches().isEmpty())
-      {
-        WebResource res = subgraphRes
-          .queryParam("left", "" + contextLeft)
-          .queryParam("right", "" + contextRight);
-
-        SubgraphFilter filter = getSubgraphFilter();
-        if (filter != null)
-        {
-          res = res.queryParam("filter", filter.name());
-        }
         // TODO: segmentation?
-          
-        SaltProject p = res.post(SaltProject.class, currentMatches);
-          convertText(LegacyGraphConverter.convertToResultSet(p), 
-            keys, args, out, offset-currentMatches.getMatches().size()-1);
+
+          SaltProject p = res.post(SaltProject.class, currentMatches);
+          convertText(LegacyGraphConverter.convertToResultSet(p),
+            keys, args, out, offset - currentMatches.getMatches().size() - 1);
+        }
+        offset = 0;
+        
       }
-      offset = 0;
+      finally
+      {
+        inReader.close();
+      }
       
       out.append("\n");
       out.append("\n");
@@ -267,6 +281,14 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
     }
   }
+
+  @Override
+  public boolean isCancelable()
+  {
+    return true;
+  }
+  
+  
   
   public abstract SubgraphFilter getSubgraphFilter();
 

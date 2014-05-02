@@ -13,7 +13,9 @@
 To search for word forms in ANNIS, simply select a corpus (in this
 example the small PCC2 demo corpus) and enter a search string between
 double quotation marks, e.g.:</p>
-<tt>"statisch"</tt>
+	<div class="indent">
+	<tt>"statisch"</tt>
+	</div>
 <p>Note that the search is <strong>case
 sensitive</strong>, so it will not
 find cases of capitalized 'Statisch', for example at the beginning of a
@@ -21,33 +23,67 @@ sentence. In order to find both options, you can either look for one
 form OR the other using the pipe sign ( <tt>|</tt>
 ):
 </p>
-<tt>"statisch" | "Statisch"</tt>
-<p>or else you can use <strong>regular
-expressions</strong>, which must be
+
+	<div class="indent">
+	<tt>"statisch" | "Statisch"</tt>
+	</div>
+
+
+<p>or else you can use <a href="regex.html">regular
+expressions</a>, which must be
 surrounded by slashes ( <tt>/</tt>
 ) instead of quotation marks:</p>
-<tt>/[Ss]tatisch/</tt>
+
+	<div class="indent">
+	<tt>/[Ss]tatisch/</tt>
+	</div>
+
 <p>To look for a sequence of
 multiple word forms, enter your search terms separated by <tt>&amp;</tt>
 and then specify that the relation between the elements is one of <strong>precedence</strong>,
 as signified by the period ( <strong><tt>.</tt></strong>
 ) operator:</p>
-<tt>"so" &amp; "statisch"
-&amp; #1 . #2</tt>
+
+	<div class="indent">
+	<tt>"so" &amp; "statisch"
+	&amp; #1 . #2</tt>
+	</div>
+
 <p>The expression <tt>#1
 . #2</tt> signifies that the first
-element ("so") precedes the second element ("statisch"). For <strong>indirect
+element ("so") precedes the second element ("statisch"). Alternatively, you can also place the operator directly between the search elements as a <strong>shortcut</strong>. The following shortcut query is equivalent:
+</p>
+
+	<div class="indent">
+	<tt>"so" . "statisch"</tt>
+	</div>
+
+<p>
+For <strong>indirect
 precedence </strong>(where other
 tokens may stand between the search terms), use the <strong><tt>.*</tt></strong>
 operator:</p>
-<tt>/[Ss]o/ &amp; "statisch"
-&amp; "wie" &amp; #1 . #2 &amp; #2 .* #3 </tt>
-<p>The above query finds sequences
+
+	<div class="indent">
+	<tt>/[Ss]o/ &amp; "statisch"
+	&amp; "wie" &amp; #1 . #2 &amp; #2 .* #3 </tt>
+	<p><b>OR using shortcuts:</b></p>
+	<tt>/[Ss]o/ . "statisch" .* "wie"</tt>
+	</div>
+
+
+<p>The queries above find sequences
 beginning with either "So" or "so", followed directly by "statisch",
 which must be followed either directly or indirectly (.*) by "wie". A
 range of allowed distances can also be specified numerically as follows:</p>
-<tt>/[Ss]tatisch/ &amp; "wie"
-&amp; #1 .1,5 #2</tt>
+
+	<div class="indent">
+	<tt>/[Ss]tatisch/ &amp; "wie"
+	&amp; #1 .1,5 #2</tt>
+	<p><b>OR:</b></p>
+	<tt>/[Ss]tatisch/ .1,5 "wie"</tt>
+	</div>
+
 <p>Meaning the two words may
 appear at a distance of 1 to 5 tokens. The operator <tt>.*</tt>
 allows a distance of up to 50 tokens by default, so searching with <tt>.1,50</tt>
@@ -61,9 +97,13 @@ preceded by the prefix meta:: and may not be bound (i.e. they are not
 referred to as #1 etc. and the numbering of other elements ignores
 their existence):
 </p>
-<tt>
-/[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2 &amp; meta::Genre="Sport"
-</tt>
+
+	<div class="indent">
+	<tt>
+	/[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2 &amp; meta::Genre="Sport"
+	</tt>
+	</div>
+
 <p>To view metadata for a search result or for a corpus, press the "i"
 icon next to it in the result window or in the search form
 respectively.

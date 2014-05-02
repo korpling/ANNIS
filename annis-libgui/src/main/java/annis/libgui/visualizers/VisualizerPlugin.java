@@ -80,7 +80,7 @@ public interface VisualizerPlugin<I extends Component> extends Plugin,
    * @param segmentationName
    */
   public void setSegmentationLayer(I visualizerImplementation,
-    String segmentationName, Map<SNode, Long> markedAndCovered);
+    String segmentationName, Map<String, Long> markedAndCovered);
 
   /**
    * Determines if this visaulizer wants to use the original text.

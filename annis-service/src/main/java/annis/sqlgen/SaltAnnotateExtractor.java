@@ -13,6 +13,8 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -49,8 +51,6 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
 import java.util.concurrent.atomic.AtomicInteger;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.LoggerFactory;
@@ -280,7 +280,23 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     
     for(Map.Entry<String, TreeMap<Long, String>> e : nodeBySegmentationPath.entrySet())
     {
+      String segName = e.getKey();
       TreeMap<Long, String> nodeBySegIndex = e.getValue();
+      
+      // mark the first node in the chain
+      if(!nodeBySegIndex.isEmpty())
+      {
+        String idOfFirstNode = nodeBySegIndex.firstEntry().getValue();
+        SNode firstNodeInSegChain = graph.getSNode(idOfFirstNode);
+        if(firstNodeInSegChain != null)
+        {
+          SFeature featFistSegInChain = SaltFactory.eINSTANCE.createSFeature();
+          featFistSegInChain.setSNS(ANNIS_NS);
+          featFistSegInChain.setSName(FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+          featFistSegInChain.setSValue(segName);
+          firstNodeInSegChain.addSFeature(featFistSegInChain);
+        }
+      }
       
       SNode lastNode = null;
       for(String nodeID : nodeBySegIndex.values())
@@ -292,7 +308,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           SOrderRelation orderRel = SaltFactory.eINSTANCE.createSOrderRelation();
           orderRel.setSSource(lastNode);
           orderRel.setSTarget(n);
-          orderRel.addSType(e.getKey());
+          orderRel.addSType(segName);
           orderRel.setSName("sOrderRel" + numberOfSOrderRels.getAndIncrement());
           graph.addSRelation(orderRel);
         }
@@ -621,19 +637,31 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     from.getSLayers().clear();
  
-    List<Edge> inEdges =  graph.getInEdges(from.getSId());
+    Multimap<SRelation, SLayer> layerOfEdge = ArrayListMultimap.create();
+    
+    List<Edge> inEdges =  new LinkedList<Edge>(graph.getInEdges(from.getSId()));
     for(Edge e : inEdges)
     {
       if(e instanceof SRelation)
       {
+        SRelation rel = (SRelation) e;
+        if(rel.getSLayers() != null)
+        {
+          layerOfEdge.putAll(rel, rel.getSLayers());
+        }
         Validate.isTrue(graph.removeEdge(e));
       }
     }
-    List<Edge> outEdges = graph.getOutEdges(from.getSId());
+    List<Edge> outEdges = new LinkedList<Edge>(graph.getOutEdges(from.getSId()));
     for(Edge e : outEdges)
     {
       if(e instanceof SRelation)
       {
+        SRelation rel = (SRelation) e;
+        if(rel.getSLayers() != null)
+        {
+          layerOfEdge.putAll(rel, rel.getSLayers());
+        }
         Validate.isTrue(graph.removeEdge(e));
       }
     }
@@ -646,8 +674,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       if(e instanceof SRelation)
       {
-        ((SRelation) e).setSTarget(to);
-        graph.addSRelation((SRelation) e);
+        SRelation rel = (SRelation) e;
+        rel.setSTarget(to);
+        graph.addSRelation(rel);
+        if(layerOfEdge.containsKey(rel))
+        {
+          for(SLayer l : layerOfEdge.get(rel))
+          {
+            rel.getSLayers().add(l);
+          }
+        }
       }
     }
     
@@ -655,8 +691,16 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     {
       if(e instanceof SRelation)
       {
-        ((SRelation) e).setSSource(to);
-        graph.addSRelation((SRelation) e);
+        SRelation rel = (SRelation) e;
+        rel.setSSource(to);
+        graph.addSRelation(rel);
+        if(layerOfEdge.containsKey(rel))
+        {
+          for(SLayer l : layerOfEdge.get(rel))
+          {
+            rel.getSLayers().add(l);
+          }
+        }
       }
     }
 

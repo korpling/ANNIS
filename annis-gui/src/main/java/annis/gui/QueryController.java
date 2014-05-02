@@ -84,11 +84,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private PagedResultQuery preparedQuery;
 
-  private transient Map<UUID, PagedResultQuery> queries;
+  private Map<UUID, PagedResultQuery> queries;
 
-  private transient BiMap<UUID, ResultViewPanel> queryPanels;
+  private BiMap<UUID, ResultViewPanel> queryPanels;
 
-  private transient Map<UUID, MatchAndDocumentCount> counts;
+  private Map<UUID, MatchAndDocumentCount> counts;
 
   /**
    * Stores updated queries. They are created when single results are queried
@@ -104,7 +104,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private int maxShortID;
 
-  private transient List<CorpusSelectionChangeListener> corpusSelChangeListeners
+  private List<CorpusSelectionChangeListener> corpusSelChangeListeners
     = new LinkedList<CorpusSelectionChangeListener>();
 
   public QueryController(SearchUI ui)
@@ -112,6 +112,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     this.ui = ui;
     this.history = new ListOrderedSet<HistoryEntry>();
   }
+  
 
   public void updateCorpusSetList()
   {
@@ -163,6 +164,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       getContextRight());
     ui.getControlPanel().getSearchOptions().setSegmentationLayer(query.
       getSegmentation());
+    ui.getControlPanel().getSearchOptions().setResultsPerPage(query.getLimit());
 
     if (query.getCorpora() != null)
     {
@@ -379,9 +381,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     ui.getControlPanel().getSearchOptions()
       .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
         getCorpusList().
-        getSelectedCorpora());
+        getSelectedCorpora(), ui);
 
-    ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
+    // Since there is a serious lag when selecting the corpus don't update
+    // the corpus fragment any longer.
+    // The user can manually get the corpus link with the corpus explorer.
+    //ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
 
     if (corpusSelChangeListeners != null)
     {
@@ -664,7 +669,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
         Match m = extractMatches.get(offset % extractMatches.size());
 
         PollControl.runInBackground(500, ui,
-          new SingleResultFetchJob(m, query, ui, queryPanels.get(queryID),
+          new SingleResultFetchJob(m, query,
             visCtxChange));
       }
     }

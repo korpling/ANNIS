@@ -15,6 +15,7 @@
  */
 package annis.libgui.visualizers;
 
+import annis.CommonHelper;
 import annis.gui.FontConfig;
 import annis.libgui.MatchedNodeColors;
 import annis.service.ifaces.AnnisResult;
@@ -25,6 +26,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.io.Writer;
 import java.util.HashMap;
@@ -36,17 +40,19 @@ import java.util.Set;
 /**
  * Contains all needed data for a visualizer to perform the visualization.
  *
- * @author Thomas Krause <krause@informatik.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class VisualizerInput implements Serializable
 {
-
+  private static final long serialVersionUID = 2L;
+  
   private transient SDocument document = SaltFactory.eINSTANCE.createSDocument();
 
   private String namespace = "";
 
-  private transient Map<SNode, Long> markedAndCovered = new HashMap<SNode, Long>();
-
+  private Map<String, Long> markedAndCovered = new HashMap<String, Long>();
+  private transient Map<SNode, Long> cachedMarkedAndCoveredNodes;
+  
   private Map<String, String> markableMap = new HashMap<String, String>();
 
   private Map<String, String> markableExactMap = new HashMap<String, String>();
@@ -65,7 +71,7 @@ public class VisualizerInput implements Serializable
 
   private String resourcePathTemplate = "%s";
 
-  private List<SToken> token;
+  private transient List<SToken> cachedToken;
 
   private Set<String> tokenAnnos;
 
@@ -74,6 +80,20 @@ public class VisualizerInput implements Serializable
   private FontConfig font;
 
   private RawTextWrapper rawText;
+
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+
+    CommonHelper.writeSDocument(document, out);
+  }
+
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+
+    this.document = CommonHelper.readSDocument(in);
+  }
 
   public String getAnnisWebServiceURL()
   {
@@ -180,7 +200,7 @@ public class VisualizerInput implements Serializable
 
   /**
    * Same as {@link #getMarkableMap() } except that this only includes the
-   * really matched nodes and not covered token.
+ really matched nodes and not covered cachedToken.
    *
    * @return
    */
@@ -198,10 +218,10 @@ public class VisualizerInput implements Serializable
 
   /**
    * Gets the map of markables used by {@link #writeOutput(Writer)}. The key of
-   * this map must be the corresponding node id of annotations or tokens. The
-   * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to
-   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
+ this map must be the corresponding node id of annotations or cachedTokens. The
+ values must be HTML compatible color definitions like #000000 or red. For
+ detailed information on HTML color definition refer to
+ {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @return
    */
@@ -213,10 +233,10 @@ public class VisualizerInput implements Serializable
 
   /**
    * Sets the map of markables used by {@link #writeOutput(Writer)}. The key of
-   * this map must be the corresponding node id of annotations or tokens. The
-   * values must be HTML compatible color definitions like #000000 or red. For
-   * detailed information on HTML color definition refer to
-   * {@link http://www.w3schools.com/HTML/html_colornames.asp}
+ this map must be the corresponding node id of annotations or cachedTokens. The
+ values must be HTML compatible color definitions like #000000 or red. For
+ detailed information on HTML color definition refer to
+ {@link http://www.w3schools.com/HTML/html_colornames.asp}
    *
    * @param markableMap
    */
@@ -234,8 +254,9 @@ public class VisualizerInput implements Serializable
    * {@link MatchedNodeColors}.
    *
    */
-  public void setMarkedAndCovered(Map<SNode, Long> markedAndCovered)
+  public void setMarkedAndCovered(Map<String, Long> markedAndCovered)
   {
+    this.cachedMarkedAndCoveredNodes = null;
     this.markedAndCovered = markedAndCovered;
   }
 
@@ -246,10 +267,20 @@ public class VisualizerInput implements Serializable
    * HEX-values according to html or css standards, it is possible to use
    * {@link MatchedNodeColors}.
    *
+   * @return 
    */
   public Map<SNode, Long> getMarkedAndCovered()
   {
-    return markedAndCovered;
+    if(cachedMarkedAndCoveredNodes == null)
+    {      
+      if (document != null)
+      {
+        cachedMarkedAndCoveredNodes = CommonHelper.createSNodeMapFromIDs(
+          markedAndCovered, document.getSDocumentGraph());
+      }
+    }
+    
+    return cachedMarkedAndCoveredNodes;
   }
 
   /**
@@ -333,30 +364,26 @@ public class VisualizerInput implements Serializable
   }
 
   /**
-   * should contains a list of all token of a the which is available with
-   * {@link VisualizerInput#getSResult()}.
-   */
-  public void setToken(List<SToken> token)
-  {
-    this.token = token;
-  }
-
-  /**
-   * should contains a list of all token of a the which is available with
-   * {@link VisualizerInput#getSResult()}.
+   * should contains a list of all cachedToken of a the which is available with
+ {@link VisualizerInput#getSResult()}.
    *
-   * @return TODO at the moment it's not certain, that token are nodes of the
-   * {@link VisualizerInput#getSResult()}.
+   * @return TODO at the moment it's not certain, that cachedToken are nodes of the
+ {@link VisualizerInput#getSResult()}.
    *
    */
+  @Deprecated
   public List<SToken> getToken()
   {
-    return this.token;
+    if(this.cachedToken == null)
+    {
+      this.cachedToken = getSResult().getSDocumentGraph().getSortedSTokenByText();
+    }
+    return this.cachedToken;
   }
 
   /**
-   * Set all token annotations which should be displayed by the visualizer and
-   * correspondands to the annos choosen by the user in the annis gui.
+   * Set all cachedToken annotations which should be displayed by the visualizer and
+ correspondands to the annos choosen by the user in the annis gui.
    */
   public void setVisibleTokenAnnos(Set<String> tokenAnnos)
   {
@@ -364,8 +391,8 @@ public class VisualizerInput implements Serializable
   }
 
   /**
-   * This token annotation should displayed by the visualizer and is selected by
-   * the user in the annis gui.
+   * This cachedToken annotation should displayed by the visualizer and is selected by
+ the user in the annis gui.
    */
   public Set<String> getVisibleTokenAnnos()
   {
@@ -414,8 +441,8 @@ public class VisualizerInput implements Serializable
    * @return <ul><li>null - if the {@link VisualizerPlugin#isUsingRawText()}
    * method false for this visualizer.</li>
    *
-   * <li>empty list - if there are only segmentations and the token layer is
-   * empty</li>
+   * <li>empty list - if there are only segmentations and the cachedToken layer is
+ empty</li>
    *
    */
   public RawTextWrapper getRawText()

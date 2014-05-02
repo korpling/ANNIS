@@ -16,6 +16,7 @@
 package annis.gui.widgets.grid;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -71,6 +72,27 @@ public class GridEvent implements Serializable
     this.value = value;
 
     this.coveredIDs = new LinkedList<String>();
+  }
+  
+  /**
+   * Copy constructor
+   * @param orig 
+   */
+  public GridEvent(GridEvent orig)
+  {
+    this.id = orig.id;
+    this.value = orig.value;
+    this.left = orig.left;
+    this.right = orig.right;
+    this.match = orig.match;
+    this.coveredIDs = new ArrayList<String>(orig.coveredIDs);
+    this.tooltip = orig.tooltip;
+    this.startTime = orig.startTime;
+    this.endTime = orig.endTime;
+    this.gap = orig.gap;
+    this.space = orig.space;
+    this.textID = orig.textID;
+    this.pageNumber = orig.pageNumber;
   }
 
   public String getId()

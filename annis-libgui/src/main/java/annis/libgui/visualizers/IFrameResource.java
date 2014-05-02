@@ -16,6 +16,7 @@
 package annis.libgui.visualizers;
 
 import java.io.Serializable;
+import java.util.Arrays;
 
 /**
  * Hold the data and meta information for a resource needed by an iframe
@@ -24,17 +25,24 @@ import java.io.Serializable;
  */
 public class IFrameResource implements Serializable
 {
-  private byte[] data;
+  private byte[] data = new byte[0];
   private String mimeType;
 
   public byte[] getData()
   {
-    return data;
+    return Arrays.copyOf(data, data.length);
   }
 
   public void setData(byte[] data)
   {
-    this.data = data;
+    if(data == null)
+    {
+      this.data = new byte[0];
+    }
+    else
+    {
+      this.data = Arrays.copyOf(data, data.length);
+    }
   }
 
   public String getMimeType()

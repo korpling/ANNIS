@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.io.Serializable;
 import java.net.URI;
@@ -22,6 +23,7 @@ import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
@@ -107,18 +109,17 @@ public class Match implements Serializable
   @Override
   public String toString()
   {
-    StringBuilder sb = new StringBuilder();
     Iterator<URI> it = saltIDs.iterator();
+    LinkedList<String> asString = new LinkedList<String>();
     while(it.hasNext())
     {
       URI u = it.next();
-      sb.append(u.toASCIIString());
-      if(it.hasNext())
+      if(u != null)
       {
-        sb.append(" ");
+        asString.add(u.toASCIIString());
       }
     }
-    return sb.toString();
+    return Joiner.on(" ").join(asString);
   }
   
   

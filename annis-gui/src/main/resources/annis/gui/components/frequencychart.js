@@ -21,20 +21,23 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
   
   var lastValues = null;
   var lastLabels = null;
-  
-  // always resize the canvas to the size of the parent div
-  $(window).resize(function() {    
-    if (lastValues !== null && lastLabels !== null)
-    {
-      theThis.showData(lastLabels, lastValues);
-    }
-  });
+  var lastFontFamily = "sans-serif";
+  var lastScale = null;
+  var lastFontSize = 10.0;
 
-  this.onStateChange = function() {    
+  
+  this.onStateChange = function() { 
+    showData(lastLabels, lastValues, lastScale, lastFontFamily, lastFontSize);
   };
   
-  this.showData = function(labels, values, scale) {
   
+  this.showData = function(labels, values, scale, fontFamily, fontSize) {    
+    if(!labels || !values || !scale)
+    {
+      alert("invalid call to showData");
+      return;
+    }
+    
     var predefinedYTicks = null;
     // the list is ordered
     var maxValue = values[0];
@@ -64,6 +67,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
       t[i] = [i];
     }
     
+    $(div).remove("canvas");
+    
     var graph = Flotr.draw(
       div,
       [d],
@@ -73,6 +78,7 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
         },
         yaxis : {
           scaling: scale,
+          
           ticks: predefinedYTicks,
           min: 0
         },
@@ -82,8 +88,8 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           tickFormatter: function(i){
 
             var l = labels[i];
-            if(l.length > 25) {
-              l = l.substring(0,24)+"...";
+            if(l.length > 20) {
+              l = l.substring(0,19)+"...";
             }
 
             return l;
@@ -97,10 +103,11 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
           }
         },
         HtmlText : false,
-        fontSize : 10.0
+        fontSize : fontSize,
+        fontFamily: fontFamily
       }
     );
-    
+        
     // bind click event
     graph.observe(div, 'flotr:click', function (position) {
       theThis.selectRow(position.hit.index);
@@ -108,6 +115,14 @@ window.annis_gui_components_FrequencyWhiteboard = function() {
     
     lastLabels = labels;
     lastValues = values;
+    lastScale = scale;
+    lastFontFamily = fontFamily;
+    lastFontSize = fontSize;
     
   };
+  
+  // always resize the canvas to the size of the parent div
+  $(window).resize(function() {
+    theThis.showData(lastLabels, lastValues, lastScale, lastFontFamily, lastFontSize);
+  });
 };

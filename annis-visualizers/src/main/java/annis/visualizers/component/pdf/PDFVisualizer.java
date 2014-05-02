@@ -81,7 +81,7 @@ public class PDFVisualizer extends AbstractVisualizer<Panel> {
     return (Panel) pdfViewer;
   }
 
-  private class PDFViewerImpl extends Panel implements PDFViewer {
+  private static class PDFViewerImpl extends Panel implements PDFViewer {
 
     VisualizerInput input;
 

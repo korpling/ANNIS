@@ -123,7 +123,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     {
       if(l == span.getId())
       {
-        matchedSpans[i] = span;
+        matchedSpans[i] = new AnnotatedSpan(span);
       }
       i++;
     }

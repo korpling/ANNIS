@@ -16,6 +16,7 @@
 package annis.model;
 
 import java.io.Serializable;
+import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
 import org.apache.commons.lang3.builder.EqualsBuilder;
@@ -33,11 +34,11 @@ public class Annotation implements Comparable<Annotation>, Serializable
   private String corpusName;
 
   /**
-   * is the path of the annotation in brackets: {x, y, z}. The first value x is
+   * is the path of the annotation. The first value x is
    * the corpus/document which is annotated. Tho following names represents the
    * parents of x.
    */
-  private String annotationPath;
+  private List<String> annotationPath;
 
   private int pre; // determine the order
 
@@ -79,7 +80,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
    * With the constructor we could determine the order of the pre parameter
    */
   public Annotation(String namespace, String name, String value, String type,
-    String corpusName, int pre, String annotationPath)
+    String corpusName, int pre, List<String> annotationPath)
   {
     this(namespace, name, value, type, corpusName, pre);
     this.annotationPath = annotationPath;
@@ -198,7 +199,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
   /**
    * @return the annotationPath
    */
-  public String getAnnotationPath()
+  public List<String> getAnnotationPath()
   {
     return annotationPath;
   }
@@ -206,7 +207,7 @@ public class Annotation implements Comparable<Annotation>, Serializable
   /**
    * @param annotationPath the annotationPath to set
    */
-  public void setAnnotationPath(String annotationPath)
+  public void setAnnotationPath(List<String> annotationPath)
   {
     this.annotationPath = annotationPath;
   }

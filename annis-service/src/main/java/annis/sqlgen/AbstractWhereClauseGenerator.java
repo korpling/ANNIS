@@ -16,7 +16,7 @@ import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -74,7 +74,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
 
       // node joins
-      for (Join join : node.getJoins())
+      for (Join join : node.getOutgoingJoins())
       {
         QueryNode target = join.getTarget();
         if (join instanceof SameSpan)

@@ -20,7 +20,6 @@ import annis.security.AnnisUserConfig;
 import java.sql.PreparedStatement;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -34,6 +33,11 @@ public interface AdministrationDao
   public List<Long> listToplevelCorpora();
 
   public void deleteCorpora(List<Long> ids, boolean acquireLock);
+  
+  /**
+   * Delete files not used by this instance in the data directory.
+   */
+  public void cleanupData();
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
@@ -114,11 +118,13 @@ public interface AdministrationDao
     public boolean isCancelled();
   }
 
+  public ImportStatus initImportStatus();
+
   /**
    * Collects the exceptions (throwables) from an import process and provides
    * several methods for extracting them.
    */
-  public interface ImportStats
+  public interface ImportStatus
   {
 
     /**
@@ -137,19 +143,29 @@ public interface AdministrationDao
     public boolean getStatus();
 
     /**
+     * Returns all throwables.
+     *
+     * @return empty if no exceptions occurs.
+     */
+    public List<Throwable> getThrowables();
+
+     /**
      * Returns all excecptions.
      *
      * @return empty if no exceptions occurs.
      */
-    public List<Throwable> getExceptions();
+    public List<Exception> getExceptions();
 
     /**
-     * Returns all exceptions of a specific corpus.
+     * Returns all throwables of a specific corpus.
      *
      * @param corpusName the name of the corpus
      * @return null if no error occured with this corpus.
      */
-    public List<Throwable> getExceptions(String corpusName);
+    public List<Throwable> getThrowable(String corpusName);
+
+
+    public Map<String, List<Throwable>> getAllThrowable();
 
     /**
      * Assigns every Exception to a corpus.
@@ -160,14 +176,18 @@ public interface AdministrationDao
     public void addException(String corpusName, Throwable ex);
 
     /**
-     * Makes an conjuction of the {@link ImportStats}, which means that if at
+     * Makes an conjuction of the {@link ImportStatus}, which means that if at
      * least one import failed the status is set to false.
      *
      * @param importStats The imported statistics which are connected.
      */
-    public void add(ImportStats importStats);
+    public void add(ImportStatus importStats);
 
-    public Map<String, List<Throwable>> getThrowables();
+    public String printMessages();
+
+    public String printDetails();
+
+    public String printType();
   }
 
   public void storeUserConfig(AnnisUserConfig config);

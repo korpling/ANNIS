@@ -50,6 +50,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -75,6 +78,7 @@ import org.slf4j.LoggerFactory;
 public class SingleResultPanel extends CssLayout implements
   Button.ClickListener, VisualizerContextChanger
 {
+  private static final long serialVersionUID = 2L;
 
   private static final String HIDE_KWIC = "hide_kwic";
 
@@ -85,13 +89,11 @@ public class SingleResultPanel extends CssLayout implements
 
   private transient SDocument result;
 
-  private transient Map<SNode, Long> markedAndCovered;
-
   private Map<String, String> markedCoveredMap;
 
   private Map<String, String> markedExactMap;
 
-  private transient PluginSystem ps;
+  private PluginSystem ps;
 
   private List<VisualizerPanel> visualizers;
 
@@ -100,8 +102,6 @@ public class SingleResultPanel extends CssLayout implements
   private List<String> path;
 
   private String segmentationName;
-
-  private transient List<SToken> token;
 
   private HorizontalLayout infoBar;
 
@@ -217,7 +217,7 @@ public class SingleResultPanel extends CssLayout implements
       rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
     }
 
-    int lftContextIdx = queryController.getPreparedQuery().getContextLeft();
+    int lftContextIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextLeft();
     lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
@@ -227,7 +227,7 @@ public class SingleResultPanel extends CssLayout implements
       true
     });
 
-    int rghtCtxIdx = queryController.getPreparedQuery().getContextRight();
+    int rghtCtxIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextRight();
     rghtCtxContainer.addItem(rghtCtxIdx);
 
     rghtCtxContainer.sort(new Object[]
@@ -270,6 +270,20 @@ public class SingleResultPanel extends CssLayout implements
     addComponent(infoBar);
     initVisualizer();
   }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+    
+    CommonHelper.writeSDocument(result, out);
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    
+   this.result = CommonHelper.readSDocument(in);
+  }
 
   public void setSegmentationLayer(String segmentationName)
   {
@@ -280,7 +294,7 @@ public class SingleResultPanel extends CssLayout implements
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getSDocumentGraph());
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
       for (VisualizerPanel p : visualizers)
       {
         p.setSegmentationLayer(segmentationName, markedAndCovered);
@@ -330,18 +344,18 @@ public class SingleResultPanel extends CssLayout implements
     } // end if result not null
   }
 
-  private void calulcateColorsForMarkedAndCoverd()
+  private void calulcateColorsForMarkedAndCovered(Map<String, Long> markedAndCovered)
   {
     if (markedAndCovered != null)
     {
-      for (Entry<SNode, Long> markedEntry : markedAndCovered.entrySet())
+      for (Entry<String, Long> markedEntry : markedAndCovered.entrySet())
       {
         int color = Math.max(0, Math.min((int) markedEntry.getValue().
           longValue()
           - 1,
           MatchedNodeColors.values().length - 1));
-        RelannisNodeFeature feat = RelannisNodeFeature.extract(markedEntry.
-          getKey());
+        SNode n = result.getSDocumentGraph().getSNode(markedEntry.getKey());
+        RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
 
         if (feat != null)
         {
@@ -352,10 +366,10 @@ public class SingleResultPanel extends CssLayout implements
     } // end if markedAndCovered not null
   }
 
-  private Map<SNode, Long> calculateMarkedAndCoveredIDs(
+  private Map<String, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Map<SNode, Long> initialCovered = new HashMap<SNode, Long>();
+    Map<String, Long> initialCovered = new HashMap<String, Long>();
 
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
@@ -366,7 +380,7 @@ public class SingleResultPanel extends CssLayout implements
 
       if (match != null)
       {
-        initialCovered.put(n, match);
+        initialCovered.put(n.getSId(), match);
       }
     }
 
@@ -374,17 +388,18 @@ public class SingleResultPanel extends CssLayout implements
     SingleResultPanel.CoveredMatchesCalculator cmc = new SingleResultPanel.CoveredMatchesCalculator(
       doc.
       getSDocumentGraph(), initialCovered);
-    Map<SNode, Long> covered = cmc.getMatchedAndCovered();
+    Map<String, Long> covered = cmc.getMatchedAndCovered();
 
     if (segmentationName != null)
     {
       // filter token
       Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
-      for (Map.Entry<SNode, Long> e : covered.entrySet())
+      for (Map.Entry<String, Long> e : covered.entrySet())
       {
-        if (e.getKey() instanceof SToken)
+        SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
+        if (n instanceof SToken)
         {
-          coveredToken.put((SToken) e.getKey(), e.getValue());
+          coveredToken.put((SToken) n, e.getValue());
         }
       }
 
@@ -393,7 +408,7 @@ public class SingleResultPanel extends CssLayout implements
         RelannisNodeFeature featSegNode = (RelannisNodeFeature) segNode.
           getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
-        if (!covered.containsKey(segNode))
+        if (!covered.containsKey(segNode.getSId()))
         {
           long leftTok = featSegNode.getLeftToken();
           long rightTok = featSegNode.getRightToken();
@@ -407,7 +422,7 @@ public class SingleResultPanel extends CssLayout implements
             if (entryTokenIndex <= rightTok && entryTokenIndex >= leftTok)
             {
               // add this segmentation node to the covered set
-              covered.put(segNode, e.getValue());
+              covered.put(segNode.getSId(), e.getValue());
               break;
             }
           } // end for each covered token
@@ -456,19 +471,18 @@ public class SingleResultPanel extends CssLayout implements
   {
     try
     {
-      ResolverEntry[] entries
-        = resolverProvider.getResolverEntries(result);
+      ResolverEntry[] entries 
+        = resolverProvider == null ? new ResolverEntry[0] 
+        : resolverProvider.getResolverEntries(result);
       visualizers = new LinkedList<VisualizerPanel>();
       List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
-
-      token = result.getSDocumentGraph().getSortedSTokenByText();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
         result.getSDocumentGraph());
 
-      markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
-      calulcateColorsForMarkedAndCoverd();
+      Map<String, Long> markedAndCovered = calculateMarkedAndCoveredIDs(result, segNodes);
+      calulcateColorsForMarkedAndCovered(markedAndCovered);
 
       String resultID = "" + new Random().nextInt(Integer.MAX_VALUE);
 
@@ -478,7 +492,7 @@ public class SingleResultPanel extends CssLayout implements
 
         VisualizerPanel p = new VisualizerPanel(
           entries[i], result, corpusName, documentName,
-          token, visibleTokenAnnos, markedAndCovered,
+          visibleTokenAnnos, markedAndCovered,
           markedCoveredMap, markedExactMap,
           htmlID, resultID, this, segmentationName, ps, instanceConfig);
 
@@ -540,7 +554,7 @@ public class SingleResultPanel extends CssLayout implements
       (VisualizerContextChanger) this, left);
   }
 
-  private class AddNewItemHandler implements AbstractSelect.NewItemHandler
+  private static class AddNewItemHandler implements AbstractSelect.NewItemHandler
   {
 
     final private ComboBox combobox;
@@ -642,12 +656,12 @@ public class SingleResultPanel extends CssLayout implements
   public static class CoveredMatchesCalculator implements SGraphTraverseHandler
   {
 
-    private Map<SNode, Long> matchedAndCovered;
+    private Map<String, Long> matchedAndCovered;
 
     private long currentMatchPos;
 
     public CoveredMatchesCalculator(SDocumentGraph graph,
-      Map<SNode, Long> initialMatches)
+      Map<String, Long> initialMatches)
     {
       this.matchedAndCovered = initialMatches;
 
@@ -689,9 +703,10 @@ public class SingleResultPanel extends CssLayout implements
           }
         });
 
-      for (Map.Entry<SNode, Long> entry : initialMatches.entrySet())
+      for (Map.Entry<String, Long> entry : initialMatches.entrySet())
       {
-        sortedByOverlappedTokenIntervall.put(entry.getKey(), entry.getValue());
+        SNode n = graph.getSNode(entry.getKey());
+        sortedByOverlappedTokenIntervall.put(n, entry.getValue());
       }
 
       currentMatchPos = 1;
@@ -709,11 +724,13 @@ public class SingleResultPanel extends CssLayout implements
       String traversalId, SNode currNode, SRelation edge, SNode fromNode,
       long order)
     {
-      if (matchedAndCovered.containsKey(fromNode) && !matchedAndCovered.
-        containsKey(currNode))
+      if (fromNode != null
+        && matchedAndCovered.containsKey(fromNode.getSId()) 
+        && currNode != null
+        && !matchedAndCovered.containsKey(currNode.getSId()))
       {
-        currentMatchPos = matchedAndCovered.get(fromNode);
-        matchedAndCovered.put(currNode, currentMatchPos);
+        currentMatchPos = matchedAndCovered.get(fromNode.getSId());
+        matchedAndCovered.put(currNode.getSId(), currentMatchPos);
       }
 
     }
@@ -739,13 +756,13 @@ public class SingleResultPanel extends CssLayout implements
       }
     }
 
-    public Map<SNode, Long> getMatchedAndCovered()
+    public Map<String, Long> getMatchedAndCovered()
     {
       return matchedAndCovered;
     }
   }
 
-  private class MinMax
+  private static class MinMax
   {
 
     String segName = "tokens";
@@ -772,17 +789,21 @@ public class SingleResultPanel extends CssLayout implements
       {
         for (SToken t : sTokens)
         {
-          RelannisNodeFeature f = (RelannisNodeFeature) t.getSFeature(ANNIS_NS,
-            FEAT_RELANNIS_NODE).getValue();
-
-          if (minMax.min > f.getTokenIndex())
+          SFeature feature = t.getSFeature(ANNIS_NS,
+            FEAT_RELANNIS_NODE);
+          if(feature != null && feature.getValue() instanceof RelannisNodeFeature)
           {
-            minMax.min = f.getTokenIndex();
-          }
+            RelannisNodeFeature f = (RelannisNodeFeature) feature.getValue();
 
-          if (minMax.max < f.getTokenIndex())
-          {
-            minMax.max = f.getTokenIndex();
+            if (minMax.min > f.getTokenIndex())
+            {
+              minMax.min = f.getTokenIndex();
+            }
+
+            if (minMax.max < f.getTokenIndex())
+            {
+              minMax.max = f.getTokenIndex();
+            }
           }
         }
       }
@@ -810,6 +831,9 @@ public class SingleResultPanel extends CssLayout implements
       }
     }
 
+    minMax.min++;
+    minMax.max++;
+    
     return minMax;
   }
 
@@ -832,4 +856,11 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.setEnabled(true);
     rghtCtxCombo.setEnabled(true);
   }
+
+  protected SDocument getResult()
+  {
+    return result;
+  }
+  
+  
 }

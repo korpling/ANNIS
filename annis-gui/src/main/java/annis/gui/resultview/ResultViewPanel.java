@@ -25,13 +25,12 @@ import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
-import annis.libgui.VisibleTokenAnnoChanger;
+import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -44,6 +43,11 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,6 +62,7 @@ import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -65,7 +70,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class ResultViewPanel extends VerticalLayout implements
-  OnLoadCallbackExtension.Callback, VisibleTokenAnnoChanger
+  OnLoadCallbackExtension.Callback
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -77,6 +82,8 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
+
+  public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
   private PagingComponent paging;
 
@@ -173,8 +180,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
-
-    VaadinSession.getCurrent().setAttribute(VisibleTokenAnnoChanger.class.getName(), this);
   }
 
   /**
@@ -366,12 +371,70 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void updateVariables(SaltProject p)
   {
-    segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
-    tokenAnnotationLevelSet.addAll(CommonHelper.
-      getTokenAnnotationLevelSet(p));
+    segmentationLayerSet.addAll(getSegmentationNames(p));
+    tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+    Set<String> hiddenTokenAnnos = null;
+
+    Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
+
+    for (String corpusName : corpusNames)
+    {
+
+      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName);
+
+      if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS))
+      {
+        hiddenTokenAnnos = new HashSet<String>(
+          Arrays.asList(
+            StringUtils.split(
+              corpusConfig.getConfig(MAPPING_HIDDEN_ANNOS), ",")
+          )
+        );
+      }
+    }
+
+    if (hiddenTokenAnnos != null)
+    {
+      for (String tokenLevel : hiddenTokenAnnos)
+      {
+        if (tokenAnnotationLevelSet.contains(tokenLevel))
+        {
+          tokenAnnotationLevelSet.remove(tokenLevel);
+        }
+      }
+    }
 
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
+  }
+  
+  private Set<String> getSegmentationNames(SaltProject p)
+  {
+    Set<String> result = new TreeSet<String>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        if (g != null)
+        {
+          // collect the start nodes of a segmentation chain of length 1
+          for (SNode n : g.getSNodes())
+          {
+            SFeature feat
+              = n.getSFeature(AnnisConstants.ANNIS_NS,
+                AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+            if (feat != null && feat.getSValueSTEXT() != null)
+            {
+              result.add(feat.getSValueSTEXT());
+            }
+          }
+        } // end if graph not null
+      }
+    }
+    
+    return result;
   }
 
   public void setCount(int count)
@@ -484,7 +547,6 @@ public class ResultViewPanel extends VerticalLayout implements
     } // end iterate for segmentation layer
   }
 
-  @Override
   public void updateVisibleToken(Set<String> tokenAnnotationLevelSet)
   {
     // if no token annotations are there, do not show this mneu
@@ -499,39 +561,45 @@ public class ResultViewPanel extends VerticalLayout implements
     }
 
     // add new annotations
-    for (String s : tokenAnnotationLevelSet)
+    if(tokenAnnotationLevelSet != null)
     {
-      if (!tokenAnnoVisible.containsKey(s))
+      for (String s : tokenAnnotationLevelSet)
       {
-        tokenAnnoVisible.put(s, Boolean.TRUE);
+        if (!tokenAnnoVisible.containsKey(s))
+        {
+          tokenAnnoVisible.put(s, Boolean.TRUE);
+        }
       }
     }
 
     miTokAnnos.removeChildren();
 
-    for (String a : tokenAnnotationLevelSet)
+    if (tokenAnnotationLevelSet != null)
     {
-      MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+      for (final String a : tokenAnnotationLevelSet)
       {
-        @Override
-        public void menuSelected(MenuItem selectedItem)
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
         {
-
-          if (selectedItem.isChecked())
+          @Override
+          public void menuSelected(MenuItem selectedItem)
           {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
-          }
-          else
-          {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
-          }
 
-          setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
-        }
-      });
+            if (selectedItem.isChecked())
+            {
+              tokenAnnoVisible.put(a, Boolean.TRUE);
+            }
+            else
+            {
+              tokenAnnoVisible.put(a, Boolean.FALSE);
+            }
 
-      miSingleTokAnno.setCheckable(true);
-      miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+            setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
+          }
+        });
+
+        miSingleTokAnno.setCheckable(true);
+        miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+      }
     }
   }
 

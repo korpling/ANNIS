@@ -35,9 +35,11 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
+import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
@@ -625,7 +627,7 @@ public class QueryServiceImpl implements QueryService
     {
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:config:" + toplevelName);
-      Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
+      Properties tmp = annisDao.getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
       corpusConfig.setConfig(tmp);
@@ -670,6 +672,29 @@ public class QueryServiceImpl implements QueryService
       throw new WebApplicationException(500);
     }
   }
+  
+  @GET
+  @Path("corpora/{top}/segmentation-names")
+  @Produces("application/xml")
+  public SegmentationList segmentationNames(
+    @PathParam("top") String toplevelCorpus) throws WebApplicationException
+  {
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      user.checkPermission("query:annotations:" + toplevelCorpus);
+
+      List<Long> corpusList = new ArrayList<Long>();
+      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+    }
+    catch (Exception ex)
+    {
+      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
+      throw new WebApplicationException(500);
+    }
+  }
 
   /**
    * Return true if this is a valid query or throw exception when invalid
@@ -699,9 +724,15 @@ public class QueryServiceImpl implements QueryService
   {
     QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
     List<QueryNode> nodes = new LinkedList<QueryNode>();
+    int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
     {
-      nodes.addAll(alternative);
+      for(QueryNode n : alternative)
+      {
+        n.setAlternativeNumber(i);
+        nodes.add(n);
+      }
+      i++;
     }
     return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
@@ -1178,5 +1209,20 @@ public class QueryServiceImpl implements QueryService
     RawTextWrapper result = new RawTextWrapper();
     result.setTexts(annisDao.getRawText(top, docname));
     return result;
+  }
+
+  @GET
+  @Path("corpora/doc_browser_config/{corpus}")
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public DocumentBrowserConfig getDocumentBrowserConfig(
+    @PathParam("corpus") String corpus)
+  {
+    DocumentBrowserConfig config = annisDao.getDocBrowserConfiguration(corpus);
+    if(config == null)
+    {
+      config = annisDao.getDefaultDocBrowserConfiguration();
+    }
+
+    return (config != null) ? config : null;
   }
 }

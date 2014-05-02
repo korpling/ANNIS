@@ -76,7 +76,7 @@ public class SpanHTMLOutputter
     
     SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
     
-    String value = "";
+    String value;
     // output to an inner text node
     switch(type)
     {
@@ -88,6 +88,9 @@ public class SpanHTMLOutputter
         break;
       case ANNO_NAME:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        break;
+      default:
+        value = "";
         break;
     }
     outputAny(left, right, matchedQName, value, outputStartTags, outputEndTags);
@@ -103,7 +106,7 @@ public class SpanHTMLOutputter
     
     long index = feat.getTokenIndex();
     
-    String value = "";
+    String value;
     
     switch(type)
     {
@@ -115,6 +118,9 @@ public class SpanHTMLOutputter
         break;
       case ANNO_NAME:
         value = "tok";
+        break;
+      default:
+        value = "";
         break;
     }
     outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    

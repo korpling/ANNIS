@@ -72,8 +72,14 @@ public class PlainTextMatchGroupProvider implements
 
     OutputStreamWriter writer = new OutputStreamWriter(entityStream,
       Charsets.UTF_8);
-    writer.append(match.toString());
-
+    try
+    {
+      writer.append(match.toString());
+    }
+    finally
+    {
+      writer.close();
+    }
   }
 
   @Override

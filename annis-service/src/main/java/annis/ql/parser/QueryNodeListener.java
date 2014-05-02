@@ -232,12 +232,14 @@ public class QueryNodeListener extends AqlParserBaseListener
   protected static QueryNode.TextMatching textMatchingFromSpec(
     AqlParser.TextSpecContext txt, boolean not)
   {
-    if (txt instanceof AqlParser.ExactTextSpecContext)
+    if (txt instanceof AqlParser.ExactTextSpecContext 
+      || txt instanceof AqlParser.EmptyExactTextSpecContext)
     {
       return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : 
         QueryNode.TextMatching.EXACT_EQUAL;
     }
-    else if (txt instanceof AqlParser.RegexTextSpecContext)
+    else if (txt instanceof AqlParser.RegexTextSpecContext
+      || txt instanceof AqlParser.EmptyRegexTextSpecContext)
     {
      return  not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : 
        QueryNode.TextMatching.REGEXP_EQUAL;

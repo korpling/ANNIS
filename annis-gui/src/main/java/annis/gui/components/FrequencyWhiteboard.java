@@ -18,6 +18,7 @@ package annis.gui.components;
 import annis.gui.frequency.FrequencyResultPanel;
 import annis.service.objects.FrequencyTable;
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import java.util.LinkedList;
@@ -34,10 +35,11 @@ import org.json.JSONException;
 {
   "flotr2.js", "vaadin://jquery.js", "frequencychart.js"
 })
-public class FrequencyWhiteboard extends AbstractJavaScriptComponent
+public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements OnLoadCallbackExtension.Callback
 {
-  public final int PIXEL_PER_VALUE = 45;
-  public final int ADDTIONAL_PIXEL_WIDTH = 100;
+  public static final int PIXEL_PER_VALUE = 45;
+  public static final int ADDTIONAL_PIXEL_WIDTH = 100;
+
   public enum Scale
   {
     LINEAR("linear"), LOG10("logarithmic");
@@ -52,6 +54,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
   private List<String> labels;
   private List<Long> values;
   private Scale lastScale;
+  private String lastFont;
+  private float lastFontSize = 10.0f;
   
   public FrequencyWhiteboard(final FrequencyResultPanel freqPanel)
   {  
@@ -68,21 +72,25 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
       }
     });
     
+    
+    OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
+    ext.extend((FrequencyWhiteboard) this);
+    
   }
-  
   @Override
   public void beforeClientResponse(boolean initial)
   {
     super.beforeClientResponse(initial);
-    if(labels != null && values != null && lastScale != null)
+    if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc);
+      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
     }
   }
   
   
   
-  public void setFrequencyData(FrequencyTable table, Scale scale)
+  public void setFrequencyData(FrequencyTable table, Scale scale, String font, 
+    float fontSize)
   {
     labels = new LinkedList<String>();
     values = new LinkedList<Long>();
@@ -94,8 +102,21 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent
     }
     setWidth(ADDTIONAL_PIXEL_WIDTH + (PIXEL_PER_VALUE * values.size()), Unit.PIXELS);
     lastScale = scale;
+    lastFont = font;
+    lastFontSize = fontSize;
     
-//    callFunction("showData", labels, values, scale.desc);
+//    callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+  }
+  
+  
+  @Override
+  public boolean onCompononentLoaded(AbstractClientConnector source)
+  {
+    if(labels != null && values != null && lastScale != null && lastFont != null)
+    {
+      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+    }
+    return true;
   }
   
   

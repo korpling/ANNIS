@@ -22,11 +22,11 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
   
   this.execCallback = function() {
     if(timeoutID) {
-      console.debug("clearing timeout " + timeoutID);
+      //console.debug("clearing timeout " + timeoutID);
       window.clearTimeout(timeoutID);
       timeoutID = null;
     }
-    console.debug("calling component loading callback");
+    //console.debug("calling component loading callback");
     component.loaded();
     
   };
@@ -36,7 +36,7 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
   this.requestRecall = function(delay) {
     if(!timeoutID) {
       timeoutID = window.setTimeout(this.execCallback, delay);
-      console.debug("Setted timeout " + timeoutID);
+      //console.debug("Setted timeout " + timeoutID);
     }
   };
 };

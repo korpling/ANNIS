@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.AnnisBaseRunner;
+import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.service.internal.AnnisServiceRunner;
 import annis.utils.Utils;
@@ -245,7 +246,10 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
-        new ExceptionDialog(ex).setVisible(true);
+        AdministrationDao.ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
   }
 
@@ -437,7 +441,10 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
-        new ExceptionDialog(this, ex).setVisible(true);
+       AdministrationDao.ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
 
     }//GEN-LAST:event_btLaunchActionPerformed

@@ -17,12 +17,15 @@ package annis.gui.docbrowser;
 
 import annis.libgui.Helper;
 import annis.model.Annotation;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.MetaDataColumn;
+import annis.service.objects.OrderBy;
+import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
-import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.server.ComponentSizeValidator;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -32,16 +35,13 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,25 +59,11 @@ public class DocBrowserTable extends Table
 
   private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
 
-  // the key for the visualizer json array list
-  public final String VIS_CONFIG_KEY = "vis";
-
   /**
    * Represents the config of the doc visualizer. If there are meta data names
    * defined, also additional columns are generated
    */
-  private JSONSerializable docVisualizerConfig;
-
-  // the key for the meta cols, which are generated in the main table
-  private final String VIS_META_DATA_COLUMNS = "metaDataColumns";
-
-  // the key for the meta data namespace
-  public final String VIS_META_CONFIG_NAMESPACE = "namespace";
-
-  // the key for the meta data name
-  private final String VIS_META_CONFIG_NAME = "name";
-
-  private final String ORDER_BY = "orderBy";
+  private DocumentBrowserConfig docVisualizerConfig;
 
   // cache for doc meta data
   private final Map<String, List<Annotation>> docMetaDataCache;
@@ -120,37 +106,42 @@ public class DocBrowserTable extends Table
 
       // reverse path and delete the brackets and set a new separator:
       // corpus > ... > subcorpus > document
-      List<String> pathList = Arrays.asList(StringUtils.split(
-        a.getAnnotationPath().substring(
-          1, a.getAnnotationPath().length() - 2), ",")
-      );
+      List<String> pathList = a.getAnnotationPath();
+      if (pathList == null)
+      {
+        pathList = new LinkedList<String>();
+      }
+
       Collections.reverse(pathList);
       String path = StringUtils.join(pathList, " > ");
 
       // use corpus path for row id, since it should be unique by annis db schema
       Item row = container.addItem(path);
-      row.getItemProperty("document name").setValue(doc);
-
-      // add the metadata columns.
-      for (MetaDataCol metaDataCol : metaCols.visibleColumns)
+      if(row != null)
       {
-        String value = generateCell(a.getAnnotationPath(), metaDataCol);
-        row.getItemProperty(metaDataCol.getColName()).setValue(value);
-      }
+        row.getItemProperty("document name").setValue(doc);
 
-      for (MetaDataCol metaDataCol : metaCols.sortColumns)
-      {
-        if (!metaCols.visibleColumns.contains(metaDataCol))
+        // add the metadata columns.
+        for (MetaDataCol metaDataCol : metaCols.visibleColumns)
         {
-          // corpusName() holds the corpus path
           String value = generateCell(a.getAnnotationPath(), metaDataCol);
           row.getItemProperty(metaDataCol.getColName()).setValue(value);
         }
-      }
 
-      row.getItemProperty("corpus path").setValue(path);
-      row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
-      row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+        for (MetaDataCol metaDataCol : metaCols.sortColumns)
+        {
+          if (!metaCols.visibleColumns.contains(metaDataCol))
+          {
+            // corpusName() holds the corpus path
+            String value = generateCell(a.getAnnotationPath(), metaDataCol);
+            row.getItemProperty(metaDataCol.getColName()).setValue(value);
+          }
+        }
+
+        row.getItemProperty("corpus path").setValue(path);
+        row.getItemProperty("visualizer").setValue(generateVisualizerLinks(doc));
+        row.getItemProperty("info").setValue(generateInfoButtonCell(doc));
+      }
     }
 
     setContainerDataSource(container);
@@ -186,69 +177,30 @@ public class DocBrowserTable extends Table
 
     MetaColumns metaColumns = new MetaColumns();
 
-    try
+    if (docVisualizerConfig == null)
     {
-      if (docVisualizerConfig.has(VIS_META_DATA_COLUMNS))
+      return metaColumns;
+    }
+
+    if (docVisualizerConfig.getMetaDataColumns() != null)
+    {
+      MetaDataColumn[] metaDataCols = docVisualizerConfig.getMetaDataColumns();
+      for (MetaDataColumn metaDataCol : metaDataCols)
       {
-        JSONArray metaArray = docVisualizerConfig.getJSONArray(
-          VIS_META_DATA_COLUMNS);
-
-        for (int i = 0; i < metaArray.length(); i++)
-        {
-          JSONSerializable c = new JSONSerializable(metaArray.getJSONObject(i));
-          String namespace = null;
-          String name = null;
-
-          if (c.has(VIS_META_CONFIG_NAMESPACE))
-          {
-            namespace = c.getString(VIS_META_CONFIG_NAMESPACE);
-          }
-
-          if (c.has(VIS_META_CONFIG_NAME))
-          {
-            name = c.getString(VIS_META_CONFIG_NAME);
-          }
-
-          metaColumns.visibleColumns.add(new MetaDataCol(namespace, name));
-        }
-
-      }
-
-      if (docVisualizerConfig.has(ORDER_BY))
-      {
-
-        JSONArray sortColumns = docVisualizerConfig.getJSONArray(ORDER_BY);
-
-        for (int i = 0; i < sortColumns.length(); i++)
-        {
-          JSONSerializable c = new JSONSerializable(sortColumns.getJSONObject(i));
-          String nameSpace = null;
-          String name = null;
-          boolean ascending = true;
-
-          if (c.has(VIS_META_CONFIG_NAMESPACE))
-          {
-            nameSpace = c.getString(VIS_META_CONFIG_NAMESPACE);
-          }
-
-          if (c.has(VIS_META_CONFIG_NAME))
-          {
-            name = c.getString(VIS_META_CONFIG_NAME);
-          }
-
-          if (c.has("ascending"))
-          {
-            ascending = c.getBoolean("ascending");
-          }
-
-          metaColumns.sortColumns.add(
-            new MetaDataCol(nameSpace, name, ascending));
-        }
+        metaColumns.visibleColumns.add(new MetaDataCol(metaDataCol.
+          getNamespace(),
+          metaDataCol.getName()));
       }
     }
-    catch (JSONException ex)
+
+    if (docVisualizerConfig.getOrderBy() != null)
     {
-      log.error("cannot retrieve meta array from doc visualizer config", ex);
+      OrderBy[] orderBys = docVisualizerConfig.getOrderBy();
+      for (OrderBy orderBy : orderBys)
+      {
+        metaColumns.sortColumns.add(new MetaDataCol(orderBy.getNamespace(),
+          orderBy.getName(), orderBy.isAscending()));
+      }
     }
 
     return metaColumns;
@@ -289,16 +241,39 @@ public class DocBrowserTable extends Table
 
           List<Annotation> annos = getDocMetaData(docName);
 
+          /**
+           * Transforms to a list of key value pairs. The values concates the
+           * namespace and ordinary value. Namespaces "NULL" are ignored.
+           */
           // create datasource and bind it to a table
-          BeanItemContainer<Annotation> dataSource = new BeanItemContainer<Annotation>(
-            Annotation.class, annos);
+          IndexedContainer container = new IndexedContainer();
+          container.addContainerProperty("key", String.class, "");
+          container.addContainerProperty("value", String.class, "");
+
+          for (Annotation a : annos)
+          {
+            String key = a.getQualifiedName();
+            String value = a.getValue();
+            Item row = container.addItem(key);
+            row.getItemProperty("key").setValue(key);
+            row.getItemProperty("value").setValue(value);
+          }
+
           Table metaTable = new Table();
-          metaTable.setContainerDataSource(dataSource);
+          metaTable.setContainerDataSource(container);
+
+          metaTable.sort(new Object[]
+          {
+            "key"
+          }, new boolean[]
+          {
+            true
+          });
 
           // style the table
           metaTable.setVisibleColumns(new Object[]
           {
-            "name", "value"
+            "key", "value"
           });
           metaTable.setColumnHeaders("name", "value");
           metaTable.setSizeFull();
@@ -365,27 +340,26 @@ public class DocBrowserTable extends Table
     Panel p = new Panel();
     VerticalLayout l = new VerticalLayout();
     p.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    try
-    {
-      JSONArray configArray = docVisualizerConfig.getJSONArray(VIS_CONFIG_KEY);
 
-      for (int i = 0; i < configArray.length(); i++)
-      {
-        JSONSerializable config = new JSONSerializable(configArray.
-          getJSONObject(i));
-        Button openVis = new Button(config.getString("displayName"));
-        openVis.setDescription(
-          "open visualizer with the full text of " + docName);
-        openVis.addClickListener(new OpenVisualizerWindow(docName, config,
-          openVis));
-        openVis.setStyleName(BaseTheme.BUTTON_LINK);
-        openVis.setDisableOnClick(true);
-        l.addComponent(openVis);
-      }
-    }
-    catch (JSONException ex)
+    if(docVisualizerConfig != null)
     {
-      log.error("cannnot retrieve json object", ex);
+      Visualizer[] visualizers = docVisualizerConfig.
+        getVisualizers();
+
+      if(visualizers != null)
+      {
+        for (Visualizer visualizer : visualizers)
+        {
+          Button openVis = new Button(visualizer.getDisplayName());
+          openVis.setDescription(
+            "open visualizer with the full text of " + docName);
+          openVis.addClickListener(new OpenVisualizerWindow(docName, visualizer,
+            openVis));
+          openVis.setStyleName(BaseTheme.BUTTON_LINK);
+          openVis.setDisableOnClick(true);
+          l.addComponent(openVis);
+        }
+      }
     }
 
     p.setContent(l);
@@ -403,11 +377,11 @@ public class DocBrowserTable extends Table
 
     private String docName;
 
-    private JSONSerializable config;
+    private Visualizer config;
 
     private final Button button;
 
-    public OpenVisualizerWindow(String docName, JSONSerializable config,
+    public OpenVisualizerWindow(String docName, Visualizer config,
       Button btn)
     {
       this.button = btn;
@@ -418,7 +392,6 @@ public class DocBrowserTable extends Table
     @Override
     public void buttonClick(Button.ClickEvent event)
     {
-
       docBrowserPanel.openVis(docName, config, button);
     }
   }
@@ -427,10 +400,10 @@ public class DocBrowserTable extends Table
    * Retrieves date from the cache or from the annis rest service for a specific
    * document.
    *
-   * @param path The document the data are fetched for.
+   * @param document The document the data are fetched for.
    * @return The a list of meta data. Can be empty but never null.
    */
-  private List<Annotation> getDocMetaData(String path)
+  private List<Annotation> getDocMetaData(String document)
   {
     // lookup up meta data in the cache
     if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
@@ -438,7 +411,7 @@ public class DocBrowserTable extends Table
       // get the metadata of a specific doc
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
-          docBrowserPanel.getCorpus()).path("closure");
+        docBrowserPanel.getCorpus()).path("closure");
       docMetaDataCache.put(docBrowserPanel.getCorpus(),
         res.get(new Helper.AnnotationListType()));
     }
@@ -448,7 +421,9 @@ public class DocBrowserTable extends Table
     // filter the annotations
     for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
     {
-      if (a.getAnnotationPath().equals(path))
+      if (a.getAnnotationPath() != null
+        && !a.getAnnotationPath().isEmpty()
+        && a.getAnnotationPath().get(0).equals(document))
       {
         annos.add(a);
       }
@@ -457,9 +432,13 @@ public class DocBrowserTable extends Table
     return annos;
   }
 
-  private String generateCell(String path, MetaDataCol metaDatum)
+  private String generateCell(List<String> path, MetaDataCol metaDatum)
   {
-    List<Annotation> metaData = getDocMetaData(path);
+    List<Annotation> metaData = new LinkedList<Annotation>();
+    if (path != null && !path.isEmpty())
+    {
+      metaData = getDocMetaData(path.get(path.size()-1));
+    }
 
     // lookup meta data
     for (Annotation a : metaData)
@@ -482,7 +461,7 @@ public class DocBrowserTable extends Table
     return "n/a";
   }
 
-  private class MetaColumns
+  private static class MetaColumns
   {
 
     List<MetaDataCol> visibleColumns;
@@ -496,7 +475,7 @@ public class DocBrowserTable extends Table
     }
   }
 
-  private class MetaDataCol
+  private static class MetaDataCol
   {
 
     String namespace;

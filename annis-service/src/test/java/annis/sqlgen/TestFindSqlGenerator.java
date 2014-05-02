@@ -1,7 +1,7 @@
 package annis.sqlgen;
 
 import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.text.StringStartsWith.startsWith;
+import static org.hamcrest.Matchers.startsWith;
 import static org.junit.Assert.assertThat;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.MockitoAnnotations.initMocks;
