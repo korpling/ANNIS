@@ -506,6 +506,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
     computeSpanFromSegmentation();
+    log.info("setting \"continuous\" to a correct value");
+    executeSqlFromScript("set_continuous.sql");
+    log.info("removing unnecessary span relations");
+    executeSqlFromScript("remove_span_relations.sql");
 
     applyConstraints();
     analyzeStagingTables();
@@ -515,7 +519,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeCorpusPath(corpusID);
 
     createAnnotations(corpusID);
-
+    
     // create the new facts table partition
     createFacts(corpusID);
 

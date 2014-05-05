@@ -175,10 +175,6 @@ FROM
     LEFT JOIN _node_annotation ON (_node_annotation.node_ref = _node.id)
     LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
   WHERE
-    _node.toplevel_corpus = :id AND
-    -- we don't want to include continuous span edges since we can reconstruct 
-    -- them from the left/right_token values of the span nodes
-    -- FIXME: check if parent is continuous, not the target node
-    (_node.token_index IS NULL OR _component.type <> 'c' OR _node.continuous IS FALSE)
+    _node.toplevel_corpus = :id
 ) as tmp
 ;
