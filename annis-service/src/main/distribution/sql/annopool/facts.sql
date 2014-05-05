@@ -117,14 +117,14 @@ SELECT
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
+                                  edge_anno_ref) = 1) AS n_r_c_ea_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
-                                  component_id) = 1) AS n_r_c_rownum,
+                                  component_id) = 1) AS n_r_c_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_rownum
+                                  node_anno_ref) = 1) AS n_r_c_na_sample
 FROM
 (
   SELECT
@@ -175,6 +175,10 @@ FROM
     LEFT JOIN _node_annotation ON (_node_annotation.node_ref = _node.id)
     LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
   WHERE
-    _node.toplevel_corpus = :id
+    _node.toplevel_corpus = :id AND
+    -- we don't want to include continuous span edges since we can reconstruct 
+    -- them from the left/right_token values of the span nodes
+    -- FIXME: check if parent is continuous, not the target node
+    (_node.token_index IS NULL OR _component.type <> 'c' OR _node.continuous IS FALSE)
 ) as tmp
 ;
