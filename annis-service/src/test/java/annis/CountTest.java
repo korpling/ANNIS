@@ -130,6 +130,7 @@ public class CountTest
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
     assertEquals(2, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" > \"was\""));
     assertEquals(1, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" >secedge \"was\""));
+    assertEquals(1, countPcc2("pos=/V.FIN/ ->dep[func=\"sbj\"] \"Jugendliche\" & cat=\"S\" & #3 >secedge #2 | \"ja\""));
     
   }
 

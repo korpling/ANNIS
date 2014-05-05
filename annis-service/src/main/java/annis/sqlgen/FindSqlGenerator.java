@@ -90,6 +90,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
     }
     
+    // add additional empty columns in or clauses with different node sizes
+    for (i = alternative.size() + 1; i <= maxWidth; ++i)
+    {
+      cols.add("NULL::bigint AS id" + i);
+      if(outputCorpusPath)
+      {      
+        cols.add("NULL::varchar AS node_name" + i);
+      }
+    }
+    
     if(!alternative.isEmpty() && outputCorpusPath)
     {
       
@@ -98,16 +108,6 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE, "corpus_ref");
       cols.add("(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias 
         + " LIMIT 1) AS path_name");
-    }
-
-    for (i = alternative.size() + 1; i <= maxWidth; ++i)
-    {
-      cols.add("NULL::bigint AS id" + i);
-      cols.add("NULL::varchar AS node_name" + i);
-      if(outputCorpusPath)
-      {
-        cols.add("NULL::varchar[] AS path_name" + i);
-      }
     }
 
     if(outputToplevelCorpus)
