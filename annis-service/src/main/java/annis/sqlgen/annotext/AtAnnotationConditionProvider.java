@@ -90,12 +90,12 @@ public class AtAnnotationConditionProvider implements
     else if(tm == TextMatching.REGEXP_EQUAL)
     {
       conditions.add(tas.aliasedColumn(table, column) 
-        + " ~ '" + prefix + val + "'");
+        + " ~ '^(" + prefix + val + ")$'");
     }
     else if(tm == TextMatching.REGEXP_NOT_EQUAL)
     {
       conditions.add(tas.aliasedColumn(table, column) 
-        + " !~ '" + prefix + val + "'");
+        + " !~ '^(" + prefix + val + ")$'");
     }
   }
 
