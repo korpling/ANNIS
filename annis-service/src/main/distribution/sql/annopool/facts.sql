@@ -117,14 +117,14 @@ SELECT
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_rownum,
+                                  edge_anno_ref) = 1) AS n_r_c_ea_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
-                                  component_id) = 1) AS n_r_c_rownum,
+                                  component_id) = 1) AS n_r_c_sample,
   (row_number() OVER (PARTITION BY id,
                                   parent,
                                   component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_rownum
+                                  node_anno_ref) = 1) AS n_r_c_na_sample
 FROM
 (
   SELECT
@@ -170,9 +170,9 @@ FROM
     ) AS edge_anno_ref
   FROM
     _node
-    JOIN _rank ON (_rank.node_ref = _node.id)
-    JOIN _component ON (_rank.component_ref = _component.id)
     LEFT JOIN _node_annotation ON (_node_annotation.node_ref = _node.id)
+    LEFT JOIN _rank ON (_rank.node_ref = _node.id)
+    LEFT JOIN _component ON (_rank.component_ref = _component.id)
     LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
   WHERE
     _node.toplevel_corpus = :id
