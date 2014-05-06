@@ -350,7 +350,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     Map<String, ComponentEntry> componentForSpan,
     AtomicInteger numberOfEdges)
   { 
-    int edgeNameCounter = 0;
     
     // add the missing spanning relations for each continuous span of the graph
     for(SSpan span : graph.getSSpans())
@@ -381,12 +380,11 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
             if(missing)
             {
-              String edgeName = "ANNISAutomaticGenSpan_" + edgeNameCounter++;
               String type = "c";
 
               SLayer layer = findOrAddSLayer(spanComponent.getNamespace(), graph);
               
-              createNewRelation(graph, span, tok, edgeName, type, 
+              createNewRelation(graph, span, tok, null, type, 
                 spanComponent.getId(), layer, 
                 0, pre++, nodeByPre, numberOfEdges);
             }
