@@ -17,5 +17,5 @@ AND NOT EXISTS (
 	AND child_component.id = child_rank.component_ref
 	AND parent_node.continuous = false
 ) AND NOT EXISTS (
-  SELECT 1 FROM _edge_annotation WHERE rank_ref = child_rank.id
+  SELECT 1 FROM _edge_annotation WHERE rank_ref = child_rank.pre
 )
