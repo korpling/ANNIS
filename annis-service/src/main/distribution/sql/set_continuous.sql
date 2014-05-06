@@ -1,8 +1,9 @@
 -- This will set the "continous" property of the spans correctly
 
 UPDATE _node AS parent_node SET continuous = false
-WHERE
-parent_node.continuous = true
+WHERE 
+parent_node.continuous = true 
+AND parent_node.token_index IS NULL -- exclude token explicitly since they are part of 'c' components
 AND EXISTS
 (
 	SELECT generate_series(parent_node.left_token, parent_node.right_token) AS s
@@ -16,6 +17,14 @@ AND EXISTS
 		AND parent_rank.node_ref = parent_node.id
 		AND child_rank.parent = parent_rank.pre
 		AND child_rank.component_ref = parent_rank.component_ref
-		AND child_node.token_index IS NOT NULL
-);
-
+		AND child_node.token_index IS NOT NULL 
+)
+-- restrict to spans by selecting nodes that are part of a c-component
+AND EXISTS (
+  SELECT 1 FROM _rank, _component
+  WHERE
+    component_ref = _component.id
+    AND node_ref = parent_node.id
+    AND "type" = 'c'
+)
+;
