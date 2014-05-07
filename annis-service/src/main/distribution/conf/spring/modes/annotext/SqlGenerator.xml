@@ -43,8 +43,7 @@ limitations under the License.
         parent="matrixSqlGeneratorBase" lazy-init="true">
   </bean>
   
-  <!--TODO: frequency sql generator for each mode -->
-  <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator"
+  <bean id="frequencySqlGenerator" class="annis.sqlgen.annotext.AtFrequencySqlGenerator"
         parent="frequencySqlGeneratorBase" lazy-init="true">
   </bean>
 
