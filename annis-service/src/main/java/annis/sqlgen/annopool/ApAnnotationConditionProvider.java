@@ -15,7 +15,6 @@
  */
 package annis.sqlgen.annopool;
 
-import annis.model.Annotation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;

@@ -21,9 +21,14 @@ import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import java.util.List;
+import java.util.Set;
+
 /**
  *
  * @author thomas
@@ -31,18 +36,17 @@ import java.util.List;
 public class AtAnnotationConditionProvider implements
   AnnotationConditionProvider
 {
-  
+
   private final Escaper likeEscaper = Escapers.builder()
     .addEscape('\'', "''")
     .addEscape('%', "\\%")
     .addEscape('_', "\\_")
     .addEscape('\\', "\\\\")
     .build();
-  
+
   private final Escaper regexEscaper = Escapers.builder()
     .addEscape('\'', "''")
     .build();
-  
 
   @Override
   public void addAnnotationConditions(List<String> conditions, QueryNode node,
@@ -50,14 +54,14 @@ public class AtAnnotationConditionProvider implements
     TableAccessStrategy tas)
   {
     TextMatching tm = annotation.getTextMatching();
-    
+
     String column = annotation.getNamespace() == null
-       ? "annotext" : "qannotext";
-    
+      ? "annotext" : "qannotext";
+
     Escaper escaper = tm != null && tm.isRegex() ? regexEscaper : likeEscaper;
-    
+
     String val;
-    if(tm == null)
+    if (tm == null)
     {
       val = "%";
     }
@@ -65,9 +69,9 @@ public class AtAnnotationConditionProvider implements
     {
       val = escaper.escape(annotation.getValue());
     }
-    
+
     String prefix;
-    if(annotation.getNamespace() == null)
+    if (annotation.getNamespace() == null)
     {
       prefix = escaper.escape(annotation.getName()) + ":";
     }
@@ -76,25 +80,25 @@ public class AtAnnotationConditionProvider implements
       prefix = escaper.escape(annotation.getNamespace())
         + ":" + escaper.escape(annotation.getName()) + ":";
     }
-    
-    if(tm == null || tm == TextMatching.EXACT_EQUAL)
+
+    if (tm == null || tm == TextMatching.EXACT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column) 
+      conditions.add(tas.aliasedColumn(table, column)
         + " LIKE '" + prefix + val + "'");
     }
-    else if(tm == TextMatching.EXACT_NOT_EQUAL)
+    else if (tm == TextMatching.EXACT_NOT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column) 
+      conditions.add(tas.aliasedColumn(table, column)
         + " NOT LIKE '" + prefix + val + "'");
     }
-    else if(tm == TextMatching.REGEXP_EQUAL)
+    else if (tm == TextMatching.REGEXP_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column) 
+      conditions.add(tas.aliasedColumn(table, column)
         + " ~ '^(" + prefix + val + ")$'");
     }
-    else if(tm == TextMatching.REGEXP_NOT_EQUAL)
+    else if (tm == TextMatching.REGEXP_NOT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column) 
+      conditions.add(tas.aliasedColumn(table, column)
         + " !~ '^(" + prefix + val + ")$'");
     }
   }
@@ -104,10 +108,69 @@ public class AtAnnotationConditionProvider implements
     QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget,
     boolean equal)
   {
-    
-    // TODO: implement equal value condition for annotext
-    
+    String op = equal ? "=" : "<>";
+
+    if (node.isToken() && target.isToken())
+    {
+      // join on span
+      conditions.add(tasNode.aliasedColumn(NODE_TABLE, "span")
+        + " " + op + " " + tasTarget.aliasedColumn(NODE_TABLE, "span"));
+    }
+    else if (haveSameNodeAnnotationDefinitions(
+      node.getNodeAnnotations(), target.getNodeAnnotations()))
+    {
+      // join on node_anno_ref
+      conditions.add(tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
+        + " " + op + " " + tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext"));
+    }
+    else
+    {
+      // most complex query, join on the actual value
+      String left;
+      if (node.isToken())
+      {
+        left = tasNode.aliasedColumn(NODE_TABLE, "span");
+      }
+      else
+      {
+        left = "getAnnoValue("
+          + tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext") 
+          +")";
+      }
+      String right;
+      if (target.isToken())
+      {
+        right = tasTarget.aliasedColumn(NODE_TABLE, "span");
+      }
+      else
+      {
+        right = "getAnnoValue("
+          + tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext") 
+          +")";
+      }
+      conditions.add(left + " " + op + " " + right);
+    }
+
   }
-  
-  
+
+  private boolean haveSameNodeAnnotationDefinitions(
+    Set<QueryAnnotation> sourceAnnos,
+    Set<QueryAnnotation> targetAnnos)
+  {
+    if (sourceAnnos != null && targetAnnos != null
+      && sourceAnnos.size() == 1 && targetAnnos.size() == 1)
+    {
+      QueryAnnotation anno1 = sourceAnnos.iterator().next();
+      QueryAnnotation anno2 = targetAnnos.iterator().next();
+
+      if (Objects.equal(anno1.getNamespace(), anno2.getNamespace())
+        && Objects.equal(anno1.getName(), anno2.getName()))
+      {
+        return true;
+      }
+    }
+
+    return false;
+  }
+
 }
