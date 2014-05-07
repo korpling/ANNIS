@@ -16,21 +16,21 @@
 package annis.sqlgen.annotext;
 
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AbstractFromClauseGenerator;
 import annis.sqlgen.AnnotateSqlGenerator;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import java.util.ArrayList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
-import static annis.sqlgen.SqlConstraints.sqlString;
 
 /**
  *
@@ -52,7 +52,7 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     sb.append(indent).append(TABSTOP);
     sb.append(
       AbstractFromClauseGenerator.tableAliasDefinition(tas, 
-        null, NODE_TABLE, 1, queryData.getCorpusList()));
+        null, NODE_TABLE, 1, corpusList));
     sb.append(",\n");
 
     sb.append(indent).append(TABSTOP);
@@ -151,8 +151,21 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     TableAccessStrategy tas = createTableAccessStrategy();
     List<String> fields = getSelectFields();
     
-    //TODO: implement document query for annotext
+    String template = "SELECT DISTINCT \n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, "
+      +  StringUtils.join(fields, ", ") +", "
+      + "c.path_name as path, c.path_name[1] as document_name\n"
+      + "FROM\n"
+      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + ",\n"
+      + "\tcorpus as c, corpus as toplevel\n"
+      + "WHERE\n"
+      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "\tAND toplevel.top_level IS TRUE\n"
+      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
+      + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
+    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
+      .replace(":document_name", sqlString(documentName));
+    return sql;
     
-    return "TODO";
   }
 }
