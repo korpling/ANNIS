@@ -133,9 +133,9 @@ public class AtAnnotationConditionProvider implements
       }
       else
       {
-        left = "getAnnoValue("
+        left = "(splitanno("
           + tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext") 
-          +")";
+          +"))[3]";
       }
       String right;
       if (target.isToken())
@@ -144,9 +144,9 @@ public class AtAnnotationConditionProvider implements
       }
       else
       {
-        right = "getAnnoValue("
+        right = "(splitanno("
           + tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext") 
-          +")";
+          +"))[3]";
       }
       conditions.add(left + " " + op + " " + right);
     }

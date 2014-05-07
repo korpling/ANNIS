@@ -105,10 +105,10 @@ public class AtFrequencySqlGenerator extends FrequencySqlGenerator
       if(e.getType() == FrequencyTableEntryType.annotation)
       {
         sb
-          .append("getannovalue(")
+          .append("(splitanno(")
           .append("v").append(i).append(".")
           .append(tas.columnName(NODE_ANNOTATION_TABLE, "qannotext"))
-          .append(")");
+          .append("))[3]");
       }
       else
       {
@@ -171,7 +171,7 @@ public class AtFrequencySqlGenerator extends FrequencySqlGenerator
       else
       {
         // filter by selected key
-        conditions.add("getannoname(v" + i + ".node_qannotext) = '" + e.getKey().replaceAll("'",
+        conditions.add("(splitanno(v" + i + ".node_qannotext))[2] = '" + e.getKey().replaceAll("'",
           "''") + "'");
         conditions.add("v" + i + ".n_na_sample IS TRUE" );
         
