@@ -43,7 +43,7 @@ public class CSVHelper
   
   private static final Logger log = LoggerFactory.getLogger(CSVHelper.class);
   
-  public static SortedMap<Integer, SortedSet<String>> exportCSVHeder(
+  public static SortedMap<Integer, SortedSet<String>> exportCSVHeader(
     Iterator<AnnotatedMatch> matches, PrintWriter w)
   {
     // figure out what annotations are used at each match position

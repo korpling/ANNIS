@@ -15,11 +15,12 @@
  */
 package annis.sqlgen.annotext;
 
-import static annis.sqlgen.TableAccessStrategy.*;
 
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import annis.sqlgen.MatrixSqlGenerator;
 import annis.sqlgen.TableAccessStrategy;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 
@@ -38,15 +39,31 @@ public class AtMatrixSqlGenerator extends MatrixSqlGenerator
     // get all the original outer joins
     super.addFromOuterJoins(sb, queryData, tas, indent);
 
-    // TODO: implement matrix outer join definition for annotext
+    List<Long> corpusList = queryData.getCorpusList();
+    
+    String factsName = tas.partitionTableName(NODE_TABLE, corpusList);
+    
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ").append(factsName).append(" AS node_anno")
+      .append(" ON  (")
+      .append(tas.aliasedColumn(NODE_TABLE, "id")).append(
+        " = node_anno.id AND ")
+      .append("node_anno.n_na_sample IS TRUE AND ")
+      .append(tas.aliasedColumn(NODE_TABLE,
+          "toplevel_corpus")).append(
+        " = node_anno.toplevel_corpus AND ")
+      .append("node_anno.toplevel_corpus IN (").append(StringUtils.
+        join(corpusList, ", "))
+      .append("))");
+
+    sb.append("\n");
 
   }
 
   @Override
   protected String selectAnnotationsString(TableAccessStrategy tas)
   {
-    // TODO: implement matrix select for annotext
-    return "TODO";
+    return "array_agg(DISTINCT node_anno.node_qannotext) AS annotations";
   }
 
   

@@ -69,10 +69,10 @@ public class ApMatrixSqlGenerator extends MatrixSqlGenerator
   @Override
   protected String selectAnnotationsString(TableAccessStrategy tas)
   {
-    return "array_agg(DISTINCT coalesce(" 
-      + "node_anno.\"namespace\"" + " || ':', '') || "
-      + "node_anno.\"name\"" + " || ':' || encode("
-      + "node_anno.\"val\"" + "::bytea, 'base64')) AS annotations";
+    return "array_agg(DISTINCT coalesce(node_anno.\"namespace\", '')" 
+      + " || ':' || "
+      + "node_anno.\"name\"" + " || ':' || "
+      + "node_anno.\"val\") AS annotations";
   }
 
   
