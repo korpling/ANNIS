@@ -758,7 +758,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           if (outputCsv)
           {
             SortedMap<Integer, SortedSet<String>> columnsByNodePos
-              = CSVHelper.exportCSVHeder(itMatches, w);
+              = CSVHelper.exportCSVHeader(itMatches, w);
             w.flush();
 
             // go back to the beginning and print the actual data

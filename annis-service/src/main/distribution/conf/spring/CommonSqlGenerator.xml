@@ -119,6 +119,8 @@ limitations under the License.
         <entry key="name" value="node_annotation_name" />
         <entry key="value" value="node_annotation_value" />
         <entry key="anno_ref" value="node_anno_ref" />
+        <entry key="annotext" value="node_annotext" />
+        <entry key="qannotext" value="node_qannotext" />
       </util:map>
     </entry>
     <entry key="component">
@@ -135,6 +137,8 @@ limitations under the License.
         <entry key="name" value="edge_annotation_name" />
         <entry key="value" value="edge_annotation_value" />
         <entry key="anno_ref" value="edge_anno_ref" />
+        <entry key="annotext" value="edge_annotext" />
+        <entry key="qannotext" value="edge_qannotext" />
       </util:map>
     </entry>
     <entry key="annotation_pool">
