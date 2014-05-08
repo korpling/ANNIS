@@ -491,7 +491,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
  //   computeLeftTokenRightToken();
     
-    removeUnecessarySpanningRelations();
+//    removeUnecessarySpanningRelations();
     
  //   adjustRankPrePost();
  //   adjustTextId();
