@@ -16,8 +16,6 @@
 package annis.sqlgen.annotext;
 
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AbstractFromClauseGenerator;
@@ -123,6 +121,7 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
     addSelectClauseAttribute(fields, NODE_TABLE, "seg_name");
     addSelectClauseAttribute(fields, NODE_TABLE, "seg_index");
+    addSelectClauseAttribute(fields, RANK_TABLE, "id");
     addSelectClauseAttribute(fields, RANK_TABLE, "pre");
     addSelectClauseAttribute(fields, RANK_TABLE, "post");
     addSelectClauseAttribute(fields, RANK_TABLE, "parent");
