@@ -13,7 +13,7 @@
   <description>Base project for a Vaadin based GUI.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.1.15</vaadin.version>
+    <vaadin.version>7.1.14</vaadin.version>
   </properties>
   
     
