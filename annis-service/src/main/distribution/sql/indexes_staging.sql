@@ -12,3 +12,6 @@ CREATE INDEX tmpidx_fk2_component_type ON _component ("type");
 CREATE INDEX tmpidx_fk_edge_annotation ON _edge_annotation (rank_ref);
 CREATE INDEX tmpidx_left_token_helper ON _node ("left", corpus_ref, text_ref, token_index) WHERE token_index IS NOT NULL;
 CREATE INDEX tmpidx_right_token_helper ON _node ("right", corpus_ref, text_ref, token_index) WHERE token_index IS NOT NULL; 
+
+CREATE INDEX tmpidx__continuous_helper1 ON _rank (component_ref, parent, node_ref);
+CREATE INDEX tmpidx__continuous_helper2 ON _node (id, token_index) WHERE token_index IS NOT NULL;

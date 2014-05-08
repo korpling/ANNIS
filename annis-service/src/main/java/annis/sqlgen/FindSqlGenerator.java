@@ -17,7 +17,6 @@ package annis.sqlgen;
 
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
@@ -37,7 +36,6 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
-import java.util.logging.Level;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -71,7 +69,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       "BUG: nodes.size() > maxWidth");
 
     boolean isDistinct = false || !optimizeDistinct;
-    List<String> ids = new ArrayList<String>();
+    List<String> cols = new ArrayList<String>();
     int i = 0;
 
     for (QueryNode node : alternative)
@@ -79,42 +77,50 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       ++i;
 
       TableAccessStrategy tblAccessStr = tables(node);
-      ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      if(outputCorpusPath)
+      cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      if (outputCorpusPath)
       {
-        ids.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+        cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
           + " AS node_name" + i);
-      
-        ids.add(tblAccessStr.aliasedColumn(CORPUS_TABLE, "path_name")
-          + " AS path_name" + i);
       }
+      
       if (tblAccessStr.usesRankTable())
       {
         isDistinct = true;
       }
     }
-
+    
+    // add additional empty columns in or clauses with different node sizes
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      ids.add("NULL::bigint AS id" + i);
-      ids.add("NULL::varchar AS node_name" + i);
+      cols.add("NULL::bigint AS id" + i);
       if(outputCorpusPath)
-      {
-        ids.add("NULL::varchar[] AS path_name" + i);
+      {      
+        cols.add("NULL::varchar AS node_name" + i);
       }
+    }
+    
+    if(!alternative.isEmpty() && outputCorpusPath)
+    {
+      
+      TableAccessStrategy tblAccessStr = tables(alternative.get(0));
+      
+      String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE, "corpus_ref");
+      cols.add("(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias 
+        + " LIMIT 1) AS path_name");
     }
 
     if(outputToplevelCorpus)
     {
-      ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+      cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
         "toplevel_corpus"));
     }
     
-    ids.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+    cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
 
     return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
-      + StringUtils.join(ids, ", ");
+      + StringUtils.join(cols, ",\n");
   }
   
   @Override
@@ -212,7 +218,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       if (outputCorpusPath && node_name != null)
       {
         match.addSaltId(buildSaltId(corpus_path, node_name));
-        
+
         node_name = null;
       }
     }

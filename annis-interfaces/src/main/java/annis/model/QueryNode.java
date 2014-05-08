@@ -70,21 +70,25 @@ public class QueryNode implements Serializable
   public enum TextMatching
   {
 
-    EXACT_EQUAL("=", "\"", "="), 
-    REGEXP_EQUAL("~", "/", "="), 
-    EXACT_NOT_EQUAL("<>", "\"", "!="), 
-    REGEXP_NOT_EQUAL("!~", "/", "!=");
+    EXACT_EQUAL("=", "\"", "=", false, false), 
+    REGEXP_EQUAL("~", "/", "=", true, false), 
+    EXACT_NOT_EQUAL("<>", "\"", "!=", false, true), 
+    REGEXP_NOT_EQUAL("!~", "/", "!=", true, true);
     
     private String sqlOperator;
     private String annisQuote;
     private String aqlOperator;
+    private boolean regex;
+    private boolean negated;
 
     private TextMatching(String sqlOperator, String annisQuote, 
-      String aqlOperator)
+      String aqlOperator, boolean regex, boolean negated)
     {
       this.sqlOperator = sqlOperator;
       this.annisQuote = annisQuote;
       this.aqlOperator = aqlOperator;
+      this.regex = regex;
+      this.negated = negated;
     }
 
     @Override
@@ -107,6 +111,18 @@ public class QueryNode implements Serializable
     {
       return aqlOperator;
     }
+
+    public boolean isRegex()
+    {
+      return regex;
+    }
+
+    public boolean isNegated()
+    {
+      return negated;
+    }
+    
+    
   };
 
   public static class Range implements Serializable
