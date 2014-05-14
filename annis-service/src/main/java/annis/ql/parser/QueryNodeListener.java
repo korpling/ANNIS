@@ -162,7 +162,7 @@ public class QueryNodeListener extends AqlParserBaseListener
       null : ctx.id.namespace.getText();
     String name = ctx.id.name.getText();
     String value = textFromSpec(ctx.txt);
-    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, false);
+    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, ctx.NEQ() != null);
     
     QueryAnnotation anno = new QueryAnnotation(namespace,
       name, value, textMatching);
