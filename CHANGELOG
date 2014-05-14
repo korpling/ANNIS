@@ -1,3 +1,11 @@
+Version 3.1.5
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=15&state=closed
+
+[Bugs]
+ #321 negated metadata queries don't work any longer
+
 Version 3.1.4
 =============
 Changelog is also available on GitHub:
