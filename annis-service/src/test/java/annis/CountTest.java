@@ -131,6 +131,8 @@ public class CountTest
     assertEquals(2, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" > \"was\""));
     assertEquals(1, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" >secedge \"was\""));
     assertEquals(1, countPcc2("pos=/V.FIN/ ->dep[func=\"sbj\"] \"Jugendliche\" & cat=\"S\" & #3 >secedge #2 | \"ja\""));
+    assertEquals(326, countPcc2("pos!=/(NN)|(NE)/"));
+    assertEquals(388, countPcc2("pos!=\"NE\""));
     
   }
 

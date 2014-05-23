@@ -120,7 +120,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       "corpus_ref"));
 
     return (needsDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
-      + StringUtils.join(cols, ",\n");
+      + StringUtils.join(cols, ", ");
   }
   
   @Override
