@@ -68,7 +68,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     Validate.isTrue(alternative.size() <= maxWidth,
       "BUG: nodes.size() > maxWidth");
 
-    boolean isDistinct = false || !optimizeDistinct;
+    boolean needsDistinct = false || !optimizeDistinct;
     List<String> cols = new ArrayList<String>();
     int i = 0;
 
@@ -86,7 +86,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       
       if (tblAccessStr.usesRankTable())
       {
-        isDistinct = true;
+        needsDistinct = true;
       }
     }
     
@@ -119,7 +119,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
 
-    return (isDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
+    return (needsDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
       + StringUtils.join(cols, ",\n");
   }
   
