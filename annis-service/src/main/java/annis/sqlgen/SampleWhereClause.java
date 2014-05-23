@@ -15,8 +15,6 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.SqlConstraints.bitSelect;
-import static annis.sqlgen.SqlConstraints.join;
 import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
