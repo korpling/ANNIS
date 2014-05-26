@@ -6,7 +6,7 @@
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
   <name>ANNIS corpus search</name>
-  <version>3.1.4</version>
+  <version>3.1.5</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
