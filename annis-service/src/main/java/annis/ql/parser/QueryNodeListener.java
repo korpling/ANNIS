@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
@@ -224,7 +227,25 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     else if (txtCtx instanceof AqlParser.RegexTextSpecContext)
     {
-      return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
+      
+      String text = ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
+     /* 
+      * For regular expressions we should also check if these are valid ones.
+      * Valid for AQL means in this case complient with Java Regex. Since
+      * the actual query is executed by PostgreSQL we might accept queries
+      * as valid even if PostgreSQL can't execute them. The purpose of this check
+      * is to avoid cryptic error messages. Thus we ignore the different syntax
+      * for corner cases of regular expressions in Java an PostgreSQL.
+      */
+      try
+      {
+        Pattern.compile(text);
+      }
+      catch(PatternSyntaxException ex)
+      {
+        throw new AnnisQLSyntaxException("Invalid regular expression: " + ex.getMessage());
+      }
+      return text;
     }
     return null;
   }
