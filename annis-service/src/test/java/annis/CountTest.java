@@ -133,6 +133,8 @@ public class CountTest
     assertEquals(1, countPcc2("pos=/V.FIN/ ->dep[func=\"sbj\"] \"Jugendliche\" & cat=\"S\" & #3 >secedge #2 | \"ja\""));
     assertEquals(326, countPcc2("pos!=/(NN)|(NE)/"));
     assertEquals(388, countPcc2("pos!=\"NE\""));
+    assertEquals(187, countPcc2("tok & meta::Titel=\"Steilpass\""));
+    assertEquals(212, countPcc2("tok & meta::Titel!=\"Steilpass\""));
     
   }
 

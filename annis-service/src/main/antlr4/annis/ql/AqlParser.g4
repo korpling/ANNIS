@@ -142,7 +142,7 @@ expr
   | variableExpr # VariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	n_ary_linguistic_term #  BinaryTermExpr
-  | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
+  | META DOUBLECOLON id=qName op=(EQ|NEQ) txt=textSpec # MetaTermExpr 
   ;
 
 andTopExpr

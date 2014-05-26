@@ -246,6 +246,8 @@ public class DocBrowserController implements Serializable
     private final String type;
 
     private final Panel visHolder;
+    
+    private VisualizerInput input;
 
     public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
       String type,
@@ -265,41 +267,51 @@ public class DocBrowserController implements Serializable
     @Override
     public void run()
     {
+      input = null;
+      
+      final boolean createVis = !initiatedVis.containsKey(canonicalTitle);
+      
+      final VisualizerPlugin visualizer = ((PluginSystem) ui).
+              getVisualizer(type);
+      
       // check if a visualization is already initiated
       {
-        if (!initiatedVis.containsKey(canonicalTitle))
+        if (createVis)
         {
-          VisualizerPlugin visualizer = ((PluginSystem) ui).
-            getVisualizer(type);
-
           // fetch the salt project - so long part
-          VisualizerInput input = createInput(corpus, doc, config, visualizer.
+          input = createInput(corpus, doc, config, visualizer.
             isUsingRawText());
 
-          // create and format visualizer
-          Component vis = visualizer.createComponent(input, null);
-          vis.addStyleName("corpus-font-force");
-          vis.setPrimaryStyleName("docviewer");
-          vis.setCaption(canonicalTitle);
-          vis.setWidth(100, Unit.PERCENTAGE);
-          vis.setHeight(-1, Unit.PIXELS);
-
-          // update visualizer memory cache
-          initiatedVis.put(canonicalTitle, vis);
         }
       }
-
+     
       // after initializing the visualizer update the gui
       UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
         {
+          
+          btn.setEnabled(true);
+
+          if (createVis && input != null)
+          {
+            // create and format visualizer
+            
+            Component vis = visualizer.createComponent(input, null);
+            vis.addStyleName("corpus-font-force");
+            vis.setPrimaryStyleName("docviewer");
+            vis.setCaption(canonicalTitle);
+            vis.setWidth(100, Unit.PERCENTAGE);
+            vis.setHeight(-1, Unit.PIXELS);
+
+            // update visualizer memory cache
+            initiatedVis.put(canonicalTitle, vis);
+          }
 
           Component vis = initiatedVis.get(canonicalTitle);
           visHolder.setContent(vis);
 
-          btn.setEnabled(true);
         }
       });
     }
