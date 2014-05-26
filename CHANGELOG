@@ -5,6 +5,7 @@ https://github.com/korpling/annis/issues?milestone=15&state=closed
 
 [Bugs]
  #323 css style sheet is not read in HTML visualizer when started from document browser on kickstarter
+ #322 Invalid regex search error is not caught by interface
  #321 negated metadata queries don't work any longer
 
 Version 3.1.4
