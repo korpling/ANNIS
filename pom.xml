@@ -119,7 +119,7 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.7</version>
         <configuration>
           <useMissingFile>true</useMissingFile>
           <missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
