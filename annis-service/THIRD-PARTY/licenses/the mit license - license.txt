@@ -30,7 +30,7 @@
  var codesite_token = null;
  
  
- var CS_env = {"loggedInUserEmail": null, "projectHomeUrl": "/p/mockito", "assetHostPath": "http://www.gstatic.com/codesite/ph", "projectName": "mockito", "token": null, "assetVersionPath": "http://www.gstatic.com/codesite/ph/3374407039186159233", "relativeBaseUrl": "", "profileUrl": null, "domainName": null};
+ var CS_env = {"projectName": "mockito", "loggedInUserEmail": null, "projectHomeUrl": "/p/mockito", "token": null, "assetVersionPath": "http://www.gstatic.com/codesite/ph/3374407039186159233", "profileUrl": null, "domainName": null, "assetHostPath": "http://www.gstatic.com/codesite/ph", "relativeBaseUrl": ""};
  var _gaq = _gaq || [];
  _gaq.push(
  ['siteTracker._setAccount', 'UA-18071-1'],
