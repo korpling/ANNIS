@@ -30,7 +30,7 @@
  var codesite_token = null;
  
  
- var CS_env = {"profileUrl":null,"token":null,"assetHostPath":"http://www.gstatic.com/codesite/ph","domainName":null,"assetVersionPath":"http://www.gstatic.com/codesite/ph/8909294867742213046","projectHomeUrl":"/p/mockito","relativeBaseUrl":"","projectName":"mockito","loggedInUserEmail":null};
+ var CS_env = {"loggedInUserEmail": null, "projectHomeUrl": "/p/mockito", "assetHostPath": "http://www.gstatic.com/codesite/ph", "projectName": "mockito", "token": null, "assetVersionPath": "http://www.gstatic.com/codesite/ph/3374407039186159233", "relativeBaseUrl": "", "profileUrl": null, "domainName": null};
  var _gaq = _gaq || [];
  _gaq.push(
  ['siteTracker._setAccount', 'UA-18071-1'],
@@ -55,17 +55,17 @@
  
  simpler &amp; better mocking - Google Project Hosting
  </title>
- <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/8909294867742213046/css/core.css">
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/3374407039186159233/css/core.css">
  
- <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/8909294867742213046/css/ph_detail.css" >
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/3374407039186159233/css/ph_detail.css" >
  
  
  
- <link type="application/atom+xml" rel="alternate" href="/feeds/p/mockito/hgchanges/basic?repo=wiki&amp;path=/License.wiki">
+ <link type="application/atom+xml" rel="alternate" href="/feeds/p/mockito/hgchanges/basic?path=/License.wiki&amp;repo=wiki">
  
  
 <!--[if IE]>
- <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/8909294867742213046/css/d_ie.css" >
+ <link type="text/css" rel="stylesheet" href="http://www.gstatic.com/codesite/ph/3374407039186159233/css/d_ie.css" >
 <![endif]-->
  <style type="text/css">
  .menuIcon.off { background: no-repeat url(http://www.gstatic.com/codesite/ph/images/dropdown_sprite.gif) 0 -42px }
@@ -125,6 +125,8 @@ contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>
  <table style="padding:0px; margin: 0px 0px 10px 0px; width:100%" cellpadding="0" cellspacing="0"
  itemscope itemtype="http://schema.org/CreativeWork">
  <tr style="height: 58px;">
+ 
+ 
  
  <td id="plogo">
  <link itemprop="url" href="/p/mockito">
@@ -199,11 +201,11 @@ contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>
  
  
  
+ 
  <div class=gtbc></div>
 </div>
 <table cellspacing="0" cellpadding="0" width="100%" align="center" border="0" class="st">
  <tr>
- 
  
  
  
@@ -267,7 +269,6 @@ contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>
 >
 
  
-<!-- IE -->
 
 
 
@@ -310,10 +311,10 @@ contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>
  Oct 7, 2010</span>
  
  by 
+
  <a class="userlink"
- href="/u/107003786236409286030/">szcze...@gmail.com</a>
-
-
+ href="/u/107003786236409286030/">szcze...@gmail.com</a
+>
  
  </div>
  </div>
@@ -351,21 +352,21 @@ contributes to open source, such as <a href="http://www.firefox.com">Firefox</a>
  </form>
 
 
- <script src="http://www.gstatic.com/codesite/ph/8909294867742213046/js/prettify/prettify.js"></script>
+ <script src="http://www.gstatic.com/codesite/ph/3374407039186159233/js/prettify/prettify.js"></script>
  <script type="text/javascript">
  prettyPrint();
  </script>
 
-<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/8909294867742213046/js/dit_scripts.js"></script>
+<script type="text/javascript" src="http://www.gstatic.com/codesite/ph/3374407039186159233/js/dit_scripts.js"></script>
 
 
 
   
  
  
- <script type="text/javascript" src="http://www.gstatic.com/codesite/ph/8909294867742213046/js/ph_core.js"></script>
+ <script type="text/javascript" src="http://www.gstatic.com/codesite/ph/3374407039186159233/js/ph_core.js"></script>
  
- <script type="text/javascript" src="http://www.gstatic.com/codesite/ph/8909294867742213046/js/ph_dwiki.js"></script>
+ <script type="text/javascript" src="http://www.gstatic.com/codesite/ph/3374407039186159233/js/ph_dwiki.js"></script>
  
  
  
