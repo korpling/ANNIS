@@ -277,7 +277,7 @@ public class ResultViewPanel extends VerticalLayout implements
     Preconditions.checkState(first != null,
       "There must be already an element in the queue");
 
-    addQueryResult(q, first);
+    addQueryResult(q, Arrays.asList(first));
   }
 
   private void resetQueryResultQueue()
@@ -288,40 +288,49 @@ public class ResultViewPanel extends VerticalLayout implements
     this.numberOfResults = 0;
   }
 
-  private void addQueryResult(PagedResultQuery q, SaltProject p)
+  private void addQueryResult(PagedResultQuery q, List<SaltProject> subgraphList)
   {
     if (q == null)
     {
       return;
     }
 
-    List<SingleResultPanel> newPanels;
+    List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
     try
     {
-      if (p == null)
+      if (subgraphList == null || subgraphList.isEmpty())
       {
         Notification.show("Could not get subgraphs",
           Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {
-        updateVariables(p);
-        newPanels = createPanels(p, q.getOffset() + currentResults);
-        currentResults += newPanels.size();
+        for(SaltProject p : subgraphList)
+        {
+          updateVariables(p);
+          newPanels = createPanels(p, q.getOffset() + currentResults);
+          currentResults += newPanels.size();
 
-        progressResult.setValue(((float) currentResults) / (float) (numberOfResults));
+          progressResult.setValue(((float) currentResults) / (float) (numberOfResults));
+
+          if (currentResults == numberOfResults)
+          {
+            resetQueryResultQueue();
+          }
+
+          for (SingleResultPanel panel : newPanels)
+          {
+            resultPanelList.add(panel);
+            resultLayout.addComponent(panel);
+            panel.setSegmentationLayer(selectedSegmentationLayer);
+          }
+        }
         
-        if (currentResults == numberOfResults)
+        if(currentResults == numberOfResults)
         {
-          resetQueryResultQueue();
+          showFinishedSubgraphSearch();
         }
-
-        for (SingleResultPanel panel : newPanels)
-        {
-          resultPanelList.add(panel);
-          resultLayout.addComponent(panel);
-          panel.setSegmentationLayer(selectedSegmentationLayer);
-        }
+        
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
         {
@@ -329,7 +338,6 @@ public class ResultViewPanel extends VerticalLayout implements
           OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
           ext.extend(newPanels.get(newPanels.size() - 1));
         }
-
       }
     }
     catch (Throwable ex)
@@ -362,8 +370,6 @@ public class ResultViewPanel extends VerticalLayout implements
       panel.setWidth("100%");
       panel.setHeight("-1px");
 
-      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
-      ext.extend(panel);
       result.add(panel);
     }
     return result;
@@ -608,23 +614,22 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     if (source != null && projectQueue != null && currentQuery != null)
     {
-      try
+      LinkedList<SaltProject> subgraphs = new LinkedList<SaltProject>();
+      SaltProject p;
+      while((p = projectQueue.poll()) != null)
       {
-        final SaltProject p = projectQueue.poll(250, TimeUnit.MILLISECONDS);
-        if (p == null)
-        {
-          log.debug("no SaltProject graph in queue");
-          return false;
-        }
-        log.debug("adding new SaltProject graph");
-        addQueryResult(currentQuery, p);
-        return true;
+        subgraphs.add(p);
+      }
+      if (subgraphs.isEmpty())
+      {
+        log.debug("no SaltProject graph in queue");
+        return false;
+      }
+      log.debug("adding new SaltProject graph");
+      addQueryResult(currentQuery, subgraphs);
+      return true;
 
-      }
-      catch (InterruptedException ex)
-      {
-        log.warn(null, ex);
-      }
+
     }
 
     return true;

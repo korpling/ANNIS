@@ -102,6 +102,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcDaoSupport;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 // FIXME: test and refactor timeout and transaction management
@@ -138,7 +139,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private int timeout;
 
   @Override
-  @Transactional
+  @Transactional(readOnly = true)
   public SaltProject graph(QueryData data)
   {
     return executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
@@ -604,7 +605,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
-  @Transactional(readOnly = true)
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData, T> generator,
