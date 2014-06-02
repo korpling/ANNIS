@@ -1,3 +1,13 @@
+Version 3.1.6
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=16&state=closed
+
+[Bugs]
+ #325 fetching results (subgraphs) slow
+ #324 Source code contains files with invalid (Windows) file names
+
+
 Version 3.1.5
 =============
 Changelog is also available on GitHub:
