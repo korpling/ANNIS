@@ -136,7 +136,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       log.error("exception when serializing SaltProject", ex);
     }
     long endTime = System.currentTimeMillis();
-    log.info("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
+    log.debug("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
   }
 
   @Override
@@ -169,7 +169,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       resource = loadXMI(entityStream);
     }
     long endTime = System.currentTimeMillis();
-    log.info("Loading XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
+    log.debug("Loading XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
     
     SaltProject project = SaltCommonFactory.eINSTANCE.createSaltProject();
     
