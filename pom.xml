@@ -6,7 +6,7 @@
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
   <name>ANNIS corpus search</name>
-  <version>3.1.5</version>
+  <version>3.1.6</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
@@ -119,7 +119,17 @@
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>license-maven-plugin</artifactId>
-        <version>1.4</version>
+        <version>1.7</version>
+        
+        <executions>
+          <execution>
+            <id>download-licenses</id>
+            <goals>
+              <goal>download-licenses</goal>
+            </goals>
+          </execution>
+        </executions>
+        
         <configuration>
           <useMissingFile>true</useMissingFile>
           <missingFile>${basedir}/src/license/THIRD-PARTY.properties</missingFile>
