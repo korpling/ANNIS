@@ -85,11 +85,11 @@ spanrelation
 ; 
 
 commonparent
-  : COMMON_PARENT (label=ID)? # CommonParent
+  : COMMON_PARENT (label=ID)?
   ;
 
 commonancestor
-  : COMMON_PARENT (label=ID)? STAR  # CommonAncestor
+  : COMMON_PARENT (label=ID)? STAR
   ;
 
 identity

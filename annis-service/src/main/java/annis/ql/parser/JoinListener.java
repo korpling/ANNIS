@@ -412,7 +412,7 @@ public class JoinListener extends AqlParserBaseListener
   }
 
   @Override
-  public void enterCommonParent(AqlParser.CommonParentContext ctx)
+  public void enterCommonparent(AqlParser.CommonparentContext ctx)
   {
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
@@ -420,10 +420,11 @@ public class JoinListener extends AqlParserBaseListener
     String label = ctx.label == null ? null : ctx.label.getText();
     
     left.addOutgoingJoin(new Sibling(right, label));
+    left.addOutgoingJoin(new Sibling(right, label));
   }
 
   @Override
-  public void enterCommonAncestor(AqlParser.CommonAncestorContext ctx)
+  public void enterCommonancestor(AqlParser.CommonancestorContext ctx)
   {
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
