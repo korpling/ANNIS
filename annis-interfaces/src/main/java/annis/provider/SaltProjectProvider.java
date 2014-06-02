@@ -57,7 +57,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
 {
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(SaltProjectProvider.class);
-  private static XMLParserPool xmlParserPool = 
+  private static final XMLParserPool xmlParserPool = 
     new XMLParserPoolImpl();
   
   public static final MediaType APPLICATION_XMI_BINARY = new MediaType("application",
@@ -107,7 +107,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       options.put(XMIResource.OPTION_ENCODING, "UTF-8");
       options.put(XMIResource.OPTION_CONFIGURATION_CACHE, Boolean.TRUE);
       options.put(XMIResource.OPTION_USE_CACHED_LOOKUP_TABLE, new ArrayList());
-      options.put(XMIResource.OPTION_FORMATTED, Boolean.TRUE);
+      options.put(XMIResource.OPTION_FORMATTED, Boolean.FALSE);
       options.put(XMIResource.OPTION_PROCESS_DANGLING_HREF, "DISCARD");
     }
     
@@ -136,7 +136,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
       log.error("exception when serializing SaltProject", ex);
     }
     long endTime = System.currentTimeMillis();
-    log.debug("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
+    log.info("Saving XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
   }
 
   @Override
