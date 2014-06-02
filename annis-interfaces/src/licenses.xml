@@ -8,10 +8,22 @@
     <dependency>
       <groupId>org.knallgrau</groupId>
       <artifactId>textcat</artifactId>
+      <version>1.0.1</version>
+      <licenses>
+       <license>
+          <name>LGPL</name>
+          <url>http://www.gnu.org/licenses/old-licenses/lgpl-2.0.txt</url>
+        </license>
+      </licenses>
+    </dependency>    
+
+       <dependency>
+      <groupId>org.abego.treelayout</groupId>
+      <artifactId>org.abego.treelayout.core</artifactId>
       <licenses>
         <license>
-          <name>GNU Lesser General Public License (LGPL), Version 2.1</name>
-          <url>http://www.fsf.org/licensing/licenses/lgpl.txt</url>
+          <name>BSD 3-Clause New or Revised License (BSD-3-Clause)</name>
+          <url>http://treelayout.googlecode.com/files/LICENSE.TXT</url>
         </license>
       </licenses>
     </dependency>
