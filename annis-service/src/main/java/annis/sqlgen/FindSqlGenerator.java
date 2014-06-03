@@ -121,7 +121,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     // add additional empty columns in or clauses with different node sizes
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
-      cols.add("NULL::bigint AS id" + i);
+      cols.add("NULL::bigint AS id" + i);      
+      cols.add("NULL::varchar AS node_annotation_ns" + i);
+      cols.add("NULL::varchar AS node_annotation_name" + i);
       if (outputCorpusPath)
       {
         cols.add("NULL::varchar AS node_name" + i);
