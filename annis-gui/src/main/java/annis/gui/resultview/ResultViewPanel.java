@@ -18,6 +18,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
@@ -39,6 +40,7 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -500,6 +502,20 @@ public class ResultViewPanel extends VerticalLayout implements
         // oldSegmentation is null, but selected is not
         setSegmentationLayer(selectedSegmentationLayer);
       }
+      
+      if(selectedSegmentationLayer != null)
+      {
+        
+        //update URL with newly selected segmentation layer
+        PagedResultQuery q;
+        
+        SearchUI sui = (SearchUI) UI.getCurrent();
+        q = sui.getQueryController().getPreparedQuery();        
+        q.setSegmentation(selectedSegmentationLayer);
+                       
+        sui.updateFragment(q);
+    	  
+      }      
     }
   }
 
