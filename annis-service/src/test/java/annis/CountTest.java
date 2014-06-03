@@ -128,6 +128,9 @@ public class CountTest
     
     // test that is is possible to search for the same node/token if the searched annotations are different
     assertEquals(1, countPcc2("\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(1, countPcc2("lemma=\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(2, countPcc2("a#\"Karola\" & (b#lemma=\"Karola\" | b#pos=\"NE\") " 
+      + "& #a _=_ #b"));
     
     // regression tests:
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
