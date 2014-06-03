@@ -82,9 +82,9 @@ START_TEXT_PLAIN:'"' -> pushMode(IN_TEXT);
 mode IN_REGEX;
 
 END_TEXT_REGEX : '/' -> popMode;
-TEXT_REGEX : (~'/'|'\\/')+;
+TEXT_REGEX : (~'/')+;
 
 mode IN_TEXT;
 
 END_TEXT_PLAIN : '"' -> popMode;
-TEXT_PLAIN : (~'"'|'\\"')+;
+TEXT_PLAIN : (~'"')+;

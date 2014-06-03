@@ -132,7 +132,12 @@
   </style>
 <!--SS_BEGIN_SNIPPET(fragment41,includes)-->			<!--SS_END_SNIPPET(fragment41,includes)-->
 
-<!--SS_BEGIN_SNIPPET(fragment42,head_tags)-->	
+<!--SS_BEGIN_SNIPPET(fragment42,head_tags)-->				  
+     
+  
+
+
+	
 <title>Oracle and Sun Microsystems | Strategic Acquisitions | Oracle</title>
 <meta name="Title" content="Oracle and Sun Microsystems | Strategic Acquisitions | Oracle">
 <meta name="Description" content="Since Oracle acquired Sun in 2010, Oracle's hardware and software engineers have worked side-by-side to build fully integrated systems and optimized solutions.">
@@ -140,7 +145,7 @@
 <meta name="robots" content="INDEX, FOLLOW">
 <meta name="country" content="USA">
 <meta name="Language" content="en">
-<meta name="Updated Date" content="11/7/13 4:01 PM">
+<meta name="Updated Date" content="2/21/14 5:48 PM">
 
 			<!--SS_END_SNIPPET(fragment42,head_tags)-->
 
@@ -187,7 +192,61 @@
 
     
 <!-- SS_BEGIN_SNIPPET(fragment46,ocomheader)-->				
-		<!-- U01v0 --> <div class="u01" id="u01" data-menusrc="/us/mosaicmenu/index.html"><div class="u01tools" data-trackas="header"><div class="u01logo"><a href="http://www.oracle.com" data-lbl="logo">Oracle</a></div> <ul class="u01navtools">     <li><a href="/us/mosaicmenu/index.html#otn-menu-countryselect" data-lbl="country" class="menu-otn">Country</a></li>     <li><a href="/us/corporate/region/index.html#ocom-menu-countryselect" data-lbl="country" class="menu-ocom menu-multicol">Country</a></li>     <li><a href="/us/community/index.html#menu-communities" data-lbl="communities">Communities</a></li>     <li><a href="/us/corporate/role/index.html#menu-iam" data-lbl="i-am-a">I am a...</a></li>     <li><a href="/us/corporate/task/index.html#menu-iwant" data-lbl="i-want-to">I want to...</a></li> </ul> <ul class="u01pfile" data-lbl="welcome">     <li id="pfile-wlcm">Welcome</li>     <li id="pfile-acct"><a href="https://myprofile.oracle.com/EndUser/faces/profile/sso/updateUser.jspx?tid=complete&amp;showRegions=primaryAddress|shippingAddress|communities|newsletters&amp;nextURL=" data-lbl="account">Account</a></li>     <li id="pfile-sout"><a href="javascript:sso_sign_out();" data-lbl="signout">Sign Out</a></li>     <li id="pfile-regs"><a href="http://www.oracle.com/webapps/redirect/signon?nexturl=" data-lbl="signin">Sign In/Register</a></li>     <li id="pfile-help"><a href="/us/corporate/contact/about-your-account-070507.html" data-lbl="help">Help</a></li> </ul> <div class="u01search"><form class="u01searchform" name="searchForm" method="get" action="http://search.oracle.com/search/search" data-errormsg="No Search Term Entered. Please Try Again"><input type="hidden" name="start" value="1" /> 				<input type="hidden" value="all" name="search_p_main_operator" /> 				<input id="txtSearch" class="textcnt autoclear" name="q" value="Search" /> 				<input type="submit" class="u01searchbttn" value="Submit Search" /></form></div></div> <ul class="u01nav" data-trackas="hnav">     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/us/products/index.html#menu-products-n-services" data-lbl="productsandservices">     <h3>Products</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/us/solutions/index.html#menu-solutions" data-lbl="solutions">     <h3>Solutions</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/us/downloads/index.html#menu-downloads" data-lbl="downloads">     <h3>Downloads</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="https://shop.oracle.com/#menu-store" data-lbl="store">     <h3>Store</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/us/support/index.html#menu-support" data-lbl="support">     <h3>Support</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://education.oracle.com/#menu-training" data-lbl="training">     <h3>Training</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/partners/index.html#menu-partners" data-lbl="partners">     <h3>Partners</h3>     </a></li>     <li><a class="u01nav" data-trackas="hnav" href="http://www.oracle.com/us/corporate/index.html#menu-about" data-lbl="about">     <h3>About</h3>     </a></li>     <li><a class="u01btn" data-trackas="hnav" href="http://www.oracle.com/technetwork/index.html#menu-otn" data-lbl="oracletechnologynetwork">     <h3>OTN</h3>     </a></li> </ul></div> <!-- /U01v0 -->
+		<!-- U01v0 -->
+<div data-menusrc="/us/mosaicmenu/index.html" id="u01" class="u01">
+<div data-trackas="header" class="u01tools">
+<div class="u01logo"><a data-lbl="logo" href="http://www.oracle.com">Oracle</a></div>
+<ul class="u01navtools">
+    <li><a class="menu-otn" data-lbl="country" href="/us/mosaicmenu/index.html#otn-menu-countryselect">Country</a></li>
+    <li><a class="menu-ocom menu-multicol" data-lbl="country" href="/us/corporate/region/index.html#ocom-menu-countryselect">Country</a></li>
+    <li><a data-lbl="communities" href="/us/community/index.html#menu-communities">Communities</a></li>
+    <li><a data-lbl="i-am-a" href="/us/corporate/role/index.html#menu-iam">I am a...</a></li>
+    <li><a data-lbl="i-want-to" href="/us/corporate/task/index.html#menu-iwant">I want to...</a></li>
+</ul>
+<ul data-lbl="welcome" class="u01pfile">
+    <li id="pfile-wlcm">Welcome</li>
+    <li id="pfile-acct"><a data-lbl="account" href="https://profile.oracle.com/myprofile/account/secure/update-account.jspx?nexturl=">Account</a></li>
+    <li id="pfile-sout"><a data-lbl="signout" href="javascript:sso_sign_out();">Sign Out</a></li>
+    <li id="pfile-regs"><a data-lbl="signin" href="http://www.oracle.com/webapps/redirect/signon?nexturl=">Sign In/Register</a></li>
+    <li id="pfile-help"><a data-lbl="help" href="/us/corporate/contact/about-your-account-070507.html">Help</a></li>
+</ul>
+<div class="u01search">
+<form data-errormsg="No Search Term Entered. Please Try Again" action="http://search.oracle.com/search/search" method="get" name="searchForm" class="u01searchform">
+    <input type="hidden" value="1" name="start" /> 				<input type="hidden" name="search_p_main_operator" value="all" /> 				<input value="Search" name="q" class="textcnt autoclear" id="txtSearch" /> 				<input type="submit" value="Submit Search" class="u01searchbttn" />
+</form>
+</div>
+</div>
+<ul data-trackas="hnav" class="u01nav">
+    <li><a data-lbl="productsandservices" href="http://www.oracle.com/us/products/index.html#menu-products-n-services" data-trackas="hnav" class="u01nav">
+    <h3>Products</h3>
+    </a></li>
+    <li><a data-lbl="solutions" href="http://www.oracle.com/us/solutions/index.html#menu-solutions" data-trackas="hnav" class="u01nav">
+    <h3>Solutions</h3>
+    </a></li>
+    <li><a data-lbl="downloads" href="http://www.oracle.com/us/downloads/index.html#menu-downloads" data-trackas="hnav" class="u01nav">
+    <h3>Downloads</h3>
+    </a></li>
+    <li><a data-lbl="store" href="https://shop.oracle.com/#menu-store" data-trackas="hnav" class="u01nav">
+    <h3>Store</h3>
+    </a></li>
+    <li><a data-lbl="support" href="http://www.oracle.com/us/support/index.html#menu-support" data-trackas="hnav" class="u01nav">
+    <h3>Support</h3>
+    </a></li>
+    <li><a data-lbl="training" href="http://education.oracle.com/#menu-training" data-trackas="hnav" class="u01nav">
+    <h3>Training</h3>
+    </a></li>
+    <li><a data-lbl="partners" href="http://www.oracle.com/partners/index.html#menu-partners" data-trackas="hnav" class="u01nav">
+    <h3>Partners</h3>
+    </a></li>
+    <li><a data-lbl="about" href="http://www.oracle.com/us/corporate/index.html#menu-about" data-trackas="hnav" class="u01nav">
+    <h3>About</h3>
+    </a></li>
+    <li><a data-lbl="oracletechnologynetwork" href="http://www.oracle.com/technetwork/index.html#menu-otn" data-trackas="hnav" class="u01btn">
+    <h3>OTN</h3>
+    </a></li>
+</ul>
+</div>
+<!-- /U01v0 -->
  
 			<!-- SS_END_SNIPPET(fragment46,ocomheader)-->
 <!--SS_BEGIN_SNIPPET(fragment29,2)-->
@@ -325,12 +384,19 @@
 	var atg_country = "US";
 </script>
 			<!-- SS_END_SNIPPET(fragment47,2)-->
-    <!-- C37v0 --> <div class="c37 c37v0 c37fullwidth"><div class="c37w1" style="height:135px;background-image:url('/us/corporate/features/feat-story-header-red-1656044.jpg')"><div class="c37w2" style="top:50px;left:11px"><h1 style="color:white;">Oracle and Sun</h1> <!--
-<ul>
-    <li><a href="###" target="_new">ABC123</a></li>
-   
-</ul>
---></div></div> <div class="c37w4"><div class="c37z1"><!-- null --></div> <div class="c37z2"><!-- null --></div></div></div> <!-- /C37v0 --><!--F02v1 -->
+    <!-- C37v0 -->
+<div class="c37 c37v0 c37fullwidth">
+<div style="height:135px;background-image:url('/us/corporate/features/feat-story-header-red-1656044.jpg')" class="c37w1">
+<div style="top:50px;left:11px" class="c37w2">
+<h1 style="color:white;">Oracle and Sun Microsystems</h1>
+</div>
+</div>
+<div class="c37w4">
+<div class="c37z1"><!-- null --></div>
+<div class="c37z2"><!-- null --></div>
+</div>
+</div>
+<!-- /C37v0 --><!--F02v1 -->
 
     <div class="f02 f02v1">
       <div class="f02w1">
@@ -565,7 +631,7 @@ show_deletebutton: true
 }; 
 </script>
 
-						<!-- C19v0 --> <div class="c19 c19v0"><div class="c19w1"><h5>Stay Connected:</h5> <ul class="scl-icons">     <li class="scl-facebook"><a href="http://www.facebook.com/Oracle" target="_blank">Facebook</a></li>     <li class="scl-twitter"><a href="http://twitter.com/oracle" target="_blank">Twitter</a></li>     <li class="scl-youtube"><a href="http://www.youtube.com/user/OracleVideo" target="_blank">YouTube</a></li> </ul></div></div> <!-- /C19v0 -->  <!-- C20v0 --> <div class="c20 c20v0"><div class="c20z1">&nbsp;</div> <div class="c20z2">&nbsp;</div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38w1"><p>Oracle acquired Sun in 2010, and since that time Oracle's hardware and software engineers have worked side-by-side to build fully integrated systems and <a target="" href="/us/solutions/oos/overview/index.html">optimized solutions</a> designed to achieve performance levels that are unmatched in the industry. Early examples include the <a href="/us/products/database/exadata-database-machine/overview/index.html" target="">Oracle Exadata Database Machine X2-8</a>, and the first <a href="/us/products/middleware/exalogic/overview/index.html" target="">Oracle Exalogic Elastic Cloud</a>, both introduced in late 2010. During 2011, Oracle introduced the <a href="/us/corporate/features/sparc-supercluster-t4-4-489157.html">SPARC SuperCluster  T4-4</a>, a general-purpose, engineered system with Oracle Solaris that delivered record-breaking performance on a series of enterprise benchmarks. Oracle's SPARC-based systems are some of the most scalable, reliable, and secure products available today. Sun's prized software portfolio has continued to develop as well, with new releases of <a target="" href="/us/products/servers-storage/solaris/index.html">Oracle Solaris</a>, <a target="" href="/us/products/mysql/index.html">MySQL</a>, and the recent introduction of <a target="" href="/us/technologies/java/index.html">Java 7</a>. Oracle invests in innovation by designing hardware and software systems that are engineered to work together.</p></div> <div class="c38list1col"><ul class="listicons">     <li><strong>Benchmarks: </strong><a target="" href="/us/solutions/performance-scalability/index.html">Oracle Hardware Benchmarks</a></li>     <li><a target="" href="/us/solutions/oos/overview/index.html">Oracle Optimized Solutions</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v0 -->     <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Product Information on Oracle.com</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c39list2col"><ul class="listicons">     <li><a target="" href="/us/products/servers-storage/servers/index.html">Sun Servers</a></li>     <li><a target="" href="/us/products/servers-storage/storage/index.html">Sun Storage and Tape</a></li>     <li><a target="" href="/us/products/servers-storage/solaris/index.html">Solaris</a></li>     <li><a target="" href="/us/technologies/java/index.html">Java</a></li>     <li><a target="" href="/us/products/mysql/index.html">MySQL</a></li> </ul> <ul class="listicons">     <li><a target="" href="/us/products/engineered-systems/index.html">Engineered Systems</a></li>     <li><a target="" href="/us/products/servers-storage/desktop-workstations/index.html">Desktops</a></li>     <li><a target="" href="/us/products/servers-storage/networking/index.html">Networking</a></li> </ul> <div class="c30seeall"><a target="" href="/us/sun/sun-products-map/index.html">Find Sun Software Products</a></div></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->    <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Download Information</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38list1col"><ul class="listicons">     <li><a target="_blank" href="/technetwork/indexes/downloads/index.html">Product downloads for Developers</a></li>     <li><a target="_blank" href="http://edelivery.oracle.com/">Latest licensed Sun product downloads</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->  <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Information for Customers and Partners</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38list1col"><ul class="listicons">     <li class="licon-pdf"><a target="_blank" href="/us/038563.pdf">Oracle and Sun Overview and FAQ for customers and partners (PDF)</a></li>     <li class="licon-pdf"><a target="_blank" href="/us/sun/042646.pdf">Oracle and Sun Overview and FAQ for partners (PDF)</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->  <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Communities</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c39list2col"><ul class="listicons">     <li><a target="_blank" href="http://java.sun.com/">Oracle Technology Network for Java Developers</a></li>     <li><a target="_blank" href="http://java.net/">Java.net</a></li> </ul> <ul class="listicons">     <li><a target="_blank" href="http://www.oracle.com/technetwork/index.html?ssSourceSiteId=ocomen">Oracle Technology Network</a></li>     <li><a target="_blank" href="http://www.oracle.com/technetwork/systems/index.html?ssSourceSiteId=ocomen">Oracle Technology Network for SysAdmins</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->
+						<!-- C19v0 --> <div class="c19 c19v0"><div class="c19w1"><h5>Stay Connected:</h5> <ul class="scl-icons">     <li class="scl-facebook"><a href="http://www.facebook.com/Oracle" target="_blank">Facebook</a></li>     <li class="scl-twitter"><a href="http://twitter.com/oracle" target="_blank">Twitter</a></li>     <li class="scl-youtube"><a href="http://www.youtube.com/user/OracleVideo" target="_blank">YouTube</a></li> </ul></div></div> <!-- /C19v0 -->  <!-- C20v0 --> <div class="c20 c20v0"><div class="c20z1">&nbsp;</div> <div class="c20z2">&nbsp;</div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38w1"><p>Oracle acquired Sun Microsystems in 2010, and since that time Oracle's hardware and software engineers have worked side-by-side to build fully integrated systems and <a target="" href="/us/solutions/oos/overview/index.html">optimized solutions</a> designed to achieve performance levels that are unmatched in the industry. Early examples include the <a href="/us/products/database/exadata-database-machine/overview/index.html" target="">Oracle Exadata Database Machine X2-8</a>, and the first <a href="/us/products/middleware/exalogic/overview/index.html" target="">Oracle Exalogic Elastic Cloud</a>, both introduced in late 2010. During 2011, Oracle introduced the <a href="/us/corporate/features/sparc-supercluster-t4-4-489157.html">SPARC SuperCluster  T4-4</a>, a general-purpose, engineered system with <a target="" href="/us/products/servers-storage/solaris/overview/index.html">Oracle Solaris</a> that delivered record-breaking performance on a series of enterprise benchmarks. Oracle's SPARC-based systems are some of the most scalable, reliable, and secure products available today. Sun's prized software portfolio has continued to develop as well, with new releases of <a target="" href="/us/products/servers-storage/solaris/solaris11/overview/index.html">Oracle Solaris</a>, <a href="/us/products/mysql/overview/index.html" target="">MySQL</a>, and the recent introduction of <a target="" href="/us/technologies/java/overview/index.html">Java 7</a>. Oracle invests in innovation by designing hardware and software systems that are engineered to work together.</p></div> <div class="c38list1col"><ul class="listicons">     <li><strong>Benchmarks: </strong><a target="" href="/us/solutions/performance-scalability/index.html">Oracle Hardware Benchmarks</a></li>     <li><a target="" href="/us/solutions/oos/overview/index.html">Oracle Optimized Solutions</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v0 -->     <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Product Information on Oracle.com</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c39list2col"><ul class="listicons">     <li><a target="" href="/us/products/servers/overview/index.html">Sun Servers</a></li>     <li><a target="" href="/us/products/storage/overview/index.html">Sun Storage and Tape</a></li>     <li><a target="" href="/us/products/servers-storage/solaris/overview/index.html">Solaris</a></li>     <li><a target="" href="/us/technologies/java/overview/index.html">Java</a></li>     <li><a href="/us/products/mysql/overview/index.html" target="">MySQL</a></li> </ul> <ul class="listicons">     <li><a target="" href="/us/products/engineered-systems/index.html">Engineered Systems</a></li>     <li><a target="" href="/us/technologies/virtualization/sun-ray/overview/index.html">Desktops</a></li>     <li><a target="" href="/us/products/networking/overview/index.html">Networking</a></li> </ul> <div class="c30seeall"><a target="" href="/us/sun/sun-products-map/index.html">Find Sun Software Products</a></div></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->    <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Download Information</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38list1col"><ul class="listicons">     <li><a target="_blank" href="/technetwork/indexes/downloads/index.html">Product downloads for Developers</a></li>     <li><a target="_blank" href="http://edelivery.oracle.com/">Latest licensed Sun product downloads</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->  <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Information for Customers and Partners</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c38list1col"><ul class="listicons">     <li class="licon-pdf"><a target="_blank" href="/us/038563.pdf">Oracle and Sun Overview and FAQ for customers and partners (PDF)</a></li>     <li class="licon-pdf"><a target="_blank" href="/us/sun/042646.pdf">Oracle and Sun Overview and FAQ for partners (PDF)</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->  <!-- C20v1 --> <div class="c20 c20v1"><div class="c20w3"><h2>Communities</h2></div> <div class="c20w1"><!-- C38v1 --> <div class="c38 c38v1"><div class="c39list2col"><ul class="listicons">     <li><a target="_blank" href="http://java.sun.com/">Oracle Technology Network for Java Developers</a></li>     <li><a target="_blank" href="http://java.net/">Java.net</a></li> </ul> <ul class="listicons">     <li><a target="_blank" href="http://www.oracle.com/technetwork/index.html?ssSourceSiteId=ocomen">Oracle Technology Network</a></li>     <li><a target="_blank" href="http://www.oracle.com/technetwork/systems/index.html?ssSourceSiteId=ocomen">Oracle Technology Network for SysAdmins</a></li> </ul></div></div> <!-- /C38v1 --></div> <div class="c20w2"><div class="c20z3">&nbsp;</div> <div class="c20z4">&nbsp;</div></div></div> <!-- /C20v1 -->
 					
 
 
@@ -647,11 +713,13 @@ show_deletebutton: true
 <div class="u06v1w2">
 <ul>
     <h5>Oracle Cloud</h5>
-    <li><a data-lbl="cloud:learn-about-oracle-cloud" href="/us/solutions/cloud/overview/index.html">Learn About Oracle Cloud</a></li>
+    <li><a data-lbl="cloud:learn-about-oracle-cloud" href="https://www.oracle.com/cloud/index.html">Learn About Oracle Cloud Computing</a></li>
     <li><a target="_blank" data-lbl="cloud:get-a-free-trial" href="https://cloud.oracle.com/tryit">Get a Free Trial</a></li>
-    <li><a data-lbl="cloud:learn-about-paas" href="/us/solutions/cloud/platform/overview/index.html">Learn About PaaS</a></li>
-    <li><a data-lbl="cloud:learn-about-saas" href="/us/technologies/saas/overview/index.html">Learn About SaaS</a></li>
-    <li><a data-lbl="cloud:learn-about-iaas" href="/us/solutions/cloud/infrastructure/overview/index.html">Learn About IaaS</a></li>
+    <li><a data-lbl="cloud:learn-about-paas" href="https://www.oracle.com/cloud/paas.html">Learn About PaaS</a></li>
+    <li><a data-lbl="cloud:learn-about-saas" href="https://www.oracle.com/cloud/saas.html">Learn About SaaS</a></li>
+    <li><a data-lbl="cloud:learn-about-iaas" href="https://www.oracle.com/cloud/iaas.html">Learn About IaaS</a></li>
+    <li><a data-lbl="cloud:learn-about-private-cloud" href="https://www.oracle.com/cloud/private-cloud.html">Learn About Private Cloud</a></li>
+    <li><a data-lbl="cloud:learn-about-managed-cloud" href="https://www.oracle.com/cloud/managed-cloud.html">Learn About Managed Cloud</a></li>
 </ul>
 </div>
 <div class="u06v1w2">
@@ -719,7 +787,7 @@ show_deletebutton: true
     <li><a data-lbl="terms of use" href="/us/legal/terms/index.html">Terms of Use</a></li>
     <li><a data-lbl="privacy rights" href="/us/legal/privacy/overview/index.html">Privacy</a></li>
     <li>
-    <div id="teconsent"></div>
+    <div id="teconsent">&nbsp;</div>
     </li>
     <li class="u06-mobile"><a data-lbl="oracle mobile" href="/us/corporate/mobile-application/index.html">Oracle Mobile</a></li>
 </ul>

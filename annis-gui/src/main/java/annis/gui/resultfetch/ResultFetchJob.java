@@ -156,8 +156,9 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 
         // prepare fetching subgraphs
         final int totalResultSize = result.getMatches().size();
+       
         final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
-          3);
+          totalResultSize);
         int current = 0;
 
         for (Match m : result.getMatches())
@@ -201,14 +202,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       {
         return;
       }
-      ui.accessSynchronously(new Runnable()
-      {
-        @Override
-        public void run()
-        {
-          resultPanel.showFinishedSubgraphSearch();
-        }
-      });
     }
     catch (InterruptedException ex)
     {
