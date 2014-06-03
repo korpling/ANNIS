@@ -36,6 +36,9 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URLEncoder;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.RowMapper;
@@ -47,19 +50,24 @@ import org.springframework.jdbc.core.RowMapper;
  * @author Benjamin Weißenfels
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
-  implements SelectClauseSqlGenerator<QueryData>, 
+  implements SelectClauseSqlGenerator<QueryData>,
   OrderByClauseSqlGenerator<QueryData>, RowMapper<Match>
-{  
-  
-  private static final Logger log = LoggerFactory.getLogger(FindSqlGenerator.class);
-  
+{
+
+  private static final Logger log = LoggerFactory.getLogger(
+    FindSqlGenerator.class);
+
   // optimize DISTINCT operation in SELECT clause
   private boolean optimizeDistinct;
+
   private boolean sortSolutions;
+
   private boolean outputCorpusPath;
+
   private boolean outputToplevelCorpus;
+
   private CorpusPathExtractor corpusPathExtractor;
-  
+
   private AnnotationConditionProvider annoCondition;
 
   @Override
@@ -80,58 +88,62 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       TableAccessStrategy tblAccessStr = tables(node);
       cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
-      if(annoCondition != null)
+      if (annoCondition != null)
       {
-        cols.add(annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_namespace" + i);
-        cols.add(annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
+        cols.add(
+          annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_ns" + i);
+        cols.add(
+          annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
       }
       if (outputCorpusPath)
       {
         cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
           + " AS node_name" + i);
       }
-      
+
       if (tblAccessStr.usesRankTable() || !node.getNodeAnnotations().isEmpty())
       {
         needsDistinct = true;
       }
     }
-    
+
     // add additional empty columns in or clauses with different node sizes
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
       cols.add("NULL::bigint AS id" + i);
-      if(outputCorpusPath)
-      {      
+      if (outputCorpusPath)
+      {
         cols.add("NULL::varchar AS node_name" + i);
       }
     }
-    
-    if(!alternative.isEmpty() && outputCorpusPath)
+
+    if (!alternative.isEmpty() && outputCorpusPath)
     {
-      
+
       TableAccessStrategy tblAccessStr = tables(alternative.get(0));
-      
-      String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE, "corpus_ref");
-      cols.add("(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias 
+
+      String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE,
+        "corpus_ref");
+      cols.add(
+        "(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias
         + " LIMIT 1) AS path_name");
     }
 
-    if(outputToplevelCorpus)
+    if (outputToplevelCorpus)
     {
       cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
         "toplevel_corpus"));
     }
-    
+
     cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
-    
+
     String colIndent = indent + TABSTOP + TABSTOP;
 
     return (needsDistinct ? "DISTINCT" : "") + "\n" + colIndent
       + StringUtils.join(cols, ",\n" + colIndent);
   }
-  
+
   @Override
   protected void appendOrderByClause(StringBuffer sb, QueryData queryData,
     List<QueryNode> alternative, String indent)
@@ -142,15 +154,15 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       return;
     }
     // don't use ORDER BY clause if we are only counting saves a sort
-    List<LimitOffsetQueryData> extensions =
-      queryData.getExtensions(LimitOffsetQueryData.class);
-    
+    List<LimitOffsetQueryData> extensions
+      = queryData.getExtensions(LimitOffsetQueryData.class);
+
     if (extensions.size() > 0)
     {
       super.appendOrderByClause(sb, queryData, alternative, indent);
     }
   }
-  
+
   @Override
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
@@ -159,9 +171,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ids.add("id" + i);
-      if(annoCondition != null)
+      if (annoCondition != null)
       {
-        ids.add("node_annotation_namespace" + i);
+        ids.add("node_annotation_ns" + i);
         ids.add("node_annotation_name" + i);
       }
     }
@@ -192,20 +204,20 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
     // the order of columns is not determined and I have to combined two
     // values, so save them here and combine later
-    String node_name = null;
     List<String> corpus_path = null;
 
     //get path
-    if(outputCorpusPath)
+    if (outputCorpusPath)
     {
       for (int column = 1; column <= columnCount; ++column)
       {
-        if (corpusPathExtractor != null && metaData.getColumnName(column).startsWith("path_name"))
+        if (corpusPathExtractor != null && metaData.getColumnName(column).
+          startsWith("path_name"))
         {
           List<String> genCorpusPath = corpusPathExtractor.extractCorpusPath(rs,
             metaData.getColumnName(column));
           // only use corpus path if valid
-          if(genCorpusPath != null)
+          if (genCorpusPath != null)
           {
             corpus_path = genCorpusPath;
             // all corpus paths are the same
@@ -213,30 +225,53 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
           }
         }
       }
-    }
 
-    // one match per column
-    for (int column = 1; column <= columnCount; ++column)
-    {
+      // collect the node names, annotation namespaces and annotation names
+      Map<Integer, String> nodeNames = new TreeMap<>();
+      Map<Integer, String> nodeAnnoNamespaces = new HashMap<>();
+      Map<Integer, String> nodeAnnoNames = new HashMap<>();
 
-      if (metaData.getColumnName(column).startsWith("node_name"))
+      for (int column = 1; column <= columnCount; ++column)
       {
-        node_name = rs.getString(column);
+        String columnName = metaData.getColumnName(column);
+        if (columnName.startsWith("node_name"))
+        {
+          String numberAsString = columnName.substring("node_name".length());
+          try
+          {
+            int number = Integer.parseInt(numberAsString);
+            nodeNames.put(number, rs.getString(column));
+
+            String annoNamespace = rs.getString("node_annotation_ns" + number);
+            if (annoNamespace != null)
+            {
+              nodeAnnoNamespaces.put(number, annoNamespace);
+            }
+            String annoName = rs.getString("node_annotation_name" + number);
+            if (annoName != null)
+            {
+              nodeAnnoNames.put(number, annoName);
+            }
+
+          }
+          catch (NumberFormatException ex)
+          {
+            log.error("Could not extract the number for column " + columnName,
+              ex);
+          }
+        }
       }
-      else // no more matches in this row if an id was NULL
-      if (rs.wasNull())
+
+      for (Map.Entry<Integer, String> nodeNameEntry : nodeNames.entrySet())
       {
-        break;
+        URI saltID
+          = buildSaltId(corpus_path, nodeNameEntry.getValue(),
+            nodeAnnoNamespaces.get(nodeNameEntry.getKey()),
+            nodeAnnoNames.get(nodeNameEntry.getKey()));
+        match.addSaltId(saltID);
       }
 
-      if (outputCorpusPath && node_name != null)
-      {
-        match.addSaltId(buildSaltId(corpus_path, node_name));
-
-        node_name = null;
-      }
-    }
-
+    } // end if output path
 
     return match;
   }
@@ -251,7 +286,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     this.optimizeDistinct = optimizeDistinct;
   }
 
-  private URI buildSaltId(List<String> path, String node_name)
+  private URI buildSaltId(List<String> path, String node_name,
+    String nodeAnnotatioNamespace, String nodeAnnotatioName)
   {
     StringBuilder sb = new StringBuilder("salt:/");
 
@@ -270,6 +306,22 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
     sb.append("#").append(node_name);
 
+    // append information about the matched annotation
+    if (nodeAnnotatioName != null)
+    {
+      if (nodeAnnotatioNamespace == null)
+      {
+        sb.append("@").append(nodeAnnotatioName);
+      }
+      else
+      {
+        sb.append("@")
+          .append(nodeAnnotatioNamespace)
+          .append("::")
+          .append(nodeAnnotatioName);
+      }
+    }
+
     URI result;
     try
     {
@@ -278,7 +330,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
     catch (URISyntaxException ex)
     {
-      log.error("Could not generate valid ID from path " 
+      log.error("Could not generate valid ID from path "
         + path.toString() + " and node name " + node_name, ex);
     }
     return null;
@@ -333,8 +385,5 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   {
     this.annoCondition = annoCondition;
   }
-  
-  
-  
-  
+
 }
