@@ -32,9 +32,11 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.regex.Pattern;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
@@ -51,6 +53,8 @@ import java.util.LinkedList;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
+  
+  private final static Pattern annotationSuffix = Pattern.compile("@.+$");
   
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
@@ -128,7 +132,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       // filter the node with the right name
       sb.append(indent)
         .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
-        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
+        .append("'").append(generateNodeName(uri)).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent)
@@ -214,5 +218,18 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     sb.append("}");
     
     return  sqlString(sb.toString());
+  }
+  
+  private String generateNodeName(URI uri)
+  { 
+    String fragment = uri.getFragment();
+    // remove any node annotation information if existent
+    if(fragment != null)
+    {
+      return annotationSuffix.matcher(fragment).replaceFirst("");
+    }
+    return null;
+    
+
   }
 }
