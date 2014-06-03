@@ -222,7 +222,7 @@ public class CountTest
     assertEquals(tokenCount, countPcc2("tok & tok & #1 _id_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _id_ #2"));
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
+    assertEquals(tokenCount, countPcc2("tok & pos=/.*/ & #1 _=_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
   }
 

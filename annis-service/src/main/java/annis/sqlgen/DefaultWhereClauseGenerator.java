@@ -458,6 +458,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     conditions.add(spanLengthSource + " = " + spanLengthTarget);
     
+    notReflexive(conditions, node, target);
     //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
 
