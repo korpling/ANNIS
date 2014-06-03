@@ -182,4 +182,23 @@ public class ApAnnotationConditionProvider implements
     
     return false;
   }
+  
+  @Override
+  public String getNodeAnnoNameSQL(TableAccessStrategy tas)
+  {
+    return "getAnnoName("
+      + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + ", "
+      + "'node')";
+  }
+  
+  @Override
+  public String getNodeAnnoNamespaceSQL(TableAccessStrategy tas)
+  {
+    return "getAnnoNamespace("
+      + tas.aliasedColumn(NODE_TABLE, "node_anno_ref") + ", "
+      + tas.aliasedColumn(NODE_TABLE, "toplevel_corpus") + ", "
+      + "'node')";
+  }
+  
 }

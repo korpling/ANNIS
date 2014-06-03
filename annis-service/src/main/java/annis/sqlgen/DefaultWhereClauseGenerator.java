@@ -153,20 +153,14 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         aliasedColumn(NODE_TABLE, "id"));
       
       // FIXME: this only works for the "annotext" scheme
-      String annoNameDifferent = join("<>",
-        "(splitanno(" 
-          + tables(node).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-        + "))[2]", 
-        "(splitanno(" 
-          + tables(target).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-        + "))[2]");
-      String annoNamespaceDifferent = join("<>",
-        "(splitanno(" 
-          + tables(node).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-        + "))[1]", 
-        "(splitanno(" 
-          + tables(target).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-        + "))[1]");
+      String annoNamespaceDifferent = join("IS DISTINCT FROM",
+        annoCondition.getNodeAnnoNamespaceSQL(tables(node)),
+        annoCondition.getNodeAnnoNamespaceSQL(tables(target)));
+      
+      String annoNameDifferent = join("IS DISTINCT FROM",
+        annoCondition.getNodeAnnoNameSQL(tables(node)),
+        annoCondition.getNodeAnnoNameSQL(tables(target)));
+      
       
       conditions.add("(" 
         + Joiner.on(" OR ").join(nodeDifferent, annoNameDifferent, annoNamespaceDifferent) 

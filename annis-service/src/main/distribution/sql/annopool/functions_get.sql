@@ -37,3 +37,23 @@ WHERE
   toplevel_corpus = $2 AND
   "type" = $3::annotype
 $f$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION getAnnoNamespace(anno_ref bigint, toplevel_corpus bigint, "type" varchar) 
+RETURNS varchar AS $f$
+SELECT namespace
+FROM annotation_pool
+WHERE
+  id = $1 AND 
+  toplevel_corpus = $2 AND
+  "type" = $3::annotype
+$f$ LANGUAGE SQL STABLE;
+
+CREATE OR REPLACE FUNCTION getAnnoName(anno_ref bigint, toplevel_corpus bigint, "type" varchar) 
+RETURNS varchar AS $f$
+SELECT "name"
+FROM annotation_pool
+WHERE
+  id = $1 AND 
+  toplevel_corpus = $2 AND
+  "type" = $3::annotype
+$f$ LANGUAGE SQL STABLE;

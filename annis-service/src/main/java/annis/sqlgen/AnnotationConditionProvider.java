@@ -46,4 +46,7 @@ public interface AnnotationConditionProvider
     QueryNode node, QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget, 
     boolean equal);
   
+  public String getNodeAnnoNamespaceSQL(TableAccessStrategy tas);
+  public String getNodeAnnoNameSQL(TableAccessStrategy tas);
+  
 }
