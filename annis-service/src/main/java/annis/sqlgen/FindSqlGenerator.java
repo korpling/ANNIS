@@ -90,10 +90,21 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
       if (annoCondition != null)
       {
-        cols.add(
-          annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_ns" + i);
-        cols.add(
-          annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
+        if(node.getNodeAnnotations().isEmpty())
+        {
+          // if a query node is not using annotations, fallback to NULL as the value
+          // this is important for the DISTINCT clause, since we don't want to match 
+          // the annotation itself but the node
+          cols.add("NULL::varchar AS node_annotation_ns" + i);
+          cols.add("NULL::varchar AS node_annotation_name" + i);
+        }
+        else
+        {
+          cols.add(
+            annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_ns" + i);
+          cols.add(
+            annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
+        }
       }
       if (outputCorpusPath)
       {
