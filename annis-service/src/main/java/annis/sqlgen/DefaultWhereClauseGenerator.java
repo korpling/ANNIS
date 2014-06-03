@@ -25,6 +25,7 @@ import static annis.sqlgen.SqlConstraints.numberJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
@@ -54,6 +55,7 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
@@ -109,7 +111,24 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
    * Explicitly disallow reflexivity.
    * 
    * Can be used if the other conditions allow reflexivity but the operator not.
-   * Two results are not equal if they are different nodes. 
+   * It depends on the search conditions if two results are not equal.
+   * 
+   * <p>
+   * <b>For two nodes (including searches for token):</b> <br />
+   * node IDs are different
+   * </p>
+   * 
+   * 
+   * <p>
+   * <b>If both nodes are an annotation:</b> <br />
+   * node IDs are different or annotation namespace+name are different
+   * </p>
+   * 
+   * <p>
+   * <b>For a node with and one without annotation condition:</b> <br />
+   * always different
+   * </p>
+   * 
    * 
    * @param conditions
    * @param node
@@ -120,7 +139,40 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     Validate.isTrue(node != target, "notReflexive(...) implies that source "
       + "and target node are not the same, but someone is violating this constraint!");
-    joinOnNode(conditions, node, target, "<>", "id", "id");
+    Validate.notNull(node);
+    Validate.notNull(target);
+    
+    if(node.getNodeAnnotations().isEmpty() && target.getNodeAnnotations().isEmpty())
+    {    
+      joinOnNode(conditions, node, target, "<>", "id", "id");
+    }
+    else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
+    {
+      String nodeDifferent = join("<>",
+        tables(node).aliasedColumn(NODE_TABLE, "id"), tables(target).
+        aliasedColumn(NODE_TABLE, "id"));
+      
+      // FIXME: this only works for the "annotext" scheme
+      String annoNameDifferent = join("<>",
+        "(splitanno(" 
+          + tables(node).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
+        + "))[2]", 
+        "(splitanno(" 
+          + tables(target).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
+        + "))[2]");
+      String annoNamespaceDifferent = join("<>",
+        "(splitanno(" 
+          + tables(node).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
+        + "))[1]", 
+        "(splitanno(" 
+          + tables(target).aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
+        + "))[1]");
+      
+      conditions.add("(" 
+        + Joiner.on(" OR ").join(nodeDifferent, annoNameDifferent, annoNamespaceDifferent) 
+        + ")");
+      
+    }
   }
 
   
