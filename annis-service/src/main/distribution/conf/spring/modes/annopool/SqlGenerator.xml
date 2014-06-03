@@ -15,6 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
+ <bean id="annotationConditionProvider" class="annis.sqlgen.annotext.ApAnnotationConditionProvider" />
+  
+
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
@@ -24,9 +27,7 @@ limitations under the License.
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
         parent="defaultWhereClauseGeneratorBase" lazy-init="true">
-    <property name="annoCondition">
-      <bean class="annis.sqlgen.annopool.ApAnnotationConditionProvider" />
-    </property>
+    <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
   
   

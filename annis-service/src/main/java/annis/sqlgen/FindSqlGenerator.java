@@ -59,6 +59,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   private boolean outputCorpusPath;
   private boolean outputToplevelCorpus;
   private CorpusPathExtractor corpusPathExtractor;
+  
+  private AnnotationConditionProvider annoCondition;
 
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -78,13 +80,18 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
 
       TableAccessStrategy tblAccessStr = tables(node);
       cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "id") + " AS id" + i);
+      if(annoCondition != null)
+      {
+        cols.add(annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_namespace" + i);
+        cols.add(annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
+      }
       if (outputCorpusPath)
       {
         cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
           + " AS node_name" + i);
       }
       
-      if (tblAccessStr.usesRankTable())
+      if (tblAccessStr.usesRankTable() || !node.getNodeAnnotations().isEmpty())
       {
         needsDistinct = true;
       }
@@ -118,9 +125,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     
     cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
       "corpus_ref"));
+    
+    String colIndent = indent + TABSTOP + TABSTOP;
 
-    return (needsDistinct ? "DISTINCT" : "") + "\n" + indent + TABSTOP
-      + StringUtils.join(cols, ", ");
+    return (needsDistinct ? "DISTINCT" : "") + "\n" + colIndent
+      + StringUtils.join(cols, ",\n" + colIndent);
   }
   
   @Override
@@ -150,6 +159,11 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ids.add("id" + i);
+      if(annoCondition != null)
+      {
+        ids.add("node_annotation_namespace" + i);
+        ids.add("node_annotation_name" + i);
+      }
     }
     return StringUtils.join(ids, ", ");
   }
@@ -308,6 +322,16 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public void setOutputToplevelCorpus(boolean outputToplevelCorpus)
   {
     this.outputToplevelCorpus = outputToplevelCorpus;
+  }
+
+  public AnnotationConditionProvider getAnnoCondition()
+  {
+    return annoCondition;
+  }
+
+  public void setAnnoCondition(AnnotationConditionProvider annoCondition)
+  {
+    this.annoCondition = annoCondition;
   }
   
   

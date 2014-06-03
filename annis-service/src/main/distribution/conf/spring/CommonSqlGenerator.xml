@@ -358,6 +358,8 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="annoCondition" ref="annotationConditionProvider" />
+    
   </bean>
   
   <bean id="frequencyFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
@@ -373,6 +375,7 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
+    <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
   
   <bean id="noCorpusPathFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
@@ -388,6 +391,7 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
+    <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
