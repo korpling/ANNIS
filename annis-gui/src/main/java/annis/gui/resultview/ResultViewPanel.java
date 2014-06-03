@@ -503,19 +503,14 @@ public class ResultViewPanel extends VerticalLayout implements
         setSegmentationLayer(selectedSegmentationLayer);
       }
       
-      if(selectedSegmentationLayer != null)
-      {
-        
-        //update URL with newly selected segmentation layer
-        PagedResultQuery q;
-        
-        SearchUI sui = (SearchUI) UI.getCurrent();
-        q = sui.getQueryController().getPreparedQuery();        
-        q.setSegmentation(selectedSegmentationLayer);
-                       
-        sui.updateFragment(q);
-    	  
-      }      
+      //update URL with newly selected segmentation layer
+      PagedResultQuery q;
+      SearchUI sui = (SearchUI) UI.getCurrent();
+      q = sui.getQueryController().getPreparedQuery();        
+      //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
+      q.setSegmentation(selectedSegmentationLayer); 
+
+      sui.updateFragment(q);
     }
   }
 
