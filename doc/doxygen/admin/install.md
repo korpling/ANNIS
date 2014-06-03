@@ -24,7 +24,7 @@ sudo -u postgres psql
 \q
 \endcode
 
-2. Make sure you have installed [JDK 6 or JDK 7](http://java.sun.com/javase/downloads/index.jsp)
+2. Make sure you have installed [JDK 7](http://java.sun.com/javase/downloads/index.jsp)
 3. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
  (or install them if you don’t)
 4. Download the ANNIS service distribution file `annis-service-<version>-distribution.tar.gz` from our website
