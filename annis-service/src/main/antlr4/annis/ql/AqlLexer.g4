@@ -45,7 +45,7 @@ RIGHT_OVERLAP:'_or_';
 LEFT_CHILD:'@l';
 RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
-IDENTITY:'_id_';
+IDENTITY:'_ident_';
 ROOT:':root';
 ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
