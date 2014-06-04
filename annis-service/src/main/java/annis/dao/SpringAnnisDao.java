@@ -57,7 +57,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -335,43 +334,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         }
       });
 
-    Closer closer = Closer.create();
-    try
+
+    File dir = getRealDataDir();
+
+    if (fileName == null)
     {
-      try
-      {
-        File dir = getRealDataDir();
+      fileName = "corpus_" 
+        + CommonHelper.getSafeFileName(toplevelCorpusName) 
+        + "_" + UUID.randomUUID() + ".properties";
+      getJdbcTemplate().update(
+        "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+        + "', 'application/text+plain', 'corpus.properties')");
+    }
+    log.info("write config file: " + dir + "/" + fileName);
+    try (FileOutputStream fStream = new FileOutputStream(new File(
+      dir.getCanonicalPath() + "/" + fileName));
+      OutputStreamWriter writer = new OutputStreamWriter(fStream,
+        Charsets.UTF_8))
+    {
+      props.store(writer, "");
 
-        if (fileName == null)
-        {
-          fileName = "corpus_" 
-            + CommonHelper.getSafeFileName(toplevelCorpusName) 
-            + "_" + UUID.randomUUID() + ".properties";
-          getJdbcTemplate().update(
-            "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-            + "', 'application/text+plain', 'corpus.properties')");
-        }
-
-        log.info("write config file: " + dir + "/" + fileName);
-        FileOutputStream fStream = new FileOutputStream(new File(
-          dir.getCanonicalPath() + "/" + fileName));
-
-        closer.register(fStream);
-
-        OutputStreamWriter writer = new OutputStreamWriter(fStream,
-          Charsets.UTF_8);
-        closer.register(writer);
-
-        props.store(writer, "");
-      }
-      catch (Throwable ex)
-      {
-        closer.rethrow(ex);
-      }
-      finally
-      {
-        closer.close();
-      }
     }
     catch (IOException ex)
     {
