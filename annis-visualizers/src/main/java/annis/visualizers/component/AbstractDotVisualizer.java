@@ -112,14 +112,13 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       pBuilder.redirectErrorStream(false);
       Process process = pBuilder.start();
      
-      InputStream inputFromProcess = process.getInputStream();
-      for(int chr=inputFromProcess.read(); chr != -1; chr = inputFromProcess.read())
+      try (InputStream inputFromProcess = process.getInputStream())
       {
-        outstream.write(chr);
+        for(int chr=inputFromProcess.read(); chr != -1; chr = inputFromProcess.read())
+        {
+          outstream.write(chr);
+        }
       }
-      
-      inputFromProcess.close();
-      
       
       int resultCode = process.waitFor();
       

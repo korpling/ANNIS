@@ -333,38 +333,20 @@ public class ImportDialog extends javax.swing.JDialog
   private void storeProperties()
   {
     confProps.put("last-directory", txtInputDir.getText());
-    FileOutputStream oStream = null;
-    try
+    try(FileOutputStream oStream = new FileOutputStream(confFile))
     {
-      oStream = new FileOutputStream(confFile);
       confProps.store(oStream, "");
     }
     catch (IOException ex)
     {
       log.error(null, ex);
     }
-    finally
-    {
-      if (oStream != null)
-      {
-        try
-        {
-          oStream.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-    }
   }
 
   private void loadProperties()
   {
-    FileInputStream iStream = null;
-    try
+    try(FileInputStream iStream = new FileInputStream(confFile);)
     {
-      iStream = new FileInputStream(confFile);
       confProps.load(iStream);
       String lastDirectory = confProps.getProperty("last-directory");
       if (lastDirectory != null)
@@ -376,20 +358,6 @@ public class ImportDialog extends javax.swing.JDialog
     catch (IOException ex)
     {
       log.error(null, ex);
-    }
-    finally
-    {
-      if (iStream != null)
-      {
-        try
-        {
-          iStream.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
 
   }

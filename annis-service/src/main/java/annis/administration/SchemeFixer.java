@@ -53,70 +53,45 @@ public class SchemeFixer
   
   protected void corpusAlias()
   {
-    ResultSet result = null;
-    Connection conn = null;
-    try
+    try(Connection conn = dataSource.getConnection();)
     {
-      conn = dataSource.getConnection();
+      
       DatabaseMetaData dbMeta = conn.getMetaData();
-      result = dbMeta.getColumns(null, null, "corpus_alias", null);
-      
-      Map<String, Integer> columnType = new HashMap<>();
-      
-      while(result.next())
-      {
-        columnType.put(result.getString(4), result.getInt(5));
+      try(ResultSet result =  dbMeta.getColumns(null, null, "corpus_alias", null);)
+      { 
+        Map<String, Integer> columnType = new HashMap<>();
+
+        while(result.next())
+        {
+          columnType.put(result.getString(4), result.getInt(5));
+        }
+
+        if(columnType.isEmpty())
+        {
+          // create the table
+          log.info("Creating corpus_alias table");
+          jdbcTemplate.execute(
+            "CREATE TABLE corpus_alias\n"
+            + "(\n"
+            + "  alias text,\n"
+            + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
+            + "  PRIMARY KEY (alias, corpus_ref)\n"
+            + ");");
+        }
+        else
+        {
+          // check if columns have correct type and name, if not throw an error
+          Preconditions.checkState(Types.VARCHAR == columnType.get("alias"), "there must be an \"alias\" column of type \"text\"");
+          Preconditions.checkState(Types.BIGINT == columnType.get("corpus_ref"), "there must be an \"corpus_ref\" column of type \"bigint\"");
+        }
+
       }
-      
-      if(columnType.isEmpty())
-      {
-        // create the table
-        log.info("Creating corpus_alias table");
-        jdbcTemplate.execute(
-          "CREATE TABLE corpus_alias\n"
-          + "(\n"
-          + "  alias text,\n"
-          + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
-          + "  PRIMARY KEY (alias, corpus_ref)\n"
-          + ");");
-      }
-      else
-      {
-        // check if columns have correct type and name, if not throw an error
-        Preconditions.checkState(Types.VARCHAR == columnType.get("alias"), "there must be an \"alias\" column of type \"text\"");
-        Preconditions.checkState(Types.BIGINT == columnType.get("corpus_ref"), "there must be an \"corpus_ref\" column of type \"bigint\"");
-      }
-      
     }
     catch (SQLException ex)
     {
       log.error("Could not get the metadata for the database", ex);
     }
-    finally
-    {
-      if(result != null)
-      {
-        try
-        {
-          result.close();
-        }
-        catch (SQLException ex1)
-        {
-          log.error("Could not close the result set", ex1);
-        }
-      }
-      if(conn != null)
-      {
-        try
-        {
-          conn.close();
-        }
-        catch (SQLException ex1)
-        {
-          log.error("Could not close the result set", ex1);
-        }
-      }
-    }
+    
   }
 
   public JdbcTemplate getJdbcTemplate()

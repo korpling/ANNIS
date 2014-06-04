@@ -398,12 +398,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public DocumentBrowserConfig getDefaultDocBrowserConfiguration()
   {
-
-      InputStream input = null;
-      try
+      String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
+      try(InputStream input = new FileInputStream(path);)
       {
-        String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
-        input = new FileInputStream(path);
+        
 
          // map json to pojo
         ObjectMapper objectMapper = new ObjectMapper();
@@ -420,22 +418,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         log.error(
           "problems with reading ${annis.home}/conf/document-browser.json", ex);
-      }
-      finally
-      {
-        try
-        {
-          if (input != null)
-          {
-            input.close();
-          }
-        }
-        catch (IOException ex)
-        {
-          log.error(
-            "Problems with closing the ${annis.home}/conf/document-browser.json",
-            ex);
-        }
       }
 
       return null;
@@ -642,36 +624,35 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         @Override
         public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
         {
-          Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.CONCUR_READ_ONLY);
-          try
+          
+          try(Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+            ResultSet.CONCUR_READ_ONLY);)
           {
             String sql = findSqlGenerator.toSql(queryData);
 
-            ResultSet rs = stmt.executeQuery(sql);
-
-            PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-            ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<>(
-              rs, findSqlGenerator);
-
-            int i = 1;
-            while (itMatches.hasNext())
+            PrintWriter w;
+            try (ResultSet rs = stmt.executeQuery(sql))
             {
-              // write single match to output stream
-              Match m = itMatches.next();
-              w.print(m.toString());
-              w.print("\n");
-
-              // flush after every 10th item
-              if (i % 10 == 0)
+              w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+              ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<>(
+                rs, findSqlGenerator);
+              int i = 1;
+              while (itMatches.hasNext())
               {
-                w.flush();
-              }
-
-              i++;
-            } // end for each match
-
-            rs.close();
+                // write single match to output stream
+                Match m = itMatches.next();
+                w.print(m.toString());
+                w.print("\n");
+                
+                // flush after every 10th item
+                if (i % 10 == 0)
+                {
+                  w.flush();
+                }
+                
+                i++;
+              } // end for each match
+            }
             w.flush();
             return true;
           }
@@ -681,10 +662,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
               "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
               ex);
           }
-          finally
-          {
-            stmt.close();
-          }
+
           return false;
         }
       });
@@ -726,11 +704,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       @Override
       public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
       {
-        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+        
+        try(Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
           ResultSet.CONCUR_READ_ONLY);
-        try
+          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));)
         {
-          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));
+          
           AnnotatedMatchIterator itMatches
             = new AnnotatedMatchIterator(rs, matrixSqlGenerator.
               getSpanExtractor());
@@ -759,18 +738,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
             WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
           }
           w.flush();
-
-          rs.close();
         }
         catch (UnsupportedEncodingException ex)
         {
           log.error(
             "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
             ex);
-        }
-        finally
-        {
-          stmt.close();
         }
         return true;
       }
@@ -1003,10 +976,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public boolean checkDatabaseVersion() throws AnnisException
   {
-    Connection conn = null;
-    try
+    try(Connection conn = getJdbcTemplate().getDataSource().getConnection();)
     {
-      conn = getJdbcTemplate().getDataSource().getConnection();
+      
       DatabaseMetaData meta = conn.getMetaData();
 
       log.debug(
@@ -1033,20 +1005,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       log.error("could not get database version", ex);
     }
-    finally
-    {
-      if (conn != null)
-      {
-        try
-        {
-          conn.close();
-        }
-        catch (SQLException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-    }
+
     return false;
   }
 

@@ -151,10 +151,9 @@ public class CorpusAdministration
       if (f.isFile())
       {
         // might be a ZIP-file
-        ZipFile zip = null;
-        try
+        try(ZipFile zip = new ZipFile(f);)
         {
-          zip = new ZipFile(f);
+          
           // get the names of all corpora included in the ZIP file
           // in order to get a folder name
           Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
@@ -165,7 +164,6 @@ public class CorpusAdministration
             join(corpora.keySet()));
           roots.addAll(unzipCorpus(outDir, zip));
 
-          zip.close();
         }
         catch (ZipException ex)
         {
@@ -178,20 +176,6 @@ public class CorpusAdministration
           log.error(
             "IOException when importing file " + f.getAbsolutePath() + ", will be ignored",
             ex);
-        }
-        finally
-        {
-          if (zip != null)
-          {
-            try
-            {
-              zip.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
         }
       }
       else
@@ -296,21 +280,21 @@ public class CorpusAdministration
           rootDirs.add(outFile.getParentFile());
         }
 
-        FileOutputStream outStream = null;
-        try
+        
+        if (!outFile.getParentFile().isDirectory())
         {
-          if (!outFile.getParentFile().isDirectory())
+          if (!outFile.getParentFile().mkdirs())
           {
-            if (!outFile.getParentFile().mkdirs())
             {
-              {
-                log.warn(
-                  "Could not create output directory for file " + outFile.
-                  getAbsolutePath());
-              }
+              log.warn(
+                "Could not create output directory for file " + outFile.
+                getAbsolutePath());
             }
           }
-          outStream = new FileOutputStream(outFile);
+        }
+        try(FileOutputStream outStream = new FileOutputStream(outFile);)
+        {
+          
           ByteStreams.copy(zip.getInputStream(e), outStream);
         }
         catch (FileNotFoundException ex)
@@ -320,20 +304,6 @@ public class CorpusAdministration
         catch (IOException ex)
         {
           log.error(null, ex);
-        }
-        finally
-        {
-          if (outStream != null)
-          {
-            try
-            {
-              outStream.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
         }
       } // end else is file
     } // end for each entry in zip file
@@ -678,10 +648,9 @@ public class CorpusAdministration
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
-    BufferedWriter writer = null;
-    try
+    try(BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));)
     {
-      writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));
+      
       writer.write("# database configuration\n");
       writer.write("datasource.driver=org.postgresql.Driver\n");
       writer.write("datasource.url=jdbc:postgresql://" + host + ":" + port + "/"
@@ -694,20 +663,6 @@ public class CorpusAdministration
     {
       log.error("Couldn't write database properties file", e);
       throw new FileAccessException(e);
-    }
-    finally
-    {
-      if (writer != null)
-      {
-        try
-        {
-          writer.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }

@@ -239,9 +239,9 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     try
     {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-        new FileInputStream(filename), "UTF-8"));
-      try
+      
+      try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+        new FileInputStream(filename), "UTF-8"));)
       {
         Map<String, Integer> queryRun = new HashMap<>();
         Map<String, Integer> queryId = new HashMap<>();
@@ -309,13 +309,6 @@ public class AnnisRunner extends AnnisBaseRunner
               System.out.println(StringUtils.join(output, "\t"));
             }
           }
-        }
-      }
-      finally
-      {
-        if (reader != null)
-        {
-          reader.close();
         }
       }
     }
@@ -660,10 +653,9 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println();
 
     // CSV output
-    try
-    {
-      CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
-        "annis_benchmark_result.csv"), "UTF-8"));
+    try(CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
+        "annis_benchmark_result.csv"), "UTF-8"));)
+    { 
 
       String[] header = new String[]
       {
@@ -682,8 +674,6 @@ public class AnnisRunner extends AnnisBaseRunner
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-      csv.close();
-      
     }
     catch (IOException ex)
     {
@@ -702,9 +692,11 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           Properties props = new Properties();
           props.put("YVALUE", "" + b.getMedian());
-          FileWriterWithEncoding writer = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8");
-          props.store(writer, "");
-          writer.close();
+          try (FileWriterWithEncoding writer = 
+            new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8"))
+          {
+            props.store(writer, "");
+          }
           
           i++;
         }
@@ -747,7 +739,6 @@ public class AnnisRunner extends AnnisBaseRunner
     switch (currentOS)
     {
       case linux:
-        Writer w = null;
         try
         {
           log.info("resetting caches");
@@ -757,8 +748,10 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            w = new FileWriterWithEncoding(dropCaches, "UTF-8");
-            w.write("3");
+            try(Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");)
+            {
+              w.write("3");
+            }
           }
           else
           {
@@ -778,27 +771,9 @@ public class AnnisRunner extends AnnisBaseRunner
           }
 
         }
-        catch (IOException ex)
+        catch (IOException | InterruptedException ex)
         {
           log.error(null, ex);
-        }
-        catch (InterruptedException ex)
-        {
-          log.error(null, ex);
-        }
-        finally
-        {
-          if (w != null)
-          {
-            try
-            {
-              w.close();
-            }
-            catch (IOException ex1)
-            {
-              log.error(null, ex1);
-            }
-          }
         }
 
         break;

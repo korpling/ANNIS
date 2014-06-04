@@ -68,14 +68,10 @@ public class RelANNISHelper
   public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException
   {
     Map<String, ZipEntry> result = new HashMap<>();
-    ZipFile zip = new ZipFile(f);
     try
+    (ZipFile zip = new ZipFile(f)) 
     {
       result.putAll(corporaInZipfile(zip));
-    }
-    finally
-    {
-      zip.close();
     }
     
     return result;

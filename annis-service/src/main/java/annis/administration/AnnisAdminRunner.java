@@ -497,11 +497,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private void usage(String error)
   {
     Resource resource = new ClassPathResource("annis/administration/usage.txt");
-    BufferedReader reader = null;
-    try
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.
+        getInputStream(), "UTF-8"));)
     {
-      reader = new BufferedReader(new InputStreamReader(resource.
-        getInputStream(), "UTF-8"));
+      
       for (String line = reader.readLine(); line != null; line = reader.
         readLine())
       {
@@ -511,20 +510,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     catch (IOException e)
     {
       log.warn("could not read usage information: " + e.getMessage());
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     if (error != null)
     {

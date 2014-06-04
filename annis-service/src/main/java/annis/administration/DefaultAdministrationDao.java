@@ -639,15 +639,13 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private void bulkImportNode(String path)
   {
-    BufferedReader reader = null;
-    try
+    // check column number by reading first line
+    File nodeTabFile = new File(path, "node.tab");
+    try (BufferedReader reader
+      = new BufferedReader(new InputStreamReader(
+          new FileInputStream(nodeTabFile), "UTF-8"));)
     {
-      // check column number by reading first line
-      File nodeTabFile = new File(path, "node.tab");
 
-      reader
-        = new BufferedReader(new InputStreamReader(
-            new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
 
       int columnNumber = firstLine == null ? 13
@@ -699,20 +697,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     catch (IOException ex)
     {
       log.error(null, ex);
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
   }
 
@@ -1349,13 +1333,13 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
     Map<String, Object> parameters = args != null ? args.getValues() : new HashMap();
-    BufferedReader reader = null;
-    try
+    
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(new FileInputStream(
+        resource.
+        getFile()), "UTF-8")); )
     {
       StringBuilder sqlBuf = new StringBuilder();
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-        resource.
-        getFile()), "UTF-8"));
+      
       for (String line = reader.readLine(); line != null; line
         = reader.readLine())
       {
@@ -1377,20 +1361,6 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.error("Couldn't read SQL script from resource file.", e);
       throw new FileAccessException(
         "Couldn't read SQL script from resource file.", e);
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error("close the reader for SQL script failed", ex);
-        }
-      }
     }
   }
 
@@ -1784,10 +1754,12 @@ public class DefaultAdministrationDao implements AdministrationDao
         return;
       }
 
-      BufferedReader bReader = new BufferedReader(
-        new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
-      String firstLine = bReader.readLine();
-      bReader.close();
+      String firstLine;
+      try (BufferedReader bReader = new BufferedReader(
+        new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8")))
+      {
+        firstLine = bReader.readLine();
+      }
 
       int cols = 9; // default number
       if (firstLine != null)

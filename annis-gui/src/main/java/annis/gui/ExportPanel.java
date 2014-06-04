@@ -431,11 +431,11 @@ public class ExportPanel extends FormLayout
       final File currentTmpFile = File.createTempFile("annis-export", ".txt");
       currentTmpFile.deleteOnExit();
 
-      OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+      
 
       final AtomicBoolean success = new AtomicBoolean(false);
-      try
+      try(OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
         exporter.convertText(queryPanel.getQuery(),
           (Integer) cbLeftContext.getValue(),
@@ -449,8 +449,6 @@ public class ExportPanel extends FormLayout
       }
       finally
       {
-        outWriter.close();
-
         ui.access(new Runnable()
         {
           @Override

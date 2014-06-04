@@ -367,38 +367,38 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         File tmpFile = File.createTempFile("annis-frequency", ".txt");
         tmpFile.deleteOnExit();
-        Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
-        
-        CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
-        
-        // write headers
-        ArrayList<String> header = new ArrayList<>();
-        if(data.getEntries().size() > 0)
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8))
         {
-          for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
+          CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
+          
+          // write headers
+          ArrayList<String> header = new ArrayList<>();
+          if(data.getEntries().size() > 0)
           {
-            FrequencyTableEntry e = freqDefinition.get(i);
-            String caption = "#" + e.getReferencedNode() + " ("
-              + (e.getType() == FrequencyTableEntryType.span
-              ? "spanned text" : e.getKey())
-              + ")";
-            
-            header.add(caption);
+            for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
+            {
+              FrequencyTableEntry e = freqDefinition.get(i);
+              String caption = "#" + e.getReferencedNode() + " ("
+                + (e.getType() == FrequencyTableEntryType.span
+                ? "spanned text" : e.getKey())
+                + ")";
+              
+              header.add(caption);
+            }
+          }
+          // add count
+          header.add("count");
+          csv.writeNext(header.toArray(new String[0]));
+          
+          // write entries
+          for (FrequencyTable.Entry e : data.getEntries())
+          {
+            ArrayList<String> d = new ArrayList<>();
+            d.addAll(Arrays.asList(e.getTupel()));
+            d.add("" + e.getCount());
+            csv.writeNext(d.toArray(new String[0]));
           }
         }
-        // add count
-        header.add("count");
-        csv.writeNext(header.toArray(new String[0]));
-        
-        // write entries
-        for (FrequencyTable.Entry e : data.getEntries())
-        {
-          ArrayList<String> d = new ArrayList<>();
-          d.addAll(Arrays.asList(e.getTupel()));
-          d.add("" + e.getCount());
-          csv.writeNext(d.toArray(new String[0]));
-        }
-        writer.close();
         
         return new FileInputStream(tmpFile);
 

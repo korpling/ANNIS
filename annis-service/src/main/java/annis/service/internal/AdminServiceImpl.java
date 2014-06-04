@@ -165,15 +165,15 @@ public class AdminServiceImpl implements AdminService
     boolean overwrite = Boolean.parseBoolean(overwriteRaw);
     
     // write content to temporary file
-    OutputStream tmpOut = null;
     try
     {
       File tmpZip = File.createTempFile("annis-import", ".zip");
       tmpZip.deleteOnExit();
       
-      tmpOut = new FileOutputStream(tmpZip);
-      ByteStreams.copy(request.getInputStream(), tmpOut); 
-      
+      try(OutputStream tmpOut = new FileOutputStream(tmpZip))
+      {
+        ByteStreams.copy(request.getInputStream(), tmpOut); 
+      }
       Set<String> allNames = RelANNISHelper.corporaInZipfile(tmpZip).keySet();
       
       if(!allNames.isEmpty())
@@ -235,20 +235,6 @@ public class AdminServiceImpl implements AdminService
     catch(IOException ex)
     {
       log.error(null, ex);
-    }
-    finally
-    {
-      if(tmpOut != null)
-      {
-        try
-        {
-          tmpOut.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     return Response.serverError().build();
   }

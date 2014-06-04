@@ -66,22 +66,16 @@ public class InitDialog extends javax.swing.JDialog
     @Override
     protected String doInBackground() throws Exception
     {
-      InputStream propStream = null;
-      try
+      // get the values from the installation
+      File propFile = new File(System.getProperty("annis.home") + "/conf",
+        "database.properties");
+      try(InputStream propStream = new FileInputStream(propFile))
       {
-        // get the values from the installation
-        File propFile = new File(System.getProperty("annis.home") + "/conf",
-          "database.properties");
-        propStream = new FileInputStream(propFile);
         Properties prop = new Properties();
-        InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8);
         try
+        (InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8)) 
         {
           prop.load(propReader);
-        }
-        finally
-        {
-          propReader.close();
         }
         
         String rawDataSourceURI = prop.getProperty("datasource.url", 
@@ -113,13 +107,6 @@ public class InitDialog extends javax.swing.JDialog
         importStatus.addException("init database exception:", ex);
         ExceptionDialog dlg = new ExceptionDialog(parent, importStatus);
         dlg.setVisible(true);
-      }
-      finally
-      {
-        if(propStream != null)
-        {
-          propStream.close();
-        }
       }
 
       return "ERROR";
