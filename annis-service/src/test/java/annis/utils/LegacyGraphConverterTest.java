@@ -86,7 +86,7 @@ public class LegacyGraphConverterTest
       @Override
       protected SolutionKey<?> createSolutionKey()
       {
-        PostgreSqlArraySolutionKey<Long> key = new PostgreSqlArraySolutionKey<Long>();
+        PostgreSqlArraySolutionKey<Long> key = new PostgreSqlArraySolutionKey<>();
         key.setKeyColumnName("key");
         key.setIdColumnName("id");
         return key;

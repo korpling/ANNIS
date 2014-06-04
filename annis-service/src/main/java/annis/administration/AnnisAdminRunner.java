@@ -246,7 +246,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       boolean useSSL = cmdLine.hasOption("ssl");
 
       boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
+      List<Map<String, Object>> existingCorpora = new LinkedList<>();
 
       if (migrateCorpora)
       {
@@ -278,7 +278,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           File rootCorpusPath = new File(corpusRoot);
           if (rootCorpusPath.isDirectory())
           {
-            LinkedList<File> l = new LinkedList<File>();
+            LinkedList<File> l = new LinkedList<>();
             l.add(rootCorpusPath);
 
             search = new Search(l);
@@ -398,7 +398,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
 
     // convert ids from string to int
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     for (String id : commandArgs)
     {
       try
@@ -536,10 +536,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   {
     // use first element to get metadata (like column names)
     Map<String, Object> first = table.get(0);
-    List<String> columnNames = new ArrayList<String>(first.keySet());
+    List<String> columnNames = new ArrayList<>(first.keySet());
 
     // determine length of column
-    Map<String, Integer> columnSize = new HashMap<String, Integer>();
+    Map<String, Integer> columnSize = new HashMap<>();
     for (String column : columnNames)
     {
       columnSize.put(column, column.length());

@@ -118,7 +118,7 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
   @Override
   public Collection<Permission> resolvePermissionsInRole(String roleString)
   {
-    HashSet<Permission> perms = new HashSet<Permission>();
+    HashSet<Permission> perms = new HashSet<>();
     
     if("*".equals(roleString))
     {

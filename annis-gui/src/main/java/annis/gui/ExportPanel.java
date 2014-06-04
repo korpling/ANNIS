@@ -74,7 +74,7 @@ public class ExportPanel extends FormLayout
     new SimpleTextExporter()
   };
 
-  private final Map<String, String> help4Exporter = new HashMap<String, String>();
+  private final Map<String, String> help4Exporter = new HashMap<>();
 
   private final ComboBox cbExporter;
 
@@ -128,7 +128,7 @@ public class ExportPanel extends FormLayout
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    exporterMap = new HashMap<String, Exporter>();
+    exporterMap = new HashMap<>();
     for (Exporter e : EXPORTER)
     {
       String name = e.getClass().getSimpleName();

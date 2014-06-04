@@ -101,7 +101,7 @@ public class TestAnnisResultImpl {
 	@Test
 	public void getTokenList() {
 		// expected
-		List<AnnisToken> expected = new ArrayList<AnnisToken>();
+		List<AnnisToken> expected = new ArrayList<>();
 		expected.add(new AnnisTokenImpl(ID1, TEXT1, LEFT, RIGHT, TOKEN_INDEX1, 1L));
 		expected.add(new AnnisTokenImpl(ID2, TEXT2, LEFT, RIGHT, TOKEN_INDEX2, 1L));
 		expected.add(new AnnisTokenImpl(ID3, TEXT3, LEFT, RIGHT, TOKEN_INDEX3, 1L));
@@ -151,7 +151,7 @@ public class TestAnnisResultImpl {
 	@Test
 	public void getMarkerIdMatchedNode() {
 		// underlying graph has marker for node ID1
-		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<Long>(Arrays.asList(ID1)));
+		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<>(Arrays.asList(ID1)));
 		
 		// wrap and test: ID1 is marked, ID2 is not
 		AnnisResult annisResult = new AnnisResultImpl(graph);
@@ -163,7 +163,7 @@ public class TestAnnisResultImpl {
 	@Test
 	public void hasMarkerId() {
 		// underlying graph has marker for node ID1
-		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<Long>(Arrays.asList(ID1)));
+		when(graph.getMatchedNodeIds()).thenReturn(new HashSet<>(Arrays.asList(ID1)));
 		
 		// wrap and test: ID1 is marked, ID2 is not
 		AnnisResult annisResult = new AnnisResultImpl(graph);

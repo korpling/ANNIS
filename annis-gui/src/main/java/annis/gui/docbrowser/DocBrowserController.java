@@ -76,9 +76,9 @@ public class DocBrowserController implements Serializable
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
-    this.initedDocBrowsers = new HashMap<String, Component>();
-    this.initiatedVis = new HashMap<String, Component>();
-    this.visibleVisHolder = new HashMap<String, Panel>();
+    this.initedDocBrowsers = new HashMap<>();
+    this.initiatedVis = new HashMap<>();
+    this.visibleVisHolder = new HashMap<>();
   }
 
   public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn)

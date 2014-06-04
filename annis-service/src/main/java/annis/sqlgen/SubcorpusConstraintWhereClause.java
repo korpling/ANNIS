@@ -43,7 +43,7 @@ public class SubcorpusConstraintWhereClause
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    Set<String> conditions = new HashSet<String>();
+    Set<String> conditions = new HashSet<>();
     List<Long> corpusList = queryData.getCorpusList();
     List<Long> documents = queryData.getDocuments();
 
@@ -57,7 +57,7 @@ public class SubcorpusConstraintWhereClause
   public List<String> commonWhereConditions(List<QueryNode> nodes,
     List<Long> corpusList, List<Long> documents)
   {
-    LinkedList<String> conditions = new LinkedList<String>();
+    LinkedList<String> conditions = new LinkedList<>();
 
     // annotations can always only be inside a subcorpus/document
     QueryNode[] copyNodes = nodes.toArray(new QueryNode[nodes.size()]);

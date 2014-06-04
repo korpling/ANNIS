@@ -230,8 +230,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public AnnisRunner()
   {
-    corpusList = new LinkedList<Long>();
-    benchmarks = new ArrayList<AnnisRunner.Benchmark>();
+    corpusList = new LinkedList<>();
+    benchmarks = new ArrayList<>();
   }
 
   ///// Commands
@@ -243,8 +243,8 @@ public class AnnisRunner extends AnnisBaseRunner
         new FileInputStream(filename), "UTF-8"));
       try
       {
-        Map<String, Integer> queryRun = new HashMap<String, Integer>();
-        Map<String, Integer> queryId = new HashMap<String, Integer>();
+        Map<String, Integer> queryRun = new HashMap<>();
+        Map<String, Integer> queryId = new HashMap<>();
         int maxId = 0;
         for (String line = reader.readLine(); line != null; line = reader.
           readLine())
@@ -494,7 +494,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
     }
 
-    List<AnnisRunner.Benchmark> session = new ArrayList<AnnisRunner.Benchmark>();
+    List<AnnisRunner.Benchmark> session = new ArrayList<>();
 
     // create sql + plan for each query and create count copies for each benchmark
     for (AnnisRunner.Benchmark benchmark : benchmarks)
@@ -722,7 +722,7 @@ public class AnnisRunner extends AnnisBaseRunner
     List<Long> corpusList = queryData.getCorpusList();
     List<QueryAnnotation> metaData = queryData.getMetaData();
     Set<Object> extensions = queryData.getExtensions();
-    List<String> fields = new ArrayList<String>();
+    List<String> fields = new ArrayList<>();
     if (!corpusList.isEmpty())
     {
       fields.add("corpus = " + corpusList);
@@ -1082,7 +1082,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCorpus(String list)
   {
-    corpusList = new LinkedList<Long>();
+    corpusList = new LinkedList<>();
     String[] splits = StringUtils.split(list, " ");
     for (String split : splits)
     {
@@ -1093,7 +1093,7 @@ public class AnnisRunner extends AnnisBaseRunner
       catch (NumberFormatException e)
       {
         // check if there is a corpus with this name
-        LinkedList<String> splitList = new LinkedList<String>();
+        LinkedList<String> splitList = new LinkedList<>();
         splitList.add(split);
         corpusList.addAll(annisDao.mapCorpusNamesToIds(splitList));
       }
@@ -1140,7 +1140,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    LinkedList<Long> corpusIdAsList = new LinkedList<Long>();
+    LinkedList<Long> corpusIdAsList = new LinkedList<>();
     try
     {
       corpusIdAsList.add(Long.parseLong(corpusId));
@@ -1340,12 +1340,12 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData = new QueryData();
     MatchGroup matchGroup = MatchGroup.parseString(param);
 
-    Set<String> corpusNames = new TreeSet<String>();
+    Set<String> corpusNames = new TreeSet<>();
 
     for(Match m : matchGroup.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(m.getSaltIDs().size());
+      List<QueryNode> pseudoNodes = new ArrayList<>(m.getSaltIDs().size());
       for (java.net.URI u : m.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
@@ -1353,7 +1353,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       queryData.addAlternative(pseudoNodes);
     }
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
       corpusNames));
 
     queryData.setCorpusList(corpusIDs);

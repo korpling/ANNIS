@@ -296,7 +296,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public String mapCorpusIdToName(long corpusId)
   {
 
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(corpusId);
     List<String> names = mapCorpusIdsToNames(ids);
 
@@ -547,8 +547,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   public SpringAnnisDao()
   {
-    planRowMapper = new ParameterizedSingleColumnRowMapper<String>();
-    sqlSessionModifiers = new ArrayList<SqlSessionModifier>();
+    planRowMapper = new ParameterizedSingleColumnRowMapper<>();
+    sqlSessionModifiers = new ArrayList<>();
   }
 
   public void init()
@@ -567,9 +567,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
 
-    Map<Long, String> corpusNamesById = new TreeMap<Long, String>();
+    Map<Long, String> corpusNamesById = new TreeMap<>();
     List<AnnisCorpus> corpora = listCorpora();
     for (AnnisCorpus corpus : corpora)
     {
@@ -669,7 +669,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
             ResultSet rs = stmt.executeQuery(sql);
 
             PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-            ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
+            ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<>(
               rs, findSqlGenerator);
 
             int i = 1;
@@ -930,7 +930,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     if (corpusNames == null || corpusNames.isEmpty())
     {
-      return new LinkedList<Long>();
+      return new LinkedList<>();
     }
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
     final List<Long> result = getJdbcTemplate().query(sql,
@@ -953,7 +953,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     catch (SQLException ex)
     {
       log.error("Could not get resolver entries from database", ex);
-      return new LinkedList<ResolverEntry>();
+      return new LinkedList<>();
     }
   }
 
@@ -984,7 +984,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private void parseCorpusConfiguration()
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
+    corpusConfiguration = new HashMap<>();
 
     try
     {
@@ -1354,7 +1354,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     catch (DataAccessException ex)
     {
-      return new LinkedList<Long>();
+      return new LinkedList<>();
     }
   }
 
@@ -1434,7 +1434,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       throw new IllegalArgumentException("corpus name may not be null");
     }
 
-    List<String> corpusNames = new ArrayList<String>();
+    List<String> corpusNames = new ArrayList<>();
     corpusNames.add(topLevelCorpus);
     List<Long> corpusIds = mapCorpusNamesToIds(corpusNames);
 

@@ -207,7 +207,7 @@ public class FrequencyResultPanel extends VerticalLayout
     if (clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
     {
       List<FrequencyTable.Entry> entries
-        = new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+        = new ArrayList<>(clippedTable.getEntries());
 
       clippedTable = new FrequencyTable();
       clippedTable.setEntries(entries.subList(0,
@@ -372,7 +372,7 @@ public class FrequencyResultPanel extends VerticalLayout
         CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
         
         // write headers
-        ArrayList<String> header = new ArrayList<String>();
+        ArrayList<String> header = new ArrayList<>();
         if(data.getEntries().size() > 0)
         {
           for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
@@ -393,7 +393,7 @@ public class FrequencyResultPanel extends VerticalLayout
         // write entries
         for (FrequencyTable.Entry e : data.getEntries())
         {
-          ArrayList<String> d = new ArrayList<String>();
+          ArrayList<String> d = new ArrayList<>();
           d.addAll(Arrays.asList(e.getTupel()));
           d.add("" + e.getCount());
           csv.writeNext(d.toArray(new String[0]));

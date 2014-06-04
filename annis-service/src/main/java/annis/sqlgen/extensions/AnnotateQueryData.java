@@ -82,7 +82,7 @@ public class AnnotateQueryData
   @Override
   public String toString()
   {
-    List<String> fields = new ArrayList<String>();
+    List<String> fields = new ArrayList<>();
 
     if (left > 0)
     {

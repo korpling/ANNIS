@@ -69,7 +69,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       "BUG: nodes.size() > maxWidth");
 
     boolean needsDistinct = false || !optimizeDistinct;
-    List<String> cols = new ArrayList<String>();
+    List<String> cols = new ArrayList<>();
     int i = 0;
 
     for (QueryNode node : alternative)
@@ -146,7 +146,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ids.add("id" + i);
@@ -158,7 +158,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   public List<Match> extractData(ResultSet rs) throws SQLException,
     DataAccessException
   {
-    List<Match> matches = new ArrayList<Match>();
+    List<Match> matches = new ArrayList<>();
     int rowNum = 0;
     while (rs.next())
     {

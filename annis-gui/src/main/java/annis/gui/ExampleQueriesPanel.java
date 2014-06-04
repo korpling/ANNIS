@@ -89,7 +89,7 @@ public class ExampleQueriesPanel extends Table
     this.parentTab = parentTab;
 
     //
-    egContainer = new BeanItemContainer<ExampleQuery>(ExampleQuery.class);
+    egContainer = new BeanItemContainer<>(ExampleQuery.class);
     setContainerDataSource(egContainer);
   }
 
@@ -307,7 +307,7 @@ public class ExampleQueriesPanel extends Table
    */
   private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
-    List<ExampleQuery> result = new LinkedList<ExampleQuery>();
+    List<ExampleQuery> result = new LinkedList<>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
@@ -414,7 +414,7 @@ public class ExampleQueriesPanel extends Table
             return;
           }
 
-          Set<String> corpusNameSet = new HashSet<String>();
+          Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
           QueryController controller = ui.getQueryController();
           if (controller != null)

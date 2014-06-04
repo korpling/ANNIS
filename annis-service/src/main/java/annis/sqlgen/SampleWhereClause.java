@@ -42,7 +42,7 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
 			List<QueryNode> alternative, String indent) {
-		Set<String> conditions = new HashSet<String>();
+		Set<String> conditions = new HashSet<>();
 		List<Long> corpusList = queryData.getCorpusList();
 		List<Long> documents = queryData.getDocuments();
 		
@@ -57,7 +57,7 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	@Deprecated
   public List<String> whereConditions(QueryNode node, List<Long> corpusList, List<Long> documents)
   {
-    LinkedList<String> conditions = new LinkedList<String>();
+    LinkedList<String> conditions = new LinkedList<>();
 
     TableAccessStrategy t = tables(node);
 

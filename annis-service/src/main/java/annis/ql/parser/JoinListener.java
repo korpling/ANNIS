@@ -72,7 +72,7 @@ public class JoinListener extends AqlParserBaseListener
   private final List<Map<Interval, QueryNode>> tokenPositions;
   private int alternativeIndex;
   
-  private ArrayList<QueryNode> relationChain = new ArrayList<QueryNode>();
+  private ArrayList<QueryNode> relationChain = new ArrayList<>();
   private int relationIdx;
  
   /**
@@ -498,7 +498,7 @@ public class JoinListener extends AqlParserBaseListener
   private LinkedList<QueryAnnotation> fromEdgeAnnotation(
     AqlParser.EdgeSpecContext ctx)
   {
-    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
+    LinkedList<QueryAnnotation> annos = new LinkedList<>();
     for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
     {
       String namespace = annoCtx.qName().namespace == null

@@ -109,7 +109,7 @@ public class EdgeBox extends Panel
   
   private void initEOs()
   {
-    EO = new HashMap<String, String>();
+    EO = new HashMap<>();
     for(int i=0; i<BASIS_OPERATORS[0].length; i++)
     {
       EO.put(BASIS_OPERATORS[0][i], BASIS_OPERATORS[1][i]);

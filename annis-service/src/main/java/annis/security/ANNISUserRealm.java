@@ -116,7 +116,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
     String userName = (String) principals.getPrimaryPrincipal();
     
     
-    Set<String> roles = new TreeSet<String>();
+    Set<String> roles = new TreeSet<>();
     roles.add(userName);  
     if(!userName.equals(anonymousUser))
     {

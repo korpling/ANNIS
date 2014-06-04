@@ -278,9 +278,9 @@ public class VisualizerPanel extends CssLayout
   {
     if(tokenIDs == null || graph == null)
     {
-      return new LinkedList<SToken>();
+      return new LinkedList<>();
     }
-    ArrayList<SToken> r = new ArrayList<SToken>(tokenIDs.size());
+    ArrayList<SToken> r = new ArrayList<>(tokenIDs.size());
     for(String t : tokenIDs)
     {
       SNode n = graph.getSNode(t);

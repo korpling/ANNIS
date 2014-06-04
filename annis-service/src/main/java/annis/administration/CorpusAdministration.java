@@ -141,7 +141,7 @@ public class CorpusAdministration
       schemeFixer.checkAndFix();
     }
 
-    List<File> roots = new LinkedList<File>();
+    List<File> roots = new LinkedList<>();
     for (String path : paths)
     {
       File f = new File(path);
@@ -269,7 +269,7 @@ public class CorpusAdministration
    */
   private List<File> unzipCorpus(File outDir, ZipFile zip)
   {
-    List<File> rootDirs = new ArrayList<File>();
+    List<File> rootDirs = new ArrayList<>();
 
     Enumeration<? extends ZipEntry> zipEnum = zip.entries();
     while (zipEnum.hasMoreElements())
@@ -375,7 +375,7 @@ public class CorpusAdministration
 
     public ImportStatsImpl()
     {
-      exceptions = new HashMap<String, List<Throwable>>();
+      exceptions = new HashMap<>();
     }
 
     @Override
@@ -387,7 +387,7 @@ public class CorpusAdministration
     @Override
     public List<Throwable> getThrowables()
     {
-      List<Throwable> allThrowables = new ArrayList<Throwable>();
+      List<Throwable> allThrowables = new ArrayList<>();
 
       for (List<Throwable> l : exceptions.values())
       {
@@ -435,7 +435,7 @@ public class CorpusAdministration
     @Override
     public List<Exception> getExceptions()
     {
-      List<Exception> exs = new ArrayList<Exception>();
+      List<Exception> exs = new ArrayList<>();
 
       if (exceptions != null)
       {
@@ -547,7 +547,7 @@ public class CorpusAdministration
     try
     {
       SimpleEmail mail = new SimpleEmail();
-      List<InternetAddress> to = new LinkedList<InternetAddress>();
+      List<InternetAddress> to = new LinkedList<>();
       to.add(new InternetAddress(adress));
 
       StringBuilder sbMsg = new StringBuilder();

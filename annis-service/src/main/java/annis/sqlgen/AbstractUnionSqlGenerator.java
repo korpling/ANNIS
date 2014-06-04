@@ -52,7 +52,7 @@ public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<
     StringBuffer sb = new StringBuffer();
 
     sb.append(indent);
-    List<String> alternatives = new ArrayList<String>();
+    List<String> alternatives = new ArrayList<>();
     for (List<QueryNode> alternative : queryData.getAlternatives())
     {
       alternatives.add(createSqlForAlternative(queryData, alternative, indent));

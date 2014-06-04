@@ -55,7 +55,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   public QueryData transform(QueryData data)
   {
     // initialize helper variables
-    HashSet<Long> visitedNodes = new HashSet<Long>();
+    HashSet<Long> visitedNodes = new HashSet<>();
     
 
     for(List<QueryNode> alternative : data.getAlternatives())
@@ -83,7 +83,7 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   
   private Set<String> getAllSegmentations(QueryNode node)
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
     
     for(Join j : node.getOutgoingJoins())
     {
@@ -102,11 +102,11 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   
   private Map<Long, Set<Precedence>> createInitialJoinMap(List<QueryNode> alternative)
   {
-    Map<Long, Set<Precedence>> result = new HashMap<Long, Set<Precedence>>();
+    Map<Long, Set<Precedence>> result = new HashMap<>();
     
     for(QueryNode node : alternative)
     {
-      Set<Precedence> joinList = new HashSet<Precedence>();
+      Set<Precedence> joinList = new HashSet<>();
       
       for(Join j : node.getOutgoingJoins())
       {
@@ -129,10 +129,10 @@ public class TransitivePrecedenceOptimizer implements QueryDataTransformer
   {
     visitedNodes.add(currentNode.getId());
     
-    Map<QueryNode, Range> nextNodes = new HashMap<QueryNode, Range>();
+    Map<QueryNode, Range> nextNodes = new HashMap<>();
     
     // iterator over all outgoing precedence joins
-    List<Join> originalJoins = new LinkedList<Join>(currentNode.getOutgoingJoins());
+    List<Join> originalJoins = new LinkedList<>(currentNode.getOutgoingJoins());
     for(Join join : originalJoins)
     {
       if(join instanceof Precedence)

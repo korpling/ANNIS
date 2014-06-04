@@ -124,7 +124,7 @@ public class AdminServiceImpl implements AdminService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:query-import:running");
     
-    List<ImportJob> result = new LinkedList<ImportJob>();
+    List<ImportJob> result = new LinkedList<>();
     ImportJob current = importWorker.getCurrentJob();
     if(current != null && 
       current.getStatus() != ImportJob.Status.SUCCESS && current.getStatus() != ImportJob.Status.ERROR)
@@ -184,7 +184,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(allNames));
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(allNames));
         if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
           ImportJob job = new ImportJob();

@@ -128,7 +128,7 @@ public class AtFrequencySqlGenerator extends FrequencySqlGenerator
   @Override
   public Set<String> whereConditions(QueryData queryData, List<QueryNode> alternative, String indent)
   {
-    Set<String> conditions = new LinkedHashSet<String>();
+    Set<String> conditions = new LinkedHashSet<>();
     
     FrequencyTableQueryData ext;
     List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(FrequencyTableQueryData.class);

@@ -52,7 +52,7 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
     annotation.setName(rs.getString("name"));
     annotation.setPre(rs.getInt("pre"));
     Array annotationPathArray = rs.getArray("path_name");
-    List<String> annotationPath = new LinkedList<String>();
+    List<String> annotationPath = new LinkedList<>();
     if(annotationPathArray.getBaseType() == Types.VARCHAR)
     {
       annotationPath = Arrays.asList((String[]) annotationPathArray.getArray());

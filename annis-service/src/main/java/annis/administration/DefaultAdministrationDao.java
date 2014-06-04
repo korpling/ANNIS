@@ -1185,7 +1185,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     
     File dataDir = getRealDataDir();
     
-    Set<File> allFilesInDatabase = new HashSet<File>();
+    Set<File> allFilesInDatabase = new HashSet<>();
     for(String singleFileName : allFilesInDatabaseList)
     {
       allFilesInDatabase.add(new File(dataDir, singleFileName));
@@ -1311,7 +1311,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   ///// Helpers
   private List<String> importedAndCreatedTables()
   {
-    List<String> tables = new ArrayList<String>();
+    List<String> tables = new ArrayList<>();
     tables.addAll(Arrays.asList(importedTables));
     tables.addAll(Arrays.asList(createdTables));
     return tables;
@@ -1319,7 +1319,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private List<String> allTables()
   {
-    List<String> tables = new ArrayList<String>();
+    List<String> tables = new ArrayList<>();
     tables.addAll(Arrays.asList(importedTables));
     tables.addAll(Arrays.asList(createdTables));
     //tables.addAll(Arrays.asList(materializedTables));
@@ -1957,7 +1957,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     Pattern opsRegex = Pattern.compile(regex);
     for (ExampleQuery eQ : exQueries)
     {
-      List<String> ops = new ArrayList<String>();
+      List<String> ops = new ArrayList<>();
       Matcher m = opsRegex.matcher(eQ.getExampleQuery().replaceAll("\\s", ""));
 
       while (m.find())
@@ -2088,7 +2088,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     if (existConflictingTopLevelCorpus(corpusName))
     {
       log.info("delete conflicting corpus: {}", corpusName);
-      List<String> corpusNames = new LinkedList<String>();
+      List<String> corpusNames = new LinkedList<>();
       corpusNames.add(corpusName);
       deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames), false);
     }

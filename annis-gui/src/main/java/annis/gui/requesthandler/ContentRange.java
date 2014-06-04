@@ -60,7 +60,7 @@ public class ContentRange
     long totalSize,
     int maxNum) throws InvalidRangeException
   {
-    List<ContentRange> result = new ArrayList<ContentRange>();
+    List<ContentRange> result = new ArrayList<>();
     if (rawRange != null)
     {
       if(!fullPattern.matcher(rawRange).matches())

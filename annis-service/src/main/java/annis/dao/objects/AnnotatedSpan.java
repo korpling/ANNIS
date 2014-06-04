@@ -43,7 +43,7 @@ public class AnnotatedSpan {
 		this.coveredText = coveredText;
 		this.annotations = annotations;
     this.metadata = metadata;
-    this.key = new ArrayList<Long>(key);
+    this.key = new ArrayList<>(key);
 	}
   
   /**
@@ -54,9 +54,9 @@ public class AnnotatedSpan {
   {
     this.id = orig.id;
     this.annotations = orig.annotations == null ? null 
-      : new ArrayList<Annotation>(orig.annotations);
+      : new ArrayList<>(orig.annotations);
     this.metadata = orig.metadata == null ? null 
-      : new ArrayList<Annotation>(orig.metadata);
+      : new ArrayList<>(orig.metadata);
     this.coveredText = orig.coveredText;
     this.key = orig.key;
   }

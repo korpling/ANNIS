@@ -59,13 +59,13 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
-      LinkedList<String> keys = new LinkedList<String>();
+      LinkedList<String> keys = new LinkedList<>();
 
       if (keysAsString == null || keysAsString.isEmpty())
       {
         // auto set
         keys.add("tok");
-        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> attributes = new LinkedList<>();
         
         for(String corpus : corpora)
         {
@@ -105,7 +105,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         }
       }
 
-      Map<String, String> args = new HashMap<String, String>();
+      Map<String, String> args = new HashMap<>();
       for (String s : argsAsString.split("&"))
       {
         String[] splitted = s.split("=", 2);

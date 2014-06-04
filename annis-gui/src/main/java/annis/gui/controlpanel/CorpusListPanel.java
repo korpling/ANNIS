@@ -114,7 +114,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private transient AnnisUserConfig userConfig;
 
-  private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
+  private List<AnnisCorpus> allCorpora = new LinkedList<>();
 
   private InstanceConfig instanceConfig;
   
@@ -185,10 +185,10 @@ public class CorpusListPanel extends VerticalLayout implements
           // select the first item
           List<String> filteredIDs = corpusContainer.getItemIds();
 
-          Set<String> selectedAndFiltered = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndFiltered = new HashSet<>(selectedIDs);
           selectedAndFiltered.retainAll(filteredIDs);
 
-          Set<String> selectedAndOutsideFilter = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndOutsideFilter = new HashSet<>(selectedIDs);
           selectedAndOutsideFilter.removeAll(filteredIDs);
 
           for (String id : selectedAndOutsideFilter)
@@ -215,7 +215,7 @@ public class CorpusListPanel extends VerticalLayout implements
     
     addComponent(tblCorpora);
 
-    corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
+    corpusContainer = new BeanContainer<>(AnnisCorpus.class);
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
@@ -319,7 +319,7 @@ public class CorpusListPanel extends VerticalLayout implements
       cbSelection.removeAllItems();
       cbSelection.addItem(ALL_CORPORA);
 
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -331,7 +331,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
 
       // add the corpus set names in sorted order
-      TreeSet<String> corpusSetNames = new TreeSet<String>();
+      TreeSet<String> corpusSetNames = new TreeSet<>();
       for (CorpusSet cs : corpusSets)
       {
         corpusSetNames.add(cs.getName());
@@ -381,7 +381,7 @@ public class CorpusListPanel extends VerticalLayout implements
       CorpusSet selectedCS = null;
 
       // TODO: use map
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -401,7 +401,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
       if (selectedCS != null)
       {
-        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<AnnisCorpus>();
+        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<>();
         for (AnnisCorpus c : allCorpora)
         {
           if (selectedCS.getCorpora().contains(c.getName()))
@@ -546,7 +546,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public Action[] getActions(Object target, Object sender)
   {
     String corpusName = (String) target;
-    LinkedList<Action> result = new LinkedList<Action>();
+    LinkedList<Action> result = new LinkedList<>();
 
     if (target == null)
     {
@@ -680,7 +680,7 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getSelectedCorpora()
   {
-    Set<String> result = new HashSet<String>();
+    Set<String> result = new HashSet<>();
 
     for (String id : corpusContainer.getItemIds())
     {
@@ -700,7 +700,7 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getVisibleCorpora()
   {
-    return new HashSet<String>(corpusContainer.getItemIds());
+    return new HashSet<>(corpusContainer.getItemIds());
   }
   
   /**

@@ -44,18 +44,18 @@ public class TableFormatter {
 			return "(no columns to print)";
 		
 		// turn vararg fields into list, because we may want to remove non-existing fields later
-		List<String> columns = new ArrayList<String>(Arrays.asList(fields));
+		List<String> columns = new ArrayList<>(Arrays.asList(fields));
 		
 		// column sizes have to be pre-computed
-		Map<String, Integer> columnSizes = new HashMap<String, Integer>();
+		Map<String, Integer> columnSizes = new HashMap<>();
 		for (String column : columns)
 			updateColumnSize(columnSizes, column, column);
 		
 		// loop through values to determine sizes
 		// save values, while at it
-		List<Map<String, String>> rows = new ArrayList<Map<String,String>>();
+		List<Map<String, String>> rows = new ArrayList<>();
 		for (Object item : list) {
-			Map<String, String> row = new HashMap<String, String>();
+			Map<String, String> row = new HashMap<>();
 			
 			// again, special handling for lists
 			if (isList) {
@@ -67,7 +67,7 @@ public class TableFormatter {
 					updateColumnSize(columnSizes, column, value);
 				}
 			} else {
-				for (String column : new ArrayList<String>(columns)) {
+				for (String column : new ArrayList<>(columns)) {
 					String value = fieldValue(item, column, columns);
 					if (value == null)
 						continue;

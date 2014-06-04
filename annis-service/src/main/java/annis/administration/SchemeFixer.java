@@ -61,7 +61,7 @@ public class SchemeFixer
       DatabaseMetaData dbMeta = conn.getMetaData();
       result = dbMeta.getColumns(null, null, "corpus_alias", null);
       
-      Map<String, Integer> columnType = new HashMap<String,Integer>();
+      Map<String, Integer> columnType = new HashMap<>();
       
       while(result.next())
       {

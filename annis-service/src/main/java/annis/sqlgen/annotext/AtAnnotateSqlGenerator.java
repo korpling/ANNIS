@@ -102,7 +102,7 @@ public class AtAnnotateSqlGenerator<T> extends AnnotateSqlGenerator<T>
   
   protected List<String> getSelectFields()
   {
-    List<String> fields = new ArrayList<String>();
+    List<String> fields = new ArrayList<>();
     
     addSelectClauseAttribute(fields, NODE_TABLE, "id");
     addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");

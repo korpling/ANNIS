@@ -44,7 +44,7 @@ public class AnnotatedSpanExtractor implements RowMapper<AnnotatedSpan>
 
   private List<Annotation> extractAnnotations(Array array) throws SQLException
   {
-    List<Annotation> result = new ArrayList<Annotation>();
+    List<Annotation> result = new ArrayList<>();
 
     if (array != null)
     {

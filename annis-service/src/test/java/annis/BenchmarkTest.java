@@ -116,7 +116,7 @@ public class BenchmarkTest
   private List<Long> getCorpusIDs(String corpus)
   {
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<String>();
+    List<String> corpusNames = new LinkedList<>();
     corpusNames.add(corpus);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
     return corpusIDs;
@@ -141,7 +141,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
     provider.writeTo(p, SaltProject.class, null, null,
-      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
   }
 
