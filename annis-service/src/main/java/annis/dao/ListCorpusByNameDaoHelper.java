@@ -32,7 +32,7 @@ public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMappe
     Validate.notEmpty(corpusNames, "Need at least one corpus name");
 
     // turn corpus names into sql strings (enclosed with ')
-    List<String> corpusNamesSqlStrings = new ArrayList<String>();
+    List<String> corpusNamesSqlStrings = new ArrayList<>();
     for (String corpus : corpusNames)
     {
       corpusNamesSqlStrings.add(sqlString(corpus));

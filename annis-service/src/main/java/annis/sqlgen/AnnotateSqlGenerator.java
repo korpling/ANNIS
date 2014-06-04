@@ -112,7 +112,7 @@ public abstract class AnnotateSqlGenerator<T>
     List<QueryNode> alternative, String indent)
   {
     
-    HashSet<String> result = new HashSet<String>();
+    HashSet<String> result = new HashSet<>();
     
     TableAccessStrategy tables = tables(null);
 

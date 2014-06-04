@@ -89,7 +89,7 @@ public class CountTest
   private List<Long> getCorpusIDs(String corpus)
   {
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<String>();
+    List<String> corpusNames = new LinkedList<>();
     corpusNames.add(corpus);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
     return corpusIDs;

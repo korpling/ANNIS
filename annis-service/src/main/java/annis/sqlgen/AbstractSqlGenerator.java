@@ -129,7 +129,7 @@ public abstract class AbstractSqlGenerator<T>
   {
     sb.append(indent);
     sb.append("FROM");
-    List<String> fromTables = new ArrayList<String>();
+    List<String> fromTables = new ArrayList<>();
     for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators)
     {
       fromTables.add(generator.fromClause(queryData, alternative, indent));
@@ -151,7 +151,7 @@ public abstract class AbstractSqlGenerator<T>
     }
 
     // treat each condition as mutable string to remove last AND
-    List<StringBuffer> conditions = new ArrayList<StringBuffer>();
+    List<StringBuffer> conditions = new ArrayList<>();
 
     for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators)
     {

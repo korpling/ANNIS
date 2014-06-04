@@ -261,10 +261,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   {
    if(f.canRead() && f.isFile())
     {
-      FileInputStream fis = null;
-      try
+      try(FileInputStream fis = new FileInputStream(f))
       {
-        fis = new FileInputStream(f);
         Properties p = new Properties();
         p.load(fis);
         
@@ -278,20 +276,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       catch(IOException ex)
       {
 
-      }
-      finally
-      {
-        if(fis != null)
-        {
-          try
-          {
-            fis.close();
-          }
-          catch(IOException ex)
-          {
-            log.error("could not close stream", ex);
-          }
-        }
       }
     }
   }

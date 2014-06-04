@@ -449,12 +449,12 @@ public class QueryServiceImpl implements QueryService
     data.addExtension(new AnnotateQueryData(left, right,
       segmentation, filter));
 
-    Set<String> corpusNames = new TreeSet<String>();
+    Set<String> corpusNames = new TreeSet<>();
 
     for (Match singleMatch : matches.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.
+      List<QueryNode> pseudoNodes = new ArrayList<>(singleMatch.
         getSaltIDs().size());
       for (java.net.URI u : singleMatch.getSaltIDs())
       {
@@ -471,7 +471,7 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:subgraph:" + c);
     }
 
-    List<String> corpusNamesList = new LinkedList<String>(corpusNames);
+    List<String> corpusNamesList = new LinkedList<>(corpusNames);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
 
     if(corpusIDs == null || corpusIDs.isEmpty())
@@ -541,7 +541,7 @@ public class QueryServiceImpl implements QueryService
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
     
     
-    List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+    List<AnnisCorpus> allowedCorpora = new LinkedList<>();
 
     // filter by which corpora the user is allowed to access
     Subject user = SecurityUtils.getSubject();
@@ -593,11 +593,11 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public List<AnnisCorpus> singleCorpus(@PathParam("top") String toplevelName)
   {
-    List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
+    List<AnnisCorpus> result = new ArrayList<>();
     
     Subject user = SecurityUtils.getSubject();
     
-    LinkedList<String> originalCorpusNames = new LinkedList<String>();
+    LinkedList<String> originalCorpusNames = new LinkedList<>();
     originalCorpusNames.add(toplevelName);
     List<Long> ids = annisDao.mapCorpusNamesToIds(originalCorpusNames);
     
@@ -659,7 +659,7 @@ public class QueryServiceImpl implements QueryService
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<Long>();
+      List<Long> corpusList = new ArrayList<>();
       corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
 
       return annisDao.listAnnotations(corpusList,
@@ -684,7 +684,7 @@ public class QueryServiceImpl implements QueryService
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<Long>();
+      List<Long> corpusList = new ArrayList<>();
       corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
 
       return new SegmentationList(annisDao.listSegmentationNames(corpusList));
@@ -723,7 +723,7 @@ public class QueryServiceImpl implements QueryService
   public Response parseNodes(@QueryParam("q") String query)
   {
     QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
-    List<QueryNode> nodes = new LinkedList<QueryNode>();
+    List<QueryNode> nodes = new LinkedList<>();
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
     {
@@ -806,7 +806,7 @@ public class QueryServiceImpl implements QueryService
 
     List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
       corpusName);
-    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<String, AnnisBinaryMetaData>();
+    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<>();
 
     for (AnnisBinaryMetaData m : meta)
     {
@@ -927,7 +927,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
 
-      List<String> allowedCorpora = new ArrayList<String>();
+      List<String> allowedCorpora = new ArrayList<>();
 
       // filter by which corpora the user is allowed to access
       Subject user = SecurityUtils.getSubject();
@@ -1075,7 +1075,7 @@ public class QueryServiceImpl implements QueryService
    */
   private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
   {
-    LinkedList<MatrixQueryData.QName> result = new LinkedList<MatrixQueryData.QName>();
+    LinkedList<MatrixQueryData.QName> result = new LinkedList<>();
 
     String[] split = raw.split(",");
     for (String s : split)

@@ -84,10 +84,10 @@ public class MatrixSqlGenerator
   public List<AnnotatedMatch> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    List<AnnotatedMatch> matches = new ArrayList<AnnotatedMatch>();
+    List<AnnotatedMatch> matches = new ArrayList<>();
 
     Map<List<Long>, AnnotatedSpan[]> matchesByGroup =
-      new HashMap<List<Long>, AnnotatedSpan[]>();
+      new HashMap<>();
 
     int rowNum = 0;
     while (resultSet.next())
@@ -171,7 +171,7 @@ public class MatrixSqlGenerator
   protected List<String> getSelectFields(TableAccessStrategy tas,
     MatrixQueryData matrixExt)
   {
-    List<String> result = new LinkedList<String>();
+    List<String> result = new LinkedList<>();
 
     result.add(selectIdString(tas));
     result.add(selectSpanString(tas));
@@ -274,7 +274,7 @@ public class MatrixSqlGenerator
         sb.append(" = ");
         sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
-        Set<String> conditions = new TreeSet<String>();
+        Set<String> conditions = new TreeSet<>();
         addAnnoSelectionCondition(conditions, matrixExt.getMetaKeys(),
           CORPUS_ANNOTATION_TABLE, tas);
         sb.append(" AND ").append(StringUtils.join(conditions, " AND "));
@@ -291,7 +291,7 @@ public class MatrixSqlGenerator
   {
 
 
-    Set<String> conditions = new HashSet<String>();
+    Set<String> conditions = new HashSet<>();
     StringBuilder sb = new StringBuilder();
     TableAccessStrategy tables = tables(null);
 
@@ -322,7 +322,7 @@ public class MatrixSqlGenerator
     sb.append("(\n");
 
     sb.append(indent).append(TABSTOP).append(TABSTOP);
-    List<String> ors = new ArrayList<String>();
+    List<String> ors = new ArrayList<>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ors.add(
@@ -343,7 +343,7 @@ public class MatrixSqlGenerator
     List<MatrixQueryData.QName> selected, String tableName,
     TableAccessStrategy tables)
   {
-    List<String> orConditions = new LinkedList<String>();
+    List<String> orConditions = new LinkedList<>();
     Iterator<MatrixQueryData.QName> itMatrix = selected.iterator();
     while (itMatrix.hasNext())
     {

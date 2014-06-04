@@ -176,7 +176,7 @@ public class QueriesGenerator
    */
   public void generateQueries(long corpusId)
   {
-    corpusIds = new ArrayList<Long>();
+    corpusIds = new ArrayList<>();
     corpusIds.add(corpusId);
     List<String> corpusNames = getAnnisDao().mapCorpusIdsToNames(corpusIds);
     corpusName = corpusNames.get(0);
@@ -199,7 +199,7 @@ public class QueriesGenerator
    */
   public void generateQueries(String name, boolean delete)
   {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
     names.add(name);
     List<Long> ids = annisDao.mapCorpusNamesToIds(names);
     if (!ids.isEmpty())

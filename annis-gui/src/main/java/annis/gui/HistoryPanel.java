@@ -98,7 +98,7 @@ public class HistoryPanel extends Panel
     
     if(e != null && controller != null)
     {
-      controller.setQuery(new Query(e.getQuery(), new HashSet<String>(e.getCorpora())));
+      controller.setQuery(new Query(e.getQuery(), new HashSet<>(e.getCorpora())));
     }
   }
 

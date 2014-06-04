@@ -109,7 +109,7 @@ public class DocBrowserTable extends Table
       List<String> pathList = a.getAnnotationPath();
       if (pathList == null)
       {
-        pathList = new LinkedList<String>();
+        pathList = new LinkedList<>();
       }
 
       Collections.reverse(pathList);
@@ -219,7 +219,7 @@ public class DocBrowserTable extends Table
     addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     // init metadata cache
-    docMetaDataCache = new HashMap<String, List<Annotation>>();
+    docMetaDataCache = new HashMap<>();
 
     addStyleName("docvis-table");
 
@@ -416,7 +416,7 @@ public class DocBrowserTable extends Table
         res.get(new Helper.AnnotationListType()));
     }
 
-    List<Annotation> annos = new ArrayList<Annotation>();
+    List<Annotation> annos = new ArrayList<>();
 
     // filter the annotations
     for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
@@ -434,7 +434,7 @@ public class DocBrowserTable extends Table
 
   private String generateCell(List<String> path, MetaDataCol metaDatum)
   {
-    List<Annotation> metaData = new LinkedList<Annotation>();
+    List<Annotation> metaData = new LinkedList<>();
     if (path != null && !path.isEmpty())
     {
       metaData = getDocMetaData(path.get(path.size()-1));
@@ -470,8 +470,8 @@ public class DocBrowserTable extends Table
 
     public MetaColumns()
     {
-      this.visibleColumns = new ArrayList<MetaDataCol>();
-      this.sortColumns = new ArrayList<MetaDataCol>();
+      this.visibleColumns = new ArrayList<>();
+      this.sortColumns = new ArrayList<>();
     }
   }
 

@@ -54,7 +54,7 @@ public class SaltAnnotateExtractorTest
   private SaltAnnotateExtractor instance;
   
   // dependencies
-  private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<String>();
+  private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<>();
   
 
   @Before

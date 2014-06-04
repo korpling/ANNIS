@@ -54,7 +54,7 @@ public class FrequencySqlGeneratorTest
   @Mock private QueryData queryData;
   @Mock private FrequencyTableQueryData freqTableQueryData;
   @Mock private QueryNode queryNode;
-  private List<QueryNode> alternative = new ArrayList<QueryNode>();
+  private List<QueryNode> alternative = new ArrayList<>();
   
   public FrequencySqlGeneratorTest()
   {
@@ -103,7 +103,7 @@ public class FrequencySqlGeneratorTest
   {
     System.out.println("whereConditions");
     
-    Set<String> expected = new TreeSet<String>();
+    Set<String> expected = new TreeSet<>();
     expected.add("hello world");
     
     Set<String> actual = generator.whereConditions(queryData, alternative, "");

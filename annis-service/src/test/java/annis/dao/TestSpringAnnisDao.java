@@ -108,8 +108,8 @@ public class TestSpringAnnisDao
   private static final String DDDQUERY = "DDDQUERY";
   private static final QueryData PARSE_RESULT = new QueryData();
   private static final String SQL = "SQL";
-  private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
-  private static final List<Long> DOCUMENT_LIST = new LinkedList<Long>();
+  private static final List<Long> CORPUS_LIST = new ArrayList<>();
+  private static final List<Long> DOCUMENT_LIST = new LinkedList<>();
 
   @SuppressWarnings("unchecked")
   @Before
@@ -272,7 +272,7 @@ public class TestSpringAnnisDao
   public void mapCorpusIdsToNames()
   {
     long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(invalidCorpusId);
     List<String> names = simpleAnnisDao.mapCorpusIdsToNames(ids);
 
@@ -286,7 +286,7 @@ public class TestSpringAnnisDao
   public void mapCorpusIdToName()
   {
     long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(invalidCorpusId);
     when(simpleAnnisDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
     simpleAnnisDao.mapCorpusIdToName(invalidCorpusId);

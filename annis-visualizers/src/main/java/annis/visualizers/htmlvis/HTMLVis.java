@@ -61,6 +61,7 @@ import org.slf4j.LoggerFactory;
  * <li>visconfigpath - path of the visualization configuration file</li>
  * </ul>
  * </p>
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
@@ -68,7 +69,6 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
-  
 
   @Override
   public String getShortName()
@@ -89,9 +89,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     scrollPanel.setSizeFull();
     Label lblResult = new Label("ERROR", ContentMode.HTML);
     lblResult.setSizeUndefined();
-    
-    List<String> corpusPath =
-      CommonHelper.getCorpusPath(vi.getDocument().getSCorpusGraph(), vi.getDocument());
+
+    List<String> corpusPath = CommonHelper.getCorpusPath(vi.getDocument().
+      getSCorpusGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     try
     {
@@ -99,124 +99,101 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
+      log.error("UTF-8 was not known as encoding", ex);
     }
-    
-    String wrapperClassName = "annis-wrapped-htmlvis-" 
+
+    String wrapperClassName = "annis-wrapped-htmlvis-"
       + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
-    
+
     scrollPanel.addStyleName(wrapperClassName);
-    
-    InputStream inStreamConfig = null;
-    InputStream inStreamCSS = null;
-    try
+
+    InputStream inStreamConfigRaw = null;
+
+    String visConfigName = vi.getMappings().getProperty("config");
+
+    if (visConfigName == null)
     {
-      String visConfigName = vi.getMappings().getProperty("config");
-      
-      if(visConfigName == null)
+      inStreamConfigRaw = HTMLVis.class.getResourceAsStream("defaultvis.config");
+    }
+    else
+    {
+      WebResource resBinary = Helper.getAnnisWebResource().path(
+        "query/corpora/").path(corpusName).path(corpusName)
+        .path("binary").path(visConfigName + ".config");
+
+      ClientResponse response = resBinary.get(ClientResponse.class);
+      if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
       {
-        inStreamConfig = HTMLVis.class.getResourceAsStream("defaultvis.config");
+        inStreamConfigRaw = response.getEntityInputStream();
       }
-      else
+    }
+
+    if (inStreamConfigRaw == null)
+    {
+      Notification.show("ERROR: html visualization configuration \""
+        + visConfigName
+        + "\" not found in database", Notification.Type.ERROR_MESSAGE);
+    }
+    else
+    {
+
+      try(InputStream inStreamConfig = inStreamConfigRaw)
       {
-        WebResource resBinary = Helper.getAnnisWebResource().path(
-          "query/corpora/").path(corpusName).path(corpusName)
-          .path("binary").path(visConfigName + ".config");
-        
-        ClientResponse response = resBinary.get(ClientResponse.class);
-        if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
-        {
-          inStreamConfig = response.getEntityInputStream();
-        }
-      }
-      
-      if(inStreamConfig == null)
-      {
-        Notification.show("ERROR: html visualization configuration \"" 
-          + visConfigName 
-          +  "\" not found in database",Notification.Type.ERROR_MESSAGE);
-      }
-      else
-      {
-      
+
         VisParser p = new VisParser(inStreamConfig);
         VisualizationDefinition[] definitions = p.getDefinitions();
 
         lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
           definitions));
-        
 
         String labelClass = vi.getMappings().getProperty("class", "htmlvis");
         lblResult.addStyleName(labelClass);
-        
-        // TODO: do not add CSSInject multiple times
-        if(visConfigName == null)
+
+        InputStream inStreamCSSRaw = null;
+        if (visConfigName == null)
         {
-           inStreamCSS = HTMLVis.class.getResourceAsStream("htmlvis.css");
+          inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
         }
         else
         {
           WebResource resBinary = Helper.getAnnisWebResource().path(
             "query/corpora/").path(corpusName).path(corpusName)
             .path("binary").path(visConfigName + ".css");
-          
+
           ClientResponse response = resBinary.get(ClientResponse.class);
-          if(response.getStatus() ==  ClientResponse.Status.OK.getStatusCode())
+          if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
           {
-            inStreamCSS = response.getEntityInputStream();
+            inStreamCSSRaw = response.getEntityInputStream();
           }
         }
-        if(inStreamCSS != null)
+        if (inStreamCSSRaw != null)
         {
-          String cssContent = IOUtils.toString(inStreamCSS);
-          UI currentUI = UI.getCurrent();
-          if(currentUI instanceof AnnisBaseUI)
+          try(InputStream inStreamCSS = inStreamCSSRaw)
           {
-            // do not add identical CSS files
-            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent, wrapperClassName);
+            String cssContent = IOUtils.toString(inStreamCSS);
+            UI currentUI = UI.getCurrent();
+            if (currentUI instanceof AnnisBaseUI)
+            {
+              // do not add identical CSS files
+              ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+                wrapperClassName);
+            }
           }
-          
         }
+
       }
-    }
-    catch (IOException ex)
-    {
-      log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
-        Notification.Type.ERROR_MESSAGE);
-    }
-    catch (VisParserException ex)
-    {
-      log.error("Could not parse the HTML visualization configuration file", ex);
-      Notification.show("Could not parse the HTML visualization configuration file", ex.getMessage(), 
-        Notification.Type.ERROR_MESSAGE);
-    }
-    finally
-    {
-      if(inStreamConfig != null)
+      catch (IOException | VisParserException ex)
       {
-        try
-        {
-          inStreamConfig.close();
-        }
-        catch (IOException ex)
-        {
-        }
-      }
-      if(inStreamCSS != null)
-      {
-        try
-        {
-          inStreamCSS.close();
-        }
-        catch (IOException ex)
-        {
-        }
+        log.error("Could not parse the HTML visualization configuration file",
+          ex);
+        Notification.show(
+          "Could not parse the HTML visualization configuration file", ex.
+          getMessage(),
+          Notification.Type.ERROR_MESSAGE);
       }
     }
 
-    
-    if(vi.getMappings().containsKey("debug"))
+    if (vi.getMappings().containsKey("debug"))
     {
       Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
       Label sep = new Label("<hr/>", ContentMode.HTML);
@@ -227,71 +204,74 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     {
       scrollPanel.setContent(lblResult);
     }
-    
+
     return scrollPanel;
   }
- 
+
   private String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
   {
-    SortedMap<Long, SortedSet<OutputItem>> outputStartTags = new TreeMap<Long, SortedSet<OutputItem>>();
-    SortedMap<Long, SortedSet<OutputItem>> outputEndTags = new TreeMap<Long, SortedSet<OutputItem>>();
+    SortedMap<Long, SortedSet<OutputItem>> outputStartTags
+      = new TreeMap<Long, SortedSet<OutputItem>>();
+    SortedMap<Long, SortedSet<OutputItem>> outputEndTags
+      = new TreeMap<Long, SortedSet<OutputItem>>();
     StringBuilder sb = new StringBuilder();
 
     EList<SToken> token = graph.getSortedSTokenByText();
 
-    
     for (SToken t : token)
     {
-      
+
       for (VisualizationDefinition vis : definitions)
       {
         String matched = vis.getMatcher().matchedAnnotation(t);
         if (matched != null)
         {
-          vis.getOutputter().outputHTML(t, matched, outputStartTags, outputEndTags);
+          vis.getOutputter().outputHTML(t, matched, outputStartTags,
+            outputEndTags);
         }
       }
     }
-    
+
     List<SSpan> spans = graph.getSSpans();
-    for(VisualizationDefinition vis : definitions)
+    for (VisualizationDefinition vis : definitions)
     {
       for (SSpan span : spans)
       {
         String matched = vis.getMatcher().matchedAnnotation(span);
         if (matched != null)
         {
-          vis.getOutputter().outputHTML(span, matched, outputStartTags, outputEndTags);
+          vis.getOutputter().outputHTML(span, matched, outputStartTags,
+            outputEndTags);
         }
       }
     }
-    
+
     // get all used indexes
     Set<Long> indexes = new TreeSet<Long>();
     indexes.addAll(outputStartTags.keySet());
     indexes.addAll(outputEndTags.keySet());
-    
-    for(Long i : indexes)
+
+    for (Long i : indexes)
     {
       // output all strings belonging to this token position
-      
+
       // first the start tags for this position
       SortedSet<OutputItem> itemsStart = outputStartTags.get(i);
-      if(itemsStart != null)
+      if (itemsStart != null)
       {
         Iterator<OutputItem> it = itemsStart.iterator();
-        boolean first=true;
-        while(it.hasNext())
+        boolean first = true;
+        while (it.hasNext())
         {
           OutputItem s = it.next();
-          if(!first)
+          if (!first)
           {
             sb.append("-->");
           }
           first = false;
           sb.append(s.getOutputString());
-          if(it.hasNext())
+          if (it.hasNext())
           {
             sb.append("<!--\n");
           }
@@ -299,7 +279,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
       // then the end tags for this position, but inverse their order
       SortedSet<OutputItem> itemsEnd = outputEndTags.get(i);
-      if(itemsEnd != null)
+      if (itemsEnd != null)
       {
         List<OutputItem> itemsEndReverse = new LinkedList<OutputItem>(itemsEnd);
         Collections.reverse(itemsEndReverse);
@@ -313,5 +293,5 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
     return sb.toString();
   }
-  
+
 }

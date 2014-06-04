@@ -70,14 +70,14 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
       annotateQueryData = extensions.get(0);
     }
 
-    List<String> selectClauseForNode = new ArrayList<String>();
+    List<String> selectClauseForNode = new ArrayList<>();
     int i=0;
    
     for (QueryNode node : alternative)
     {
       i++;
       TableAccessStrategy tables = tables(node);
-      List<String> fields = new ArrayList<String>();
+      List<String> fields = new ArrayList<>();
       
       fields.addAll(solutionKey.generateInnerQueryColumns(tables, i));
       fields.add(tables.aliasedColumn(NODE_TABLE, "text_ref") + " AS text" + i);
@@ -138,7 +138,7 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    List<String> ids = new ArrayList<String>();
+    List<String> ids = new ArrayList<>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ids.add("id" + i);

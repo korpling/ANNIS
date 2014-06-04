@@ -230,8 +230,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public AnnisRunner()
   {
-    corpusList = new LinkedList<Long>();
-    benchmarks = new ArrayList<AnnisRunner.Benchmark>();
+    corpusList = new LinkedList<>();
+    benchmarks = new ArrayList<>();
   }
 
   ///// Commands
@@ -239,12 +239,12 @@ public class AnnisRunner extends AnnisBaseRunner
   {
     try
     {
-      BufferedReader reader = new BufferedReader(new InputStreamReader(
-        new FileInputStream(filename), "UTF-8"));
-      try
+      
+      try(BufferedReader reader = new BufferedReader(new InputStreamReader(
+        new FileInputStream(filename), "UTF-8"));)
       {
-        Map<String, Integer> queryRun = new HashMap<String, Integer>();
-        Map<String, Integer> queryId = new HashMap<String, Integer>();
+        Map<String, Integer> queryRun = new HashMap<>();
+        Map<String, Integer> queryId = new HashMap<>();
         int maxId = 0;
         for (String line = reader.readLine(); line != null; line = reader.
           readLine())
@@ -309,13 +309,6 @@ public class AnnisRunner extends AnnisBaseRunner
               System.out.println(StringUtils.join(output, "\t"));
             }
           }
-        }
-      }
-      finally
-      {
-        if (reader != null)
-        {
-          reader.close();
         }
       }
     }
@@ -494,7 +487,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
     }
 
-    List<AnnisRunner.Benchmark> session = new ArrayList<AnnisRunner.Benchmark>();
+    List<AnnisRunner.Benchmark> session = new ArrayList<>();
 
     // create sql + plan for each query and create count copies for each benchmark
     for (AnnisRunner.Benchmark benchmark : benchmarks)
@@ -660,10 +653,9 @@ public class AnnisRunner extends AnnisBaseRunner
     out.println();
 
     // CSV output
-    try
-    {
-      CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
-        "annis_benchmark_result.csv"), "UTF-8"));
+    try(CSVWriter csv = new CSVWriter(new FileWriterWithEncoding(new File(
+        "annis_benchmark_result.csv"), "UTF-8"));)
+    { 
 
       String[] header = new String[]
       {
@@ -682,8 +674,6 @@ public class AnnisRunner extends AnnisBaseRunner
         line[4] = "" + Math.abs(median - benchmark.worstTimeInMilliseconds);
         csv.writeNext(line);
       }
-      csv.close();
-      
     }
     catch (IOException ex)
     {
@@ -702,9 +692,11 @@ public class AnnisRunner extends AnnisBaseRunner
         {
           Properties props = new Properties();
           props.put("YVALUE", "" + b.getMedian());
-          FileWriterWithEncoding writer = new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8");
-          props.store(writer, "");
-          writer.close();
+          try (FileWriterWithEncoding writer = 
+            new FileWriterWithEncoding(new File(outputDir, i + ".properties"), "UTF-8"))
+          {
+            props.store(writer, "");
+          }
           
           i++;
         }
@@ -722,7 +714,7 @@ public class AnnisRunner extends AnnisBaseRunner
     List<Long> corpusList = queryData.getCorpusList();
     List<QueryAnnotation> metaData = queryData.getMetaData();
     Set<Object> extensions = queryData.getExtensions();
-    List<String> fields = new ArrayList<String>();
+    List<String> fields = new ArrayList<>();
     if (!corpusList.isEmpty())
     {
       fields.add("corpus = " + corpusList);
@@ -747,7 +739,6 @@ public class AnnisRunner extends AnnisBaseRunner
     switch (currentOS)
     {
       case linux:
-        Writer w = null;
         try
         {
           log.info("resetting caches");
@@ -757,8 +748,10 @@ public class AnnisRunner extends AnnisBaseRunner
           if (dropCaches.canWrite())
           {
             log.debug("clearing file system cache");
-            w = new FileWriterWithEncoding(dropCaches, "UTF-8");
-            w.write("3");
+            try(Writer w = new FileWriterWithEncoding(dropCaches, "UTF-8");)
+            {
+              w.write("3");
+            }
           }
           else
           {
@@ -778,27 +771,9 @@ public class AnnisRunner extends AnnisBaseRunner
           }
 
         }
-        catch (IOException ex)
+        catch (IOException | InterruptedException ex)
         {
           log.error(null, ex);
-        }
-        catch (InterruptedException ex)
-        {
-          log.error(null, ex);
-        }
-        finally
-        {
-          if (w != null)
-          {
-            try
-            {
-              w.close();
-            }
-            catch (IOException ex1)
-            {
-              log.error(null, ex1);
-            }
-          }
         }
 
         break;
@@ -1082,7 +1057,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doCorpus(String list)
   {
-    corpusList = new LinkedList<Long>();
+    corpusList = new LinkedList<>();
     String[] splits = StringUtils.split(list, " ");
     for (String split : splits)
     {
@@ -1093,7 +1068,7 @@ public class AnnisRunner extends AnnisBaseRunner
       catch (NumberFormatException e)
       {
         // check if there is a corpus with this name
-        LinkedList<String> splitList = new LinkedList<String>();
+        LinkedList<String> splitList = new LinkedList<>();
         splitList.add(split);
         corpusList.addAll(annisDao.mapCorpusNamesToIds(splitList));
       }
@@ -1140,7 +1115,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doMeta(String corpusId)
   {
-    LinkedList<Long> corpusIdAsList = new LinkedList<Long>();
+    LinkedList<Long> corpusIdAsList = new LinkedList<>();
     try
     {
       corpusIdAsList.add(Long.parseLong(corpusId));
@@ -1340,12 +1315,12 @@ public class AnnisRunner extends AnnisBaseRunner
     QueryData queryData = new QueryData();
     MatchGroup matchGroup = MatchGroup.parseString(param);
 
-    Set<String> corpusNames = new TreeSet<String>();
+    Set<String> corpusNames = new TreeSet<>();
 
     for(Match m : matchGroup.getMatches())
     {
       // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(m.getSaltIDs().size());
+      List<QueryNode> pseudoNodes = new ArrayList<>(m.getSaltIDs().size());
       for (java.net.URI u : m.getSaltIDs())
       {
         pseudoNodes.add(new QueryNode());
@@ -1353,7 +1328,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       queryData.addAlternative(pseudoNodes);
     }
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
       corpusNames));
 
     queryData.setCorpusList(corpusIDs);

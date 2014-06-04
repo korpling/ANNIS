@@ -28,7 +28,7 @@ public class TestFindSqlGenerator
   private QueryData queryData;
   @Mock
   private QueryNode queryNode;
-  private ArrayList<QueryNode> alternative = new ArrayList<QueryNode>();
+  private ArrayList<QueryNode> alternative = new ArrayList<>();
 
   @Before
   public void setup()

@@ -225,7 +225,7 @@ public class TestTableJoinsInWhereClauseGenerator {
 	}
 	
 	private TreeSet<QueryAnnotation> annotationSet(QueryAnnotation... annotations) {
-		return new TreeSet<QueryAnnotation>(Arrays.asList(annotations));
+		return new TreeSet<>(Arrays.asList(annotations));
 	}
 
 	///// Helper

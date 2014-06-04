@@ -38,7 +38,7 @@ public abstract class AbstractWhereClauseGenerator extends
   public Set<String> whereConditions(QueryData queryData,
       List<QueryNode> alternative, String indent)
   {
-    List<String> conditions = new ArrayList<String>();
+    List<String> conditions = new ArrayList<>();
 
     for (QueryNode node : alternative)
     {
@@ -165,7 +165,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
     }
 
-    return new HashSet<String>(conditions);
+    return new HashSet<>(conditions);
   }
 
   protected abstract void addSpanConditions(List<String> conditions,

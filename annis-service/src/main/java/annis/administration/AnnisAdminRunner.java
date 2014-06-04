@@ -246,7 +246,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       boolean useSSL = cmdLine.hasOption("ssl");
 
       boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
+      List<Map<String, Object>> existingCorpora = new LinkedList<>();
 
       if (migrateCorpora)
       {
@@ -278,7 +278,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           File rootCorpusPath = new File(corpusRoot);
           if (rootCorpusPath.isDirectory())
           {
-            LinkedList<File> l = new LinkedList<File>();
+            LinkedList<File> l = new LinkedList<>();
             l.add(rootCorpusPath);
 
             search = new Search(l);
@@ -398,7 +398,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
 
     // convert ids from string to int
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     for (String id : commandArgs)
     {
       try
@@ -497,11 +497,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private void usage(String error)
   {
     Resource resource = new ClassPathResource("annis/administration/usage.txt");
-    BufferedReader reader = null;
-    try
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.
+        getInputStream(), "UTF-8"));)
     {
-      reader = new BufferedReader(new InputStreamReader(resource.
-        getInputStream(), "UTF-8"));
+      
       for (String line = reader.readLine(); line != null; line = reader.
         readLine())
       {
@@ -511,20 +510,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     catch (IOException e)
     {
       log.warn("could not read usage information: " + e.getMessage());
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     if (error != null)
     {
@@ -536,10 +521,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   {
     // use first element to get metadata (like column names)
     Map<String, Object> first = table.get(0);
-    List<String> columnNames = new ArrayList<String>(first.keySet());
+    List<String> columnNames = new ArrayList<>(first.keySet());
 
     // determine length of column
-    Map<String, Integer> columnSize = new HashMap<String, Integer>();
+    Map<String, Integer> columnSize = new HashMap<>();
     for (String column : columnNames)
     {
       columnSize.put(column, column.length());

@@ -88,10 +88,11 @@ public class LoginServletRequestHandler implements RequestHandler
         .replaceAll("%or%", "or")
         .replaceAll("%cancelcaption%", "Cancel");
 
-      OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8);
-      CharStreams.copy(new StringReader(htmlSource), writer);
-      writer.close();
-      out.flush();
+      try (OutputStreamWriter writer = new OutputStreamWriter(out, Charsets.UTF_8))
+      {
+        CharStreams.copy(new StringReader(htmlSource), writer);
+        out.flush();
+      }
     }
     catch (IOException ex)
     {
@@ -177,12 +178,13 @@ public class LoginServletRequestHandler implements RequestHandler
         }
       }
 
-      OutputStreamWriter writer = new OutputStreamWriter(response.
-        getOutputStream(), Charsets.UTF_8);
-      String html = Resources.toString(LoginServletRequestHandler.class.getResource(
-        "closelogin.html"), Charsets.UTF_8);
-      CharStreams.copy(new StringReader(html), writer);
-      writer.close();
+      try (OutputStreamWriter writer = new OutputStreamWriter(response.
+        getOutputStream(), Charsets.UTF_8)) 
+      {
+        String html = Resources.toString(LoginServletRequestHandler.class.getResource(
+          "closelogin.html"), Charsets.UTF_8);
+        CharStreams.copy(new StringReader(html), writer);
+      }
 
     } // end if login attempt
 

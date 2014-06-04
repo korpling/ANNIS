@@ -74,7 +74,7 @@ public class ExportPanel extends FormLayout
     new SimpleTextExporter()
   };
 
-  private final Map<String, String> help4Exporter = new HashMap<String, String>();
+  private final Map<String, String> help4Exporter = new HashMap<>();
 
   private final ComboBox cbExporter;
 
@@ -128,7 +128,7 @@ public class ExportPanel extends FormLayout
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    exporterMap = new HashMap<String, Exporter>();
+    exporterMap = new HashMap<>();
     for (Exporter e : EXPORTER)
     {
       String name = e.getClass().getSimpleName();
@@ -431,11 +431,11 @@ public class ExportPanel extends FormLayout
       final File currentTmpFile = File.createTempFile("annis-export", ".txt");
       currentTmpFile.deleteOnExit();
 
-      OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+      
 
       final AtomicBoolean success = new AtomicBoolean(false);
-      try
+      try(OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
         exporter.convertText(queryPanel.getQuery(),
           (Integer) cbLeftContext.getValue(),
@@ -449,8 +449,6 @@ public class ExportPanel extends FormLayout
       }
       finally
       {
-        outWriter.close();
-
         ui.access(new Runnable()
         {
           @Override

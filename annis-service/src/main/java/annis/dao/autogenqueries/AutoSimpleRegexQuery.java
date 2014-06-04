@@ -59,7 +59,7 @@ public class AutoSimpleRegexQuery extends AbstractAutoQuery
   public void analyzingQuery(SaltProject saltProject)
   {
 
-    List<String> tokens = new ArrayList<String>();
+    List<String> tokens = new ArrayList<>();
     for (SCorpusGraph g : saltProject.getSCorpusGraphs())
     {
       if (g != null)

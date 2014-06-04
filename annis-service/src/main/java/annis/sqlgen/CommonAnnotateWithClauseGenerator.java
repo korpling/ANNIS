@@ -63,7 +63,7 @@ public class CommonAnnotateWithClauseGenerator
     IslandsPolicy.IslandPolicies policy = getIslandsPolicy().getMostRestrictivePolicy(corpusList,
       corpusProperties);
 
-    List<String> result = new LinkedList<String>();
+    List<String> result = new LinkedList<>();
 
     List<AnnotateQueryData> ext = queryData.getExtensions(
       AnnotateQueryData.class);
