@@ -48,12 +48,12 @@ public class Match implements Serializable
 
   public Match()
   {
-    saltIDs = new ArrayList<URI>();
+    saltIDs = new ArrayList<>();
   }
   
   public Match(Collection<URI> original)
   {
-    saltIDs = new ArrayList<URI>(original);
+    saltIDs = new ArrayList<>(original);
   }
 
   public void addSaltId(URI id)

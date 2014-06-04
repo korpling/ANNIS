@@ -51,7 +51,8 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   implements SelectClauseSqlGenerator<QueryData>,
-  OrderByClauseSqlGenerator<QueryData>, RowMapper<Match>
+  OrderByClauseSqlGenerator<QueryData>, RowMapper<Match>,
+  GroupByClauseSqlGenerator<QueryData>
 {
 
   private static final Logger log = LoggerFactory.getLogger(
@@ -92,9 +93,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       {
         if(node.getNodeAnnotations().isEmpty())
         {
-          // if a query node is not using annotations, fallback to NULL as the value
-          // this is important for the DISTINCT clause, since we don't want to match 
-          // the annotation itself but the node
+          // If a query node is not using annotations, fallback to NULL as the value.
+          // This is important for the DISTINCT clause, since we don't want to match 
+          // the annotation itself but the node.
           cols.add("NULL::varchar AS node_annotation_ns" + i);
           cols.add("NULL::varchar AS node_annotation_name" + i);
         }
@@ -108,8 +109,8 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       }
       if (outputCorpusPath)
       {
-        cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-          + " AS node_name" + i);
+        cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+          + ") AS node_name" + i);
       }
 
       if (tblAccessStr.usesRankTable() || !node.getNodeAnnotations().isEmpty())
@@ -138,23 +139,24 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
       String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE,
         "corpus_ref");
       cols.add(
-        "(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias
-        + " LIMIT 1) AS path_name");
+        "(SELECT c.path_name FROM corpus AS c WHERE c.id = min(" + corpusRefAlias
+        + ") LIMIT 1) AS path_name");
     }
 
     if (outputToplevelCorpus)
     {
-      cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-        "toplevel_corpus"));
+      cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "toplevel_corpus")
+        + ") AS toplevel_corpus");
     }
 
-    cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-      "corpus_ref"));
+    cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+      "corpus_ref")
+      + ") AS corpus_ref");
 
     String colIndent = indent + TABSTOP + TABSTOP;
 
-    return (needsDistinct ? "DISTINCT" : "") + "\n" + colIndent
-      + StringUtils.join(cols, ",\n" + colIndent);
+    return "\n" + colIndent + StringUtils.join(cols, ",\n" + colIndent);
   }
 
   @Override
@@ -192,6 +194,25 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
     return StringUtils.join(ids, ", ");
   }
+
+  @Override
+  public String groupByAttributes(QueryData queryData,
+    List<QueryNode> alternative)
+  {
+    List<String> ids = new ArrayList<>();
+    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    {
+      ids.add("id" + i);
+      if (annoCondition != null)
+      {
+        ids.add("node_annotation_ns" + i);
+        ids.add("node_annotation_name" + i);
+      }
+    }
+    return StringUtils.join(ids, ", ");
+  }
+  
+  
 
   @Override
   public List<Match> extractData(ResultSet rs) throws SQLException,

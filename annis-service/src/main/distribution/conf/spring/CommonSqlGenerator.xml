@@ -358,6 +358,7 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="annoCondition" ref="annotationConditionProvider" />
     
   </bean>
@@ -375,6 +376,7 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
+    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
   
@@ -391,6 +393,7 @@ limitations under the License.
     <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
+    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
 
