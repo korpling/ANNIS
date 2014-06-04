@@ -126,6 +126,13 @@ public class CountTest
     // that cover more than one token
     assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
+    // test different annotations and component normalization in one query
+    assertEquals(20, countPcc2("a#node "
+      + "& (b#ambiguity | b#anaphor_type) "
+      + "& c#node "
+      + "& #a ->anaphor_antecedent #b "
+      + "& #b ->anaphor_antecedent #c"));
+    
     // regression tests:
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
     assertEquals(2, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" > \"was\""));
@@ -135,6 +142,11 @@ public class CountTest
     assertEquals(388, countPcc2("pos!=\"NE\""));
     assertEquals(187, countPcc2("tok & meta::Titel=\"Steilpass\""));
     assertEquals(212, countPcc2("tok & meta::Titel!=\"Steilpass\""));
+    assertEquals(10, countPcc2("a#node "
+      + "& b#ambiguity "
+      + "& c#node "
+      + "& #a ->anaphor_antecedent #b "
+      + "& #b ->anaphor_antecedent #c"));
     
   }
 
