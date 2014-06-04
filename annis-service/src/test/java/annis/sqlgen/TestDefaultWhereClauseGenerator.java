@@ -646,14 +646,14 @@ public class TestDefaultWhereClauseGenerator
     node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3"));
     node42.addNodeAnnotation(new QueryAnnotation("namespace4", "name4"));
     
-    // does not make any sense, but an simple enough condition :)
-    node23.addOutgoingJoin(new Identical(node42));
+    node23.addOutgoingJoin(new Precedence(node42, 1));
     
     
     checkWhereConditions(node23,
       "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
       "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', NULL, NULL, ARRAY[], 'node'))",
-      "_node23.id = _node42.id"
+      "_node23.right_token = _node42.left_token - 1",
+      "_node23.text_ref = _node42.text_ref"
     );
     checkWhereConditions(node42,
       "_annotation42_1.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, NULL, ARRAY[], 'node'))",
@@ -719,7 +719,8 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)")
+        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)"),
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 

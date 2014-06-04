@@ -126,12 +126,6 @@ public class CountTest
     // that cover more than one token
     assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
-    // test that is is possible to search for the same node/token if the searched annotations are different
-    assertEquals(1, countPcc2("\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
-    assertEquals(1, countPcc2("lemma=\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
-    assertEquals(2, countPcc2("a#\"Karola\" & (b#lemma=\"Karola\" | b#pos=\"NE\") " 
-      + "& #a _=_ #b"));
-    
     // regression tests:
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
     assertEquals(2, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" > \"was\""));
@@ -179,10 +173,11 @@ public class CountTest
     };
 
 
-    // get token count as reference
+    // get node and token count as reference
     int nodeCount = countPcc2("node");
 
 
+    // automatic testing for "node"
     for (String op : operatorsToTest)
     {
       try
@@ -209,6 +204,9 @@ public class CountTest
         }
       }
     }
+    
+    // manual testing
+    assertEquals(0, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _ident_ #2"));
   }
 
   @Test
@@ -219,11 +217,16 @@ public class CountTest
     // get token count as reference
     int tokenCount = countPcc2("tok");
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 _id_ #2"));
-    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _id_ #2"));
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 _ident_ #2"));
 
     assertEquals(tokenCount, countPcc2("tok & pos=/.*/ & #1 _=_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
+    
+    // test that is is possible to search for the same node/token if the searched annotations are different
+    assertEquals(1, countPcc2("\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(1, countPcc2("lemma=\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(2, countPcc2("a#\"Karola\" & (b#lemma=\"Karola\" | b#pos=\"NE\") " 
+      + "& #a _=_ #b"));
   }
 
   private int countPcc2(String aql)

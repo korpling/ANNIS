@@ -152,7 +152,6 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
         tables(node).aliasedColumn(NODE_TABLE, "id"), tables(target).
         aliasedColumn(NODE_TABLE, "id"));
       
-      // FIXME: this only works for the "annotext" scheme
       String annoNamespaceDifferent = join("IS DISTINCT FROM",
         annoCondition.getNodeAnnoNamespaceSQL(tables(node)),
         annoCondition.getNodeAnnoNamespaceSQL(tables(target)));
@@ -429,7 +428,27 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   protected void addIdenticalConditions(List<String> conditions,
     QueryNode node, QueryNode target, Identical join, QueryData queryData)
   {
-    joinOnNode(conditions, node, target, "=", "id", "id");
+    if(node.getNodeAnnotations().isEmpty() && target.getNodeAnnotations().isEmpty())
+    {    
+      joinOnNode(conditions, node, target, "=", "id", "id");
+    }
+    else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
+    {
+      joinOnNode(conditions, node, target, "=", "id", "id");
+      
+      conditions.add(join("IS NOT DISTINCT FROM",
+        annoCondition.getNodeAnnoNamespaceSQL(tables(node)),
+        annoCondition.getNodeAnnoNamespaceSQL(tables(target))));
+      
+      conditions.add(join("IS NOT DISTINCT FROM",
+        annoCondition.getNodeAnnoNameSQL(tables(node)),
+        annoCondition.getNodeAnnoNameSQL(tables(target))));
+    }
+    else
+    {
+      // the identity join between a node and an annotation condition is always false
+      conditions.add("FALSE");
+    }
   }
 
   @Override
