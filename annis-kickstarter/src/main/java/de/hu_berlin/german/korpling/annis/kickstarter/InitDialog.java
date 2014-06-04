@@ -21,10 +21,12 @@ import com.google.common.base.Charsets;
 import java.awt.Frame;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -64,22 +66,16 @@ public class InitDialog extends javax.swing.JDialog
     @Override
     protected String doInBackground() throws Exception
     {
-      InputStream propStream = null;
-      try
+      // get the values from the installation
+      File propFile = new File(System.getProperty("annis.home") + "/conf",
+        "database.properties");
+      try(InputStream propStream = new FileInputStream(propFile))
       {
-        // get the values from the installation
-        File propFile = new File(System.getProperty("annis.home") + "/conf",
-          "database.properties");
-        propStream = new FileInputStream(propFile);
         Properties prop = new Properties();
-        InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8);
         try
+        (InputStreamReader propReader = new InputStreamReader(propStream, Charsets.UTF_8)) 
         {
           prop.load(propReader);
-        }
-        finally
-        {
-          propReader.close();
         }
         
         String rawDataSourceURI = prop.getProperty("datasource.url", 
@@ -104,20 +100,13 @@ public class InitDialog extends javax.swing.JDialog
 
         return "";
       }
-      catch (Exception ex)
+      catch (IOException | URISyntaxException ex)
       { 
         parent.setVisible(false);
         ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
         importStatus.addException("init database exception:", ex);
         ExceptionDialog dlg = new ExceptionDialog(parent, importStatus);
         dlg.setVisible(true);
-      }
-      finally
-      {
-        if(propStream != null)
-        {
-          propStream.close();
-        }
       }
 
       return "ERROR";

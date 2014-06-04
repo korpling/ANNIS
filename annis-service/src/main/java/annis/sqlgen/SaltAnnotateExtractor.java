@@ -84,15 +84,15 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SDocumentGraph graph = null;
 
       // fn: parent information (pre and component) id to node
-      FastInverseMap<RankID, SNode> nodeByPre = new FastInverseMap<RankID, SNode>();
+      FastInverseMap<RankID, SNode> nodeByPre = new FastInverseMap<>();
 
-      TreeSet<Long> allTextIDs = new TreeSet<Long>();
-      TreeMap<Long, String> tokenTexts = new TreeMap<Long, String>();
-      TreeMap<Long, SToken> tokenByIndex = new TreeMap<Long, SToken>();
+      TreeSet<Long> allTextIDs = new TreeSet<>();
+      TreeMap<Long, String> tokenTexts = new TreeMap<>();
+      TreeMap<Long, SToken> tokenByIndex = new TreeMap<>();
       TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath =
-        new TreeMap<String, TreeMap<Long, String>>();
+        new TreeMap<>();
       Map<String, ComponentEntry> componentForSpan = 
-        new HashMap<String, ComponentEntry>();
+        new HashMap<>();
 
       // clear mapping functions for this graph
       // assumes that the result set is sorted by key, pre
@@ -226,7 +226,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   private void removeArtificialDominancesEdges(SDocumentGraph graph)
   {
     Iterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().iterator();
-    List<SDominanceRelation> edgesToRemove = new LinkedList<SDominanceRelation>();
+    List<SDominanceRelation> edgesToRemove = new LinkedList<>();
     while(itDomReal.hasNext())
     {
       SDominanceRelation rel = itDomReal.next();
@@ -279,7 +279,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     for(SDominanceRelation rel : edgesToRemove)
     {
       // remove edge from layer (removing it from graph does not remove it from layer...)
-      EList<SLayer> layersOfRel = new BasicEList<SLayer>(rel.getSLayers());
+      EList<SLayer> layersOfRel = new BasicEList<>(rel.getSLayers());
       for(SLayer layer : layersOfRel)
       {
         layer.getSRelations().remove(rel);
@@ -717,7 +717,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
  
     Multimap<SRelation, SLayer> layerOfEdge = ArrayListMultimap.create();
     
-    List<Edge> inEdges =  new LinkedList<Edge>(graph.getInEdges(from.getSId()));
+    List<Edge> inEdges =  new LinkedList<>(graph.getInEdges(from.getSId()));
     for(Edge e : inEdges)
     {
       if(e instanceof SRelation)
@@ -730,7 +730,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         Validate.isTrue(graph.removeEdge(e));
       }
     }
-    List<Edge> outEdges = new LinkedList<Edge>(graph.getOutEdges(from.getSId()));
+    List<Edge> outEdges = new LinkedList<>(graph.getOutEdges(from.getSId()));
     for(Edge e : outEdges)
     {
       if(e instanceof SRelation)
@@ -1108,8 +1108,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   
   public static class FastInverseMap<KeyType, ValueType>
   {
-    private Map<KeyType, ValueType> key2value = new HashMap<KeyType, ValueType>();
-    private Map<ValueType, List<KeyType>> values2keys = new HashMap<ValueType, List<KeyType>>(); 
+    private Map<KeyType, ValueType> key2value = new HashMap<>();
+    private Map<ValueType, List<KeyType>> values2keys = new HashMap<>(); 
     
     /**
      * Wrapper for {@link Map#put(java.lang.Object, java.lang.Object) }
@@ -1122,7 +1122,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       List<KeyType> inverse = values2keys.get(value);
       if(inverse == null)
       {
-        inverse = new LinkedList<KeyType>();
+        inverse = new LinkedList<>();
         values2keys.put(value, inverse);
       }
       
@@ -1152,12 +1152,12 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       List<KeyType> result = values2keys.get(value);
       if(result == null)
       {
-        result = new LinkedList<KeyType>();
+        result = new LinkedList<>();
         values2keys.put(value, result);
       }
       
       // always return a copy
-      return new LinkedList<KeyType>(result);
+      return new LinkedList<>(result);
     }
     
     /**

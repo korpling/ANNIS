@@ -147,7 +147,7 @@ public class TestDefaultWhereClauseGenerator
   private void checkEdgeConditions(String componentPredicate, String edgeType,
       String componentName, String... expected)
   {
-    List<String> expectedConditions = new ArrayList<String>();
+    List<String> expectedConditions = new ArrayList<>();
     expectedConditions.add(join("=", "_component23.id", "_component42.id"));
     if ("lhs".equals(componentPredicate) || "both".equals(componentPredicate))
     {
@@ -801,7 +801,7 @@ public class TestDefaultWhereClauseGenerator
 
   private void checkWhereConditions(QueryNode node, String... expected)
   {
-    List<QueryNode> alternative = new ArrayList<QueryNode>();
+    List<QueryNode> alternative = new ArrayList<>();
     alternative.add(node);
     Set<String> actual = generator.whereConditions(queryData, alternative, "");
     for (String item : expected)

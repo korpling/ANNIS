@@ -39,7 +39,7 @@ public class GridExporter extends GeneralTextExporter
   {
     
     Map<String, Map<String, Annotation>> metadataCache = 
-      new HashMap<String, Map<String, Annotation>>();
+      new HashMap<>();
 
 
     boolean showNumbers = true;
@@ -53,7 +53,7 @@ public class GridExporter extends GeneralTextExporter
         showNumbers = false;
       }
     }
-    List<String> metaKeys = new LinkedList<String>();
+    List<String> metaKeys = new LinkedList<>();
     if(args.containsKey("metakeys"))
     {
       Iterable<String> it = 
@@ -68,7 +68,7 @@ public class GridExporter extends GeneralTextExporter
     for (AnnisResult annisResult : queryResult)
     {
       HashMap<String, TreeMap<Long, Span>> annos =
-        new HashMap<String, TreeMap<Long, Span>>();
+        new HashMap<>();
 
       counter++;
       out.append((counter + offset) + ".");
@@ -144,7 +144,7 @@ public class GridExporter extends GeneralTextExporter
     Map<String, Map<String, Annotation>> metadataCache)
     throws IOException
   {
-    Map<String, Annotation> metaData = new HashMap<String, Annotation>();
+    Map<String, Annotation> metaData = new HashMap<>();
     if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
     {
       metaData = metadataCache.get(toplevelCorpus + ":" + documentName);

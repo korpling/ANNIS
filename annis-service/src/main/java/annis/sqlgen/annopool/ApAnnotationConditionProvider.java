@@ -51,7 +51,7 @@ public class ApAnnotationConditionProvider implements
     }
 
 
-    List<String> params = new LinkedList<String>();
+    List<String> params = new LinkedList<>();
 
     if (annotation.getNamespace() != null)
     {

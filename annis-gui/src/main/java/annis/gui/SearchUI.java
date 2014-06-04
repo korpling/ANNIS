@@ -680,7 +680,7 @@ public class SearchUI extends AnnisBaseUI
       }
 
       // CIDS
-      Set<String> selectedCorpora = new HashSet<String>();
+      Set<String> selectedCorpora = new HashSet<>();
       if (m.group(2) != null)
       {
         String[] cids = m.group(2).split(",");
@@ -693,7 +693,7 @@ public class SearchUI extends AnnisBaseUI
         res.path("query").path("corpora").
         get(new AnnisCorpusListType());
 
-      LinkedList<String> userCorporaStrings = new LinkedList<String>();
+      LinkedList<String> userCorporaStrings = new LinkedList<>();
       for (AnnisCorpus c : userCorpora)
       {
         userCorporaStrings.add(c.getName());
@@ -726,7 +726,7 @@ public class SearchUI extends AnnisBaseUI
       }
 
       // remove all currently openend sub-windows
-      Set<Window> all = new HashSet<Window>(getWindows());
+      Set<Window> all = new HashSet<>(getWindows());
       for (Window w : all)
       {
         removeWindow(w);
@@ -896,7 +896,7 @@ public class SearchUI extends AnnisBaseUI
       WebBrowser browser = getPage().getWebBrowser();
 
       // IE9 users can install a plugin
-      Set<String> supportedByIE9Plugin = new HashSet<String>();
+      Set<String> supportedByIE9Plugin = new HashSet<>();
       supportedByIE9Plugin.add("video/webm");
       supportedByIE9Plugin.add("audio/ogg");
       supportedByIE9Plugin.add("video/ogg");
@@ -986,7 +986,7 @@ public class SearchUI extends AnnisBaseUI
   private Set<String> getMappedCorpora(List<String> originalNames)
   {
     WebResource rootRes = Helper.getAnnisWebResource();
-    Set<String> mappedNames = new HashSet<String>();
+    Set<String> mappedNames = new HashSet<>();
     // iterate over given corpora and map names if necessary
     for (String selectedCorpusName : originalNames)
     {
@@ -1031,7 +1031,7 @@ public class SearchUI extends AnnisBaseUI
 
     Map<String, String> args = Helper.parseFragment(fragment);
 
-    Set<String> corpora = new TreeSet<String>();
+    Set<String> corpora = new TreeSet<>();
 
     if (args.containsKey("c"))
     {

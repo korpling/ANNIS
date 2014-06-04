@@ -48,15 +48,15 @@ public class TestAbstractSqlGenerator {
   @Mock private WithClauseSqlGenerator<QueryData> withClauseSqlGenerator;
 	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
-	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<FromClauseSqlGenerator<QueryData>>();
+	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<>();
 	@Mock private WhereClauseSqlGenerator<QueryData> whereClauseSqlGenerator;
-	@Spy private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators = new ArrayList<WhereClauseSqlGenerator<QueryData>>();
+	@Spy private List<WhereClauseSqlGenerator<QueryData>> whereClauseSqlGenerators = new ArrayList<>();
 	
 	// test data
 	private QueryData queryData = new QueryData();
 	private QueryNode annisNode = new QueryNode();
-	private List<QueryNode> alternative = new ArrayList<QueryNode>();
-	private List<List<QueryNode>> alternatives = new ArrayList<List<QueryNode>>();
+	private List<QueryNode> alternative = new ArrayList<>();
+	private List<List<QueryNode>> alternatives = new ArrayList<>();
 	
 	@Before
 	public void setup() {
@@ -139,7 +139,7 @@ public class TestAbstractSqlGenerator {
   @Test
   public void shouldAppendWithClause() 
   {
-    LinkedList<String> clauses = new LinkedList<String>();
+    LinkedList<String> clauses = new LinkedList<>();
     clauses.add("A as (SELECT 1)");
     clauses.add("B as (SELECT 2)");
     clauses.add("C as (SELECT 3)");

@@ -30,7 +30,7 @@ public class Query implements Serializable
 
   public Query()
   {
-    corpora = new HashSet<String>();
+    corpora = new HashSet<>();
   }
 
   public Query(String query,

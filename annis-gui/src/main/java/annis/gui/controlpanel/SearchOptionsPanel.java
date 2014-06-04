@@ -116,7 +116,7 @@ public class SearchOptionsPanel extends FormLayout
     addStyleName("contextsensible-formlayout");
 
     // init the config cache
-    lastSelection = new HashMap<String, CorpusConfig>();
+    lastSelection = new HashMap<>();
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -317,7 +317,7 @@ public class SearchOptionsPanel extends FormLayout
   private static List<String> getSegmentationNamesFromService(
     Set<String> corpora)
   {
-    List<String> segNames = new ArrayList<String>();
+    List<String> segNames = new ArrayList<>();
     WebResource service = Helper.getAnnisWebResource();
     if (service != null)
     {
@@ -649,7 +649,7 @@ public class SearchOptionsPanel extends FormLayout
     boolean keepCustomValues)
   {
 
-    Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
+    Set<Integer> tmpResultsPerPage = new TreeSet<>();
     if (keepCustomValues)
     {
       Collection<?> itemIds = cbResultsPerPage.getItemIds();
@@ -698,7 +698,7 @@ public class SearchOptionsPanel extends FormLayout
      * The sorting via index container is much to complex for me, so I sort the
      * items first and put them afterwards into the combo boxes.
      */
-    SortedSet<Integer> steps = new TreeSet<Integer>();
+    SortedSet<Integer> steps = new TreeSet<>();
 
     if (keepCustomValues)
     {
@@ -752,7 +752,7 @@ public class SearchOptionsPanel extends FormLayout
    */
   private static String buildKey(Set<String> corpusNames)
   {
-    SortedSet<String> names = new TreeSet<String>(corpusNames);
+    SortedSet<String> names = new TreeSet<>(corpusNames);
     StringBuilder key = new StringBuilder();
 
     for (String name : names)

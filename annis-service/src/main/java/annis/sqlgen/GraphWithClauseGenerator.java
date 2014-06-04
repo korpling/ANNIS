@@ -173,7 +173,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
     
-    List<String> subselects = new LinkedList<String>();
+    List<String> subselects = new LinkedList<>();
     
     
     String indent2 = indent + TABSTOP;

@@ -72,7 +72,7 @@ public class ReportBugWindow extends Window
     layout.setHeight("350px");
     layout.setWidth("750px");
     
-    form = new FieldGroup(new BeanItem<BugReport>(new BugReport()));
+    form = new FieldGroup(new BeanItem<>(new BugReport()));
     form.bindMemberFields(layout);
     form.setBuffered(true);
     
@@ -99,7 +99,7 @@ public class ReportBugWindow extends Window
         }
         catch (FieldGroup.CommitException ex)
         {
-          List<String> errorFields = new LinkedList<String>();
+          List<String> errorFields = new LinkedList<>();
           for(Field f : form.getFields())
           {
             if (f instanceof AbstractComponent)

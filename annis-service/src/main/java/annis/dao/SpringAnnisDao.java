@@ -57,7 +57,6 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Closer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -296,7 +295,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   public String mapCorpusIdToName(long corpusId)
   {
 
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(corpusId);
     List<String> names = mapCorpusIdsToNames(ids);
 
@@ -335,43 +334,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         }
       });
 
-    Closer closer = Closer.create();
-    try
+
+    File dir = getRealDataDir();
+
+    if (fileName == null)
     {
-      try
-      {
-        File dir = getRealDataDir();
+      fileName = "corpus_" 
+        + CommonHelper.getSafeFileName(toplevelCorpusName) 
+        + "_" + UUID.randomUUID() + ".properties";
+      getJdbcTemplate().update(
+        "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
+        + "', 'application/text+plain', 'corpus.properties')");
+    }
+    log.info("write config file: " + dir + "/" + fileName);
+    try (FileOutputStream fStream = new FileOutputStream(new File(
+      dir.getCanonicalPath() + "/" + fileName));
+      OutputStreamWriter writer = new OutputStreamWriter(fStream,
+        Charsets.UTF_8))
+    {
+      props.store(writer, "");
 
-        if (fileName == null)
-        {
-          fileName = "corpus_" 
-            + CommonHelper.getSafeFileName(toplevelCorpusName) 
-            + "_" + UUID.randomUUID() + ".properties";
-          getJdbcTemplate().update(
-            "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
-            + "', 'application/text+plain', 'corpus.properties')");
-        }
-
-        log.info("write config file: " + dir + "/" + fileName);
-        FileOutputStream fStream = new FileOutputStream(new File(
-          dir.getCanonicalPath() + "/" + fileName));
-
-        closer.register(fStream);
-
-        OutputStreamWriter writer = new OutputStreamWriter(fStream,
-          Charsets.UTF_8);
-        closer.register(writer);
-
-        props.store(writer, "");
-      }
-      catch (Throwable ex)
-      {
-        closer.rethrow(ex);
-      }
-      finally
-      {
-        closer.close();
-      }
     }
     catch (IOException ex)
     {
@@ -416,12 +398,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public DocumentBrowserConfig getDefaultDocBrowserConfiguration()
   {
-
-      InputStream input = null;
-      try
+      String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
+      try(InputStream input = new FileInputStream(path);)
       {
-        String path = System.getProperty("annis.home") + "/conf" + "/document-browser.json";
-        input = new FileInputStream(path);
+        
 
          // map json to pojo
         ObjectMapper objectMapper = new ObjectMapper();
@@ -438,22 +418,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       {
         log.error(
           "problems with reading ${annis.home}/conf/document-browser.json", ex);
-      }
-      finally
-      {
-        try
-        {
-          if (input != null)
-          {
-            input.close();
-          }
-        }
-        catch (IOException ex)
-        {
-          log.error(
-            "Problems with closing the ${annis.home}/conf/document-browser.json",
-            ex);
-        }
       }
 
       return null;
@@ -547,8 +511,8 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   public SpringAnnisDao()
   {
-    planRowMapper = new ParameterizedSingleColumnRowMapper<String>();
-    sqlSessionModifiers = new ArrayList<SqlSessionModifier>();
+    planRowMapper = new ParameterizedSingleColumnRowMapper<>();
+    sqlSessionModifiers = new ArrayList<>();
   }
 
   public void init()
@@ -567,9 +531,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
-    List<String> names = new ArrayList<String>();
+    List<String> names = new ArrayList<>();
 
-    Map<Long, String> corpusNamesById = new TreeMap<Long, String>();
+    Map<Long, String> corpusNamesById = new TreeMap<>();
     List<AnnisCorpus> corpora = listCorpora();
     for (AnnisCorpus corpus : corpora)
     {
@@ -660,36 +624,35 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         @Override
         public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
         {
-          Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
-            ResultSet.CONCUR_READ_ONLY);
-          try
+          
+          try(Statement stmt = con.createStatement(ResultSet.TYPE_FORWARD_ONLY,
+            ResultSet.CONCUR_READ_ONLY);)
           {
             String sql = findSqlGenerator.toSql(queryData);
 
-            ResultSet rs = stmt.executeQuery(sql);
-
-            PrintWriter w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
-            ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<Match>(
-              rs, findSqlGenerator);
-
-            int i = 1;
-            while (itMatches.hasNext())
+            PrintWriter w;
+            try (ResultSet rs = stmt.executeQuery(sql))
             {
-              // write single match to output stream
-              Match m = itMatches.next();
-              w.print(m.toString());
-              w.print("\n");
-
-              // flush after every 10th item
-              if (i % 10 == 0)
+              w = new PrintWriter(new OutputStreamWriter(out, "UTF-8"));
+              ResultSetTypedIterator<Match> itMatches = new ResultSetTypedIterator<>(
+                rs, findSqlGenerator);
+              int i = 1;
+              while (itMatches.hasNext())
               {
-                w.flush();
-              }
-
-              i++;
-            } // end for each match
-
-            rs.close();
+                // write single match to output stream
+                Match m = itMatches.next();
+                w.print(m.toString());
+                w.print("\n");
+                
+                // flush after every 10th item
+                if (i % 10 == 0)
+                {
+                  w.flush();
+                }
+                
+                i++;
+              } // end for each match
+            }
             w.flush();
             return true;
           }
@@ -699,10 +662,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
               "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
               ex);
           }
-          finally
-          {
-            stmt.close();
-          }
+
           return false;
         }
       });
@@ -744,11 +704,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       @Override
       public Boolean doInConnection(Connection con) throws SQLException, DataAccessException
       {
-        Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
+        
+        try(Statement stmt = con.createStatement(ResultSet.TYPE_SCROLL_SENSITIVE,
           ResultSet.CONCUR_READ_ONLY);
-        try
+          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));)
         {
-          ResultSet rs = stmt.executeQuery(matrixSqlGenerator.toSql(queryData));
+          
           AnnotatedMatchIterator itMatches
             = new AnnotatedMatchIterator(rs, matrixSqlGenerator.
               getSpanExtractor());
@@ -777,18 +738,12 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
             WekaHelper.exportArffData(itMatches, columnsByNodePos, w);
           }
           w.flush();
-
-          rs.close();
         }
         catch (UnsupportedEncodingException ex)
         {
           log.error(
             "Your system is not able to handle UTF-8 but ANNIS really needs this charset",
             ex);
-        }
-        finally
-        {
-          stmt.close();
         }
         return true;
       }
@@ -930,7 +885,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     if (corpusNames == null || corpusNames.isEmpty())
     {
-      return new LinkedList<Long>();
+      return new LinkedList<>();
     }
     final String sql = listCorpusByNameDaoHelper.createSql(corpusNames);
     final List<Long> result = getJdbcTemplate().query(sql,
@@ -953,7 +908,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     catch (SQLException ex)
     {
       log.error("Could not get resolver entries from database", ex);
-      return new LinkedList<ResolverEntry>();
+      return new LinkedList<>();
     }
   }
 
@@ -984,7 +939,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private void parseCorpusConfiguration()
   {
-    corpusConfiguration = new HashMap<Long, Properties>();
+    corpusConfiguration = new HashMap<>();
 
     try
     {
@@ -1021,10 +976,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public boolean checkDatabaseVersion() throws AnnisException
   {
-    Connection conn = null;
-    try
+    try(Connection conn = getJdbcTemplate().getDataSource().getConnection();)
     {
-      conn = getJdbcTemplate().getDataSource().getConnection();
+      
       DatabaseMetaData meta = conn.getMetaData();
 
       log.debug(
@@ -1051,20 +1005,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       log.error("could not get database version", ex);
     }
-    finally
-    {
-      if (conn != null)
-      {
-        try
-        {
-          conn.close();
-        }
-        catch (SQLException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-    }
+
     return false;
   }
 
@@ -1354,7 +1295,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
     catch (DataAccessException ex)
     {
-      return new LinkedList<Long>();
+      return new LinkedList<>();
     }
   }
 
@@ -1434,7 +1375,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       throw new IllegalArgumentException("corpus name may not be null");
     }
 
-    List<String> corpusNames = new ArrayList<String>();
+    List<String> corpusNames = new ArrayList<>();
     corpusNames.add(topLevelCorpus);
     List<Long> corpusIds = mapCorpusNamesToIds(corpusNames);
 

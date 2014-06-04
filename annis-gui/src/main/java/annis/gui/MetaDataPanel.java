@@ -192,7 +192,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName,
       documentName);
 
-    Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
+    Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
 
 
     if (metadata != null && !metadata.isEmpty())
@@ -201,11 +201,11 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       if (documentName != null)
       {
         hashMetaData =
-          new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+          new TreeMap<>(Collections.reverseOrder());
       }
       else
       {
-        hashMetaData = new TreeMap<Integer, List<Annotation>>();
+        hashMetaData = new TreeMap<>();
       }
 
       for (Annotation metaDatum : metadata)
@@ -230,14 +230,14 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     Map<Integer, List<Annotation>> splittedAnnotationsList)
   {
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
-      new ArrayList<BeanItemContainer<Annotation>>();
+      new ArrayList<>();
 
 
 
     for (List<Annotation> list : splittedAnnotationsList.values())
     {
       BeanItemContainer<Annotation> metaContainer =
-        new BeanItemContainer<Annotation>(Annotation.class);
+        new BeanItemContainer<>(Annotation.class);
       metaContainer.addAll(list);
 
       listOfBeanItemCon.add(metaContainer);
@@ -312,7 +312,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private void loadTable(String item, List<Annotation> metaData)
   {
     BeanItemContainer<Annotation> metaContainer =
-      new BeanItemContainer<Annotation>(Annotation.class);
+      new BeanItemContainer<>(Annotation.class);
     metaContainer.addAll(metaData);
 
     if (corpusAnnotationTable != null)

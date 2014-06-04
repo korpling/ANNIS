@@ -235,7 +235,7 @@ public abstract class AnnisBaseRunner
 
   protected List<String> detectAvailableCommands()
   {
-    LinkedList<String> result = new LinkedList<String>();
+    LinkedList<String> result = new LinkedList<>();
 
     Method[] methods = getClass().getMethods();
 
@@ -350,7 +350,7 @@ public abstract class AnnisBaseRunner
       System.out.println(ex.getMessage());
     }
 
-    ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<ILoggingEvent>();
+    ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
     consoleAppender.setContext(loggerContext);
     consoleAppender.setName("CONSOLE");
 

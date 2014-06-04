@@ -91,7 +91,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
     this.controller = ui.getQueryController();
     this.lastPublicStatus = OK_STATUS;
-    this.history = new LinkedList<HistoryEntry>();
+    this.history = new LinkedList<>();
 
     setSpacing(true);
     setMargin(false);

@@ -35,7 +35,7 @@ public class Search
   public Search(List<File> rootPaths)
   {
     this.rootPaths = rootPaths;
-    this.corpusPaths = new TreeMap<String, File>();
+    this.corpusPaths = new TreeMap<>();
     this.wasSearched = false;
   }
 

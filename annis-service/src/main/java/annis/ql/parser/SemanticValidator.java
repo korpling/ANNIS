@@ -81,14 +81,14 @@ public class SemanticValidator implements QueryDataTransformer
     
     // get all nodes connected to the first one
     Multimap<Long, QueryNode> connected = calculateConnected(alternative);
-    Set<Long> transitiveHull = new HashSet<Long>();
+    Set<Long> transitiveHull = new HashSet<>();
     transitiveHull.add(alternative.get(0).getId());
     createTransitiveHull(alternative.get(0), 
       connected, transitiveHull);
     
     Multiset<String> variableNames = TreeMultiset.create();
    
-    Set<Long> unconnectedNodes = new HashSet<Long>();
+    Set<Long> unconnectedNodes = new HashSet<>();
     for(QueryNode n : alternative)
     {
       unconnectedNodes.add(n.getId());
@@ -99,7 +99,7 @@ public class SemanticValidator implements QueryDataTransformer
     // check if each node is contained in the connected nodes
     if (!unconnectedNodes.isEmpty())
     { 
-      List<String> variables = new LinkedList<String>();
+      List<String> variables = new LinkedList<>();
       for (QueryNode n : alternative)
       {
         if(unconnectedNodes.contains(n.getId()))
@@ -126,7 +126,7 @@ public class SemanticValidator implements QueryDataTransformer
     }
     
     // check if any variable name was given more than once
-    List<String> invalidNames = new LinkedList<String>();
+    List<String> invalidNames = new LinkedList<>();
     for(Multiset.Entry<String> e : variableNames.entrySet())
     {
       if(e.getCount() > 1)

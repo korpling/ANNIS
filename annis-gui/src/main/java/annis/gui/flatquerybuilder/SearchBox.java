@@ -81,7 +81,7 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     this.vn = vn;
     this.ebene = ebene;
     this.sq = sq;
-    this.vfs = new ArrayList<ValueField>();    
+    this.vfs = new ArrayList<>();    
     vnframe = new VerticalLayout();
     vnframe.setSpacing(true);
     vnframe.setImmediate(true);

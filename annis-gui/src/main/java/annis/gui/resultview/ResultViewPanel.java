@@ -130,7 +130,7 @@ public class ResultViewPanel extends VerticalLayout implements
   public ResultViewPanel(QueryController controller,
     PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
   {
-    this.tokenAnnoVisible = new TreeMap<String, Boolean>();
+    this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.queryId = queryId;
     this.controller = controller;
@@ -297,7 +297,7 @@ public class ResultViewPanel extends VerticalLayout implements
       return;
     }
 
-    List<SingleResultPanel> newPanels = new LinkedList<SingleResultPanel>();
+    List<SingleResultPanel> newPanels = new LinkedList<>();
     try
     {
       if (subgraphList == null || subgraphList.isEmpty())
@@ -356,7 +356,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
   {
-    List<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
+    List<SingleResultPanel> result = new LinkedList<>();
 
     int i = 0;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
@@ -392,7 +392,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
       if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS))
       {
-        hiddenTokenAnnos = new HashSet<String>(
+        hiddenTokenAnnos = new HashSet<>(
           Arrays.asList(
             StringUtils.split(
               corpusConfig.getConfig(MAPPING_HIDDEN_ANNOS), ",")
@@ -418,7 +418,7 @@ public class ResultViewPanel extends VerticalLayout implements
   
   private Set<String> getSegmentationNames(SaltProject p)
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
     {
@@ -453,7 +453,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public SortedSet<String> getVisibleTokenAnnos()
   {
-    TreeSet<String> result = new TreeSet<String>();
+    TreeSet<String> result = new TreeSet<>();
 
     for (Entry<String, Boolean> e : tokenAnnoVisible.entrySet())
     {
@@ -625,7 +625,7 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     if (source != null && projectQueue != null && currentQuery != null)
     {
-      LinkedList<SaltProject> subgraphs = new LinkedList<SaltProject>();
+      LinkedList<SaltProject> subgraphs = new LinkedList<>();
       SaltProject p;
       while((p = projectQueue.poll()) != null)
       {

@@ -157,7 +157,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         // prepare fetching subgraphs
         final int totalResultSize = result.getMatches().size();
        
-        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<SaltProject>(
+        final BlockingQueue<SaltProject> queue = new ArrayBlockingQueue<>(
           totalResultSize);
         int current = 0;
 
@@ -168,7 +168,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
             return;
           }
 
-          List<Match> subList = new LinkedList<Match>();
+          List<Match> subList = new LinkedList<>();
           subList.add(m);
           final SaltProject p = executeQuery(subgraphRes, 
             new MatchGroup(subList), 

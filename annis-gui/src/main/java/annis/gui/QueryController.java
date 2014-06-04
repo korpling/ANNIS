@@ -105,12 +105,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   private int maxShortID;
 
   private List<CorpusSelectionChangeListener> corpusSelChangeListeners
-    = new LinkedList<CorpusSelectionChangeListener>();
+    = new LinkedList<>();
 
   public QueryController(SearchUI ui)
   {
     this.ui = ui;
-    this.history = new ListOrderedSet<HistoryEntry>();
+    this.history = new ListOrderedSet<>();
   }
   
 
@@ -218,7 +218,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (corpusSelChangeListeners == null)
     {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+      corpusSelChangeListeners = new LinkedList<>();
     }
     corpusSelChangeListeners.add(listener);
   }
@@ -228,7 +228,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (corpusSelChangeListeners == null)
     {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+      corpusSelChangeListeners = new LinkedList<>();
     }
     else
     {
@@ -468,7 +468,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (queries == null)
     {
-      queries = new HashMap<UUID, PagedResultQuery>();
+      queries = new HashMap<>();
     }
     return queries;
   }
@@ -486,7 +486,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (counts == null)
     {
-      counts = new HashMap<UUID, MatchAndDocumentCount>();
+      counts = new HashMap<>();
     }
     return counts;
   }
@@ -629,7 +629,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       if (updatedQueries == null)
       {
-        updatedQueries = new HashMap<UUID, Map<Integer, PagedResultQuery>>();
+        updatedQueries = new HashMap<>();
       }
 
       if (!updatedQueries.containsKey(queryID))
