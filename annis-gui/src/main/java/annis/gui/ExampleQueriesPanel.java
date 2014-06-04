@@ -23,6 +23,7 @@ import annis.gui.model.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -332,7 +333,7 @@ public class ExampleQueriesPanel extends Table
     {
       // ignore
     }
-    catch (Exception ex)
+    catch (ClientHandlerException ex)
     {
       log.error("problems with getting example queries from remote for {}",
         corpusNames, ex);

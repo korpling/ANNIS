@@ -25,12 +25,14 @@ import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
+import java.awt.HeadlessException;
 import java.io.*;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.concurrent.ExecutionException;
 import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingUtilities;
@@ -240,7 +242,7 @@ public class ImportDialog extends javax.swing.JDialog
           }
         }
       }
-      catch (Exception ex)
+      catch (HeadlessException | InterruptedException | ExecutionException ex)
       {
         log.error(null, ex);
       }

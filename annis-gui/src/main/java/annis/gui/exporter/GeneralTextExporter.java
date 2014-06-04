@@ -218,22 +218,8 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("finished");
 
     }
-    catch (AnnisQLSemanticsException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisQLSyntaxException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisCorpusAccessException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (RemoteException ex)
+    catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
+      | AnnisCorpusAccessException | RemoteException  ex)
     {
       log.error(
         null, ex);

@@ -152,10 +152,11 @@ public abstract class AbstractDotVisualizer extends AbstractVisualizer<ImagePane
       }
 
     }
-    catch (Exception ex)
+    catch (IOException | InterruptedException ex)
     {
       log.error(null, ex);
     }
+
   }
 
   public abstract void createDotContent(VisualizerInput input, StringBuilder sb);

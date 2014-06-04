@@ -40,9 +40,11 @@ import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -614,7 +616,7 @@ public class CorpusAdministration
       });
 
     }
-    catch (Throwable ex)
+    catch (AddressException | EmailException ex)
     {
       log.warn("Could not send mail: " + ex.getMessage());
     }

@@ -469,12 +469,6 @@ public class CorpusListPanel extends VerticalLayout implements
           Notification.Type.TRAY_NOTIFICATION);
       }
     }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-      Notification.show("Exception: " + ex.getLocalizedMessage(),
-        Notification.Type.TRAY_NOTIFICATION);
-    }
     return false;
   }
 
