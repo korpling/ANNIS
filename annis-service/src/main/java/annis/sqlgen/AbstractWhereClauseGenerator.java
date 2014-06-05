@@ -20,6 +20,7 @@ import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -112,6 +113,10 @@ public abstract class AbstractWhereClauseGenerator extends
         } else if (join instanceof Precedence)
         {
           addPrecedenceConditions(conditions, node, target, (Precedence) join,
+              queryData);
+        } else if (join instanceof Near)
+        {
+          addNearConditions(conditions, node, target, (Near) join,
               queryData);
         } else if (join instanceof Sibling)
         {
@@ -225,6 +230,9 @@ public abstract class AbstractWhereClauseGenerator extends
 
   protected abstract void addPrecedenceConditions(List<String> conditions,
       QueryNode node, QueryNode target, Precedence join, QueryData queryData);
+
+  protected abstract void addNearConditions(List<String> conditions,
+      QueryNode node, QueryNode target, Near join, QueryData queryData);
 
   protected abstract void addAnnotationConditions(List<String> conditions,
       QueryNode node, int index, QueryAnnotation annotation, String table,

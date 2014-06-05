@@ -62,6 +62,12 @@ precedence
 	| PRECEDENCE (layer=ID COMMA?)? rangeSpec #RangePrecedence
 	;
 
+near
+	: NEAR (layer=ID)? # DirectNear
+	| NEAR (layer=ID)? STAR # IndirectNear
+	| NEAR (layer=ID COMMA?)? rangeSpec #RangeNear
+	;
+
 dominance
 	: DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
 	| DOMINANCE (layer=ID)? STAR # IndirectDominance
@@ -106,6 +112,7 @@ notequalvalue
 
 operator
   : precedence
+  | near
   | spanrelation
   | dominance
   | pointing

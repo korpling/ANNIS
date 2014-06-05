@@ -16,12 +16,15 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.betweenMirror;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
 import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.mirrorJoin;
 import static annis.sqlgen.SqlConstraints.numberJoin;
+import static annis.sqlgen.SqlConstraints.numberMirrorJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
@@ -44,6 +47,7 @@ import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -87,12 +91,30 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
       aliasedColumn(NODE_TABLE, rightColumn)));
   }
+  
+    void mirrorJoinOnNode(List<String> conditions, QueryNode node, QueryNode target,
+    String operator, String leftColumn, String rightColumn)
+  {
+    conditions.add(mirrorJoin(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn)));
+  }
+
 
   void betweenJoinOnNode(List<String> conditions, QueryNode node,
     QueryNode target, String leftColumn, String rightColumn, int min, int max)
   {
     conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+  }
+
+    void betweenMirrorJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String leftColumn, String rightColumn, int min, int max)
+  {
+    
+    conditions.add(betweenMirror(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
+      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+
   }
 
   void numberJoinOnNode(List<String> conditions, QueryNode node,
@@ -104,7 +126,17 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       aliasedColumn(NODE_TABLE, rightColumn), offset));
   }
   
-    
+  void numberMirrorJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String operator, String leftColumn, String rightColumn,
+    int offset)
+  {
+    conditions.add(numberMirrorJoin(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn), offset));
+  }
+
+  
+  
   /**
    * Explicitly disallow reflexivity.
    * 
@@ -314,6 +346,61 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
   }
 
+    @Override
+  protected void addNearConditions(List<String> conditions,
+    QueryNode node, QueryNode target, Near join, QueryData queryData)
+  {
+    joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
+
+    int min = join.getMinDistance();
+    int max = join.getMaxDistance();
+
+    String left = join.getSegmentationName() == null ? "left_token" : "seg_index";
+    String right = join.getSegmentationName() == null ? "right_token" : "seg_index";
+    
+    // we are using a special segmentation
+    if(join.getSegmentationName() != null)
+    {
+      conditions.add(join("=",  
+        tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
+      
+      conditions.add(join("=",  
+        tables(target).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
+    }
+    
+    
+    // indirect
+    if (min == 0 && max == 0)
+    {
+      if (optimizeIndirectPrecedence)
+      {
+        numberMirrorJoinOnNode(conditions, node, target, "<=", right,
+          left, -1);
+      }
+      else
+      {
+        mirrorJoinOnNode(conditions, node, target, "<", right, left);
+      }
+
+    }
+    // exact distance
+    else if (min == max)
+    {
+      numberMirrorJoinOnNode(conditions, node, target, "=", right,
+        left, -min);
+
+    }
+    // ranged distance
+    else
+    {
+      betweenMirrorJoinOnNode(conditions, node, target, right, left,
+        -min, -max);
+    }
+  }
+  
+  
   @Override
   protected void addRightOverlapConditions(List<String> conditions,
     QueryNode target, QueryNode node, RightOverlap join, QueryData queryData)
