@@ -33,6 +33,20 @@ INSERT INTO annotation_category (toplevel_corpus, namespace, name)
 
 CREATE INDEX annocat_inverse_50
   ON annotation_category_50
-  USING btree
   (namespace, name, id);
 
+ALTER TABLE facts_50 ADD COLUMN node_anno_category bigint;
+
+UPDATE facts_50 SET node_anno_category=NULL 
+WHERE node_qannotext IS NULL;
+
+UPDATE facts_50 
+SET node_anno_category=
+  (SELECT id 
+   FROM annotation_category_50 AS c 
+   WHERE 
+     (splitanno(node_qannotext))[1] IS NOT DISTINCT FROM c.namespace 
+     AND (splitanno(node_qannotext))[2] IS NOT DISTINCT FROM c."name"
+   LIMIT 1
+  )      
+WHERE node_qannotext IS NOT NULL;
