@@ -36,7 +36,9 @@ public enum AQLOperator
   LEFT_MOST_CHILD(">@l", "left-most child"),
   RIGHT_MOST_CHILD(">@r", "right-most child"),
   COMMON_PARENT("$", "common parent node"),
-  COMMON_ANCESTOR("$*", "common ancestor node");
+  COMMON_ANCESTOR("$*", "common ancestor node"),
+  DIRECT_NEAR("^", "directly near"),
+  INDIRECT_NEAR("^*", "indirectly near");
   
   
   
