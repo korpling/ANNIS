@@ -109,7 +109,7 @@ A & B & #1 ^ #2
 
 Elements are next to each other in any order (A-B or B-A). For non-terminal nodes, adjacency is determined by the right most and left most terminal children.
 
-## indirectly near: ".*" ## {#dev-aql-indirectnear}
+## indirectly near: "^*" ## {#dev-aql-indirectnear}
 
 \verbatim
 A & B & #1 ^* #2
