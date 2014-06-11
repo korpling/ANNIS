@@ -22,6 +22,13 @@ CREATE TABLE annotation_category_50
 )
 INHERITS (annotation_category);
 
+INSERT INTO annotation_category (toplevel_corpus, namespace, name)
+(
+  SELECT DISTINCT 50, namespace, name
+  FROM annotations_50
+  WHERE name IS NOT NULL  AND type = 'node'
+);
+
 -- DROP INDEX annocat_inverse_50;
 
 CREATE INDEX annocat_inverse_50
