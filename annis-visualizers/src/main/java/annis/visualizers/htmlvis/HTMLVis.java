@@ -21,6 +21,7 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.model.Annotation;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -31,9 +32,11 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -218,7 +221,48 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     StringBuilder sb = new StringBuilder();
 
     EList<SToken> token = graph.getSortedSTokenByText();
+    
+    // Add pseudo tokens at beginning and end of first STextualDS found to trigger annis:BEGIN/END instructions
+    // No support for separate metadata of multiple texts yet (not yet possible in ANNIS anyway)
+    SToken tokPseudoTokenBegin = graph.createSToken(graph.getSTextualDSs().get(0), 1, 1);
+    SToken tokPseudoTokenEnd = graph.createSToken(graph.getSTextualDSs().get(0), 
+        graph.getSTextualDSs().get(0).toString().length()-1, graph.getSTextualDSs().get(0).toString().length()-1);
+    tokPseudoTokenBegin.createSAnnotation("annis", "BEGIN", "BEGIN");
+    tokPseudoTokenEnd.createSAnnotation("annis", "END", "END");
+        
+    //Get corpus and document name
+    String strDocName = "";
+    String strCorpName = "";
+    
+    //Get metadata for visualizer if stylesheet requires it
+    //First check the stylesheet
+    Boolean bolMetaTypeFound = false;
+    for (VisualizationDefinition vis : definitions) {
+        if (vis.getOutputter().getType().toString().equals("META_NAME"))
+        { 
+            bolMetaTypeFound = true;
+        }
+    }
+    if (bolMetaTypeFound == true)
+    {
+        //Metadata is required, get corpus and document name
+        strDocName = graph.getSDocument().getSName();
+        List<String> corpusPath = CommonHelper.getCorpusPath(graph.getSDocument().getSCorpusGraph(), graph.getSDocument());
+        strCorpName = corpusPath.get(corpusPath.size() - 1);
+        //Get metadata
+        List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName,strDocName);
+        //Assign all metadata as annotations with NS 'meta' to the pseudo tokens BEGIN and END
+        for (Annotation metaDatum : metaData) {
+            tokPseudoTokenBegin.createSAnnotation("meta", metaDatum.getName(), metaDatum.getValue());
+            tokPseudoTokenEnd.createSAnnotation("meta", metaDatum.getName(), metaDatum.getValue());
+        }
+    }
+    
+    //Manually insert pseudo tokens at correct position in token list
+    token.add(0,tokPseudoTokenBegin);
+    token.add(tokPseudoTokenEnd);
 
+    
     for (SToken t : token)
     {
 
@@ -251,7 +295,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     Set<Long> indexes = new TreeSet<Long>();
     indexes.addAll(outputStartTags.keySet());
     indexes.addAll(outputEndTags.keySet());
-
+    
     for (Long i : indexes)
     {
       // output all strings belonging to this token position

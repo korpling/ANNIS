@@ -164,6 +164,17 @@ public class VisParser extends HTMLVisConfigBaseListener
     currentOutputter.setType(SpanHTMLOutputter.Type.ANNO_NAME);
   }
 
+    @Override
+  public void enterTypeMeta(HTMLVisConfigParser.TypeMetaContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.META_NAME);
+    //Using constant property for metadata, since constant and metavalue are never set simultaneously
+    //Alternatively we could consider adding another property for meta, or renaming 'constant' to 
+    //something more appropriate.
+    currentOutputter.setConstant(ctx.innertype().getText());
+  }
+
+  
   @Override
   public void enterTypeConstant(HTMLVisConfigParser.TypeConstantContext ctx)
   {

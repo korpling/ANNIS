@@ -22,6 +22,7 @@ EQUALS : '=';
 TOK : 'tok';
 VALUE : 'value';
 ANNO : 'anno';
+META : 'meta';
 STYLE : 'style';
 COLON : ':';
 QUOTE : '"';
@@ -38,6 +39,7 @@ type
   : VALUE # typeValue
   | ANNO # typeAnno
   | QUOTE innertype QUOTE # typeConstant
+  | META COLON COLON innertype # typeMeta
   ;
 
 element 

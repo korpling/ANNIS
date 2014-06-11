@@ -20,6 +20,7 @@ import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -34,7 +35,7 @@ import java.util.TreeSet;
  */
 public class SpanHTMLOutputter
 {
-  public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT};
+    public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT, META_NAME};
   
   public static final String NULL_VAL = "NULL";
   
@@ -50,12 +51,16 @@ public class SpanHTMLOutputter
   {
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
-      SToken tok = (SToken) node;
-      outputToken(tok, outputStartTags, outputEndTags);
+        // only treat this as a match for "tok" if this is not a pseudo token BEGIN/END
+        if (!node.getSAnnotations().get(0).getSNS().equals("annis") || node.getSAnnotations().get(0) == null)
+        {
+            SToken tok = (SToken) node;
+            outputToken(tok, outputStartTags, outputEndTags);
+        }
     }
     else if(node instanceof SSpan || node instanceof SToken)
     {
-      outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
+            outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
     }
     else
     {
@@ -67,14 +72,40 @@ public class SpanHTMLOutputter
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
   {
+    long left;
+    long right;
     
-    RelannisNodeFeature feat = 
-      (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
-    
-    long left = feat.getLeftToken();
-    long right = feat.getRightToken();
-    
-    SAnnotation matchedAnnotation = span.getSAnnotation(matchedQName);
+    if(span.getSAnnotations().get(0).getSNS().equals("annis") && span.getSAnnotations().get(0) != null) //found pseudo node instruction
+    {
+        // set left/right if special instruction found in pseudo region at BEGIN/END of htmlvis
+        if (span.getSAnnotations().get(0).getSName().equals("BEGIN"))
+        {
+            left = -1;
+            right = -1;
+        }
+        else //END pseudo region
+        {
+            left = 1000000;
+            right = 1000000;
+        }
+    }
+    else
+    {
+        RelannisNodeFeature feat = 
+        (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+
+        left = feat.getLeftToken();
+        right = feat.getRightToken();
+    }
+  
+    SAnnotation matchedAnnotation;
+    if (type == Type.META_NAME){
+        matchedAnnotation = span.getSAnnotation("meta::" + constant); //constant property is used to store metadata names, see VisParser.java
+    }
+    else
+    {
+        matchedAnnotation = span.getSAnnotation(matchedQName);
+    }
     
     String value;
     // output to an inner text node
@@ -88,6 +119,10 @@ public class SpanHTMLOutputter
         break;
       case ANNO_NAME:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
+        break;
+      case META_NAME:
+        value = matchedAnnotation.getSValue().toString() == null ? "NULL" : matchedAnnotation.getSValue().toString();
+        matchedQName = "meta::" + constant;
         break;
       default:
         value = "";
