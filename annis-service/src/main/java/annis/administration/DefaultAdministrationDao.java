@@ -520,6 +520,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createAnnotations(corpusID);
     
+    createAnnoCategory(corpusID);
+    
     // create the new facts table partition
     createFacts(corpusID);
 
@@ -1044,6 +1046,13 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("indexing annotations table for corpus with ID " + corpusID);
     executeSqlFromScript("indexes_annotations.sql", args);
+  }
+  
+  void createAnnoCategory(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+    log.info("creating annotation category table for corpus with ID " + corpusID);
+    executeSqlFromScript("annotation_category.sql", args);
   }
 
   void analyzeFacts(long corpusID)

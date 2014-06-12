@@ -53,6 +53,17 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
+CREATE TABLE annotation_category
+(
+  id SERIAL,
+  namespace character varying,
+  name character varying NOT NULL,
+  toplevel_corpus integer NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id),
+  UNIQUE (namespace, name, toplevel_corpus)
+);
+
 DROP TABLE IF EXISTS facts CASCADE;
 CREATE TABLE facts (
   fid bigserial,
@@ -81,6 +92,7 @@ CREATE TABLE facts (
   edge_type character(1), -- edge type of this component
   edge_namespace varchar, -- optional namespace of the edges’ names
   edge_name varchar, -- name of the edges in this component
+  node_anno_category INTEGER REFERENCES annotation_category(id),
   node_annotext varchar, -- the combined name and value of the annotation, separated by ":"
   node_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
   edge_annotext varchar, -- the combined name and value of the annotation, separated by ":"
