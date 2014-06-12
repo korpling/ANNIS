@@ -148,21 +148,19 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
     else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
     {
+      TableAccessStrategy tasNode = tables(node);
+      TableAccessStrategy tasTarget = tables(target);
+      
       String nodeDifferent = join("<>",
-        tables(node).aliasedColumn(NODE_TABLE, "id"), tables(target).
-        aliasedColumn(NODE_TABLE, "id"));
+        tasNode.aliasedColumn(NODE_TABLE, "id"), 
+        tasTarget.aliasedColumn(NODE_TABLE, "id"));
       
-      String annoNamespaceDifferent = join("IS DISTINCT FROM",
-        annoCondition.getNodeAnnoNamespaceSQL(tables(node)),
-        annoCondition.getNodeAnnoNamespaceSQL(tables(target)));
-      
-      String annoNameDifferent = join("IS DISTINCT FROM",
-        annoCondition.getNodeAnnoNameSQL(tables(node)),
-        annoCondition.getNodeAnnoNameSQL(tables(target)));
-      
+      String annoCatDifferent = join("IS DISTINCT FROM",
+        tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "category"),
+        tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "category"));
       
       conditions.add("(" 
-        + Joiner.on(" OR ").join(nodeDifferent, annoNameDifferent, annoNamespaceDifferent) 
+        + Joiner.on(" OR ").join(nodeDifferent, annoCatDifferent) 
         + ")");
       
     }
@@ -434,15 +432,13 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
     else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
     {
+      TableAccessStrategy tasNode = tables(node);
+      TableAccessStrategy tasTarget = tables(target);
       joinOnNode(conditions, node, target, "=", "id", "id");
       
-      conditions.add(join("IS NOT DISTINCT FROM",
-        annoCondition.getNodeAnnoNamespaceSQL(tables(node)),
-        annoCondition.getNodeAnnoNamespaceSQL(tables(target))));
-      
-      conditions.add(join("IS NOT DISTINCT FROM",
-        annoCondition.getNodeAnnoNameSQL(tables(node)),
-        annoCondition.getNodeAnnoNameSQL(tables(target))));
+      conditions.add(join("IS NOT DISTINCT FROM", 
+        tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "category"),
+        tasTarget.aliasedColumn(NODE_TABLE, NODE_TABLE)));
     }
     else
     {

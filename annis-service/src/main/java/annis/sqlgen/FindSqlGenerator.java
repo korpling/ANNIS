@@ -66,7 +66,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
   private boolean outputCorpusPath;
 
   private boolean outputToplevelCorpus;
-
+  
   private CorpusPathExtractor corpusPathExtractor;
 
   private AnnotationConditionProvider annoCondition;
@@ -211,8 +211,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator<List<Match>>
     }
     return StringUtils.join(ids, ", ");
   }
-  
-  
+
 
   @Override
   public List<Match> extractData(ResultSet rs) throws SQLException,

@@ -60,7 +60,7 @@ CREATE TABLE annotation_category
   name character varying NOT NULL,
   toplevel_corpus integer NOT NULL,
   PRIMARY KEY (id),
-  FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id),
+  FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id) ON DELETE CASCADE,
   UNIQUE (namespace, name, toplevel_corpus)
 );
 

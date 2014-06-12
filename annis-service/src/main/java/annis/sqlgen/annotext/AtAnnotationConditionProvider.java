@@ -181,21 +181,13 @@ public class AtAnnotationConditionProvider implements
   @Override
   public String getNodeAnnoNamespaceSQL(TableAccessStrategy tas)
   {
-    return "(splitanno("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-      + "))[1]";
+    return tas.aliasedColumn("annotation_category", "namespace");
   }
 
   @Override
   public String getNodeAnnoNameSQL(TableAccessStrategy tas)
   {
-    return "(splitanno("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "qannotext")
-      + "))[2]";
+    return tas.aliasedColumn("annotation_category", "name");
   }
-  
-  
-  
-  
 
 }
