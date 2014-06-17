@@ -42,7 +42,7 @@ import annis.ql.parser.QueryData;
 
 public class TestAbstractUnionSqlGenerator {
 
-	@InjectMocks private AbstractUnionSqlGenerator<?> generator;
+	@InjectMocks private AbstractUnionSqlGenerator generator;
 	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
 	@Spy private List<FromClauseSqlGenerator<QueryData>> fromClauseSqlGenerators = new ArrayList<>();
@@ -61,13 +61,7 @@ public class TestAbstractUnionSqlGenerator {
 	@Before
 	public void setup() {
 		// wire up dependencies
-		generator = new AbstractUnionSqlGenerator<Object>() {
-
-			@Override
-			public Object extractData(ResultSet rs) throws SQLException,
-					DataAccessException {
-				throw new UnsupportedOperationException("This SqlGenerator is only used for test purposes.");
-			}
+		generator = new AbstractUnionSqlGenerator() {
 		};
 		initMocks(this);
 		fromClauseSqlGenerators.add(fromClauseSqlGenerator);

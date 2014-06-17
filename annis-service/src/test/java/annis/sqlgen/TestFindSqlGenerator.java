@@ -19,7 +19,7 @@ public class TestFindSqlGenerator
 {
 
   // class under test
-  private FindSqlGenerator generator;
+  private SolutionSqlGenerator generator;
 
   // test data
   @Mock
@@ -34,7 +34,7 @@ public class TestFindSqlGenerator
   public void setup()
   {
     initMocks(this);
-    generator = new FindSqlGenerator()
+    generator = new SolutionSqlGenerator()
     {
       protected TableAccessStrategy createTableAccessStrategy()
       {
@@ -49,24 +49,11 @@ public class TestFindSqlGenerator
     given(queryData.getMaxWidth()).willReturn(1);
   }
 
-  @Test
-  public void shouldNotOptimizeDistinct()
-  {
-    // given
-    generator.setOptimizeDistinct(false);
-    setupQueryData();
-    given(tableAccessStrategy.usesRankTable()).willReturn(false);
-    // when
-    String actual = generator.selectClause(queryData, alternative, "");
-    // then
-    assertThat(actual, startsWith("DISTINCT"));
-  }
 
   @Test
   public void shouldSkipDistinctIfOnlyNodeTablesAreUsed()
   {
     // given
-    generator.setOptimizeDistinct(true);
     setupQueryData();
     given(tableAccessStrategy.usesRankTable()).willReturn(false);
     // when
@@ -79,7 +66,6 @@ public class TestFindSqlGenerator
   public void shouldUseDistinctIfEdgeTablesAreUsed()
   {
     // given
-    generator.setOptimizeDistinct(true);
     setupQueryData();
     given(tableAccessStrategy.usesRankTable()).willReturn(true);
     // when

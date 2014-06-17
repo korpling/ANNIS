@@ -15,11 +15,10 @@
  */
 package annis.sqlgen;
 
-public interface SqlGenerator<QueryType>
+import org.springframework.jdbc.core.ResultSetExtractor;
+
+public interface SqlGeneratorAndExtractor<QueryType, T> 
+  extends SqlGenerator<QueryType>, ResultSetExtractor<T>
 {
-
-	String toSql(QueryType queryData);
-
-	String toSql(QueryType queryData, String indent);
 
 }

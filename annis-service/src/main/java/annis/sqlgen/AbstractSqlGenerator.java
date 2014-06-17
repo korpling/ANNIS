@@ -38,9 +38,9 @@ import org.springframework.util.Assert;
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
-public abstract class AbstractSqlGenerator<T>
+public abstract class AbstractSqlGenerator
   extends TableAccessStrategyFactory
-  implements SqlGenerator<QueryData, T>
+  implements SqlGenerator<QueryData>
 {
 
   // generators for different SQL statement clauses

@@ -20,11 +20,11 @@ import java.util.List;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 
-public abstract class AbstractSolutionMatchInFromClauseSqlGenerator<T> extends
-    AbstractSqlGenerator<T> implements FromClauseSqlGenerator<QueryData>
+public abstract class AbstractSolutionMatchInFromClauseSqlGenerator extends
+    AbstractSqlGenerator implements FromClauseSqlGenerator<QueryData>
 {
 
-  private SqlGenerator<QueryData, ?> findSqlGenerator;
+  private SqlGenerator<QueryData> findSqlGenerator;
 
   @Override
   public String fromClause(QueryData queryData, List<QueryNode> alternative,
@@ -41,11 +41,11 @@ public abstract class AbstractSolutionMatchInFromClauseSqlGenerator<T> extends
     return sb.toString();
   }
 
-  public SqlGenerator<QueryData, ?> getFindSqlGenerator() {
+  public SqlGenerator<QueryData> getFindSqlGenerator() {
     return findSqlGenerator;
   }
 
-  public void setFindSqlGenerator(SqlGenerator<QueryData, ?> findSqlGenerator) {
+  public void setFindSqlGenerator(SqlGenerator<QueryData> findSqlGenerator) {
     this.findSqlGenerator = findSqlGenerator;
   }
 

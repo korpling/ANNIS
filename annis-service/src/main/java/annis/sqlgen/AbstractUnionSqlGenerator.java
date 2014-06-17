@@ -40,7 +40,7 @@ import annis.ql.parser.QueryData;
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
-public abstract class AbstractUnionSqlGenerator<T> extends AbstractSqlGenerator<T>
+public abstract class AbstractUnionSqlGenerator extends AbstractSqlGenerator
 {
 
   // corpusList, documents

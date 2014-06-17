@@ -356,7 +356,6 @@ limitations under the License.
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
-    <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
     <property name="outputCorpusPath" value="true" />
     <property name="outputToplevelCorpus" value="true" />
@@ -371,11 +370,28 @@ limitations under the License.
     <property name="annoCondition" ref="annotationConditionProvider" />
     
   </bean>
+
+  <bean id="solutionSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
+        parent="tableAccessStrategyFactory" lazy-init="true">
+
+    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
+    <property name="outputNodeName" value="true" />
+    <property name="outputToplevelCorpus" value="true" />
+
+    <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+    <property name="fromClauseSqlGenerators" ref="annoCatJoinFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+    <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="annoCondition" ref="annotationConditionProvider" />
+    
+  </bean>
   
-  <bean id="frequencyFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
+  <bean id="frequencyFindSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
           parent="tableAccessStrategyFactory" lazy-init="true">
 
-    <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="false" />
     <property name="outputCorpusPath" value="false" />
     <property name="outputToplevelCorpus" value="true" />
@@ -389,10 +405,9 @@ limitations under the License.
     <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
   
-  <bean id="noCorpusPathFindSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
+  <bean id="noCorpusPathFindSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
-    <property name="optimizeDistinct" value="${annis.optimize-distinct}" />
     <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
     <property name="outputCorpusPath" value="false" />
     <property name="outputToplevelCorpus" value="false" />

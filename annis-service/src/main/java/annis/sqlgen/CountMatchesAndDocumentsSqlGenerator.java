@@ -24,10 +24,14 @@ import org.springframework.dao.DataAccessException;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.MatchAndDocumentCount;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import org.springframework.jdbc.core.ResultSetExtractor;
 
 
-public class CountMatchesAndDocumentsSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator<MatchAndDocumentCount>
-	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
+public class CountMatchesAndDocumentsSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator
+	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>, 
+     ResultSetExtractor<MatchAndDocumentCount>
+{
 
 	@Override
 	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {

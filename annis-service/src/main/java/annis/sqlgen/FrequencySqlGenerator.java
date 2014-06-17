@@ -15,26 +15,15 @@
  */
 package annis.sqlgen;
 
-import annis.exceptions.AnnisQLSemanticsException;
 import annis.service.objects.FrequencyTable;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
-import static annis.sqlgen.TableAccessStrategy.ANNOTATION_POOL_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
-import com.google.common.base.Function;
-import com.google.common.collect.ImmutableMap;
-import com.google.common.collect.Maps;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
-import java.util.Iterator;
-import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
 import org.springframework.dao.DataAccessException;
 
@@ -42,12 +31,13 @@ import org.springframework.dao.DataAccessException;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public abstract class FrequencySqlGenerator extends AbstractSqlGenerator<FrequencyTable>
+public abstract class FrequencySqlGenerator extends AbstractSqlGenerator
   implements WhereClauseSqlGenerator<QueryData>, SelectClauseSqlGenerator<QueryData>,
-  GroupByClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>
+  GroupByClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>,
+  SqlGeneratorAndExtractor<QueryData, FrequencyTable>
 {
   
-  private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
+  private SqlGenerator<QueryData> innerQuerySqlGenerator;
 
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -112,12 +102,12 @@ public abstract class FrequencySqlGenerator extends AbstractSqlGenerator<Frequen
   @Override
   public abstract String fromClause(QueryData queryData, List<QueryNode> alternative, String indent);
 
-  public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
+  public SqlGenerator<QueryData> getInnerQuerySqlGenerator()
   {
     return innerQuerySqlGenerator;
   }
 
-  public void setInnerQuerySqlGenerator(SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
+  public void setInnerQuerySqlGenerator(SqlGenerator<QueryData> innerQuerySqlGenerator)
   {
     this.innerQuerySqlGenerator = innerQuerySqlGenerator;
   }

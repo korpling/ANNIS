@@ -25,15 +25,12 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.List;
 
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
@@ -42,19 +39,13 @@ public class AbstractSolutionMatchInFromClauseSqlGeneratorTest
 {
 
   // class under test
-  @InjectMocks private AbstractSolutionMatchInFromClauseSqlGenerator<?> generator = new AbstractSolutionMatchInFromClauseSqlGenerator<Object>()
+  @InjectMocks private AbstractSolutionMatchInFromClauseSqlGenerator 
+    generator = new AbstractSolutionMatchInFromClauseSqlGenerator()
   {
-
-    @Override
-    public Object extractData(ResultSet arg0) throws SQLException,
-        DataAccessException
-    {
-      throw new UnsupportedOperationException("BUG: This is a test case support class");
-    }
   };
   
   // dependencies
-  @Mock private SqlGenerator<QueryData, ?> findSqlGenerator;
+  @Mock private SqlGeneratorAndExtractor<QueryData, ?> findSqlGenerator;
   
   // test data
   @Mock private QueryData queryData;

@@ -40,11 +40,12 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  * @author thomas
  */
 public abstract class AnnotateSqlGenerator<T>
-  extends AbstractSqlGenerator<T>
+  extends AbstractSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
   WhereClauseSqlGenerator<QueryData>, OrderByClauseSqlGenerator<QueryData>,
-  AnnotateExtractor<T>
+  AnnotateExtractor<T>,
+  SqlGeneratorAndExtractor<QueryData, T>
 {
 
   // include document name in SELECT clause
@@ -66,6 +67,7 @@ public abstract class AnnotateSqlGenerator<T>
    * {@code extractData}.
    *
    * This method must be overridden in child classes or by Spring.
+   * @return 
    */
   protected SolutionKey<?> createSolutionKey()
   {

@@ -40,6 +40,7 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
+import annis.sqlgen.SolutionSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -53,6 +54,7 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.SqlGeneratorAndExtractor;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -426,14 +428,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
-    SqlGenerator<QueryData, String>
+    SqlGenerator<QueryData>, ResultSetExtractor<String>
   {
 
     private final boolean analyze;
 
-    private final SqlGenerator<QueryData, ?> generator;
+    private final SqlGenerator<QueryData> generator;
 
-    private ExplainSqlGenerator(SqlGenerator<QueryData, ?> generator,
+    private ExplainSqlGenerator(SqlGenerator<QueryData> generator,
       boolean analyze)
     {
       this.generator = generator;
@@ -521,14 +523,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator)
-  {
-    return executeQueryFunction(queryData, generator, generator);
-  }
-
-  @Override
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
     List<String> names = new ArrayList<>();
@@ -569,10 +563,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
+  @Override
+  @Transactional(readOnly = true)
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGeneratorAndExtractor<QueryData, T> generator)
+  {
+    return executeQueryFunction(queryData, generator, generator);
+  }
+
+  
   @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
+    final SqlGenerator<QueryData> generator,
     final ResultSetExtractor<T> extractor)
   {
 
@@ -610,7 +613,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<Match> find(QueryData queryData)
   {
-    return executeQueryFunction(queryData, findSqlGenerator);
+    return executeQueryFunction(queryData, findSqlGenerator, findSqlGenerator);
   }
 
   @Transactional(readOnly = true)
@@ -674,14 +677,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public int count(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countSqlGenerator);
+    return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
   }
 
   @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator);
+    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator,
+      countMatchesAndDocumentsSqlGenerator);
   }
 
   @Override
@@ -754,17 +758,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public FrequencyTable frequency(QueryData queryData)
   {
-    return executeQueryFunction(queryData, frequencySqlGenerator);
+    return executeQueryFunction(queryData, frequencySqlGenerator, 
+      frequencySqlGenerator);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public String explain(SqlGenerator<QueryData, ?> generator,
+  public String explain(SqlGenerator<QueryData> generator,
     QueryData queryData,
     final boolean analyze)
   {
-    return executeQueryFunction(queryData, new ExplainSqlGenerator(generator,
-      analyze));
+    ExplainSqlGenerator gen = new ExplainSqlGenerator(generator,
+      analyze);
+    return executeQueryFunction(queryData, gen, gen);
   }
 
   @Override

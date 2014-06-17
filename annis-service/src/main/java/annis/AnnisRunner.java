@@ -73,6 +73,7 @@ import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
+import annis.sqlgen.SqlGeneratorAndExtractor;
 import java.util.Properties;
 
 
@@ -84,13 +85,13 @@ public class AnnisRunner extends AnnisBaseRunner
   private static final Logger log = LoggerFactory.getLogger(AnnisRunner.class);
   // SQL generators for query functions
 
-  private SqlGenerator<QueryData, List<Match>> findSqlGenerator;
+  private SqlGeneratorAndExtractor<QueryData, List<Match>> findSqlGenerator;
 
-  private SqlGenerator<QueryData, Integer> countSqlGenerator;
+  private SqlGeneratorAndExtractor<QueryData, Integer> countSqlGenerator;
 
   private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
 
-  private SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
+  private SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
 
   private AnnotateSqlGenerator<?> graphSqlGenerator;
   private FrequencySqlGenerator frequencySqlGenerator;
@@ -383,7 +384,7 @@ public class AnnisRunner extends AnnisBaseRunner
   {
 
     String doSqlFunctionName = "sql_" + funcCall.split("\\s", 2)[0];
-    SqlGenerator<QueryData, ?> gen = getGeneratorForQueryFunction(funcCall);
+    SqlGenerator<QueryData> gen = getGeneratorForQueryFunction(funcCall);
     String annisQuery = getAnnisQueryFromFunctionCall(funcCall);
     QueryData queryData = analyzeQuery(annisQuery, doSqlFunctionName);
 
@@ -396,7 +397,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doExplain(String functionCall, boolean analyze)
   {
-    SqlGenerator<QueryData, ?> generator = getGeneratorForQueryFunction(
+    SqlGenerator<QueryData> generator = getGeneratorForQueryFunction(
       functionCall);
     String function = getAnnisQueryFromFunctionCall(functionCall);
     String annisQuery = getAnnisQueryFromFunctionCall(functionCall);
@@ -417,7 +418,7 @@ public class AnnisRunner extends AnnisBaseRunner
     doExplain(functionCall, true);
   }
 
-  private SqlGenerator<QueryData, ?> getGeneratorForQueryFunction(
+  private SqlGeneratorAndExtractor<QueryData, ?> getGeneratorForQueryFunction(
     String funcCall)
   {
     String[] split = funcCall.split(" ", 2);
@@ -425,7 +426,7 @@ public class AnnisRunner extends AnnisBaseRunner
     Validate.isTrue(split.length == 2, "bad call to plan");
     String function = split[0];
 
-    SqlGenerator<QueryData, ?> generator = null;
+    SqlGeneratorAndExtractor<QueryData, ?> generator = null;
     if ("count".equals(function))
     {
       generator = countSqlGenerator;
@@ -455,6 +456,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     return generator;
   }
+  
 
   private String getAnnisQueryFromFunctionCall(String functionCall)
   {
@@ -497,7 +499,7 @@ public class AnnisRunner extends AnnisBaseRunner
         resetCaches(currentOS);
       }
 
-      SqlGenerator<QueryData, ?> generator =
+      SqlGeneratorAndExtractor<QueryData, ?> generator =
         getGeneratorForQueryFunction(benchmark.functionCall);
       benchmark.sql = getGeneratorForQueryFunction(benchmark.functionCall).
         toSql(
@@ -578,7 +580,7 @@ public class AnnisRunner extends AnnisBaseRunner
         continue;
       }
       boolean error = false;
-      SqlGenerator<QueryData, ?> generator =
+      SqlGeneratorAndExtractor<QueryData, ?> generator =
         getGeneratorForQueryFunction(benchmark.functionCall);
       long start = new Date().getTime();
       try
@@ -1244,13 +1246,13 @@ public class AnnisRunner extends AnnisBaseRunner
     this.matchLimit = matchLimit;
   }
 
-  public SqlGenerator<QueryData, Integer> getCountSqlGenerator()
+  public SqlGeneratorAndExtractor<QueryData, Integer> getCountSqlGenerator()
   {
     return countSqlGenerator;
   }
 
   public void setCountSqlGenerator(
-    SqlGenerator<QueryData, Integer> countSqlGenerator)
+    SqlGeneratorAndExtractor<QueryData, Integer> countSqlGenerator)
   {
     this.countSqlGenerator = countSqlGenerator;
   }
@@ -1266,24 +1268,24 @@ public class AnnisRunner extends AnnisBaseRunner
     this.annotateSqlGenerator = annotateSqlGenerator;
   }
 
-  public SqlGenerator<QueryData, List<Match>> getFindSqlGenerator()
+  public SqlGeneratorAndExtractor<QueryData, List<Match>> getFindSqlGenerator()
   {
     return findSqlGenerator;
   }
 
   public void setFindSqlGenerator(
-    SqlGenerator<QueryData, List<Match>> findSqlGenerator)
+    SqlGeneratorAndExtractor<QueryData, List<Match>> findSqlGenerator)
   {
     this.findSqlGenerator = findSqlGenerator;
   }
 
-  public SqlGenerator<QueryData, List<AnnotatedMatch>> getMatrixSqlGenerator()
+  public SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>> getMatrixSqlGenerator()
   {
     return matrixSqlGenerator;
   }
 
   public void setMatrixSqlGenerator(
-    SqlGenerator<QueryData, List<AnnotatedMatch>> matrixSqlGenerator)
+    SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>> matrixSqlGenerator)
   {
     this.matrixSqlGenerator = matrixSqlGenerator;
   }
