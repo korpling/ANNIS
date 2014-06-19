@@ -49,7 +49,7 @@ public class FrequencySqlGeneratorTest
   
   private FrequencySqlGenerator generator = new ApFrequencySqlGenerator();
   
-  @Mock private SqlGeneratorAndExtractor<QueryData, ?> innerSqlGenerator = mock(SqlGeneratorAndExtractor.class);
+  @Mock private SolutionSqlGenerator solutionSqlGenerator = mock(SolutionSqlGenerator.class);
   @Mock private QueryData queryData;
   @Mock private FrequencyTableQueryData freqTableQueryData;
   @Mock private QueryNode queryNode;
@@ -59,10 +59,10 @@ public class FrequencySqlGeneratorTest
   {
     initMocks(this);
     
-    generator.setInnerQuerySqlGenerator(innerSqlGenerator);
+    generator.setSolutionSqlGenerator(solutionSqlGenerator);
     
     given(queryData.getExtensions()).willReturn(new HashSet(Arrays.asList(freqTableQueryData)));
-    given(innerSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
+    given(solutionSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
     
     alternative.add(queryNode);
     given(queryData.getMaxWidth()).willReturn(3);
