@@ -28,13 +28,15 @@ import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.dao.DataAccessException;
-import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
 
 /**
@@ -43,14 +45,16 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class FindSqlGenerator extends AbstractUnionSqlGenerator
   implements RowMapper<Match>, SelectClauseSqlGenerator<QueryData>,
-  FromClauseSqlGenerator<QueryData>,  ResultSetExtractor<List<Match>> 
+  FromClauseSqlGenerator<QueryData>,  
+  WhereClauseSqlGenerator<QueryData>,
+  SqlGeneratorAndExtractor<QueryData, List<Match>> 
 {
   
   private static final Logger log = LoggerFactory.getLogger(
     FindSqlGenerator.class);
   
   private CorpusPathExtractor corpusPathExtractor;
-  private boolean outputCorpusPath;
+  private boolean outputCorpusPath = true;
   private AnnotationConditionProvider annoCondition;
   private SolutionSqlGenerator solutionSqlGenerator;
 
@@ -88,9 +92,43 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     
     sb.append(solutionSqlGenerator.toString());
     
-    sb.append(") AS solution \n");
+    sb.append(") AS solution, \n");
+    
+    // add the left joins with the annotation category table
+    Iterator<QueryNode> itNodes = alternative.iterator();
+    for(QueryNode n= itNodes.next(); itNodes.hasNext(); n = itNodes.next())
+    {
+      sb.append(indent)
+        .append("LEFT JOIN annotation_category AS annotation_category")
+        .append(n.getId())
+        .append(" ON (solution.toplevel_corpus = annotation_category")
+        .append(n.getId())
+        .append(" AND solution.cat")
+        .append(n.getId())
+        .append(" = annotation_category")
+        .append(n.getId())
+        .append(")");
+        if(!itNodes.hasNext())
+        {
+          sb.append(",");
+        }
+        sb.append("\n");
+    }
+    
+    sb.append(indent).append("corpus AS c\n");
     
     return sb.toString();
+  }
+
+  @Override
+  public Set<String> whereConditions(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    Set<String> conditions = new LinkedHashSet<>();
+    
+    conditions.add("c.id = solution.corpus_ref");
+    
+    return conditions;
   }
 
   

@@ -25,12 +25,11 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.MatchAndDocumentCount;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
 
 public class CountMatchesAndDocumentsSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator
 	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>, 
-     ResultSetExtractor<MatchAndDocumentCount>
+     SqlGeneratorAndExtractor<QueryData, MatchAndDocumentCount>
 {
 
 	@Override

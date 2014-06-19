@@ -37,7 +37,7 @@ public abstract class FrequencySqlGenerator extends AbstractSqlGenerator
   SqlGeneratorAndExtractor<QueryData, FrequencyTable>
 {
   
-  private SqlGenerator<QueryData> innerQuerySqlGenerator;
+  private SolutionSqlGenerator solutionSqlGenerator;
 
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -102,14 +102,15 @@ public abstract class FrequencySqlGenerator extends AbstractSqlGenerator
   @Override
   public abstract String fromClause(QueryData queryData, List<QueryNode> alternative, String indent);
 
-  public SqlGenerator<QueryData> getInnerQuerySqlGenerator()
+  public SolutionSqlGenerator getSolutionSqlGenerator()
   {
-    return innerQuerySqlGenerator;
+    return solutionSqlGenerator;
   }
 
-  public void setInnerQuerySqlGenerator(SqlGenerator<QueryData> innerQuerySqlGenerator)
+  public void setSolutionSqlGenerator(SolutionSqlGenerator solutionSqlGenerator)
   {
-    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+    this.solutionSqlGenerator = solutionSqlGenerator;
   }
-  
+
+ 
 }

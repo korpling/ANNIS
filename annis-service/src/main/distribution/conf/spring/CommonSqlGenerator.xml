@@ -217,50 +217,6 @@ limitations under the License.
 
   <bean id="subQueryCorpusSelectionStrategy" class="annis.sqlgen.SubQueryCorpusSelectionStrategy" lazy-init="true" />
 
-  <bean id="matrixSqlGeneratorBase" class="annis.sqlgen.MatrixSqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
-
-    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
-    <property name="innerQuerySqlGenerator" ref="noCorpusPathFindSqlGenerator" />
-
-    <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="matrixSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="matrixSqlGenerator" />
-      </util:list>
-    </property>
-    <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
-    <property name="orderByClauseSqlGenerator" ref="matrixSqlGenerator" />
-    <property name="spanExtractor">
-      <bean class="annis.sqlgen.AnnotatedSpanExtractor" />
-    </property>
-  </bean>
-  
-  <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
-    
-    <property name="innerQuerySqlGenerator" ref="frequencyFindSqlGenerator" />
-
-    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="frequencySqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="frequencySqlGenerator" />
-      </util:list>
-    </property>
-    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
-    
-  </bean>
-
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor" lazy-init="true"/>
 
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype" lazy-init="true">
@@ -353,73 +309,84 @@ limitations under the License.
     <ref bean="sampleWhereClause" />
   </util:list>
 
+  <bean id="solutionSqlGeneratorBase" class="annis.sqlgen.SolutionSqlGenerator"
+    parent="tableAccessStrategyFactory">
+    <property name="annoCondition" ref="annotationConditionProvider" />
+    
+    <property name="selectClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
+    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
+    <property name="fromClauseSqlGenerators" ref="annoCatJoinFromClauseGenerators" />
+    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
+    <property name="orderByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
+    <property name="groupByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
+  </bean>
+
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
-    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
-    <property name="outputCorpusPath" value="true" />
-    <property name="outputToplevelCorpus" value="true" />
-
-    <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
-    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="annoCatJoinFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-    <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="annoCondition" ref="annotationConditionProvider" />
+    <property name="solutionSqlGenerator">
+      <bean parent="solutionSqlGeneratorBase">
+      </bean>
+    </property>
+  </bean>
+  
+    <bean id="matrixSqlGeneratorBase" class="annis.sqlgen.MatrixSqlGenerator"
+        parent="tableAccessStrategyFactory" lazy-init="true">
+
+    <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
+    <property name="solutionSqlGenerator">
+       <bean parent="solutionSqlGeneratorBase">
+         <property name="outputToplevelCorpus" value="false" />
+         <property name="outputNodeName" value="false" />
+      </bean>
+    </property>
+
+    <property name="selectClauseSqlGenerator" ref="matrixSqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="matrixSqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="matrixSqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="matrixSqlGenerator" />
+    <property name="orderByClauseSqlGenerator" ref="matrixSqlGenerator" />
+    <property name="spanExtractor">
+      <bean class="annis.sqlgen.AnnotatedSpanExtractor" />
+    </property>
+  </bean>
+  
+  <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
+        parent="tableAccessStrategyFactory" lazy-init="true">
+    
+    <property name="solutionSqlGenerator" >
+      <bean parent="solutionSqlGeneratorBase">
+        <property name="orderByClauseSqlGenerator">
+          <null/>
+        </property>
+      </bean>
+    </property>
+    
+    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
     
   </bean>
 
-  <bean id="solutionSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
-
-    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
-    <property name="outputNodeName" value="true" />
-    <property name="outputToplevelCorpus" value="true" />
-
-    <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor"/>
-    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="annoCatJoinFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-    <property name="orderByClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="annoCondition" ref="annotationConditionProvider" />
-    
-  </bean>
-  
-  <bean id="frequencyFindSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
-          parent="tableAccessStrategyFactory" lazy-init="true">
-
-    <property name="sortSolutions" value="false" />
-    <property name="outputCorpusPath" value="false" />
-    <property name="outputToplevelCorpus" value="true" />
-
-    <property name="selectClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
-    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-    <property name="orderByClauseSqlGenerator" ref="frequencyFindSqlGenerator" />
-    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="annoCondition" ref="annotationConditionProvider" />
-  </bean>
-  
-  <bean id="noCorpusPathFindSqlGenerator" class="annis.sqlgen.SolutionSqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
-
-    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
-    <property name="outputCorpusPath" value="false" />
-    <property name="outputToplevelCorpus" value="false" />
-
-    <property name="selectClauseSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
-    <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
-    <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
-    <property name="orderByClauseSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
-    <property name="groupByClauseSqlGenerator" ref="findSqlGenerator" />
-    <property name="annoCondition" ref="annotationConditionProvider" />
-  </bean>
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
     parent="commonAnnotateSqlGenerator" lazy-init="true" >
@@ -430,7 +397,15 @@ limitations under the License.
 
     <property name="selectClauseSqlGenerator" ref="countSqlGenerator" />
 
-    <property name="findSqlGenerator" ref="noCorpusPathFindSqlGenerator" />
+    <property name="solutionSqlGenerator">
+      <bean parent="solutionSqlGeneratorBase">
+        <property name="outputToplevelCorpus" value="false" />
+        <property name="outputNodeName" value="false" />
+        <property name="orderByClauseSqlGenerator">
+          <null/>
+        </property>
+      </bean>
+    </property>
 
     <property name="fromClauseSqlGenerators">
       <util:list>

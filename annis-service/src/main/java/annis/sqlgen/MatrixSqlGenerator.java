@@ -46,7 +46,6 @@ import java.util.LinkedList;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.jdbc.core.ResultSetExtractor;
 
 /**
  *
@@ -58,7 +57,7 @@ public class MatrixSqlGenerator
   FromClauseSqlGenerator<QueryData>,
   WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>,
   OrderByClauseSqlGenerator<QueryData>,
-  ResultSetExtractor<List<AnnotatedMatch>>
+  SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>>
 {
 
   private final Logger log = LoggerFactory.getLogger(MatrixSqlGenerator.class);
@@ -66,7 +65,7 @@ public class MatrixSqlGenerator
   @Deprecated
   private String matchedNodesViewName;
 
-  private SqlGenerator<QueryData> innerQuerySqlGenerator;
+  private SolutionSqlGenerator solutionSqlGenerator;
 
   private AnnotatedSpanExtractor spanExtractor;
 
@@ -233,7 +232,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append("(\n");
     sb.append(indent);
 
-    sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
     sb.append(indent).append(TABSTOP);
@@ -417,17 +416,17 @@ public class MatrixSqlGenerator
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public SqlGenerator<QueryData> getInnerQuerySqlGenerator()
+  public SolutionSqlGenerator getSolutionSqlGenerator()
   {
-    return innerQuerySqlGenerator;
+    return solutionSqlGenerator;
   }
 
-  public void setInnerQuerySqlGenerator(
-    SqlGenerator<QueryData> innerQuerySqlGenerator)
+  public void setSolutionSqlGenerator(SolutionSqlGenerator solutionSqlGenerator)
   {
-    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+    this.solutionSqlGenerator = solutionSqlGenerator;
   }
 
+  
 
   public AnnotatedSpanExtractor getSpanExtractor()
   {

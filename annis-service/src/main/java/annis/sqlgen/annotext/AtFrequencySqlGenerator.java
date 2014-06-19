@@ -59,7 +59,7 @@ public class AtFrequencySqlGenerator extends FrequencySqlGenerator
     sb.append(indent).append("(\n");
     sb.append(indent);
 
-    sb.append(getInnerQuerySqlGenerator().toSql(queryData, indent + TABSTOP));
+    sb.append(getSolutionSqlGenerator().toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
     int i = 1;

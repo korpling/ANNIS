@@ -24,29 +24,32 @@ public abstract class AbstractSolutionMatchInFromClauseSqlGenerator extends
     AbstractSqlGenerator implements FromClauseSqlGenerator<QueryData>
 {
 
-  private SqlGenerator<QueryData> findSqlGenerator;
+  private SolutionSqlGenerator solutionSqlGenerator;
 
   @Override
   public String fromClause(QueryData queryData, List<QueryNode> alternative,
       String indent)
   {
-    StringBuffer sb = new StringBuffer();
+    StringBuilder sb = new StringBuilder();
     
     sb.append(indent).append("(\n");
     
     sb.append(indent).append(TABSTOP);
-    sb.append(findSqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(TABSTOP).append(") AS solutions");
     
     return sb.toString();
   }
 
-  public SqlGenerator<QueryData> getFindSqlGenerator() {
-    return findSqlGenerator;
+  public SolutionSqlGenerator getSolutionSqlGenerator()
+  {
+    return solutionSqlGenerator;
   }
 
-  public void setFindSqlGenerator(SqlGenerator<QueryData> findSqlGenerator) {
-    this.findSqlGenerator = findSqlGenerator;
+  public void setSolutionSqlGenerator(SolutionSqlGenerator solutionSqlGenerator)
+  {
+    this.solutionSqlGenerator = solutionSqlGenerator;
   }
 
+  
 }

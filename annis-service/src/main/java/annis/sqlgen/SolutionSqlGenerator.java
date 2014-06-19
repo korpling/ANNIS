@@ -44,13 +44,9 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   private static final Logger log = LoggerFactory.getLogger(
     SolutionSqlGenerator.class);
 
-  private boolean sortSolutions;
+  private boolean outputToplevelCorpus = true;
 
-  private boolean outputToplevelCorpus;
-
-  private boolean outputNodeName;
-
-  private CorpusPathExtractor corpusPathExtractor;
+  private boolean outputNodeName = true;
 
   private AnnotationConditionProvider annoCondition;
 
@@ -174,26 +170,6 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       }
     }
     return StringUtils.join(ids, ", ");
-  }
-
-  public CorpusPathExtractor getCorpusPathExtractor()
-  {
-    return corpusPathExtractor;
-  }
-
-  public void setCorpusPathExtractor(CorpusPathExtractor corpusPathExtractor)
-  {
-    this.corpusPathExtractor = corpusPathExtractor;
-  }
-
-  public boolean isSortSolutions()
-  {
-    return sortSolutions;
-  }
-
-  public void setSortSolutions(boolean sortSolutions)
-  {
-    this.sortSolutions = sortSolutions;
   }
 
   public boolean isOutputToplevelCorpus()
