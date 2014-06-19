@@ -236,7 +236,6 @@ public abstract class AbstractSqlGenerator
   {
     if (limitOffsetClauseSqlGenerator != null)
     {
-      sb.append(indent);
       sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData,
         alternative, indent));
       sb.append("\n");

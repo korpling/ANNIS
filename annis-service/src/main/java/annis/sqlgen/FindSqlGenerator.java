@@ -66,7 +66,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
   {
     StringBuilder sb = new StringBuilder();
     
-    sb.append(indent).append("solution.*,\n");
+    String indent2 = indent + TABSTOP;
+    
+    sb.append(indent2).append("solution.*,\n");
     
     // add node annotation namespace and name for each query node
     Iterator<QueryNode> itNodes = alternative.iterator();
@@ -74,19 +76,17 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     {
       QueryNode n = itNodes.next();
       TableAccessStrategy tas = tables(n);
-      sb.append(indent).append(annoCondition.getNodeAnnoNamespaceSQL(tas))
+      sb.append(indent2).append(annoCondition.getNodeAnnoNamespaceSQL(tas))
         .append(" AS node_annotation_ns").append(n.getId()).append(",\n");
-      sb.append(indent).append(annoCondition.getNodeAnnoNameSQL(tas))
+      sb.append(indent2).append(annoCondition.getNodeAnnoNameSQL(tas))
         .append(" AS node_annotation_name").append(n.getId()).append(",\n");
       
       // corpus path is only needed ince
-      sb.append(indent).append("c.path_name AS path_name");
+      sb.append(indent2).append("c.path_name AS path_name");
       if(itNodes.hasNext())
       {
-        sb.append(",");
+        sb.append(",\n");
       }
-      sb.append("\n");
-      
     }
     
     return sb.toString();
@@ -98,9 +98,9 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
   {
     StringBuilder sb = new StringBuilder();
     
-    sb.append(indent).append("(");
+    sb.append(indent).append("(\n");
     
-    sb.append(solutionSqlGenerator.toSql(queryData, indent));
+    sb.append(solutionSqlGenerator.toSql(queryData, indent+TABSTOP));
     
     sb.append(") AS solution \n");
     
@@ -129,7 +129,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
         sb.append("\n");
     }
     
-    sb.append(indent).append("corpus AS c\n");
+    sb.append(indent).append("corpus AS c");
     
     return sb.toString();
   }
