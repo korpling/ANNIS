@@ -330,6 +330,11 @@ limitations under the License.
       <bean parent="solutionSqlGeneratorBase">
       </bean>
     </property>
+    
+    <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
+    <property name="fromClauseSqlGenerators" ref="findSqlGenerator" />
+    <property name="whereClauseSqlGenerators" ref="findSqlGenerator" />
+    
   </bean>
   
     <bean id="matrixSqlGeneratorBase" class="annis.sqlgen.MatrixSqlGenerator"

@@ -19,6 +19,7 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
+import com.google.common.base.Preconditions;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -31,6 +32,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
@@ -64,11 +66,13 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
   {
     StringBuilder sb = new StringBuilder();
     
-    sb.append(indent).append("solution.*").append("\n");
+    sb.append(indent).append("solution.*,\n");
     
     // add node annotation namespace and name for each query node
-    for(QueryNode n : alternative)
+    Iterator<QueryNode> itNodes = alternative.iterator();
+    while(itNodes.hasNext())
     {
+      QueryNode n = itNodes.next();
       TableAccessStrategy tas = tables(n);
       sb.append(indent).append(annoCondition.getNodeAnnoNamespaceSQL(tas))
         .append(" AS node_annotation_ns").append(n.getId()).append(",\n");
@@ -76,7 +80,13 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
         .append(" AS node_annotation_name").append(n.getId()).append(",\n");
       
       // corpus path is only needed ince
-      sb.append(indent).append("c.path_name AS path_name\n");
+      sb.append(indent).append("c.path_name AS path_name");
+      if(itNodes.hasNext())
+      {
+        sb.append(",");
+      }
+      sb.append("\n");
+      
     }
     
     return sb.toString();
@@ -90,23 +100,27 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     
     sb.append(indent).append("(");
     
-    sb.append(solutionSqlGenerator.toString());
+    sb.append(solutionSqlGenerator.toSql(queryData, indent));
     
-    sb.append(") AS solution, \n");
+    sb.append(") AS solution \n");
     
+    Preconditions.checkArgument(!alternative.isEmpty(), "There must be at least one query node in the alternative");
     // add the left joins with the annotation category table
     Iterator<QueryNode> itNodes = alternative.iterator();
-    for(QueryNode n= itNodes.next(); itNodes.hasNext(); n = itNodes.next())
+    while(itNodes.hasNext())
     {
+      QueryNode n = itNodes.next();
       sb.append(indent)
         .append("LEFT JOIN annotation_category AS annotation_category")
         .append(n.getId())
         .append(" ON (solution.toplevel_corpus = annotation_category")
         .append(n.getId())
+        .append(".toplevel_corpus")
         .append(" AND solution.cat")
         .append(n.getId())
         .append(" = annotation_category")
         .append(n.getId())
+        .append(".id")
         .append(")");
         if(!itNodes.hasNext())
         {

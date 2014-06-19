@@ -75,15 +75,12 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
           // If a query node is not using annotations, fallback to NULL as the value.
           // This is important for the DISTINCT clause, since we don't want to match 
           // the annotation itself but the node.
-          cols.add("NULL::varchar AS node_annotation_ns" + i);
-          cols.add("NULL::varchar AS node_annotation_name" + i);
+          cols.add("NULL::int AS cat" + i);
         }
         else
         {
           cols.add(
-            annoCondition.getNodeAnnoNamespaceSQL(tblAccessStr) + " AS node_annotation_ns" + i);
-          cols.add(
-            annoCondition.getNodeAnnoNameSQL(tblAccessStr) + " AS node_annotation_name" + i);
+            tblAccessStr.aliasedColumn("node_annotation", "category") + " AS cat" + i);
         }
       }
       if (outputNodeName)
@@ -148,8 +145,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       ids.add("id" + i);
       if (annoCondition != null)
       {
-        ids.add("node_annotation_ns" + i);
-        ids.add("node_annotation_name" + i);
+        ids.add("cat" + i);
       }
     }
     return StringUtils.join(ids, ", ");
@@ -165,8 +161,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       ids.add("id" + i);
       if (annoCondition != null)
       {
-        ids.add("node_annotation_ns" + i);
-        ids.add("node_annotation_name" + i);
+        ids.add("cat" + i);
       }
     }
     return StringUtils.join(ids, ", ");
