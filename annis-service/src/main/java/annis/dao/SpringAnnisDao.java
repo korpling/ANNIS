@@ -340,16 +340,28 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       try
       {
-        File dir = getRealDataDir();
-
         if (fileName == null)
         {
-          fileName = "corpus_" 
-            + CommonHelper.getSafeFileName(toplevelCorpusName) 
+          fileName = "corpus_"
+            + CommonHelper.getSafeFileName(toplevelCorpusName)
             + "_" + UUID.randomUUID() + ".properties";
           getJdbcTemplate().update(
             "INSERT INTO media_files VALUES ('" + fileName + "','" + corpusID
             + "', 'application/text+plain', 'corpus.properties')");
+        }
+
+        File dir = getRealDataDir();
+        if (!dir.exists())
+        {
+          if (dir.mkdirs())
+          {
+            log.info("Created directory " + dir);
+          }
+          else
+          {
+            log.error(
+              "Directory " + dir + " doesn't exist and cannot be created");
+          }
         }
 
         log.info("write config file: " + dir + "/" + fileName);
