@@ -55,8 +55,6 @@ limitations under the License.
   <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
         parent="tableAccessStrategyFactory"  lazy-init="true"/>
   
-  <bean id="annotationCategoryJoinFromClause" class="annis.sqlgen.AnnotationCategoryJoinFromClause"
-        parent="tableAccessStrategyFactory"  lazy-init="true"/>
 
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGeneratorBase" class="annis.sqlgen.DefaultWhereClauseGenerator"
@@ -297,10 +295,6 @@ limitations under the License.
     <ref bean="tableJoinsInWhereClauseGenerator" />
   </util:list>
   
-  <util:list id="annoCatJoinFromClauseGenerators">
-    <ref bean="annotationCategoryJoinFromClause" />
-  </util:list>
-
   <util:list id="defaultWhereClauseGenerators">
     <ref bean="tableJoinsInWhereClauseGenerator" />
     <ref bean="defaultWhereClauseGenerator" />
@@ -315,7 +309,7 @@ limitations under the License.
     
     <property name="selectClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
     <property name="limitOffsetClauseSqlGenerator" ref="commonLimitOffsetGenerator" />
-    <property name="fromClauseSqlGenerators" ref="annoCatJoinFromClauseGenerators" />
+    <property name="fromClauseSqlGenerators" ref="defaultFromClauseGenerators" />
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
     <property name="groupByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
