@@ -111,6 +111,18 @@ public class VisParser extends HTMLVisConfigBaseListener
   }
 
   @Override
+  public void enterConditionBegin(HTMLVisConfigParser.ConditionBeginContext ctx)
+  {
+    currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.BEGIN);
+  }
+
+  @Override
+  public void enterConditionEnd(HTMLVisConfigParser.ConditionEndContext ctx)
+  {
+    currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.END);
+  }
+
+  @Override
   public void enterConditionNameAndValue(
     HTMLVisConfigParser.ConditionNameAndValueContext ctx)
   {
@@ -171,7 +183,7 @@ public class VisParser extends HTMLVisConfigBaseListener
     //Using constant property for metadata, since constant and metavalue are never set simultaneously
     //Alternatively we could consider adding another property for meta, or renaming 'constant' to 
     //something more appropriate.
-    currentOutputter.setConstant(ctx.innertype().getText());
+    currentOutputter.setMetaname(ctx.innermeta().getText().trim());
   }
 
   

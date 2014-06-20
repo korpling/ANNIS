@@ -25,6 +25,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.HashMap;
 import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeSet;
@@ -44,6 +45,9 @@ public class SpanHTMLOutputter
   private String attribute;
   private String style = "";
   private String constant;
+  private String metaname;
+  private HashMap<String, String> hshMeta = new HashMap<>();
+  
   
   public void outputHTML(SNode node, String matchedQName,
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
@@ -51,16 +55,12 @@ public class SpanHTMLOutputter
   {
     if(node instanceof SToken && "tok".equals(matchedQName))
     {
-        // only treat this as a match for "tok" if this is not a pseudo token BEGIN/END
-        if (!node.getSAnnotations().get(0).getSNS().equals("annis") || node.getSAnnotations().get(0) == null)
-        {
-            SToken tok = (SToken) node;
-            outputToken(tok, outputStartTags, outputEndTags);
-        }
+        SToken tok = (SToken) node;
+        outputToken(tok, outputStartTags, outputEndTags);
     }
     else if(node instanceof SSpan || node instanceof SToken)
     {
-            outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
+        outputAnnotation(node, matchedQName, outputStartTags, outputEndTags);
     }
     else
     {
@@ -75,28 +75,11 @@ public class SpanHTMLOutputter
     long left;
     long right;
     
-    if(span.getSAnnotations().get(0).getSNS().equals("annis") && span.getSAnnotations().get(0) != null) //found pseudo node instruction
-    {
-        // set left/right if special instruction found in pseudo region at BEGIN/END of htmlvis
-        if (span.getSAnnotations().get(0).getSName().equals("BEGIN"))
-        {
-            left = -1;
-            right = -1;
-        }
-        else //END pseudo region
-        {
-            left = 1000000;
-            right = 1000000;
-        }
-    }
-    else
-    {
         RelannisNodeFeature feat = 
         (RelannisNodeFeature) span.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
 
         left = feat.getLeftToken();
         right = feat.getRightToken();
-    }
   
     SAnnotation matchedAnnotation;
     if (type == Type.META_NAME){
@@ -122,7 +105,7 @@ public class SpanHTMLOutputter
         break;
       case META_NAME:
         value = matchedAnnotation.getSValue().toString() == null ? "NULL" : matchedAnnotation.getSValue().toString();
-        matchedQName = "meta::" + constant;
+        matchedQName = "meta::" + metaname;
         break;
       default:
         value = "";
@@ -161,7 +144,7 @@ public class SpanHTMLOutputter
     outputAny(index, index, "tok", value, outputStartTags, outputEndTags);    
   }
   
-  private void outputAny(long left, long right, String matchedQName,
+  public void outputAny(long left, long right, String matchedQName,
     String value, 
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags, 
     SortedMap<Long, SortedSet<OutputItem>> outputEndTags)
@@ -289,5 +272,24 @@ public class SpanHTMLOutputter
   {
     this.attribute = attribute;
   }
+
+    public HashMap<String, String> getMeta() {
+        return hshMeta;
+    }
+
+    public void setMeta( HashMap<String, String> meta) {
+        this.hshMeta = meta;
+    }
+
+    public String getMetaname() {
+        return metaname;
+    }
+
+    public void setMetaname(String metaname) {
+        this.metaname = metaname;
+    }
   
+    
+    
 }
+

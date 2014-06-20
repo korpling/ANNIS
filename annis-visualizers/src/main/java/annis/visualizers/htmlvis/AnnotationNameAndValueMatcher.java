@@ -59,8 +59,8 @@ public class AnnotationNameAndValueMatcher implements SpanMatcher
         {
           return match;
         }
-        }
       }
+    }
     
     return null;
 

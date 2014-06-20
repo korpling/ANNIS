@@ -42,6 +42,7 @@ import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -221,47 +222,34 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     StringBuilder sb = new StringBuilder();
 
     EList<SToken> token = graph.getSortedSTokenByText();
-    
-    // Add pseudo tokens at beginning and end of first STextualDS found to trigger annis:BEGIN/END instructions
-    // No support for separate metadata of multiple texts yet (not yet possible in ANNIS anyway)
-    SToken tokPseudoTokenBegin = graph.createSToken(graph.getSTextualDSs().get(0), 1, 1);
-    SToken tokPseudoTokenEnd = graph.createSToken(graph.getSTextualDSs().get(0), 
-        graph.getSTextualDSs().get(0).toString().length()-1, graph.getSTextualDSs().get(0).toString().length()-1);
-    tokPseudoTokenBegin.createSAnnotation("annis", "BEGIN", "BEGIN");
-    tokPseudoTokenEnd.createSAnnotation("annis", "END", "END");
-        
-    //Get corpus and document name
-    String strDocName = "";
-    String strCorpName = "";
-    
+
     //Get metadata for visualizer if stylesheet requires it
     //First check the stylesheet
     Boolean bolMetaTypeFound = false;
+    
+    HashMap<String, String> meta = new  HashMap<>();
     for (VisualizationDefinition vis : definitions) {
-        if (vis.getOutputter().getType().toString().equals("META_NAME"))
+        if (vis.getOutputter().getType() == SpanHTMLOutputter.Type.META_NAME)
         { 
             bolMetaTypeFound = true;
         }
+        vis.getOutputter().setMeta(meta);
     }
-    if (bolMetaTypeFound == true)
+    if (bolMetaTypeFound == true)        //Metadata is required, get corpus and document name
     {
-        //Metadata is required, get corpus and document name
+        //Get corpus and document name
+        String strDocName = "";
+        String strCorpName = "";    
         strDocName = graph.getSDocument().getSName();
         List<String> corpusPath = CommonHelper.getCorpusPath(graph.getSDocument().getSCorpusGraph(), graph.getSDocument());
         strCorpName = corpusPath.get(corpusPath.size() - 1);
-        //Get metadata
+        
+        //Get metadata and put in hashmap
         List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName,strDocName);
-        //Assign all metadata as annotations with NS 'meta' to the pseudo tokens BEGIN and END
         for (Annotation metaDatum : metaData) {
-            tokPseudoTokenBegin.createSAnnotation("meta", metaDatum.getName(), metaDatum.getValue());
-            tokPseudoTokenEnd.createSAnnotation("meta", metaDatum.getName(), metaDatum.getValue());
+            meta.put(metaDatum.getName(), metaDatum.getValue());
         }
     }
-    
-    //Manually insert pseudo tokens at correct position in token list
-    token.add(0,tokPseudoTokenBegin);
-    token.add(tokPseudoTokenEnd);
-
     
     for (SToken t : token)
     {
@@ -291,6 +279,50 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
 
+  
+
+    //Find BEGIN and END instructions if available
+    for (VisualizationDefinition vis : definitions)
+    {
+        PseudoRegionMatcher.PseudoRegion psdRegionType;
+        if (vis.getMatcher() instanceof PseudoRegionMatcher)
+        {
+            int position;
+            psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+            if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN) {
+                position = outputEndTags.firstKey().intValue()-1;
+            }
+            else //END region
+            {
+                position = outputEndTags.lastKey().intValue()+1;
+            }
+            switch (vis.getOutputter().getType())
+            {
+                case META_NAME:
+                    String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());;
+                    if (strMetaVal == null)
+                    { 
+                        throw new NullPointerException("no such metadata name in document: '" + vis.getOutputter().getMetaname().trim() + "'");
+                    }
+                    else
+                    {
+                        vis.getOutputter().outputAny(position, position, vis.getOutputter().getMetaname(), strMetaVal, outputStartTags, outputEndTags);                    
+                    }                           
+                    break;
+                case CONSTANT:
+                    vis.getOutputter().outputAny(position, position, vis.getOutputter().getConstant(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
+                case ANNO_NAME:
+                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+                case VALUE:
+                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+                default:
+            }
+
+        }
+        
+    }
+
+    
     // get all used indexes
     Set<Long> indexes = new TreeSet<Long>();
     indexes.addAll(outputStartTags.keySet());
