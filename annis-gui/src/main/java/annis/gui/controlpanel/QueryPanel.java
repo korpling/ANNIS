@@ -238,7 +238,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
-     * with the cost of some complexitiy when defining the positions of the
+     * with the cost of some complexity when defining the positions of the
      * elements in the layout.
      * 
      * This grid hopefully helps a little bit in understanding the "magic"
@@ -263,10 +263,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * 3 | STAT| STAT| STAT| STAT
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(txtStatus, 0, 3, 3, 3);
+    addComponent(txtStatus, 0, 3, 2, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);
     addComponent(btHistory, 2, 2);
+    addComponent(piCount, 3, 3);
     addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
@@ -457,7 +458,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(!piCount.isVisible())
         {
-          replaceComponent(txtStatus, piCount);
           piCount.setVisible(true);
           piCount.setEnabled(true);
         }
@@ -466,7 +466,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(piCount.isVisible())
         {
-          replaceComponent(piCount, txtStatus);
           piCount.setVisible(false);
           piCount.setEnabled(false);
         }
@@ -620,6 +619,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       tabSheet.setSelectedTab(queryBuilder);
     }
     
+  }
+
+  public String getTxtStatusValue()
+  {
+    return txtStatus.getValue();
   }
 
   public QueryController getQueryController()

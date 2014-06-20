@@ -89,8 +89,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private PagingComponent paging;
 
-  private ProgressBar progressResult;
-
   private PluginSystem ps;
 
   private MenuItem miTokAnnos;
@@ -124,8 +122,12 @@ public class ResultViewPanel extends VerticalLayout implements
   private transient BlockingQueue<SaltProject> projectQueue;
   
   private UUID queryId;
-
+ 
   private PagedResultQuery currentQuery;
+  
+  SearchUI sui = (SearchUI) UI.getCurrent();
+  private String strCurrentCaption ="";
+
 
   public ResultViewPanel(QueryController controller,
     PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
@@ -163,17 +165,9 @@ public class ResultViewPanel extends VerticalLayout implements
     miSegmentation = mbResult.addItem("Base text", null);
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    progressResult = new ProgressBar();
-
-    progressResult.setVisible(false);
-
-    addComponent(progressResult);
     addComponent(resultPanel);
 
-    setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
-
     setExpandRatio(mbResult, 0.0f);
-    setExpandRatio(progressResult, 0.0f);
     setExpandRatio(resultPanel, 1.0f);
 
     paging = new PagingComponent();
@@ -192,14 +186,6 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showMatchSearchInProgress(PagedResultQuery query)
   {
     resultLayout.removeAllComponents();
-
-    progressResult.setIndeterminate(true);
-    progressResult.setCaption("Searching for \"" + query.getQuery().replaceAll(
-      "\n",
-      " ") + "\"");
-    progressResult.setVisible(true);
-    setExpandRatio(progressResult, 1.0f);
-
     segmentationName = query.getSegmentation();
   }
 
@@ -207,9 +193,6 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     resultLayout.removeAllComponents();
     currentResults = 0;
-
-    progressResult.setCaption("");
-    progressResult.setVisible(false);
 
     // nothing to show since we have an empty result
     Label lblNoResult = new Label("No matches found.");
@@ -227,11 +210,6 @@ public class ResultViewPanel extends VerticalLayout implements
       currentResults = 0;
     }
 
-    progressResult.setIndeterminate(false);
-    progressResult.setCaption("");
-    progressResult.setVisible(true);
-    setExpandRatio(progressResult, 0.0f);
-    progressResult.setValue(percent);
   }
 
   /**
@@ -247,7 +225,8 @@ public class ResultViewPanel extends VerticalLayout implements
     this.projectQueue = queue;
     this.currentQuery = q;
     this.numberOfResults = numberOfResults;
-
+    strCurrentCaption =  sui.getControlPanel().getQueryPanel().getTxtStatusValue();
+    
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
 
@@ -292,6 +271,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void addQueryResult(PagedResultQuery q, List<SaltProject> subgraphList)
   {
+
     if (q == null)
     {
       return;
@@ -313,7 +293,8 @@ public class ResultViewPanel extends VerticalLayout implements
           newPanels = createPanels(p, q.getOffset() + currentResults);
           currentResults += newPanels.size();
 
-          progressResult.setValue(((float) currentResults) / (float) (numberOfResults));
+          String strResults  = numberOfResults > 1 ? "results" : "result";
+          sui.getControlPanel().getQueryPanel().setStatus(strCurrentCaption + " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");          
 
           if (currentResults == numberOfResults)
           {
@@ -332,7 +313,7 @@ public class ResultViewPanel extends VerticalLayout implements
         {
           showFinishedSubgraphSearch();
         }
-        
+
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
         {
@@ -351,7 +332,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public void showFinishedSubgraphSearch()
   {
-    progressResult.setVisible(false);
+
   }
 
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
