@@ -21,6 +21,7 @@ import annis.libgui.Helper;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.model.Annotation;
 import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
@@ -31,14 +32,17 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
@@ -219,6 +223,34 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
     EList<SToken> token = graph.getSortedSTokenByText();
 
+    //Get metadata for visualizer if stylesheet requires it
+    //First check the stylesheet
+    Boolean bolMetaTypeFound = false;
+    
+    HashMap<String, String> meta = new  HashMap<>();
+    for (VisualizationDefinition vis : definitions) {
+        if (vis.getOutputter().getType() == SpanHTMLOutputter.Type.META_NAME)
+        { 
+            bolMetaTypeFound = true;
+        }
+        vis.getOutputter().setMeta(meta);
+    }
+    if (bolMetaTypeFound == true)        //Metadata is required, get corpus and document name
+    {
+        //Get corpus and document name
+        String strDocName = "";
+        String strCorpName = "";    
+        strDocName = graph.getSDocument().getSName();
+        List<String> corpusPath = CommonHelper.getCorpusPath(graph.getSDocument().getSCorpusGraph(), graph.getSDocument());
+        strCorpName = corpusPath.get(corpusPath.size() - 1);
+        
+        //Get metadata and put in hashmap
+        List<Annotation> metaData = Helper.getMetaDataDoc(strCorpName,strDocName);
+        for (Annotation metaDatum : metaData) {
+            meta.put(metaDatum.getName(), metaDatum.getValue());
+        }
+    }
+    
     for (SToken t : token)
     {
 
@@ -247,11 +279,55 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       }
     }
 
+  
+
+    //Find BEGIN and END instructions if available
+    for (VisualizationDefinition vis : definitions)
+    {
+        PseudoRegionMatcher.PseudoRegion psdRegionType;
+        if (vis.getMatcher() instanceof PseudoRegionMatcher)
+        {
+            int position;
+            psdRegionType = ((PseudoRegionMatcher) vis.getMatcher()).getPsdRegion();
+            if (psdRegionType == PseudoRegionMatcher.PseudoRegion.BEGIN) {
+                position = outputEndTags.firstKey().intValue()-1;
+            }
+            else //END region
+            {
+                position = outputEndTags.lastKey().intValue()+1;
+            }
+            switch (vis.getOutputter().getType())
+            {
+                case META_NAME:
+                    String strMetaVal = meta.get(vis.getOutputter().getMetaname().trim());;
+                    if (strMetaVal == null)
+                    { 
+                        throw new NullPointerException("no such metadata name in document: '" + vis.getOutputter().getMetaname().trim() + "'");
+                    }
+                    else
+                    {
+                        vis.getOutputter().outputAny(position, position, vis.getOutputter().getMetaname(), strMetaVal, outputStartTags, outputEndTags);                    
+                    }                           
+                    break;
+                case CONSTANT:
+                    vis.getOutputter().outputAny(position, position, vis.getOutputter().getConstant(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
+                case ANNO_NAME:
+                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+                case VALUE:
+                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+                default:
+            }
+
+        }
+        
+    }
+
+    
     // get all used indexes
     Set<Long> indexes = new TreeSet<Long>();
     indexes.addAll(outputStartTags.keySet());
     indexes.addAll(outputEndTags.keySet());
-
+    
     for (Long i : indexes)
     {
       // output all strings belonging to this token position
