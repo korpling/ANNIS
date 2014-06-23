@@ -53,6 +53,7 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
+DROP TABLE IF EXISTS annotation_category CASCADE;
 CREATE TABLE annotation_category
 (
   id SERIAL,
