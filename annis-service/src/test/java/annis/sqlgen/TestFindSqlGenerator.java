@@ -14,6 +14,8 @@ import org.mockito.Mock;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import org.junit.Assert;
+import org.mockito.Matchers;
 
 public class TestFindSqlGenerator
 {
@@ -63,15 +65,31 @@ public class TestFindSqlGenerator
   }
 
   @Test
-  public void shouldUseDistinctIfEdgeTablesAreUsed()
+  public void shouldUseGroupByIfPartOfEdge()
   {
     // given
     setupQueryData();
     given(tableAccessStrategy.usesRankTable()).willReturn(true);
+    given(queryNode.isPartOfEdge()).willReturn(true);
+    given(queryNode.isRoot()).willReturn(false);
     // when
-    String actual = generator.selectClause(queryData, alternative, "");
+    String actual = generator.groupByAttributes(queryData, alternative);
     // then
-    assertThat(actual, startsWith("DISTINCT"));
+    Assert.assertNotNull(actual);
+  }
+  
+  @Test
+  public void shouldUseGroupByIfRoot()
+  {
+    // given
+    setupQueryData();
+    given(tableAccessStrategy.usesRankTable()).willReturn(true);
+    given(queryNode.isPartOfEdge()).willReturn(false);
+    given(queryNode.isRoot()).willReturn(true);
+    // when
+    String actual = generator.groupByAttributes(queryData, alternative);
+    // then
+    Assert.assertNotNull(actual);
   }
 
 }

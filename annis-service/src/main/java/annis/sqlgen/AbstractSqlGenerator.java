@@ -210,11 +210,15 @@ public abstract class AbstractSqlGenerator
   {
     if (groupByClauseSqlGenerator != null)
     {
-      sb.append(indent);
-      sb.append("GROUP BY ");
-      sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData,
-        alternative));
-      sb.append("\n");
+      String atts = groupByClauseSqlGenerator.groupByAttributes(queryData,
+        alternative);
+      if(atts != null && !atts.isEmpty())
+      {
+        sb.append(indent);
+        sb.append("GROUP BY ");
+        sb.append(atts);
+        sb.append("\n");
+      }
     }
   }
 

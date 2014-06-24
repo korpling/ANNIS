@@ -34,6 +34,7 @@ import org.slf4j.LoggerFactory;
  * {@link QueryServiceImpl#subgraph(java.lang.String, java.lang.String, java.lang.String)}
  *
  * @author Benjamin Weißenfels
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
@@ -58,10 +59,11 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
     Validate.isTrue(alternative.size() <= maxWidth,
       "BUG: nodes.size() > maxWidth");
 
-    boolean needsDistinct = false;
     List<String> cols = new ArrayList<>();
     int i = 0;
 
+    boolean needsDistinct = isDistinctNeeded(alternative);
+    
     for (QueryNode node : alternative)
     {
       ++i;
@@ -85,13 +87,16 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       }
       if (outputNodeName)
       {
-        cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-          + ") AS node_name" + i);
-      }
-
-      if (tblAccessStr.usesRankTable() || !node.getNodeAnnotations().isEmpty())
-      {
-        needsDistinct = true;
+        if(needsDistinct)
+        {
+          cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+            + ") AS node_name" + i);
+        }
+        else
+        {
+          cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
+            + " AS node_name" + i);
+        }
       }
     }
 
@@ -99,8 +104,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
     for (i = alternative.size() + 1; i <= maxWidth; ++i)
     {
       cols.add("NULL::bigint AS id" + i);
-      cols.add("NULL::varchar AS node_annotation_ns" + i);
-      cols.add("NULL::varchar AS node_annotation_name" + i);
+      cols.add("NULL::integer AS cat" + i);
       if (outputNodeName)
       {
         cols.add("NULL::varchar AS node_name" + i);
@@ -114,22 +118,49 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
 
       String corpusRefAlias = tblAccessStr.aliasedColumn(NODE_TABLE,
         "corpus_ref");
-      cols.add(
-        "(SELECT c.path_name FROM corpus AS c WHERE c.id = min(" + corpusRefAlias
-        + ") LIMIT 1) AS path_name");
+      
+      if(needsDistinct)
+      {
+        cols.add(
+          "(SELECT c.path_name FROM corpus AS c WHERE c.id = min(" + corpusRefAlias
+          + ") LIMIT 1) AS path_name");
+      }
+      else
+      {
+        cols.add(
+          "(SELECT c.path_name FROM corpus AS c WHERE c.id = " + corpusRefAlias
+          + " LIMIT 1) AS path_name");
+      }
     }
 
     if (outputToplevelCorpus)
     {
-      cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-        "toplevel_corpus")
-        + ") AS toplevel_corpus");
+      if(needsDistinct)
+      {
+        cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+          "toplevel_corpus")
+          + ") AS toplevel_corpus");
+      }
+      else
+      {
+        cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+          "toplevel_corpus")
+          + " AS toplevel_corpus");
+      }
     }
 
-    cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
-      "corpus_ref")
-      + ") AS corpus_ref");
-
+    if(needsDistinct)
+    {
+      cols.add("min(" + tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "corpus_ref")
+        + ") AS corpus_ref");
+    }
+    else
+    {
+      cols.add(tables(alternative.get(0)).aliasedColumn(NODE_TABLE,
+        "corpus_ref")
+        + " AS corpus_ref");
+    }
     String colIndent = indent + TABSTOP + TABSTOP;
 
     return "\n" + colIndent + StringUtils.join(cols, ",\n" + colIndent);
@@ -155,16 +186,50 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   public String groupByAttributes(QueryData queryData,
     List<QueryNode> alternative)
   {
-    List<String> ids = new ArrayList<>();
-    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    if(isDistinctNeeded(alternative))
     {
-      ids.add("id" + i);
-      if (annoCondition != null)
+      List<String> ids = new ArrayList<>();
+      for (int i = 1; i <= queryData.getMaxWidth(); ++i)
       {
-        ids.add("cat" + i);
+        ids.add("id" + i);
+        if (annoCondition != null)
+        {
+          ids.add("cat" + i);
+        }
+      }
+      return StringUtils.join(ids, ", "); 
+    }
+    else
+    {
+      return null;
+    }
+  }
+  
+  private boolean isDistinctNeeded(List<QueryNode> alternative)
+  {
+    
+    /* 
+    This is a very conservative assumption. If there is no join at all and 
+    the node does not use the rank table we can assume the result is already
+    distinct. Of course this only works as long the SampleWhereClause generator
+    is active and filters out node annotation duplicates.
+    */
+    if(alternative.size() == 1)
+    {
+      QueryNode node = alternative.get(0);
+      if(node.isPartOfEdge() || node.isRoot())
+      {
+        return true;
+      }
+      else
+      {
+        return false;
       }
     }
-    return StringUtils.join(ids, ", ");
+    else
+    {
+      return true;
+    }
   }
 
   public boolean isOutputToplevelCorpus()

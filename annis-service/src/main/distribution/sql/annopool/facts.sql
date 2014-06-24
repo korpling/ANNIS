@@ -104,27 +104,13 @@ INSERT INTO facts_:id
   node_anno_ref,
   edge_anno_ref,
   n_sample,
-  n_na_sample,
-  n_r_c_ea_sample,
-  n_r_c_sample,
-  n_r_c_na_sample
+  n_na_sample
 )
 
 SELECT
   *,
   (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
-  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id,
-                                  edge_anno_ref) = 1) AS n_r_c_ea_sample,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id) = 1) AS n_r_c_sample,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id,
-                                  node_anno_ref) = 1) AS n_r_c_na_sample
+  (row_number() OVER (PARTITION BY id, node_anno_ref) = 1) AS n_na_sample
 FROM
 (
   SELECT

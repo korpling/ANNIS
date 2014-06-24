@@ -101,9 +101,6 @@ CREATE TABLE facts (
   edge_anno_ref bigint REFERENCES annotation_pool(id),
   n_sample boolean,
   n_na_sample boolean,
-  n_r_c_ea_sample boolean,
-  n_r_c_sample boolean,
-  n_r_c_na_sample boolean,
   PRIMARY KEY (fid)
 );
 

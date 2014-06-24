@@ -45,7 +45,7 @@ public class AbstractSolutionMatchInFromClauseSqlGeneratorTest
   };
   
   // dependencies
-  @Mock private SqlGeneratorAndExtractor<QueryData, ?> findSqlGenerator;
+  @Mock private SolutionSqlGenerator solutionSqlGen;
   
   // test data
   @Mock private QueryData queryData;
@@ -62,7 +62,7 @@ public class AbstractSolutionMatchInFromClauseSqlGeneratorTest
   {
     // given
     String innerSql = uniqueString();
-    given(findSqlGenerator.toSql(eq(queryData), anyString())).willReturn(innerSql);
+    given(solutionSqlGen.toSql(eq(queryData), anyString())).willReturn(innerSql);
     // when
     String actual = generator.fromClause(queryData, alternative, TABSTOP);
     // then
