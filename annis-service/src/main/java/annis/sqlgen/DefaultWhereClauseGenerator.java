@@ -438,7 +438,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       
       conditions.add(join("IS NOT DISTINCT FROM", 
         tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "category"),
-        tasTarget.aliasedColumn(NODE_TABLE, NODE_TABLE)));
+        tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "category")));
     }
     else
     {
