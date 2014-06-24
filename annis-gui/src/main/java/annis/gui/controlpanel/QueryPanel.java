@@ -39,8 +39,6 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
@@ -78,7 +76,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
-  private ProgressBar piCount;
+  public ProgressBar piCount;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
@@ -251,6 +249,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * MOR: "More actions" button 
      * HIST: "History" button
      * STAT: Text field with the real status
+     * PROG: indefinite progress bar (spinning circle)
      * 
      *   \  0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
@@ -260,7 +259,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * --+-----+-----+-----+-----
      * 2 | SEA | MOR | HIST|     
      * --+-----+-----+-----+-----
-     * 3 | STAT| STAT| STAT| STAT
+     * 3 | STAT| STAT| STAT| PROG
      */
     addComponent(txtQuery, 0, 0, 2, 1);
     addComponent(txtStatus, 0, 3, 2, 3);
@@ -462,14 +461,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
           piCount.setEnabled(true);
         }
       }
-      else
-      {
-        if(piCount.isVisible())
-        {
-          piCount.setVisible(false);
-          piCount.setEnabled(false);
-        }
-      }
       
       btShowResult.setEnabled(!enabled);
 //      btShowResultNewTab.setEnabled(!enabled);
@@ -487,6 +478,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
   }
 
+    public void setStatus(String status, String resultStatus)
+  {
+    if(txtStatus != null)
+    {
+      txtStatus.setReadOnly(false);
+      txtStatus.setValue(status + resultStatus);
+      lastPublicStatus = status;
+      txtStatus.setReadOnly(true);
+    }
+  }
+
+  
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
@@ -621,9 +624,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
   }
 
-  public String getTxtStatusValue()
+  public String getLastPublicStatus()
   {
-    return txtStatus.getValue();
+    return lastPublicStatus;
   }
 
   public QueryController getQueryController()

@@ -39,7 +39,6 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -225,7 +224,7 @@ public class ResultViewPanel extends VerticalLayout implements
     this.projectQueue = queue;
     this.currentQuery = q;
     this.numberOfResults = numberOfResults;
-    strCurrentCaption =  sui.getControlPanel().getQueryPanel().getTxtStatusValue();
+    strCurrentCaption =  sui.getControlPanel().getQueryPanel().getLastPublicStatus();
     
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
@@ -294,7 +293,7 @@ public class ResultViewPanel extends VerticalLayout implements
           currentResults += newPanels.size();
 
           String strResults  = numberOfResults > 1 ? "results" : "result";
-          sui.getControlPanel().getQueryPanel().setStatus(strCurrentCaption + " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");          
+          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().getQueryPanel().getLastPublicStatus(), " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");          
 
           if (currentResults == numberOfResults)
           {
@@ -332,7 +331,15 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public void showFinishedSubgraphSearch()
   {
-
+    //Search complete, stop progress bar control
+    if (sui.getControlPanel().getQueryPanel().piCount != null )
+    {
+      if (sui.getControlPanel().getQueryPanel().piCount.isVisible())
+       {
+           sui.getControlPanel().getQueryPanel().piCount.setVisible(false);
+           sui.getControlPanel().getQueryPanel().piCount.setEnabled(false);
+       }
+     }
   }
 
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
