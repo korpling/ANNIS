@@ -104,7 +104,7 @@ public class SpanHTMLOutputter
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
         break;
       case META_NAME:
-        value = matchedAnnotation.getSValue().toString() == null ? "NULL" : matchedAnnotation.getSValue().toString();
+        value = matchedAnnotation.getSValue() == null ? "NULL" : matchedAnnotation.getSValue().toString();
         matchedQName = "meta::" + metaname;
         break;
       default:

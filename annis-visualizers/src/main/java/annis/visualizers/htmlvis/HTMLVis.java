@@ -311,6 +311,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
                     break;
                 case CONSTANT:
                     vis.getOutputter().outputAny(position, position, vis.getOutputter().getConstant(), vis.getOutputter().getConstant(), outputStartTags, outputEndTags);                    
+                    break;
                 case ANNO_NAME:
                     break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
                 case VALUE:
