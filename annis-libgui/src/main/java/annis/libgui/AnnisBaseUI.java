@@ -512,7 +512,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       
       File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
       Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
-      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath(), "UTF-8");
+      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath());
       styleSheet.compile();
       
       return styleSheet.toString();

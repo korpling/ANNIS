@@ -415,11 +415,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
             if (st.size() > 1) {
               tmp = st.pop();
-              st.peek().append("children", node);
+              getOrCreateArray(st.peek(), "children").put(node);
               sortChildren(st.peek());
               st.push(tmp);
             } else {
-              result.append("children", node);
+              getOrCreateArray(result, "children").put(node);
             }
 
             setSentenceSpan(node, st.peek());
@@ -430,7 +430,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       }
 
       if (!isAppendedToParent) {
-        root.append("children", node);
+        getOrCreateArray(root, "children").put(node);
         setSentenceSpan(node, root);
         sortChildren(root);
       }
@@ -457,7 +457,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     if (st.size() == 1) {
       try {
-        result.append("children", st.pop());
+        getOrCreateArray(result, "children").put(st.pop());
         sortChildren(result);
       } catch (JSONException ex) {
         log.error("Problems with adding roots", ex);
@@ -477,6 +477,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     }
 
     return true;
+  }
+  
+  private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException
+  {
+      JSONArray array = parent.getJSONArray(key);
+      if(array == null)
+      {
+          array = new JSONArray();
+          parent.put(key, array);
+      }
+      return array;
   }
 
   /**
@@ -574,7 +585,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
         if (annos != null) {
           for (SAnnotation anno : annos) {
-            jsonEdge.append("annotation", anno.getSValueSTEXT());
+            getOrCreateArray(jsonEdge, "annotation").put(anno.getSValueSTEXT());
           }
         }
       }
