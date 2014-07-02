@@ -264,7 +264,7 @@ limitations under the License.
     <property name="innerQuerySqlGenerator" ref="annotateInnerQuerySqlGenerator" />
   </bean>
 
-  <bean id="annotateSqlGeneratorBase" class="annis.sqlgen.AnnotateSqlGenerator"
+  <bean id="graphSqlGeneratorBase" class="annis.sqlgen.AnnotateSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
@@ -274,18 +274,18 @@ limitations under the License.
     <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
     <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
 
-    <property name="selectClauseSqlGenerator" ref="annotateSqlGenerator" />
+    <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
     <property name="fromClauseSqlGenerators">
       <util:list>
-        <ref bean="annotateSqlGenerator" />
+        <ref bean="graphSqlGenerator" />
       </util:list>
     </property>
     <property name="whereClauseSqlGenerators">
       <util:list>
-        <ref bean="annotateSqlGenerator" />
+        <ref bean="graphSqlGenerator" />
       </util:list>
     </property>
-    <property name="orderByClauseSqlGenerator" ref="annotateSqlGenerator" />
+    <property name="orderByClauseSqlGenerator" ref="graphSqlGenerator" />
     <property name="corpusPathExtractor" ref="arrayCorpusPathExtractor" />
     <property name="outerQueryTableAccessStrategy" ref="annotateOuterQueryTableAccessStrategy" />
     <property name="resultExtractor" ref="saltAnnotateExtractor" />

@@ -30,13 +30,8 @@ limitations under the License.
     <property name="annoCondition" ref="annotationConditionProvider" />
   </bean>
   
-  
-  <bean id="annotateSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator"
-        parent="annotateSqlGeneratorBase" lazy-init="true">
-  </bean>
-  
-  
-  <bean id="graphSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator" parent="annotateSqlGenerator" lazy-init="true">
+  <bean id="graphSqlGenerator" class="annis.sqlgen.annopool.ApAnnotateSqlGenerator" parent="graphSqlGeneratorBase" 
+        lazy-init="true">
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
   </bean>
 

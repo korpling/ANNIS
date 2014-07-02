@@ -89,8 +89,6 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private SqlGeneratorAndExtractor<QueryData, Integer> countSqlGenerator;
 
-  private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
-
   private SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>> matrixSqlGenerator;
 
   private AnnotateSqlGenerator<?> graphSqlGenerator;
@@ -434,10 +432,6 @@ public class AnnisRunner extends AnnisBaseRunner
     else if ("find".equals(function))
     {
       generator = findSqlGenerator;
-    }
-    else if ("annotate".equals(function))
-    {
-      generator = annotateSqlGenerator;
     }
     else if ("matrix".equals(function))
     {
@@ -1044,19 +1038,6 @@ public class AnnisRunner extends AnnisBaseRunner
     System.out.println("graph as dot written to /tmp/annissalt");
   }
 
-  public void doAnnotate(String annisQuery)
-  {
-    QueryData queryData = analyzeQuery(annisQuery, "annotate");
-
-    out.println("NOTICE: left = " + left + "; right = " + right + "; limit = "
-      + limit + "; offset = " + offset);
-    SaltProject result = annisDao.annotate(queryData);
-
-    URI uri = URI.createFileURI("/tmp/annissalt");
-    result.saveSaltProject_DOT(uri);
-    System.out.println("graph as dot written to /tmp/annissalt");
-  }
-
   public void doCorpus(String list)
   {
     corpusList = new LinkedList<>();
@@ -1140,7 +1121,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
     Validate.isTrue(splitted.length > 1,
       "must have to arguments (toplevel corpus name and document name");
-    System.out.println(annotateSqlGenerator.getDocumentQuery(splitted[0],
+    System.out.println(graphSqlGenerator.getDocumentQuery(splitted[0],
       splitted[1]));
   }
 
@@ -1257,16 +1238,6 @@ public class AnnisRunner extends AnnisBaseRunner
     this.countSqlGenerator = countSqlGenerator;
   }
 
-  public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
-  {
-    return annotateSqlGenerator;
-  }
-
-  public void setAnnotateSqlGenerator(
-    AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
-  {
-    this.annotateSqlGenerator = annotateSqlGenerator;
-  }
 
   public SqlGeneratorAndExtractor<QueryData, List<Match>> getFindSqlGenerator()
   {

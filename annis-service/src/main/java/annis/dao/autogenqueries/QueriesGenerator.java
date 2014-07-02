@@ -19,6 +19,8 @@ import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisCorpus;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -239,7 +241,11 @@ public class QueriesGenerator
 
 
     // retrieve the salt project to analyze
-    SaltProject saltProject = getAnnisDao().annotate(queryData);
+    List<Match> matches = getAnnisDao().find(queryData);
+    QueryData matchQueryData = new QueryData();
+    matchQueryData.addExtension(new MatchGroup(matches));
+    
+    SaltProject saltProject = getAnnisDao().graph(matchQueryData);
     queryBuilder.analyzingQuery(saltProject);
 
     // set the corpus name

@@ -16,6 +16,7 @@
 package annis.model;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 /**
@@ -35,9 +36,10 @@ public class AnnisConstants
 
   /**
    * The number of the query node if matched. Feature is applied to
-   * {@link SNode}.
+   * {@link SNode} and {@link SAnnotation}.
    */
   public static final String FEAT_MATCHEDNODE = "matchednode";
+  
 
   /**
    * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.   * 

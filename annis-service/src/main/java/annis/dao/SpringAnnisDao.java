@@ -40,7 +40,6 @@ import annis.sqlgen.ByteHelper;
 import annis.sqlgen.CountMatchesAndDocumentsSqlGenerator;
 import annis.sqlgen.CountSqlGenerator;
 import annis.sqlgen.FindSqlGenerator;
-import annis.sqlgen.SolutionSqlGenerator;
 import annis.sqlgen.FrequencySqlGenerator;
 import annis.sqlgen.ListDocumentsSqlHelper;
 import annis.sqlgen.ListAnnotationsSqlHelper;
@@ -117,8 +116,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private CountMatchesAndDocumentsSqlGenerator countMatchesAndDocumentsSqlGenerator;
 
   private CountSqlGenerator countSqlGenerator;
-
-  private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
 
   private SaltAnnotateExtractor saltAnnotateExtractor;
 
@@ -699,14 +696,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       countMatchesAndDocumentsSqlGenerator);
   }
 
-  @Override
-  @Transactional(readOnly = true)
-  public SaltProject annotate(QueryData queryData)
-  {
-    return executeQueryFunction(queryData, annotateSqlGenerator,
-      saltAnnotateExtractor);
-  }
-
   @Transactional(readOnly = true)
   @Override
   public void matrix(final QueryData queryData, final boolean outputCsv,
@@ -854,7 +843,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     String documentName)
   {
     SaltProject p
-      = annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
+      = graphSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
         toplevelCorpusName, documentName);
     return p;
   }
@@ -1314,17 +1303,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       return new LinkedList<>();
     }
-  }
-
-  public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
-  {
-    return annotateSqlGenerator;
-  }
-
-  public void setAnnotateSqlGenerator(
-    AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
-  {
-    this.annotateSqlGenerator = annotateSqlGenerator;
   }
 
   public FrequencySqlGenerator getFrequencySqlGenerator()
