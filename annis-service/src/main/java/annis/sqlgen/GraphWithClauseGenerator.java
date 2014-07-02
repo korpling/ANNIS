@@ -32,11 +32,9 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
-import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.regex.Pattern;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
@@ -53,9 +51,7 @@ import java.util.regex.Pattern;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
-  
-  private final static Pattern annotationSuffix = Pattern.compile("@.+$");
-  
+    
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
     int match,
@@ -222,14 +218,6 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   
   private String generateNodeName(URI uri)
   { 
-    String fragment = uri.getFragment();
-    // remove any node annotation information if existent
-    if(fragment != null)
-    {
-      return annotationSuffix.matcher(fragment).replaceFirst("");
-    }
-    return null;
-    
-
+    return uri.getFragment();
   }
 }

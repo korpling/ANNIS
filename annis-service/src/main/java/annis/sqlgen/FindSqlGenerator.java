@@ -262,23 +262,25 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
         sb.append(dir).append("/");
       }
     }
-    sb.append("#").append(node_name);
-
+   
     // append information about the matched annotation
     if (nodeAnnotatioName != null)
     {
       if (nodeAnnotatioNamespace == null)
       {
-        sb.append("@").append(nodeAnnotatioName);
+        sb.append("?a=").append(nodeAnnotatioName);
       }
       else
       {
-        sb.append("@")
+        sb.append("?a=")
           .append(nodeAnnotatioNamespace)
           .append("::")
           .append(nodeAnnotatioName);
       }
     }
+    
+     sb.append("#").append(node_name);
+
 
     URI result;
     try
