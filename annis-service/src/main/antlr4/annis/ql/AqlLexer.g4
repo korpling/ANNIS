@@ -34,6 +34,7 @@ NEQ:'!=';
 DOMINANCE:'>';
 POINTING:'->';
 PRECEDENCE:'.';
+NEAR:'^';
 TEST:'%';
 IDENT_COV:'_=_';
 INCLUSION:'_i_';

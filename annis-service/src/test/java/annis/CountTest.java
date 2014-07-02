@@ -133,6 +133,12 @@ public class CountTest
       + "& #a ->anaphor_antecedent #b "
       + "& #b ->anaphor_antecedent #c"));
     
+    // test near operators
+    assertEquals(2, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^ #2"));
+    assertEquals(5, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^3 #2"));
+    assertEquals(8, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^3,4 #2"));
+    assertEquals(184, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^* #2")); //assuming indirect precendence bound is default (50)
+    
     // regression tests:
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
     assertEquals(2, countPcc2("cat=\"CS\" >[func=\"CJ\"] cat=\"S\" > \"was\""));
@@ -181,7 +187,7 @@ public class CountTest
     String[] operatorsToTest = new String[]
     {
       ".", ".*", ">", ">*", "_=_" , "_i_", "_o_", "_l_", "_r_", "->dep", "->dep *",
-      ">@l", ">@r", "$", "$*"
+      ">@l", ">@r", "$", "$*", "^", "^*"
     };
 
 

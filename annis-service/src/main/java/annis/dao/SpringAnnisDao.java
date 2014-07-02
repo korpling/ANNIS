@@ -338,6 +338,17 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
 
     File dir = getRealDataDir();
+    if (!dir.exists())
+    {
+      if (dir.mkdirs())
+      {
+        log.info("Created directory " + dir);
+      }
+      else
+      {
+        log.error("Directory " + dir + " doesn't exist and cannot be created");
+      }
+    }
 
     if (fileName == null)
     {

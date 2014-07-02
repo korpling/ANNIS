@@ -5,6 +5,9 @@
             <goals>
                 <goal>install</goal>
             </goals>
+            <properties>
+                <skipTests>true</skipTests>
+            </properties>
 <!--            <properties>
                 <maven.test.skip>true</maven.test.skip>
             </properties>-->

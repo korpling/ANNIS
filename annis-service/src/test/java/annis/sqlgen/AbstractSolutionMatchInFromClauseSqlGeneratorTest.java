@@ -41,7 +41,7 @@ public class AbstractSolutionMatchInFromClauseSqlGeneratorTest
   // class under test
   @InjectMocks private AbstractSolutionMatchInFromClauseSqlGenerator 
     generator = new AbstractSolutionMatchInFromClauseSqlGenerator()
-  {
+  {    
   };
   
   // dependencies
