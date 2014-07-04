@@ -300,6 +300,7 @@ limitations under the License.
     <property name="selectClauseSqlGenerator" ref="findSqlGenerator" />
     <property name="fromClauseSqlGenerators" ref="findSqlGenerator" />
     <property name="whereClauseSqlGenerators" ref="findSqlGenerator" />
+    <property name="orderByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
     
   </bean>
   
