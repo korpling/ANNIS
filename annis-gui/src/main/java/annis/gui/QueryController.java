@@ -271,6 +271,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     Validate.notNull(preparedQuery,
       "You have to set a query before you can execute it.");
 
+    ui.getControlPanel().getQueryPanel().setStatus("");
+    
     prepareExecuteQuery();
 
     if (preparedQuery.getCorpora() == null || preparedQuery.getCorpora().

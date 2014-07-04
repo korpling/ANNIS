@@ -20,6 +20,7 @@ import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
+import annis.gui.controlpanel.QueryPanel;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
@@ -337,6 +338,9 @@ public class ResultViewPanel extends VerticalLayout implements
            sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
        }
      }
+    // also remove the info how many results have been fetched
+    QueryPanel qp = sui.getControlPanel().getQueryPanel();
+    qp.setStatus(qp.getLastPublicStatus());
   }
 
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
