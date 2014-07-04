@@ -271,7 +271,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     Validate.notNull(preparedQuery,
       "You have to set a query before you can execute it.");
 
-    ui.getControlPanel().getQueryPanel().setStatus("");
+    ui.getControlPanel().getQueryPanel().setStatus("Searching...");
     
     prepareExecuteQuery();
 
@@ -597,23 +597,28 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
             {
               if (causeFinal.getResponse().getStatus() == 400)
               {
-                Notification.show(
-                  "parsing error",
-                  causeFinal.getResponse().getEntity(String.class),
-                  Notification.Type.WARNING_MESSAGE);
+                String errMsg = causeFinal.getResponse().getEntity(String.class);
+                Notification.show("parsing error", 
+                  errMsg, Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }
               else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
               {
+                String errMsg =  "Timeout: query execution took too long.";
                 Notification.show(
-                  "Timeout: query execution took too long.",
+                  errMsg,
                   "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
                   Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }
               else
               {
                 log.error("Unexpected exception:  " + causeFinal.
                   getLocalizedMessage(), causeFinal);
                 ExceptionDialog.show(causeFinal);
+                
+                ui.getControlPanel().getQueryPanel().setStatus(
+                  "Unexpected exception:  " + causeFinal.getMessage());
               }
             } // end if cause != null
 

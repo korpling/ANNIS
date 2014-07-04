@@ -67,7 +67,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   // the view name
   public static final String NAME = "query";
-  public static final String OK_STATUS = "Status: Ok";
 
   private TextArea txtQuery;
   private TextArea txtStatus;
@@ -88,7 +87,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     super(4,5);
     
     this.controller = ui.getQueryController();
-    this.lastPublicStatus = OK_STATUS;
+    this.lastPublicStatus = "Welcome to ANNIS! "
+      + "A tutorial is available on the right side.";
     this.history = new LinkedList<>();
 
     setSpacing(true);
@@ -364,7 +364,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
           if ("ok".equalsIgnoreCase(result))
           {
-            txtStatus.setValue(lastPublicStatus);
+            if(getQueryController().getSelectedCorpora().isEmpty())
+            {
+              txtStatus.setValue("Please select a corpus from the list below, then click on \"Search\".");
+            }
+            else
+            {
+              txtStatus.setValue("Valid query, click on \"Search\" to start searching.");
+            }
           }
           else
           {
