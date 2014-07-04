@@ -27,9 +27,13 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.SubgraphFilter;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -37,9 +41,9 @@ import org.springframework.jdbc.core.ResultSetExtractor;
  *
  * @param <T> Type into which the JDBC result set is transformed
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public abstract class AnnotateSqlGenerator<T>
+public class AnnotateSqlGenerator<T>
   extends AbstractSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
@@ -82,9 +86,6 @@ public abstract class AnnotateSqlGenerator<T>
       documentName), this);
   }
 
-  public abstract String getDocumentQuery(String toplevelCorpusName,
-    String documentName);
-
   public String getMatchedNodesViewName()
   {
     return matchedNodesViewName;
@@ -94,10 +95,6 @@ public abstract class AnnotateSqlGenerator<T>
   {
     this.matchedNodesViewName = matchedNodesViewName;
   }
-
-  @Override
-  public abstract String selectClause(QueryData queryData,
-    List<QueryNode> alternative, String indent);
 
   protected void addSelectClauseAttribute(List<String> fields,
     String table, String column)
@@ -185,8 +182,133 @@ public abstract class AnnotateSqlGenerator<T>
   }
 
   @Override
-  public abstract String fromClause(QueryData queryData,
-    List<QueryNode> alternative, String indent);
+  public String fromClause(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    TableAccessStrategy tas = tables(null);
+    List<Long> corpusList = queryData.getCorpusList();
+    StringBuilder sb = new StringBuilder();
+    
+    sb.append(indent).append("solutions,\n");
+
+    sb.append(indent).append(TABSTOP);
+    sb.append(
+      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
+        null, NODE_TABLE, 1, corpusList));
+    sb.append(",\n");
+
+    sb.append(indent).append(TABSTOP);
+    sb.append(TableAccessStrategy.CORPUS_TABLE);
+
+    return sb.toString();
+  }
+
+  @Override
+  public String selectClause(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    String innerIndent = indent + TABSTOP;
+    StringBuilder sb = new StringBuilder();
+
+    sb.append("DISTINCT\n");
+    
+    sb.append(innerIndent).append("solutions.\"key\",\n");
+    sb.append(innerIndent);
+    
+    int matchStart = 0;
+    List<LimitOffsetQueryData> extension =
+      queryData.getExtensions(LimitOffsetQueryData.class);
+    if(extension.size() > 0)
+    {
+      matchStart = extension.get(0).getOffset();
+    }
+
+    sb.append(matchStart).append(" AS \"matchstart\",\n");
+    sb.append(innerIndent).append("solutions.n,\n");
+
+    List<String> fields = getSelectFields();
+
+    sb.append(innerIndent).append(StringUtils.join(fields, ",\n" + innerIndent));
+    sb.append(innerIndent).append(",\n");
+
+    // corpus.path_name
+    sb.append(innerIndent).append("corpus.path_name AS path");
+
+    if (isIncludeDocumentNameInAnnotateQuery())
+    {
+      sb.append(",\n");
+      sb.append(innerIndent).append("corpus.path_name[1] AS document_name");
+    }
+    return sb.toString();
+  }
+  
+  protected List<String> getSelectFields()
+  {
+    List<String> fields = new ArrayList<>();
+    
+    addSelectClauseAttribute(fields, NODE_TABLE, "id");
+    addSelectClauseAttribute(fields, NODE_TABLE, "text_ref");
+    addSelectClauseAttribute(fields, NODE_TABLE, "corpus_ref");
+    addSelectClauseAttribute(fields, NODE_TABLE, "toplevel_corpus");
+    addSelectClauseAttribute(fields, NODE_TABLE, "namespace");
+    addSelectClauseAttribute(fields, NODE_TABLE, "name");
+    addSelectClauseAttribute(fields, NODE_TABLE, "left");
+    addSelectClauseAttribute(fields, NODE_TABLE, "right");
+    addSelectClauseAttribute(fields, NODE_TABLE, "token_index");
+    if (isIncludeIsTokenColumn())
+    {
+      addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
+    }
+    addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
+    addSelectClauseAttribute(fields, NODE_TABLE, "span");
+    addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
+    addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_name");
+    addSelectClauseAttribute(fields, NODE_TABLE, "seg_index");
+    addSelectClauseAttribute(fields, RANK_TABLE, "pre");
+    addSelectClauseAttribute(fields, RANK_TABLE, "post");
+    addSelectClauseAttribute(fields, RANK_TABLE, "parent");
+    addSelectClauseAttribute(fields, RANK_TABLE, "root");
+    addSelectClauseAttribute(fields, RANK_TABLE, "level");
+    addSelectClauseAttribute(fields, COMPONENT_TABLE, "id");
+    addSelectClauseAttribute(fields, COMPONENT_TABLE, "type");
+    addSelectClauseAttribute(fields, COMPONENT_TABLE, "name");
+    addSelectClauseAttribute(fields, COMPONENT_TABLE, "namespace");
+    
+    fields.add("(splitanno(node_qannotext))[1] as node_annotation_namespace");
+    fields.add("(splitanno(node_qannotext))[2] as node_annotation_name");
+    fields.add("(splitanno(node_qannotext))[3] as node_annotation_value");
+    
+    fields.add("(splitanno(edge_qannotext))[1] as edge_annotation_namespace");
+    fields.add("(splitanno(edge_qannotext))[2] as edge_annotation_name");
+    fields.add("(splitanno(edge_qannotext))[3] as edge_annotation_value");
+
+    
+    return fields;
+  }
+
+  public String getDocumentQuery(String toplevelCorpusName, String documentName)
+  {
+    TableAccessStrategy tas = createTableAccessStrategy();
+    List<String> fields = getSelectFields();
+    
+    String template = "SELECT DISTINCT \n"
+      + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, "
+      +  StringUtils.join(fields, ", ") +", "
+      + "c.path_name as path, c.path_name[1] as document_name\n"
+      + "FROM\n"
+      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + ",\n"
+      + "\tcorpus as c, corpus as toplevel\n"
+      + "WHERE\n"
+      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "\tAND toplevel.top_level IS TRUE\n"
+      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
+      + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
+    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
+      .replace(":document_name", sqlString(documentName));
+    return sql;
+    
+  }
 
   @Override
   public T extractData(ResultSet resultSet)
