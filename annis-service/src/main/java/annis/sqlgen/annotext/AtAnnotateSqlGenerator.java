@@ -16,8 +16,6 @@
 package annis.sqlgen.annotext;
 
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AbstractFromClauseGenerator;

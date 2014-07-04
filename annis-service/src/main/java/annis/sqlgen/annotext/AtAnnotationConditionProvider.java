@@ -21,7 +21,6 @@ import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.AnnotationConditionProvider;
 import annis.sqlgen.TableAccessStrategy;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import com.google.common.base.Objects;

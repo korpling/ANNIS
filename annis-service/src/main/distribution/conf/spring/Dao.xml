@@ -163,7 +163,13 @@
   </bean>
 
   <!-- base bean for exported Database API for administration tasks -->
-  <bean id="administrationDaoBase" class="annis.administration.DefaultAdministrationDao" init-method="init" lazy-init="true">
+  
+  <bean id="schemeFixerBase" class="annis.administration.SchemeFixer" lazy-init="true">
+    <property name="dataSource" ref="dataSource" />
+  </bean>
+ 
+	<!-- exported Database API for administration tasks -->
+  <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
     <property name="scriptPath" value="${annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
     <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
@@ -192,14 +198,6 @@
     </property>
     <property name="tableInsertSelect" ref="tableInsertSelect" />
     <property name="queriesGenerator" ref="queriesGenerator" />
-  </bean>
-  
-  <bean id="schemeFixerBase" class="annis.administration.SchemeFixer" lazy-init="true">
-    <property name="dataSource" ref="dataSource" />
-  </bean>
- 
-	<!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.AtAdministrationDao" parent="administrationDaoBase" lazy-init="true">
     <property name="schemaVersion" value="annotext-v1"/>
   </bean>
   

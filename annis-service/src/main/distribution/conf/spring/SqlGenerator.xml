@@ -359,32 +359,6 @@ limitations under the License.
     </property>
   </bean>
   
-  <bean id="frequencySqlGeneratorBase" class="annis.sqlgen.FrequencySqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
-    
-    <property name="solutionSqlGenerator" >
-      <bean parent="solutionSqlGeneratorBase">
-        <property name="orderByClauseSqlGenerator">
-          <null/>
-        </property>
-      </bean>
-    </property>
-    
-    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
-    <property name="fromClauseSqlGenerators">
-      <util:list>
-        <ref bean="frequencySqlGenerator" />
-      </util:list>
-    </property>
-    <property name="whereClauseSqlGenerators">
-      <util:list>
-        <ref bean="frequencySqlGenerator" />
-      </util:list>
-    </property>
-    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
-    
-  </bean>
-
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
     parent="commonAnnotateSqlGenerator" lazy-init="true" >
@@ -439,8 +413,31 @@ limitations under the License.
         parent="matrixSqlGeneratorBase" lazy-init="true">
   </bean>
   
-  <bean id="frequencySqlGenerator" class="annis.sqlgen.annotext.AtFrequencySqlGenerator"
-        parent="frequencySqlGeneratorBase" lazy-init="true">
+  <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator" 
+        lazy-init="true">
+    
+    <property name="solutionSqlGenerator" >
+      <bean parent="solutionSqlGeneratorBase">
+        <property name="orderByClauseSqlGenerator">
+          <null/>
+        </property>
+      </bean>
+    </property>
+    
+    <property name="selectClauseSqlGenerator" ref="frequencySqlGenerator" />
+    <property name="fromClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="whereClauseSqlGenerators">
+      <util:list>
+        <ref bean="frequencySqlGenerator" />
+      </util:list>
+    </property>
+    <property name="groupByClauseSqlGenerator" ref="frequencySqlGenerator" />
+
+    
   </bean>
   
   

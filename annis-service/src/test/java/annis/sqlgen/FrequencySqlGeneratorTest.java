@@ -19,7 +19,6 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
-import annis.sqlgen.annotext.AtFrequencySqlGenerator;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import static annis.test.TestUtils.size;
 import java.util.ArrayList;
@@ -47,7 +46,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class FrequencySqlGeneratorTest
 {
   
-  private FrequencySqlGenerator generator = new AtFrequencySqlGenerator();
+  private FrequencySqlGenerator generator = new FrequencySqlGenerator();
   
   @Mock private SolutionSqlGenerator solutionSqlGenerator = mock(SolutionSqlGenerator.class);
   @Mock private QueryData queryData;

@@ -320,6 +320,10 @@ public class DefaultAdministrationDao implements AdministrationDao
           FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
+    
+    log.info(
+      "creating immutable functions for extracting annotations");
+    executeSqlFromScript("functions_get.sql"); 
   }
 
   /**
