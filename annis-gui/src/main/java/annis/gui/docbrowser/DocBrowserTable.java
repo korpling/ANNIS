@@ -66,7 +66,7 @@ public class DocBrowserTable extends Table
   private DocumentBrowserConfig docVisualizerConfig;
 
   // cache for doc meta data
-  private final Map<String, List<Annotation>> docMetaDataCache;
+  private final Map<String, Map<String, List<Annotation>>> docMetaDataCache;
 
   private IndexedContainer container;
 
@@ -408,28 +408,38 @@ public class DocBrowserTable extends Table
     // lookup up meta data in the cache
     if (!docMetaDataCache.containsKey(docBrowserPanel.getCorpus()))
     {
-      // get the metadata of a specific doc
+      // get the metadata for the corpus
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
         docBrowserPanel.getCorpus()).path("closure");
-      docMetaDataCache.put(docBrowserPanel.getCorpus(),
-        res.get(new Helper.AnnotationListType()));
-    }
-
-    List<Annotation> annos = new ArrayList<>();
-
-    // filter the annotations
-    for (Annotation a : docMetaDataCache.get(docBrowserPanel.getCorpus()))
-    {
-      if (a.getAnnotationPath() != null
-        && !a.getAnnotationPath().isEmpty()
-        && a.getAnnotationPath().get(0).equals(document))
+      
+      Map<String, List<Annotation>> metaDataMap = new HashMap<>();
+      
+      // create a document -> metadata map
+      for (Annotation a : res.get(new Helper.AnnotationListType()))
       {
-        annos.add(a);
+        if (a.getAnnotationPath() != null
+          && !a.getAnnotationPath().isEmpty()
+          && a.getType().equals("DOCUMENT"))
+        {
+          String docName = a.getAnnotationPath().get(0);
+          if (!metaDataMap.containsKey(docName)) {
+            metaDataMap.put(docName, new ArrayList<Annotation>());
+          }
+          metaDataMap.get(docName).add(a);
+        }
       }
+      docMetaDataCache.put(docBrowserPanel.getCorpus(), metaDataMap);
     }
-
-    return annos;
+    
+    if (docMetaDataCache.get(docBrowserPanel.getCorpus()).containsKey(document))
+    {
+      return docMetaDataCache.get(docBrowserPanel.getCorpus()).get(document);
+    }
+    else
+    {
+      return new ArrayList<Annotation>();
+    }
   }
 
   private String generateCell(List<String> path, MetaDataCol metaDatum)

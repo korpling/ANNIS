@@ -2,6 +2,7 @@
 <actions>
         <action>
             <actionName>run</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
@@ -15,6 +16,7 @@
         </action>
         <action>
             <actionName>debug</actionName>
+            <preAction>build-with-dependencies</preAction>
             <goals>
                 <goal>process-classes</goal>
                 <goal>org.codehaus.mojo:exec-maven-plugin:1.1.1:exec</goal>
