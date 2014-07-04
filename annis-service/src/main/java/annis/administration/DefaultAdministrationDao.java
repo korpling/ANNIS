@@ -293,7 +293,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchema()
   {
-    log.info("creating ANNIS database schema (" + getDatabaseSchemaVersion() + ")");
+    log.info("creating ANNIS database schema (" + getSchemaVersion() + ")");
     executeSqlFromScript("schema.sql");
 
     // update schema version
@@ -322,6 +322,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("update_resolver_sequence.sql");
   }
 
+  /**
+   * Get the real schema name and version as used by the database.
+   * @return 
+   */
   @Override
   @Transactional(readOnly = true, propagation = Propagation.NESTED)
   public String getDatabaseSchemaVersion()
@@ -1637,6 +1641,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.temporaryStagingArea = temporaryStagingArea;
   }
 
+  /** 
+   * Get the name and version of the schema this @{link AdministrationDao} 
+   is configured to work with.
+   */
   public String getSchemaVersion()
   {
     return schemaVersion;
