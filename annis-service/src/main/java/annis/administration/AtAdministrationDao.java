@@ -36,7 +36,7 @@ public class AtAdministrationDao extends DefaultAdministrationDao
 
     log.info(
       "creating immutable functions for extracting annotations");
-    executeSqlFromScript(getDbLayout() + "/functions_get.sql"); 
+    executeSqlFromScript("functions_get.sql"); 
   }
   
 

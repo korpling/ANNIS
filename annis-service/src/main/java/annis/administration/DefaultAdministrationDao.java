@@ -223,8 +223,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     "media_files"
   };
 
-  private String dbLayout;
-
   private AnnisDao annisDao;
 
   private ObjectMapper jsonMapper = new ObjectMapper();
@@ -295,8 +293,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchema()
   {
-    log.info("creating ANNIS database schema (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schema.sql");
+    log.info("creating ANNIS database schema (" + getDatabaseSchemaVersion() + ")");
+    executeSqlFromScript("schema.sql");
 
     // update schema version
     jdbcTemplate.execute(
@@ -310,8 +308,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchemaIndexes()
   {
-    log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schemaindex.sql");
+    log.info("creating ANNIS database schema indexes (" + getDatabaseSchemaVersion() + ")");
+    executeSqlFromScript("schemaindex.sql");
   }
 
   protected void populateSchema()
@@ -1070,12 +1068,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript(dbLayout + "/facts.sql", args);
+    executeSqlFromScript("facts.sql", args);
 
     clusterFacts(corpusID);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript(dbLayout + "/indexes.sql", args);
+    executeSqlFromScript("indexes.sql", args);
 
   }
 
@@ -1085,10 +1083,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    if (executeSqlFromScript(dbLayout + "/cluster.sql", args) != null)
-    {
-      executeSqlFromScript("cluster.sql", args);
-    }
+    executeSqlFromScript("cluster.sql", args);
+    
   }
   
   void removeUnecessarySpanningRelations()
@@ -1629,16 +1625,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   public void setExternalFilesPath(String externalFilesPath)
   {
     this.externalFilesPath = externalFilesPath;
-  }
-
-  public String getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(String dbLayout)
-  {
-    this.dbLayout = dbLayout;
   }
 
   public boolean isTemporaryStagingArea()

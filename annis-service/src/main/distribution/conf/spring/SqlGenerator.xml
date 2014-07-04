@@ -15,15 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 -->
 
-<!-- this defines default beans which can be extended and changed in the mode definition -->
-
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
 
-	<!-- Configure use of BETWEEN SYMMETRIC -->
+  
+  <!-- Configure use of BETWEEN SYMMETRIC -->
   <bean
     class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="true">
     <property name="targetClass">
@@ -420,5 +419,31 @@ limitations under the License.
   <bean id="countMatchesAndDocumentsSqlGenerator" class="annis.sqlgen.CountMatchesAndDocumentsSqlGenerator" parent="countSqlGenerator">
     <property name="selectClauseSqlGenerator" ref="countMatchesAndDocumentsSqlGenerator"/>
   </bean>
+
+  
+ <bean id="annotationConditionProvider" class="annis.sqlgen.annotext.AtAnnotationConditionProvider" />
+  
+	<!-- WHERE clause generator -->
+  <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
+        parent="defaultWhereClauseGeneratorBase" lazy-init="true">
+    <property name="annoCondition" ref="annotationConditionProvider" />
+  </bean>
+  
+  
+  <bean id="graphSqlGenerator" class="annis.sqlgen.annotext.AtAnnotateSqlGenerator" 
+        parent="graphSqlGeneratorBase" lazy-init="true">
+    <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
+  </bean>
+
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.annotext.AtMatrixSqlGenerator"
+        parent="matrixSqlGeneratorBase" lazy-init="true">
+  </bean>
+  
+  <bean id="frequencySqlGenerator" class="annis.sqlgen.annotext.AtFrequencySqlGenerator"
+        parent="frequencySqlGeneratorBase" lazy-init="true">
+  </bean>
+  
+  
+  
 
 </beans>
