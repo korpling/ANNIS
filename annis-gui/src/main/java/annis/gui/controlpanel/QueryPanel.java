@@ -39,8 +39,6 @@ import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
@@ -238,7 +236,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
-     * with the cost of some complexitiy when defining the positions of the
+     * with the cost of some complexity when defining the positions of the
      * elements in the layout.
      * 
      * This grid hopefully helps a little bit in understanding the "magic"
@@ -251,6 +249,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * MOR: "More actions" button 
      * HIST: "History" button
      * STAT: Text field with the real status
+     * PROG: indefinite progress bar (spinning circle)
      * 
      *   \  0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
@@ -260,13 +259,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * --+-----+-----+-----+-----
      * 2 | SEA | MOR | HIST|     
      * --+-----+-----+-----+-----
-     * 3 | STAT| STAT| STAT| STAT
+     * 3 | STAT| STAT| STAT| PROG
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(txtStatus, 0, 3, 3, 3);
+    addComponent(txtStatus, 0, 3, 2, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);
     addComponent(btHistory, 2, 2);
+    addComponent(piCount, 3, 3);
     addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
@@ -457,18 +457,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(!piCount.isVisible())
         {
-          replaceComponent(txtStatus, piCount);
           piCount.setVisible(true);
           piCount.setEnabled(true);
-        }
-      }
-      else
-      {
-        if(piCount.isVisible())
-        {
-          replaceComponent(piCount, txtStatus);
-          piCount.setVisible(false);
-          piCount.setEnabled(false);
         }
       }
       
@@ -488,6 +478,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
   }
 
+    public void setStatus(String status, String resultStatus)
+  {
+    if(txtStatus != null)
+    {
+      txtStatus.setReadOnly(false);
+      txtStatus.setValue(status + resultStatus);
+      lastPublicStatus = status;
+      txtStatus.setReadOnly(true);
+    }
+  }
+
+  
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
@@ -622,8 +624,20 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
   }
 
+  public String getLastPublicStatus()
+  {
+    return lastPublicStatus;
+  }
+
   public QueryController getQueryController()
   {
     return this.controller;
   }
+
+  public ProgressBar getPiCount()
+  {
+    return piCount;
+  }
+  
+  
 }

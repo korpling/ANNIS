@@ -86,7 +86,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private Map<UUID, PagedResultQuery> queries;
 
-  private BiMap<UUID, ResultViewPanel> queryPanels;
+  private BiMap<UUID, ResultViewPanel> resultPanels;
 
   private Map<UUID, MatchAndDocumentCount> counts;
 
@@ -271,6 +271,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     Validate.notNull(preparedQuery,
       "You have to set a query before you can execute it.");
 
+    ui.getControlPanel().getQueryPanel().setStatus("");
+    
     prepareExecuteQuery();
 
     if (preparedQuery.getCorpora() == null || preparedQuery.getCorpora().
@@ -295,7 +297,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     // begin execute match fetching
     //
     // remove old result from view
-    ResultViewPanel oldPanel = getQueryPanels().get(oldQueryUUID);
+    ResultViewPanel oldPanel = getResultPanels().get(oldQueryUUID);
 
     if (replaceOldTab && oldQueryUUID != null && oldPanel != null)
     {
@@ -310,7 +312,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
     Tab newTab;
 
-    String caption = getQueryPanels().isEmpty()
+    String caption = getResultPanels().isEmpty()
       ? "Query Result" : "Query Result #" + maxShortID;
 
     if (replaceOldTab && oldPanel != null)
@@ -332,8 +334,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       lastQueryUUID));
 
-    getQueryPanels().put(lastQueryUUID, newResultView);
-
+    getResultPanels().put(lastQueryUUID, newResultView);
     PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
       newResultView, ui, this));
 
@@ -365,12 +366,16 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private void updateMatches(UUID uuid, PagedResultQuery newQuery)
   {
-    ResultViewPanel panel = getQueryPanels().get(uuid);
+    ResultViewPanel panel = getResultPanels().get(uuid);
     if (panel != null && preparedQuery != null)
     {
       prepareExecuteQuery();
-
+      
       getQueries().put(uuid, newQuery);
+      
+      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+      
       lastMatchFuture = PollControl.runInBackground(500, ui,
         new ResultFetchJob(newQuery, panel, ui, this));
     }
@@ -406,7 +411,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       ResultViewPanel panel = (ResultViewPanel) event.getTabSheet().
         getSelectedTab();
-      UUID uuid = getQueryPanels().inverse().get(panel);
+      UUID uuid = getResultPanels().inverse().get(panel);
       if (uuid != null)
       {
         lastQueryUUID = uuid;
@@ -446,7 +451,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     if (uuid != null)
     {
       getQueries().remove(uuid);
-      getQueryPanels().remove(uuid);
+      getResultPanels().remove(uuid);
       getCounts().remove(uuid);
     }
   }
@@ -455,7 +460,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (panel != null)
     {
-      removeQuery(getQueryPanels().inverse().get(panel));
+      removeQuery(getResultPanels().inverse().get(panel));
     }
   }
 
@@ -473,13 +478,13 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     return queries;
   }
 
-  private BiMap<UUID, ResultViewPanel> getQueryPanels()
+  private BiMap<UUID, ResultViewPanel> getResultPanels()
   {
-    if (queryPanels == null)
+    if (resultPanels == null)
     {
-      queryPanels = HashBiMap.create();
+      resultPanels = HashBiMap.create();
     }
-    return queryPanels;
+    return resultPanels;
   }
 
   private Map<UUID, MatchAndDocumentCount> getCounts()
@@ -494,7 +499,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   private class SpecificPagingCallback implements PagingCallback
   {
 
-    private UUID uuid;
+    private final UUID uuid;
 
     public SpecificPagingCallback(UUID uuid)
     {
@@ -579,11 +584,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
                   getMatchCount() + " " + matchesString
                   + "\nin " + countResult.getDocumentCount() + " " + documentString);
                 if (lastQueryUUID != null && countResult.getMatchCount() > 0
-                  && getQueryPanels().get(lastQueryUUID) != null)
+                  && getResultPanels().get(lastQueryUUID) != null)
                 {
-                  getQueryPanels().get(lastQueryUUID).getPaging().setPageSize(
+                  getResultPanels().get(lastQueryUUID).getPaging().setPageSize(
                     getQueries().get(uuid).getLimit(), false);
-                  getQueryPanels().get(lastQueryUUID).setCount(countResult.
+                  getResultPanels().get(lastQueryUUID).setCount(countResult.
                     getMatchCount());
                 }
               }
@@ -625,7 +630,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
     PagedResultQuery query;
 
-    if (queries.containsKey(queryID) && queryPanels.containsKey(queryID))
+    if (queries.containsKey(queryID) && resultPanels.containsKey(queryID))
     {
       if (updatedQueries == null)
       {
