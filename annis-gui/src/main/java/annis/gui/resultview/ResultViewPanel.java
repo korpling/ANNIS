@@ -332,12 +332,12 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showFinishedSubgraphSearch()
   {
     //Search complete, stop progress bar control
-    if (sui.getControlPanel().getQueryPanel().piCount != null )
+    if (sui.getControlPanel().getQueryPanel().getPiCount() != null )
     {
-      if (sui.getControlPanel().getQueryPanel().piCount.isVisible())
+      if (sui.getControlPanel().getQueryPanel().getPiCount().isVisible())
        {
-           sui.getControlPanel().getQueryPanel().piCount.setVisible(false);
-           sui.getControlPanel().getQueryPanel().piCount.setEnabled(false);
+           sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
+           sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
        }
      }
   }

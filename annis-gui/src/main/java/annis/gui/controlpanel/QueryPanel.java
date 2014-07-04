@@ -76,7 +76,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   private PopupButton btHistory;
   private ListSelect lstHistory;
   private QueryController controller;
-  public ProgressBar piCount;
+  private ProgressBar piCount;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
   private Window historyWindow;
@@ -633,4 +633,11 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     return this.controller;
   }
+
+  public ProgressBar getPiCount()
+  {
+    return piCount;
+  }
+  
+  
 }
