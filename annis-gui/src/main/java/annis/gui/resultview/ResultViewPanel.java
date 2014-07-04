@@ -62,7 +62,6 @@ import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -125,7 +124,6 @@ public class ResultViewPanel extends VerticalLayout implements
   private PagedResultQuery currentQuery;
   
   SearchUI sui = (SearchUI) UI.getCurrent();
-  private String strCurrentCaption ="";
 
 
   public ResultViewPanel(QueryController controller,
@@ -224,7 +222,6 @@ public class ResultViewPanel extends VerticalLayout implements
     this.projectQueue = queue;
     this.currentQuery = q;
     this.numberOfResults = numberOfResults;
-    strCurrentCaption =  sui.getControlPanel().getQueryPanel().getLastPublicStatus();
     
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
