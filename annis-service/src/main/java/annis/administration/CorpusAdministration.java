@@ -339,7 +339,7 @@ public class CorpusAdministration
   public static class ImportStatsImpl implements AdministrationDao.ImportStatus
   {
 
-    private boolean status;
+    private boolean status = true;
 
     private final static String SEPERATOR = "--------------------------\n";
 
