@@ -6599,6 +6599,16 @@ body .annis.v-app .v-app-loading {
 	background-color: #ecffe7;
 }
 
+.annis .help-tab .v-captiontext {
+	text-decoration: underline;
+	color: #3137F5;
+}
+
+.annis .help-tab .v-accordion-item-open .v-captiontext {
+	text-decoration: none;
+	color: black;
+}
+
 .annis .blue-tab .v-tabsheet-tabitem {
 	border: 1px solid #cccccc;
 	border-bottom: none;
