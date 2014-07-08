@@ -90,26 +90,26 @@ public class AnnotationConditionProvider
 
     if (tm == null || tm == TextMatching.EXACT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " LIKE '" + prefix + val + "'");
     }
     else if (tm == TextMatching.EXACT_NOT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " LIKE '" + prefix +  "%'");
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " NOT LIKE '" + prefix + val + "'");
     }
     else if (tm == TextMatching.REGEXP_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " ~ '^(" + prefix + "(" + val + "))$'");
     }
     else if (tm == TextMatching.REGEXP_NOT_EQUAL)
     {
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " LIKE '" + prefix +  "%'");
-      conditions.add(tas.aliasedColumn(table, column)
+      conditions.add(tas.aliasedColumn(table, column, index)
         + " !~ '^(" + prefix + "(" +  val + "))$'");
     }
   }
