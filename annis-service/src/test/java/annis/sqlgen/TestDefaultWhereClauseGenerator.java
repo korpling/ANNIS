@@ -58,7 +58,6 @@ import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
 import annis.model.Join;
-import annis.sqlgen.annotext.AtAnnotationConditionProvider;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -107,7 +106,7 @@ public class TestDefaultWhereClauseGenerator
 
     
     generator = new TestWhereClauseGenerator();
-    generator.setAnnoCondition(new AtAnnotationConditionProvider());
+    generator.setAnnoCondition(new AnnotationConditionProvider());
    
   }
   

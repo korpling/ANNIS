@@ -304,7 +304,7 @@ limitations under the License.
     
   </bean>
   
-    <bean id="matrixSqlGeneratorBase" class="annis.sqlgen.MatrixSqlGenerator"
+    <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
@@ -369,7 +369,7 @@ limitations under the License.
   </bean>
 
   
- <bean id="annotationConditionProvider" class="annis.sqlgen.annotext.AtAnnotationConditionProvider" />
+ <bean id="annotationConditionProvider" class="annis.sqlgen.AnnotationConditionProvider" />
   
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
@@ -406,10 +406,6 @@ limitations under the License.
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
   </bean>
 
-  <bean id="matrixSqlGenerator" class="annis.sqlgen.annotext.AtMatrixSqlGenerator"
-        parent="matrixSqlGeneratorBase" lazy-init="true">
-  </bean>
-  
   <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator" 
         lazy-init="true">
     
