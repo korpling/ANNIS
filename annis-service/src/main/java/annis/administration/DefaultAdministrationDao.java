@@ -498,7 +498,8 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeLeftTokenRightToken();
     
     removeUnecessarySpanningRelations();
-    
+
+    addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
     long corpusID = updateIds();
@@ -916,6 +917,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("analyzing _node and _text");
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("text"));
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("node"));
+  }
+  
+  protected void addUniqueNodeNameAppendix()
+  {
+    log.info("add a unique node name appendix");
+    executeSqlFromScript("unique_node_name_appendix.sql");
   }
 
   /**
