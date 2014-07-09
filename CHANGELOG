@@ -1,3 +1,16 @@
+Version 3.1.7
+=============
+
+We would like to give special thanks to Adriane Boyd and Lari Lampen for providing the bug fixes for the issues #332 and #336.
+
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=17&state=closed
+
+[Bugs]
+ #340 fixed bug in CorefVisualizer. The annotation name is now displayed
+ #336 Existence of directory is not checked when saving corpus properties
+ #332 document browser needs long time to load when there is a larger number of metadata
+
 Version 3.1.6
 =============
 Changelog is also available on GitHub:
