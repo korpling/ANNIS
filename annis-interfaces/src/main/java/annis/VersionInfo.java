@@ -16,6 +16,7 @@
 package annis;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -36,11 +37,12 @@ public class VersionInfo
 
   private final static Properties versionProperties = new Properties();
   
-  static {
-    try
+  static
+  {
+    try (InputStream is = VersionInfo.class.getResourceAsStream(
+      "version.properties"))
     {
-      versionProperties.load(VersionInfo.class.getResourceAsStream(
-        "version.properties"));
+      versionProperties.load(is);
     }
     catch (IOException ex)
     {
