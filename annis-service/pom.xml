@@ -311,10 +311,6 @@
         </excludes>
       </resource>
       <resource>
-        <directory>${basedir}/src/main/resources</directory>
-        <filtering>true</filtering>
-      </resource>
-      <resource>
         <directory>src/main/meta-inf/</directory>
         <targetPath>META-INF</targetPath>
       </resource>

@@ -30,9 +30,6 @@ import java.util.Map;
 import java.util.Set;
 import java.util.TreeSet;
 
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -934,6 +931,11 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doShow(String setting)
   {
     doSet("?" + setting);
+  }
+  
+  public void doVersion(String ignore)
+  {
+    out.println(VersionInfo.getVersion());
   }
 
   /**

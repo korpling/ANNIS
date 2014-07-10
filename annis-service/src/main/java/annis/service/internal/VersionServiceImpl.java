@@ -16,6 +16,7 @@
 
 package annis.service.internal;
 
+import annis.VersionInfo;
 import java.io.IOException;
 import java.util.Properties;
 import javax.ws.rs.GET;
@@ -73,7 +74,7 @@ public class VersionServiceImpl
   @Path("release")
   public String getReleaseName()
   {
-    return versionProperties.getProperty("version", "UNKNOWN_RELEASE");
+    return VersionInfo.getReleaseName();
   }
   
   @GET

@@ -133,7 +133,7 @@ public abstract class AnnisBaseRunner
 
   protected void runInteractive() throws IOException
   {
-    System.out.println(helloMessage);
+    System.out.println(helloMessage + " " + VersionInfo.getReleaseName());
     System.out.println();
     System.out.println("Use \"help\" for a list of all commands.");
     System.out.println();
