@@ -37,7 +37,7 @@
 
     <property name="username" value="$dao{datasource.username}"/>
     <property name="password" value="$dao{datasource.password}"/>
-    <property name="connectionProperties" value="ssl=$dao{datasource.ssl}" />
+    <property name="connectionProperties" value="#{ $dao{datasource.ssl} ? 'ssl=true' : ''}" />
     
     <property name="validationQuery" value="SELECT 1;" />
     <property name="accessToUnderlyingConnectionAllowed" value="true" />
