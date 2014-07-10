@@ -20,7 +20,6 @@ import java.io.IOException;
 import java.io.PrintStream;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
 import java.util.LinkedList;
@@ -38,7 +37,6 @@ import org.springframework.context.support.GenericXmlApplicationContext;
 
 import annis.exceptions.AnnisQLSyntaxException;
 import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.classic.PatternLayout;
 import ch.qos.logback.classic.filter.ThresholdFilter;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -422,7 +420,7 @@ public abstract class AnnisBaseRunner
     {
 
       if (event.getLoggerName() != null && event.getLoggerName().equals(
-        annis.utils.SSLEnabledDataSource.class.getCanonicalName()))
+        org.apache.commons.dbcp2.BasicDataSource.class.getCanonicalName()))
       {
         return FilterReply.DENY;
       }

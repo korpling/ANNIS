@@ -23,7 +23,7 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
 import annis.utils.DynamicDataSource;
-import annis.utils.SSLEnabledDataSource;
+import com.google.common.base.Preconditions;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -42,6 +42,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.DelegatingConnection;
+import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -422,7 +425,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     populateSchema();
   }
 
-  private SSLEnabledDataSource createDataSource(String host, String port,
+  private BasicDataSource createDataSource(String host, String port,
     String database,
     String user, String password, boolean useSSL)
   {
@@ -440,11 +443,13 @@ public class DefaultAdministrationDao implements AdministrationDao
     props.put("user", user);
     props.put("password", password);
 
-    SSLEnabledDataSource result = new SSLEnabledDataSource();
+    BasicDataSource result = new BasicDataSource();
     result.setUrl(url);
-    result.setUseSSL(useSSL);
+    result.setConnectionProperties("ssl=" + useSSL);
     result.setUsername(user);
     result.setPassword(password);
+    result.setValidationQuery("SELECT 1;");
+    result.setAccessToUnderlyingConnectionAllowed(true);
 
     result.setDriverClassName("org.postgresql.Driver");
 
@@ -1477,13 +1482,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       // retrieve the currently open connection if running inside a transaction
-      Connection con = DataSourceUtils.getConnection(dataSource);
-
+      Connection originalCon = DataSourceUtils.getConnection(dataSource);
+      Connection con = originalCon;
+      if(con instanceof DelegatingConnection)
+      {
+        DelegatingConnection<?> delCon = (DelegatingConnection<?>) con;
+        con = delCon.getInnermostDelegate();
+      }
+      
+      Preconditions.checkState(con instanceof PGConnection, 
+        "bulk-loading only works with a PostgreSQL JDBC connection");
+      
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
 
-      DataSourceUtils.releaseConnection(con, dataSource);
+      DataSourceUtils.releaseConnection(originalCon, dataSource);
 
     }
     catch (SQLException e)
