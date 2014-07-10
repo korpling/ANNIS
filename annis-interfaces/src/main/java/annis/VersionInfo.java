@@ -35,7 +35,7 @@ public class VersionInfo
   private final static Logger log = LoggerFactory.getLogger(VersionInfo.class);
 
   private final static Properties versionProperties = new Properties();
-
+  
   static {
     try
     {
@@ -88,11 +88,11 @@ public class VersionInfo
   /**
    * Get the release name {@code (e.g. 3.1.0)}.
    *
-   * @return
+   * @return the release name or empty string if unknown.
    */
   public static String getReleaseName()
   {
-    return versionProperties.getProperty("version", "UNKNOWN_RELEASE");
+    return versionProperties.getProperty("version", "");
   }
 
   /**
