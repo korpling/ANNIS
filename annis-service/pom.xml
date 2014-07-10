@@ -312,12 +312,7 @@
       </resource>
       <resource>
         <directory>${basedir}/src/main/resources</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
+        <filtering>true</filtering>
       </resource>
       <resource>
         <directory>src/main/meta-inf/</directory>
