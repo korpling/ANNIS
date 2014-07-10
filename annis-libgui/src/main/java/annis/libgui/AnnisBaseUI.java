@@ -36,6 +36,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -379,7 +380,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
       result = format.parse(versionProperties.getProperty("build_date"));
     }
-    catch (Exception ex)
+    catch (ParseException ex)
     {
       log.debug(null, ex);
     }
