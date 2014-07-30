@@ -20,6 +20,10 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import com.google.common.net.PercentEscaper;
+import com.google.common.net.UrlEscapers;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -59,6 +63,10 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
   private AnnotationConditionProvider annoCondition;
   private SolutionSqlGenerator solutionSqlGenerator;
 
+  private final Escaper fragmentEscaper = UrlEscapers.urlFragmentEscaper();
+  private final Escaper pathEscaper = UrlEscapers.urlPathSegmentEscaper();
+  private final Escaper paramEscaper = UrlEscapers.urlFormParameterEscaper();
+  
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
@@ -250,16 +258,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
 
     for (String dir : path)
     {
-      try
-      {
-        sb.append(URLEncoder.encode(dir, "UTF-8")).append("/");
-      }
-      catch (UnsupportedEncodingException ex)
-      {
-        log.error(null, ex);
-        // fallback, cross fingers there are no invalid characters
-        sb.append(dir).append("/");
-      }
+      sb.append(pathEscaper.escape(dir)).append("/");
     }
    
     // append information about the matched annotation
@@ -267,18 +266,18 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     {
       if (nodeAnnotatioNamespace == null)
       {
-        sb.append("?a=").append(nodeAnnotatioName);
+        sb.append("?a=").append(paramEscaper.escape(nodeAnnotatioName));
       }
       else
       {
         sb.append("?a=")
-          .append(nodeAnnotatioNamespace)
+          .append(paramEscaper.escape(nodeAnnotatioNamespace))
           .append("::")
-          .append(nodeAnnotatioName);
+          .append(paramEscaper.escape(nodeAnnotatioName));
       }
     }
     
-     sb.append("#").append(node_name);
+     sb.append("#").append(fragmentEscaper.escape(node_name));
 
 
     URI result;
