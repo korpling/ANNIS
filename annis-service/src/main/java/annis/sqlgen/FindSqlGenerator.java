@@ -21,13 +21,9 @@ import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
 import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
-import com.google.common.net.PercentEscaper;
 import com.google.common.net.UrlEscapers;
-import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
-import java.net.URLEncoder;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -65,7 +61,6 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
 
   private final Escaper fragmentEscaper = UrlEscapers.urlFragmentEscaper();
   private final Escaper pathEscaper = UrlEscapers.urlPathSegmentEscaper();
-  private final Escaper paramEscaper = UrlEscapers.urlFormParameterEscaper();
   
   @Override
   public String selectClause(QueryData queryData, List<QueryNode> alternative,
@@ -240,10 +235,13 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
       for (Map.Entry<Integer, String> nodeNameEntry : nodeNames.entrySet())
       {
         URI saltID
-          = buildSaltId(corpus_path, nodeNameEntry.getValue(),
-            nodeAnnoNamespaces.get(nodeNameEntry.getKey()),
+          = buildSaltId(corpus_path, nodeNameEntry.getValue());
+        
+        String qualifiedAnnoName = 
+          buildAnnoName(nodeAnnoNamespaces.get(nodeNameEntry.getKey()),
             nodeAnnoNames.get(nodeNameEntry.getKey()));
-        match.addSaltId(saltID);
+        
+        match.addSaltId(saltID, qualifiedAnnoName);
       }
 
     } // end if output path
@@ -251,30 +249,29 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     return match;
   }
   
-  private URI buildSaltId(List<String> path, String node_name,
-    String nodeAnnotatioNamespace, String nodeAnnotatioName)
+  private String buildAnnoName(String ns, String name)
+  {
+    if(name != null)
+    {
+      if(ns == null)
+      {
+        return name;
+      }
+      else
+      {
+        return ns + "::" + name;
+      }
+    }
+    return null;
+  }
+  
+  private URI buildSaltId(List<String> path, String node_name)
   {
     StringBuilder sb = new StringBuilder("salt:/");
 
     for (String dir : path)
     {
       sb.append(pathEscaper.escape(dir)).append("/");
-    }
-   
-    // append information about the matched annotation
-    if (nodeAnnotatioName != null)
-    {
-      if (nodeAnnotatioNamespace == null)
-      {
-        sb.append("?a=").append(paramEscaper.escape(nodeAnnotatioName));
-      }
-      else
-      {
-        sb.append("?a=")
-          .append(paramEscaper.escape(nodeAnnotatioNamespace))
-          .append("::")
-          .append(paramEscaper.escape(nodeAnnotatioName));
-      }
     }
     
      sb.append("#").append(fragmentEscaper.escape(node_name));
