@@ -64,7 +64,7 @@ public class Match implements Serializable
   {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(saltIDs.size());
-    for(int i=0; i < saltIDs.size(); i++)
+    for (URI saltID : saltIDs)
     {
       annos.add("");
     }
@@ -125,6 +125,10 @@ public class Match implements Serializable
   @XmlElement(name="anno")
   public List<String> getAnnos()
   {
+    if(annos == null || annos.size() != saltIDs.size())
+    {
+      createEmptyAnnoList();
+    }
     return annos;
   }
 
@@ -133,6 +137,17 @@ public class Match implements Serializable
     this.annos = annos;
   }
   
+  private void createEmptyAnnoList()
+  {
+    if(saltIDs != null)
+    {
+      annos = new ArrayList<>(saltIDs.size());
+      for (URI saltID : saltIDs)
+      {
+        annos.add("");
+      }
+    }
+  }
   
   public static Match parseFromString(String raw)
   {
