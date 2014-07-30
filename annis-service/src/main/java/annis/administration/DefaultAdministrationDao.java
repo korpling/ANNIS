@@ -430,22 +430,17 @@ public class DefaultAdministrationDao implements AdministrationDao
     String user, String password, boolean useSSL)
   {
 
-    Properties props = new Properties();
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
 
-    if (useSSL)
-    {
-      props.put("ssl", "true");
-    }
     // DriverManagerDataSource is deprecated
     // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
 
-    props.put("user", user);
-    props.put("password", password);
-
     BasicDataSource result = new BasicDataSource();
     result.setUrl(url);
-    result.setConnectionProperties("ssl=" + useSSL);
+    if(useSSL)
+    {
+      result.setConnectionProperties("ssl=true");
+    }
     result.setUsername(user);
     result.setPassword(password);
     result.setValidationQuery("SELECT 1;");
