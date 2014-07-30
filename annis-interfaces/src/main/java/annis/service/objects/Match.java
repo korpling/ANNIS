@@ -27,9 +27,12 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import javax.xml.bind.annotation.XmlAccessOrder;
+import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,6 +42,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
+@XmlAccessorOrder(XmlAccessOrder.ALPHABETICAL)
 public class Match implements Serializable
 {
   
