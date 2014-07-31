@@ -474,6 +474,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       log.error("Another import is currently running");
       return false;
     }
+    
+    // explicitly unset any timeout
+    jdbcTemplate.update("SET statement_timeout TO 0");
 
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
@@ -668,6 +671,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
       else if (columnNumber == 10)
       {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
         // create temporary table for  bulk import
         jdbcTemplate.execute(
