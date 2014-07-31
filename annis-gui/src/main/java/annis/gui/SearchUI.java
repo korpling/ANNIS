@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.VersionInfo;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
@@ -46,6 +47,7 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
@@ -426,6 +428,50 @@ public class SearchUI extends AnnisBaseUI
 
     updateUserInformation();
     updateControlsForSidebarState();
+    
+    
+    checkServiceVersion();
+  }
+  
+  private void checkServiceVersion()
+  {
+    try
+    {
+      WebResource resRelease 
+        = Helper.getAnnisWebResource().path("version").path("release");
+      String releaseService = resRelease.get(String.class);
+      String releaseGUI = VersionInfo.getReleaseName();
+
+      // check if the release version differs and show a big warning
+      if(!releaseGUI.equals(releaseService))
+      {
+        Notification.show("Different service version",
+          "The service uses version " + releaseService
+          + " but the user interface is using version  " + releaseGUI
+          + ". This can produce unwanted errors.",
+          Notification.Type.WARNING_MESSAGE);
+      }
+      else
+      {
+        // show a smaller warning if the revisions are not the same
+        WebResource resRevision 
+          = Helper.getAnnisWebResource().path("version").path("revision");
+        String revisionService = resRevision.get(String.class);
+        String revisionGUI = VersionInfo.getBuildRevision();
+        if(!revisionService.equals(revisionGUI))
+        {
+          Notification.show("Different service revision",
+            "The service uses revision " + revisionService
+            + " but the user interface is using revision  " + revisionGUI
+            + ".",
+            Notification.Type.TRAY_NOTIFICATION);
+        }
+      }
+    }
+    catch(UniformInterfaceException ex)
+    {
+      log.warn("Could not get the version of the service", ex);
+    }
   }
   
   public void regenerateStateFromCookies()

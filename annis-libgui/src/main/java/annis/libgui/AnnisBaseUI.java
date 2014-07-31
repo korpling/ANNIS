@@ -15,6 +15,7 @@
  */
 package annis.libgui;
 
+import annis.VersionInfo;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
@@ -36,6 +37,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -94,8 +96,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
 
-  private Properties versionProperties;
-
   private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
@@ -118,19 +118,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
-    
-    // get version of ANNIS
-    ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
-    versionProperties = new Properties();
-    try
-    {
-      versionProperties.load(res.getStream().getStream());
-      getSession().setAttribute("annis-version", getVersion());
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-    }
     
     initPlugins();
     
@@ -327,64 +314,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   }
 
-  public String getBuildRevision()
-  {
-    String result = versionProperties.getProperty("build_revision", "");
-    return result;
-  }
-
-  public String getVersion()
-  {
-    String rev = getBuildRevision();
-    Date date = getBuildDate();
-    StringBuilder result = new StringBuilder();
-
-    result.append(getVersionNumber());
-    if (!"".equals(rev) || date != null)
-    {
-      result.append(" (");
-
-      boolean added = false;
-      if (!"".equals(rev))
-      {
-        result.append("rev. ");
-        result.append(rev);
-        added = true;
-      }
-      if (date != null)
-      {
-        result.append(added ? ", built " : "");
-
-        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        result.append(d.format(date));
-      }
-
-      result.append(")");
-    }
-
-    return result.toString();
-
-  }
-
-  public String getVersionNumber()
-  {
-    return versionProperties.getProperty("version", "UNKNOWNVERSION");
-  }
-
-  public Date getBuildDate()
-  {
-    Date result = null;
-    try
-    {
-      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-      result = format.parse(versionProperties.getProperty("build_date"));
-    }
-    catch (Exception ex)
-    {
-      log.debug(null, ex);
-    }
-    return result;
-  }
   
   /**
    * Override this method to append additional plugins to the internal {@link PluginManager}.
@@ -409,7 +338,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
     File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
-      + getVersionNumber() + ".jar");
+      + VersionInfo.getReleaseName() + ".jar");
     pluginManager.addPluginsFrom(builtin.toURI());
     log.info("added plugins from {}", builtin.getPath());
     
