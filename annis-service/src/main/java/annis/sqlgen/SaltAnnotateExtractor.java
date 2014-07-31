@@ -479,7 +479,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     boolean isToken = !resultSet.wasNull();
 
     org.eclipse.emf.common.util.URI nodeURI = graph.getSElementPath();
-    nodeURI = nodeURI.appendFragment(name);
+    nodeURI = nodeURI.appendFragment(saltID);
     SStructuredNode node = (SStructuredNode) graph.getSNode(nodeURI.toString());
     if (node == null)
     {
@@ -494,7 +494,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       }
 
       node.setSName(name);
-      node.setSId(saltID);
+      node.setSId(nodeURI.toString());
       
       setFeaturesForNode(node, internalID, resultSet);
       
@@ -707,6 +707,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     Validate.notNull(from);
     Validate.notNull(to);
 
+    String oldID = from.getSId();
+    
     to.setSName(from.getSName());
     for (SLayer l : from.getSLayers())
     {
@@ -744,6 +746,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     
     Validate.isTrue(graph.removeNode(from));
+    to.setSId(oldID);
     graph.addNode(to);
     
     // fix old edges
