@@ -126,13 +126,18 @@ public class CountTest
     // that cover more than one token
     assertEquals(2, countPcc2("NP & NP & NP &  #1 . #2 & #2 . #3"));
     
+    // test different annotations and component normalization in one query
+    assertEquals(20, countPcc2("a#node "
+      + "& (b#ambiguity | b#anaphor_type) "
+      + "& c#node "
+      + "& #a ->anaphor_antecedent #b "
+      + "& #b ->anaphor_antecedent #c"));
     
     // test near operators
     assertEquals(2, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^ #2"));
     assertEquals(5, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^3 #2"));
     assertEquals(8, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^3,4 #2"));
     assertEquals(184, countPcc2("pos=\"KON\" & pos=\"NN\" & #1 ^* #2")); //assuming indirect precendence bound is default (50)
-
     
     // regression tests:
     assertEquals(78, countPcc2("Inf-Stat & NP & #1 _=_ #2"));
@@ -143,6 +148,11 @@ public class CountTest
     assertEquals(388, countPcc2("pos!=\"NE\""));
     assertEquals(187, countPcc2("tok & meta::Titel=\"Steilpass\""));
     assertEquals(212, countPcc2("tok & meta::Titel!=\"Steilpass\""));
+    assertEquals(10, countPcc2("a#node "
+      + "& b#ambiguity "
+      + "& c#node "
+      + "& #a ->anaphor_antecedent #b "
+      + "& #b ->anaphor_antecedent #c"));
     
   }
 
@@ -176,22 +186,23 @@ public class CountTest
 
     String[] operatorsToTest = new String[]
     {
-      ".", ".*", ">", ">*", "_i_", "_o_", "_l_", "_r_", "->dep", "->dep *",
+      ".", ".*", ">", ">*", "_=_" , "_i_", "_o_", "_l_", "_r_", "->dep", "->dep *",
       ">@l", ">@r", "$", "$*", "^", "^*"
     };
 
 
-    // get token count as reference
-    int tokenCount = countPcc2("tok");
+    // get node and token count as reference
+    int nodeCount = countPcc2("node");
 
 
+    // automatic testing for "node"
     for (String op : operatorsToTest)
     {
       try
       {
-        int tokResult = countPcc2("tok & tok & #1 " + op + " #2");
-        assertFalse("\"" + op + "\" operator should be non-reflexive",
-          tokenCount == tokResult);
+        int nodeResult = countPcc2("node & node & #1 " + op + " #2");
+        assertFalse("\"" + op + "\" operator should be non-reflexive for nodes",
+          nodeCount == nodeResult);
       }
       catch (DataAccessException ex)
       {
@@ -211,6 +222,9 @@ public class CountTest
         }
       }
     }
+    
+    // manual testing
+    assertEquals(0, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _ident_ #2"));
   }
 
   @Test
@@ -221,11 +235,16 @@ public class CountTest
     // get token count as reference
     int tokenCount = countPcc2("tok");
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 _id_ #2"));
-    assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _id_ #2"));
+    assertEquals(tokenCount, countPcc2("tok & tok & #1 _ident_ #2"));
 
-    assertEquals(tokenCount, countPcc2("tok & tok & #1 _=_ #2"));
+    assertEquals(tokenCount, countPcc2("tok & pos=/.*/ & #1 _=_ #2"));
     assertEquals(tokenCount, countPcc2("pos=/.*/ & lemma=/.*/ & #1 _=_ #2"));
+    
+    // test that is is possible to search for the same node/token if the searched annotations are different
+    assertEquals(1, countPcc2("\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(1, countPcc2("lemma=\"Karola\" & pos=\"NE\" & #1 _l_ #2 & #1 _r_ #2"));
+    assertEquals(2, countPcc2("a#\"Karola\" & (b#lemma=\"Karola\" | b#pos=\"NE\") " 
+      + "& #a _=_ #b"));
   }
 
   private int countPcc2(String aql)

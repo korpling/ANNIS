@@ -119,7 +119,6 @@ public class TestSpringAnnisDao
     simpleAnnisDao = new SpringAnnisDao();
     simpleAnnisDao.setAqlParser(annisParser);
     simpleAnnisDao.setSqlGenerator(sqlGenerator);
-    simpleAnnisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
     simpleAnnisDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
     simpleAnnisDao.setPlanRowMapper(planRowMapper);
     simpleAnnisDao.setJdbcTemplate(jdbcTemplate);

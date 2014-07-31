@@ -24,6 +24,7 @@ INSERT INTO facts_:id
   toplevel_corpus,
   node_namespace,
   node_name,
+  salt_id,
   "left",
   "right",
   token_index,
@@ -43,32 +44,19 @@ INSERT INTO facts_:id
   edge_type,
   edge_namespace,
   edge_name,
+  node_anno_category,
   node_annotext,
   node_qannotext,
   edge_annotext,
   edge_qannotext,
   n_sample,
-  n_na_sample,
-  n_r_c_ea_sample,
-  n_r_c_sample,
-  n_r_c_na_sample
+  n_na_sample
 )
 
 SELECT
   *,
   (row_number() OVER (PARTITION BY id) = 1) AS n_sample,
-  (row_number() OVER (PARTITION BY id, node_qannotext) = 1) AS n_na_sample,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id,
-                                  edge_qannotext) = 1) AS n_r_c_ea_rownum,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id) = 1) AS n_r_c_rownum,
-  (row_number() OVER (PARTITION BY id,
-                                  parent,
-                                  component_id,
-                                  node_qannotext) = 1) AS n_r_c_na_rownum
+  (row_number() OVER (PARTITION BY id, node_qannotext) = 1) AS n_na_sample
 FROM
 (
   SELECT
@@ -78,6 +66,7 @@ FROM
     _node.toplevel_corpus AS toplevel_corpus,
     _node.namespace AS node_namespace,
     _node.name AS node_name,
+    _node.name || _node.unique_name_appendix AS salt_id,
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
@@ -99,7 +88,7 @@ FROM
     _component.type AS edge_type,
     _component.namespace AS edge_namespace,
     _component.name AS edge_name,
-
+    annotation_category.id AS node_anno_category,
     (
       CASE WHEN _node_annotation.name IS NULL THEN NULL
       ELSE concat(_node_annotation.name, ':', _node_annotation.value)
@@ -127,6 +116,11 @@ FROM
     LEFT JOIN _rank ON (_rank.node_ref = _node.id)
     LEFT JOIN _component ON (_rank.component_ref = _component.id)
     LEFT JOIN _edge_annotation ON (_edge_annotation.rank_ref = _rank.id)
+    LEFT JOIN annotation_category ON (
+      annotation_category."name" = _node_annotation."name" 
+      AND annotation_category.namespace IS NOT DISTINCT FROM _node_annotation.namespace
+      AND annotation_category.toplevel_corpus = :id
+    )
   WHERE
     _node.toplevel_corpus = :id
 ) as tmp

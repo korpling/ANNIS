@@ -23,8 +23,12 @@ import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-public class CountSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator<Integer>
-	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData> {
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import org.springframework.jdbc.core.ResultSetExtractor;
+public class CountSqlGenerator extends AbstractSolutionMatchInFromClauseSqlGenerator
+	implements SelectClauseSqlGenerator<QueryData>, FromClauseSqlGenerator<QueryData>,
+  ResultSetExtractor<Integer>
+{
 
 	@Override
 	public String selectClause(QueryData queryData, List<QueryNode> alternative, String indent) {

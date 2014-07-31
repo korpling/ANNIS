@@ -16,6 +16,7 @@
 package annis.model;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 
 /**
@@ -32,12 +33,21 @@ public class AnnisConstants
    * {@link SDocument}.
    */
   public static final String FEAT_MATCHEDIDS = "matchedids";
+  
+  /**
+   * Comma-sperated list of matched annotations. 
+   * If the node itself and not an annotation was matched the string is empty.
+   * 
+   * Feature is applied to {@link SDocument}.
+   */
+  public static final String FEAT_MATCHEDANNOS = "matchedannos";
 
   /**
    * The number of the query node if matched. Feature is applied to
-   * {@link SNode}.
+   * {@link SNode} and {@link SAnnotation}.
    */
   public static final String FEAT_MATCHEDNODE = "matchednode";
+  
 
   /**
    * A number of relANNIS specific node values encoded as {@link RelannisNodeFeature}.   * 

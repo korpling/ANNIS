@@ -44,7 +44,7 @@ import java.util.LinkedList;
 public class TestAbstractSqlGenerator {
 
 	// class under test and dependencies
-	@InjectMocks private AbstractSqlGenerator<?> generator;
+	@InjectMocks private AbstractSqlGenerator generator;
   @Mock private WithClauseSqlGenerator<QueryData> withClauseSqlGenerator;
 	@Mock private SelectClauseSqlGenerator<QueryData> selectClauseSqlGenerator;
 	@Mock private FromClauseSqlGenerator<QueryData> fromClauseSqlGenerator;
@@ -61,13 +61,8 @@ public class TestAbstractSqlGenerator {
 	@Before
 	public void setup() {
 		// wire up dependencies
-		generator = new AbstractSqlGenerator<Object>() {
+		generator = new AbstractSqlGenerator() {
 
-			@Override
-			public Object extractData(ResultSet rs) throws SQLException,
-					DataAccessException {
-				throw new UnsupportedOperationException("This SqlGenerator is only used for test purposes.");
-			}
 		};
 		initMocks(this);
 		fromClauseSqlGenerators.add(fromClauseSqlGenerator);

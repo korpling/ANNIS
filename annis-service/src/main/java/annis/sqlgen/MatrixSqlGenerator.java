@@ -52,11 +52,12 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class MatrixSqlGenerator
-  extends AbstractSqlGenerator<List<AnnotatedMatch>>
+  extends AbstractSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
   WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>,
-  OrderByClauseSqlGenerator<QueryData>
+  OrderByClauseSqlGenerator<QueryData>,
+  SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>>
 {
 
   private final Logger log = LoggerFactory.getLogger(MatrixSqlGenerator.class);
@@ -64,7 +65,7 @@ public class MatrixSqlGenerator
   @Deprecated
   private String matchedNodesViewName;
 
-  private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
+  private SolutionSqlGenerator solutionSqlGenerator;
 
   private AnnotatedSpanExtractor spanExtractor;
 
@@ -198,17 +199,6 @@ public class MatrixSqlGenerator
       + tas.aliasedColumn(NODE_TABLE, "left") + ")) AS span";
   }
 
-  protected String selectAnnotationsString(TableAccessStrategy tas)
-  {
-    return "array_agg(DISTINCT coalesce("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace")
-      + " || ':', '') || "
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "name")
-      + " || ':' || encode("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "value")
-      + "::bytea, 'base64')) AS annotations";
-  }
-
   protected String selectMetadataString(TableAccessStrategy tas)
   {
     return "array_agg(DISTINCT coalesce("
@@ -231,7 +221,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append("(\n");
     sb.append(indent);
 
-    sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
     sb.append(indent).append(TABSTOP);
@@ -281,8 +271,27 @@ public class MatrixSqlGenerator
 
         sb.append(")\n");
       }
+      
     }
+    
+    List<Long> corpusList = queryData.getCorpusList();
 
+    String factsName = tas.partitionTableName(NODE_TABLE, corpusList);
+
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ").append(factsName).append(" AS node_anno")
+      .append(" ON  (")
+      .append(tas.aliasedColumn(NODE_TABLE, "id")).append(
+        " = node_anno.id AND ")
+      .append("node_anno.n_na_sample IS TRUE AND ")
+      .append(tas.aliasedColumn(NODE_TABLE,
+          "toplevel_corpus")).append(
+        " = node_anno.toplevel_corpus AND ")
+      .append("node_anno.toplevel_corpus IN (").append(StringUtils.
+        join(corpusList, ", "))
+      .append("))");
+
+    sb.append("\n");
   }
 
   @Override
@@ -393,6 +402,11 @@ public class MatrixSqlGenerator
       + tas.aliasedColumn(NODE_TABLE, "id");
   }
 
+  protected String selectAnnotationsString(TableAccessStrategy tas)
+  {
+    return "array_agg(DISTINCT node_anno.node_qannotext) AS annotations";
+  }
+
   @Override
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
@@ -415,17 +429,17 @@ public class MatrixSqlGenerator
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
+  public SolutionSqlGenerator getSolutionSqlGenerator()
   {
-    return innerQuerySqlGenerator;
+    return solutionSqlGenerator;
   }
 
-  public void setInnerQuerySqlGenerator(
-    SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
+  public void setSolutionSqlGenerator(SolutionSqlGenerator solutionSqlGenerator)
   {
-    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+    this.solutionSqlGenerator = solutionSqlGenerator;
   }
 
+  
 
   public AnnotatedSpanExtractor getSpanExtractor()
   {

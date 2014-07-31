@@ -226,8 +226,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     "media_files"
   };
 
-  private String dbLayout;
-
   private AnnisDao annisDao;
 
   private ObjectMapper jsonMapper = new ObjectMapper();
@@ -298,8 +296,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchema()
   {
-    log.info("creating ANNIS database schema (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schema.sql");
+    log.info("creating ANNIS database schema (" + getSchemaVersion() + ")");
+    executeSqlFromScript("schema.sql");
 
     // update schema version
     jdbcTemplate.execute(
@@ -313,8 +311,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchemaIndexes()
   {
-    log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schemaindex.sql");
+    log.info("creating ANNIS database schema indexes (" + getDatabaseSchemaVersion() + ")");
+    executeSqlFromScript("schemaindex.sql");
   }
 
   protected void populateSchema()
@@ -325,8 +323,16 @@ public class DefaultAdministrationDao implements AdministrationDao
           FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
+    
+    log.info(
+      "creating immutable functions for extracting annotations");
+    executeSqlFromScript("functions_get.sql"); 
   }
 
+  /**
+   * Get the real schema name and version as used by the database.
+   * @return 
+   */
   @Override
   @Transactional(readOnly = true, propagation = Propagation.NESTED)
   public String getDatabaseSchemaVersion()
@@ -493,6 +499,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     
     removeUnecessarySpanningRelations();
     
+    addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
     long corpusID = updateIds();
@@ -520,6 +527,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createAnnotations(corpusID);
     
+    createAnnoCategory(corpusID);
+    
     // create the new facts table partition
     createFacts(corpusID);
 
@@ -541,7 +550,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
     analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
-
+    
     if (aliasName != null && !aliasName.isEmpty())
     {
       addCorpusAlias(corpusID, aliasName);
@@ -909,6 +918,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("text"));
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("node"));
   }
+  
+  protected void addUniqueNodeNameAppendix()
+  {
+    log.info("add a unique node name appendix");
+    executeSqlFromScript("unique_node_name_appendix.sql");
+  }
 
   /**
    *
@@ -1045,6 +1060,13 @@ public class DefaultAdministrationDao implements AdministrationDao
     log.info("indexing annotations table for corpus with ID " + corpusID);
     executeSqlFromScript("indexes_annotations.sql", args);
   }
+  
+  void createAnnoCategory(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+    log.info("creating annotation category table for corpus with ID " + corpusID);
+    executeSqlFromScript("annotation_category.sql", args);
+  }
 
   void analyzeFacts(long corpusID)
   {
@@ -1061,12 +1083,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript(dbLayout + "/facts.sql", args);
+    executeSqlFromScript("facts.sql", args);
 
     clusterFacts(corpusID);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript(dbLayout + "/indexes.sql", args);
+    executeSqlFromScript("indexes.sql", args);
 
   }
 
@@ -1076,10 +1098,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    if (executeSqlFromScript(dbLayout + "/cluster.sql", args) != null)
-    {
-      executeSqlFromScript("cluster.sql", args);
-    }
+    executeSqlFromScript("cluster.sql", args);
+    
   }
   
   void removeUnecessarySpanningRelations()
@@ -1631,16 +1651,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.externalFilesPath = externalFilesPath;
   }
 
-  public String getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(String dbLayout)
-  {
-    this.dbLayout = dbLayout;
-  }
-
   public boolean isTemporaryStagingArea()
   {
     return temporaryStagingArea;
@@ -1651,6 +1661,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.temporaryStagingArea = temporaryStagingArea;
   }
 
+  /** 
+   * Get the name and version of the schema this @{link AdministrationDao} 
+   is configured to work with.
+   */
   public String getSchemaVersion()
   {
     return schemaVersion;

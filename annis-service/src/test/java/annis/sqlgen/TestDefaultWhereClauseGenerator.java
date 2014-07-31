@@ -53,7 +53,6 @@ import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
 import annis.ql.parser.QueryData;
-import annis.sqlgen.annopool.ApAnnotationConditionProvider;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
@@ -107,7 +106,7 @@ public class TestDefaultWhereClauseGenerator
 
     
     generator = new TestWhereClauseGenerator();
-    generator.setAnnoCondition(new ApAnnotationConditionProvider());
+    generator.setAnnoCondition(new AnnotationConditionProvider());
    
   }
   
@@ -229,7 +228,7 @@ public class TestDefaultWhereClauseGenerator
         join("=", "_rank23.pre", "_rank42.parent"));
     checkWhereConditions(
         node42,
-        "_rank_annotation42.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+        "_rank_annotation42.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
 
@@ -631,9 +630,9 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     
     checkWhereConditions(
-      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
-      "_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
+      "_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_annotation23_2.qannotext LIKE 'namespace2:name2:value2'",
+      "_annotation23_3.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
   
@@ -646,18 +645,18 @@ public class TestDefaultWhereClauseGenerator
     node42.addNodeAnnotation(new QueryAnnotation("namespace3", "name3"));
     node42.addNodeAnnotation(new QueryAnnotation("namespace4", "name4"));
     
-    // does not make any sense, but an simple enough condition :)
-    node23.addOutgoingJoin(new Identical(node42));
+    node23.addOutgoingJoin(new Precedence(node42, 1));
     
     
     checkWhereConditions(node23,
-      "_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', NULL, NULL, ARRAY[], 'node'))",
-      "_node23.id = _node42.id"
+      "_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_annotation23_2.qannotext LIKE 'namespace2:name2:%'",
+      "_node23.right_token = _node42.left_token - 1",
+      "_node23.text_ref = _node42.text_ref"
     );
     checkWhereConditions(node42,
-      "_annotation42_1.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, NULL, ARRAY[], 'node'))",
-      "_annotation42_2.anno_ref= ANY(getAnno('namespace4', 'name4', NULL, NULL, ARRAY[], 'node'))"
+      "_annotation42_1.qannotext LIKE 'namespace3:name3:%'",
+      "_annotation42_2.qannotext LIKE 'namespace4:name4:%'"
     );
   }
   
@@ -670,8 +669,10 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_NOT_EQUAL));
     
     checkWhereConditions(
-      "_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'node'))",
-      "_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'node'))"
+      "_annotation23_1.qannotext NOT LIKE 'namespace2:name2:value2'",
+      "_annotation23_1.qannotext LIKE 'namespace2:name2:%'",
+      "_annotation23_2.qannotext !~ '^(namespace3:name3:(value3))$'",
+      "_annotation23_2.qannotext LIKE 'namespace3:name3:%'"
     );
   }
 
@@ -688,9 +689,9 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     node42.addOutgoingJoin(j);
     checkWhereConditions(
-      "_rank_annotation23_1.anno_ref= ANY(getAnno('namespace1', 'name1', NULL, NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_2.anno_ref= ANY(getAnno('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_3.anno_ref= ANY(getAnno('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+      "_rank_annotation23_1.qannotext LIKE 'namespace1:name1:%'",
+      "_rank_annotation23_2.qannotext LIKE 'namespace2:name2:value2'",
+      "_rank_annotation23_3.qannotext ~ '^(namespace3:name3:(value3))$'"
     );
   }
   
@@ -707,8 +708,10 @@ public class TestDefaultWhereClauseGenerator
     node42.addOutgoingJoin(j);
     
     checkWhereConditions(
-      "_rank_annotation23_1.anno_ref= ANY(getAnnoNot('namespace2', 'name2', 'value2', NULL, ARRAY[], 'edge'))",
-      "_rank_annotation23_2.anno_ref= ANY(getAnnoNot('namespace3', 'name3', NULL, '^(value3)$', ARRAY[], 'edge'))"
+      "_rank_annotation23_1.qannotext NOT LIKE 'namespace2:name2:value2'",
+      "_rank_annotation23_1.qannotext LIKE 'namespace2:name2:%'",
+      "_rank_annotation23_2.qannotext !~ '^(namespace3:name3:(value3))$'",
+      "_rank_annotation23_2.qannotext LIKE 'namespace3:name3:%'"
     );
   }
 
@@ -719,7 +722,8 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new SameSpan(node42));
     checkWhereConditions(join("=", "_node23.text_ref", "_node42.text_ref"),
         join("=", "_node23.left_token", "_node42.left_token"),
-        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)")
+        join("=", "(_node23.right_token - _node23.left_token)", "(_node42.right_token - _node42.left_token)"),
+        join("<>", "_node23.id", "_node42.id")
     );
   }
 

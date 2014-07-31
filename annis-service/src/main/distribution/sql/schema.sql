@@ -53,20 +53,16 @@ COMMENT ON COLUMN text.id IS 'primary key';
 COMMENT ON COLUMN text.name IS 'informational name of the primary data text';
 COMMENT ON COLUMN text.text IS 'raw text data';
 
-DROP TYPE IF EXISTS annotype CASCADE;
-CREATE TYPE annotype AS ENUM ('node', 'edge', 'segmentation');
--- collect all node annotations
-DROP TABLE IF EXISTS annotation_pool CASCADE;
-CREATE TABLE annotation_pool (
-  id bigserial,
-  toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
-  namespace varchar,
-  "name" varchar,
-  val varchar,
-  "type" annotype,
-  occurences bigint,
-  PRIMARY KEY(id),
-  UNIQUE(namespace, "name", val, "type", toplevel_corpus)
+DROP TABLE IF EXISTS annotation_category CASCADE;
+CREATE TABLE annotation_category
+(
+  id SERIAL,
+  namespace character varying,
+  name character varying NOT NULL,
+  toplevel_corpus integer NOT NULL,
+  PRIMARY KEY (id),
+  FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id) ON DELETE CASCADE,
+  UNIQUE (namespace, name, toplevel_corpus)
 );
 
 DROP TABLE IF EXISTS facts CASCADE;
@@ -78,6 +74,7 @@ CREATE TABLE facts (
   toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   node_namespace varchar,
   node_name varchar,
+  salt_id varchar,
   "left" integer,
   "right" integer,
   token_index integer,
@@ -97,13 +94,13 @@ CREATE TABLE facts (
   edge_type character(1), -- edge type of this component
   edge_namespace varchar, -- optional namespace of the edges’ names
   edge_name varchar, -- name of the edges in this component
-  node_anno_ref bigint REFERENCES annotation_pool(id),
-  edge_anno_ref bigint REFERENCES annotation_pool(id),
+  node_anno_category INTEGER REFERENCES annotation_category(id),
+  node_annotext varchar, -- the combined name and value of the annotation, separated by ":"
+  node_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
+  edge_annotext varchar, -- the combined name and value of the annotation, separated by ":"
+  edge_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
-  n_r_c_ea_sample boolean,
-  n_r_c_sample boolean,
-  n_r_c_na_sample boolean,
   PRIMARY KEY (fid)
 );
 

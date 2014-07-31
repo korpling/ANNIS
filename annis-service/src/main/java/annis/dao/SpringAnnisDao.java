@@ -34,6 +34,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
@@ -53,6 +54,7 @@ import annis.sqlgen.RawTextSqlHelper;
 import annis.sqlgen.ResultSetTypedIterator;
 import annis.sqlgen.SaltAnnotateExtractor;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.SqlGeneratorAndExtractor;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
@@ -116,8 +118,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private CountSqlGenerator countSqlGenerator;
 
-  private AnnotateSqlGenerator<SaltProject> annotateSqlGenerator;
-
   private SaltAnnotateExtractor saltAnnotateExtractor;
 
   private MatrixSqlGenerator matrixSqlGenerator;
@@ -141,7 +141,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public SaltProject graph(QueryData data)
   {
-    return executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
+    SaltProject p = executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
+    List<MatchGroup> matchGroupExt = data.getExtensions(MatchGroup.class);
+    SaltAnnotateExtractor.addMatchInformation(p, matchGroupExt.get(0));
+    
+    return p;
   }
 
   /**
@@ -437,14 +441,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 //	private MatrixSqlGenerator matrixSqlGenerator;
   // SqlGenerator that prepends EXPLAIN to a query
   private static final class ExplainSqlGenerator implements
-    SqlGenerator<QueryData, String>
+    SqlGenerator<QueryData>, ResultSetExtractor<String>
   {
 
     private final boolean analyze;
 
-    private final SqlGenerator<QueryData, ?> generator;
+    private final SqlGenerator<QueryData> generator;
 
-    private ExplainSqlGenerator(SqlGenerator<QueryData, ?> generator,
+    private ExplainSqlGenerator(SqlGenerator<QueryData> generator,
       boolean analyze)
     {
       this.generator = generator;
@@ -532,14 +536,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  @Transactional(readOnly = true)
-  public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator)
-  {
-    return executeQueryFunction(queryData, generator, generator);
-  }
-
-  @Override
   public List<String> mapCorpusIdsToNames(List<Long> ids)
   {
     List<String> names = new ArrayList<>();
@@ -580,10 +576,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   // query functions
+  @Override
+  @Transactional(readOnly = true)
+  public <T> T executeQueryFunction(QueryData queryData,
+    final SqlGeneratorAndExtractor<QueryData, T> generator)
+  {
+    return executeQueryFunction(queryData, generator, generator);
+  }
+
+  
   @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
+    final SqlGenerator<QueryData> generator,
     final ResultSetExtractor<T> extractor)
   {
 
@@ -621,7 +626,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public List<Match> find(QueryData queryData)
   {
-    return executeQueryFunction(queryData, findSqlGenerator);
+    return executeQueryFunction(queryData, findSqlGenerator, findSqlGenerator);
   }
 
   @Transactional(readOnly = true)
@@ -685,22 +690,15 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public int count(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countSqlGenerator);
+    return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
   }
 
   @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
-    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator);
-  }
-
-  @Override
-  @Transactional(readOnly = true)
-  public SaltProject annotate(QueryData queryData)
-  {
-    return executeQueryFunction(queryData, annotateSqlGenerator,
-      saltAnnotateExtractor);
+    return executeQueryFunction(queryData, countMatchesAndDocumentsSqlGenerator,
+      countMatchesAndDocumentsSqlGenerator);
   }
 
   @Transactional(readOnly = true)
@@ -765,17 +763,19 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public FrequencyTable frequency(QueryData queryData)
   {
-    return executeQueryFunction(queryData, frequencySqlGenerator);
+    return executeQueryFunction(queryData, frequencySqlGenerator, 
+      frequencySqlGenerator);
   }
 
   @Override
   @Transactional(readOnly = true)
-  public String explain(SqlGenerator<QueryData, ?> generator,
+  public String explain(SqlGenerator<QueryData> generator,
     QueryData queryData,
     final boolean analyze)
   {
-    return executeQueryFunction(queryData, new ExplainSqlGenerator(generator,
-      analyze));
+    ExplainSqlGenerator gen = new ExplainSqlGenerator(generator,
+      analyze);
+    return executeQueryFunction(queryData, gen, gen);
   }
 
   @Override
@@ -848,7 +848,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     String documentName)
   {
     SaltProject p
-      = annotateSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
+      = graphSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
         toplevelCorpusName, documentName);
     return p;
   }
@@ -1308,17 +1308,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     {
       return new LinkedList<>();
     }
-  }
-
-  public AnnotateSqlGenerator<SaltProject> getAnnotateSqlGenerator()
-  {
-    return annotateSqlGenerator;
-  }
-
-  public void setAnnotateSqlGenerator(
-    AnnotateSqlGenerator<SaltProject> annotateSqlGenerator)
-  {
-    this.annotateSqlGenerator = annotateSqlGenerator;
   }
 
   public FrequencySqlGenerator getFrequencySqlGenerator()

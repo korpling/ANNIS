@@ -35,6 +35,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.SqlGeneratorAndExtractor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
@@ -145,10 +146,8 @@ public interface AnnisDao
   public boolean find(final QueryData queryData, final OutputStream out);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with null
-   * null null null null null null null null null null null null null null null
-   * null null null null null null null null null null null null null null null
-   * null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with the 
+   * {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -156,9 +155,7 @@ public interface AnnisDao
    */
   SaltProject graph(QueryData queryData);
 
-  SaltProject annotate(QueryData queryData);
-
-  String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
+  String explain(SqlGenerator<QueryData> generator, QueryData queryData,
     final boolean analyze);
 
   FrequencyTable frequency(QueryData queryData);
@@ -167,10 +164,10 @@ public interface AnnisDao
     final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator);
+    final SqlGeneratorAndExtractor<QueryData, T> generator);
 
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
+    final SqlGenerator<QueryData> generator,
     final ResultSetExtractor<T> extractor);
 
   /**

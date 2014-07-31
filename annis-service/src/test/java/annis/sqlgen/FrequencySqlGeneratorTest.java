@@ -19,8 +19,6 @@ import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
-import annis.sqlgen.annopool.ApFrequencySqlGenerator;
-import annis.sqlgen.annotext.AtFrequencySqlGenerator;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import static annis.test.TestUtils.size;
 import java.util.ArrayList;
@@ -48,9 +46,9 @@ import static org.mockito.MockitoAnnotations.initMocks;
 public class FrequencySqlGeneratorTest
 {
   
-  private FrequencySqlGenerator generator = new ApFrequencySqlGenerator();
+  private FrequencySqlGenerator generator = new FrequencySqlGenerator();
   
-  @Mock private SqlGenerator<QueryData, ?> innerSqlGenerator = mock(SqlGenerator.class);
+  @Mock private SolutionSqlGenerator solutionSqlGenerator = mock(SolutionSqlGenerator.class);
   @Mock private QueryData queryData;
   @Mock private FrequencyTableQueryData freqTableQueryData;
   @Mock private QueryNode queryNode;
@@ -60,10 +58,10 @@ public class FrequencySqlGeneratorTest
   {
     initMocks(this);
     
-    generator.setInnerQuerySqlGenerator(innerSqlGenerator);
+    generator.setSolutionSqlGenerator(solutionSqlGenerator);
     
     given(queryData.getExtensions()).willReturn(new HashSet(Arrays.asList(freqTableQueryData)));
-    given(innerSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
+    given(solutionSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
     
     alternative.add(queryNode);
     given(queryData.getMaxWidth()).willReturn(3);

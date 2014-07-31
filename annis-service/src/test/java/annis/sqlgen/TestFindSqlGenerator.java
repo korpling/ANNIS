@@ -14,12 +14,14 @@ import org.mockito.Mock;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import org.junit.Assert;
+import org.mockito.Matchers;
 
 public class TestFindSqlGenerator
 {
 
   // class under test
-  private FindSqlGenerator generator;
+  private SolutionSqlGenerator generator;
 
   // test data
   @Mock
@@ -34,7 +36,7 @@ public class TestFindSqlGenerator
   public void setup()
   {
     initMocks(this);
-    generator = new FindSqlGenerator()
+    generator = new SolutionSqlGenerator()
     {
       protected TableAccessStrategy createTableAccessStrategy()
       {
@@ -49,24 +51,11 @@ public class TestFindSqlGenerator
     given(queryData.getMaxWidth()).willReturn(1);
   }
 
-  @Test
-  public void shouldNotOptimizeDistinct()
-  {
-    // given
-    generator.setOptimizeDistinct(false);
-    setupQueryData();
-    given(tableAccessStrategy.usesRankTable()).willReturn(false);
-    // when
-    String actual = generator.selectClause(queryData, alternative, "");
-    // then
-    assertThat(actual, startsWith("DISTINCT"));
-  }
 
   @Test
   public void shouldSkipDistinctIfOnlyNodeTablesAreUsed()
   {
     // given
-    generator.setOptimizeDistinct(true);
     setupQueryData();
     given(tableAccessStrategy.usesRankTable()).willReturn(false);
     // when
@@ -76,16 +65,31 @@ public class TestFindSqlGenerator
   }
 
   @Test
-  public void shouldUseDistinctIfEdgeTablesAreUsed()
+  public void shouldUseGroupByIfPartOfEdge()
   {
     // given
-    generator.setOptimizeDistinct(true);
     setupQueryData();
     given(tableAccessStrategy.usesRankTable()).willReturn(true);
+    given(queryNode.isPartOfEdge()).willReturn(true);
+    given(queryNode.isRoot()).willReturn(false);
     // when
-    String actual = generator.selectClause(queryData, alternative, "");
+    String actual = generator.groupByAttributes(queryData, alternative);
     // then
-    assertThat(actual, startsWith("DISTINCT"));
+    Assert.assertNotNull(actual);
+  }
+  
+  @Test
+  public void shouldUseGroupByIfRoot()
+  {
+    // given
+    setupQueryData();
+    given(tableAccessStrategy.usesRankTable()).willReturn(true);
+    given(queryNode.isPartOfEdge()).willReturn(false);
+    given(queryNode.isRoot()).willReturn(true);
+    // when
+    String actual = generator.groupByAttributes(queryData, alternative);
+    // then
+    Assert.assertNotNull(actual);
   }
 
 }

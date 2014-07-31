@@ -46,12 +46,12 @@ public class CommonLimitOffsetGenerator implements
 
     if (limit != null && limit >= 0)
     {
-      sb.append("LIMIT ").append(limit).append("\n");
+      sb.append(indent).append("LIMIT ").append(limit).append("\n");
     }
 
     if (offset != null && offset >= 0)
     {
-      sb.append("OFFSET ").append(offset);
+      sb.append(indent).append("OFFSET ").append(offset);
     }
 
     return sb.toString();

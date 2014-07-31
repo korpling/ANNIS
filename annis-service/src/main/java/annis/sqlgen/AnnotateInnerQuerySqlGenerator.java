@@ -3,20 +3,17 @@
 import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import org.apache.commons.lang3.Validate;
 
-public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Object>
+public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
   OrderByClauseSqlGenerator<QueryData>
 {
@@ -25,14 +22,6 @@ public class AnnotateInnerQuerySqlGenerator extends AbstractUnionSqlGenerator<Ob
   private boolean sortSolutions;
   // annotation graph key generation
   private SolutionKey<?> solutionKey;
-
-  @Override
-  public Object extractData(ResultSet rs) throws SQLException,
-    DataAccessException
-  {
-    throw new UnsupportedOperationException(
-      "BUG: inner query result is evaluated by outer query");
-  }
 
   @Override
   public String toSql(QueryData queryData, String indent)
