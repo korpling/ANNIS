@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.2.4";
+	content: "7.2.5";
 }
 
 .v-generated-body {
@@ -1332,6 +1332,11 @@ body .annis.v-app .v-app-loading {
 	padding: 0;
 	border: 0;
 	margin: 0;
+}
+
+.annis .v-contextmenu .gwt-MenuBar {
+	overflow-y: auto;
+	overflow-x: hidden;
 }
 
 .annis .v-contextmenu .gwt-MenuItem div {
@@ -5729,6 +5734,7 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-tabsheet-scrollerPrev, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerPrev-disabled:active, .annis .v-tabsheet-scrollerNext-disabled:active {
+	padding-top: 12px;
 	border: 1px solid #b3b3b3;
 	border-width: 0;
 	background: transparent url(../chameleon/img/tab-arrows.png) no-repeat 6px 50%;
