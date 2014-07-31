@@ -1,5 +1,3 @@
-ALTER TABLE _node ADD COLUMN unique_name_appendix varchar;
-
 UPDATE _node AS n SET unique_name_appendix = 
 (
     WITH same AS

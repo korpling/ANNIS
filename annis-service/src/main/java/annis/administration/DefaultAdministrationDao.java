@@ -925,8 +925,22 @@ public class DefaultAdministrationDao implements AdministrationDao
   
   protected void addUniqueNodeNameAppendix()
   {
-    log.info("add a unique node name appendix");
-    executeSqlFromScript("unique_node_name_appendix.sql");
+    // first check if this is actually necessary
+    log.info("check if node names are unique");
+    
+    jdbcTemplate.execute("ALTER TABLE _node ADD COLUMN unique_name_appendix varchar;");
+    
+    List<Integer> checkDuplicate = jdbcTemplate.queryForList(
+      "SELECT COUNT(*) from _node GROUP BY \"name\", corpus_ref HAVING COUNT(*) > 1 LIMIT 1", Integer.class);
+    if(checkDuplicate.isEmpty())
+    {
+      log.info("node names are unique, no update necessary");
+    }
+    else
+    {
+      log.info("add an unique node name appendix");
+      executeSqlFromScript("unique_node_name_appendix.sql");
+    }
   }
 
   /**
