@@ -9,7 +9,7 @@ UPDATE _node AS n SET unique_name_appendix =
     )
     SELECT
     CASE WHEN (SELECT same.r FROM same WHERE n.id = same.id) > 1 
-    THEN n.name || '_' ||(SELECT same.r-1 FROM same  WHERE n.id = same.id) 
+    THEN '_' ||(SELECT same.r-1 FROM same  WHERE n.id = same.id) 
     ELSE '' 
     END
 );

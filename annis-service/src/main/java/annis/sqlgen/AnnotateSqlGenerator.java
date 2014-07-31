@@ -252,6 +252,7 @@ public class AnnotateSqlGenerator<T>
     addSelectClauseAttribute(fields, NODE_TABLE, "toplevel_corpus");
     addSelectClauseAttribute(fields, NODE_TABLE, "namespace");
     addSelectClauseAttribute(fields, NODE_TABLE, "name");
+    addSelectClauseAttribute(fields, NODE_TABLE, "salt_id");
     addSelectClauseAttribute(fields, NODE_TABLE, "left");
     addSelectClauseAttribute(fields, NODE_TABLE, "right");
     addSelectClauseAttribute(fields, NODE_TABLE, "token_index");

@@ -48,8 +48,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.net.URI;
-import java.net.URISyntaxException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.TreeSet;
@@ -474,6 +472,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     SolutionKey<?> key) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
+    String saltID = stringValue(resultSet, NODE_TABLE, "salt_id");
     long internalID = longValue(resultSet, "node", "id");
 
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
@@ -495,6 +494,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       }
 
       node.setSName(name);
+      node.setSId(saltID);
       
       setFeaturesForNode(node, internalID, resultSet);
       

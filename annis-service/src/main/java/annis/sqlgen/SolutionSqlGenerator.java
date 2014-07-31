@@ -87,15 +87,15 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       }
       if (outputNodeName)
       {
+        
         if(needsDistinct)
         {
-          cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-            + ") AS node_name" + i);
+          cols.add("min(" + tblAccessStr.aliasedColumn(NODE_TABLE, "salt_id") 
+            + ") AS salt_id" + i);
         }
         else
         {
-          cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "node_name")
-            + " AS node_name" + i);
+          cols.add(tblAccessStr.aliasedColumn(NODE_TABLE, "salt_id") + " AS salt_id" + i);
         }
       }
     }

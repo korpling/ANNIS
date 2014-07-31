@@ -74,7 +74,7 @@ CREATE TABLE facts (
   toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   node_namespace varchar,
   node_name varchar,
-  node_unique_name_appendix varchar,
+  salt_id varchar,
   "left" integer,
   "right" integer,
   token_index integer,

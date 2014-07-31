@@ -83,7 +83,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
       sb.append(indent2).append(annoCondition.getNodeAnnoNameSQL(tas))
         .append(" AS node_annotation_name").append(n.getId()).append(",\n");
       
-      // corpus path is only needed ince
+      // corpus path is only needed once
       sb.append(indent2).append("c.path_name AS path_name");
       if(itNodes.hasNext())
       {
@@ -196,21 +196,21 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
         }
       }
 
-      // collect the node names, annotation namespaces and annotation names
-      Map<Integer, String> nodeNames = new TreeMap<>();
+      // collect the salt id, node name appendix, annotation namespaces and annotation names
+      Map<Integer, String> saltIDs = new TreeMap<>();
       Map<Integer, String> nodeAnnoNamespaces = new HashMap<>();
       Map<Integer, String> nodeAnnoNames = new HashMap<>();
 
       for (int column = 1; column <= columnCount; ++column)
       {
         String columnName = metaData.getColumnName(column);
-        if (columnName.startsWith("node_name"))
+        if (columnName.startsWith("salt_id"))
         {
-          String numberAsString = columnName.substring("node_name".length());
+          String numberAsString = columnName.substring("salt_id".length());
           try
           {
             int number = Integer.parseInt(numberAsString);
-            nodeNames.put(number, rs.getString(column));
+            saltIDs.put(number, rs.getString(column));
 
             String annoNamespace = rs.getString("node_annotation_ns" + number);
             if (annoNamespace != null)
@@ -232,14 +232,13 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
         }
       }
 
-      for (Map.Entry<Integer, String> nodeNameEntry : nodeNames.entrySet())
+      for (Map.Entry<Integer, String> saltIDEntry : saltIDs.entrySet())
       {
-        URI saltID
-          = buildSaltId(corpus_path, nodeNameEntry.getValue());
+        URI saltID = buildSaltId(corpus_path, saltIDEntry.getValue());
         
         String qualifiedAnnoName = 
-          buildAnnoName(nodeAnnoNamespaces.get(nodeNameEntry.getKey()),
-            nodeAnnoNames.get(nodeNameEntry.getKey()));
+          buildAnnoName(nodeAnnoNamespaces.get(saltIDEntry.getKey()),
+            nodeAnnoNames.get(saltIDEntry.getKey()));
         
         match.addSaltId(saltID, qualifiedAnnoName);
       }
@@ -265,7 +264,13 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     return null;
   }
   
-  private URI buildSaltId(List<String> path, String node_name)
+  /**
+   * Builds a proper salt ID.
+   * @param path
+   * @param saltID
+   * @return 
+   */
+  private URI buildSaltId(List<String> path, String saltID)
   {
     StringBuilder sb = new StringBuilder("salt:/");
 
@@ -274,7 +279,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
       sb.append(pathEscaper.escape(dir)).append("/");
     }
     
-     sb.append("#").append(fragmentEscaper.escape(node_name));
+    sb.append("#").append(fragmentEscaper.escape(saltID));
 
 
     URI result;
@@ -286,7 +291,7 @@ public class FindSqlGenerator extends AbstractUnionSqlGenerator
     catch (URISyntaxException ex)
     {
       log.error("Could not generate valid ID from path "
-        + path.toString() + " and node name " + node_name, ex);
+        + path.toString() + " and node name " + saltID, ex);
     }
     return null;
   }

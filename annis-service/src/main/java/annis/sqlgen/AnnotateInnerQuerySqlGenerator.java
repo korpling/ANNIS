@@ -3,14 +3,11 @@
 import annis.sqlgen.extensions.AnnotateQueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 
-import java.sql.ResultSet;
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 
 
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.dao.DataAccessException;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;

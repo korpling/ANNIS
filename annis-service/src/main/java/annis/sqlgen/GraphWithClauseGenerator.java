@@ -41,7 +41,7 @@ import java.util.LinkedList;
  *
  * Salt ids are simple URI and are defined like this:
  *
- * <p>{@code salt:/corp1/corp2/doc1}</p>.
+ * <p>{@code salt:/corp1/corp2/doc1#node}</p>.
  *
  * The leading / of the URI is a must, // would cause an error, because
  * authorities are currently not supported.
@@ -127,8 +127,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
       // filter the node with the right name
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
-        .append("'").append(generateNodeName(uri)).append("'").append(" AND\n");
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".salt_id = ")
+        .append("'").append(generateNodeID(uri)).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent)
@@ -216,7 +216,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     return  sqlString(sb.toString());
   }
   
-  private String generateNodeName(URI uri)
+  private String generateNodeID(URI uri)
   { 
     return uri.getFragment();
   }
