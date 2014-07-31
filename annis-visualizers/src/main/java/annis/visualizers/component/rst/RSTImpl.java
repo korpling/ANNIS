@@ -598,7 +598,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Build a unique HTML id.
    */
   private String getUniStrId(SNode node) {
-    return visId + "_" + node.getSName();
+    return visId + "_" + node.getSId();
   }
 
   /**

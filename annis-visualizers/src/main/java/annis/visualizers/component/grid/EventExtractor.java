@@ -100,7 +100,7 @@ public class EventExtractor {
 
     // only look at annotations which were defined by the user
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-            new LinkedHashMap<String, ArrayList<Row>>();
+            new LinkedHashMap<>();
 
     for (String anno : annotationNames) {
       rowsByAnnotation.put(anno, new ArrayList<Row>());

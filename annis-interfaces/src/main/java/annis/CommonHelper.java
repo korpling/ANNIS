@@ -473,7 +473,7 @@ public class CommonHelper
    */
   public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph)
   {
-    HashMap<SNode, V> result = new LinkedHashMap<SNode, V>();
+    HashMap<SNode, V> result = new LinkedHashMap<>();
     
     if(map != null && graph != null)
     {
