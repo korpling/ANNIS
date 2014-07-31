@@ -550,7 +550,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeFacts(corpusID);
     analyzeTextTable(toplevelCorpusName);
     generateExampleQueries(corpusID);
-
+    
     if (aliasName != null && !aliasName.isEmpty())
     {
       addCorpusAlias(corpusID, aliasName);

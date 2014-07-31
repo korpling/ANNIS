@@ -17,6 +17,7 @@
 package annis.service.internal;
 
 import annis.CommonHelper;
+import annis.GraphHelper;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
@@ -402,7 +403,7 @@ public class QueryServiceImpl implements QueryService
     int right = Integer.parseInt(rightRaw);
     SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
-    QueryData data = new QueryData();
+    QueryData data = GraphHelper.createQueryData(matches, annisDao);
 
     data.addExtension(new AnnotateQueryData(left, right,
       segmentation, filter));
@@ -411,16 +412,11 @@ public class QueryServiceImpl implements QueryService
 
     for (Match singleMatch : matches.getMatches())
     {
-      // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<>(singleMatch.
-        getSaltIDs().size());
+      // collect list of used corpora
       for (java.net.URI u : singleMatch.getSaltIDs())
       {
-        pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
-
-      data.addAlternative(pseudoNodes);
     }
 
     Subject user = SecurityUtils.getSubject();
@@ -430,15 +426,12 @@ public class QueryServiceImpl implements QueryService
     }
 
     List<String> corpusNamesList = new LinkedList<>(corpusNames);
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
-
-    if(corpusIDs == null || corpusIDs.isEmpty())
+    
+    if(data.getCorpusList() == null || data.getCorpusList().isEmpty())
     {
       throw new WebApplicationException(400);
     }
-
-    data.setCorpusList(corpusIDs);
-    data.addExtension(matches);
+    
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();

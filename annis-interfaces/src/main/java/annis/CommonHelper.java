@@ -16,6 +16,7 @@
 package annis;
 
 import annis.model.AnnisConstants;
+import annis.service.objects.MatchGroup;
 import com.google.common.base.Charsets;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
@@ -489,7 +490,7 @@ public class CommonHelper
     
     return result;
   }
-
+  
   // TODO: remove if really not needed
 //  public static SNode[] getMatchedNodes(SDocument doc)
 //  {

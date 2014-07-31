@@ -964,7 +964,7 @@ public class AnnisRunner extends AnnisBaseRunner
     }
     else
     {
-      queryData = extractSaltIds(annisQuery);
+      queryData = GraphHelper.createQueryData(MatchGroup.parseString(annisQuery), annisDao);
     }
 
     queryData.setCorpusConfiguration(annisDao.getCorpusConfiguration());
@@ -1283,33 +1283,4 @@ public class AnnisRunner extends AnnisBaseRunner
     this.frequencySqlGenerator = frequencySqlGenerator;
   }
   
-  
-
-  private QueryData extractSaltIds(String param)
-  {
-    QueryData queryData = new QueryData();
-    MatchGroup matchGroup = MatchGroup.parseString(param);
-
-    Set<String> corpusNames = new TreeSet<>();
-
-    for(Match m : matchGroup.getMatches())
-    {
-      // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<>(m.getSaltIDs().size());
-      for (java.net.URI u : m.getSaltIDs())
-      {
-        pseudoNodes.add(new QueryNode());
-        corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
-      }
-      queryData.addAlternative(pseudoNodes);
-    }
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(
-      corpusNames));
-
-    queryData.setCorpusList(corpusIDs);
-
-    log.debug(matchGroup.toString());
-    queryData.addExtension(matchGroup);
-    return queryData;
-  }
 }
