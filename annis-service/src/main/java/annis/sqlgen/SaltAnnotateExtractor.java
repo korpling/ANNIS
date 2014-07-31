@@ -4,10 +4,12 @@
  */
 package annis.sqlgen;
 
+import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
 import static annis.model.AnnisConstants.*;
 import annis.model.RelannisEdgeFeature;
 import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
@@ -99,8 +101,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       nodeByPre.clear();
 
       SDocument document = null;
-
-      URI[] keyNameList = new URI[0];
       
       AtomicInteger numberOfEdges = new AtomicInteger();
       int match_index = 0;
@@ -129,7 +129,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
               numberOfEdges);
             removeArtificialDominancesEdges(graph);
             createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
-            setMatchedIDs(document, new Match(Arrays.asList(keyNameList)));
             addOrderingRelations(graph, nodeBySegmentationPath);
           }
 
@@ -138,8 +137,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           tokenTexts.clear();
           tokenByIndex.clear();
           componentForSpan.clear();
-          keyNameList = new URI[key.getKeySize()];
-
 
           Integer matchstart = resultSet.getInt("matchstart");
           corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
@@ -170,6 +167,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
             corpus = subcorpus;
           }
           document.setSName(path.get(path.size() - 1));
+          document.setSId("" + match_index);
           corpusGraph.addSDocument(corpus, document);
 
           document.setSDocumentGraph(graph);
@@ -179,7 +177,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         // get node data
         SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath,
-          key, keyNameList);
+          key);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long componentID = longValue(resultSet, COMPONENT_TABLE, "id");
         if (!resultSet.wasNull())
@@ -206,7 +204,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           numberOfEdges);
         removeArtificialDominancesEdges(graph);
         createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
-        setMatchedIDs(document, new Match(Arrays.asList(keyNameList)));
         addOrderingRelations(graph, nodeBySegmentationPath);
       }
     }
@@ -463,8 +460,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     SDocumentGraph graph, TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
-    SolutionKey<?> key,
-    URI[] keyNameList) throws SQLException
+    SolutionKey<?> key) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     long internalID = longValue(resultSet, "node", "id");
@@ -500,14 +496,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       if (matchedNode != null)
       {
         addLongSFeature(node, FEAT_MATCHEDNODE, matchedNode);
-        try
-        {
-          keyNameList[matchedNode-1] = new URI(node.getSId());
-        }
-        catch (URISyntaxException ex)
-        {
-          log.error("" + node.getId() + " is not a valid URI", ex);
-        }
       }
       
       mapLayer(node, graph, resultSet);
@@ -1045,6 +1033,30 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       graph.addSLayer(layer);
     }
     return layer;
+  }
+  
+  /**
+   * Sets additional match (global) information about the matched nodes and annotations.
+   * 
+   * This will add the {@link AnnisConstants#FEAT_MATCHEDIDS) to all {@link SDocument} elements of the 
+   * salt project.
+   * 
+   * @param p The salt project to add the features to.
+   * @param matchGroup A list of matches in the same order as the corpus graphs of the salt project.
+   */
+  public void addMatchInformation(SaltProject p, MatchGroup matchGroup)
+  {
+    int matchIndex = 0;
+    for(Match m : matchGroup.getMatches())
+    {
+      // get the corresponding SDocument of the salt project    
+      SCorpusGraph corpusGraph = p.getSCorpusGraphs().get(matchIndex);
+      SDocument doc = corpusGraph.getSDocuments().get(0);
+      
+      setMatchedIDs(doc, m);
+      
+      matchIndex++;
+    }
   }
   
   protected SolutionKey<?> createSolutionKey()

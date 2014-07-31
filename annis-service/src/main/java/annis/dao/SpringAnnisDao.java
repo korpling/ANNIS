@@ -34,6 +34,7 @@ import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.AnnotateSqlGenerator;
 import annis.sqlgen.AnnotatedMatchIterator;
 import annis.sqlgen.ByteHelper;
@@ -140,7 +141,11 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public SaltProject graph(QueryData data)
   {
-    return executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
+    SaltProject p = executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
+    List<MatchGroup> matchGroupExt = data.getExtensions(MatchGroup.class);
+    saltAnnotateExtractor.addMatchInformation(p, matchGroupExt.get(0));
+    
+    return p;
   }
 
   /**

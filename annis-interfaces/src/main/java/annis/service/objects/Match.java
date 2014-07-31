@@ -23,16 +23,13 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Collections;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import javax.xml.bind.annotation.XmlAccessOrder;
 import javax.xml.bind.annotation.XmlAccessorOrder;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.XmlType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +47,7 @@ public class Match implements Serializable
 
   private final static Splitter matchSplitter = Splitter.on(" ").trimResults().omitEmptyStrings();
   private final static Splitter annoIDSplitter = Splitter.on("::").trimResults().limit(3);
+ 
   
   private List<URI> saltIDs;
   private List<String> annos;
@@ -224,12 +222,7 @@ public class Match implements Serializable
         String anno = itAnno.next();
         if(u != null)
         {
-          String v = u.toASCIIString();
-          if(anno != null && !anno.isEmpty())
-          {
-            v = anno + "::" + u;
-          }
-          asString.add(v);
+          asString.add(singleMatchToString(u, anno));
         }
       }
       return Joiner.on(" ").join(asString);
@@ -237,6 +230,19 @@ public class Match implements Serializable
     return "";
   }
   
+  public static String singleMatchToString(URI uri, String anno)
+  {
+    if(uri != null)
+    {
+      String v = uri.toASCIIString();
+      if(anno != null && !anno.isEmpty())
+      {
+        v = anno + "::" + uri;
+      }
+      return v;
+    }
+    return "";
+  }
   
   
 }
