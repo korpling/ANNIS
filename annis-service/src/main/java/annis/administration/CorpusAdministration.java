@@ -262,13 +262,12 @@ public class CorpusAdministration
     {
       ZipEntry e = zipEnum.nextElement();
       File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
-      outFile.deleteOnExit();
-
+   
       if (e.isDirectory())
       {
         if (!outFile.mkdirs())
         {
-          log.warn("Could not create temporary directory " + outFile.
+          log.warn("Could not create output directory " + outFile.
             getAbsolutePath());
         }
       } // end if directory
