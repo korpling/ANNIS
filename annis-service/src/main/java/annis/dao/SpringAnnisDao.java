@@ -143,7 +143,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   {
     SaltProject p = executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
     List<MatchGroup> matchGroupExt = data.getExtensions(MatchGroup.class);
-    saltAnnotateExtractor.addMatchInformation(p, matchGroupExt.get(0));
+    SaltAnnotateExtractor.addMatchInformation(p, matchGroupExt.get(0));
     
     return p;
   }

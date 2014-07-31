@@ -49,7 +49,6 @@ import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
-import static com.neovisionaries.i18n.LanguageCode.id;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.net.URI;
@@ -107,24 +106,27 @@ public class LegacyGraphConverter
     Match match = new Match();
     if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
     {    
-       match = Match.parseFromString(featMatchedIDs.getSValueSTEXT());
+       match = Match.parseFromString(featMatchedIDs.getSValueSTEXT(), ',');
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
     
     // get matched node names by using the IDs
-    List<String> matchedNodeIDs = new ArrayList<String>();
+    List<Long> matchedNodeIDs = new ArrayList<>();
     for(URI u : match.getSaltIDs())
     {
       SNode node = docGraph.getSNode(u.toASCIIString());
       if(node == null)
       {
         // that's weird, fallback to the id
-        log.warn("Could not get matched node from id {}", id);
-        matchedNodeIDs.add(id.toString());
+        log.warn("Could not get matched node from id {}", u.toASCIIString());
+        matchedNodeIDs.add(-1l);
       }
       else
       {
-        matchedNodeIDs.add(node.getSId());
+        RelannisNodeFeature relANNISFeat = 
+          (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        
+        matchedNodeIDs.add(relANNISFeat.getInternalID());
       }
     }
     
@@ -134,9 +136,9 @@ public class LegacyGraphConverter
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
-    List<String> matchedNodeIDs)
+    List<Long> matchedNodeIDs)
   {
-    Set<String> matchSet = new HashSet<>(matchedNodeIDs);
+    Set<Long> matchSet = new HashSet<>(matchedNodeIDs);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
     List<String> pathList = 
@@ -163,7 +165,7 @@ public class LegacyGraphConverter
             sAnno.getSName(),
             sAnno.getSValueSTEXT()));
         }
-        aNode.setName(sNode.getSId());
+        aNode.setName(sNode.getSName());
         aNode.setNamespace(sNode.getSLayers().get(0).getSName());
 
         RelannisNodeFeature feat = (RelannisNodeFeature) sNode.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
@@ -196,9 +198,9 @@ public class LegacyGraphConverter
         aNode.setLeftToken(feat.getLeftToken());
         aNode.setRight(feat.getRight());
         aNode.setRightToken(feat.getRightToken());
-        if (matchSet.contains(aNode.getName()))
+        if (matchSet.contains(aNode.getId()))
         {
-          aNode.setMatchedNodeInQuery((long) matchedNodeIDs.indexOf(aNode.getName()) + 1);
+          aNode.setMatchedNodeInQuery((long) matchedNodeIDs.indexOf(aNode.getId()) + 1);
           annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else

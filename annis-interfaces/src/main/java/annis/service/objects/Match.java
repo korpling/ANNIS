@@ -149,9 +149,20 @@ public class Match implements Serializable
   
   public static Match parseFromString(String raw)
   {
+    return parseFromString(raw, ' ');
+  }
+  
+  public static Match parseFromString(String raw, char separator)
+  {
     Match match = new Match();
 
-    for (String singleMatch : matchSplitter.split(raw))
+    Splitter splitter = matchSplitter;
+    if(separator != ' ')
+    {
+      splitter = Splitter.on(separator).trimResults().omitEmptyStrings();
+    }
+    
+    for (String singleMatch : splitter.split(raw))
     {
       URI uri;
       
@@ -185,12 +196,13 @@ public class Match implements Serializable
       try
       {
         
-        uri = new java.net.URI(id);
+        uri = new java.net.URI(id).normalize();
 
         if (!"salt".equals(uri.getScheme()) || uri.getFragment() == null)
         {
           throw new URISyntaxException("not a Salt id", uri.toString());
         }
+        
       }
       catch (URISyntaxException ex)
       {

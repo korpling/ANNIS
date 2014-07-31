@@ -29,11 +29,12 @@ import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import annis.sqlgen.*;
 import annis.test.CsvResultSetProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
-import org.apache.commons.collections.ListUtils;
-import org.springframework.context.annotation.PropertySource;
+import java.util.ArrayList;
 
 /**
  *
@@ -97,9 +98,14 @@ public class LegacyGraphConverterTest
 
     TestAnnotateSqlGenerator.setupOuterQueryFactsTableColumnAliases(saltExtractor);
     
+    List<Match> matches = new ArrayList<>();
+    matches.add(Match.parseFromString("salt:/pcc2/4282/#tok_155 tiger::pos::salt:/pcc2/4282/#tok_156"));
+    MatchGroup matchGroup = new MatchGroup(matches);
+    
     SaltProject p =
       saltExtractor.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.
       getResourceAsStream("SampleAnnotateResult.csv")).getResultSet());
+    SaltAnnotateExtractor.addMatchInformation(p, matchGroup);
 
     List<AnnotationGraph> expected =
       aomSqlGen.extractData(new CsvResultSetProvider(annis.sqlgen.SaltAnnotateExtractorTest.class.

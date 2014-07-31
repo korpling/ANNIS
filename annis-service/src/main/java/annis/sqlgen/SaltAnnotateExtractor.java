@@ -390,7 +390,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     } // end for each span
   }
 
-  private void setMatchedIDs(SDocument document, Match match)
+  private static void setMatchedIDs(SDocument document, Match match)
   {
     List<String> allUrisAsString = new LinkedList<>();
     for(URI u : match.getSaltIDs())
@@ -473,12 +473,19 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     String saltID = stringValue(resultSet, NODE_TABLE, "salt_id");
+    if(saltID == null)
+    {
+      // fallback to the name
+      saltID = name;
+    }
     long internalID = longValue(resultSet, "node", "id");
 
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
     boolean isToken = !resultSet.wasNull();
 
-    org.eclipse.emf.common.util.URI nodeURI = graph.getSElementPath();
+    org.eclipse.emf.common.util.URI nodeURI = graph.getSDocument().getSElementPath();
+
+    nodeURI = nodeURI.appendSegment("");
     nodeURI = nodeURI.appendFragment(saltID);
     SStructuredNode node = (SStructuredNode) graph.getSNode(nodeURI.toString());
     if (node == null)
@@ -1058,7 +1065,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
    * @param p The salt project to add the features to.
    * @param matchGroup A list of matches in the same order as the corpus graphs of the salt project.
    */
-  public void addMatchInformation(SaltProject p, MatchGroup matchGroup)
+  public static void addMatchInformation(SaltProject p, MatchGroup matchGroup)
   {
     int matchIndex = 0;
     for(Match m : matchGroup.getMatches())
