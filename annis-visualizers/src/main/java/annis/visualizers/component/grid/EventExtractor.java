@@ -264,7 +264,7 @@ public class EventExtractor {
     SFeature featMatchedAnnos = graph.getSDocument().getSFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
     if(featMatchedAnnos != null)
     {
-      matchedAnnos = Splitter.on(Pattern.compile("\\s*,\\s*")).trimResults()
+      matchedAnnos = Splitter.on(',').trimResults()
         .splitToList(featMatchedAnnos.getSValueSTEXT());
     }
     // check if the span is a matched node
