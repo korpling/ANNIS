@@ -481,13 +481,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   
   private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException
   {
-      JSONArray array = parent.getJSONArray(key);
-      if(array == null)
-      {
-          array = new JSONArray();
-          parent.put(key, array);
-      }
-      return array;
+    JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
+    if(array == null)
+    {
+        array = new JSONArray();
+        parent.put(key, array);
+    }
+    return array;
   }
 
   /**
