@@ -444,7 +444,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath());
       styleSheet.compile();
       
-      return styleSheet.toString();
+      return styleSheet.printState();
       
     }
     catch (IOException ex)
