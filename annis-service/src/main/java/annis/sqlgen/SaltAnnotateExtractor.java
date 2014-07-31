@@ -15,6 +15,7 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import com.google.common.base.Joiner;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 
@@ -393,13 +394,23 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
 
   private void setMatchedIDs(SDocument document, Match match)
   {
-    
+    List<String> allUrisAsString = new LinkedList<>();
+    for(URI u : match.getSaltIDs())
+    {
+      allUrisAsString.add(u.toASCIIString());
+    }
     // set the matched keys
-    SFeature feature = SaltFactory.eINSTANCE.createSFeature();
-    feature.setSNS(ANNIS_NS);
-    feature.setSName(FEAT_MATCHEDIDS);
-    feature.setSValue(match.toString());
-    document.addSFeature(feature);
+    SFeature featIDs = SaltFactory.eINSTANCE.createSFeature();
+    featIDs.setSNS(ANNIS_NS);
+    featIDs.setSName(FEAT_MATCHEDIDS);
+    featIDs.setSValue(Joiner.on(",").join(allUrisAsString));
+    document.addSFeature(featIDs);
+    
+    SFeature featAnnos = SaltFactory.eINSTANCE.createSFeature();
+    featAnnos.setSNS(ANNIS_NS);
+    featAnnos.setSName(FEAT_MATCHEDANNOS);
+    featAnnos.setSValue(Joiner.on(",").join(match.getAnnos()));
+    document.addSFeature(featAnnos);
 
   }
 
@@ -1054,6 +1065,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       SDocument doc = corpusGraph.getSDocuments().get(0);
       
       setMatchedIDs(doc, m);
+      
       
       matchIndex++;
     }
