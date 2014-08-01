@@ -454,6 +454,8 @@ public class DefaultAdministrationDao implements AdministrationDao
   private BasicDataSource createDataSource(File dbProperties)
     throws IOException, URISyntaxException
   {
+    BasicDataSource result = null;
+    
     Properties props = new Properties();
     try(InputStream is = new FileInputStream(dbProperties))
     {
@@ -464,7 +466,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       rawJdbcURL = StringUtils.removeStart(rawJdbcURL, "jdbc:");
       URI jdbcURL = new URI(rawJdbcURL);
       
-      return createDataSource(
+      result = createDataSource(
         jdbcURL.getHost(),
         "" + jdbcURL.getPort(),
         jdbcURL.getPath().substring(1), // remove the "/" at the beginning
@@ -472,7 +474,10 @@ public class DefaultAdministrationDao implements AdministrationDao
         props.getProperty("datasource.password"),
         "true".equalsIgnoreCase(props.getProperty("datasource.ssl")),
         props.getProperty("datasource.schema"));
+      ;
     }
+    
+    return result;
   }
 
   private BasicDataSource createDataSource(String host, String port,
