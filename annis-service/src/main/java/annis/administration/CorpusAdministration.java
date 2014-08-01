@@ -631,6 +631,11 @@ public class CorpusAdministration
   {
     return administrationDao.listCorpusStats();
   }
+  
+   public List<Map<String, Object>> listCorpusStats(File databaseProperties)
+  {
+    return administrationDao.listCorpusStats(databaseProperties);
+  }
 
   public List<String> listUsedIndexes()
   {

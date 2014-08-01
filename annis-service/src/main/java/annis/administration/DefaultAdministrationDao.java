@@ -25,6 +25,8 @@ import annis.security.AnnisUserConfig;
 import annis.utils.DynamicDataSource;
 import com.google.common.base.Preconditions;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +44,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.sql.DataSource;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.DelegatingConnection;
 import org.apache.commons.io.FilenameUtils;
@@ -446,6 +449,30 @@ public class DefaultAdministrationDao implements AdministrationDao
     createSchema();
     createSchemaIndexes();
     populateSchema();
+  }
+  
+  private BasicDataSource createDataSource(File dbProperties)
+    throws IOException, URISyntaxException
+  {
+    Properties props = new Properties();
+    try(InputStream is = new FileInputStream(dbProperties))
+    {
+      props.load(is);
+      
+      String rawJdbcURL = props.getProperty("datasource.url").trim();
+      
+      rawJdbcURL = StringUtils.removeStart(rawJdbcURL, "jdbc:");
+      URI jdbcURL = new URI(rawJdbcURL);
+      
+      return createDataSource(
+        jdbcURL.getHost(),
+        "" + jdbcURL.getPort(),
+        jdbcURL.getPath().substring(1), // remove the "/" at the beginning
+        props.getProperty("datasource.username"),
+        props.getProperty("datasource.password"),
+        "true".equalsIgnoreCase(props.getProperty("datasource.ssl")),
+        props.getProperty("datasource.schema"));
+    }
   }
 
   private BasicDataSource createDataSource(String host, String port,
@@ -1262,6 +1289,28 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     return jdbcTemplate.queryForList(
       "SELECT * FROM corpus_info ORDER BY name");
+  }
+  
+  @Override
+  public List<Map<String, Object>> listCorpusStats(File databaseProperties)
+  {
+    List<Map<String, Object>> result = new LinkedList<>();
+    DataSource origDataSource = dataSource.getInnerDataSource();
+    try
+    {
+      dataSource.setInnerDataSource(createDataSource(databaseProperties));
+      result = jdbcTemplate.queryForList(
+        "SELECT * FROM corpus_info ORDER BY name");
+    }
+    catch(IOException | URISyntaxException | DataAccessException ex)
+    {
+      log.error("Could not query corpus list for the file " + databaseProperties.getAbsolutePath(), ex);
+    }
+    finally
+    {
+      dataSource.setInnerDataSource(origDataSource);
+    }
+    return result;
   }
 
   @Override
