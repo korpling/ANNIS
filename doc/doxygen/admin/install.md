@@ -24,39 +24,47 @@ sudo -u postgres psql
 \q
 \endcode
 
-2. Make sure you have installed [JDK 7](http://java.sun.com/javase/downloads/index.jsp)
-3. Install a Java Servlet Container ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
+2. Make sure you have **installed [JDK 7](http://java.sun.com/javase/downloads/index.jsp)**
+3. **Install a Java Servlet Container** ("Java web server") such as [Tomcat](http://tomcat.apache.org/) or [Jetty](http://www.mortbay.org/jetty/)
  (or install them if you don’t)
-4. Download the ANNIS service distribution file `annis-service-<version>-distribution.tar.gz` from our website
-and then unzip the downloaded file:
+4. **Download** the ANNIS service distribution file `annis-service-<version>-distribution.tar.gz` from our website
+and then **unzip** the downloaded file:
 \code{.sh}
 tar xzvf annis-service-<version>-distribution.tar.gz -C <installation directory>
 \endcode
-5. Set the environment variables (each time when starting up)
+5. Set the **environment variables** (each time when starting up)
 \code{.sh}
 export ANNIS_HOME=<installation directory>
 export PATH=$PATH:$ANNIS_HOME/bin
 \endcode
-6. Next initialize your ANNIS database (only the first time you use the system).
+6. Next **initialize** your ANNIS database (only the first time you use the system).
 When the ANNIS service is normally installed, it assumes it can get PostgreSQL super user rights for this step. Thus you need the superuser password.
 \code{.sh}
-annis-admin.sh init -u <username> -d <dbname> -p <new user password>
+annis-admin.sh init -u <username> -d <dbname> --schema <schema> -p <new user password>
 -P <postgres superuser password>
 \endcode
 This call will 
 <ul><li>create a new database with the name given by the "-d" parameter</li>
+<ul><li>create a [PostgreSQL schema](http://www.postgresql.org/docs/9.1/static/ddl-schemas.html), you should use a schema name the corresponds to the ANNIS version to make an upgrade easier (e.g. you can name it "v31" for ANNIS 3.1.0)</li>
 <li>create a new PostgreSQL user with the user name given by the "-u" parameter and the password given by the "-p" parameter</li>
 <li>create all necessary tables, PSQL functions and initial data in the database</li></ul>
-\warning Do not use "postgres" as database name for ANNIS since it is reserved by PostgresSQL itself.
-
-You can omit the PostgreSQL administrator password option (`-P`). Then the database and user must already
-exists. E.g. you should execute the following as PostgreSQL administrator:
+If you want to have parallel installations of ANNIS inside the same database you
+can use the `--schema` parameter to define a [PostgreSQL schema](http://www.postgresql.org/docs/9.1/static/ddl-schemas.html)
+other than the default `public` schema.
+You can also omit the PostgreSQL administrator password option (`-P`) if you don't have
+access to the administrator password. In this case the database and the user must already
+exist. To manually create a user and a database the PostgreSQL adminstrator should execute the following:
 \code{.sql}
 CREATE LANGUAGE plpgsql; -- ignore the error if the language is already installed
 CREATE USER myuser PASSWORD 'mypassword';
 CREATE DATABASE mydb OWNER myuser ENCODING 'UTF8';
 \endcode
-7. Now you can import some corpora:
+\warning Do not use "postgres" as database name for ANNIS since it is reserved by PostgresSQL itself.
+
+7. Have a look in the file `conf/annis-service.properties` and check if you need to change
+any of the configuration variables.
+
+8. Now you can **import** some corpora:
 \code{.sh}
 annis-admin.sh import path/to/corpus1 path/to/corpus2 ...
 \endcode
@@ -69,7 +77,7 @@ same might happen if you close your shell before the import
 script terminates, so you will want to prefix it with the "nohup"-
 command.
 
-8. Now you can start the ANNIS service:
+9. Now you are ready to **start** the ANNIS service:
 \code{.sh}
 annis-service.sh start
 \endcode
@@ -79,10 +87,10 @@ corpus without login you can start ANNIS with
 annis-service-no-security.sh start
 \endcode
 instead of the default script.
-9. To get the ANNIS front-end running, first download annis-
+10. To get the ANNIS **front-end** running, first download annis-
 gui-<version>.war from our website and deploy it to your Java servlet
 container (this is depending on the servlet container you use).
-10. Configure users and groups as described [here](@ref admin-configure-user) 
+11. Configure users and groups as described [here](@ref admin-configure-user) 
 and define who is allowed to see which corpus.
 
 \note
