@@ -39,6 +39,8 @@ import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.io.File;
 import java.util.LinkedList;
 import org.apache.commons.cli.CommandLine;
@@ -57,6 +59,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private AnnisDao annisDao;
 
   private QueriesGenerator queriesGenerator;
+  
+  private final Escaper pgSchemaEscaper = Escapers.builder() 
+    .setUnsafeReplacement("_")
+    .setSafeRange('a','z').build();
 
   public static void main(String[] args)
   {
@@ -167,7 +173,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       options.addOption(opt, longOpt, true, description);
       return this;
     }
-
+    
     public OptionBuilder addLongParameter(String longOpt, String description)
     {
       options.addOption(null, longOpt, true, description);
@@ -219,6 +225,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       + "You can set the root directory for corpus sources as an argument.")
       .addToggle("s", "ssl", false,
       "if given use SSL for connecting to the database")
+      .addParameter(null, "schema", "The PostgreSQL schema to use (defaults to \"public\"). "
+        + "Only the charactes 'a' to 'z' are allowed in the schema name.")
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
@@ -244,6 +252,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       String superUser = cmdLine.getOptionValue("superuser", "postgres");
       String superPassword = cmdLine.getOptionValue("superpassword");
       boolean useSSL = cmdLine.hasOption("ssl");
+      String pgSchema = 
+        pgSchemaEscaper.escape(cmdLine.getOptionValue("schema", "public"));
 
       boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
       List<Map<String, Object>> existingCorpora = new LinkedList<>();
@@ -266,7 +276,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       corpusAdministration.
         initializeDatabase(host, port, database, user, password,
-        defaultDatabase, superUser, superPassword, useSSL);
+        defaultDatabase, superUser, superPassword, useSSL, pgSchema);
 
       if (migrateCorpora && existingCorpora.size() > 0)
       {

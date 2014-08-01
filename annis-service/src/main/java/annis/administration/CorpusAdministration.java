@@ -95,15 +95,16 @@ public class CorpusAdministration
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL)
+    String superPassword, boolean useSSL, String pgSchema)
   {
 
     log.info("initializing database");
     administrationDao.initializeDatabase(host, port, database, user, password,
-      defaultDatabase, superUser, superPassword, useSSL);
+      defaultDatabase, superUser, superPassword, useSSL, pgSchema);
 
     // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
+    writeDatabasePropertiesFile(host, port, database, user, password, useSSL,
+      pgSchema);
 
     // create tables and other stuff that is handled by the scheme fixer
     if (schemeFixer != null)
@@ -643,7 +644,7 @@ public class CorpusAdministration
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
-    String database, String user, String password, boolean useSSL)
+    String database, String user, String password, boolean useSSL, String schema)
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
@@ -657,6 +658,10 @@ public class CorpusAdministration
       writer.write("datasource.username=" + user + "\n");
       writer.write("datasource.password=" + password + "\n");
       writer.write("datasource.ssl=" + (useSSL ? "true" : "false") + "\n");
+      if(schema != null)
+      {
+        writer.write("datasource.schema=" + schema + "\n");
+      }
     }
     catch (IOException e)
     {

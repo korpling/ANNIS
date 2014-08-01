@@ -24,6 +24,8 @@ import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
 import annis.utils.DynamicDataSource;
 import com.google.common.base.Preconditions;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -44,7 +46,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.dbcp2.DelegatingConnection;
-import org.apache.commons.dbcp2.PoolingDataSource;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -81,6 +82,10 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private static final Logger log = LoggerFactory.getLogger(
     AdministrationDao.class);
+  
+  private final Escaper schemaEscaper = Escapers.builder() 
+    .setUnsafeReplacement("_")
+    .setSafeRange('a','z').build();
 
   // external files path
   private String externalFilesPath;
@@ -97,7 +102,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   private StatementController statementController;
 
   private DynamicDataSource dataSource;
-
+  
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
    * is the case the visualizer and no document visualizer are defined in the
@@ -391,21 +396,39 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL)
+    String superPassword, boolean useSSL, String pgSchema)
   {
     // connect as super user to the default database to create new user and database
     if (superPassword != null)
     {
       log.info("Creating Annis database and user.");
       dataSource.setInnerDataSource(createDataSource(host, port,
-        defaultDatabase, superUser, superPassword, useSSL));
+        defaultDatabase, superUser, superPassword, useSSL, pgSchema));
 
       createDatabaseAndUserInTransaction(database, user, password);
     }
-    // switch to new database as new user for the rest
+    // switch to new database as new user for the rest of the initialization procedure
     dataSource.setInnerDataSource(createDataSource(host, port, database,
-      user, password, useSSL));
+      user, password, useSSL, pgSchema));
 
+    
+    //
+    if(pgSchema != null && !"public".equalsIgnoreCase(pgSchema))
+    {
+      pgSchema = schemaEscaper.escape(pgSchema);
+      log.info("creating PostgreSQL schema {}", pgSchema);
+      // we have to create a schema before we can use it
+      try
+      {
+        jdbcTemplate.execute("CREATE SCHEMA " + pgSchema + ";");
+      }
+      catch(DataAccessException ex)
+      {
+        // ignore if the schema already exists
+        log.info("schema " + pgSchema + " already exists");
+      }
+    }
+    
     createSchemaInTransaction();
 
   }
@@ -433,7 +456,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private BasicDataSource createDataSource(String host, String port,
     String database,
-    String user, String password, boolean useSSL)
+    String user, String password, boolean useSSL,
+    String schema)
   {
 
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
@@ -451,6 +475,11 @@ public class DefaultAdministrationDao implements AdministrationDao
     result.setPassword(password);
     result.setValidationQuery("SELECT 1;");
     result.setAccessToUnderlyingConnectionAllowed(true);
+    if(schema == null)
+    {
+      schema = "public";
+    }
+    result.setConnectionInitSqls(Arrays.asList("SET search_path TO \"$user\"," + schema));
 
     result.setDriverClassName("org.postgresql.Driver");
 
@@ -2112,5 +2141,6 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     this.statementController = statementCon;
   }
+
 
 }
