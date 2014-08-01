@@ -33,6 +33,11 @@ limitations under the License.
     </property>
   </bean>
   
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
+    <property name="location" value="file:${annis.home}/conf/develop.properties"/>
+    <property name="placeholderPrefix" value="$dev{"/>
+  </bean>
+  
   <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype"> 
     <bean class="annis.ql.parser.SemanticValidator" 
           scope="prototype" />
@@ -45,7 +50,7 @@ limitations under the License.
 	</util:list>
   
   <bean id="annisParserAntlr" class="annis.ql.parser.AnnisParserAntlr">
-    <property name="precedenceBound" value="${annis.precedence-restriction}"/>
+    <property name="precedenceBound" value="$dev{annis.precedence-restriction}"/>
     <property name="postProcessors" ref="queryAnalysisPostProcessors" />    
   </bean>
 

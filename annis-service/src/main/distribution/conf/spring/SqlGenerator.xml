@@ -32,7 +32,7 @@ limitations under the License.
       <value>setDisableBetweenSymmetricPredicate</value>
     </property>
     <property name="arguments">
-      <value>${annis.disable-between-symmetric-predicate}</value>
+      <value>$dev{annis.disable-between-symmetric-predicate}</value>
     </property>
   </bean>
 
@@ -46,7 +46,7 @@ limitations under the License.
       <value>setDisableBetweenPredicate</value>
     </property>
     <property name="arguments">
-      <value>${annis.disable-between-predicate}</value>
+      <value>$dev{annis.disable-between-predicate}</value>
     </property>
   </bean>
 
@@ -58,13 +58,13 @@ limitations under the License.
 	<!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGeneratorBase" class="annis.sqlgen.DefaultWhereClauseGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
-    <property name="optimizeIndirectPrecedence" value="${annis.optimize-indirect-precedence}" />
-    <property name="allowIdenticalSibling" value="${annis.allow-identical-sibling}" />
-    <property name="optimizeInclusion" value="${annis.optimize-inclusion}" />
-    <property name="componentPredicates" value="${annis.component-predicates}" />
-    <property name="useIsTokenColumn" value="${annis.use-is-token-column}" />
-    <property name="useComponentRefPredicateInCommonAncestorSubquery" value="${annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
-    <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="${annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
+    <property name="optimizeIndirectPrecedence" value="$dev{annis.optimize-indirect-precedence}" />
+    <property name="allowIdenticalSibling" value="$dev{annis.allow-identical-sibling}" />
+    <property name="optimizeInclusion" value="$dev{annis.optimize-inclusion}" />
+    <property name="componentPredicates" value="$dev{annis.component-predicates}" />
+    <property name="useIsTokenColumn" value="$dev{annis.use-is-token-column}" />
+    <property name="useComponentRefPredicateInCommonAncestorSubquery" value="$dev{annis.use-component-ref-predicate-in-common-ancestor-subquery}"/>
+    <property name="useToplevelCorpusPredicateInCommonAncestorSubquery" value="$dev{annis.use-toplevel-corpus-predicate-in-common-ancestor-subquery}"/>
     
     <!-- missing: annoCondition -->
     
@@ -217,7 +217,7 @@ limitations under the License.
   <bean id="arrayCorpusPathExtractor" class="annis.sqlgen.ArrayCorpusPathExtractor" lazy-init="true"/>
 
   <bean id="postgreSqlArraySolutionKey" class="annis.sqlgen.PostgreSqlArraySolutionKey" scope="prototype" lazy-init="true">
-    <property name="idColumnName" value="${annis.node-id-column-name}"/>
+    <property name="idColumnName" value="$dev{annis.node-id-column-name}"/>
     <property name="keyColumnName" value="key"/>
   </bean>
 
@@ -231,7 +231,7 @@ limitations under the License.
   <bean id="annotateInnerQuerySqlGenerator" class="annis.sqlgen.AnnotateInnerQuerySqlGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
 
-    <property name="sortSolutions" value="${annis.annotate.sort-solutions}" />
+    <property name="sortSolutions" value="$dev{annis.annotate.sort-solutions}" />
 
     <property name="solutionKey" ref="postgreSqlArraySolutionKey"/>
     <property name="selectClauseSqlGenerator" ref="annotateInnerQuerySqlGenerator" />
@@ -384,8 +384,8 @@ limitations under the License.
     
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
 
-    <property name="includeIsTokenColumn" value="${annis.use-is-token-column}" />
-    <property name="includeDocumentNameInAnnotateQuery" value="${annis.include-document-name-in-annotate-query}"/>
+    <property name="includeIsTokenColumn" value="$dev{annis.use-is-token-column}" />
+    <property name="includeDocumentNameInAnnotateQuery" value="$dev{annis.include-document-name-in-annotate-query}"/>
 
     <property name="selectClauseSqlGenerator" ref="graphSqlGenerator" />
     <property name="fromClauseSqlGenerators">

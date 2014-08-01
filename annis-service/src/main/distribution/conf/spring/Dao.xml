@@ -34,6 +34,7 @@
     <property name="location" value="file:${annis.home}/conf/database.properties"/>
     <property name="placeholderPrefix" value="$dao{"/>
   </bean>
+  
   <!-- DataSource -->
   <bean id="startupDataSource" class="org.apache.commons.dbcp2.BasicDataSource" lazy-init="true">
     <property name="driverClassName" value="$dao{datasource.driver}"/>
@@ -179,9 +180,9 @@
  
 	<!-- exported Database API for administration tasks -->
   <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
-    <property name="scriptPath" value="${annis.script-path}"/>
+    <property name="scriptPath" value="$dev{annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>
-    <property name="temporaryStagingArea" value="${annis.import.temporary-staging-area}" />
+    <property name="temporaryStagingArea" value="$dev{annis.import.temporary-staging-area}" />
     <property name="generateExampleQueries" value="${annis.import.example-queries}" />
     <property name="annisDao" ref="annisDao" />
     <property name="dataSource" ref="dataSource" />

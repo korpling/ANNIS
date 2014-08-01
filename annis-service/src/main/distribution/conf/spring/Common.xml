@@ -12,7 +12,12 @@
   <context:annotation-config/>
   
   <aop:aspectj-autoproxy proxy-target-class="false"/>
-   
+  
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
+    <property name="location" value="file:${annis.home}/conf/develop.properties"/>
+    <property name="placeholderPrefix" value="$dev{"/>
+  </bean> 
+  
   <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
   <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
  
