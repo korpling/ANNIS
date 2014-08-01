@@ -454,37 +454,52 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           }
         }
         
-        log.info("The following corpora will be imported:\n {}",
-          Joiner.on("\n").join(corpusPaths));
-        
-        //import each corpus
-        ImportStatus status = corpusAdministration.importCorporaSave(
-          cmdLine.hasOption("overwrite"), null, 
-          cmdLine.getOptionValue("mail"), 
-          false,
-          corpusPaths);
-        
-        // report the successful or failure failed
-        Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
-        Set<String> failedCorpora = new LinkedHashSet<>(status.getAllThrowable().keySet());
-        successfullCorpora.removeAll(failedCorpora);
-        
-        if(failedCorpora.isEmpty())
+        if(corpusPaths.isEmpty())
         {
-          log.info("All corpora imported without errors:\n{}", 
-            Joiner.on("\n").join(successfullCorpora));
+          log.warn("No corpora found");
         }
         else
         {
-          
-          log.error("Errors occured during import, not all corpora have been imported.\n"
-            + "Success:\n"
-            + "{}\n"
+          log.info("The following corpora will be imported:\n"
             + "---------------\n"
-            + "Failed:\n"
-            + "{}", 
-            Joiner.on("\n").join(successfullCorpora),
-            Joiner.on("\n").join(failedCorpora));
+            + "{}\n"
+            + "---------------\n",
+            Joiner.on("\n").join(corpusPaths));
+
+          //import each corpus
+          ImportStatus status = corpusAdministration.importCorporaSave(
+            cmdLine.hasOption("overwrite"), null, 
+            cmdLine.getOptionValue("mail"), 
+            false,
+            corpusPaths);
+
+          // report the successful or failure failed
+          Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
+          Set<String> failedCorpora = new LinkedHashSet<>(status.getAllThrowable().keySet());
+          successfullCorpora.removeAll(failedCorpora);
+
+          if(failedCorpora.isEmpty())
+          {
+            log.info("All corpora imported without errors:\n"
+              + "---------------\n"
+              + "{}\n"
+              + "---------------\n",
+              Joiner.on("\n").join(successfullCorpora));
+          }
+          else
+          {
+
+            log.error("Errors occured during import, not all corpora have been imported.\n"
+              + "---------------\n"
+              + "Success:\n"
+              + "{}\n"
+              + "---------------\n"
+              + "Failed:\n"
+              + "{}\n"
+              + "---------------\n", 
+              Joiner.on("\n").join(successfullCorpora),
+              Joiner.on("\n").join(failedCorpora));
+          }
         }
       }
       else
