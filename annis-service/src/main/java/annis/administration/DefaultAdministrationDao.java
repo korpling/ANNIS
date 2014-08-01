@@ -24,8 +24,6 @@ import annis.ql.parser.QueryData;
 import annis.security.AnnisUserConfig;
 import annis.utils.DynamicDataSource;
 import com.google.common.base.Preconditions;
-import com.google.common.escape.Escaper;
-import com.google.common.escape.Escapers;
 import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
@@ -82,10 +80,6 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private static final Logger log = LoggerFactory.getLogger(
     AdministrationDao.class);
-  
-  private final Escaper schemaEscaper = Escapers.builder() 
-    .setUnsafeReplacement("_")
-    .setSafeRange('a','z').build();
 
   // external files path
   private String externalFilesPath;
@@ -415,7 +409,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     //
     if(pgSchema != null && !"public".equalsIgnoreCase(pgSchema))
     {
-      pgSchema = schemaEscaper.escape(pgSchema);
+      pgSchema = pgSchema.toLowerCase().replaceAll("[^a-z0-9]", "_");
       log.info("creating PostgreSQL schema {}", pgSchema);
       // we have to create a schema before we can use it
       try

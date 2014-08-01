@@ -60,10 +60,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
   private QueriesGenerator queriesGenerator;
   
-  private final Escaper pgSchemaEscaper = Escapers.builder() 
-    .setUnsafeReplacement("_")
-    .setSafeRange('a','z').build();
-
   public static void main(String[] args)
   {
     // get Runner from Spring
@@ -226,7 +222,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       .addToggle("s", "ssl", false,
       "if given use SSL for connecting to the database")
       .addParameter(null, "schema", "The PostgreSQL schema to use (defaults to \"public\"). "
-        + "Only the charactes 'a' to 'z' are allowed in the schema name.")
+        + "Only lowercase characters and digits are allowed in the schema name.")
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
@@ -252,8 +248,8 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       String superUser = cmdLine.getOptionValue("superuser", "postgres");
       String superPassword = cmdLine.getOptionValue("superpassword");
       boolean useSSL = cmdLine.hasOption("ssl");
-      String pgSchema = 
-        pgSchemaEscaper.escape(cmdLine.getOptionValue("schema", "public"));
+      String pgSchema = cmdLine.getOptionValue("schema", "public")
+        .toLowerCase().replaceAll("[^a-z0-9]", "_");;
 
       boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
       List<Map<String, Object>> existingCorpora = new LinkedList<>();
