@@ -91,7 +91,8 @@ public class InitDialog extends javax.swing.JDialog
           "postgres",
           txtAdminUsername.getText(), 
           new String(txtAdminPassword.getPassword()), 
-          prop.getProperty("datasource.ssl", "false").trim().equalsIgnoreCase("true"));
+          prop.getProperty("datasource.ssl", "false").trim().equalsIgnoreCase("true"),
+          prop.getProperty("datasource.schema", "public"));
         
         // also perform a cleanup of the data directory
         // when using kickstarter you are either using just the default one instance
