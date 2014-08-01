@@ -24,6 +24,10 @@
   <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
     <property name="dataSource" ref="dataSource"/>
   </bean>
+  
+  <util:list id="connectionInitSQL">
+    <value>SET search_path TO "$user",$dao{datasource.schema:#{'public'}}</value>
+  </util:list>
 
   <!-- database connection configuration -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
@@ -41,6 +45,8 @@
     
     <property name="validationQuery" value="SELECT 1;" />
     <property name="accessToUnderlyingConnectionAllowed" value="true" />
+    
+    <property name="connectionInitSqls" ref="connectionInitSQL"/>
   </bean>
   <bean id="dataSource" class="annis.utils.DynamicDataSource" lazy-init="true">
     <property name="innerDataSource" ref="startupDataSource" />
