@@ -1,23 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans
 
-	xmlns="http://www.springframework.org/schema/beans"
-   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-   xmlns:util="http://www.springframework.org/schema/util"
-   xmlns:context="http://www.springframework.org/schema/context"
-   xmlns:tx="http://www.springframework.org/schema/tx"
-   xmlns:aop="http://www.springframework.org/schema/aop"
-
-	xsi:schemaLocation="
+  xmlns="http://www.springframework.org/schema/beans"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xmlns:util="http://www.springframework.org/schema/util"
+  xmlns:tx="http://www.springframework.org/schema/tx"
+  
+  xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
 		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
-		http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-	">
+	" 
+  default-lazy-init="true">
   
-   <!-- Enable bean autowiring -->
-  <context:annotation-config/>
+  <import resource="Common.xml" />
+  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
 
   <!-- Transaction management -->
   <tx:annotation-driven transaction-manager="transactionManager"/>
@@ -178,7 +175,7 @@
     <property name="dataSource" ref="dataSource" />
   </bean>
  
-	<!-- exported Database API for administration tasks -->
+  <!-- exported Database API for administration tasks -->
   <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
     <property name="scriptPath" value="$dev{annis.script-path}"/>
     <property name="externalFilesPath" value="${annis.external-data-path}"/>

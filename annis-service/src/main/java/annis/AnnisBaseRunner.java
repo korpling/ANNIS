@@ -88,6 +88,8 @@ public abstract class AnnisBaseRunner
     setupLogging(logToConsole);
 
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    ctx.setValidating(false);
+   
     AnnisXmlContextHelper.prepareContext(ctx);
 
     ctx.load(contextLocations);

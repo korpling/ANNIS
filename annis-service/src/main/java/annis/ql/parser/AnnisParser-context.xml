@@ -22,7 +22,9 @@ limitations under the License.
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-	">
+	"
+  default-lazy-init="true"
+  >
 	
   <!-- Properties configuration -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -36,7 +38,7 @@ limitations under the License.
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
     <property name="location" value="file:${annis.home}/conf/develop.properties"/>
     <property name="placeholderPrefix" value="$dev{"/>
-  </bean>
+  </bean> 
   
   <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype"> 
     <bean class="annis.ql.parser.SemanticValidator" 

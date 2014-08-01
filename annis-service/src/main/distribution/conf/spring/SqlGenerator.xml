@@ -19,8 +19,11 @@ limitations under the License.
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd"
+       default-lazy-init="true">
 
+  
+  <import resource="Common.xml" />
   
   <!-- Configure use of BETWEEN SYMMETRIC -->
   <bean
@@ -36,7 +39,7 @@ limitations under the License.
     </property>
   </bean>
 
-	<!-- Configure BETWEEN workaround for MonetDB -->
+  <!-- Configure BETWEEN workaround for MonetDB -->
   <bean
     class="org.springframework.beans.factory.config.MethodInvokingFactoryBean" lazy-init="true">
     <property name="targetClass">
@@ -50,12 +53,12 @@ limitations under the License.
     </property>
   </bean>
 
-	<!-- FROM clause generator -->
+  <!-- FROM clause generator -->
   <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
         parent="tableAccessStrategyFactory"  lazy-init="true"/>
   
 
-	<!-- WHERE clause generator -->
+  <!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGeneratorBase" class="annis.sqlgen.DefaultWhereClauseGenerator"
         parent="tableAccessStrategyFactory" lazy-init="true">
     <property name="optimizeIndirectPrecedence" value="$dev{annis.optimize-indirect-precedence}" />
@@ -256,7 +259,7 @@ limitations under the License.
   </bean>
 
   <bean id="commonAnnotateSqlGenerator" class="annis.sqlgen.CommonAnnotateWithClauseGenerator"
-    parent="tableAccessStrategyFactory" lazy-init="true">
+        parent="tableAccessStrategyFactory" lazy-init="true">
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     
     <property name="islandsPolicy" ref="islandsPolicy" />
@@ -276,7 +279,7 @@ limitations under the License.
   </util:list>
 
   <bean id="solutionSqlGeneratorBase" class="annis.sqlgen.SolutionSqlGenerator"
-    parent="tableAccessStrategyFactory">
+        parent="tableAccessStrategyFactory">
     <property name="annoCondition" ref="annotationConditionProvider" />
     
     <property name="selectClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
@@ -304,14 +307,14 @@ limitations under the License.
     
   </bean>
   
-    <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
-        parent="tableAccessStrategyFactory" lazy-init="true">
+  <bean id="matrixSqlGenerator" class="annis.sqlgen.MatrixSqlGenerator"
+          parent="tableAccessStrategyFactory" lazy-init="true">
 
     <lookup-method name="createSolutionKey" bean="postgreSqlArraySolutionKey"/>
     <property name="solutionSqlGenerator">
-       <bean parent="solutionSqlGeneratorBase">
-         <property name="outputToplevelCorpus" value="false" />
-         <property name="outputNodeName" value="false" />
+      <bean parent="solutionSqlGeneratorBase">
+        <property name="outputToplevelCorpus" value="false" />
+        <property name="outputNodeName" value="false" />
       </bean>
     </property>
 
@@ -335,7 +338,7 @@ limitations under the License.
   
 
   <bean id="graphWithClauseSqlGenerator" class="annis.sqlgen.GraphWithClauseGenerator"
-    parent="commonAnnotateSqlGenerator" lazy-init="true" >
+        parent="commonAnnotateSqlGenerator" lazy-init="true" >
   </bean>
 
   <bean id="countSqlGenerator" class="annis.sqlgen.CountSqlGenerator"
@@ -369,9 +372,9 @@ limitations under the License.
   </bean>
 
   
- <bean id="annotationConditionProvider" class="annis.sqlgen.AnnotationConditionProvider" />
+  <bean id="annotationConditionProvider" class="annis.sqlgen.AnnotationConditionProvider" />
   
-	<!-- WHERE clause generator -->
+  <!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGenerator" class="annis.sqlgen.DefaultWhereClauseGenerator"
         parent="defaultWhereClauseGeneratorBase" lazy-init="true">
     <property name="annoCondition" ref="annotationConditionProvider" />

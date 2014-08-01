@@ -44,7 +44,9 @@ import java.util.ArrayList;
 // TODO: do not text context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
 public class LegacyGraphConverterTest
 {

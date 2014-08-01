@@ -60,7 +60,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
+  
 }, loader = AnnisXmlContextLoader.class)
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")

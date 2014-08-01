@@ -173,6 +173,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
 
     // create beans
     GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    ctx.setValidating(false);
     AnnisXmlContextHelper.prepareContext(ctx);
     ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").
       getAbsolutePath());

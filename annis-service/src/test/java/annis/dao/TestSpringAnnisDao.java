@@ -71,10 +71,13 @@ import org.springframework.validation.BindingResultUtils;
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
 public class TestSpringAnnisDao
 {
+  
 
   @Resource(name="annisDao")
   private AnnisDao annisDao;

@@ -18,19 +18,16 @@ limitations under the License.
 
 <beans xmlns="http://www.springframework.org/schema/beans"
 
-	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
-       xmlns:context="http://www.springframework.org/schema/context"
-       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 
-	xsi:schemaLocation="
+       xsi:schemaLocation="
 		http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-		http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-		http://www.springframework.org/schema/context http://www.springframework.org/schema/context/spring-context-3.1.xsd
-		http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-3.1.xsd
-	">
+	"
+       default-lazy-init="true">
 
   <import resource="file:${annis.home}/conf/spring/Common.xml" />
+  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
 
   <bean id="annisRunner" class="annis.AnnisRunner" lazy-init="true">
     <property name="findSqlGenerator" ref="findSqlGenerator"/>
