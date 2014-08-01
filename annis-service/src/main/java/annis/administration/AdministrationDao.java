@@ -41,7 +41,7 @@ public interface AdministrationDao
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL);
+    String superPassword, boolean useSSL, String pgSchema);
 
   /**
    * Reads relAnnis files from several directories.
