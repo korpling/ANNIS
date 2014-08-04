@@ -92,8 +92,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
   public void setFrequencyData(FrequencyTable table, Scale scale, String font, 
     float fontSize)
   {
-    labels = new LinkedList<String>();
-    values = new LinkedList<Long>();
+    labels = new LinkedList<>();
+    values = new LinkedList<>();
 
     for (FrequencyTable.Entry e : table.getEntries())
     {

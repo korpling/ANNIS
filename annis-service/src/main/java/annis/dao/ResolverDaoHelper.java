@@ -134,8 +134,8 @@ public class ResolverDaoHelper implements ResultSetExtractor, PreparedStatementC
   @Override
   public List<ResolverEntry> extractData(ResultSet rs) throws SQLException, DataAccessException
   {
-    List<ResolverEntry> result = new LinkedList<ResolverEntry>();
-    Set<RemoveIndexElement> removeEntries = new HashSet<RemoveIndexElement>();
+    List<ResolverEntry> result = new LinkedList<>();
+    Set<RemoveIndexElement> removeEntries = new HashSet<>();
 
     while (rs.next())
     {

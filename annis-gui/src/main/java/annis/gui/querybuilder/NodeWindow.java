@@ -63,13 +63,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
   {
     this.parent = parent;
     this.id = id;
-    this.annoNames = new TreeSet<String>();
+    this.annoNames = new TreeSet<>();
     
     for(String a :parent.getAvailableAnnotationNames())
     {
       annoNames.add(a.replaceFirst("^[^:]*:", ""));
     }
-    constraints = new ArrayList<ConstraintLayout>();
+    constraints = new ArrayList<>();
     
     setSizeFull();
     

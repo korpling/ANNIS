@@ -60,7 +60,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
+  
 }, loader = AnnisXmlContextLoader.class)
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
@@ -116,7 +119,7 @@ public class BenchmarkTest
   private List<Long> getCorpusIDs(String corpus)
   {
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<String>();
+    List<String> corpusNames = new LinkedList<>();
     corpusNames.add(corpus);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
     return corpusIDs;
@@ -141,7 +144,7 @@ public class BenchmarkTest
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
         "4282");
     provider.writeTo(p, SaltProject.class, null, null,
-      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
   }
 

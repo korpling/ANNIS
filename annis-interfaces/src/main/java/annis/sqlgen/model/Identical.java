@@ -33,13 +33,13 @@ public class Identical extends Join
   @Override
   public String toString()
   {
-    return "identical node " + target.getId();
+    return "identical element " + target.getId();
   }
 
   @Override
   public String toAqlOperator()
   {
-    return "_id_";
+    return "_ident_";
   }
   
   

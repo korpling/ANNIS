@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.VersionInfo;
 import annis.libgui.Helper;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
@@ -72,7 +73,7 @@ public class ReportBugWindow extends Window
     layout.setHeight("350px");
     layout.setWidth("750px");
     
-    form = new FieldGroup(new BeanItem<BugReport>(new BugReport()));
+    form = new FieldGroup(new BeanItem<>(new BugReport()));
     form.bindMemberFields(layout);
     form.setBuffered(true);
     
@@ -99,7 +100,7 @@ public class ReportBugWindow extends Window
         }
         catch (FieldGroup.CommitException ex)
         {
-          List<String> errorFields = new LinkedList<String>();
+          List<String> errorFields = new LinkedList<>();
           for(Field f : form.getFields())
           {
             if (f instanceof AbstractComponent)
@@ -201,8 +202,7 @@ public class ReportBugWindow extends Window
       sbMsg.append("Reporter: ").append(form.getField("name").getValue().
         toString()).append(" (").append(form.getField("email").getValue().
         toString()).append(")\n");
-      sbMsg.append("Version: ").append(VaadinSession.getCurrent().getAttribute(
-        "annis-version")).append(
+      sbMsg.append("Version: ").append(VersionInfo.getVersion()).append(
         "\n");
       sbMsg.append("Vaadin Version: ").append(Version.getFullVersion()).append(
         "\n");

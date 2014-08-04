@@ -24,6 +24,8 @@ import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.Visualizer;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.Sizeable.Unit;
@@ -38,6 +40,7 @@ import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
@@ -76,9 +79,9 @@ public class DocBrowserController implements Serializable
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
-    this.initedDocBrowsers = new HashMap<String, Component>();
-    this.initiatedVis = new HashMap<String, Component>();
-    this.visibleVisHolder = new HashMap<String, Panel>();
+    this.initedDocBrowsers = new HashMap<>();
+    this.initiatedVis = new HashMap<>();
+    this.visibleVisHolder = new HashMap<>();
   }
 
   public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn)
@@ -191,11 +194,7 @@ public class DocBrowserController implements Serializable
         }
       }
     }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
+    catch (ClientHandlerException | UniformInterfaceException | UnsupportedEncodingException e)
     {
       log.error("General remote service exception", e);
     }
@@ -246,6 +245,8 @@ public class DocBrowserController implements Serializable
     private final String type;
 
     private final Panel visHolder;
+    
+    private VisualizerInput input;
 
     public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
       String type,
@@ -265,41 +266,51 @@ public class DocBrowserController implements Serializable
     @Override
     public void run()
     {
+      input = null;
+      
+      final boolean createVis = !initiatedVis.containsKey(canonicalTitle);
+      
+      final VisualizerPlugin visualizer = ((PluginSystem) ui).
+              getVisualizer(type);
+      
       // check if a visualization is already initiated
       {
-        if (!initiatedVis.containsKey(canonicalTitle))
+        if (createVis)
         {
-          VisualizerPlugin visualizer = ((PluginSystem) ui).
-            getVisualizer(type);
-
           // fetch the salt project - so long part
-          VisualizerInput input = createInput(corpus, doc, config, visualizer.
+          input = createInput(corpus, doc, config, visualizer.
             isUsingRawText());
 
-          // create and format visualizer
-          Component vis = visualizer.createComponent(input, null);
-          vis.addStyleName("corpus-font-force");
-          vis.setPrimaryStyleName("docviewer");
-          vis.setCaption(canonicalTitle);
-          vis.setWidth(100, Unit.PERCENTAGE);
-          vis.setHeight(-1, Unit.PIXELS);
-
-          // update visualizer memory cache
-          initiatedVis.put(canonicalTitle, vis);
         }
       }
-
+     
       // after initializing the visualizer update the gui
       UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
         {
+          
+          btn.setEnabled(true);
+
+          if (createVis && input != null)
+          {
+            // create and format visualizer
+            
+            Component vis = visualizer.createComponent(input, null);
+            vis.addStyleName("corpus-font-force");
+            vis.setPrimaryStyleName("docviewer");
+            vis.setCaption(canonicalTitle);
+            vis.setWidth(100, Unit.PERCENTAGE);
+            vis.setHeight(-1, Unit.PIXELS);
+
+            // update visualizer memory cache
+            initiatedVis.put(canonicalTitle, vis);
+          }
 
           Component vis = initiatedVis.get(canonicalTitle);
           visHolder.setContent(vis);
 
-          btn.setEnabled(true);
         }
       });
     }

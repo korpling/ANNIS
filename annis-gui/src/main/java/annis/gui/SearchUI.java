@@ -15,6 +15,7 @@
  */
 package annis.gui;
 
+import annis.VersionInfo;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
@@ -23,7 +24,6 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -47,10 +47,10 @@ import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.event.ShortcutAction;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
@@ -428,6 +428,50 @@ public class SearchUI extends AnnisBaseUI
 
     updateUserInformation();
     updateControlsForSidebarState();
+    
+    
+    checkServiceVersion();
+  }
+  
+  private void checkServiceVersion()
+  {
+    try
+    {
+      WebResource resRelease 
+        = Helper.getAnnisWebResource().path("version").path("release");
+      String releaseService = resRelease.get(String.class);
+      String releaseGUI = VersionInfo.getReleaseName();
+
+      // check if the release version differs and show a big warning
+      if(!releaseGUI.equals(releaseService))
+      {
+        Notification.show("Different service version",
+          "The service uses version " + releaseService
+          + " but the user interface is using version  " + releaseGUI
+          + ". This can produce unwanted errors.",
+          Notification.Type.WARNING_MESSAGE);
+      }
+      else
+      {
+        // show a smaller warning if the revisions are not the same
+        WebResource resRevision 
+          = Helper.getAnnisWebResource().path("version").path("revision");
+        String revisionService = resRevision.get(String.class);
+        String revisionGUI = VersionInfo.getBuildRevision();
+        if(!revisionService.equals(revisionGUI))
+        {
+          Notification.show("Different service revision",
+            "The service uses revision " + revisionService
+            + " but the user interface is using revision  " + revisionGUI
+            + ".",
+            Notification.Type.TRAY_NOTIFICATION);
+        }
+      }
+    }
+    catch(UniformInterfaceException ex)
+    {
+      log.warn("Could not get the version of the service", ex);
+    }
   }
   
   public void regenerateStateFromCookies()
@@ -680,7 +724,7 @@ public class SearchUI extends AnnisBaseUI
       }
 
       // CIDS
-      Set<String> selectedCorpora = new HashSet<String>();
+      Set<String> selectedCorpora = new HashSet<>();
       if (m.group(2) != null)
       {
         String[] cids = m.group(2).split(",");
@@ -693,7 +737,7 @@ public class SearchUI extends AnnisBaseUI
         res.path("query").path("corpora").
         get(new AnnisCorpusListType());
 
-      LinkedList<String> userCorporaStrings = new LinkedList<String>();
+      LinkedList<String> userCorporaStrings = new LinkedList<>();
       for (AnnisCorpus c : userCorpora)
       {
         userCorporaStrings.add(c.getName());
@@ -726,7 +770,7 @@ public class SearchUI extends AnnisBaseUI
       }
 
       // remove all currently openend sub-windows
-      Set<Window> all = new HashSet<Window>(getWindows());
+      Set<Window> all = new HashSet<>(getWindows());
       for (Window w : all)
       {
         removeWindow(w);
@@ -896,7 +940,7 @@ public class SearchUI extends AnnisBaseUI
       WebBrowser browser = getPage().getWebBrowser();
 
       // IE9 users can install a plugin
-      Set<String> supportedByIE9Plugin = new HashSet<String>();
+      Set<String> supportedByIE9Plugin = new HashSet<>();
       supportedByIE9Plugin.add("video/webm");
       supportedByIE9Plugin.add("audio/ogg");
       supportedByIE9Plugin.add("video/ogg");
@@ -986,7 +1030,7 @@ public class SearchUI extends AnnisBaseUI
   private Set<String> getMappedCorpora(List<String> originalNames)
   {
     WebResource rootRes = Helper.getAnnisWebResource();
-    Set<String> mappedNames = new HashSet<String>();
+    Set<String> mappedNames = new HashSet<>();
     // iterate over given corpora and map names if necessary
     for (String selectedCorpusName : originalNames)
     {
@@ -1031,7 +1075,7 @@ public class SearchUI extends AnnisBaseUI
 
     Map<String, String> args = Helper.parseFragment(fragment);
 
-    Set<String> corpora = new TreeSet<String>();
+    Set<String> corpora = new TreeSet<>();
 
     if (args.containsKey("c"))
     {

@@ -138,7 +138,7 @@ public class CorefVisualizer extends WriterVisualizer
     
     public SerializableAnnotation(SAnnotation orig)
     {
-      this.value = orig.getSName();
+      this.name = orig.getSName();
       this.value = orig.getSValueSTEXT();
     }
 

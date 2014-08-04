@@ -118,11 +118,7 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
                                     + res.toString(), ex);
                         }
                     }
-                } catch (UniformInterfaceException ex) {
-                    log.error(null, ex);
-                } catch (ClientHandlerException ex) {
-                    log.error(null, ex);
-                } catch (UnsupportedEncodingException ex) {
+                } catch (UniformInterfaceException | ClientHandlerException | UnsupportedEncodingException ex) {
                     log.error(null, ex);
                 }
             }

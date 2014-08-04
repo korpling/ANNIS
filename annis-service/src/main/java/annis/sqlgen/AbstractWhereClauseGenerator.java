@@ -20,6 +20,7 @@ import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -38,7 +39,7 @@ public abstract class AbstractWhereClauseGenerator extends
   public Set<String> whereConditions(QueryData queryData,
       List<QueryNode> alternative, String indent)
   {
-    List<String> conditions = new ArrayList<String>();
+    List<String> conditions = new ArrayList<>();
 
     for (QueryNode node : alternative)
     {
@@ -113,6 +114,10 @@ public abstract class AbstractWhereClauseGenerator extends
         {
           addPrecedenceConditions(conditions, node, target, (Precedence) join,
               queryData);
+        } else if (join instanceof Near)
+        {
+          addNearConditions(conditions, node, target, (Near) join,
+              queryData);
         } else if (join instanceof Sibling)
         {
           addSiblingConditions(conditions, node, target, (Sibling) join,
@@ -165,7 +170,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
     }
 
-    return new HashSet<String>(conditions);
+    return new HashSet<>(conditions);
   }
 
   protected abstract void addSpanConditions(List<String> conditions,
@@ -225,6 +230,9 @@ public abstract class AbstractWhereClauseGenerator extends
 
   protected abstract void addPrecedenceConditions(List<String> conditions,
       QueryNode node, QueryNode target, Precedence join, QueryData queryData);
+
+  protected abstract void addNearConditions(List<String> conditions,
+      QueryNode node, QueryNode target, Near join, QueryData queryData);
 
   protected abstract void addAnnotationConditions(List<String> conditions,
       QueryNode node, int index, QueryAnnotation annotation, String table,

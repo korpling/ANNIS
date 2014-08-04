@@ -70,7 +70,7 @@ public class TestTableAccessStrategy {
 
 		tableAccessStrategy = new TableAccessStrategy(node23);
 
-		expected = new HashMap<String, Integer>();
+		expected = new HashMap<>();
 		expected.put(NODE_TABLE, 0);
 		expected.put(RANK_TABLE, 0);
 		expected.put(COMPONENT_TABLE, 0);

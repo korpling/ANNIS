@@ -40,13 +40,13 @@ public class MetaDataAndCorpusWhereClauseGenerator
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    Set<String> conditions = new HashSet<String>();
+    Set<String> conditions = new HashSet<>();
     List<Long> corpusList = queryData.getCorpusList();
     List<Long> documents = queryData.getDocuments();
 
     if (documents == null && corpusList == null)
     {
-      return new HashSet<String>();
+      return new HashSet<>();
     }
 
     for (QueryNode node : alternative)
@@ -55,7 +55,7 @@ public class MetaDataAndCorpusWhereClauseGenerator
       // conditions.add("-- select documents by metadata and toplevel corpus");
       if (documents != null)
       {
-        List<String> emptyList = new LinkedList<String>();
+        List<String> emptyList = new LinkedList<>();
         emptyList.add("NULL");
         
         conditions.add(in(tables(node).aliasedColumn(NODE_TABLE, "corpus_ref"),
