@@ -108,7 +108,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         unsetPrompt();
       }
       
-      if(cmTextArea.getValue() !== connector.getState().text)
+      if(connector.getState().clientText !== connector.getState().text)
       {
         cmTextArea.setValue(connector.getState().text);
 

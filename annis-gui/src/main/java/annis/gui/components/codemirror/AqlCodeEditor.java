@@ -76,7 +76,9 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     public void call(JSONArray args) throws JSONException
     {
       getState().text = args.getString(0);
-      validate(args.getString(0));
+      getState().clientText = getState().text;
+      
+      validate(getState().text);
       final String textCopy = getState().text;
       final int cursorPos = args.getInt(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)

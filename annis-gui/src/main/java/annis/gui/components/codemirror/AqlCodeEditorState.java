@@ -27,7 +27,10 @@ import java.util.List;
  */
 public class AqlCodeEditorState extends JavaScriptComponentState
 {
-  public String text = ""; 
+  /** The current text of the editor **/
+  public String text = "";
+  /** The last string as sent by the client **/
+  public String clientText = "";
   public String inputPrompt = "";
   public List<AqlParseError> errors = new LinkedList<AqlParseError>();
 
