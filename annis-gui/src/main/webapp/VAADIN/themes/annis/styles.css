@@ -6516,12 +6516,22 @@ body .annis.v-app .v-app-loading {
 	color: red;
 }
 
+.annis .aql-code-editor .cm-node_1 {
+	color: red;
+	font-weight: bold;
+}
+
 .annis .v-table-cell-content-match_2 {
 	color: #c71585;
 }
 
 .annis .kwic td.v-table-cell-content-match_2 {
 	color: #c71585;
+}
+
+.annis .aql-code-editor .cm-node_2 {
+	color: #c71585;
+	font-weight: bold;
 }
 
 .annis .v-table-cell-content-match_3 {
@@ -6532,12 +6542,22 @@ body .annis.v-app .v-app-loading {
 	color: #32cd32;
 }
 
+.annis .aql-code-editor .cm-node_3 {
+	color: #32cd32;
+	font-weight: bold;
+}
+
 .annis .v-table-cell-content-match_4 {
 	color: #cd853f;
 }
 
 .annis .kwic td.v-table-cell-content-match_4 {
 	color: #cd853f;
+}
+
+.annis .aql-code-editor .cm-node_4 {
+	color: #cd853f;
+	font-weight: bold;
 }
 
 .annis .v-table-cell-content-match_5 {
@@ -6548,12 +6568,22 @@ body .annis.v-app .v-app-loading {
 	color: #cd5c5c;
 }
 
+.annis .aql-code-editor .cm-node_5 {
+	color: #cd5c5c;
+	font-weight: bold;
+}
+
 .annis .v-table-cell-content-match_6 {
 	color: #adff2f;
 }
 
 .annis .kwic td.v-table-cell-content-match_6 {
 	color: #adff2f;
+}
+
+.annis .aql-code-editor .cm-node_6 {
+	color: #adff2f;
+	font-weight: bold;
 }
 
 .annis .v-table-cell-content-match_7 {
@@ -6564,12 +6594,22 @@ body .annis.v-app .v-app-loading {
 	color: #8b0000;
 }
 
+.annis .aql-code-editor .cm-node_7 {
+	color: #8b0000;
+	font-weight: bold;
+}
+
 .annis .v-table-cell-content-match_8 {
 	color: #ff4500;
 }
 
 .annis .kwic td.v-table-cell-content-match_8 {
 	color: #ff4500;
+}
+
+.annis .aql-code-editor .cm-node_8 {
+	color: #ff4500;
+	font-weight: bold;
 }
 
 .annis .v-form-errormessage {

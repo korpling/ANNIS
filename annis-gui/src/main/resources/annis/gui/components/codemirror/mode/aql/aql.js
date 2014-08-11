@@ -57,10 +57,6 @@ CodeMirror.defineMode("aql", function() {
         {
           return "bracket";
         }
-        else if(stream.match("tok") || stream.match("node"))
-        {
-          return "keyword";
-        }
         else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->)|(>@l)|(>@r)|(>\*)|(>)|(\$\*)|(\$)/))
         {
           return "operator";
@@ -68,6 +64,14 @@ CodeMirror.defineMode("aql", function() {
         else if(stream.match(/#[0-9a-zA-Z]+/))
         {
           return "variable-2";
+        }
+        else if(stream.match(/[a-zA-Z][a-zA-Z0-9]*/))
+        {
+          if (state.numberOfNodes < 8)
+          {
+            state.numberOfNodes++;
+          }
+          return "node_" + state.numberOfNodes;
         }
       }
       
@@ -79,7 +83,8 @@ CodeMirror.defineMode("aql", function() {
 
     startState: function() {
       return {
-        position : "def"       // Current position, "def" or "quote"
+        position : "def",       // Current position, "def" or "quote",
+        numberOfNodes : 0  // number of ndes that have been detected yet
       };
     }
 
