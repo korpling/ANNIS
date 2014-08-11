@@ -108,6 +108,13 @@
       <version>9.1-901-1.jdbc4</version>
       <scope>compile</scope>
     </dependency>
+    
+    <dependency>
+      <groupId>org.apache.commons</groupId>
+      <artifactId>commons-dbcp2</artifactId>
+      <version>2.0.1</version>
+      <scope>compile</scope>
+    </dependency>
 
 
     <dependency>
@@ -253,17 +260,22 @@
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-core</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-web</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
     </dependency>
     <dependency>
       <groupId>org.apache.shiro</groupId>
       <artifactId>shiro-ehcache</artifactId>
-      <version>1.2.2</version>
+      <version>1.2.3</version>
+    </dependency>
+    <dependency>
+      <groupId>net.sf.ehcache</groupId>
+      <artifactId>ehcache-core</artifactId>
+      <version>2.6.9</version>
     </dependency>
 
     <dependency>
@@ -276,7 +288,7 @@
     <dependency>
       <groupId>com.tunnelvisionlabs</groupId>
       <artifactId>antlr4-runtime</artifactId>
-      <version>4.1</version>
+      <version>4.2.2</version>
       <scope>compile</scope>
     </dependency>
     
@@ -291,15 +303,6 @@
       <resource>
         <!-- include everything from src/main/java except *.java files -->
         <directory>${basedir}/src/main/java</directory>
-        <includes>
-          <include>**/*</include>
-        </includes>
-        <excludes>
-          <exclude>**/*.java</exclude>
-        </excludes>
-      </resource>
-      <resource>
-        <directory>${basedir}/src/main/resources</directory>
         <includes>
           <include>**/*</include>
         </includes>
@@ -331,7 +334,7 @@
       <plugin>
         <groupId>com.tunnelvisionlabs</groupId>
         <artifactId>antlr4-maven-plugin</artifactId>
-        <version>4.1</version>
+        <version>4.2.2</version>
         <executions>
           <execution>
            <goals>
@@ -342,17 +345,6 @@
             </configuration>
           </execution>
         </executions>
-      </plugin>
-
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>2.0.2</version>
-        <configuration>
-          <encoding>${project.build.sourceEncoding}</encoding>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
       </plugin>
 
       <plugin>

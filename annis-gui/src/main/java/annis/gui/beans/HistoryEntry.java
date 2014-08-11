@@ -32,7 +32,7 @@ public class HistoryEntry implements CitationProvider, Serializable
 
   public HistoryEntry()
   {
-    corpora = new HashSet<String>();
+    corpora = new HashSet<>();
   }
 
   @Override

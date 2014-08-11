@@ -70,7 +70,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     sb.setImmediate(true);
     sb.setSpacing(true);
     sb.setMargin(true);
-    ConcurrentSkipListSet<String> annos = new ConcurrentSkipListSet<String>();
+    ConcurrentSkipListSet<String> annos = new ConcurrentSkipListSet<>();
     for(String a : sq.getAvailableAnnotationLevels(ebene))
     {
       annos.add(a);
@@ -158,7 +158,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
   public void textChange(FieldEvents.TextChangeEvent event)
   {        
     String txt = event.getText();
-    HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
+    HashMap<Integer, Collection> levdistvals = new HashMap<>();
     if (txt.length() > 1)
     {
       cb.removeAllItems();
@@ -169,12 +169,12 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
           levdistvals.get(d).add(s);
         }
         if (!levdistvals.containsKey(d)){
-          Set<String> newc = new TreeSet<String>();
+          Set<String> newc = new TreeSet<>();
           newc.add(s);
           levdistvals.put(d, newc);
         }
       }
-      SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
+      SortedSet<Integer> keys = new TreeSet<>(levdistvals.keySet());
       for(Integer k : keys.subSet(0, 5)){
         List<String> values = new ArrayList(levdistvals.get(k));
         Collections.sort(values, String.CASE_INSENSITIVE_ORDER);

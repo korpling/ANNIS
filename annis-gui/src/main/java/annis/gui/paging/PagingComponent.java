@@ -106,7 +106,7 @@ public class PagingComponent extends Panel implements
 
     addStyleName("toolbar");
 
-    callbacks = new HashSet<PagingCallback>();
+    callbacks = new HashSet<>();
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);

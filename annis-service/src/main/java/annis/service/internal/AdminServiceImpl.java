@@ -124,7 +124,7 @@ public class AdminServiceImpl implements AdminService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:query-import:running");
     
-    List<ImportJob> result = new LinkedList<ImportJob>();
+    List<ImportJob> result = new LinkedList<>();
     ImportJob current = importWorker.getCurrentJob();
     if(current != null && 
       current.getStatus() != ImportJob.Status.SUCCESS && current.getStatus() != ImportJob.Status.ERROR)
@@ -165,15 +165,15 @@ public class AdminServiceImpl implements AdminService
     boolean overwrite = Boolean.parseBoolean(overwriteRaw);
     
     // write content to temporary file
-    OutputStream tmpOut = null;
     try
     {
       File tmpZip = File.createTempFile("annis-import", ".zip");
       tmpZip.deleteOnExit();
       
-      tmpOut = new FileOutputStream(tmpZip);
-      ByteStreams.copy(request.getInputStream(), tmpOut); 
-      
+      try(OutputStream tmpOut = new FileOutputStream(tmpZip))
+      {
+        ByteStreams.copy(request.getInputStream(), tmpOut); 
+      }
       Set<String> allNames = RelANNISHelper.corporaInZipfile(tmpZip).keySet();
       
       if(!allNames.isEmpty())
@@ -184,7 +184,7 @@ public class AdminServiceImpl implements AdminService
         }
         String caption = Joiner.on(", ").join(allNames);
 
-        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<String>(allNames));
+        List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(new LinkedList<>(allNames));
         if(overwrite || corpusIDs == null || corpusIDs.isEmpty())
         {
           ImportJob job = new ImportJob();
@@ -235,20 +235,6 @@ public class AdminServiceImpl implements AdminService
     catch(IOException ex)
     {
       log.error(null, ex);
-    }
-    finally
-    {
-      if(tmpOut != null)
-      {
-        try
-        {
-          tmpOut.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     return Response.serverError().build();
   }

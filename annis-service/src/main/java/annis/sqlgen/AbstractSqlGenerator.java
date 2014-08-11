@@ -38,9 +38,9 @@ import org.springframework.util.Assert;
  *
  * @param <T> Type into which the JDBC result set is transformed.
  */
-public abstract class AbstractSqlGenerator<T>
+public abstract class AbstractSqlGenerator
   extends TableAccessStrategyFactory
-  implements SqlGenerator<QueryData, T>
+  implements SqlGenerator<QueryData>
 {
 
   // generators for different SQL statement clauses
@@ -129,7 +129,7 @@ public abstract class AbstractSqlGenerator<T>
   {
     sb.append(indent);
     sb.append("FROM");
-    List<String> fromTables = new ArrayList<String>();
+    List<String> fromTables = new ArrayList<>();
     for (FromClauseSqlGenerator<QueryData> generator : fromClauseSqlGenerators)
     {
       fromTables.add(generator.fromClause(queryData, alternative, indent));
@@ -151,7 +151,7 @@ public abstract class AbstractSqlGenerator<T>
     }
 
     // treat each condition as mutable string to remove last AND
-    List<StringBuffer> conditions = new ArrayList<StringBuffer>();
+    List<StringBuffer> conditions = new ArrayList<>();
 
     for (WhereClauseSqlGenerator<QueryData> generator : whereClauseSqlGenerators)
     {
@@ -210,11 +210,15 @@ public abstract class AbstractSqlGenerator<T>
   {
     if (groupByClauseSqlGenerator != null)
     {
-      sb.append(indent);
-      sb.append("GROUP BY ");
-      sb.append(groupByClauseSqlGenerator.groupByAttributes(queryData,
-        alternative));
-      sb.append("\n");
+      String atts = groupByClauseSqlGenerator.groupByAttributes(queryData,
+        alternative);
+      if(atts != null && !atts.isEmpty())
+      {
+        sb.append(indent);
+        sb.append("GROUP BY ");
+        sb.append(atts);
+        sb.append("\n");
+      }
     }
   }
 
@@ -236,7 +240,6 @@ public abstract class AbstractSqlGenerator<T>
   {
     if (limitOffsetClauseSqlGenerator != null)
     {
-      sb.append(indent);
       sb.append(limitOffsetClauseSqlGenerator.limitOffsetClause(queryData,
         alternative, indent));
       sb.append("\n");

@@ -82,6 +82,21 @@ B	    </strong>
 		  <td width="26">&nbsp;</td>
 		  <td>Both elements span an area ending with the same token </td>
 		</tr>
+    	<tr>
+	  <td height="38"><code>^</code></td>
+	  <td>Directly near</td>
+    <td colspan="3"><div style="align: center"><left><strong>AB</strong> or<br/> <strong>BA</strong></left></div>
+	        </td>
+          <td>Elements stand next to each other in some order. Use <code>^n,m</code> or <code>^*</code> to specify possible distance in tokens as shown below.</td>
+	</tr>
+    	<tr>
+	  <td height="38"><code>^*</code></td>
+	  <td>Indirectly near</td>
+      <td colspan="3"><div style="align: center"><left><strong>A</strong> x y z <strong>B</strong> or<br/> <strong>B</strong> x y z <strong>A</strong></left></div>
+	        </td>
+          <td>Elements appear near each other in some order within 50 tokens (by default). Use <code>^n,m</code> to specify exact distance range.</td>
+	</tr>
+
 			<tr>
 	  <td height="38">==</td>
 	  <td>Value identity</td>

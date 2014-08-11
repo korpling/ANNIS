@@ -49,7 +49,7 @@ public class AnnisParserAntlr
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    final List<AqlParseError> errors = new LinkedList<AqlParseError>();
+    final List<AqlParseError> errors = new LinkedList<>();
     
 
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
@@ -134,7 +134,7 @@ public class AnnisParserAntlr
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
     
-    final List<AqlParseError> errors = new LinkedList<AqlParseError>();
+    final List<AqlParseError> errors = new LinkedList<>();
 
     parser.removeErrorListeners();
     parser.addErrorListener(new AqlParseErrorListener(errors));

@@ -97,7 +97,7 @@ public class RawAqlListener extends RawAqlPreParserBaseListener
   
   private static List<Token> collectToken(ParseTree node)
   {
-    List<Token> token = new LinkedList<Token>();
+    List<Token> token = new LinkedList<>();
     collectToken(node, token);
     return token;
   }

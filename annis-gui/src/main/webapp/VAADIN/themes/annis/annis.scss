@@ -261,9 +261,20 @@ $font-size: 10pt;
     border-width: 1px;
   }
   
-  .help-tab .v-accordion-item-caption {
-    background-color: #ecffe7;
-  }
+  .help-tab {
+    .v-accordion-item-caption {
+      background-color: #ecffe7;
+    }
+    .v-captiontext {
+      text-decoration: underline;
+      color: #3137F5;
+    }
+    .v-accordion-item-open .v-captiontext {
+      text-decoration: none;
+      color: black;
+    }
+  } 
+
   /* Chamaeleon theme tab appeareance is sub-optimal */
   .blue-tab .v-tabsheet-tabitem {
     border: 1px solid rgb(204,204,204);

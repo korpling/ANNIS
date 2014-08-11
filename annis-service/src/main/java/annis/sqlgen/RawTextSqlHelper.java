@@ -74,7 +74,7 @@ public class RawTextSqlHelper implements ResultSetExtractor<List<String>>
   @Override
   public List<String> extractData(ResultSet rs) throws SQLException, DataAccessException
   {
-    List<String> resultBuffer = new ArrayList<String>();
+    List<String> resultBuffer = new ArrayList<>();
     while (rs.next())
     {
       resultBuffer.add(rs.getString("text"));

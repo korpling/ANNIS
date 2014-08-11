@@ -1,3 +1,44 @@
+Version 3.1.7
+=============
+
+We would like to give special thanks to Adriane Boyd and Lari Lampen for providing the bug fixes for the issues #332 and #336.
+
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=17&state=closed
+
+[Bugs]
+ #340 fixed bug in CorefVisualizer. The annotation name is now displayed
+ #336 Existence of directory is not checked when saving corpus properties
+ #332 document browser needs long time to load when there is a larger number of metadata
+
+Version 3.1.6
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=16&state=closed
+
+[Bugs]
+ #325 fetching results (subgraphs) slow
+ #324 Source code contains files with invalid (Windows) file names
+
+
+Version 3.1.5
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=15&state=closed
+
+[Bugs]
+ #323 css style sheet is not read in HTML visualizer when started from document browser on kickstarter
+ #322 Invalid regex search error is not caught by interface
+ #321 negated metadata queries don't work any longer
+
+Version 3.1.4
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=14&state=closed
+
+[Bugs]
+ #316 OR-queries with different number of nodes don't work any longer
+
 Version 3.1.3
 =============
 Changelog is also available on GitHub:

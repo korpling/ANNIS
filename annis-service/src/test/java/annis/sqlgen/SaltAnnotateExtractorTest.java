@@ -54,7 +54,7 @@ public class SaltAnnotateExtractorTest
   private SaltAnnotateExtractor instance;
   
   // dependencies
-  private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<String>();
+  private PostgreSqlArraySolutionKey<String> solutionKey = new PostgreSqlArraySolutionKey<>();
   
 
   @Before
@@ -117,9 +117,9 @@ public class SaltAnnotateExtractorTest
     assertEquals("dep", layers.get(0).getSName());
     assertEquals("exmaralda", layers.get(1).getSName());
     assertEquals("mmax", layers.get(2).getSName());
-    assertEquals("tiger", layers.get(3).getSName());
-    assertEquals("token_merged", layers.get(4).getSName());
-    assertEquals("urml", layers.get(5).getSName());
+    assertEquals("rst", layers.get(3).getSName());
+    assertEquals("tiger", layers.get(4).getSName());
+    assertEquals("token_merged", layers.get(5).getSName());
   }
 
   @Test
@@ -135,23 +135,23 @@ public class SaltAnnotateExtractorTest
     ECollections.sort(n, new NameComparator());
     assertEquals(9, n.size());
     assertEquals("sSpan10", n.get(0).getSName());
-    assertEquals("sSpan40", n.get(1).getSName());
-    assertEquals("sSpan41", n.get(2).getSName());
-    assertEquals("sSpan74", n.get(3).getSName());
-    assertEquals("sSpan75", n.get(4).getSName());
-    assertEquals("sSpan86", n.get(5).getSName());
+    assertEquals("sSpan41", n.get(1).getSName());
+    assertEquals("sSpan42", n.get(2).getSName());
+    assertEquals("sSpan75", n.get(3).getSName());
+    assertEquals("sSpan76", n.get(4).getSName());
+    assertEquals("sSpan87", n.get(5).getSName());
     assertEquals("sSpan9", n.get(6).getSName());
-    assertEquals("sSpan97", n.get(7).getSName());
-    assertEquals("sSpan98", n.get(8).getSName());
+    assertEquals("sSpan98", n.get(7).getSName());
+    assertEquals("sSpan99", n.get(8).getSName());
 
     n = g.getSLayerByName("mmax").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
     assertEquals(5, n.size());
-    assertEquals("sSpan121", n.get(0).getSName());
-    assertEquals("sSpan124", n.get(1).getSName());
-    assertEquals("sSpan151", n.get(2).getSName());
-    assertEquals("sSpan152", n.get(3).getSName());
-    assertEquals("sSpan153", n.get(4).getSName());
+    assertEquals("sSpan122", n.get(0).getSName());
+    assertEquals("sSpan125", n.get(1).getSName());
+    assertEquals("sSpan152", n.get(2).getSName());
+    assertEquals("sSpan153", n.get(3).getSName());
+    assertEquals("sSpan154", n.get(4).getSName());
 
     n = g.getSLayerByName("tiger").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
@@ -183,12 +183,19 @@ public class SaltAnnotateExtractorTest
     assertEquals("tok_160", n.get(10).getSName());
     assertEquals("tok_161", n.get(11).getSName());
 
-    n = g.getSLayerByName("urml").get(0).getSNodes();
+    n = g.getSLayerByName("rst").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
-    assertEquals(2, n.size());
-    assertEquals("sSpan166", n.get(0).getSName());
-    assertEquals("sSpan167", n.get(1).getSName());
-
+    assertEquals(9, n.size());
+    assertEquals("u0", n.get(0).getSName());
+    assertEquals("u10", n.get(1).getSName());
+    assertEquals("u11", n.get(2).getSName());
+    assertEquals("u12", n.get(3).getSName());
+    assertEquals("u20", n.get(4).getSName());
+    assertEquals("u23", n.get(5).getSName());
+    assertEquals("u24", n.get(6).getSName());
+    assertEquals("u27", n.get(7).getSName());
+    assertEquals("u28", n.get(8).getSName());
+    
     assertEquals(0, g.getSLayerByName("dep").get(0).getSNodes().size());
   }
 
@@ -256,25 +263,25 @@ public class SaltAnnotateExtractorTest
     assertEquals("sSpan10", e.get(6).getSSource().getSName());
     assertEquals("tok_160", e.get(6).getSTarget().getSName());
 
-    assertEquals("sSpan40", e.get(7).getSSource().getSName());
+    assertEquals("sSpan41", e.get(7).getSSource().getSName());
     assertEquals("tok_150", e.get(7).getSTarget().getSName());
-    assertEquals("sSpan40", e.get(8).getSSource().getSName());
+    assertEquals("sSpan41", e.get(8).getSSource().getSName());
     assertEquals("tok_151", e.get(8).getSTarget().getSName());
 
-    assertEquals("sSpan41", e.get(9).getSSource().getSName());
+    assertEquals("sSpan42", e.get(9).getSSource().getSName());
     assertEquals("tok_155", e.get(9).getSTarget().getSName());
 
-    assertEquals("sSpan74", e.get(10).getSSource().getSName());
+    assertEquals("sSpan75", e.get(10).getSSource().getSName());
     assertEquals("tok_150", e.get(10).getSTarget().getSName());
-    assertEquals("sSpan74", e.get(11).getSSource().getSName());
+    assertEquals("sSpan75", e.get(11).getSSource().getSName());
     assertEquals("tok_151", e.get(11).getSTarget().getSName());
 
-    assertEquals("sSpan75", e.get(12).getSSource().getSName());
+    assertEquals("sSpan76", e.get(12).getSSource().getSName());
     assertEquals("tok_155", e.get(12).getSTarget().getSName());
 
-    assertEquals("sSpan86", e.get(13).getSSource().getSName());
+    assertEquals("sSpan87", e.get(13).getSSource().getSName());
     assertEquals("tok_150", e.get(13).getSTarget().getSName());
-    assertEquals("sSpan86", e.get(14).getSSource().getSName());
+    assertEquals("sSpan87", e.get(14).getSSource().getSName());
     assertEquals("tok_151", e.get(14).getSTarget().getSName());
 
     assertEquals("sSpan9", e.get(15).getSSource().getSName());
@@ -284,30 +291,30 @@ public class SaltAnnotateExtractorTest
     assertEquals("sSpan9", e.get(17).getSSource().getSName());
     assertEquals("tok_152", e.get(17).getSTarget().getSName());
 
-    assertEquals("sSpan97", e.get(18).getSSource().getSName());
+    assertEquals("sSpan98", e.get(18).getSSource().getSName());
     assertEquals("tok_150", e.get(18).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(19).getSSource().getSName());
+    assertEquals("sSpan98", e.get(19).getSSource().getSName());
     assertEquals("tok_151", e.get(19).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(20).getSSource().getSName());
+    assertEquals("sSpan98", e.get(20).getSSource().getSName());
     assertEquals("tok_152", e.get(20).getSTarget().getSName());
-    assertEquals("sSpan97", e.get(21).getSSource().getSName());
+    assertEquals("sSpan98", e.get(21).getSSource().getSName());
     assertEquals("tok_153", e.get(21).getSTarget().getSName());
 
-    assertEquals("sSpan98", e.get(22).getSSource().getSName());
+    assertEquals("sSpan99", e.get(22).getSSource().getSName());
     assertEquals("tok_154", e.get(22).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(23).getSSource().getSName());
+    assertEquals("sSpan99", e.get(23).getSSource().getSName());
     assertEquals("tok_155", e.get(23).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(24).getSSource().getSName());
+    assertEquals("sSpan99", e.get(24).getSSource().getSName());
     assertEquals("tok_156", e.get(24).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(25).getSSource().getSName());
+    assertEquals("sSpan99", e.get(25).getSSource().getSName());
     assertEquals("tok_157", e.get(25).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(26).getSSource().getSName());
+    assertEquals("sSpan99", e.get(26).getSSource().getSName());
     assertEquals("tok_158", e.get(26).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(27).getSSource().getSName());
+    assertEquals("sSpan99", e.get(27).getSSource().getSName());
     assertEquals("tok_159", e.get(27).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(28).getSSource().getSName());
+    assertEquals("sSpan99", e.get(28).getSSource().getSName());
     assertEquals("tok_160", e.get(28).getSTarget().getSName());
-    assertEquals("sSpan98", e.get(29).getSSource().getSName());
+    assertEquals("sSpan99", e.get(29).getSSource().getSName());
     assertEquals("tok_161", e.get(29).getSTarget().getSName());
 
     // mmax, only control samples //
@@ -316,9 +323,9 @@ public class SaltAnnotateExtractorTest
 
     assertEquals(14, e.size());
 
-    assertEquals("sSpan151", e.get(2).getSSource().getSName());
+    assertEquals("sSpan152", e.get(2).getSSource().getSName());
     assertEquals("tok_150", e.get(2).getSTarget().getSName());
-    assertEquals("sSpan151", e.get(3).getSSource().getSName());
+    assertEquals("sSpan152", e.get(3).getSSource().getSName());
     assertEquals("tok_151", e.get(3).getSTarget().getSName());
 
     // tiger, only control samples //
@@ -333,15 +340,15 @@ public class SaltAnnotateExtractorTest
     assertEquals("tok_156", e.get(16).getSTarget().getSName());
 
     // urml, only control samples //
-    e = g.getSLayerByName("urml").get(0).getSRelations();
+    e = g.getSLayerByName("rst").get(0).getSRelations();
     ECollections.sort(e, new EdgeComparator());
 
-    assertEquals(12, e.size());
+    assertEquals(20, e.size());
 
-    assertEquals("sSpan166", e.get(0).getSSource().getSName());
-    assertEquals("tok_150", e.get(0).getSTarget().getSName());
-    assertEquals("sSpan167", e.get(6).getSSource().getSName());
-    assertEquals("tok_156", e.get(6).getSTarget().getSName());
+    assertEquals("u0", e.get(0).getSSource().getSName());
+    assertEquals("u28", e.get(0).getSTarget().getSName());
+    assertEquals("u12", e.get(7).getSSource().getSName());
+    assertEquals("tok_154", e.get(7).getSTarget().getSName());
 
   }
 

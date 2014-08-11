@@ -75,7 +75,7 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
       return;
     }
 
-    List<Match> subList = new LinkedList<Match>();
+    List<Match> subList = new LinkedList<>();
     subList.add(match);
     SaltProject p = executeQuery(subgraphRes,
       new MatchGroup(subList),

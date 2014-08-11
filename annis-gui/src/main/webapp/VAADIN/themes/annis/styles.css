@@ -7,7 +7,7 @@
 }
 
 .v-vaadin-version:after {
-	content: "7.1.14";
+	content: "7.2.6";
 }
 
 .v-generated-body {
@@ -250,15 +250,15 @@
 }
 
 .v-debugwindow-row.FINE {
-	color: #777;
+	color: #737373;
 }
 
 .v-debugwindow-row.FINER {
-	color: #888;
+	color: gray;
 }
 
 .v-debugwindow-row.FINEST {
-	color: #888;
+	color: #8c8c8c;
 }
 
 .v-debugwindow-row > span.caption {
@@ -269,6 +269,14 @@
 
 .v-debugwindow-row > span.value {
 	width: 100%;
+}
+
+.v-debugwindow-selector > span.value {
+	width: 100%;
+}
+
+.v-debugwindow-selector :hover {
+	background: rgba(255, 32, 32, 0.5);
 }
 
 .v-debugwindow-log {
@@ -310,6 +318,23 @@
 
 .v-debugwindow-network .v-debugwindow-row > span {
 	display: inline;
+}
+
+@font-face {
+	font-family: FontAwesome;
+	src: url(../base/fonts/fontawesome-webfont.eot);
+	src: url(../base/fonts/fontawesome-webfont.eot?#iefix) format("embedded-opentype"), url(../base/fonts/fontawesome-webfont.woff) format("woff"), url(../base/fonts/fontawesome-webfont.ttf) format("truetype"), url(../base/fonts/fontawesome-webfont.svg) format("svg");
+	font-weight: normal;
+	font-style: normal;
+}
+
+.FontAwesome {
+	font-family: FontAwesome;
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
 }
 
 .pdf-panel, .pdf-wrapper {
@@ -1309,6 +1334,11 @@ body .annis.v-app .v-app-loading {
 	margin: 0;
 }
 
+.annis .v-contextmenu .gwt-MenuBar {
+	overflow-y: auto;
+	overflow-x: hidden;
+}
+
 .annis .v-contextmenu .gwt-MenuItem div {
 	cursor: pointer;
 	vertical-align: middle;
@@ -1628,10 +1658,6 @@ body .annis.v-app .v-app-loading {
 	padding-right: 12px;
 }
 
-.annis .v-customcomponent {
-	overflow: hidden;
-}
-
 .annis .v-customlayout {
 	overflow: hidden;
 }
@@ -1866,6 +1892,8 @@ body .annis.v-app .v-app-loading {
 	-webkit-border-radius: 4px;
 	border-radius: 4px;
 	position: relative;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .annis [draggable=true] {
@@ -2727,6 +2755,8 @@ body .annis.v-app .v-app-loading {
 	height: 12px;
 	margin-top: -5px;
 	font-size: 0;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .annis .v-slider-vertical {
@@ -2782,6 +2812,8 @@ body .annis.v-app .v-app-loading {
 	background: #ddd;
 	cursor: e-resize;
 	cursor: col-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .annis .v-disabled .v-splitpanel-hsplitter div {
@@ -2797,6 +2829,8 @@ body .annis.v-app .v-app-loading {
 	background: #ddd;
 	cursor: s-resize;
 	cursor: row-resize;
+	-ms-touch-action: none;
+	touch-action: none;
 }
 
 .annis .v-disabled .v-splitpanel-vsplitter div {
@@ -3207,6 +3241,14 @@ body .annis.v-app .v-app-loading {
 	cursor: default;
 }
 
+.annis .v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: underline;
+}
+
+.annis .v-tabsheet-tabitem-selected.v-tabsheet-tabitem-focus .v-captiontext {
+	text-decoration: inherit;
+}
+
 .annis .v-tabsheet-content {
 	border: 1px solid #aaa;
 	border-top: none;
@@ -3494,7 +3536,6 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-treetable .v-table-row .v-table-cell-content, .annis .v-treetable .v-table-row-odd .v-table-cell-content {
-	position: relative;
 	z-index: 10;
 }
 
@@ -5693,6 +5734,7 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-tabsheet-scrollerPrev, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerPrev-disabled, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerPrev-disabled:active, .annis .v-tabsheet-scrollerNext-disabled:active {
+	padding-top: 12px;
 	border: 1px solid #b3b3b3;
 	border-width: 0;
 	background: transparent url(../chameleon/img/tab-arrows.png) no-repeat 6px 50%;
@@ -5956,20 +5998,20 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-app {
-	background: rgb(249, 249, 249);
+	background: #f9f9f9;
 }
 
 .annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu {
-	background-color: rgb(249, 249, 249);
+	background-color: #f9f9f9;
 }
 
 .annis body.v-ie6 .v-window, .annis body.v-ie7 .v-window, .annis body.v-ie6 .v-popupview-popup, .annis body.v-ie7 .v-popupview-popup, .annis body.v-ie6 .v-filterselect-suggestpopup, .annis body.v-ie7 .v-filterselect-suggestpopup, .annis body.v-ie6 .v-datefield-popup, .annis body.v-ie7 .v-datefield-popup, .annis body.v-ie6 .v-contextmenu, .annis body.v-ie7 .v-contextmenu, .annis body.v-ie6 .v-menubar-submenu, .annis body.v-ie7 .v-menubar-submenu, .annis .v-panel-content, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-content, .annis .v-tabsheet-tabitem-selected, .annis .v-slider-base, .annis .v-window-modalitycurtain, .annis .v-window-opaque, .annis .v-progressindicator-wrapper, .annis .v-accordion-item-caption, .annis .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-accordion-opaque div.v-accordion-item-open, .annis .v-table-scrollposition, .annis .v-table-body {
-	background-color: rgb(249, 249, 249);
+	background-color: #f9f9f9;
 }
 
 .annis .v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-app input, .annis .v-app button, .annis .v-app textarea, .annis .v-window input, .annis .v-window button, .annis .v-window textarea, .annis .v-popupview-popup input, .annis .v-popupview-popup button, .annis .v-popupview-popup textarea, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-datefield-calendarpanel-header button, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-table-header-drag, .annis .v-filterselect-select-button .v-filterselect-input, .annis .v-drag-element {
 	font-size: 12px;
-	color: rgb(34, 34, 34);
+	color: #222222;
 }
 
 .annis .v-app select, .annis .v-window select, .annis .v-popupview-popup select, .annis .v-datefield-popup select {
@@ -5977,98 +6019,98 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-button:active, .annis .v-ie .v-button.v-pressed, .annis div.v-button-down, .annis .v-slider .v-slider-handle-active {
-	background-color: rgb(188, 194, 202);
-	border-color: rgb(120, 124, 130);
+	background-color: #bcc2ca;
+	border-color: #787c82;
 }
 
 .annis div.v-button-down:active {
-	background-color: rgb(150, 155, 162);
+	background-color: #969ba2;
 }
 
 .annis .v-button:focus {
-	background-color: rgb(188, 194, 202);
+	background-color: #bcc2ca;
 }
 
 .annis .v-button:active .v-button-wrap, .annis .v-ie .v-button.v-pressed .v-button-wrap, .annis .v-button-down .v-button-wrap, .annis .v-datefield-calendarpanel-header td, .annis .v-slider-base, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerNext-disabled:active, .annis .v-table-header-wrap, .annis .v-table-body, .annis .v-table-resizer, .annis div.v-table-focus-slot-left, .annis div.v-table-focus-slot-right, .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
-	border-color: rgb(150, 155, 162);
+	border-color: #969ba2;
 }
 
 .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
-	border-bottom-color: rgb(188, 194, 202);
-	border-left-color: rgb(188, 194, 202);
-	border-right-color: rgb(188, 194, 202);
+	border-bottom-color: #bcc2ca;
+	border-left-color: #bcc2ca;
+	border-right-color: #bcc2ca;
 }
 
 .annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-button, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-slider-handle, .annis .v-table-header-wrap, .annis .v-table-header-drag, .annis .v-filterselect-prevpage-off, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage, .annis .v-filterselect-nextpage, .annis .v-filterselect-select-button, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-accordion-opaque, .annis .v-accordion-opaque .v-accordion-item-open, .annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-tabsheet-scroller, .annis .v-csslayout-toolbar, .annis .v-menubar {
-	background-color: rgb(235, 243, 253);
-	border-color: rgb(150, 155, 162);
+	background-color: #ebf3fd;
+	border-color: #969ba2;
 }
 
 .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-splitpanel-hsplitter-small, .annis .v-splitpanel-vsplitter-small, .annis .v-splitpanel-hsplitter-small-locked, .annis .v-splitpanel-vsplitter-small-locked {
-	background-color: rgb(188, 194, 202);
+	background-color: #bcc2ca;
 }
 
 .annis .v-progressindicator-wrapper {
-	border-color: rgb(188, 194, 202);
+	border-color: #bcc2ca;
 }
 
 .annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-tabsheet-tabitem-selected .v-caption, .annis .v-window-header, .annis .v-table-caption-container, .annis .v-accordion-item-caption, .annis .v-menubar .v-menubar-menuitem, .annis .v-filterselect-select-button .v-filterselect-input {
-	text-shadow: 0 1px 0 rgb(248, 251, 254);
+	text-shadow: 0 1px 0 #f8fbfe;
 }
 
 .annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-panel-caption, .annis .v-panel-nocaption, .annis .v-panel-content, .annis .v-panel-deco, .annis .v-panel-light .v-panel-caption-light, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-content-bubble, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-tabitem-selected, .annis .v-tabsheet-tabitem, .annis .v-tabsheet-spacertd div, .annis .v-tabsheet-content, .annis .v-tabsheet-deco, .annis .v-slider, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-table-scrollposition, .annis .v-accordion, .annis .v-accordion-item-caption, .annis .v-accordion-item-open, .annis .v-menubar-separator span {
-	border-color: rgb(199, 199, 199);
+	border-color: #c7c7c7;
 }
 
 .annis .v-label-color, .annis .v-button-link, .annis .v-button-link:focus, .annis .v-button-link:active, .annis .v-disabled.v-button-link, .annis .v-disabled.v-button-link:focus, .annis .v-app a, .annis .v-popupview-popup a, .annis .v-popupview, .annis .sidebar-menu .v-label {
-	color: rgb(32, 38, 227);
+	color: #2026e3;
 }
 
 .annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down {
-	border-color: rgb(44, 48, 146);
+	border-color: #2c3092;
 }
 
 .annis .v-button-default:focus, .annis .v-horizontallayout-segment-alternate .v-button-down:active {
-	background-color: rgb(41, 46, 182);
+	background-color: #292eb6;
 }
 
 .annis .v-button-default:active .v-button-wrap, .annis .v-ie7 .v-button-default.v-pressed .v-button-wrap, .annis .v-ie8 .v-button-default.v-pressed .v-button-wrap, .annis .v-progressindicator-indicator, .annis .v-datefield-calendarpanel-day:hover, .annis .v-horizontallayout-segment-alternate .v-button-down .v-button-wrap {
-	border-color: rgb(41, 46, 182);
+	border-color: #292eb6;
 }
 
 .annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .v-panel-bubble .v-panel-caption, .annis .v-datefield-calendarpanel-day-selected, .annis .v-table tr.v-selected, .annis .v-contextmenu .gwt-MenuItem-selected, .annis .v-contextmenu .gwt-MenuItem-selected div, .annis .v-filterselect-suggestpopup .gwt-MenuItem-selected, .annis .v-progressindicator-indicator, .annis .v-tree-node-selected span, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down, .annis .v-menubar .v-menubar-menuitem-selected, .annis .v-menubar-submenu .v-menubar-menuitem-selected {
-	background-color: rgb(32, 38, 227);
-	color: rgb(250, 250, 251);
-	text-shadow: 0 -1px 0 rgb(44, 48, 146);
+	background-color: #2026e3;
+	color: #fafafb;
+	text-shadow: 0 -1px 0 #2c3092;
 }
 
 .annis .v-ie6 .v-progressindicator-indicator {
-	background-color: rgb(32, 38, 227);
+	background-color: #2026e3;
 }
 
 .annis .v-panel-caption, .annis .v-table-striped .v-table-row-odd, .annis .sidebar-menu {
-	background: rgb(226, 227, 245);
+	background: #e2e3f5;
 }
 
 .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected {
-	text-shadow: 0 1px 0 rgb(44, 48, 146);
+	text-shadow: 0 1px 0 #2c3092;
 }
 
 .annis .v-app {
-	background: rgb(255, 255, 255);
+	background: white;
 }
 
 .annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu {
-	background-color: rgb(255, 255, 255);
+	background-color: white;
 }
 
 .annis body.v-ie6 .v-window, .annis body.v-ie7 .v-window, .annis body.v-ie6 .v-popupview-popup, .annis body.v-ie7 .v-popupview-popup, .annis body.v-ie6 .v-filterselect-suggestpopup, .annis body.v-ie7 .v-filterselect-suggestpopup, .annis body.v-ie6 .v-datefield-popup, .annis body.v-ie7 .v-datefield-popup, .annis body.v-ie6 .v-contextmenu, .annis body.v-ie7 .v-contextmenu, .annis body.v-ie6 .v-menubar-submenu, .annis body.v-ie7 .v-menubar-submenu, .annis .v-panel-content, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-content, .annis .v-tabsheet-tabitem-selected, .annis .v-slider-base, .annis .v-window-modalitycurtain, .annis .v-window-opaque, .annis .v-progressindicator-wrapper, .annis .v-accordion-item-caption, .annis .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-accordion-opaque div.v-accordion-item-open, .annis .v-table-scrollposition, .annis .v-table-body {
-	background-color: rgb(255, 255, 255);
+	background-color: white;
 }
 
 .annis .v-app, .annis .v-window, .annis .v-popupview-popup, .annis .v-app input, .annis .v-app button, .annis .v-app textarea, .annis .v-window input, .annis .v-window button, .annis .v-window textarea, .annis .v-popupview-popup input, .annis .v-popupview-popup button, .annis .v-popupview-popup textarea, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-datefield-calendarpanel-header button, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-table-header-drag, .annis .v-filterselect-select-button .v-filterselect-input, .annis .v-drag-element {
 	font-size: 12px;
-	color: rgb(34, 34, 34);
+	color: #222222;
 }
 
 .annis .v-app select, .annis .v-window select, .annis .v-popupview-popup select, .annis .v-datefield-popup select {
@@ -6076,73 +6118,73 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-button:active, .annis .v-ie .v-button.v-pressed, .annis div.v-button-down, .annis .v-slider .v-slider-handle-active {
-	background-color: rgb(163, 173, 185);
-	border-color: rgb(104, 110, 118);
+	background-color: #a3adb9;
+	border-color: #686e76;
 }
 
 .annis div.v-button-down:active {
-	background-color: rgb(130, 138, 148);
+	background-color: #828a94;
 }
 
 .annis .v-button:focus {
-	background-color: rgb(163, 173, 185);
+	background-color: #a3adb9;
 }
 
 .annis .v-button:active .v-button-wrap, .annis .v-ie .v-button.v-pressed .v-button-wrap, .annis .v-button-down .v-button-wrap, .annis .v-datefield-calendarpanel-header td, .annis .v-slider-base, .annis .v-tabsheet-scrollerNext, .annis .v-tabsheet-scrollerNext-disabled, .annis .v-tabsheet-scrollerNext-disabled:active, .annis .v-table-header-wrap, .annis .v-table-body, .annis .v-table-resizer, .annis div.v-table-focus-slot-left, .annis div.v-table-focus-slot-right, .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
-	border-color: rgb(130, 138, 148);
+	border-color: #828a94;
 }
 
 .annis input.v-textfield, .annis textarea.v-textarea, .annis .v-filterselect {
-	border-bottom-color: rgb(163, 173, 185);
-	border-left-color: rgb(163, 173, 185);
-	border-right-color: rgb(163, 173, 185);
+	border-bottom-color: #a3adb9;
+	border-left-color: #a3adb9;
+	border-right-color: #a3adb9;
 }
 
 .annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-button, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-slider-handle, .annis .v-table-header-wrap, .annis .v-table-header-drag, .annis .v-filterselect-prevpage-off, .annis .v-filterselect-nextpage-off, .annis .v-filterselect-prevpage, .annis .v-filterselect-nextpage, .annis .v-filterselect-select-button, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-accordion-opaque, .annis .v-accordion-opaque .v-accordion-item-open, .annis .v-accordion-opaque .v-accordion-item-caption, .annis .v-accordion-opaque .v-accordion-item-open .v-accordion-item-caption:active, .annis .v-tabsheet-scroller, .annis .v-csslayout-toolbar, .annis .v-menubar {
-	background-color: rgb(204, 216, 231);
-	border-color: rgb(130, 138, 148);
+	background-color: #ccd8e7;
+	border-color: #828a94;
 }
 
 .annis .v-datefield-calendarpanel-weekdays strong, .annis .v-splitpanel-hsplitter-small, .annis .v-splitpanel-vsplitter-small, .annis .v-splitpanel-hsplitter-small-locked, .annis .v-splitpanel-vsplitter-small-locked {
-	background-color: rgb(163, 173, 185);
+	background-color: #a3adb9;
 }
 
 .annis .v-progressindicator-wrapper {
-	border-color: rgb(163, 173, 185);
+	border-color: #a3adb9;
 }
 
 .annis .v-button, .annis .v-disabled.v-button:focus, .annis .v-disabled.v-button:active, .annis .v-datefield-calendarpanel-header button, .annis td.v-datefield-calendarpanel-month, .annis .v-tabsheet-tabitem-selected .v-caption, .annis .v-window-header, .annis .v-table-caption-container, .annis .v-accordion-item-caption, .annis .v-menubar .v-menubar-menuitem, .annis .v-filterselect-select-button .v-filterselect-input {
-	text-shadow: 0 1px 0 rgb(232, 236, 241);
+	text-shadow: 0 1px 0 #e8ecf1;
 }
 
 .annis .v-window, .annis .v-popupview-popup, .annis .v-filterselect-suggestpopup, .annis .v-datefield-popup, .annis .v-contextmenu, .annis .v-Notification, .annis .v-menubar-submenu, .annis .v-panel-caption, .annis .v-panel-nocaption, .annis .v-panel-content, .annis .v-panel-deco, .annis .v-panel-light .v-panel-caption-light, .annis .v-panel-bubble .v-panel-captionwrap, .annis .v-panel-bubble .v-panel-content-bubble, .annis .v-panel-bubble .v-panel-deco-bubble, .annis .v-tabsheet-tabitem-selected, .annis .v-tabsheet-tabitem, .annis .v-tabsheet-spacertd div, .annis .v-tabsheet-content, .annis .v-tabsheet-deco, .annis .v-slider, .annis .v-splitpanel-hsplitter, .annis .v-splitpanel-vsplitter, .annis .v-splitpanel-hsplitter-locked, .annis .v-splitpanel-vsplitter-locked, .annis .v-table-scrollposition, .annis .v-accordion, .annis .v-accordion-item-caption, .annis .v-accordion-item-open, .annis .v-menubar-separator span {
-	border-color: rgb(204, 204, 204);
+	border-color: #cccccc;
 }
 
 .annis .v-label-color, .annis .v-button-link, .annis .v-button-link:focus, .annis .v-button-link:active, .annis .v-disabled.v-button-link, .annis .v-disabled.v-button-link:focus, .annis .v-app a, .annis .v-popupview-popup a, .annis .v-popupview, .annis .sidebar-menu .v-label {
-	color: rgb(49, 55, 245);
+	color: #3137f5;
 }
 
 .annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down {
-	border-color: rgb(55, 58, 157);
+	border-color: #373a9d;
 }
 
 .annis .v-button-default:focus, .annis .v-horizontallayout-segment-alternate .v-button-down:active {
-	background-color: rgb(55, 59, 196);
+	background-color: #373bc4;
 }
 
 .annis .v-button-default:active .v-button-wrap, .annis .v-ie7 .v-button-default.v-pressed .v-button-wrap, .annis .v-ie8 .v-button-default.v-pressed .v-button-wrap, .annis .v-progressindicator-indicator, .annis .v-datefield-calendarpanel-day:hover, .annis .v-horizontallayout-segment-alternate .v-button-down .v-button-wrap {
-	border-color: rgb(55, 59, 196);
+	border-color: #373bc4;
 }
 
 .annis .v-button-default, .annis .v-disabled.v-button-default, .annis .v-disabled.v-button-default:focus, .annis .v-button-default:active, .annis .v-ie7 .v-button-default.v-pressed, .annis .v-ie8 .v-button-default.v-pressed, .annis .v-panel-bubble .v-panel-caption, .annis .v-datefield-calendarpanel-day-selected, .annis .v-table tr.v-selected, .annis .v-contextmenu .gwt-MenuItem-selected, .annis .v-contextmenu .gwt-MenuItem-selected div, .annis .v-filterselect-suggestpopup .gwt-MenuItem-selected, .annis .v-progressindicator-indicator, .annis .v-tree-node-selected span, .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected, .annis .v-horizontallayout-segment-alternate .v-button-down, .annis .v-menubar .v-menubar-menuitem-selected, .annis .v-menubar-submenu .v-menubar-menuitem-selected {
-	background-color: rgb(49, 55, 245);
-	color: rgb(252, 252, 254);
-	text-shadow: 0 -1px 0 rgb(55, 58, 157);
+	background-color: #3137f5;
+	color: #fcfcfe;
+	text-shadow: 0 -1px 0 #373a9d;
 }
 
 .annis .v-ie6 .v-progressindicator-indicator {
-	background-color: rgb(49, 55, 245);
+	background-color: #3137f5;
 }
 
 .annis .v-panel-caption, .annis .v-table-striped .v-table-row-odd, .annis .sidebar-menu {
@@ -6150,7 +6192,7 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .sidebar-menu .tab-selected, .annis .sidebar-menu .selected {
-	text-shadow: 0 1px 0 rgb(55, 58, 157);
+	text-shadow: 0 1px 0 #373a9d;
 }
 
 .annis .example-queries-table table, .annis .example-queries-table .v-table-body-wrapper, .annis .docvis-table .v-table-body td, .annis .docvis-table .v-table-body-wrapper {
@@ -6170,7 +6212,7 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .docviewer .v-panel-captionwrap {
-	border-color: rgb(130, 138, 148);
+	border-color: #828a94;
 	background: #ECF0F6 url(../chameleon/img/grad-light-top.png) repeat-x;
 	line-height: normal;
 }
@@ -6178,7 +6220,7 @@ body .annis.v-app .v-app-loading {
 .annis .docviewer .v-panel-caption {
 	font-size: 10pt;
 	font-weight: normal;
-	text-shadow: 0 1px 0 rgb(232, 236, 241);
+	text-shadow: 0 1px 0 #e8ecf1;
 	overflow: hidden;
 	white-space: nowrap;
 	padding-top: 0.2em;
@@ -6210,7 +6252,7 @@ body .annis.v-app .v-app-loading {
 	padding: 2px;
 	font-weight: bold;
 	border-style: dotted;
-	border-color: rgb(200, 200, 200);
+	border-color: #c8c8c8;
 	border-width: 1px;
 }
 
@@ -6230,9 +6272,9 @@ body .annis.v-app .v-app-loading {
 
 .annis .partitur_table td {
 	margin: 0px;
-	background-color: rgb(255, 255, 255);
+	background-color: white;
 	border-style: dotted;
-	border-color: rgb(200, 200, 200);
+	border-color: #c8c8c8;
 	border-width: 1px;
 	padding: 0px 10px 0px 10px;
 }
@@ -6242,14 +6284,14 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .partitur_table td.single_event {
-	background-color: rgb(230, 230, 230);
-	border-color: rgb(0, 0, 0);
+	background-color: #e6e6e6;
+	border-color: black;
 	border-style: solid;
 	border-width: 1px;
 }
 
 .annis .partitur_table td.highlight-source {
-	background-color: rgb(200, 200, 200);
+	background-color: #c8c8c8;
 }
 
 .annis .checkedItem:before {
@@ -6454,80 +6496,80 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .solid-white-background {
-	background-color: rgb(255, 255, 255);
+	background-color: white;
 }
 
 .annis .v-window-outerheader {
 	background-attachment: scroll;
 	background-clip: border-box;
-	background-color: rgb(204, 216, 231);
+	background-color: #ccd8e7;
 	background-image: url(../chameleon/img/grad-light-top.png);
 	background-origin: padding-box;
 	background-size: auto;
 }
 
 .annis .v-table-cell-content-match_1 {
-	color: rgb(255, 0, 0);
+	color: red;
 }
 
 .annis .kwic td.v-table-cell-content-match_1 {
-	color: rgb(255, 0, 0);
+	color: red;
 }
 
 .annis .v-table-cell-content-match_2 {
-	color: rgb(199, 21, 133);
+	color: #c71585;
 }
 
 .annis .kwic td.v-table-cell-content-match_2 {
-	color: rgb(199, 21, 133);
+	color: #c71585;
 }
 
 .annis .v-table-cell-content-match_3 {
-	color: rgb(50, 205, 50);
+	color: #32cd32;
 }
 
 .annis .kwic td.v-table-cell-content-match_3 {
-	color: rgb(50, 205, 50);
+	color: #32cd32;
 }
 
 .annis .v-table-cell-content-match_4 {
-	color: rgb(205, 133, 63);
+	color: #cd853f;
 }
 
 .annis .kwic td.v-table-cell-content-match_4 {
-	color: rgb(205, 133, 63);
+	color: #cd853f;
 }
 
 .annis .v-table-cell-content-match_5 {
-	color: rgb(205, 92, 92);
+	color: #cd5c5c;
 }
 
 .annis .kwic td.v-table-cell-content-match_5 {
-	color: rgb(205, 92, 92);
+	color: #cd5c5c;
 }
 
 .annis .v-table-cell-content-match_6 {
-	color: rgb(173, 255, 47);
+	color: #adff2f;
 }
 
 .annis .kwic td.v-table-cell-content-match_6 {
-	color: rgb(173, 255, 47);
+	color: #adff2f;
 }
 
 .annis .v-table-cell-content-match_7 {
-	color: rgb(139, 0, 0);
+	color: #8b0000;
 }
 
 .annis .kwic td.v-table-cell-content-match_7 {
-	color: rgb(139, 0, 0);
+	color: #8b0000;
 }
 
 .annis .v-table-cell-content-match_8 {
-	color: rgb(255, 69, 0);
+	color: #ff4500;
 }
 
 .annis .kwic td.v-table-cell-content-match_8 {
-	color: rgb(255, 69, 0);
+	color: #ff4500;
 }
 
 .annis .v-form-errormessage {
@@ -6575,8 +6617,18 @@ body .annis.v-app .v-app-loading {
 	background-color: #ecffe7;
 }
 
+.annis .help-tab .v-captiontext {
+	text-decoration: underline;
+	color: #3137F5;
+}
+
+.annis .help-tab .v-accordion-item-open .v-captiontext {
+	text-decoration: none;
+	color: black;
+}
+
 .annis .blue-tab .v-tabsheet-tabitem {
-	border: 1px solid rgb(204, 204, 204);
+	border: 1px solid #cccccc;
 	border-bottom: none;
 }
 

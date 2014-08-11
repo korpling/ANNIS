@@ -33,6 +33,7 @@ import annis.model.Edge.EdgeType;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
 import annis.sqlgen.SaltAnnotateExtractor.RankID;
+import java.util.Map.Entry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,8 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
 
   private TableAccessStrategy outerQueryTableAccessStrategy;
   
-  public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy) throws SQLException
+  public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy, 
+    Map<Long, ComponentEntry> continuousSpans) throws SQLException
   {
     AnnisNode annisNode = new AnnisNode(longValue(resultSet, NODE_TABLE, "id", tableAccessStrategy));
     
@@ -64,6 +66,21 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     annisNode.setSpannedText(stringValue(resultSet, NODE_TABLE, "span", tableAccessStrategy));
     annisNode.setLeftToken(longValue(resultSet, NODE_TABLE, "left_token", tableAccessStrategy));
     annisNode.setRightToken(longValue(resultSet, NODE_TABLE, "right_token", tableAccessStrategy));
+    
+    boolean continuous = booleanValue(resultSet, NODE_TABLE, "continuous",
+      tableAccessStrategy);
+    String typeAsString = stringValue(resultSet, COMPONENT_TABLE, "type",
+      tableAccessStrategy);
+    
+    if(continuousSpans != null && "c".equals(typeAsString) && continuous)
+    {
+      ComponentEntry entry = new ComponentEntry(
+        longValue(resultSet, COMPONENT_TABLE, "id", tableAccessStrategy), 
+        typeAsString.charAt(0), 
+        stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy),
+        stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
+      continuousSpans.put(annisNode.getId(), entry);
+    }
     
     return annisNode;
   }
@@ -113,6 +130,10 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   private String stringValue(ResultSet resultSet, String table, String column, TableAccessStrategy tableAccessStrategy) throws SQLException {
     return resultSet.getString(tableAccessStrategy.columnName(table, column));
   }
+  
+  private boolean booleanValue(ResultSet resultSet, String table, String column, TableAccessStrategy tableAccessStrategy) throws SQLException {
+    return resultSet.getBoolean(tableAccessStrategy.columnName(table, column));
+  }
 
   @Override
   public List<AnnotationGraph> extractData(ResultSet resultSet)
@@ -122,20 +143,25 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     
     // function result
     List<AnnotationGraph> graphs =
-      new LinkedList<AnnotationGraph>();
+      new LinkedList<>();
 
     // fn: match group -> annotation graph
 
     Map<List<Long>, AnnotationGraph> graphByMatchGroup =
-      new HashMap<List<Long>, AnnotationGraph>();
+      new HashMap<>();
 
     // fn: node id -> node
-    Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
+    Map<Long, AnnisNode> nodeById = new HashMap<>();
 
     // fn: edge pre order value -> edge
-    Map<RankID, Edge> edgeByPre = new HashMap<RankID, Edge>();
+    Map<RankID, Edge> edgeByPre = new HashMap<>();
+    
+    // maps span that are continous to their coverage component
+    Map<List<Long>, Map<Long, ComponentEntry>> continuousSpansForGraph 
+      = new HashMap<>();
 
     int rowNum = 0;
+    
     while (resultSet.next())
     {
       // process result by match group
@@ -150,13 +176,17 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
 
       Long[] keyArray = (Long[]) sqlKey.getArray();
       List<Long> key = Arrays.asList(keyArray);
+      
 
       if (!graphByMatchGroup.containsKey(key))
-      {
+      { 
+        
         log.debug("starting annotation graph for match: " + key);
+        Map<Long, ComponentEntry> continuousSpans = new HashMap<>();
         AnnotationGraph graph = new AnnotationGraph();
         graphs.add(graph);
         graphByMatchGroup.put(key, graph);
+        continuousSpansForGraph.put(key, continuousSpans);
 
         // clear mapping functions for this graph
         // assumes that the result set is sorted by key, pre
@@ -174,7 +204,9 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       }
 
       AnnotationGraph graph = graphByMatchGroup.get(key);
-
+      Map<Long, ComponentEntry> continuousSpans = continuousSpansForGraph.
+        get(key);
+      
       graph.setDocumentName(new DocumentNameMapRow().mapRow(
         resultSet, rowNum));
 
@@ -182,7 +214,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       graph.setPath((String[]) path.getArray());
 
       // get node data
-      AnnisNode node = mapNode(resultSet, tableAccessStrategy);
+      AnnisNode node = mapNode(resultSet, tableAccessStrategy, continuousSpans);
 
       // add node to graph if it is new, else get known copy
       long id = node.getId();
@@ -258,11 +290,13 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         edge.addAnnotation(edgeAnnotation);
       }
       rowNum++;
-    }
+    } // end for each row
+    
     
     // remove edges from the graph with a source node inside the match
-    for(AnnotationGraph graph : graphByMatchGroup.values())
+    for(Entry<List<Long>,AnnotationGraph> entry : graphByMatchGroup.entrySet())
     {
+      AnnotationGraph graph = entry.getValue();
       ListIterator<Edge> itEdge = graph.getEdges().listIterator();
       while(itEdge.hasNext())
       {
@@ -273,9 +307,67 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
           itEdge.remove();
         }
       }
+      
+      Map<Long, ComponentEntry> continuousSpans = continuousSpansForGraph.get(entry.getKey());
+      createMissingSpanningRelations(graph, continuousSpans, nodeById);
+      
     }
 
     return graphs;
+  }
+  
+  private void createMissingSpanningRelations(AnnotationGraph graph,
+    Map<Long, ComponentEntry> continuousSpans,
+    Map<Long, AnnisNode> nodeById)
+  { 
+    if(continuousSpans == null || nodeById == null)
+    {
+      return;
+    }
+    for(Map.Entry<Long, ComponentEntry> spanEntry : continuousSpans.entrySet())
+    {
+      Long spanID = spanEntry.getKey();
+        long pre=1;
+      AnnisNode span = nodeById.get(spanID);
+      if(span != null)
+      {
+        for(long i=span.getLeftToken(); i <= span.getRightToken(); i++)
+        {
+          AnnisNode tok = graph.getToken(i);
+          if(tok != null)
+          {
+            boolean missing = true;
+            for(Edge tokenInEdge : tok.getIncomingEdges())
+            {
+              if(tokenInEdge.getEdgeType() == EdgeType.COVERAGE 
+                && tokenInEdge.getSource() != null 
+                && span.getId() == tokenInEdge.getSource().getId())
+              {
+                missing = false;
+                break;
+              }
+            }
+
+            if(missing)
+            {
+              Edge edge = new Edge();
+              ComponentEntry component = spanEntry.getValue();
+
+              edge.setPre(pre++);
+              edge.setComponentID(component.getId());
+              edge.setEdgeType(EdgeType.COVERAGE);
+              edge.setNamespace(component.getNamespace());
+              edge.setName(null);
+              edge.setDestination(tok);
+              edge.setSource(span);
+              graph.addEdge(edge);
+              span.addOutgoingEdge(edge);
+              tok.addIncomingEdge(edge);
+            }
+          } // end if token exists
+        } // end for each covered token index
+      }
+    } // end for each node
   }
 
   protected void fixNodes(Edge edge, Map<RankID, Edge> edgeByPre,
@@ -308,6 +400,52 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   public void setOuterQueryTableAccessStrategy(TableAccessStrategy outerQueryTableAccessStrategy)
   {
     this.outerQueryTableAccessStrategy = outerQueryTableAccessStrategy;
+  }
+  
+  public static class ComponentEntry
+  {
+    
+    private final long id;
+    private final char type;
+    private final String namespace;
+    private final String name;
+
+    public ComponentEntry(long id, char type, String namespace, String name)
+    {
+      this.id = id;
+      this.type = type;
+      this.namespace = namespace;
+      this.name = name;
+    }
+
+    public long getId()
+    {
+      return id;
+    }
+
+    public char getType()
+    {
+      return type;
+    }
+
+    public String getNamespace()
+    {
+      return namespace;
+    }
+
+    public String getName()
+    {
+      return name;
+    }
+
+    @Override
+    public String toString()
+    {
+      return "ComponentEntry{" + "id=" + id + ", type=" + type + ", namespace=" + namespace + ", name=" + name + '}';
+    }
+
+    
+    
   }
   
   

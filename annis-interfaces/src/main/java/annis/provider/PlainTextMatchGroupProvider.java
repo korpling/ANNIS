@@ -70,15 +70,11 @@ public class PlainTextMatchGroupProvider implements
     throws IOException, WebApplicationException
   {
 
-    OutputStreamWriter writer = new OutputStreamWriter(entityStream,
-      Charsets.UTF_8);
-    try
+    
+    try(OutputStreamWriter writer = new OutputStreamWriter(entityStream,
+      Charsets.UTF_8))
     {
       writer.append(match.toString());
-    }
-    finally
-    {
-      writer.close();
     }
   }
 

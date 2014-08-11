@@ -203,7 +203,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
 
   private ArrayList<String> getStyles(GridEvent event, String annoName)
   {
-    ArrayList<String> styles = new ArrayList<String>();
+    ArrayList<String> styles = new ArrayList<>();
 
     if (tokRowKey.equals(annoName))
     {
