@@ -262,8 +262,8 @@ public class VakyarthaDependencyTree extends WriterVisualizer
         String tokenColor = "black";
         if (input.getMarkedAndCovered().containsKey(node))
         {
-          int colorNumber = ((int) (long) input.getMarkedAndCovered().get(node)) - 1;
-          tokenColor = MatchedNodeColors.values()[colorNumber].getHTMLColor();
+          tokenColor = MatchedNodeColors
+                  .getHTMLColorByMatch(input.getMarkedAndCovered().get(node));
         }
         tAttris.put("fill", tokenColor);
         tAttris.put("font", "11px " + StringUtils.join(fontsText, ","));

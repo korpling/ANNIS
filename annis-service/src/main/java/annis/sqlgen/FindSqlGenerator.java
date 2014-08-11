@@ -44,7 +44,7 @@ import org.springframework.jdbc.core.RowMapper;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class FindSqlGenerator extends AbstractUnionSqlGenerator
+public class FindSqlGenerator extends AbstractSqlGenerator
   implements RowMapper<Match>, SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,  
   WhereClauseSqlGenerator<QueryData>,
