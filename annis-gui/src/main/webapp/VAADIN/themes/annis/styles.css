@@ -6529,35 +6529,99 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-table-cell-content-match_5 {
-	color: #cd5c5c;
+	color: #add8e6;
 }
 
 .annis .kwic td.v-table-cell-content-match_5 {
-	color: #cd5c5c;
+	color: #add8e6;
 }
 
 .annis .v-table-cell-content-match_6 {
-	color: #adff2f;
+	color: #cd5c5c;
 }
 
 .annis .kwic td.v-table-cell-content-match_6 {
-	color: #adff2f;
+	color: #cd5c5c;
 }
 
 .annis .v-table-cell-content-match_7 {
-	color: #8b0000;
+	color: #adff2f;
 }
 
 .annis .kwic td.v-table-cell-content-match_7 {
-	color: #8b0000;
+	color: #adff2f;
 }
 
 .annis .v-table-cell-content-match_8 {
-	color: #ff4500;
+	color: #8b0000;
 }
 
 .annis .kwic td.v-table-cell-content-match_8 {
+	color: #8b0000;
+}
+
+.annis .v-table-cell-content-match_9 {
 	color: #ff4500;
+}
+
+.annis .kwic td.v-table-cell-content-match_9 {
+	color: #ff4500;
+}
+
+.annis .v-table-cell-content-match_10 {
+	color: #ffd700;
+}
+
+.annis .kwic td.v-table-cell-content-match_10 {
+	color: #ffd700;
+}
+
+.annis .v-table-cell-content-match_11 {
+	color: #d2b48c;
+}
+
+.annis .kwic td.v-table-cell-content-match_11 {
+	color: #d2b48c;
+}
+
+.annis .v-table-cell-content-match_12 {
+	color: navy;
+}
+
+.annis .kwic td.v-table-cell-content-match_12 {
+	color: navy;
+}
+
+.annis .v-table-cell-content-match_13 {
+	color: #00fa9a;
+}
+
+.annis .kwic td.v-table-cell-content-match_13 {
+	color: #00fa9a;
+}
+
+.annis .v-table-cell-content-match_14 {
+	color: #1e90ff;
+}
+
+.annis .kwic td.v-table-cell-content-match_14 {
+	color: #1e90ff;
+}
+
+.annis .v-table-cell-content-match_15 {
+	color: #6b8e23;
+}
+
+.annis .kwic td.v-table-cell-content-match_15 {
+	color: #6b8e23;
+}
+
+.annis .v-table-cell-content-match_16 {
+	color: #ffb6c1;
+}
+
+.annis .kwic td.v-table-cell-content-match_16 {
+	color: #ffb6c1;
 }
 
 .annis .v-form-errormessage {
