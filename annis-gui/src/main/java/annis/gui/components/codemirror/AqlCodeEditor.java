@@ -50,7 +50,6 @@ import org.json.JSONException;
     "lib/edit/matchbrackets.js",
     "lib/lint/lint.js",
     "AqlCodeEditor.js"
-//  "lib/lint/aql-lint.js",
   })
 @StyleSheet(
   {

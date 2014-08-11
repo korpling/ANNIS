@@ -6388,9 +6388,9 @@ body .annis.v-app .v-app-loading {
 .annis .aql-code-editor {
 	border-style: solid;
 	border-width: 1px;
-	border-bottom-color: rgb(163, 173, 185);
-	border-left-color: rgb(163, 173, 185);
-	border-right-color: rgb(163, 173, 185);
+	border-bottom-color: #a3adb9;
+	border-left-color: #a3adb9;
+	border-right-color: #a3adb9;
 }
 
 .annis .aql-code-prompt .cm-def {
