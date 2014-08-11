@@ -316,16 +316,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doSet("left to 5");
-    doSet("right to 5");
 //    doSet("seg to dipl");
     doCorpus("pcc2");
-    doSql("count cat=\"S\" > s#cat=\"S\" &\n" +
-"((p1#cat = \"NP\" & p2#cat = \"PP\")\n" +
-"|\n" +
-"(p1#cat = \"PP\" & p2#cat = \"NP\"))\n" +
-"& #s >* #p1\n" +
-"& #p1 > #p2");
+    doSql("find (cat | tok)");
     //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
   }
 
