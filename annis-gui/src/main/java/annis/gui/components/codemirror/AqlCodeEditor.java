@@ -49,6 +49,7 @@ import org.json.JSONException;
     "mode/aql/aql.js",
     "lib/edit/matchbrackets.js",
     "lib/lint/lint.js",
+    "lib/display/placeholder.js",
     "AqlCodeEditor.js"
   })
 @StyleSheet(

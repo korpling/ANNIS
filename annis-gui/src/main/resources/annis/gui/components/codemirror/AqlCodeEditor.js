@@ -23,8 +23,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     var changeDelayTime = 500;
     
-    var promptIsShown = false;
-    
     var errorList = [];
 
     CodeMirror.registerHelper("lint", "aql", function(text) {
@@ -38,37 +36,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       lineWrapping: true,
       matchBrackets: true,
       gutters: ["CodeMirror-lint-markers"],
-      lint: true
+      lint: true,
+      placeholder: ""
     });
-    
-    function setPrompt(forceNoFocus)
-    {
-      if(connector.getState().inputPrompt !== ""
-         &&
-         (forceNoFocus || !cmTextArea.hasFocus()) && cmTextArea.getValue() === "")
-      {
-        // hack: the setValue should not trigger and onChange event
-        // which will unset the prompt again
-        promptIsShown = false; 
-        cmTextArea.setValue(connector.getState().inputPrompt);
-        promptIsShown = true;
-        $(rootDiv).addClass("aql-code-prompt");
-        return true;
-      }
-      return false;
-    }
-    
-    function unsetPrompt()
-    {
-      if(promptIsShown)
-      {
-        promptIsShown = false;
-        cmTextArea.setValue(connector.getState().text);
-        $(rootDiv).removeClass("aql-code-prompt");
         
-      }
-    }
-    
     this.sendTextIfNecessary = function() 
     {
       var current = cmTextArea.getValue();
@@ -78,10 +49,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         window.clearTimeout(changeDelayTimerID);
       }
       
-      if(promptIsShown)
-      {
-        current = "";
-      }
       if(lastSentText !== current)
       {
         var cursor = cmTextArea.getCursor();
@@ -94,7 +61,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         }
         absPos += cursor.ch;
         
-        connector.textChanged(cmTextArea.getValue(), absPos);
+        connector.textChanged(current, absPos);
         lastSentText = current;
       }
     };
@@ -103,10 +70,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       var cursor = cmTextArea.getCursor();
       
-      if(connector.getState().text !== "")
-      {
-        unsetPrompt();
-      }
+      cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
       
       if(connector.getState().clientText !== connector.getState().text)
       {
@@ -115,7 +79,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         // restore the cursor position
         cmTextArea.setCursor(cursor);
       }
-      setPrompt(false);
       
       // copy all error messages
       errorList = [];
@@ -143,9 +106,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     };
     
     cmTextArea.on("change", function(instance, changeObj)
-    { 
-      unsetPrompt();
-      
+    {       
       if(changeDelayTimerID)
       {
         window.clearTimeout(changeDelayTimerID);
@@ -153,15 +114,9 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       changeDelayTimerID = window.setTimeout(connector.sendTextIfNecessary, changeDelayTime);
     });
     
-    cmTextArea.on("focus", function(instance)
-    {
-      unsetPrompt();
-    });
-    
     cmTextArea.on("blur", function(instance)
     {
       connector.sendTextIfNecessary();
-      setPrompt(true);
     });
     
 };

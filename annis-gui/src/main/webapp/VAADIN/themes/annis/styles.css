@@ -6393,7 +6393,7 @@ body .annis.v-app .v-app-loading {
 	border-right-color: #a3adb9;
 }
 
-.annis .aql-code-prompt .cm-def {
+.annis .CodeMirror-placeholder {
 	color: grey;
 }
 
