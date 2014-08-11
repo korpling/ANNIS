@@ -34,21 +34,9 @@ import org.springframework.stereotype.Component;
 @Path("annis/version")
 public class VersionServiceImpl
 {
-  private final Properties versionProperties = new Properties();
   
   private final static Logger log = LoggerFactory.getLogger(VersionServiceImpl.class);
   
-  public VersionServiceImpl()
-  {
-    try
-    {
-      versionProperties.load(VersionServiceImpl.class.getResourceAsStream("version.properties"));
-    }
-    catch (IOException ex)
-    {
-      log.warn("Could not load the version of the ANNIS service", ex);
-    }
-  }
   
   @GET
   public String getFull()
@@ -81,6 +69,6 @@ public class VersionServiceImpl
   @Path("revision")
   public String getRevisionNumber()
   {
-    return versionProperties.getProperty("build_revision", "");
+    return VersionInfo.getBuildRevision();
   }
 }
