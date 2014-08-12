@@ -209,27 +209,19 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   {
     
     /* 
-    This is a very conservative assumption. If there is no join at all and 
-    the node does not use the rank table we can assume the result is already
+    If no node uses the rank table we can assume the result is already
     distinct. Of course this only works as long the SampleWhereClause generator
     is active and filters out node annotation duplicates.
     */
-    if(alternative.size() == 1)
+    for(QueryNode node : alternative)
     {
-      QueryNode node = alternative.get(0);
-      if(node.isPartOfEdge() || node.isRoot())
+      TableAccessStrategy tas = tables(node);
+      if(tas.usesRankTable())
       {
         return true;
       }
-      else
-      {
-        return false;
-      }
     }
-    else
-    {
-      return true;
-    }
+    return false;
   }
 
   public boolean isOutputToplevelCorpus()

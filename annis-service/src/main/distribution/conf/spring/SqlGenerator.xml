@@ -412,6 +412,7 @@ limitations under the License.
   </bean>
 
   <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator" 
+        parent="tableAccessStrategyFactory"
         lazy-init="true">
     
     <property name="solutionSqlGenerator" >
