@@ -16,7 +16,12 @@
 package annis.gui.admin;
 
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
+import annis.service.objects.ImportJob;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import com.sun.jersey.api.client.ClientResponse;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.ui.CheckBox;
@@ -24,6 +29,7 @@ import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
 import java.io.File;
@@ -34,6 +40,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
+import java.util.List;
+import java.util.UUID;
+import java.util.logging.Level;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -178,6 +187,11 @@ public class ImportPanel extends Panel
       {
         URI location = response.getLocation();
         appendMessage("Import requested, update URL is " + location);
+        
+        UI ui = UI.getCurrent();
+        PollControl.runInBackground(1000, 1000, ui, 
+          new WaitForFinishRunner(location, ui));
+        
       }
       else
       {
@@ -188,6 +202,93 @@ public class ImportPanel extends Panel
     catch (FileNotFoundException ex)
     {
       log.error(null, ex);
+    }
+    
+  }
+  
+  private class WaitForFinishRunner implements Runnable
+  {
+    private final URI location;
+    private final UI ui;
+    private final String uuid;
+    public WaitForFinishRunner(URI location, UI ui)
+    {
+      this.location = location;
+      this.ui = ui;
+      
+      List<String> path = 
+        Splitter.on('/').trimResults().omitEmptyStrings().splitToList(location.getPath());
+      
+      uuid = path.get(path.size()-1);
+    }
+
+    @Override
+    public void run()
+    {
+      // check the overall status
+      WebResource res = Helper.getAnnisWebResource()
+        .path("admin").path("import").path("status");
+      
+      ImportJob.Status lastStatus = ImportJob.Status.WAITING;
+      try
+      {
+        while (lastStatus == ImportJob.Status.WAITING
+          || lastStatus == ImportJob.Status.RUNNING)
+        {
+
+          lastStatus = ImportJob.Status.ERROR;
+          
+          List<ImportJob> jobs = res.get(new GenericType<List<ImportJob>>()
+          {
+          });
+          for (ImportJob j : jobs)
+          {
+            if (uuid.equals(j.getUuid()))
+            {
+              lastStatus = j.getStatus();
+              appendFromBackground(ui, "Current status: " + j.getStatus());
+              break;
+            }
+          }
+          Thread.currentThread().sleep(1000);
+        }
+      }
+      catch (InterruptedException ex)
+      {
+        log.error(null, ex);
+      }
+
+      
+      
+      
+      ImportJob finishInfo = res.path("finished").path(uuid).get(ImportJob.class);
+      // print all messages
+      appendFromBackground(ui, Joiner.on("\n").join(finishInfo.getMessages()));
+      
+      if(finishInfo.getStatus() == ImportJob.Status.SUCCESS)
+      {
+        appendFromBackground(ui, "Finished successfully.");
+      }
+      else if(finishInfo.getStatus() == ImportJob.Status.ERROR)
+      {
+        appendFromBackground(ui, "Failed.");
+      }
+      else
+      {
+        appendFromBackground(ui, "Unknown status.");
+      }
+    }
+    
+    private void appendFromBackground(UI ui, final String message)
+    {
+      ui.access(new Runnable()
+      {
+        @Override
+        public void run()
+        {
+          appendMessage(message);
+        }
+      });
     }
     
   }
