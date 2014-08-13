@@ -211,6 +211,9 @@ public class ImportPanel extends Panel
     private final URI location;
     private final UI ui;
     private final String uuid;
+    
+    private int currentMessageIndex = 0;
+    
     public WaitForFinishRunner(URI location, UI ui)
     {
       this.location = location;
@@ -246,11 +249,19 @@ public class ImportPanel extends Panel
             if (uuid.equals(j.getUuid()))
             {
               lastStatus = j.getStatus();
-              appendFromBackground(ui, "Current status: " + j.getStatus());
+              
+              if(lastStatus == ImportJob.Status.WAITING)
+              {
+                appendFromBackground("Still waiting for other imports to finish...");
+              }
+              else if(lastStatus == ImportJob.Status.RUNNING)
+              {
+                outputNewMessages(j.getMessages());
+              }
               break;
             }
           }
-          Thread.currentThread().sleep(1000);
+          Thread.sleep(1000);
         }
       }
       catch (InterruptedException ex)
@@ -260,26 +271,39 @@ public class ImportPanel extends Panel
 
       
       
-      
       ImportJob finishInfo = res.path("finished").path(uuid).get(ImportJob.class);
-      // print all messages
-      appendFromBackground(ui, Joiner.on("\n").join(finishInfo.getMessages()));
+      // print all remaining messages
+      outputNewMessages(finishInfo.getMessages());
       
       if(finishInfo.getStatus() == ImportJob.Status.SUCCESS)
       {
-        appendFromBackground(ui, "Finished successfully.");
+        appendFromBackground("Finished successfully.");
       }
       else if(finishInfo.getStatus() == ImportJob.Status.ERROR)
       {
-        appendFromBackground(ui, "Failed.");
+        appendFromBackground("Failed.");
       }
       else
       {
-        appendFromBackground(ui, "Unknown status.");
+        appendFromBackground("Unknown status.");
       }
     }
     
-    private void appendFromBackground(UI ui, final String message)
+    private void outputNewMessages(List<String> allMessages)
+    {
+      if(currentMessageIndex < allMessages.size())
+      {
+        final List<String> newMessages = allMessages.subList(currentMessageIndex,
+          allMessages.size());
+
+        currentMessageIndex = allMessages.size();
+        
+        appendFromBackground(Joiner.on("\n").join(newMessages));
+        
+      }
+    }
+    
+    private void appendFromBackground(final String message)
     {
       ui.access(new Runnable()
       {
