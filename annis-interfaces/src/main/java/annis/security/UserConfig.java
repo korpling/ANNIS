@@ -23,26 +23,14 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
- * Properties of an ANNIS user as stored in the configuration.
+ * Configuration of an ANNIS user as stored as JSON in the database.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
-public class AnnisUserConfig implements Serializable
+public class UserConfig implements Serializable
 {
-  private String name;
-  
-  private List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
-
-  public String getName()
-  {
-    return name;
-  }
-
-  public void setName(String name)
-  {
-    this.name = name;
-  }
-  
+  private List<CorpusSet> corpusSets = new LinkedList<>();
+   
   @XmlElement(name="corpus-set")
   public List<CorpusSet> getCorpusSets()
   {
@@ -52,7 +40,7 @@ public class AnnisUserConfig implements Serializable
   public void setCorpusSets(List<CorpusSet> corpusSets)
   {
     this.corpusSets = corpusSets;
-  }
+  } 
   
   
 }

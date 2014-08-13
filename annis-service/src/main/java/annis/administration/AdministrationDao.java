@@ -16,7 +16,7 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
-import annis.security.AnnisUserConfig;
+import annis.security.UserConfig;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -82,7 +82,7 @@ public interface AdministrationDao
   public PreparedStatement executeSqlFromScript(String script,
     MapSqlParameterSource args);
 
-  public AnnisUserConfig retrieveUserConfig(String userName);
+  public UserConfig retrieveUserConfig(String userName);
 
   public void registerGUICancelThread(StatementController statementCon);
 
@@ -199,5 +199,5 @@ public interface AdministrationDao
     public String printType();
   }
 
-  public void storeUserConfig(AnnisUserConfig config);
+  public void storeUserConfig(String userName, UserConfig config);
 }

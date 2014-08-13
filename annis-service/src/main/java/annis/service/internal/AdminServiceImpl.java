@@ -19,23 +19,19 @@ import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
-import annis.security.AnnisUserConfig;
+import annis.security.UserConfig;
 import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
-import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
-import java.util.zip.ZipEntry;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
@@ -88,12 +84,13 @@ public class AdminServiceImpl implements AdminService
   }
   
   /**
-   * Get the user configuration for the currentl logged in user.
+   * Get the user configuration for the currently logged in user.
+   * @return 
    */
   @GET
   @Path("userconfig")
   @Produces("application/xml")
-  public AnnisUserConfig getUserConfig()
+  public UserConfig getUserConfig()
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:read:userconfig");
@@ -102,17 +99,19 @@ public class AdminServiceImpl implements AdminService
   }
   
   /**
-   * Sets the user configuration for the currentl logged in user.
+   * Sets the user configuration for the currently logged in user.
    */
   @POST
   @Path("userconfig")
   @Consumes("application/xml")
-  public Response setUserConfig(JAXBElement<AnnisUserConfig> config)
+  public Response setUserConfig(JAXBElement<UserConfig> config)
   {
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("admin:write:userconfig");
     
-    adminDao.storeUserConfig(config.getValue());      
+    String userName = (String) user.getPrincipal();
+    
+    adminDao.storeUserConfig(userName, config.getValue());      
       return Response.ok().build();
   }
   

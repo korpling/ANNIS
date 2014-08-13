@@ -18,6 +18,8 @@ package annis.gui.admin;
 
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 
 /**
  *
@@ -25,8 +27,16 @@ import com.vaadin.ui.Panel;
  */
 public class UserPanel extends Panel
 {
+  
+  private VerticalLayout layout;
+  private Table userList;
+  
   public UserPanel()
   {
-    setContent(new Label("TODO"));
+    layout = new VerticalLayout();
+    setContent(layout);
+    
+    
+    
   }
 }

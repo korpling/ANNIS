@@ -19,7 +19,7 @@ import annis.gui.ExampleQueriesPanel;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
-import annis.security.AnnisUserConfig;
+import annis.security.UserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
@@ -108,7 +108,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private TextField txtFilter;
 
-  private transient AnnisUserConfig userConfig;
+  private transient UserConfig userConfig;
 
   private List<AnnisCorpus> allCorpora = new LinkedList<>();
 
@@ -473,7 +473,7 @@ public class CorpusListPanel extends VerticalLayout implements
     WebResource rootRes = Helper.getAnnisWebResource();
     // get the current corpus configuration
     this.userConfig = rootRes.path("admin").path("userconfig").
-      get(AnnisUserConfig.class);
+      get(UserConfig.class);
   }
 
   private void storeChangesRemote()

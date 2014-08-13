@@ -22,7 +22,6 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Properties;
-import java.util.TreeSet;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.io.FileUtils;
@@ -38,9 +37,6 @@ import org.slf4j.LoggerFactory;
 public class ANNISRolePermissionResolver implements RolePermissionResolver
 {
   private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISRolePermissionResolver.class);
-  
-  private String defaultUserRole = "user";
-  private String anonymousUserRole = "anonymous";
   
   private File groupsFile;
   private Properties groups;
@@ -111,18 +107,18 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
       perms.add(new WildcardPermission("query:*:*"));
       perms.add(new WildcardPermission("meta:*"));
     }
+    else if(Group.DEFAULT_USER_ROLE.equals(roleString))
+    {
+      // every user can read/write its user configuration
+      perms.add(new WildcardPermission("admin:*:userconfig"));
+    }
+    else if(Group.ANONYMOUS.equals(roleString))
+    {
+      // every anonymous user can read its user configuration
+      perms.add(new WildcardPermission("admin:read:userconfig"));
+    }
     else
     {
-      if(roleString.equals(defaultUserRole))
-      {
-        // every user can get/set its user configuration
-        perms.add(new WildcardPermission("admin:*:userconfig"));
-      }
-      else if(roleString.equals(anonymousUserRole))
-      {
-        // every anonymous user can get/set its user configuration
-        perms.add(new WildcardPermission("admin:read:userconfig"));
-      }
       checkConfiguration();
 
       lock.readLock().lock();
@@ -165,29 +161,6 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
       lock.writeLock().unlock();
     }
   }
-
-  public String getDefaultUserRole()
-  {
-    return defaultUserRole;
-  }
-
-  public void setDefaultUserRole(String defaultUserRole)
-  {
-    this.defaultUserRole = defaultUserRole;
-  }
-
-  public String getAnonymousUserRole()
-  {
-    return anonymousUserRole;
-  }
-
-  public void setAnonymousUserRole(String anonymousUserRole)
-  {
-    this.anonymousUserRole = anonymousUserRole;
-  }
-  
-  
-  
   
   
 }
