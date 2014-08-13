@@ -21,6 +21,8 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.concurrent.locks.ReadWriteLock;
@@ -34,7 +36,7 @@ import org.slf4j.LoggerFactory;
  *
  * It has a global lock to ensure that read/write operations are not interfering
  * which each other.
- * 
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ANNISUserConfigurationManager
@@ -134,17 +136,63 @@ public class ANNISUserConfigurationManager
         {
           // get the file which corresponds to the user
           File userFile = new File(userDir.getAbsolutePath(), userName);
-          if (userFile.isFile() && userFile.canRead())
+          return getUserFromFile(userFile);
+        }
+      }
+      finally
+      {
+        lock.readLock().unlock();
+      }
+    } // end if resourcePath not null
+
+    return null;
+  }
+  
+  /**
+   * Internal helper function to parse a user file.
+   * It assumes the calling function already has handled the locking.
+   * @param userFile
+   * @return 
+   */
+  private User getUserFromFile(File userFile)
+  {
+    if (userFile.isFile() && userFile.canRead())
+    {
+      try (FileInputStream userFileIO = new FileInputStream(userFile);)
+      {
+        Properties userProps = new Properties();
+        userProps.load(userFileIO);
+        return new User(userProps);
+      }
+      catch (IOException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    return null;
+  }
+
+  public List<User> listAllUsers()
+  {
+    List<User> result = new LinkedList<>();
+    // load user info from file
+    if (resourcePath != null)
+    {
+
+      lock.readLock().lock();
+      try
+      {
+        File userDir = new File(resourcePath, "users");
+        if (userDir.isDirectory())
+        {
+          // get all the files within this directory
+          for(File f : userDir.listFiles())
           {
-            try (FileInputStream userFileIO = new FileInputStream(userFile);)
+            // the filename is the user name, so check it
+            User u = getUserFromFile(f);
+            if(u != null)
             {
-              Properties userProps = new Properties();
-              userProps.load(userFileIO);
-              return new User(userProps);
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
+              result.add(u);
             }
           }
         }
@@ -155,7 +203,7 @@ public class ANNISUserConfigurationManager
       }
     } // end if resourcePath not null
 
-    return null;
+    return result;
   }
 
   public String getResourcePath()

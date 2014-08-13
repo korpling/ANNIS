@@ -19,6 +19,8 @@ import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
+import annis.security.ANNISSecurityManager;
+import annis.security.ANNISUserConfigurationManager;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
@@ -124,9 +126,15 @@ public class AdminServiceImpl implements AdminService
     Subject requestingUser = SecurityUtils.getSubject();
     requestingUser.checkPermission("admin:read:userlist");
     
-    // TODO
-    
-    return new LinkedList<User>();
+    if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserConfigurationManager confManager = getConfManager();
+      if(confManager != null)
+      {
+        return confManager.listAllUsers();
+      }
+    }
+    return new LinkedList<>();
   }
   
   @GET
@@ -250,6 +258,17 @@ public class AdminServiceImpl implements AdminService
       log.error(null, ex);
     }
     return Response.serverError().build();
+  }
+  
+  private ANNISUserConfigurationManager getConfManager()
+  {
+    if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserConfigurationManager confManager =
+        ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).getConfManager();
+      return confManager;
+    }
+    return null;
   }
  
   
