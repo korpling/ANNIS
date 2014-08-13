@@ -267,7 +267,7 @@ public class ImportPanel extends Panel
         appendMessage("Import requested, update URL is " + location);
         
         UI ui = UI.getCurrent();
-        PollControl.runInBackground(1000, 1000, ui, 
+        PollControl.runInBackground(500, 500, ui, 
           new WaitForFinishRunner(location, ui));
         
       }
@@ -339,7 +339,7 @@ public class ImportPanel extends Panel
               break;
             }
           }
-          Thread.sleep(1000);
+          Thread.sleep(500);
         }
       }
       catch (InterruptedException ex)
