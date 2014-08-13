@@ -24,14 +24,22 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.FormLayout;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Upload;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -41,8 +49,6 @@ import java.io.OutputStream;
 import java.net.URI;
 import java.text.DecimalFormat;
 import java.util.List;
-import java.util.UUID;
-import java.util.logging.Level;
 import javax.ws.rs.core.Response;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -63,6 +69,9 @@ public class ImportPanel extends Panel
   private final TextField txtMail;
   private final CheckBox cbOverwrite;
   private final TextField txtAlias;
+  private final ProgressBar progress;
+  private final Label lblProgress;
+  private final Button btDetailedLog;
   
   private File temporaryCorpusFile;
   
@@ -87,26 +96,89 @@ public class ImportPanel extends Panel
     txtAlias = new TextField("alias name");
     form.addComponent(txtAlias);
     
+    HorizontalLayout actionBar = new HorizontalLayout();
+    actionBar.setSpacing(true);
+    actionBar.setWidth("100%");
+    
     upload = new Upload("", this);
     upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
     upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
     
-    layout.addComponent(upload);
+    actionBar.addComponent(upload);
+    
+    progress = new ProgressBar();
+    progress.setIndeterminate(true);
+    progress.setVisible(false);
+    
+    actionBar.addComponent(progress);
+    
+    lblProgress = new Label();
+    lblProgress.setWidth("100%");
+  
+    actionBar.addComponent(lblProgress);
+    
+    actionBar.setExpandRatio(lblProgress, 1.0f);
+    actionBar.setComponentAlignment(lblProgress, Alignment.MIDDLE_LEFT);
+    actionBar.setComponentAlignment(upload, Alignment.MIDDLE_LEFT);
+    actionBar.setComponentAlignment(progress, Alignment.MIDDLE_LEFT);
+    
+    layout.addComponent(actionBar);
+    
+    btDetailedLog = new Button();
+    btDetailedLog.setStyleName(BaseTheme.BUTTON_LINK);
+    btDetailedLog.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        setLogVisible(!isLogVisible());
+      }
+    });
+    layout.addComponent(btDetailedLog);
+    
     
     txtMessages = new TextArea();
     txtMessages.setSizeFull();
-    txtMessages.setValue("Ready.");
+    txtMessages.setValue("");
     txtMessages.setReadOnly(true);
     layout.addComponent(txtMessages);
     
     layout.setExpandRatio(txtMessages, 1.0f);
     
+    setLogVisible(false);
+    appendMessage("Ready.");
+    
+  }
+  
+  private boolean isLogVisible()
+  {
+    return txtMessages.isVisible();
+  }
+  
+  private void setLogVisible(boolean visible)
+  {
+    txtMessages.setVisible(visible);
+    if(visible)
+    {
+      btDetailedLog.setCaption("Hide log");
+      btDetailedLog.setIcon(new ThemeResource("tango-icons/16x16/list-remove.png"), "minus sign");
+      layout.setExpandRatio(btDetailedLog, 0.0f);
+    }
+    else
+    {
+      btDetailedLog.setCaption("Show log");
+      btDetailedLog.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"), "plus sign");
+      layout.setExpandRatio(btDetailedLog, 1.0f);
+    }
   }
   
   private void appendMessage(String message)
   {
+    lblProgress.setValue(message);
+    
     txtMessages.setReadOnly(false);
     String oldVal = txtMessages.getValue();
     if(oldVal == null || oldVal.isEmpty())
@@ -121,18 +193,22 @@ public class ImportPanel extends Panel
     txtMessages.setCursorPosition(txtMessages.getValue().length()-1);
     txtMessages.setReadOnly(true);
   }
+  
 
   @Override
   public void updateProgress(long readBytes, long contentLength)
   {
-    float progress = (float) readBytes / (float) contentLength;
+    float ratioComplete = (float) readBytes / (float) contentLength;
+    
+    
     DecimalFormat format = new DecimalFormat("#0.00");
-    appendMessage("uploaded " + format.format(progress*100.0f) + "%");
+    appendMessage("uploaded " + format.format(ratioComplete*100.0f) + "%");
   }
 
   @Override
   public void uploadFinished(Upload.FinishedEvent event)
   {
+    
     appendMessage("Finished upload, starting import");
     startImport();
   }
@@ -141,6 +217,8 @@ public class ImportPanel extends Panel
   public void uploadStarted(Upload.StartedEvent event)
   {
     upload.setEnabled(false);
+    progress.setVisible(true);
+    progress.setEnabled(true);
     appendMessage("Started upload");
     event.getUpload().addProgressListener(this);
   }
@@ -163,6 +241,7 @@ public class ImportPanel extends Panel
   
   private void startImport()
   {
+    
     WebResource res = Helper.getAnnisWebResource().path("admin").path("import");
     String mail = txtMail.getValue();
     if(txtMail.isValid() && mail != null && !mail.isEmpty())
@@ -197,6 +276,7 @@ public class ImportPanel extends Panel
       else
       {
         upload.setEnabled(true);
+        progress.setVisible(false);
         appendMessage("Error (response code " + response.getStatus() + "): " + response.getEntity(String.class));
       }
       
@@ -210,7 +290,6 @@ public class ImportPanel extends Panel
   
   private class WaitForFinishRunner implements Runnable
   {
-    private final URI location;
     private final UI ui;
     private final String uuid;
     
@@ -218,7 +297,6 @@ public class ImportPanel extends Panel
     
     public WaitForFinishRunner(URI location, UI ui)
     {
-      this.location = location;
       this.ui = ui;
       
       List<String> path = 
@@ -296,6 +374,7 @@ public class ImportPanel extends Panel
         @Override
         public void run()
         {
+          progress.setVisible(false);
           upload.setEnabled(true);
         }
       });
@@ -311,7 +390,7 @@ public class ImportPanel extends Panel
 
         currentMessageIndex = allMessages.size();
         
-        appendFromBackground(Joiner.on("\n").join(newMessages));
+        appendFromBackground(newMessages);
         
       }
     }
@@ -326,6 +405,14 @@ public class ImportPanel extends Panel
           appendMessage(message);
         }
       });
+    }
+    
+    private void appendFromBackground(List<String> message)
+    {
+      for(String m : message)
+      {
+        appendFromBackground(m);
+      }
     }
     
   }

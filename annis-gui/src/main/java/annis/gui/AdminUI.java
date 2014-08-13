@@ -26,7 +26,7 @@ import com.vaadin.ui.VerticalLayout;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Theme("reindeer")
+@Theme("annis")
 public class AdminUI extends AnnisBaseUI
 {
   private VerticalLayout layout;
