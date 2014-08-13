@@ -88,7 +88,7 @@ public class ImportPanel extends Panel
     form.addComponent(txtAlias);
     
     upload = new Upload("", this);
-    upload.setButtonCaption("Upload ZIP file with relANNIS corpus");
+    upload.setButtonCaption("Upload ZIP file with relANNIS corpus and start import");
     upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
@@ -140,6 +140,7 @@ public class ImportPanel extends Panel
   @Override
   public void uploadStarted(Upload.StartedEvent event)
   {
+    upload.setEnabled(false);
     appendMessage("Started upload");
     event.getUpload().addProgressListener(this);
   }
@@ -195,6 +196,7 @@ public class ImportPanel extends Panel
       }
       else
       {
+        upload.setEnabled(true);
         appendMessage("Error (response code " + response.getStatus() + "): " + response.getEntity(String.class));
       }
       
@@ -287,6 +289,17 @@ public class ImportPanel extends Panel
       {
         appendFromBackground("Unknown status.");
       }
+      
+      ui.access(new Runnable()
+      {
+
+        @Override
+        public void run()
+        {
+          upload.setEnabled(true);
+        }
+      });
+      
     }
     
     private void outputNewMessages(List<String> allMessages)
