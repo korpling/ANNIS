@@ -56,14 +56,13 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
     else
     {
       
-      String corporaRaw = confManager.getGroups().get(roleString);
-      if(corporaRaw != null)
+      Group group =  confManager.getGroups().get(roleString);
+      if(group != null)
       {
-        String[] corpora = corporaRaw.split("\\s*,\\s*");
-        for(String c : corpora)
+        for(String c : group.getCorpora())
         {
-          perms.add(new WildcardPermission("query:*:" + c.trim()));
-          perms.add(new WildcardPermission("meta:" + c.trim()));
+          perms.add(new WildcardPermission("query:*:" + c));
+          perms.add(new WildcardPermission("meta:" + c));
         }
       }
 

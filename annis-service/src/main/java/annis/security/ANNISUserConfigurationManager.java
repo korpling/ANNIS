@@ -32,36 +32,42 @@ import org.slf4j.LoggerFactory;
  * Allows to read and write user and group information in a centralized and safe
  * way.
  *
+ * It has a global lock to ensure that read/write operations are not interfering
+ * which each other.
+ * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ANNISUserConfigurationManager
 {
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISUserConfigurationManager.class);
+
+  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
+    ANNISUserConfigurationManager.class);
 
   private String resourcePath;
+
   private File groupsFile;
-  
-  private Map<String, String> groups;
+
+  private Map<String, Group> groups;
+
   private Date lastTimeReloaded = null;
- 
 
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
-  
   private void checkConfiguration()
   {
     boolean reload = false;
-    
+
     // get a read lock that does not block anyone else to find out if we need an update
     lock.readLock().lock();
     try
     {
-      if(groupsFile == null)
+      if (groupsFile == null)
       {
         return;
       }
 
-      if( lastTimeReloaded == null || FileUtils.isFileNewer(groupsFile, lastTimeReloaded))
+      if (lastTimeReloaded == null || FileUtils.isFileNewer(groupsFile,
+        lastTimeReloaded))
       {
         reload = true;
       }
@@ -70,32 +76,32 @@ public class ANNISUserConfigurationManager
     {
       lock.readLock().unlock();
     }
-    
-    if(reload)
+
+    if (reload)
     {
       reloadGroups();
     }
   }
-  
+
   private void reloadGroups()
   {
     lock.writeLock().lock();
     try
     {
-      
+
       Properties propGroups = new Properties();
-      try(FileInputStream inStream = new FileInputStream(groupsFile);)
+      try (FileInputStream inStream = new FileInputStream(groupsFile);)
       {
-        
+
         propGroups.load(inStream);
         lastTimeReloaded = new Date(groupsFile.lastModified());
-        
+
         groups = new HashMap<>();
-        for(String k : propGroups.stringPropertyNames())
+        for (String k : propGroups.stringPropertyNames())
         {
-          groups.put(k, propGroups.getProperty(k));
+          groups.put(k, new Group(k, propGroups.getProperty(k)));
         }
-        
+
       }
       catch (IOException ex)
       {
@@ -107,13 +113,51 @@ public class ANNISUserConfigurationManager
       lock.writeLock().unlock();
     }
   }
-  
-  public ImmutableMap<String, String> getGroups()
+
+  public ImmutableMap<String, Group> getGroups()
   {
     checkConfiguration();
     return ImmutableMap.copyOf(groups);
   }
-  
+
+  public User getUser(String userName)
+  {
+    // load user info from file
+    if (resourcePath != null)
+    {
+
+      lock.readLock().lock();
+      try
+      {
+        File userDir = new File(resourcePath, "users");
+        if (userDir.isDirectory())
+        {
+          // get the file which corresponds to the user
+          File userFile = new File(userDir.getAbsolutePath(), userName);
+          if (userFile.isFile() && userFile.canRead())
+          {
+            try (FileInputStream userFileIO = new FileInputStream(userFile);)
+            {
+              Properties userProps = new Properties();
+              userProps.load(userFileIO);
+              return new User(userProps);
+            }
+            catch (IOException ex)
+            {
+              log.error(null, ex);
+            }
+          }
+        }
+      }
+      finally
+      {
+        lock.readLock().unlock();
+      }
+    } // end if resourcePath not null
+
+    return null;
+  }
+
   public String getResourcePath()
   {
     return resourcePath;

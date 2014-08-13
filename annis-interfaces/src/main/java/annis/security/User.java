@@ -53,6 +53,8 @@ public class User
   public User(Properties props)
   {
     this.name = props.getProperty("name", "");
+    this.passwordHash = props.getProperty("password");
+    
     String groupsRaw = props.getProperty("groups", "");
     for(String g : Splitter.on(",").trimResults().omitEmptyStrings().split(groupsRaw))
     {
