@@ -33,6 +33,7 @@ public class User
   private String name;
   private String passwordHash;
   private List<String> groups = new ArrayList<>();
+  private List<String> permissions = new ArrayList<>();
  
   public User()
   {
@@ -56,6 +57,12 @@ public class User
     for(String g : Splitter.on(",").trimResults().omitEmptyStrings().split(groupsRaw))
     {
       this.groups.add(g);
+    }
+    // add manual permissions
+    String permsRaw = props.getProperty("permissions", "");
+    for(String g : Splitter.on(",").trimResults().omitEmptyStrings().split(permsRaw))
+    {
+      this.permissions.add(g);
     }
   }
 
@@ -88,6 +95,17 @@ public class User
   {
     this.groups = groups;
   }
+
+  public List<String> getPermissions()
+  {
+    return permissions;
+  }
+
+  public void setPermissions(List<String> permissions)
+  {
+    this.permissions = permissions;
+  }
+  
   
   
   
@@ -101,6 +119,10 @@ public class User
     Properties props = new Properties();
     props.put("password", passwordHash);
     props.put("groups", Joiner.on(',').join(groups));
+    if(permissions != null && !permissions.isEmpty())
+    {
+      props.put("permissions", Joiner.on(',').join(permissions));
+    }
     return props;
   }
   

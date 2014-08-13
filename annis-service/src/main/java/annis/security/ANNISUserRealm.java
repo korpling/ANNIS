@@ -15,6 +15,7 @@
  */
 package annis.security;
 
+import com.google.common.base.Splitter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -98,19 +99,25 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
     Validate.isInstanceOf(String.class, principals.getPrimaryPrincipal());
     String userName = (String) principals.getPrimaryPrincipal();
     
+    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
     
-    Set<String> roles = new TreeSet<>();
-    roles.add(userName);  
+    Splitter splitter = Splitter.on(',').trimResults().omitEmptyStrings();
+    
+    info.addRole(userName);
     if(!userName.equals(anonymousUser))
     {
       Properties userProps = getPropertiesForUser(userName);
     
-      String groupsRaw = userProps.getProperty("groups", "").trim();
-      roles.addAll(Arrays.asList(groupsRaw.split("\\s*,\\s*")));
+      String groupsRaw = userProps.getProperty("groups", "");
+      info.addRoles(splitter.splitToList(groupsRaw));
+      info.addRole(defaultUserRole);
       
-      roles.add(defaultUserRole);
+      // add any manual given permissions
+      String permRaw = userProps.getProperty("permissions", "");
+      info.addStringPermissions(splitter.splitToList(permRaw));
+      
     }
-    return new SimpleAuthorizationInfo(roles);
+    return info;
   }
 
   @Override

@@ -19,6 +19,7 @@ import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
+import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
@@ -113,6 +114,17 @@ public class AdminServiceImpl implements AdminService
     
     adminDao.storeUserConfig(userName, config.getValue());      
       return Response.ok().build();
+  }
+  
+  @GET
+  @Path("users")
+  @Produces("application/xml")
+  public List<User> listUsers()
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:read:userlist");
+    
+    return new LinkedList<User>();
   }
   
   @GET
