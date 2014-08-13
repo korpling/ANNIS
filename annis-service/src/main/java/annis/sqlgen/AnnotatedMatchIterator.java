@@ -28,7 +28,7 @@ import org.springframework.jdbc.core.RowMapper;
 /**
  * Implements an {@link Iterator} for a {@link AnnotatedMatch} from
  * a JDBC {@link ResultSet}.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
 {
@@ -37,7 +37,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   
   public AnnotatedMatchIterator(ResultSet rs, RowMapper<AnnotatedSpan> mapper)
   {
-    this.itSpan = new ResultSetTypedIterator<AnnotatedSpan>(rs, mapper);
+    this.itSpan = new ResultSetTypedIterator<>(rs, mapper);
     this.lastSpan = null;
   }
   
@@ -59,7 +59,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   @Override
   public AnnotatedMatch next()
   {
-    List<Long> key = new ArrayList<Long>();
+    List<Long> key = new ArrayList<>();
     AnnotatedSpan[] matchedSpans = new AnnotatedSpan[0];
     
     if(lastSpan != null)
@@ -123,7 +123,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
     {
       if(l == span.getId())
       {
-        matchedSpans[i] = span;
+        matchedSpans[i] = new AnnotatedSpan(span);
       }
       i++;
     }

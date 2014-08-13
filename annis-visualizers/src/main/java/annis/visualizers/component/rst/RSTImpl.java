@@ -47,6 +47,8 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.TreeSet;
+import java.util.UUID;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONArray;
@@ -129,7 +131,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Create a unique id, for every RSTImpl instance, for building an unique html
    * id, in the DOM.
    */
-  private static int count = 0;
+  private final UUID uniqueID = UUID.randomUUID();
 
   // unique id for every instance of RSTImpl
   private final String visId;
@@ -206,12 +208,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     namespace = visInput.getNamespace();
 
-    /**
-     * build id and increase count for every instance, so we receive an unique
-     * id
-     */
-    visId = "rst_" + count;
-    count++;
+    visId = "rst_" + uniqueID.toString();
 
     jit = new JITWrapper();
     jit.setWidth("100%");
@@ -222,6 +219,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     jit.setVisData(transformSaltToJSON(visInput));
     jit.setProperties(visInput.getMappings());
     jit.requestRepaint();
+
+    addScrollbar();
 
   }
 
@@ -257,8 +256,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
                 String traversalId, SNode currNode, SRelation sRelation,
                 SNode fromNode, long order) {
           if (currNode instanceof SStructure
-                  && isSegment(currNode)
-                  && CommonHelper.checkSLayer(namespace, fromNode)) {
+                  && isSegment(currNode)) {
             sentences.add((SStructure) currNode);
           }
         }
@@ -284,7 +282,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       });
 
       //decorate segments with sentence number
-      int i = 0;
+      int i = 1;
       for (SStructure sentence : sentences) {
         sentence.createSProcessingAnnotation(
                 SENTENCE_INDEX, SENTENCE_INDEX, Integer.toString(i));
@@ -417,11 +415,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
             if (st.size() > 1) {
               tmp = st.pop();
-              st.peek().append("children", node);
+              getOrCreateArray(st.peek(), "children").put(node);
               sortChildren(st.peek());
               st.push(tmp);
             } else {
-              result.append("children", node);
+              getOrCreateArray(result, "children").put(node);
             }
 
             setSentenceSpan(node, st.peek());
@@ -432,7 +430,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       }
 
       if (!isAppendedToParent) {
-        root.append("children", node);
+        getOrCreateArray(root, "children").put(node);
         setSentenceSpan(node, root);
         sortChildren(root);
       }
@@ -459,7 +457,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     if (st.size() == 1) {
       try {
-        result.append("children", st.pop());
+        getOrCreateArray(result, "children").put(st.pop());
         sortChildren(result);
       } catch (JSONException ex) {
         log.error("Problems with adding roots", ex);
@@ -480,6 +478,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     return true;
   }
+  
+  private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException
+  {
+    JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
+    if(array == null)
+    {
+        array = new JSONArray();
+        parent.put(key, array);
+    }
+    return array;
+  }
 
   /**
    * Gets the overlapping token as string from a node, which are direct
@@ -495,13 +504,13 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     EList<SDataSourceSequence> sSequences = currNode.getSDocumentGraph().
             getOverlappedDSSequences(currNode, relationTypes);
 
-    log.debug("sSequences {}", sSequences.toString());
-
     // only support one text for spanns
     if (sSequences == null || sSequences.size() != 1) {
       log.error("rst supports only one text and only text level");
       return null;
     }
+    
+    log.debug("sSequences {}", sSequences.toString());
 
     /**
      * Check if it is a text data structure. As described in the salt manual in
@@ -576,7 +585,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
         if (annos != null) {
           for (SAnnotation anno : annos) {
-            jsonEdge.append("annotation", anno.getSValueSTEXT());
+            getOrCreateArray(jsonEdge, "annotation").put(anno.getSValueSTEXT());
           }
         }
       }
@@ -589,7 +598,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Build a unique HTML id.
    */
   private String getUniStrId(SNode node) {
-    return visId + "_" + node.getSName();
+    return visId + "_" + node.getSId();
   }
 
   /**
@@ -717,9 +726,6 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     children = new JSONArray(childrenSorted);
     root.put("children", children);
-
-    addScrollbar();
-
   }
 
   private boolean hasRSTType(SRelation e) {

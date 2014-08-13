@@ -23,7 +23,7 @@ public class AbstractSolutionKeyTest
 {
 
   // class under test
-  AbstractSolutionKey<Integer> key = new AbstractSolutionKey<Integer>();
+  AbstractSolutionKey<Integer> key = new AbstractSolutionKey<>();
   
   // test data
   @Mock private TableAccessStrategy tableAccessStrategy;

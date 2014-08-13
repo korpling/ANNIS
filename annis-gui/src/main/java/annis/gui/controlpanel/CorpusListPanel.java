@@ -25,6 +25,8 @@ import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.collect.Collections2;
+import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -38,17 +40,24 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.ExternalResource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+<<<<<<< HEAD
+=======
+import com.vaadin.ui.GridLayout;
+>>>>>>> develop
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
@@ -64,6 +73,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.Response;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -107,10 +117,10 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private transient AnnisUserConfig userConfig;
 
-  private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
+  private List<AnnisCorpus> allCorpora = new LinkedList<>();
 
   private InstanceConfig instanceConfig;
-
+  
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
@@ -141,7 +151,7 @@ public class CorpusListPanel extends VerticalLayout implements
     cbSelection.setNewItemsAllowed(true);
     cbSelection.setNewItemHandler((AbstractSelect.NewItemHandler) this);
     cbSelection.setImmediate(true);
-    cbSelection.addListener(new ValueChangeListener()
+    cbSelection.addValueChangeListener(new ValueChangeListener()
     {
       @Override
       public void valueChange(ValueChangeEvent event)
@@ -178,10 +188,10 @@ public class CorpusListPanel extends VerticalLayout implements
           // select the first item
           List<String> filteredIDs = corpusContainer.getItemIds();
 
-          Set<String> selectedAndFiltered = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndFiltered = new HashSet<>(selectedIDs);
           selectedAndFiltered.retainAll(filteredIDs);
 
-          Set<String> selectedAndOutsideFilter = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndOutsideFilter = new HashSet<>(selectedIDs);
           selectedAndOutsideFilter.removeAll(filteredIDs);
 
           for (String id : selectedAndOutsideFilter)
@@ -208,7 +218,7 @@ public class CorpusListPanel extends VerticalLayout implements
     
     addComponent(tblCorpora);
 
-    corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
+    corpusContainer = new BeanContainer<>(AnnisCorpus.class);
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
@@ -281,6 +291,11 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void updateCorpusSetList(boolean showLoginMessage)
   {
+    if(ui != null)
+    {
+      ui.clearCorpusConfigCache();
+    }
+    
     if (queryServerForCorpusList() && userConfig != null)
     {
       if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
@@ -307,7 +322,7 @@ public class CorpusListPanel extends VerticalLayout implements
       cbSelection.removeAllItems();
       cbSelection.addItem(ALL_CORPORA);
 
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -319,7 +334,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
 
       // add the corpus set names in sorted order
-      TreeSet<String> corpusSetNames = new TreeSet<String>();
+      TreeSet<String> corpusSetNames = new TreeSet<>();
       for (CorpusSet cs : corpusSets)
       {
         corpusSetNames.add(cs.getName());
@@ -369,7 +384,7 @@ public class CorpusListPanel extends VerticalLayout implements
       CorpusSet selectedCS = null;
 
       // TODO: use map
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -389,7 +404,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
       if (selectedCS != null)
       {
-        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<AnnisCorpus>();
+        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<>();
         for (AnnisCorpus c : allCorpora)
         {
           if (selectedCS.getCorpora().contains(c.getName()))
@@ -456,12 +471,6 @@ public class CorpusListPanel extends VerticalLayout implements
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
           Notification.Type.TRAY_NOTIFICATION);
       }
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-      Notification.show("Exception: " + ex.getLocalizedMessage(),
-        Notification.Type.TRAY_NOTIFICATION);
     }
     return false;
   }
@@ -534,7 +543,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public Action[] getActions(Object target, Object sender)
   {
     String corpusName = (String) target;
-    LinkedList<Action> result = new LinkedList<Action>();
+    LinkedList<Action> result = new LinkedList<>();
 
     if (target == null)
     {
@@ -609,7 +618,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     }
   }
-
+  
   public static class CorpusSorter extends DefaultItemSorter
   {
 
@@ -638,8 +647,20 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Select the corpora
+   * @param corpora Corpora to select
+   */
   public void selectCorpora(Set<String> corpora)
   {
+    // if the corpus to select is not contained in the corpus set, 
+    // reset to the "All corpora" corpus set
+    Set<String> visibleCorpora = getVisibleCorpora();
+    if(!visibleCorpora.containsAll(corpora))
+    {
+       setCorpusSet(CorpusListPanel.ALL_CORPORA);
+    }
+
     if (tblCorpora != null)
     {
       tblCorpora.setValue(corpora);
@@ -650,9 +671,13 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
 
+  /**
+   * Get the names of the corpora that are currently selected.
+   * @return 
+   */
   public Set<String> getSelectedCorpora()
   {
-    Set<String> result = new HashSet<String>();
+    Set<String> result = new HashSet<>();
 
     for (String id : corpusContainer.getItemIds())
     {
@@ -664,6 +689,25 @@ public class CorpusListPanel extends VerticalLayout implements
 
     return result;
   }
+  
+  /**
+   * Get the names of the corpora that are currently visible and can be choosen
+   * by the user.
+   * @return 
+   */
+  public Set<String> getVisibleCorpora()
+  {
+    return new HashSet<>(corpusContainer.getItemIds());
+  }
+  
+  /**
+   * Set the currently displayed corpus set.
+   * @param corpusSet 
+   */
+  public void setCorpusSet(String corpusSet)
+  {
+    cbSelection.select(corpusSet);
+  }
 
   public class DocLinkGenerator implements Table.ColumnGenerator
   {
@@ -672,12 +716,14 @@ public class CorpusListPanel extends VerticalLayout implements
     public Object generateCell(Table source, Object itemId, Object columnId)
     {
       final String id = (String) itemId;
-      Button l = new Button();
-      l.setStyleName(BaseTheme.BUTTON_LINK);
-      l.setIcon(DOC_ICON);
-
+      
+      
       if (ui.getDocBrowserController().docsAvailable(id))
       {
+        Button l = new Button();
+        l.setStyleName(BaseTheme.BUTTON_LINK);
+        l.setIcon(DOC_ICON);
+
         l.setDescription("opens the document browser for " + id);
         l.addClickListener(new Button.ClickListener()
         {
@@ -687,14 +733,10 @@ public class CorpusListPanel extends VerticalLayout implements
             ui.getDocBrowserController().openDocBrowser(id);
           }
         });
-      }
-      else
-      {
-        l.setDescription("document browser is disabled for this corpus");
-        l.setEnabled(false);
+        return l;
       }
 
-      return l;
+      return "";
     }
   }
 
@@ -798,19 +840,32 @@ public class CorpusListPanel extends VerticalLayout implements
     MetaDataPanel meta = new MetaDataPanel(c.getName());
 
     CorpusBrowserPanel browse = new CorpusBrowserPanel(c, controller);
-    HorizontalLayout layout = new HorizontalLayout();
-    layout.addComponent(meta);
-    layout.addComponent(browse);
-    layout.setSizeFull();
-    layout.setExpandRatio(meta, 0.5f);
-    layout.setExpandRatio(browse, 0.5f);
-
+    GridLayout infoLayout = new GridLayout(2, 2);
+    infoLayout.setSizeFull();
+    
+    String corpusURL =  Helper.generateCorpusLink(Sets.newHashSet(topLevelCorpusName));
+    Label lblLink = new Label("Link to corpus: <a href=\"" + corpusURL + "\">"
+      + corpusURL + "</a>", ContentMode.HTML);
+    lblLink.setHeight("-1px");
+    lblLink.setWidth("-1px");
+    
+    
+    infoLayout.addComponent(meta, 0, 0);
+    infoLayout.addComponent(browse, 1, 0);
+    infoLayout.addComponent(lblLink, 0,1,1, 1);
+    
+    infoLayout.setRowExpandRatio(0, 1.0f);
+    infoLayout.setColumnExpandRatio(0, 0.5f);
+    infoLayout.setColumnExpandRatio(1, 0.5f);
+    infoLayout.setComponentAlignment(lblLink, Alignment.MIDDLE_CENTER);
+    
     Window window = new Window("Corpus information for " + c.getName()
-      + " (ID: " + c.getId() + ")", layout);
+      + " (ID: " + c.getId() + ")", infoLayout);
     window.setWidth(70, UNITS_EM);
-    window.setHeight(40, UNITS_EM);
-    window.setResizable(false);
+    window.setHeight(45, UNITS_EM);
+    window.setResizable(true);
     window.setModal(false);
+    window.setResizeLazy(true);
 
     window.addCloseListener(new Window.CloseListener()
     {

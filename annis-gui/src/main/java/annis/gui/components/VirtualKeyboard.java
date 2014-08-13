@@ -27,7 +27,7 @@ import org.json.JSONException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @StyleSheet({"keyboard.css"})
 @JavaScript({"vaadin://jquery.js","keyboard.js", "virtualkeyboard.js"})

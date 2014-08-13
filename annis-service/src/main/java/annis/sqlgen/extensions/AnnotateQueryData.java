@@ -40,7 +40,7 @@ public class AnnotateQueryData
 
   public AnnotateQueryData(int left, int right, String segmentationLayer)
   {
-    this(left, right, segmentationLayer, SubgraphFilter.All);
+    this(left, right, segmentationLayer, SubgraphFilter.all);
   }
   
   public AnnotateQueryData(int left, int right, String segmentationLayer, SubgraphFilter filter)
@@ -82,7 +82,7 @@ public class AnnotateQueryData
   @Override
   public String toString()
   {
-    List<String> fields = new ArrayList<String>();
+    List<String> fields = new ArrayList<>();
 
     if (left > 0)
     {

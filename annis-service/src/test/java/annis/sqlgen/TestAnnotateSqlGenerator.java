@@ -88,7 +88,7 @@ public class TestAnnotateSqlGenerator
   @Mock private QueryData queryData;
   @Mock private AnnotateQueryData annotateQueryData;
   @Mock private LimitOffsetQueryData limitOffsetQueryData;
-  private List<QueryNode> alternative = new ArrayList<QueryNode>(); 
+  private List<QueryNode> alternative = new ArrayList<>(); 
   private static final String INDENT = TABSTOP;
   
   @Before
@@ -100,26 +100,26 @@ public class TestAnnotateSqlGenerator
   }
   
   public static void setupOuterQueryFactsTableColumnAliases(AnnotateExtractor<?> generator) {
-    Map<String, String> nodeColumns = new HashMap<String, String>();
+    Map<String, String> nodeColumns = new HashMap<>();
     nodeColumns.put("namespace", "node_namespace");
     nodeColumns.put("name", "node_name");
 
-    Map<String, String> nodeAnnotationColumns = new HashMap<String, String>();
+    Map<String, String> nodeAnnotationColumns = new HashMap<>();
     nodeAnnotationColumns.put("node_ref", "id");
     nodeAnnotationColumns.put("namespace", "node_annotation_namespace");
     nodeAnnotationColumns.put("name", "node_annotation_name");
     nodeAnnotationColumns.put("value", "node_annotation_value");
 
-    Map<String, String> edgeAnnotationColumns = new HashMap<String, String>();
+    Map<String, String> edgeAnnotationColumns = new HashMap<>();
     nodeAnnotationColumns.put("rank_ref", "pre");
     edgeAnnotationColumns.put("namespace", "edge_annotation_namespace");
     edgeAnnotationColumns.put("name", "edge_annotation_name");
     edgeAnnotationColumns.put("value", "edge_annotation_value");
 
-    Map<String, String> edgeColumns = new HashMap<String, String>();
+    Map<String, String> edgeColumns = new HashMap<>();
     edgeColumns.put("node_ref", "id");
 
-    Map<String, String> componentColumns = new HashMap<String, String>();
+    Map<String, String> componentColumns = new HashMap<>();
     componentColumns.put("id", "component_id");
     componentColumns.put("name", "edge_name");
     componentColumns.put("namespace", "edge_namespace");
@@ -129,7 +129,7 @@ public class TestAnnotateSqlGenerator
     edgeColumns.put("namespace", "edge_namespace");
 
     Map<String, Map<String, String>> columnAliases =
-      new HashMap<String, Map<String, String>>();
+      new HashMap<>();
     columnAliases.put(TableAccessStrategy.NODE_TABLE, nodeColumns);
     columnAliases.put(TableAccessStrategy.NODE_ANNOTATION_TABLE,
       nodeAnnotationColumns);
@@ -402,7 +402,7 @@ public class TestAnnotateSqlGenerator
   @Test
   public void shouldAddIsTokenOnFilter()
   {
-    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.Token);
+    given(annotateQueryData.getFilter()).willReturn(SubgraphFilter.token);
     
     String isTokenAlias = createColumnAlias(NODE_TABLE, "is_token");
     

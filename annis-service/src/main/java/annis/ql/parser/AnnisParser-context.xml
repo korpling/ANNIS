@@ -22,7 +22,9 @@ limitations under the License.
 	xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
 	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd
-	">
+	"
+  default-lazy-init="true"
+  >
 	
   <!-- Properties configuration -->
   <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
@@ -33,17 +35,24 @@ limitations under the License.
     </property>
   </bean>
   
+  <bean class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer" lazy-init="true">
+    <property name="location" value="file:${annis.home}/conf/develop.properties"/>
+    <property name="placeholderPrefix" value="$dev{"/>
+  </bean> 
+  
   <util:list id="queryAnalysisPostProcessors" value-type="annis.ql.parser.QueryDataTransformer" scope="prototype"> 
     <bean class="annis.ql.parser.SemanticValidator" 
           scope="prototype" />
     <bean class="annis.ql.parser.ComponentSearchRelationNormalizer" 
           scope="prototype" />
+    <!--
 		<bean class="annis.ql.parser.TransitivePrecedenceOptimizer" 
           scope="prototype" />
+          -->
 	</util:list>
   
   <bean id="annisParserAntlr" class="annis.ql.parser.AnnisParserAntlr">
-    <property name="precedenceBound" value="${annis.precedence-restriction}"/>
+    <property name="precedenceBound" value="$dev{annis.precedence-restriction}"/>
     <property name="postProcessors" ref="queryAnalysisPostProcessors" />    
   </bean>
 

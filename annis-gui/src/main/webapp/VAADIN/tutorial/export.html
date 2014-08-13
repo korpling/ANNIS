@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <title>Pointing Relations in
+  <title>Exporting results in
 ANNIS - Search and Visualization in Multilevel Linguistic Corpora</title>
   <link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
 </head>
@@ -11,12 +11,12 @@ ANNIS - Search and Visualization in Multilevel Linguistic Corpora</title>
 <h2>Exporting
 Results</h2>
 <p>
-By going to the Export tab at the bottom of the search form on the
-left, you can select one of four exporters: the SimpleTextExporter, the
-TextExporter, the WekaExporter and the GridExporter.
-</p>
+To export search results, open the menu "More" between the Search and History buttons and select "Export":</p>
 <img src="export.png">
-<p>The
+<p>Enter the query whose results you want to export as usual in the AQL box. Note that you <strong>do not need to carry out the query first</strong>. You can enter the query and export without pressing Search before. Several exporter modules can be selected from the Export tab shown below.</p>
+<img src="export2.png">
+
+<p>
 The SimpleTextExporter simply gives the text for all tokens in each search result, including context, in a one-row-per-hit format. The tokens covered by the match area are marked with square brackets and the results are numbered, as in the following example:</p>
 <tt><small>
 1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große <br>
@@ -29,8 +29,7 @@ The SimpleTextExporter simply gives the text for all tokens in each search resul
 The TextExporter adds all annotations of each token separated by slashes (e.g. dogs/NN/dog for the token dogs annotated with a part-of-speech NN and a lemma dog).
 </p>
 <p>
-The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter numbers=false). The user can specify annotation layers to be exported in the additional 'Parameters' box, using the setting 'keys=' and annotation names separated by comas. If nothing is specified in the parameters box, all available annotations will be exported. Multiple options are separated by a semicolon, e.g. keys=tok,pos,cat;numbers=false. An example output with token numbers looks as follows.
-</p>
+The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter <tt>numbers=false</tt> in the ‘Parameters’ box). The user can specify annotation layers to be exported in the additional ‘Annotation Keys’ box, and annotation names should be separated by comas, as in the image above. Metadata annotations can also be exported by entering “metakeys=” and a list of comma separated metadata names in the Parameters box. If nothing is specified, all available annotations and no metadata will be exported. Multiple options are separated by a semicolon, e.g. the Parameters <tt>metakeys=Genre,Titel;numbers=false</tt>. An example output with token numbers looks as follows. </p>
 <tt><small>
 <table border="0">
 <tr>
@@ -40,7 +39,7 @@ The GridExporter adds all annotations available for the span of retrieved tokens
 </table>
 </tt></small>
 <p>
-Meaning that the annotation cat="NP" applied to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name 'tok' is not specified, the tokens themselves will not be exported (annotations only).
+Meaning that the annotation cat="NP" applies to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name 'tok' is not specified, the tokens themselves will not be exported (annotations only).
 </p>
 <p>The WekaExporter outputs the
 format used by the WEKA machine learning
@@ -77,7 +76,15 @@ in the beginning of the export text, as in this example:
 of an NP node dominating a token with
 the part-of-speech ADJA. Since the token also has other attributes,
 such as the lemma, the token text and morphology, these are also
-retrieved. Note that exporting may be slow in both exporters if the
+retrieved. </p>
+
+<p>It is also possible to output metadata annotations per hit using the WekaExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For example, if your documents have a metadata annotation called 'genre', you may export it for each search result as a further column using metakeys=Genre in the parameters box.
+</p>
+<p>
+The CSVExporter behaves much like the WekaExporter, except that the Weka header specifying the content of the columns is not used (useful for importing into spreadsheet programs such as Excel or Calc).
+</p>
+
+<p>Note that exporting may be slow in both exporters if the
 result set is very large.
 </p>
 </div>

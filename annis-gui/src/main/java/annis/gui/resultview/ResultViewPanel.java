@@ -18,20 +18,21 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
+import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
+import annis.gui.controlpanel.QueryPanel;
 import annis.gui.model.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.libgui.ResolverProviderImpl;
-import annis.libgui.VisibleTokenAnnoChanger;
+import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import com.google.common.base.Preconditions;
 import com.vaadin.server.AbstractClientConnector;
-import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
@@ -39,11 +40,16 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -52,10 +58,12 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
+import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
-import java.util.concurrent.TimeUnit;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -63,7 +71,7 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class ResultViewPanel extends VerticalLayout implements
-  OnLoadCallbackExtension.Callback, VisibleTokenAnnoChanger
+  OnLoadCallbackExtension.Callback
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -76,9 +84,9 @@ public class ResultViewPanel extends VerticalLayout implements
   public static final String FILESYSTEM_CACHE_RESULT
     = "ResultSetPanel_FILESYSTEM_CACHE_RESULT";
 
-  private PagingComponent paging;
+  public static final String MAPPING_HIDDEN_ANNOS = "hidden_annos";
 
-  private ProgressBar progressResult;
+  private PagingComponent paging;
 
   private PluginSystem ps;
 
@@ -111,14 +119,20 @@ public class ResultViewPanel extends VerticalLayout implements
   private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
-
+  
+  private UUID queryId;
+ 
   private PagedResultQuery currentQuery;
+  
+  SearchUI sui = (SearchUI) UI.getCurrent();
+
 
   public ResultViewPanel(QueryController controller,
-    PluginSystem ps, InstanceConfig instanceConfig)
+    PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
   {
-    this.tokenAnnoVisible = new TreeMap<String, Boolean>();
+    this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
+    this.queryId = queryId;
     this.controller = controller;
     this.selectedSegmentationLayer = controller.getPreparedQuery().
       getSegmentation();
@@ -149,17 +163,9 @@ public class ResultViewPanel extends VerticalLayout implements
     miSegmentation = mbResult.addItem("Base text", null);
     miTokAnnos = mbResult.addItem("Token Annotations", null);
 
-    progressResult = new ProgressBar();
-
-    progressResult.setVisible(false);
-
-    addComponent(progressResult);
     addComponent(resultPanel);
 
-    setComponentAlignment(progressResult, Alignment.MIDDLE_CENTER);
-
     setExpandRatio(mbResult, 0.0f);
-    setExpandRatio(progressResult, 0.0f);
     setExpandRatio(resultPanel, 1.0f);
 
     paging = new PagingComponent();
@@ -168,8 +174,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
     setComponentAlignment(paging, Alignment.TOP_CENTER);
     setExpandRatio(paging, 0.0f);
-
-    VaadinSession.getCurrent().setAttribute(VisibleTokenAnnoChanger.class.getName(), this);
   }
 
   /**
@@ -180,14 +184,6 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showMatchSearchInProgress(PagedResultQuery query)
   {
     resultLayout.removeAllComponents();
-
-    progressResult.setIndeterminate(true);
-    progressResult.setCaption("Searching for \"" + query.getQuery().replaceAll(
-      "\n",
-      " ") + "\"");
-    progressResult.setVisible(true);
-    setExpandRatio(progressResult, 1.0f);
-
     segmentationName = query.getSegmentation();
   }
 
@@ -195,9 +191,6 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     resultLayout.removeAllComponents();
     currentResults = 0;
-
-    progressResult.setCaption("");
-    progressResult.setVisible(false);
 
     // nothing to show since we have an empty result
     Label lblNoResult = new Label("No matches found.");
@@ -215,11 +208,6 @@ public class ResultViewPanel extends VerticalLayout implements
       currentResults = 0;
     }
 
-    progressResult.setIndeterminate(false);
-    progressResult.setCaption("");
-    progressResult.setVisible(true);
-    setExpandRatio(progressResult, 0.0f);
-    progressResult.setValue(percent);
   }
 
   /**
@@ -235,7 +223,7 @@ public class ResultViewPanel extends VerticalLayout implements
     this.projectQueue = queue;
     this.currentQuery = q;
     this.numberOfResults = numberOfResults;
-
+    
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
 
@@ -267,7 +255,7 @@ public class ResultViewPanel extends VerticalLayout implements
     Preconditions.checkState(first != null,
       "There must be already an element in the queue");
 
-    addQueryResult(q, first);
+    addQueryResult(q, Arrays.asList(first));
   }
 
   private void resetQueryResultQueue()
@@ -278,40 +266,51 @@ public class ResultViewPanel extends VerticalLayout implements
     this.numberOfResults = 0;
   }
 
-  private void addQueryResult(PagedResultQuery q, SaltProject p)
+  private void addQueryResult(PagedResultQuery q, List<SaltProject> subgraphList)
   {
+
     if (q == null)
     {
       return;
     }
 
-    List<SingleResultPanel> newPanels;
+    List<SingleResultPanel> newPanels = new LinkedList<>();
     try
     {
-      if (p == null)
+      if (subgraphList == null || subgraphList.isEmpty())
       {
         Notification.show("Could not get subgraphs",
           Notification.Type.TRAY_NOTIFICATION);
       }
       else
       {
-        updateVariables(p);
-        newPanels = createPanels(p, q.getOffset() + currentResults);
-        currentResults += newPanels.size();
+        for(SaltProject p : subgraphList)
+        {
+          updateVariables(p);
+          newPanels = createPanels(p, q.getOffset() + currentResults);
+          currentResults += newPanels.size();
 
-        progressResult.setValue(((float) currentResults) / (float) (numberOfResults));
+          String strResults  = numberOfResults > 1 ? "results" : "result";
+          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().getQueryPanel().getLastPublicStatus(), " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");          
+
+          if (currentResults == numberOfResults)
+          {
+            resetQueryResultQueue();
+          }
+
+          for (SingleResultPanel panel : newPanels)
+          {
+            resultPanelList.add(panel);
+            resultLayout.addComponent(panel);
+            panel.setSegmentationLayer(selectedSegmentationLayer);
+          }
+        }
         
-        if (currentResults == numberOfResults)
+        if(currentResults == numberOfResults)
         {
-          resetQueryResultQueue();
+          showFinishedSubgraphSearch();
         }
 
-        for (SingleResultPanel panel : newPanels)
-        {
-          resultPanelList.add(panel);
-          resultLayout.addComponent(panel);
-          panel.setSegmentationLayer(selectedSegmentationLayer);
-        }
 
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
         {
@@ -319,7 +318,6 @@ public class ResultViewPanel extends VerticalLayout implements
           OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
           ext.extend(newPanels.get(newPanels.size() - 1));
         }
-
       }
     }
     catch (Throwable ex)
@@ -331,12 +329,23 @@ public class ResultViewPanel extends VerticalLayout implements
 
   public void showFinishedSubgraphSearch()
   {
-    progressResult.setVisible(false);
+    //Search complete, stop progress bar control
+    if (sui.getControlPanel().getQueryPanel().getPiCount() != null )
+    {
+      if (sui.getControlPanel().getQueryPanel().getPiCount().isVisible())
+       {
+           sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
+           sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
+       }
+     }
+    // also remove the info how many results have been fetched
+    QueryPanel qp = sui.getControlPanel().getQueryPanel();
+    qp.setStatus(qp.getLastPublicStatus());
   }
 
   private List<SingleResultPanel> createPanels(SaltProject p, int offset)
   {
-    List<SingleResultPanel> result = new LinkedList<SingleResultPanel>();
+    List<SingleResultPanel> result = new LinkedList<>();
 
     int i = 0;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
@@ -344,15 +353,14 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        tokenAnnotationLevelSet, segmentationName,
+        getVisibleTokenAnnos(), segmentationName, queryId, controller, 
         instanceConfig);
+      
       i++;
 
       panel.setWidth("100%");
       panel.setHeight("-1px");
 
-      OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this);
-      ext.extend(panel);
       result.add(panel);
     }
     return result;
@@ -360,12 +368,70 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private void updateVariables(SaltProject p)
   {
-    segmentationLayerSet.addAll(CommonHelper.getOrderingTypes(p));
-    tokenAnnotationLevelSet.addAll(CommonHelper.
-      getTokenAnnotationLevelSet(p));
+    segmentationLayerSet.addAll(getSegmentationNames(p));
+    tokenAnnotationLevelSet.addAll(CommonHelper.getTokenAnnotationLevelSet(p));
+    Set<String> hiddenTokenAnnos = null;
+
+    Set<String> corpusNames = CommonHelper.getToplevelCorpusNames(p);
+
+    for (String corpusName : corpusNames)
+    {
+
+      CorpusConfig corpusConfig = Helper.getCorpusConfig(corpusName);
+
+      if (corpusConfig != null && corpusConfig.containsKey(MAPPING_HIDDEN_ANNOS))
+      {
+        hiddenTokenAnnos = new HashSet<>(
+          Arrays.asList(
+            StringUtils.split(
+              corpusConfig.getConfig(MAPPING_HIDDEN_ANNOS), ",")
+          )
+        );
+      }
+    }
+
+    if (hiddenTokenAnnos != null)
+    {
+      for (String tokenLevel : hiddenTokenAnnos)
+      {
+        if (tokenAnnotationLevelSet.contains(tokenLevel))
+        {
+          tokenAnnotationLevelSet.remove(tokenLevel);
+        }
+      }
+    }
 
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
+  }
+  
+  private Set<String> getSegmentationNames(SaltProject p)
+  {
+    Set<String> result = new TreeSet<>();
+
+    for (SCorpusGraph corpusGraphs : p.getSCorpusGraphs())
+    {
+      for (SDocument doc : corpusGraphs.getSDocuments())
+      {
+        SDocumentGraph g = doc.getSDocumentGraph();
+        if (g != null)
+        {
+          // collect the start nodes of a segmentation chain of length 1
+          for (SNode n : g.getSNodes())
+          {
+            SFeature feat
+              = n.getSFeature(AnnisConstants.ANNIS_NS,
+                AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
+            if (feat != null && feat.getSValueSTEXT() != null)
+            {
+              result.add(feat.getSValueSTEXT());
+            }
+          }
+        } // end if graph not null
+      }
+    }
+    
+    return result;
   }
 
   public void setCount(int count)
@@ -374,9 +440,9 @@ public class ResultViewPanel extends VerticalLayout implements
     paging.setStartNumber(controller.getPreparedQuery().getOffset());
   }
 
-  public Set<String> getVisibleTokenAnnos()
+  public SortedSet<String> getVisibleTokenAnnos()
   {
-    TreeSet<String> result = new TreeSet<String>();
+    TreeSet<String> result = new TreeSet<>();
 
     for (Entry<String, Boolean> e : tokenAnnoVisible.entrySet())
     {
@@ -398,6 +464,9 @@ public class ResultViewPanel extends VerticalLayout implements
     @Override
     public void menuSelected(MenuItem selectedItem)
     {
+      // remember old value
+      String oldSegmentationLayer = selectedSegmentationLayer;
+      
       // set the new selected item
       selectedSegmentationLayer = selectedItem.getText();
 
@@ -409,8 +478,28 @@ public class ResultViewPanel extends VerticalLayout implements
       {
         mi.setChecked(mi == selectedItem);
       }
+      
+      if(oldSegmentationLayer != null)
+      {
+        if(!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        {
+          setSegmentationLayer(selectedSegmentationLayer);
+        }
+      }
+      else if(selectedSegmentationLayer != null)
+      {
+        // oldSegmentation is null, but selected is not
+        setSegmentationLayer(selectedSegmentationLayer);
+      }
+      
+      //update URL with newly selected segmentation layer
+      PagedResultQuery q;
+      SearchUI sui = (SearchUI) UI.getCurrent();
+      q = sui.getQueryController().getPreparedQuery();        
+      //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
+      q.setSegmentation(selectedSegmentationLayer); 
 
-      setSegmentationLayer(selectedSegmentationLayer);
+      sui.updateFragment(q);
     }
   }
 
@@ -478,39 +567,45 @@ public class ResultViewPanel extends VerticalLayout implements
     }
 
     // add new annotations
-    for (String s : tokenAnnotationLevelSet)
+    if(tokenAnnotationLevelSet != null)
     {
-      if (!tokenAnnoVisible.containsKey(s))
+      for (String s : tokenAnnotationLevelSet)
       {
-        tokenAnnoVisible.put(s, Boolean.TRUE);
+        if (!tokenAnnoVisible.containsKey(s))
+        {
+          tokenAnnoVisible.put(s, Boolean.TRUE);
+        }
       }
     }
 
     miTokAnnos.removeChildren();
 
-    for (String a : tokenAnnotationLevelSet)
+    if (tokenAnnotationLevelSet != null)
     {
-      MenuItem miSingleTokAnno = miTokAnnos.addItem(a, new MenuBar.Command()
+      for (final String a : tokenAnnotationLevelSet)
       {
-        @Override
-        public void menuSelected(MenuItem selectedItem)
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
         {
-
-          if (selectedItem.isChecked())
+          @Override
+          public void menuSelected(MenuItem selectedItem)
           {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.TRUE);
-          }
-          else
-          {
-            tokenAnnoVisible.put(selectedItem.getText(), Boolean.FALSE);
-          }
 
-          setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
-        }
-      });
+            if (selectedItem.isChecked())
+            {
+              tokenAnnoVisible.put(a, Boolean.TRUE);
+            }
+            else
+            {
+              tokenAnnoVisible.put(a, Boolean.FALSE);
+            }
 
-      miSingleTokAnno.setCheckable(true);
-      miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+            setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
+          }
+        });
+
+        miSingleTokAnno.setCheckable(true);
+        miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
+      }
     }
   }
 
@@ -519,29 +614,28 @@ public class ResultViewPanel extends VerticalLayout implements
   {
     if (source != null && projectQueue != null && currentQuery != null)
     {
-      try
+      LinkedList<SaltProject> subgraphs = new LinkedList<>();
+      SaltProject p;
+      while((p = projectQueue.poll()) != null)
       {
-        final SaltProject p = projectQueue.poll(250, TimeUnit.MILLISECONDS);
-        if (p == null)
-        {
-          log.debug("no SaltProject graph in queue");
-          return false;
-        }
-        log.debug("adding new SaltProject graph");
-        addQueryResult(currentQuery, p);
-        return true;
+        subgraphs.add(p);
+      }
+      if (subgraphs.isEmpty())
+      {
+        log.debug("no SaltProject graph in queue");
+        return false;
+      }
+      log.debug("adding new SaltProject graph");
+      addQueryResult(currentQuery, subgraphs);
+      return true;
 
-      }
-      catch (InterruptedException ex)
-      {
-        log.warn(null, ex);
-      }
+
     }
 
     return true;
   }
 
-  private void setVisibleTokenAnnosVisible(Set<String> annos)
+  private void setVisibleTokenAnnosVisible(SortedSet<String> annos)
   {
     for (SingleResultPanel p : resultPanelList)
     {

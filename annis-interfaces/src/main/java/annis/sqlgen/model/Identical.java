@@ -15,6 +15,7 @@
  */
 package annis.sqlgen.model;
 
+import annis.model.Join;
 import annis.model.QueryNode;
 
 /**
@@ -32,13 +33,13 @@ public class Identical extends Join
   @Override
   public String toString()
   {
-    return "identical node " + target.getId();
+    return "identical element " + target.getId();
   }
 
   @Override
   public String toAqlOperator()
   {
-    return "=";
+    return "_ident_";
   }
   
   

@@ -22,10 +22,9 @@ import annis.model.AnnisNode;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.Match;
+import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import annis.service.objects.SubgraphQuery;
 import annis.utils.LegacyGraphConverter;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
@@ -38,8 +37,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
@@ -62,13 +59,13 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
-      LinkedList<String> keys = new LinkedList<String>();
+      LinkedList<String> keys = new LinkedList<>();
 
       if (keysAsString == null || keysAsString.isEmpty())
       {
         // auto set
         keys.add("tok");
-        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> attributes = new LinkedList<>();
         
         for(String corpus : corpora)
         {
@@ -108,7 +105,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         }
       }
 
-      Map<String, String> args = new HashMap<String, String>();
+      Map<String, String> args = new HashMap<>();
       for (String s : argsAsString.split("&"))
       {
         String[] splitted = s.split("=", 2);
@@ -132,99 +129,97 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       BufferedReader inReader = new BufferedReader(new InputStreamReader(
         matchStream, "UTF-8"));
-      
-      WebResource subgraphRes = annisResource.path("search/subgraph");
-      SaltURIGroupSet saltURIs = new SaltURIGroupSet();
-      String currentLine;
-      int offset=0;
-      // 2. iterate over all matches and get the sub-graph for a group of matches
-      while((currentLine = inReader.readLine()) != null)
+      try
       {
-        SaltURIGroup urisForMatch = new SaltURIGroup();
-        
-        for(String uri : currentLine.split(","))
+        WebResource subgraphRes = annisResource.path("search/subgraph");
+        MatchGroup currentMatches = new MatchGroup();
+        String currentLine;
+        int offset=0;
+        // 2. iterate over all matches and get the sub-graph for a group of matches
+        while((currentLine = inReader.readLine()) != null)
         {
-          try
+          
+          if(Thread.currentThread().isInterrupted())
           {
-            urisForMatch.getUris().add(new URI(uri));
+            // return from loop and abort export
+            break;
           }
-          catch (URISyntaxException ex)
+          
+          Match match = Match.parseFromString(currentLine);
+
+          currentMatches.getMatches().add(match);
+
+          if(currentMatches.getMatches().size() >= stepSize)
           {
-            log.error(null, ex);
+            WebResource res = subgraphRes
+              .queryParam("left", "" + contextLeft)
+              .queryParam("right","" + contextRight);
+
+            SubgraphFilter filter = getSubgraphFilter();
+            if(filter != null)
+            {
+              res = res.queryParam("filter", filter.name());
+            }
+            // TODO: segmentation?
+
+            Stopwatch stopwatch = new Stopwatch();
+            stopwatch.start();
+            SaltProject p = res.post(SaltProject.class, currentMatches);
+            stopwatch.stop();
+
+            // dynamically adjust the number of items to fetch if single subgraph
+            // export was fast enough
+            if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
+            {
+              stepSize += 10;
+            }
+
+            convertText(LegacyGraphConverter.convertToResultSet(p), 
+              keys, args, out, offset-currentMatches.getMatches().size());
+
+            currentMatches.getMatches().clear();
+
+            if(eventBus != null)
+            {
+              eventBus.post(Integer.valueOf(offset+1));
+            }
           }
-        }
-        saltURIs.getGroups().put(offset, urisForMatch);
+          offset++;
+        } // end for each line
         
-        if(saltURIs.getGroups().size() >= stepSize)
+        // query the left over matches
+        if (!currentMatches.getMatches().isEmpty())
         {
-          SubgraphQuery subQuery = new SubgraphQuery();
-          subQuery.setLeft(contextLeft);
-          subQuery.setRight(contextRight);
-          subQuery.setMatches(saltURIs);
-          subQuery.setFilter(getSubgraphFilter());
-          // TODO: segmentation?
-          
-          Stopwatch stopwatch = new Stopwatch();
-          stopwatch.start();
-          SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
-          stopwatch.stop();
-          
-          // dynamically adjust the number of items to fetch single subgraph
-          // export was fast enough
-          if(stopwatch.elapsed(TimeUnit.MILLISECONDS) < 500 && stepSize < 50)
+          WebResource res = subgraphRes
+            .queryParam("left", "" + contextLeft)
+            .queryParam("right", "" + contextRight);
+
+          SubgraphFilter filter = getSubgraphFilter();
+          if (filter != null)
           {
-            stepSize += 10;
+            res = res.queryParam("filter", filter.name());
           }
-          
-          convertText(LegacyGraphConverter.convertToResultSet(p), 
-            keys, args, out, offset-saltURIs.getGroups().size());
-          
-          saltURIs.getGroups().clear();
-          
-          if(eventBus != null)
-          {
-            eventBus.post(new Integer(offset+1));
-          }
+        // TODO: segmentation?
+
+          SaltProject p = res.post(SaltProject.class, currentMatches);
+          convertText(LegacyGraphConverter.convertToResultSet(p),
+            keys, args, out, offset - currentMatches.getMatches().size() - 1);
         }
-        offset++;
+        offset = 0;
+        
       }
-      
-      if(!saltURIs.getGroups().isEmpty())
+      finally
       {
-        SubgraphQuery subQuery = new SubgraphQuery();
-          subQuery.setLeft(contextLeft);
-          subQuery.setRight(contextRight);
-          subQuery.setMatches(saltURIs);
-          subQuery.setFilter(getSubgraphFilter());
-          // TODO: segmentation?
-          
-        SaltProject p = subgraphRes.post(SaltProject.class, subQuery);
-          convertText(LegacyGraphConverter.convertToResultSet(p), 
-            keys, args, out, offset-saltURIs.getGroups().size()-1);
+        inReader.close();
       }
-      offset = 0;
       
       out.append("\n");
       out.append("\n");
       out.append("finished");
 
     }
-    catch (AnnisQLSemanticsException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisQLSyntaxException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisCorpusAccessException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (RemoteException ex)
+    catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
+      | AnnisCorpusAccessException | RemoteException  ex)
     {
       log.error(
         null, ex);
@@ -272,6 +267,14 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
     }
   }
+
+  @Override
+  public boolean isCancelable()
+  {
+    return true;
+  }
+  
+  
   
   public abstract SubgraphFilter getSubgraphFilter();
 

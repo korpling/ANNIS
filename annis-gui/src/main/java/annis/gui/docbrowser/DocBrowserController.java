@@ -23,6 +23,9 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
+import annis.service.objects.Visualizer;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.Sizeable.Unit;
@@ -37,12 +40,12 @@ import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,62 +79,55 @@ public class DocBrowserController implements Serializable
   public DocBrowserController(SearchUI ui)
   {
     this.ui = ui;
-    this.initedDocBrowsers = new HashMap<String, Component>();
-    this.initiatedVis = new HashMap<String, Component>();
-    this.visibleVisHolder = new HashMap<String, Panel>();
+    this.initedDocBrowsers = new HashMap<>();
+    this.initiatedVis = new HashMap<>();
+    this.visibleVisHolder = new HashMap<>();
   }
 
-  public void openDocVis(String corpus, String doc, JSONSerializable config,
-    Button btn)
+  public void openDocVis(String corpus, String doc, Visualizer visConfig, Button btn)
   {
-    try
-    {
-      final String type = config.getString("type");
-      final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + type;
-      final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
 
-      if (visibleVisHolder.containsKey(canonicalTitle))
+    final String canonicalTitle = corpus + " > " + doc + " - " + "Visualizer: " + visConfig.
+      getDisplayName();
+    final String tabCaption = StringUtils.substring(canonicalTitle, 0, 15) + "...";
+
+    if (visibleVisHolder.containsKey(canonicalTitle))
+    {
+      Panel visHolder = visibleVisHolder.get(canonicalTitle);
+      ui.getTabSheet().setSelectedTab(visHolder);
+      return;
+    }
+
+    Panel visHolder = new Panel();
+    visHolder.setSizeFull();
+    visHolder.addDetachListener(new ClientConnector.DetachListener()
+    {
+      @Override
+      public void detach(ClientConnector.DetachEvent event)
       {
-        Panel visHolder = visibleVisHolder.get(canonicalTitle);
-        ui.getTabSheet().setSelectedTab(visHolder);
-        return;
+        visibleVisHolder.remove(canonicalTitle);
       }
+    });
 
-      Panel visHolder = new Panel();
-      visHolder.setSizeFull();
-      visHolder.addDetachListener(new ClientConnector.DetachListener()
-      {
-        @Override
-        public void detach(ClientConnector.DetachEvent event)
-        {
-          visibleVisHolder.remove(canonicalTitle);
-        }
-      });
+    // first set loading indicator
+    ProgressBar progressBar = new ProgressBar(1.0f);
+    progressBar.setIndeterminate(true);
+    progressBar.setSizeFull();
+    visHolder.setContent(progressBar);
 
-      // first set loading indicator
-      ProgressBar progressBar = new ProgressBar(1.0f);
-      progressBar.setIndeterminate(true);
-      progressBar.setSizeFull();
-      visHolder.setContent(progressBar);
+    Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+    visTab.setDescription(canonicalTitle);
+    visTab.setIcon(EYE_ICON);
+    visTab.setClosable(true);
+    ui.getTabSheet().setSelectedTab(visTab);
 
-      Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
-      visTab.setDescription(canonicalTitle);
-      visTab.setIcon(EYE_ICON);
-      visTab.setClosable(true);
-      ui.getTabSheet().setSelectedTab(visTab);
+    // register visible visHolder
+    this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-      // register visible visHolder
-      this.visibleVisHolder.put(canonicalTitle, visHolder);
-
-      PollControl.runInBackground(100, ui, 
-        new DocVisualizerFetcher(corpus, doc, canonicalTitle, type, visHolder,
-          config, btn)
-      );
-    }
-    catch (JSONException ex)
-    {
-      log.error("problems with reading document visualizer config", ex);
-    }
+    PollControl.runInBackground(100, ui,
+      new DocVisualizerFetcher(corpus, doc, canonicalTitle,
+        visConfig.getType(), visHolder, visConfig, btn)
+    );
   }
 
   public void openDocBrowser(String corpus)
@@ -165,16 +161,19 @@ public class DocBrowserController implements Serializable
    * whole document.
    */
   private VisualizerInput createInput(String corpus, String docName,
-    JSONSerializable config, boolean isUsingRawText)
+    Visualizer config, boolean isUsingRawText)
   {
     VisualizerInput input = new VisualizerInput();
 
     try
     {
+      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
+      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
       if (isUsingRawText)
       {
         WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext").path(corpus).path(docName);
+        w = w.path("query").path("rawtext")
+          .path(encodedToplevelCorpus).path(encodedDocument);
         RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
         input.setRawText(rawTextWrapper);
       }
@@ -183,12 +182,10 @@ public class DocBrowserController implements Serializable
         // get the whole document wrapped in a salt project
         SaltProject txt = null;
 
-        String topLevelCorpusName = URLEncoder.encode(corpus, "UTF-8");
-        docName = URLEncoder.encode(docName, "UTF-8");
         WebResource annisResource = Helper.getAnnisWebResource();
-        txt = annisResource.path("query").path("graphs").
-          path(topLevelCorpusName).
-          path(docName).get(SaltProject.class);
+        txt = annisResource.path("query").path("graph").
+          path(encodedToplevelCorpus).
+          path(encodedDocument).get(SaltProject.class);
 
         if (txt != null)
         {
@@ -197,40 +194,27 @@ public class DocBrowserController implements Serializable
         }
       }
     }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
+    catch (ClientHandlerException | UniformInterfaceException | UnsupportedEncodingException e)
     {
       log.error("General remote service exception", e);
     }
 
     // set mappings and namespaces. some visualizer do not survive without   
     input.setMappings(parseMappings(config));
-    input.setNamespace(getNamespace(config));
+    input.setNamespace(config.getNamespace());
 
     return input;
   }
 
-  private Properties parseMappings(JSONSerializable config)
+  private Properties parseMappings(Visualizer config)
   {
     Properties mappings = new Properties();
-    String mappingsAsString = null;
 
-    try
-    {
-      mappingsAsString = config.getString("mappings");
-    }
-    catch (JSONException ex)
-    {
-      log.debug("no mappings defined", ex);
-    }
 
-    if (mappingsAsString != null)
+    if (config.getMappings() != null)
     {
       // split the entrys
-      String[] entries = mappingsAsString.split(";");
+      String[] entries = config.getMappings().split(";");
       for (String e : entries)
       {
         // split key-value
@@ -245,28 +229,10 @@ public class DocBrowserController implements Serializable
     return mappings;
   }
 
-  private String getNamespace(JSONSerializable config)
-  {
-    String namespace = null;
-    try
-    {
-      if (config.has("namespace"))
-      {
-        namespace = config.getString("namespace");
-      }
-    }
-    catch (JSONException ex)
-    {
-      log.error("no namespace retrieved for doc visualizer", ex);
-    }
-
-    return namespace;
-  }
-
   private class DocVisualizerFetcher implements Runnable
   {
 
-    JSONSerializable config;
+    Visualizer config;
 
     String corpus;
 
@@ -279,11 +245,13 @@ public class DocBrowserController implements Serializable
     private final String type;
 
     private final Panel visHolder;
+    
+    private VisualizerInput input;
 
     public DocVisualizerFetcher(String corpus, String doc, String canonicalTitle,
       String type,
       Panel visHolder,
-      JSONSerializable config,
+      Visualizer config,
       Button btn)
     {
       this.corpus = corpus;
@@ -298,41 +266,51 @@ public class DocBrowserController implements Serializable
     @Override
     public void run()
     {
+      input = null;
+      
+      final boolean createVis = !initiatedVis.containsKey(canonicalTitle);
+      
+      final VisualizerPlugin visualizer = ((PluginSystem) ui).
+              getVisualizer(type);
+      
       // check if a visualization is already initiated
       {
-        if (!initiatedVis.containsKey(canonicalTitle))
+        if (createVis)
         {
-          VisualizerPlugin visualizer = ((PluginSystem) ui).
-            getVisualizer(type);
-
           // fetch the salt project - so long part
-          VisualizerInput input = createInput(corpus, doc, config, visualizer.
+          input = createInput(corpus, doc, config, visualizer.
             isUsingRawText());
 
-          // create and format visualizer
-          Component vis = visualizer.createComponent(input, null);
-          vis.addStyleName("corpus-font-force");
-          vis.setPrimaryStyleName("docviewer");
-          vis.setCaption(canonicalTitle);
-          vis.setWidth(100, Unit.PERCENTAGE);
-          vis.setHeight(-1, Unit.PIXELS);
-
-          // update visualizer memory cache
-          initiatedVis.put(canonicalTitle, vis);
         }
       }
-
+     
       // after initializing the visualizer update the gui
       UI.getCurrent().access(new Runnable()
       {
         @Override
         public void run()
         {
+          
+          btn.setEnabled(true);
+
+          if (createVis && input != null)
+          {
+            // create and format visualizer
+            
+            Component vis = visualizer.createComponent(input, null);
+            vis.addStyleName("corpus-font-force");
+            vis.setPrimaryStyleName("docviewer");
+            vis.setCaption(canonicalTitle);
+            vis.setWidth(100, Unit.PERCENTAGE);
+            vis.setHeight(-1, Unit.PIXELS);
+
+            // update visualizer memory cache
+            initiatedVis.put(canonicalTitle, vis);
+          }
 
           Component vis = initiatedVis.get(canonicalTitle);
           visHolder.setContent(vis);
 
-          btn.setEnabled(true);
         }
       });
     }
@@ -340,12 +318,27 @@ public class DocBrowserController implements Serializable
 
   public boolean docsAvailable(String id)
   {
-    CorpusConfig corpusConfig = Helper.getCorpusConfig(id);
-
-    if (corpusConfig != null)
+    if (ui != null)
     {
-      return Boolean.parseBoolean(corpusConfig.getConfig("browse-documents",
-        "true"));
+      CorpusConfig corpusConfig = ui.getCorpusConfigWithCache(id);
+
+      if (corpusConfig != null)
+      {
+        if (corpusConfig.containsKey("browse-documents"))
+        {
+          return Boolean.
+            parseBoolean(corpusConfig.getConfig("browse-documents"));
+        }
+
+        // get the default config
+        else
+        {
+          corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
+          boolean browseDocuments = Boolean.parseBoolean(
+            corpusConfig.getConfig("browse-documents", "true"));
+          return browseDocuments;
+        }
+      }
     }
 
     return true;

@@ -36,7 +36,7 @@ import com.vaadin.ui.themes.BaseTheme;
  * A dialog that displays the message of an exception and allows to show
  * the stack trace if requested.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ExceptionDialog extends Window implements Button.ClickListener
 {

@@ -15,15 +15,20 @@
  */
 package annis.libgui;
 
+import annis.VersionInfo;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.VisualizerPlugin;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
+import com.google.common.base.Charsets;
 import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
+import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.Page;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
@@ -32,6 +37,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
@@ -56,8 +62,6 @@ import org.codehaus.jackson.map.SerializationConfig;
 import org.codehaus.jackson.xc.JaxbAnnotationIntrospector;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
-import org.vaadin.cssinject.CSSInject;
-
 /**
  * Basic UI functionality.
  * 
@@ -92,18 +96,17 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   private static final Map<String, Date> resourceAddedDate =
     Collections.synchronizedMap(new HashMap<String, Date>());
 
-  private Properties versionProperties;
-
   private transient MediaController mediaController;
 
   private transient ObjectMapper jsonMapper;
   
-  private transient TreeSet<String> alreadyAddedCSS;
+  private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
   
   @Override
   protected void init(VaadinRequest request)
   {  
+    
     initLogging();
     // load some additional properties from our ANNIS configuration
     loadApplicationProperties("annis-gui.properties");
@@ -111,30 +114,40 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
     getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
     
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
-    
-
-    // get version of ANNIS
-    ClassResource res = new ClassResource(AnnisBaseUI.class, "version.properties");
-    versionProperties = new Properties();
-    try
-    {
-      versionProperties.load(res.getStream().getStream());
-      getSession().setAttribute("annis-version", getVersion());
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-    }
+    alreadyAddedCSS.clear();
     
     initPlugins();
     
     checkIfRemoteLoggedIn(request);
     getSession().addRequestHandler(new RemoteUserRequestHandler());
+    
   }
- 
+
+  @Override
+  public void attach()
+  {
+    
+    super.attach();
+    alreadyAddedCSS.clear();
+  }
+  
+  
+
+  @Override
+  public void close()
+  {
+    if (pluginManager != null)
+    {
+      pluginManager.shutdown();
+    }
+    super.close();
+  }
+  
+  
+
 
   /**
    * Given an configuration file name (might include directory) this function
@@ -235,10 +248,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   {
    if(f.canRead() && f.isFile())
     {
-      FileInputStream fis = null;
-      try
+      try(FileInputStream fis = new FileInputStream(f))
       {
-        fis = new FileInputStream(f);
         Properties p = new Properties();
         p.load(fis);
         
@@ -252,20 +263,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       catch(IOException ex)
       {
 
-      }
-      finally
-      {
-        if(fis != null)
-        {
-          try
-          {
-            fis.close();
-          }
-          catch(IOException ex)
-          {
-            log.error("could not close stream", ex);
-          }
-        }
       }
     }
   }
@@ -317,64 +314,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   }
 
-  public String getBuildRevision()
-  {
-    String result = versionProperties.getProperty("build_revision", "");
-    return result;
-  }
-
-  public String getVersion()
-  {
-    String rev = getBuildRevision();
-    Date date = getBuildDate();
-    StringBuilder result = new StringBuilder();
-
-    result.append(getVersionNumber());
-    if (!"".equals(rev) || date != null)
-    {
-      result.append(" (");
-
-      boolean added = false;
-      if (!"".equals(rev))
-      {
-        result.append("rev. ");
-        result.append(rev);
-        added = true;
-      }
-      if (date != null)
-      {
-        result.append(added ? ", built " : "");
-
-        SimpleDateFormat d = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-        result.append(d.format(date));
-      }
-
-      result.append(")");
-    }
-
-    return result.toString();
-
-  }
-
-  public String getVersionNumber()
-  {
-    return versionProperties.getProperty("version", "UNKNOWNVERSION");
-  }
-
-  public Date getBuildDate()
-  {
-    Date result = null;
-    try
-    {
-      DateFormat format = new SimpleDateFormat("yyyy-MM-dd_HH-mm-ss");
-      result = format.parse(versionProperties.getProperty("build_date"));
-    }
-    catch (Exception ex)
-    {
-      log.debug(null, ex);
-    }
-    return result;
-  }
   
   /**
    * Override this method to append additional plugins to the internal {@link PluginManager}.
@@ -399,7 +338,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     File baseDir = VaadinService.getCurrent().getBaseDirectory();
     
     File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
-      + getVersionNumber() + ".jar");
+      + VersionInfo.getReleaseName() + ".jar");
     pluginManager.addPluginsFrom(builtin.toURI());
     log.info("added plugins from {}", builtin.getPath());
     
@@ -448,19 +387,6 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
         Helper.setUser(new AnnisUser(remoteUser, client, true));
       }
   }
-
-      
-  
-  @Override
-  public void close()
-  {
-    if (pluginManager != null)
-    {
-      pluginManager.shutdown();
-    }
-
-    super.close();
-  }
   
   /**
    * Inject CSS into the UI. 
@@ -470,19 +396,68 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
    */
   public void injectUniqueCSS(String cssContent)
   {
+    injectUniqueCSS(cssContent, null);
+  }
+  
+  /**
+   * Inject CSS into the UI. 
+   * This function will not add multiple style-elements if the
+   * exact CSS string was already added.
+   * @param cssContent 
+   * @param wrapperClass Name of the wrapper class (a CSS class that is applied to a parent element)
+   */
+  public void injectUniqueCSS(String cssContent, String wrapperClass)
+  {
     if(alreadyAddedCSS == null)
     {
-      alreadyAddedCSS = new TreeSet<String>();
+      alreadyAddedCSS = new TreeSet<String>(); 
     }
-    String hashForCssContent = Hashing.md5().hashString(cssContent).toString();
+    
+    if(wrapperClass != null)
+    {
+      cssContent = wrapCSS(cssContent, wrapperClass);
+    }
+    
+    String hashForCssContent = Hashing.md5().hashString(cssContent, Charsets.UTF_8).toString();
     if(!alreadyAddedCSS.contains(hashForCssContent))
     {
-      CSSInject cssInject = new CSSInject(UI.getCurrent());
-      cssInject.setStyles(cssContent);
+//      CSSInject cssInject = new CSSInject(UI.getCurrent());
+//      cssInject.setStyles(cssContent);
+      Page.getCurrent().getStyles().add(cssContent);
       alreadyAddedCSS.add(hashForCssContent);
     }
   }
-
+  
+  private String wrapCSS(String cssContent, String wrapperClass)
+  {
+    try
+    {
+      
+      String wrappedContent
+        = wrapperClass == null ? cssContent
+        : "." + wrapperClass + "{\n"
+        + cssContent
+        + "\n}";
+      
+      File tmpFile = File.createTempFile("annis-stylesheet", ".scss");
+      Files.write(wrappedContent, tmpFile, Charsets.UTF_8);
+      ScssStylesheet styleSheet = ScssStylesheet.get(tmpFile.getCanonicalPath());
+      styleSheet.compile();
+      
+      return styleSheet.printState();
+      
+    }
+    catch (IOException ex)
+    {
+      log.error("IOException when compiling wrapped CSS", ex);
+    }
+    catch (Exception ex)
+    {
+      log.error("Could not compile wrapped CSS", ex);
+    }
+    return null;
+  }
+  
   
   @Override
   public PluginManager getPluginManager()

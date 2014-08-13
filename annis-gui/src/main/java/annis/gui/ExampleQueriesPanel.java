@@ -23,6 +23,7 @@ import annis.gui.model.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -89,7 +90,7 @@ public class ExampleQueriesPanel extends Table
     this.parentTab = parentTab;
 
     //
-    egContainer = new BeanItemContainer<ExampleQuery>(ExampleQuery.class);
+    egContainer = new BeanItemContainer<>(ExampleQuery.class);
     setContainerDataSource(egContainer);
   }
 
@@ -307,7 +308,7 @@ public class ExampleQueriesPanel extends Table
    */
   private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
-    List<ExampleQuery> result = new LinkedList<ExampleQuery>();
+    List<ExampleQuery> result = new LinkedList<>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
@@ -332,7 +333,7 @@ public class ExampleQueriesPanel extends Table
     {
       // ignore
     }
-    catch (Exception ex)
+    catch (ClientHandlerException ex)
     {
       log.error("problems with getting example queries from remote for {}",
         corpusNames, ex);
@@ -400,7 +401,6 @@ public class ExampleQueriesPanel extends Table
         {
           ControlPanel controlPanel = ui.getControlPanel();
           QueryPanel queryPanel;
-          QueryController qController;
 
           if (controlPanel == null)
           {
@@ -415,7 +415,7 @@ public class ExampleQueriesPanel extends Table
             return;
           }
 
-          Set<String> corpusNameSet = new HashSet<String>();
+          Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
           QueryController controller = ui.getQueryController();
           if (controller != null)

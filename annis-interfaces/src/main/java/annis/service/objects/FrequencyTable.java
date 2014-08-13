@@ -28,7 +28,7 @@ import javax.xml.bind.annotation.XmlTransient;
 /**
  * A frequency table holds the result of a frequency analysis on a specific result.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
 public class FrequencyTable implements Serializable
@@ -109,13 +109,20 @@ public class FrequencyTable implements Serializable
       }
 
       // we want to have greatest elements first
-      int countCmp = -(((Long) lhs.getCount()).compareTo(rhs.getCount()));
+      int countCmp = ((Long) lhs.getCount()).compareTo(rhs.getCount());
       if (countCmp == 0)
       {
         // their are actually equal in count, but we can still use their hash code
         return ((Integer) lhs.hashCode()).compareTo(rhs.hashCode());
       }
-      return countCmp;
+      else if(countCmp < 0)
+      {
+        return +1;
+      }
+      else
+      {
+        return -1;
+      }
 
     }
   }

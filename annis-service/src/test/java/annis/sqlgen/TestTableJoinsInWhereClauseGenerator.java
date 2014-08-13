@@ -36,6 +36,7 @@ import org.mockito.Mock;
 
 import annis.model.QueryNode;
 import annis.model.QueryAnnotation;
+import annis.sqlgen.model.PointingRelation;
 import org.junit.Before;
 
 
@@ -154,8 +155,12 @@ public class TestTableJoinsInWhereClauseGenerator {
 	// join the rank table once and the edge annotation table for each edge annotation
 	@Test
 	public void fromClauseOfEdgeAnnotations() {
-		node23.setEdgeAnnotations(annotations);
-		
+    
+    PointingRelation j = new PointingRelation(node23, "edge");
+    j.setEdgeAnnotations(annotations);
+    QueryNode source = new QueryNode();
+    source.addOutgoingJoin(j);
+    
 		String expected = "_node AS _node23, _rank AS _rank23, _component AS _component23, _rank_annotation AS _rank_annotation23_1, _rank_annotation AS _rank_annotation23_2, _rank_annotation AS _rank_annotation23_3"; 
 		assertEquals(expected, generator.fromClauseForNode(node23));
 		checkWhereCondition(
@@ -170,7 +175,12 @@ public class TestTableJoinsInWhereClauseGenerator {
 	// join annotation table for each edge annotation, use rank table for first annotation if they are the same
 	@Test
 	public void fromClauseEdgeAnnotationsAliasedToRank() {
-		node23.setEdgeAnnotations(annotations);
+    
+    PointingRelation j = new PointingRelation(node23, "edge");
+    j.setEdgeAnnotations(annotations);
+    QueryNode source = new QueryNode();
+    source.addOutgoingJoin(j);
+    
 		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_rank");
 		tableAccessStrategy.addTableAlias(EDGE_ANNOTATION_TABLE, "_rank");
 		tableAccessStrategy.addColumnAlias(EDGE_ANNOTATION_TABLE, "rank_ref", "pre");
@@ -187,11 +197,16 @@ public class TestTableJoinsInWhereClauseGenerator {
 	// use one node table for each annotation and nothing else if all tables are aliased to node
 	@Test
 	public void fromClauseAllTablesAliasedToNode() {
+    
 		Set<QueryAnnotation> annotations1 = annotationSet(annotation1, annotation2);
 		node23.setNodeAnnotations(annotations1);
 
-		Set<QueryAnnotation> annotations2 = annotationSet(annotation1, annotation2, annotation3);
-		node23.setEdgeAnnotations(annotations2);
+    Set<QueryAnnotation> annotations2 = annotationSet(annotation1, annotation2,
+      annotation3);
+    PointingRelation j = new PointingRelation(node23, "edge");
+    j.setEdgeAnnotations(annotations2);
+    QueryNode source = new QueryNode();
+    source.addOutgoingJoin(j);
 
 		tableAccessStrategy.addTableAlias(RANK_TABLE, "_node");
 		tableAccessStrategy.addTableAlias(COMPONENT_TABLE, "_node");
@@ -210,7 +225,7 @@ public class TestTableJoinsInWhereClauseGenerator {
 	}
 	
 	private TreeSet<QueryAnnotation> annotationSet(QueryAnnotation... annotations) {
-		return new TreeSet<QueryAnnotation>(Arrays.asList(annotations));
+		return new TreeSet<>(Arrays.asList(annotations));
 	}
 
 	///// Helper

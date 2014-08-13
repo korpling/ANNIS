@@ -8,7 +8,12 @@
 		
 	<util:map id="exampleSyntaxTrees">
     <entry key="tok=/abc/ . pos . node">
+      <!-- with precedence optimization
       <value><![CDATA[tok=/abc/ & pos & node & #1 . #2 & #1 .* #3 & #2 . #3]]>
+      </value>
+      -->
+      <!-- without precdence optimization -->
+      <value><![CDATA[tok=/abc/ & pos & node & #1 . #2 & #2 . #3]]>
       </value>
     </entry>
     <entry key="tok=/abc/ . right#pos">
@@ -79,9 +84,23 @@
     <value><![CDATA[Inf-Stat="new" & PP & #1 _o_ #2]]></value>
     <value><![CDATA[Topic="ab" & Inf-Stat="new" & #1 _i_ #2]]></value>
     <value><![CDATA[( (tok))]]></value>
+    <value><![CDATA[node _ident_ node _ident_ pos="NN"]]></value>
+    <value><![CDATA[pos . lemma . pos & #1 == #2]]></value>
+     <value><![CDATA[pos . lemma . pos & #1 != #2]]></value>
     <!-- corner cases of OR -->
     <value><![CDATA["das" | "die" | "der"]]></value>
     <value><![CDATA["das" | ("die" & pos="NN" & #2 . #3) | "der"]]></value>
+    <value><![CDATA[""]]></value>
+    <value><![CDATA[//]]></value>
+    <value><![CDATA[tok=""]]></value>
+    <value><![CDATA[tok=//]]></value>
+    <value><![CDATA[pos=""]]></value>
+    <value><![CDATA[pos=//]]></value>
+    <value><![CDATA[pos!=""]]></value>
+    <value><![CDATA[pos!=//]]></value>
+    <value><![CDATA[tok !=""]]></value>
+    <value><![CDATA[tok!=//]]></value>
+    <value><![CDATA[tok & meta::Titel!="Steilpass"]]></value>
 	</util:list>
 	
 	<util:list id="bad">
@@ -96,6 +115,8 @@
     <value><![CDATA[tok & tok & #1 .1,norm #2]]></value>
     <value><![CDATA[tok & tok & #1 .3,norm,4 #2]]></value>
     <value><![CDATA[tok & tok & #1 .2, #2]]></value>
+    <value><![CDATA[pos == lemma]]></value>
+    <value><![CDATA[pos != lemma]]></value>
 	</util:list>
 	
 </beans>

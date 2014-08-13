@@ -31,7 +31,7 @@ import com.google.common.collect.Lists;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CommonAnnotateWithClauseGenerator
   extends TableAccessStrategyFactory
@@ -63,7 +63,7 @@ public class CommonAnnotateWithClauseGenerator
     IslandsPolicy.IslandPolicies policy = getIslandsPolicy().getMostRestrictivePolicy(corpusList,
       corpusProperties);
 
-    List<String> result = new LinkedList<String>();
+    List<String> result = new LinkedList<>();
 
     List<AnnotateQueryData> ext = queryData.getExtensions(
       AnnotateQueryData.class);
@@ -232,7 +232,6 @@ public class CommonAnnotateWithClauseGenerator
     String indent2 = indent + TABSTOP;
     String indent3 = indent2 + TABSTOP;
     
-    SolutionKey<?> key = createSolutionKey();
     // use copy constructor in order not to mess up the global TableAccessStrategy bean
     TableAccessStrategy tas = new TableAccessStrategy(createTableAccessStrategy());
     tas.addTableAlias("solutions", matchesName);

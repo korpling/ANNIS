@@ -19,26 +19,27 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.HashSet;
+import java.util.ListIterator;
 import java.util.Set;
 
 /**
  * Represents one row in the grid view
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Row implements Serializable
 {
-  private ArrayList<GridEvent> events;
-  private BitSet occupancySet;
-  private Set<String> textIDs;
+  private final ArrayList<GridEvent> events;
+  private final BitSet occupancySet;
+  private final Set<String> textIDs;
 
   /**
    * Default constructor.
    */
   public Row()
   {
-    this.events = new ArrayList<GridEvent>();
-    this.textIDs = new HashSet<String>();
+    this.events = new ArrayList<>();
+    this.textIDs = new HashSet<>();
 
     occupancySet = new BitSet();
   }
@@ -68,10 +69,39 @@ public class Row implements Serializable
 
     return true;
   }
+  
+  /**
+   * Adds an event to this row using {@link ListIterator#add(java.lang.Object) }
+   * @param e
+   * @return False if could not be added because the event is overlapping an
+   *          other event in the row.
+   */
+  public boolean addEvent(ListIterator<GridEvent> iterator, GridEvent e)
+  {
+    
+    BitSet eventOccupance = new BitSet(e.getRight());
+    eventOccupance.set(e.getLeft(), e.getRight()+1, true);
+    if(occupancySet.intersects(eventOccupance))
+    {
+      return false;
+    }
+    // set all bits to true that are covered by the other event
+    occupancySet.or(eventOccupance);
+    iterator.add(e);
+
+    if(e.getTextID() != null && !e.getTextID().isEmpty())
+    {
+      textIDs.add(e.getTextID());
+    }
+
+    return true;
+  }
 
   /**
    * Returns true if merge is possible.
    *
+   * @param other
+   * @return 
    * @see #merge(annis.gui.visualizers.component.grid.Row)
    */
   public boolean canMerge(Row other)
@@ -111,14 +141,57 @@ public class Row implements Serializable
   {
     return events;
   }
-
+  
+  public boolean removeEvent(GridEvent event)
+  {
+    boolean success = events.remove(event);
+    if(success)
+    {
+      // we never allow overlapping events in a row, so we can set the area to unoccupied
+      occupancySet.set(event.getLeft(), event.getRight()+1, false);
+    }
+    
+    return success;
+  }
+  
+  /**
+   * Call {@link ListIterator#remove() } and update internal occupancy grid.
+   * @param iterator
+   * @return 
+   */
+  public void removeEvent(ListIterator<GridEvent> iterator)
+  {
+    if(iterator != null)
+    {
+      // go one step back
+      iterator.previous();
+      // get the element again
+      GridEvent event = iterator.next();
+      if(event != null)
+      {
+        iterator.remove();
+        // we never allow overlapping events in a row, so we can set the area to unoccupied
+        occupancySet.set(event.getLeft(), event.getRight() + 1, false);
+      }
+    }
+  }
+  
   /**
    * Get Salt IDs of all texts used by events of this row.
    * @return
    */
   public Set<String> getTextIDs()
   {
-    return new HashSet<String>(textIDs);
+    return new HashSet<>(textIDs);
+  }
+  
+  /**
+   * Returns a copy of the internal occupancy grid.
+   * @return 
+   */
+  public BitSet getOccupancyGridCopy()
+  {
+    return (BitSet) occupancySet.clone();
   }
 
 

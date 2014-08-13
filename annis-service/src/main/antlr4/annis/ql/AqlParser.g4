@@ -62,6 +62,12 @@ precedence
 	| PRECEDENCE (layer=ID COMMA?)? rangeSpec #RangePrecedence
 	;
 
+near
+	: NEAR (layer=ID)? # DirectNear
+	| NEAR (layer=ID)? STAR # IndirectNear
+	| NEAR (layer=ID COMMA?)? rangeSpec #RangeNear
+	;
+
 dominance
 	: DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
 	| DOMINANCE (layer=ID)? STAR # IndirectDominance
@@ -85,25 +91,36 @@ spanrelation
 ; 
 
 commonparent
-  : COMMON_PARENT (label=ID)? # CommonParent
+  : COMMON_PARENT (label=ID)?
   ;
 
 commonancestor
-  : COMMON_PARENT (label=ID)? STAR  # CommonAncestor
+  : COMMON_PARENT (label=ID)? STAR
   ;
 
 identity
   : IDENTITY 
   ;
 
+equalvalue
+  : EQ_VAL 
+  ;
+
+notequalvalue
+  : NEQ 
+  ;
+
 operator
   : precedence
+  | near
   | spanrelation
   | dominance
   | pointing
   | commonparent
   | commonancestor
   | identity
+  | equalvalue
+  | notequalvalue
   ;
 
 
@@ -132,7 +149,7 @@ expr
   | variableExpr # VariableTermExpr
 	|	unary_linguistic_term # UnaryTermExpr
 	|	n_ary_linguistic_term #  BinaryTermExpr
-  | META DOUBLECOLON id=qName op=EQ txt=textSpec # MetaTermExpr 
+  | META DOUBLECOLON id=qName op=(EQ|NEQ) txt=textSpec # MetaTermExpr 
   ;
 
 andTopExpr

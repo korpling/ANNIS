@@ -35,7 +35,7 @@ import com.vaadin.client.ui.dd.VTransferable;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class VGripDragComponent extends VCustomComponent 
 {

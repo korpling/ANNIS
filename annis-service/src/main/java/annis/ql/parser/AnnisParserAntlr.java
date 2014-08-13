@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AnnisParserAntlr
 {
@@ -48,7 +48,7 @@ public class AnnisParserAntlr
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    final List<String> errors = new LinkedList<String>();
+    final List<String> errors = new LinkedList<>();
     
 
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
@@ -117,7 +117,7 @@ public class AnnisParserAntlr
     }
     catch(NullPointerException ex)
     {
-      log.warn(null, ex);
+      log.warn("Null pointer exception occured during parsing", ex);
       throw new AnnisQLSemanticsException(ex.getMessage());
     }
     catch(IllegalArgumentException ex)
@@ -133,7 +133,7 @@ public class AnnisParserAntlr
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
     
-    final List<String> errors = new LinkedList<String>();
+    final List<String> errors = new LinkedList<>();
 
     parser.removeErrorListeners();
     parser.addErrorListener(new StringListErrorListener(errors));

@@ -39,7 +39,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
@@ -49,10 +48,10 @@ import static annis.model.AnnisConstants.*;
 import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
+import annis.service.objects.Match;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
-import java.util.LinkedList;
-import org.apache.commons.lang3.StringUtils;
+import java.net.URI;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.slf4j.Logger;
@@ -63,7 +62,7 @@ import org.slf4j.LoggerFactory;
  *  AOM (Annis Object Model)
  *  and
  *  "PaulaInline"
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class LegacyGraphConverter
 {
@@ -102,50 +101,54 @@ public class LegacyGraphConverter
 
   public static AnnotationGraph convertToAnnotationGraph(SDocument document)
   {
-    List<String> matchedIDs = new ArrayList<String>();
     SFeature featMatchedIDs = document.getSFeature(ANNIS_NS,
       FEAT_MATCHEDIDS);
+    Match match = new Match();
     if (featMatchedIDs != null && featMatchedIDs.getSValueSTEXT() != null)
-    {
-      matchedIDs =
-        Arrays.asList(StringUtils.split(featMatchedIDs.getSValueSTEXT(), ','));
+    {    
+       match = Match.parseFromString(featMatchedIDs.getSValueSTEXT(), ',');
     }
     SDocumentGraph docGraph = document.getSDocumentGraph();
     
     // get matched node names by using the IDs
-    List<String> matchedNodeNames = new ArrayList<String>();
-    for(String id : matchedIDs)
+    List<Long> matchedNodeIDs = new ArrayList<>();
+    for(URI u : match.getSaltIDs())
     {
-      SNode node = docGraph.getSNode(id);
+      SNode node = docGraph.getSNode(u.toASCIIString());
       if(node == null)
       {
         // that's weird, fallback to the id
-        log.warn("Could not get matched node from id {}", id);
-        matchedNodeNames.add(id);
+        log.warn("Could not get matched node from id {}", u.toASCIIString());
+        matchedNodeIDs.add(-1l);
       }
       else
       {
-        matchedNodeNames.add(node.getSName());
+        RelannisNodeFeature relANNISFeat = 
+          (RelannisNodeFeature) node.getSFeature(ANNIS_NS, FEAT_RELANNIS_NODE).getValue();
+        
+        matchedNodeIDs.add(relANNISFeat.getInternalID());
       }
     }
     
-    AnnotationGraph result = convertToAnnotationGraph(docGraph, matchedNodeNames);
+    AnnotationGraph result = convertToAnnotationGraph(docGraph, matchedNodeIDs);
 
     return result;
   }
 
   public static AnnotationGraph convertToAnnotationGraph(SDocumentGraph docGraph,
-    List<String> matchedNodeNames)
+    List<Long> matchedNodeIDs)
   {
-    Set<String> matchSet = new HashSet<String>(matchedNodeNames);
+    Set<Long> matchSet = new HashSet<>(matchedNodeIDs);
     AnnotationGraph annoGraph = new AnnotationGraph();
 
-    annoGraph.setPath(
+    List<String> pathList = 
       CommonHelper.getCorpusPath(docGraph.getSDocument().getSCorpusGraph(), 
-      docGraph.getSDocument()).toArray(new String[0]));
+      docGraph.getSDocument());
+    
+    annoGraph.setPath(pathList.toArray(new String[pathList.size()]));
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
-    Map<Node, AnnisNode> allNodes = new HashMap<Node, AnnisNode>();
+    Map<Node, AnnisNode> allNodes = new HashMap<>();
 
     for (SNode sNode : docGraph.getSNodes())
     {
@@ -195,9 +198,9 @@ public class LegacyGraphConverter
         aNode.setLeftToken(feat.getLeftToken());
         aNode.setRight(feat.getRight());
         aNode.setRightToken(feat.getRightToken());
-        if (matchSet.contains(aNode.getName()))
+        if (matchSet.contains(aNode.getId()))
         {
-          aNode.setMatchedNodeInQuery((long) matchedNodeNames.indexOf(aNode.getName()) + 1);
+          aNode.setMatchedNodeInQuery((long) matchedNodeIDs.indexOf(aNode.getId()) + 1);
           annoGraph.getMatchedNodeIds().add(aNode.getId());
         }
         else

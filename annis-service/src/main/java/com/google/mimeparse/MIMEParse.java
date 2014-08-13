@@ -25,7 +25,7 @@ import org.apache.commons.lang3.math.NumberUtils;
  * 
  * Ported by Tom Zellman <tzellman@gmail.com>.
  * 
- * Adjusted to Apache Commons Lang3 by Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * Adjusted to Apache Commons Lang3 by Thomas Krause <krauseto@hu-berlin.de>
  * 
  */
 public final class MIMEParse
@@ -66,7 +66,7 @@ public final class MIMEParse
     {
         String[] parts = StringUtils.split(mimeType, ";");
         ParseResults results = new ParseResults();
-        results.params = new HashMap<String, String>();
+        results.params = new HashMap<>();
 
         for (int i = 1; i < parts.length; ++i)
         {
@@ -216,7 +216,7 @@ public final class MIMEParse
      */
     public static float quality(String mimeType, String ranges)
     {
-        List<ParseResults> results = new LinkedList<ParseResults>();
+        List<ParseResults> results = new LinkedList<>();
         for (String r : StringUtils.split(ranges, ','))
             results.add(parseMediaRange(r));
         return qualityParsed(mimeType, results);
@@ -237,8 +237,8 @@ public final class MIMEParse
      */
     public static String bestMatch(Collection<String> supported, String header)
     {
-        List<ParseResults> parseResults = new LinkedList<ParseResults>();
-        List<FitnessAndQuality> weightedMatches = new LinkedList<FitnessAndQuality>();
+        List<ParseResults> parseResults = new LinkedList<>();
+        List<FitnessAndQuality> weightedMatches = new LinkedList<>();
         for (String r : StringUtils.split(header, ','))
             parseResults.add(parseMediaRange(r));
 

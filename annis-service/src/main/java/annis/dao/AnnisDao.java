@@ -16,7 +16,6 @@
 package annis.dao;
 
 import annis.administration.BinaryImportHelper;
-import annis.dao.objects.AnnotatedMatch;
 import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.service.objects.Match;
@@ -33,9 +32,12 @@ import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
+import annis.sqlgen.SqlGeneratorAndExtractor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.UUID;
@@ -55,6 +57,8 @@ public interface AnnisDao
     boolean listValues, boolean onlyMostFrequentValues);
 
   public List<Annotation> listCorpusAnnotations(String toplevelCorpusName);
+
+  public List<String> listSegmentationNames(List<Long> corpusList);
 
   /**
    * Creates sql for getting annotations of corpora.
@@ -142,9 +146,8 @@ public interface AnnisDao
   public boolean find(final QueryData queryData, final OutputStream out);
 
   /**
-   * Returns a part of a salt document according the saltIDs, we get with null
-   * null null null null null null null null null null null null null null null
-   * null null null null null null null null null null null null null null   {@link AnnisDao#find(annis.ql.parser.QueryData)
+   * Returns a part of a salt document according the saltIDs, we get with the 
+   * {@link AnnisDao#find(annis.ql.parser.QueryData)
    *
    * @param queryData should include an extensions with a {@code List<URI>}
    * object
@@ -152,20 +155,19 @@ public interface AnnisDao
    */
   SaltProject graph(QueryData queryData);
 
-  SaltProject annotate(QueryData queryData);
-
-  String explain(SqlGenerator<QueryData, ?> generator, QueryData queryData,
+  String explain(SqlGenerator<QueryData> generator, QueryData queryData,
     final boolean analyze);
 
   FrequencyTable frequency(QueryData queryData);
 
-  public void matrix(final QueryData queryData, final OutputStream out);
+  public void matrix(final QueryData queryData, boolean outputCSV,
+    final OutputStream out);
 
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator);
+    final SqlGeneratorAndExtractor<QueryData, T> generator);
 
   public <T> T executeQueryFunction(QueryData queryData,
-    final SqlGenerator<QueryData, T> generator,
+    final SqlGenerator<QueryData> generator,
     final ResultSetExtractor<T> extractor);
 
   /**
@@ -182,6 +184,25 @@ public interface AnnisDao
    * @return The return value is the Key of corpus table entry.
    */
   public CorpusConfigMap getCorpusConfigurations();
+
+  /**
+   * Reads the document browser configuration from the filesystem and returns
+   * null if there is none.
+   *
+   * @param topLevelCorpusName The name of the corpus the configuraion is
+   * fetched for.
+   *
+   * @return A JSONObject which holds the configuration.
+   */
+  public DocumentBrowserConfig getDocBrowserConfiguration(String topLevelCorpusName);
+
+  /**
+   * Reads the document browser configuration which is configure system wide in
+   * ${annis.home}/conf/document-browser.json
+   *
+   * @return An pojo which holds the configuration.
+   */
+  public DocumentBrowserConfig getDefaultDocBrowserConfiguration();
 
   public void setCorpusConfiguration(
     HashMap<Long, Properties> corpusConfiguration);
@@ -210,12 +231,26 @@ public interface AnnisDao
    * The actual name of a specific corpus property file is stored in the
    * media_file table.<p>
    *
+   *
+   * @param topLevelCorpus Determines the corpus.
+   *
    * @return The corpus configuration is represented as Key-Value-Pairs.
    *
    * @see BinaryImportHelper
+   * @throws FileNotFoundException If no corpus properties file exists a
+   * exception is thrown.
    *
    */
-  public Properties getCorpusConfiguration(String corpusName);
+  public Properties getCorpusConfiguration(String topLevelCorpus) throws FileNotFoundException;
+
+  /**
+   * Get a specific configuration of a corpus from directory.
+   *
+   * @param topLevelCorpus Determines the corpus.
+   *
+   * @return The corpus configuration is represented as Key-Value-Pairs.
+   */
+  public Properties getCorpusConfigurationSave(String topLevelCorpus);
 
   /**
    * Called to check if the database management program has the right version
@@ -286,10 +321,17 @@ public interface AnnisDao
   public String mapCorpusIdToName(long corpusId);
 
   /**
-   * Stores a corpus configuration.
+   * Stores a corpus configuration. If the properties object is empty, an empty
+   * file is written in the annis data directory.
    *
-   * @param corpusID The id of the corpus, for which the properties are written.
+   * <p>
+   * The name of the corpus properties file follows the schema:<br>
+   * <pre>corpus_&lt;toplevelCorpusName&gt;_&lt;UUID&gt;.properties</pre>
+   * </p>
+   *
+   * @param topLevelCorpus The name of the corpus, for which the properties are
+   * written.
    * @param props The properties
    */
-  public void setCorpusConfiguration(long corpusID, Properties props);
+  public void setCorpusConfiguration(String topLevelCorpus, Properties props);
 }

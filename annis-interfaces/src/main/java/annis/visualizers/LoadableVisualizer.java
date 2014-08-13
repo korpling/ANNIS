@@ -20,7 +20,7 @@ import java.io.Serializable;
 /**
  * A visualizer that can callback their owners when they are loaded.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface LoadableVisualizer
 {

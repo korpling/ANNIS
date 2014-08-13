@@ -43,8 +43,23 @@ public class AnnotatedSpan {
 		this.coveredText = coveredText;
 		this.annotations = annotations;
     this.metadata = metadata;
-    this.key = new ArrayList<Long>(key);
+    this.key = new ArrayList<>(key);
 	}
+  
+  /**
+   * Copy constructor
+   * @param orig 
+   */
+  public AnnotatedSpan(AnnotatedSpan orig)
+  {
+    this.id = orig.id;
+    this.annotations = orig.annotations == null ? null 
+      : new ArrayList<>(orig.annotations);
+    this.metadata = orig.metadata == null ? null 
+      : new ArrayList<>(orig.metadata);
+    this.coveredText = orig.coveredText;
+    this.key = orig.key;
+  }
 
 	public long getId() {
 		return id;

@@ -16,6 +16,7 @@
 package annis.administration;
 
 import com.google.common.base.Preconditions;
+import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -26,8 +27,6 @@ import javax.sql.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.support.rowset.SqlRowSet;
-import org.springframework.jdbc.support.xml.SqlXmlValue;
 
 /**
  * A helper class that allows you to fix the database scheme.
@@ -54,42 +53,45 @@ public class SchemeFixer
   
   protected void corpusAlias()
   {
-    try
+    try(Connection conn = dataSource.getConnection();)
     {
-      DatabaseMetaData dbMeta = dataSource.getConnection().getMetaData();
-      ResultSet result = dbMeta.getColumns(null, null, "corpus_alias", null);
       
-      Map<String, Integer> columnType = new HashMap<String,Integer>();
-      
-      while(result.next())
-      {
-        columnType.put(result.getString(4), result.getInt(5));
+      DatabaseMetaData dbMeta = conn.getMetaData();
+      try(ResultSet result =  dbMeta.getColumns(null, null, "corpus_alias", null);)
+      { 
+        Map<String, Integer> columnType = new HashMap<>();
+
+        while(result.next())
+        {
+          columnType.put(result.getString(4), result.getInt(5));
+        }
+
+        if(columnType.isEmpty())
+        {
+          // create the table
+          log.info("Creating corpus_alias table");
+          jdbcTemplate.execute(
+            "CREATE TABLE corpus_alias\n"
+            + "(\n"
+            + "  alias text,\n"
+            + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
+            + "  PRIMARY KEY (alias, corpus_ref)\n"
+            + ");");
+        }
+        else
+        {
+          // check if columns have correct type and name, if not throw an error
+          Preconditions.checkState(Types.VARCHAR == columnType.get("alias"), "there must be an \"alias\" column of type \"text\"");
+          Preconditions.checkState(Types.BIGINT == columnType.get("corpus_ref"), "there must be an \"corpus_ref\" column of type \"bigint\"");
+        }
+
       }
-      
-      if(columnType.isEmpty())
-      {
-        // create the table
-        log.info("Creating corpus_alias table");
-        jdbcTemplate.execute(
-          "CREATE TABLE corpus_alias\n"
-          + "(\n"
-          + "  alias text,\n"
-          + "  corpus_ref bigint references corpus(id) ON DELETE CASCADE,\n"
-          + "  PRIMARY KEY (alias, corpus_ref)\n"
-          + ");");
-      }
-      else
-      {
-        // check if columns have correct type and name, if not throw an error
-        Preconditions.checkState(Types.VARCHAR == columnType.get("alias"), "there must be an \"alias\" column of type \"text\"");
-        Preconditions.checkState(Types.BIGINT == columnType.get("corpus_ref"), "there must be an \"corpus_ref\" column of type \"bigint\"");
-      }
-      
     }
     catch (SQLException ex)
     {
       log.error("Could not get the metadata for the database", ex);
     }
+    
   }
 
   public JdbcTemplate getJdbcTemplate()

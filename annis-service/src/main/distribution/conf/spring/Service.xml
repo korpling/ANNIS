@@ -1,17 +1,19 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-       xmlns:util="http://www.springframework.org/schema/util"
        xsi:schemaLocation="
 	http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd
-	http://www.springframework.org/schema/util http://www.springframework.org/schema/util/spring-util-3.1.xsd">
+  "
+       default-lazy-init="true">
 
   <import resource="Common.xml" />
+  <import resource="file:${annis.home}/conf/spring/SqlGenerator.xml" />
+  <import resource="file:${annis.home}/conf/spring/Dao.xml"/>
   <import resource="Admin.xml" />
   
-<bean id="importWorker" class="annis.service.internal.ImportWorker" lazy-init="true">
-  <property name="corpusAdmin" ref="corpusAdministration" />
-</bean>
+  <bean id="importWorker" class="annis.service.internal.ImportWorker" lazy-init="true">
+    <property name="corpusAdmin" ref="corpusAdministration" />
+  </bean>
   
   <!-- AdminService -->
   <bean id="adminService" class="annis.service.internal.AdminServiceImpl" 
@@ -37,7 +39,7 @@
         <prop key="results-per-page">${results-per-page}</prop>
         <prop key="default-context-segmentation">${default-context-segmentation}</prop>
         <prop key="default-base-text-segmentation">${default-base-text-segmentation}</prop>
-        <prop key="browse-document-visualizers">${browse-document-visualizers}</prop>
+        <prop key="browse-documents">${browse-documents}</prop>
       </props>
     </property>
   </bean>

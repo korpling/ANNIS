@@ -15,16 +15,19 @@
  */
 package annis.visualizers.component.tree;
 
+import annis.CommonHelper;
+import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AnnisGraphTools
+public class AnnisGraphTools implements Serializable
 {
 
   private static final String PRIMEDGE_SUBTYPE = "edge";
@@ -134,31 +137,22 @@ public class AnnisGraphTools
 
   public static HorizontalOrientation detectLayoutDirection(AnnotationGraph ag)
   {
-    int withHebrew = 0;
+    if(Helper.isRTLDisabled())
+    {
+      return HorizontalOrientation.LEFT_TO_RIGHT;
+    }
+    
+    int withhRTL = 0;
     for (AnnisNode token : ag.getTokens())
     {
-      if (isHebrewToken(token.getSpannedText()))
+      if (CommonHelper.containsRTLText(token.getSpannedText()))
       {
-        withHebrew += 1;
+        withhRTL += 1;
       }
     }
-    return (withHebrew > ag.getTokens().size() / 3)
+    return (withhRTL > ag.getTokens().size() / 3)
       ? HorizontalOrientation.RIGHT_TO_LEFT
       : HorizontalOrientation.LEFT_TO_RIGHT;
-  }
-
-  private static boolean isHebrewToken(String text)
-  {
-    for (int i = 0; i < text.length(); ++i)
-    {
-      char c = text.charAt(i);
-      if ((c >= 0x0590 && c <= 0x06f9) || (c >= 0xfb1e && c <= 0xfdff) || (c
-        >= 0xfe70 && c <= 0xfeff))
-      {
-        return true;
-      }
-    }
-    return false;
   }
 
   /**

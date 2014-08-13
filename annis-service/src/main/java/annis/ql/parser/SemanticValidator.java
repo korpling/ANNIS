@@ -17,10 +17,10 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.QueryNode;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
+import annis.sqlgen.model.NonBindingJoin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
@@ -40,7 +40,7 @@ import java.util.Set;
  * <li>every node variable name should be given only once in an alternative</li>
  * </ul>
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class SemanticValidator implements QueryDataTransformer
 {
@@ -69,7 +69,7 @@ public class SemanticValidator implements QueryDataTransformer
     if (alternative.size() == 1)
     {
       QueryNode n = alternative.get(0);
-      for (Join j : n.getJoins())
+      for (Join j : n.getOutgoingJoins())
       {
         if (j.getTarget() != null)
         {
@@ -81,14 +81,14 @@ public class SemanticValidator implements QueryDataTransformer
     
     // get all nodes connected to the first one
     Multimap<Long, QueryNode> connected = calculateConnected(alternative);
-    Set<Long> transitiveHull = new HashSet<Long>();
+    Set<Long> transitiveHull = new HashSet<>();
     transitiveHull.add(alternative.get(0).getId());
     createTransitiveHull(alternative.get(0), 
       connected, transitiveHull);
     
     Multiset<String> variableNames = TreeMultiset.create();
    
-    Set<Long> unconnectedNodes = new HashSet<Long>();
+    Set<Long> unconnectedNodes = new HashSet<>();
     for(QueryNode n : alternative)
     {
       unconnectedNodes.add(n.getId());
@@ -99,7 +99,7 @@ public class SemanticValidator implements QueryDataTransformer
     // check if each node is contained in the connected nodes
     if (!unconnectedNodes.isEmpty())
     { 
-      List<String> variables = new LinkedList<String>();
+      List<String> variables = new LinkedList<>();
       for (QueryNode n : alternative)
       {
         if(unconnectedNodes.contains(n.getId()))
@@ -126,7 +126,7 @@ public class SemanticValidator implements QueryDataTransformer
     }
     
     // check if any variable name was given more than once
-    List<String> invalidNames = new LinkedList<String>();
+    List<String> invalidNames = new LinkedList<>();
     for(Multiset.Entry<String> e : variableNames.entrySet())
     {
       if(e.getCount() > 1)
@@ -149,9 +149,9 @@ public class SemanticValidator implements QueryDataTransformer
     
     for(QueryNode n : nodes)
     {
-      for(Join j : n.getJoins())
+      for(Join j : n.getOutgoingJoins())
       {
-        if(j.getTarget() != null)
+        if(j.getTarget() != null && !(j instanceof NonBindingJoin))
         {
           long left = n.getId();
           long right = j.getTarget().getId();

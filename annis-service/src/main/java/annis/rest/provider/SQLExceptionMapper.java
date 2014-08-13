@@ -24,7 +24,7 @@ import org.springframework.dao.DataAccessResourceFailureException;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Provider
 public class SQLExceptionMapper implements ExceptionMapper<DataAccessResourceFailureException>

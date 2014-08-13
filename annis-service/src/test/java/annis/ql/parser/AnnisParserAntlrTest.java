@@ -30,7 +30,7 @@ import org.junit.runners.Parameterized;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(value= Parameterized.class)
 public class AnnisParserAntlrTest
@@ -98,7 +98,7 @@ public class AnnisParserAntlrTest
   public void testParse()
   {
     System.out.println("parse " + aql);
-    List<Long> corpusList = new LinkedList<Long>();
+    List<Long> corpusList = new LinkedList<>();
     corpusList.add(1234l);
     
     AnnisParserAntlr instance = new AnnisParserAntlr();

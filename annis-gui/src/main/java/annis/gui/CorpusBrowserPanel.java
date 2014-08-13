@@ -38,6 +38,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -93,19 +94,19 @@ public class CorpusBrowserPanel extends Panel
     setContent(accordion);
     accordion.setSizeFull();
 
-    containerNodeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerNodeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerNodeAnno.setItemSorter(new ExampleSorter());
 
-    containerEdgeType = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeType = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeType.setItemSorter(new ExampleSorter());
 
-    containerEdgeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeAnno.setItemSorter(new ExampleSorter());
 
-    containerMetaAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerMetaAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerMetaAnno.setItemSorter(new ExampleSorter());
 
@@ -113,23 +114,27 @@ public class CorpusBrowserPanel extends Panel
 
     tblNodeAnno = new ExampleTable(citationGenerator, containerNodeAnno);
     tblNodeAnno.addValueChangeListener(new ExampleListener());
+    tblNodeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblEdgeTypes = new ExampleTable(citationGenerator, containerEdgeType);
     tblEdgeTypes.addValueChangeListener(new ExampleListener());
+    tblEdgeTypes.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblEdgeAnno = new ExampleTable(citationGenerator, containerEdgeAnno);
     tblEdgeAnno.addValueChangeListener(new ExampleListener());
+    tblEdgeAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     tblMetaAnno = new ExampleTable(citationGenerator, containerMetaAnno);
     tblMetaAnno.addValueChangeListener(new ExampleListener());
+    tblMetaAnno.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
-    HashSet<String> nodeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeNames = new HashSet<String>();
-    HashSet<String> fullEdgeNames = new HashSet<String>();
+    HashSet<String> nodeAnnoNames = new HashSet<>();
+    HashSet<String> edgeAnnoNames = new HashSet<>();
+    HashSet<String> edgeNames = new HashSet<>();
+    HashSet<String> fullEdgeNames = new HashSet<>();
     boolean hasDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
@@ -188,7 +193,7 @@ public class CorpusBrowserPanel extends Panel
     }
 
     // secound round, fill the actual containers
-    Set<String> metaAnnosKey = new HashSet<String>();
+    Set<String> metaAnnosKey = new HashSet<>();
     for (AnnisAttribute a : attributes)
     {
       // if the annotation name is already in the example skip this.
@@ -305,7 +310,7 @@ public class CorpusBrowserPanel extends Panel
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
   {
-    Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
+    Collection<AnnisAttribute> result = new ArrayList<>();
     try
     {
       WebResource service = Helper.getAnnisWebResource();
@@ -335,13 +340,13 @@ public class CorpusBrowserPanel extends Panel
     }
     catch (UnsupportedEncodingException ex)
     {
-      log.error(null, ex);
+      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
       Notification.show(
         "UTF-8 encoding is not supported on server, this is weird: " + ex.
         getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    return new LinkedList<AnnisAttribute>(result);
+    return new LinkedList<>(result);
   }
 
   public static class ExampleTable extends Table
@@ -392,7 +397,7 @@ public class CorpusBrowserPanel extends Panel
 
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
-      Set<String> corpusNameSet = new HashSet<String>();
+      Set<String> corpusNameSet = new HashSet<>();
       corpusNameSet.add(corpus.getName());
       if (controller != null && cbe != null)
       {

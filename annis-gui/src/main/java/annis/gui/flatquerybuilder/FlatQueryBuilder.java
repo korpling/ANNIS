@@ -21,7 +21,9 @@ import annis.gui.QueryController;
 import annis.gui.model.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -40,13 +42,17 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /*
  * @author martin klotz (martin.klotz@hu-berlin.de)
  * @author tom ruette (tom.ruette@hu-berlin.de)
  */
 public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
-  {
+{
+  private static final Logger log = LoggerFactory.getLogger(FlatQueryBuilder.class);
+  
   private Button btGo;
   private Button btClear;
   private Button btInverse;
@@ -73,7 +79,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private SpanBox spbox;
   private String query;
   private MenuBar.MenuItem spanMenu;
-  private reducingStringComparator rsc;
+  private ReducingStringComparator rsc;
   
   private static final String[] REGEX_CHARACTERS = {"\\", "+", ".", "[", "*", 
     "^","$", "|", "?", "(", ")"};
@@ -117,13 +123,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private void launch(QueryController cp)
   {
     this.cp = cp;
-    rsc = new reducingStringComparator();
+    rsc = new ReducingStringComparator();
     this.query = "";
     mainLayout = new VerticalLayout();
     // tracking lists for vertical nodes, edgeboxes and metaboxes
-    vnodes = new ArrayList<VerticalNode>();
-    eboxes = new ArrayList<EdgeBox>();
-    mboxes = new ArrayList<MetaBox>();
+    vnodes = new ArrayList<>();
+    eboxes = new ArrayList<>();
+    mboxes = new ArrayList<>();
     spbox = null;
     // buttons and checks    
     btGo = new Button(BUTTON_GO_LABEL, (Button.ClickListener) this);
@@ -132,15 +138,15 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     btClear.setStyleName(ChameleonTheme.BUTTON_SMALL);
     btInverse = new Button(BUTTON_INV_LABEL, (Button.ClickListener) this);
     btInverse.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btInitLanguage = new Button(ADD_LING_PARAM, (Button.ClickListener) this);
+    btInitLanguage = new Button("Initialize", (Button.ClickListener) this);
     btInitLanguage.setDescription(INFO_INIT_LANG);
-    btInitSpan = new Button(ADD_SPAN_PARAM, (Button.ClickListener) this);
+    btInitSpan = new Button("Initialize", (Button.ClickListener) this);
     btInitSpan.setDescription(INFO_INIT_SPAN);
-    btInitMeta = new Button(ADD_META_PARAM, (Button.ClickListener) this);
+    btInitMeta = new Button("Initialize", (Button.ClickListener) this);
     btInitMeta.setDescription(INFO_INIT_META);
     filtering = new NativeSelect("Filtering mechanisms");
     filtering.setDescription(INFO_FILTER);
-    reducingStringComparator rdc = new reducingStringComparator();
+    ReducingStringComparator rdc = new ReducingStringComparator();
     Set mappings = rdc.getMappings().keySet();
     int i;
     for (i=0; i<mappings.size(); i++){
@@ -234,7 +240,10 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       language.removeComponent(addMenu);
       span.removeComponent(addMenuSpan);
       meta.removeComponent(addMenuMeta);
-    } catch (Exception e) { }
+    } catch (Exception e) 
+    {
+      log.error(null, e);
+    }
     
     //init variables:
     final FlatQueryBuilder sq = this;
@@ -243,8 +252,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitLanguage:    
     addMenu = new MenuBar();
-    addMenu.setDescription(INFO_INIT_LANG);
-    addMenu.setAutoOpen(true);
+    //addMenu.setDescription(INFO_INIT_LANG);
+    addMenu.setAutoOpen(false);
     final MenuBar.MenuItem add = addMenu.addItem(ADD_LING_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -269,8 +278,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitSpan:    
     addMenuSpan = new MenuBar();
-    addMenuSpan.setDescription(INFO_INIT_SPAN);
-    addMenuSpan.setAutoOpen(true);
+    //addMenuSpan.setDescription(INFO_INIT_SPAN);
+    addMenuSpan.setAutoOpen(false);
     final MenuBar.MenuItem addSpan = addMenuSpan.addItem(ADD_SPAN_PARAM, null);
     for (final String annoname : annonames)
     {
@@ -289,8 +298,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     
     //Code from btInitMeta:    
     addMenuMeta = new MenuBar();
-    addMenuMeta.setDescription(INFO_INIT_META);  
-    addMenuMeta.setAutoOpen(true);
+    //addMenuMeta.setDescription(INFO_INIT_META);  
+    addMenuMeta.setAutoOpen(false);
     final MenuBar.MenuItem addMeta = addMenuMeta.addItem(ADD_META_PARAM, null);
     int i = 0;
     for (final String annoname : metanames)
@@ -350,22 +359,22 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Collection<String> values = mb.getValues();
     if(!values.isEmpty())
     {
-      String result = "\n& meta::"+mb.getMetaDatum()+" = ";
+      StringBuilder result = new StringBuilder("\n& meta::"+mb.getMetaDatum()+" = ");
       if(values.size()==1)
       {
-        result += "\""+values.iterator().next().replace("\"", "\\x22")+"\"";
+        result.append("\""+values.iterator().next().replace("\"", "\\x22")+"\"");
       }
       else
       {      
         Iterator<String> itValues = values.iterator();
-        result += "/(" + escapeRegexCharacters(itValues.next())+")";
+        result.append("/(" + escapeRegexCharacters(itValues.next())+")");
         while(itValues.hasNext())
         {
-          result+= "|("+escapeRegexCharacters(itValues.next())+")";
+          result.append("|("+escapeRegexCharacters(itValues.next())+")");
         }
-        result += "/";
+        result.append("/");
       }   
-      return result;
+      return result.toString();
     }
     return "";
   }
@@ -420,31 +429,33 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private String getAQLQuery()
   {
     int count = 1;    
-    String ql = "", edgeQuery = "", sentenceQuery = "";
-    Collection<Integer> sentenceVars = new ArrayList<Integer>();
+    StringBuilder ql = new StringBuilder();
+    StringBuilder edgeQuery = new StringBuilder();
+    StringBuilder sentenceQuery = new StringBuilder();
+    Collection<Integer> sentenceVars = new ArrayList<>();
     Iterator<EdgeBox> itEboxes = eboxes.iterator();
     for (VerticalNode v : vnodes)
     {
       Collection<SearchBox> sboxes = v.getSearchBoxes();
       for (SearchBox s : sboxes)
       {
-        ql += " & " + getAQLFragment(s);
+        ql.append(" & " + getAQLFragment(s));
       }
       if (sboxes.isEmpty())
       {
         //not sure we want to do it this way:
-        ql += "\n& /.*/";
+        ql.append("\n& /.*/");
       }
-      sentenceVars.add(new Integer(count));
+      sentenceVars.add(Integer.valueOf(count));
       for(int i=1; i < sboxes.size(); i++)
       {
         String addQuery = "\n& #" + count +"_=_"+ "#" + ++count;
-        edgeQuery += addQuery;
+        edgeQuery.append(addQuery);
       }
       count++;
       String edgeQueryAdds = (itEboxes.hasNext()) ? "\n& #"+(count-1)+" "
         +itEboxes.next().getValue()+" #"+count : "";
-      edgeQuery += edgeQueryAdds;
+      edgeQuery.append(edgeQueryAdds);
     }
     String addQuery = "";
     try
@@ -461,21 +472,21 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       if (spb.getValue().isEmpty()){
         addQuery = "\n&" + spb.getAttribute();
       }
-      ql += addQuery;
+      ql.append(addQuery);
       for(Integer i : sentenceVars)
       {
-        sentenceQuery += "\n& #" + count + "_i_#"+i.toString();
+        sentenceQuery.append("\n& #").append(count).append("_i_#").append(i.toString());
       }
     } catch (Exception ex){
       ex = null;
     }
-    String metaQuery = "";
+    StringBuilder metaQuery = new StringBuilder();
     Iterator<MetaBox> itMetaBoxes = mboxes.iterator();
     while(itMetaBoxes.hasNext())
     {
-      metaQuery += getMetaQueryFragment(itMetaBoxes.next());
+      metaQuery.append(getMetaQueryFragment(itMetaBoxes.next()));
     }
-    String fullQuery = (ql+edgeQuery+sentenceQuery+metaQuery);
+    String fullQuery = (ql.toString() + edgeQuery.toString()+sentenceQuery.toString()+metaQuery.toString());
     if (fullQuery.length() < 3) {return "";}
     fullQuery = fullQuery.substring(3);//deletes leading " & "
     this.query = fullQuery;
@@ -494,8 +505,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
-    final FlatQueryBuilder sq = this; 
-    if (cp.getSelectedCorpora().isEmpty()){
+    if (cp.getSelectedCorpora().isEmpty())
+    {
       Notification.show(NO_CORPORA_WARNING);
     }
     else
@@ -517,8 +528,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         {
           loadQuery();
         }
-        catch(Exception e)
+        catch(EmptyReferenceException e)
         {          
+          log.error(null, e);
+        }
+        catch (EqualityConstraintException e)
+        {
+          log.error(null, e);
+        }
+        catch (InvalidCharacterSequenceException e)
+        {
+          log.error(null, e);
+        }
+        catch (MultipleAssignmentException e)
+        {
+          log.error(null, e);
+        }
+        catch (UnknownLevelException e)
+        {
+          log.error(null, e);
         }
       }
       if (event.getComponent() == btInitMeta || event.getComponent() == btInitSpan || event.getComponent() == btInitLanguage){
@@ -615,7 +643,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public Collection<String> getAnnotationValues(String level)
   {
-    Collection<String> values = new TreeSet<String>();
+    Collection<String> values = new TreeSet<>();
     for(String s : getAvailableAnnotationLevels(level))
     {      
       values.add(s);
@@ -625,7 +653,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public Set<String> getAvailableAnnotationNames()
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -633,7 +661,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
         for(String corpus : corpusSelection)
         {
           atts.addAll(service.path("query").path("corpora").path(corpus).path("annotations")
@@ -650,8 +678,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     result.add("tok");
@@ -660,7 +693,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public Collection<String> getAvailableAnnotationLevels(String meta)
   {
-    Collection<String> result = new TreeSet<String>();
+    Collection<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -668,7 +701,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
         for(String corpus : corpusSelection)
         {
           atts.addAll(service.path("query").path("corpora").path(corpus)
@@ -690,8 +723,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -710,7 +748,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public Set<String> getAvailableMetaNames()
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -718,7 +756,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
 
         for(String corpus : corpusSelection)
         {
@@ -736,8 +774,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -745,7 +788,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public Set<String> getAvailableMetaLevels(String meta)
 {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
     Set<String> corpusSelection = cp.getSelectedCorpora();
@@ -753,7 +796,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
         for(String corpus : corpusSelection)
         {
           atts.addAll(service.path("query").path("corpora").path(corpus)
@@ -775,8 +818,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           }
         }
       }
-      catch (Exception ex)
+      catch (ClientHandlerException ex)
       {
+        log.error(null, ex);
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.error(null, ex);
       }
     }
     return result;
@@ -808,7 +856,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 	 * only for complex regex expressions
 	 */
 	{	
-    ArrayList<String> values = new ArrayList<String>();
+    ArrayList<String> values = new ArrayList<>();
     String s = expression;
     
     while(s.length()>0)
@@ -816,7 +864,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
        if(s.charAt(0)=='|') {s = s.substring(1);}
        if(s.charAt(0)!='(')
        {
-         values = new ArrayList<String>();
+         values = new ArrayList<>();
          values.add(expression);
          return values;
        }
@@ -839,7 +887,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     return values;
 	}
   
-  public reducingStringComparator getRSC()
+  public ReducingStringComparator getRSC()
   {
     return rsc;
   }
@@ -865,12 +913,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       
         //the dot marks the end of the string - it is not read, it's just a place holder
         tq += ".";
-        HashMap<Integer, Constraint> constraints = new HashMap<Integer, Constraint>();
-        ArrayList<Relation> pRelations = new ArrayList<Relation>();
-        ArrayList<Relation> eRelations = new ArrayList<Relation>();
+        HashMap<Integer, Constraint> constraints = new HashMap<>();
+        ArrayList<Relation> pRelations = new ArrayList<>();
+        ArrayList<Relation> eRelations = new ArrayList<>();
         Relation inclusion=null;
         Constraint conInclusion=null;
-        ArrayList<Constraint> metaConstraints = new ArrayList<Constraint>();
+        ArrayList<Constraint> metaConstraints = new ArrayList<>();
 
         //parse typed-in Query
         //Step 1: get indices of tq-chars, where constraints are separated (&)
@@ -954,7 +1002,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         }
         
         //create Vertical Nodes
-        HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<Integer, VerticalNode>();
+        HashMap<Integer, VerticalNode> indexedVnodes = new HashMap<>();
         VerticalNode vn=null;
         Collection<String> annonames = getAvailableAnnotationNames();        
         for(int i : constraints.keySet())
@@ -1094,7 +1142,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
             MetaBox mb = new MetaBox(mc.getLevel(), this);
             //for a particular reason (unknown) setValue() with a String parameter
             //is not accepted by OptionGroup
-            Collection<String> values = new TreeSet<String>();
+            Collection<String> values = new TreeSet<>();
             values.add(unescapeSlQ(mc.getValue()));
             mb.setValue(values);
             mboxes.add(mb);
@@ -1103,17 +1151,25 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         }
         query = tq.substring(0, tq.length()-1);
       }
-      catch(Exception e)
+      catch(EmptyReferenceException e)
       {
-        if((e instanceof UnknownLevelException) | (e instanceof EqualityConstraintException) | (e instanceof MultipleAssignmentException) | (e instanceof InvalidCharacterSequenceException) | (e instanceof EmptyReferenceException))
-        {
-          Notification.show(e.getMessage());
-          //LATER: maybe highlight the critical character sequence          
-        }
-        else
-        {
-          Notification.show(QUERY_ERROR_WARNING);
-        }    
+        Notification.show(e.getMessage());
+      }
+      catch (EqualityConstraintException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (InvalidCharacterSequenceException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (MultipleAssignmentException e)
+      {
+        Notification.show(e.getMessage());
+      }
+      catch (UnknownLevelException e)
+      {
+        Notification.show(e.getMessage());
       }
     }    
   }
@@ -1167,12 +1223,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
         level = l;
         value = v;
       }
-      else if( ((s.charAt(0)=='\"')&(s.charAt(s.length()-1)=='\"')) | ((s.charAt(0)=='/')&(s.charAt(s.length()-1)=='/')))
+      else if( ((s.charAt(0)=='\"') && 
+        (s.charAt(s.length()-1)=='\"')) || ((s.charAt(0)=='/') && (s.charAt(s.length()-1)=='/')))
       {
         level = "tok";
         value = s.substring(1, s.length()-1);
       }
-      else if((s.contains("\""))|(s.contains("/")))
+      else if((s.contains("\""))||(s.contains("/")))
       {
         throw new InvalidCharacterSequenceException(s);
       }
@@ -1228,9 +1285,9 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     public Relation(String in) throws EqualityConstraintException
     {
       
-      String op = "";
-      String o1str = "";
-      String o2str = "";
+      StringBuilder op = new StringBuilder();
+      StringBuilder o1str = new StringBuilder();
+      StringBuilder o2str = new StringBuilder();
       
       int i=1;
       char c = in.charAt(1);
@@ -1238,13 +1295,13 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       
       while((c!='.')&(c!='>')&(c!='_')&(c!='#')&(c!='-')&(c!='$')&(c!='='))
       {
-        o1str+=c;
+        o1str.append(c);
         i++;
         c = in.charAt(i);
       }     
       while(c!='#')
       {
-        op+=c;
+        op.append(c);
         i++;
         c = in.charAt(i);
       }
@@ -1252,19 +1309,19 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       while((i<in.length()))
       {
         c = in.charAt(i);
-        o2str+=c;
+        o2str.append(c);
         i++;
       }
       
-      operator = op;
-      o1 = Integer.parseInt(o1str);
-      o2 = Integer.parseInt(o2str);
+      operator = op.toString();
+      o1 = Integer.parseInt(o1str.toString());
+      o2 = Integer.parseInt(o2str.toString());
       
-      if(op.startsWith("."))
+      if(operator.startsWith("."))
       {
        type = RelationType.PRECEDENCE; 
       }
-      else if((op.equals("=")) | (op.equals("_=_")))
+      else if((op.equals("=")) || (op.equals("_=_")))
       {
         type = RelationType.EQUALITY;
         if(o1>o2)

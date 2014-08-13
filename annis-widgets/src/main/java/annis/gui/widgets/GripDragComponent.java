@@ -27,7 +27,7 @@ import java.util.Map;
 
 /**
  * A draggabe panel where only a specific grip is the starting point for the drag action.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GripDragComponent extends CustomComponent implements DragSource, LegacyComponent
 {

@@ -1,0 +1,15 @@
+set clear-caches to false
+record
+corpus RIDGES_Herbology_Version4.0
+
+count pos="NN" & norm & #1 _=_ #2 & dipl & #1 _=_ #3
+count dipl=/.*/
+count lemma="bekommen" & pos="VVFIN" & #1 .3 #2
+count lemma="bekommen" & pos="VVPP" & #1 .3 #2
+count pos="NN" . pos . tok . dipl
+count norm & dipl & dipl & #1 _l_ #2 & #1 _r_ #3 
+count dipl="An" .dipl,2,10 dipl="ES"
+count pos="NN" & dipl & norm & #1 _=_ #3 & #1 _o_ #2
+count dipl=/[eE][sS]/ _o_ norm
+
+benchmark 20

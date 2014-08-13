@@ -43,7 +43,7 @@ import org.slf4j.LoggerFactory;
  * A realm for the property based user authentification and authorization pattern
  * used by ANNIS.
  * 
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionResolverAware
 {
@@ -74,32 +74,15 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
         File userFile = new File(userDir.getAbsolutePath(), userName);
         if(userFile.isFile() && userFile.canRead())
         {
-          FileInputStream userFileIO = null;
-          try
+          try(FileInputStream userFileIO = new FileInputStream(userFile);)
           {
             Properties userProps = new Properties();
-
-            userFileIO = new FileInputStream(userFile);
             userProps.load(userFileIO);
             return userProps;
           }
           catch (IOException ex)
           {
             log.error(null, ex);
-          }
-          finally
-          {
-            if (userFileIO != null)
-            {
-              try
-              {
-                userFileIO.close();
-              }
-              catch (IOException ex)
-              {
-                log.error(null, ex);
-              }
-            }
           }
         }
 
@@ -116,7 +99,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
     String userName = (String) principals.getPrimaryPrincipal();
     
     
-    Set<String> roles = new TreeSet<String>();
+    Set<String> roles = new TreeSet<>();
     roles.add(userName);  
     if(!userName.equals(anonymousUser))
     {

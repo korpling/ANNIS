@@ -15,11 +15,13 @@
  */
 package annis.gui;
 
+import annis.VersionInfo;
 import annis.libgui.Helper;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.fieldgroup.PropertyId;
 import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.Page;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.UserError;
 import com.vaadin.server.VaadinService;
@@ -44,7 +46,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ReportBugWindow extends Window
 {
@@ -71,7 +73,7 @@ public class ReportBugWindow extends Window
     layout.setHeight("350px");
     layout.setWidth("750px");
     
-    form = new FieldGroup(new BeanItem<BugReport>(new BugReport()));
+    form = new FieldGroup(new BeanItem<>(new BugReport()));
     form.bindMemberFields(layout);
     form.setBuffered(true);
     
@@ -98,7 +100,7 @@ public class ReportBugWindow extends Window
         }
         catch (FieldGroup.CommitException ex)
         {
-          List<String> errorFields = new LinkedList<String>();
+          List<String> errorFields = new LinkedList<>();
           for(Field f : form.getFields())
           {
             if (f instanceof AbstractComponent)
@@ -200,11 +202,11 @@ public class ReportBugWindow extends Window
       sbMsg.append("Reporter: ").append(form.getField("name").getValue().
         toString()).append(" (").append(form.getField("email").getValue().
         toString()).append(")\n");
-      sbMsg.append("Version: ").append(VaadinSession.getCurrent().getAttribute(
-        "annis-version")).append(
+      sbMsg.append("Version: ").append(VersionInfo.getVersion()).append(
         "\n");
       sbMsg.append("Vaadin Version: ").append(Version.getFullVersion()).append(
         "\n");
+      sbMsg.append("Browser: ").append(Page.getCurrent().getWebBrowser().getBrowserApplication()).append("\n");
       sbMsg.append("URL: ").append(UI.getCurrent().getPage().getLocation().toASCIIString()).append(
         "\n");
 

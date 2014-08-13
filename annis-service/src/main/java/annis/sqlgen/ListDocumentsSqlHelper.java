@@ -16,8 +16,13 @@
 package annis.sqlgen;
 
 import annis.model.Annotation;
+import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import org.springframework.jdbc.core.simple.ParameterizedRowMapper;
 
 /**
@@ -46,7 +51,13 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
     Annotation annotation = new Annotation();
     annotation.setName(rs.getString("name"));
     annotation.setPre(rs.getInt("pre"));
-    annotation.setAnnotationPath(rs.getString("path_name"));
+    Array annotationPathArray = rs.getArray("path_name");
+    List<String> annotationPath = new LinkedList<>();
+    if(annotationPathArray.getBaseType() == Types.VARCHAR)
+    {
+      annotationPath = Arrays.asList((String[]) annotationPathArray.getArray());
+    }
+    annotation.setAnnotationPath(annotationPath);
     return annotation;
   }
 }

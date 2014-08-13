@@ -17,6 +17,7 @@
 package annis.service.internal;
 
 import annis.CommonHelper;
+import annis.GraphHelper;
 import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
@@ -35,16 +36,18 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
+import annis.service.objects.MatchGroup;
 import annis.service.objects.RawTextWrapper;
-import annis.service.objects.SaltURIGroup;
-import annis.service.objects.SubgraphQuery;
+import annis.service.objects.SegmentationList;
+import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
-import com.google.common.primitives.Bytes;
 import com.google.mimeparse.MIMEParse;
 import com.sun.jersey.api.core.ResourceConfig;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -62,6 +65,7 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.servlet.http.HttpServletRequest;
+import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
@@ -72,11 +76,11 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.GenericEntity;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
-import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.authz.AuthorizationException;
@@ -90,7 +94,7 @@ import org.springframework.stereotype.Component;
 /**
  * Methods for querying the database.
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @Component
@@ -139,6 +143,7 @@ public class QueryServiceImpl implements QueryService
   @GET
   @Path("search/count")
   @Produces("application/xml")
+  @Override
   public Response count(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames)
   {
@@ -164,75 +169,10 @@ public class QueryServiceImpl implements QueryService
 
     return Response.ok(count).type(MediaType.APPLICATION_XML_TYPE).build();
   }
-
-  @GET
-  @Path("search/annotate")
-  @Produces({"application/xml", "application/xmi+xml", "application/xmi+binary"})
-  public SaltProject annotate(@QueryParam("q") String query,
-    @QueryParam("corpora") String rawCorpusNames,
-    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("10") @QueryParam("limit") String limitRaw,
-    @DefaultValue("5") @QueryParam("left") String leftRaw,
-    @DefaultValue("5") @QueryParam("right") String rightRaw,
-    @QueryParam("seglayer") String segmentationLayer) throws IOException
+  
+  private StreamingOutput findRaw(final QueryData data, 
+    final String rawCorpusNames, final String query) throws IOException
   {
-    requiredParameter(query, "q", "AnnisQL query");
-    requiredParameter(rawCorpusNames, "corpora",
-      "comma separated list of corpus names");
-
-    Subject user = SecurityUtils.getSubject();
-    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
-    for (String c : corpusNames)
-    {
-      user.checkPermission("query:annotate:" + c);
-    }
-
-    int offset = Integer.parseInt(offsetRaw);
-    int limit = Integer.parseInt(limitRaw);
-    int left = Math.min(getContextLeft(), Integer.parseInt(leftRaw));
-    int right = Math.min(getContextRight(), Integer.parseInt(rightRaw));
-
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    String logParameters = createAnnotateLogParameters(left, right, offset,
-      limit);
-
-    data.addExtension(new LimitOffsetQueryData(offset, limit));
-    data.addExtension(new AnnotateQueryData(left, right, segmentationLayer));
-    long start = new Date().getTime();
-    SaltProject p = annisDao.annotate(data);
-    long end = new Date().getTime();
-    logQuery("ANNOTATE", query, splitCorpusNamesFromRaw(rawCorpusNames),
-      end - start, logParameters);
-    return p;
-
-  }
-
-  @GET
-  @Path("search/find")
-  @Produces("text/plain")
-  public StreamingOutput findRaw(@QueryParam("q") final String query,
-    @QueryParam("corpora") final String rawCorpusNames,
-    @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
-  {
-    requiredParameter(query, "q", "AnnisQL query");
-    requiredParameter(rawCorpusNames, "corpora",
-      "comma separated list of corpus names");
-
-    Subject user = SecurityUtils.getSubject();
-    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
-    for (String c : corpusNames)
-    {
-      user.checkPermission("query:find:" + c);
-    }
-
-    int offset = Integer.parseInt(offsetRaw);
-    int limit = Integer.parseInt(limitRaw);
-
-    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    data.addExtension(new LimitOffsetQueryData(offset, limit));
-
     return new StreamingOutput()
     {
       @Override
@@ -248,10 +188,23 @@ public class QueryServiceImpl implements QueryService
 
   }
 
+  private List<Match> findXml(QueryData data,
+    final String rawCorpusNames, final String query) throws IOException
+  {
+    long start = new Date().getTime();
+    List<Match> result = annisDao.find(data);
+    long end = new Date().getTime();
+    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
+    return result;
+  }
+  
+  
+  
   @GET
   @Path("search/find")
-  @Produces("application/xml")
-  public List<Match> findXml(@QueryParam("q") String query,
+  @Produces({"application/xml", "text/plain"})
+  @Override
+  public Response find(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
@@ -267,24 +220,45 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:find:" + c);
     }
 
-
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
-
-    QueryData data = queryDataFromParameters(query, rawCorpusNames);
+    
+    final QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
     data.addExtension(new LimitOffsetQueryData(offset, limit));
-
-    long start = new Date().getTime();
-    List<Match> matches = annisDao.find(data);
-    long end = new Date().getTime();
-    logQuery("FIND", query, splitCorpusNamesFromRaw(rawCorpusNames), end - start);
-
-    return matches;
+    
+    String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    if (acceptHeader == null || acceptHeader.trim().isEmpty())
+    {
+      acceptHeader = "*/*";
+    }
+    
+    List<String> knownTypes = Lists.newArrayList("text/plain", "application/xml");
+    
+    // find the best matching mime type
+    String bestMediaTypeMatch =
+      MIMEParse.bestMatch(knownTypes, acceptHeader);
+    
+    if("text/plain".equals(bestMediaTypeMatch))
+    {
+      return Response.ok(findRaw(data, rawCorpusNames, query), "text/plain").build();
+    }
+    else
+    {
+      List<Match> result = findXml(data, rawCorpusNames, query);
+      return Response.ok().type("application/xml").entity(new GenericEntity<MatchGroup>(new MatchGroup(result)) {}).build();
+    }
+    
   }
+
 
   /**
    * Get result as matrix in WEKA (ARFF) format.
+   * @param query
+   * @param rawCorpusNames
+   * @param rawMetaKeys
+   * @param rawCsv
+   * @return 
    */
   @GET
   @Path("search/matrix")
@@ -292,12 +266,15 @@ public class QueryServiceImpl implements QueryService
   public StreamingOutput matrix(
     final @QueryParam("q") String query,
     final @QueryParam("corpora") String rawCorpusNames,
-    @QueryParam("metakeys") String rawMetaKeys)
+    @QueryParam("metakeys") String rawMetaKeys,
+    @DefaultValue("false") @QueryParam("csv") String rawCsv)
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
       "comma separated list of corpus names");
 
+    final boolean outputCsv = Boolean.parseBoolean(rawCsv);
+    
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
     for (String c : corpusNames)
@@ -325,7 +302,7 @@ public class QueryServiceImpl implements QueryService
       public void write(OutputStream output) throws IOException, WebApplicationException
       {
         long start = new Date().getTime();
-        annisDao.matrix(data, output);
+        annisDao.matrix(data, outputCsv, output);
         long end = new Date().getTime();
         logQuery("MATRIX", query, splitCorpusNamesFromRaw(rawCorpusNames),
           end - start);
@@ -397,52 +374,49 @@ public class QueryServiceImpl implements QueryService
     return freqTable;
   }
   
-
-  /**
-   * Get a graph as {@link SaltProject} of a set of Salt IDs.
-   *
-   * @param saltIDs saltIDs must have at least one saltId, more than one id are
-   * separated by + or space
-   * @param leftRaw left context parameter
-   * @param rightRaw right context parameter
-   * @return the graph of this hit.
-   */
   @POST
   @Path("search/subgraph")
+  @Consumes({"application/xml", "text/plain"})
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
-  public SaltProject subgraph(final SubgraphQuery query)
+  @Override
+  public SaltProject subgraph(
+    MatchGroup matches,
+    @QueryParam("segmentation") String segmentation, 
+    @DefaultValue("0") @QueryParam("left") String leftRaw, 
+    @DefaultValue("0") @QueryParam("right") String rightRaw, 
+    @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
+    
     // some robustness stuff
-    if (query == null)
+    if (matches == null)
     {
       throw new WebApplicationException(
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
         "missing required request body").build());
     }
+    
+    int left = Integer.parseInt(leftRaw);
+    int right = Integer.parseInt(rightRaw);
+    SubgraphFilter filter = SubgraphFilter.valueOf(filterRaw);
 
-    QueryData data = new QueryData();
+    QueryData data = GraphHelper.createQueryData(matches, annisDao);
 
-    data.addExtension(new AnnotateQueryData(query.getLeft(), query.getRight(),
-      query.getSegmentationLayer(), query.getFilter()));
+    data.addExtension(new AnnotateQueryData(left, right,
+      segmentation, filter));
 
-    Set<String> corpusNames = new TreeSet<String>();
+    Set<String> corpusNames = new TreeSet<>();
 
-    for (SaltURIGroup singleMatch : query.getMatches().getGroups().values())
+    for (Match singleMatch : matches.getMatches())
     {
-      // collect list of used corpora and created pseudo QueryNodes for each URI
-      List<QueryNode> pseudoNodes = new ArrayList<QueryNode>(singleMatch.
-        getUris().size());
-      for (java.net.URI u : singleMatch.getUris())
+      // collect list of used corpora
+      for (java.net.URI u : singleMatch.getSaltIDs())
       {
-        pseudoNodes.add(new QueryNode());
         corpusNames.add(CommonHelper.getCorpusPath(u).get(0));
       }
-
-      data.addAlternative(pseudoNodes);
     }
 
     Subject user = SecurityUtils.getSubject();
@@ -451,16 +425,13 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:subgraph:" + c);
     }
 
-    List<String> corpusNamesList = new LinkedList<String>(corpusNames);
-    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNamesList);
-
-    if(corpusIDs == null || corpusIDs.isEmpty())
+    List<String> corpusNamesList = new LinkedList<>(corpusNames);
+    
+    if(data.getCorpusList() == null || data.getCorpusList().isEmpty())
     {
       throw new WebApplicationException(400);
     }
-
-    data.setCorpusList(corpusIDs);
-    data.addExtension(query.getMatches());
+    
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();
@@ -470,11 +441,12 @@ public class QueryServiceImpl implements QueryService
   }
 
   @GET
-  @Path("graphs/{top}/{doc}")
+  @Path("graph/{top}/{doc}")
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary"
   })
+  @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName)
   {
@@ -520,7 +492,7 @@ public class QueryServiceImpl implements QueryService
     List<AnnisCorpus> allCorpora = annisDao.listCorpora();
     
     
-    List<AnnisCorpus> allowedCorpora = new LinkedList<AnnisCorpus>();
+    List<AnnisCorpus> allowedCorpora = new LinkedList<>();
 
     // filter by which corpora the user is allowed to access
     Subject user = SecurityUtils.getSubject();
@@ -572,11 +544,11 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public List<AnnisCorpus> singleCorpus(@PathParam("top") String toplevelName)
   {
-    List<AnnisCorpus> result = new ArrayList<AnnisCorpus>();
+    List<AnnisCorpus> result = new ArrayList<>();
     
     Subject user = SecurityUtils.getSubject();
     
-    LinkedList<String> originalCorpusNames = new LinkedList<String>();
+    LinkedList<String> originalCorpusNames = new LinkedList<>();
     originalCorpusNames.add(toplevelName);
     List<Long> ids = annisDao.mapCorpusNamesToIds(originalCorpusNames);
     
@@ -606,7 +578,7 @@ public class QueryServiceImpl implements QueryService
     {
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:config:" + toplevelName);
-      Properties tmp = annisDao.getCorpusConfiguration(toplevelName);
+      Properties tmp = annisDao.getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
       corpusConfig.setConfig(tmp);
@@ -638,7 +610,7 @@ public class QueryServiceImpl implements QueryService
       Subject user = SecurityUtils.getSubject();
       user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<Long>();
+      List<Long> corpusList = new ArrayList<>();
       corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
 
       return annisDao.listAnnotations(corpusList,
@@ -648,6 +620,29 @@ public class QueryServiceImpl implements QueryService
     catch (Exception ex)
     {
       log.error("could not get annotations for {}", toplevelCorpus, ex);
+      throw new WebApplicationException(500);
+    }
+  }
+  
+  @GET
+  @Path("corpora/{top}/segmentation-names")
+  @Produces("application/xml")
+  public SegmentationList segmentationNames(
+    @PathParam("top") String toplevelCorpus) throws WebApplicationException
+  {
+    try
+    {
+      Subject user = SecurityUtils.getSubject();
+      user.checkPermission("query:annotations:" + toplevelCorpus);
+
+      List<Long> corpusList = new ArrayList<>();
+      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+    }
+    catch (Exception ex)
+    {
+      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
       throw new WebApplicationException(500);
     }
   }
@@ -679,10 +674,16 @@ public class QueryServiceImpl implements QueryService
   public Response parseNodes(@QueryParam("q") String query)
   {
     QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
-    List<QueryNode> nodes = new LinkedList<QueryNode>();
+    List<QueryNode> nodes = new LinkedList<>();
+    int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
     {
-      nodes.addAll(alternative);
+      for(QueryNode n : alternative)
+      {
+        n.setAlternativeNumber(i);
+        nodes.add(n);
+      }
+      i++;
     }
     return Response.ok(new GenericEntity<List<QueryNode>>(nodes) {}).build();
   }
@@ -748,15 +749,15 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:binary:" + toplevelCorpusName);
 
-    String acceptHeader = request.getHeader("Accept");
-    if (acceptHeader == null || acceptHeader.isEmpty())
+    String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
+    if (acceptHeader == null || acceptHeader.trim().isEmpty())
     {
       acceptHeader = "*/*";
     }
 
     List<AnnisBinaryMetaData> meta = annisDao.getBinaryMeta(toplevelCorpusName,
       corpusName);
-    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<String, AnnisBinaryMetaData>();
+    HashMap<String, AnnisBinaryMetaData> matchedMetaByType = new LinkedHashMap<>();
 
     for (AnnisBinaryMetaData m : meta)
     {
@@ -877,7 +878,7 @@ public class QueryServiceImpl implements QueryService
         }
       }
 
-      List<String> allowedCorpora = new ArrayList<String>();
+      List<String> allowedCorpora = new ArrayList<>();
 
       // filter by which corpora the user is allowed to access
       Subject user = SecurityUtils.getSubject();
@@ -1025,7 +1026,7 @@ public class QueryServiceImpl implements QueryService
    */
   private List<MatrixQueryData.QName> splitMatrixKeysFromRaw(String raw)
   {
-    LinkedList<MatrixQueryData.QName> result = new LinkedList<MatrixQueryData.QName>();
+    LinkedList<MatrixQueryData.QName> result = new LinkedList<>();
 
     String[] split = raw.split(",");
     for (String s : split)
@@ -1159,5 +1160,20 @@ public class QueryServiceImpl implements QueryService
     RawTextWrapper result = new RawTextWrapper();
     result.setTexts(annisDao.getRawText(top, docname));
     return result;
+  }
+
+  @GET
+  @Path("corpora/doc_browser_config/{corpus}")
+  @Produces({MediaType.APPLICATION_XML, MediaType.APPLICATION_JSON})
+  public DocumentBrowserConfig getDocumentBrowserConfig(
+    @PathParam("corpus") String corpus)
+  {
+    DocumentBrowserConfig config = annisDao.getDocBrowserConfiguration(corpus);
+    if(config == null)
+    {
+      config = annisDao.getDefaultDocBrowserConfiguration();
+    }
+
+    return (config != null) ? config : null;
   }
 }

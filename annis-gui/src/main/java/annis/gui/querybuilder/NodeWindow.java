@@ -20,7 +20,6 @@ import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
 
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -64,13 +63,13 @@ public class NodeWindow extends Panel implements Button.ClickListener
   {
     this.parent = parent;
     this.id = id;
-    this.annoNames = new TreeSet<String>();
+    this.annoNames = new TreeSet<>();
     
     for(String a :parent.getAvailableAnnotationNames())
     {
       annoNames.add(a.replaceFirst("^[^:]*:", ""));
     }
-    constraints = new ArrayList<ConstraintLayout>();
+    constraints = new ArrayList<>();
     
     setSizeFull();
     
@@ -268,7 +267,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
   
   
 
-  public static class ConstraintLayout extends HorizontalLayout 
+  public class ConstraintLayout extends HorizontalLayout 
   implements LayoutClickListener, ValueChangeListener
   {
 
@@ -276,6 +275,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     private ComboBox cbName;
     private ComboBox cbOperator;
     private TextField txtValue;
+    private Button btDelete;
 
     public ConstraintLayout(TigerQueryBuilderCanvas parent, Set<String> annoNames)
     {
@@ -316,14 +316,32 @@ public class NodeWindow extends Panel implements Button.ClickListener
       cbName.setWidth("100%");
       txtValue.setWidth("100%");
 
+      btDelete = new Button("X");
+      btDelete.addStyleName(ChameleonTheme.BUTTON_LINK);
+      btDelete.setDescription("Remove node condition");
+      btDelete.addClickListener(new Button.ClickListener()
+      {
+
+        @Override
+        public void buttonClick(ClickEvent event)
+        {
+          vLayout.removeComponent(ConstraintLayout.this);
+          constraints.remove(ConstraintLayout.this);
+        }
+      });
+      
       addComponent(cbName);
       addComponent(cbOperator);
       addComponent(txtValue);
+      addComponent(btDelete);
 
       setExpandRatio(cbName, 0.8f);
       setExpandRatio(txtValue, 1.0f);
+      setExpandRatio(btDelete, 0.0f);
       
-      addListener((LayoutClickListener) this);
+      setComponentAlignment(btDelete, Alignment.MIDDLE_RIGHT);
+      
+      addLayoutClickListener((LayoutClickListener) this);
       
     }
 

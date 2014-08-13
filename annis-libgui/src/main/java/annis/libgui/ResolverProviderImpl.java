@@ -44,9 +44,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ResolverProviderImpl implements ResolverProvider {
+public class ResolverProviderImpl implements ResolverProvider, Serializable
+{
 
-    private Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
+    private final static Logger log = LoggerFactory.getLogger(ResolverProviderImpl.class);
+    
     private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
     public ResolverProviderImpl(Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver) {
@@ -115,11 +117,7 @@ public class ResolverProviderImpl implements ResolverProvider {
                                     + res.toString(), ex);
                         }
                     }
-                } catch (UniformInterfaceException ex) {
-                    log.error(null, ex);
-                } catch (ClientHandlerException ex) {
-                    log.error(null, ex);
-                } catch (UnsupportedEncodingException ex) {
+                } catch (UniformInterfaceException | ClientHandlerException | UnsupportedEncodingException ex) {
                     log.error(null, ex);
                 }
             }

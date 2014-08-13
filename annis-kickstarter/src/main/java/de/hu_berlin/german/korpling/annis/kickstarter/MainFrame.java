@@ -16,6 +16,7 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.AnnisBaseRunner;
+import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.service.internal.AnnisServiceRunner;
 import annis.utils.Utils;
@@ -29,6 +30,7 @@ import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.Serializable;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -36,6 +38,7 @@ import javax.imageio.ImageIO;
 import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 import javax.swing.UIManager;
+import javax.swing.UnsupportedLookAndFeelException;
 import org.eclipse.jetty.server.Server;
 import org.eclipse.jetty.webapp.WebAppContext;
 import org.slf4j.LoggerFactory;
@@ -179,7 +182,7 @@ public class MainFrame extends javax.swing.JFrame
     {
       UIManager.setLookAndFeel(UIManager.getSystemLookAndFeelClassName());
     }
-    catch (Exception ex)
+    catch (ClassNotFoundException | IllegalAccessException | InstantiationException | UnsupportedLookAndFeelException ex)
     {
       log.error(null, ex);
     }
@@ -245,7 +248,10 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
-        new ExceptionDialog(ex).setVisible(true);
+        AdministrationDao.ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
   }
 
@@ -435,9 +441,12 @@ public class MainFrame extends javax.swing.JFrame
         Desktop.getDesktop().browse(new URI(
           "http://localhost:8080/annis-gui/"));
       }
-      catch (Exception ex)
+      catch (IOException | URISyntaxException ex)
       {
-        new ExceptionDialog(this, ex).setVisible(true);
+       AdministrationDao.ImportStatus importStatus = corpusAdministration
+          .getAdministrationDao().initImportStatus();
+        importStatus.addException("unknown exception", ex);
+        new ExceptionDialog(importStatus).setVisible(true);
       }
 
     }//GEN-LAST:event_btLaunchActionPerformed

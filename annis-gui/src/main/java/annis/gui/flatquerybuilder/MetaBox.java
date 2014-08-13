@@ -46,7 +46,7 @@ public class MetaBox extends Panel implements Button.ClickListener
     btClose = new Button(SearchBox.BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
     btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);
     // metabox values for ebene
-    Collection<String> annonames = new TreeSet<String>();
+    Collection<String> annonames = new TreeSet<>();
     for(String a :sq.getAvailableMetaLevels(level))
     {
       annonames.add(a);

@@ -15,6 +15,7 @@
  */
 package annis.service.objects;
 
+import java.io.Serializable;
 import java.util.List;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -24,7 +25,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
 @XmlRootElement
-public class RawTextWrapper
+public class RawTextWrapper implements Serializable
 {
 
   // holds the texts of a document.

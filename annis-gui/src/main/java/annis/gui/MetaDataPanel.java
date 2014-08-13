@@ -26,6 +26,7 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.*;
@@ -179,6 +180,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
     tblMeta.setSortContainerPropertyId("name");
+    tblMeta.addStyleName(ChameleonTheme.TABLE_STRIPED);
     return tblMeta;
   }
 
@@ -190,7 +192,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     List<Annotation> metadata = Helper.getMetaData(toplevelCorpusName,
       documentName);
 
-    Map<Integer, List<Annotation>> hashMetaData = new HashMap<Integer, List<Annotation>>();
+    Map<Integer, List<Annotation>> hashMetaData = new HashMap<>();
 
 
     if (metadata != null && !metadata.isEmpty())
@@ -199,11 +201,11 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       if (documentName != null)
       {
         hashMetaData =
-          new TreeMap<Integer, List<Annotation>>(Collections.reverseOrder());
+          new TreeMap<>(Collections.reverseOrder());
       }
       else
       {
-        hashMetaData = new TreeMap<Integer, List<Annotation>>();
+        hashMetaData = new TreeMap<>();
       }
 
       for (Annotation metaDatum : metadata)
@@ -228,14 +230,14 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     Map<Integer, List<Annotation>> splittedAnnotationsList)
   {
     List<BeanItemContainer<Annotation>> listOfBeanItemCon =
-      new ArrayList<BeanItemContainer<Annotation>>();
+      new ArrayList<>();
 
 
 
     for (List<Annotation> list : splittedAnnotationsList.values())
     {
       BeanItemContainer<Annotation> metaContainer =
-        new BeanItemContainer<Annotation>(Annotation.class);
+        new BeanItemContainer<>(Annotation.class);
       metaContainer.addAll(list);
 
       listOfBeanItemCon.add(metaContainer);
@@ -310,7 +312,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private void loadTable(String item, List<Annotation> metaData)
   {
     BeanItemContainer<Annotation> metaContainer =
-      new BeanItemContainer<Annotation>(Annotation.class);
+      new BeanItemContainer<>(Annotation.class);
     metaContainer.addAll(metaData);
 
     if (corpusAnnotationTable != null)

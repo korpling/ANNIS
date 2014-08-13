@@ -16,6 +16,7 @@
 package annis.gui.widgets.grid;
 
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -23,7 +24,7 @@ import java.util.List;
  * An event has a right and left border (but might have holes)
  *
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GridEvent implements Serializable
 {
@@ -48,6 +49,7 @@ public class GridEvent implements Serializable
   private Double endTime;
 
   private boolean gap;
+  private boolean space;
 
   private String textID;
 
@@ -69,7 +71,28 @@ public class GridEvent implements Serializable
     this.right = right;
     this.value = value;
 
-    this.coveredIDs = new LinkedList<String>();
+    this.coveredIDs = new LinkedList<>();
+  }
+  
+  /**
+   * Copy constructor
+   * @param orig 
+   */
+  public GridEvent(GridEvent orig)
+  {
+    this.id = orig.id;
+    this.value = orig.value;
+    this.left = orig.left;
+    this.right = orig.right;
+    this.match = orig.match;
+    this.coveredIDs = new ArrayList<>(orig.coveredIDs);
+    this.tooltip = orig.tooltip;
+    this.startTime = orig.startTime;
+    this.endTime = orig.endTime;
+    this.gap = orig.gap;
+    this.space = orig.space;
+    this.textID = orig.textID;
+    this.pageNumber = orig.pageNumber;
   }
 
   public String getId()
@@ -207,4 +230,16 @@ public class GridEvent implements Serializable
   {
     this.tooltip = tooltip;
   }
+
+  public boolean isSpace()
+  {
+    return space;
+  }
+
+  public void setSpace(boolean space)
+  {
+    this.space = space;
+  }
+  
+  
 }

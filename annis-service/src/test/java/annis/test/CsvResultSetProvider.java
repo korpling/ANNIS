@@ -37,7 +37,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CsvResultSetProvider
 {
@@ -55,7 +55,7 @@ public class CsvResultSetProvider
   {
     MockitoAnnotations.initMocks((CsvResultSetProvider) this);
 
-    header = new HashMap<String, Integer>();
+    header = new HashMap<>();
     reader = new CSVReader(new InputStreamReader(csvStream), ';', '"');
     try
     {

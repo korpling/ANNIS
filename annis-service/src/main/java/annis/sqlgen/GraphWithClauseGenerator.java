@@ -15,11 +15,11 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.SaltURIGroupSet;
+import annis.service.objects.MatchGroup;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.service.objects.SaltURIGroup;
+import annis.service.objects.Match;
 import java.net.URI;
 import java.util.List;
 import org.apache.commons.lang3.Validate;
@@ -35,24 +35,23 @@ import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
 import java.util.Collections;
 import java.util.LinkedList;
-import java.util.Map;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.
  *
  * Salt ids are simple URI and are defined like this:
  *
- * <p>{@code salt:/corp1/corp2/doc1}</p>.
+ * <p>{@code salt:/corp1/corp2/doc1#node}</p>.
  *
  * The leading / of the URI is a must, // would cause an error, because
  * authorities are currently not supported.
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
-  
+    
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
     int match,
@@ -128,8 +127,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
       // filter the node with the right name
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
-        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".salt_id = ")
+        .append("'").append(generateNodeID(uri)).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent)
@@ -166,20 +165,20 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
       queryData.getExtensions(AnnotateQueryData.class);
     AnnotateQueryData annotateQueryData = extensions.isEmpty()
       ? new AnnotateQueryData(5, 5) : extensions.get(0);
-    List<SaltURIGroupSet> listOfSaltURIs = queryData.getExtensions(SaltURIGroupSet.class);
+    List<MatchGroup> listOfSaltURIs = queryData.getExtensions(MatchGroup.class);
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
     
-    List<String> subselects = new LinkedList<String>();
+    List<String> subselects = new LinkedList<>();
     
     
     String indent2 = indent + TABSTOP;
     
-    SaltURIGroupSet groupSet = listOfSaltURIs.get(0);
+    MatchGroup groupSet = listOfSaltURIs.get(0);
     int matchNr = 1;
-    for(Map.Entry<Integer, SaltURIGroup> match : groupSet.getGroups().entrySet())
+    for(Match match : groupSet.getMatches())
     {
-      List<URI> uriList = match.getValue().getUris();
+      List<URI> uriList = match.getSaltIDs();
       int nodeNr = 1;
       for (URI uri : uriList)
       {
@@ -215,5 +214,10 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     sb.append("}");
     
     return  sqlString(sb.toString());
+  }
+  
+  private String generateNodeID(URI uri)
+  { 
+    return uri.getFragment();
   }
 }

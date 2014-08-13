@@ -35,7 +35,7 @@ public class SimpleCanvas extends AbstractComponent implements LegacyComponent
   
   public SimpleCanvas()
   {
-    lines = new LinkedList<Line2D>();
+    lines = new LinkedList<>();
   }
   
   @Override

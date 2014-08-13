@@ -19,7 +19,7 @@ import java.io.Serializable;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyTableEntry implements Serializable
 {

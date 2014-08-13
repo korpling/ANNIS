@@ -61,7 +61,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
     }
 
     // fetch corpus annotations
-    sql += "UNION"
+    sql += "\nUNION"
       + "\nSELECT distinct"
       + "\nm.namespace, m.name, :value, 'meta' as \"type\", 'm' as subtype, "
       + "\n'' as edge_namespace, '' as ege_name"
@@ -82,7 +82,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public Object extractData(ResultSet resultSet) throws SQLException,
     DataAccessException
   {
-    Map<String, AnnisAttribute> attributesByName = new HashMap<String, AnnisAttribute>();
+    Map<String, AnnisAttribute> attributesByName = new HashMap<>();
 
     while (resultSet.next())
     {
@@ -143,6 +143,6 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       }
     }
 
-    return new ArrayList<AnnisAttribute>(attributesByName.values());
+    return new ArrayList<>(attributesByName.values());
   }
 }

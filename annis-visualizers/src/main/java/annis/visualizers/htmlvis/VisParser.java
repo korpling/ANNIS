@@ -30,7 +30,7 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class VisParser extends HTMLVisConfigBaseListener
 {
@@ -90,7 +90,12 @@ public class VisParser extends HTMLVisConfigBaseListener
   @Override
   public void enterConditionName(HTMLVisConfigParser.ConditionNameContext ctx)
   {
-    currentMatcher = new AnnotationNameMatcher(ctx.ID().getText());
+    String namespace = null;
+    if(ctx.qName().namespace != null)
+    {
+      namespace = ctx.qName().namespace.getText();
+    }
+    currentMatcher = new AnnotationNameMatcher(namespace, ctx.qName().name.getText());
   }
 
   @Override
@@ -106,10 +111,27 @@ public class VisParser extends HTMLVisConfigBaseListener
   }
 
   @Override
+  public void enterConditionBegin(HTMLVisConfigParser.ConditionBeginContext ctx)
+  {
+    currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.BEGIN);
+  }
+
+  @Override
+  public void enterConditionEnd(HTMLVisConfigParser.ConditionEndContext ctx)
+  {
+    currentMatcher = new PseudoRegionMatcher(PseudoRegionMatcher.PseudoRegion.END);
+  }
+
+  @Override
   public void enterConditionNameAndValue(
     HTMLVisConfigParser.ConditionNameAndValueContext ctx)
   {
-    currentMatcher = new AnnotationNameAndValueMatcher(ctx.ID().getText(), 
+    String namespace = null;
+    if(ctx.qName().namespace != null)
+    {
+      namespace = ctx.qName().namespace.getText();
+    }
+    currentMatcher = new AnnotationNameAndValueMatcher(namespace, ctx.qName().name.getText(), 
       ctx.value().innervalue().getText());
   }
 
@@ -154,6 +176,17 @@ public class VisParser extends HTMLVisConfigBaseListener
     currentOutputter.setType(SpanHTMLOutputter.Type.ANNO_NAME);
   }
 
+    @Override
+  public void enterTypeMeta(HTMLVisConfigParser.TypeMetaContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.META_NAME);
+    //Using constant property for metadata, since constant and metavalue are never set simultaneously
+    //Alternatively we could consider adding another property for meta, or renaming 'constant' to 
+    //something more appropriate.
+    currentOutputter.setMetaname(ctx.innermeta().getText().trim());
+  }
+
+  
   @Override
   public void enterTypeConstant(HTMLVisConfigParser.TypeConstantContext ctx)
   {

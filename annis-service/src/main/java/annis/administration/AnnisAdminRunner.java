@@ -35,12 +35,16 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
+import annis.administration.AdministrationDao.ImportStatus;
 import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
+import com.google.common.base.Joiner;
 import java.io.File;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
@@ -57,7 +61,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private AnnisDao annisDao;
 
   private QueriesGenerator queriesGenerator;
-
+  
   public static void main(String[] args)
   {
     // get Runner from Spring
@@ -81,30 +85,26 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     // following parameters are arguments for the command
     List<String> commandArgs = Arrays.asList(args).subList(1, args.length);
 
-    // command: help
     if ("help".equals(command) || "--help".equals(command))
     {
       usage(null);
-
-      // command: init
     }
     else if ("init".equals(command))
     {
       doInit(commandArgs);
-
-      // command: import
     }
     else if ("import".equals(command))
     {
       doImport(commandArgs);
 
-      // command: delete
     }
     else if ("delete".equals(command))
     {
       doDelete(commandArgs);
-
-      // command status
+    }
+    else if ("copy".equals(command))
+    {
+      doCopy(commandArgs);
     }
     else if ("list".equals(command))
     {
@@ -113,8 +113,6 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if ("indexes".equals(command))
     {
       doIndexes();
-
-      // unknown command
     }
     else if ("genexamples".equals(command))
     {
@@ -123,6 +121,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else if ("delexamples".equals(command))
     {
       doDeleteExampleQueries(commandArgs);
+    }
+    else if("cleanup-data".equals(command))
+    {
+      doCleanupData(commandArgs);
     }
     else
     {
@@ -163,7 +165,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       options.addOption(opt, longOpt, true, description);
       return this;
     }
-
+    
     public OptionBuilder addLongParameter(String longOpt, String description)
     {
       options.addOption(null, longOpt, true, description);
@@ -197,24 +199,26 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
     Options options = new OptionBuilder()
       .addParameter("h", "host",
-      "database server host (defaults to localhost)")
+        "database server host (defaults to localhost)")
       .addLongParameter("port", "database server port")
       .addRequiredParameter("d", "database",
-      "name of the ANNIS database (REQUIRED)")
+        "name of the ANNIS database (REQUIRED)")
       .addRequiredParameter("u", "user", "name of the ANNIS user (REQUIRED)")
       .addRequiredParameter("p", "password",
-      "password of the ANNIS suer (REQUIRED)")
+        "password of the ANNIS suer (REQUIRED)")
       .addParameter("D", "defaultdb",
-      "name of the PostgreSQL default database (defaults to \"postgres\")")
+        "name of the PostgreSQL default database (defaults to \"postgres\")")
       .addParameter("U", "superuser",
-      "name of a PostgreSQL super user (defaults to \"postgres\")")
+        "name of a PostgreSQL super user (defaults to \"postgres\")")
       .addParameter("P", "superpassword",
-      "password of a PostgreSQL super user")
+        "password of a PostgreSQL super user")
       .addParameter("m", "migratecorpora",
-      "Try to import the already existing corpora into the database. "
-      + "You can set the root directory for corpus sources as an argument.")
+        "Try to import the already existing corpora into the database. "
+        + "You can set the root directory for corpus sources as an argument.")
       .addToggle("s", "ssl", false,
-      "if given use SSL for connecting to the database")
+        "if given use SSL for connecting to the database")
+      .addLongParameter("schema", "The PostgreSQL schema to use (defaults to \"public\"). "
+        + "Only lowercase characters and digits are allowed in the schema name.")
       .createOptions();
     CommandLineParser parser = new PosixParser();
     CommandLine cmdLine = null;
@@ -240,9 +244,12 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       String superUser = cmdLine.getOptionValue("superuser", "postgres");
       String superPassword = cmdLine.getOptionValue("superpassword");
       boolean useSSL = cmdLine.hasOption("ssl");
+      String pgSchema = cmdLine.getOptionValue("schema", "public")
+        .toLowerCase().replaceAll("[^a-z0-9]", "_");;
 
       boolean migrateCorpora = cmdLine.hasOption("migratecorpora");
-      List<Map<String, Object>> existingCorpora = new LinkedList<Map<String, Object>>();
+      
+      List<Map<String, Object>> existingCorpora = new LinkedList<>();
 
       if (migrateCorpora)
       {
@@ -262,71 +269,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
 
       corpusAdministration.
         initializeDatabase(host, port, database, user, password,
-        defaultDatabase, superUser, superPassword, useSSL);
+        defaultDatabase, superUser, superPassword, useSSL, pgSchema);
 
       if (migrateCorpora && existingCorpora.size() > 0)
       {
-        String corpusRoot = cmdLine.getOptionValue("migratecorpora");
-
-        Search search = null;
-        if (corpusRoot != null && !"".equals(corpusRoot))
-        {
-          File rootCorpusPath = new File(corpusRoot);
-          if (rootCorpusPath.isDirectory())
-          {
-            LinkedList<File> l = new LinkedList<File>();
-            l.add(rootCorpusPath);
-
-            search = new Search(l);
-          }
-        }
-
-        for (Map<String, Object> corpusStat : existingCorpora)
-        {
-          String corpusName = (String) corpusStat.get("name");
-          String migratePath = (String) corpusStat.get("source_path");
-
-          if (migratePath == null)
-          {
-
-            if (search == null)
-            {
-              log.error(
-                "You have to give a valid corpus root directory as argument to migratecorpora");
-              search = new Search(new LinkedList<File>());
-            }
-            else if (!search.isWasSearched())
-            {
-              log.info("Searching for corpora at given directory, "
-                + "this can take some minutes");
-              search.startSearch();
-            }
-
-            // used the searched corpus path of corpus path was not part of the
-            // corpus description in the database
-            if (search.getCorpusPaths().containsKey(corpusName))
-            {
-              migratePath = search.getCorpusPaths().get(corpusName).
-                getParentFile().getAbsolutePath();
-            }
-
-          } // end if migratePath == null
-
-
-          if (migratePath == null || !(new File(migratePath).isDirectory()))
-          {
-            log.warn(
-              "Unable to migrate \"" + corpusName + "\" because the system "
-              + "can not find a valid source directory where it is located.");
-          }
-          else
-          {
-            log.info("migrating corpus " + corpusName);
-            corpusAdministration.importCorporaSave(true, null, null, false, migratePath);
-          }
-        }
-
-
+        doMigration(cmdLine.getOptionValue("migratecorpora"), existingCorpora);
       }
 
     }
@@ -334,6 +281,68 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("annis-admin.sh init", options);
+    }
+  }
+  
+  private void doMigration(String corpusRoot, List<Map<String, Object>> existingCorpora)
+  {
+
+    Search search = null;
+    if (corpusRoot != null && !"".equals(corpusRoot))
+    {
+      File rootCorpusPath = new File(corpusRoot);
+      if (rootCorpusPath.isDirectory())
+      {
+        LinkedList<File> l = new LinkedList<>();
+        l.add(rootCorpusPath);
+
+        search = new Search(l);
+      }
+    }
+
+    for (Map<String, Object> corpusStat : existingCorpora)
+    {
+      String corpusName = (String) corpusStat.get("name");
+      String migratePath = (String) corpusStat.get("source_path");
+
+      if (migratePath == null)
+      {
+
+        if (search == null)
+        {
+          log.error(
+            "You have to give a valid corpus root directory as argument to migratecorpora");
+          search = new Search(new LinkedList<File>());
+        }
+        else if (!search.isWasSearched())
+        {
+          log.info("Searching for corpora at given directory, "
+            + "this can take some minutes");
+          search.startSearch();
+        }
+
+        // used the searched corpus path of corpus path was not part of the
+        // corpus description in the database
+        if (search.getCorpusPaths().containsKey(corpusName))
+        {
+          migratePath = search.getCorpusPaths().get(corpusName).
+            getParentFile().getAbsolutePath();
+        }
+
+      } // end if migratePath == null
+
+
+      if (migratePath == null || !(new File(migratePath).isDirectory()))
+      {
+        log.warn(
+          "Unable to migrate \"" + corpusName + "\" because the system "
+          + "can not find a valid source directory where it is located.");
+      }
+      else
+      {
+        log.info("migrating corpus " + corpusName);
+        corpusAdministration.importCorporaSave(true, null, null, false, migratePath);
+      }
     }
   }
 
@@ -361,22 +370,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner
           "Where can I find the corpus you want to import?");
       }
 
-      if (cmdLine.hasOption('o'))
-      {
-        corpusAdministration.importCorporaSave(true, 
+      boolean overwrite = cmdLine.hasOption('o');
+      corpusAdministration.importCorporaSave(overwrite, 
           options.getOption("alias").getValue(),
           options.getOption("mail").getValue(), 
           false,
           cmdLine.getArgList());
-      }
-      else
-      {
-        corpusAdministration.importCorporaSave(false, 
-          options.getOption("alias").getValue(),
-          options.getOption("mail").getValue(), 
-          false,
-          cmdLine.getArgList());
-      }
+      
     }
     catch (ParseException ex)
     {
@@ -394,7 +394,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     }
 
     // convert ids from string to int
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     for (String id : commandArgs)
     {
       try
@@ -416,6 +416,106 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       }
     }
     corpusAdministration.deleteCorpora(ids);
+  }
+  
+  private void doCopy(List<String> commandArgs)
+  {
+    Options options = new OptionBuilder()
+      .addToggle("o", "overwrite", false,
+        "Overwrites a corpus, when it is already stored in the database.")
+      .addParameter("m", "mail",
+        "e-mail adress to where status updates should be send")
+      .createOptions();
+
+    CommandLineParser parser = new PosixParser();
+    try
+    {
+      CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
+        new String[commandArgs.size()]));
+
+      if (cmdLine.getArgList().isEmpty())
+      {
+        throw new ParseException(
+          "You need to specifiy where to find the database.properties file is located.");
+      }
+      
+      File dbProperties = new File(cmdLine.getArgs()[0]);
+      if(dbProperties.isFile() && dbProperties.canRead())
+      {
+        // find the corpus paths
+        List<Map<String, Object>> corpora = corpusAdministration.listCorpusStats(dbProperties);
+        List<String> corpusPaths = new LinkedList<>();
+        for(Map<String, Object> c : corpora)
+        {
+          String sourcePath = (String) c.get("source_path");
+          if(sourcePath != null)
+          {
+            corpusPaths.add(sourcePath);
+          }
+        }
+        
+        if(corpusPaths.isEmpty())
+        {
+          log.warn("No corpora found");
+        }
+        else
+        {
+          log.info("The following corpora will be imported:\n"
+            + "---------------\n"
+            + "{}\n"
+            + "---------------\n",
+            Joiner.on("\n").join(corpusPaths));
+
+          //import each corpus
+          ImportStatus status = corpusAdministration.importCorporaSave(
+            cmdLine.hasOption("overwrite"), null, 
+            cmdLine.getOptionValue("mail"), 
+            false,
+            corpusPaths);
+
+          // report the successful or failure failed
+          Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
+          Set<String> failedCorpora = new LinkedHashSet<>(status.getAllThrowable().keySet());
+          successfullCorpora.removeAll(failedCorpora);
+
+          if(failedCorpora.isEmpty())
+          {
+            log.info("All corpora imported without errors:\n"
+              + "---------------\n"
+              + "{}\n"
+              + "---------------\n",
+              Joiner.on("\n").join(successfullCorpora));
+          }
+          else
+          {
+
+            log.error("Errors occured during import, not all corpora have been imported.\n"
+              + "---------------\n"
+              + "Success:\n"
+              + "{}\n"
+              + "---------------\n"
+              + "Failed:\n"
+              + "{}\n"
+              + "---------------\n", 
+              Joiner.on("\n").join(successfullCorpora),
+              Joiner.on("\n").join(failedCorpora));
+          }
+        }
+      }
+      else
+      {
+        log.error("Can not read the database configuration file {}", dbProperties.getAbsolutePath());
+      }
+      
+      
+    }
+    catch (ParseException ex)
+    {
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh copy [OPTION] CONFIGFILE",
+        options);
+    }
+
   }
 
   private void doList()
@@ -454,6 +554,11 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       queriesGenerator.delExampleQueries(commandArgs);
     }
   }
+  
+  private void doCleanupData(List<String> commandArgs)
+  {
+    corpusAdministration.cleanupData();
+  }
 
   private void doGenerateExampleQueries(List<String> commandArgs)
   {
@@ -488,11 +593,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   private void usage(String error)
   {
     Resource resource = new ClassPathResource("annis/administration/usage.txt");
-    BufferedReader reader = null;
-    try
+    try(BufferedReader reader = new BufferedReader(new InputStreamReader(resource.
+        getInputStream(), "UTF-8"));)
     {
-      reader = new BufferedReader(new InputStreamReader(resource.
-        getInputStream(), "UTF-8"));
+      
       for (String line = reader.readLine(); line != null; line = reader.
         readLine())
       {
@@ -503,34 +607,20 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       log.warn("could not read usage information: " + e.getMessage());
     }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
-    }
     if (error != null)
     {
       error(error);
     }
-  }
+  } 
 
   private void printTable(List<Map<String, Object>> table)
   {
     // use first element to get metadata (like column names)
     Map<String, Object> first = table.get(0);
-    List<String> columnNames = new ArrayList<String>(first.keySet());
+    List<String> columnNames = new ArrayList<>(first.keySet());
 
     // determine length of column
-    Map<String, Integer> columnSize = new HashMap<String, Integer>();
+    Map<String, Integer> columnSize = new HashMap<>();
     for (String column : columnNames)
     {
       columnSize.put(column, column.length());

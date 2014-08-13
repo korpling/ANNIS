@@ -20,15 +20,20 @@ import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.Visualizer;
+import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.List;
-import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +44,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private SearchUI ui;
+  private final SearchUI ui;
 
   private VerticalLayout layout;
 
@@ -47,9 +52,6 @@ public class DocBrowserPanel extends Panel
   private String corpus;
 
   private DocBrowserTable table;
-
-  // the key for the json config of the doc visualization
-  private static final String DOC_BROWSER_CONFIG_KEY = "browse-document-visualizers";
 
   private Logger log = LoggerFactory.getLogger(DocBrowserPanel.class);
 
@@ -95,60 +97,9 @@ public class DocBrowserPanel extends Panel
     }
   }
 
-  /**
-   * Normally get the page size from annis-service.properties for the paging
-   * component. If something went wrong this value or the amount of documents
-   * within the corpus is used:
-   *
-   * <code>min(configValue, min(pageSize, amountOf(documents)))</code>
-   *
-   * @param docSize The amount of documents with this corpus.
-   *
-   * @return the page size, which is never bigger than the doc size.
-   */
-  public int getPageSize(int docSize)
+  public DocumentBrowserConfig getDocBrowserConfig()
   {
-    int result = Math.min(PAGE_SIZE, docSize);
-    try
-    {
-      result = Math.min(result, getDocBrowserConfig().getInt(
-        "pageSize"));
-    }
-    catch (JSONException ex)
-    {
-      log.warn(
-        "cannot read the docvisualizer pageSize, so it's set to " + PAGE_SIZE,
-        ex);
-
-    }
-    return result;
-  }
-
-  public JSONSerializable getDocBrowserConfig()
-  {
-    // check first, if the a config is already fetched.
-    if (corpusConfig == null)
-    {
-      corpusConfig = Helper.getCorpusConfig(corpus);
-    }
-
-    if (corpusConfig == null || !corpusConfig.getConfig().containsKey(
-      DOC_BROWSER_CONFIG_KEY))
-    {
-      corpusConfig = Helper.getDefaultCorpusConfig();
-    }
-
-    String c = corpusConfig.getConfig().getProperty(DOC_BROWSER_CONFIG_KEY);
-    try
-    {
-      return new JSONSerializable(c);
-    }
-    catch (JSONException ex)
-    {
-      log.error("could not read the doc browser config", ex);
-    }
-
-    return null;
+    return Helper.getDocBrowserConfig(corpus);
   }
 
   /**
@@ -164,7 +115,7 @@ public class DocBrowserPanel extends Panel
     return new DocBrowserPanel(ui, corpus);
   }
 
-  public void openVis(String doc, JSONSerializable config, Button btn)
+  public void openVis(String doc, Visualizer config, Button btn)
   {
     ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
@@ -177,22 +128,41 @@ public class DocBrowserPanel extends Panel
     {
 
       WebResource res = Helper.getAnnisWebResource();
-      final List<Annotation> docs = res.path("meta/docnames/" + corpus).
-        get(new Helper.AnnotationListType());
-
-
-      UI.getCurrent().access(new Runnable()
+      try
       {
-        @Override
-        public void run()
-        {
-          table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
-          layout.removeComponent(progress);
-          layout.addComponent(table);
+        final List<Annotation> docs = res.path("meta/docnames/"
+          + URLEncoder.encode(corpus, "UTF-8")).
+          get(new Helper.AnnotationListType());
 
-          table.setDocNames(docs);
-        }
-      });
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
+            layout.removeComponent(progress);
+            layout.addComponent(table);
+
+            table.setDocNames(docs);
+          }
+        });
+      }
+      catch (final UnsupportedEncodingException ex)
+      {
+        log.
+          error("UTF-8 encoding is not supported on server, this is weird", ex);
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            Notification.show(
+              "UTF-8 encoding is not supported on server, this is weird: " + ex.
+              getLocalizedMessage(),
+              Notification.Type.WARNING_MESSAGE);
+          }
+        });
+      }
     }
   }
 

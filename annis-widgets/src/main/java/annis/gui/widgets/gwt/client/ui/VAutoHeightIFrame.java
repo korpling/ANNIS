@@ -37,6 +37,9 @@ public class VAutoHeightIFrame extends Widget
     super();
 
     iframe = Document.get().createIFrameElement();
+    iframe.setFrameBorder(0);
+    iframe.setScrolling("no");
+    
     setElement(iframe);
 
 
@@ -76,7 +79,6 @@ public class VAutoHeightIFrame extends Widget
       }
     }, LoadEvent.getType());
 
-    iframe.setFrameBorder(0);
   }
 
   private void checkIFrameLoaded(Document doc)

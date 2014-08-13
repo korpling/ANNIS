@@ -16,7 +16,7 @@
 package annis.ql.parser;
 
 import annis.model.QueryNode;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
 import annis.sqlgen.model.Precedence;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +24,7 @@ import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import static org.junit.Assert.*;
+import static org.junit.Assume.assumeTrue;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.ContextConfiguration;
@@ -31,13 +32,14 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml"})
+@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml", 
+  "classpath:annis/AutowiredContext.xml"})
 public class TransitivePrecedenceOptimizerTest
 {
-  
+  private boolean postProcessorExists = false;
 
  	@Autowired private AnnisParserAntlr parser;
   public TransitivePrecedenceOptimizerTest()
@@ -49,6 +51,15 @@ public class TransitivePrecedenceOptimizerTest
   public void setUp()
   {
     parser.setPrecedenceBound(0);
+    postProcessorExists = false;
+    for(QueryDataTransformer t : parser.getPostProcessors())
+    {
+      if(t instanceof TransitivePrecedenceOptimizer)
+      {
+        postProcessorExists = true;
+        break;
+      }
+    }
   }
 
   @After
@@ -64,6 +75,8 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithBound()
   {
+    assumeTrue(postProcessorExists);
+    
     System.out.println("addTransitivePrecedenceOperatorsWithBound");
     
     // query to extend
@@ -90,76 +103,76 @@ public class TransitivePrecedenceOptimizerTest
     // and not more
     // (especially since we might introduce a loop by accident)
     assertEquals("wrong number of outgoing joins for node 1", 
-      3, nodes.get(0).getJoins().size());
+      3, nodes.get(0).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 2", 
-      2, nodes.get(1).getJoins().size());
+      2, nodes.get(1).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 3", 
-      2, nodes.get(2).getJoins().size());
+      2, nodes.get(2).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 4", 
-      2, nodes.get(3).getJoins().size());
+      2, nodes.get(3).getOutgoingJoins().size());
     
     // these constraints must be a precedence operator
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(0) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(1) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(1) instanceof Precedence);
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(2) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(2) instanceof Precedence);
     assertTrue("not a precedence operator (node 2)", 
-      nodes.get(1).getJoins().get(0) instanceof Precedence);
+      nodes.get(1).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 2)", 
-      nodes.get(1).getJoins().get(1) instanceof Precedence);
+      nodes.get(1).getOutgoingJoins().get(1) instanceof Precedence);
     assertTrue("not a precedence operator (node 3)", 
-      nodes.get(2).getJoins().get(0) instanceof Precedence);
+      nodes.get(2).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 4)", 
-      nodes.get(3).getJoins().get(0) instanceof Precedence);
+      nodes.get(3).getOutgoingJoins().get(0) instanceof Precedence);
     
     // test if target nodes are as expected
-    assertEquals(2, ((Precedence) nodes.get(0).getJoins().get(0)).getTarget().getId());
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(1)).getTarget().getId());
-    assertEquals(4, ((Precedence) nodes.get(0).getJoins().get(2)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getTarget().getId());
     
-    assertEquals(3, ((Precedence) nodes.get(1).getJoins().get(0)).getTarget().getId());
-    assertEquals(4, ((Precedence) nodes.get(1).getJoins().get(1)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getTarget().getId());
     
-    assertEquals(4, ((Precedence) nodes.get(2).getJoins().get(0)).getTarget().getId());
-    assertEquals(2, ((Precedence) nodes.get(2).getJoins().get(1)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getTarget().getId());
     
-    assertEquals(2, ((Precedence) nodes.get(3).getJoins().get(0)).getTarget().getId());
-    assertEquals(3, ((Precedence) nodes.get(3).getJoins().get(1)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getTarget().getId());
     
     // test if ranges are correct
     
     // node 1
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMinDistance());
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMaxDistance());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(8, ((Precedence) nodes.get(0).getJoins().get(1)).getMinDistance());
-    assertEquals(13, ((Precedence) nodes.get(0).getJoins().get(1)).getMaxDistance());
+    assertEquals(8, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(13, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getMaxDistance());
     
-    assertEquals(9, ((Precedence) nodes.get(0).getJoins().get(2)).getMinDistance());
-    assertEquals(63, ((Precedence) nodes.get(0).getJoins().get(2)).getMaxDistance());
+    assertEquals(9, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getMinDistance());
+    assertEquals(63, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getMaxDistance());
     
     // node 2
-    assertEquals(5, ((Precedence) nodes.get(1).getJoins().get(0)).getMinDistance());
-    assertEquals(10, ((Precedence) nodes.get(1).getJoins().get(0)).getMaxDistance());
+    assertEquals(5, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(10, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(6, ((Precedence) nodes.get(1).getJoins().get(1)).getMinDistance());
-    assertEquals(60, ((Precedence) nodes.get(1).getJoins().get(1)).getMaxDistance());
+    assertEquals(6, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(60, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getMaxDistance());
     
     // node 3
-    assertEquals(1, ((Precedence) nodes.get(2).getJoins().get(0)).getMinDistance());
-    assertEquals(50, ((Precedence) nodes.get(2).getJoins().get(0)).getMaxDistance());
+    assertEquals(1, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(50, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(2, ((Precedence) nodes.get(2).getJoins().get(1)).getMinDistance());
-    assertEquals(100, ((Precedence) nodes.get(2).getJoins().get(1)).getMaxDistance());
+    assertEquals(2, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(100, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getMaxDistance());
     
     // node 4
-    assertEquals(1, ((Precedence) nodes.get(3).getJoins().get(0)).getMinDistance());
-    assertEquals(50, ((Precedence) nodes.get(3).getJoins().get(0)).getMaxDistance());
+    assertEquals(1, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(50, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(6, ((Precedence) nodes.get(3).getJoins().get(1)).getMinDistance());
-    assertEquals(60, ((Precedence) nodes.get(3).getJoins().get(1)).getMaxDistance());
+    assertEquals(6, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(60, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getMaxDistance());
   }
   
   /**
@@ -170,6 +183,7 @@ public class TransitivePrecedenceOptimizerTest
   @Test
   public void testAddTransitivePrecedenceOperatorsWithoutBound()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("addTransitivePrecedenceOperatorsWithoutBound");
     
     // query to extend
@@ -193,81 +207,82 @@ public class TransitivePrecedenceOptimizerTest
     // and not more
     // (especially since we might introduce a loop by accident)
     assertEquals("wrong number of outgoing joins for node 1", 
-      3, nodes.get(0).getJoins().size());
+      3, nodes.get(0).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 2", 
-      2, nodes.get(1).getJoins().size());
+      2, nodes.get(1).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 3", 
-      2, nodes.get(2).getJoins().size());
+      2, nodes.get(2).getOutgoingJoins().size());
     assertEquals("wrong number of outgoing joins for node 4", 
-      2, nodes.get(3).getJoins().size());
+      2, nodes.get(3).getOutgoingJoins().size());
     
     // these constraints must be a precedence operator
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(0) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(1) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(1) instanceof Precedence);
     assertTrue("not a precedence operator (node 1)", 
-      nodes.get(0).getJoins().get(2) instanceof Precedence);
+      nodes.get(0).getOutgoingJoins().get(2) instanceof Precedence);
     assertTrue("not a precedence operator (node 2)", 
-      nodes.get(1).getJoins().get(0) instanceof Precedence);
+      nodes.get(1).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 2)", 
-      nodes.get(1).getJoins().get(1) instanceof Precedence);
+      nodes.get(1).getOutgoingJoins().get(1) instanceof Precedence);
     assertTrue("not a precedence operator (node 3)", 
-      nodes.get(2).getJoins().get(0) instanceof Precedence);
+      nodes.get(2).getOutgoingJoins().get(0) instanceof Precedence);
     assertTrue("not a precedence operator (node 4)", 
-      nodes.get(3).getJoins().get(0) instanceof Precedence);
+      nodes.get(3).getOutgoingJoins().get(0) instanceof Precedence);
     
     // test if target nodes are as expected
-    assertEquals(2, ((Precedence) nodes.get(0).getJoins().get(0)).getTarget().getId());
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(1)).getTarget().getId());
-    assertEquals(4, ((Precedence) nodes.get(0).getJoins().get(2)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getTarget().getId());
     
-    assertEquals(3, ((Precedence) nodes.get(1).getJoins().get(0)).getTarget().getId());
-    assertEquals(4, ((Precedence) nodes.get(1).getJoins().get(1)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getTarget().getId());
     
-    assertEquals(4, ((Precedence) nodes.get(2).getJoins().get(0)).getTarget().getId());
-    assertEquals(2, ((Precedence) nodes.get(2).getJoins().get(1)).getTarget().getId());
+    assertEquals(4, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getTarget().getId());
     
-    assertEquals(2, ((Precedence) nodes.get(3).getJoins().get(0)).getTarget().getId());
-    assertEquals(3, ((Precedence) nodes.get(3).getJoins().get(1)).getTarget().getId());
+    assertEquals(2, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getTarget().getId());
+    assertEquals(3, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getTarget().getId());
     
     // test if ranges are correct
     
     // node 1
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMinDistance());
-    assertEquals(3, ((Precedence) nodes.get(0).getJoins().get(0)).getMaxDistance());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(3, ((Precedence) nodes.get(0).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(8, ((Precedence) nodes.get(0).getJoins().get(1)).getMinDistance());
-    assertEquals(13, ((Precedence) nodes.get(0).getJoins().get(1)).getMaxDistance());
+    assertEquals(8, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(13, ((Precedence) nodes.get(0).getOutgoingJoins().get(1)).getMaxDistance());
     
-    assertEquals(0, ((Precedence) nodes.get(0).getJoins().get(2)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(0).getJoins().get(2)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(0).getOutgoingJoins().get(2)).getMaxDistance());
     
     // node 2
-    assertEquals(5, ((Precedence) nodes.get(1).getJoins().get(0)).getMinDistance());
-    assertEquals(10, ((Precedence) nodes.get(1).getJoins().get(0)).getMaxDistance());
+    assertEquals(5, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(10, ((Precedence) nodes.get(1).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(0, ((Precedence) nodes.get(1).getJoins().get(1)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(1).getJoins().get(1)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(1).getOutgoingJoins().get(1)).getMaxDistance());
     
     // node 3
-    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(0)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(0)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(2).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(1)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(2).getJoins().get(1)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(2).getOutgoingJoins().get(1)).getMaxDistance());
     
     // node 4
-    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(0)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(0)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(3).getOutgoingJoins().get(0)).getMaxDistance());
     
-    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(1)).getMinDistance());
-    assertEquals(0, ((Precedence) nodes.get(3).getJoins().get(1)).getMaxDistance());
+    assertEquals(0, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getMinDistance());
+    assertEquals(0, ((Precedence) nodes.get(3).getOutgoingJoins().get(1)).getMaxDistance());
   }
   
   @Test
   public void testFollowSegmentation()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("followSegmentation");
     
     // query to extend
@@ -280,12 +295,13 @@ public class TransitivePrecedenceOptimizerTest
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
-    assertEquals(2, nodes.get(0).getJoins().size());
+    assertEquals(2, nodes.get(0).getOutgoingJoins().size());
   }
   
   @Test
   public void testDontFollowSegmentation()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontFollowSegmentation");
     
     // query to extend
@@ -298,12 +314,13 @@ public class TransitivePrecedenceOptimizerTest
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
-    assertEquals(1, nodes.get(0).getJoins().size());
+    assertEquals(1, nodes.get(0).getOutgoingJoins().size());
   }
   
   @Test
   public void testDontFollowSegmentationFromTok()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontFollowSegmentationFromTok");
     
     // query to extend
@@ -316,12 +333,13 @@ public class TransitivePrecedenceOptimizerTest
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
-    assertEquals(1, nodes.get(0).getJoins().size());
+    assertEquals(1, nodes.get(0).getOutgoingJoins().size());
   }
   
   @Test
   public void testDontUseRangedPrecendenceOnSpans()
   {
+    assumeTrue(postProcessorExists);
     System.out.println("dontUseRangedPrecendenceOnSpans");
     
     // query to extend
@@ -333,9 +351,9 @@ public class TransitivePrecedenceOptimizerTest
     assertEquals(1, data.getAlternatives().size());
     List<QueryNode> nodes = data.getAlternatives().get(0);
     
-    assertEquals(2, nodes.get(0).getJoins().size());
-    Join j0 = nodes.get(0).getJoins().get(0);
-    Join j1 = nodes.get(0).getJoins().get(1);
+    assertEquals(2, nodes.get(0).getOutgoingJoins().size());
+    Join j0 = nodes.get(0).getOutgoingJoins().get(0);
+    Join j1 = nodes.get(0).getOutgoingJoins().get(1);
     
     assertTrue(j0 instanceof Precedence);
     assertTrue(j1 instanceof Precedence);

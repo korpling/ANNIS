@@ -106,7 +106,7 @@ public class PagingComponent extends Panel implements
 
     addStyleName("toolbar");
 
-    callbacks = new HashSet<PagingCallback>();
+    callbacks = new HashSet<>();
 
     layout = new HorizontalLayout();
     layout.setSpacing(true);
@@ -128,6 +128,7 @@ public class PagingComponent extends Panel implements
     btFirst.addClickListener((Button.ClickListener) this);
     btFirst.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btFirst.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btFirst.setDisableOnClick(true);
 
     btLast = new Button();
     btLast.setIcon(LAST);
@@ -135,6 +136,7 @@ public class PagingComponent extends Panel implements
     btLast.addClickListener((Button.ClickListener) this);
     btLast.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btLast.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLast.setDisableOnClick(true);
 
     btNext = new Button();
     btNext.setIcon(RIGHT_ARROW);
@@ -142,6 +144,7 @@ public class PagingComponent extends Panel implements
     btNext.addClickListener((Button.ClickListener) this);
     btNext.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btNext.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btNext.setDisableOnClick(true);
 
     btPrevious = new Button();
     btPrevious.setIcon(LEFT_ARROW);
@@ -149,6 +152,7 @@ public class PagingComponent extends Panel implements
     btPrevious.addClickListener((Button.ClickListener) this);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btPrevious.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btPrevious.setDisableOnClick(true);
 
     txtPage = new TextField();
     txtPage.setDescription("current page");
@@ -278,6 +282,11 @@ public class PagingComponent extends Panel implements
   @Override
   public void buttonClick(ClickEvent event)
   {
+    btFirst.setEnabled(true);
+    btLast.setEnabled(true);
+    btNext.setEnabled(true);
+    btPrevious.setEnabled(true);
+      
     if (event.getButton() == btFirst)
     {
       currentPage = 1;

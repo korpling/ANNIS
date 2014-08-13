@@ -103,8 +103,6 @@ public class BinaryRequestHandler implements RequestHandler
       response.resetBuffer();
       response.setBufferSize(BUFFER_SIZE); // 4K
       
-      OutputStream out = response.getOutputStream();
-
       String requestedRangeRaw = request.getHeader("Range");
 
       WebResource binaryRes = Helper.getAnnisWebResource()
@@ -162,11 +160,14 @@ public class BinaryRequestHandler implements RequestHandler
         response.flushBuffer();
         if(sendContent)
         {
-          writeFromServiceToClient(
-            r.getStart(), contentLength, binaryRes, out, mimeType);
+          try (
+            OutputStream out = response.getOutputStream();)
+          {
+            writeFromServiceToClient(
+              r.getStart(), contentLength, binaryRes, out, mimeType);
+          }
         }
         
-        out.close();
 
       }
       catch(ContentRange.InvalidRangeException ex)

@@ -19,6 +19,7 @@ import annis.model.Annotation;
 import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.RawTextWrapper;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -35,6 +36,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -89,6 +91,12 @@ public class Helper
     + "<p>Please ask the responsible admin or consult the ANNIS "
     + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
 
+  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER
+    = "Problems with parsing the document browser configuration.";
+
+  private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY
+    = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
+
   /**
    * Creates an authentificiated REST client
    *
@@ -139,10 +147,11 @@ public class Helper
 
     VaadinSession vSession = VaadinSession.getCurrent();
     WrappedSession wrappedSession = null;
-    
-    
+
     if (vSession != null)
+    {
       wrappedSession = vSession.getSession();
+    }
 
     if (wrappedSession != null)
     {
@@ -240,9 +249,10 @@ public class Helper
     // get URI used by the application
     String uri = null;
 
-    if (vSession != null) {
-     uri = (String) VaadinSession.getCurrent().getAttribute(
-      KEY_WEB_SERVICE_URL);
+    if (vSession != null)
+    {
+      uri = (String) VaadinSession.getCurrent().getAttribute(
+        KEY_WEB_SERVICE_URL);
     }
 
     // if already authentificated the REST client is set as the "user" property
@@ -346,9 +356,31 @@ public class Helper
 
       return new URI(appURI.getScheme(), null,
         appURI.getHost(), appURI.getPort(),
-        getContext(), null,
+        appURI.getPath(), null,
         StringUtils.join(citationFragment(aql, corpora,
             contextLeft, contextRight, segmentation, start, limit), "&"))
+        .toASCIIString();
+    }
+    catch (URISyntaxException ex)
+    {
+      log.error(null, ex);
+    }
+    return "ERROR";
+  }
+
+  public static String generateCorpusLink(Set<String> corpora)
+  {
+    try
+    {
+      URI appURI = UI.getCurrent().getPage().getLocation();
+
+      String fragment = "_c="
+        + encodeBase64URL(StringUtils.join(corpora, ","));
+
+      return new URI(appURI.getScheme(), null,
+        appURI.getHost(), appURI.getPort(),
+        appURI.getPath(), null,
+        fragment)
         .toASCIIString();
     }
     catch (URISyntaxException ex)
@@ -495,6 +527,42 @@ public class Helper
     return result;
   }
 
+  public static DocumentBrowserConfig getDocBrowserConfig(String corpus)
+  {
+    try
+    {
+      DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query")
+        .path("corpora").path("doc_browser_config")
+        .path(URLEncoder.encode(corpus, "UTF-8"))
+        .get(DocumentBrowserConfig.class);
+
+      return docBrowserConfig;
+    }
+    catch (UnsupportedEncodingException ex)
+    {
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true).show(Page.getCurrent());
+      log.error("problems with fetching document browsing", ex);
+    }
+    catch (UniformInterfaceException ex)
+    {
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true).show(Page.getCurrent());
+      log.error("problems with fetching document browsing", ex);
+    }
+    catch (ClientHandlerException ex)
+    {
+      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
+        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
+        true).show(Page.getCurrent());
+      log.error("problems with fetching document browsing", ex);
+    }
+
+    return null;
+  }
+
   /**
    * Loads the corpus config of a specific corpus.
    *
@@ -552,7 +620,7 @@ public class Helper
     try
     {
       defaultCorpusConfig = Helper.getAnnisWebResource().path("query")
-        .path("corpora").path("default-config").get(CorpusConfig.class);
+        .path("corpora").path(DEFAULT_CONFIG).get(CorpusConfig.class);
     }
     catch (UniformInterfaceException ex)
     {
@@ -727,6 +795,39 @@ public class Helper
     }
 
     return texts;
+  }
+  
+  /**
+   * Get the qualified name seperated by a single ":" when a namespace exists.
+   * @param anno
+   * @return 
+   */
+  public static String getQualifiedName(SAnnotation anno)
+  {
+    if(anno != null)
+    {
+      if(anno.getSNS() == null || anno.getSNS().isEmpty())
+      {
+        return anno.getSName();
+      }
+      else
+      {
+        return anno.getSNS() + ":" + anno.getSName();
+      }
+    }
+    return "";
+  }
+  
+  /**
+   * Returns true if the right-to-left heuristic should be disabled.
+   * @return 
+   */
+  public static boolean isRTLDisabled()
+  {
+    String disableRtl = (String) VaadinSession.getCurrent().getAttribute(
+      "disable-rtl");
+    return "true".equalsIgnoreCase(
+        disableRtl);
   }
 
   /**

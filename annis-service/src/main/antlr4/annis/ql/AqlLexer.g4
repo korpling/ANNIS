@@ -28,12 +28,13 @@ NODE:'node';
 META:'meta';
 AND:'&';
 OR:'|';
-IDENTITY:'==';
+EQ_VAL:'==';
 EQ: '=';
 NEQ:'!=';
 DOMINANCE:'>';
 POINTING:'->';
 PRECEDENCE:'.';
+NEAR:'^';
 TEST:'%';
 IDENT_COV:'_=_';
 INCLUSION:'_i_';
@@ -45,6 +46,7 @@ RIGHT_OVERLAP:'_or_';
 LEFT_CHILD:'@l';
 RIGHT_CHILD:'@r';
 COMMON_PARENT:'$';
+IDENTITY:'_ident_';
 ROOT:':root';
 ARITY:':arity';
 TOKEN_ARITY:':tokenarity';
@@ -81,9 +83,9 @@ START_TEXT_PLAIN:'"' -> pushMode(IN_TEXT);
 mode IN_REGEX;
 
 END_TEXT_REGEX : '/' -> popMode;
-TEXT_REGEX : (~'/'|'\\/')+;
+TEXT_REGEX : (~'/')+;
 
 mode IN_TEXT;
 
 END_TEXT_PLAIN : '"' -> popMode;
-TEXT_PLAIN : (~'"'|'\\"')+;
+TEXT_PLAIN : (~'"')+;

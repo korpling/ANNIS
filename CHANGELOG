@@ -1,3 +1,118 @@
+Version 3.1.7
+=============
+
+We would like to give special thanks to Adriane Boyd and Lari Lampen for providing the bug fixes for the issues #332 and #336.
+
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=17&state=closed
+
+[Bugs]
+ #340 fixed bug in CorefVisualizer. The annotation name is now displayed
+ #336 Existence of directory is not checked when saving corpus properties
+ #332 document browser needs long time to load when there is a larger number of metadata
+
+Version 3.1.6
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=16&state=closed
+
+[Bugs]
+ #325 fetching results (subgraphs) slow
+ #324 Source code contains files with invalid (Windows) file names
+
+
+Version 3.1.5
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=15&state=closed
+
+[Bugs]
+ #323 css style sheet is not read in HTML visualizer when started from document browser on kickstarter
+ #322 Invalid regex search error is not caught by interface
+ #321 negated metadata queries don't work any longer
+
+Version 3.1.4
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=14&state=closed
+
+[Bugs]
+ #316 OR-queries with different number of nodes don't work any longer
+
+Version 3.1.3
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=13&state=closed
+
+[Bugs]
+ #314 Frequency query needs statistics workaround, too
+ #313 incorrect documentation for "graph" and "binary"
+ #310 corpus.properties is not created if corpus has  "/" in name
+
+[Enhancements]
+ #315 avoid joining the corpus table in "find"
+
+[Other]
+ #312 Slash in corpus name causes config file not to be found
+
+
+Version 3.1.2
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=11&state=closed
+
+[Bugs]
+ #309 corpora with token which have the same left or right text boundaries can't be imported
+
+Version 3.1.1
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=11&state=closed
+
+[Bugs]
+ #308 corpus properties are fetched for sub-corpus
+
+Version 3.1.0
+=============
+Changelog is also available on GitHub:
+https://github.com/korpling/annis/issues?milestone=8&state=closed
+
+[Bugs]
+ #304 Corpus migration on upgrade of kickstarter in windows fails
+ #302 metadata in document browser doesn't work
+ #301 Caching bug with document browser
+ #297 notification when export is finished will be given to wrong user
+ #295 browser fonts are broken
+ #292 Match position in segmentations should count from 1, not 0
+ #287 css styles from HTML vis are appended instead of replaced
+ #286 metadata not sorted and no namespaces in document browser
+ #284 Reference URL settings reset
+ #273 Display error message when importing empty corpora
+ #271 Search for empty values should be allowed
+ #270 RST-Visualizer sentence numbers are shifted by -2
+ #263 Inefficent subgraph retrievial
+ #261 Document Browser produces NullPointerException, if the same document name is added twice to the document table
+
+[Enhancements]
+ #305 Global option to disable right-to-left heuristic
+ #299 Single colons for namespaces in grid/kwic  tooltip when hovering over an annotation
+ #289 Embedded fonts don't work in statistics output
+ #288 test and fix CommentHelper.readSDocument()
+ #281 Empty tokens trigger island visualization in KWIC
+ #280 Query builder operator behavior
+ #279 Islands may cause spans not covering any tokens in grid
+ #278 Empty space under arch dependency
+ #274 Configure the doc browser via a json file, not in the corpus.properties file
+ #269 Allow to abort exporters
+ #266 CSV exporter
+ #265 Hidden token annotations should be configurable corpus wide via the corpus.properties
+ #264 corpus.properties files should have a more meaningful name
+ #262 Annis import: measure progress in hours/minutes/seconds instead of milliseconds
+
+[Other]
+ #303 What is the syntax for null namespace for metadata to display in document browser?
+ #267 MD5 passwords don't work any longer in 3.1.0-SNAPSHOT
+
 Version 3.0.1
 =============
 

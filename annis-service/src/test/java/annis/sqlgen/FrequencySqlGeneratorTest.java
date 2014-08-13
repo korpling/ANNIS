@@ -41,27 +41,27 @@ import static org.mockito.MockitoAnnotations.initMocks;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencySqlGeneratorTest
 {
   
   private FrequencySqlGenerator generator = new FrequencySqlGenerator();
   
-  @Mock private SqlGenerator<QueryData, ?> innerSqlGenerator = mock(SqlGenerator.class);
+  @Mock private SolutionSqlGenerator solutionSqlGenerator = mock(SolutionSqlGenerator.class);
   @Mock private QueryData queryData;
   @Mock private FrequencyTableQueryData freqTableQueryData;
   @Mock private QueryNode queryNode;
-  private List<QueryNode> alternative = new ArrayList<QueryNode>();
+  private List<QueryNode> alternative = new ArrayList<>();
   
   public FrequencySqlGeneratorTest()
   {
     initMocks(this);
     
-    generator.setInnerQuerySqlGenerator(innerSqlGenerator);
+    generator.setSolutionSqlGenerator(solutionSqlGenerator);
     
     given(queryData.getExtensions()).willReturn(new HashSet(Arrays.asList(freqTableQueryData)));
-    given(innerSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
+    given(solutionSqlGenerator.toSql(any(QueryData.class), anyString())).willReturn("<innerquery>");
     
     alternative.add(queryNode);
     given(queryData.getMaxWidth()).willReturn(3);
@@ -101,7 +101,7 @@ public class FrequencySqlGeneratorTest
   {
     System.out.println("whereConditions");
     
-    Set<String> expected = new TreeSet<String>();
+    Set<String> expected = new TreeSet<>();
     expected.add("hello world");
     
     Set<String> actual = generator.whereConditions(queryData, alternative, "");

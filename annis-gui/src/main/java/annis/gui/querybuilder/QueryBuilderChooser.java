@@ -36,7 +36,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
  * Wrapper for selecting and showing the desired query builder.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
@@ -57,8 +57,8 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     this.pluginSystem = pluginSystem;
     this.instanceConfig = instanceConfig;
     
-    this.pluginRegistry = new HashMap<String, QueryBuilderPlugin>();
-    this.short2caption = new HashMap<String, String>();
+    this.pluginRegistry = new HashMap<>();
+    this.short2caption = new HashMap<>();
  
     setStyleName(ChameleonTheme.PANEL_BORDERLESS);
     

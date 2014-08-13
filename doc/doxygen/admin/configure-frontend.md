@@ -74,14 +74,16 @@ Thus the file `instances/falko.json` defines the instance named "falko".
 		"falko-summary-l2"
 		]
 	}
-	]
+	],
+	"keyboard-layout" : "de"
 }
 \endcode
 
 Each instance configuration can have a verbose display-name which is
 displayed in the title of the browser window. `default-querybuilder` defines the
-short name of the query builder you want to use. Currently only "tigersearch" is
+short name of the query builder you want to use. Currently only "tigersearch" and "flatquerybuilder" are
 available, see [here](@ref dev-querybuilder) if you want to add your own query builder.
+The `keyboard-layout` variable is used as the default value for the virtual keyboard of the AQL query box.
 
 While any user can group corpora into corpus sets for their own, you can define
 corpus sets for the whole instance. Each corpus set is an JSON-object with a
@@ -143,7 +145,7 @@ These are the valid values for the `visibility` column in the `resolver_vis_map`
 
 short name| Description | Java class | Screenshot
 ----------|-------------|------------|-----------
-`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.KWICPanel) | ![kwic](kwic_vis.png)
+`kwic` | shows word in a specific context and also token annotations. | [KWICPanel](@ref annis.visualizers.component.kwic.KWICVisualizer) | ![kwic](kwic_vis.png)
 `tree` | constituent syntax tree | [TigerTreeVisualizer](@ref annis.visualizers.component.tree.TigerTreeVisualizer) | ![tree](tiger_tree_vis.png)
 `grid` | annotation grid, with annotations spanning multiple tokens | [GridVisualizer](@ref annis.visualizers.component.grid.GridVisualizer)  | ![grid](grid_vis.png)
 `grid_tree` | a grid visualizing hierarchical tree annotations as ordered grid layers | [GridTreeVisualizer](@ref annis.visualizers.iframe.gridtree.GridTreeVisualizer ) | ![grid_tree](grid_tree_vis.png)
@@ -156,6 +158,8 @@ short name| Description | Java class | Screenshot
 `video` | a linked video file | [VideoVisualizer](@ref annis.visualizers.component.VideoVisualizer) | ![video](video.png)
 `audio` | a linked audio file | [AudioVisualizer](@ref annis.visualizers.component.AudioVisualizer) | ![audio](audio.png)
 `rst` and `rstdoc` | imitates the RST-diagrams from the [RST-Tool](http://www.wagsoft.com/RSTTool/) for a match or complete document| [RST](@ref annis.visualizers.component.rst.RST)/[RSTFull](@ref annis.visualizers.component.rst.RSTFull) | ![rst](rst_vis.png)
+`raw_text` | simple and default visualizer for the document browser, shows the content of the text.tab file for a specific document.| [RawTextVisualizer](@ref annis.visualizers.component.RawTextVisualizer) | ![raw text](raw_text_vis.png)
+
 
 
 ## Visualizations with Software Requirements ## {#admin-configure-visibility}
@@ -170,34 +174,63 @@ your local machine for Kickstarter) and make sure it is available in your system
 path (check this by calling e.g. the program `dot` on the command line).
 
 
-# Document Browsing # {#document-visualizer}
+# Document Browser # {#document-visualizer}
+
+The default configuration for the document browser is stored in the
+`conf/document_browser.json` file. It can be overwritten by a custom
+the `document_browser.json` file placed in the `ExtData` directory of
+a corpus.
+
+## automatic switch on/off ##
+
+The ANNIS importer tries to detect an artificial token
+segmentation. If the text.tab contains only artificial token (which
+means there are only white spaces) the document browser is
+disabled. In the case there exists a `document_browser.json` file
+which configures the document browser it will never be disabled by
+ANNIS. Also if in the `corpus.properties` the `browse-documents`
+properties is set to true, the document browser will stay active.
+
+## custom visualizer and sorting ## {#custom-visualizer-and-sorting}
 
 It is also possible to use a custom visualizer for browsing a whole
-document. The configuration is in JSON-Syntax and placed in the
-corpus.properties file, which can be add to the ExtData directory of
+document. The configuration is in JSON-Syntax file named
+document_browser.json, which can be add to the ExtData directory of
 each corpus.
 
 
 \code{.json}
 {
-	vis : [
-		{type : 'htmldoc', displayName : 'diplomatic view'},
-		{type : 'rstdoc', displayName : 'rst doc', namespace:'rst'}
-	],
-	metaDataColumns : [
-		{namespace : 'annis', name : 'Genre'} // optional
-	],
-	orderBy : [
-		{ namespace : 'annis', name :'Titel', ascending : 'false'}
-	]
+    "visualizers": [
+        {
+            "type"  : "raw_text",
+            "displayName" :  "full text",
+            "mappings" : "vertical:true"
+        }
+    ],
 
+    "metaDataColumns" : [
+	{
+	    "namespace" : "annis",
+	    "name" : "Genre"
+	}
+    ],
+
+    "orderBy" : [
+	{
+	    "namespace" : "annis",
+	    "name" :"Titel",
+	    "ascending" : "false"}
+    ]
 }
+
 \endcode
 
 Explanation in detail:
 
-* vis: All visualizer from the list above with the suffix "doc" in
-  their name are suitable for using as doc visualizer.
+* visualizers: Defines which document visualizers are available for a
+   corpus. All visualizer from the list above with the suffix "doc" in
+   their name are suitable for using as doc visualizer.
 
 * metaDataColumns (optional): For every defined metadata object an
   additional column is generated with the metadata key as column
@@ -208,6 +241,8 @@ Explanation in detail:
   document name. But it's also possible to define a custom sort by the
   metadata fields, even if the column is not visible. 'namespace' and
   'ascending' is optional. 'ascending' its default setting is 'true'.
+
+
 
 # Web fonts # {#web-fonts}
 
@@ -238,7 +273,7 @@ und is reachable under the defined link in the instance config:
 \code{.css}
 
 @font-face {
-  font-family: 'bar;
+  font-family: 'bar';
   font-style: normal;
   font-weight: normal;
   font-size: larger;
@@ -251,3 +286,5 @@ und is reachable under the defined link in the instance config:
 Further explantation about the `@font-face` rule is availabe on the [W3C
 websites](http://www.w3.org/TR/css-fonts-3/#font-face-rule).
 
+If you need to have a different font configuration for the frequency chart
+just add a `frequency-font` entry. It has the same structure as `font`.

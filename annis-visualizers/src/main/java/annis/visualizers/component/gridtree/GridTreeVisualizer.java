@@ -81,7 +81,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         return new GridTreePanel(visInput, visToggle);
     }
 
-    private class GridTreePanel extends Panel {
+    private static class GridTreePanel extends Panel {
 
         private VisualizerInput input;
         private SDocumentGraph graph;
@@ -285,7 +285,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
         }
     }
 
-    private class Traverse implements SGraphTraverseHandler {
+    private static class Traverse implements SGraphTraverseHandler {
 
         /**
          * Tracks the depth of the traversal. Steps are counted, when the node

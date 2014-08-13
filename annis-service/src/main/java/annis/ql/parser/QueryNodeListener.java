@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSyntaxException;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -26,6 +27,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
+import java.util.regex.PatternSyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.misc.Interval;
 import org.slf4j.Logger;
@@ -33,7 +36,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class QueryNodeListener extends AqlParserBaseListener
 {
@@ -41,7 +44,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   
   private QueryData data = null;
 
-  private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
+  private final List<QueryNode> currentAlternative = new ArrayList<>();
 
   private long aliasCount = 0l;
   private String lastVariableDefinition = null;
@@ -52,7 +55,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
   private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
-  private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
+  private final List<QueryAnnotation> metaData = new ArrayList<>();
 
   public QueryNodeListener()
   {
@@ -72,7 +75,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
     data = new QueryData();
-    tokenPositions = new ArrayList<Map<Interval, QueryNode>>();
+    tokenPositions = new ArrayList<>();
   }
 
   @Override
@@ -86,8 +89,8 @@ public class QueryNodeListener extends AqlParserBaseListener
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
-    tokenPositions.add(new HashMap<Interval, QueryNode>(currentTokenPosition));
+    data.addAlternative(new ArrayList<>(currentAlternative));
+    tokenPositions.add(new HashMap<>(currentTokenPosition));
   }
 
   
@@ -162,7 +165,7 @@ public class QueryNodeListener extends AqlParserBaseListener
       null : ctx.id.namespace.getText();
     String name = ctx.id.name.getText();
     String value = textFromSpec(ctx.txt);
-    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, false);
+    QueryNode.TextMatching textMatching = textMatchingFromSpec(ctx.txt, ctx.NEQ() != null);
     
     QueryAnnotation anno = new QueryAnnotation(namespace,
       name, value, textMatching);
@@ -224,7 +227,25 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     else if (txtCtx instanceof AqlParser.RegexTextSpecContext)
     {
-      return ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
+      
+      String text = ((AqlParser.RegexTextSpecContext) txtCtx).content.getText();
+     /* 
+      * For regular expressions we should also check if these are valid ones.
+      * Valid for AQL means in this case complient with Java Regex. Since
+      * the actual query is executed by PostgreSQL we might accept queries
+      * as valid even if PostgreSQL can't execute them. The purpose of this check
+      * is to avoid cryptic error messages. Thus we ignore the different syntax
+      * for corner cases of regular expressions in Java an PostgreSQL.
+      */
+      try
+      {
+        Pattern.compile(text);
+      }
+      catch(PatternSyntaxException ex)
+      {
+        throw new AnnisQLSyntaxException("Invalid regular expression: " + ex.getMessage());
+      }
+      return text;
     }
     return null;
   }
@@ -232,12 +253,14 @@ public class QueryNodeListener extends AqlParserBaseListener
   protected static QueryNode.TextMatching textMatchingFromSpec(
     AqlParser.TextSpecContext txt, boolean not)
   {
-    if (txt instanceof AqlParser.ExactTextSpecContext)
+    if (txt instanceof AqlParser.ExactTextSpecContext 
+      || txt instanceof AqlParser.EmptyExactTextSpecContext)
     {
       return not ? QueryNode.TextMatching.EXACT_NOT_EQUAL : 
         QueryNode.TextMatching.EXACT_EQUAL;
     }
-    else if (txt instanceof AqlParser.RegexTextSpecContext)
+    else if (txt instanceof AqlParser.RegexTextSpecContext
+      || txt instanceof AqlParser.EmptyRegexTextSpecContext)
     {
      return  not ? QueryNode.TextMatching.REGEXP_NOT_EQUAL : 
        QueryNode.TextMatching.REGEXP_EQUAL;

@@ -6,54 +6,6 @@ The configuration is intended to be shared among all the users of project and
 therefore it is assumed to be part of version control checkout.
 Without this configuration present, some functionality in the IDE may be limited or fail altogether.
 -->
-    <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
-        <configurations>
-            <configuration id="ServiceRun" profiles=""/>
-            <configuration id="Adminstration" profiles=""/>
-            <configuration id="ServiceFastRun" profiles=""/>
-        </configurations>
-    </config-data>
-    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
-        <config-files>
-            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/fullfacts/Dao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/fullfacts/SqlGenerator.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/splitfacts/Dao.xml</config-file>
-            <config-file>src/main/distribution/conf/spring/modes/splitfacts/SqlGenerator.xml</config-file>
-        </config-files>
-        <config-file-groups>
-            <config-file-group name="annopool">
-                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/annopool/Dao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/annopool/SqlGenerator.xml</config-file>
-            </config-file-group>
-            <config-file-group name="fullfacts">
-                <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonDao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/CommonSqlGenerator.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/fullfacts/Dao.xml</config-file>
-                <config-file>src/main/distribution/conf/spring/modes/fullfacts/SqlGenerator.xml</config-file>
-            </config-file-group>
-        </config-file-groups>
-    </spring-data>
     <properties xmlns="http://www.netbeans.org/ns/maven-properties-data/1">
         <!--
 Properties that influence various parts of the IDE, especially code formatting and the like.
@@ -90,7 +42,26 @@ Any value defined here will override the pom.xml file value but is only applicab
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>1</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.blankLinesAfterFields>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapChainedMethodCalls>
         <org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>WRAP_IF_LONG</org-netbeans-modules-editor-indent.text.x-java.CodeStyle.project.wrapMethodCallArgs>
-        <netbeans.compile.on.save>all</netbeans.compile.on.save>
-        <netbeans.hint.jdkPlatform>JDK_1.6</netbeans.hint.jdkPlatform>
+        <netbeans.compile.on.save>none</netbeans.compile.on.save>
     </properties>
+    <config-data xmlns="http://www.netbeans.org/ns/maven-config-data/1">
+        <configurations>
+            <configuration id="Adminstration" profiles=""/>
+            <configuration id="ServiceRun" profiles=""/>
+        </configurations>
+    </config-data>
+    <spring-data xmlns="http://www.netbeans.org/ns/spring-data/1">
+        <config-files>
+            <config-file>src/main/distribution/conf/spring/Common.xml</config-file>
+            <config-file>src/main/java/annis/ql/parser/AnnisParser-context.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Shell.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Service.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Admin.xml</config-file>
+            <config-file>src/test/java/annis/TestAnnisBaseRunner-context.xml</config-file>
+            <config-file>src/test/java/annis/ql/parser/TestAnnisParser-examples.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/Dao.xml</config-file>
+            <config-file>src/main/distribution/conf/spring/SqlGenerator.xml</config-file>
+        </config-files>
+        <config-file-groups/>
+    </spring-data>
 </project-shared-configuration>

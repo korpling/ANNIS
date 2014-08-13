@@ -58,21 +58,26 @@ import annis.sqlgen.ListAnnotationsSqlHelper;
 import annis.sqlgen.SqlGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.DocumentBrowserConfig;
 import annis.sqlgen.SaltAnnotateExtractor;
 import java.util.LinkedList;
 import javax.annotation.Resource;
 import org.junit.Assert;
 import org.springframework.dao.DataAccessException;
 import org.springframework.test.web.ModelAndViewAssert;
+import org.springframework.validation.BindingResultUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
 }, loader=AnnisXmlContextLoader.class)
 public class TestSpringAnnisDao
 {
+  
 
   @Resource(name="annisDao")
   private AnnisDao annisDao;
@@ -106,8 +111,8 @@ public class TestSpringAnnisDao
   private static final String DDDQUERY = "DDDQUERY";
   private static final QueryData PARSE_RESULT = new QueryData();
   private static final String SQL = "SQL";
-  private static final List<Long> CORPUS_LIST = new ArrayList<Long>();
-  private static final List<Long> DOCUMENT_LIST = new LinkedList<Long>();
+  private static final List<Long> CORPUS_LIST = new ArrayList<>();
+  private static final List<Long> DOCUMENT_LIST = new LinkedList<>();
 
   @SuppressWarnings("unchecked")
   @Before
@@ -117,7 +122,6 @@ public class TestSpringAnnisDao
     simpleAnnisDao = new SpringAnnisDao();
     simpleAnnisDao.setAqlParser(annisParser);
     simpleAnnisDao.setSqlGenerator(sqlGenerator);
-    simpleAnnisDao.setAnnotateSqlGenerator(annotateSqlGenerator);
     simpleAnnisDao.setSaltAnnotateExtractor(saltAnnotateExtractor);
     simpleAnnisDao.setPlanRowMapper(planRowMapper);
     simpleAnnisDao.setJdbcTemplate(jdbcTemplate);
@@ -270,7 +274,7 @@ public class TestSpringAnnisDao
   public void mapCorpusIdsToNames()
   {
     long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(invalidCorpusId);
     List<String> names = simpleAnnisDao.mapCorpusIdsToNames(ids);
 
@@ -284,9 +288,22 @@ public class TestSpringAnnisDao
   public void mapCorpusIdToName()
   {
     long invalidCorpusId = -1;
-    List<Long> ids = new ArrayList<Long>();
+    List<Long> ids = new ArrayList<>();
     ids.add(invalidCorpusId);
     when(simpleAnnisDao.mapCorpusIdsToNames(ids)).thenReturn(new ArrayList<String>());
     simpleAnnisDao.mapCorpusIdToName(invalidCorpusId);
+  }
+
+  @Test
+  public void getDefaultDocBrowserConfiguration()
+  {
+    DocumentBrowserConfig docBrowseConfig =
+      simpleAnnisDao.getDefaultDocBrowserConfiguration();
+
+    Assert.assertNotNull("default document browser config may not be null", docBrowseConfig);
+    Assert.assertNotNull(docBrowseConfig.getVisualizers());
+    Assert.assertTrue(docBrowseConfig.getVisualizers().length > 0);
+    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getType() != null);
+    Assert.assertTrue(docBrowseConfig.getVisualizers()[0].getDisplayName() != null);
   }
 }

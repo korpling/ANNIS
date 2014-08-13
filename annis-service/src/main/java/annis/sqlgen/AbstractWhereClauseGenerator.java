@@ -13,12 +13,15 @@ import annis.model.QueryAnnotation;
 import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
+import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.sqlgen.model.Join;
+import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
+import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
 import annis.sqlgen.model.Precedence;
@@ -36,7 +39,7 @@ public abstract class AbstractWhereClauseGenerator extends
   public Set<String> whereConditions(QueryData queryData,
       List<QueryNode> alternative, String indent)
   {
-    List<String> conditions = new ArrayList<String>();
+    List<String> conditions = new ArrayList<>();
 
     for (QueryNode node : alternative)
     {
@@ -72,7 +75,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
 
       // node joins
-      for (Join join : node.getJoins())
+      for (Join join : node.getOutgoingJoins())
       {
         QueryNode target = join.getTarget();
         if (join instanceof SameSpan)
@@ -111,6 +114,10 @@ public abstract class AbstractWhereClauseGenerator extends
         {
           addPrecedenceConditions(conditions, node, target, (Precedence) join,
               queryData);
+        } else if (join instanceof Near)
+        {
+          addNearConditions(conditions, node, target, (Near) join,
+              queryData);
         } else if (join instanceof Sibling)
         {
           addSiblingConditions(conditions, node, target, (Sibling) join,
@@ -135,6 +142,12 @@ public abstract class AbstractWhereClauseGenerator extends
         {
           addPointingRelationConditions(conditions, node, target,
               (PointingRelation) join, queryData);
+        } else if (join instanceof EqualValue)
+        {
+          addEqualValueConditions(conditions, node, target, (EqualValue) join, queryData);
+        } else if (join instanceof NotEqualValue)
+        {
+          addNotEqualValueConditions(conditions, node, target, (NotEqualValue) join, queryData);
         }
       }
 
@@ -157,7 +170,7 @@ public abstract class AbstractWhereClauseGenerator extends
       }
     }
 
-    return new HashSet<String>(conditions);
+    return new HashSet<>(conditions);
   }
 
   protected abstract void addSpanConditions(List<String> conditions,
@@ -218,6 +231,9 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addPrecedenceConditions(List<String> conditions,
       QueryNode node, QueryNode target, Precedence join, QueryData queryData);
 
+  protected abstract void addNearConditions(List<String> conditions,
+      QueryNode node, QueryNode target, Near join, QueryData queryData);
+
   protected abstract void addAnnotationConditions(List<String> conditions,
       QueryNode node, int index, QueryAnnotation annotation, String table,
       QueryData queryData);
@@ -234,5 +250,13 @@ public abstract class AbstractWhereClauseGenerator extends
   protected abstract void addPointingRelationConditions(
       List<String> conditions, QueryNode node, QueryNode target,
       PointingRelation join, QueryData queryData);
+  
+  protected abstract void addEqualValueConditions(
+      List<String> conditions, QueryNode node, QueryNode target,
+      EqualValue join, QueryData queryData);
+  
+  protected abstract void addNotEqualValueConditions(
+      List<String> conditions, QueryNode node, QueryNode target,
+      NotEqualValue join, QueryData queryData);
 
 }
