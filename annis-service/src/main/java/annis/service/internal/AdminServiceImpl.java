@@ -124,6 +124,8 @@ public class AdminServiceImpl implements AdminService
     Subject requestingUser = SecurityUtils.getSubject();
     requestingUser.checkPermission("admin:read:userlist");
     
+    // TODO
+    
     return new LinkedList<User>();
   }
   

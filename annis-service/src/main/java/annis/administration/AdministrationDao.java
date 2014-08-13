@@ -16,6 +16,7 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
+import annis.security.User;
 import annis.security.UserConfig;
 import java.io.File;
 import java.sql.PreparedStatement;
@@ -87,7 +88,11 @@ public interface AdministrationDao
   public void registerGUICancelThread(StatementController statementCon);
 
   public void addCorpusAlias(long corpusID, String alias);
-  
+
+  public ImportStatus initImportStatus();
+
+  public void storeUserConfig(String userName, UserConfig config);
+    
   /**
    * Provides a interface to cancel {@link PreparedStatement} via a gui.
    */
@@ -126,8 +131,6 @@ public interface AdministrationDao
      */
     public boolean isCancelled();
   }
-
-  public ImportStatus initImportStatus();
 
   /**
    * Collects the exceptions (throwables) from an import process and provides
@@ -199,5 +202,4 @@ public interface AdministrationDao
     public String printType();
   }
 
-  public void storeUserConfig(String userName, UserConfig config);
 }
