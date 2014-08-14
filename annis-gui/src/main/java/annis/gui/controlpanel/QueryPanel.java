@@ -25,7 +25,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;

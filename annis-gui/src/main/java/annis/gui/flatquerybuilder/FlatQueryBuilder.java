@@ -18,7 +18,7 @@ package annis.gui.flatquerybuilder;
 
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.ClientHandlerException;

@@ -17,35 +17,24 @@
 package annis.gui.admin;
 
 import annis.security.User;
-import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
-import com.vaadin.ui.VerticalLayout;
+import com.vaadin.data.util.BeanContainer;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserPanel extends Panel
+public class UserContainer extends BeanContainer<String, User>
 {
-  
-  private VerticalLayout layout;
-  private Table userList;
-  private UserContainer container;
-  
-  public UserPanel()
+
+  public UserContainer(
+    Class<? super User> type)
   {
-    layout = new VerticalLayout();
-    layout.setSizeFull();
-    setContent(layout);
-    setSizeFull();
-    
-    container = new UserContainer(User.class);
-    
-    userList = new Table();
-    userList.setSizeFull();
-    userList.setContainerDataSource(container);
-    
-    
+    super(type);
+  }
+  
+  public void reload()
+  {
     
   }
+  
 }

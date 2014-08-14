@@ -20,7 +20,7 @@ import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;

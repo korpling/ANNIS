@@ -16,7 +16,7 @@
 package annis.gui;
 
 import annis.gui.beans.HistoryEntry;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;

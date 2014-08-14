@@ -19,7 +19,7 @@ import annis.examplequeries.ExampleQuery;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;

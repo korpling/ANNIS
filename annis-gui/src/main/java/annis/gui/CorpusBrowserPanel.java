@@ -17,7 +17,7 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
