@@ -106,13 +106,13 @@ public class ANNISUserRealm extends AuthorizingRealm implements
     User user = confManager.getUser(userName);
     if (user != null)
     {
-      String password = user.getPasswordHash();
-      if (password != null)
+      String passwordHash = user.getPasswordHash();
+      if (passwordHash != null)
       {
-        if (password.startsWith("$"))
+        if (passwordHash.startsWith("$"))
         {
           Shiro1CryptFormat fmt = new Shiro1CryptFormat();
-          Hash hashCredentials = fmt.parse(password);
+          Hash hashCredentials = fmt.parse(passwordHash);
           if (hashCredentials instanceof SimpleHash)
           {
             SimpleHash simpleHash = (SimpleHash) hashCredentials;
@@ -132,7 +132,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements
         {
           // fallback unsalted hex hash
           SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-            token.getPrincipal(), password, ANNISUserRealm.class.getName());
+            token.getPrincipal(), passwordHash, ANNISUserRealm.class.getName());
           return info;
         }
 

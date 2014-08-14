@@ -21,13 +21,17 @@ import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -62,10 +66,13 @@ public class UserManagementPanel extends Panel
     userList.setEditable(true);
     userList.setSizeFull();
     userList.setContainerDataSource(userContainer);
-    userList.setVisibleColumns("name", "groups", "permissions");
-    userList.setColumnHeaders("Username", "Groups", "Additional permissions");
+    userList.addGeneratedColumn("changepassword", new PasswordChangeColumnGenerator());
+    
+    userList.setVisibleColumns("name", "groups", "permissions", "changepassword");
+    userList.setColumnHeaders("Username", "Groups", "Additional permissions", "");
     
     userList.setTableFieldFactory(new FieldFactory());
+    
     
     layout.addComponent(userList);
   }
@@ -84,6 +91,31 @@ public class UserManagementPanel extends Panel
   {
     userContainer.removeAllItems();
     userContainer.addAll(users);
+  }
+  
+  public class PasswordChangeColumnGenerator implements Table.ColumnGenerator
+  {
+
+    @Override
+    public Object generateCell(Table source, final Object itemId, Object columnId)
+    {
+     PasswordField txtNewPassword = new PasswordField();
+      txtNewPassword.setInputPrompt("New password");
+      Button btChangePassword = new Button("Change password");
+      btChangePassword.addClickListener(new Button.ClickListener()
+      {
+
+        @Override
+        public void buttonClick(Button.ClickEvent event)
+        {
+          NewPasswordWindow w = new NewPasswordWindow((String) itemId, listeners);
+          UI.getCurrent().addWindow(w);
+          w.center();
+        }
+      });
+      return btChangePassword;
+    }
+    
   }
 
   public class FieldFactory implements TableFieldFactory

@@ -34,6 +34,7 @@ public interface UserManagementView
   public interface Listener
   {
     public void userUpdated(User user);
+    public void passwordChanged(String userName, String newPassword);
   }
   
 }

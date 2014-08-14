@@ -46,6 +46,13 @@ public class UserManagementController
   {
     model.createOrUpdateUser(user);
   }
+
+  @Override
+  public void passwordChanged(String userName, String newPassword)
+  {
+    model.setPassword(userName, newPassword);
+  }
+  
   
   
   

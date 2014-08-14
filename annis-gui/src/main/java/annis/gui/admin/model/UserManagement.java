@@ -38,10 +38,23 @@ public class UserManagement
   {
     if(rootResource != null)
     {
-      WebResource res = rootResource.path("admin/users/").path(newUser.getName());
+      WebResource res = rootResource.path("admin/users").path(newUser.getName());
       res.put(newUser);
       users.put(newUser.getName(), newUser);
     }
+  }
+  
+  public User setPassword(String userName, String newPassword)
+  {
+
+    WebResource res = rootResource.path("admin/users").path(userName).path("password");
+    User newUser = res.post(User.class, newPassword);
+    if(newUser != null)
+    {
+      users.put(newUser.getName(), newUser);
+    }
+    return newUser;
+
   }
   
   public void fetchUsers()

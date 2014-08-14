@@ -21,6 +21,7 @@ import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
+import annis.security.ANNISUserRealm;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
@@ -48,7 +49,14 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
+import org.apache.commons.lang3.Validate;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.authc.SimpleAuthenticationInfo;
+import org.apache.shiro.crypto.hash.Hash;
+import org.apache.shiro.crypto.hash.HashRequest;
+import org.apache.shiro.crypto.hash.Sha256Hash;
+import org.apache.shiro.crypto.hash.SimpleHash;
+import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -141,7 +149,7 @@ public class AdminServiceImpl implements AdminService
   @PUT
   @Path("users/{userName}")
   @Consumes("application/xml")
-  public Response listUsers(
+  public Response updateOrCreateUser(
     User user,
     @PathParam("userName") String userName)
   {
@@ -150,10 +158,10 @@ public class AdminServiceImpl implements AdminService
     
     if(!userName.equals(user.getName()))
     {
-      throw new WebApplicationException(
+      return
         Response.status(Response.Status.BAD_REQUEST)
           .entity("Username in object is not the same as in path")
-          .build());
+          .build();
     }
     
     if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
@@ -167,10 +175,49 @@ public class AdminServiceImpl implements AdminService
         }
       }
     }
-    throw new WebApplicationException(Response
+    return Response
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not update/create user")
-      .build());
+      .build();
+  }
+  
+  @POST
+  @Path("users/{userName}/password")
+  @Consumes("text/plain")
+  @Produces("application/xml")
+  public Response changePassword(
+    String newPassword,
+    @PathParam("userName") String userName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:write:userlist");
+    
+    if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserConfigurationManager confManager = getConfManager();
+      if(confManager != null)
+      {
+        User user = confManager.getUser(userName);
+        if(user == null)
+        {
+          return Response.status(Response.Status.NOT_FOUND).build();
+        }
+        
+        Shiro1CryptFormat format = new Shiro1CryptFormat();
+        
+        Sha256Hash hash = new Sha256Hash(newPassword, null, 1);
+        user.setPasswordHash(format.format(hash));
+        
+        if(confManager.writeUser(user))
+        {
+          return Response.ok().entity(user).build();
+        }
+      }
+    }
+    return Response
+      .status(Response.Status.INTERNAL_SERVER_ERROR)
+      .entity("Could not change password")
+      .build();
   }
   
   @GET
