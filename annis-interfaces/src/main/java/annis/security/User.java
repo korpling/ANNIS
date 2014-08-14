@@ -18,9 +18,10 @@ package annis.security;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -32,8 +33,8 @@ public class User
 {
   private String name;
   private String passwordHash;
-  private List<String> groups = new ArrayList<>();
-  private List<String> permissions = new ArrayList<>();
+  private Set<String> groups = new TreeSet<>();
+  private Set<String> permissions = new TreeSet<>();
  
   public User()
   {
@@ -88,22 +89,22 @@ public class User
     this.passwordHash = passwordHash;
   }
 
-  public List<String> getGroups()
+  public Set<String> getGroups()
   {
     return groups;
   }
 
-  public void setGroups(List<String> groups)
+  public void setGroups(Set<String> groups)
   {
     this.groups = groups;
   }
 
-  public List<String> getPermissions()
+  public Set<String> getPermissions()
   {
     return permissions;
   }
 
-  public void setPermissions(List<String> permissions)
+  public void setPermissions(Set<String> permissions)
   {
     this.permissions = permissions;
   }
@@ -127,5 +128,7 @@ public class User
     }
     return props;
   }
+  
+  
   
 }

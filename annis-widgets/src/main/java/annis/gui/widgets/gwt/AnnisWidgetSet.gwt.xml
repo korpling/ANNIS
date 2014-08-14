@@ -47,4 +47,6 @@
     </generate-with>
 
     
+
+    <inherits name="org.vaadin.tokenfield.TokenfieldWidgetset" />
 </module>

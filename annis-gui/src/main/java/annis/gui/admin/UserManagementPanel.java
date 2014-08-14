@@ -18,13 +18,29 @@ package annis.gui.admin;
 
 import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
+import com.vaadin.data.Container;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.converter.Converter;
+import com.vaadin.data.util.converter.StringToDoubleConverter;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.DefaultFieldFactory;
+import com.vaadin.ui.Field;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TableFieldFactory;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import java.lang.reflect.ParameterizedType;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import org.vaadin.tokenfield.TokenField;
 
 /**
  *
@@ -48,9 +64,15 @@ public class UserManagementPanel extends Panel
     container = new BeanContainer<>(User.class);
     container.setBeanIdProperty("name");
     
+    
     userList = new Table();
+    userList.setEditable(true);
     userList.setSizeFull();
     userList.setContainerDataSource(container);
+    userList.setVisibleColumns("name", "groups", "permissions");
+    userList.setColumnHeaders("Username", "Groups", "Additional permissions");
+    
+    userList.setTableFieldFactory(new FieldFactory());
     
     layout.addComponent(userList);
   }
@@ -63,7 +85,35 @@ public class UserManagementPanel extends Panel
     container.addAll(users);
   }
 
-  
+  public static class FieldFactory implements TableFieldFactory
+  {
+
+    @Override
+    public Field<?> createField(Container container, Object itemId,
+      Object propertyId, Component uiContext)
+    {
+      if("groups".equals(propertyId) || "permissions".equals(propertyId))
+      {
+        TokenField field = new TokenField();
+        field.setPropertyDataSource(container.getContainerProperty(itemId,
+          propertyId));
+        return field;
+      }
+      else
+      {
+        TextField field = new TextField(container.getContainerProperty(itemId,
+          propertyId));
+        
+        if("name".equals(propertyId))
+        {
+          field.setReadOnly(true);
+        }
+        
+        return field;
+      }
+    }
+    
+  }
   
   
 }
