@@ -50,9 +50,9 @@ public class User
    * user file. 
    * @param props
    */
-  public User(Properties props)
+  public User(String name, Properties props)
   {
-    this.name = props.getProperty("name", "");
+    this.name = name;
     this.passwordHash = props.getProperty("password");
     
     String groupsRaw = props.getProperty("groups", "");

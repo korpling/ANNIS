@@ -16,36 +16,54 @@
 
 package annis.gui.admin;
 
+import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
+import com.vaadin.data.util.BeanContainer;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import java.util.Collection;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserPanel extends Panel
+public class UserManagementPanel extends Panel
+  implements UserManagementView
 {
   
-  private VerticalLayout layout;
-  private Table userList;
-  private UserContainer container;
+  private final VerticalLayout layout;
+  private final Table userList;
+  private final BeanContainer<String, User> container;
   
-  public UserPanel()
+  public UserManagementPanel()
   {
     layout = new VerticalLayout();
     layout.setSizeFull();
     setContent(layout);
     setSizeFull();
     
-    container = new UserContainer(User.class);
+    container = new BeanContainer<>(User.class);
+    container.setBeanIdProperty("name");
     
     userList = new Table();
     userList.setSizeFull();
     userList.setContainerDataSource(container);
     
-    
-    
+    layout.addComponent(userList);
   }
+
+
+  @Override
+  public void setUserList(Collection<User> users)
+  {
+    container.removeAllItems();
+    container.addAll(users);
+  }
+
+  
+  
+  
 }

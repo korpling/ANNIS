@@ -14,25 +14,21 @@
  * limitations under the License.
  */
 
-package annis.gui.admin;
+package annis.gui.admin.view;
 
 import annis.security.User;
-import com.vaadin.data.util.BeanContainer;
+import java.util.Collection;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserContainer extends BeanContainer<String, User>
+public interface UserManagementView
 {
-
-  public UserContainer(
-    Class<? super User> type)
-  {
-    super(type);
-  }
+  public void setUserList(Collection<User> users);
   
-  public void reload()
+  
+  public interface Listener
   {
     
   }

@@ -162,7 +162,7 @@ public class ANNISUserConfigurationManager
       {
         Properties userProps = new Properties();
         userProps.load(userFileIO);
-        return new User(userProps);
+        return new User(userFile.getName(), userProps);
       }
       catch (IOException ex)
       {

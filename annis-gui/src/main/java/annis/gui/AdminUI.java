@@ -16,8 +16,11 @@
 package annis.gui;
 
 import annis.gui.admin.ImportPanel;
-import annis.gui.admin.UserPanel;
+import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.controller.UserManagementController;
+import annis.gui.admin.model.UserManagement;
 import annis.libgui.AnnisBaseUI;
+import annis.libgui.Helper;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
@@ -33,6 +36,10 @@ public class AdminUI extends AnnisBaseUI
 {
   private VerticalLayout layout;
   
+  private UserManagementController
+     userController;
+  private UserManagement userManagement;
+  
   @Override
   protected void init(VaadinRequest request)
   {
@@ -42,9 +49,15 @@ public class AdminUI extends AnnisBaseUI
     layout.setSizeFull();
     setContent(layout);
     
+    UserManagementPanel userManagementPanel = new UserManagementPanel();
+    userManagement = new UserManagement();
+    userManagement.setRootResource(Helper.getAnnisWebResource());
+    userController = new UserManagementController(userManagement,
+      userManagementPanel);
+    
     TabSheet tabSheet = new TabSheet();
     tabSheet.addTab(new ImportPanel(), "Import Corpus", new ThemeResource("tango-icons/16x16/document-save.png"));
-    tabSheet.addTab(new UserPanel(), "User management", new ThemeResource("tango-icons/16x16/system-users.png"));
+    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("tango-icons/16x16/system-users.png"));
     tabSheet.setSizeFull();
     
     layout.addComponent(tabSheet);
