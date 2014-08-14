@@ -38,7 +38,7 @@ public class UserManagementController
     
     model.fetchUsers();
     view.setUserList(model.getUsers());
-    view.addListener(this);
+    view.addListener(UserManagementController.this);
   }
 
   @Override
@@ -52,8 +52,28 @@ public class UserManagementController
   {
     model.setPassword(userName, newPassword);
   }
-  
-  
-  
+
+  @Override
+  public void addNewUser(String userName)
+  {
+    if(userName == null || userName.isEmpty())
+    {
+      view.showError("User name is empty");
+    }
+    else if(model.getUser(userName) != null)
+    {
+      view.showError("User already exists");
+    }
+    else
+    {
+      // create new user with empty password
+      User u = new User(userName);
+      model.createOrUpdateUser(u);
+      view.askForPasswordChange(userName); 
+      
+      model.fetchUsers();
+      view.setUserList(model.getUsers());
+    }
+  }
   
 }

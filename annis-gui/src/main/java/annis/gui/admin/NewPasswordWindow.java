@@ -35,7 +35,7 @@ import java.util.List;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class NewPasswordWindow extends Window
-{
+{ 
   public NewPasswordWindow(final String userName, final List<UserManagementView.Listener> listeners)
   {
     setCaption("Set new password for user \"" + userName + "\"");
@@ -118,5 +118,4 @@ public class NewPasswordWindow extends Window
     layout.addComponent(txtPassword2);
     layout.addComponent(actionLayout);
   }
-  
 }

@@ -142,20 +142,16 @@ public class ANNISUserConfigurationManager
         {
           // get the file which corresponds to the user
           File userFile = new File(userDir.getAbsolutePath(), user.getName());
-          if(userFile.canWrite())
+          Properties props = user.toProperties();
+          try (FileOutputStream out = new FileOutputStream(userFile))
           {
-            Properties props = user.toProperties();
-            try(FileOutputStream out = new FileOutputStream(userFile))
-            {
-              props.store(out, "");
-              return true;
-            }
-            catch(IOException ex)
-            {
-              log.error("Could not write users file", ex);
-            }
+            props.store(out, "");
+            return true;
           }
-          
+          catch (IOException ex)
+          {
+            log.error("Could not write users file", ex);
+          }          
         }
       }
       finally

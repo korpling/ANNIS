@@ -71,6 +71,11 @@ public class UserManagement
     }
   }
   
+  public User getUser(String userName)
+  {
+    return users.get(userName);
+  }
+  
   public Collection<User> getUsers()
   {
     return users.values();

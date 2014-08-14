@@ -31,10 +31,16 @@ public interface UserManagementView
   
   public void addListener(Listener listener);
   
+  public void askForPasswordChange(String userName);
+  
+  public void showError(String error);
+  
   public interface Listener
   {
     public void userUpdated(User user);
     public void passwordChanged(String userName, String newPassword);
+    
+    public void addNewUser(String userName);
   }
   
 }

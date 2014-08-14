@@ -24,6 +24,8 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.HorizontalLayout;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Table;
@@ -32,6 +34,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,9 +56,6 @@ public class UserManagementPanel extends Panel
   
   public UserManagementPanel()
   {
-    layout = new VerticalLayout();
-    layout.setSizeFull();
-    setContent(layout);
     setSizeFull();
     
     userContainer = new BeanContainer<>(User.class);
@@ -64,6 +64,8 @@ public class UserManagementPanel extends Panel
     
     userList = new Table();
     userList.setEditable(true);
+    userList.setSelectable(true);
+    userList.addStyleName(ChameleonTheme.TABLE_STRIPED);
     userList.setSizeFull();
     userList.setContainerDataSource(userContainer);
     userList.addGeneratedColumn("changepassword", new PasswordChangeColumnGenerator());
@@ -73,9 +75,36 @@ public class UserManagementPanel extends Panel
     
     userList.setTableFieldFactory(new FieldFactory());
     
+    final TextField txtUserName = new TextField();
+    txtUserName.setInputPrompt("New user name");
     
-    layout.addComponent(userList);
+    Button btAddNewUser = new Button("Add new user");
+    btAddNewUser.addClickListener(new Button.ClickListener()
+    {
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        for(UserManagementView.Listener l : listeners)
+        {
+          l.addNewUser(txtUserName.getValue());
+        }
+      }
+    });
+    
+    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName, btAddNewUser);
+    layout = new VerticalLayout(userList, actionLayout);
+    layout.setSizeFull();
+    setContent(layout);
+    
   }
+
+  @Override
+  public void showError(String error)
+  {
+    Notification.show(error, Notification.Type.ERROR_MESSAGE);
+  }
+  
+  
 
   @Override
   public void addListener(UserManagementView.Listener listener)
@@ -83,8 +112,14 @@ public class UserManagementPanel extends Panel
     listeners.add(listener);
   }
 
+  @Override
+  public void askForPasswordChange(String userName)
+  {
+    NewPasswordWindow w = new NewPasswordWindow(userName, listeners);
+    UI.getCurrent().addWindow(w);
+    w.center();
+  }
   
-
 
   @Override
   public void setUserList(Collection<User> users)
@@ -108,9 +143,7 @@ public class UserManagementPanel extends Panel
         @Override
         public void buttonClick(Button.ClickEvent event)
         {
-          NewPasswordWindow w = new NewPasswordWindow((String) itemId, listeners);
-          UI.getCurrent().addWindow(w);
-          w.center();
+          askForPasswordChange((String) itemId);
         }
       });
       return btChangePassword;

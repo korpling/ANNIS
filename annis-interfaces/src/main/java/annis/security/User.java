@@ -18,7 +18,6 @@ package annis.security;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
-import java.util.List;
 import java.util.Properties;
 import java.util.Set;
 import java.util.TreeSet;
@@ -120,8 +119,14 @@ public class User
   public Properties toProperties()
   {
     Properties props = new Properties();
-    props.put("password", passwordHash);
-    props.put("groups", Joiner.on(',').join(groups));
+    if(passwordHash != null)
+    {
+      props.put("password", passwordHash);
+    }
+    if(groups != null && !groups.isEmpty())
+    {
+      props.put("groups", Joiner.on(',').join(groups));
+    }
     if(permissions != null && !permissions.isEmpty())
     {
       props.put("permissions", Joiner.on(',').join(permissions));
