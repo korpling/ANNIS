@@ -18,6 +18,7 @@ package annis.security;
 import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
 import java.util.HashMap;
@@ -120,6 +121,49 @@ public class ANNISUserConfigurationManager
   {
     checkConfiguration();
     return ImmutableMap.copyOf(groups);
+  }
+  
+  /**
+   * Writes the user to the disk
+   * @param user
+   * @return True if successful.
+   */
+  public boolean writeUser(User user)
+  {
+    // load user info from file
+    if (resourcePath != null)
+    {
+
+      lock.writeLock().lock();
+      try
+      {
+        File userDir = new File(resourcePath, "users");
+        if (userDir.isDirectory())
+        {
+          // get the file which corresponds to the user
+          File userFile = new File(userDir.getAbsolutePath(), user.getName());
+          if(userFile.canWrite())
+          {
+            Properties props = user.toProperties();
+            try(FileOutputStream out = new FileOutputStream(userFile))
+            {
+              props.store(out, "");
+              return true;
+            }
+            catch(IOException ex)
+            {
+              log.error("Could not write users file", ex);
+            }
+          }
+          
+        }
+      }
+      finally
+      {
+        lock.writeLock().unlock();
+      }
+    } // end if resourcePath not null
+    return false;
   }
 
   public User getUser(String userName)

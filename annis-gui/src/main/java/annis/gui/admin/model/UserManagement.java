@@ -36,7 +36,12 @@ public class UserManagement
   
   public void createOrUpdateUser(User newUser)
   {
-    // TODO
+    if(rootResource != null)
+    {
+      WebResource res = rootResource.path("admin/users/").path(newUser.getName());
+      res.put(newUser);
+      users.put(newUser.getName(), newUser);
+    }
   }
   
   public void fetchUsers()

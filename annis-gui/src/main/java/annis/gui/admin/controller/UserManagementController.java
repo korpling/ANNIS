@@ -18,6 +18,7 @@ package annis.gui.admin.controller;
 
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UserManagementView;
+import annis.security.User;
 
 /**
  *
@@ -26,6 +27,7 @@ import annis.gui.admin.view.UserManagementView;
 public class UserManagementController
   implements UserManagementView.Listener
 {
+  
   private final UserManagement model;
   private final UserManagementView view;
 
@@ -36,6 +38,15 @@ public class UserManagementController
     
     model.fetchUsers();
     view.setUserList(model.getUsers());
+    view.addListener(this);
   }
+
+  @Override
+  public void userUpdated(User user)
+  {
+    model.createOrUpdateUser(user);
+  }
+  
+  
   
 }

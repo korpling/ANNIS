@@ -19,26 +19,18 @@ package annis.gui.admin;
 import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
 import com.vaadin.data.Container;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.converter.Converter;
-import com.vaadin.data.util.converter.StringToDoubleConverter;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
-import java.lang.reflect.ParameterizedType;
-import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import java.util.Set;
 import org.vaadin.tokenfield.TokenField;
 
@@ -52,7 +44,8 @@ public class UserManagementPanel extends Panel
   
   private final VerticalLayout layout;
   private final Table userList;
-  private final BeanContainer<String, User> container;
+  private final BeanContainer<String, User> userContainer;
+  private final List<UserManagementView.Listener> listeners = new LinkedList<>();
   
   public UserManagementPanel()
   {
@@ -61,14 +54,14 @@ public class UserManagementPanel extends Panel
     setContent(layout);
     setSizeFull();
     
-    container = new BeanContainer<>(User.class);
-    container.setBeanIdProperty("name");
+    userContainer = new BeanContainer<>(User.class);
+    userContainer.setBeanIdProperty("name");
     
     
     userList = new Table();
     userList.setEditable(true);
     userList.setSizeFull();
-    userList.setContainerDataSource(container);
+    userList.setContainerDataSource(userContainer);
     userList.setVisibleColumns("name", "groups", "permissions");
     userList.setColumnHeaders("Username", "Groups", "Additional permissions");
     
@@ -77,19 +70,27 @@ public class UserManagementPanel extends Panel
     layout.addComponent(userList);
   }
 
+  @Override
+  public void addListener(UserManagementView.Listener listener)
+  {
+    listeners.add(listener);
+  }
+
+  
+
 
   @Override
   public void setUserList(Collection<User> users)
   {
-    container.removeAllItems();
-    container.addAll(users);
+    userContainer.removeAllItems();
+    userContainer.addAll(users);
   }
 
-  public static class FieldFactory implements TableFieldFactory
+  public class FieldFactory implements TableFieldFactory
   {
 
     @Override
-    public Field<?> createField(Container container, Object itemId,
+    public Field<?> createField(Container container, final Object itemId,
       Object propertyId, Component uiContext)
     {
       if("groups".equals(propertyId) || "permissions".equals(propertyId))
@@ -97,6 +98,21 @@ public class UserManagementPanel extends Panel
         TokenField field = new TokenField();
         field.setPropertyDataSource(container.getContainerProperty(itemId,
           propertyId));
+        
+        field.addValueChangeListener(new Property.ValueChangeListener()
+        {
+
+          @Override
+          public void valueChange(Property.ValueChangeEvent event)
+          {
+            for(UserManagementView.Listener l : listeners) 
+            {
+              l.userUpdated(userContainer.getItem(itemId).getBean());
+            }
+          }
+        });
+
+        
         return field;
       }
       else

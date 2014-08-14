@@ -18,6 +18,7 @@ package annis.gui.admin.view;
 
 import annis.security.User;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -28,9 +29,11 @@ public interface UserManagementView
   public void setUserList(Collection<User> users);
   
   
+  public void addListener(Listener listener);
+  
   public interface Listener
   {
-    
+    public void userUpdated(User user);
   }
   
 }

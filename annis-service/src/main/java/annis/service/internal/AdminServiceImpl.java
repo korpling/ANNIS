@@ -39,6 +39,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -135,6 +136,41 @@ public class AdminServiceImpl implements AdminService
       }
     }
     return new LinkedList<>();
+  }
+  
+  @PUT
+  @Path("users/{userName}")
+  @Consumes("application/xml")
+  public Response listUsers(
+    User user,
+    @PathParam("userName") String userName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:write:userlist");
+    
+    if(!userName.equals(user.getName()))
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST)
+          .entity("Username in object is not the same as in path")
+          .build());
+    }
+    
+    if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserConfigurationManager confManager = getConfManager();
+      if(confManager != null)
+      {
+        if(confManager.writeUser(user))
+        {
+          return Response.ok().build();
+        }
+      }
+    }
+    throw new WebApplicationException(Response
+      .status(Response.Status.INTERNAL_SERVER_ERROR)
+      .entity("Could not update/create user")
+      .build());
   }
   
   @GET
