@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin;
 
 import annis.gui.admin.view.UserManagementView;
@@ -23,22 +22,22 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.TableFieldFactory;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 import org.vaadin.tokenfield.TokenField;
 
 /**
@@ -48,54 +47,90 @@ import org.vaadin.tokenfield.TokenField;
 public class UserManagementPanel extends Panel
   implements UserManagementView
 {
-  
+
   private final VerticalLayout layout;
+
   private final Table userList;
+
   private final BeanContainer<String, User> userContainer;
+
   private final List<UserManagementView.Listener> listeners = new LinkedList<>();
-  
+
   public UserManagementPanel()
   {
     setSizeFull();
-    
+
     userContainer = new BeanContainer<>(User.class);
     userContainer.setBeanIdProperty("name");
-    
-    
+
     userList = new Table();
     userList.setEditable(true);
     userList.setSelectable(true);
+    userList.setMultiSelect(true);
     userList.addStyleName(ChameleonTheme.TABLE_STRIPED);
     userList.setSizeFull();
     userList.setContainerDataSource(userContainer);
-    userList.addGeneratedColumn("changepassword", new PasswordChangeColumnGenerator());
-    
-    userList.setVisibleColumns("name", "groups", "permissions", "changepassword");
-    userList.setColumnHeaders("Username", "Groups", "Additional permissions", "");
-    
+    userList.addGeneratedColumn("changepassword",
+      new PasswordChangeColumnGenerator());
+
+    userList.
+      setVisibleColumns("name", "groups", "permissions", "changepassword");
+    userList.
+      setColumnHeaders("Username", "Groups", "Additional permissions", "");
+
     userList.setTableFieldFactory(new FieldFactory());
-    
+
     final TextField txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
-    
+
     Button btAddNewUser = new Button("Add new user");
     btAddNewUser.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        for(UserManagementView.Listener l : listeners)
+        for (UserManagementView.Listener l : listeners)
         {
           l.addNewUser(txtUserName.getValue());
         }
       }
     });
-    
-    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName, btAddNewUser);
+
+    Button btDeleteUser = new Button("Delete selected user(s)");
+    btDeleteUser.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        // get selected users
+        Set<String> selectedUsers = new TreeSet<>();
+        for (String u : userContainer.getItemIds())
+        {
+          if (userList.isSelected(u))
+          {
+            selectedUsers.add(u);
+          }
+        }
+        for (UserManagementView.Listener l : listeners)
+        {
+          l.deleteUsers(selectedUsers);
+        }
+      }
+    });
+
+    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
+      btAddNewUser, btDeleteUser);
     layout = new VerticalLayout(userList, actionLayout);
     layout.setSizeFull();
     setContent(layout);
-    
+
+  }
+
+  @Override
+  public void showInfo(String info)
+  {
+    Notification.show(info, Notification.Type.HUMANIZED_MESSAGE);
   }
 
   @Override
@@ -103,8 +138,6 @@ public class UserManagementPanel extends Panel
   {
     Notification.show(error, Notification.Type.ERROR_MESSAGE);
   }
-  
-  
 
   @Override
   public void addListener(UserManagementView.Listener listener)
@@ -119,7 +152,6 @@ public class UserManagementPanel extends Panel
     UI.getCurrent().addWindow(w);
     w.center();
   }
-  
 
   @Override
   public void setUserList(Collection<User> users)
@@ -127,14 +159,15 @@ public class UserManagementPanel extends Panel
     userContainer.removeAllItems();
     userContainer.addAll(users);
   }
-  
+
   public class PasswordChangeColumnGenerator implements Table.ColumnGenerator
   {
 
     @Override
-    public Object generateCell(Table source, final Object itemId, Object columnId)
+    public Object generateCell(Table source, final Object itemId,
+      Object columnId)
     {
-     PasswordField txtNewPassword = new PasswordField();
+      PasswordField txtNewPassword = new PasswordField();
       txtNewPassword.setInputPrompt("New password");
       Button btChangePassword = new Button("Change password");
       btChangePassword.addClickListener(new Button.ClickListener()
@@ -148,53 +181,53 @@ public class UserManagementPanel extends Panel
       });
       return btChangePassword;
     }
-    
+
   }
 
-  public class FieldFactory implements TableFieldFactory
+  public class FieldFactory extends DefaultFieldFactory
   {
 
     @Override
     public Field<?> createField(Container container, final Object itemId,
       Object propertyId, Component uiContext)
     {
-      if("groups".equals(propertyId) || "permissions".equals(propertyId))
-      {
-        TokenField field = new TokenField();
-        field.setPropertyDataSource(container.getContainerProperty(itemId,
-          propertyId));
-        
-        field.addValueChangeListener(new Property.ValueChangeListener()
-        {
+      Field<?> result = null;
 
-          @Override
-          public void valueChange(Property.ValueChangeEvent event)
+      switch ((String) propertyId)
+      {
+        case "groups":
+        case "permissions":
+          TokenField tokenField = new TokenField();
+          tokenField.setPropertyDataSource(container.
+            getContainerProperty(itemId,
+              propertyId));
+
+          tokenField.addValueChangeListener(new Property.ValueChangeListener()
           {
-            for(UserManagementView.Listener l : listeners) 
-            {
-              l.userUpdated(userContainer.getItem(itemId).getBean());
-            }
-          }
-        });
 
-        
-        return field;
+            @Override
+            public void valueChange(Property.ValueChangeEvent event)
+            {
+              for (UserManagementView.Listener l : listeners)
+              {
+                l.userUpdated(userContainer.getItem(itemId).getBean());
+              }
+            }
+          });
+          result = tokenField;
+          break;
+        case "name":
+          // explicitly request a read-only label for the name
+          result = null;
+          break;
+        default:
+          result = super.createField(container, itemId, propertyId, uiContext);
+          break;
       }
-      else
-      {
-        TextField field = new TextField(container.getContainerProperty(itemId,
-          propertyId));
-        
-        if("name".equals(propertyId))
-        {
-          field.setReadOnly(true);
-        }
-        
-        return field;
-      }
+
+      return result;
     }
-    
+
   }
-  
-  
+
 }

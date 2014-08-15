@@ -33,6 +33,7 @@ public interface UserManagementView
   
   public void askForPasswordChange(String userName);
   
+  public void showInfo(String info);
   public void showError(String error);
   
   public interface Listener
@@ -41,6 +42,7 @@ public interface UserManagementView
     public void passwordChanged(String userName, String newPassword);
     
     public void addNewUser(String userName);
+    public void deleteUsers(Set<String> userName);
   }
   
 }

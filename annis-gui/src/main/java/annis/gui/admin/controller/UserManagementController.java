@@ -19,6 +19,8 @@ package annis.gui.admin.controller;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
+import com.google.common.base.Joiner;
+import java.util.Set;
 
 /**
  *
@@ -70,10 +72,29 @@ public class UserManagementController
       User u = new User(userName);
       model.createOrUpdateUser(u);
       view.askForPasswordChange(userName); 
-      
-      model.fetchUsers();
       view.setUserList(model.getUsers());
     }
   }
+
+  @Override
+  public void deleteUsers(Set<String> userName)
+  {
+    for(String u : userName)
+    {
+      model.deleteUser(u);
+    }
+    view.setUserList(model.getUsers());
+    
+    if(userName.size() == 1)
+    {
+      view.showInfo("User \"" + userName.iterator().next() +  "\" was deleted");
+    }
+    else
+    {
+      view.showInfo("Deleted users: " + Joiner.on(", ").join(userName));
+    }
+  }
+  
+  
   
 }

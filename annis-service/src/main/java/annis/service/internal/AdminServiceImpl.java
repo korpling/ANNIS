@@ -21,7 +21,6 @@ import annis.administration.CorpusAdministration;
 import annis.dao.AnnisDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
-import annis.security.ANNISUserRealm;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
@@ -38,6 +37,7 @@ import java.util.Set;
 import java.util.UUID;
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.POST;
 import javax.ws.rs.PUT;
@@ -49,13 +49,8 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
-import org.apache.commons.lang3.Validate;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authc.SimpleAuthenticationInfo;
-import org.apache.shiro.crypto.hash.Hash;
-import org.apache.shiro.crypto.hash.HashRequest;
 import org.apache.shiro.crypto.hash.Sha256Hash;
-import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
@@ -133,7 +128,7 @@ public class AdminServiceImpl implements AdminService
   public List<User> listUsers()
   {
     Subject requestingUser = SecurityUtils.getSubject();
-    requestingUser.checkPermission("admin:read:userlist");
+    requestingUser.checkPermission("admin:read:user");
     
     if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
     {
@@ -154,7 +149,7 @@ public class AdminServiceImpl implements AdminService
     @PathParam("userName") String userName)
   {
     Subject requestingUser = SecurityUtils.getSubject();
-    requestingUser.checkPermission("admin:write:userlist");
+    requestingUser.checkPermission("admin:write:user");
     
     if(!userName.equals(user.getName()))
     {
@@ -181,6 +176,41 @@ public class AdminServiceImpl implements AdminService
       .build();
   }
   
+  @DELETE
+  @Path("users/{userName}")
+  @Consumes("application/xml")
+  public Response deleteUser(@PathParam("userName") String userName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:write:user");
+    
+    
+    if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserConfigurationManager confManager = getConfManager();
+      if(confManager != null)
+      {
+        User user = confManager.getUser(userName);
+        if(user == null)
+        {
+          return Response.status(Response.Status.BAD_REQUEST).entity("User \"" 
+            + userName + "\" does not exist." ).build();
+        }
+        else
+        {
+          if(confManager.deleteUser(user))
+          {
+            return Response.ok().build();
+          }
+        }
+      }
+    }
+    return Response
+      .status(Response.Status.INTERNAL_SERVER_ERROR)
+      .entity("Could not delete user")
+      .build();
+  }
+  
   @POST
   @Path("users/{userName}/password")
   @Consumes("text/plain")
@@ -190,7 +220,7 @@ public class AdminServiceImpl implements AdminService
     @PathParam("userName") String userName)
   {
     Subject requestingUser = SecurityUtils.getSubject();
-    requestingUser.checkPermission("admin:write:userlist");
+    requestingUser.checkPermission("admin:write:user");
     
     if(SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
     {

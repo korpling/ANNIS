@@ -161,6 +161,36 @@ public class ANNISUserConfigurationManager
     } // end if resourcePath not null
     return false;
   }
+  
+  /**
+   * Deletes the user from the disk
+   * @param user
+   * @return True if successful.
+   */
+  public boolean deleteUser(User user)
+  {
+    // load user info from file
+    if (resourcePath != null)
+    {
+
+      lock.writeLock().lock();
+      try
+      {
+        File userDir = new File(resourcePath, "users");
+        if (userDir.isDirectory())
+        {
+          // get the file which corresponds to the user
+          File userFile = new File(userDir.getAbsolutePath(), user.getName());
+          return userFile.delete();
+        }
+      }
+      finally
+      {
+        lock.writeLock().unlock();
+      }
+    } // end if resourcePath not null
+    return false;
+  }
 
   public User getUser(String userName)
   {

@@ -44,6 +44,16 @@ public class UserManagement
     }
   }
   
+  public void deleteUser(String userName)
+  {
+    if(rootResource != null)
+    {
+      WebResource res = rootResource.path("admin/users").path(userName);
+      res.delete();
+      users.remove(userName);
+    }
+  }
+  
   public User setPassword(String userName, String newPassword)
   {
 
