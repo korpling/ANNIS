@@ -16,11 +16,26 @@
 
 package annis.gui.admin.controller;
 
+import annis.gui.admin.model.GroupManagement;
+import annis.gui.admin.view.GroupManagementView;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GroupManagementController
 {
+  private GroupManagement model;
+  private GroupManagementView view;
+
+  public GroupManagementController(GroupManagement model,
+    GroupManagementView view)
+  {
+    this.model = model;
+    this.view = view;
+  }
+
+  
+  
   
 }

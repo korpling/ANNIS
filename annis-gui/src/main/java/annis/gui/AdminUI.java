@@ -15,9 +15,14 @@
  */
 package annis.gui;
 
+import annis.gui.admin.GroupManagementPanel;
+import annis.gui.admin.ImportPanel;
 import annis.gui.admin.ImportPanel;
 import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.controller.GroupManagementController;
 import annis.gui.admin.controller.UserManagementController;
+import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -38,7 +43,8 @@ public class AdminUI extends AnnisBaseUI
   
   private UserManagementController
      userController;
-  private UserManagement userManagement;
+  private GroupManagementController
+     groupManagementController;
   
   @Override
   protected void init(VaadinRequest request)
@@ -50,14 +56,21 @@ public class AdminUI extends AnnisBaseUI
     setContent(layout);
     
     UserManagementPanel userManagementPanel = new UserManagementPanel();
-    userManagement = new UserManagement();
+    UserManagement userManagement = new UserManagement();
     userManagement.setRootResource(Helper.getAnnisWebResource());
     userController = new UserManagementController(userManagement,
       userManagementPanel);
     
+    GroupManagementPanel groupManagementPanel = new GroupManagementPanel();
+    GroupManagement groupManagement = new GroupManagement();
+    groupManagementController = new GroupManagementController(groupManagement,
+      groupManagementPanel);
+    
+    
     TabSheet tabSheet = new TabSheet();
     tabSheet.addTab(new ImportPanel(), "Import Corpus", new ThemeResource("images/tango-icons/16x16/document-save.png"));
-    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("images/tango-icons/16x16/system-users.png"));
+    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("images/tango-icons/16x16/user-info.png"));
+    tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource("images/tango-icons/16x16/system-users.png"));
     tabSheet.setSizeFull();
     
     layout.addComponent(tabSheet);

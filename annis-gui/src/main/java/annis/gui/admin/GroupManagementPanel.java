@@ -14,17 +14,27 @@
  * limitations under the License.
  */
 
-package annis.gui.admin.view;
+package annis.gui.admin;
+
+import annis.gui.admin.view.GroupManagementView;
+import com.vaadin.ui.Panel;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface GroupManagementView
+public class GroupManagementPanel extends Panel
+implements GroupManagementView
 {
-  public void addListener(Listener listener);
-  
-  public interface Listener
+
+  private List<GroupManagementView.Listener> listeners = new LinkedList<>();
+
+  @Override
+  public void addListener(GroupManagementView.Listener listener)
   {
+    listeners.add(listener);
   }
+  
 }
