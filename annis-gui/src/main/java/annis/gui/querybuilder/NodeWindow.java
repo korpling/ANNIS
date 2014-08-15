@@ -168,7 +168,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     if(prepare)
     {
       btEdge.setCaption("Dock");
-      btEdge.setIcon(new ThemeResource("pixel.png"));
+      btEdge.setIcon(new ThemeResource("images/pixel.png"));
     }
     else
     {
@@ -191,7 +191,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       {
         parent.prepareAddingEdge(this);
         setPrepareEdgeDock(true);
-        btEdge.setIcon(new ThemeResource("pixel.png"));
+        btEdge.setIcon(new ThemeResource("images/pixel.png"));
         btEdge.setCaption("Cancel");
       }
     }

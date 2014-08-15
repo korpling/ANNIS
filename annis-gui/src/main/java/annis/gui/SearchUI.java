@@ -219,7 +219,7 @@ public class SearchUI extends AnnisBaseUI
     
     Button btAboutAnnis = new Button("About ANNIS");
     btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
+    btAboutAnnis.setIcon(new ThemeResource("images/annis_16.png"));
 
     btAboutAnnis.addClickListener(new AboutClickListener());
 

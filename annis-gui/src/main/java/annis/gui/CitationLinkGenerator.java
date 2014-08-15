@@ -38,7 +38,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   {
     Button btLink = new Button();
     btLink.setStyleName(BaseTheme.BUTTON_LINK);
-    btLink.setIcon(new ThemeResource("url.png"));
+    btLink.setIcon(new ThemeResource("images/url.png"));
     btLink.setDescription("show citation link");
     btLink.addListener(this);
 

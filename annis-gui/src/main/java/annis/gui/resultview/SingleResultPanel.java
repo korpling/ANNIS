@@ -85,7 +85,7 @@ public class SingleResultPanel extends CssLayout implements
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "info.gif");
+    "images/info.gif");
 
   private transient SDocument result;
 

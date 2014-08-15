@@ -80,10 +80,10 @@ public class CorpusListPanel extends VerticalLayout implements
   private static final org.slf4j.Logger log = LoggerFactory.
     getLogger(CorpusListPanel.class);
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
+  private static final ThemeResource INFO_ICON = new ThemeResource("images/info.gif");
 
   private static final ThemeResource DOC_ICON = new ThemeResource(
-    "document_ico.png");
+    "images/document_ico.png");
 
   public static final String ALL_CORPORA = "All";
 
