@@ -201,7 +201,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
-      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "images/keyboard.png"));
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
