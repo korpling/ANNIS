@@ -70,7 +70,8 @@ public class AdminUI extends AnnisBaseUI
     
     MainToolbar toolbar = new MainToolbar(null);
     addExtension(toolbar.getScreenshotExtension());
-    
+    toolbar.addLoginListener(userManagementPanel);
+   
     layout = new VerticalLayout(toolbar, tabSheet);
     layout.setSizeFull();
     

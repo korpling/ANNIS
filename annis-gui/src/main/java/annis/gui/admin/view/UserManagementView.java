@@ -17,6 +17,7 @@
 package annis.gui.admin.view;
 
 import annis.security.User;
+import com.sun.jersey.api.client.WebResource;
 import java.util.Collection;
 import java.util.Set;
 
@@ -43,6 +44,9 @@ public interface UserManagementView
     
     public void addNewUser(String userName);
     public void deleteUsers(Set<String> userName);
+    
+    public void attached();
+    public void loginChanged(WebResource annisRootResource);
   }
   
 }

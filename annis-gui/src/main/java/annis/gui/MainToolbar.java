@@ -78,7 +78,7 @@ public class MainToolbar extends HorizontalLayout
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
   
-  private final List<LoginListener> loginListeners = new LinkedList<LoginListener>();
+  private final List<LoginListener> loginListeners = new LinkedList<>();
 
   private Throwable lastBugReportCause;
   
@@ -169,6 +169,10 @@ public class MainToolbar extends HorizontalLayout
       {
         // logout
         Helper.setUser(null);
+        for(LoginListener l : loginListeners)
+        {
+          l.onLogout();
+        }
         Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
         updateUserInformation();
       }
@@ -436,6 +440,14 @@ public class MainToolbar extends HorizontalLayout
     }
     updateUserInformation();
   }
+
+  @Override
+  public void onLogout()
+  {
+    updateUserInformation();
+  }
+  
+  
   
   public boolean canReportBugs()
   {

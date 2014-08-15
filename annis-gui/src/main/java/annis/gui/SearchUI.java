@@ -665,7 +665,11 @@ public class SearchUI extends AnnisBaseUI
     queryController.updateCorpusSetList();
   }
   
-  
+  @Override
+  public void onLogout()
+  {
+    queryController.updateCorpusSetList();
+  }
 
   @Override
   public void notifyMightNotPlayMimeType(String mimeType)

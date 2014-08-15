@@ -20,6 +20,8 @@ import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
 import com.google.common.base.Joiner;
+import com.sun.jersey.api.client.WebResource;
+import java.util.LinkedList;
 import java.util.Set;
 
 /**
@@ -36,11 +38,28 @@ public class UserManagementController
   public UserManagementController(UserManagement model, UserManagementView view)
   {
     this.model = model;
-    this.view = view;
-    
-    model.fetchUsers();
-    view.setUserList(model.getUsers());
+    this.view = view;    
     view.addListener(UserManagementController.this);
+  }
+  
+  private void updateUserList()
+  {
+    if(model.fetchUsers())
+    {
+      view.setUserList(model.getUsers());
+    }
+    
+    else
+    {
+      view.showError("Cannot get the user list");
+      view.setUserList(new LinkedList<User>());
+    }
+  }
+
+  @Override
+  public void attached()
+  {
+    updateUserList();
   }
 
   @Override
@@ -94,7 +113,13 @@ public class UserManagementController
       view.showInfo("Deleted users: " + Joiner.on(", ").join(userName));
     }
   }
-  
+
+  @Override
+  public void loginChanged(WebResource annisRootResource)
+  {
+    model.setRootResource(annisRootResource);
+    updateUserList();
+  }
   
   
 }

@@ -15,7 +15,9 @@
  */
 package annis.gui.admin;
 
+import annis.gui.LoginListener;
 import annis.gui.admin.view.UserManagementView;
+import annis.libgui.Helper;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -45,7 +47,7 @@ import org.vaadin.tokenfield.TokenField;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class UserManagementPanel extends Panel
-  implements UserManagementView
+  implements UserManagementView, LoginListener
 {
 
   private final VerticalLayout layout;
@@ -128,6 +130,18 @@ public class UserManagementPanel extends Panel
   }
 
   @Override
+  public void attach()
+  {
+    super.attach();
+    for(UserManagementView.Listener l : listeners)
+    {
+      l.attached();
+    }
+  }
+  
+  
+
+  @Override
   public void showInfo(String info)
   {
     Notification.show(info, Notification.Type.HUMANIZED_MESSAGE);
@@ -183,6 +197,28 @@ public class UserManagementPanel extends Panel
     }
 
   }
+
+  @Override
+  public void onLogin()
+  {
+    for(UserManagementView.Listener l : listeners)
+    {
+      l.loginChanged(Helper.getAnnisWebResource());
+    }
+  }
+
+  @Override
+  public void onLogout()
+  {
+    for(UserManagementView.Listener l : listeners)
+    {
+      l.loginChanged(Helper.getAnnisWebResource());
+    }
+  }
+  
+  
+  
+  
 
   public class FieldFactory extends DefaultFieldFactory
   {
