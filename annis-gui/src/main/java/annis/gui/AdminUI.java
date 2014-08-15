@@ -17,8 +17,6 @@ package annis.gui;
 
 import annis.gui.admin.GroupManagementPanel;
 import annis.gui.admin.ImportPanel;
-import annis.gui.admin.ImportPanel;
-import annis.gui.admin.UserManagementPanel;
 import annis.gui.admin.UserManagementPanel;
 import annis.gui.admin.controller.GroupManagementController;
 import annis.gui.admin.controller.UserManagementController;
@@ -51,10 +49,6 @@ public class AdminUI extends AnnisBaseUI
   {
     super.init(request);
     
-    layout = new VerticalLayout();
-    layout.setSizeFull();
-    setContent(layout);
-    
     UserManagementPanel userManagementPanel = new UserManagementPanel();
     UserManagement userManagement = new UserManagement();
     userManagement.setRootResource(Helper.getAnnisWebResource());
@@ -72,8 +66,19 @@ public class AdminUI extends AnnisBaseUI
     tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("images/tango-icons/16x16/user-info.png"));
     tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource("images/tango-icons/16x16/system-users.png"));
     tabSheet.setSizeFull();
+
     
-    layout.addComponent(tabSheet);
+    MainToolbar toolbar = new MainToolbar(null);
+    addExtension(toolbar.getScreenshotExtension());
+    
+    layout = new VerticalLayout(toolbar, tabSheet);
+    layout.setSizeFull();
+    
+    layout.setExpandRatio(toolbar, 0.0f);
+    layout.setExpandRatio(tabSheet, 1.0f);
+    
+    setContent(layout);
+
   }
   
 }
