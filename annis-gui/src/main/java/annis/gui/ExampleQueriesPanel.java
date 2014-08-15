@@ -81,7 +81,7 @@ public class ExampleQueriesPanel extends Table
   private final HelpPanel parentTab;
 
   private static final ThemeResource SEARCH_ICON = new ThemeResource(
-    "tango-icons/16x16/system-search.png");
+    "images/tango-icons/16x16/system-search.png");
 
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {

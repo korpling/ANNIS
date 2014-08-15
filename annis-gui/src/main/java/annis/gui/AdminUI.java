@@ -56,8 +56,8 @@ public class AdminUI extends AnnisBaseUI
       userManagementPanel);
     
     TabSheet tabSheet = new TabSheet();
-    tabSheet.addTab(new ImportPanel(), "Import Corpus", new ThemeResource("tango-icons/16x16/document-save.png"));
-    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("tango-icons/16x16/system-users.png"));
+    tabSheet.addTab(new ImportPanel(), "Import Corpus", new ThemeResource("images/tango-icons/16x16/document-save.png"));
+    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("images/tango-icons/16x16/system-users.png"));
     tabSheet.setSizeFull();
     
     layout.addComponent(tabSheet);

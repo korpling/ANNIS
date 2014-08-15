@@ -97,7 +97,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
 
     btMove = new Button("");
     btMove.setWidth("100%");
-    btMove.setIcon(new ThemeResource("tango-icons/22x22/view-fullscreen.png"));
+    btMove.setIcon(new ThemeResource("images/tango-icons/22x22/view-fullscreen.png"));
     btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
     btMove.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btMove.addStyleName(ChameleonTheme.BUTTON_SMALL);
@@ -106,7 +106,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
    
     
     btEdge = new Button("Edge");
-    btEdge.setIcon(new ThemeResource("tango-icons/16x16/go-jump.png"));
+    btEdge.setIcon(new ThemeResource("images/tango-icons/16x16/go-jump.png"));
     btEdge.addClickListener((Button.ClickListener) this);
     btEdge.addStyleName(ChameleonTheme.BUTTON_SMALL);
     //btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
@@ -120,7 +120,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btEdge);
     
     btAdd = new Button("Add");
-    btAdd.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"));
+    btAdd.setIcon(new ThemeResource("images/tango-icons/16x16/list-add.png"));
     btAdd.addStyleName(ChameleonTheme.BUTTON_SMALL);
     //btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addClickListener((Button.ClickListener) this);
@@ -131,7 +131,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btAdd);
     
     btClear = new Button("Clear");
-    btClear.setIcon(new ThemeResource("tango-icons/16x16/edit-clear.png"));
+    btClear.setIcon(new ThemeResource("images/tango-icons/16x16/edit-clear.png"));
     btClear.addStyleName(ChameleonTheme.BUTTON_SMALL);
     //btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addClickListener((Button.ClickListener) this);
@@ -139,7 +139,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btClear);
 
     btClose = new Button("");
-    btClose.setIcon(new ThemeResource("tango-icons/22x22/process-stop.png"));
+    btClose.setIcon(new ThemeResource("images/tango-icons/22x22/process-stop.png"));
     btClose.setDescription("<strong>Close</strong><br />Close this node description window");
     btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
@@ -172,7 +172,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else
     {
-      btEdge.setIcon(new ThemeResource("tango-icons/16x16/go-jump.png"));
+      btEdge.setIcon(new ThemeResource("images/tango-icons/16x16/go-jump.png"));
       btEdge.setCaption("Edge");
     }
   }

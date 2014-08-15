@@ -333,7 +333,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addStyleName("blue-tab");
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
-    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
+    helpTab.setIcon(new ThemeResource("images/tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);

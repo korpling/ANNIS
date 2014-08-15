@@ -266,7 +266,7 @@ public class CorpusListPanel extends VerticalLayout implements
           Notification.Type.HUMANIZED_MESSAGE);
       }
     });
-    btReload.setIcon(new ThemeResource("tango-icons/16x16/view-refresh.png"));
+    btReload.setIcon(new ThemeResource("images/tango-icons/16x16/view-refresh.png"));
     btReload.setDescription("Reload corpus list");
     btReload.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 

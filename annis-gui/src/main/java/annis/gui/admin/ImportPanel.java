@@ -162,13 +162,13 @@ public class ImportPanel extends Panel
     if(visible)
     {
       btDetailedLog.setCaption("Hide log");
-      btDetailedLog.setIcon(new ThemeResource("tango-icons/16x16/list-remove.png"), "minus sign");
+      btDetailedLog.setIcon(new ThemeResource("images/tango-icons/16x16/list-remove.png"), "minus sign");
       layout.setExpandRatio(btDetailedLog, 0.0f);
     }
     else
     {
       btDetailedLog.setCaption("Show log");
-      btDetailedLog.setIcon(new ThemeResource("tango-icons/16x16/list-add.png"), "plus sign");
+      btDetailedLog.setIcon(new ThemeResource("images/tango-icons/16x16/list-add.png"), "plus sign");
       layout.setExpandRatio(btDetailedLog, 1.0f);
     }
   }

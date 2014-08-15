@@ -326,7 +326,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
-      newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
+      newTab.setIcon(new ThemeResource("images/tango-icons/16x16/system-search.png"));
     }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();

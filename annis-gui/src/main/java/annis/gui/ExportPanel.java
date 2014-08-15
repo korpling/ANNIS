@@ -181,12 +181,12 @@ public class ExportPanel extends FormLayout
 
     btExport = new Button("Perform Export");
     btExport.setIcon(new ThemeResource(
-      "tango-icons/16x16/media-playback-start.png"));
+      "images/tango-icons/16x16/media-playback-start.png"));
     btExport.setDisableOnClick(true);
     btExport.addClickListener(new ExportButtonListener());
 
     btCancel = new Button("Cancel Export");
-    btCancel.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btCancel.setIcon(new ThemeResource("images/tango-icons/16x16/process-stop.png"));
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
     Exporter exporter = exporterMap.get((String) cbExporter.getValue());
@@ -197,7 +197,7 @@ public class ExportPanel extends FormLayout
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
-    btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+    btDownload.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
