@@ -21,8 +21,10 @@ import annis.gui.admin.view.GroupManagementView;
 import annis.gui.admin.view.UIView;
 import annis.security.Group;
 import annis.security.User;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
+import java.util.Set;
 
 /**
  *
@@ -71,6 +73,50 @@ public class GroupManagementController implements GroupManagementView.Listener,
   {
     model.setRootResource(annisRootResource);
     updateGroupList();
+  }
+
+  @Override
+  public void groupUpdated(Group user)
+  {
+    model.createOrUpdateGroup(user);
+  }
+
+  @Override
+  public void addNewGroup(String groupName)
+  {
+    if(groupName == null || groupName.isEmpty())
+    {
+      uiView.showError("Group name is empty");
+    }
+    else if(model.getGroup(groupName) != null)
+    {
+      uiView.showError("Group already exists");
+    }
+    else
+    {
+      Group g = new Group(groupName);
+      model.createOrUpdateGroup(g);
+      view.setGroupList(model.getGroups());
+    }
+  }
+
+  @Override
+  public void deleteGroups(Set<String> groupName)
+  {
+    for(String g : groupName)
+    {
+      model.deleteGroup(g);
+    }
+    view.setGroupList(model.getGroups());
+    
+    if(groupName.size() == 1)
+    {
+      uiView.showInfo("Group \"" + groupName.iterator().next() +  "\" was deleted");
+    }
+    else
+    {
+      uiView.showInfo("Deleted groups: " + Joiner.on(", ").join(groupName));
+    }
   }
   
   

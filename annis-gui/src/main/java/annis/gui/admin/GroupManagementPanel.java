@@ -21,15 +21,19 @@ import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 import org.vaadin.tokenfield.TokenField;
 
 /**
@@ -61,8 +65,43 @@ public class GroupManagementPanel extends Panel
 
     tblGroups.setVisibleColumns("name", "corpora");
     tblGroups.setColumnHeaders("Name", "Allowed corpora");
+    
+    final TextField txtUserName = new TextField();
+    txtUserName.setInputPrompt("New group name");
 
-    VerticalLayout layout = new VerticalLayout(tblGroups);
+    Button btAddNewGroup = new Button("Add new group");
+    btAddNewGroup.addClickListener(new Button.ClickListener()
+    {
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        for (GroupManagementView.Listener l : listeners)
+        {
+          l.addNewGroup(txtUserName.getValue());
+        }
+      }
+    });
+
+    Button btDeleteGroup = new Button("Delete selected group(s)");
+    btDeleteGroup.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        // get selected users
+        Set<String> selectedGroups = (Set<String>) tblGroups.getValue();
+        for (GroupManagementView.Listener l : listeners)
+        {
+          l.deleteGroups(selectedGroups);
+        }
+      }
+    });
+    
+    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
+      btAddNewGroup, btDeleteGroup);
+
+    VerticalLayout layout = new VerticalLayout(tblGroups, actionLayout);
     layout.setSizeFull();
     setContent(layout);
   }
@@ -115,7 +154,7 @@ public class GroupManagementPanel extends Panel
             {
               for (GroupManagementView.Listener l : listeners)
               {
-//                l.userUpdated(userContainer.getItem(itemId).getBean());
+                l.groupUpdated(groupsContainer.getItem(itemId).getBean());
               }
             }
           });

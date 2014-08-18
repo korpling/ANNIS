@@ -18,6 +18,7 @@ package annis.gui.admin.view;
 
 import annis.security.Group;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -32,5 +33,9 @@ public interface GroupManagementView
   public interface Listener
   {
     public void attached();
+    public void groupUpdated(Group user);
+    
+    public void addNewGroup(String groupName);
+    public void deleteGroups(Set<String> groupName);
   }
 }

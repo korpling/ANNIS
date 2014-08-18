@@ -62,6 +62,31 @@ public class GroupManagement
     return false;
   }
   
+  public void createOrUpdateGroup(Group newGroup)
+  {
+    if(rootResource != null)
+    {
+      WebResource res = rootResource.path("admin/groups").path(newGroup.getName());
+      res.put(newGroup);
+      groups.put(newGroup.getName(), newGroup);
+    }
+  }
+  
+  public void deleteGroup(String groupName)
+  {
+    if(rootResource != null)
+    {
+      WebResource res = rootResource.path("admin/groups").path(groupName);
+      res.delete();
+      groups.remove(groupName);
+    }
+  }
+  
+  public Group getGroup(String groupName)
+  {
+    return groups.get(groupName);
+  }
+  
   public Collection<Group> getGroups()
   {
     return groups.values();
