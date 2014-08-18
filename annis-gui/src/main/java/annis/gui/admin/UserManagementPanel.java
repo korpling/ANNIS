@@ -171,6 +171,7 @@ public class UserManagementPanel extends Panel
     txtUserName.setValue("");
   }
   
+  @Override
   public void setAvailableGroupNames(Collection<String> groupNames)
   {
     groupNamesContainer.removeAllItems();

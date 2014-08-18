@@ -17,13 +17,17 @@ package annis.gui.admin;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupView;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
+import java.util.Collection;
 import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 /**
  *
@@ -35,8 +39,9 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   private final HorizontalLayout layout;
 
   private final TextField txtValue;
+
   private final TwinColSelect selector;
-  
+
   public PopupTwinColumnSelect(Container predefinedItems)
   {
     txtValue = new TextField();
@@ -44,12 +49,13 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     txtValue.setWidth("100%");
 
     selector = new TwinColSelect();
+    selector.setConverter(new TreeSetConverter());
     selector.setNewItemsAllowed(false);
     selector.setLeftColumnCaption("Available");
     selector.setRightColumnCaption("Selected");
-    
+
     selector.setContainerDataSource(predefinedItems);
-    
+
     PopupView popup = new PopupView("Select", selector);
 
     layout = new HorizontalLayout(txtValue, popup);
@@ -68,13 +74,12 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   public void setPropertyDataSource(Property newDataSource)
   {
     addAllItemsFromProperty(newDataSource);
-    
+
     txtValue.setPropertyDataSource(newDataSource);
     selector.setPropertyDataSource(newDataSource);
     super.setPropertyDataSource(newDataSource);
-    
+
   }
-  
 
   @Override
   public void valueChange(Property.ValueChangeEvent event)
@@ -82,10 +87,26 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     addAllItemsFromProperty(event.getProperty());
     super.valueChange(event);
   }
+
+  @Override
+  public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
+  {
+    // always use a sorted TreeSet
+    if(newFieldValue != null
+      && !(newFieldValue instanceof TreeSet))
+    {
+      TreeSet sortedSet = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+      sortedSet.addAll((Collection) newFieldValue);
+      newFieldValue = sortedSet;
+    }
+    super.setValue(newFieldValue); //To change body of generated methods, choose Tools | Templates.
+  }
   
+  
+
   private void addAllItemsFromProperty(Property prop)
   {
-     if(prop != null && prop.getValue() != null 
+    if (prop != null && prop.getValue() != null
       && prop.getType() == Set.class)
     {
       Set items = (Set) prop.getValue();
@@ -102,5 +123,4 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     return Set.class;
   }
 
-  
 }
