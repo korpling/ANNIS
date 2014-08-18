@@ -21,6 +21,8 @@ import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.event.Action;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -30,6 +32,7 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,6 +51,8 @@ public class GroupManagementPanel extends Panel
 
   private final Table tblGroups = new Table();
 
+  private final TextField txtGroupName;
+
   private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
     Group.class);
 
@@ -60,14 +65,14 @@ public class GroupManagementPanel extends Panel
     tblGroups.setSelectable(true);
     tblGroups.setMultiSelect(true);
     tblGroups.setSizeFull();
-    
+
     tblGroups.setTableFieldFactory(new FieldFactory());
 
     tblGroups.setVisibleColumns("name", "corpora");
     tblGroups.setColumnHeaders("Name", "Allowed corpora");
-    
-    final TextField txtUserName = new TextField();
-    txtUserName.setInputPrompt("New group name");
+
+    txtGroupName = new TextField();
+    txtGroupName.setInputPrompt("New group name");
 
     Button btAddNewGroup = new Button("Add new group");
     btAddNewGroup.addClickListener(new Button.ClickListener()
@@ -75,12 +80,10 @@ public class GroupManagementPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        for (GroupManagementView.Listener l : listeners)
-        {
-          l.addNewGroup(txtUserName.getValue());
-        }
+        handleAdd();
       }
     });
+    btAddNewGroup.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
 
     Button btDeleteGroup = new Button("Delete selected group(s)");
     btDeleteGroup.addClickListener(new Button.ClickListener()
@@ -97,13 +100,23 @@ public class GroupManagementPanel extends Panel
         }
       }
     });
-    
-    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
+
+    HorizontalLayout actionLayout = new HorizontalLayout(txtGroupName,
       btAddNewGroup, btDeleteGroup);
 
     VerticalLayout layout = new VerticalLayout(tblGroups, actionLayout);
     layout.setSizeFull();
     setContent(layout);
+    
+    addActionHandler(new AddGroupHandler(txtGroupName));
+  }
+
+  private void handleAdd()
+  {
+    for (GroupManagementView.Listener l : listeners)
+    {
+      l.addNewGroup(txtGroupName.getValue());
+    }
   }
 
   @Override
@@ -127,6 +140,43 @@ public class GroupManagementPanel extends Panel
   {
     groupsContainer.removeAllItems();
     groupsContainer.addAll(groups);
+  }
+
+  @Override
+  public void emptyNewGroupNameTextField()
+  {
+    txtGroupName.setValue("");
+  }
+
+  public class AddGroupHandler implements Action.Handler
+  {
+    private final Action enterKeyShortcutAction 
+      = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
+
+    private final Object registeredTarget;
+
+    public AddGroupHandler(Object registeredTarget)
+    {
+      this.registeredTarget = registeredTarget;
+    }
+
+    @Override
+    public Action[] getActions(Object target, Object sender)
+    {
+      return new Action[]
+      {
+        enterKeyShortcutAction
+      };
+    }
+    
+    @Override
+    public void handleAction(Action action, Object sender, Object target)
+    {
+      if(action == enterKeyShortcutAction && target == registeredTarget)
+      {
+        handleAdd();
+      }
+    }
   }
 
   public class FieldFactory extends DefaultFieldFactory

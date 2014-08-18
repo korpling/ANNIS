@@ -16,10 +16,13 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.UserManagementView;
+import annis.gui.paging.PagingComponent;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.event.Action;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -32,6 +35,7 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,6 +57,8 @@ public class UserManagementPanel extends Panel
   private final BeanContainer<String, User> userContainer;
 
   private final List<UserManagementView.Listener> listeners = new LinkedList<>();
+
+  private final TextField txtUserName;
 
   public UserManagementPanel()
   {
@@ -78,7 +84,7 @@ public class UserManagementPanel extends Panel
 
     userList.setTableFieldFactory(new FieldFactory());
 
-    final TextField txtUserName = new TextField();
+    txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
 
     Button btAddNewUser = new Button("Add new user");
@@ -87,12 +93,10 @@ public class UserManagementPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        for (UserManagementView.Listener l : listeners)
-        {
-          l.addNewUser(txtUserName.getValue());
-        }
+        handleAdd();
       }
     });
+    btAddNewUser.addStyleName(ChameleonTheme.BUTTON_DEFAULT);
 
     Button btDeleteUser = new Button("Delete selected user(s)");
     btDeleteUser.addClickListener(new Button.ClickListener()
@@ -112,22 +116,32 @@ public class UserManagementPanel extends Panel
 
     HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
       btAddNewUser, btDeleteUser);
+    
     layout = new VerticalLayout(userList, actionLayout);
     layout.setSizeFull();
     setContent(layout);
 
+    addActionHandler(new AddUserHandler(txtUserName));
+    
+  }
+
+  private void handleAdd()
+  {
+    for (UserManagementView.Listener l : listeners)
+    {
+      l.addNewUser(txtUserName.getValue());
+    }
   }
 
   @Override
   public void attach()
   {
     super.attach();
-    for(UserManagementView.Listener l : listeners)
+    for (UserManagementView.Listener l : listeners)
     {
       l.attached();
     }
   }
-  
 
   @Override
   public void addListener(UserManagementView.Listener listener)
@@ -148,6 +162,43 @@ public class UserManagementPanel extends Panel
   {
     userContainer.removeAllItems();
     userContainer.addAll(users);
+  }
+
+  @Override
+  public void emptyNewUserNameTextField()
+  {
+    txtUserName.setValue("");
+  }
+
+  public class AddUserHandler implements Action.Handler
+  {
+    private final Action enterKeyShortcutAction 
+      = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
+
+    private final Object registeredTarget;
+
+    public AddUserHandler(Object registeredTarget)
+    {
+      this.registeredTarget = registeredTarget;
+    }
+
+    @Override
+    public Action[] getActions(Object target, Object sender)
+    {
+      return new Action[]
+      {
+        enterKeyShortcutAction
+      };
+    }
+    
+    @Override
+    public void handleAction(Action action, Object sender, Object target)
+    {
+      if(action == enterKeyShortcutAction && target == registeredTarget)
+      {
+        handleAdd();
+      }
+    }
   }
 
   public class PasswordChangeColumnGenerator implements Table.ColumnGenerator

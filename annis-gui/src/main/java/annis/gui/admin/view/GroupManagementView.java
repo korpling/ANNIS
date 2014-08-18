@@ -30,6 +30,8 @@ public interface GroupManagementView
   
   public void setGroupList(Collection<Group> groups);
   
+  public void emptyNewGroupNameTextField();
+  
   public interface Listener
   {
     public void attached();

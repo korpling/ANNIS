@@ -34,6 +34,8 @@ public interface UserManagementView
   
   public void askForPasswordChange(String userName);
   
+  public void emptyNewUserNameTextField();
+  
   public interface Listener
   {
     public void userUpdated(User user);

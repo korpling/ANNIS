@@ -97,6 +97,7 @@ public class GroupManagementController implements GroupManagementView.Listener,
       Group g = new Group(groupName);
       model.createOrUpdateGroup(g);
       view.setGroupList(model.getGroups());
+      view.emptyNewGroupNameTextField();
     }
   }
 

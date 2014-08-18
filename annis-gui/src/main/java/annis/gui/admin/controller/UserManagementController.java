@@ -96,6 +96,7 @@ public class UserManagementController
       model.createOrUpdateUser(u);
       view.askForPasswordChange(userName); 
       view.setUserList(model.getUsers());
+      view.emptyNewUserNameTextField();
     }
   }
 
