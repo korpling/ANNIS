@@ -670,17 +670,8 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getSelectedCorpora()
   {
-    Set<String> result = new HashSet<>();
-
-    for (String id : corpusContainer.getItemIds())
-    {
-      if (tblCorpora.isSelected(id))
-      {
-        result.add(id);
-      }
-    }
-
-    return result;
+    // make a copy
+    return new HashSet<>((Set<String>) tblCorpora.getValue());
   }
   
   /**
