@@ -17,7 +17,6 @@
 package annis.gui.admin.view;
 
 import annis.security.User;
-import com.sun.jersey.api.client.WebResource;
 import java.util.Collection;
 import java.util.Set;
 

@@ -194,12 +194,6 @@
       <version>2.2.1</version>
     </dependency>
     <dependency>
-      <groupId>org.vaadin.addons</groupId>
-      <artifactId>tokenfield</artifactId>
-      <version>7.0.1</version>
-    </dependency>
-    
-    <dependency>
       <groupId>com.google.guava</groupId>
       <artifactId>guava-gwt</artifactId>
       <version>16.0</version>

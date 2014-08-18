@@ -37,8 +37,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.vaadin.tokenfield.TokenField;
-
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
@@ -191,12 +189,10 @@ public class GroupManagementPanel extends Panel
       switch ((String) propertyId)
       {
         case "corpora":
-          TokenField tokenField = new TokenField();
-          tokenField.setPropertyDataSource(container.
-            getContainerProperty(itemId,
-              propertyId));
-
-          tokenField.addValueChangeListener(new Property.ValueChangeListener()
+          TextField txt = new TextField();
+          txt.setConverter(new CommaSeperatedStringConverter());
+          txt.setWidth("100%");
+          txt.addValueChangeListener(new Property.ValueChangeListener()
           {
 
             @Override
@@ -208,7 +204,8 @@ public class GroupManagementPanel extends Panel
               }
             }
           });
-          result = tokenField;
+
+          result = txt;
           break;
         case "name":
           // explicitly request a read-only label for the name

@@ -16,7 +16,6 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.UserManagementView;
-import annis.gui.paging.PagingComponent;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -35,12 +34,10 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.vaadin.tokenfield.TokenField;
 
 /**
  *
@@ -80,7 +77,7 @@ public class UserManagementPanel extends Panel
     userList.
       setVisibleColumns("name", "groups", "permissions", "changepassword");
     userList.
-      setColumnHeaders("Username", "Groups", "Additional permissions", "");
+      setColumnHeaders("Username", "Groups (seperate with comma)", "Additional permissions (seperate with comma)", "");
 
     userList.setTableFieldFactory(new FieldFactory());
 
@@ -116,13 +113,13 @@ public class UserManagementPanel extends Panel
 
     HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
       btAddNewUser, btDeleteUser);
-    
+
     layout = new VerticalLayout(userList, actionLayout);
     layout.setSizeFull();
     setContent(layout);
 
     addActionHandler(new AddUserHandler(txtUserName));
-    
+
   }
 
   private void handleAdd()
@@ -172,7 +169,8 @@ public class UserManagementPanel extends Panel
 
   public class AddUserHandler implements Action.Handler
   {
-    private final Action enterKeyShortcutAction 
+
+    private final Action enterKeyShortcutAction
       = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
 
     private final Object registeredTarget;
@@ -190,11 +188,11 @@ public class UserManagementPanel extends Panel
         enterKeyShortcutAction
       };
     }
-    
+
     @Override
     public void handleAction(Action action, Object sender, Object target)
     {
-      if(action == enterKeyShortcutAction && target == registeredTarget)
+      if (action == enterKeyShortcutAction && target == registeredTarget)
       {
         handleAdd();
       }
@@ -236,14 +234,13 @@ public class UserManagementPanel extends Panel
 
       switch ((String) propertyId)
       {
-        case "groups":
         case "permissions":
-          TokenField tokenField = new TokenField();
-          tokenField.setPropertyDataSource(container.
-            getContainerProperty(itemId,
-              propertyId));
+        case "groups":
 
-          tokenField.addValueChangeListener(new Property.ValueChangeListener()
+          TextField txt = new TextField();
+          txt.setConverter(new CommaSeperatedStringConverter());
+          txt.setWidth("100%");
+          txt.addValueChangeListener(new Property.ValueChangeListener()
           {
 
             @Override
@@ -255,10 +252,11 @@ public class UserManagementPanel extends Panel
               }
             }
           });
-          result = tokenField;
+
+          result = txt;
           break;
         case "name":
-          // explicitly request a read-only label for the name
+          // explicitly request a read-only label for the name and groups
           result = null;
           break;
         default:
