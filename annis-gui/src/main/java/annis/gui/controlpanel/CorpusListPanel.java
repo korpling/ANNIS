@@ -612,33 +612,6 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
   
-  public static class CorpusSorter extends DefaultItemSorter
-  {
-
-    @Override
-    protected int compareProperty(Object propertyId, boolean sortDirection,
-      Item item1, Item item2)
-    {
-      if ("name".equals(propertyId))
-      {
-        String val1 = (String) item1.getItemProperty(propertyId).getValue();
-        String val2 = (String) item2.getItemProperty(propertyId).getValue();
-
-        if (sortDirection)
-        {
-          return val1.compareToIgnoreCase(val2);
-        }
-        else
-        {
-          return val2.compareToIgnoreCase(val1);
-        }
-      }
-      else
-      {
-        return super.compareProperty(propertyId, sortDirection, item1, item2);
-      }
-    }
-  }
 
   /**
    * Select the corpora

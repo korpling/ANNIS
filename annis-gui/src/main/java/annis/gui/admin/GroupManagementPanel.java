@@ -67,7 +67,7 @@ public class GroupManagementPanel extends Panel
     tblGroups.setTableFieldFactory(new FieldFactory());
 
     tblGroups.setVisibleColumns("name", "corpora");
-    tblGroups.setColumnHeaders("Name", "Allowed corpora");
+    tblGroups.setColumnHeaders("Name", "Allowed corpora (seperate with comma)");
 
     txtGroupName = new TextField();
     txtGroupName.setInputPrompt("New group name");

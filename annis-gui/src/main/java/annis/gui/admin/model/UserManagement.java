@@ -35,7 +35,7 @@ public class UserManagement
 {
   private WebResource rootResource;
 
-  private final Map<String, User> users = new TreeMap<>();
+  private final Map<String, User> users = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);
   

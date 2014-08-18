@@ -32,8 +32,8 @@ public class User
 {
   private String name;
   private String passwordHash;
-  private Set<String> groups = new TreeSet<>();
-  private Set<String> permissions = new TreeSet<>();
+  private Set<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private Set<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
  
   public User()
   {

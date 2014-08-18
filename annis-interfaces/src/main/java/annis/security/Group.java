@@ -36,7 +36,7 @@ public class Group
   public static final String DEFAULT_USER_ROLE = "user";
   
   private String name;
-  private Set<String> corpora = new TreeSet<>();
+  private Set<String> corpora = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
 
   public Group()
   {
@@ -56,8 +56,10 @@ public class Group
   
   public Group(String name, String corpusNames)
   {
-    this(name, new TreeSet<>(Splitter.on(',').omitEmptyStrings().trimResults().splitToList(
-      corpusNames)));
+    this(name);
+    List<String> splitted = Splitter.on(',').omitEmptyStrings().trimResults().splitToList(
+      corpusNames);
+    corpora.addAll(splitted);
   }
   
   public String getName()

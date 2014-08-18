@@ -36,7 +36,7 @@ public class GroupManagement
   
   private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
   
-  private final Map<String, Group> groups = new TreeMap<>();
+  private final Map<String, Group> groups = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private WebResource rootResource;
   
   public boolean fetchGroups()

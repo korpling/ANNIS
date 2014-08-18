@@ -13,12 +13,12 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
+import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,14 +29,22 @@ import java.util.TreeSet;
  */
 public class CommaSeperatedStringConverter implements Converter<String, Set>
 {
-  private final Splitter splitter = Splitter.on(',').trimResults().omitEmptyStrings();
+
+  private final Splitter splitter = Splitter.on(',').trimResults().
+    omitEmptyStrings();
+
   private final Joiner joiner = Joiner.on(", ");
 
   @Override
   public Set convertToModel(String value,
     Class<? extends Set> targetType, Locale locale) throws ConversionException
   {
-    return new TreeSet<>(splitter.splitToList(value));
+    TreeSet<String> result = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    for(String s : splitter.split(value))
+    {
+      result.add(s);
+    }
+    return result;
   }
 
   @Override
