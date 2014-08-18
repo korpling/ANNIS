@@ -281,5 +281,9 @@ $font-size: 10pt;
   .v-tabsheet-tabcontainer-blue-tab {
     background-color: #ecf0f6;
   }
+  
+  .transparent-selection tr.v-selected {
+    background-color: rgba(49, 55, 245, 0.5);
+  } 
 
 }

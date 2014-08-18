@@ -69,6 +69,7 @@ public class UserManagementPanel extends Panel
     userList.setSelectable(true);
     userList.setMultiSelect(true);
     userList.addStyleName(ChameleonTheme.TABLE_STRIPED);
+    userList.addStyleName("transparent-selection");
     userList.setSizeFull();
     userList.setContainerDataSource(userContainer);
     userList.addGeneratedColumn("changepassword",
@@ -237,10 +238,9 @@ public class UserManagementPanel extends Panel
         case "permissions":
         case "groups":
 
-          TextField txt = new TextField();
-          txt.setConverter(new CommaSeperatedStringConverter());
-          txt.setWidth("100%");
-          txt.addValueChangeListener(new Property.ValueChangeListener()
+          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
+          selector.setWidth("100%");
+          selector.addValueChangeListener(new Property.ValueChangeListener()
           {
 
             @Override
@@ -253,7 +253,7 @@ public class UserManagementPanel extends Panel
             }
           });
 
-          result = txt;
+          result = selector;
           break;
         case "name":
           // explicitly request a read-only label for the name and groups

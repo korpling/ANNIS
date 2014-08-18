@@ -48,6 +48,7 @@ public class User
   /**
    * Constructs a represention from the contents of an an ANNIS
    * user file. 
+   * @param name
    * @param props
    */
   public User(String name, Properties props)

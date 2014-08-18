@@ -63,6 +63,7 @@ public class GroupManagementPanel extends Panel
     tblGroups.setSelectable(true);
     tblGroups.setMultiSelect(true);
     tblGroups.setSizeFull();
+    tblGroups.addStyleName("transparent-selection");
 
     tblGroups.setTableFieldFactory(new FieldFactory());
 
@@ -189,10 +190,10 @@ public class GroupManagementPanel extends Panel
       switch ((String) propertyId)
       {
         case "corpora":
-          TextField txt = new TextField();
-          txt.setConverter(new CommaSeperatedStringConverter());
-          txt.setWidth("100%");
-          txt.addValueChangeListener(new Property.ValueChangeListener()
+          
+          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
+          selector.setWidth("100%");
+          selector.addValueChangeListener(new Property.ValueChangeListener()
           {
 
             @Override
@@ -205,7 +206,7 @@ public class GroupManagementPanel extends Panel
             }
           });
 
-          result = txt;
+          result = selector;
           break;
         case "name":
           // explicitly request a read-only label for the name
