@@ -17,12 +17,14 @@
 package annis.gui.admin.model;
 
 import annis.security.Group;
+import com.google.common.collect.ImmutableSet;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +41,7 @@ public class GroupManagement
   private final Map<String, Group> groups = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private WebResource rootResource;
   
-  public boolean fetchGroups()
+  public boolean fetchFromService()
   {
     if(rootResource != null)
     {
@@ -90,6 +92,11 @@ public class GroupManagement
   public Collection<Group> getGroups()
   {
     return groups.values();
+  }
+  
+  public ImmutableSet<String> getGroupNames()
+  {
+    return ImmutableSet.copyOf(groups.keySet());
   }
 
   public WebResource getRootResource()

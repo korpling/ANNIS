@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
@@ -36,7 +37,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   private final TextField txtValue;
   private final TwinColSelect selector;
   
-  public PopupTwinColumnSelect()
+  public PopupTwinColumnSelect(Container predefinedItems)
   {
     txtValue = new TextField();
     txtValue.setConverter(new CommaSeperatedStringConverter());
@@ -44,6 +45,8 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
     selector = new TwinColSelect();
     selector.setNewItemsAllowed(true);
+    
+    selector.setContainerDataSource(predefinedItems);
     
     PopupView popup = new PopupView("Select", selector);
 
@@ -97,10 +100,5 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     return Set.class;
   }
 
-  public void setItems(Set<String> items)
-  {
-    selector.removeAllItems();
-    selector.addItems(items);
-  }
   
 }

@@ -14,25 +14,23 @@
  * limitations under the License.
  */
 
-package annis.gui.admin.view;
-
-import com.sun.jersey.api.client.WebResource;
+package annis.gui;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface UIView
+public class CriticalServiceQueryException extends ServiceQueryException
 {
-  public void addListener(Listener listener);
-  
-  public void showInfo(String info, String description);
-  public void showBackgroundInfo(String info, String description);
-  public void showWarning(String warning, String description);
-  public void showError(String error, String description);
-  
-  public interface Listener
+
+  public CriticalServiceQueryException(String msg)
   {
-    public void loginChanged(WebResource annisRootResource);
+    super(msg);
   }
+  
+  public CriticalServiceQueryException(String msg, String description)
+  {
+    super(msg, description);
+  }
+  
 }

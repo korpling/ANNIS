@@ -14,25 +14,31 @@
  * limitations under the License.
  */
 
-package annis.gui.admin.view;
-
-import com.sun.jersey.api.client.WebResource;
+package annis.gui;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface UIView
-{
-  public void addListener(Listener listener);
+public class ServiceQueryException extends Exception
+{ 
+  private final String description;
   
-  public void showInfo(String info, String description);
-  public void showBackgroundInfo(String info, String description);
-  public void showWarning(String warning, String description);
-  public void showError(String error, String description);
-  
-  public interface Listener
+  public ServiceQueryException(String msg)
   {
-    public void loginChanged(WebResource annisRootResource);
+    super(msg);
+    this.description = null;
   }
+  
+  public ServiceQueryException(String msg, String description)
+  {
+    super(msg);
+    this.description = description;
+  }
+
+  public String getDescription()
+  {
+    return description;
+  }
+  
 }

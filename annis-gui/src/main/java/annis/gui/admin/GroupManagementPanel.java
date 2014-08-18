@@ -16,11 +16,11 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.GroupManagementView;
-import annis.gui.admin.view.UserManagementView;
 import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
@@ -48,12 +48,12 @@ public class GroupManagementPanel extends Panel
   private final List<GroupManagementView.Listener> listeners = new LinkedList<>();
 
   private final Table tblGroups = new Table();
-
   private final TextField txtGroupName;
 
   private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
     Group.class);
-
+  
+  private final IndexedContainer corpusNamesContainer = new IndexedContainer();
   public GroupManagementPanel()
   {
     groupsContainer.setBeanIdProperty("name");
@@ -147,6 +147,18 @@ public class GroupManagementPanel extends Panel
     txtGroupName.setValue("");
   }
 
+  @Override
+  public void setAvailableCorpusNames(Collection<String> corpusNames)
+  {
+    corpusNamesContainer.removeAllItems();
+    for(String n : corpusNames)
+    {
+      corpusNamesContainer.addItem(n);
+    }
+  }
+  
+  
+
   public class AddGroupHandler implements Action.Handler
   {
     private final Action enterKeyShortcutAction 
@@ -191,7 +203,7 @@ public class GroupManagementPanel extends Panel
       {
         case "corpora":
           
-          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
+          PopupTwinColumnSelect selector = new PopupTwinColumnSelect(corpusNamesContainer);
           selector.setWidth("100%");
           selector.addValueChangeListener(new Property.ValueChangeListener()
           {

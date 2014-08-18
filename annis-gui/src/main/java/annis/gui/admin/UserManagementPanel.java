@@ -20,6 +20,7 @@ import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
@@ -56,6 +57,8 @@ public class UserManagementPanel extends Panel
   private final List<UserManagementView.Listener> listeners = new LinkedList<>();
 
   private final TextField txtUserName;
+  
+  private IndexedContainer groupNamesContainer = new IndexedContainer();
 
   public UserManagementPanel()
   {
@@ -167,6 +170,15 @@ public class UserManagementPanel extends Panel
   {
     txtUserName.setValue("");
   }
+  
+  public void setAvailableGroupNames(Collection<String> groupNames)
+  {
+    groupNamesContainer.removeAllItems();
+    for(String n : groupNames)
+    {
+      groupNamesContainer.addItem(n);
+    }
+  }
 
   public class AddUserHandler implements Action.Handler
   {
@@ -235,12 +247,11 @@ public class UserManagementPanel extends Panel
 
       switch ((String) propertyId)
       {
-        case "permissions":
         case "groups":
 
-          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
-          selector.setWidth("100%");
-          selector.addValueChangeListener(new Property.ValueChangeListener()
+          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupNamesContainer);
+          groupsSelector.setWidth("100%");
+          groupsSelector.addValueChangeListener(new Property.ValueChangeListener()
           {
 
             @Override
@@ -253,7 +264,28 @@ public class UserManagementPanel extends Panel
             }
           });
 
-          result = selector;
+          result = groupsSelector;
+          
+          break;
+        case "permissions":
+          
+          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(null);
+          permissionSelector.setWidth("100%");
+          permissionSelector.addValueChangeListener(new Property.ValueChangeListener()
+          {
+
+            @Override
+            public void valueChange(Property.ValueChangeEvent event)
+            {
+              for (UserManagementView.Listener l : listeners)
+              {
+                l.userUpdated(userContainer.getItem(itemId).getBean());
+              }
+            }
+          });
+
+          result = permissionSelector;
+          
           break;
         case "name":
           // explicitly request a read-only label for the name and groups

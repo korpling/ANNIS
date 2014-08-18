@@ -18,6 +18,7 @@ package annis.gui.admin.view;
 
 import annis.security.Group;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -31,6 +32,8 @@ public interface GroupManagementView
   public void setGroupList(Collection<Group> groups);
   
   public void emptyNewGroupNameTextField();
+  
+  public void setAvailableCorpusNames(Collection<String> corpusNames);
   
   public interface Listener
   {

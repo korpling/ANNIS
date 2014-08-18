@@ -18,6 +18,7 @@ package annis.gui.admin.view;
 
 import annis.security.User;
 import java.util.Collection;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -34,6 +35,8 @@ public interface UserManagementView
   public void askForPasswordChange(String userName);
   
   public void emptyNewUserNameTextField();
+  
+  public void setAvailableGroupNames(Collection<String> groupNames);
   
   public interface Listener
   {

@@ -16,6 +16,7 @@
 
 package annis.gui.admin.controller;
 
+import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserManagementView;
@@ -24,6 +25,7 @@ import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -37,7 +39,8 @@ public class UserManagementController
   private final UserManagementView view;
   private final UIView uiView;
 
-  public UserManagementController(UserManagement model, UserManagementView view, UIView uiView)
+  public UserManagementController(UserManagement model,
+    UserManagementView view, UIView uiView)
   {
     this.model = model;
     this.view = view;    
@@ -46,16 +49,16 @@ public class UserManagementController
     uiView.addListener(UserManagementController.this);
   }
   
-  private void updateUserList()
+  private void fetchFromService()
   {
-    if(model.fetchUsers())
+    if(model.fetchFromService())
     {
       view.setUserList(model.getUsers());
     }
     
     else
     {
-      uiView.showError("Cannot get the user list");
+      uiView.showError("Cannot get the user list", null);
       view.setUserList(new LinkedList<User>());
     }
   }
@@ -63,7 +66,7 @@ public class UserManagementController
   @Override
   public void attached()
   {
-    updateUserList();
+    fetchFromService();
   }
 
   @Override
@@ -83,11 +86,11 @@ public class UserManagementController
   {
     if(userName == null || userName.isEmpty())
     {
-      uiView.showError("User name is empty");
+      uiView.showError("User name is empty", null);
     }
     else if(model.getUser(userName) != null)
     {
-      uiView.showError("User already exists");
+      uiView.showError("User already exists", null);
     }
     else
     {
@@ -111,11 +114,11 @@ public class UserManagementController
     
     if(userName.size() == 1)
     {
-      uiView.showInfo("User \"" + userName.iterator().next() +  "\" was deleted");
+      uiView.showInfo("User \"" + userName.iterator().next() +  "\" was deleted", null);
     }
     else
     {
-      uiView.showInfo("Deleted users: " + Joiner.on(", ").join(userName));
+      uiView.showInfo("Deleted users: " + Joiner.on(", ").join(userName), null);
     }
   }
 
@@ -123,7 +126,7 @@ public class UserManagementController
   public void loginChanged(WebResource annisRootResource)
   {
     model.setRootResource(annisRootResource);
-    updateUserList();
+    fetchFromService();
   }
   
   

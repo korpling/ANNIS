@@ -24,8 +24,10 @@ import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserManagementView;
+import annis.gui.query.model.CorpusManagement;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
+import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
@@ -56,17 +58,22 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
   {
     super.init(request);
     
-    UserManagementPanel userManagementPanel = new UserManagementPanel();
+    WebResource rootResource = Helper.getAnnisWebResource();
     UserManagement userManagement = new UserManagement();
-    userManagement.setRootResource(Helper.getAnnisWebResource());
+    userManagement.setRootResource(rootResource);
+    GroupManagement groupManagement = new GroupManagement();
+    groupManagement.setRootResource(rootResource);
+    CorpusManagement corpusManagement = new CorpusManagement();
+    corpusManagement.setRootResource(rootResource);
+    
+    UserManagementPanel userManagementPanel = new UserManagementPanel();
     userController = new UserManagementController(userManagement,
       userManagementPanel, this);
     
     GroupManagementPanel groupManagementPanel = new GroupManagementPanel();
-    GroupManagement groupManagement = new GroupManagement();
-    groupManagement.setRootResource(Helper.getAnnisWebResource());
     groupManagementController = new GroupManagementController(groupManagement,
-      groupManagementPanel, this);
+      corpusManagement,
+      groupManagementPanel, this, userManagementPanel);
     
     
     TabSheet tabSheet = new TabSheet();
@@ -98,15 +105,27 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
   
 
   @Override
-  public void showInfo(String info)
+  public void showInfo(String info, String description)
   {
-    Notification.show(info, Notification.Type.HUMANIZED_MESSAGE);
+    Notification.show(info, description, Notification.Type.HUMANIZED_MESSAGE);
+  }
+  
+  @Override
+  public void showBackgroundInfo(String info, String description)
+  {
+    Notification.show(info, description, Notification.Type.TRAY_NOTIFICATION);
+  }
+  
+  @Override
+  public void showWarning(String error, String description)
+  {
+    Notification.show(error, description, Notification.Type.WARNING_MESSAGE);
   }
 
   @Override
-  public void showError(String error)
+  public void showError(String error, String description)
   {
-    Notification.show(error, Notification.Type.ERROR_MESSAGE);
+    Notification.show(error, description, Notification.Type.ERROR_MESSAGE);
   }
   
   @Override

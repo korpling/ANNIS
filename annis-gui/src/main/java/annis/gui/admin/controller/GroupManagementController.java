@@ -16,15 +16,22 @@
 
 package annis.gui.admin.controller;
 
+import annis.gui.CriticalServiceQueryException;
+import annis.gui.ServiceQueryException;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.view.GroupManagementView;
 import annis.gui.admin.view.UIView;
+import annis.gui.admin.view.UserManagementView;
+import annis.gui.query.model.CorpusManagement;
 import annis.security.Group;
 import annis.security.User;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -34,45 +41,76 @@ public class GroupManagementController implements GroupManagementView.Listener,
   UIView.Listener
 {
   private final GroupManagement model;
+  private final CorpusManagement corpusModel;
   private final GroupManagementView view;
   private final UIView uiView;
+  private final UserManagementView userView;
 
   public GroupManagementController(GroupManagement model,
-    GroupManagementView view, UIView uiView)
+    CorpusManagement corpusModel,
+    GroupManagementView view, UIView uiView,
+    UserManagementView userView)
   {
     this.model = model;
+    this.corpusModel = corpusModel;
     this.view = view;
     this.uiView = uiView;
+    this.userView = userView;
     
     this.view.addListener(GroupManagementController.this);
     this.uiView.addListener(GroupManagementController.this);
   }
 
-  private void updateGroupList()
+  private void fetchDataFromService()
   {
-    if(model.fetchGroups())
+    if(model.fetchFromService())
     {
       view.setGroupList(model.getGroups());
     }
     
     else
     {
-      uiView.showError("Cannot get the group list");
+      uiView.showError("Cannot get the group list", null);
       view.setGroupList(new LinkedList<Group>());
     }
+    
+    try
+    {
+      corpusModel.fetchFromService();
+      view.setAvailableCorpusNames(corpusModel.getCorpusNames());
+    }
+    catch(CriticalServiceQueryException ex)
+    {
+      uiView.showWarning(ex.getMessage(), ex.getDescription());
+    }
+    catch (ServiceQueryException ex)
+    {
+      uiView.showInfo(ex.getMessage(), ex.getDescription());
+    }
+    
+    updateUserUI();
+    
+  }
+  
+  private void updateUserUI()
+  {
+    Set<String> names = new TreeSet<>(model.getGroupNames());
+    names.add("*");
+    userView.setAvailableGroupNames(names);
   }
 
   @Override
   public void attached()
   {
-    updateGroupList();
+    fetchDataFromService();
   }
 
   @Override
   public void loginChanged(WebResource annisRootResource)
   {
     model.setRootResource(annisRootResource);
-    updateGroupList();
+    corpusModel.setRootResource(annisRootResource);
+    fetchDataFromService();
   }
 
   @Override
@@ -86,11 +124,11 @@ public class GroupManagementController implements GroupManagementView.Listener,
   {
     if(groupName == null || groupName.isEmpty())
     {
-      uiView.showError("Group name is empty");
+      uiView.showError("Group name is empty", null);
     }
     else if(model.getGroup(groupName) != null)
     {
-      uiView.showError("Group already exists");
+      uiView.showError("Group already exists", null);
     }
     else
     {
@@ -98,6 +136,8 @@ public class GroupManagementController implements GroupManagementView.Listener,
       model.createOrUpdateGroup(g);
       view.setGroupList(model.getGroups());
       view.emptyNewGroupNameTextField();
+      
+      updateUserUI();
     }
   }
 
@@ -112,12 +152,14 @@ public class GroupManagementController implements GroupManagementView.Listener,
     
     if(groupName.size() == 1)
     {
-      uiView.showInfo("Group \"" + groupName.iterator().next() +  "\" was deleted");
+      uiView.showInfo("Group \"" + groupName.iterator().next() +  "\" was deleted", null);
     }
     else
     {
-      uiView.showInfo("Deleted groups: " + Joiner.on(", ").join(groupName));
+      uiView.showInfo("Deleted groups: " + Joiner.on(", ").join(groupName), null);
     }
+    
+    updateUserUI();
   }
   
   

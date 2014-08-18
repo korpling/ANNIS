@@ -72,7 +72,7 @@ public class UserManagement
 
   }
   
-  public boolean fetchUsers()
+  public boolean fetchFromService()
   {
     if(rootResource != null)
     {
