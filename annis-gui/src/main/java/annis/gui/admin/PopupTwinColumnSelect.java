@@ -45,6 +45,8 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
     selector = new TwinColSelect();
     selector.setNewItemsAllowed(true);
+    selector.setLeftColumnCaption("Available");
+    selector.setRightColumnCaption("Selected");
     
     selector.setContainerDataSource(predefinedItems);
     
