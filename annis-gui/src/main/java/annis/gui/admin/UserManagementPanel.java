@@ -15,9 +15,7 @@
  */
 package annis.gui.admin;
 
-import annis.gui.LoginListener;
 import annis.gui.admin.view.UserManagementView;
-import annis.libgui.Helper;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -27,7 +25,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.Table;
@@ -39,7 +36,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.TreeSet;
 import org.vaadin.tokenfield.TokenField;
 
 /**
@@ -47,7 +43,7 @@ import org.vaadin.tokenfield.TokenField;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class UserManagementPanel extends Panel
-  implements UserManagementView, LoginListener
+  implements UserManagementView
 {
 
   private final VerticalLayout layout;
@@ -106,14 +102,7 @@ public class UserManagementPanel extends Panel
       public void buttonClick(Button.ClickEvent event)
       {
         // get selected users
-        Set<String> selectedUsers = new TreeSet<>();
-        for (String u : userContainer.getItemIds())
-        {
-          if (userList.isSelected(u))
-          {
-            selectedUsers.add(u);
-          }
-        }
+        Set<String> selectedUsers = (Set<String>) userList.getValue();
         for (UserManagementView.Listener l : listeners)
         {
           l.deleteUsers(selectedUsers);
@@ -139,19 +128,6 @@ public class UserManagementPanel extends Panel
     }
   }
   
-  
-
-  @Override
-  public void showInfo(String info)
-  {
-    Notification.show(info, Notification.Type.HUMANIZED_MESSAGE);
-  }
-
-  @Override
-  public void showError(String error)
-  {
-    Notification.show(error, Notification.Type.ERROR_MESSAGE);
-  }
 
   @Override
   public void addListener(UserManagementView.Listener listener)
@@ -197,28 +173,6 @@ public class UserManagementPanel extends Panel
     }
 
   }
-
-  @Override
-  public void onLogin()
-  {
-    for(UserManagementView.Listener l : listeners)
-    {
-      l.loginChanged(Helper.getAnnisWebResource());
-    }
-  }
-
-  @Override
-  public void onLogout()
-  {
-    for(UserManagementView.Listener l : listeners)
-    {
-      l.loginChanged(Helper.getAnnisWebResource());
-    }
-  }
-  
-  
-  
-  
 
   public class FieldFactory extends DefaultFieldFactory
   {

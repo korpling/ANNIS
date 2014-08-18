@@ -15,17 +15,18 @@
  */
 package annis.security;
 
+import com.google.common.base.Joiner;
 import com.google.common.collect.ImmutableMap;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
+import java.util.TreeMap;
 import java.util.concurrent.locks.ReadWriteLock;
 import java.util.concurrent.locks.ReentrantReadWriteLock;
 import org.apache.commons.io.FileUtils;
@@ -50,7 +51,7 @@ public class ANNISUserConfigurationManager
 
   private File groupsFile;
 
-  private Map<String, Group> groups;
+  private final Map<String, Group> groups = new TreeMap<>();
 
   private Date lastTimeReloaded = null;
 
@@ -82,11 +83,11 @@ public class ANNISUserConfigurationManager
 
     if (reload)
     {
-      reloadGroups();
+      reloadGroupsFromFile();
     }
   }
 
-  private void reloadGroups()
+  private void reloadGroupsFromFile()
   {
     lock.writeLock().lock();
     try
@@ -99,7 +100,7 @@ public class ANNISUserConfigurationManager
         propGroups.load(inStream);
         lastTimeReloaded = new Date(groupsFile.lastModified());
 
-        groups = new HashMap<>();
+        groups.clear();
         for (String k : propGroups.stringPropertyNames())
         {
           groups.put(k, new Group(k, propGroups.getProperty(k)));
@@ -123,6 +124,68 @@ public class ANNISUserConfigurationManager
     return ImmutableMap.copyOf(groups);
   }
   
+  public boolean writeGroup(Group group)
+  {
+    if (groupsFile != null)
+    {
+
+      lock.writeLock().lock();
+      try
+      {
+        // make sure to have the newest version of the groups
+        reloadGroupsFromFile();
+        
+        // update/create the new group
+        groups.put(group.getName(), group);
+        
+        return writeGroupFile();
+        
+      }
+      finally
+      {
+        lock.writeLock().unlock();
+      }
+    } // end if resourcePath not null
+    return false;
+  }
+  
+  private boolean writeGroupFile()
+  {
+    if (groupsFile != null)
+    {
+
+      lock.writeLock().lock();
+      try
+      {
+        
+        Properties props = new Properties();
+        for(Group g : groups.values())
+        {
+          props.put(g.getName(), Joiner.on(',').join(g.getCorpora()));
+        }
+        
+        try(FileOutputStream outStream = new FileOutputStream(groupsFile))
+        {
+          props.store(outStream, "");
+          outStream.close();
+
+          // update the last modification time
+          lastTimeReloaded = new Date(groupsFile.lastModified());
+          return true;
+        }
+        catch(IOException ex)
+        {
+          log.error("Could not write groups file", ex);
+        }
+      }
+      finally
+      {
+        lock.writeLock().unlock();
+      }
+    } // end if resourcePath not null
+    return false;
+  }
+  
   /**
    * Writes the user to the disk
    * @param user
@@ -130,7 +193,7 @@ public class ANNISUserConfigurationManager
    */
   public boolean writeUser(User user)
   {
-    // load user info from file
+    // save user info to file
     if (resourcePath != null)
     {
 
@@ -164,10 +227,10 @@ public class ANNISUserConfigurationManager
   
   /**
    * Deletes the user from the disk
-   * @param user
+   * @param userName
    * @return True if successful.
    */
-  public boolean deleteUser(User user)
+  public boolean deleteUser(String userName)
   {
     // load user info from file
     if (resourcePath != null)
@@ -180,9 +243,33 @@ public class ANNISUserConfigurationManager
         if (userDir.isDirectory())
         {
           // get the file which corresponds to the user
-          File userFile = new File(userDir.getAbsolutePath(), user.getName());
+          File userFile = new File(userDir.getAbsolutePath(), userName);
           return userFile.delete();
         }
+      }
+      finally
+      {
+        lock.writeLock().unlock();
+      }
+    } // end if resourcePath not null
+    return false;
+  }
+  
+  /**
+   * Deletes the group from the disk
+   * @param groupName
+   * @return True if successful.
+   */
+  public boolean deleteGroup(String groupName)
+  {
+    if (groupsFile != null)
+    {
+      lock.writeLock().lock();
+      try
+      {
+        reloadGroupsFromFile();
+        groups.remove(groupName);
+        return writeGroupFile();
       }
       finally
       {

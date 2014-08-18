@@ -16,11 +16,68 @@
 
 package annis.gui.admin.model;
 
+import annis.security.Group;
+import com.sun.jersey.api.client.GenericType;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.client.WebResource;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GroupManagement
 {
+  
+  private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
+  
+  private final Map<String, Group> groups = new TreeMap<>();
+  private WebResource rootResource;
+  
+  public boolean fetchGroups()
+  {
+    if(rootResource != null)
+    {
+      WebResource res = rootResource.path("admin/groups");
+      groups.clear();
+      try
+      {
+        List<Group> list = res.get(new GenericType<List<Group>>() {});
+        for(Group g : list)
+        {
+          groups.put(g.getName(), g);
+        }
+        return true;
+      }
+      catch(UniformInterfaceException ex)
+      {
+        log.error("Could not get the list of groups", ex);
+      }
+    }
+    return false;
+  }
+  
+  public Collection<Group> getGroups()
+  {
+    return groups.values();
+  }
+
+  public WebResource getRootResource()
+  {
+    return rootResource;
+  }
+
+  public void setRootResource(WebResource rootResource)
+  {
+    this.rootResource = rootResource;
+  }
+  
+  
+  
   
 }

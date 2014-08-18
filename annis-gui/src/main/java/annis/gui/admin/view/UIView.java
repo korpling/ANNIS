@@ -16,21 +16,21 @@
 
 package annis.gui.admin.view;
 
-import annis.security.Group;
-import java.util.Collection;
+import com.sun.jersey.api.client.WebResource;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface GroupManagementView
+public interface UIView
 {
   public void addListener(Listener listener);
   
-  public void setGroupList(Collection<Group> groups);
+  public void showInfo(String info);
+  public void showError(String error);
   
   public interface Listener
   {
-    public void attached();
+    public void loginChanged(WebResource annisRootResource);
   }
 }

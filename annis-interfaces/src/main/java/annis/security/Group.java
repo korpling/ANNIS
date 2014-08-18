@@ -17,9 +17,9 @@
 package annis.security;
 
 import com.google.common.base.Splitter;
-import java.util.ArrayList;
 import java.util.List;
-import java.util.Properties;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -36,7 +36,7 @@ public class Group
   public static final String DEFAULT_USER_ROLE = "user";
   
   private String name;
-  private List<String> corpora = new ArrayList<>();
+  private Set<String> corpora = new TreeSet<>();
 
   public Group()
   {
@@ -48,7 +48,7 @@ public class Group
     this.name = name;
   }
   
-  public Group(String name, List<String> corpora)
+  public Group(String name, Set<String> corpora)
   {
     this.name = name;
     this.corpora = corpora;
@@ -56,8 +56,8 @@ public class Group
   
   public Group(String name, String corpusNames)
   {
-    this(name, Splitter.on(',').omitEmptyStrings().trimResults().splitToList(
-      corpusNames));
+    this(name, new TreeSet<>(Splitter.on(',').omitEmptyStrings().trimResults().splitToList(
+      corpusNames)));
   }
   
   public String getName()
@@ -70,12 +70,12 @@ public class Group
     this.name = name;
   }
 
-  public List<String> getCorpora()
+  public Set<String> getCorpora()
   {
     return corpora;
   }
 
-  public void setCorpora(List<String> corpora)
+  public void setCorpora(Set<String> corpora)
   {
     this.corpora = corpora;
   }

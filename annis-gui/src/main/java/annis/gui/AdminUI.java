@@ -22,20 +22,25 @@ import annis.gui.admin.controller.GroupManagementController;
 import annis.gui.admin.controller.UserManagementController;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
+import annis.gui.admin.view.UIView;
+import annis.gui.admin.view.UserManagementView;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-public class AdminUI extends AnnisBaseUI
+public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
 {
   private VerticalLayout layout;
   
@@ -43,6 +48,8 @@ public class AdminUI extends AnnisBaseUI
      userController;
   private GroupManagementController
      groupManagementController;
+  
+  private final List<UIView.Listener> listeners = new LinkedList<>();
   
   @Override
   protected void init(VaadinRequest request)
@@ -53,12 +60,13 @@ public class AdminUI extends AnnisBaseUI
     UserManagement userManagement = new UserManagement();
     userManagement.setRootResource(Helper.getAnnisWebResource());
     userController = new UserManagementController(userManagement,
-      userManagementPanel);
+      userManagementPanel, this);
     
     GroupManagementPanel groupManagementPanel = new GroupManagementPanel();
     GroupManagement groupManagement = new GroupManagement();
+    groupManagement.setRootResource(Helper.getAnnisWebResource());
     groupManagementController = new GroupManagementController(groupManagement,
-      groupManagementPanel);
+      groupManagementPanel, this);
     
     
     TabSheet tabSheet = new TabSheet();
@@ -70,7 +78,7 @@ public class AdminUI extends AnnisBaseUI
     
     MainToolbar toolbar = new MainToolbar(null);
     addExtension(toolbar.getScreenshotExtension());
-    toolbar.addLoginListener(userManagementPanel);
+    toolbar.addLoginListener(AdminUI.this);
    
     layout = new VerticalLayout(toolbar, tabSheet);
     layout.setSizeFull();
@@ -80,6 +88,43 @@ public class AdminUI extends AnnisBaseUI
     
     setContent(layout);
 
+  }
+
+  @Override
+  public void addListener(UIView.Listener listener)
+  {
+    listeners.add(listener);
+  }
+  
+
+  @Override
+  public void showInfo(String info)
+  {
+    Notification.show(info, Notification.Type.HUMANIZED_MESSAGE);
+  }
+
+  @Override
+  public void showError(String error)
+  {
+    Notification.show(error, Notification.Type.ERROR_MESSAGE);
+  }
+  
+  @Override
+  public void onLogin()
+  {
+    for(UIView.Listener l : listeners)
+    {
+      l.loginChanged(Helper.getAnnisWebResource());
+    }
+  }
+
+  @Override
+  public void onLogout()
+  {
+    for(UIView.Listener l : listeners)
+    {
+      l.loginChanged(Helper.getAnnisWebResource());
+    }
   }
   
 }

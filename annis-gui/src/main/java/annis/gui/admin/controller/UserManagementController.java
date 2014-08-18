@@ -17,6 +17,7 @@
 package annis.gui.admin.controller;
 
 import annis.gui.admin.model.UserManagement;
+import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserManagementView;
 import annis.security.User;
 import com.google.common.base.Joiner;
@@ -29,17 +30,20 @@ import java.util.Set;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class UserManagementController
-  implements UserManagementView.Listener
+  implements UserManagementView.Listener, UIView.Listener
 {
   
   private final UserManagement model;
   private final UserManagementView view;
+  private final UIView uiView;
 
-  public UserManagementController(UserManagement model, UserManagementView view)
+  public UserManagementController(UserManagement model, UserManagementView view, UIView uiView)
   {
     this.model = model;
     this.view = view;    
+    this.uiView = uiView;
     view.addListener(UserManagementController.this);
+    uiView.addListener(UserManagementController.this);
   }
   
   private void updateUserList()
@@ -51,7 +55,7 @@ public class UserManagementController
     
     else
     {
-      view.showError("Cannot get the user list");
+      uiView.showError("Cannot get the user list");
       view.setUserList(new LinkedList<User>());
     }
   }
@@ -79,11 +83,11 @@ public class UserManagementController
   {
     if(userName == null || userName.isEmpty())
     {
-      view.showError("User name is empty");
+      uiView.showError("User name is empty");
     }
     else if(model.getUser(userName) != null)
     {
-      view.showError("User already exists");
+      uiView.showError("User already exists");
     }
     else
     {
@@ -106,11 +110,11 @@ public class UserManagementController
     
     if(userName.size() == 1)
     {
-      view.showInfo("User \"" + userName.iterator().next() +  "\" was deleted");
+      uiView.showInfo("User \"" + userName.iterator().next() +  "\" was deleted");
     }
     else
     {
-      view.showInfo("Deleted users: " + Joiner.on(", ").join(userName));
+      uiView.showInfo("Deleted users: " + Joiner.on(", ").join(userName));
     }
   }
 

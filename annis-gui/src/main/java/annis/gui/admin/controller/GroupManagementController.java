@@ -18,23 +18,61 @@ package annis.gui.admin.controller;
 
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.view.GroupManagementView;
+import annis.gui.admin.view.UIView;
+import annis.security.Group;
+import annis.security.User;
+import com.sun.jersey.api.client.WebResource;
+import java.util.LinkedList;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class GroupManagementController
+public class GroupManagementController implements GroupManagementView.Listener,
+  UIView.Listener
 {
-  private GroupManagement model;
-  private GroupManagementView view;
+  private final GroupManagement model;
+  private final GroupManagementView view;
+  private final UIView uiView;
 
   public GroupManagementController(GroupManagement model,
-    GroupManagementView view)
+    GroupManagementView view, UIView uiView)
   {
     this.model = model;
     this.view = view;
+    this.uiView = uiView;
+    
+    this.view.addListener(GroupManagementController.this);
+    this.uiView.addListener(GroupManagementController.this);
   }
 
+  private void updateGroupList()
+  {
+    if(model.fetchGroups())
+    {
+      view.setGroupList(model.getGroups());
+    }
+    
+    else
+    {
+      uiView.showError("Cannot get the group list");
+      view.setGroupList(new LinkedList<Group>());
+    }
+  }
+
+  @Override
+  public void attached()
+  {
+    updateGroupList();
+  }
+
+  @Override
+  public void loginChanged(WebResource annisRootResource)
+  {
+    model.setRootResource(annisRootResource);
+    updateGroupList();
+  }
+  
   
   
   
