@@ -17,11 +17,12 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.CorpusListView;
-import annis.gui.admin.view.UIView.Listener;
-import annis.gui.admin.view.UserListView;
-import annis.security.User;
 import annis.service.objects.AnnisCorpus;
+import com.vaadin.data.util.BeanContainer;
+import com.vaadin.ui.Layout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Table;
+import com.vaadin.ui.VerticalLayout;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
@@ -36,8 +37,25 @@ public class CorpusAdminPanel extends Panel
   
   private final List<CorpusListView.Listener> listeners = new LinkedList<>();
 
+  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
+  
   public CorpusAdminPanel()
   {
+    corpusContainer.setBeanIdProperty("name");
+    
+    Table tblCorpora = new Table();
+    tblCorpora.setContainerDataSource(corpusContainer);
+    tblCorpora.setSizeFull();
+    tblCorpora.setSelectable(true);
+    tblCorpora.setMultiSelect(true);
+    
+    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");
+    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "Source path");
+    
+    VerticalLayout layout = new VerticalLayout(tblCorpora);
+    layout.setSizeFull();
+    layout.setExpandRatio(tblCorpora, 1.0f);
+    setContent(layout);
   }
   
   @Override
@@ -49,7 +67,8 @@ public class CorpusAdminPanel extends Panel
   @Override
   public void setAvailableCorpora(Collection<AnnisCorpus> corpora)
   {
-    throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+    corpusContainer.removeAllItems();
+    corpusContainer.addAll(corpora);
   }
   
 }

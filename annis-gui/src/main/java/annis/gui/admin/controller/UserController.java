@@ -16,7 +16,6 @@
 
 package annis.gui.admin.controller;
 
-import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserListView;
@@ -25,7 +24,6 @@ import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.TreeSet;
 
 /**
  *
@@ -128,6 +126,16 @@ public class UserController
     model.setRootResource(annisRootResource);
     fetchFromService();
   }
+
+  @Override
+  public void selectedTabChanged(Object selectedTab)
+  {
+    if(selectedTab == view)
+    {
+      fetchFromService();
+    }
+  }
+  
   
   
 }

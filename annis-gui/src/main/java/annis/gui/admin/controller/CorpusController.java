@@ -19,16 +19,11 @@ package annis.gui.admin.controller;
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;
 import annis.gui.admin.model.CorpusManagement;
-import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.CorpusListView;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserListView;
-import annis.security.User;
 import annis.service.objects.AnnisCorpus;
-import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
-import java.util.Set;
 
 /**
  *
@@ -84,6 +79,17 @@ public class CorpusController
     model.setRootResource(annisRootResource);
     fetchFromService();
   }
+
+  @Override
+  public void selectedTabChanged(Object selectedTab)
+  {
+    if(selectedTab == view)
+    {
+      fetchFromService();
+    }
+  }
+  
+  
   
   
 }

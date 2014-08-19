@@ -24,14 +24,11 @@ import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserListView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.security.Group;
-import annis.security.User;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -160,6 +157,15 @@ public class GroupController implements GroupListView.Listener,
     }
     
     updateUserUI();
+  }
+
+  @Override
+  public void selectedTabChanged(Object selectedTab)
+  {
+    if(selectedTab == view)
+    {
+      fetchDataFromService();
+    }
   }
   
   
