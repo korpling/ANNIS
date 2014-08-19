@@ -32,7 +32,7 @@ public interface GroupListView
   
   public void emptyNewGroupNameTextField();
   
-  public void setAvailableCorpusNames(Collection<String> corpusNames);
+  public void addAvailableCorpusNames(Collection<String> corpusNames);
   
   public interface Listener
   {

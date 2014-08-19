@@ -20,6 +20,7 @@ import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
@@ -60,8 +61,8 @@ public class UserManagementPanel extends Panel
 
   private final TextField txtUserName;
   
-  private IndexedContainer groupNamesContainer = new IndexedContainer();
-
+  private final IndexedContainer groupsContainer = new IndexedContainer();
+  
   public UserManagementPanel()
   {
 
@@ -168,17 +169,18 @@ public class UserManagementPanel extends Panel
   {
     txtUserName.setValue("");
   }
-  
+
   @Override
-  public void setAvailableGroupNames(Collection<String> groupNames)
+  public void addAvailableGroupNames(Collection<String> groupNames)
   {
-    groupNamesContainer.removeAllItems();
-    for(String n : groupNames)
+    for(String g : groupNames)
     {
-      groupNamesContainer.addItem(n);
+      groupsContainer.addItem(g);
     }
   }
-
+  
+  
+  
   public class AddUserHandler implements Action.Handler
   {
 
@@ -248,7 +250,7 @@ public class UserManagementPanel extends Panel
       {
         case "groups":
 
-          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupNamesContainer);
+          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupsContainer);
           groupsSelector.setWidth("100%");
           groupsSelector.addValueChangeListener(new Property.ValueChangeListener()
           {

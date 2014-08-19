@@ -17,6 +17,8 @@ package annis.gui.admin;
 
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.data.util.converter.Converter;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
@@ -26,7 +28,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import java.util.Collection;
 import java.util.Set;
-import java.util.SortedSet;
 import java.util.TreeSet;
 
 /**
@@ -42,8 +43,19 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
   private final TwinColSelect selector;
 
-  public PopupTwinColumnSelect(Container predefinedItems)
+  private final IndexedContainer selectableContainer;
+ 
+  public PopupTwinColumnSelect(IndexedContainer selectableContainer)
   {
+    if(selectableContainer == null)
+    {
+      selectableContainer = new IndexedContainer();
+    }
+    this.selectableContainer = selectableContainer;
+    
+    selectableContainer.setItemSorter(new StringItemSorter());
+    selectableContainer.sort(null, null);
+    
     txtValue = new TextField();
     txtValue.setConverter(new CommaSeperatedStringConverter());
     txtValue.setWidth("100%");
@@ -53,8 +65,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selector.setNewItemsAllowed(false);
     selector.setLeftColumnCaption("Available");
     selector.setRightColumnCaption("Selected");
-
-    selector.setContainerDataSource(predefinedItems);
+    selector.setContainerDataSource(selectableContainer);
 
     PopupView popup = new PopupView("Select", selector);
 
@@ -62,6 +73,8 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     layout.setExpandRatio(popup, 0.0f);
     layout.setExpandRatio(txtValue, 1.0f);
     layout.setWidth("100%");
+    
+    addValueChangeListener(new UpdateContainerListener());
   }
 
   @Override
@@ -73,48 +86,32 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   @Override
   public void setPropertyDataSource(Property newDataSource)
   {
-    addAllItemsFromProperty(newDataSource);
-
-    txtValue.setPropertyDataSource(newDataSource);
-    selector.setPropertyDataSource(newDataSource);
     super.setPropertyDataSource(newDataSource);
-
+    txtValue.setPropertyDataSource(getPropertyDataSource());
+    selector.setPropertyDataSource(getPropertyDataSource());    
   }
 
-  @Override
-  public void valueChange(Property.ValueChangeEvent event)
+  public void addPredefinedSelectableItems(Collection<String> predefined)
   {
-    addAllItemsFromProperty(event.getProperty());
-    super.valueChange(event);
+    for(String s : predefined)
+    {
+      selectableContainer.addItem(predefined);
+    }
+    selectableContainer.sort(null, null);
   }
 
   @Override
   public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
   {
     // always use a sorted TreeSet
-    if(newFieldValue != null
+    if (newFieldValue != null
       && !(newFieldValue instanceof TreeSet))
     {
       TreeSet sortedSet = new TreeSet(String.CASE_INSENSITIVE_ORDER);
       sortedSet.addAll((Collection) newFieldValue);
       newFieldValue = sortedSet;
     }
-    super.setValue(newFieldValue); //To change body of generated methods, choose Tools | Templates.
-  }
-  
-  
-
-  private void addAllItemsFromProperty(Property prop)
-  {
-    if (prop != null && prop.getValue() != null
-      && prop.getType() == Set.class)
-    {
-      Set items = (Set) prop.getValue();
-      for (Object o : items)
-      {
-        selector.addItem(o);
-      }
-    }
+    super.setValue(newFieldValue);
   }
 
   @Override
@@ -122,5 +119,52 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   {
     return Set.class;
   }
+
+  public static class StringItemSorter implements ItemSorter
+  {
+
+    @Override
+    public void setSortProperties(Container.Sortable container,
+      Object[] propertyId, boolean[] ascending)
+    {
+
+    }
+
+    @Override
+    public int compare(Object itemId1, Object itemId2)
+    {
+      if(itemId1 instanceof String && itemId2 instanceof String)
+      {
+        return String.CASE_INSENSITIVE_ORDER.compare((String) itemId1, (String) itemId2);
+      }
+      else
+      {
+        return 0;
+      }
+    }
+    
+  }
+  
+  public class UpdateContainerListener implements Property.ValueChangeListener
+  {
+    @Override
+    public void valueChange(Property.ValueChangeEvent event)
+    {
+      Object val = event.getProperty().getValue();
+      if(val instanceof Collection)
+      {
+        for(Object id : (Collection) val)
+        {
+          selectableContainer.addItem(id);
+        }
+      }
+      else
+      {
+        selectableContainer.addItem(val);
+      }
+      selectableContainer.sort(null, null);
+    }
+  }
+  
 
 }

@@ -74,7 +74,7 @@ public class GroupController implements GroupListView.Listener,
     try
     {
       corpusModel.fetchFromService();
-      view.setAvailableCorpusNames(corpusModel.getCorpusNames());
+      view.addAvailableCorpusNames(corpusModel.getCorpusNames());
     }
     catch(CriticalServiceQueryException ex)
     {
@@ -93,7 +93,7 @@ public class GroupController implements GroupListView.Listener,
   {
     Set<String> names = new TreeSet<>(model.getGroupNames());
     names.add("*");
-    userView.setAvailableGroupNames(names);
+    userView.addAvailableGroupNames(names);
   }
 
   @Override

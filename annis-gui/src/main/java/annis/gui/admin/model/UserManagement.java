@@ -16,6 +16,7 @@
 
 package annis.gui.admin.model;
 
+import annis.security.Group;
 import annis.security.User;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -24,6 +25,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -36,6 +38,7 @@ public class UserManagement
   private WebResource rootResource;
 
   private final Map<String, User> users = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final TreeSet<String> usedGroupNames = new TreeSet<>();
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);
   
@@ -46,6 +49,7 @@ public class UserManagement
       WebResource res = rootResource.path("admin/users").path(newUser.getName());
       res.put(newUser);
       users.put(newUser.getName(), newUser);
+      updateUsedGroupNames();
     }
   }
   
@@ -56,6 +60,7 @@ public class UserManagement
       WebResource res = rootResource.path("admin/users").path(userName);
       res.delete();
       users.remove(userName);
+      updateUsedGroupNames();
     }
   }
   
@@ -78,12 +83,14 @@ public class UserManagement
     {
       WebResource res = rootResource.path("admin/users");
       users.clear();
+      usedGroupNames.clear();
       try
       {
         List<User> list = res.get(new GenericType<List<User>>() {});
         for(User u : list)
         {
           users.put(u.getName(), u);
+          usedGroupNames.addAll(u.getGroups());
         }
         return true;
       }
@@ -95,6 +102,15 @@ public class UserManagement
     return false;
   }
   
+  private void updateUsedGroupNames()
+  {
+    usedGroupNames.clear();
+    for(User u : users.values())
+    {
+      usedGroupNames.addAll(u.getGroups());
+    }
+  }
+  
   public User getUser(String userName)
   {
     return users.get(userName);
@@ -104,6 +120,13 @@ public class UserManagement
   {
     return users.values();
   }
+
+  public TreeSet<String> getUsedGroupNames()
+  {
+    return usedGroupNames;
+  }
+  
+  
   
   public WebResource getRootResource()
   {

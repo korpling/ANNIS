@@ -35,7 +35,7 @@ public interface UserListView
   
   public void emptyNewUserNameTextField();
   
-  public void setAvailableGroupNames(Collection<String> groupNames);
+  public void addAvailableGroupNames(Collection<String> groupNames);
   
   public interface Listener
   {

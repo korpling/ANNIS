@@ -32,8 +32,8 @@ public class User
 {
   private String name;
   private String passwordHash;
-  private Set<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-  private Set<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private TreeSet<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private TreeSet<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
  
   public User()
   {
@@ -89,22 +89,22 @@ public class User
     this.passwordHash = passwordHash;
   }
 
-  public Set<String> getGroups()
+  public TreeSet<String> getGroups()
   {
     return groups;
   }
 
-  public void setGroups(Set<String> groups)
+  public void setGroups(TreeSet<String> groups)
   {
     this.groups = groups;
   }
 
-  public Set<String> getPermissions()
+  public TreeSet<String> getPermissions()
   {
     return permissions;
   }
 
-  public void setPermissions(Set<String> permissions)
+  public void setPermissions(TreeSet<String> permissions)
   {
     this.permissions = permissions;
   }

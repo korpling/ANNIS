@@ -19,14 +19,13 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CommaSeperatedStringConverter implements Converter<String, Set>
+public class CommaSeperatedStringConverter implements Converter<String, TreeSet>
 {
 
   private static final Splitter splitter = Splitter.on(',').trimResults().
@@ -35,8 +34,8 @@ public class CommaSeperatedStringConverter implements Converter<String, Set>
   private static final Joiner joiner = Joiner.on(", ");
 
   @Override
-  public Set convertToModel(String value,
-    Class<? extends Set> targetType, Locale locale) throws ConversionException
+  public TreeSet convertToModel(String value,
+    Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
   {
     TreeSet<String> result = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
     for(String s : splitter.split(value))
@@ -47,7 +46,7 @@ public class CommaSeperatedStringConverter implements Converter<String, Set>
   }
 
   @Override
-  public String convertToPresentation(Set value,
+  public String convertToPresentation(TreeSet value,
     Class<? extends String> targetType, Locale locale) throws ConversionException
   {
     return joiner.join(value);
@@ -60,9 +59,9 @@ public class CommaSeperatedStringConverter implements Converter<String, Set>
   }
 
   @Override
-  public Class<Set> getModelType()
+  public Class<TreeSet> getModelType()
   {
-    return Set.class;
+    return TreeSet.class;
   }
   
 }

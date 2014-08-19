@@ -20,7 +20,9 @@ import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ItemSorter;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -55,10 +57,11 @@ public class GroupManagementPanel extends Panel
   private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
     Group.class);
   
-  private final IndexedContainer corpusNamesContainer = new IndexedContainer();
+  private final IndexedContainer corpusContainer = new IndexedContainer();
   public GroupManagementPanel()
   {
     groupsContainer.setBeanIdProperty("name");
+    
 
     tblGroups.setContainerDataSource(groupsContainer);
     tblGroups.setEditable(true);
@@ -148,16 +151,16 @@ public class GroupManagementPanel extends Panel
   }
 
   @Override
-  public void setAvailableCorpusNames(Collection<String> corpusNames)
+  public void addAvailableCorpusNames(Collection<String> corpusNames)
   {
-    corpusNamesContainer.removeAllItems();
-    for(String n : corpusNames)
+    for(String c : corpusNames)
     {
-      corpusNamesContainer.addItem(n);
+      corpusContainer.addItem(c);
     }
   }
   
   
+
 
   public class AddGroupHandler implements Action.Handler
   {
@@ -203,7 +206,7 @@ public class GroupManagementPanel extends Panel
       {
         case "corpora":
           
-          PopupTwinColumnSelect selector = new PopupTwinColumnSelect(corpusNamesContainer);
+          PopupTwinColumnSelect selector = new PopupTwinColumnSelect(corpusContainer);
           selector.setWidth("100%");
           selector.addValueChangeListener(new Property.ValueChangeListener()
           {
