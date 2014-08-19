@@ -69,10 +69,11 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
     PopupView popup = new PopupView("Select", selector);
 
-    layout = new HorizontalLayout(txtValue, popup);
+    layout = new HorizontalLayout(popup, txtValue);
     layout.setExpandRatio(popup, 0.0f);
     layout.setExpandRatio(txtValue, 1.0f);
     layout.setWidth("100%");
+    layout.setSpacing(true);
     
     addValueChangeListener(new UpdateContainerListener());
   }
