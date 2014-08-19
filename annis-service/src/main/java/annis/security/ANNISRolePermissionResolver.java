@@ -28,46 +28,47 @@ import org.slf4j.LoggerFactory;
  */
 public class ANNISRolePermissionResolver implements RolePermissionResolver
 {
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISRolePermissionResolver.class);
-  
+
+  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
+    ANNISRolePermissionResolver.class);
+
   private ANNISUserConfigurationManager confManager;
-  
-  
+
   @Override
   public Collection<Permission> resolvePermissionsInRole(String roleString)
   {
     HashSet<Permission> perms = new HashSet<>();
-    
-    if("*".equals(roleString))
+
+    if ("*".equals(roleString))
     {
       perms.add(new WildcardPermission("query:*:*"));
       perms.add(new WildcardPermission("meta:*"));
     }
-    else if(Group.DEFAULT_USER_ROLE.equals(roleString))
-    {
-      // every user can read/write its user configuration
-      perms.add(new WildcardPermission("admin:*:userconfig"));
-    }
-    else if(Group.ANONYMOUS.equals(roleString))
-    {
-      // every anonymous user can read its user configuration
-      perms.add(new WildcardPermission("admin:read:userconfig"));
-    }
     else
     {
-      
-      Group group =  confManager.getGroups().get(roleString);
-      if(group != null)
+      if (Group.DEFAULT_USER_ROLE.equals(roleString))
       {
-        for(String c : group.getCorpora())
+        // every user can read/write its user configuration
+        perms.add(new WildcardPermission("admin:*:userconfig"));
+      }
+      else if (Group.ANONYMOUS.equals(roleString))
+      {
+        // every anonymous user can read its user configuration
+        perms.add(new WildcardPermission("admin:read:userconfig"));
+      }
+      
+
+      // add all corpora for this role
+      Group group = confManager.getGroups().get(roleString);
+      if (group != null)
+      {
+        for (String c : group.getCorpora())
         {
           perms.add(new WildcardPermission("query:*:" + c));
           perms.add(new WildcardPermission("meta:" + c));
         }
       }
-
     }
-    
     return perms;
   }
 
@@ -80,7 +81,5 @@ public class ANNISRolePermissionResolver implements RolePermissionResolver
   {
     this.confManager = confManager;
   }
-  
-  
-  
+
 }

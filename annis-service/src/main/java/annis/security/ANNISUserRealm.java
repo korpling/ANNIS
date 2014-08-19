@@ -52,9 +52,9 @@ public class ANNISUserRealm extends AuthorizingRealm implements
 
   private ANNISUserConfigurationManager confManager;
 
-  private String defaultUserRole = "user";
+  private String defaultUserRole = Group.DEFAULT_USER_ROLE;
 
-  private String anonymousUser = "anonymous";
+  private String anonymousUser = Group.ANONYMOUS;
 
   public ANNISUserRealm()
   {
