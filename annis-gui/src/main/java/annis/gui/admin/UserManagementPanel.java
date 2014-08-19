@@ -252,6 +252,7 @@ public class UserManagementPanel extends Panel
 
           PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupsContainer);
           groupsSelector.setWidth("100%");
+          groupsSelector.setCaption("Groups for \"" + itemId + "\"");
           groupsSelector.addValueChangeListener(new Property.ValueChangeListener()
           {
 
@@ -272,6 +273,7 @@ public class UserManagementPanel extends Panel
           
           PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(permissionsContainer);
           permissionSelector.setWidth("100%");
+          permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
           permissionSelector.addValueChangeListener(new Property.ValueChangeListener()
           {
 

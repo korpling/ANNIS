@@ -66,7 +66,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selector.setLeftColumnCaption("Available");
     selector.setRightColumnCaption("Selected");
     selector.setContainerDataSource(selectableContainer);
-
+    
     PopupView popup = new PopupView("Select", selector);
 
     layout = new HorizontalLayout(popup, txtValue);
@@ -77,6 +77,15 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     
     addValueChangeListener(new UpdateContainerListener());
   }
+
+  @Override
+  public void setCaption(String caption)
+  {
+    super.setCaption(caption);
+    selector.setCaption(caption);
+  }
+  
+  
 
   @Override
   protected Component initContent()
