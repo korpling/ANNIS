@@ -73,7 +73,7 @@ public class UserManagementPanel extends Panel
     userList.setSelectable(true);
     userList.setMultiSelect(true);
     userList.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    userList.addStyleName("transparent-selection");
+    userList.addStyleName("grey-selection");
     userList.setSizeFull();
     userList.setContainerDataSource(userContainer);
     userList.addGeneratedColumn("changepassword",

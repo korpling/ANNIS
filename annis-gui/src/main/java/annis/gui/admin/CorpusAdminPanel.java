@@ -53,7 +53,7 @@ public class CorpusAdminPanel extends Panel
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
     tblCorpora.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    tblCorpora.addStyleName("transparent-selection");
+    tblCorpora.addStyleName("grey-selection");
     
     tblCorpora.
       setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");

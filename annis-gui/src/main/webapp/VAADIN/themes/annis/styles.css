@@ -6688,8 +6688,8 @@ body .annis.v-app .v-app-loading {
 	background-color: #ecf0f6;
 }
 
-.annis .transparent-selection tr.v-selected {
-	background-color: rgba(49, 55, 245, 0.5);
+.annis .grey-selection tr.v-selected {
+	background-color: #808080;
 }
 
 body .annis.v-app .v-app-loading {

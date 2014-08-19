@@ -65,7 +65,8 @@ public class GroupManagementPanel extends Panel
     tblGroups.setSelectable(true);
     tblGroups.setMultiSelect(true);
     tblGroups.setSizeFull();
-    tblGroups.addStyleName("transparent-selection");
+    tblGroups.addStyleName(ChameleonTheme.TABLE_STRIPED);
+    tblGroups.addStyleName("grey-selection");
 
     tblGroups.setTableFieldFactory(new FieldFactory());
 
