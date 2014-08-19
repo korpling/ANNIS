@@ -74,6 +74,8 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
   {
     super.init(request);
 
+    getPage().setTitle("ANNIS Adminstration");
+    
     WebResource rootResource = Helper.getAnnisWebResource();
 
     UserManagement userManagement = new UserManagement();
