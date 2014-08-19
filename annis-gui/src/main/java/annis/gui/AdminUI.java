@@ -137,6 +137,10 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
   
   private void selectTabFromFragment(String fragment)
   {
+    if(fragment == null)
+    {
+      return;
+    }
     switch (fragment)
     {
       case "import":

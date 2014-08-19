@@ -16,7 +16,6 @@
 package annis.administration;
 
 import annis.exceptions.AnnisException;
-import annis.security.User;
 import annis.security.UserConfig;
 import java.io.File;
 import java.sql.PreparedStatement;
