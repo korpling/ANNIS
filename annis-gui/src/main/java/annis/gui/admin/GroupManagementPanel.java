@@ -23,6 +23,8 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
@@ -102,10 +104,17 @@ public class GroupManagementPanel extends Panel
 
     HorizontalLayout actionLayout = new HorizontalLayout(txtGroupName,
       btAddNewGroup, btDeleteGroup);
-
-    VerticalLayout layout = new VerticalLayout(tblGroups, actionLayout);
+    
+    VerticalLayout layout = new VerticalLayout(actionLayout, tblGroups);
     layout.setSizeFull();
+    layout.setExpandRatio(tblGroups, 1.0f);
+    layout.setSpacing(true);
+    layout.setMargin(new MarginInfo(true, false, false, false));
+    
+    layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
+    
     setContent(layout);
+    setSizeFull();
     
     addActionHandler(new AddGroupHandler(txtGroupName));
   }

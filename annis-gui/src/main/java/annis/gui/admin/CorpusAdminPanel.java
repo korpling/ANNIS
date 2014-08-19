@@ -18,6 +18,8 @@ package annis.gui.admin;
 import annis.gui.admin.view.CorpusListView;
 import annis.service.objects.AnnisCorpus;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -51,7 +53,8 @@ public class CorpusAdminPanel extends Panel
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
     tblCorpora.addStyleName(ChameleonTheme.TABLE_STRIPED);
-
+    tblCorpora.addStyleName("transparent-selection");
+    
     tblCorpora.
       setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");
     tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "Source path");
@@ -74,10 +77,16 @@ public class CorpusAdminPanel extends Panel
       }
     });
 
-    VerticalLayout layout = new VerticalLayout(tblCorpora, btDelete);
+    VerticalLayout layout = new VerticalLayout(btDelete, tblCorpora);
     layout.setSizeFull();
     layout.setExpandRatio(tblCorpora, 1.0f);
+    layout.setSpacing(true);
+    layout.setMargin(new MarginInfo(true, false, false, false));
+    
+    layout.setComponentAlignment(btDelete, Alignment.MIDDLE_CENTER);
+    
     setContent(layout);
+    setSizeFull();
   }
 
   @Override
