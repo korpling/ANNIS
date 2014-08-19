@@ -16,7 +16,7 @@
 
 package annis.gui.admin;
 
-import annis.gui.admin.view.UserManagementView;
+import annis.gui.admin.view.UserListView;
 import com.vaadin.data.Validator;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.server.Page;
@@ -36,7 +36,7 @@ import java.util.List;
  */
 public class NewPasswordWindow extends Window
 { 
-  public NewPasswordWindow(final String userName, final List<UserManagementView.Listener> listeners)
+  public NewPasswordWindow(final String userName, final List<UserListView.Listener> listeners)
   {
     setCaption("Set new password for user \"" + userName + "\"");
     
@@ -80,7 +80,7 @@ public class NewPasswordWindow extends Window
         
           if(txtPassword1.isValid() && txtPassword2.isValid())
           {
-            for(UserManagementView.Listener l : listeners)
+            for(UserListView.Listener l : listeners)
             {
               l.passwordChanged(userName, txtPassword1.getValue());
             }

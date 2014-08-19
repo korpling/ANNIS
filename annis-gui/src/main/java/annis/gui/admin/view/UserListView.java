@@ -16,7 +16,7 @@
 
 package annis.gui.admin.view;
 
-import annis.security.Group;
+import annis.security.User;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
@@ -25,22 +25,28 @@ import java.util.Set;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface GroupManagementView
+public interface UserListView
 {
+  public void setUserList(Collection<User> users);
+  
+  
   public void addListener(Listener listener);
   
-  public void setGroupList(Collection<Group> groups);
+  public void askForPasswordChange(String userName);
   
-  public void emptyNewGroupNameTextField();
+  public void emptyNewUserNameTextField();
   
-  public void setAvailableCorpusNames(Collection<String> corpusNames);
+  public void setAvailableGroupNames(Collection<String> groupNames);
   
   public interface Listener
   {
-    public void attached();
-    public void groupUpdated(Group user);
+    public void userUpdated(User user);
+    public void passwordChanged(String userName, String newPassword);
     
-    public void addNewGroup(String groupName);
-    public void deleteGroups(Set<String> groupName);
+    public void addNewUser(String userName);
+    public void deleteUsers(Set<String> userName);
+    
+    public void attached();
   }
+  
 }

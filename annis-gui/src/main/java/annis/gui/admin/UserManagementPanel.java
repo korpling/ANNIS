@@ -15,7 +15,7 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.UserManagementView;
+import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -45,7 +45,7 @@ import java.util.Set;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class UserManagementPanel extends Panel
-  implements UserManagementView
+  implements UserListView
 {
 
   private final VerticalLayout layout;
@@ -54,7 +54,7 @@ public class UserManagementPanel extends Panel
 
   private final BeanContainer<String, User> userContainer;
 
-  private final List<UserManagementView.Listener> listeners = new LinkedList<>();
+  private final List<UserListView.Listener> listeners = new LinkedList<>();
 
   private final TextField txtUserName;
   
@@ -108,7 +108,7 @@ public class UserManagementPanel extends Panel
       {
         // get selected users
         Set<String> selectedUsers = (Set<String>) userList.getValue();
-        for (UserManagementView.Listener l : listeners)
+        for (UserListView.Listener l : listeners)
         {
           l.deleteUsers(selectedUsers);
         }
@@ -128,7 +128,7 @@ public class UserManagementPanel extends Panel
 
   private void handleAdd()
   {
-    for (UserManagementView.Listener l : listeners)
+    for (UserListView.Listener l : listeners)
     {
       l.addNewUser(txtUserName.getValue());
     }
@@ -138,14 +138,14 @@ public class UserManagementPanel extends Panel
   public void attach()
   {
     super.attach();
-    for (UserManagementView.Listener l : listeners)
+    for (UserListView.Listener l : listeners)
     {
       l.attached();
     }
   }
 
   @Override
-  public void addListener(UserManagementView.Listener listener)
+  public void addListener(UserListView.Listener listener)
   {
     listeners.add(listener);
   }
@@ -258,7 +258,7 @@ public class UserManagementPanel extends Panel
             @Override
             public void valueChange(Property.ValueChangeEvent event)
             {
-              for (UserManagementView.Listener l : listeners)
+              for (UserListView.Listener l : listeners)
               {
                 l.userUpdated(userContainer.getItem(itemId).getBean());
               }
@@ -278,7 +278,7 @@ public class UserManagementPanel extends Panel
             @Override
             public void valueChange(Property.ValueChangeEvent event)
             {
-              for (UserManagementView.Listener l : listeners)
+              for (UserListView.Listener l : listeners)
               {
                 l.userUpdated(userContainer.getItem(itemId).getBean());
               }

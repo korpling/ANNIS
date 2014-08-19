@@ -18,12 +18,12 @@ package annis.gui;
 import annis.gui.admin.GroupManagementPanel;
 import annis.gui.admin.ImportPanel;
 import annis.gui.admin.UserManagementPanel;
-import annis.gui.admin.controller.GroupManagementController;
-import annis.gui.admin.controller.UserManagementController;
+import annis.gui.admin.controller.GroupController;
+import annis.gui.admin.controller.UserController;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserManagementView;
+import annis.gui.admin.view.UserListView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -46,9 +46,9 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
 {
   private VerticalLayout layout;
   
-  private UserManagementController
+  private UserController
      userController;
-  private GroupManagementController
+  private GroupController
      groupManagementController;
   
   private final List<UIView.Listener> listeners = new LinkedList<>();
@@ -67,11 +67,11 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
     corpusManagement.setRootResource(rootResource);
     
     UserManagementPanel userManagementPanel = new UserManagementPanel();
-    userController = new UserManagementController(userManagement,
+    userController = new UserController(userManagement,
       userManagementPanel, this);
     
     GroupManagementPanel groupManagementPanel = new GroupManagementPanel();
-    groupManagementController = new GroupManagementController(groupManagement,
+    groupManagementController = new GroupController(groupManagement,
       corpusManagement,
       groupManagementPanel, this, userManagementPanel);
     

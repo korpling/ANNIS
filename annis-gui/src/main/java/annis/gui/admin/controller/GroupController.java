@@ -19,9 +19,9 @@ package annis.gui.admin.controller;
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;
 import annis.gui.admin.model.GroupManagement;
-import annis.gui.admin.view.GroupManagementView;
+import annis.gui.admin.view.GroupListView;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserManagementView;
+import annis.gui.admin.view.UserListView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.security.Group;
 import annis.security.User;
@@ -37,19 +37,19 @@ import java.util.logging.Logger;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class GroupManagementController implements GroupManagementView.Listener,
+public class GroupController implements GroupListView.Listener,
   UIView.Listener
 {
   private final GroupManagement model;
   private final CorpusManagement corpusModel;
-  private final GroupManagementView view;
+  private final GroupListView view;
   private final UIView uiView;
-  private final UserManagementView userView;
+  private final UserListView userView;
 
-  public GroupManagementController(GroupManagement model,
+  public GroupController(GroupManagement model,
     CorpusManagement corpusModel,
-    GroupManagementView view, UIView uiView,
-    UserManagementView userView)
+    GroupListView view, UIView uiView,
+    UserListView userView)
   {
     this.model = model;
     this.corpusModel = corpusModel;
@@ -57,8 +57,8 @@ public class GroupManagementController implements GroupManagementView.Listener,
     this.uiView = uiView;
     this.userView = userView;
     
-    this.view.addListener(GroupManagementController.this);
-    this.uiView.addListener(GroupManagementController.this);
+    this.view.addListener(GroupController.this);
+    this.uiView.addListener(GroupController.this);
   }
 
   private void fetchDataFromService()

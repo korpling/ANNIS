@@ -15,7 +15,7 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.GroupManagementView;
+import annis.gui.admin.view.GroupListView;
 import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
@@ -42,10 +42,10 @@ import java.util.Set;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GroupManagementPanel extends Panel
-  implements GroupManagementView
+  implements GroupListView
 {
 
-  private final List<GroupManagementView.Listener> listeners = new LinkedList<>();
+  private final List<GroupListView.Listener> listeners = new LinkedList<>();
 
   private final Table tblGroups = new Table();
   private final TextField txtGroupName;
@@ -93,7 +93,7 @@ public class GroupManagementPanel extends Panel
       {
         // get selected users
         Set<String> selectedGroups = (Set<String>) tblGroups.getValue();
-        for (GroupManagementView.Listener l : listeners)
+        for (GroupListView.Listener l : listeners)
         {
           l.deleteGroups(selectedGroups);
         }
@@ -112,7 +112,7 @@ public class GroupManagementPanel extends Panel
 
   private void handleAdd()
   {
-    for (GroupManagementView.Listener l : listeners)
+    for (GroupListView.Listener l : listeners)
     {
       l.addNewGroup(txtGroupName.getValue());
     }
@@ -122,14 +122,14 @@ public class GroupManagementPanel extends Panel
   public void attach()
   {
     super.attach();
-    for (GroupManagementView.Listener l : listeners)
+    for (GroupListView.Listener l : listeners)
     {
       l.attached();
     }
   }
 
   @Override
-  public void addListener(GroupManagementView.Listener listener)
+  public void addListener(GroupListView.Listener listener)
   {
     listeners.add(listener);
   }
@@ -211,7 +211,7 @@ public class GroupManagementPanel extends Panel
             @Override
             public void valueChange(Property.ValueChangeEvent event)
             {
-              for (GroupManagementView.Listener l : listeners)
+              for (GroupListView.Listener l : listeners)
               {
                 l.groupUpdated(groupsContainer.getItem(itemId).getBean());
               }

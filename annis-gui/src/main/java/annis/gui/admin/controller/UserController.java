@@ -19,7 +19,7 @@ package annis.gui.admin.controller;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserManagementView;
+import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
@@ -31,22 +31,22 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserManagementController
-  implements UserManagementView.Listener, UIView.Listener
+public class UserController
+  implements UserListView.Listener, UIView.Listener
 {
   
   private final UserManagement model;
-  private final UserManagementView view;
+  private final UserListView view;
   private final UIView uiView;
 
-  public UserManagementController(UserManagement model,
-    UserManagementView view, UIView uiView)
+  public UserController(UserManagement model,
+    UserListView view, UIView uiView)
   {
     this.model = model;
     this.view = view;    
     this.uiView = uiView;
-    view.addListener(UserManagementController.this);
-    uiView.addListener(UserManagementController.this);
+    view.addListener(UserController.this);
+    uiView.addListener(UserController.this);
   }
   
   private void fetchFromService()
