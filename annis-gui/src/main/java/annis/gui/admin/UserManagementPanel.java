@@ -20,7 +20,6 @@ import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
@@ -62,6 +61,7 @@ public class UserManagementPanel extends Panel
   private final TextField txtUserName;
   
   private final IndexedContainer groupsContainer = new IndexedContainer();
+  private final IndexedContainer permissionsContainer = new IndexedContainer();
   
   public UserManagementPanel()
   {
@@ -270,7 +270,7 @@ public class UserManagementPanel extends Panel
           break;
         case "permissions":
           
-          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(null);
+          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(permissionsContainer);
           permissionSelector.setWidth("100%");
           permissionSelector.addValueChangeListener(new Property.ValueChangeListener()
           {
