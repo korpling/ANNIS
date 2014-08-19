@@ -13,19 +13,20 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin;
 
 import annis.gui.admin.view.CorpusListView;
 import annis.service.objects.AnnisCorpus;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.ui.Layout;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 /**
  *
@@ -34,30 +35,51 @@ import java.util.List;
 public class CorpusAdminPanel extends Panel
   implements CorpusListView
 {
-  
+
   private final List<CorpusListView.Listener> listeners = new LinkedList<>();
 
-  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
-  
+  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<String, AnnisCorpus>(
+    AnnisCorpus.class);
+
   public CorpusAdminPanel()
   {
     corpusContainer.setBeanIdProperty("name");
-    
-    Table tblCorpora = new Table();
+
+    final Table tblCorpora = new Table();
     tblCorpora.setContainerDataSource(corpusContainer);
     tblCorpora.setSizeFull();
     tblCorpora.setSelectable(true);
     tblCorpora.setMultiSelect(true);
-    
-    tblCorpora.setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");
+    tblCorpora.addStyleName(ChameleonTheme.TABLE_STRIPED);
+
+    tblCorpora.
+      setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");
     tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "Source path");
-    
-    VerticalLayout layout = new VerticalLayout(tblCorpora);
+
+    Button btDelete = new Button("Delete selected");
+    btDelete.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        Set<String> selection = (Set<String>) tblCorpora.getValue();
+        if (selection != null)
+        {
+          for (CorpusListView.Listener l : listeners)
+          {
+            l.deleteCorpora(selection);
+          }
+        }
+      }
+    });
+
+    VerticalLayout layout = new VerticalLayout(tblCorpora, btDelete);
     layout.setSizeFull();
     layout.setExpandRatio(tblCorpora, 1.0f);
     setContent(layout);
   }
-  
+
   @Override
   public void addListener(CorpusListView.Listener listener)
   {
@@ -70,5 +92,5 @@ public class CorpusAdminPanel extends Panel
     corpusContainer.removeAllItems();
     corpusContainer.addAll(corpora);
   }
-  
+
 }

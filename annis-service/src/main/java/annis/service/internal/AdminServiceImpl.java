@@ -32,6 +32,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -50,7 +51,6 @@ import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
-import org.apache.commons.lang3.NotImplementedException;
 import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
@@ -186,7 +186,6 @@ public class AdminServiceImpl implements AdminService
 
   @DELETE
   @Path("users/{userName}")
-  @Consumes("application/xml")
   public Response deleteUser(@PathParam("userName") String userName)
   {
     Subject requestingUser = SecurityUtils.getSubject();
@@ -304,7 +303,6 @@ public class AdminServiceImpl implements AdminService
 
   @DELETE
   @Path("groups/{groupName}")
-  @Consumes("application/xml")
   public Response deleteGroup(@PathParam("groupName") String groupName)
   {
 
@@ -328,6 +326,27 @@ public class AdminServiceImpl implements AdminService
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not delete group")
       .build();
+  }
+  
+  @DELETE
+  @Path("corpora/{corpusName}")
+  public Response deleteCorpus(@PathParam("corpusName") String corpusName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:write:corpus");
+    
+    try
+    {
+
+      // get ID of corpus
+      long id = annisDao.mapCorpusNameToId(corpusName);
+      adminDao.deleteCorpora(Arrays.asList(id), true);
+      return Response.status(Response.Status.OK).build();
+    }
+    catch (IllegalArgumentException ex)
+    {
+      return Response.status(Response.Status.NOT_FOUND).build();
+    }
   }
 
   @GET

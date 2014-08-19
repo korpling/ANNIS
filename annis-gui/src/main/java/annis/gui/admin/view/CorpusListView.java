@@ -18,6 +18,7 @@ package annis.gui.admin.view;
 
 import annis.service.objects.AnnisCorpus;
 import java.util.Collection;
+import java.util.Set;
 
 /**
  *
@@ -31,6 +32,7 @@ public interface CorpusListView
   public interface Listener
   {
     public void attached();
+    public void deleteCorpora(Set<String> corpusName);
 
   }
 }

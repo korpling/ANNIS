@@ -17,7 +17,6 @@ package annis.gui.admin.model;
 
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;
-import annis.gui.admin.model.UserManagement;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.ImmutableList;
@@ -26,7 +25,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.ui.Notification;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -80,6 +78,48 @@ public class CorpusManagement
         {
           throw new CriticalServiceQueryException(
             "You are not authorized to get the corpus list.");
+        }
+        else
+        {
+          log.error(null, ex);
+          throw new ServiceQueryException("Remote exception: " + ex.
+            getLocalizedMessage());
+        }
+      }
+
+    }
+  }
+  
+  public void delete(String corpusName)
+    throws CriticalServiceQueryException, ServiceQueryException
+  {
+    if (rootResource != null)
+    {
+      try
+      {
+        WebResource rootRes = Helper.getAnnisWebResource();
+        rootRes.path("admin").path("corpora").path(corpusName).delete();
+        corpora.remove(corpusName);
+      }
+      catch (ClientHandlerException ex)
+      {
+        log.error(null, ex);
+        throw new ServiceQueryException("Service not available: " + ex.
+          getLocalizedMessage());
+      }
+      catch (UniformInterfaceException ex)
+      {
+        if (ex.getResponse().getStatus() == Response.Status.UNAUTHORIZED.
+          getStatusCode())
+        {
+          throw new CriticalServiceQueryException(
+            "You are not authorized to delete a corpus");
+        }
+        else if(ex.getResponse().getStatus() == Response.Status.NOT_FOUND.
+          getStatusCode())
+        {
+          throw new ServiceQueryException(
+            "Corpus with name " + corpusName + " not found");
         }
         else
         {

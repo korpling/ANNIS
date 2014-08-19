@@ -22,8 +22,13 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.view.CorpusListView;
 import annis.gui.admin.view.UIView;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.WebResource;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
+import java.util.Set;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -88,8 +93,33 @@ public class CorpusController
       fetchFromService();
     }
   }
-  
-  
+
+  @Override
+  public void deleteCorpora(Set<String> corpusName)
+  {
+    Set<String> deleted = new LinkedHashSet<>();
+    for(String c : corpusName)
+    {
+      try
+      {
+        model.delete(c);
+        deleted.add(c);
+      }
+      catch (CriticalServiceQueryException ex)
+      {
+        uiView.showWarning(ex.getMessage(), ex.getDescription());
+      }
+      catch (ServiceQueryException ex)
+      {
+        uiView.showInfo(ex.getMessage(), ex.getDescription());
+      }
+    }
+    if(!deleted.isEmpty())
+    {
+      uiView.showInfo("Deleted corpora: " + Joiner.on(", ").join(deleted), null);
+    }
+    view.setAvailableCorpora(model.getCorpora());
+  }
   
   
 }
