@@ -36,7 +36,6 @@ public interface GroupListView
   
   public interface Listener
   {
-    public void attached();
     public void groupUpdated(Group user);
     
     public void addNewGroup(String groupName);

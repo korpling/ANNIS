@@ -56,15 +56,9 @@ public class UserController
     
     else
     {
-      uiView.showError("Cannot get the user list", null);
+      uiView.showWarning("Cannot get the user list", null);
       view.setUserList(new LinkedList<User>());
     }
-  }
-
-  @Override
-  public void attached()
-  {
-    fetchFromService();
   }
 
   @Override

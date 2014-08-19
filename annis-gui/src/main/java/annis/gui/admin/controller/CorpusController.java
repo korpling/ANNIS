@@ -72,13 +72,6 @@ public class CorpusController
   }
 
   @Override
-  public void attached()
-  {
-    fetchFromService();
-  }
-
-
-  @Override
   public void loginChanged(WebResource annisRootResource)
   {
     model.setRootResource(annisRootResource);

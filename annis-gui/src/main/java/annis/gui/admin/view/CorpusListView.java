@@ -31,7 +31,6 @@ public interface CorpusListView
   
   public interface Listener
   {
-    public void attached();
     public void deleteCorpora(Set<String> corpusName);
 
   }

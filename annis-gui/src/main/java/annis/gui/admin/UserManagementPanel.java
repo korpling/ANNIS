@@ -143,16 +143,6 @@ public class UserManagementPanel extends Panel
   }
 
   @Override
-  public void attach()
-  {
-    super.attach();
-    for (UserListView.Listener l : listeners)
-    {
-      l.attached();
-    }
-  }
-
-  @Override
   public void addListener(UserListView.Listener listener)
   {
     listeners.add(listener);

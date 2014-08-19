@@ -129,16 +129,6 @@ public class GroupManagementPanel extends Panel
   }
 
   @Override
-  public void attach()
-  {
-    super.attach();
-    for (GroupListView.Listener l : listeners)
-    {
-      l.attached();
-    }
-  }
-
-  @Override
   public void addListener(GroupListView.Listener listener)
   {
     listeners.add(listener);

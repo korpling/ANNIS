@@ -67,7 +67,7 @@ public class GroupController implements GroupListView.Listener,
     
     else
     {
-      uiView.showError("Cannot get the group list", null);
+      uiView.showWarning("Cannot get the group list", null);
       view.setGroupList(new LinkedList<Group>());
     }
     
@@ -94,12 +94,6 @@ public class GroupController implements GroupListView.Listener,
     Set<String> names = new TreeSet<>(model.getGroupNames());
     names.add("*");
     userView.setAvailableGroupNames(names);
-  }
-
-  @Override
-  public void attached()
-  {
-    fetchDataFromService();
   }
 
   @Override

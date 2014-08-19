@@ -44,8 +44,6 @@ public interface UserListView
     
     public void addNewUser(String userName);
     public void deleteUsers(Set<String> userName);
-    
-    public void attached();
   }
   
 }
