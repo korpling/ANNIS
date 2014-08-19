@@ -18,7 +18,7 @@ package annis.gui.querybuilder;
 import annis.libgui.Helper;
 import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;

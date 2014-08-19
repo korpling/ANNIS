@@ -20,8 +20,8 @@ import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
@@ -326,7 +326,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
-      newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
+      newTab.setIcon(new ThemeResource("images/tango-icons/16x16/system-search.png"));
     }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();

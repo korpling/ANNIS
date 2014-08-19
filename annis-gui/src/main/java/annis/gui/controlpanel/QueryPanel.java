@@ -25,7 +25,7 @@ import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -209,7 +209,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     btShowQueryBuilder.setHtmlContentAllowed(true);
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
     btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
-    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/document-properties.png"));
+    btShowQueryBuilder.setIcon(new ThemeResource("images/tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
@@ -538,7 +538,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+        tab.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
       }
       
       
@@ -574,7 +574,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+        tab.setIcon(new ThemeResource("images/tango-icons/16x16/x-office-spreadsheet.png"));
       }
       
       
@@ -610,7 +610,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(queryBuilder, "Query Builder", 
-          new ThemeResource("tango-icons/16x16/document-properties.png"));
+          new ThemeResource("images/tango-icons/16x16/document-properties.png"));
         
         ui.addAction(new ShortcutListener("^Query builder")
         {

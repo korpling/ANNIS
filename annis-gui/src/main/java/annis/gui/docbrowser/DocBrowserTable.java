@@ -57,7 +57,7 @@ public class DocBrowserTable extends Table
 
   private final DocBrowserPanel docBrowserPanel;
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
+  private static final ThemeResource INFO_ICON = new ThemeResource("images/info.gif");
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names

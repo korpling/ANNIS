@@ -48,14 +48,14 @@ public class PagingComponent extends Panel implements
     PagingComponent.class);
 
   public static final ThemeResource LEFT_ARROW = new ThemeResource(
-    "left_arrow.png");
+    "images/left_arrow.png");
 
   public static final ThemeResource RIGHT_ARROW = new ThemeResource(
-    "right_arrow.png");
+    "images/right_arrow.png");
 
-  public static final ThemeResource FIRST = new ThemeResource("first.png");
+  public static final ThemeResource FIRST = new ThemeResource("images/first.png");
 
-  public static final ThemeResource LAST = new ThemeResource("last.png");
+  public static final ThemeResource LAST = new ThemeResource("images/last.png");
 
   private HorizontalLayout layout;
 

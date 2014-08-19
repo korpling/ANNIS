@@ -92,10 +92,10 @@ public class VisualizerPanel extends CssLayout
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
   public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
-    "icon-collapse.gif");
+    "images/icon-collapse.gif");
 
   public static final ThemeResource ICON_EXPAND = new ThemeResource(
-    "icon-expand.gif");
+    "images/icon-expand.gif");
 
   private String corpusName;
 

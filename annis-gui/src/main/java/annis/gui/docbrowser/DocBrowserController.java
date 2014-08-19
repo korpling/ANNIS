@@ -71,10 +71,10 @@ public class DocBrowserController implements Serializable
   // keep track of already visible doc visualizer, so it easy to switch to them.
   private final Map<String, Panel> visibleVisHolder;
 
-  private static final ThemeResource EYE_ICON = new ThemeResource("eye.png");
+  private static final ThemeResource EYE_ICON = new ThemeResource("images/eye.png");
 
   private static final ThemeResource DOC_ICON = new ThemeResource(
-    "document_ico.png");
+    "images/document_ico.png");
 
   public DocBrowserController(SearchUI ui)
   {

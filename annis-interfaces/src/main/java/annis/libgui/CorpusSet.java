@@ -29,7 +29,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class CorpusSet implements Serializable
 {
   
-  private Set<String> corpora = new TreeSet<String>();
+  private Set<String> corpora = new TreeSet<>();
   private String name = ""; 
 
   @XmlElement(name="corpus")

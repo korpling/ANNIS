@@ -72,7 +72,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     btClose = new Button();
     btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
     btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btClose.setIcon(new ThemeResource("images/tango-icons/16x16/process-stop.png"));
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     

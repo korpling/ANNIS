@@ -20,7 +20,7 @@ import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
@@ -85,7 +85,7 @@ public class SingleResultPanel extends CssLayout implements
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "info.gif");
+    "images/info.gif");
 
   private transient SDocument result;
 

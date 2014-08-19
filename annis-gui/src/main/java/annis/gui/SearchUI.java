@@ -22,23 +22,20 @@ import annis.gui.components.ExceptionDialog;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
-import annis.gui.components.ScreenshotMaker;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
-import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import static annis.libgui.Helper.*;
-import annis.libgui.AnnisUser;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
@@ -52,9 +49,7 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ErrorHandler;
-import com.vaadin.server.ExternalResource;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
@@ -66,11 +61,7 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 
 import com.vaadin.ui.*;
-import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -83,8 +74,6 @@ import javax.servlet.http.Cookie;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
-import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -94,10 +83,10 @@ import org.slf4j.LoggerFactory;
  */
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
-  implements ScreenshotMaker.ScreenshotCallback,
-  MimeTypeErrorListener,
+  implements   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  LoginListener, ErrorHandler, TabSheet.CloseHandler
+  ErrorHandler, TabSheet.CloseHandler,
+  LoginListener, Sidebar
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -114,29 +103,12 @@ public class SearchUI extends AnnisBaseUI
     "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
     Pattern.MULTILINE | Pattern.DOTALL);
 
-  private HorizontalLayout layoutToolbar;
+  private MainToolbar toolbar;
 
-  private Label lblUserName;
-
-  private Button btSidebar; 
-  
-  private Button btLogin;
-
-  private Button btLogout;
-
-  private Button btBugReport;
-
-  private ScreenshotMaker screenshot;
-
-  private Throwable lastBugReportCause;
 
   private ControlPanel controlPanel;
 
   private TabSheet mainTab;
-
-  private Window windowLogin;
-
-  private String bugEMailAddress;
 
   private QueryController queryController;
 
@@ -148,8 +120,6 @@ public class SearchUI extends AnnisBaseUI
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
-  private SidebarState sidebarState = SidebarState.VISIBLE;
-  
   private void initTransients()
   {
     corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
@@ -174,13 +144,8 @@ public class SearchUI extends AnnisBaseUI
 
     this.instanceConfig = getInstanceConfig(request);
     
-    regenerateStateFromCookies();
-    
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
-
-    JavaScript.getCurrent().addFunction("annis.gui.logincallback",
-      new LoginCloseCallback());
 
     // init a doc browser controller
     docBrowserController = new DocBrowserController(this);
@@ -198,132 +163,12 @@ public class SearchUI extends AnnisBaseUI
     mainLayout.setRowExpandRatio(1, 1.0f);
     mainLayout.setColumnExpandRatio(1, 1.0f);
     
-    screenshot = new ScreenshotMaker(this);
-    addExtension(screenshot);
+    toolbar = new MainToolbar(SearchUI.this);
+    toolbar.addLoginListener(SearchUI.this);
+    addExtension(toolbar.getScreenshotExtension());
 
-    layoutToolbar = new HorizontalLayout();
-    layoutToolbar.setWidth("100%");
-    layoutToolbar.setHeight("-1px");
-
-    mainLayout.addComponent(layoutToolbar, 0,0, 1, 0);
-    layoutToolbar.addStyleName("toolbar");
-    layoutToolbar.addStyleName("border-layout");
-
-    btSidebar = new Button();
-    btSidebar.setDisableOnClick(true);
-    btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btSidebar.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btSidebar.setDescription("Show and hide search sidebar");
-    btSidebar.setIcon(sidebarState.getIcon());
-    btSidebar.setIconAlternateText(btSidebar.getDescription());
-    
-    Button btAboutAnnis = new Button("About ANNIS");
-    btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btAboutAnnis.setIcon(new ThemeResource("annis_16.png"));
-
-    btAboutAnnis.addClickListener(new AboutClickListener());
-
-    btBugReport = new Button("Report Problem");
-    btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btBugReport.setDisableOnClick(true);
-    btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
-    btBugReport.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        reportBug();
-      }
-    });
-
-    String bugmail = (String) VaadinSession.getCurrent().getAttribute(
-      "bug-e-mail");
-    if (bugmail != null && !bugmail.isEmpty()
-      && !bugmail.startsWith("${")
-      && new EmailValidator("").isValid(bugmail))
-    {
-      this.bugEMailAddress = bugmail;
-    }
-    btBugReport.setVisible(canReportBugs());
-
-    lblUserName = new Label("not logged in");
-    lblUserName.setWidth("-1px");
-    lblUserName.setHeight("-1px");
-    lblUserName.addStyleName("right-aligned-text");
-
-    btLogin = new Button("Login", new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        BrowserFrame frame = new BrowserFrame("login", new ExternalResource(
-          Helper.getContext() + "/login"));
-        frame.setWidth("100%");
-        frame.setHeight("200px");
-
-        windowLogin = new Window("ANNIS Login", frame);
-        windowLogin.setModal(true);
-        windowLogin.setWidth("400px");
-        windowLogin.setHeight("250px");
-
-        addWindow(windowLogin);
-        windowLogin.center();
-      }
-    });
-
-    btLogout = new Button("Logout", new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        // logout
-        Helper.setUser(null);
-        Notification.show("Logged out", Notification.Type.TRAY_NOTIFICATION);
-        updateUserInformation();
-      }
-    });
-
-    btLogin.setSizeUndefined();
-    btLogin.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btLogin.setIcon(new ThemeResource("../runo/icons/16/user.png"));
-
-    btLogout.setSizeUndefined();
-    btLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
-
-    Button btOpenSource = new Button("Help us to make ANNIS better!");
-    btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
-    btOpenSource.addListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        Window w = new HelpUsWindow();
-        w.setCaption("Help us to make ANNIS better!");
-        w.setModal(true);
-        w.setResizable(true);
-        w.setWidth("600px");
-        w.setHeight("500px");
-        addWindow(w);
-        w.center();
-      }
-    });
-
-
-    layoutToolbar.addComponent(btSidebar);
-    layoutToolbar.addComponent(btAboutAnnis);
-    layoutToolbar.addComponent(btBugReport);
-    layoutToolbar.addComponent(btOpenSource);
-    
-    layoutToolbar.setSpacing(true);
-    layoutToolbar.setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
-    layoutToolbar.setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
-    layoutToolbar.setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
-
-    addLoginButton(layoutToolbar);
-
-    layoutToolbar.setExpandRatio(btOpenSource, 1.0f);
-
+    mainLayout.addComponent(toolbar, 0,0, 1, 0);
+   
     final HelpPanel help = new HelpPanel(this);
 
     mainTab = new TabSheet();
@@ -333,7 +178,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addStyleName("blue-tab");
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
-    helpTab.setIcon(new ThemeResource("tango-icons/16x16/help-browser.png"));
+    helpTab.setIcon(new ThemeResource("images/tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);
@@ -343,62 +188,6 @@ public class SearchUI extends AnnisBaseUI
     
     mainLayout.addComponent(controlPanel, 0, 1);
     mainLayout.addComponent(mainTab, 1,1);
-    
-    btSidebar.addClickListener(new ClickListener()
-    {
-      @Override
-      public void buttonClick(ClickEvent event)
-      {
-        btSidebar.setEnabled(true);
-      
-        // decide new state
-        switch (sidebarState)
-        {
-          case VISIBLE:
-            if (event.isCtrlKey())
-            {
-              sidebarState = SidebarState.AUTO_VISIBLE;
-            }
-            else
-            {
-              sidebarState = SidebarState.HIDDEN;
-            }
-            break;
-          case HIDDEN:
-            if (event.isCtrlKey())
-            {
-              sidebarState = SidebarState.AUTO_HIDDEN;
-            }
-            else
-            {
-              sidebarState = SidebarState.VISIBLE;
-            }
-            break;
-
-          case AUTO_VISIBLE:
-            if (event.isCtrlKey())
-            {
-              sidebarState = SidebarState.VISIBLE;
-            }
-            else
-            {
-              sidebarState = SidebarState.AUTO_HIDDEN;
-            }
-            break;
-          case AUTO_HIDDEN:
-            if (event.isCtrlKey())
-            {
-              sidebarState = SidebarState.HIDDEN;
-            }
-            else
-            {
-              sidebarState = SidebarState.AUTO_VISIBLE;
-            }
-            break;
-        }
-        updateControlsForSidebarState();
-      }
-    });
     
     addAction(new ShortcutListener("Tutor^eial")
     {
@@ -425,10 +214,6 @@ public class SearchUI extends AnnisBaseUI
     checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
-
-    updateUserInformation();
-    updateControlsForSidebarState();
-    
     
     checkServiceVersion();
   }
@@ -474,36 +259,6 @@ public class SearchUI extends AnnisBaseUI
     }
   }
   
-  public void regenerateStateFromCookies()
-  {
-    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
-    if(cookies != null)
-    {
-      for(Cookie c : cookies )
-      {
-        if("annis-sidebar-state".equals(c.getName()))
-        {
-          try
-          {
-            sidebarState = SidebarState.valueOf(c.getValue());
-            // don't be invisible
-            if(sidebarState == SidebarState.AUTO_HIDDEN)
-            {
-              sidebarState = SidebarState.AUTO_VISIBLE;
-            }
-            else if(sidebarState == SidebarState.HIDDEN)
-            {
-              sidebarState = SidebarState.VISIBLE;
-            }
-          }
-          catch(IllegalArgumentException ex)
-          {
-            log.debug("Invalid cookie for sidebar state", ex);
-          }
-        }
-      }
-    }
-  }
   
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
@@ -525,19 +280,21 @@ public class SearchUI extends AnnisBaseUI
 
   public boolean canReportBugs()
   {
-    return this.bugEMailAddress != null;
+    if(toolbar != null)
+    {
+      return toolbar.canReportBugs();
+    }
+    return false;
   }
 
   public void reportBug()
   {
-    reportBug(null);
+    toolbar.reportBug();
   }
 
   public void reportBug(Throwable cause)
   {
-    lastBugReportCause = cause;
-    screenshot.makeScreenshot();
-    btBugReport.setCaption("problem report is initialized...");
+    toolbar.reportBug(cause);
   }
 
   private void loadInstanceFonts()
@@ -783,84 +540,21 @@ public class SearchUI extends AnnisBaseUI
 
   }
   
-  /**
-   * update controls according to new state
-   */
-  private void updateControlsForSidebarState()
+  @Override
+  public void updateSidebarState(SidebarState state)
   {
-    if(controlPanel != null && sidebarState != null && btSidebar != null)
+    if(controlPanel != null && state != null && toolbar != null)
     {
-      controlPanel.setVisible(sidebarState.isSidebarVisible());
-      btSidebar.setIcon(sidebarState.getIcon());
+      controlPanel.setVisible(state.isSidebarVisible());
       
       // set cookie
-      Cookie c = new Cookie("annis-sidebar-state", sidebarState.name());
+      Cookie c = new Cookie("annis-sidebar-state", state.name());
       c.setMaxAge(30*24*60*60); // 30 days
       c.setPath(VaadinService.getCurrentRequest().getContextPath());
       VaadinService.getCurrentResponse().addCookie(c);
     }
   }
-
-  public void updateUserInformation()
-  {
-    if (layoutToolbar == null || lblUserName == null)
-    {
-      return;
-    }
-    if (isLoggedIn())
-    {
-      AnnisUser user = Helper.getUser();
-      if (user != null)
-      {
-        lblUserName.setValue("logged in as \"" + ((AnnisUser) user).
-          getUserName() + "\"");
-        if (layoutToolbar.getComponentIndex(btLogin) > -1)
-        {
-          layoutToolbar.replaceComponent(btLogin, btLogout);
-          layoutToolbar.setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
-        }
-        // do not show the logout button if the user cannot logout using ANNIS
-        btLogout.setVisible(!user.isRemote());
-      }
-    }
-    else
-    {
-      lblUserName.setValue("not logged in");
-      if (layoutToolbar.getComponentIndex(btLogout) > -1)
-      {
-        layoutToolbar.replaceComponent(btLogout, btLogin);
-        layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
-      }
-    }
-
-    queryController.updateCorpusSetList();
-  }
-
-  @Override
-  public void onLogin()
-  {
-    AnnisUser user = Helper.getUser();
-
-    if (user == null)
-    {
-      Object loginErrorOject = VaadinSession.getCurrent().getSession().
-        getAttribute(USER_LOGIN_ERROR);
-      if (loginErrorOject != null && loginErrorOject instanceof String)
-      {
-        Notification.show((String) loginErrorOject,
-          Notification.Type.WARNING_MESSAGE);
-      }
-      VaadinSession.getCurrent().getSession().removeAttribute(
-        AnnisBaseUI.USER_LOGIN_ERROR);
-    }
-    else if (user.getUserName() != null)
-    {
-      Notification.show("Logged in as \"" + user.getUserName() + "\"",
-        Notification.Type.TRAY_NOTIFICATION);
-    }
-
-    updateUserInformation();
-  }
+  
 
   @Override
   public void onTabClose(TabSheet tabsheet, Component tabContent)
@@ -876,11 +570,6 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  public boolean isLoggedIn()
-  {
-    return Helper.getUser() != null;
-  }
-
   public ControlPanel getControlPanel()
   {
     return controlPanel;
@@ -889,26 +578,6 @@ public class SearchUI extends AnnisBaseUI
   public InstanceConfig getInstanceConfig()
   {
     return instanceConfig;
-  }
-
-  @Override
-  public void screenshotReceived(byte[] imageData, String mimeType)
-  {
-    btBugReport.setEnabled(true);
-    btBugReport.setCaption("Report Problem");
-
-    if (bugEMailAddress != null)
-    {
-      ReportBugWindow reportBugWindow =
-        new ReportBugWindow(bugEMailAddress, imageData, mimeType,
-        lastBugReportCause);
-
-      reportBugWindow.setModal(true);
-      reportBugWindow.setResizable(true);
-      addWindow(reportBugWindow);
-      reportBugWindow.center();
-      lastBugReportCause = null;
-    }
   }
 
   public QueryController getQueryController()
@@ -987,11 +656,19 @@ public class SearchUI extends AnnisBaseUI
   
   public void notifiyQueryStarted()
   {
-    if(sidebarState == SidebarState.AUTO_VISIBLE)
-    {
-      sidebarState = SidebarState.AUTO_HIDDEN;
-    }
-    updateControlsForSidebarState();
+    toolbar.notifiyQueryStarted();
+  }
+
+  @Override
+  public void onLogin()
+  {
+    queryController.updateCorpusSetList();
+  }
+  
+  @Override
+  public void onLogout()
+  {
+    queryController.updateCorpusSetList();
   }
 
   @Override
@@ -1176,34 +853,7 @@ public class SearchUI extends AnnisBaseUI
     }
   }
 
-  /**
-   * Adds the login button + login text to the toolbar. This is only happened,
-   * when the gui is not started via the kickstarter.
-   *
-   * <p>The Kickstarter overrides the "kickstarterEnvironment" context parameter
-   * and set it to "true", so the gui can detect, that is not necessary to offer
-   * a login button.</p>
-   *
-   * @param layoutToolbar The login text and login button are added to this
-   * component.
-   */
-  private void addLoginButton(HorizontalLayout layoutToolbar)
-  {
-    DeploymentConfiguration configuration = getSession().getConfiguration();
-
-    boolean kickstarter = Boolean.parseBoolean(
-      configuration.getInitParameters().getProperty("kickstarterEnvironment",
-      "false"));
-
-    if (!kickstarter)
-    {
-      layoutToolbar.addComponent(lblUserName);
-      layoutToolbar.setComponentAlignment(lblUserName, Alignment.MIDDLE_RIGHT);
-      layoutToolbar.addComponent(btLogin);
-      layoutToolbar.setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
-
-    }
-  }
+  
 
   private class CitationRequestHandler implements RequestHandler
   {
@@ -1214,41 +864,6 @@ public class SearchUI extends AnnisBaseUI
     {
       checkCitation();
       return false;
-    }
-  }
-
-  private class LoginCloseCallback implements JavaScriptFunction
-  {
-
-    @Override
-    public void call(JSONArray arguments) throws JSONException
-    {
-      if (windowLogin != null)
-      {
-        removeWindow(windowLogin);
-
-      }
-      onLogin();
-    }
-  }
-
-  private static class AboutClickListener implements ClickListener
-  {
-
-    public AboutClickListener()
-    {
-    }
-
-    @Override
-    public void buttonClick(ClickEvent event)
-    {
-      Window w = new AboutWindow();
-      w.setCaption("About ANNIS");
-      w.setModal(true);
-      w.setResizable(true);
-      w.setWidth("500px");
-      w.setHeight("500px");
-      UI.getCurrent().addWindow(w);
     }
   }
 

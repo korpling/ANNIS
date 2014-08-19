@@ -27,14 +27,14 @@
 
 
   .partitur_table td.gap {
-    background-image: url("hatching.png");
+    background-image: url("images/hatching.png");
     background-repeat: repeat;
     border-style: solid;
     border-color: black;
   }
   
   .partitur_table td.space {
-    background-image: url("space.png");
+    background-image: url("images/space.png");
     background-repeat: repeat-y;
     border-style: none;
     background-position: center;
@@ -83,11 +83,11 @@
   }
 
   .speaker {
-    background: url("speaker.png") no-repeat right;
+    background: url("images/speaker.png") no-repeat right;
   }
 
   .pdf {
-    background: url("pdf.png") no-repeat right;
+    background: url("images/pdf.png") no-repeat right;
   }
 
   .speaker, .speaker div, .pdf,  .pdf div {

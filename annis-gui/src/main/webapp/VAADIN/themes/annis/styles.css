@@ -6257,14 +6257,14 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .partitur_table td.gap {
-	background-image: url("hatching.png");
+	background-image: url("images/hatching.png");
 	background-repeat: repeat;
 	border-style: solid;
 	border-color: black;
 }
 
 .annis .partitur_table td.space {
-	background-image: url("space.png");
+	background-image: url("images/space.png");
 	background-repeat: repeat-y;
 	border-style: none;
 	background-position: center;
@@ -6311,11 +6311,11 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .speaker {
-	background: url("speaker.png") no-repeat right;
+	background: url("images/speaker.png") no-repeat right;
 }
 
 .annis .pdf {
-	background: url("pdf.png") no-repeat right;
+	background: url("images/pdf.png") no-repeat right;
 }
 
 .annis .speaker, .annis .speaker div, .annis .pdf, .annis .pdf div {
@@ -6394,7 +6394,7 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-table-cell-content-kwic-media {
-	background: url(speaker.png) no-repeat left;
+	background: url(images/speaker.png) no-repeat left;
 	width: 32px;
 	height: 32px;
 }
@@ -6529,11 +6529,11 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .v-table-cell-content-match_5 {
-	color: #add8e6;
+	color: #87ceeb;
 }
 
 .annis .kwic td.v-table-cell-content-match_5 {
-	color: #add8e6;
+	color: #87ceeb;
 }
 
 .annis .v-table-cell-content-match_6 {
@@ -6635,12 +6635,12 @@ body .annis.v-app .v-app-loading {
 }
 
 .annis .left-button {
-	background-image: url(left_rst_arrow.png);
+	background-image: url(images/left_rst_arrow.png);
 	background-repeat: repeat-y;
 }
 
 .annis .right-button {
-	background-image: url(right_rst_arrow.png);
+	background-image: url(images/right_rst_arrow.png);
 	background-repeat: repeat-y;
 }
 
@@ -6688,8 +6688,12 @@ body .annis.v-app .v-app-loading {
 	background-color: #ecf0f6;
 }
 
+.annis .grey-selection tr.v-selected {
+	background-color: #808080;
+}
+
 body .annis.v-app .v-app-loading {
-	background-image: url(annisloading.gif);
+	background-image: url(images/annisloading.gif);
 	background-repeat: no-repeat;
 	background-position: 50%;
 	width: 100%;
