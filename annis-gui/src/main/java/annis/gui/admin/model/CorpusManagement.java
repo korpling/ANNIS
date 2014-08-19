@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.query.model;
+package annis.gui.admin.model;
 
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;

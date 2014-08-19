@@ -24,7 +24,7 @@ import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserManagementView;
-import annis.gui.query.model.CorpusManagement;
+import annis.gui.admin.model.CorpusManagement;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.WebResource;
