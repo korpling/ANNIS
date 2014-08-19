@@ -157,6 +157,8 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
       case "groups":
         tabSheet.setSelectedTab(groupManagementPanel);
         break;
+      default:
+        break;
     }
   }
 

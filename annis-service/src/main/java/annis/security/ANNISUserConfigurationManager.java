@@ -371,9 +371,9 @@ public class ANNISUserConfigurationManager
   public void setResourcePath(String resourcePath)
   {
     lock.writeLock().lock();
-    this.resourcePath = resourcePath;
     try
     {
+      this.resourcePath = resourcePath;
       this.groupsFile = new File(resourcePath, "groups");
     }
     finally

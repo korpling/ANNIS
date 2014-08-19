@@ -18,7 +18,6 @@ package annis.gui.admin;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
-import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TreeSet;
@@ -30,10 +29,10 @@ import java.util.TreeSet;
 public class CommaSeperatedStringConverter implements Converter<String, Set>
 {
 
-  private final Splitter splitter = Splitter.on(',').trimResults().
+  private static final Splitter splitter = Splitter.on(',').trimResults().
     omitEmptyStrings();
 
-  private final Joiner joiner = Joiner.on(", ");
+  private static final Joiner joiner = Joiner.on(", ");
 
   @Override
   public Set convertToModel(String value,
