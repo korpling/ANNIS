@@ -15,15 +15,16 @@
  */
 package annis.gui;
 
+import annis.gui.admin.CorpusAdminPanel;
 import annis.gui.admin.GroupManagementPanel;
 import annis.gui.admin.ImportPanel;
 import annis.gui.admin.UserManagementPanel;
+import annis.gui.admin.controller.CorpusController;
 import annis.gui.admin.controller.GroupController;
 import annis.gui.admin.controller.UserController;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.view.UserListView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
@@ -50,6 +51,7 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
      userController;
   private GroupController
      groupManagementController;
+  private CorpusController corpusController;
   
   private final List<UIView.Listener> listeners = new LinkedList<>();
   
@@ -59,12 +61,17 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
     super.init(request);
     
     WebResource rootResource = Helper.getAnnisWebResource();
+    
     UserManagement userManagement = new UserManagement();
     userManagement.setRootResource(rootResource);
     GroupManagement groupManagement = new GroupManagement();
     groupManagement.setRootResource(rootResource);
     CorpusManagement corpusManagement = new CorpusManagement();
     corpusManagement.setRootResource(rootResource);
+   
+    CorpusAdminPanel corpusAdminPanel = new CorpusAdminPanel();
+    corpusController = new CorpusController(corpusManagement, corpusAdminPanel,
+      this);
     
     UserManagementPanel userManagementPanel = new UserManagementPanel();
     userController = new UserController(userManagement,
@@ -78,6 +85,7 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener
     
     TabSheet tabSheet = new TabSheet();
     tabSheet.addTab(new ImportPanel(), "Import Corpus", new ThemeResource("images/tango-icons/16x16/document-save.png"));
+    tabSheet.addTab(corpusAdminPanel, "Corpus management", new ThemeResource("images/tango-icons/16x16/system-file-manager.png"));
     tabSheet.addTab(userManagementPanel, "User management", new ThemeResource("images/tango-icons/16x16/user-info.png"));
     tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource("images/tango-icons/16x16/system-users.png"));
     tabSheet.setSizeFull();

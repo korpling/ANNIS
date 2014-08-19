@@ -18,7 +18,6 @@ package annis.gui.admin.view;
 
 import annis.security.Group;
 import java.util.Collection;
-import java.util.List;
 import java.util.Set;
 
 /**

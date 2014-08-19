@@ -16,36 +16,21 @@
 
 package annis.gui.admin.view;
 
-import annis.security.User;
+import annis.service.objects.AnnisCorpus;
 import java.util.Collection;
-import java.util.Set;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface UserListView
+public interface CorpusListView
 {
-  public void setUserList(Collection<User> users);
-  
-  
   public void addListener(Listener listener);
-  
-  public void askForPasswordChange(String userName);
-  
-  public void emptyNewUserNameTextField();
-  
-  public void setAvailableGroupNames(Collection<String> groupNames);
+  public void setAvailableCorpora(Collection<AnnisCorpus> corpora);
   
   public interface Listener
   {
-    public void userUpdated(User user);
-    public void passwordChanged(String userName, String newPassword);
-    
-    public void addNewUser(String userName);
-    public void deleteUsers(Set<String> userName);
-    
     public void attached();
+
   }
-  
 }
