@@ -257,6 +257,10 @@ public class SearchUI extends AnnisBaseUI
     {
       log.warn("Could not get the version of the service", ex);
     }
+    catch(ClientHandlerException ex)
+    {
+      log.warn("Could not get the version of the service because service is not running", ex);
+    }
   }
   
   
