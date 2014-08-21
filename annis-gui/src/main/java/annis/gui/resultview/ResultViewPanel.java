@@ -198,6 +198,8 @@ public class ResultViewPanel extends VerticalLayout implements
     lblNoResult.addStyleName("result-view-no-content");
     
     resultLayout.addComponent(lblNoResult);
+    
+    showFinishedSubgraphSearch();
   }
 
   public void showSubgraphSearchInProgress(PagedResultQuery q, float percent)
