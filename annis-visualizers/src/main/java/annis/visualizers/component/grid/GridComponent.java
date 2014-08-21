@@ -125,6 +125,10 @@ public class GridComponent extends Panel
     grid.addStyleName("corpus-font-force");
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
+    grid.setShowNamespace(Boolean.parseBoolean(input.getMappings().
+      getProperty(MAPPING_SHOW_NAMESPACE, "false")));
+    
+    
     layout.addComponent(grid);
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
     
