@@ -63,6 +63,8 @@ public class GridComponent extends Panel
   public static final String MAPPING_HIDE_TOK_KEY = "hide_tok";
   public static final String MAPPING_TOK_ANNOS_KEY = "tok_anno";
   public static final String MAPPING_ESCAPE_HTML = "escape_html";
+  public static final String MAPPING_SHOW_NAMESPACE = "show_ns";
+  
   private AnnotationGrid grid;
   private final transient VisualizerInput input;
   private final transient MediaController mediaController;
@@ -70,7 +72,7 @@ public class GridComponent extends Panel
   private final VerticalLayout layout;
   private Set<String> manuallySelectedTokenAnnos;
   private String segmentationName;
-  private transient STextualDS enforcedText;
+  private final transient STextualDS enforcedText;
   
   public enum ElementType
   {
@@ -153,7 +155,7 @@ public class GridComponent extends Panel
       if(isTokenFirst())
       {
         // copy original list but add token row at the beginning
-        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<String, ArrayList<Row>>();
+        LinkedHashMap<String, ArrayList<Row>> newList = new LinkedHashMap<>();
         
         newList.put("tok", Lists.newArrayList(tokenRow));
         newList.putAll(rowsByAnnotation);
@@ -179,7 +181,7 @@ public class GridComponent extends Panel
   {
     /* we will only add tokens of one texts which is mentioned by any
       included annotation. */
-    Set<String> validTextIDs = new HashSet<String>();
+    Set<String> validTextIDs = new HashSet<>();
     
     if(enforcedText == null)
     {
@@ -263,7 +265,7 @@ public class GridComponent extends Panel
   private LinkedHashMap<String, ArrayList<Row>> computeAnnotationRows(
     long startIndex, long endIndex)
   {
-    List<String> annos = new LinkedList<String>();
+    List<String> annos = new LinkedList<>();
     
     boolean showSpanAnnotations = isShowingSpanAnnotations();
     if(showSpanAnnotations)
@@ -289,7 +291,7 @@ public class GridComponent extends Panel
     
     if(isFilteringMediaLayer())
     {
-      mediaAnnotations = new HashSet<String>();
+      mediaAnnotations = new HashSet<>();
       Pattern patternMedia = Pattern.compile("(annis::)?time");
       for (String qname : annos)
       {

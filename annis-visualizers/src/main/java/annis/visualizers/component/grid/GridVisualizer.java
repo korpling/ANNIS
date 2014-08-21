@@ -21,8 +21,6 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.media.PDFController;
 import com.vaadin.server.VaadinSession;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.Map;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
