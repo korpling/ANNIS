@@ -43,7 +43,7 @@ public class TestAnnotateInnerQuerySqlGenerator
   // test data
   @Mock private QueryData queryData;
   @Mock private AnnotateQueryData annotateQueryData;
-  private List<QueryNode> alternative = new ArrayList<QueryNode>(); 
+  private List<QueryNode> alternative = new ArrayList<>(); 
   private static final String INDENT = TABSTOP;
   
   @Before
@@ -65,7 +65,7 @@ public class TestAnnotateInnerQuerySqlGenerator
     int left = uniqueInt(10);
     int right = uniqueInt(20);
     
-    List extensions = new ArrayList<AnnotateQueryData>();
+    List extensions = new ArrayList<>();
     extensions.add(annotateQueryData);
 
     given(annotateQueryData.getLeft()).willReturn(left);

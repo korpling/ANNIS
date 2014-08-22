@@ -21,10 +21,12 @@ import annis.examplequeries.ExampleQuery;
 import annis.exceptions.AnnisException;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.security.AnnisUserConfig;
+import annis.security.UserConfig;
 import annis.utils.DynamicDataSource;
-import annis.utils.SSLEnabledDataSource;
+import com.google.common.base.Preconditions;
 import java.io.*;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -42,6 +44,9 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import javax.sql.DataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.dbcp2.DelegatingConnection;
 import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.filefilter.DirectoryFileFilter;
 import org.apache.commons.io.filefilter.FileFileFilter;
@@ -223,8 +228,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     "media_files"
   };
 
-  private String dbLayout;
-
   private AnnisDao annisDao;
 
   private ObjectMapper jsonMapper = new ObjectMapper();
@@ -295,8 +298,8 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchema()
   {
-    log.info("creating ANNIS database schema (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schema.sql");
+    log.info("creating ANNIS database schema (" + getSchemaVersion() + ")");
+    executeSqlFromScript("schema.sql");
 
     // update schema version
     jdbcTemplate.execute(
@@ -310,8 +313,9 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   protected void createSchemaIndexes()
   {
-    log.info("creating ANNIS database schema indexes (" + dbLayout + ")");
-    executeSqlFromScript(dbLayout + "/schemaindex.sql");
+    log.info(
+      "creating ANNIS database schema indexes (" + getDatabaseSchemaVersion() + ")");
+    executeSqlFromScript("schemaindex.sql");
   }
 
   protected void populateSchema()
@@ -322,8 +326,17 @@ public class DefaultAdministrationDao implements AdministrationDao
           FILE_RESOLVER_VIS_MAP + REL_ANNIS_FILE_SUFFIX)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
+
+    log.info(
+      "creating immutable functions for extracting annotations");
+    executeSqlFromScript("functions_get.sql");
   }
 
+  /**
+   * Get the real schema name and version as used by the database.
+   *
+   * @return
+   */
   @Override
   @Transactional(readOnly = true, propagation = Propagation.NESTED)
   public String getDatabaseSchemaVersion()
@@ -382,20 +395,37 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL)
+    String superPassword, boolean useSSL, String pgSchema)
   {
     // connect as super user to the default database to create new user and database
     if (superPassword != null)
     {
       log.info("Creating Annis database and user.");
       dataSource.setInnerDataSource(createDataSource(host, port,
-        defaultDatabase, superUser, superPassword, useSSL));
+        defaultDatabase, superUser, superPassword, useSSL, pgSchema));
 
       createDatabaseAndUserInTransaction(database, user, password);
     }
-    // switch to new database as new user for the rest
+    // switch to new database as new user for the rest of the initialization procedure
     dataSource.setInnerDataSource(createDataSource(host, port, database,
-      user, password, useSSL));
+      user, password, useSSL, pgSchema));
+
+    //
+    if (pgSchema != null && !"public".equalsIgnoreCase(pgSchema))
+    {
+      pgSchema = pgSchema.toLowerCase().replaceAll("[^a-z0-9]", "_");
+      log.info("creating PostgreSQL schema {}", pgSchema);
+      // we have to create a schema before we can use it
+      try
+      {
+        jdbcTemplate.execute("CREATE SCHEMA " + pgSchema + ";");
+      }
+      catch (DataAccessException ex)
+      {
+        // ignore if the schema already exists
+        log.info("schema " + pgSchema + " already exists");
+      }
+    }
 
     createSchemaInTransaction();
 
@@ -422,29 +452,61 @@ public class DefaultAdministrationDao implements AdministrationDao
     populateSchema();
   }
 
-  private SSLEnabledDataSource createDataSource(String host, String port,
-    String database,
-    String user, String password, boolean useSSL)
+  private BasicDataSource createDataSource(File dbProperties)
+    throws IOException, URISyntaxException
   {
+    BasicDataSource result = null;
 
     Properties props = new Properties();
+    try (InputStream is = new FileInputStream(dbProperties))
+    {
+      props.load(is);
+
+      String rawJdbcURL = props.getProperty("datasource.url").trim();
+
+      rawJdbcURL = StringUtils.removeStart(rawJdbcURL, "jdbc:");
+      URI jdbcURL = new URI(rawJdbcURL);
+
+      result = createDataSource(
+        jdbcURL.getHost(),
+        "" + jdbcURL.getPort(),
+        jdbcURL.getPath().substring(1), // remove the "/" at the beginning
+        props.getProperty("datasource.username"),
+        props.getProperty("datasource.password"),
+        "true".equalsIgnoreCase(props.getProperty("datasource.ssl")),
+        props.getProperty("datasource.schema"));
+      ;
+    }
+
+    return result;
+  }
+
+  private BasicDataSource createDataSource(String host, String port,
+    String database,
+    String user, String password, boolean useSSL,
+    String schema)
+  {
+
     String url = "jdbc:postgresql://" + host + ":" + port + "/" + database;
 
-    if (useSSL)
-    {
-      props.put("ssl", "true");
-    }
     // DriverManagerDataSource is deprecated
     // return new DriverManagerDataSource("org.postgresql.Driver", url, user, password);
-
-    props.put("user", user);
-    props.put("password", password);
-
-    SSLEnabledDataSource result = new SSLEnabledDataSource();
+    BasicDataSource result = new BasicDataSource();
     result.setUrl(url);
-    result.setUseSSL(useSSL);
+    if (useSSL)
+    {
+      result.setConnectionProperties("ssl=true");
+    }
     result.setUsername(user);
     result.setPassword(password);
+    result.setValidationQuery("SELECT 1;");
+    result.setAccessToUnderlyingConnectionAllowed(true);
+    if (schema == null)
+    {
+      schema = "public";
+    }
+    result.setConnectionInitSqls(Arrays.asList(
+      "SET search_path TO \"$user\"," + schema));
 
     result.setDriverClassName("org.postgresql.Driver");
 
@@ -469,6 +531,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       return false;
     }
 
+    // explicitly unset any timeout
+    jdbcTemplate.update("SET statement_timeout TO 0");
+
     createStagingArea(temporaryStagingArea);
     bulkImport(path);
 
@@ -490,9 +555,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     analyzeStagingTables();
 
     computeLeftTokenRightToken();
-    
+
     removeUnecessarySpanningRelations();
-    
+
+    addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
     long corpusID = updateIds();
@@ -503,7 +569,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     extendStagingExampleQueries(corpusID);
 
     analyzeAutoGeneratedQueries(corpusID);
-    
 
     computeRealRoot();
     computeLevel();
@@ -519,7 +584,9 @@ public class DefaultAdministrationDao implements AdministrationDao
     computeCorpusPath(corpusID);
 
     createAnnotations(corpusID);
-    
+
+    createAnnoCategory(corpusID);
+
     // create the new facts table partition
     createFacts(corpusID);
 
@@ -639,15 +706,13 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private void bulkImportNode(String path)
   {
-    BufferedReader reader = null;
-    try
+    // check column number by reading first line
+    File nodeTabFile = new File(path, "node.tab");
+    try (BufferedReader reader
+      = new BufferedReader(new InputStreamReader(
+          new FileInputStream(nodeTabFile), "UTF-8"));)
     {
-      // check column number by reading first line
-      File nodeTabFile = new File(path, "node.tab");
 
-      reader
-        = new BufferedReader(new InputStreamReader(
-            new FileInputStream(nodeTabFile), "UTF-8"));
       String firstLine = reader.readLine();
 
       int columnNumber = firstLine == null ? 13
@@ -661,6 +726,7 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
       else if (columnNumber == 10)
       {
+        jdbcTemplate.execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
         // create temporary table for  bulk import
         jdbcTemplate.execute(
@@ -695,25 +761,11 @@ public class DefaultAdministrationDao implements AdministrationDao
         throw new RuntimeException("Illegal number of columns in node.tab, "
           + "should be 13 or 10 but was " + columnNumber);
       }
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
         }
         catch (IOException ex)
         {
           log.error(null, ex);
         }
-      }
-    }
   }
 
   void createStagingAreaIndexes()
@@ -926,6 +978,28 @@ public class DefaultAdministrationDao implements AdministrationDao
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("node"));
   }
 
+  protected void addUniqueNodeNameAppendix()
+  {
+    // first check if this is actually necessary
+    log.info("check if node names are unique");
+
+    jdbcTemplate.execute(
+      "ALTER TABLE _node ADD COLUMN unique_name_appendix varchar;");
+
+    List<Integer> checkDuplicate = jdbcTemplate.queryForList(
+      "SELECT COUNT(*) from _node GROUP BY \"name\", corpus_ref HAVING COUNT(*) > 1 LIMIT 1",
+      Integer.class);
+    if (checkDuplicate.isEmpty())
+    {
+      log.info("node names are unique, no update necessary");
+    }
+    else
+    {
+      log.info("add an unique node name appendix");
+      executeSqlFromScript("unique_node_name_appendix.sql");
+    }
+  }
+
   /**
    *
    * @return the new corpus ID
@@ -1062,6 +1136,14 @@ public class DefaultAdministrationDao implements AdministrationDao
     executeSqlFromScript("indexes_annotations.sql", args);
   }
 
+  void createAnnoCategory(long corpusID)
+  {
+    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
+    log.
+      info("creating annotation category table for corpus with ID " + corpusID);
+    executeSqlFromScript("annotation_category.sql", args);
+  }
+
   void analyzeFacts(long corpusID)
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
@@ -1077,12 +1159,12 @@ public class DefaultAdministrationDao implements AdministrationDao
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript(dbLayout + "/facts.sql", args);
+    executeSqlFromScript("facts.sql", args);
 
     clusterFacts(corpusID);
 
     log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
-    executeSqlFromScript(dbLayout + "/indexes.sql", args);
+    executeSqlFromScript("indexes.sql", args);
 
   }
 
@@ -1092,25 +1174,22 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     log.info("clustering materialized facts table for corpus with ID "
       + corpusID);
-    if (executeSqlFromScript(dbLayout + "/cluster.sql", args) != null)
-    {
-      executeSqlFromScript("cluster.sql", args);
-    }
+    executeSqlFromScript("cluster.sql", args);
+
   }
-  
+
   void removeUnecessarySpanningRelations()
   {
     log.info("setting \"continuous\" to a correct value");
     executeSqlFromScript("set_continuous.sql");
-    
+
     // re-analyze node since we added new columns
     log.info("analyzing node");
     jdbcTemplate.execute("ANALYZE " + tableInStagingArea("node"));
-    
+
     log.info("removing unnecessary span relations");
     executeSqlFromScript("remove_span_relations.sql");
 
-    
   }
 
   ///// Other sub tasks
@@ -1179,29 +1258,28 @@ public class DefaultAdministrationDao implements AdministrationDao
   @Override
   public void cleanupData()
   {
-    
+
     List<String> allFilesInDatabaseList = jdbcTemplate.queryForList(
-        "SELECT filename FROM media_files AS m", String.class);
-    
+      "SELECT filename FROM media_files AS m", String.class);
+
     File dataDir = getRealDataDir();
-    
-    Set<File> allFilesInDatabase = new HashSet<File>();
-    for(String singleFileName : allFilesInDatabaseList)
+
+    Set<File> allFilesInDatabase = new HashSet<>();
+    for (String singleFileName : allFilesInDatabaseList)
     {
       allFilesInDatabase.add(new File(dataDir, singleFileName));
     }
-    
-    
+
     log.info("Cleaning up the data directory");
     // go through each file of the folder and check if it is not included
     File[] childFiles = dataDir.listFiles();
-    if(childFiles != null)
+    if (childFiles != null)
     {
-      for(File f : childFiles)
+      for (File f : childFiles)
       {
-        if(f.isFile() && !allFilesInDatabase.contains(f))
+        if (f.isFile() && !allFilesInDatabase.contains(f))
         {
-          if(!f.delete())
+          if (!f.delete())
           {
             log.warn("Could not delete {}", f.getAbsolutePath());
           }
@@ -1209,14 +1287,36 @@ public class DefaultAdministrationDao implements AdministrationDao
       }
     }
   }
-  
-  
 
   @Override
   public List<Map<String, Object>> listCorpusStats()
   {
     return jdbcTemplate.queryForList(
       "SELECT * FROM corpus_info ORDER BY name");
+  }
+
+  @Override
+  public List<Map<String, Object>> listCorpusStats(File databaseProperties)
+  {
+    List<Map<String, Object>> result = new LinkedList<>();
+    DataSource origDataSource = dataSource.getInnerDataSource();
+    try
+    {
+      dataSource.setInnerDataSource(createDataSource(databaseProperties));
+      result = jdbcTemplate.queryForList(
+        "SELECT * FROM corpus_info ORDER BY name");
+    }
+    catch (IOException | URISyntaxException | DataAccessException ex)
+    {
+      log.error(
+        "Could not query corpus list for the file " + databaseProperties.
+        getAbsolutePath(), ex);
+    }
+    finally
+    {
+      dataSource.setInnerDataSource(origDataSource);
+    }
+    return result;
   }
 
   @Override
@@ -1235,29 +1335,28 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = true)
-  public AnnisUserConfig retrieveUserConfig(final String userName)
+  public UserConfig retrieveUserConfig(final String userName)
   {
     String sql = "SELECT * FROM user_config WHERE id=?";
-    AnnisUserConfig config = jdbcTemplate.query(sql, new Object[]
+    UserConfig config = jdbcTemplate.query(sql, new Object[]
     {
       userName
     },
-      new ResultSetExtractor<AnnisUserConfig>()
+      new ResultSetExtractor<UserConfig>()
       {
         @Override
-        public AnnisUserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
+        public UserConfig extractData(ResultSet rs) throws SQLException, DataAccessException
         {
 
           // default to empty config
-          AnnisUserConfig c = new AnnisUserConfig();
-          c.setName(userName);
+          UserConfig c = new UserConfig();
 
           if (rs.next())
           {
             try
             {
               c = jsonMapper.readValue(rs.getString("config"),
-                AnnisUserConfig.class);
+                UserConfig.class);
             }
             catch (IOException ex)
             {
@@ -1276,7 +1375,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   @Override
   @Transactional(readOnly = false)
-  public void storeUserConfig(AnnisUserConfig config)
+  public void storeUserConfig(String userName, UserConfig config)
   {
     String sqlUpdate = "UPDATE user_config SET config=?::json WHERE id=?";
     String sqlInsert = "INSERT INTO user_config(id, config) VALUES(?,?)";
@@ -1285,9 +1384,9 @@ public class DefaultAdministrationDao implements AdministrationDao
       String jsonVal = jsonMapper.writeValueAsString(config);
 
       // if no row was affected there is no entry yet and we should create one
-      if (jdbcTemplate.update(sqlUpdate, jsonVal, config.getName()) == 0)
+      if (jdbcTemplate.update(sqlUpdate, jsonVal, userName) == 0)
       {
-        jdbcTemplate.update(sqlInsert, config.getName(), jsonVal);
+        jdbcTemplate.update(sqlInsert, userName, jsonVal);
       }
     }
     catch (IOException ex)
@@ -1311,7 +1410,7 @@ public class DefaultAdministrationDao implements AdministrationDao
   ///// Helpers
   private List<String> importedAndCreatedTables()
   {
-    List<String> tables = new ArrayList<String>();
+    List<String> tables = new ArrayList<>();
     tables.addAll(Arrays.asList(importedTables));
     tables.addAll(Arrays.asList(createdTables));
     return tables;
@@ -1319,7 +1418,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
   private List<String> allTables()
   {
-    List<String> tables = new ArrayList<String>();
+    List<String> tables = new ArrayList<>();
     tables.addAll(Arrays.asList(importedTables));
     tables.addAll(Arrays.asList(createdTables));
     //tables.addAll(Arrays.asList(materializedTables));
@@ -1349,13 +1448,14 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
     Map<String, Object> parameters = args != null ? args.getValues() : new HashMap();
-    BufferedReader reader = null;
-    try
+
+    try (BufferedReader reader = new BufferedReader(new InputStreamReader(
+      new FileInputStream(
+        resource.
+        getFile()), "UTF-8"));)
     {
       StringBuilder sqlBuf = new StringBuilder();
-      reader = new BufferedReader(new InputStreamReader(new FileInputStream(
-        resource.
-        getFile()), "UTF-8"));
+
       for (String line = reader.readLine(); line != null; line
         = reader.readLine())
       {
@@ -1371,27 +1471,13 @@ public class DefaultAdministrationDao implements AdministrationDao
         sql = sql.replaceAll(key, Matcher.quoteReplacement(value));
       }
       return sql;
-    }
-    catch (IOException e)
-    {
-      log.error("Couldn't read SQL script from resource file.", e);
-      throw new FileAccessException(
-        "Couldn't read SQL script from resource file.", e);
-    }
-    finally
-    {
-      if (reader != null)
-      {
-        try
-        {
-          reader.close();
-        }
-        catch (IOException ex)
-        {
-          log.error("close the reader for SQL script failed", ex);
-        }
       }
-    }
+      catch (IOException e)
+      {
+        log.error("Couldn't read SQL script from resource file.", e);
+        throw new FileAccessException(
+          "Couldn't read SQL script from resource file.", e);
+      }
   }
 
   // executes an SQL script from $ANNIS_HOME/scripts
@@ -1507,13 +1593,22 @@ public class DefaultAdministrationDao implements AdministrationDao
     try
     {
       // retrieve the currently open connection if running inside a transaction
-      Connection con = DataSourceUtils.getConnection(dataSource);
+      Connection originalCon = DataSourceUtils.getConnection(dataSource);
+      Connection con = originalCon;
+      if (con instanceof DelegatingConnection)
+      {
+        DelegatingConnection<?> delCon = (DelegatingConnection<?>) con;
+        con = delCon.getInnermostDelegate();
+      }
+
+      Preconditions.checkState(con instanceof PGConnection,
+        "bulk-loading only works with a PostgreSQL JDBC connection");
 
       // Postgres JDBC4 8.4 driver now supports the copy API
       PGConnection pgCon = (PGConnection) con;
       pgCon.getCopyAPI().copyIn(sql, resource.getInputStream());
 
-      DataSourceUtils.releaseConnection(con, dataSource);
+      DataSourceUtils.releaseConnection(originalCon, dataSource);
 
     }
     catch (SQLException e)
@@ -1652,16 +1747,6 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.externalFilesPath = externalFilesPath;
   }
 
-  public String getDbLayout()
-  {
-    return dbLayout;
-  }
-
-  public void setDbLayout(String dbLayout)
-  {
-    this.dbLayout = dbLayout;
-  }
-
   public boolean isTemporaryStagingArea()
   {
     return temporaryStagingArea;
@@ -1672,6 +1757,10 @@ public class DefaultAdministrationDao implements AdministrationDao
     this.temporaryStagingArea = temporaryStagingArea;
   }
 
+  /**
+   * Get the name and version of the schema this @{link AdministrationDao} is
+   * configured to work with.
+   */
   public String getSchemaVersion()
   {
     return schemaVersion;
@@ -1784,10 +1873,12 @@ public class DefaultAdministrationDao implements AdministrationDao
         return;
       }
 
-      BufferedReader bReader = new BufferedReader(
-        new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8"));
-      String firstLine = bReader.readLine();
-      bReader.close();
+      String firstLine;
+      try (BufferedReader bReader = new BufferedReader(
+        new InputStreamReader(new FileInputStream(resolver_vis_tab), "UTF-8")))
+      {
+        firstLine = bReader.readLine();
+      }
 
       int cols = 9; // default number
       if (firstLine != null)
@@ -1957,7 +2048,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     Pattern opsRegex = Pattern.compile(regex);
     for (ExampleQuery eQ : exQueries)
     {
-      List<String> ops = new ArrayList<String>();
+      List<String> ops = new ArrayList<>();
       Matcher m = opsRegex.matcher(eQ.getExampleQuery().replaceAll("\\s", ""));
 
       while (m.find())
@@ -2088,7 +2179,7 @@ public class DefaultAdministrationDao implements AdministrationDao
     if (existConflictingTopLevelCorpus(corpusName))
     {
       log.info("delete conflicting corpus: {}", corpusName);
-      List<String> corpusNames = new LinkedList<String>();
+      List<String> corpusNames = new LinkedList<>();
       corpusNames.add(corpusName);
       deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames), false);
     }

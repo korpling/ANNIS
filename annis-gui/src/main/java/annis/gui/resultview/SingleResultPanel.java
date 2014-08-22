@@ -20,7 +20,7 @@ import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
@@ -85,7 +85,7 @@ public class SingleResultPanel extends CssLayout implements
   private static final String INITIAL_OPEN = "initial_open";
 
   private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "info.gif");
+    "images/info.gif");
 
   private transient SDocument result;
 
@@ -192,7 +192,7 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    this.visualizerState = new HashMap<Long, Boolean>();
+    this.visualizerState = new HashMap<>();
 
     // init context combox
     lftCtxCombo = new ComboBox();
@@ -312,8 +312,8 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedExactMap = new HashMap<String, String>();
-    markedCoveredMap = new HashMap<String, String>();
+    markedExactMap = new HashMap<>();
+    markedCoveredMap = new HashMap<>();
 
     if (result != null)
     {
@@ -369,7 +369,7 @@ public class SingleResultPanel extends CssLayout implements
   private Map<String, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Map<String, Long> initialCovered = new HashMap<String, Long>();
+    Map<String, Long> initialCovered = new HashMap<>();
 
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
@@ -393,7 +393,7 @@ public class SingleResultPanel extends CssLayout implements
     if (segmentationName != null)
     {
       // filter token
-      Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
+      Map<SToken, Long> coveredToken = new HashMap<>();
       for (Map.Entry<String, Long> e : covered.entrySet())
       {
         SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
@@ -474,8 +474,8 @@ public class SingleResultPanel extends CssLayout implements
       ResolverEntry[] entries 
         = resolverProvider == null ? new ResolverEntry[0] 
         : resolverProvider.getResolverEntries(result);
-      visualizers = new LinkedList<VisualizerPanel>();
-      List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
+      visualizers = new LinkedList<>();
+      List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
@@ -665,7 +665,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       this.matchedAndCovered = initialMatches;
 
-      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<SNode, Long>(
+      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<>(
         new Comparator<SNode>()
         {
           @Override
@@ -712,7 +712,7 @@ public class SingleResultPanel extends CssLayout implements
       currentMatchPos = 1;
       if (initialMatches.size() > 0)
       {
-        graph.traverse(new BasicEList<SNode>(sortedByOverlappedTokenIntervall.
+        graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
           keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
           (SGraphTraverseHandler) this, true);

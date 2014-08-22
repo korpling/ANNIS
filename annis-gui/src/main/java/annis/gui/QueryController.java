@@ -20,8 +20,8 @@ import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
@@ -86,7 +86,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private Map<UUID, PagedResultQuery> queries;
 
-  private BiMap<UUID, ResultViewPanel> queryPanels;
+  private BiMap<UUID, ResultViewPanel> resultPanels;
 
   private Map<UUID, MatchAndDocumentCount> counts;
 
@@ -105,12 +105,12 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   private int maxShortID;
 
   private List<CorpusSelectionChangeListener> corpusSelChangeListeners
-    = new LinkedList<CorpusSelectionChangeListener>();
+    = new LinkedList<>();
 
   public QueryController(SearchUI ui)
   {
     this.ui = ui;
-    this.history = new ListOrderedSet<HistoryEntry>();
+    this.history = new ListOrderedSet<>();
   }
   
 
@@ -218,7 +218,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (corpusSelChangeListeners == null)
     {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+      corpusSelChangeListeners = new LinkedList<>();
     }
     corpusSelChangeListeners.add(listener);
   }
@@ -228,7 +228,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (corpusSelChangeListeners == null)
     {
-      corpusSelChangeListeners = new LinkedList<CorpusSelectionChangeListener>();
+      corpusSelChangeListeners = new LinkedList<>();
     }
     else
     {
@@ -271,6 +271,8 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     Validate.notNull(preparedQuery,
       "You have to set a query before you can execute it.");
 
+    ui.getControlPanel().getQueryPanel().setStatus("Searching...");
+    
     prepareExecuteQuery();
 
     if (preparedQuery.getCorpora() == null || preparedQuery.getCorpora().
@@ -295,7 +297,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     // begin execute match fetching
     //
     // remove old result from view
-    ResultViewPanel oldPanel = getQueryPanels().get(oldQueryUUID);
+    ResultViewPanel oldPanel = getResultPanels().get(oldQueryUUID);
 
     if (replaceOldTab && oldQueryUUID != null && oldPanel != null)
     {
@@ -310,7 +312,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
     Tab newTab;
 
-    String caption = getQueryPanels().isEmpty()
+    String caption = getResultPanels().isEmpty()
       ? "Query Result" : "Query Result #" + maxShortID;
 
     if (replaceOldTab && oldPanel != null)
@@ -324,7 +326,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
-      newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
+      newTab.setIcon(new ThemeResource("images/tango-icons/16x16/system-search.png"));
     }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();
@@ -332,8 +334,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     newResultView.getPaging().addCallback(new SpecificPagingCallback(
       lastQueryUUID));
 
-    getQueryPanels().put(lastQueryUUID, newResultView);
-
+    getResultPanels().put(lastQueryUUID, newResultView);
     PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
       newResultView, ui, this));
 
@@ -365,12 +366,16 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private void updateMatches(UUID uuid, PagedResultQuery newQuery)
   {
-    ResultViewPanel panel = getQueryPanels().get(uuid);
+    ResultViewPanel panel = getResultPanels().get(uuid);
     if (panel != null && preparedQuery != null)
     {
       prepareExecuteQuery();
-
+      
       getQueries().put(uuid, newQuery);
+      
+      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+      
       lastMatchFuture = PollControl.runInBackground(500, ui,
         new ResultFetchJob(newQuery, panel, ui, this));
     }
@@ -406,7 +411,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       ResultViewPanel panel = (ResultViewPanel) event.getTabSheet().
         getSelectedTab();
-      UUID uuid = getQueryPanels().inverse().get(panel);
+      UUID uuid = getResultPanels().inverse().get(panel);
       if (uuid != null)
       {
         lastQueryUUID = uuid;
@@ -446,7 +451,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     if (uuid != null)
     {
       getQueries().remove(uuid);
-      getQueryPanels().remove(uuid);
+      getResultPanels().remove(uuid);
       getCounts().remove(uuid);
     }
   }
@@ -455,7 +460,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (panel != null)
     {
-      removeQuery(getQueryPanels().inverse().get(panel));
+      removeQuery(getResultPanels().inverse().get(panel));
     }
   }
 
@@ -468,25 +473,25 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   {
     if (queries == null)
     {
-      queries = new HashMap<UUID, PagedResultQuery>();
+      queries = new HashMap<>();
     }
     return queries;
   }
 
-  private BiMap<UUID, ResultViewPanel> getQueryPanels()
+  private BiMap<UUID, ResultViewPanel> getResultPanels()
   {
-    if (queryPanels == null)
+    if (resultPanels == null)
     {
-      queryPanels = HashBiMap.create();
+      resultPanels = HashBiMap.create();
     }
-    return queryPanels;
+    return resultPanels;
   }
 
   private Map<UUID, MatchAndDocumentCount> getCounts()
   {
     if (counts == null)
     {
-      counts = new HashMap<UUID, MatchAndDocumentCount>();
+      counts = new HashMap<>();
     }
     return counts;
   }
@@ -494,7 +499,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
   private class SpecificPagingCallback implements PagingCallback
   {
 
-    private UUID uuid;
+    private final UUID uuid;
 
     public SpecificPagingCallback(UUID uuid)
     {
@@ -579,11 +584,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
                   getMatchCount() + " " + matchesString
                   + "\nin " + countResult.getDocumentCount() + " " + documentString);
                 if (lastQueryUUID != null && countResult.getMatchCount() > 0
-                  && getQueryPanels().get(lastQueryUUID) != null)
+                  && getResultPanels().get(lastQueryUUID) != null)
                 {
-                  getQueryPanels().get(lastQueryUUID).getPaging().setPageSize(
+                  getResultPanels().get(lastQueryUUID).getPaging().setPageSize(
                     getQueries().get(uuid).getLimit(), false);
-                  getQueryPanels().get(lastQueryUUID).setCount(countResult.
+                  getResultPanels().get(lastQueryUUID).setCount(countResult.
                     getMatchCount());
                 }
               }
@@ -592,23 +597,28 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
             {
               if (causeFinal.getResponse().getStatus() == 400)
               {
-                Notification.show(
-                  "parsing error",
-                  causeFinal.getResponse().getEntity(String.class),
-                  Notification.Type.WARNING_MESSAGE);
+                String errMsg = causeFinal.getResponse().getEntity(String.class);
+                Notification.show("parsing error", 
+                  errMsg, Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }
               else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
               {
+                String errMsg =  "Timeout: query execution took too long.";
                 Notification.show(
-                  "Timeout: query execution took too long.",
+                  errMsg,
                   "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
                   Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }
               else
               {
                 log.error("Unexpected exception:  " + causeFinal.
                   getLocalizedMessage(), causeFinal);
                 ExceptionDialog.show(causeFinal);
+                
+                ui.getControlPanel().getQueryPanel().setStatus(
+                  "Unexpected exception:  " + causeFinal.getMessage());
               }
             } // end if cause != null
 
@@ -625,11 +635,11 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
     PagedResultQuery query;
 
-    if (queries.containsKey(queryID) && queryPanels.containsKey(queryID))
+    if (queries.containsKey(queryID) && resultPanels.containsKey(queryID))
     {
       if (updatedQueries == null)
       {
-        updatedQueries = new HashMap<UUID, Map<Integer, PagedResultQuery>>();
+        updatedQueries = new HashMap<>();
       }
 
       if (!updatedQueries.containsKey(queryID))

@@ -41,7 +41,7 @@ public class TableJoinsInWhereClauseGenerator
 	@Override
 	public String fromClause(QueryData queryData, List<QueryNode> alternative,
 			String indent) {
-		List<String> tables = new ArrayList<String>();
+		List<String> tables = new ArrayList<>();
 		for (QueryNode node : alternative)
 			tables.add(fromClauseForNode(queryData.getCorpusList(), node, false));
 		return StringUtils.join(tables, ",\n" + indent + TABSTOP);
@@ -50,7 +50,7 @@ public class TableJoinsInWhereClauseGenerator
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
 			List<QueryNode> alternative, String indent) {
-		Set<String> conditions = new HashSet<String>();
+		Set<String> conditions = new HashSet<>();
 		
 		for (QueryNode node : alternative) {
 			conditions.addAll(whereConditionsForNode(node));
@@ -69,7 +69,7 @@ public class TableJoinsInWhereClauseGenerator
 
 	public String fromClauseForNode(List<Long> corpusList, 
     QueryNode node, boolean leftJoin) {
-		List<String> tables = new ArrayList<String>();
+		List<String> tables = new ArrayList<>();
 
 		// every node uses the node table
 		tables.add(tableAliasDefinition(node, NODE_TABLE, 1, corpusList));
@@ -106,7 +106,7 @@ public class TableJoinsInWhereClauseGenerator
   public Set<String> whereConditionsForNode(QueryNode node)
   {
 
-		Set<String> conditions = new HashSet<String>();
+		Set<String> conditions = new HashSet<>();
 
 		// join rank table
 		if (tables(node).usesRankTable() && ! tables(node).isMaterialized(RANK_TABLE, NODE_TABLE)) {

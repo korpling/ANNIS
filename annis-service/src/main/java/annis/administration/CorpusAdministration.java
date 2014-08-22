@@ -40,9 +40,11 @@ import java.util.Map.Entry;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
+import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.output.FileWriterWithEncoding;
+import org.apache.commons.mail.EmailException;
 import org.apache.commons.mail.SimpleEmail;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -93,15 +95,16 @@ public class CorpusAdministration
 
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
-    String superPassword, boolean useSSL)
+    String superPassword, boolean useSSL, String pgSchema)
   {
 
     log.info("initializing database");
     administrationDao.initializeDatabase(host, port, database, user, password,
-      defaultDatabase, superUser, superPassword, useSSL);
+      defaultDatabase, superUser, superPassword, useSSL, pgSchema);
 
     // write database information to property file
-    writeDatabasePropertiesFile(host, port, database, user, password, useSSL);
+    writeDatabasePropertiesFile(host, port, database, user, password, useSSL,
+      pgSchema);
 
     // create tables and other stuff that is handled by the scheme fixer
     if (schemeFixer != null)
@@ -141,7 +144,7 @@ public class CorpusAdministration
       schemeFixer.checkAndFix();
     }
 
-    List<File> roots = new LinkedList<File>();
+    List<File> roots = new LinkedList<>();
     for (String path : paths)
     {
       File f = new File(path);
@@ -149,10 +152,9 @@ public class CorpusAdministration
       if (f.isFile())
       {
         // might be a ZIP-file
-        ZipFile zip = null;
-        try
+        try(ZipFile zip = new ZipFile(f);)
         {
-          zip = new ZipFile(f);
+          
           // get the names of all corpora included in the ZIP file
           // in order to get a folder name
           Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
@@ -163,7 +165,6 @@ public class CorpusAdministration
             join(corpora.keySet()));
           roots.addAll(unzipCorpus(outDir, zip));
 
-          zip.close();
         }
         catch (ZipException ex)
         {
@@ -176,20 +177,6 @@ public class CorpusAdministration
           log.error(
             "IOException when importing file " + f.getAbsolutePath() + ", will be ignored",
             ex);
-        }
-        finally
-        {
-          if (zip != null)
-          {
-            try
-            {
-              zip.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
         }
       }
       else
@@ -269,20 +256,19 @@ public class CorpusAdministration
    */
   private List<File> unzipCorpus(File outDir, ZipFile zip)
   {
-    List<File> rootDirs = new ArrayList<File>();
+    List<File> rootDirs = new ArrayList<>();
 
     Enumeration<? extends ZipEntry> zipEnum = zip.entries();
     while (zipEnum.hasMoreElements())
     {
       ZipEntry e = zipEnum.nextElement();
       File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
-      outFile.deleteOnExit();
-
+   
       if (e.isDirectory())
       {
         if (!outFile.mkdirs())
         {
-          log.warn("Could not create temporary directory " + outFile.
+          log.warn("Could not create output directory " + outFile.
             getAbsolutePath());
         }
       } // end if directory
@@ -294,21 +280,21 @@ public class CorpusAdministration
           rootDirs.add(outFile.getParentFile());
         }
 
-        FileOutputStream outStream = null;
-        try
+        
+        if (!outFile.getParentFile().isDirectory())
         {
-          if (!outFile.getParentFile().isDirectory())
+          if (!outFile.getParentFile().mkdirs())
           {
-            if (!outFile.getParentFile().mkdirs())
             {
-              {
-                log.warn(
-                  "Could not create output directory for file " + outFile.
-                  getAbsolutePath());
-              }
+              log.warn(
+                "Could not create output directory for file " + outFile.
+                getAbsolutePath());
             }
           }
-          outStream = new FileOutputStream(outFile);
+        }
+        try(FileOutputStream outStream = new FileOutputStream(outFile);)
+        {
+          
           ByteStreams.copy(zip.getInputStream(e), outStream);
         }
         catch (FileNotFoundException ex)
@@ -318,20 +304,6 @@ public class CorpusAdministration
         catch (IOException ex)
         {
           log.error(null, ex);
-        }
-        finally
-        {
-          if (outStream != null)
-          {
-            try
-            {
-              outStream.close();
-            }
-            catch (IOException ex)
-            {
-              log.error(null, ex);
-            }
-          }
         }
       } // end else is file
     } // end for each entry in zip file
@@ -367,7 +339,7 @@ public class CorpusAdministration
   public static class ImportStatsImpl implements AdministrationDao.ImportStatus
   {
 
-    private boolean status;
+    private boolean status = true;
 
     private final static String SEPERATOR = "--------------------------\n";
 
@@ -375,7 +347,7 @@ public class CorpusAdministration
 
     public ImportStatsImpl()
     {
-      exceptions = new HashMap<String, List<Throwable>>();
+      exceptions = new HashMap<>();
     }
 
     @Override
@@ -387,7 +359,7 @@ public class CorpusAdministration
     @Override
     public List<Throwable> getThrowables()
     {
-      List<Throwable> allThrowables = new ArrayList<Throwable>();
+      List<Throwable> allThrowables = new ArrayList<>();
 
       for (List<Throwable> l : exceptions.values())
       {
@@ -435,7 +407,7 @@ public class CorpusAdministration
     @Override
     public List<Exception> getExceptions()
     {
-      List<Exception> exs = new ArrayList<Exception>();
+      List<Exception> exs = new ArrayList<>();
 
       if (exceptions != null)
       {
@@ -547,7 +519,7 @@ public class CorpusAdministration
     try
     {
       SimpleEmail mail = new SimpleEmail();
-      List<InternetAddress> to = new LinkedList<InternetAddress>();
+      List<InternetAddress> to = new LinkedList<>();
       to.add(new InternetAddress(adress));
 
       StringBuilder sbMsg = new StringBuilder();
@@ -614,7 +586,7 @@ public class CorpusAdministration
       });
 
     }
-    catch (Throwable ex)
+    catch (AddressException | EmailException ex)
     {
       log.warn("Could not send mail: " + ex.getMessage());
     }
@@ -659,6 +631,11 @@ public class CorpusAdministration
   {
     return administrationDao.listCorpusStats();
   }
+  
+   public List<Map<String, Object>> listCorpusStats(File databaseProperties)
+  {
+    return administrationDao.listCorpusStats(databaseProperties);
+  }
 
   public List<String> listUsedIndexes()
   {
@@ -672,14 +649,13 @@ public class CorpusAdministration
 
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
-    String database, String user, String password, boolean useSSL)
+    String database, String user, String password, boolean useSSL, String schema)
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
-    BufferedWriter writer = null;
-    try
+    try(BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));)
     {
-      writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));
+      
       writer.write("# database configuration\n");
       writer.write("datasource.driver=org.postgresql.Driver\n");
       writer.write("datasource.url=jdbc:postgresql://" + host + ":" + port + "/"
@@ -687,25 +663,15 @@ public class CorpusAdministration
       writer.write("datasource.username=" + user + "\n");
       writer.write("datasource.password=" + password + "\n");
       writer.write("datasource.ssl=" + (useSSL ? "true" : "false") + "\n");
+      if(schema != null)
+      {
+        writer.write("datasource.schema=" + schema + "\n");
+      }
     }
     catch (IOException e)
     {
       log.error("Couldn't write database properties file", e);
       throw new FileAccessException(e);
-    }
-    finally
-    {
-      if (writer != null)
-      {
-        try
-        {
-          writer.close();
-        }
-        catch (IOException ex)
-        {
-          log.error(null, ex);
-        }
-      }
     }
     log.info("Wrote database configuration to " + file.getAbsolutePath());
   }

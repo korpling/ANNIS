@@ -25,10 +25,12 @@ import annis.libgui.media.TimeHelper;
 import annis.libgui.visualizers.VisualizerInput;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_MATCHEDNODE;
+import static annis.model.AnnisConstants.FEAT_MATCHEDANNOS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNOS_KEY;
 import static annis.visualizers.component.grid.GridComponent.MAPPING_ANNO_REGEX_KEY;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Range;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
@@ -68,7 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventExtractor {
 
-  private static Logger log = LoggerFactory.getLogger(EventExtractor.class);
+  private static final Logger log = LoggerFactory.getLogger(EventExtractor.class);
 
   /**
    * Converts Salt document graph to rows.
@@ -98,7 +100,7 @@ public class EventExtractor {
 
     // only look at annotations which were defined by the user
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation =
-            new LinkedHashMap<String, ArrayList<Row>>();
+            new LinkedHashMap<>();
 
     for (String anno : annotationNames) {
       rowsByAnnotation.put(anno, new ArrayList<Row>());
@@ -166,7 +168,7 @@ public class EventExtractor {
   public static void removeEmptySpace(LinkedHashMap<String, 
     ArrayList<Row>> rowsByAnnotation, Row tokenRow)
   {
-    List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
+    List<Range<Integer>> gaps = new LinkedList<>();
 
     BitSet totalOccupancyGrid = new BitSet();
     for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
@@ -220,7 +222,7 @@ public class EventExtractor {
         ArrayList<Row> rows = rowEntry.getValue();
         for(Row r : rows)
         {
-          List<GridEvent> eventsCopy = new LinkedList<GridEvent>(r.getEvents());
+          List<GridEvent> eventsCopy = new LinkedList<>(r.getEvents());
           for(GridEvent e : eventsCopy)
           {
             if(e.getLeft() >= g.upperEndpoint())
@@ -258,6 +260,25 @@ public class EventExtractor {
     Set<String> mediaLayer, boolean unsetValueForMedia)
   {
 
+    List<String> matchedAnnos = new ArrayList<>();
+    SFeature featMatchedAnnos = graph.getSDocument().getSFeature(ANNIS_NS, FEAT_MATCHEDANNOS);
+    if(featMatchedAnnos != null)
+    {
+      matchedAnnos = Splitter.on(',').trimResults()
+        .splitToList(featMatchedAnnos.getSValueSTEXT());
+    }
+    // check if the span is a matched node
+    SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
+    Long matchRaw = featMatched == null ? null : featMatched.
+      getSValueSNUMERIC();
+    
+    String matchedQualifiedAnnoName = "";
+    if(matchRaw != null && matchRaw <= matchedAnnos.size())
+    {
+      matchedQualifiedAnnoName = matchedAnnos.get((int) ((long) matchRaw)-1);
+    }
+    
+
     // calculate the left and right values of a span
     // TODO: howto get these numbers with Salt?
     RelannisNodeFeature feat = (RelannisNodeFeature) node.
@@ -292,13 +313,21 @@ public class EventExtractor {
           anno.getSValueSTEXT());
         event.setTooltip(Helper.getQualifiedName(anno));
 
-        // check if the span is a matched node
-        SFeature featMatched = node.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-        Long match = featMatched == null ? null : featMatched.
-          getSValueSNUMERIC();
-        if(addMatch)
+        if(addMatch && matchRaw != null)
         {
-          event.setMatch(match);
+          long match = matchRaw;
+          
+          if(matchedQualifiedAnnoName.isEmpty())
+          {
+            // always set the match when there is no matched annotation at all
+            event.setMatch(match);
+          }
+          // check if the annotation also matches
+          else if(matchedQualifiedAnnoName.equals(anno.getQName()))
+          {
+            event.setMatch(match);
+          }
+
         }
         if(node instanceof SSpan)
         {
@@ -412,7 +441,7 @@ public class EventExtractor {
   public static List<String> computeDisplayAnnotations(VisualizerInput input,
           Class<? extends SNode> type) {
     if (input == null) {
-      return new LinkedList<String>();
+      return new LinkedList<>();
     }
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
@@ -420,7 +449,7 @@ public class EventExtractor {
     Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
       getAnnotationLevelSet(graph, null, type)
       : getAnnotationLevelSet(graph, input.getNamespace(), type);
-    List<String> annos = new LinkedList<String>(annoPool);
+    List<String> annos = new LinkedList<>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
             MAPPING_ANNOS_KEY);
@@ -435,7 +464,7 @@ public class EventExtractor {
           // check if they match
           Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
 
-          LinkedList<String> matchingAnnos = new LinkedList<String>();
+          LinkedList<String> matchingAnnos = new LinkedList<>();
           for (String a : annoPool) {
             if (regex.matcher(a).matches()) {
               matchingAnnos.add(a);
@@ -489,7 +518,7 @@ public class EventExtractor {
    */
   private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
           String namespace, Class<? extends SNode> type) {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     if (graph != null) {
       EList<? extends SNode> nodes;
@@ -688,7 +717,7 @@ public class EventExtractor {
       int lastTokenIndex = -1;
 
       // sort the coveredIDs
-      LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.
+      LinkedList<String> sortedCoveredToken = new LinkedList<>(event.
         getCoveredIDs());
       Collections.sort(sortedCoveredToken, new Comparator<String>()
       {
@@ -726,7 +755,7 @@ public class EventExtractor {
       });
 
       // first calculate all gaps
-      List<GridEvent> gaps = new LinkedList<GridEvent>();
+      List<GridEvent> gaps = new LinkedList<>();
       for (String id : sortedCoveredToken)
       {
 

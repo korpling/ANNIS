@@ -96,7 +96,7 @@ $font-size: 10pt;
   }
 
   .v-table-cell-content-kwic-media {
-    background: url(speaker.png) no-repeat left;
+    background: url(images/speaker.png) no-repeat left;
     width: 32px;
     height: 32px;
   }
@@ -199,14 +199,24 @@ $font-size: 10pt;
     background-size: auto;
   } 
   
-  @include match-color(1, rgb(255,0,0));
-  @include match-color(2, rgb(199,21,133));
-  @include match-color(3, rgb(50, 205, 50));
-  @include match-color(4, rgb(205,133,63));
-  @include match-color(5, rgb(205,92,92));
-  @include match-color(6, rgb(173,255,47));
-  @include match-color(7, rgb(139,0,0));
-  @include match-color(8, rgb(255,69,0));
+  /* Always synchronize with the MatchedNodeColors class! */
+  @include match-color(1, rgb(255,0,0)); // Red
+  @include match-color(2, rgb(199,21,133)); // MediumVioletRed
+  @include match-color(3, rgb(50, 205, 50)); // LimeGreen
+  @include match-color(4, rgb(205,133,63)); // Peru
+  @include match-color(5, rgb(135, 206, 235)); // SkyBlue
+  @include match-color(6, rgb(205,92,92)); // IndianRed
+  @include match-color(7, rgb(173,255,47)); // YellowGreen
+  @include match-color(8, rgb(139,0,0)); // DarkRed
+  @include match-color(9, rgb(255,69,0)); // OrangeRed
+  @include match-color(10, rgb(255,215,0)); // Gold
+  @include match-color(11, rgb(210, 180, 140)); // Tan
+  @include match-color(12, rgb(0, 0, 128)); // Navy
+  @include match-color(13, rgb(0, 250, 154)); // MediumSpringGreen
+  @include match-color(14, rgb(30, 144, 255)); // DodgerBlue
+  @include match-color(15, rgb(107, 142,  35)); // OliveDrab
+  @include match-color(16, rgb(255, 182, 193)); // LightPink
+
 
   .v-form-errormessage {
     color: red;
@@ -219,12 +229,12 @@ $font-size: 10pt;
   }
 
   .left-button {
-    background-image: url(left_rst_arrow.png);
+    background-image: url(images/left_rst_arrow.png);
     background-repeat: repeat-y;
   }
 
   .right-button {
-    background-image: url(right_rst_arrow.png);
+    background-image: url(images/right_rst_arrow.png);
     background-repeat: repeat-y;
   }
 
@@ -248,9 +258,20 @@ $font-size: 10pt;
     border-width: 1px;
   }
   
-  .help-tab .v-accordion-item-caption {
-    background-color: #ecffe7;
-  }
+  .help-tab {
+    .v-accordion-item-caption {
+      background-color: #ecffe7;
+    }
+    .v-captiontext {
+      text-decoration: underline;
+      color: #3137F5;
+    }
+    .v-accordion-item-open .v-captiontext {
+      text-decoration: none;
+      color: black;
+    }
+  } 
+
   /* Chamaeleon theme tab appeareance is sub-optimal */
   .blue-tab .v-tabsheet-tabitem {
     border: 1px solid rgb(204,204,204);
@@ -260,5 +281,9 @@ $font-size: 10pt;
   .v-tabsheet-tabcontainer-blue-tab {
     background-color: #ecf0f6;
   }
+  
+  .grey-selection tr.v-selected {
+    background-color: #808080;
+  } 
 
 }

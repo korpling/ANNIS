@@ -17,7 +17,7 @@ package annis.gui.frequency;
 
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
@@ -295,7 +295,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        ArrayList<FrequencyTableEntry> freqDefinition = new ArrayList<FrequencyTableEntry>();
+        ArrayList<FrequencyTableEntry> freqDefinition = new ArrayList<>();
         for(Object oid : tblFrequencyDefinition.getItemIds())
         {
           FrequencyTableEntry entry = new FrequencyTableEntry();
@@ -476,7 +476,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   {
     if(query == null || query.isEmpty())
     {
-      return new LinkedList<QueryNode>();
+      return new LinkedList<>();
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
@@ -526,7 +526,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           alternativesOfVariable.put(n.getVariable(), n.getAlternativeNumber());
         }
       }
-      Set<String> allowedVariables = new LinkedHashSet<String>();
+      Set<String> allowedVariables = new LinkedHashSet<>();
       for(QueryNode n : nodes)
       {
         // we assume that the alternative numbering is continuous and without gaps

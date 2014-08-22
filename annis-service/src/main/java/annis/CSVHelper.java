@@ -48,7 +48,7 @@ public class CSVHelper
   {
     // figure out what annotations are used at each match position
     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
-      new TreeMap<Integer, SortedSet<String>>();
+      new TreeMap<>();
     while(matches.hasNext())
     {
       AnnotatedMatch match = matches.next();
@@ -75,7 +75,7 @@ public class CSVHelper
     CSVWriter csvWriter = new CSVWriter(w, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
     // print column names and data types
     int count = columnsByNodePos.keySet().size();
-    ArrayList<String> headerLine = new ArrayList<String>();
+    ArrayList<String> headerLine = new ArrayList<>();
     
     for(int j = 0; j < count; ++j)
     {
@@ -103,12 +103,12 @@ public class CSVHelper
     {
       AnnotatedMatch match = matches.next();
       
-      List<String> line = new ArrayList<String>();
+      List<String> line = new ArrayList<>();
       int k = 0;
       for(; k < match.size(); ++k)
       {
         AnnotatedSpan span = match.get(k);
-        Map<String, String> valueByName = new HashMap<String, String>();
+        Map<String, String> valueByName = new HashMap<>();
 
         if(span != null)
         {

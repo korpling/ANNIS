@@ -50,7 +50,7 @@ public class ReducingStringComparator
   
   private HashMap initAlphabet()
   {
-    HashMap<Character, Character> h = new HashMap<Character, Character>();
+    HashMap<Character, Character> h = new HashMap<>();
     
     //standard-alphabet:
     for(int i=97; i<122; i++)
@@ -65,7 +65,7 @@ public class ReducingStringComparator
   
   private void readMappings()
   {	  
-    ALLOGRAPHS = new HashMap<String, HashMap>();
+    ALLOGRAPHS = new HashMap<>();
     ClassResource cr = new ClassResource(ReducingStringComparator.class, MAPPING_FILE); 
     try{
       DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();

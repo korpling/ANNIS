@@ -16,15 +16,19 @@
 package annis.sqlgen;
 
 import static annis.sqlgen.SqlConstraints.between;
+import static annis.sqlgen.SqlConstraints.betweenMirror;
 import static annis.sqlgen.SqlConstraints.in;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
 import static annis.sqlgen.SqlConstraints.isTrue;
 import static annis.sqlgen.SqlConstraints.join;
+import static annis.sqlgen.SqlConstraints.mirrorJoin;
 import static annis.sqlgen.SqlConstraints.numberJoin;
+import static annis.sqlgen.SqlConstraints.numberMirrorJoin;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 
 import java.util.List;
@@ -44,6 +48,7 @@ import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -54,6 +59,7 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import com.google.common.base.Joiner;
 import org.apache.commons.lang3.Validate;
 
 public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
@@ -87,12 +93,30 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
       aliasedColumn(NODE_TABLE, rightColumn)));
   }
+  
+    void mirrorJoinOnNode(List<String> conditions, QueryNode node, QueryNode target,
+    String operator, String leftColumn, String rightColumn)
+  {
+    conditions.add(mirrorJoin(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn)));
+  }
+
 
   void betweenJoinOnNode(List<String> conditions, QueryNode node,
     QueryNode target, String leftColumn, String rightColumn, int min, int max)
   {
     conditions.add(between(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
       tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+  }
+
+    void betweenMirrorJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String leftColumn, String rightColumn, int min, int max)
+  {
+    
+    conditions.add(betweenMirror(tables(node).aliasedColumn(NODE_TABLE, leftColumn),
+      tables(target).aliasedColumn(NODE_TABLE, rightColumn), min, max));
+
   }
 
   void numberJoinOnNode(List<String> conditions, QueryNode node,
@@ -104,12 +128,39 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
       aliasedColumn(NODE_TABLE, rightColumn), offset));
   }
   
-    
+  void numberMirrorJoinOnNode(List<String> conditions, QueryNode node,
+    QueryNode target, String operator, String leftColumn, String rightColumn,
+    int offset)
+  {
+    conditions.add(numberMirrorJoin(operator,
+      tables(node).aliasedColumn(NODE_TABLE, leftColumn), tables(target).
+      aliasedColumn(NODE_TABLE, rightColumn), offset));
+  }
+
+  
+  
   /**
    * Explicitly disallow reflexivity.
    * 
    * Can be used if the other conditions allow reflexivity but the operator not.
-   * Two results are not equal if they are different nodes. 
+   * It depends on the search conditions if two results are not equal.
+   * 
+   * <p>
+   * <b>For two nodes (including searches for token):</b> <br />
+   * node IDs are different
+   * </p>
+   * 
+   * 
+   * <p>
+   * <b>If both nodes are an annotation:</b> <br />
+   * node IDs are different or annotation namespace+name are different
+   * </p>
+   * 
+   * <p>
+   * <b>For a node with and one without annotation condition:</b> <br />
+   * always different
+   * </p>
+   * 
    * 
    * @param conditions
    * @param node
@@ -120,7 +171,31 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   {
     Validate.isTrue(node != target, "notReflexive(...) implies that source "
       + "and target node are not the same, but someone is violating this constraint!");
-    joinOnNode(conditions, node, target, "<>", "id", "id");
+    Validate.notNull(node);
+    Validate.notNull(target);
+    
+    if(node.getNodeAnnotations().isEmpty() && target.getNodeAnnotations().isEmpty())
+    {    
+      joinOnNode(conditions, node, target, "<>", "id", "id");
+    }
+    else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
+    {
+      TableAccessStrategy tasNode = tables(node);
+      TableAccessStrategy tasTarget = tables(target);
+      
+      String nodeDifferent = join("<>",
+        tasNode.aliasedColumn(NODE_TABLE, "id"), 
+        tasTarget.aliasedColumn(NODE_TABLE, "id"));
+      
+      String annoCatDifferent = join("IS DISTINCT FROM",
+        tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "category"),
+        tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "category"));
+      
+      conditions.add("(" 
+        + Joiner.on(" OR ").join(nodeDifferent, annoCatDifferent) 
+        + ")");
+      
+    }
   }
 
   
@@ -314,6 +389,61 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     }
   }
 
+    @Override
+  protected void addNearConditions(List<String> conditions,
+    QueryNode node, QueryNode target, Near join, QueryData queryData)
+  {
+    joinOnNode(conditions, node, target, "=", "text_ref", "text_ref");
+
+    int min = join.getMinDistance();
+    int max = join.getMaxDistance();
+
+    String left = join.getSegmentationName() == null ? "left_token" : "seg_index";
+    String right = join.getSegmentationName() == null ? "right_token" : "seg_index";
+    
+    // we are using a special segmentation
+    if(join.getSegmentationName() != null)
+    {
+      conditions.add(join("=",  
+        tables(node).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
+      
+      conditions.add(join("=",  
+        tables(target).aliasedColumn(NODE_TABLE, "seg_name"), 
+        sqlString(join.getSegmentationName()))); 
+    }
+    
+    
+    // indirect
+    if (min == 0 && max == 0)
+    {
+      if (optimizeIndirectPrecedence)
+      {
+        numberMirrorJoinOnNode(conditions, node, target, "<=", right,
+          left, -1);
+      }
+      else
+      {
+        mirrorJoinOnNode(conditions, node, target, "<", right, left);
+      }
+
+    }
+    // exact distance
+    else if (min == max)
+    {
+      numberMirrorJoinOnNode(conditions, node, target, "=", right,
+        left, -min);
+
+    }
+    // ranged distance
+    else
+    {
+      betweenMirrorJoinOnNode(conditions, node, target, right, left,
+        -min, -max);
+    }
+  }
+  
+  
   @Override
   protected void addRightOverlapConditions(List<String> conditions,
     QueryNode target, QueryNode node, RightOverlap join, QueryData queryData)
@@ -383,7 +513,25 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
   protected void addIdenticalConditions(List<String> conditions,
     QueryNode node, QueryNode target, Identical join, QueryData queryData)
   {
-    joinOnNode(conditions, node, target, "=", "id", "id");
+    if(node.getNodeAnnotations().isEmpty() && target.getNodeAnnotations().isEmpty())
+    {    
+      joinOnNode(conditions, node, target, "=", "id", "id");
+    }
+    else if(!node.getNodeAnnotations().isEmpty() && !target.getNodeAnnotations().isEmpty())
+    {
+      TableAccessStrategy tasNode = tables(node);
+      TableAccessStrategy tasTarget = tables(target);
+      joinOnNode(conditions, node, target, "=", "id", "id");
+      
+      conditions.add(join("IS NOT DISTINCT FROM", 
+        tasNode.aliasedColumn(NODE_ANNOTATION_TABLE, "category"),
+        tasTarget.aliasedColumn(NODE_ANNOTATION_TABLE, "category")));
+    }
+    else
+    {
+      // the identity join between a node and an annotation condition is always false
+      conditions.add("FALSE");
+    }
   }
 
   @Override
@@ -412,6 +560,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     conditions.add(spanLengthSource + " = " + spanLengthTarget);
     
+    notReflexive(conditions, node, target);
     //joinOnNode(conditions, node, target, "=", "right_token", "right_token");
   }
 

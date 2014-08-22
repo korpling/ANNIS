@@ -74,7 +74,7 @@ public class ExportPanel extends FormLayout
     new SimpleTextExporter()
   };
 
-  private final Map<String, String> help4Exporter = new HashMap<String, String>();
+  private final Map<String, String> help4Exporter = new HashMap<>();
 
   private final ComboBox cbExporter;
 
@@ -128,7 +128,7 @@ public class ExportPanel extends FormLayout
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    exporterMap = new HashMap<String, Exporter>();
+    exporterMap = new HashMap<>();
     for (Exporter e : EXPORTER)
     {
       String name = e.getClass().getSimpleName();
@@ -181,12 +181,12 @@ public class ExportPanel extends FormLayout
 
     btExport = new Button("Perform Export");
     btExport.setIcon(new ThemeResource(
-      "tango-icons/16x16/media-playback-start.png"));
+      "images/tango-icons/16x16/media-playback-start.png"));
     btExport.setDisableOnClick(true);
     btExport.addClickListener(new ExportButtonListener());
 
     btCancel = new Button("Cancel Export");
-    btCancel.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btCancel.setIcon(new ThemeResource("images/tango-icons/16x16/process-stop.png"));
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
     Exporter exporter = exporterMap.get((String) cbExporter.getValue());
@@ -197,7 +197,7 @@ public class ExportPanel extends FormLayout
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
-    btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+    btDownload.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
@@ -431,11 +431,11 @@ public class ExportPanel extends FormLayout
       final File currentTmpFile = File.createTempFile("annis-export", ".txt");
       currentTmpFile.deleteOnExit();
 
-      OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+      
 
       final AtomicBoolean success = new AtomicBoolean(false);
-      try
+      try(OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
         exporter.convertText(queryPanel.getQuery(),
           (Integer) cbLeftContext.getValue(),
@@ -449,8 +449,6 @@ public class ExportPanel extends FormLayout
       }
       finally
       {
-        outWriter.close();
-
         ui.access(new Runnable()
         {
           @Override

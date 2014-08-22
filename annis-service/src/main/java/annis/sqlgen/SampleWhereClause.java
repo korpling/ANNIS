@@ -42,7 +42,7 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	@Override
 	public Set<String> whereConditions(QueryData queryData,
 			List<QueryNode> alternative, String indent) {
-		Set<String> conditions = new HashSet<String>();
+		Set<String> conditions = new HashSet<>();
 		List<Long> corpusList = queryData.getCorpusList();
 		List<Long> documents = queryData.getDocuments();
 		
@@ -57,7 +57,7 @@ public class SampleWhereClause extends TableAccessStrategyFactory
 	@Deprecated
   public List<String> whereConditions(QueryNode node, List<Long> corpusList, List<Long> documents)
   {
-    LinkedList<String> conditions = new LinkedList<String>();
+    LinkedList<String> conditions = new LinkedList<>();
 
     TableAccessStrategy t = tables(node);
 
@@ -69,53 +69,19 @@ public class SampleWhereClause extends TableAccessStrategyFactory
       && t.isMaterialized(COMPONENT_TABLE, FACTS_TABLE))
     {
 
-      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
+      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable() && !t.usesNodeAnnotationTable())
       {
         // artificial node subview
         conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_sample")));
         //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{true, false, false, false, false}));
       }
-      else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
-      {
-        // artificial node-rank-component subview
-        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_sample")));
-        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, true, false, false}));
-      }
-      else if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable())
+      else if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesEdgeAnnotationTable() && t.usesNodeAnnotationTable())
       {
         // artificial node-node_annotation subview
         conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_na_sample")));
         //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, true, false, false, false}));
       }
-      else if(!t.usesNodeAnnotationTable())
-      {
-        // artificial node-rank-component-edge_annotation subview
-        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_ea_sample")));
-        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, true, false}));
-      }
-      else if(!t.usesEdgeAnnotationTable())
-      {
-        // artificial node-rank-component-node_annotation subview
-        conditions.add(isTrue(t.aliasedColumn(FACTS_TABLE, "n_r_c_na_sample")));
-        //conditions.add(bitSelect(t.aliasedColumn(FACTS_TABLE, "sample"), new boolean[]{false, false, false, false, true}));
-      }
-    }
-    // only apply if we have a full facts table seperated for edges and nodes
-    else if(t.isMaterialized(NODE_TABLE, NODE_ANNOTATION_TABLE)
-      && t.isMaterialized(RANK_TABLE, EDGE_ANNOTATION_TABLE)
-      && !t.isMaterialized(NODE_TABLE, RANK_TABLE))
-    {
 
-      if(!t.usesRankTable() && !t.usesComponentTable() && !t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
-      {
-        // artificial node subview
-        conditions.add(isTrue(t.aliasedColumn(NODE_TABLE, "n_sample")));
-      }
-      else if(!t.usesNodeAnnotationTable() && !t.usesEdgeAnnotationTable())
-      {
-        // artificial node-rank-component subview
-        conditions.add(isTrue(t.aliasedColumn(RANK_TABLE, "r_c_sample")));
-      }
     }
     return conditions;
   }

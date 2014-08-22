@@ -55,7 +55,7 @@ public class CsvResultSetProvider
   {
     MockitoAnnotations.initMocks((CsvResultSetProvider) this);
 
-    header = new HashMap<String, Integer>();
+    header = new HashMap<>();
     reader = new CSVReader(new InputStreamReader(csvStream), ';', '"');
     try
     {

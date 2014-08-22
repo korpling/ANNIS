@@ -52,11 +52,12 @@ import org.slf4j.LoggerFactory;
  * @author thomas
  */
 public class MatrixSqlGenerator
-  extends AbstractSqlGenerator<List<AnnotatedMatch>>
+  extends AbstractSqlGenerator
   implements SelectClauseSqlGenerator<QueryData>,
   FromClauseSqlGenerator<QueryData>,
   WhereClauseSqlGenerator<QueryData>, GroupByClauseSqlGenerator<QueryData>,
-  OrderByClauseSqlGenerator<QueryData>
+  OrderByClauseSqlGenerator<QueryData>,
+  SqlGeneratorAndExtractor<QueryData, List<AnnotatedMatch>>
 {
 
   private final Logger log = LoggerFactory.getLogger(MatrixSqlGenerator.class);
@@ -64,7 +65,7 @@ public class MatrixSqlGenerator
   @Deprecated
   private String matchedNodesViewName;
 
-  private SqlGenerator<QueryData, ?> innerQuerySqlGenerator;
+  private SolutionSqlGenerator solutionSqlGenerator;
 
   private AnnotatedSpanExtractor spanExtractor;
 
@@ -84,10 +85,10 @@ public class MatrixSqlGenerator
   public List<AnnotatedMatch> extractData(ResultSet resultSet)
     throws SQLException, DataAccessException
   {
-    List<AnnotatedMatch> matches = new ArrayList<AnnotatedMatch>();
+    List<AnnotatedMatch> matches = new ArrayList<>();
 
     Map<List<Long>, AnnotatedSpan[]> matchesByGroup =
-      new HashMap<List<Long>, AnnotatedSpan[]>();
+      new HashMap<>();
 
     int rowNum = 0;
     while (resultSet.next())
@@ -171,7 +172,7 @@ public class MatrixSqlGenerator
   protected List<String> getSelectFields(TableAccessStrategy tas,
     MatrixQueryData matrixExt)
   {
-    List<String> result = new LinkedList<String>();
+    List<String> result = new LinkedList<>();
 
     result.add(selectIdString(tas));
     result.add(selectSpanString(tas));
@@ -198,17 +199,6 @@ public class MatrixSqlGenerator
       + tas.aliasedColumn(NODE_TABLE, "left") + ")) AS span";
   }
 
-  protected String selectAnnotationsString(TableAccessStrategy tas)
-  {
-    return "array_agg(DISTINCT coalesce("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "namespace")
-      + " || ':', '') || "
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "name")
-      + " || ':' || encode("
-      + tas.aliasedColumn(NODE_ANNOTATION_TABLE, "value")
-      + "::bytea, 'base64')) AS annotations";
-  }
-
   protected String selectMetadataString(TableAccessStrategy tas)
   {
     return "array_agg(DISTINCT coalesce("
@@ -231,7 +221,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append("(\n");
     sb.append(indent);
 
-    sb.append(innerQuerySqlGenerator.toSql(queryData, indent + TABSTOP));
+    sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
     sb.append(indent).append(TABSTOP);
@@ -274,15 +264,34 @@ public class MatrixSqlGenerator
         sb.append(" = ");
         sb.append(tas.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
-        Set<String> conditions = new TreeSet<String>();
+        Set<String> conditions = new TreeSet<>();
         addAnnoSelectionCondition(conditions, matrixExt.getMetaKeys(),
           CORPUS_ANNOTATION_TABLE, tas);
         sb.append(" AND ").append(StringUtils.join(conditions, " AND "));
 
         sb.append(")\n");
       }
+      
     }
+    
+    List<Long> corpusList = queryData.getCorpusList();
 
+    String factsName = tas.partitionTableName(NODE_TABLE, corpusList);
+
+    sb.append(indent).append(TABSTOP);
+    sb.append("LEFT OUTER JOIN ").append(factsName).append(" AS node_anno")
+      .append(" ON  (")
+      .append(tas.aliasedColumn(NODE_TABLE, "id")).append(
+        " = node_anno.id AND ")
+      .append("node_anno.n_na_sample IS TRUE AND ")
+      .append(tas.aliasedColumn(NODE_TABLE,
+          "toplevel_corpus")).append(
+        " = node_anno.toplevel_corpus AND ")
+      .append("node_anno.toplevel_corpus IN (").append(StringUtils.
+        join(corpusList, ", "))
+      .append("))");
+
+    sb.append("\n");
   }
 
   @Override
@@ -291,7 +300,7 @@ public class MatrixSqlGenerator
   {
 
 
-    Set<String> conditions = new HashSet<String>();
+    Set<String> conditions = new HashSet<>();
     StringBuilder sb = new StringBuilder();
     TableAccessStrategy tables = tables(null);
 
@@ -322,7 +331,7 @@ public class MatrixSqlGenerator
     sb.append("(\n");
 
     sb.append(indent).append(TABSTOP).append(TABSTOP);
-    List<String> ors = new ArrayList<String>();
+    List<String> ors = new ArrayList<>();
     for (int i = 1; i <= queryData.getMaxWidth(); ++i)
     {
       ors.add(
@@ -343,7 +352,7 @@ public class MatrixSqlGenerator
     List<MatrixQueryData.QName> selected, String tableName,
     TableAccessStrategy tables)
   {
-    List<String> orConditions = new LinkedList<String>();
+    List<String> orConditions = new LinkedList<>();
     Iterator<MatrixQueryData.QName> itMatrix = selected.iterator();
     while (itMatrix.hasNext())
     {
@@ -393,6 +402,11 @@ public class MatrixSqlGenerator
       + tas.aliasedColumn(NODE_TABLE, "id");
   }
 
+  protected String selectAnnotationsString(TableAccessStrategy tas)
+  {
+    return "array_agg(DISTINCT node_anno.node_qannotext) AS annotations";
+  }
+
   @Override
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
@@ -415,17 +429,17 @@ public class MatrixSqlGenerator
     this.matchedNodesViewName = matchedNodesViewName;
   }
 
-  public SqlGenerator<QueryData, ?> getInnerQuerySqlGenerator()
+  public SolutionSqlGenerator getSolutionSqlGenerator()
   {
-    return innerQuerySqlGenerator;
+    return solutionSqlGenerator;
   }
 
-  public void setInnerQuerySqlGenerator(
-    SqlGenerator<QueryData, ?> innerQuerySqlGenerator)
+  public void setSolutionSqlGenerator(SolutionSqlGenerator solutionSqlGenerator)
   {
-    this.innerQuerySqlGenerator = innerQuerySqlGenerator;
+    this.solutionSqlGenerator = solutionSqlGenerator;
   }
 
+  
 
   public AnnotatedSpanExtractor getSpanExtractor()
   {

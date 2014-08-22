@@ -54,7 +54,7 @@ public class WekaHelper
     w.append("\n");
     // figure out what annotations are used at each match position
     SortedMap<Integer, SortedSet<String>> columnsByNodePos = 
-      new TreeMap<Integer, SortedSet<String>>();
+      new TreeMap<>();
     while(matches.hasNext())
     {
       AnnotatedMatch match = matches.next();
@@ -104,12 +104,12 @@ public class WekaHelper
     {
       AnnotatedMatch match = matches.next();
       
-      List<String> line = new ArrayList<String>();
+      List<String> line = new ArrayList<>();
       int k = 0;
       for(; k < match.size(); ++k)
       {
         AnnotatedSpan span = match.get(k);
-        Map<String, String> valueByName = new HashMap<String, String>();
+        Map<String, String> valueByName = new HashMap<>();
 
         if(span != null)
         {

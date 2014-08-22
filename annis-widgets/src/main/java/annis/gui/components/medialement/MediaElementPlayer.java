@@ -53,7 +53,7 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
   public MediaElementPlayer(MediaElement elementType, String resourceURL,
     String mimeType)
   {
-    this.callbacks = new HashSet<Callback>();
+    this.callbacks = new HashSet<>();
     this.wasLoaded = false;
 
     getState().setElementType(elementType);

@@ -18,7 +18,7 @@ package annis.gui.querybuilder;
 import annis.libgui.Helper;
 import annis.gui.QueryController;
 import annis.gui.controlpanel.ControlPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
@@ -68,8 +68,8 @@ public class TigerQueryBuilderCanvas extends Panel
   {
     this.controller = controller;
 
-    nodes = new HashMap<NodeWindow, GripDragComponent>();
-    edges = new ArrayList<EdgeWindow>();
+    nodes = new HashMap<>();
+    edges = new ArrayList<>();
 
     setSizeFull();
     setImmediate(true);
@@ -108,7 +108,7 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public Set<String> getAvailableAnnotationNames()
   {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     WebResource service = Helper.getAnnisWebResource();
 
@@ -119,7 +119,7 @@ public class TigerQueryBuilderCanvas extends Panel
     {
       try
       {
-        List<AnnisAttribute> atts = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> atts = new LinkedList<>();
         
         for(String corpus : corpusSelection)
         {
@@ -206,7 +206,7 @@ public class TigerQueryBuilderCanvas extends Panel
   private List<Line2D> createArrow(double x, double y, double direction,
     double arrowLength)
   {
-    LinkedList<Line2D> result = new LinkedList<Line2D>();
+    LinkedList<Line2D> result = new LinkedList<>();
 
 
     double dir1 = direction + Math.PI / 8.0;
@@ -296,7 +296,7 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void deleteNode(NodeWindow n)
   {
-    LinkedList<EdgeWindow> edgesToRemove = new LinkedList<EdgeWindow>();
+    LinkedList<EdgeWindow> edgesToRemove = new LinkedList<>();
     for (EdgeWindow e : edges)
     {
       if (e.getSource() == n || e.getTarget() == n)
@@ -390,7 +390,7 @@ public class TigerQueryBuilderCanvas extends Panel
     StringBuilder query = new StringBuilder();
     StringBuffer nodeIdentityOperations = new StringBuffer();
     Map<NodeWindow, Integer> nodeComponentMap =
-      new HashMap<NodeWindow, Integer>();
+      new HashMap<>();
 
 
     //creating node definitions

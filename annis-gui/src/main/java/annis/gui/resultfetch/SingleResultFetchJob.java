@@ -15,16 +15,13 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.SearchUI;
-import static annis.gui.resultfetch.ResultFetchJob.log;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.resultview.ResultViewPanel;
+import annis.gui.QueryController;
+import annis.gui.objects.PagedResultQuery;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
@@ -75,7 +72,7 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
       return;
     }
 
-    List<Match> subList = new LinkedList<Match>();
+    List<Match> subList = new LinkedList<>();
     subList.add(match);
     SaltProject p = executeQuery(subgraphRes,
       new MatchGroup(subList),

@@ -1,11 +1,12 @@
 ANNIS Corpus Search Tool
 
-Copyright 2009-2012 Collaborative Research Centre SFB 632
+Copyright 2009-2014 Collaborative Research Centre SFB 632
 
 special thanks
 ==============
 
 We want to thank the following people for their work on ANNIS
+ * Adriane Boyd and Lari Lampen for providing bug fixes
  * Kim Gerdes from the Arborator/Vākyārtha project for providing
    the javascript library for rendering of pointing relation based dependencies 
  * the PROIEL project (University in Oslo) and Dag Haug for their support and 

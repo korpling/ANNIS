@@ -19,10 +19,11 @@ import annis.examplequeries.ExampleQuery;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -80,7 +81,7 @@ public class ExampleQueriesPanel extends Table
   private final HelpPanel parentTab;
 
   private static final ThemeResource SEARCH_ICON = new ThemeResource(
-    "tango-icons/16x16/system-search.png");
+    "images/tango-icons/16x16/system-search.png");
 
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
@@ -89,7 +90,7 @@ public class ExampleQueriesPanel extends Table
     this.parentTab = parentTab;
 
     //
-    egContainer = new BeanItemContainer<ExampleQuery>(ExampleQuery.class);
+    egContainer = new BeanItemContainer<>(ExampleQuery.class);
     setContainerDataSource(egContainer);
   }
 
@@ -307,7 +308,7 @@ public class ExampleQueriesPanel extends Table
    */
   private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
   {
-    List<ExampleQuery> result = new LinkedList<ExampleQuery>();
+    List<ExampleQuery> result = new LinkedList<>();
     WebResource service = Helper.getAnnisWebResource();
     try
     {
@@ -332,7 +333,7 @@ public class ExampleQueriesPanel extends Table
     {
       // ignore
     }
-    catch (Exception ex)
+    catch (ClientHandlerException ex)
     {
       log.error("problems with getting example queries from remote for {}",
         corpusNames, ex);
@@ -414,7 +415,7 @@ public class ExampleQueriesPanel extends Table
             return;
           }
 
-          Set<String> corpusNameSet = new HashSet<String>();
+          Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
           QueryController controller = ui.getQueryController();
           if (controller != null)

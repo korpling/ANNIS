@@ -44,7 +44,7 @@ public class SubQueryCorpusSelectionStrategy {
 		if (hasCorpusSelection(corpusList, metaData))
 			sb.append(" WHERE ");
 		
-		List<String> conditions = new ArrayList<String>();
+		List<String> conditions = new ArrayList<>();
 		
 		if ( ! corpusList.isEmpty() ) {
 			conditions.add("c1.pre >= c2.pre");

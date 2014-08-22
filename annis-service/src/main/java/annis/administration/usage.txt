@@ -1,14 +1,14 @@
-Annis Administration Utility
+ANNIS Administration Utility
 ----------------------------
 
 usage:
-  annis-admin init DATABASE OPTIONS
-  annis-admin import OPTIONS PATH [PATH ...]
-  annis-admin delete CORPUS_ID [CORPUS_ID ...]
-  annis-admin list
-  annis-admin indexes
-  annis-admin delexamples [CORPUS_NAME ...]
-  annis-admin genexamples [CORPUS_NAME ...]
+  annis-admin.sh init DATABASE OPTIONS
+  annis-admin.sh import OPTIONS PATH [PATH ...]
+  annis-admin.sh delete CORPUS_ID [CORPUS_ID ...]
+  annis-admin.sh list
+  annis-admin.sh copy [OPTION] CONFIGFILE
+  annis-admin.sh delexamples [CORPUS_NAME ...]
+  annis-admin.sh genexamples [CORPUS_NAME ...]
 
 * init:    Initialize a PostgreSQL database for Annis and
     update conf/database.properties
@@ -48,7 +48,11 @@ usage:
 
 * list:    List all top-level corpora.
 
-* indexes:  Show definitions of used and unused indexes.
+* copy: Import all the corpora from another ANNIS installation
+  Options:
+    -m,--mail <arg>   e-mail adress to where status updates should be send
+    -o,--overwrite    Overwrites a corpus, when it is already stored in the
+                      database.
 
 * genexamples:  Generate example queries for corpora.
     Specify to one or more corpus names as arguments.

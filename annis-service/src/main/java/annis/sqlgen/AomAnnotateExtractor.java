@@ -143,22 +143,22 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     
     // function result
     List<AnnotationGraph> graphs =
-      new LinkedList<AnnotationGraph>();
+      new LinkedList<>();
 
     // fn: match group -> annotation graph
 
     Map<List<Long>, AnnotationGraph> graphByMatchGroup =
-      new HashMap<List<Long>, AnnotationGraph>();
+      new HashMap<>();
 
     // fn: node id -> node
-    Map<Long, AnnisNode> nodeById = new HashMap<Long, AnnisNode>();
+    Map<Long, AnnisNode> nodeById = new HashMap<>();
 
     // fn: edge pre order value -> edge
-    Map<RankID, Edge> edgeByPre = new HashMap<RankID, Edge>();
+    Map<RankID, Edge> edgeByPre = new HashMap<>();
     
     // maps span that are continous to their coverage component
     Map<List<Long>, Map<Long, ComponentEntry>> continuousSpansForGraph 
-      = new HashMap<List<Long>, Map<Long, ComponentEntry>>();
+      = new HashMap<>();
 
     int rowNum = 0;
     
@@ -182,7 +182,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       { 
         
         log.debug("starting annotation graph for match: " + key);
-        Map<Long, ComponentEntry> continuousSpans = new HashMap<Long, ComponentEntry>();
+        Map<Long, ComponentEntry> continuousSpans = new HashMap<>();
         AnnotationGraph graph = new AnnotationGraph();
         graphs.add(graph);
         graphByMatchGroup.put(key, graph);

@@ -190,8 +190,17 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     
     String caption = row.getStringAttribute("caption");
-    String[] captionSplit = caption.split("::");
-    String name = captionSplit[captionSplit.length - 1];
+    boolean showNamespace = row.getBooleanAttribute("show-namespace");
+    String name;
+    if(showNamespace)
+    {
+      name = caption;
+    }
+    else
+    {
+      String[] captionSplit = caption.split("::");
+      name = captionSplit[captionSplit.length - 1];
+    }
     
     boolean showCaption = row.getBooleanAttribute("show-caption");
 
