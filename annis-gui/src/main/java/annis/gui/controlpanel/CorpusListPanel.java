@@ -39,6 +39,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.FontAwesome;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -266,7 +267,7 @@ public class CorpusListPanel extends VerticalLayout implements
           Notification.Type.HUMANIZED_MESSAGE);
       }
     });
-    btReload.setIcon(new ThemeResource("images/tango-icons/16x16/view-refresh.png"));
+    btReload.setIcon(FontAwesome.REFRESH);
     btReload.setDescription("Reload corpus list");
     btReload.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
 
