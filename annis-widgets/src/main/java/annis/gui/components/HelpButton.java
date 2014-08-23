@@ -18,7 +18,7 @@ package annis.gui.components;
 import com.vaadin.data.Property;
 import com.vaadin.data.Validator;
 import com.vaadin.data.Validator.InvalidValueException;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CssLayout;
@@ -26,7 +26,7 @@ import com.vaadin.ui.CustomComponent;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import org.apache.commons.lang3.Validate;
 
@@ -47,8 +47,8 @@ public class HelpButton<T> extends CustomComponent implements Field<T>,
     setCompositionRoot(layout);
     
     Button btHelp = new Button("");
-    btHelp.setIcon(new ThemeResource("../runo/icons/16/help.png"));
-    btHelp.addStyleName(BaseTheme.BUTTON_LINK);
+    btHelp.setIcon(FontAwesome.QUESTION);
+    btHelp.addStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btHelp.addStyleName("helpbutton");
     btHelp.addClickListener((Button.ClickListener) this);
     
