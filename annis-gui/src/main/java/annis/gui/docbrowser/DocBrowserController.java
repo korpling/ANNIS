@@ -28,6 +28,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
@@ -71,10 +73,9 @@ public class DocBrowserController implements Serializable
   // keep track of already visible doc visualizer, so it easy to switch to them.
   private final Map<String, Panel> visibleVisHolder;
 
-  private static final ThemeResource EYE_ICON = new ThemeResource("images/eye.png");
+  private static final Resource EYE_ICON = FontAwesome.EYE;
 
-  private static final ThemeResource DOC_ICON = new ThemeResource(
-    "images/document_ico.png");
+  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
 
   public DocBrowserController(SearchUI ui)
   {

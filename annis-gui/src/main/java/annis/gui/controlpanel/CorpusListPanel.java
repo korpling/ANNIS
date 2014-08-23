@@ -40,6 +40,7 @@ import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -81,10 +82,9 @@ public class CorpusListPanel extends VerticalLayout implements
   private static final org.slf4j.Logger log = LoggerFactory.
     getLogger(CorpusListPanel.class);
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("images/info.gif");
+  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
 
-  private static final ThemeResource DOC_ICON = new ThemeResource(
-    "images/document_ico.png");
+  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
 
   public static final String ALL_CORPORA = "All";
 
@@ -679,7 +679,7 @@ public class CorpusListPanel extends VerticalLayout implements
       if (ui.getDocBrowserController().docsAvailable(id))
       {
         Button l = new Button();
-        l.setStyleName(BaseTheme.BUTTON_LINK);
+        l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
         l.setIcon(DOC_ICON);
 
         l.setDescription("opens the document browser for " + id);
@@ -706,7 +706,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
       final Button l = new Button();
-      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
       l.addClickListener(new Button.ClickListener()
