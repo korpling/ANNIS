@@ -27,6 +27,7 @@ import annis.libgui.Helper;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
@@ -180,11 +181,11 @@ public class MainToolbar extends HorizontalLayout
 
     btLogin.setSizeUndefined();
     btLogin.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btLogin.setIcon(new ThemeResource("../runo/icons/16/user.png"));
+    btLogin.setIcon(FontAwesome.USER);
 
     btLogout.setSizeUndefined();
     btLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
-    btLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
+    btLogout.setIcon(FontAwesome.USER);
 
     Button btOpenSource = new Button("Help us to make ANNIS better!");
     btOpenSource.setStyleName(BaseTheme.BUTTON_LINK);
