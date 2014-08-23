@@ -28,7 +28,9 @@ import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
@@ -84,8 +86,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final String INITIAL_OPEN = "initial_open";
 
-  private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "images/info.gif");
+  private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
   private transient SDocument result;
 
@@ -162,7 +163,7 @@ public class SingleResultPanel extends CssLayout implements
     lblNumber.setSizeUndefined();
 
     btInfo = new Button();
-    btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btInfo.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
