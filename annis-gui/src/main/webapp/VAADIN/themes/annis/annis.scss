@@ -1,5 +1,11 @@
-@import "../chameleon/chameleon.scss";
-@import "annis-base.scss";
+/* TODO: adjust Valo parameters here */
+$v-app-loading-text: "Please wait while ANNIS is loaded";
+
+@import "../valo/valo";
+
+/* @import "../chameleon/chameleon.scss"; */
+/* @import "annis-base.scss"; */
+
 @import "partitur.scss";
 @import "pdf.scss";
 @import "raw_text.scss";
@@ -18,8 +24,8 @@ $font-size: 10pt;
 }
 
 @mixin annis {
-  @include chameleon;
-  @include annis-base;
+  @include valo;
+/*  @include annis-base; */
   @include partitur;
 
   .hidden {
