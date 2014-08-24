@@ -1,6 +1,6 @@
 @import "annis.scss";
 
-@include font(ANNISFontIcon,
+@include v-font(ANNISFontIcon,
               '../../../../annis/fonts/annisicon');
 
 .v-app {

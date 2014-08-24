@@ -43,7 +43,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -163,7 +163,7 @@ public class SingleResultPanel extends CssLayout implements
     lblNumber.setSizeUndefined();
 
     btInfo = new Button();
-    btInfo.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
+    btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
@@ -205,6 +205,9 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.setNullSelectionAllowed(false);
     rghtCtxCombo.setNullSelectionAllowed(false);
 
+    lftCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    rghtCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    
     IndexedContainer lftCtxContainer = new IndexedContainer();
     IndexedContainer rghtCtxContainer = new IndexedContainer();
 
