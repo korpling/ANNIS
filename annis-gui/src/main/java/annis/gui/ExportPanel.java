@@ -120,7 +120,6 @@ public class ExportPanel extends FormLayout
     
     setWidth("99%");
     setHeight("-1px");
-    addStyleName("contextsensible-formlayout");
 
     initHelpMessages();
 

@@ -175,8 +175,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addSelectedTabChangeListener(queryController);
-    mainTab.addStyleName("blue-tab");
-
+    
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(new ThemeResource("images/tango-icons/16x16/help-browser.png"));
     helpTab.setClosable(false);

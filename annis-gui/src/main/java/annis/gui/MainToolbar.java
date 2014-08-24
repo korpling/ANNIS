@@ -41,7 +41,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.Cookie;
@@ -112,19 +112,19 @@ public class MainToolbar extends HorizontalLayout
     addStyleName("border-layout");
 
     Button btAboutAnnis = new Button("About ANNIS");
-    btAboutAnnis.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAboutAnnis.addStyleName(ValoTheme.BUTTON_SMALL);
     btAboutAnnis.setIcon(new ThemeResource("images/annis_16.png"));
     btAboutAnnis.addClickListener(new AboutClickListener());
 
     btSidebar = new Button();
     btSidebar.setDisableOnClick(true);
-    btSidebar.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btSidebar.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btSidebar.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+    btSidebar.addStyleName(ValoTheme.BUTTON_SMALL);
     btSidebar.setDescription("Show and hide search sidebar");
     btSidebar.setIconAlternateText(btSidebar.getDescription());
 
     btBugReport = new Button("Report Problem");
-    btBugReport.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btBugReport.addStyleName(ValoTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
     btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
     btBugReport.addClickListener(new Button.ClickListener()
@@ -179,11 +179,11 @@ public class MainToolbar extends HorizontalLayout
     });
 
     btLogin.setSizeUndefined();
-    btLogin.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLogin.setStyleName(ValoTheme.BUTTON_SMALL);
     btLogin.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     btLogout.setSizeUndefined();
-    btLogout.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btLogout.setStyleName(ValoTheme.BUTTON_SMALL);
     btLogout.setIcon(new ThemeResource("../runo/icons/16/user.png"));
 
     Button btOpenSource = new Button("Help us to make ANNIS better!");

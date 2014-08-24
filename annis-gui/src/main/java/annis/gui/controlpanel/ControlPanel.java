@@ -19,10 +19,9 @@ import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,7 +55,7 @@ public class ControlPanel extends VerticalLayout
     setSizeFull();
     setMargin(true);
 
-    setStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    setStyleName(ValoTheme.PANEL_BORDERLESS);
     addStyleName("control");
 
     queryPanel = new QueryPanel(ui);
@@ -66,7 +65,6 @@ public class ControlPanel extends VerticalLayout
     optionsTab = new TabSheet();
     optionsTab.setHeight("100%");
     optionsTab.setWidth("100%");
-    optionsTab.addStyleName("blue-tab");
 
     corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
     

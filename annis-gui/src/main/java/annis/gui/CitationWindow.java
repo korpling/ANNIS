@@ -18,7 +18,7 @@ package annis.gui;
 import annis.libgui.Helper;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.Set;
 
 
@@ -46,7 +46,7 @@ public class CitationWindow extends Window
 
     txtCitation.setWidth("100%");
     txtCitation.setHeight("100%");
-    txtCitation.addStyleName(ChameleonTheme.TEXTFIELD_BIG);
+    txtCitation.addStyleName(ValoTheme.TEXTFIELD_LARGE);
     txtCitation.addStyleName("citation");
     txtCitation.setValue(url);
     txtCitation.setWordwrap(true);

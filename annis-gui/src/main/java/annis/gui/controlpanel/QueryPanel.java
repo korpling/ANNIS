@@ -24,7 +24,6 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.objects.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -43,7 +42,7 @@ import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -199,16 +198,16 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard = new Button();
       btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP);
     btShowQueryBuilder.setIcon(new ThemeResource("images/tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     

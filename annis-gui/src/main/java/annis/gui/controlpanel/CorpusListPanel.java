@@ -60,7 +60,7 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -268,7 +268,7 @@ public class CorpusListPanel extends VerticalLayout implements
     });
     btReload.setIcon(new ThemeResource("images/tango-icons/16x16/view-refresh.png"));
     btReload.setDescription("Reload corpus list");
-    btReload.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
     selectionLayout.addComponent(btReload);
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);

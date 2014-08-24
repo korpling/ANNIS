@@ -113,8 +113,6 @@ public class SearchOptionsPanel extends FormLayout
     setWidth("100%");
     setHeight("-1px");
 
-    addStyleName("contextsensible-formlayout");
-
     // init the config cache
     lastSelection = new HashMap<>();
 
