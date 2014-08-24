@@ -40,6 +40,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -91,11 +93,9 @@ public class VisualizerPanel extends CssLayout
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
-    "images/icon-collapse.gif");
+  public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
 
-  public static final ThemeResource ICON_EXPAND = new ThemeResource(
-    "images/icon-expand.gif");
+  public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
 
   private String corpusName;
 
