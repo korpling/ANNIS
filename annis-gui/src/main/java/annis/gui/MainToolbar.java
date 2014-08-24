@@ -119,7 +119,7 @@ public class MainToolbar extends HorizontalLayout
 
     btSidebar = new Button();
     btSidebar.setDisableOnClick(true);
-    btSidebar.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+//    btSidebar.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     btSidebar.addStyleName(ValoTheme.BUTTON_SMALL);
     btSidebar.setDescription("Show and hide search sidebar");
     btSidebar.setIconAlternateText(btSidebar.getDescription());
@@ -214,6 +214,7 @@ public class MainToolbar extends HorizontalLayout
     addComponent(btOpenSource);
 
     setSpacing(true);
+    setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
