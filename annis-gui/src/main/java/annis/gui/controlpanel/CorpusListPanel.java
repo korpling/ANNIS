@@ -682,7 +682,7 @@ public class CorpusListPanel extends VerticalLayout implements
       if (ui.getDocBrowserController().docsAvailable(id))
       {
         Button l = new Button();
-        l.setStyleName(BaseTheme.BUTTON_LINK);
+        l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
         l.setIcon(DOC_ICON);
 
         l.setDescription("opens the document browser for " + id);
@@ -709,7 +709,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
       final Button l = new Button();
-      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
       l.addClickListener(new Button.ClickListener()
