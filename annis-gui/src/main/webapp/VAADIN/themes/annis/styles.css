@@ -1559,19 +1559,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis .v-margin-top {
-	padding-top: 25px;
+	padding-top: 12px;
 }
 
 .annis .v-margin-right {
-	padding-right: 25px;
+	padding-right: 12px;
 }
 
 .annis .v-margin-bottom {
-	padding-bottom: 25px;
+	padding-bottom: 12px;
 }
 
 .annis .v-margin-left {
-	padding-left: 25px;
+	padding-left: 12px;
 }
 
 .annis .v-spacing {
@@ -3572,19 +3572,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow  > .v-formlayout-captioncell, .annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow  > .v-formlayout-contentcell, .annis .v-formlayout-margin-top > tbody > .v-formlayout-firstrow  > .v-formlayout-errorcell {
-	padding-top: 25px;
+	padding-top: 12px;
 }
 
 .annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow  > .v-formlayout-captioncell, .annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow  > .v-formlayout-contentcell, .annis .v-formlayout-margin-bottom > tbody > .v-formlayout-lastrow  > .v-formlayout-errorcell {
-	padding-bottom: 25px;
+	padding-bottom: 12px;
 }
 
 .annis .v-formlayout-margin-left > tbody > .v-formlayout-row > .v-formlayout-captioncell {
-	padding-left: 25px;
+	padding-left: 12px;
 }
 
 .annis .v-formlayout-margin-right > tbody > .v-formlayout-row > .v-formlayout-contentcell {
-	padding-right: 25px;
+	padding-right: 12px;
 }
 
 .annis .v-formlayout > table {
@@ -5862,19 +5862,19 @@ div.v-layout.v-horizontal.v-widget {
 }
 
 .annis .v-gridlayout-margin-top {
-	padding-top: 25px;
+	padding-top: 12px;
 }
 
 .annis .v-gridlayout-margin-bottom {
-	padding-bottom: 25px;
+	padding-bottom: 12px;
 }
 
 .annis .v-gridlayout-margin-left {
-	padding-left: 25px;
+	padding-left: 12px;
 }
 
 .annis .v-gridlayout-margin-right {
-	padding-right: 25px;
+	padding-right: 12px;
 }
 
 .annis .v-gridlayout-spacing-on {
