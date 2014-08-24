@@ -55,6 +55,14 @@ $font-size: 10pt;
     background-color: $annis-color;
   }
   
+  .result-view-css {
+    width: 100%;
+  }
+  
+  .result-view-no-content {
+    text-align: center;
+  }
+  
   .v-table-cell-content-kwic-anno {
     color: grey;
   }

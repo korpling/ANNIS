@@ -11798,6 +11798,14 @@ div.v-layout.v-horizontal.v-widget {
 	background-color: #ecf0f6;
 }
 
+.annis .result-view-css {
+	width: 100%;
+}
+
+.annis .result-view-no-content {
+	text-align: center;
+}
+
 .annis .v-table-cell-content-kwic-anno {
 	color: grey;
 }
