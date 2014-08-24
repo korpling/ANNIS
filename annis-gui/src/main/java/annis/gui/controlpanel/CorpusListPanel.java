@@ -30,11 +30,9 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
@@ -42,7 +40,6 @@ import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
@@ -61,7 +58,6 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -682,7 +678,7 @@ public class CorpusListPanel extends VerticalLayout implements
       if (ui.getDocBrowserController().docsAvailable(id))
       {
         Button l = new Button();
-        l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
+        l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         l.setIcon(DOC_ICON);
 
         l.setDescription("opens the document browser for " + id);
@@ -709,7 +705,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
       final Button l = new Button();
-      l.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
+      l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
       l.addClickListener(new Button.ClickListener()

@@ -1190,6 +1190,24 @@ div.v-layout.v-horizontal.v-widget {
 	font-weight: bold;
 }
 
+@font-face {
+	font-family: ANNISFontIcon;
+	font-weight: normal;
+	font-style: normal;
+	src: url(../valo/util/bourbon/css3/../../../../annis/fonts/annisicon.eot);
+	src: url(../valo/util/bourbon/css3/../../../../annis/fonts/annisicon.eot?#iefix) format("embedded-opentype"), url(../valo/util/bourbon/css3/../../../../annis/fonts/annisicon.woff) format("woff"), url(../valo/util/bourbon/css3/../../../../annis/fonts/annisicon.ttf) format("truetype"), url(../valo/util/bourbon/css3/../../../../annis/fonts/annisicon.svg#ANNISFontIcon) format("svg");
+}
+
+.ANNISFontIcon {
+	font-family: ANNISFontIcon;
+	font-style: normal;
+	font-weight: normal;
+	-webkit-font-smoothing: antialiased;
+	-moz-osx-font-smoothing: grayscale;
+	display: inline-block;
+	text-align: center;
+}
+
 .v-app {
 	width: 100%;
 	height: 100%;

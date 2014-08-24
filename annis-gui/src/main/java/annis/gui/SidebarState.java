@@ -16,19 +16,19 @@
 
 package annis.gui;
 
+import annis.gui.util.ANNISFontIcon;
 import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
 
 /**
  * The current behavior state of the side bar.
- * @author Thomas Krause <thomas.krause@alumni.hu-berlin.de>
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public enum SidebarState
 {
-  VISIBLE(new ThemeResource("images/menu_left.png"), true), 
-  HIDDEN(new ThemeResource("images/menu_right.png"), false), 
-  AUTO_VISIBLE(new ThemeResource("images/menu_auto.png"), true),
-  AUTO_HIDDEN(new ThemeResource("images/menu_auto.png"), false);
+  VISIBLE(ANNISFontIcon.MENU_LEFT, true), 
+  HIDDEN(ANNISFontIcon.MENU_RIGHT, false), 
+  AUTO_VISIBLE(ANNISFontIcon.MENU_AUTO, true),
+  AUTO_HIDDEN(ANNISFontIcon.MENU_AUTO, false);
   
   private final Resource icon;
   private final boolean sidebarVisible;
