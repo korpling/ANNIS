@@ -1,271 +1,3 @@
-@-webkit-keyframes valo-placeholder-animate-in {
-		0% {
-		visibility: visible;
-	}
-	}
-
-@-moz-keyframes valo-placeholder-animate-in {
-		0% {
-		visibility: visible;
-	}
-	}
-
-@keyframes valo-placeholder-animate-in {
-		0% {
-		visibility: visible;
-	}
-	}
-
-@-webkit-keyframes valo-placeholder-animate-out {
-		100% {
-		visibility: visible;
-	}
-	}
-
-@-moz-keyframes valo-placeholder-animate-out {
-		100% {
-		visibility: visible;
-	}
-	}
-
-@keyframes valo-placeholder-animate-out {
-		100% {
-		visibility: visible;
-	}
-	}
-
-@-webkit-keyframes valo-anim-fade-in {
-		0% {
-		opacity: 0;
-	}
-	}
-
-@-moz-keyframes valo-anim-fade-in {
-		0% {
-		opacity: 0;
-	}
-	}
-
-@keyframes valo-anim-fade-in {
-		0% {
-		opacity: 0;
-	}
-	}
-
-@-webkit-keyframes valo-anim-fade-out {
-		100% {
-		opacity: 0;
-	}
-	}
-
-@-moz-keyframes valo-anim-fade-out {
-		100% {
-		opacity: 0;
-	}
-	}
-
-@keyframes valo-anim-fade-out {
-		100% {
-		opacity: 0;
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-in-down {
-		0% {
-		-webkit-transform: translateY(-100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-in-down {
-		0% {
-		-moz-transform: translateY(-100%);
-	}
-	}
-
-@keyframes valo-anim-slide-in-down {
-		0% {
-		-webkit-transform: translateY(-100%);
-		transform: translateY(-100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-in-up {
-		0% {
-		-webkit-transform: translateY(100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-in-up {
-		0% {
-		-moz-transform: translateY(100%);
-	}
-	}
-
-@keyframes valo-anim-slide-in-up {
-		0% {
-		-webkit-transform: translateY(100%);
-		transform: translateY(100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-in-left {
-		0% {
-		-webkit-transform: translateX(100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-in-left {
-		0% {
-		-moz-transform: translateX(100%);
-	}
-	}
-
-@keyframes valo-anim-slide-in-left {
-		0% {
-		-webkit-transform: translateX(100%);
-		transform: translateX(100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-in-right {
-		0% {
-		-webkit-transform: translateX(-100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-in-right {
-		0% {
-		-moz-transform: translateX(-100%);
-	}
-	}
-
-@keyframes valo-anim-slide-in-right {
-		0% {
-		-webkit-transform: translateX(-100%);
-		transform: translateX(-100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-out-down {
-		100% {
-		-webkit-transform: translateY(100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-out-down {
-		100% {
-		-moz-transform: translateY(100%);
-	}
-	}
-
-@keyframes valo-anim-slide-out-down {
-		100% {
-		-webkit-transform: translateY(100%);
-		transform: translateY(100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-out-up {
-		100% {
-		-webkit-transform: translateY(-100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-out-up {
-		100% {
-		-moz-transform: translateY(-100%);
-	}
-	}
-
-@keyframes valo-anim-slide-out-up {
-		100% {
-		-webkit-transform: translateY(-100%);
-		transform: translateY(-100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-out-left {
-		100% {
-		-webkit-transform: translateX(-100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-out-left {
-		100% {
-		-moz-transform: translateX(-100%);
-	}
-	}
-
-@keyframes valo-anim-slide-out-left {
-		100% {
-		-webkit-transform: translateX(-100%);
-		transform: translateX(-100%);
-	}
-	}
-
-@-webkit-keyframes valo-anim-slide-out-right {
-		100% {
-		-webkit-transform: translateX(100%);
-	}
-	}
-
-@-moz-keyframes valo-anim-slide-out-right {
-		100% {
-		-moz-transform: translateX(100%);
-	}
-	}
-
-@keyframes valo-anim-slide-out-right {
-		100% {
-		-webkit-transform: translateX(100%);
-		transform: translateX(100%);
-	}
-	}
-
-@-webkit-keyframes valo-overlay-animate-in {
-		0% {
-		-webkit-transform: translatey(-4px);
-		opacity: 0;
-	}
-	}
-
-@-moz-keyframes valo-overlay-animate-in {
-		0% {
-		-moz-transform: translatey(-4px);
-		opacity: 0;
-	}
-	}
-
-@keyframes valo-overlay-animate-in {
-		0% {
-		-webkit-transform: translatey(-4px);
-		transform: translatey(-4px);
-		opacity: 0;
-	}
-	}
-
-@-webkit-keyframes valo-anim-drop-fade-out {
-		100% {
-		opacity: 0;
-		-webkit-transform: translatey(30%);
-	}
-	}
-
-@-moz-keyframes valo-anim-drop-fade-out {
-		100% {
-		opacity: 0;
-		-moz-transform: translatey(30%);
-	}
-	}
-
-@keyframes valo-anim-drop-fade-out {
-		100% {
-		opacity: 0;
-		-webkit-transform: translatey(30%);
-		transform: translatey(30%);
-	}
-	}
-
 @font-face {
 	font-family: FontAwesome;
 	font-weight: normal;
@@ -511,55 +243,6 @@
 		0% {
 		-webkit-transform: scale(0);
 		transform: scale(0);
-	}
-	}
-
-@-webkit-keyframes valo-modal-window-indication {
-		0% {
-		opacity: 0;
-	}
-		100% {
-		opacity: 1;
-	}
-	}
-
-@-moz-keyframes valo-modal-window-indication {
-		0% {
-		opacity: 0;
-	}
-		100% {
-		opacity: 1;
-	}
-	}
-
-@keyframes valo-modal-window-indication {
-		0% {
-		opacity: 0;
-	}
-		100% {
-		opacity: 1;
-	}
-	}
-
-@-webkit-keyframes valo-anim-scale-down-fade-out {
-		100% {
-		-webkit-transform: scale(0.8);
-		opacity: 0;
-	}
-	}
-
-@-moz-keyframes valo-anim-scale-down-fade-out {
-		100% {
-		-moz-transform: scale(0.8);
-		opacity: 0;
-	}
-	}
-
-@keyframes valo-anim-scale-down-fade-out {
-		100% {
-		-webkit-transform: scale(0.8);
-		transform: scale(0.8);
-		opacity: 0;
 	}
 	}
 
@@ -1400,9 +1083,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-decoration: underline;
 	font-weight: inherit;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis a:hover {
@@ -1483,18 +1163,6 @@ div.v-layout.v-horizontal.v-widget {
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
 	padding: 3px 3px;
-}
-
-.annis .v-contextmenu[class*="animate-in"] {
-	-webkit-animation: valo-overlay-animate-in 120ms;
-	-moz-animation: valo-overlay-animate-in 120ms;
-	animation: valo-overlay-animate-in 120ms;
-}
-
-.annis .v-contextmenu[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	-moz-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
 }
 
 .annis .v-contextmenu table {
@@ -1705,15 +1373,6 @@ div.v-layout.v-horizontal.v-widget {
 	bottom: 0;
 	left: 0;
 	border-radius: inherit;
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
-}
-
-.annis .v-button:focus:after {
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 }
 
 .annis .v-button.v-disabled {
@@ -1949,9 +1608,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-decoration: underline;
 	font-weight: inherit;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-button-link:hover:after {
@@ -2199,9 +1855,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-checkbox > input:active ~ label:after {
@@ -2331,9 +1984,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-checkbox-small > input:active ~ label:after {
@@ -2463,9 +2113,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-checkbox-large > input:active ~ label:after {
@@ -2529,9 +2176,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #384457;
 	-webkit-box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
 	padding-right: 30px;
@@ -2551,9 +2195,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-filterselect .v-filterselect-input:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -2605,9 +2246,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-filterselect .v-filterselect-button:before {
 	font-family: FontAwesome;
 	content: "\f078";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 	position: absolute;
 	width: 25px;
 	text-align: center;
@@ -2685,12 +2323,6 @@ div.v-layout.v-horizontal.v-widget {
 	margin-top: 4px !important;
 }
 
-.annis .v-filterselect-suggestpopup[class*="animate-in"] {
-	-webkit-animation: valo-overlay-animate-in 120ms;
-	-moz-animation: valo-overlay-animate-in 120ms;
-	animation: valo-overlay-animate-in 120ms;
-}
-
 .annis .v-filterselect-suggestpopup .v-filterselect-suggestmenu {
 	padding: 3px 3px;
 	border-radius: 4px;
@@ -2763,9 +2395,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0 4px;
 	cursor: default;
 	pointer-events: none;
-	-webkit-animation: valo-anim-slide-in-down 200ms 80ms backwards;
-	-moz-animation: valo-anim-slide-in-down 200ms 80ms backwards;
-	animation: valo-anim-slide-in-down 200ms 80ms backwards;
 }
 
 .annis .v-filterselect-suggestpopup .v-filterselect-status  > * {
@@ -2872,9 +2501,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-filterselect-no-input .v-filterselect-input:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 white, inset 0 -1px 0 #e7e7e7, 0 2px 3px rgba(0, 0, 0, 0.05);
@@ -2958,9 +2584,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 2px 4px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
 	padding-right: 23px;
@@ -3005,9 +2628,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-filterselect-tiny .v-filterselect-button:before {
 	font-family: FontAwesome;
 	content: "\f078";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 	position: absolute;
 	width: 19px;
 	text-align: center;
@@ -3088,9 +2708,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 2px 4px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
 	padding-right: 25px;
@@ -3135,9 +2752,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-filterselect-compact .v-filterselect-button:before, .annis .v-filterselect-small .v-filterselect-button:before {
 	font-family: FontAwesome;
 	content: "\f078";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 	position: absolute;
 	width: 21px;
 	text-align: center;
@@ -3223,9 +2837,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 3px 5px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
 	padding-right: 36px;
@@ -3270,9 +2881,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-filterselect-large .v-filterselect-button:before {
 	font-family: FontAwesome;
 	content: "\f078";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 	position: absolute;
 	width: 30px;
 	text-align: center;
@@ -3354,9 +2962,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 4px 7px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 100% !important;
 	height: 100%;
 	padding-right: 48px;
@@ -3401,9 +3006,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-filterselect-huge .v-filterselect-button:before {
 	font-family: FontAwesome;
 	content: "\f078";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 	position: absolute;
 	width: 40px;
 	text-align: center;
@@ -3675,9 +3277,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	-webkit-box-shadow: none;
 	box-shadow: none;
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	background: transparent;
 	border: none;
 	color: inherit;
@@ -3696,9 +3295,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-formlayout.light .v-formlayout-contentcell  > .v-textfield:focus, .annis .v-formlayout.light .v-formlayout-contentcell  > .v-textarea:focus, .annis .v-formlayout.light .v-formlayout-contentcell  > .v-filterselect input:focus, .annis .v-formlayout.light .v-formlayout-contentcell  > .v-datefield input:focus, .annis .v-formlayout.light .v-formlayout-contentcell  > .v-richtextarea:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), none;
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), none;
@@ -3861,9 +3457,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #384457;
 	-webkit-box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	width: 125px;
 }
 
@@ -3880,9 +3473,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-textfield:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -3949,9 +3539,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 2px 6px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	font-size: 10px;
 }
 
@@ -3981,9 +3568,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 2px 6px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 }
 
 .v-ie8 .annis .v-textfield-compact, .v-ie9 .annis .v-textfield-compact, .v-ie8 .annis .v-textfield-small, .v-ie9 .annis .v-textfield-small {
@@ -4016,9 +3600,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 3px 7px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	font-size: 16px;
 }
 
@@ -4048,9 +3629,6 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 4px 9px;
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	font-size: 21px;
 }
 
@@ -4325,9 +3903,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #384457;
 	-webkit-box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
@@ -4347,9 +3922,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-textarea:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -4423,9 +3995,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
@@ -4465,9 +4034,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
@@ -4507,9 +4073,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
@@ -4549,9 +4112,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	resize: none;
 	white-space: pre-wrap;
@@ -4611,9 +4171,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #384457;
 	-webkit-box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	padding-left: 30.0px;
 	width: 100%;
 	height: 100%;
@@ -4633,9 +4190,6 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-datefield .v-datefield-textfield:focus {
 	outline: none;
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 	border-color: #0f63e2;
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5), inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -4681,9 +4235,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-datefield .v-datefield-button:before {
 	font-family: FontAwesome;
 	content: "\f073";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-datefield .v-datefield-button:active:after {
@@ -4774,18 +4325,6 @@ div.v-layout.v-horizontal.v-widget {
 	width: auto;
 }
 
-.annis .v-datefield-popup[class*="animate-in"] {
-	-webkit-animation: valo-overlay-animate-in 120ms;
-	-moz-animation: valo-overlay-animate-in 120ms;
-	animation: valo-overlay-animate-in 120ms;
-}
-
-.annis .v-datefield-popup[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	-moz-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-}
-
 .annis .v-datefield-popup table {
 	border-collapse: collapse;
 	border-spacing: 0;
@@ -4816,9 +4355,6 @@ div.v-layout.v-horizontal.v-widget {
 	font-size: 12px;
 	background: #fafafa;
 	border-radius: 2px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 	display: inline-block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -4897,9 +4433,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 }
 
 .annis .v-datefield-popup td[class$="year"] button:hover, .annis .v-datefield-popup td[class$="month"] button:hover {
@@ -4998,9 +4531,6 @@ div.v-layout.v-horizontal.v-widget {
 	font-size: 12px;
 	background: #fafafa;
 	border-radius: 2px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 	display: inline-block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5079,9 +4609,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 }
 
 .annis td[class$="year"] button:hover, .annis td[class$="month"] button:hover {
@@ -5224,9 +4751,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	padding-left: 22.8px;
 	width: 100%;
 	height: 100%;
@@ -5264,9 +4788,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-datefield-tiny .v-datefield-button:before {
 	font-family: FontAwesome;
 	content: "\f073";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-datefield-tiny .v-datefield-button:active:after {
@@ -5342,9 +4863,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	padding-left: 25.2px;
 	width: 100%;
 	height: 100%;
@@ -5382,9 +4900,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-datefield-compact .v-datefield-button:before, .annis .v-datefield-small .v-datefield-button:before {
 	font-family: FontAwesome;
 	content: "\f073";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-datefield-compact .v-datefield-button:active:after, .annis .v-datefield-small .v-datefield-button:active:after {
@@ -5465,9 +4980,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	padding-left: 36px;
 	width: 100%;
 	height: 100%;
@@ -5505,9 +5017,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-datefield-large .v-datefield-button:before {
 	font-family: FontAwesome;
 	content: "\f073";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-datefield-large .v-datefield-button:active:after {
@@ -5584,9 +5093,6 @@ div.v-layout.v-horizontal.v-widget {
 	
 	
 	
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	padding-left: 48px;
 	width: 100%;
 	height: 100%;
@@ -5624,9 +5130,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-datefield-huge .v-datefield-button:before {
 	font-family: FontAwesome;
 	content: "\f073";
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-datefield-huge .v-datefield-button:active:after {
@@ -5694,9 +5197,6 @@ div.v-layout.v-horizontal.v-widget {
 	font-size: 12px;
 	background: #fafafa;
 	border-radius: 2px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 	display: inline-block;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
@@ -5775,9 +5275,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
-	-webkit-transition: color 200ms;
-	-moz-transition: color 200ms;
-	transition: color 200ms;
 }
 
 .annis td[class$="year"] button:hover, .annis td[class$="month"] button:hover {
@@ -5919,15 +5416,6 @@ div.v-layout.v-horizontal.v-widget {
 	bottom: 0;
 	left: 0;
 	border-radius: inherit;
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
-}
-
-.annis .v-menubar:focus:after {
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 }
 
 .annis .v-menubar.v-disabled {
@@ -6128,18 +5616,6 @@ div.v-layout.v-horizontal.v-widget {
 	margin: 4px 0 0 1px !important;
 }
 
-.annis .v-menubar-popup[class*="animate-in"] {
-	-webkit-animation: valo-overlay-animate-in 120ms;
-	-moz-animation: valo-overlay-animate-in 120ms;
-	animation: valo-overlay-animate-in 120ms;
-}
-
-.annis .v-menubar-popup[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	-moz-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-}
-
 .annis .v-menubar-popup .v-menubar-submenu {
 	outline: none;
 }
@@ -6280,9 +5756,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0 8px;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-menubar-borderless .v-menubar-menuitem:first-child, .annis .v-menubar-borderless .v-menubar-menuitem:last-child, .annis .v-menubar-borderless .v-menubar-menuitem:first-child:last-child {
@@ -6423,9 +5896,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-radiobutton > input:active ~ label:after {
@@ -6588,9 +6058,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-select-optiongroup-small .v-checkbox > input:active ~ label:after {
@@ -6719,9 +6186,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-select-optiongroup-small .v-radiobutton > input:active ~ label:after {
@@ -6884,9 +6348,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-select-optiongroup-large .v-checkbox > input:active ~ label:after {
@@ -7015,9 +6476,6 @@ div.v-layout.v-horizontal.v-widget {
 	content: "\f00c";
 	font-family: FontAwesome;
 	color: transparent;
-	-webkit-transition: color 100ms;
-	-moz-transition: color 100ms;
-	transition: color 100ms;
 }
 
 :root .annis .v-select-optiongroup-large .v-radiobutton > input:active ~ label:after {
@@ -7098,9 +6556,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-decoration: underline;
 	font-weight: inherit;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-link:hover {
@@ -7111,9 +6566,6 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: inherit;
 	color: inherit;
 	text-decoration: inherit;
-	-webkit-transition: inherit;
-	-moz-transition: inherit;
-	transition: inherit;
 }
 
 .annis .v-link .v-icon {
@@ -7146,27 +6598,6 @@ div.v-layout.v-horizontal.v-widget {
 	min-height: 25px !important;
 	white-space: nowrap;
 	overflow: hidden !important;
-	-webkit-transition: width 200ms, height 200ms, top 200ms, left 200ms;
-	-moz-transition: width 200ms, height 200ms, top 200ms, left 200ms;
-	transition: width 200ms, height 200ms, top 200ms, left 200ms;
-}
-
-.annis .v-window[class*="animate-in"] {
-	-webkit-animation: valo-placeholder-animate-in 140ms, valo-anim-fade-in 140ms;
-	-moz-animation: valo-placeholder-animate-in 140ms, valo-anim-fade-in 140ms;
-	animation: valo-placeholder-animate-in 140ms, valo-anim-fade-in 140ms;
-}
-
-.annis .v-window[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 100ms, valo-anim-scale-down-fade-out 100ms;
-	-moz-animation: valo-placeholder-animate-out 100ms, valo-anim-scale-down-fade-out 100ms;
-	animation: valo-placeholder-animate-out 100ms, valo-anim-scale-down-fade-out 100ms;
-}
-
-.annis .v-window.v-window-animate-in {
-	-webkit-transition: none;
-	-moz-transition: none;
-	transition: none;
 }
 
 .annis .v-window-modalitycurtain {
@@ -7252,9 +6683,6 @@ div.v-layout.v-horizontal.v-widget {
 	cursor: pointer;
 	font-size: 17px;
 	color: #899dbc;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-window-closebox:focus, .annis .v-window-maximizebox:focus, .annis .v-window-restorebox:focus {
@@ -7935,9 +7363,6 @@ div.v-layout.v-horizontal.v-widget {
 	text-align: center;
 	opacity: 0;
 	filter: alpha(opacity=0) ;
-	-webkit-transition: opacity 200ms 1s;
-	-moz-transition: opacity 200ms 1s;
-	transition: opacity 200ms 1s;
 }
 
 .annis .v-table-column-selector:after {
@@ -8758,9 +8183,6 @@ div.v-layout.v-horizontal.v-widget {
 	-webkit-box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5);
 	box-shadow: 0 0 0 2px rgba(15, 99, 226, 0.5);
 	opacity: 0;
-	-webkit-transition: opacity 200ms;
-	-moz-transition: opacity 200ms;
-	transition: opacity 200ms;
 }
 
 .v-ie8 .annis .v-slider-handle:after {
@@ -8907,9 +8329,6 @@ div.v-layout.v-horizontal.v-widget {
 	overflow: hidden;
 	text-overflow: ellipsis;
 	border-bottom: 2px solid transparent;
-	-webkit-transition: border-bottom 200ms, color 200ms;
-	-moz-transition: border-bottom 200ms, color 200ms;
-	transition: border-bottom 200ms, color 200ms;
 }
 
 .annis .v-tabsheet-tabitemcell .v-caption .v-captiontext {
@@ -9066,72 +8485,6 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=10) !important;
 }
 
-.annis .v-tabsheet-tabsheetpanel > .v-scrollable > .v-widget {
-	-webkit-animation: valo-anim-fade-in 300ms;
-	-moz-animation: valo-anim-fade-in 300ms;
-	animation: valo-anim-fade-in 300ms;
-}
-
-.annis .v-tabsheet-deco {
-	height: 14px !important;
-	width: 14px !important;
-	-webkit-box-sizing: border-box;
-	-moz-box-sizing: border-box;
-	box-sizing: border-box;
-	border: 2px solid rgba(15, 99, 226, 0.2);
-	border-top-color: #0f63e2;
-	border-right-color: #0f63e2;
-	border-radius: 100%;
-	-webkit-animation: v-rotate-360 500ms infinite linear;
-	-moz-animation: v-rotate-360 500ms infinite linear;
-	animation: v-rotate-360 500ms infinite linear;
-	pointer-events: none;
-	height: 0 !important;
-	border-style: none;
-	display: block;
-	position: absolute;
-	z-index: -1;
-	bottom: 50%;
-	margin-bottom: -20px;
-	left: 50%;
-	margin-left: -7px;
-	opacity: 0;
-}
-
-.v-ie8 .annis .v-tabsheet-deco, .v-ie9 .annis .v-tabsheet-deco {
-	border: none;
-	border-radius: 4px;
-	background: #fff url(../valo/shared/img/spinner.gif) no-repeat 50% 50%;
-	background-size: 80%;
-}
-
-.v-ie8 .annis .v-tabsheet-deco {
-	min-width: 30px;
-	min-height: 30px;
-}
-
-.v-ie8 .annis .v-tabsheet-deco {
-	min-height: 0;
-}
-
-.annis .v-tabsheet-loading .v-tabsheet-deco {
-	-webkit-transition: opacity 200ms 200ms;
-	-moz-transition: opacity 200ms 200ms;
-	transition: opacity 200ms 200ms;
-	opacity: 1;
-	z-index: 1;
-	height: 14px !important;
-	border-style: solid;
-}
-
-.v-ie8 .annis .v-tabsheet-loading .v-tabsheet-deco, .v-ie9 .annis .v-tabsheet-loading .v-tabsheet-deco {
-	border-style: none;
-}
-
-.v-ie8 .annis .v-tabsheet-loading .v-tabsheet-deco {
-	min-height: 30px;
-}
-
 .annis .v-tabsheet-equal-width-tabs  > .v-tabsheet-tabcontainer table, .annis .v-tabsheet-equal-width-tabs  > .v-tabsheet-tabcontainer tbody, .annis .v-tabsheet-equal-width-tabs  > .v-tabsheet-tabcontainer tr {
 	width: 100%;
 }
@@ -9158,9 +8511,6 @@ div.v-layout.v-horizontal.v-widget {
 	line-height: 24px;
 	border-radius: 4px 4px 0 0;
 	font-weight: 500;
-	-webkit-transition: background-color 160ms;
-	-moz-transition: background-color 160ms;
-	transition: background-color 160ms;
 }
 
 .annis .v-tabsheet-framed  > .v-tabsheet-tabcontainer .v-caption:hover {
@@ -10484,9 +9834,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-decoration: underline;
 	font-weight: inherit;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-popupview:hover {
@@ -10504,18 +9851,6 @@ div.v-layout.v-horizontal.v-widget {
 	-moz-backface-visibility: hidden;
 	-ms-backface-visibility: hidden;
 	backface-visibility: hidden;
-}
-
-.annis .v-popupview-popup[class*="animate-in"] {
-	-webkit-animation: v-popupview-animate-in 120ms;
-	-moz-animation: v-popupview-animate-in 120ms;
-	animation: v-popupview-animate-in 120ms;
-}
-
-.annis .v-popupview-popup[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	-moz-animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
-	animation: valo-placeholder-animate-out 120ms, valo-anim-fade-out 120ms;
 }
 
 .annis .v-popupview-popup .popupContent  > .v-margin-top {
@@ -10586,9 +9921,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #384457;
 	-webkit-box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
 	box-shadow: inset 0 1px 0 #f5f6f9, 0 1px 0 rgba(255, 255, 255, 0.1);
-	-webkit-transition: box-shadow 180ms, border 180ms;
-	-moz-transition: box-shadow 180ms, border 180ms;
-	transition: box-shadow 180ms, border 180ms;
 	height: auto;
 	overflow: hidden;
 }
@@ -10774,36 +10106,6 @@ div.v-layout.v-horizontal.v-widget {
 	left: -9999px;
 }
 
-.annis .v-Notification-animate-in {
-	-webkit-animation: valo-placeholder-animate-in 100ms, valo-anim-fade-in 100ms;
-	-moz-animation: valo-placeholder-animate-in 100ms, valo-anim-fade-in 100ms;
-	animation: valo-placeholder-animate-in 100ms, valo-anim-fade-in 100ms;
-}
-
-.annis .v-Notification-animate-in.v-position-left {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-right 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-right 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-right 200ms;
-}
-
-.annis .v-Notification-animate-in.v-position-right {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-left 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-left 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-left 200ms;
-}
-
-.annis .v-Notification-animate-out {
-	-webkit-animation: valo-placeholder-animate-out 150ms, valo-anim-fade-out 150ms;
-	-moz-animation: valo-placeholder-animate-out 150ms, valo-anim-fade-out 150ms;
-	animation: valo-placeholder-animate-out 150ms, valo-anim-fade-out 150ms;
-}
-
-.annis .v-Notification-animate-out.v-position-left, .annis .v-Notification-animate-out.v-position-right {
-	-webkit-animation: valo-placeholder-animate-out 120ms, valo-anim-drop-fade-out 120ms;
-	-moz-animation: valo-placeholder-animate-out 120ms, valo-anim-drop-fade-out 120ms;
-	animation: valo-placeholder-animate-out 120ms, valo-anim-drop-fade-out 120ms;
-}
-
 .annis .v-Notification {
 	border-radius: 4px;
 	text-align: center;
@@ -10879,32 +10181,8 @@ div.v-layout.v-horizontal.v-widget {
 	top: 0;
 }
 
-.annis .v-Notification-system.v-position-top[class*="animate-in"] {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-}
-
-.annis .v-Notification-system.v-position-top[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-	-moz-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-	animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-}
-
 .annis .v-Notification-system.v-position-bottom {
 	bottom: 0;
-}
-
-.annis .v-Notification-system.v-position-bottom[class*="animate-in"] {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-}
-
-.annis .v-Notification-system.v-position-bottom[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
-	-moz-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
-	animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
 }
 
 .annis .v-Notification-system h1 {
@@ -10991,32 +10269,8 @@ div.v-layout.v-horizontal.v-widget {
 	top: 0;
 }
 
-.annis .v-Notification.bar.v-position-top[class*="animate-in"] {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-down 200ms;
-}
-
-.annis .v-Notification.bar.v-position-top[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-	-moz-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-	animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-up 200ms;
-}
-
 .annis .v-Notification.bar.v-position-bottom {
 	bottom: 0;
-}
-
-.annis .v-Notification.bar.v-position-bottom[class*="animate-in"] {
-	-webkit-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-	-moz-animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-	animation: valo-placeholder-animate-in 200ms, valo-anim-slide-in-up 200ms;
-}
-
-.annis .v-Notification.bar.v-position-bottom[class*="animate-out"] {
-	-webkit-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
-	-moz-animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
-	animation: valo-placeholder-animate-out 200ms, valo-anim-slide-out-down 200ms;
 }
 
 .annis .v-Notification.small {
@@ -11235,9 +10489,6 @@ div.v-layout.v-horizontal.v-widget {
 	color: #0f63e2;
 	text-shadow: 0 -1px 0 rgba(255, 255, 255, 0.05);
 	padding: 0 8px;
-	-webkit-transition: color 140ms;
-	-moz-transition: color 140ms;
-	transition: color 140ms;
 }
 
 .annis .v-menubar-user-menu .v-menubar-menuitem:first-child, .annis .v-menubar-user-menu .v-menubar-menuitem:last-child, .annis .v-menubar-user-menu .v-menubar-menuitem:first-child:last-child {
