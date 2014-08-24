@@ -56,7 +56,6 @@ public class ControlPanel extends VerticalLayout
     setMargin(true);
 
     setStyleName(ValoTheme.PANEL_BORDERLESS);
-    addStyleName("control");
 
     queryPanel = new QueryPanel(ui);
     queryPanel.setHeight("-1px");
