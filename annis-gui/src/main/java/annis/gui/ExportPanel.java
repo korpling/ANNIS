@@ -36,6 +36,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ExportPanel extends FormLayout
 {
@@ -179,13 +180,12 @@ public class ExportPanel extends FormLayout
     addComponent(new HelpButton(txtParameters));
 
     btExport = new Button("Perform Export");
-    btExport.setIcon(new ThemeResource(
-      "images/tango-icons/16x16/media-playback-start.png"));
+    btExport.setIcon(FontAwesome.PLAY);
     btExport.setDisableOnClick(true);
     btExport.addClickListener(new ExportButtonListener());
 
     btCancel = new Button("Cancel Export");
-    btCancel.setIcon(new ThemeResource("images/tango-icons/16x16/process-stop.png"));
+    btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
     Exporter exporter = exporterMap.get((String) cbExporter.getValue());
@@ -196,7 +196,7 @@ public class ExportPanel extends FormLayout
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
-    btDownload.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
+    btDownload.setIcon(FontAwesome.DOWNLOAD);
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
@@ -209,7 +209,7 @@ public class ExportPanel extends FormLayout
     addComponent(vLayout);
 
     progressBar = new ProgressBar();
-    progressBar.setEnabled(false);
+    progressBar.setVisible(false);
     progressBar.setIndeterminate(true);
     vLayout.addComponent(progressBar);
 
@@ -371,7 +371,7 @@ public class ExportPanel extends FormLayout
         e.setCorpora(corpusListPanel.getSelectedCorpora());
         e.setQuery(queryPanel.getQuery());
         controller.addHistoryEntry(e);
-        progressBar.setEnabled(true);
+        progressBar.setVisible(true);
         progressLabel.setValue("");
 
         if (exporter.isCancelable())
@@ -455,7 +455,7 @@ public class ExportPanel extends FormLayout
           {
             btExport.setEnabled(true);
             btCancel.setEnabled(false);
-            progressBar.setEnabled(false);
+            progressBar.setVisible(false);
             progressLabel.setValue("");
 
             // copy the result to the class member in order to delete if

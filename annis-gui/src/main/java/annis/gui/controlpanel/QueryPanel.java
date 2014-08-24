@@ -37,6 +37,7 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -537,7 +538,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
-        tab.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
+        tab.setIcon(FontAwesome.DOWNLOAD);
       }
       
       
@@ -573,7 +574,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
-        tab.setIcon(new ThemeResource("images/tango-icons/16x16/x-office-spreadsheet.png"));
+        tab.setIcon(FontAwesome.BAR_CHART_O);
       }
       
       
