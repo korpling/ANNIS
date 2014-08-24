@@ -62,6 +62,7 @@ import com.vaadin.server.WebBrowser;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -174,6 +175,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
+    mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(queryController);
     
     Tab helpTab = mainTab.addTab(help, "Help/Examples");

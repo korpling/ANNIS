@@ -153,7 +153,7 @@ public class SingleResultPanel extends CssLayout implements
     setHeight("-1px");
 
     infoBar = new HorizontalLayout();
-    infoBar.addStyleName("docPath");
+    infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
 

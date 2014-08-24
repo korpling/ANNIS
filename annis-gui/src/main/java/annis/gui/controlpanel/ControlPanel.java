@@ -65,6 +65,7 @@ public class ControlPanel extends VerticalLayout
     optionsTab = new TabSheet();
     optionsTab.setHeight("100%");
     optionsTab.setWidth("100%");
+    optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
     corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
     

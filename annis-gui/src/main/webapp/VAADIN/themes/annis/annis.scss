@@ -2,12 +2,20 @@
 $v-app-loading-text: "ANNIS corpus search is loading";
 $v-font-size: 13px;
 $v-app-background-color: white;
-$v-layout-margin-top: 20px;
-$v-layout-margin-right: 20px;
-$v-layout-margin-bottom: 20px; 
-$v-layout-margin-left: 20px;
+
+$v-unit-size: 25px;
+
+/*
+$v-layout-margin-top: 12px;
+$v-layout-margin-right: 12px;
+$v-layout-margin-bottom: 12px; 
+$v-layout-margin-left: 12px;
+*/
+
+/*
 $v-layout-spacing-vertical: 5px;
 $v-layout-spacing-horizontal: 5px;
+*/
 
 @import "../valo/valo";
 
@@ -211,5 +219,12 @@ $font-size: 10pt;
   .grey-selection tr.v-selected {
     background-color: #808080;
   } 
+  
+  .info-bar {
+    background-color: $annis-color;
+    border-style: solid;
+    border-color: black;
+    border-width: 1px 0px 0px 0px;
+  }
 
 }

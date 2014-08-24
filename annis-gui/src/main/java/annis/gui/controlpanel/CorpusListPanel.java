@@ -39,6 +39,8 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -80,10 +82,9 @@ public class CorpusListPanel extends VerticalLayout implements
   private static final org.slf4j.Logger log = LoggerFactory.
     getLogger(CorpusListPanel.class);
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("images/info.gif");
+  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
 
-  private static final ThemeResource DOC_ICON = new ThemeResource(
-    "images/document_ico.png");
+  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
 
   public static final String ALL_CORPORA = "All";
 
@@ -139,6 +140,7 @@ public class CorpusListPanel extends VerticalLayout implements
     cbSelection.setDescription("Choose corpus selection set");
     cbSelection.setWidth("100%");
     cbSelection.setHeight("-1px");
+    cbSelection.addStyleName(ValoTheme.COMBOBOX_SMALL);
     cbSelection.setInputPrompt("Add new corpus selection set");
     cbSelection.setNullSelectionAllowed(false);
     cbSelection.setNewItemsAllowed(true);
@@ -205,6 +207,7 @@ public class CorpusListPanel extends VerticalLayout implements
     });
     txtFilter.setWidth("100%");
     txtFilter.setHeight("-1px");
+    txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
     addComponent(txtFilter);
 
     tblCorpora = new Table();
@@ -233,6 +236,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.setColumnWidth("info", 19);
+    tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
     
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
@@ -266,7 +270,7 @@ public class CorpusListPanel extends VerticalLayout implements
           Notification.Type.HUMANIZED_MESSAGE);
       }
     });
-    btReload.setIcon(new ThemeResource("images/tango-icons/16x16/view-refresh.png"));
+    btReload.setIcon(FontAwesome.REFRESH);
     btReload.setDescription("Reload corpus list");
     btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 

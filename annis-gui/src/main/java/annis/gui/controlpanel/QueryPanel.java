@@ -125,7 +125,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtStatus = new TextArea();
     txtStatus.setValue(this.lastPublicStatus);
     txtStatus.setWidth("100%");
-    txtStatus.setHeight(3.5f, Unit.EM);
+    txtStatus.setHeight(4.0f, Unit.EM);
     txtStatus.addStyleName("border-layout");
     txtStatus.setReadOnly(true);
     
