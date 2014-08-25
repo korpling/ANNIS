@@ -95,10 +95,12 @@ public class UserController
     {
       // create new user with empty password
       User u = new User(userName);
-      model.createOrUpdateUser(u);
-      view.askForPasswordChange(userName); 
-      view.setUserList(model.getUsers());
-      view.emptyNewUserNameTextField();
+      if(model.createOrUpdateUser(u))
+      {
+        view.askForPasswordChange(userName); 
+        view.setUserList(model.getUsers());
+        view.emptyNewUserNameTextField();
+      }
     }
   }
 

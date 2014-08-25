@@ -74,8 +74,16 @@ public class GroupManagement
     if(rootResource != null)
     {
       WebResource res = rootResource.path("admin/groups").path(newGroup.getName());
-      res.put(newGroup);
-      groups.put(newGroup.getName(), newGroup);
+      try
+      {
+        res.put(newGroup);
+        groups.put(newGroup.getName(), newGroup);
+      }
+      catch(UniformInterfaceException ex)
+      {
+        log.warn("Could not update group", ex);
+      }
+      
     }
   }
   
