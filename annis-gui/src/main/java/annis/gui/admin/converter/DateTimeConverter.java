@@ -32,6 +32,10 @@ public class DateTimeConverter implements Converter<Date, DateTime>
   public DateTime convertToModel(Date value,
     Class<? extends DateTime> targetType, Locale locale) throws ConversionException
   {
+    if(value == null)
+    {
+      return null;
+    }
     return new DateTime(value);
   }
 
@@ -39,6 +43,10 @@ public class DateTimeConverter implements Converter<Date, DateTime>
   public Date convertToPresentation(DateTime value,
     Class<? extends Date> targetType, Locale locale) throws ConversionException
   {
+    if(value == null)
+    {
+      return null;
+    }
     return value.toDate();
   }
 

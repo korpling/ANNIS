@@ -26,6 +26,7 @@ import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -44,6 +45,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -277,9 +279,7 @@ public class UserManagementPanel extends Panel
           result = null;
           break;
         case "expires":
-          DateField dateField = new DateField();
-          dateField.setConverter(new DateTimeConverter());
-          dateField.setResolution(Resolution.DAY);
+          OptionalDateTimeField dateField = new OptionalDateTimeField("expires");
           dateField.addValueChangeListener(new UserChangeListener(itemId));
           
           result = dateField;
