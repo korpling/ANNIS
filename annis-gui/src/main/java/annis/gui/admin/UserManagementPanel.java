@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.gui.admin.converter.DateTimeConverter;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;
@@ -27,6 +28,7 @@ import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
@@ -81,12 +83,13 @@ public class UserManagementPanel extends Panel
       new PasswordChangeColumnGenerator());
 
     userList.
-      setVisibleColumns("name", "groups", "permissions", "changepassword");
+      setVisibleColumns("name", "groups", "permissions", "expires", "changepassword");
     userList.
-      setColumnHeaders("Username", "Groups (seperate with comma)", "Additional permissions (seperate with comma)", "");
+      setColumnHeaders("Username", "Groups (seperate with comma)", 
+        "Additional permissions (seperate with comma)", "Expiration Date", "");
 
     userList.setTableFieldFactory(new FieldFactory());
-
+    
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
 
@@ -293,6 +296,11 @@ public class UserManagementPanel extends Panel
         case "name":
           // explicitly request a read-only label for the name and groups
           result = null;
+          break;
+        case "expires":
+          DateField dateField = new DateField();
+          dateField.setConverter(DateTimeConverter.class);
+          result = dateField;
           break;
         default:
           result = super.createField(container, itemId, propertyId, uiContext);

@@ -14,55 +14,55 @@
  * limitations under the License.
  */
 
-package annis.gui.admin;
+package annis.gui.admin.converter;
 
 import com.vaadin.data.util.converter.Converter;
-import java.util.Collection;
+import java.util.Date;
 import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
+import org.joda.time.DateTime;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class TreeSetConverter implements Converter<Object, TreeSet>
+public class DateTimeConverter implements Converter<DateTime, Date>
 {
 
   @Override
-  public TreeSet convertToModel(Object value,
-    Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
+  public Date convertToModel(DateTime value,
+    Class<? extends Date> targetType, Locale locale) throws ConversionException
   {
-    TreeSet result = new TreeSet(String.CASE_INSENSITIVE_ORDER);
-    if(value instanceof Collection)
+    if(value == null)
     {
-      result.addAll((Collection) value);
+      return null;
     }
-    else
+    
+    return value.toDate();
+  }
+
+  @Override
+  public DateTime convertToPresentation(Date value,
+    Class<? extends DateTime> targetType, Locale locale) throws ConversionException
+  {
+    if(value == null)
     {
-      result.add(value);
+      return null;
     }
-    return result;
+    return new DateTime(value);
   }
 
   @Override
-  public Object convertToPresentation(TreeSet value,
-    Class<? extends Object> targetType, Locale locale) throws ConversionException
+  public Class<Date> getModelType()
   {
-    return value;
+    return Date.class;
   }
 
   @Override
-  public Class<TreeSet> getModelType()
+  public Class<DateTime> getPresentationType()
   {
-    return TreeSet.class;
+    return DateTime.class;
   }
 
-  @Override
-  public Class<Object> getPresentationType()
-  {
-    return Object.class;
-  }
-
-
+  
+  
 }

@@ -38,7 +38,7 @@ public class User
   private String passwordHash;
   private TreeSet<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
   private TreeSet<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-  private DateTime expirationDate;
+  private DateTime expires;
  
   public User()
   {
@@ -78,11 +78,11 @@ public class User
     {
       try
       {
-        expirationDate = DateTime.parse(dateRaw);
+        expires = DateTime.parse(dateRaw);
       }
       catch(IllegalArgumentException ex)
       {
-        expirationDate = null;
+        expires = null;
       }
     }
     
@@ -151,22 +151,23 @@ public class User
     {
       props.put("permissions", Joiner.on(',').join(permissions));
     }
-    if(expirationDate != null)
+    if(expires != null)
     {
-      props.put("expires", ISODateTimeFormat.date().print(expirationDate));
+      props.put("expires", ISODateTimeFormat.date().print(expires));
     }
     return props;
   }
 
   @XmlJavaTypeAdapter(DateTimeAdapter.class)
-  public DateTime getExpirationDate()
+  public DateTime getExpires()
   {
-    return expirationDate;
+    return expires;
   }
 
-  public void setExpirationDate(DateTime expirationDate)
+  public void setExpires(DateTime expires)
   {
-    this.expirationDate = expirationDate;
+    this.expires = expires;
   }
+  
   
 }
