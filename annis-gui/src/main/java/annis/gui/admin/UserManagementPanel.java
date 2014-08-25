@@ -25,6 +25,7 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.datefield.Resolution;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -256,18 +257,7 @@ public class UserManagementPanel extends Panel
           PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupsContainer);
           groupsSelector.setWidth("100%");
           groupsSelector.setCaption("Groups for \"" + itemId + "\"");
-          groupsSelector.addValueChangeListener(new Property.ValueChangeListener()
-          {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event)
-            {
-              for (UserListView.Listener l : listeners)
-              {
-                l.userUpdated(userContainer.getItem(itemId).getBean());
-              }
-            }
-          });
+          groupsSelector.addValueChangeListener(new UserChangeListener(itemId));
 
           result = groupsSelector;
           
@@ -277,18 +267,7 @@ public class UserManagementPanel extends Panel
           PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(permissionsContainer);
           permissionSelector.setWidth("100%");
           permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
-          permissionSelector.addValueChangeListener(new Property.ValueChangeListener()
-          {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event)
-            {
-              for (UserListView.Listener l : listeners)
-              {
-                l.userUpdated(userContainer.getItem(itemId).getBean());
-              }
-            }
-          });
+          permissionSelector.addValueChangeListener(new UserChangeListener(itemId));
 
           result = permissionSelector;
           
@@ -299,7 +278,10 @@ public class UserManagementPanel extends Panel
           break;
         case "expires":
           DateField dateField = new DateField();
-          dateField.setConverter(DateTimeConverter.class);
+          dateField.setConverter(new DateTimeConverter());
+          dateField.setResolution(Resolution.DAY);
+          dateField.addValueChangeListener(new UserChangeListener(itemId));
+          
           result = dateField;
           break;
         default:
@@ -310,6 +292,26 @@ public class UserManagementPanel extends Panel
       return result;
     }
 
+  }
+  
+  private class UserChangeListener implements Property.ValueChangeListener
+  {
+    private final Object itemId;
+
+    public UserChangeListener(Object itemId)
+    {
+      this.itemId = itemId;
+    }
+
+    @Override
+    public void valueChange(Property.ValueChangeEvent event)
+    {
+      for (UserListView.Listener l : listeners)
+      {
+        l.userUpdated(userContainer.getItem(itemId).getBean());
+      }
+    }
+    
   }
 
 }

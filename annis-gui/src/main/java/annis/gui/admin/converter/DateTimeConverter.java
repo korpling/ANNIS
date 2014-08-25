@@ -25,42 +25,33 @@ import org.joda.time.DateTime;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class DateTimeConverter implements Converter<DateTime, Date>
+public class DateTimeConverter implements Converter<Date, DateTime>
 {
 
   @Override
-  public Date convertToModel(DateTime value,
-    Class<? extends Date> targetType, Locale locale) throws ConversionException
-  {
-    if(value == null)
-    {
-      return null;
-    }
-    
-    return value.toDate();
-  }
-
-  @Override
-  public DateTime convertToPresentation(Date value,
+  public DateTime convertToModel(Date value,
     Class<? extends DateTime> targetType, Locale locale) throws ConversionException
   {
-    if(value == null)
-    {
-      return null;
-    }
     return new DateTime(value);
   }
 
   @Override
-  public Class<Date> getModelType()
+  public Date convertToPresentation(DateTime value,
+    Class<? extends Date> targetType, Locale locale) throws ConversionException
   {
-    return Date.class;
+    return value.toDate();
   }
 
   @Override
-  public Class<DateTime> getPresentationType()
+  public Class<DateTime> getModelType()
   {
     return DateTime.class;
+  }
+
+  @Override
+  public Class<Date> getPresentationType()
+  {
+    return Date.class;
   }
 
   
