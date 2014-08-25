@@ -534,7 +534,14 @@ public class MainToolbar extends HorizontalLayout
     {
       for(LoginListener l : loginListeners)
       {
-        l.onLogin();
+        try
+        {
+          l.onLogin();
+        }
+        catch(Exception ex)
+        {
+          log.error("excption thrown while notifying login listeners", ex);
+        }
       }
       onLogin();
     }
