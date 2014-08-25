@@ -23,6 +23,7 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
@@ -332,6 +333,17 @@ public class SearchOptionsPanel extends FormLayout
             .path("segmentation-names")
             .get(SegmentationList.class);
           segNames.addAll(segList.getSegmentatioNames());
+        }
+        catch(UniformInterfaceException ex)
+        {
+          if(ex.getResponse().getStatus() == 403)
+          {
+            log.debug("Did not have access rights to query segmentation names for corpus", ex);
+          }
+          else
+          {
+            log.warn("Could not query segmentation names for corpus", ex);
+          }
         }
         catch (UnsupportedEncodingException ex)
         {
