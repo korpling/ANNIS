@@ -16,12 +16,15 @@
 
 package annis.security;
 
+import annis.adapter.DateTimeAdapter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeSet;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Represents a user.
@@ -30,10 +33,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class User
 {
+  
   private String name;
   private String passwordHash;
   private TreeSet<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
   private TreeSet<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private DateTime expirationDate;
  
   public User()
   {
@@ -67,6 +72,20 @@ public class User
     {
       this.permissions.add(g);
     }
+    
+    String dateRaw = props.getProperty("expires");
+    if(dateRaw != null)
+    {
+      try
+      {
+        expirationDate = DateTime.parse(dateRaw);
+      }
+      catch(IllegalArgumentException ex)
+      {
+        expirationDate = null;
+      }
+    }
+    
   }
 
   public String getName()
@@ -132,9 +151,22 @@ public class User
     {
       props.put("permissions", Joiner.on(',').join(permissions));
     }
+    if(expirationDate != null)
+    {
+      props.put("expires", ISODateTimeFormat.date().print(expirationDate));
+    }
     return props;
   }
-  
-  
+
+  @XmlJavaTypeAdapter(DateTimeAdapter.class)
+  public DateTime getExpirationDate()
+  {
+    return expirationDate;
+  }
+
+  public void setExpirationDate(DateTime expirationDate)
+  {
+    this.expirationDate = expirationDate;
+  }
   
 }
