@@ -39,6 +39,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Page;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -300,13 +301,6 @@ public class CorpusListPanel extends VerticalLayout implements
             Notification.show("No corpora found. Please login "
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
-          }
-          else if (Helper.getUser() == null)
-          {
-            Notification.
-              show(
-              "You can login (use button at upper right corner) to get access to more corpora",
-              Notification.Type.TRAY_NOTIFICATION);
           }
         }
       }

@@ -245,11 +245,13 @@ public class SearchUI extends AnnisBaseUI
         String revisionGUI = VersionInfo.getBuildRevision();
         if(!revisionService.equals(revisionGUI))
         {
-          Notification.show("Different service revision",
+          Notification n = new Notification("Different service revision",
             "The service uses revision " + revisionService
             + " but the user interface is using revision  " + revisionGUI
             + ".",
             Notification.Type.TRAY_NOTIFICATION);
+          n.setDelayMsec(3000);
+          n.show(Page.getCurrent());
         }
       }
     }
