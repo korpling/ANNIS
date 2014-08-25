@@ -98,17 +98,29 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
       corpusManagement,
       groupManagementPanel, this, userManagementPanel);
 
-    importPanel = new ImportPanel();
-
+    
+    boolean kickstarter = Boolean.parseBoolean(
+        getSession().getConfiguration().getInitParameters()
+          .getProperty("kickstarterEnvironment",
+          "false"));
+    
+    importPanel = new ImportPanel(!kickstarter, Helper.getUser() != null);
+    
     tabSheet = new TabSheet();
     tabSheet.addTab(importPanel, "Import Corpus", new ThemeResource(
       "images/tango-icons/16x16/document-save.png"));
     tabSheet.addTab(corpusAdminPanel, "Corpus management", new ThemeResource(
       "images/tango-icons/16x16/system-file-manager.png"));
-    tabSheet.addTab(userManagementPanel, "User management", new ThemeResource(
-      "images/tango-icons/16x16/user-info.png"));
-    tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource(
-      "images/tango-icons/16x16/system-users.png"));
+    
+    
+    if(!kickstarter)
+    {
+      tabSheet.addTab(userManagementPanel, "User management", new ThemeResource(
+        "images/tango-icons/16x16/user-info.png"));
+      tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource(
+        "images/tango-icons/16x16/system-users.png"));
+    }
+    
     tabSheet.setSizeFull();
 
     tabSheet.addSelectedTabChangeListener(this);
@@ -226,7 +238,12 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
   {
     for (UIView.Listener l : listeners)
     {
-      l.loginChanged(Helper.getAnnisWebResource());
+      l.loginChanged(Helper.getAnnisWebResource(), true);
+    }
+    // TODO: make import panel a normal UI view listener
+    if(importPanel != null)
+    {
+      importPanel.onLogin();
     }
   }
 
@@ -235,7 +252,12 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
   {
     for (UIView.Listener l : listeners)
     {
-      l.loginChanged(Helper.getAnnisWebResource());
+      l.loginChanged(Helper.getAnnisWebResource(), false);
+    }
+    // TODO: make import panel a normal UI view listener
+    if(importPanel != null)
+    {
+      importPanel.onLogout();
     }
   }
 

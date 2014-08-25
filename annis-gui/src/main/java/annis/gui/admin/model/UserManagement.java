@@ -77,6 +77,12 @@ public class UserManagement
 
   }
   
+  public void clear()
+  {
+    users.clear();
+    usedGroupNames.clear();
+  }
+  
   public boolean fetchFromService()
   {
     if(rootResource != null)

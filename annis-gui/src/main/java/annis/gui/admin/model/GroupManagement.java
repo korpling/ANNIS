@@ -41,6 +41,11 @@ public class GroupManagement
   private final Map<String, Group> groups = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private WebResource rootResource;
   
+  public void clear()
+  {
+    groups.clear();
+  }
+  
   public boolean fetchFromService()
   {
     if(rootResource != null)

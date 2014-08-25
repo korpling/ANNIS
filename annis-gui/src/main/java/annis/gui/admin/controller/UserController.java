@@ -36,6 +36,7 @@ public class UserController
   private final UserManagement model;
   private final UserListView view;
   private final UIView uiView;
+  private boolean isLoggedIn = false;
 
   public UserController(UserManagement model,
     UserListView view, UIView uiView)
@@ -45,6 +46,12 @@ public class UserController
     this.uiView = uiView;
     view.addListener(UserController.this);
     uiView.addListener(UserController.this);
+  }
+  
+  private void clearModel()
+  {
+    model.clear();
+    view.setUserList(model.getUsers());
   }
   
   private void fetchFromService()
@@ -115,19 +122,28 @@ public class UserController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource)
+  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
   {
+    this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
-    fetchFromService();
+    if(isLoggedIn)
+    {
+      fetchFromService();
+    }
+    else
+    {
+      clearModel();
+    }
   }
 
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(selectedTab == view)
+    if(isLoggedIn && selectedTab == view)
     {
       fetchFromService();
     }
+
   }
   
   
