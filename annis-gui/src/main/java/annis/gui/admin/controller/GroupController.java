@@ -47,13 +47,14 @@ public class GroupController implements GroupListView.Listener,
   public GroupController(GroupManagement model,
     CorpusManagement corpusModel,
     GroupListView view, UIView uiView,
-    UserListView userView)
+    UserListView userView, boolean isLoggedIn)
   {
     this.model = model;
     this.corpusModel = corpusModel;
     this.view = view;
     this.uiView = uiView;
     this.userView = userView;
+    this.isLoggedIn = isLoggedIn;
     
     this.view.addListener(GroupController.this);
     this.uiView.addListener(GroupController.this);

@@ -42,11 +42,12 @@ public class CorpusController
   private boolean isLoggedIn = false;
 
   public CorpusController(CorpusManagement model,
-    CorpusListView view, UIView uiView)
+    CorpusListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
     this.view = view;    
     this.uiView = uiView;
+    this.isLoggedIn = isLoggedIn;
     view.addListener(CorpusController.this);
     uiView.addListener(CorpusController.this);
   }

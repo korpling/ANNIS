@@ -85,18 +85,20 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
     CorpusManagement corpusManagement = new CorpusManagement();
     corpusManagement.setRootResource(rootResource);
 
+    boolean isLoggedIn = Helper.getUser() != null;
+    
     corpusAdminPanel = new CorpusAdminPanel();
     corpusController = new CorpusController(corpusManagement, corpusAdminPanel,
-      this);
+      this, isLoggedIn);
 
     userManagementPanel = new UserManagementPanel();
     userController = new UserController(userManagement,
-      userManagementPanel, this);
+      userManagementPanel, this, isLoggedIn);
 
     groupManagementPanel = new GroupManagementPanel();
     groupManagementController = new GroupController(groupManagement,
       corpusManagement,
-      groupManagementPanel, this, userManagementPanel);
+      groupManagementPanel, this, userManagementPanel, isLoggedIn);
 
     
     boolean kickstarter = Boolean.parseBoolean(

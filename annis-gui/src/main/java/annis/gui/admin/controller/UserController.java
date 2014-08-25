@@ -39,11 +39,12 @@ public class UserController
   private boolean isLoggedIn = false;
 
   public UserController(UserManagement model,
-    UserListView view, UIView uiView)
+    UserListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
     this.view = view;    
     this.uiView = uiView;
+    this.isLoggedIn = isLoggedIn;
     view.addListener(UserController.this);
     uiView.addListener(UserController.this);
   }
