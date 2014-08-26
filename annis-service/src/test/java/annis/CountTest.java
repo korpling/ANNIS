@@ -134,6 +134,10 @@ public class CountTest
     assertEquals(187, countPcc2("tok & meta::Titel=\"Steilpass\""));
     assertEquals(212, countPcc2("tok & meta::Titel!=\"Steilpass\""));
     
+    assertEquals(2, countPcc2("\"wollen\" & tok & tok \n" +
+"& #1 ->dep[func=\"obja\"] #2 \n" +
+"& #1 ->dep[func=\"sbj\"] #3"));
+    
   }
 
   @Test
