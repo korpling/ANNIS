@@ -17,14 +17,11 @@ package annis.gui.admin;
 
 import annis.gui.admin.converter.DateTimeConverter;
 import com.vaadin.data.Property;
-import com.vaadin.data.util.converter.Converter;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.DateField;
 import com.vaadin.ui.HorizontalLayout;
-import java.util.Locale;
 import java.util.Objects;
 import org.joda.time.DateTime;
 
@@ -44,6 +41,7 @@ public class OptionalDateTimeField extends CustomField<DateTime>
     dateField = new DateField();
     dateField.setConverter(new DateTimeConverter());
     dateField.setDateFormat("yyyy-MM-dd");
+    dateField.setImmediate(true);
 
     checkBox = new CheckBox(checkboxCaption);
     checkBox.addValueChangeListener(new ValueChangeListener()
