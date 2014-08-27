@@ -206,11 +206,11 @@ public class QueryNode implements Serializable
     this.id = other.id;
     if(copyOutgoingJoins)
     {
-      this.outgoingJoins = new ArrayList<>(other.outgoingJoins);
+      this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
     }
     else
     {
-      this.outgoingJoins = new ArrayList<>();
+      this.outgoingJoins = new ArrayList<Join>();
     }
     // do not copy the ingoing join since this is a property of the joins itself
     // only if they change their target it is allowed to change the state of 
