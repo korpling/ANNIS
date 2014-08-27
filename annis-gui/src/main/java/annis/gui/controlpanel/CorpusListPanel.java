@@ -427,7 +427,8 @@ public class CorpusListPanel extends VerticalLayout implements
    * @return True if successful
    */
   private boolean queryServerForCorpusList()
-  {
+  {    
+    allCorpora.clear();
     try
     {
       loadFromRemote();
@@ -451,6 +452,13 @@ public class CorpusListPanel extends VerticalLayout implements
       {
         Notification.show("You are not authorized to get the corpus list.", ex.
           getMessage(), Notification.Type.WARNING_MESSAGE);
+      }
+      else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+        getStatusCode())
+      {
+        Notification.show("Your account has expired.", ex.
+          getMessage(), Notification.Type.WARNING_MESSAGE);
+        return true;
       }
       else
       {

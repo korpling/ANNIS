@@ -15,6 +15,8 @@
  */
 package annis.gui.admin;
 
+import annis.gui.admin.converter.CommaSeperatedStringConverter;
+import annis.gui.admin.converter.TreeSetConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
