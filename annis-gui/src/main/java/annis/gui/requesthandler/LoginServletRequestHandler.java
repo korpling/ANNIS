@@ -161,6 +161,7 @@ public class LoginServletRequestHandler implements RequestHandler
       {
         session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Authentification error: " + ex.getMessage());
+        response.setStatus(502); // bad gateway
       }
       catch (UniformInterfaceException ex)
       {
@@ -169,12 +170,14 @@ public class LoginServletRequestHandler implements RequestHandler
         {
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
+          response.setStatus(403); // Forbidden
         }
         else
         {
           log.error(null, ex);
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Unexpected exception: " + ex.getMessage());
+          response.setStatus(500);
         }
       }
 
