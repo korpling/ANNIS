@@ -12,6 +12,6 @@ The first step is to configure a custom login page in the `annis-gui.properties`
 
 The custom login page should be a web application that does the following things:
 - authentificate the user
-- use the [REST API](@ref annis.service.AdminService#updateOrCreateUser) to create a temporary account with a random password (you can use an expiration date to limit the validity).
+- use the [special REST API function](@ref annis.service.AdminService#updateOrCreateUser) to create a temporary account with a random password (you can use an expiration date to limit the validity).
 - initiate a `POST` request to `https://<yourdmain>/<annispath>/login` containing the parameters `annis-login-user` and `annis-login-password` from the users browser.
 - if you want to close the login window without changing the login-information execute the `window.parent.annis.gui.logincallback()` javascript function

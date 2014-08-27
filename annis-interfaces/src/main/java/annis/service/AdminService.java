@@ -190,6 +190,9 @@ public interface AdminService
    * 
    * @param requestBody
    * @param userName The name of the user to create or update.
+   * 
+   * @see http://shiro.apache.org/static/current/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html
+   * @see http://en.wikipedia.org/wiki/ISO_8601
    * @return 
    */
   public Response updateOrCreateUser(
