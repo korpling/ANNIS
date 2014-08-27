@@ -22,15 +22,13 @@ Configuration file location {#admin-configure-userfileloc}
 There is a central location where the user configuration files are stored.
 Configure the path to this location in the `conf/shiro.info` configuration file of
 the ANNIS service. The default path is `/etc/annis/user_config/` and
-must be changed at two locations in the configuration file.
+can be changed in the configuration file.
 
 \verbatim
 [main]
-annisRealm = annis.security.ANNISUserRealm
-annisRealm.resourcePath=/etc/annis/user_config/
-annisRealm.authenticationCachingEnabled = true
-globalPermResolver = annis.security.ANNISRolePermissionResolver
-globalPermResolver.resourcePath = /etc/annis/user_config/
+confManager = annis.security.ANNISUserConfigurationManager
+confManager.resourcePath=/etc/annis/user_config/
+[...]
 \endverbatim
 
 User and group files {#admin-configure-userformat}
@@ -52,13 +50,15 @@ the user's name is *exactly* the file name (no file endings).
 \verbatim
 groups=group1,group3
 password=$shiro1$SHA-256$1$tQNwUIxEQhrDn6FKcY1yNg==$Xq8ZCb3RFBwn3GfQ7pav3G3vHg4TKRGD1ItpfdW+JvI=
-given_name=userGivenName
-surname=userSurname
+# these are optional entries
+permissions=adm:*,query:*
+expires=2015-04-25
 \endverbatim
   - A superuser who has access to every corpus can be created with `groups=*`
-  - `given_name` and `surname` can contain any string
   - The password must be hashed with SHA256 (one iteration and using a Salt) and formatted in the [Shiro1CryptFormat](http://shiro.apache.org/static/current/
 apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html).
+  - Additional permissions for the user are given as comma seperated list in the `permissions` field.
+  - With `expires` you can define when an account will expire. The format must be in encoded according to the [ISO-8601 standard](http://en.wikipedia.org/wiki/ISO_8601).
 
   The easiest way to generate the passwort hash is to use the
 Apache Shiro command line hasher (http://shiro.apache.org/command-line-hasher.html) which can be downloaded from http://shiro.apache.org/download.html#Download-1.2.1.BinaryDistribution .
@@ -76,9 +76,49 @@ $shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxa
   \endcode
   The last line is what you have to insert into the password field.
 
-### anonymous group ### {#admin-configure-anonymous}
+### "anonymous" and "user" group ### {#admin-configure-anonymous}
 
-The special group `anonymous` is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login.
+The special group `anonymous` is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login. In addition the group "user" is added to
+every user that is logged in.
+
+### Advanced permissions ### {#admin-configure-permissions}
+
+The following permissions can be granted to individual users. Wildcards ("*") can be used
+as described in the [Apache Shiro documentation](https://shiro.apache.org/permissions.html).
+
+#### Administration ####
+
+If you want to have an adminstrator user just add
+\verbatim
+admin:*
+\endverbatim
+to it's permissions. For more fine-grained control (e.g. for the web service users) you can specifiy the actual action. You can always use "*" wildcard instead of the corpus name to allow the specific action for any corpus.
+
+permission               | description 
+-------------------------|-------------
+admin:import:<b>{corpusname}</b> | Allow to @ref annis.service.AdminService#importCorpus "import and overwrite" a corpus with a specific name.
+admin:query-import:finished | Allow to @ref annis.service.AdminService#finishedImport "check if an import has finished".
+admin:query-import:running | Allow to list the @ref annis.service.AdminService#currentImports "currently running imports".
+admin:write:user | Allow to the @ref annis.service.AdminService#updateOrCreateUser "update or create" users.
+
+
+#### Querying ####
+
+Every user that is part of a group that contains a corpus always get these permissions for a corpus automatically. If you want to allow a user to access only a certain functionality 
+you can add more fine grained permissions. E.g.
+\verbatim
+query:count:*
+\endverbatim
+allows a user to count on all corpora but won't allow him to fetch the annotation graphs. For users that use the graphical user interface and not the service directly you should always grant a user all query permissions for a corpus. Otherwise he the user interface might not function as expected.
+
+permission               | description 
+-------------------------|-------------
+query:count:<b>{corpusname}</b> | Allow to @ref annis.service.QueryService#count "count" on a specific corpus.
+query:find:<b>{corpusname}</b>  | Allow to @ref annis.service.QueryService#find "find matches" on a specific corpus.
+query:subgraph:<b>{corpusname}</b>  | Allow to query @ref annis.service.QueryService#subgraph "subgraphs" on a specific corpus.
+query:subgraph:<b>{corpusname}</b>  | Allow to query @ref annis.service.QueryService#subgraph "annptated subgraphs" on a specific corpus
+query:subgraph:<b>{corpusname}</b>  | Allow to query @ref annis.service.QueryService#subgraph "annotated subgraphs" and @ref annis.service.QueryService#graph "complete annotated graphs" on a specific corpus.
+query:binary:<b>{corpusname}</b>  | Allow to get the  @ref annis.service.QueryService#binary "binary files" of a specific corpus.
 
 Changing maximal context size {#admin-configure-contextsize}
 =============================

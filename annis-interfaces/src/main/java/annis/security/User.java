@@ -21,6 +21,7 @@ import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.Properties;
 import java.util.TreeSet;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.joda.time.DateTime;
@@ -108,6 +109,7 @@ public class User
     this.passwordHash = passwordHash;
   }
 
+  @XmlElement(name="group")
   public TreeSet<String> getGroups()
   {
     return groups;
@@ -123,6 +125,7 @@ public class User
     return permissions;
   }
 
+  @XmlElement(name="permission")
   public void setPermissions(TreeSet<String> permissions)
   {
     this.permissions = permissions;
