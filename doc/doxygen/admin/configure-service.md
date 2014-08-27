@@ -22,15 +22,13 @@ Configuration file location {#admin-configure-userfileloc}
 There is a central location where the user configuration files are stored.
 Configure the path to this location in the `conf/shiro.info` configuration file of
 the ANNIS service. The default path is `/etc/annis/user_config/` and
-must be changed at two locations in the configuration file.
+can be changed in the configuration file.
 
 \verbatim
 [main]
-annisRealm = annis.security.ANNISUserRealm
-annisRealm.resourcePath=/etc/annis/user_config/
-annisRealm.authenticationCachingEnabled = true
-globalPermResolver = annis.security.ANNISRolePermissionResolver
-globalPermResolver.resourcePath = /etc/annis/user_config/
+confManager = annis.security.ANNISUserConfigurationManager
+confManager.resourcePath=/etc/annis/user_config/
+[...]
 \endverbatim
 
 User and group files {#admin-configure-userformat}
@@ -76,9 +74,11 @@ $shiro1$SHA-256$1$kRMX+Et6w7XJgwSEAgq9nw==$sQOgObXsQdO76wnNxvN0aesvTSPoBsd/2bjxa
   \endcode
   The last line is what you have to insert into the password field.
 
-### anonymous group ### {#admin-configure-anonymous}
+### "anonymous" and "user" group ### {#admin-configure-anonymous}
 
-The special group `anonymous` is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login.
+The special group `anonymous` is used for non logged-in users. Thus every corpus listed here is available for everyone without (and with) login. In addition the group "user" is added to
+every user that is logged in.
+
 
 Changing maximal context size {#admin-configure-contextsize}
 =============================
