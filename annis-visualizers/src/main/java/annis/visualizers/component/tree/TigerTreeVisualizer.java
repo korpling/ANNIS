@@ -74,7 +74,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     
     public DefaultStyler(Java2dBackend backend_)
     {
-      backend = backend_;
+      this.backend = backend_;
     }
 
     public int getLabelPadding()
@@ -82,9 +82,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       return LABEL_PADDING;
     }
 
-    public GraphicsBackend.Font getFont(AnnisNode n)
+    public GraphicsBackend.Font getFont(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+      if(AnnisGraphTools.isTerminal(n, input))
       {
         return backend.getFont(Font.SANS_SERIF, 12, java.awt.Font.PLAIN);
       }
@@ -116,7 +116,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         {
         }
 
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Rectangle(Color.WHITE, backColor, DEFAULT_PEN_STYLE, getLabelPadding());
         }
@@ -127,7 +127,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
       else
       {
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Invisible(getLabelPadding());
         }
@@ -235,7 +235,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
         return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName);
       }
-      else if(n.isToken())
+      else if(AnnisGraphTools.isTerminal(n, input))
       {
         String spannedText = n.getSpannedText();
         if(spannedText == null || "".equals(spannedText))

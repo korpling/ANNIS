@@ -67,24 +67,9 @@ public class AnnisGraphTools implements Serializable
   private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
      String terminalNamespace, String terminalName)
   {
-    boolean terminalFound = false;
-    if(terminalName == null)
-    { 
-      terminalFound = n.isToken();
-    }
-    else
-    {
-      String extracted = extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName);
-      if(extracted != null)
-      {
-        terminalFound = true;
-      }
-    }
+    boolean addToGraph = AnnisGraphTools.isTerminal(n, input);
     
-    
-    boolean addToGraph = terminalFound;
-    
-    if(!terminalFound)
+    if(!addToGraph)
     {
       for (Edge e : n.getOutgoingEdges())
       {
@@ -119,7 +104,28 @@ public class AnnisGraphTools implements Serializable
     }
     return true;
   }
+  
+  public static boolean isTerminal(AnnisNode n, VisualizerInput input)
+  {
+    String terminalName = (input == null ? null : input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NAME_KEY));
+    
+    if(terminalName == null)
+    {
+      return n.isToken();
+    }
+    else
+    {
+      String terminalNamespace = (input == null ? null : input.getMappings().getProperty(
+        TigerTreeVisualizer.TERMINAL_NS_KEY));
 
+      String annoValue = extractAnnotation(n.getNodeAnnotations(),
+        terminalNamespace,
+        terminalName);
+      
+      return annoValue != null;
+    }
+  }
   private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
     AnnisNode n, String terminalNamespace, String terminalName)
   {
