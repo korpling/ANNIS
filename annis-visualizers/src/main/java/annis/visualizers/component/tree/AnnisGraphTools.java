@@ -27,6 +27,7 @@ import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AnnisGraphTools implements Serializable
 {
@@ -45,7 +46,11 @@ public class AnnisGraphTools implements Serializable
     AnnotationGraph ag = input.getResult().getGraph();
     String namespace = input.getMappings().getProperty("node_ns", input.
       getNamespace());
-    String terminalAnnotation = input.getMappings().getProperty("terminal", null);
+    String terminalName =  input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NAME_KEY);
+    String terminalNamespace =  input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NS_KEY);
+    
     List<DirectedGraph<AnnisNode, Edge>> resultGraphs =
       new ArrayList<DirectedGraph<AnnisNode, Edge>>();
 
@@ -53,36 +58,26 @@ public class AnnisGraphTools implements Serializable
     {
       if (isRootNode(n, namespace))
       {
-        resultGraphs.add(extractGraph(ag, n, terminalAnnotation));
+        resultGraphs.add(extractGraph(ag, n, terminalNamespace, terminalName));
       }
     }
     return resultGraphs;
   }
 
   private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
-    String terminalAnnotation)
+     String terminalNamespace, String terminalName)
   {
     boolean terminalFound = false;
-    if(terminalAnnotation == null)
+    if(terminalName == null)
     { 
       terminalFound = n.isToken();
     }
     else
     {
-      for(Annotation anno : n.getNodeAnnotations())
+      String extracted = extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName);
+      if(extracted != null)
       {
-        // build the qualified name by ourself to imitate the Salt
-        // schema with two colons instead of the older one with only ":"
-        String qName = anno.getName();
-        if(anno.getNamespace() != null && !anno.getNamespace().isEmpty())
-        {
-          qName = anno.getNamespace() + "::" + qName;
-        }
-        if(terminalAnnotation.equals(qName))
-        {
-          terminalFound = true;
-          break; // for each annotation
-        }
+        terminalFound = true;
       }
     }
     
@@ -93,7 +88,7 @@ public class AnnisGraphTools implements Serializable
     {
       for (Edge e : n.getOutgoingEdges())
       {
-        if (includeEdge(e) && copyNode(graph, e.getDestination(), terminalAnnotation))
+        if (includeEdge(e) && copyNode(graph, e.getDestination(), terminalNamespace, terminalName))
         {
           addToGraph |= true;
           graph.addEdge(e, n, e.getDestination());
@@ -126,11 +121,11 @@ public class AnnisGraphTools implements Serializable
   }
 
   private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n, String terminalAnnotation)
+    AnnisNode n, String terminalNamespace, String terminalName)
   {
-    DirectedGraph<AnnisNode, Edge> graph =
-      new DirectedSparseGraph<AnnisNode, Edge>();
-    copyNode(graph, n, terminalAnnotation);
+    DirectedGraph<AnnisNode, Edge> graph
+      = new DirectedSparseGraph<AnnisNode, Edge>();
+    copyNode(graph, n, terminalNamespace, terminalName);
     for (Edge e : ag.getEdges())
     {
       if (hasEdgeSubtype(e, getSecEdgeSubType()) && graph.
@@ -206,5 +201,28 @@ public class AnnisGraphTools implements Serializable
   public String getSecEdgeSubType()
   {
     return input.getMappings().getProperty("secedge_type", SECEDGE_SUBTYPE);
+  }
+  
+  public static String extractAnnotation(Set<Annotation> annotations,
+    String namespace, String featureName)
+  {
+    for (Annotation a : annotations)
+    {
+      if(namespace == null)
+      {
+        if (a.getName().equals(featureName))
+        {
+          return a.getValue();
+        }
+      }
+      else
+      {
+        if (a.getNamespace().equals(namespace) && a.getName().equals(featureName))
+        {
+          return a.getValue();
+        }
+      }
+    }
+    return null;
   }
 }

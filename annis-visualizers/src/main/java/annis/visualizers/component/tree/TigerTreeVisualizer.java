@@ -59,7 +59,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private final DefaultLabeler labeler;
   private transient DefaultStyler styler;
   private AnnisGraphTools graphtools;
-
+  public static final String TERMINAL_NAME_KEY = "terminal_name";
+  public static final String TERMINAL_NS_KEY = "terminal_ns";
+  
   public class DefaultStyler implements TreeElementStyler
   {
 
@@ -69,7 +71,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     public static final int TOKEN_SPACING = 15;
     public static final int VEDGE_OVERLAP_THRESHOLD = 20;
     private final Java2dBackend backend;
-
+    
     public DefaultStyler(Java2dBackend backend_)
     {
       backend = backend_;
@@ -227,7 +229,13 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public String getLabel(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+      String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
+      if(terminalName != null)
+      {        
+        String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
+        return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName);
+      }
+      else if(n.isToken())
       {
         String spannedText = n.getSpannedText();
         if(spannedText == null || "".equals(spannedText))
@@ -254,14 +262,13 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
 
     private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName)
     {
-      for(Annotation a : annotations)
+      String result = AnnisGraphTools.extractAnnotation(annotations, namespace,
+        featureName);
+      if(result == null)
       {
-        if(a.getNamespace().equals(namespace) && a.getName().equals(featureName))
-        {
-          return a.getValue();
-        }
+        result = "--";
       }
-      return "--";
+      return result;
     }
   }
 
