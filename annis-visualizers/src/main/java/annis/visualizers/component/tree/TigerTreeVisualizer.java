@@ -40,12 +40,17 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 /**
  * Visualizes a constituent syntax tree.
  * 
+ * <p>
  * Mappings:<br />
  * The annotation names to be displayed in non terminal nodes can be 
  * set e.g. using <b>node_key:cat</b> for an annotation called cat (the default), and 
  * similarly the edge labels using <b>edge_key:func</b> for an edge label called 
- * <b>func</b> (the default). Instructions are separated using semicolons.
+ * <b>func</b> (the default). Instructions are separated using semicolons. <br /><br />
  * 
+ * With the mapping <b>terminal_name</b> and <b>terminal_ns</b> you can
+ * select span nodes with the corresponding annotations as terminal elements
+ * instead of the default tokens.
+ * </p>
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
