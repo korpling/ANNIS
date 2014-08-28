@@ -19,6 +19,7 @@ import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
@@ -44,6 +45,7 @@ public class AnnisGraphTools implements Serializable
     AnnotationGraph ag = input.getResult().getGraph();
     String namespace = input.getMappings().getProperty("node_ns", input.
       getNamespace());
+    String terminalAnnotation = input.getMappings().getProperty("terminal", null);
     List<DirectedGraph<AnnisNode, Edge>> resultGraphs =
       new ArrayList<DirectedGraph<AnnisNode, Edge>>();
 
@@ -51,23 +53,54 @@ public class AnnisGraphTools implements Serializable
     {
       if (isRootNode(n, namespace))
       {
-        resultGraphs.add(extractGraph(ag, n));
+        resultGraphs.add(extractGraph(ag, n, terminalAnnotation));
       }
     }
     return resultGraphs;
   }
 
-  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n)
+  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
+    String terminalAnnotation)
   {
-    boolean addToGraph = n.isToken();
-    for (Edge e : n.getOutgoingEdges())
+    boolean terminalFound = false;
+    if(terminalAnnotation == null)
+    { 
+      terminalFound = n.isToken();
+    }
+    else
     {
-      if (includeEdge(e) && copyNode(graph, e.getDestination()))
+      for(Annotation anno : n.getNodeAnnotations())
       {
-        addToGraph |= true;
-        graph.addEdge(e, n, e.getDestination());
+        // build the qualified name by ourself to imitate the Salt
+        // schema with two colons instead of the older one with only ":"
+        String qName = anno.getName();
+        if(anno.getNamespace() != null && !anno.getNamespace().isEmpty())
+        {
+          qName = anno.getNamespace() + "::" + qName;
+        }
+        if(terminalAnnotation.equals(qName))
+        {
+          terminalFound = true;
+          break; // for each annotation
+        }
       }
     }
+    
+    
+    boolean addToGraph = terminalFound;
+    
+    if(!terminalFound)
+    {
+      for (Edge e : n.getOutgoingEdges())
+      {
+        if (includeEdge(e) && copyNode(graph, e.getDestination(), terminalAnnotation))
+        {
+          addToGraph |= true;
+          graph.addEdge(e, n, e.getDestination());
+        }
+      }
+    }
+    
     if (addToGraph)
     {
       graph.addVertex(n);
@@ -93,11 +126,11 @@ public class AnnisGraphTools implements Serializable
   }
 
   private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n)
+    AnnisNode n, String terminalAnnotation)
   {
     DirectedGraph<AnnisNode, Edge> graph =
       new DirectedSparseGraph<AnnisNode, Edge>();
-    copyNode(graph, n);
+    copyNode(graph, n, terminalAnnotation);
     for (Edge e : ag.getEdges())
     {
       if (hasEdgeSubtype(e, getSecEdgeSubType()) && graph.
