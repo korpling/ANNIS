@@ -144,8 +144,8 @@ public class ConstituentLayouter<T extends GraphicsItem> {
 			NodeStructureData structureData = new NodeStructureData(parent);
 			structureData.setChildHeight(0);
 			structureData.setTokenArity(1);
-			structureData.setLeftCorner(node.getTokenIndex().longValue());
-			structureData.setRightCorner(node.getTokenIndex().longValue());
+			structureData.setLeftCorner(node.getLeftToken());
+			structureData.setRightCorner(node.getLeftToken());
 			dataMap.put(node, structureData);
 			return structureData;
 		} else {
