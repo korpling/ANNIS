@@ -229,20 +229,25 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public String getLabel(AnnisNode n, VisualizerInput input)
     {
-      String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
-      if(terminalName != null)
-      {        
-        String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
-        return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName);
-      }
-      else if(AnnisGraphTools.isTerminal(n, input))
+    
+      if(AnnisGraphTools.isTerminal(n, input))
       {
-        String spannedText = n.getSpannedText();
-        if(spannedText == null || "".equals(spannedText))
-        {
-          spannedText = " ";
+        String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
+        if(terminalName == null)
+        {        
+          
+          String spannedText = n.getSpannedText();
+          if (spannedText == null || "".equals(spannedText))
+          {
+            spannedText = " ";
+          }
+          return spannedText;
         }
-        return spannedText;
+        else
+        {
+          String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
+          return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName); 
+        }
       }
       else
       {
