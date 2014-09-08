@@ -82,10 +82,36 @@
     font-size: 9pt;
   }
 
-  .speaker {
-    background: url("images/speaker.png") no-repeat right;
+  .speaker .v-label {
+    position: relative;
   }
-
+  
+  td.speaker  .v-label {
+    padding: 0px 20px 0px 10px;
+  }
+  
+  .kwic td.speaker  .v-label {
+    padding: 0px;
+  }
+  
+  .speaker  .v-label:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    
+    position:absolute;
+    color: #96B2D3;
+    top:0px;
+    right: 2px;
+    content: "\f028";
+  }
+  
+  .kwic .speaker  .v-label:before {
+    position:relative;
+    top:0px;
+    right: 0px;
+  }
+  
   .pdf {
     background: url("images/pdf.png") no-repeat right;
   }
