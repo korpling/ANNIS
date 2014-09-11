@@ -39,6 +39,7 @@ import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
+import com.vaadin.server.Page;
 import static com.vaadin.server.Sizeable.UNITS_EM;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
@@ -301,13 +302,6 @@ public class CorpusListPanel extends VerticalLayout implements
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
           }
-          else if (Helper.getUser() == null)
-          {
-            Notification.
-              show(
-              "You can login (use button at upper right corner) to get access to more corpora",
-              Notification.Type.TRAY_NOTIFICATION);
-          }
         }
       }
 
@@ -433,7 +427,8 @@ public class CorpusListPanel extends VerticalLayout implements
    * @return True if successful
    */
   private boolean queryServerForCorpusList()
-  {
+  {    
+    allCorpora.clear();
     try
     {
       loadFromRemote();
@@ -457,6 +452,13 @@ public class CorpusListPanel extends VerticalLayout implements
       {
         Notification.show("You are not authorized to get the corpus list.", ex.
           getMessage(), Notification.Type.WARNING_MESSAGE);
+      }
+      else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+        getStatusCode())
+      {
+        Notification.show("Your account has expired.", ex.
+          getMessage(), Notification.Type.WARNING_MESSAGE);
+        return true;
       }
       else
       {

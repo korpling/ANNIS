@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.gui.admin.converter.DateTimeConverter;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;
@@ -24,9 +25,12 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
+import com.vaadin.shared.ui.datefield.Resolution;
+import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
@@ -41,6 +45,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -81,12 +86,13 @@ public class UserManagementPanel extends Panel
       new PasswordChangeColumnGenerator());
 
     userList.
-      setVisibleColumns("name", "groups", "permissions", "changepassword");
+      setVisibleColumns("name", "groups", "permissions", "expires", "changepassword");
     userList.
-      setColumnHeaders("Username", "Groups (seperate with comma)", "Additional permissions (seperate with comma)", "");
+      setColumnHeaders("Username", "Groups (seperate with comma)", 
+        "Additional permissions (seperate with comma)", "Expiration Date", "");
 
     userList.setTableFieldFactory(new FieldFactory());
-
+    
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
 
@@ -253,18 +259,7 @@ public class UserManagementPanel extends Panel
           PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupsContainer);
           groupsSelector.setWidth("100%");
           groupsSelector.setCaption("Groups for \"" + itemId + "\"");
-          groupsSelector.addValueChangeListener(new Property.ValueChangeListener()
-          {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event)
-            {
-              for (UserListView.Listener l : listeners)
-              {
-                l.userUpdated(userContainer.getItem(itemId).getBean());
-              }
-            }
-          });
+          groupsSelector.addValueChangeListener(new UserChangeListener(itemId));
 
           result = groupsSelector;
           
@@ -274,18 +269,7 @@ public class UserManagementPanel extends Panel
           PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(permissionsContainer);
           permissionSelector.setWidth("100%");
           permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
-          permissionSelector.addValueChangeListener(new Property.ValueChangeListener()
-          {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event)
-            {
-              for (UserListView.Listener l : listeners)
-              {
-                l.userUpdated(userContainer.getItem(itemId).getBean());
-              }
-            }
-          });
+          permissionSelector.addValueChangeListener(new UserChangeListener(itemId));
 
           result = permissionSelector;
           
@@ -293,6 +277,12 @@ public class UserManagementPanel extends Panel
         case "name":
           // explicitly request a read-only label for the name and groups
           result = null;
+          break;
+        case "expires":
+          OptionalDateTimeField dateField = new OptionalDateTimeField("expires");
+          dateField.addValueChangeListener(new UserChangeListener(itemId));
+          
+          result = dateField;
           break;
         default:
           result = super.createField(container, itemId, propertyId, uiContext);
@@ -302,6 +292,26 @@ public class UserManagementPanel extends Panel
       return result;
     }
 
+  }
+  
+  private class UserChangeListener implements Property.ValueChangeListener
+  {
+    private final Object itemId;
+
+    public UserChangeListener(Object itemId)
+    {
+      this.itemId = itemId;
+    }
+
+    @Override
+    public void valueChange(Property.ValueChangeEvent event)
+    {
+      for (UserListView.Listener l : listeners)
+      {
+        l.userUpdated(userContainer.getItem(itemId).getBean());
+      }
+    }
+    
   }
 
 }

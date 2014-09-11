@@ -611,6 +611,14 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
                   Notification.Type.WARNING_MESSAGE);
                 ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }
+              else if(causeFinal.getResponse().getStatus() == 403)
+              {
+                String errMsg = "You don't have the access rights to query this corpus. "
+                  + "You might want to login to access more corpora.";
+                Notification.show(errMsg, 
+                  Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
+              }
               else
               {
                 log.error("Unexpected exception:  " + causeFinal.

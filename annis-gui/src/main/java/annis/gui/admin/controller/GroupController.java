@@ -42,20 +42,29 @@ public class GroupController implements GroupListView.Listener,
   private final GroupListView view;
   private final UIView uiView;
   private final UserListView userView;
-
+  private boolean isLoggedIn = false;
+  
   public GroupController(GroupManagement model,
     CorpusManagement corpusModel,
     GroupListView view, UIView uiView,
-    UserListView userView)
+    UserListView userView, boolean isLoggedIn)
   {
     this.model = model;
     this.corpusModel = corpusModel;
     this.view = view;
     this.uiView = uiView;
     this.userView = userView;
+    this.isLoggedIn = isLoggedIn;
     
     this.view.addListener(GroupController.this);
     this.uiView.addListener(GroupController.this);
+  }
+  
+  private void clearModel()
+  {
+    model.clear();
+    corpusModel.clear();
+    view.setGroupList(model.getGroups());
   }
 
   private void fetchDataFromService()
@@ -97,11 +106,19 @@ public class GroupController implements GroupListView.Listener,
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource)
+  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
   {
+    this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
     corpusModel.setRootResource(annisRootResource);
-    fetchDataFromService();
+    if(isLoggedIn)
+    {
+      fetchDataFromService();
+    }
+    else
+    {
+      clearModel();
+    }
   }
 
   @Override
@@ -156,7 +173,7 @@ public class GroupController implements GroupListView.Listener,
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(selectedTab == view)
+    if(isLoggedIn && selectedTab == view)
     {
       fetchDataFromService();
     }

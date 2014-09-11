@@ -46,6 +46,11 @@ public class CorpusManagement
 
   private final Logger log = LoggerFactory.getLogger(CorpusManagement.class);
 
+  public void clear()
+  {
+    corpora.clear();
+  }
+  
   public void fetchFromService() throws CriticalServiceQueryException, ServiceQueryException
   {
     if (rootResource != null)

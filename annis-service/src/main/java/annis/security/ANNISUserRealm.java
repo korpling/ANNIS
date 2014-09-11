@@ -15,11 +15,6 @@
  */
 package annis.security;
 
-import com.google.common.base.Splitter;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Properties;
 import org.apache.commons.lang3.Validate;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -35,6 +30,7 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -74,17 +70,25 @@ public class ANNISUserRealm extends AuthorizingRealm implements
 
     SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
 
-    info.addRole(userName);
-    if (!userName.equals(anonymousUser))
+    User user = confManager.getUser(userName);
+
+    if(user != null)
     {
-      User user = confManager.getUser(userName);
+      // only add any user role/permission if account is not expired
+      if(user.getExpires() == null || user.getExpires().isAfterNow())
+      { 
+        info.addRole(userName);
 
-      info.addRoles(user.getGroups());
-      info.addRole(defaultUserRole);
+        info.addRoles(user.getGroups());
+        info.addRole(defaultUserRole);
 
-      // add any manual given permissions
-      info.addStringPermissions(user.getPermissions());
-
+        // add any manual given permissions
+        info.addStringPermissions(user.getPermissions());
+      }
+    }
+    else if(userName.equals(anonymousUser))
+    {
+      info.addRole(anonymousUser);
     }
     return info;
   }
@@ -105,7 +109,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements
 
     User user = confManager.getUser(userName);
     if (user != null)
-    {
+    { 
       String passwordHash = user.getPasswordHash();
       if (passwordHash != null)
       {

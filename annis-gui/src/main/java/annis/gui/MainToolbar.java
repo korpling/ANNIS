@@ -27,9 +27,11 @@ import annis.libgui.Helper;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
+import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.BrowserFrame;
 import com.vaadin.ui.Button;
@@ -86,12 +88,21 @@ public class MainToolbar extends HorizontalLayout
     
   private ScreenshotMaker screenshotExtension;
   
+  public static final String BUG_MAIL_KEY = "bug-e-mail";
+  public static final String LOGIN_URL_KEY = "login-url";
+  public static final String LOGIN_MAXIMIZED_KEY = "login-window-maximized";
+  
+  private final String loginURL;
+  
   public MainToolbar(Sidebar sidebar)
   {
     this.sidebar = sidebar;
     
+    this.loginURL = (String) 
+      VaadinSession.getCurrent().getAttribute(LOGIN_URL_KEY);
+    
     String bugmail = (String) VaadinSession.getCurrent().getAttribute(
-      "bug-e-mail");
+      BUG_MAIL_KEY);
     if (bugmail != null && !bugmail.isEmpty()
       && !bugmail.startsWith("${")
       && new EmailValidator("").isValid(bugmail))
@@ -147,16 +158,31 @@ public class MainToolbar extends HorizontalLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        BrowserFrame frame = new BrowserFrame("login", new ExternalResource(
-          Helper.getContext() + "/login"));
+        Resource loginRes;
+        if(loginURL == null || loginURL.isEmpty())
+        {
+          loginRes = new ExternalResource(
+          Helper.getContext() + "/login");
+        }
+        else
+        {
+          loginRes = new ExternalResource(loginURL);
+        }
+        
+        BrowserFrame frame = new BrowserFrame("login", loginRes);
         frame.setWidth("100%");
         frame.setHeight("200px");
 
         windowLogin = new Window("ANNIS Login", frame);
         windowLogin.setModal(true);
+        
         windowLogin.setWidth("400px");
         windowLogin.setHeight("250px");
-
+        String loginMaximizedRaw = (String)getSession().getAttribute(LOGIN_MAXIMIZED_KEY);
+        if(Boolean.parseBoolean(loginMaximizedRaw))
+        {
+          windowLogin.setWindowMode(WindowMode.MAXIMIZED);
+        }
         UI.getCurrent().addWindow(windowLogin);
         windowLogin.center();
       }
@@ -534,7 +560,14 @@ public class MainToolbar extends HorizontalLayout
     {
       for(LoginListener l : loginListeners)
       {
-        l.onLogin();
+        try
+        {
+          l.onLogin();
+        }
+        catch(Exception ex)
+        {
+          log.error("excption thrown while notifying login listeners", ex);
+        }
       }
       onLogin();
     }

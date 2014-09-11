@@ -36,15 +36,23 @@ public class UserController
   private final UserManagement model;
   private final UserListView view;
   private final UIView uiView;
+  private boolean isLoggedIn = false;
 
   public UserController(UserManagement model,
-    UserListView view, UIView uiView)
+    UserListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
     this.view = view;    
     this.uiView = uiView;
+    this.isLoggedIn = isLoggedIn;
     view.addListener(UserController.this);
     uiView.addListener(UserController.this);
+  }
+  
+  private void clearModel()
+  {
+    model.clear();
+    view.setUserList(model.getUsers());
   }
   
   private void fetchFromService()
@@ -88,10 +96,12 @@ public class UserController
     {
       // create new user with empty password
       User u = new User(userName);
-      model.createOrUpdateUser(u);
-      view.askForPasswordChange(userName); 
-      view.setUserList(model.getUsers());
-      view.emptyNewUserNameTextField();
+      if(model.createOrUpdateUser(u))
+      {
+        view.askForPasswordChange(userName); 
+        view.setUserList(model.getUsers());
+        view.emptyNewUserNameTextField();
+      }
     }
   }
 
@@ -115,19 +125,28 @@ public class UserController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource)
+  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
   {
+    this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
-    fetchFromService();
+    if(isLoggedIn)
+    {
+      fetchFromService();
+    }
+    else
+    {
+      clearModel();
+    }
   }
 
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(selectedTab == view)
+    if(isLoggedIn && selectedTab == view)
     {
       fetchFromService();
     }
+
   }
   
   

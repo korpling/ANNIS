@@ -16,12 +16,16 @@
 
 package annis.security;
 
+import annis.adapter.DateTimeAdapter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.Properties;
-import java.util.Set;
 import java.util.TreeSet;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import org.joda.time.DateTime;
+import org.joda.time.format.ISODateTimeFormat;
 
 /**
  * Represents a user.
@@ -30,10 +34,12 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class User
 {
+  
   private String name;
   private String passwordHash;
   private TreeSet<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
   private TreeSet<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private DateTime expires;
  
   public User()
   {
@@ -67,6 +73,20 @@ public class User
     {
       this.permissions.add(g);
     }
+    
+    String dateRaw = props.getProperty("expires");
+    if(dateRaw != null)
+    {
+      try
+      {
+        expires = DateTime.parse(dateRaw);
+      }
+      catch(IllegalArgumentException ex)
+      {
+        expires = null;
+      }
+    }
+    
   }
 
   public String getName()
@@ -89,6 +109,7 @@ public class User
     this.passwordHash = passwordHash;
   }
 
+  @XmlElement(name="group")
   public TreeSet<String> getGroups()
   {
     return groups;
@@ -104,6 +125,7 @@ public class User
     return permissions;
   }
 
+  @XmlElement(name="permission")
   public void setPermissions(TreeSet<String> permissions)
   {
     this.permissions = permissions;
@@ -132,9 +154,23 @@ public class User
     {
       props.put("permissions", Joiner.on(',').join(permissions));
     }
+    if(expires != null)
+    {
+      props.put("expires", ISODateTimeFormat.date().print(expires));
+    }
     return props;
   }
-  
+
+  @XmlJavaTypeAdapter(DateTimeAdapter.class)
+  public DateTime getExpires()
+  {
+    return expires;
+  }
+
+  public void setExpires(DateTime expires)
+  {
+    this.expires = expires;
+  }
   
   
 }

@@ -27,8 +27,6 @@ import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -41,15 +39,23 @@ public class CorpusController
   private final CorpusManagement model;
   private final CorpusListView view;
   private final UIView uiView;
+  private boolean isLoggedIn = false;
 
   public CorpusController(CorpusManagement model,
-    CorpusListView view, UIView uiView)
+    CorpusListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
     this.view = view;    
     this.uiView = uiView;
+    this.isLoggedIn = isLoggedIn;
     view.addListener(CorpusController.this);
     uiView.addListener(CorpusController.this);
+  }
+  
+  private void clearModel()
+  {
+    model.clear();
+    view.setAvailableCorpora(model.getCorpora());
   }
   
   private void fetchFromService()
@@ -72,16 +78,24 @@ public class CorpusController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource)
+  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
   {
+    this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
-    fetchFromService();
+    if(isLoggedIn)
+    {
+      fetchFromService();
+    }
+    else
+    {
+      clearModel();
+    }
   }
 
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(selectedTab == view)
+    if(isLoggedIn && selectedTab == view)
     {
       fetchFromService();
     }

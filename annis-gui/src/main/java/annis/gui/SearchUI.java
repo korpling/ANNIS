@@ -245,11 +245,13 @@ public class SearchUI extends AnnisBaseUI
         String revisionGUI = VersionInfo.getBuildRevision();
         if(!revisionService.equals(revisionGUI))
         {
-          Notification.show("Different service revision",
+          Notification n = new Notification("Different service revision",
             "The service uses revision " + revisionService
             + " but the user interface is using revision  " + revisionGUI
             + ".",
             Notification.Type.TRAY_NOTIFICATION);
+          n.setDelayMsec(3000);
+          n.show(Page.getCurrent());
         }
       }
     }
@@ -724,9 +726,20 @@ public class SearchUI extends AnnisBaseUI
             {
           });
 
-        for (AnnisCorpus c : corporaByName)
+        if(corporaByName == null || corporaByName.isEmpty())
         {
-          mappedNames.add(c.getName());
+          // When we did not get any answer for this corpus we might not have
+          // the rights to access it yet. Since we want to preserve the "c"
+          // parameter in the string we should still remember it.
+          // See https://github.com/korpling/ANNIS/issues/330
+          mappedNames.add(selectedCorpusName);
+        }
+        else
+        {
+          for (AnnisCorpus c : corporaByName)
+          {
+            mappedNames.add(c.getName());
+          }
         }
       }
       catch(UnsupportedEncodingException ex)

@@ -630,21 +630,15 @@ public class QueryServiceImpl implements QueryService
   public SegmentationList segmentationNames(
     @PathParam("top") String toplevelCorpus) throws WebApplicationException
   {
-    try
-    {
-      Subject user = SecurityUtils.getSubject();
-      user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<>();
-      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
-    }
-    catch (Exception ex)
-    {
-      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
-      throw new WebApplicationException(500);
-    }
+    List<Long> corpusList = new ArrayList<>();
+    corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+    return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+
   }
 
   /**

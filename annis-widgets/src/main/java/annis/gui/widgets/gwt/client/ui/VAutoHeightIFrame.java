@@ -38,7 +38,7 @@ public class VAutoHeightIFrame extends Widget
 
     iframe = Document.get().createIFrameElement();
     iframe.setFrameBorder(0);
-    iframe.setScrolling("no");
+    iframe.setScrolling("auto");
     
     setElement(iframe);
 
