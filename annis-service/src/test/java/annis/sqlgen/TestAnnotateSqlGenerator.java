@@ -63,7 +63,7 @@ public class TestAnnotateSqlGenerator
     }
 
     @Override
-    public String getDocumentQuery(String toplevelCorpusName,
+    public String getDocumentQuery(long toplevelCorpusID,
       String documentName, List<String> nodeAnnoFilter)
     {
       throw new UnsupportedOperationException();

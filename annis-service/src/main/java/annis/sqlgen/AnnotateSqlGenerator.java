@@ -87,10 +87,10 @@ public class AnnotateSqlGenerator<T>
   }
 
   public T queryAnnotationGraph(
-    JdbcTemplate jdbcTemplate, String toplevelCorpusName, String documentName,
+    JdbcTemplate jdbcTemplate, long toplevelCorpusID, String documentName,
      List<String> nodeAnnotationFilter)
   {
-    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName,
+    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusID,
       documentName, nodeAnnotationFilter), this);
   }
 
@@ -296,7 +296,7 @@ public class AnnotateSqlGenerator<T>
     return fields;
   }
 
-  public String getDocumentQuery(String toplevelCorpusName, String documentName,
+  public String getDocumentQuery(long toplevelCorpusID, String documentName,
      List<String> nodeAnnotationFilter)
   {
     TableAccessStrategy tas = createTableAccessStrategy();
@@ -334,10 +334,10 @@ public class AnnotateSqlGenerator<T>
       +  StringUtils.join(fields, ", ") +", "
       + "c.path_name as path, c.path_name[1] as document_name\n"
       + "FROM\n"
-      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + ",\n"
+      + "\tfacts_:top AS facts,\n"
       + "\tcorpus as c, corpus as toplevel\n"
       + "WHERE\n"
-      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "\ttoplevel.id = :top AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
       + "\tAND toplevel.top_level IS TRUE\n"
       + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n");
     
@@ -360,7 +360,7 @@ public class AnnotateSqlGenerator<T>
     }
       
     template.append("ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre"));
-    String sql = template.toString().replace(":toplevel_name", sqlString(toplevelCorpusName))
+    String sql = template.toString().replace(":top", "" + toplevelCorpusID)
       .replace(":document_name", sqlString(documentName));
     return sql;
     

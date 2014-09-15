@@ -1123,10 +1123,13 @@ public class AnnisRunner extends AnnisBaseRunner
         splitted.get(2));
     }
     
+    
     Validate.isTrue(splitted.size() > 1,
       "must have to arguments (toplevel corpus name and document name");
+    
+    long corpusID = annisDao.mapCorpusNameToId(splitted.get(0));
     System.out.println(graphSqlGenerator.getDocumentQuery(
-      splitted.get(0),
+      corpusID,
       splitted.get(1),
       annoFilter));
   }
