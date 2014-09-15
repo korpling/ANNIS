@@ -450,7 +450,7 @@ public class QueryServiceImpl implements QueryService
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
     @PathParam("doc") String documentName,
-    @PathParam("filternodeanno") String filternodeanno)
+    @QueryParam("filternodeanno") String filternodeanno)
   {
 
     Subject user = SecurityUtils.getSubject();
