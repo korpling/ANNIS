@@ -131,7 +131,7 @@ public class BenchmarkTest
     assumeTrue(pcc2CorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
 
     assertEquals(1, p.getSCorpusGraphs().size());
   }
@@ -142,7 +142,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
     provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
@@ -154,7 +154,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
     provider.writeTo(p, SaltProject.class, null, null,
       typeBinary, null,
       nullStream);
@@ -166,7 +166,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
 
     assertEquals(1, p.getSCorpusGraphs().size());
   }
@@ -177,7 +177,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
     provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, null,
       nullStream);
@@ -189,7 +189,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
     provider.writeTo(p, SaltProject.class, null, null,
       new MediaType("application", "xmi+binary"), null,
       nullStream);

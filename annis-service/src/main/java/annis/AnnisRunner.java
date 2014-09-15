@@ -71,6 +71,7 @@ import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.SqlGeneratorAndExtractor;
+import com.google.common.base.Splitter;
 import java.util.Properties;
 
 
@@ -1112,21 +1113,40 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doSqlDoc(String docCall)
   {
-    String[] splitted = docCall.split("( )+");
+    List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
+      .splitToList(docCall);
 
-    Validate.isTrue(splitted.length > 1,
+    List<String> annoFilter = null;
+    if(splitted.size() > 2)
+    {
+      annoFilter = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
+        splitted.get(2));
+    }
+    
+    Validate.isTrue(splitted.size() > 1,
       "must have to arguments (toplevel corpus name and document name");
-    System.out.println(graphSqlGenerator.getDocumentQuery(splitted[0],
-      splitted[1]));
+    System.out.println(graphSqlGenerator.getDocumentQuery(
+      splitted.get(0),
+      splitted.get(1),
+      annoFilter));
   }
 
   public void doDoc(String docCall)
   {
-    String[] splitted = docCall.split("( )+");
+    List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
+      .splitToList(docCall);
 
-    Validate.isTrue(splitted.length > 1,
+    List<String> annoFilter = null;
+    if(splitted.size() > 2)
+    {
+      annoFilter = Splitter.on(',').trimResults().omitEmptyStrings().splitToList(
+        splitted.get(2));
+    }
+
+    Validate.isTrue(splitted.size() > 1,
       "must have to arguments (toplevel corpus name and document name");
-    SaltProject p = annisDao.retrieveAnnotationGraph(splitted[0], splitted[1]);
+    SaltProject p = annisDao.retrieveAnnotationGraph(splitted.get(0), 
+      splitted.get(1), annoFilter);
     System.out.println(printSaltAsXMI(p));
   }
 

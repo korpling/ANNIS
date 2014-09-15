@@ -208,13 +208,17 @@ public interface QueryService
    * <code>application/xml</code> or <code>application/xmi+xml</code>:<br />
    * A representation of the Salt graph in the EMF XMI format.
    * 
-   * @param top The toplevel corpus
+   * @param top The toplevel corpus.
    * @param doc The document.
+   * @param filternodeanno A comma seperated list of node annotations which are 
+   * used as a filter for the graph. Only nodes having one of the annotations
+   * are included in the result.
    * @return 
    */
   public SaltProject graph(
     String top,
-    String doc);
+    String doc,
+    String filternodeanno);
   
   /**
    * Get the content an ANNIS binary object for a specific document.
