@@ -22,9 +22,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
-import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientResponse;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
@@ -32,11 +30,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -44,8 +40,10 @@ import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Properties;
 import java.util.Set;
 import java.util.SortedMap;
 import java.util.SortedSet;
@@ -111,9 +109,123 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 
     scrollPanel.addStyleName(wrapperClassName);
 
-    InputStream inStreamConfigRaw = null;
-
+  
     String visConfigName = vi.getMappings().getProperty("config");
+  
+    VisualizationDefinition[] definitions = parseDefinitions(corpusName, vi.getMappings());
+
+    if (definitions != null)
+    {
+
+
+        
+      lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
+        definitions));
+
+      String labelClass = vi.getMappings().getProperty("class", "htmlvis");
+      lblResult.addStyleName(labelClass);
+
+      InputStream inStreamCSSRaw = null;
+      if (visConfigName == null)
+      {
+        inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
+      }
+      else
+      {
+        WebResource resBinary = Helper.getAnnisWebResource().path(
+          "query/corpora/").path(corpusName).path(corpusName)
+          .path("binary").path(visConfigName + ".css");
+
+        ClientResponse response = resBinary.get(ClientResponse.class);
+        if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
+        {
+          inStreamCSSRaw = response.getEntityInputStream();
+        }
+      }
+      if (inStreamCSSRaw != null)
+      {
+        try(InputStream inStreamCSS = inStreamCSSRaw)
+        {
+          String cssContent = IOUtils.toString(inStreamCSS);
+          UI currentUI = UI.getCurrent();
+          if (currentUI instanceof AnnisBaseUI)
+          {
+            // do not add identical CSS files
+            ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
+              wrapperClassName);
+          }
+        }
+        catch(IOException ex)
+        {
+          log.error("Could not parse the HTML visualizer CSS file",
+          ex);
+        Notification.show(
+          "Could not parse the HTML visualizer CSS file", ex.
+          getMessage(),
+          Notification.Type.ERROR_MESSAGE);
+        }
+      }
+
+    }
+
+    if (vi.getMappings().containsKey("debug"))
+    {
+      Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
+      Label sep = new Label("<hr/>", ContentMode.HTML);
+      VerticalLayout layout = new VerticalLayout(lblDebug, sep, lblResult);
+      scrollPanel.setContent(layout);
+    }
+    else
+    {
+      scrollPanel.setContent(lblResult);
+    }
+
+    return scrollPanel;
+  }
+
+  @Override
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
+    String documentName, Properties mappings)
+  {
+    Set<String> result = new LinkedHashSet<>();
+    
+    VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
+      mappings);
+
+    if(definitions != null)
+    {
+      for (VisualizationDefinition def : definitions)
+      {
+        List<String> sub = def.getMatcher().getRequiredAnnotationNames();
+        if(sub == null)
+        {
+          // a rule requires all annotations, abort
+          result = null;
+          break;
+        }
+        else
+        {
+          result.addAll(sub);
+        }
+      }
+    }
+    
+    if(result == null)
+    {
+      return null;
+    }
+    else
+    {
+      return new LinkedList<>(result);
+    }
+  }
+  
+  private VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
+    Properties mappings)
+  {
+    InputStream inStreamConfigRaw = null;
+    
+    String visConfigName = mappings.getProperty("config");
 
     if (visConfigName == null)
     {
@@ -122,7 +234,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     else
     {
       WebResource resBinary = Helper.getAnnisWebResource().path(
-        "query/corpora/").path(corpusName).path(corpusName)
+        "query/corpora/").path(toplevelCorpusName).path(toplevelCorpusName)
         .path("binary").path(visConfigName + ".config");
 
       ClientResponse response = resBinary.get(ClientResponse.class);
@@ -145,46 +257,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
       {
 
         VisParser p = new VisParser(inStreamConfig);
-        VisualizationDefinition[] definitions = p.getDefinitions();
-
-        lblResult.setValue(createHTML(vi.getSResult().getSDocumentGraph(),
-          definitions));
-
-        String labelClass = vi.getMappings().getProperty("class", "htmlvis");
-        lblResult.addStyleName(labelClass);
-
-        InputStream inStreamCSSRaw = null;
-        if (visConfigName == null)
-        {
-          inStreamCSSRaw = HTMLVis.class.getResourceAsStream("htmlvis.css");
-        }
-        else
-        {
-          WebResource resBinary = Helper.getAnnisWebResource().path(
-            "query/corpora/").path(corpusName).path(corpusName)
-            .path("binary").path(visConfigName + ".css");
-
-          ClientResponse response = resBinary.get(ClientResponse.class);
-          if (response.getStatus() == ClientResponse.Status.OK.getStatusCode())
-          {
-            inStreamCSSRaw = response.getEntityInputStream();
-          }
-        }
-        if (inStreamCSSRaw != null)
-        {
-          try(InputStream inStreamCSS = inStreamCSSRaw)
-          {
-            String cssContent = IOUtils.toString(inStreamCSS);
-            UI currentUI = UI.getCurrent();
-            if (currentUI instanceof AnnisBaseUI)
-            {
-              // do not add identical CSS files
-              ((AnnisBaseUI) currentUI).injectUniqueCSS(cssContent,
-                wrapperClassName);
-            }
-          }
-        }
-
+        return p.getDefinitions();
       }
       catch (IOException | VisParserException ex)
       {
@@ -196,21 +269,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
           Notification.Type.ERROR_MESSAGE);
       }
     }
-
-    if (vi.getMappings().containsKey("debug"))
-    {
-      Label lblDebug = new Label(lblResult.getValue(), ContentMode.PREFORMATTED);
-      Label sep = new Label("<hr/>", ContentMode.HTML);
-      VerticalLayout layout = new VerticalLayout(lblDebug, sep, lblResult);
-      scrollPanel.setContent(layout);
-    }
-    else
-    {
-      scrollPanel.setContent(lblResult);
-    }
-
-    return scrollPanel;
+    return null;
   }
+  
+  
 
   private String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
