@@ -47,7 +47,6 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.Page;
@@ -86,7 +85,8 @@ public class SearchUI extends AnnisBaseUI
   implements   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
   ErrorHandler, TabSheet.CloseHandler,
-  LoginListener, Sidebar
+  LoginListener, Sidebar, 
+  TabSheet.SelectedTabChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -118,6 +118,8 @@ public class SearchUI extends AnnisBaseUI
 
   private DocBrowserController docBrowserController;
 
+  private Set<Component> selectedTabHistory;
+  
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private void initTransients()
@@ -142,6 +144,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     setErrorHandler(this);
 
+    this.selectedTabHistory  = new LinkedHashSet<>();
     this.instanceConfig = getInstanceConfig(request);
     
     getPage().setTitle(
@@ -175,6 +178,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addSelectedTabChangeListener(this);
     mainTab.addStyleName("blue-tab");
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
@@ -565,6 +569,19 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onTabClose(TabSheet tabsheet, Component tabContent)
   {
+    // select the tab that was selected before
+    if(tabsheet == mainTab)
+    {
+      selectedTabHistory.remove(tabContent);
+
+      if (!selectedTabHistory.isEmpty())
+      {
+        // get the last selected tab
+        Component[] asArray = selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
+        mainTab.setSelectedTab(asArray[asArray.length-1]);
+      }
+    }
+    
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
@@ -574,7 +591,22 @@ public class SearchUI extends AnnisBaseUI
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
+    
   }
+
+  @Override
+  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  {
+    Component tab = event.getTabSheet().getSelectedTab();
+    if(tab != null)
+    {
+      // first remove the old element to make sure it is added at the end
+      selectedTabHistory.remove(tab);
+      selectedTabHistory.add(tab);
+    }
+  }
+  
+  
 
   public ControlPanel getControlPanel()
   {
