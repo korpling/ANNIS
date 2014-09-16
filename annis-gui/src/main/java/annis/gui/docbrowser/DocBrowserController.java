@@ -129,7 +129,7 @@ public class DocBrowserController implements Serializable
 
     PollControl.runInBackground(100, ui,
       new DocVisualizerFetcher(corpus, doc, canonicalTitle,
-        visConfig.getType(), visHolder, visConfig, btn)
+        visConfig.getType(), visHolder, visConfig, btn, UI.getCurrent())
     );
   }
 
@@ -169,6 +169,10 @@ public class DocBrowserController implements Serializable
   {
     VisualizerInput input = new VisualizerInput();
 
+    // set mappings and namespaces. some visualizer do not survive without   
+    input.setMappings(parseMappings(config));
+    input.setNamespace(config.getNamespace());
+    
     try
     {
       String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
@@ -210,9 +214,7 @@ public class DocBrowserController implements Serializable
       log.error("General remote service exception", e);
     }
 
-    // set mappings and namespaces. some visualizer do not survive without   
-    input.setMappings(parseMappings(config));
-    input.setNamespace(config.getNamespace());
+    
 
     return input;
   }
@@ -263,7 +265,8 @@ public class DocBrowserController implements Serializable
       String type,
       Panel visHolder,
       Visualizer config,
-      Button btn)
+      Button btn,
+      final UI ui)
     {
       this.corpus = corpus;
       this.doc = doc;
@@ -288,7 +291,7 @@ public class DocBrowserController implements Serializable
       if(visualizer instanceof FilteringVisualizerPlugin)
       {
         nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer)
-          .getFilteredNodeAnnotationNames(corpus, doc, new Properties());
+          .getFilteredNodeAnnotationNames(corpus, doc, parseMappings(config));
       }
       
       // check if a visualization is already initiated
@@ -303,7 +306,7 @@ public class DocBrowserController implements Serializable
       }
      
       // after initializing the visualizer update the gui
-      UI.getCurrent().access(new Runnable()
+      ui.access(new Runnable()
       {
         @Override
         public void run()
