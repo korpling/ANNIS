@@ -19,11 +19,13 @@ import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
 import annis.libgui.PollControl;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.Visualizer;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -43,6 +45,7 @@ import java.io.Serializable;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import org.apache.commons.lang3.StringUtils;
@@ -157,11 +160,12 @@ public class DocBrowserController implements Serializable
    * @param config the visualizer configuration
    * @param isUsingRawText indicates, whether the text from text table is taken,
    * or if the salt project is traversed.
+   * @param nodeAnnoFilter A list of node annotation names for filtering the nodes or null if no filtering should be applied.
    * @return a {@link VisualizerInput} input, which is usable for rendering the
    * whole document.
    */
   private VisualizerInput createInput(String corpus, String docName,
-    Visualizer config, boolean isUsingRawText)
+    Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter)
   {
     VisualizerInput input = new VisualizerInput();
 
@@ -177,15 +181,22 @@ public class DocBrowserController implements Serializable
         RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
         input.setRawText(rawTextWrapper);
       }
-      else
+      else 
       {
         // get the whole document wrapped in a salt project
         SaltProject txt = null;
 
-        WebResource annisResource = Helper.getAnnisWebResource();
-        txt = annisResource.path("query").path("graph").
+        WebResource res = Helper.getAnnisWebResource()
+          .path("query").path("graph").
           path(encodedToplevelCorpus).
-          path(encodedDocument).get(SaltProject.class);
+          path(encodedDocument);
+        
+        if(nodeAnnoFilter != null)
+        {
+          res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+        }
+        
+        txt = res.get(SaltProject.class);
 
         if (txt != null)
         {
@@ -273,13 +284,20 @@ public class DocBrowserController implements Serializable
       final VisualizerPlugin visualizer = ((PluginSystem) ui).
               getVisualizer(type);
       
+      List<String> nodeAnnoFilter = null;
+      if(visualizer instanceof FilteringVisualizerPlugin)
+      {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visualizer)
+          .getFilteredNodeAnnotationNames(corpus, doc, new Properties());
+      }
+      
       // check if a visualization is already initiated
       {
         if (createVis)
         {
           // fetch the salt project - so long part
           input = createInput(corpus, doc, config, visualizer.
-            isUsingRawText());
+            isUsingRawText(), nodeAnnoFilter);
 
         }
       }

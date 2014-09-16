@@ -19,11 +19,19 @@ import java.util.List;
 import java.util.Properties;
 
 /**
- * A visualizer that defines a filtering for the annotations.
+ * A visualizer that defines a filtering for the annotations. This filtering
+ * is currently only used when fetching complete documents (if {@link VisualizerPlugin#isUsingText() is true.).
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface FilteringVisualizerPlugin
 {
+  /**
+   * Return the node annotation names or null if no filtering should be applied.
+   * @param toplevelCorpusName
+   * @param documentName
+   * @param mappings
+   * @return 
+   */
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
     String documentName, Properties mappings);
 }

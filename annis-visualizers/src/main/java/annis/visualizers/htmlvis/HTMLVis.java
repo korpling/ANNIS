@@ -60,7 +60,7 @@ import org.slf4j.LoggerFactory;
  * <p>
  * <strong>Mappings:</strong><br />
  * <ul>
- * <li>visconfigpath - path of the visualization configuration file</li>
+ * <li>config - path of the visualization configuration file</li>
  * </ul>
  * </p>
  *
@@ -187,7 +187,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
     String documentName, Properties mappings)
   {
-    Set<String> result = new LinkedHashSet<>();
+    Set<String> result = null;
     
     VisualizationDefinition[] definitions = parseDefinitions(toplevelCorpusName,
       mappings);
@@ -205,6 +205,10 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
         else
         {
+          if(result == null)
+          {
+            result = new LinkedHashSet<>();
+          }
           result.addAll(sub);
         }
       }
