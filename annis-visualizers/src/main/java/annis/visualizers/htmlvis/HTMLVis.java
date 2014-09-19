@@ -22,7 +22,6 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
-import annis.service.objects.AnnisBinaryMetaData;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
@@ -32,11 +31,9 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SMetaAnnotation;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -73,6 +70,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
+  private HashMap<String, Integer> instruction_priorities = new HashMap<>();
 
   @Override
   public String getShortName()
@@ -228,12 +226,28 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     Boolean bolMetaTypeFound = false;
     
     HashMap<String, String> meta = new  HashMap<>();
+    int def_priority=0;
     for (VisualizationDefinition vis : definitions) {
         if (vis.getOutputter().getType() == SpanHTMLOutputter.Type.META_NAME)
         { 
             bolMetaTypeFound = true;
         }
+        else //not a meta-annotation, remember order in config file to set priority
+        {
+            if (vis.getMatcher() instanceof AnnotationNameMatcher)
+            {
+                instruction_priorities.put(((AnnotationNameMatcher) vis.getMatcher()).getAnnotationName(), def_priority);              
+            }
+            else if(vis.getMatcher() instanceof AnnotationNameAndValueMatcher){
+                instruction_priorities.put(((AnnotationNameAndValueMatcher) vis.getMatcher()).getNameMatcher().getAnnotationName(), def_priority);
+            }
+            else if(vis.getMatcher() instanceof TokenMatcher){
+                instruction_priorities.put("tok", def_priority);
+            }
+            def_priority--;        
+        }
         vis.getOutputter().setMeta(meta);
+        
     }
     if (bolMetaTypeFound == true)        //Metadata is required, get corpus and document name
     {
@@ -332,9 +346,22 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     for (Long i : indexes)
     {
       // output all strings belonging to this token position
-
       // first the start tags for this position
-      SortedSet<OutputItem> itemsStart = outputStartTags.get(i);
+
+        
+      // add priorities from instruction_priorities for sorting length ties
+      SortedSet<OutputItem> unsortedStart = outputStartTags.get(i);
+      SortedSet<OutputItem> itemsStart = new TreeSet();
+      if (unsortedStart != null)
+      {
+        Iterator<OutputItem> it = unsortedStart.iterator();
+        while (it.hasNext())
+        {
+          OutputItem s = it.next();
+          s.setPriority(instruction_priorities.get(s.getAnnoName()));
+          itemsStart.add(s);          
+        }
+      }
       if (itemsStart != null)
       {
         Iterator<OutputItem> it = itemsStart.iterator();
@@ -355,7 +382,18 @@ public class HTMLVis extends AbstractVisualizer<Panel>
         }
       }
       // then the end tags for this position, but inverse their order
-      SortedSet<OutputItem> itemsEnd = outputEndTags.get(i);
+      SortedSet<OutputItem> unsortedEnd = outputEndTags.get(i);
+      SortedSet<OutputItem> itemsEnd = new TreeSet();
+      if (unsortedEnd != null)
+      {
+        Iterator<OutputItem> it = unsortedEnd.iterator();
+        while (it.hasNext())
+        {
+          OutputItem s = it.next();
+          s.setPriority(instruction_priorities.get(s.getAnnoName()));
+          itemsEnd.add(s);
+        }
+      }
       if (itemsEnd != null)
       {
         List<OutputItem> itemsEndReverse = new LinkedList<OutputItem>(itemsEnd);
