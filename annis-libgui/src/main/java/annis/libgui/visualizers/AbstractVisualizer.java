@@ -17,7 +17,9 @@ package annis.libgui.visualizers;
 
 import com.vaadin.ui.Component;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.List;
 import java.util.Map;
+import java.util.Properties;
 import java.util.Set;
 
 /**
@@ -28,7 +30,8 @@ import java.util.Set;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>
+public abstract class AbstractVisualizer<I extends Component> implements VisualizerPlugin<I>,
+  FilteringVisualizerPlugin
 {
 
   /**
@@ -56,4 +59,13 @@ public abstract class AbstractVisualizer<I extends Component> implements Visuali
   {
     return false;
   }
+
+  @Override
+  public List<String> getFilteredNodeAnnotationNames(String toplevelCorpusName, 
+    String documentName, Properties mappings)
+  {
+    return null;
+  }
+  
+  
 }

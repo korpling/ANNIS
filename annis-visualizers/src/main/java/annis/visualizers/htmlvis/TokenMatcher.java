@@ -17,6 +17,8 @@ package annis.visualizers.htmlvis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -40,5 +42,14 @@ public class TokenMatcher implements SpanMatcher
       return null;
     }
   }
+
+  @Override
+  public List<String> getRequiredAnnotationNames()
+  {
+    // we don't need any annotation, so return empty list
+    return new LinkedList<>();
+  }
+  
+  
   
 }
