@@ -82,16 +82,32 @@
     font-size: 9pt;
   }
 
-  .speaker .v-label {
-    position: relative;
+  .speaker, .pdf {
+    .v-label {
+      position: relative;
+    }
   }
   
-  td.speaker  .v-label {
-    padding: 0px 20px 0px 10px;
+  td.speaker, td.pdf {
+    .v-label {
+      padding: 0px 20px 0px 10px;
+    }
   }
   
-  .kwic td.speaker  .v-label {
-    padding: 0px;
+  .kwic {
+    td.speaker, td.pdf {
+      .v-label {
+        padding: 0px;
+      }
+    }
+    
+    .speaker, .pdf {
+      .v-label:before {
+        position:relative;
+        top:0px;
+        right: 0px;
+      }
+    }
   }
   
   .speaker  .v-label:before {
@@ -106,14 +122,15 @@
     content: "\f028";
   }
   
-  .kwic .speaker  .v-label:before {
-    position:relative;
+  .pdf  .v-label:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    position:absolute;
+    color: red;
     top:0px;
-    right: 0px;
-  }
-  
-  .pdf {
-    background: url("images/pdf.png") no-repeat right;
+    right: 2px;
+    content: "\f1c1";
   }
 
   .speaker, .speaker div, .pdf,  .pdf div {
