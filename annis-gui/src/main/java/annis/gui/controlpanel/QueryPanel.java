@@ -138,6 +138,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
 
     btShowResult = new Button("Search");
+    btShowResult.setIcon(FontAwesome.SEARCH);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
@@ -226,10 +227,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setIcon(FontAwesome.DOWNLOAD);
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
     
     Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setIcon(FontAwesome.BAR_CHART_O);
     btShowFrequency.setWidth("100%");
     moreActionsLayout.addComponent(btShowFrequency);
     
