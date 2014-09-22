@@ -440,7 +440,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "@version@";
+	content: "7.3.1";
 }
 
 .v-widget {
@@ -4448,7 +4448,7 @@ div.v-layout.v-horizontal.v-widget {
 	color: #949fb2;
 }
 
-.annis .v-datefield [class$="button"] {
+.annis .v-datefield [class*="button"] {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
@@ -4473,16 +4473,16 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 3px 0 0 3px;
 }
 
-.annis .v-datefield [class$="button"]:hover {
+.annis .v-datefield [class*="button"]:hover {
 	color: #374458;
 }
 
-.annis .v-datefield [class$="button"]:before {
+.annis .v-datefield [class*="button"]:before {
 	font-family: FontAwesome;
 	content: "\f073";
 }
 
-.annis .v-datefield [class$="button"]:active:after {
+.annis .v-datefield [class*="button"]:active:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -4498,12 +4498,12 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=50) ;
 }
 
-.annis .v-datefield.v-disabled [class$="button"] {
+.annis .v-datefield.v-disabled [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield.v-disabled [class$="button"]:active:after {
+.annis .v-datefield.v-disabled [class*="button"]:active:after {
 	display: none;
 }
 
@@ -4519,12 +4519,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #babdc2;
 }
 
-.annis .v-datefield.v-readonly [class$="button"] {
+.annis .v-datefield.v-readonly [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield.v-readonly [class$="button"]:active:after {
+.annis .v-datefield.v-readonly [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5012,7 +5012,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-bottom: 0;
 }
 
-.annis .v-datefield-tiny [class$="button"] {
+.annis .v-datefield-tiny [class*="button"] {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
@@ -5034,12 +5034,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 4px 0 0 4px;
 }
 
-.annis .v-datefield-tiny [class$="button"]:before {
+.annis .v-datefield-tiny [class*="button"]:before {
 	font-family: FontAwesome;
 	content: "\f073";
 }
 
-.annis .v-datefield-tiny [class$="button"]:active:after {
+.annis .v-datefield-tiny [class*="button"]:active:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -5054,12 +5054,12 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=50) ;
 }
 
-.annis .v-datefield-tiny.v-disabled [class$="button"] {
+.annis .v-datefield-tiny.v-disabled [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-tiny.v-disabled [class$="button"]:active:after {
+.annis .v-datefield-tiny.v-disabled [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5075,12 +5075,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #babdc2;
 }
 
-.annis .v-datefield-tiny.v-readonly [class$="button"] {
+.annis .v-datefield-tiny.v-readonly [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-tiny.v-readonly [class$="button"]:active:after {
+.annis .v-datefield-tiny.v-readonly [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5125,7 +5125,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-bottom: 0;
 }
 
-.annis .v-datefield-compact [class$="button"], .annis .v-datefield-small [class$="button"] {
+.annis .v-datefield-compact [class*="button"], .annis .v-datefield-small [class*="button"] {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
@@ -5147,12 +5147,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 4px 0 0 4px;
 }
 
-.annis .v-datefield-compact [class$="button"]:before, .annis .v-datefield-small [class$="button"]:before {
+.annis .v-datefield-compact [class*="button"]:before, .annis .v-datefield-small [class*="button"]:before {
 	font-family: FontAwesome;
 	content: "\f073";
 }
 
-.annis .v-datefield-compact [class$="button"]:active:after, .annis .v-datefield-small [class$="button"]:active:after {
+.annis .v-datefield-compact [class*="button"]:active:after, .annis .v-datefield-small [class*="button"]:active:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -5167,12 +5167,12 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=50) ;
 }
 
-.annis .v-datefield-compact.v-disabled [class$="button"], .annis .v-datefield-small.v-disabled [class$="button"] {
+.annis .v-datefield-compact.v-disabled [class*="button"], .annis .v-datefield-small.v-disabled [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-compact.v-disabled [class$="button"]:active:after, .annis .v-datefield-small.v-disabled [class$="button"]:active:after {
+.annis .v-datefield-compact.v-disabled [class*="button"]:active:after, .annis .v-datefield-small.v-disabled [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5188,12 +5188,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #babdc2;
 }
 
-.annis .v-datefield-compact.v-readonly [class$="button"], .annis .v-datefield-small.v-readonly [class$="button"] {
+.annis .v-datefield-compact.v-readonly [class*="button"], .annis .v-datefield-small.v-readonly [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-compact.v-readonly [class$="button"]:active:after, .annis .v-datefield-small.v-readonly [class$="button"]:active:after {
+.annis .v-datefield-compact.v-readonly [class*="button"]:active:after, .annis .v-datefield-small.v-readonly [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5243,7 +5243,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-bottom: 0;
 }
 
-.annis .v-datefield-large [class$="button"] {
+.annis .v-datefield-large [class*="button"] {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
@@ -5265,12 +5265,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 4px 0 0 4px;
 }
 
-.annis .v-datefield-large [class$="button"]:before {
+.annis .v-datefield-large [class*="button"]:before {
 	font-family: FontAwesome;
 	content: "\f073";
 }
 
-.annis .v-datefield-large [class$="button"]:active:after {
+.annis .v-datefield-large [class*="button"]:active:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -5285,12 +5285,12 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=50) ;
 }
 
-.annis .v-datefield-large.v-disabled [class$="button"] {
+.annis .v-datefield-large.v-disabled [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-large.v-disabled [class$="button"]:active:after {
+.annis .v-datefield-large.v-disabled [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5306,12 +5306,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #babdc2;
 }
 
-.annis .v-datefield-large.v-readonly [class$="button"] {
+.annis .v-datefield-large.v-readonly [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-large.v-readonly [class$="button"]:active:after {
+.annis .v-datefield-large.v-readonly [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5357,7 +5357,7 @@ div.v-layout.v-horizontal.v-widget {
 	padding-bottom: 0;
 }
 
-.annis .v-datefield-huge [class$="button"] {
+.annis .v-datefield-huge [class*="button"] {
 	-webkit-tap-highlight-color: transparent;
 	-webkit-touch-callout: none;
 	cursor: pointer;
@@ -5379,12 +5379,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-radius: 4px 0 0 4px;
 }
 
-.annis .v-datefield-huge [class$="button"]:before {
+.annis .v-datefield-huge [class*="button"]:before {
 	font-family: FontAwesome;
 	content: "\f073";
 }
 
-.annis .v-datefield-huge [class$="button"]:active:after {
+.annis .v-datefield-huge [class*="button"]:active:after {
 	content: "";
 	position: absolute;
 	top: 0;
@@ -5399,12 +5399,12 @@ div.v-layout.v-horizontal.v-widget {
 	filter: alpha(opacity=50) ;
 }
 
-.annis .v-datefield-huge.v-disabled [class$="button"] {
+.annis .v-datefield-huge.v-disabled [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-huge.v-disabled [class$="button"]:active:after {
+.annis .v-datefield-huge.v-disabled [class*="button"]:active:after {
 	display: none;
 }
 
@@ -5420,12 +5420,12 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #babdc2;
 }
 
-.annis .v-datefield-huge.v-readonly [class$="button"] {
+.annis .v-datefield-huge.v-readonly [class*="button"] {
 	cursor: default;
 	pointer-events: none;
 }
 
-.annis .v-datefield-huge.v-readonly [class$="button"]:active:after {
+.annis .v-datefield-huge.v-readonly [class*="button"]:active:after {
 	display: none;
 }
 
