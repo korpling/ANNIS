@@ -16,7 +16,7 @@
 package annis.gui.querybuilder;
 
 import annis.gui.QueryController;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.HorizontalLayout;
@@ -91,7 +91,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
 
       final Button btHelp = new Button();
       btHelp.setStyleName(ChameleonTheme.BUTTON_LINK);
-      btHelp.setIcon(new ThemeResource("../runo/icons/16/help.png"));
+      btHelp.setIcon(FontAwesome.QUESTION);
       btHelp.addClickListener(new HelpClickListener());
       toolbar.addComponent(btHelp);
 

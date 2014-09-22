@@ -15,11 +15,13 @@
  */
 package annis.gui.paging;
 
+import annis.gui.util.ANNISFontIcon;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -47,15 +49,13 @@ public class PagingComponent extends Panel implements
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     PagingComponent.class);
 
-  public static final ThemeResource LEFT_ARROW = new ThemeResource(
-    "images/left_arrow.png");
+  public static final Resource LEFT_ARROW = ANNISFontIcon.LEFT_ARROW;
 
-  public static final ThemeResource RIGHT_ARROW = new ThemeResource(
-    "images/right_arrow.png");
+  public static final Resource RIGHT_ARROW = ANNISFontIcon.RIGHT_ARROW;
 
-  public static final ThemeResource FIRST = new ThemeResource("images/first.png");
+  public static final Resource FIRST = ANNISFontIcon.FIRST;
 
-  public static final ThemeResource LAST = new ThemeResource("images/last.png");
+  public static final Resource LAST = ANNISFontIcon.LAST;
 
   private HorizontalLayout layout;
 

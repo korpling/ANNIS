@@ -28,7 +28,9 @@ import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
@@ -41,7 +43,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -84,8 +86,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final String INITIAL_OPEN = "initial_open";
 
-  private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "images/info.gif");
+  private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
   private transient SDocument result;
 
@@ -153,7 +154,7 @@ public class SingleResultPanel extends CssLayout implements
     setHeight("-1px");
 
     infoBar = new HorizontalLayout();
-    infoBar.addStyleName("docPath");
+    infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
 
@@ -162,7 +163,7 @@ public class SingleResultPanel extends CssLayout implements
     lblNumber.setSizeUndefined();
 
     btInfo = new Button();
-    btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
@@ -204,6 +205,9 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.setNullSelectionAllowed(false);
     rghtCtxCombo.setNullSelectionAllowed(false);
 
+    lftCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    rghtCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    
     IndexedContainer lftCtxContainer = new IndexedContainer();
     IndexedContainer rghtCtxContainer = new IndexedContainer();
 

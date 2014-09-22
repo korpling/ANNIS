@@ -49,10 +49,10 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -61,6 +61,7 @@ import com.vaadin.server.WebBrowser;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
@@ -177,12 +178,12 @@ public class SearchUI extends AnnisBaseUI
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
+    mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(queryController);
     mainTab.addSelectedTabChangeListener(this);
-    mainTab.addStyleName("blue-tab");
-
+    
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
-    helpTab.setIcon(new ThemeResource("images/tango-icons/16x16/help-browser.png"));
+    helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);

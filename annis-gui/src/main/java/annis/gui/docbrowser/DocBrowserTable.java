@@ -26,6 +26,8 @@ import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -57,7 +59,7 @@ public class DocBrowserTable extends Table
 
   private final DocBrowserPanel docBrowserPanel;
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("images/info.gif");
+  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names
@@ -229,7 +231,7 @@ public class DocBrowserTable extends Table
   public Button generateInfoButtonCell(final String docName)
   {
     Button btn = new Button();
-    btn.setStyleName(BaseTheme.BUTTON_LINK);
+    btn.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btn.setIcon(INFO_ICON);
     btn.addClickListener(new Button.ClickListener()
     {
