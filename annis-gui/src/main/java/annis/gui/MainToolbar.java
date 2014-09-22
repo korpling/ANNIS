@@ -138,7 +138,7 @@ public class MainToolbar extends HorizontalLayout
     btBugReport = new Button("Report Problem");
     btBugReport.addStyleName(ValoTheme.BUTTON_SMALL);
     btBugReport.setDisableOnClick(true);
-    btBugReport.setIcon(new ThemeResource("../runo/icons/16/email.png"));
+    btBugReport.setIcon(FontAwesome.ENVELOPE_O);
     btBugReport.addClickListener(new Button.ClickListener()
     {
       @Override
