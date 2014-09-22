@@ -234,13 +234,13 @@ public class MainToolbar extends HorizontalLayout
     if(sidebar != null)
     {
       addComponent(btSidebar);
+      setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
     }
     addComponent(btAboutAnnis);
     addComponent(btBugReport);
     addComponent(btOpenSource);
 
     setSpacing(true);
-    setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
