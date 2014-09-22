@@ -1125,7 +1125,7 @@ div.v-layout.v-horizontal.v-widget {
 	text-align: center;
 	left: 0;
 	right: 0;
-	content: "ANNIS corpus search is loading";
+	content: "ANNIS corpus search";
 }
 
 .annis .v-loading-indicator {
@@ -11622,4 +11622,21 @@ div.v-layout.v-horizontal.v-widget {
 	border-style: solid;
 	border-color: black;
 	border-width: 1px 0px 0px 0px;
+}
+
+.annis .v-app-loading:before {
+	background-image: url(images/annisloading.gif);
+	margin-top: -100px;
+	margin-left: -64px;
+	width: 128px;
+	height: 200px;
+	padding: 0px;
+}
+
+.annis .v-app-loading:after {
+	padding-top: 110px;
+}
+
+.annis .v-app-loading {
+	background-color: white;
 }

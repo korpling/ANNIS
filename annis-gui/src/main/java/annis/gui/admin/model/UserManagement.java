@@ -42,15 +42,25 @@ public class UserManagement
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);
   
-  public void createOrUpdateUser(User newUser)
+  public boolean createOrUpdateUser(User newUser)
   {
     if(rootResource != null)
     {
       WebResource res = rootResource.path("admin/users").path(newUser.getName());
-      res.put(newUser);
-      users.put(newUser.getName(), newUser);
-      updateUsedGroupNames();
+      try
+      {
+        res.put(newUser);
+        users.put(newUser.getName(), newUser);
+        
+        updateUsedGroupNames();
+        return true;
+      }
+      catch(UniformInterfaceException ex)
+      {
+        log.warn("Could not update user", ex);
+      }
     }
+    return false;
   }
   
   public void deleteUser(String userName)
@@ -75,6 +85,12 @@ public class UserManagement
     }
     return newUser;
 
+  }
+  
+  public void clear()
+  {
+    users.clear();
+    usedGroupNames.clear();
   }
   
   public boolean fetchFromService()

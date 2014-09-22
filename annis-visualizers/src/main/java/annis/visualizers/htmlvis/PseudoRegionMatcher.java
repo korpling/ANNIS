@@ -13,40 +13,52 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.visualizers.htmlvis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
  * @author Amir Zeldes
  */
-public class PseudoRegionMatcher implements SpanMatcher{
+public class PseudoRegionMatcher implements SpanMatcher
+{
 
-    enum PseudoRegion {
-        BEGIN,
-        END;    
-    }
+  enum PseudoRegion
+  {
 
-    final private PseudoRegion psdRegion;
-    
-    @Override
-    public String matchedAnnotation(SNode node) {
-   
-        return null;
-        
-    }
-    
-    public PseudoRegionMatcher(PseudoRegion psdRegion){
+    BEGIN,
+    END;
+  }
 
-        this.psdRegion = psdRegion;
-    }
+  final private PseudoRegion psdRegion;
 
-    public PseudoRegion getPsdRegion() {
-        return psdRegion;
-    }
+  @Override
+  public String matchedAnnotation(SNode node)
+  {
 
-    
-    
+    return null;
+
+  }
+
+  public PseudoRegionMatcher(PseudoRegion psdRegion)
+  {
+
+    this.psdRegion = psdRegion;
+  }
+
+  public PseudoRegion getPsdRegion()
+  {
+    return psdRegion;
+  }
+
+  @Override
+  public List<String> getRequiredAnnotationNames()
+  {
+    // we don't need any annotation, so return empty list
+    return new LinkedList<>();
+  }
+
 }

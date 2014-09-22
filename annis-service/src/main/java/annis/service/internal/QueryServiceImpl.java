@@ -46,6 +46,7 @@ import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.mimeparse.MIMEParse;
@@ -448,17 +449,25 @@ public class QueryServiceImpl implements QueryService
   })
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
-    @PathParam("doc") String documentName)
+    @PathParam("doc") String documentName,
+    @QueryParam("filternodeanno") String filternodeanno)
   {
 
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:subgraph:" + toplevelCorpusName);
 
+    List<String> nodeAnnotationFilter = null;
+    if(filternodeanno != null)
+    {
+      nodeAnnotationFilter = Splitter.on(',').trimResults().omitEmptyStrings()
+        .splitToList(filternodeanno);
+    }
+    
     try
     {
       long start = new Date().getTime();
       SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
-        documentName);
+        documentName, nodeAnnotationFilter);
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
       return p;
@@ -630,21 +639,15 @@ public class QueryServiceImpl implements QueryService
   public SegmentationList segmentationNames(
     @PathParam("top") String toplevelCorpus) throws WebApplicationException
   {
-    try
-    {
-      Subject user = SecurityUtils.getSubject();
-      user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<>();
-      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
-    }
-    catch (Exception ex)
-    {
-      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
-      throw new WebApplicationException(500);
-    }
+    List<Long> corpusList = new ArrayList<>();
+    corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+    return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+
   }
 
   /**

@@ -407,6 +407,7 @@ limitations under the License.
     <property name="resultExtractor" ref="saltAnnotateExtractor" />
     
     <property name="withClauseSqlGenerator" ref="graphWithClauseSqlGenerator" />
+    
   </bean>
 
   <bean id="frequencySqlGenerator" class="annis.sqlgen.FrequencySqlGenerator" 

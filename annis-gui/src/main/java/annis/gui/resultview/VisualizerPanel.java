@@ -24,6 +24,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
@@ -38,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import static annis.model.AnnisConstants.*;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
@@ -350,8 +352,14 @@ public class VisualizerPanel extends CssLayout
       && result != null
       && result.getSDocumentGraph().getSNodes().size() > 0)
     {
+      List<String> nodeAnnoFilter = null;
+      if(visPlugin instanceof FilteringVisualizerPlugin)
+      {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+          corpusName, documentName, input.getMappings());
+      }
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
-        get(0).getSName(), result.getSName());
+        get(0).getSName(), result.getSName(), nodeAnnoFilter);
 
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
         .get(0);
@@ -393,16 +401,21 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private SaltProject getDocument(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName,
+    List<String> nodeAnnoFilter)
   {
     SaltProject txt = null;
     try
     {
       toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
       documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graph").path(toplevelCorpusName).
-        path(documentName).get(SaltProject.class);
+      WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName).
+        path(documentName);
+      if(nodeAnnoFilter != null)
+      {
+        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+      }
+      txt = res.get(SaltProject.class);
     }
     catch (ClientHandlerException | UniformInterfaceException | UnsupportedEncodingException e)
     {

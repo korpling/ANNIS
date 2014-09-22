@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.gui.LoginListener;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.service.objects.ImportJob;
@@ -57,7 +58,7 @@ import org.slf4j.LoggerFactory;
  */
 public class ImportPanel extends Panel 
   implements Upload.ProgressListener, Upload.FinishedListener, Upload.StartedListener,
-  Upload.Receiver
+  Upload.Receiver, LoginListener
 {
   
   private static final Logger log = LoggerFactory.getLogger(ImportPanel.class);
@@ -72,9 +73,12 @@ public class ImportPanel extends Panel
   private final Button btDetailedLog;
   
   private File temporaryCorpusFile;
+  private final boolean needsLogin;
   
-  public ImportPanel()
+  public ImportPanel(boolean needsLogin, boolean isLoggedIn)
   {
+    this.needsLogin = needsLogin;
+    
     setSizeFull();
     layout = new VerticalLayout();
     layout.setWidth("100%");
@@ -103,6 +107,10 @@ public class ImportPanel extends Panel
     upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
+    if(needsLogin)
+    {
+      upload.setEnabled(isLoggedIn);
+    }
     
     actionBar.addComponent(upload);
     
@@ -414,5 +422,25 @@ public class ImportPanel extends Panel
     }
     
   }
+
+  @Override
+  public void onLogin()
+  {
+    if(needsLogin)
+    {
+      upload.setEnabled(true);
+    }
+  }
+
+  @Override
+  public void onLogout()
+  {
+    if(needsLogin)
+    {
+      upload.setEnabled(false);
+    }
+  }
+  
+  
   
 }

@@ -33,7 +33,7 @@ public interface UIView
   
   public interface Listener
   {
-    public void loginChanged(WebResource annisRootResource);
+    public void loginChanged(WebResource annisRootResource, boolean isLoggedIn);
     public void selectedTabChanged(Object selectedTab);
   }
 }

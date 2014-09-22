@@ -229,6 +229,10 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               {
                 paging.setInfo("Timeout: query exeuction took too long");
               }
+              else if(ex.getResponse().getStatus() == 403)
+              {
+                paging.setInfo("Not authorized to query this corpus.");
+              }
               else
               {
                 paging.setInfo("unknown error: " + ex);

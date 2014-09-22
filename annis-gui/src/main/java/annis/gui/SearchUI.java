@@ -47,14 +47,12 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -88,7 +86,8 @@ public class SearchUI extends AnnisBaseUI
   implements   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
   ErrorHandler, TabSheet.CloseHandler,
-  LoginListener, Sidebar
+  LoginListener, Sidebar, 
+  TabSheet.SelectedTabChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -120,6 +119,8 @@ public class SearchUI extends AnnisBaseUI
 
   private DocBrowserController docBrowserController;
 
+  private Set<Component> selectedTabHistory;
+  
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private void initTransients()
@@ -144,6 +145,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     setErrorHandler(this);
 
+    this.selectedTabHistory  = new LinkedHashSet<>();
     this.instanceConfig = getInstanceConfig(request);
     
     getPage().setTitle(
@@ -178,6 +180,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setCloseHandler(this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addSelectedTabChangeListener(this);
     
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
@@ -247,11 +250,13 @@ public class SearchUI extends AnnisBaseUI
         String revisionGUI = VersionInfo.getBuildRevision();
         if(!revisionService.equals(revisionGUI))
         {
-          Notification.show("Different service revision",
+          Notification n = new Notification("Different service revision",
             "The service uses revision " + revisionService
             + " but the user interface is using revision  " + revisionGUI
             + ".",
             Notification.Type.TRAY_NOTIFICATION);
+          n.setDelayMsec(3000);
+          n.show(Page.getCurrent());
         }
       }
     }
@@ -565,6 +570,19 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onTabClose(TabSheet tabsheet, Component tabContent)
   {
+    // select the tab that was selected before
+    if(tabsheet == mainTab)
+    {
+      selectedTabHistory.remove(tabContent);
+
+      if (!selectedTabHistory.isEmpty())
+      {
+        // get the last selected tab
+        Component[] asArray = selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
+        mainTab.setSelectedTab(asArray[asArray.length-1]);
+      }
+    }
+    
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
@@ -574,7 +592,22 @@ public class SearchUI extends AnnisBaseUI
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
+    
   }
+
+  @Override
+  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  {
+    Component tab = event.getTabSheet().getSelectedTab();
+    if(tab != null)
+    {
+      // first remove the old element to make sure it is added at the end
+      selectedTabHistory.remove(tab);
+      selectedTabHistory.add(tab);
+    }
+  }
+  
+  
 
   public ControlPanel getControlPanel()
   {
@@ -726,9 +759,20 @@ public class SearchUI extends AnnisBaseUI
             {
           });
 
-        for (AnnisCorpus c : corporaByName)
+        if(corporaByName == null || corporaByName.isEmpty())
         {
-          mappedNames.add(c.getName());
+          // When we did not get any answer for this corpus we might not have
+          // the rights to access it yet. Since we want to preserve the "c"
+          // parameter in the string we should still remember it.
+          // See https://github.com/korpling/ANNIS/issues/330
+          mappedNames.add(selectedCorpusName);
+        }
+        else
+        {
+          for (AnnisCorpus c : corporaByName)
+          {
+            mappedNames.add(c.getName());
+          }
         }
       }
       catch(UnsupportedEncodingException ex)

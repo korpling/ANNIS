@@ -41,6 +41,11 @@ public class GroupManagement
   private final Map<String, Group> groups = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
   private WebResource rootResource;
   
+  public void clear()
+  {
+    groups.clear();
+  }
+  
   public boolean fetchFromService()
   {
     if(rootResource != null)
@@ -69,8 +74,16 @@ public class GroupManagement
     if(rootResource != null)
     {
       WebResource res = rootResource.path("admin/groups").path(newGroup.getName());
-      res.put(newGroup);
-      groups.put(newGroup.getName(), newGroup);
+      try
+      {
+        res.put(newGroup);
+        groups.put(newGroup.getName(), newGroup);
+      }
+      catch(UniformInterfaceException ex)
+      {
+        log.warn("Could not update group", ex);
+      }
+      
     }
   }
   

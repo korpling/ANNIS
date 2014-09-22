@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 SFB 632.
+ * Copyright 2012 SFB 632.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,43 +13,36 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.visualizers.htmlvis;
+package annis.adapter;
 
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.LinkedList;
-import java.util.List;
+import javax.ws.rs.ext.Provider;
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import org.joda.time.DateTime;
+import org.slf4j.LoggerFactory;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class TokenMatcher implements SpanMatcher
+@Provider
+public class DateTimeAdapter extends XmlAdapter<String, DateTime>
 {
-  public TokenMatcher()
-  {
-  }
-  
+
+  private static final org.slf4j.Logger log = LoggerFactory.getLogger(
+    DateTimeAdapter.class);
+
   @Override
-  public String matchedAnnotation(SNode node)
+  public DateTime unmarshal(String v) throws Exception
   {
-    if(node instanceof SToken)
-    {
-      return "tok";
-    }
-    else
-    {
-      return null;
-    }
+    return DateTime.parse(v);
   }
 
   @Override
-  public List<String> getRequiredAnnotationNames()
+  public String marshal(DateTime v) throws Exception
   {
-    // we don't need any annotation, so return empty list
-    return new LinkedList<>();
+    return v.toString();
   }
-  
-  
-  
+
+
+
 }

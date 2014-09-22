@@ -155,6 +155,7 @@ public class AdminServiceImpl implements AdminService
   @PUT
   @Path("users/{userName}")
   @Consumes("application/xml")
+  @Override
   public Response updateOrCreateUser(
     User user,
     @PathParam("userName") String userName)
