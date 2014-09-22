@@ -169,8 +169,6 @@ public class DocBrowserTable extends Table
       setColumnHeader((String) colName, (String) colName);
     }
 
-    setColumnWidth("info", 26);
-
     sortByMetaData(metaCols.sortColumns);
   }
 

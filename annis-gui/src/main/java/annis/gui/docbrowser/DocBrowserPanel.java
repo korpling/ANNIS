@@ -22,13 +22,12 @@ import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.Visualizer;
-import annis.service.objects.Visualizer;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.io.UnsupportedEncodingException;
@@ -93,6 +92,7 @@ public class DocBrowserPanel extends Panel
     if (table == null)
     {
       layout.addComponent(progress);
+      layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
       PollControl.runInBackground(100, ui, new LoadingDocs());
     }
   }

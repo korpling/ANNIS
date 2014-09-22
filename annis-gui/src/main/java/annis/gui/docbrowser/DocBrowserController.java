@@ -34,6 +34,7 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Panel;
@@ -41,6 +42,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
@@ -117,8 +119,12 @@ public class DocBrowserController implements Serializable
     ProgressBar progressBar = new ProgressBar(1.0f);
     progressBar.setIndeterminate(true);
     progressBar.setSizeFull();
-    visHolder.setContent(progressBar);
-
+    VerticalLayout layoutProgress = new VerticalLayout(progressBar);
+    layoutProgress.setSizeFull();
+    layoutProgress.setComponentAlignment(progressBar, Alignment.MIDDLE_CENTER);
+    
+    visHolder.setContent(layoutProgress);
+    
     Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
     visTab.setDescription(canonicalTitle);
     visTab.setIcon(EYE_ICON);
