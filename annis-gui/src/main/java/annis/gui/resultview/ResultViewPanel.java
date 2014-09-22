@@ -149,6 +149,7 @@ public class ResultViewPanel extends VerticalLayout implements
     Panel resultPanel = new Panel(resultLayout);
     resultPanel.setSizeFull();
     resultPanel.addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    resultPanel.addStyleName("result-view-panel");
 
     this.instanceConfig = instanceConfig;
 
