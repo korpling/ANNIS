@@ -67,11 +67,13 @@ public class HelpButton<T> extends CustomComponent implements Field<T>,
     if(getCaption() != null 
       && !getCaption().isEmpty())
     {
-      caption = "Help for \"" + getCaption() + "\"";
+      caption = "Help for \"" + getCaption();
     }
+    caption = caption + "<br/><br/>(Click here to close)";
     Notification notify = new Notification(caption, Notification.Type.HUMANIZED_MESSAGE);
     notify.setHtmlContentAllowed(true);
     notify.setDescription(field.getDescription());
+    notify.setDelayMsec(-1);
     notify.show(UI.getCurrent().getPage());
   }
   

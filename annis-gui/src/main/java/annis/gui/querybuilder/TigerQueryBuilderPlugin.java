@@ -90,8 +90,9 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
 
 
       final Button btHelp = new Button();
-      btHelp.setStyleName(ChameleonTheme.BUTTON_LINK);
       btHelp.setIcon(FontAwesome.QUESTION);
+      btHelp.addStyleName(ChameleonTheme.BUTTON_BORDERLESS);
+      btHelp.addStyleName("helpbutton");
       btHelp.addClickListener(new HelpClickListener());
       toolbar.addComponent(btHelp);
 
@@ -146,10 +147,11 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
       + "node should occur before the other, etc. For details on the meaning and usage of\n"
       + "each operator, see the tutorial tab above.";
 
-        Notification notify = new Notification("Help for query builder",
+        Notification notify = new Notification("Help for query builder<br/><br/>(Click here to close)",
           Notification.Type.HUMANIZED_MESSAGE);
         notify.setHtmlContentAllowed(true);
         notify.setDescription(message);
+        notify.setDelayMsec(-1);
         notify.show(UI.getCurrent().getPage());
       }
     }
