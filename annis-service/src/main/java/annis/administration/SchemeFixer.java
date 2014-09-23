@@ -48,6 +48,7 @@ public class SchemeFixer
    */
   public void checkAndFix()
   {
+    log.info("fixing schema if necessary");
     corpusAlias();
   }
   

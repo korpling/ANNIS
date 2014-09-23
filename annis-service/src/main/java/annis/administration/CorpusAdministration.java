@@ -29,14 +29,18 @@ import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
+import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
+import java.util.Set;
+import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -87,7 +91,7 @@ public class CorpusAdministration
     administrationDao.deleteCorpora(ids, true);
     log.info("Finished deleting corpora: " + ids);
   }
-  
+
   public void cleanupData()
   {
     administrationDao.cleanupData();
@@ -152,9 +156,9 @@ public class CorpusAdministration
       if (f.isFile())
       {
         // might be a ZIP-file
-        try(ZipFile zip = new ZipFile(f);)
+        try (ZipFile zip = new ZipFile(f);)
         {
-          
+
           // get the names of all corpora included in the ZIP file
           // in order to get a folder name
           Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
@@ -169,13 +173,15 @@ public class CorpusAdministration
         catch (ZipException ex)
         {
           log.error(
-            "" + f.getAbsolutePath() + " might not be a valid ZIP file and will be ignored",
+            "" + f.getAbsolutePath()
+            + " might not be a valid ZIP file and will be ignored",
             ex);
         }
         catch (IOException ex)
         {
           log.error(
-            "IOException when importing file " + f.getAbsolutePath() + ", will be ignored",
+            "IOException when importing file " + f.getAbsolutePath()
+            + ", will be ignored",
             ex);
         }
       }
@@ -263,7 +269,7 @@ public class CorpusAdministration
     {
       ZipEntry e = zipEnum.nextElement();
       File outFile = new File(outDir, e.getName().replaceAll("\\/", "/"));
-   
+
       if (e.isDirectory())
       {
         if (!outFile.mkdirs())
@@ -280,7 +286,6 @@ public class CorpusAdministration
           rootDirs.add(outFile.getParentFile());
         }
 
-        
         if (!outFile.getParentFile().isDirectory())
         {
           if (!outFile.getParentFile().mkdirs())
@@ -292,9 +297,9 @@ public class CorpusAdministration
             }
           }
         }
-        try(FileOutputStream outStream = new FileOutputStream(outFile);)
+        try (FileOutputStream outStream = new FileOutputStream(outFile);)
         {
-          
+
           ByteStreams.copy(zip.getInputStream(e), outStream);
         }
         catch (FileNotFoundException ex)
@@ -631,8 +636,8 @@ public class CorpusAdministration
   {
     return administrationDao.listCorpusStats();
   }
-  
-   public List<Map<String, Object>> listCorpusStats(File databaseProperties)
+
+  public List<Map<String, Object>> listCorpusStats(File databaseProperties)
   {
     return administrationDao.listCorpusStats(databaseProperties);
   }
@@ -647,15 +652,104 @@ public class CorpusAdministration
     return administrationDao.listUnusedIndexes();
   }
 
+  public void copyFromOtherInstance(File dbProperties,
+    boolean overwrite, String mail)
+  {
+    if (dbProperties.isFile() && dbProperties.canRead())
+    {
+      // find the corpus paths
+      List<Map<String, Object>> corpora = listCorpusStats(
+        dbProperties);
+      List<String> corpusPaths = new LinkedList<>();
+      for (Map<String, Object> c : corpora)
+      {
+        String sourcePath = (String) c.get("source_path");
+        if (sourcePath != null)
+        {
+          corpusPaths.add(sourcePath);
+        }
+      }
+
+      if (corpusPaths.isEmpty())
+      {
+        log.warn("No corpora found");
+      }
+      else
+      {
+        
+        log.info("The following corpora will be imported:\n"
+          + "---------------\n"
+          + "{}\n"
+          + "---------------\n",
+          Joiner.on("\n").join(corpusPaths));
+
+
+        // remember the corpus alias table
+        Multimap<String, String> corpusAlias = administrationDao.listCorpusAlias(
+          dbProperties);
+
+        //import each corpus
+        ImportStatus status = importCorporaSave(
+          overwrite, null,
+          mail,
+          false,
+          corpusPaths);
+
+
+        // report the successful or failure failed
+        Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
+        Set<String> failedCorpora = new LinkedHashSet<>(
+          status.getAllThrowable().keySet());
+        successfullCorpora.removeAll(failedCorpora);
+
+        log.info("copying corpus aliases");
+        for(Map.Entry<String, String> e : corpusAlias.entries())
+        {
+          administrationDao.addCorpusAlias(e.getValue(), e.getKey());
+        }
+
+        if (failedCorpora.isEmpty())
+        {
+          log.info("All corpora imported without errors:\n"
+            + "---------------\n"
+            + "{}\n"
+            + "---------------\n",
+            Joiner.on("\n").join(successfullCorpora));
+        }
+        else
+        {
+
+          log.error(
+            "Errors occured during import, not all corpora have been imported.\n"
+              + "---------------\n"
+              + "Success:\n"
+              + "{}\n"
+              + "---------------\n"
+              + "Failed:\n"
+              + "{}\n"
+              + "---------------\n",
+            Joiner.on("\n").join(successfullCorpora),
+            Joiner.on("\n").join(failedCorpora));
+        }
+      }
+    }
+    else
+    {
+      log.error("Can not read the database configuration file {}", dbProperties.
+        getAbsolutePath());
+    }
+  }
+
   ///// Helper
   protected void writeDatabasePropertiesFile(String host, String port,
     String database, String user, String password, boolean useSSL, String schema)
   {
     File file = new File(System.getProperty("annis.home") + "/conf",
       "database.properties");
-    try(BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(file, "UTF-8"));)
+    try (BufferedWriter writer = new BufferedWriter(new FileWriterWithEncoding(
+      file, "UTF-8"));)
     {
-      
+
       writer.write("# database configuration\n");
       writer.write("datasource.driver=org.postgresql.Driver\n");
       writer.write("datasource.url=jdbc:postgresql://" + host + ":" + port + "/"
@@ -663,7 +757,7 @@ public class CorpusAdministration
       writer.write("datasource.username=" + user + "\n");
       writer.write("datasource.password=" + password + "\n");
       writer.write("datasource.ssl=" + (useSSL ? "true" : "false") + "\n");
-      if(schema != null)
+      if (schema != null)
       {
         writer.write("datasource.schema=" + schema + "\n");
       }
