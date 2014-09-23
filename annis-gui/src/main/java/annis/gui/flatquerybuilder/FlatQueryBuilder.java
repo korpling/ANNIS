@@ -116,6 +116,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public FlatQueryBuilder(QueryController cp)
   {
+    setSizeFull();
     launch(cp); 
     
   }
@@ -205,7 +206,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     mainLayout.addComponent(toolbar);
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
-    getContent().setSizeFull();   
+    getContent().setWidth("100%");
+    getContent().setHeight("-1px");
   }
 
   @Override
