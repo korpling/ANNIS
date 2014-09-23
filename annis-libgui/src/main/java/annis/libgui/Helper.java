@@ -89,7 +89,7 @@ public class Helper
     + "<li>the ANNIS service is not running</li>"
     + "<li>the corpus properties are not well defined</li></ul>"
     + "<p>Please ask the responsible admin or consult the ANNIS "
-    + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
+    + "<a href=\"http://korpling.github.io/ANNIS/doc/\">Documentation</a>.</p></div>";
 
   private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER
     = "Problems with parsing the document browser configuration.";
