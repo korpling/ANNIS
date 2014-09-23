@@ -399,6 +399,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
                     break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
                 case VALUE:
                     break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
+                case ESCAPED_VALUE:
+                    break; //this shouldn't happen, since the BEGIN/END instruction has no triggering annotation name or value
                 default:
             }
 

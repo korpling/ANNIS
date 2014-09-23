@@ -76,7 +76,7 @@ public class ParserTest
       VisParser parser = new VisParser(inStream);
       VisualizationDefinition[] definitions =  parser.getDefinitions();
       
-      assertEquals("There must be 15 rules from the parsing", 16, definitions.length);
+      assertEquals("There must be 17 rules from the parsing", 17, definitions.length);
       
       VisualizationDefinition def = definitions[0];
       assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
@@ -221,6 +221,14 @@ public class ParserTest
       assertEquals(SpanHTMLOutputter.Type.VALUE, def.getOutputter().getType());
       assertNull(def.getOutputter().getConstant());
       assertEquals("title", def.getOutputter().getAttribute());
+      
+      def = definitions[16];
+      assertTrue(def.getMatcher()instanceof AnnotationNameMatcher);
+      assertEquals("pb_n",((AnnotationNameMatcher) def.getMatcher()).getAnnotationName());
+      assertEquals("span", def.getOutputter().getElement());
+      assertEquals(SpanHTMLOutputter.Type.ESCAPED_VALUE, def.getOutputter().getType());
+      assertNull(def.getOutputter().getConstant());
+      assertNull(def.getOutputter().getAttribute());
     }
     catch (IOException ex)
     {
