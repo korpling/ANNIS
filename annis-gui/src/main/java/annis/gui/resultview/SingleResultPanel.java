@@ -88,7 +88,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 

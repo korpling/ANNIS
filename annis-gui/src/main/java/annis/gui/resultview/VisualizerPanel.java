@@ -105,7 +105,7 @@ public class VisualizerPanel extends CssLayout
 
   private Component vis;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private PluginSystem ps;
 
