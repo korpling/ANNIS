@@ -18,6 +18,8 @@ package annis.gui;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import com.google.common.collect.ComparisonChain;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
@@ -26,8 +28,6 @@ import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +44,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     MetaDataPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private VerticalLayout layout;
 
@@ -251,7 +253,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     try
     {
       res = res.path("meta").path("docnames")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName));
       result = res.get(new Helper.AnnotationListType());
       
       Collections.sort(result, new Comparator<Annotation>()
@@ -279,14 +281,6 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
 

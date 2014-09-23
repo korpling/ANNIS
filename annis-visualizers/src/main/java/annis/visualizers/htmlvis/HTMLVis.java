@@ -22,6 +22,8 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.Annotation;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -35,8 +37,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -71,6 +71,9 @@ public class HTMLVis extends AbstractVisualizer<Panel>
 {
 
   private static final Logger log = LoggerFactory.getLogger(HTMLVis.class);
+ 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   private HashMap<String, Integer> instruction_priorities = new HashMap<>();
 
   @Override
@@ -96,15 +99,8 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     List<String> corpusPath = CommonHelper.getCorpusPath(vi.getDocument().
       getSCorpusGraph(), vi.getDocument());
     String corpusName = corpusPath.get(corpusPath.size() - 1);
-    try
-    {
-      corpusName = URLEncoder.encode(corpusName, "UTF-8");
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error("UTF-8 was not known as encoding", ex);
-    }
-
+    corpusName = urlPathEscape.escape(corpusName);
+    
     String wrapperClassName = "annis-wrapped-htmlvis-"
       + corpusName.replaceAll("[^0-9A-Za-z-]", "_");
 

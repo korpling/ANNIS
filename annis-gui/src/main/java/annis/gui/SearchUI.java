@@ -42,6 +42,8 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -65,7 +67,6 @@ import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -93,6 +94,7 @@ public class SearchUI extends AnnisBaseUI
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
   
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   private transient Cache<String, CorpusConfig> corpusConfigCache;
 
@@ -754,7 +756,7 @@ public class SearchUI extends AnnisBaseUI
       try
       {
         List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(URLEncoder.encode(selectedCorpusName, "UTF-8"))
+          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(selectedCorpusName))
           .get(new GenericType<List<AnnisCorpus>>()
             {
           });
@@ -774,11 +776,6 @@ public class SearchUI extends AnnisBaseUI
             mappedNames.add(c.getName());
           }
         }
-      }
-      catch(UnsupportedEncodingException ex)
-      {
-        log.
-          error("UTF-8 encoding is not supported on server, this is weird", ex);
       }
       catch (ClientHandlerException ex)
       {

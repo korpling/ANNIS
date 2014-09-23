@@ -26,14 +26,13 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.Visualizer;
 import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
@@ -46,8 +45,6 @@ import com.vaadin.ui.VerticalLayout;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -81,6 +78,8 @@ public class DocBrowserController implements Serializable
   private static final Resource EYE_ICON = FontAwesome.EYE;
 
   private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   public DocBrowserController(SearchUI ui)
   {
@@ -180,48 +179,40 @@ public class DocBrowserController implements Serializable
     input.setMappings(parseMappings(config));
     input.setNamespace(config.getNamespace());
     
-    try
+    String encodedToplevelCorpus = urlPathEscape.escape(corpus);
+    String encodedDocument = urlPathEscape.escape(docName);
+    if (isUsingRawText)
     {
-      String encodedToplevelCorpus = URLEncoder.encode(corpus, "UTF-8");
-      String encodedDocument = URLEncoder.encode(docName, "UTF-8");
-      if (isUsingRawText)
+      WebResource w = Helper.getAnnisWebResource();
+      w = w.path("query").path("rawtext")
+        .path(encodedToplevelCorpus).path(encodedDocument);
+      RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
+      input.setRawText(rawTextWrapper);
+    }
+    else 
+    {
+      // get the whole document wrapped in a salt project
+      SaltProject txt = null;
+
+      WebResource res = Helper.getAnnisWebResource()
+        .path("query").path("graph").
+        path(encodedToplevelCorpus).
+        path(encodedDocument);
+
+      if(nodeAnnoFilter != null)
       {
-        WebResource w = Helper.getAnnisWebResource();
-        w = w.path("query").path("rawtext")
-          .path(encodedToplevelCorpus).path(encodedDocument);
-        RawTextWrapper rawTextWrapper = w.get(RawTextWrapper.class);
-        input.setRawText(rawTextWrapper);
+        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
       }
-      else 
+
+      txt = res.get(SaltProject.class);
+
+      if (txt != null)
       {
-        // get the whole document wrapped in a salt project
-        SaltProject txt = null;
-
-        WebResource res = Helper.getAnnisWebResource()
-          .path("query").path("graph").
-          path(encodedToplevelCorpus).
-          path(encodedDocument);
-        
-        if(nodeAnnoFilter != null)
-        {
-          res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
-        }
-        
-        txt = res.get(SaltProject.class);
-
-        if (txt != null)
-        {
-          SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
-          input.setResult(sDoc);
-        }
+        SDocument sDoc = txt.getSCorpusGraphs().get(0).getSDocuments().get(0);
+        input.setResult(sDoc);
       }
     }
-    catch (ClientHandlerException | UniformInterfaceException | UnsupportedEncodingException e)
-    {
-      log.error("General remote service exception", e);
-    }
 
-    
 
     return input;
   }

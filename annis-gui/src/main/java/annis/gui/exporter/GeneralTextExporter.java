@@ -27,7 +27,9 @@ import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
 import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -37,7 +39,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +51,8 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, String keysAsString, String argsAsString,
@@ -71,7 +74,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         {
           attributes.addAll(
             annisResource.path("corpora")
-              .path(URLEncoder.encode(corpus, "UTF-8"))
+              .path(urlPathEscape.escape(corpus))
               .path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "false")

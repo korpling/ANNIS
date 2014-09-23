@@ -38,14 +38,14 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import static annis.model.AnnisConstants.*;
 import com.google.common.base.Joiner;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
@@ -53,21 +53,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
@@ -142,6 +137,8 @@ public class VisualizerPanel extends CssLayout
   private InstanceConfig instanceConfig;
 
   private VisualizerContextChanger visCtxChanger;
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -407,8 +404,8 @@ public class VisualizerPanel extends CssLayout
     SaltProject txt = null;
     try
     {
-      toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
-      documentName = URLEncoder.encode(documentName, "UTF-8");
+      toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
+      documentName = urlPathEscape.escape(documentName);
       WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName).
         path(documentName);
       if(nodeAnnoFilter != null)
@@ -417,7 +414,7 @@ public class VisualizerPanel extends CssLayout
       }
       txt = res.get(SaltProject.class);
     }
-    catch (ClientHandlerException | UniformInterfaceException | UnsupportedEncodingException e)
+    catch (ClientHandlerException | UniformInterfaceException e)
     {
       log.error("General remote service exception", e);
     }

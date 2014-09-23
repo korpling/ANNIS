@@ -21,6 +21,8 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.RawTextWrapper;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -96,7 +98,9 @@ public class Helper
 
   private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY
     = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
-
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   /**
    * Creates an authentificiated REST client
    *
@@ -437,8 +441,8 @@ public class Helper
     try
     {
       res = res.path("meta").path("doc")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      res = res.path(URLEncoder.encode(documentName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName));
+      res = res.path(urlPathEscape.escape(documentName));
 
       result = res.get(new GenericType<List<Annotation>>()
       {
@@ -456,14 +460,6 @@ public class Helper
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return result;
@@ -486,11 +482,11 @@ public class Helper
     try
     {
       res = res.path("meta").path("doc")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName));
 
       if (documentName != null)
       {
-        res = res.path(documentName);
+        res = res.path(urlPathEscape.escape(documentName));
       }
 
       if (documentName != null && !toplevelCorpusName.equals(documentName))
@@ -516,14 +512,6 @@ public class Helper
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
     return result;
   }
 
@@ -533,17 +521,10 @@ public class Helper
     {
       DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query")
         .path("corpora").path("doc_browser_config")
-        .path(URLEncoder.encode(corpus, "UTF-8"))
+        .path(urlPathEscape.escape(corpus))
         .get(DocumentBrowserConfig.class);
 
       return docBrowserConfig;
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
-        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true).show(Page.getCurrent());
-      log.error("problems with fetching document browsing", ex);
     }
     catch (UniformInterfaceException ex)
     {
@@ -587,14 +568,8 @@ public class Helper
     try
     {
       corpusConfig = Helper.getAnnisWebResource().path("query")
-        .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+        .path("corpora").path(urlPathEscape.escape(corpus))
         .path("config").get(CorpusConfig.class);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
     }
     catch (UniformInterfaceException ex)
     {
