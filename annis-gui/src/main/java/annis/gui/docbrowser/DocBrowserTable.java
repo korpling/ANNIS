@@ -21,6 +21,8 @@ import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
 import annis.service.objects.Visualizer;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
@@ -57,6 +59,8 @@ public class DocBrowserTable extends Table
 
   private Logger log = LoggerFactory.getLogger(DocBrowserTable.class);
 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   private final DocBrowserPanel docBrowserPanel;
 
   private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
@@ -411,7 +415,7 @@ public class DocBrowserTable extends Table
       // get the metadata for the corpus
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
-        docBrowserPanel.getCorpus()).path("closure");
+        urlPathEscape.escape(docBrowserPanel.getCorpus())).path("closure");
       
       Map<String, List<Annotation>> metaDataMap = new HashMap<>();
       
