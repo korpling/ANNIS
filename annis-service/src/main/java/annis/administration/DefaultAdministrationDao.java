@@ -551,6 +551,7 @@ public class DefaultAdministrationDao implements AdministrationDao
 
     createStagingAreaIndexes();
 
+    fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(FILE_RESOLVER_VIS_MAP));
     computeTopLevelCorpus();
     analyzeStagingTables();
 
@@ -1913,6 +1914,24 @@ public class DefaultAdministrationDao implements AdministrationDao
     {
       log.error("could not read {}", table, e);
     }
+  }
+  
+  /**
+   * Removes any unwanted entries from the resolver_vis_map table
+   * @param toplevelCorpus
+   * @param table 
+   */
+  private void fixResolverVisMapTable(String toplevelCorpus, String table)
+  {
+    log.info("checking resolver_vis_map for errors");
+
+    // delete all entries that reference a different corpus than the imported one
+    int invalidRows = jdbcTemplate.update("DELETE FROM " + table + " WHERE corpus <> ?", toplevelCorpus);
+    if(invalidRows > 0)
+    {
+      log.warn("there were " + invalidRows + " rows in the resolver_vis_map that referenced the wrong corpus");
+    }
+
   }
 
   /**
