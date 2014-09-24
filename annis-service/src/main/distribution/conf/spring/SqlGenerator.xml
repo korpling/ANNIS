@@ -54,9 +54,6 @@ limitations under the License.
   </bean>
 
   <!-- FROM clause generator -->
-  <bean id="selectedCorporaWithClauseGenerator" class="annis.sqlgen.SelectedCorporaWithClauseGenerator"
-    lazy-init="true"/>
-  
   <bean id="selectedFactsFromClauseGenerator" class="annis.sqlgen.SelectedFactsFromClauseGenerator"
     lazy-init="true"/>  
   
@@ -289,7 +286,6 @@ limitations under the License.
     <property name="whereClauseSqlGenerators" ref="defaultWhereClauseGenerators" />
     <property name="orderByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
     <property name="groupByClauseSqlGenerator" ref="solutionSqlGeneratorBase" />
-    <property name="withClauseSqlGenerator" ref="selectedCorporaWithClauseGenerator" />
   </bean>
 
   <bean id="findSqlGenerator" class="annis.sqlgen.FindSqlGenerator"

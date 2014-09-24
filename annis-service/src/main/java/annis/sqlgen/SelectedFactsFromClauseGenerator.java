@@ -17,6 +17,7 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import com.google.common.base.Joiner;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,12 +40,37 @@ public class SelectedFactsFromClauseGenerator implements FromClauseSqlGenerator<
   {
     List<String> clauses = new LinkedList<>();
     
+    boolean optimize = (queryData.getCorpusList().size() == 1);
+    
     for (QueryNode node : alternative)
     {
-      clauses.add("selected_facts AS facts" + String.valueOf(node.getId()));
+      if(optimize)
+      {
+        clauses.add("facts_" + queryData.getCorpusList().get(0) + " AS facts" + String.valueOf(node.getId()));
+      }
+      else
+      {
+        clauses.add(innerQuery(queryData, alternative, indent) + " AS facts" + String.valueOf(node.getId()));
+      }
     }
 
     return Joiner.on(",\n" + indent + AbstractSqlGenerator.TABSTOP).join(clauses);
+  }
+  
+  private String innerQuery(QueryData queryData,
+    List<QueryNode> alternative, String indent)
+  {
+    List<String> tables = new LinkedList<>();
+    for(Long corpusID : queryData.getCorpusList())
+    {
+      tables.add("SELECT * FROM facts_" + corpusID);
+    }
+    
+    String indent2 = indent + AbstractSqlGenerator.TABSTOP;
+    
+    return "(\n" + indent2
+      + Joiner.on("\n" + indent2 + "UNION ALL\n" + indent2).join(tables)
+      + "\n" + indent + ")";
   }
   
 }

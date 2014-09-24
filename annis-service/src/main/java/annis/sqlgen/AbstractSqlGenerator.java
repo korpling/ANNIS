@@ -118,6 +118,7 @@ public abstract class AbstractSqlGenerator
   private void appendSelectClause(StringBuffer sb, QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    sb.append(indent);
     sb.append("SELECT ");
     sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative,
       indent));
