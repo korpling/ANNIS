@@ -41,12 +41,17 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
     List<String> clauses = new LinkedList<>();
     
     boolean optimize = (queryData.getCorpusList().size() == 1);
+    boolean empty = queryData.getCorpusList().isEmpty();
     
     for (QueryNode node : alternative)
     {
       TableAccessStrategy tas = tables(node);
       String aliasName = TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), TableAccessStrategy.FACTS_TABLE, 1);
-      if(optimize)
+      if(empty)
+      {
+        clauses.add("(SELECT * FROM facts LIMIT 0)" + " AS " + aliasName);
+      }
+      else if(optimize)
       {
         clauses.add("facts_" + queryData.getCorpusList().get(0) + " AS " + aliasName);
       }
