@@ -42,18 +42,19 @@ import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
-import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
@@ -62,10 +63,10 @@ import com.vaadin.server.WebBrowser;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.net.URLEncoder;
 import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -86,12 +87,14 @@ public class SearchUI extends AnnisBaseUI
   implements   MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
   ErrorHandler, TabSheet.CloseHandler,
-  LoginListener, Sidebar
+  LoginListener, Sidebar, 
+  TabSheet.SelectedTabChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
   
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   private transient Cache<String, CorpusConfig> corpusConfigCache;
 
@@ -118,6 +121,8 @@ public class SearchUI extends AnnisBaseUI
 
   private DocBrowserController docBrowserController;
 
+  private Set<Component> selectedTabHistory;
+  
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private void initTransients()
@@ -142,6 +147,7 @@ public class SearchUI extends AnnisBaseUI
     super.init(request);
     setErrorHandler(this);
 
+    this.selectedTabHistory  = new LinkedHashSet<>();
     this.instanceConfig = getInstanceConfig(request);
     
     getPage().setTitle(
@@ -174,11 +180,12 @@ public class SearchUI extends AnnisBaseUI
     mainTab = new TabSheet();
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
+    mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(queryController);
-    mainTab.addStyleName("blue-tab");
-
+    mainTab.addSelectedTabChangeListener(this);
+    
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
-    helpTab.setIcon(new ThemeResource("images/tango-icons/16x16/help-browser.png"));
+    helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
     controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);
@@ -565,6 +572,19 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onTabClose(TabSheet tabsheet, Component tabContent)
   {
+    // select the tab that was selected before
+    if(tabsheet == mainTab)
+    {
+      selectedTabHistory.remove(tabContent);
+
+      if (!selectedTabHistory.isEmpty())
+      {
+        // get the last selected tab
+        Component[] asArray = selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
+        mainTab.setSelectedTab(asArray[asArray.length-1]);
+      }
+    }
+    
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
@@ -574,7 +594,22 @@ public class SearchUI extends AnnisBaseUI
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
+    
   }
+
+  @Override
+  public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
+  {
+    Component tab = event.getTabSheet().getSelectedTab();
+    if(tab != null)
+    {
+      // first remove the old element to make sure it is added at the end
+      selectedTabHistory.remove(tab);
+      selectedTabHistory.add(tab);
+    }
+  }
+  
+  
 
   public ControlPanel getControlPanel()
   {
@@ -721,7 +756,7 @@ public class SearchUI extends AnnisBaseUI
       try
       {
         List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(URLEncoder.encode(selectedCorpusName, "UTF-8"))
+          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(selectedCorpusName))
           .get(new GenericType<List<AnnisCorpus>>()
             {
           });
@@ -741,11 +776,6 @@ public class SearchUI extends AnnisBaseUI
             mappedNames.add(c.getName());
           }
         }
-      }
-      catch(UnsupportedEncodingException ex)
-      {
-        log.
-          error("UTF-8 encoding is not supported on server, this is weird", ex);
       }
       catch (ClientHandlerException ex)
       {

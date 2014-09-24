@@ -33,6 +33,8 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
@@ -80,8 +82,7 @@ public class ExampleQueriesPanel extends Table
   // hold the parent tab of annis3
   private final HelpPanel parentTab;
 
-  private static final ThemeResource SEARCH_ICON = new ThemeResource(
-    "images/tango-icons/16x16/system-search.png");
+  private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
@@ -104,7 +105,7 @@ public class ExampleQueriesPanel extends Table
     setSizeFull();
 
     // Allow selecting items from the table.
-    setSelectable(true);
+    setSelectable(false);
 
     // Send changes in selection immediately to server.
     setImmediate(true);
@@ -124,21 +125,8 @@ public class ExampleQueriesPanel extends Table
     final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
     addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
-    final String COLUMN_SHOW_RESULT = "show result";
-    addGeneratedColumn(COLUMN_SHOW_RESULT, new ShowResultColumn());
 
-    addGeneratedColumn("exampleQuery", new ColumnGenerator()
-    {
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        ExampleQuery eQ = (ExampleQuery) itemId;
-        Label l = new Label(eQ.getExampleQuery());
-        l.setContentMode(ContentMode.TEXT);
-        l.addStyleName("corpus-font-force");
-        return l;
-      }
-    });
+    addGeneratedColumn("exampleQuery", new QueryColumn());
 
     addGeneratedColumn("description", new ColumnGenerator()
     {
@@ -155,21 +143,17 @@ public class ExampleQueriesPanel extends Table
 
     setVisibleColumns(new Object[]
     {
-      COLUMN_SHOW_RESULT,
       "exampleQuery",
       "description",
       COLUMN_OPEN_CORPUS_BROWSER
     });
 
-
-    setColumnWidth(getVisibleColumns()[0], 24);
+    setColumnExpandRatio(getVisibleColumns()[0], 0.40f);
     setColumnExpandRatio(getVisibleColumns()[1], 0.40f);
-    setColumnExpandRatio(getVisibleColumns()[2], 0.40f);
 
-    setColumnHeader(getVisibleColumns()[0], "");
-    setColumnHeader(getVisibleColumns()[1], "Example Query");
-    setColumnHeader(getVisibleColumns()[2], "Description");
-    setColumnHeader(getVisibleColumns()[3], "open corpus browser");
+    setColumnHeader(getVisibleColumns()[0], "Example Query");
+    setColumnHeader(getVisibleColumns()[1], "Description");
+    setColumnHeader(getVisibleColumns()[2], "open corpus browser");
   }
 
   @Override
@@ -379,8 +363,8 @@ public class ExampleQueriesPanel extends Table
     });
 
   }
-
-  private class ShowResultColumn implements Table.ColumnGenerator
+  
+  private class QueryColumn implements Table.ColumnGenerator
   {
 
     @Override
@@ -389,10 +373,12 @@ public class ExampleQueriesPanel extends Table
       final ExampleQuery eQ = (ExampleQuery) itemId;
       Button btn = new Button();
       btn.setDescription("show corpus browser for " + eQ.getCorpusName());
-      btn.addStyleName(BaseTheme.BUTTON_LINK);
+      btn.addStyleName(ChameleonTheme.BUTTON_LINK);
       btn.setIcon(SEARCH_ICON);
+      btn.setCaption(eQ.getExampleQuery());
       btn.setDescription("show results for \"" + eQ.getExampleQuery()
         + "\" in " + eQ.getCorpusName());
+      btn.addStyleName("corpus-font-force");
       
       btn.addClickListener(new Button.ClickListener()
       {

@@ -235,7 +235,7 @@ public class VAnnotationGrid extends Composite implements Paintable
 
       if (event.hasAttribute("tooltip"))
       {
-        VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
+        VLabel label = new VLabel(value);
         label.setTitle(event.getStringAttribute("tooltip"));
 
         // add a label with a title as table cell

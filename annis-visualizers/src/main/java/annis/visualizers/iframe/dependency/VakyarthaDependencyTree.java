@@ -28,6 +28,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.io.IOException;
 import java.io.Writer;
@@ -58,7 +59,7 @@ import org.slf4j.LoggerFactory;
  * Mappings: <br />
  * If a annotation key is specified with <b>node_key:key</b>, all
  * nodes which carry this annotation are searched for pointing relations and
- * instead token the annotation value is used.
+ * instead of the token span the annotation value is used.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  * @author Benjamin Weißenfels<b.pixeldrama@gmail.com>
@@ -234,25 +235,47 @@ public class VakyarthaDependencyTree extends WriterVisualizer
 
         for (Edge e : sEdges)
         {
-          if (!(e instanceof SPointingRelation))
+          if(e instanceof SPointingRelation)
           {
-            continue;
-          }
+            SPointingRelation sRelation = (SPointingRelation) e;
+            boolean includeEdge = true;
 
-          SPointingRelation sRelation = (SPointingRelation) e;
-          SNode source = (SNode) sRelation.getSource();
 
-          String label = "";
-          for (SAnnotation anno : sRelation.getSAnnotations())
-          {
-            label = anno.getSValueSTEXT();
-            break;
-          }
+            // check layer
+            if(input.getNamespace() != null)
+            {
+              // must be included in the layer in order to be included
+              includeEdge = false;
+              if(sRelation.getSLayers() != null)
+              {
+                for(SLayer layer : sRelation.getSLayers())
+                {
+                  if(input.getNamespace().equals(layer.getSName()))
+                  {
+                    includeEdge = true;
+                    break;
+                  }
+                }
+              }
+            }
 
-          if (sRelation.getSource() != null && node2Int.containsKey(source))
-          {
-            govs.put(String.valueOf(node2Int.get(source)), label);
-          }
+            if(includeEdge)
+            {
+              SNode source = (SNode) sRelation.getSource();
+
+              String label = "";
+              for (SAnnotation anno : sRelation.getSAnnotations())
+              {
+                label = anno.getSValueSTEXT();
+                break;
+              }
+
+              if (sRelation.getSource() != null && node2Int.containsKey(source))
+              {
+                govs.put(String.valueOf(node2Int.get(source)), label);
+              }
+            }
+          } // end if pointing relation
         }
 
         vakyarthaObject.put("govs", govs);

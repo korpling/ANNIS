@@ -35,15 +35,13 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
-
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 /**
  *
  * @author thomas
@@ -53,6 +51,8 @@ public class CorpusBrowserPanel extends Panel
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     CorpusBrowserPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    *
@@ -317,7 +317,7 @@ public class CorpusBrowserPanel extends Panel
       if (service != null)
       {
         WebResource query = service.path("query").path("corpora")
-          .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
+          .path(urlPathEscape.escape(toplevelCorpus))
           .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true");
@@ -336,14 +336,6 @@ public class CorpusBrowserPanel extends Panel
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return new LinkedList<>(result);

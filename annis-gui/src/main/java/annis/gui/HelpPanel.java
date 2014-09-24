@@ -16,7 +16,7 @@
 package annis.gui;
 
 import annis.gui.tutorial.TutorialPanel;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Accordion;
 
 /**
@@ -39,8 +39,8 @@ public class HelpPanel extends Accordion
       "example queries", parent, this);
     examples.setHeight("99%");
     
-    addTab(tutorial, "Tutorial", new ThemeResource("images/tango-icons/22x22/help-browser.png"));
-    addTab(examples, "Example Queries", new ThemeResource("images/tango-icons/22x22/edit-paste.png"));
+    addTab(tutorial, "Tutorial", FontAwesome.BOOK);
+    addTab(examples, "Example Queries", FontAwesome.LIST_ALT);
     setSelectedTab(examples);
     addStyleName("help-tab");
     

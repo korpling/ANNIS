@@ -18,7 +18,6 @@ package annis.gui.querybuilder;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
-import annis.gui.controlpanel.ControlPanel;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
@@ -26,12 +25,10 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import javax.sound.midi.ControllerEventListener;
 import net.xeoh.plugins.base.util.PluginManagerUtil;
 
 /**
@@ -60,7 +57,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     this.pluginRegistry = new HashMap<>();
     this.short2caption = new HashMap<>();
  
-    setStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    setStyleName(ValoTheme.PANEL_BORDERLESS);
     
     layout = new VerticalLayout();
     setContent(layout);
@@ -74,7 +71,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
     cbChooseBuilder.setNullSelectionAllowed(false);
     cbChooseBuilder.setImmediate(true);
     cbChooseBuilder.setInputPrompt("Choose a query builder");
-    
+    cbChooseBuilder.setWidth("200px");
     
     PluginManagerUtil util = new PluginManagerUtil(pluginSystem.getPluginManager());
     Collection<QueryBuilderPlugin> builders = util.getPlugins(QueryBuilderPlugin.class);

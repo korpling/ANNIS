@@ -47,7 +47,7 @@ public interface AnnisDao
 {
 
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
-    String documentName);
+    String documentName, List<String> nodeAnnotationFilter);
 
   public List<AnnisCorpus> listCorpora();
 

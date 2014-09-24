@@ -199,6 +199,13 @@ public class VisParser extends HTMLVisConfigBaseListener
   {
     currentOutputter.setType(SpanHTMLOutputter.Type.VALUE);
   }
+
+  @Override
+  public void enterTypeEscapedValue(
+    HTMLVisConfigParser.TypeEscapedValueContext ctx)
+  {
+    currentOutputter.setType(SpanHTMLOutputter.Type.ESCAPED_VALUE);
+  }
   
   
 

@@ -24,7 +24,6 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
 import annis.gui.objects.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
@@ -38,12 +37,13 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -126,7 +126,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtStatus = new TextArea();
     txtStatus.setValue(this.lastPublicStatus);
     txtStatus.setWidth("100%");
-    txtStatus.setHeight(3.5f, Unit.EM);
+    txtStatus.setHeight(4.0f, Unit.EM);
     txtStatus.addStyleName("border-layout");
     txtStatus.setReadOnly(true);
     
@@ -138,6 +138,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
 
     btShowResult = new Button("Search");
+    btShowResult.setIcon(FontAwesome.SEARCH);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
@@ -199,16 +200,16 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard = new Button();
       btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP);
     btShowQueryBuilder.setIcon(new ThemeResource("images/tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
@@ -226,10 +227,12 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setIcon(FontAwesome.DOWNLOAD);
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
     
     Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setIcon(FontAwesome.BAR_CHART_O);
     btShowFrequency.setWidth("100%");
     moreActionsLayout.addComponent(btShowFrequency);
     
@@ -538,7 +541,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
-        tab.setIcon(new ThemeResource("images/tango-icons/16x16/document-save.png"));
+        tab.setIcon(FontAwesome.DOWNLOAD);
       }
       
       
@@ -574,7 +577,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
-        tab.setIcon(new ThemeResource("images/tango-icons/16x16/x-office-spreadsheet.png"));
+        tab.setIcon(FontAwesome.BAR_CHART_O);
       }
       
       

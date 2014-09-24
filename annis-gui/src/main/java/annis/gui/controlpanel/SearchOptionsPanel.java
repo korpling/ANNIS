@@ -23,6 +23,8 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.AbstractSelect;
@@ -30,8 +32,6 @@ import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -72,6 +72,8 @@ public class SearchOptionsPanel extends FormLayout
 
   private static final Logger log = LoggerFactory.getLogger(
     SearchOptionsPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    * Holds all available corpus configuarations, including the defautl
@@ -113,8 +115,6 @@ public class SearchOptionsPanel extends FormLayout
   {
     setWidth("100%");
     setHeight("-1px");
-
-    addStyleName("contextsensible-formlayout");
 
     // init the config cache
     lastSelection = new HashMap<>();
@@ -327,9 +327,8 @@ public class SearchOptionsPanel extends FormLayout
         try
         {
           SegmentationList segList
-            = service.path("query").path("corpora").path(URLEncoder.encode(
-                corpus,
-                "UTF-8"))
+            = service.path("query").path("corpora").path(urlPathEscape.escape(
+                corpus))
             .path("segmentation-names")
             .get(SegmentationList.class);
           segNames.addAll(segList.getSegmentatioNames());
@@ -344,10 +343,6 @@ public class SearchOptionsPanel extends FormLayout
           {
             log.warn("Could not query segmentation names for corpus", ex);
           }
-        }
-        catch (UnsupportedEncodingException ex)
-        {
-          log.error(null, ex);
         }
       }
 
