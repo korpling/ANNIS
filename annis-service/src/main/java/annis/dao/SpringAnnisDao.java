@@ -138,7 +138,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   private int timeout;
 
   @Override
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   public SaltProject graph(QueryData data)
   {
     SaltProject p = executeQueryFunction(data, graphSqlGenerator, saltAnnotateExtractor);
@@ -577,7 +577,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   // query functions
   @Override
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGeneratorAndExtractor<QueryData, T> generator)
   {
@@ -585,7 +585,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRED)
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   @Override
   public <T> T executeQueryFunction(QueryData queryData,
     final SqlGenerator<QueryData> generator,
@@ -622,14 +622,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     }
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public List<Match> find(QueryData queryData)
   {
     return executeQueryFunction(queryData, findSqlGenerator, findSqlGenerator);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public boolean find(final QueryData queryData, final OutputStream out)
   {
@@ -686,14 +686,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     return finished;
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public int count(QueryData queryData)
   {
     return executeQueryFunction(queryData, countSqlGenerator, countSqlGenerator);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public MatchAndDocumentCount countMatchesAndDocuments(QueryData queryData)
   {
@@ -701,7 +701,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       countMatchesAndDocumentsSqlGenerator);
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public void matrix(final QueryData queryData, final boolean outputCsv,
     final OutputStream out)
@@ -759,7 +759,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     });
   }
 
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   @Override
   public FrequencyTable frequency(QueryData queryData)
   {
@@ -768,7 +768,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   }
 
   @Override
-  @Transactional(readOnly = false)
+  @Transactional(readOnly = true)
   public String explain(SqlGenerator<QueryData> generator,
     QueryData queryData,
     final boolean analyze)

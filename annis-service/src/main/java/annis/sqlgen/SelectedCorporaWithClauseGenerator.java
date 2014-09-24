@@ -13,24 +13,26 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.dao;
+package annis.sqlgen;
 
+import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import com.google.common.base.Joiner;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class SelectedCorporaSessionModifier implements SqlSessionModifier
+public class SelectedCorporaWithClauseGenerator 
+  implements WithClauseSqlGenerator<QueryData>
 {
 
   @Override
-  public void modifySqlSession(JdbcTemplate jdbc,
-    QueryData queryData)
+  public List<String> withClauses(QueryData queryData,
+    List<QueryNode> alternative, String indent)
   {
     List<String> tables = new LinkedList<>();
     for(Long corpusID : queryData.getCorpusList())
@@ -38,10 +40,12 @@ public class SelectedCorporaSessionModifier implements SqlSessionModifier
       tables.add("SELECT * FROM facts_" + corpusID);
     }
     
-    jdbc.execute(
-      "CREATE OR REPLACE TEMPORARY VIEW selected_facts AS ("
-      + Joiner.on("\nUNION ALL\n").join(tables) + ")");
+    String indent2 = indent + AbstractSqlGenerator.TABSTOP;
     
+    return Arrays.asList(indent + 
+      "selected_facts AS (\n" + indent2 
+      + Joiner.on("\n" + indent2 + "UNION ALL\n" + indent2).join(tables) 
+      + ")");
   }
   
 }

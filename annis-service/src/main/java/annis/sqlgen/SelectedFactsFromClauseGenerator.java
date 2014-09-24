@@ -14,8 +14,6 @@
  * limitations under the License.
  */
 package annis.sqlgen;
-
-import annis.dao.SelectedCorporaSessionModifier;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import com.google.common.base.Joiner;
@@ -26,7 +24,7 @@ import java.util.List;
  * A simple {@link FromClauseSqlGenerator} that statically returns
  * the name of the view which contains the selected facts table.
  * 
- * In order to work this needs the {@link SelectedCorporaSessionModifier} to
+ * In order to work this needs the {@link SelectedCorporaWithClauseGenerator} to
  * be enabled and we have to use the facts table. This implementation is not
  * prepared for a dynamic scheme where node, rank etc. are seperate tables.
  * 
