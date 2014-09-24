@@ -55,7 +55,7 @@ limitations under the License.
 
   <!-- FROM clause generator -->
   <bean id="selectedFactsFromClauseGenerator" class="annis.sqlgen.SelectedFactsFromClauseGenerator"
-    lazy-init="true"/>  
+    parent="tableAccessStrategyFactory" lazy-init="true"/>  
   
 
   <!-- WHERE clause generator -->

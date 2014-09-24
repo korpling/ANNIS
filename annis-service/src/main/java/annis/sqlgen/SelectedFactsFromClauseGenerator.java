@@ -31,7 +31,7 @@ import java.util.List;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class SelectedFactsFromClauseGenerator implements FromClauseSqlGenerator<QueryData>
+public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerator
 {
 
   @Override
@@ -44,13 +44,16 @@ public class SelectedFactsFromClauseGenerator implements FromClauseSqlGenerator<
     
     for (QueryNode node : alternative)
     {
+      TableAccessStrategy tas = tables(node);
+      String aliasName = TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), TableAccessStrategy.FACTS_TABLE, 1);
       if(optimize)
       {
-        clauses.add("facts_" + queryData.getCorpusList().get(0) + " AS facts" + String.valueOf(node.getId()));
+        clauses.add("facts_" + queryData.getCorpusList().get(0) + " AS " + aliasName);
       }
       else
       {
-        clauses.add(innerQuery(queryData, alternative, indent + AbstractSqlGenerator.TABSTOP) + " AS facts" + String.valueOf(node.getId()));
+        clauses.add(innerQuery(queryData, alternative, indent + AbstractSqlGenerator.TABSTOP) 
+          + " AS " + aliasName);
       }
     }
 
