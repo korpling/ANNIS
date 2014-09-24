@@ -54,9 +54,8 @@ limitations under the License.
   </bean>
 
   <!-- FROM clause generator -->
-  <bean id="tableJoinsInWhereClauseGenerator" class="annis.sqlgen.TableJoinsInWhereClauseGenerator"
-        parent="tableAccessStrategyFactory"  lazy-init="true"/>
-  
+  <bean id="selectedFactsFromClauseGenerator" class="annis.sqlgen.SelectedFactsFromClauseGenerator"
+    lazy-init="true"/>  
 
   <!-- WHERE clause generator -->
   <bean id="defaultWhereClauseGeneratorBase" class="annis.sqlgen.DefaultWhereClauseGenerator"
@@ -267,12 +266,10 @@ limitations under the License.
   </bean>
 
   <util:list id="defaultFromClauseGenerators">
-    <ref bean="tableJoinsInWhereClauseGenerator" />
+    <ref bean="selectedFactsFromClauseGenerator" />
   </util:list>
   
-  <util:list id="defaultWhereClauseGenerators">
-    <ref bean="tableJoinsInWhereClauseGenerator" />
-    <ref bean="defaultWhereClauseGenerator" />
+  <util:list id="defaultWhereClauseGenerators">    <ref bean="defaultWhereClauseGenerator" />
     <ref bean="subcorpusConstraintWhereClause" />
     <ref bean="metaDataAndCorpusWhereClauseGenerator" />
     <ref bean="sampleWhereClause" />

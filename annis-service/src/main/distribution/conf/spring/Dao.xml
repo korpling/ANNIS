@@ -119,8 +119,9 @@
   
   <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
-
-    <!-- missing: administrationDao -->
+  </bean>
+    
+  <bean id="selectedCorporaSessionModifier" class="annis.dao.SelectedCorporaSessionModifier" lazy-init="true">
   </bean>
 
   <!-- BEGIN EXPORTS -->
@@ -158,6 +159,7 @@
       <util:list>
         <ref bean="annisDao"/>
         <ref bean="sqlScriptSessionModifier"/>
+        <ref bean="selectedCorporaSessionModifier"/>
       </util:list>
     </property>
 
