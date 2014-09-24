@@ -57,7 +57,8 @@ public abstract class AbstractSqlGenerator
   @Override
   public String toSql(QueryData queryData)
   {
-    return toSql(queryData, "");
+    String result = toSql(queryData, "");
+    return result;
   }
 
   @Override

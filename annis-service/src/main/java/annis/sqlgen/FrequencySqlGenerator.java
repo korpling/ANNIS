@@ -137,9 +137,10 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 
       sb.append(indent).append(TABSTOP);
 
-      sb.append(TableAccessStrategy.partitionTableName(
-        tas.getTableAliases(), tas.getTablePartitioned(),
-        NODE_TABLE, queryData.getCorpusList()));
+      String factsSql = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+        queryData, indent);
+      
+      sb.append(factsSql);
       sb.append(" AS v").append(i);
 
       if (itEntry.hasNext())
