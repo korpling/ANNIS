@@ -46,27 +46,35 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
     for (QueryNode node : alternative)
     {
       TableAccessStrategy tas = tables(node);
-      String aliasName = TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), TableAccessStrategy.FACTS_TABLE, 1);
-      if(empty)
-      {
-        clauses.add("(SELECT * FROM facts LIMIT 0)" + " AS " + aliasName);
-      }
-      else if(optimize)
-      {
-        clauses.add("facts_" + queryData.getCorpusList().get(0) + " AS " + aliasName);
-      }
-      else
-      {
-        clauses.add(innerQuery(queryData, alternative, indent + AbstractSqlGenerator.TABSTOP) 
-          + " AS " + aliasName);
-      }
+      String aliasName = TableAccessStrategy.aliasedTable(node, tas.getTableAliases(), 
+      TableAccessStrategy.FACTS_TABLE, 1);
+      
+      clauses.add(selectedFactsSQL(queryData, indent)  + " AS " + aliasName);
     }
 
     return Joiner.on(",\n" + indent + AbstractSqlGenerator.TABSTOP).join(clauses);
   }
   
-  private String innerQuery(QueryData queryData,
-    List<QueryNode> alternative, String indent)
+  public static String selectedFactsSQL(QueryData queryData, String indent)
+  {
+    int numOfCorpora = queryData.getCorpusList().size();
+    if (numOfCorpora == 0)
+    {
+      return "(SELECT * FROM facts LIMIT 0)";
+    }
+    else if (numOfCorpora == 1)
+    {
+      return "facts_" + queryData.getCorpusList().get(0);
+    }
+    else
+    {
+      return unionAllSelectedFacts(queryData, indent
+        + AbstractSqlGenerator.TABSTOP);
+    }
+  }
+  
+  private static String unionAllSelectedFacts(QueryData queryData, 
+    String indent)
   {
     List<String> tables = new LinkedList<>();
     for(Long corpusID : queryData.getCorpusList())
