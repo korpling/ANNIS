@@ -213,9 +213,7 @@ public class MatrixSqlGenerator
   @Override
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
-  {
-    TableAccessStrategy tas = tables(null);
-    
+  {    
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");

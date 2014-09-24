@@ -112,8 +112,6 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   public String fromClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    TableAccessStrategy tas = tables(null);
-
     FrequencyTableQueryData ext;
     List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(
       FrequencyTableQueryData.class);

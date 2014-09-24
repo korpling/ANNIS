@@ -17,7 +17,6 @@ package annis.sqlgen;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import com.google.common.base.Joiner;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -39,9 +38,6 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
     String indent)
   {
     List<String> clauses = new LinkedList<>();
-    
-    boolean optimize = (queryData.getCorpusList().size() == 1);
-    boolean empty = queryData.getCorpusList().isEmpty();
     
     for (QueryNode node : alternative)
     {
