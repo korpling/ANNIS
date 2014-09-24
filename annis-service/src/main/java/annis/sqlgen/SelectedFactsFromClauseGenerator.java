@@ -18,6 +18,8 @@ package annis.sqlgen;
 import annis.dao.SelectedCorporaSessionModifier;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import com.google.common.base.Joiner;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -25,7 +27,8 @@ import java.util.List;
  * the name of the view which contains the selected facts table.
  * 
  * In order to work this needs the {@link SelectedCorporaSessionModifier} to
- * be enabled.
+ * be enabled and we have to use the facts table. This implementation is not
+ * prepared for a dynamic scheme where node, rank etc. are seperate tables.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
@@ -36,7 +39,14 @@ public class SelectedFactsFromClauseGenerator implements FromClauseSqlGenerator<
   public String fromClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    return "selected_facts";
+    List<String> clauses = new LinkedList<>();
+    
+    for (QueryNode node : alternative)
+    {
+      clauses.add("selected_facts AS facts" + String.valueOf(node.getId()));
+    }
+
+    return Joiner.on(",\n" + indent + AbstractSqlGenerator.TABSTOP).join(clauses);
   }
   
 }
