@@ -50,7 +50,7 @@ public class SelectedFactsFromClauseGenerator implements FromClauseSqlGenerator<
       }
       else
       {
-        clauses.add(innerQuery(queryData, alternative, indent) + " AS facts" + String.valueOf(node.getId()));
+        clauses.add(innerQuery(queryData, alternative, indent + AbstractSqlGenerator.TABSTOP) + " AS facts" + String.valueOf(node.getId()));
       }
     }
 

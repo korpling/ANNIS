@@ -34,7 +34,6 @@ public abstract class AbstractSolutionMatchInFromClauseSqlGenerator extends
     
     sb.append(indent).append("(\n");
     
-    sb.append(indent).append(TABSTOP);
     sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(TABSTOP).append(") AS solutions");
     
