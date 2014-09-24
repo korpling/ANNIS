@@ -1,5 +1,8 @@
 @import "annis.scss";
 
+@include v-font(ANNISFontIcon,
+'../../../../annis/fonts/annisicon');
+
 .v-app {
   width: 100%;
   height: 100%;
@@ -9,12 +12,19 @@
   @include annis;
 }
 
-body .annis.v-app .v-app-loading {
+.annis .v-app-loading:before {
   background-image: url(images/annisloading.gif);
-  background-repeat: no-repeat;
-  background-position: 50%;
-  width: 100%;
-  height: 100%;
+  margin-top: -100px;
+  margin-left: -64px;
+  width: 128px;
+  height: 200px;
+  padding: 0px;
 }
 
+.annis .v-app-loading:after {
+  padding-top: 110px;
+}
 
+.annis .v-app-loading {
+  background-color: white
+}

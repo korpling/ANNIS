@@ -30,6 +30,7 @@ import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
@@ -37,6 +38,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -109,18 +111,14 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
     importPanel = new ImportPanel(!kickstarter, Helper.getUser() != null);
     
     tabSheet = new TabSheet();
-    tabSheet.addTab(importPanel, "Import Corpus", new ThemeResource(
-      "images/tango-icons/16x16/document-save.png"));
-    tabSheet.addTab(corpusAdminPanel, "Corpus management", new ThemeResource(
-      "images/tango-icons/16x16/system-file-manager.png"));
+    tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
+    tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
     
     
     if(!kickstarter)
     {
-      tabSheet.addTab(userManagementPanel, "User management", new ThemeResource(
-        "images/tango-icons/16x16/user-info.png"));
-      tabSheet.addTab(groupManagementPanel, "Group management", new ThemeResource(
-        "images/tango-icons/16x16/system-users.png"));
+      tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
+      tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
     }
     
     tabSheet.setSizeFull();
@@ -136,6 +134,8 @@ public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
 
     layout.setExpandRatio(toolbar, 0.0f);
     layout.setExpandRatio(tabSheet, 1.0f);
+    
+    tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
     setContent(layout);
 

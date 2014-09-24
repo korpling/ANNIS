@@ -24,6 +24,7 @@ import com.sun.jersey.api.client.ClientResponse;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
@@ -80,9 +81,12 @@ public class ImportPanel extends Panel
     this.needsLogin = needsLogin;
     
     setSizeFull();
+   
     layout = new VerticalLayout();
     layout.setWidth("100%");
     layout.setHeight("100%");
+    layout.setMargin(true);
+    
     setContent(layout);
     
     FormLayout form = new FormLayout();
@@ -170,13 +174,13 @@ public class ImportPanel extends Panel
     if(visible)
     {
       btDetailedLog.setCaption("Hide log");
-      btDetailedLog.setIcon(new ThemeResource("images/tango-icons/16x16/list-remove.png"), "minus sign");
+      btDetailedLog.setIcon(FontAwesome.MINUS_SQUARE_O, "minus sign");
       layout.setExpandRatio(btDetailedLog, 0.0f);
     }
     else
     {
       btDetailedLog.setCaption("Show log");
-      btDetailedLog.setIcon(new ThemeResource("images/tango-icons/16x16/list-add.png"), "plus sign");
+      btDetailedLog.setIcon(FontAwesome.PLUS_SQUARE_O, "plus sign");
       layout.setExpandRatio(btDetailedLog, 1.0f);
     }
   }

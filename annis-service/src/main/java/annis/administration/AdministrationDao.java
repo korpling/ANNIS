@@ -17,6 +17,7 @@ package annis.administration;
 
 import annis.exceptions.AnnisException;
 import annis.security.UserConfig;
+import com.google.common.collect.Multimap;
 import java.io.File;
 import java.sql.PreparedStatement;
 import java.util.List;
@@ -87,10 +88,18 @@ public interface AdministrationDao
   public void registerGUICancelThread(StatementController statementCon);
 
   public void addCorpusAlias(long corpusID, String alias);
+  public void addCorpusAlias(String corpusName, String alias);
 
   public ImportStatus initImportStatus();
 
   public void storeUserConfig(String userName, UserConfig config);
+  
+  /**
+   * Provides a list where the keys are the aliases and the values are the corpus names.
+   * @param databaseProperties
+   * @return 
+   */
+  public Multimap<String, String> listCorpusAlias(File databaseProperties);
     
   /**
    * Provides a interface to cancel {@link PreparedStatement} via a gui.

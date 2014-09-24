@@ -24,8 +24,6 @@ import annis.service.objects.FrequencyTableEntryType;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -36,8 +34,8 @@ import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
 import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -45,7 +43,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -119,8 +117,8 @@ public class FrequencyResultPanel extends VerticalLayout
     setComponentAlignment(btDownloadCSV, Alignment.TOP_RIGHT);
     
     btDownloadCSV.setVisible(false);
-    btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
-    btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btDownloadCSV.setIcon(FontAwesome.DOWNLOAD);
+    btDownloadCSV.addStyleName(ValoTheme.BUTTON_SMALL);
     
     final UI ui = UI.getCurrent();
     // actually start query

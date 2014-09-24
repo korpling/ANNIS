@@ -19,12 +19,13 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.LayoutEvents.LayoutClickEvent;
 import com.vaadin.event.LayoutEvents.LayoutClickListener;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.AbstractSelect.NewItemHandler;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -74,9 +75,8 @@ public class NodeWindow extends Panel implements Button.ClickListener
     setSizeFull();
     
     // HACK: use our own border since the one from chameleon does not really work
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
-    addStyleName("border-layout");
-    addStyleName("solid-white-background");
+    addStyleName(ValoTheme.PANEL_WELL);
+    //addStyleName("border-layout");
     
     prepareEdgeDock = false;
 
@@ -85,7 +85,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     vLayout.setWidth("100%");
     vLayout.setHeight("-1px");
     vLayout.setMargin(false);
-    vLayout.setSpacing(false);
+    vLayout.setSpacing(true);
 
     toolbar = new HorizontalLayout();
     toolbar.addStyleName("toolbar");
@@ -95,20 +95,19 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.setSpacing(false);
     vLayout.addComponent(toolbar);
 
-    btMove = new Button("");
+    btMove = new Button();
     btMove.setWidth("100%");
-    btMove.setIcon(new ThemeResource("images/tango-icons/22x22/view-fullscreen.png"));
+    btMove.setIcon(FontAwesome.ARROWS);
     btMove.setDescription("<strong>Move node</strong><br />Click, hold and move mouse to move the node.");
-    btMove.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btMove.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btMove.addStyleName(ValoTheme.BUTTON_SMALL);
     btMove.addStyleName("drag-source-enabled");
     toolbar.addComponent(btMove);
    
     
     btEdge = new Button("Edge");
-    btEdge.setIcon(new ThemeResource("images/tango-icons/16x16/go-jump.png"));
+    btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
     btEdge.addClickListener((Button.ClickListener) this);
-    btEdge.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btEdge.addStyleName(ValoTheme.BUTTON_SMALL);
     //btEdge.addStyleName(ChameleonTheme.BUTTON_LINK);
     btEdge.setDescription("<strong>Add Edge</strong><br />"
       + "To create a new edge between "
@@ -120,8 +119,8 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btEdge);
     
     btAdd = new Button("Add");
-    btAdd.setIcon(new ThemeResource("images/tango-icons/16x16/list-add.png"));
-    btAdd.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAdd.setIcon(FontAwesome.PLUS);
+    btAdd.addStyleName(ValoTheme.BUTTON_SMALL);
     //btAdd.addStyleName(ChameleonTheme.BUTTON_LINK);
     btAdd.addClickListener((Button.ClickListener) this);
     btAdd.setDescription("<strong>Add Node Condition</strong><br />"
@@ -131,28 +130,27 @@ public class NodeWindow extends Panel implements Button.ClickListener
     toolbar.addComponent(btAdd);
     
     btClear = new Button("Clear");
-    btClear.setIcon(new ThemeResource("images/tango-icons/16x16/edit-clear.png"));
-    btClear.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btClear.setIcon(FontAwesome.TRASH_O);
+    btClear.addStyleName(ValoTheme.BUTTON_SMALL);
     //btClear.addStyleName(ChameleonTheme.BUTTON_LINK);
     btClear.addClickListener((Button.ClickListener) this);
     btClear.setDescription("<strong>Clear All Node Conditions</strong>");
     toolbar.addComponent(btClear);
 
-    btClose = new Button("");
-    btClose.setIcon(new ThemeResource("images/tango-icons/22x22/process-stop.png"));
+    btClose = new Button();
+    btClose.setIcon(FontAwesome.TIMES_CIRCLE);
     btClose.setDescription("<strong>Close</strong><br />Close this node description window");
-    btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btClose.addStyleName(ValoTheme.BUTTON_SMALL);
     btClose.addClickListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
 
-    toolbar.setComponentAlignment(btMove, Alignment.MIDDLE_LEFT);
+    toolbar.setComponentAlignment(btMove, Alignment.TOP_LEFT);
     toolbar.setExpandRatio(btMove, 1.0f);
     
-    toolbar.setComponentAlignment(btEdge, Alignment.MIDDLE_CENTER);
-    toolbar.setComponentAlignment(btAdd, Alignment.MIDDLE_CENTER);
-    toolbar.setComponentAlignment(btClear, Alignment.MIDDLE_CENTER);
-    toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
+    toolbar.setComponentAlignment(btEdge, Alignment.TOP_CENTER);
+    toolbar.setComponentAlignment(btAdd, Alignment.TOP_CENTER);
+    toolbar.setComponentAlignment(btClear, Alignment.TOP_CENTER);
+    toolbar.setComponentAlignment(btClose, Alignment.TOP_RIGHT);
 
   }
 
@@ -172,7 +170,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
     }
     else
     {
-      btEdge.setIcon(new ThemeResource("images/tango-icons/16x16/go-jump.png"));
+      btEdge.setIcon(FontAwesome.EXTERNAL_LINK);
       btEdge.setCaption("Edge");
     }
   }
@@ -317,7 +315,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       txtValue.setWidth("100%");
 
       btDelete = new Button("X");
-      btDelete.addStyleName(ChameleonTheme.BUTTON_LINK);
+      btDelete.addStyleName(ValoTheme.BUTTON_LINK);
       btDelete.setDescription("Remove node condition");
       btDelete.addClickListener(new Button.ClickListener()
       {

@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.beans.CitationProvider;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -38,7 +39,7 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   {
     Button btLink = new Button();
     btLink.setStyleName(BaseTheme.BUTTON_LINK);
-    btLink.setIcon(new ThemeResource("images/url.png"));
+    btLink.setIcon(FontAwesome.LINK);
     btLink.setDescription("show citation link");
     btLink.addListener(this);
 

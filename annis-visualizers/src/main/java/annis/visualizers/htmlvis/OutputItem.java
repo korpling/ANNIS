@@ -22,17 +22,23 @@ import com.google.common.collect.ComparisonChain;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class OutputItem implements Comparable<OutputItem>
+public class OutputItem implements Comparable<OutputItem> //Comparator<OutputItem>, 
 {
   private String qName;
   private long length;
   private String outputString;
+  private int priority;
 
   public String getqName()
   {
     return qName;
   }
 
+  public String getAnnoName()
+  {
+      return (qName.indexOf(":") > 0) ? qName.substring(qName.indexOf(":")+2) : qName;
+  }
+  
   public void setqName(String qName)
   {
     this.qName = qName;
@@ -68,6 +74,7 @@ public class OutputItem implements Comparable<OutputItem>
     
     return ComparisonChain.start()
       .compare(o.getLength(), length)
+      .compare(o.getPriority(), priority)
       .compare(qName, o.getqName())
       .result();
   }
@@ -93,8 +100,14 @@ public class OutputItem implements Comparable<OutputItem>
   {
     return outputString + " (" + qName +  ", " + length + ")";
   }
-  
-  
-  
+
+  public int getPriority() {
+    return priority;
+  }
+
+  public void setPriority(int priority) {
+    this.priority = priority;
+  }
+    
   
 }

@@ -16,11 +16,12 @@
 package annis.visualizers.htmlvis;
 
 import annis.CommonHelper;
-import annis.model.AnnisConstants;
 import static annis.model.AnnisConstants.ANNIS_NS;
 import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
+import com.google.common.html.HtmlEscapers;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
@@ -36,7 +37,7 @@ import java.util.TreeSet;
  */
 public class SpanHTMLOutputter
 {
-    public enum Type {EMPTY, VALUE, ANNO_NAME, CONSTANT, META_NAME};
+  public enum Type {EMPTY, VALUE, ESCAPED_VALUE, ANNO_NAME, CONSTANT, META_NAME};
   
   public static final String NULL_VAL = "NULL";
   
@@ -47,6 +48,8 @@ public class SpanHTMLOutputter
   private String constant;
   private String metaname;
   private HashMap<String, String> hshMeta = new HashMap<>();
+  
+  private final static Escaper htmlEscaper = HtmlEscapers.htmlEscaper();
   
   
   public void outputHTML(SNode node, String matchedQName,
@@ -100,6 +103,9 @@ public class SpanHTMLOutputter
       case VALUE:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT();
         break;
+      case ESCAPED_VALUE:
+        value = htmlEscaper.escape(matchedAnnotation == null ? "NULL" : matchedAnnotation.getSValueSTEXT());
+        break;
       case ANNO_NAME:
         value = matchedAnnotation == null ? "NULL" : matchedAnnotation.getSName();
         break;
@@ -133,6 +139,9 @@ public class SpanHTMLOutputter
         break;
       case VALUE:
         value = CommonHelper.getSpannedText(tok);
+        break;
+      case ESCAPED_VALUE:
+        value = htmlEscaper.escape(CommonHelper.getSpannedText(tok));
         break;
       case ANNO_NAME:
         value = "tok";

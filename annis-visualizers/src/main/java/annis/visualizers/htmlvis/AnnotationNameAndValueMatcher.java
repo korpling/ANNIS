@@ -19,6 +19,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -85,5 +86,13 @@ public class AnnotationNameAndValueMatcher implements SpanMatcher
   {
     this.annotationValue = annotationValue;
   }
+
+  @Override
+  public List<String> getRequiredAnnotationNames()
+  {
+    return nameMatcher.getRequiredAnnotationNames();
+  }
+  
+  
   
 }
