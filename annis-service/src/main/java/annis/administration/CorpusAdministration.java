@@ -24,7 +24,6 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
-import annis.administration.AdministrationDao.ImportStatus;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
 import annis.utils.RelANNISHelper;
@@ -40,7 +39,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -61,6 +59,7 @@ public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private DeleteCorpusDao deleteCorpusDao;
 
   private SchemeFixer schemeFixer;
 
@@ -88,7 +87,7 @@ public class CorpusAdministration
       }
     }
     log.info("Deleting corpora: " + ids);
-    administrationDao.deleteCorpora(ids, true);
+    deleteCorpusDao.deleteCorpora(ids, true);
     log.info("Finished deleting corpora: " + ids);
   }
 
@@ -223,7 +222,7 @@ public class CorpusAdministration
         }
       }
 
-      catch (DefaultAdministrationDao.ConflictingCorpusException ex)
+      catch (AdministrationDao.ConflictingCorpusException ex)
       {
         importStats.setStatus(false);
         importStats.addException(r.getPath(), ex);
@@ -346,14 +345,14 @@ public class CorpusAdministration
     return outDir;
   }
 
-  public static class ImportStatsImpl implements AdministrationDao.ImportStatus
+  public static class ImportStatsImpl implements ImportStatus
   {
 
-    private boolean status = true;
+    boolean status = true;
 
     private final static String SEPERATOR = "--------------------------\n";
 
-    private final Map<String, List<Throwable>> exceptions;
+    final Map<String, List<Throwable>> exceptions;
 
     public ImportStatsImpl()
     {
@@ -805,5 +804,17 @@ public class CorpusAdministration
   {
     this.schemeFixer = schemeFixer;
   }
+
+  public DeleteCorpusDao getDeleteCorpusDao()
+  {
+    return deleteCorpusDao;
+  }
+
+  public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao)
+  {
+    this.deleteCorpusDao = deleteCorpusDao;
+  }
+  
+  
 
 }

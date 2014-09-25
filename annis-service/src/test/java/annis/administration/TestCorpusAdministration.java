@@ -38,7 +38,7 @@ public class TestCorpusAdministration
 {
 
   @Mock
-  private DefaultAdministrationDao administrationDao;
+  private AdministrationDao administrationDao;
   private CorpusAdministration administration;
 
   @Before

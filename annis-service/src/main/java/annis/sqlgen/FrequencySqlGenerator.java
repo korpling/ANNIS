@@ -136,7 +136,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       sb.append(indent).append(TABSTOP);
 
       String factsSql = SelectedFactsFromClauseGenerator.selectedFactsSQL(
-        queryData, indent);
+        queryData.getCorpusList(), indent);
       
       sb.append(factsSql);
       sb.append(" AS v").append(i);
