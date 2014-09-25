@@ -100,6 +100,11 @@ public interface AdministrationDao
    * @return 
    */
   public Multimap<String, String> listCorpusAlias(File databaseProperties);
+  
+  /**
+   * Update the statistics for the "facts" table as a whole.
+   */
+  public void analyzeParentFacts();
     
   /**
    * Provides a interface to cancel {@link PreparedStatement} via a gui.

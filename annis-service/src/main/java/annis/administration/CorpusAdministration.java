@@ -247,8 +247,8 @@ public class CorpusAdministration
         sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
           ex.getMessage());
       }
-    }
-
+    } // end for each corpus
+    administrationDao.analyzeParentFacts();
     return importStats;
   }
 

@@ -1159,10 +1159,16 @@ public class DefaultAdministrationDao implements AdministrationDao
   {
     log.info("analyzing facts table for corpus with ID " + corpusID);
     jdbcTemplate.execute("ANALYZE facts_" + corpusID);
+  }
 
+  @Override
+  public void analyzeParentFacts()
+  {
     log.info("analyzing parent facts table");
     jdbcTemplate.execute("ANALYZE facts");
   }
+  
+  
 
   void createFacts(long corpusID)
   {
