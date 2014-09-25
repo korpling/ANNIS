@@ -18,6 +18,7 @@ package annis.service.internal;
 import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
+import annis.administration.DeleteCorpusDao;
 import annis.dao.AnnisDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
@@ -75,6 +76,7 @@ public class AdminServiceImpl implements AdminService
     AdminServiceImpl.class);
 
   private AdministrationDao adminDao;
+  private DeleteCorpusDao deleteCorpusDao;
 
   private CorpusAdministration corpusAdmin;
 
@@ -343,7 +345,7 @@ public class AdminServiceImpl implements AdminService
 
       // get ID of corpus
       long id = annisDao.mapCorpusNameToId(corpusName);
-      adminDao.deleteCorpora(Arrays.asList(id), true);
+      deleteCorpusDao.deleteCorpora(Arrays.asList(id), true);
       return Response.status(Response.Status.OK).build();
     }
     catch (IllegalArgumentException ex)
@@ -529,5 +531,17 @@ public class AdminServiceImpl implements AdminService
   {
     this.corpusAdmin = corpusAdmin;
   }
+
+  public DeleteCorpusDao getDeleteCorpusDao()
+  {
+    return deleteCorpusDao;
+  }
+
+  public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao)
+  {
+    this.deleteCorpusDao = deleteCorpusDao;
+  }
+  
+  
 
 }

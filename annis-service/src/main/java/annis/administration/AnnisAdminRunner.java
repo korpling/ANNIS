@@ -35,7 +35,7 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
-import annis.administration.AdministrationDao.ImportStatus;
+import annis.administration.ImportStatus;
 import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;

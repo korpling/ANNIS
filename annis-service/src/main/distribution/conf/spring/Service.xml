@@ -22,6 +22,7 @@
     <property name="importWorker" ref="importWorker" />
     <property name="annisDao" ref="annisDao" />
     <property name="corpusAdmin" ref="corpusAdministration" />
+    <property name="deleteCorpusDao" ref="deleteCorpusDao" />
   </bean>
 
   <!-- Default Corpus Config -->
