@@ -100,7 +100,7 @@ public class VisualizerPanel extends CssLayout
 
   private Component vis;
 
-  private SDocument result;
+  private transient SDocument result;
 
   private PluginSystem ps;
 
@@ -260,6 +260,20 @@ public class VisualizerPanel extends CssLayout
 
     } // end if entry not null
 
+  }
+  
+  private void writeObject(ObjectOutputStream out) throws IOException
+  {
+    out.defaultWriteObject();
+    
+    CommonHelper.writeSDocument(result, out);
+  }
+  
+  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    
+   this.result = CommonHelper.readSDocument(in);
   }
   
   private List<SToken> createTokenList(List<String> tokenIDs, SDocumentGraph graph)
