@@ -11267,6 +11267,10 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #c8c8c8;
 	border-width: 1px;
 	padding: 0px 10px 0px 10px;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
 }
 
 .annis .partitur_table .header {
@@ -11306,6 +11310,13 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis td.speaker .v-label, .annis td.pdf .v-label {
 	padding: 0px 20px 0px 10px;
+}
+
+.annis .kwic td {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
 }
 
 .annis .kwic td.speaker .v-label, .annis .kwic td.pdf .v-label {
