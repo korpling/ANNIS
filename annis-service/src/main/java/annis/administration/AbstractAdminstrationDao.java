@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import annis.dao.AnnisDao;
 import annis.utils.DynamicDataSource;
 import java.io.BufferedReader;
 import java.io.File;
@@ -23,6 +24,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
@@ -35,6 +37,7 @@ import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementCallback;
 import org.springframework.jdbc.core.PreparedStatementCreator;
+import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 
 /**
@@ -54,14 +57,15 @@ public abstract class AbstractAdminstrationDao
   private String scriptPath;
   private StatementController statementController;
   private DynamicDataSource dataSource;
+  private AnnisDao annisDao;
 
-  protected boolean lockCorpusTable(boolean waitForOtherTasks)
+  protected boolean lockRepositoryMetadataTable(boolean waitForOtherTasks)
   {
     try
     {
-      log.info("Locking corpus table to ensure no other import is running");
+      log.info("Locking repository_metadata table to ensure no other import is running");
       jdbcTemplate.execute(
-        "LOCK TABLE corpus IN EXCLUSIVE MODE" + (waitForOtherTasks ? ""
+        "LOCK TABLE repository_metadata IN EXCLUSIVE MODE" + (waitForOtherTasks ? ""
           : " NOWAIT"));
       return true;
     }
@@ -171,6 +175,43 @@ public abstract class AbstractAdminstrationDao
           "Couldn't read SQL script from resource file.", e);
       }
   }
+  
+  /**
+   * Checks, if there already exists a top level corpus.
+   *
+   * @param topLevelCorpusName The name of the corpus, which is checked.
+   * @return Is false, if the no top level coprpus exists.
+   */
+  protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
+  {
+    String sql = "SELECT count(name) as amount FROM corpus WHERE name='"
+      + topLevelCorpusName + "'";
+    Integer numberOfCorpora = getJdbcTemplate().query(sql,
+      new ResultSetExtractor<Integer>()
+      {
+        @Override
+        public Integer extractData(ResultSet rs) throws SQLException,
+        DataAccessException
+        {
+          if (rs.next())
+          {
+            return rs.getInt("amount");
+          }
+          else
+          {
+            return 0;
+          }
+        }
+      });
+
+    return numberOfCorpora > 0;
+  }
+  
+  // tables in the staging area have their names prefixed with "_"
+  protected String tableInStagingArea(String table)
+  {
+    return "_" + table;
+  }
 
   public JdbcTemplate getJdbcTemplate()
   {
@@ -258,6 +299,17 @@ public abstract class AbstractAdminstrationDao
       return null;
     }
   }
+
+  public AnnisDao getAnnisDao()
+  {
+    return annisDao;
+  }
+
+  public void setAnnisDao(AnnisDao annisDao)
+  {
+    this.annisDao = annisDao;
+  }
+  
   
 
 }

@@ -16,10 +16,12 @@
 package annis.administration;
 
 import java.io.File;
+import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -32,10 +34,30 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
   
   private final static Logger log = LoggerFactory.getLogger(AdministrationDao.class);
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
+  
+  
+  /**
+   * Deletes a top level corpus, when it is already exists.
+   * @param corpusName
+   */
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
+    isolation = Isolation.READ_COMMITTED)
+  public void checkAndRemoveTopLevelCorpus(String corpusName)
+  {
+    if (existConflictingTopLevelCorpus(corpusName))
+    {
+      log.info("delete conflicting corpus: {}", corpusName);
+      List<String> corpusNames = new LinkedList<>();
+      corpusNames.add(corpusName);
+      deleteCorpora(getAnnisDao().mapCorpusNamesToIds(corpusNames), false);
+    }
+  }
+  
+  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
+    isolation = Isolation.READ_COMMITTED)
   public void deleteCorpora(List<Long> ids, boolean acquireLock)
   {
-    if (acquireLock && !lockCorpusTable(false))
+    if (acquireLock && !lockRepositoryMetadataTable(false))
     {
       log.error("Another import is currently running");
       return;

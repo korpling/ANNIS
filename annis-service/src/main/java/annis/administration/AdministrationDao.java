@@ -94,7 +94,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    */
   private void analyzeTextTable(String toplevelCorpusName)
   {
-    List<String> rawTexts = annisDao.getRawText(toplevelCorpusName);
+    List<String> rawTexts = getAnnisDao().getRawText(toplevelCorpusName);
 
     // pattern for checking the token layer
     final Pattern WHITESPACE_MATCHER = Pattern.compile("^\\s+$");
@@ -105,13 +105,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
       if (s != null && WHITESPACE_MATCHER.matcher(s).matches())
       {
         // deactivate doc browsing if no document browser configuration is exists
-        if (annisDao.getDocBrowserConfiguration(toplevelCorpusName) == null)
+        if (getAnnisDao().getDocBrowserConfiguration(toplevelCorpusName) == null)
         {
           // should exists anyway
           Properties corpusConf;
           try
           {
-            corpusConf = annisDao.getCorpusConfiguration(toplevelCorpusName);
+            corpusConf = getAnnisDao().getCorpusConfiguration(toplevelCorpusName);
           }
           catch (FileNotFoundException ex)
           {
@@ -131,7 +131,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
           {
             log.info("disable document browser");
             corpusConf.put("browse-documents", "false");
-            annisDao.setCorpusConfiguration(toplevelCorpusName, corpusConf);
+            getAnnisDao().setCorpusConfiguration(toplevelCorpusName, corpusConf);
           }
 
           // once disabled don't search in further texts
@@ -209,8 +209,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     "corpus_stats",
     "media_files"
   };
-
-  private AnnisDao annisDao;
 
   private final ObjectMapper jsonMapper = new ObjectMapper();
 
@@ -498,7 +496,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // check schema version first
     checkDatabaseSchemaVersion();
 
-    if (!lockCorpusTable(waitForOtherTasks))
+    if (!lockRepositoryMetadataTable(waitForOtherTasks))
     {
       log.error("Another import is currently running");
       return false;
@@ -515,7 +513,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // remove conflicting top level corpora, when override is set to true.
     if (overwrite)
     {
-      checkAndRemoveTopLevelCorpus();
+      deleteCorpusDao.checkAndRemoveTopLevelCorpus(toplevelCorpusName);
     }
     else
     {
@@ -574,10 +572,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
 
     // create empty corpus properties file
-    if (annisDao.getCorpusConfigurationSave(toplevelCorpusName) == null)
+    if (getAnnisDao().getCorpusConfigurationSave(toplevelCorpusName) == null)
     {
       log.info("creating new corpus.properties file");
-      annisDao.setCorpusConfiguration(toplevelCorpusName, new Properties());
+      getAnnisDao().setCorpusConfiguration(toplevelCorpusName, new Properties());
     }
 
     analyzeFacts(corpusID);
@@ -1439,12 +1437,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return tables;
   }
 
-  // tables in the staging area have their names prefixed with "_"
-  private String tableInStagingArea(String table)
-  {
-    return "_" + table;
-  }
-
   private ParameterizedSingleColumnRowMapper<String> stringRowMapper()
   {
     return ParameterizedSingleColumnRowMapper.newInstance(String.class);
@@ -1577,6 +1569,42 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       return false;
     }
+  }
+  
+  /**
+   * Retrieves the name of the top level corpus in the corpus.tab file.
+   *
+   * <p>
+   * At this point, the tab files must be in the staging area.</p>
+   *
+   * @return The name of the toplevel corpus or an empty String if no top level
+   * corpus is found.
+   */
+  private String getTopLevelCorpusFromTmpArea()
+  {
+    String sql = "SELECT name FROM " + tableInStagingArea("corpus")
+      + " WHERE type='CORPUS'\n"
+      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus")
+      + ")\n"
+      + "AND post = (SELECT max(post) FROM " + tableInStagingArea("corpus")
+      + ")";
+
+    return getJdbcTemplate().query(sql, new ResultSetExtractor<String>()
+    {
+      @Override
+      public String extractData(ResultSet rs) throws SQLException,
+        DataAccessException
+      {
+        if (rs.next())
+        {
+          return rs.getString("name");
+        }
+        else
+        {
+          return null;
+        }
+      }
+    });
   }
 
   ///// Getter / Setter
@@ -1851,16 +1879,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  public AnnisDao getAnnisDao()
-  {
-    return annisDao;
-  }
-
-  public void setAnnisDao(AnnisDao annisDao)
-  {
-    this.annisDao = annisDao;
-  }
-
   /**
    * Writes the counted nodes and the used operators back to the staging area.
    *
@@ -1939,42 +1957,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     this.deleteCorpusDao = deleteCorpusDao;
   }
   
-  
-  /**
-   * Retrieves the name of the top level corpus in the corpus.tab file.
-   *
-   * <p>
-   * At this point, the tab files must be in the staging area.</p>
-   *
-   * @return The name of the toplevel corpus or an empty String if no top level
-   * corpus is found.
-   */
-  private String getTopLevelCorpusFromTmpArea()
-  {
-    String sql = "SELECT name FROM " + tableInStagingArea("corpus")
-      + " WHERE type='CORPUS'\n"
-      + "AND pre = (SELECT min(pre) FROM " + tableInStagingArea("corpus")
-      + ")\n"
-      + "AND post = (SELECT max(post) FROM " + tableInStagingArea("corpus")
-      + ")";
-
-    return getJdbcTemplate().query(sql, new ResultSetExtractor<String>()
-    {
-      @Override
-      public String extractData(ResultSet rs) throws SQLException,
-        DataAccessException
-      {
-        if (rs.next())
-        {
-          return rs.getString("name");
-        }
-        else
-        {
-          return null;
-        }
-      }
-    });
-  }
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level
@@ -1995,37 +1977,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  /**
-   * Checks, if there already exists a top level corpus.
-   *
-   * @param topLevelCorpusName The name of the corpus, which is checked.
-   * @return Is false, if the no top level coprpus exists.
-   */
-  @Transactional(propagation = Propagation.MANDATORY)
-  private boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
-  {
-    String sql = "SELECT count(name) as amount FROM corpus WHERE name='"
-      + topLevelCorpusName + "'";
-    Integer numberOfCorpora = getJdbcTemplate().query(sql,
-      new ResultSetExtractor<Integer>()
-      {
-        @Override
-        public Integer extractData(ResultSet rs) throws SQLException,
-        DataAccessException
-        {
-          if (rs.next())
-          {
-            return rs.getInt("amount");
-          }
-          else
-          {
-            return 0;
-          }
-        }
-      });
-
-    return numberOfCorpora > 0;
-  }
 
   public static class ConflictingCorpusException extends AnnisException
   {
@@ -2033,21 +1984,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     public ConflictingCorpusException(String msg)
     {
       super(msg);
-    }
-  }
-
-  /**
-   * Deletes a top level corpus, when it is already exists.
-   */
-  private void checkAndRemoveTopLevelCorpus()
-  {
-    String corpusName = getTopLevelCorpusFromTmpArea();
-    if (existConflictingTopLevelCorpus(corpusName))
-    {
-      log.info("delete conflicting corpus: {}", corpusName);
-      List<String> corpusNames = new LinkedList<>();
-      corpusNames.add(corpusName);
-      deleteCorpusDao.deleteCorpora(annisDao.mapCorpusNamesToIds(corpusNames), false);
     }
   }
 
