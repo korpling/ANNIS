@@ -86,12 +86,15 @@
     </rollingPolicy>
   </appender>
 
+  <logger name="org.springframework.jdbc" level="DEBUG"/>
   <logger name="org.springframework" level="WARN"/>
   <logger name="org.apache.shiro" level="WARN"/>
   <logger name="com.sun.jersey" level="WARN" />
   <logger name="net.sf.ehcache" level="WARN" />
+  <logger name="annis" level="INFO"/>
   <logger name="annis.administration.CorpusAdministration" level="INFO"/>
-  <logger name="annis.administrations" level="WARN"/>
+  <logger name="annis.administration.AdministrationDao" level="INFO"/>
+  <logger name="annis.administration" level="WARN"/>
   <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>
   <logger name="annis.benchmarking" level="DEBUG"/>
 
