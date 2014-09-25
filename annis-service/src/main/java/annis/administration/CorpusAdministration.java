@@ -201,6 +201,7 @@ public class CorpusAdministration
     } // end for each given path
 
     // import each corpus separately
+    boolean anyCorpusImported = false;
     for (File r : roots)
     {
       try
@@ -212,6 +213,7 @@ public class CorpusAdministration
           log.info("Finished import from: " + r.getPath());
           sendStatusMail(statusEmailAdress, r.getPath(),
             ImportJob.Status.SUCCESS, null);
+          anyCorpusImported = true;
         }
         else
         {
@@ -248,7 +250,10 @@ public class CorpusAdministration
           ex.getMessage());
       }
     } // end for each corpus
-    administrationDao.analyzeParentFacts();
+    if(anyCorpusImported)
+    {
+      administrationDao.analyzeParentFacts();
+    }
     return importStats;
   }
 

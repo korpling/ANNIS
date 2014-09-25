@@ -29,6 +29,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -47,6 +48,10 @@ public class TestCorpusAdministration
 
     administration = new CorpusAdministration();
     administration.setAdministrationDao(administrationDao);
+    
+    Mockito.when(administrationDao.importCorpus(Matchers.anyString(), Matchers.
+      anyString(), Matchers.anyBoolean(), Matchers.anyBoolean())).thenReturn(
+        Boolean.TRUE);
   }
 
   @Test
