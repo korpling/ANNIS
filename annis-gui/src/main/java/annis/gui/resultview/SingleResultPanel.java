@@ -88,7 +88,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
-  private transient SDocument result;
+  private SDocument result;
 
   private Map<String, String> markedCoveredMap;
 
@@ -275,20 +275,6 @@ public class SingleResultPanel extends CssLayout implements
     initVisualizer();
   }
   
-  private void writeObject(ObjectOutputStream out) throws IOException
-  {
-    out.defaultWriteObject();
-    
-    CommonHelper.writeSDocument(result, out);
-  }
-  
-  private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    
-   this.result = CommonHelper.readSDocument(in);
-  }
-
   public void setSegmentationLayer(String segmentationName)
   {
     this.segmentationName = segmentationName;
