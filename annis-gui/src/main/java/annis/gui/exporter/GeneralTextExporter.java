@@ -323,7 +323,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       Annotation anno = metaData.get(key);
       if(anno != null)
       {
-        out.append("\tmeta:" + key + "\t" + anno.getValue()).append("\n");
+        out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
       }
     }
   }
