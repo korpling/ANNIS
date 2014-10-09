@@ -18,7 +18,9 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.libgui.Helper;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
@@ -26,6 +28,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
+import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
@@ -237,7 +240,21 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   public void convertText(AnnisResultSet queryResult, LinkedList<String> keys,
     Map<String, String> args, Writer out, int offset) throws IOException
   {
+    Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+    
+    List<String> metaKeys = new LinkedList<>();
+    if(args.containsKey("metakeys"))
+    {
+      Iterable<String> it = 
+        Splitter.on(",").trimResults().split(args.get("metakeys"));
+      for(String s : it)
+      {
+        metaKeys.add(s);
+      }
+    }
+    
     int counter = 0;
+
     for (AnnisResult annisResult : queryResult)
     {
       Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
@@ -268,9 +285,49 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 
       }
       out.append("\n");
+    
+      if(!metaKeys.isEmpty())
+      {
+        String[] path = annisResult.getPath();
+        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+      }
+      out.append("\n");
     }
+
   }
 
+  public void appendMetaData(Writer out, 
+    List<String> metaKeys,
+    String toplevelCorpus, String documentName,
+    Map<String, Map<String, Annotation>> metadataCache)
+    throws IOException
+  {
+    Map<String, Annotation> metaData = new HashMap<>();
+    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
+    {
+      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
+    }
+    else
+    {
+      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
+      for(Annotation anno : asList)
+      {
+        metaData.put(anno.getQualifiedName(), anno);
+        metaData.put(anno.getName(), anno);
+      }
+      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
+    }
+    
+    for(String key : metaKeys)
+    {
+      Annotation anno = metaData.get(key);
+      if(anno != null)
+      {
+        out.append("\tmeta:" + key + "\t" + anno.getValue()).append("\n");
+      }
+    }
+  }
+  
   @Override
   public boolean isCancelable()
   {
