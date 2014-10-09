@@ -143,7 +143,7 @@ public class FrequencyResultPanel extends VerticalLayout
       } 
     };
     
-    PollControl.callInBackground(1000, null, r);
+    PollControl.callInBackground(1000, ui, r);
   }
   
   private FrequencyTable loadBeans()
