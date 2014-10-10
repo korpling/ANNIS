@@ -15,13 +15,24 @@
  */
 package annis.gui.components;
 
+import com.google.common.base.Joiner;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.VerticalLayout;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.LinkedHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Embedds a single HTML page and adds navigation to it's headers (if they have
@@ -33,9 +44,13 @@ import org.json.JSONException;
  */
 public class NavigateableSinglePage extends VerticalLayout
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(NavigateableSinglePage.class);
 
   private final IFrameComponent iframe = new IFrameComponent();
   private final Label lblHeaderID = new Label();
+  
+  private final static Pattern regexHeader = Pattern.compile("h([1-6])");
   
   public NavigateableSinglePage()
   {
@@ -49,6 +64,7 @@ public class NavigateableSinglePage extends VerticalLayout
     addComponent(iframe);
     
     setExpandRatio(iframe, 1.0f);
+    
   }
 
   private void onScroll(String headerID)
@@ -59,6 +75,56 @@ public class NavigateableSinglePage extends VerticalLayout
   public void setSource(String source)
   {
     iframe.getState().setSource(source);
+    parseHTML(source);
+  }
+  
+  private LinkedHashMap<String, String> parseHTML(String source)
+  {
+    
+    LinkedHashMap<String, String> result = new LinkedHashMap<>();
+    try
+    {
+      Document doc = Jsoup.connect(source).get();
+      
+      ArrayList<String> currentPath = new ArrayList<>();
+      // find all headers that have an ID
+//      for(Element e : doc.getElementsByAttribute("id"))
+      for(Element e : doc.getAllElements())
+      {
+        Matcher m = regexHeader.matcher(e.tagName());
+        if(m.matches())
+        {
+          int level = Integer.parseInt(m.group(1))-1;
+          
+          // decide wether to expand the path (one level deeper) or to truncate
+          if(level == 0)
+          {
+            currentPath.clear();          }
+          else if(currentPath.size() >= level)
+          {
+            // truncate
+            currentPath = new ArrayList<>(currentPath.subList(0, level));  
+          }
+          
+          
+          if(currentPath.isEmpty() && level > 0)
+          {
+            // fill the path with empty elements
+            for(int i=0; i < level; i++)
+            {
+              currentPath.add("");
+            }
+          }
+          currentPath.add(e.text());
+          log.info("current path: {}", Joiner.on(" | ").join(currentPath));
+        }
+      }
+    }
+    catch (IOException ex)
+    {
+      log.error("Could not parse iframe source", ex);
+    }
+    return result;
   }
 
   @JavaScript(
