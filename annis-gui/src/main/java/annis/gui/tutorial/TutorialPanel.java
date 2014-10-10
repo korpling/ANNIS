@@ -15,6 +15,7 @@
  */
 package annis.gui.tutorial;
 
+import annis.gui.components.NavigateableSinglePage;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.BrowserFrame;
@@ -26,17 +27,16 @@ import com.vaadin.ui.VerticalLayout;
  */
 public class TutorialPanel extends VerticalLayout
 {
-  private BrowserFrame embedded;
+  private NavigateableSinglePage embedded;
   public TutorialPanel()
   {
     setSizeFull();   
     
-    embedded = new BrowserFrame();
+    embedded = new NavigateableSinglePage();
     embedded.setSizeFull();
     addComponent(embedded);
 
     String contextPath = VaadinService.getCurrentRequest().getContextPath();
-    embedded.setSource(new ExternalResource(contextPath + "/VAADIN/tutorial/index.html"));
-    
+    embedded.setSource(contextPath + "/VAADIN/tutorial/index_singlepage.html");    
   }
 }
