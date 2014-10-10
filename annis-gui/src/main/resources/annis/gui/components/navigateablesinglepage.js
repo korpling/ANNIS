@@ -28,11 +28,11 @@ window.annis_gui_components_NavigateableSinglePage = function () {
     iframeElement.attr("allowtransparency", "true");
     iframeElement.attr("src", connector.getState().source);
     
-    var iframeContent = $(iframeElement.get(0).contentDocument);
-    
-    $(iframeContent).bind('scroll',function(){
+    var iframeWindow = $(iframeElement.get(0).contentWindow);
+    iframeWindow.on('scroll',function(){
       connector.scrolled("test");
     });
+
   }
 
   this.onStateChange = function () {

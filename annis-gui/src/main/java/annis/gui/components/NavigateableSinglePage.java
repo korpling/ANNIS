@@ -49,7 +49,6 @@ public class NavigateableSinglePage extends AbstractJavaScriptComponent
   
   private void onScroll(String headerID)
   {
-    
   }
   
   @Override
