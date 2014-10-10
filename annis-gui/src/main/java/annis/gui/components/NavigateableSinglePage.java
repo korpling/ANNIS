@@ -20,10 +20,13 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.MenuBar;
+import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
+import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
@@ -50,6 +53,8 @@ public class NavigateableSinglePage extends VerticalLayout
   private final IFrameComponent iframe = new IFrameComponent();
   private final Label lblHeaderID = new Label();
   
+  private MenuBar navigation;
+  
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
   
   public NavigateableSinglePage()
@@ -75,21 +80,30 @@ public class NavigateableSinglePage extends VerticalLayout
   public void setSource(String source)
   {
     iframe.getState().setSource(source);
-    parseHTML(source);
+    if(navigation != null)
+    {
+      removeComponent(navigation);
+    }
+    navigation = createMenubarFromHTML(source);
+    addComponent(navigation, 0);
   }
   
-  private LinkedHashMap<String, String> parseHTML(String source)
+  private MenuBar createMenubarFromHTML(String source)
   {
     
+    MenuBar mbNavigation = new MenuBar();
+    MenuItem navRoot = mbNavigation.addItem("Choose topic", null);
+    
+        
     LinkedHashMap<String, String> result = new LinkedHashMap<>();
     try
     {
       Document doc = Jsoup.connect(source).get();
       
-      ArrayList<String> currentPath = new ArrayList<>();
+      ArrayList<MenuItem> itemPath = new ArrayList<>();
       // find all headers that have an ID
-//      for(Element e : doc.getElementsByAttribute("id"))
-      for(Element e : doc.getAllElements())
+      for(Element e : doc.getElementsByAttribute("id"))
+//      for(Element e : doc.getAllElements())
       {
         Matcher m = regexHeader.matcher(e.tagName());
         if(m.matches())
@@ -99,24 +113,24 @@ public class NavigateableSinglePage extends VerticalLayout
           // decide wether to expand the path (one level deeper) or to truncate
           if(level == 0)
           {
-            currentPath.clear();          }
-          else if(currentPath.size() >= level)
+            itemPath.clear();
+          }
+          else if(itemPath.size() >= level)
           {
             // truncate
-            currentPath = new ArrayList<>(currentPath.subList(0, level));  
+            itemPath = new ArrayList<>(itemPath.subList(0, level));
           }
           
-          
-          if(currentPath.isEmpty() && level > 0)
+          if(itemPath.isEmpty() && level > 0)
           {
             // fill the path with empty elements
             for(int i=0; i < level; i++)
             {
-              currentPath.add("");
+              itemPath.add(createItem(navRoot, itemPath, "<empty>"));
             }
           }
-          currentPath.add(e.text());
-          log.info("current path: {}", Joiner.on(" | ").join(currentPath));
+          itemPath.add(createItem(navRoot, itemPath, e.text()));
+          log.info("current path: {}", Joiner.on(" | ").join(itemPath));
         }
       }
     }
@@ -124,7 +138,24 @@ public class NavigateableSinglePage extends VerticalLayout
     {
       log.error("Could not parse iframe source", ex);
     }
-    return result;
+    return mbNavigation;
+  }
+  
+  private MenuItem createItem(MenuItem rootItem, List<MenuItem> path, String caption)
+  {
+    MenuItem parent;
+    
+    if(path.isEmpty())
+    {
+      parent = rootItem;
+    }
+    else
+    {
+      parent = path.get(path.size()-1);
+      
+    }
+    MenuItem child = parent.addItem(caption, null);
+    return child;
   }
 
   @JavaScript(
