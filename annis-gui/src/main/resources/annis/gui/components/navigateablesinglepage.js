@@ -38,7 +38,7 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function ()
       {
         var top = iframeWindow.scrollTop();
         var windowHeight = iframeWindow.height();
-        var visibleBorder = top + (windowHeight / 3);
+        var visibleBorder = top + (windowHeight / 4);
 
 
         var lastInvisibleID = headersWithID.attr('id')
