@@ -50,41 +50,46 @@ import org.slf4j.LoggerFactory;
  */
 public class NavigateableSinglePage extends VerticalLayout
 {
-  
-  private final static Logger log = LoggerFactory.getLogger(NavigateableSinglePage.class);
+
+  private final static Logger log = LoggerFactory.getLogger(
+    NavigateableSinglePage.class);
 
   private final IFrameComponent iframe = new IFrameComponent();
-  
+
   private MenuBar navigation;
-  private Map<String, MenuItem> menuItemRegistry = new HashMap<>();
-  private MenuItem lastCheckedItem;
+
+  private final Map<String, MenuItem> menuItemRegistry = new HashMap<>();
+
+  private MenuItem lastSelectedItem;
+
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
-  
+
   public NavigateableSinglePage()
   {
     iframe.setSizeFull();
-   
+
+    setSpacing(true);
     addComponent(iframe);
-    
+
     setExpandRatio(iframe, 1.0f);
-    
+
   }
 
   private void onScroll(String headerID)
   {
-    if(navigation != null)
+    if (navigation != null)
     {
-      MenuItem navRoot =  navigation.getItems().get(0);
+      MenuItem navRoot = navigation.getItems().get(0);
       MenuItem toSelect = menuItemRegistry.get(headerID);
-      if(toSelect != null)
+      if (toSelect != null)
       {
         navRoot.setText(toSelect.getText());
         toSelect.setStyleName("huge-selected");
-        if(lastCheckedItem != null && lastCheckedItem != toSelect)
+        if (lastSelectedItem != null && lastSelectedItem != toSelect)
         {
-          lastCheckedItem.setStyleName("huge");
-        }        
-        lastCheckedItem = toSelect;
+          lastSelectedItem.setStyleName("huge");
+        }
+        lastSelectedItem = toSelect;
       }
     }
   }
@@ -92,7 +97,7 @@ public class NavigateableSinglePage extends VerticalLayout
   public void setSource(String source)
   {
     iframe.getState().setSource(source);
-    if(navigation != null)
+    if (navigation != null)
     {
       removeComponent(navigation);
     }
@@ -100,43 +105,44 @@ public class NavigateableSinglePage extends VerticalLayout
     navigation = createMenubarFromHTML(source, menuItemRegistry);
     addComponent(navigation, 0);
   }
-  
-  private MenuBar createMenubarFromHTML(String source, Map<String, MenuItem> idToMenuItem)
+
+  private MenuBar createMenubarFromHTML(String source,
+    Map<String, MenuItem> idToMenuItem)
   {
-    
+
     MenuBar mbNavigation = new MenuBar();
     mbNavigation.setStyleName("huge");
     MenuItem navRoot = mbNavigation.addItem("Choose topic", null);
     navRoot.setStyleName("huge");
-    
+
     try
     {
       Document doc = Jsoup.connect(source).get();
-      
+
       ArrayList<MenuItem> itemPath = new ArrayList<>();
       // find all headers that have an ID
-      for(Element e : doc.getElementsByAttribute("id"))
+      for (Element e : doc.getElementsByAttribute("id"))
       {
         Matcher m = regexHeader.matcher(e.tagName());
-        if(m.matches())
+        if (m.matches())
         {
-          int level = Integer.parseInt(m.group(1))-1;
-          
+          int level = Integer.parseInt(m.group(1)) - 1;
+
           // decide wether to expand the path (one level deeper) or to truncate
-          if(level == 0)
+          if (level == 0)
           {
             itemPath.clear();
           }
-          else if(itemPath.size() >= level)
+          else if (itemPath.size() >= level)
           {
             // truncate
             itemPath = new ArrayList<>(itemPath.subList(0, level));
           }
-          
-          if(itemPath.isEmpty() && level > 0)
+
+          if (itemPath.isEmpty() && level > 0)
           {
             // fill the path with empty elements
-            for(int i=0; i < level; i++)
+            for (int i = 0; i < level; i++)
             {
               itemPath.add(createItem(navRoot, itemPath, "<empty>", null));
             }
@@ -153,59 +159,69 @@ public class NavigateableSinglePage extends VerticalLayout
     }
     return mbNavigation;
   }
-  
-  private MenuItem createItem(MenuItem rootItem, List<MenuItem> path, String caption, String id)
+
+  private MenuItem createItem(MenuItem rootItem, List<MenuItem> path,
+    String caption, String id)
   {
     MenuItem parent;
-    
-    if(path.isEmpty())
+
+    if (path.isEmpty())
     {
       parent = rootItem;
     }
     else
     {
-      parent = path.get(path.size()-1);
-      
+      parent = path.get(path.size() - 1);
+
     }
     MenuItem child = parent.addItem(caption, new IDSelectionCommand(id));
     child.setStyleName("huge");
     return child;
   }
-  
+
   private class IDSelectionCommand implements MenuBar.Command
   {
+
     private final String id;
-    
+
     public IDSelectionCommand(String id)
     {
       this.id = id;
     }
-    
+
     @Override
     public void menuSelected(MenuItem selectedItem)
     {
-      if(id != null)
+      if (id != null)
       {
+        MenuItem navRoot = navigation.getItems().get(0);
         String lastSource = iframe.getState().getSource();
         // remove the fragment part
-        if(lastSource != null)
+        if (lastSource != null)
         {
           int hashPos = lastSource.lastIndexOf('#');
-          if(hashPos >= 0)
+          if (hashPos >= 0)
           {
             lastSource = lastSource.substring(0, hashPos);
           }
+          selectedItem.setStyleName("huge-selected");
+          navRoot.setText(selectedItem.getText());
+          if (lastSelectedItem != null && lastSelectedItem != selectedItem)
+          {
+            lastSelectedItem.setStyleName("huge");
+          }
+          lastSelectedItem = selectedItem;
           iframe.getState().setSource(lastSource + "#" + id);
         }
       }
     }
-    
+
   }
 
   @JavaScript(
-  {
-    "vaadin://jquery.js", "navigateablesinglepage.js"
-  })
+    {
+      "vaadin://jquery.js", "navigateablesinglepage.js"
+    })
   private class IFrameComponent extends AbstractJavaScriptComponent
   {
 
