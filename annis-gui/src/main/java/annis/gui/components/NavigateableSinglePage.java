@@ -23,10 +23,13 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import org.json.JSONArray;
@@ -51,21 +54,16 @@ public class NavigateableSinglePage extends VerticalLayout
   private final static Logger log = LoggerFactory.getLogger(NavigateableSinglePage.class);
 
   private final IFrameComponent iframe = new IFrameComponent();
-  private final Label lblHeaderID = new Label();
   
   private MenuBar navigation;
-  
+  private Map<String, MenuItem> menuItemRegistry = new HashMap<>();
+  private MenuItem lastCheckedItem;
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
   
   public NavigateableSinglePage()
   {
-    lblHeaderID.setCaption("Selected header ID: ");
-    
-    lblHeaderID.setWidth("100%");
-    lblHeaderID.setHeight("-1px");
     iframe.setSizeFull();
-    
-    addComponent(lblHeaderID);
+   
     addComponent(iframe);
     
     setExpandRatio(iframe, 1.0f);
@@ -74,7 +72,21 @@ public class NavigateableSinglePage extends VerticalLayout
 
   private void onScroll(String headerID)
   {
-    lblHeaderID.setValue(headerID);
+    if(navigation != null)
+    {
+      MenuItem navRoot =  navigation.getItems().get(0);
+      MenuItem toSelect = menuItemRegistry.get(headerID);
+      if(toSelect != null)
+      {
+        navRoot.setText(toSelect.getText());
+        toSelect.setStyleName("huge-selected");
+        if(lastCheckedItem != null && lastCheckedItem != toSelect)
+        {
+          lastCheckedItem.setStyleName("huge");
+        }        
+        lastCheckedItem = toSelect;
+      }
+    }
   }
 
   public void setSource(String source)
@@ -84,18 +96,19 @@ public class NavigateableSinglePage extends VerticalLayout
     {
       removeComponent(navigation);
     }
-    navigation = createMenubarFromHTML(source);
+    menuItemRegistry.clear();
+    navigation = createMenubarFromHTML(source, menuItemRegistry);
     addComponent(navigation, 0);
   }
   
-  private MenuBar createMenubarFromHTML(String source)
+  private MenuBar createMenubarFromHTML(String source, Map<String, MenuItem> idToMenuItem)
   {
     
     MenuBar mbNavigation = new MenuBar();
+    mbNavigation.setStyleName("huge");
     MenuItem navRoot = mbNavigation.addItem("Choose topic", null);
+    navRoot.setStyleName("huge");
     
-        
-    LinkedHashMap<String, String> result = new LinkedHashMap<>();
     try
     {
       Document doc = Jsoup.connect(source).get();
@@ -103,7 +116,6 @@ public class NavigateableSinglePage extends VerticalLayout
       ArrayList<MenuItem> itemPath = new ArrayList<>();
       // find all headers that have an ID
       for(Element e : doc.getElementsByAttribute("id"))
-//      for(Element e : doc.getAllElements())
       {
         Matcher m = regexHeader.matcher(e.tagName());
         if(m.matches())
@@ -129,8 +141,9 @@ public class NavigateableSinglePage extends VerticalLayout
               itemPath.add(createItem(navRoot, itemPath, "<empty>"));
             }
           }
-          itemPath.add(createItem(navRoot, itemPath, e.text()));
-          log.info("current path: {}", Joiner.on(" | ").join(itemPath));
+          MenuItem item = createItem(navRoot, itemPath, e.text());
+          itemPath.add(item);
+          idToMenuItem.put(e.id(), item);
         }
       }
     }
@@ -155,6 +168,7 @@ public class NavigateableSinglePage extends VerticalLayout
       
     }
     MenuItem child = parent.addItem(caption, null);
+    child.setStyleName("huge");
     return child;
   }
 

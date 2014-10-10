@@ -11631,6 +11631,23 @@ div.v-layout.v-horizontal.v-widget {
 	border-width: 1px 0px 0px 0px;
 }
 
+.annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
+	line-height: 40px;
+}
+
+.annis .v-menubar-popup .v-menubar-menuitem-huge .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after {
+	line-height: 40px;
+}
+
+.annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
+	text-decoration: underline;
+}
+
+.annis .v-menubar-huge {
+	line-height: 40px;
+	height: 42px;
+}
+
 .annis .v-app-loading:before {
 	background-image: url(images/annisloading.gif);
 	margin-top: -100px;
