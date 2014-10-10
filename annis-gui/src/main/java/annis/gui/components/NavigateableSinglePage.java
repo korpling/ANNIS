@@ -138,10 +138,10 @@ public class NavigateableSinglePage extends VerticalLayout
             // fill the path with empty elements
             for(int i=0; i < level; i++)
             {
-              itemPath.add(createItem(navRoot, itemPath, "<empty>"));
+              itemPath.add(createItem(navRoot, itemPath, "<empty>", null));
             }
           }
-          MenuItem item = createItem(navRoot, itemPath, e.text());
+          MenuItem item = createItem(navRoot, itemPath, e.text(), e.id());
           itemPath.add(item);
           idToMenuItem.put(e.id(), item);
         }
@@ -154,7 +154,7 @@ public class NavigateableSinglePage extends VerticalLayout
     return mbNavigation;
   }
   
-  private MenuItem createItem(MenuItem rootItem, List<MenuItem> path, String caption)
+  private MenuItem createItem(MenuItem rootItem, List<MenuItem> path, String caption, String id)
   {
     MenuItem parent;
     
@@ -167,9 +167,39 @@ public class NavigateableSinglePage extends VerticalLayout
       parent = path.get(path.size()-1);
       
     }
-    MenuItem child = parent.addItem(caption, null);
+    MenuItem child = parent.addItem(caption, new IDSelectionCommand(id));
     child.setStyleName("huge");
     return child;
+  }
+  
+  private class IDSelectionCommand implements MenuBar.Command
+  {
+    private final String id;
+    
+    public IDSelectionCommand(String id)
+    {
+      this.id = id;
+    }
+    
+    @Override
+    public void menuSelected(MenuItem selectedItem)
+    {
+      if(id != null)
+      {
+        String lastSource = iframe.getState().getSource();
+        // remove the fragment part
+        if(lastSource != null)
+        {
+          int hashPos = lastSource.lastIndexOf('#');
+          if(hashPos >= 0)
+          {
+            lastSource = lastSource.substring(0, hashPos);
+          }
+          iframe.getState().setSource(lastSource + "#" + id);
+        }
+      }
+    }
+    
   }
 
   @JavaScript(
