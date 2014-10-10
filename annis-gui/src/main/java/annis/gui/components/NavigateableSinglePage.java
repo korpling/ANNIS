@@ -18,47 +18,73 @@ package annis.gui.components;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.VerticalLayout;
 import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
- * Embedds a single HTML page and adds navigation to it's 
- * headers (if they have an id).
- * 
+ * Embedds a single HTML page and adds navigation to it's headers (if they have
+ * an id).
+ *
  * This is e.g. usefull for documentation.
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@JavaScript(
+public class NavigateableSinglePage extends VerticalLayout
 {
-  "vaadin://jquery.js", "navigateablesinglepage.js"
-})
-public class NavigateableSinglePage extends AbstractJavaScriptComponent
-{
+
+  private final IFrameComponent iframe = new IFrameComponent();
+  private final Label lblHeaderID = new Label();
+  
   public NavigateableSinglePage()
   {
-    addFunction("scrolled", new JavaScriptFunction()
-    {
-
-      @Override
-      public void call(JSONArray arguments) throws JSONException
-      {
-        onScroll(arguments.getString(0));
-      }
-    });
+    lblHeaderID.setCaption("Selected header ID: ");
+    
+    lblHeaderID.setWidth("100%");
+    lblHeaderID.setHeight("-1px");
+    iframe.setSizeFull();
+    
+    addComponent(lblHeaderID);
+    addComponent(iframe);
+    
+    setExpandRatio(iframe, 1.0f);
   }
-  
+
   private void onScroll(String headerID)
   {
+    lblHeaderID.setValue(headerID);
   }
-  
-  @Override
-  public final IframeState getState()
-  {
-    return (IframeState) super.getState();
-  }
-  
+
   public void setSource(String source)
   {
-    getState().setSource(source);
+    iframe.getState().setSource(source);
+  }
+
+  @JavaScript(
+  {
+    "vaadin://jquery.js", "navigateablesinglepage.js"
+  })
+  private class IFrameComponent extends AbstractJavaScriptComponent
+  {
+
+    public IFrameComponent()
+    {
+      addFunction("scrolled", new JavaScriptFunction()
+      {
+
+        @Override
+        public void call(JSONArray arguments) throws JSONException
+        {
+          onScroll(arguments.getString(0));
+        }
+      });
+    }
+
+    @Override
+    public final IframeState getState()
+    {
+      return (IframeState) super.getState();
+    }
   }
 }

@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-window.annis_gui_components_NavigateableSinglePage = function () {
+window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function () {
 
   var connector = this;
   var rootDiv = $(this.getElement(this.getConnectorId()));
@@ -27,12 +27,38 @@ window.annis_gui_components_NavigateableSinglePage = function () {
     iframeElement.attr("height", "100%");
     iframeElement.attr("allowtransparency", "true");
     iframeElement.attr("src", connector.getState().source);
-    
-    var iframeWindow = $(iframeElement.get(0).contentWindow);
-    iframeWindow.on('scroll',function(){
-      connector.scrolled("test");
-    });
 
+    var iframeWindow = $(iframeElement.get(0).contentWindow);
+    iframeWindow.on('scroll', function () {
+
+      // find ID of the first header which is inside the visible range
+      var headersWithID = $(iframeWindow.get(0).document).find("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
+
+      if (headersWithID.length > 0)
+      {
+        var top = iframeWindow.scrollTop();
+        var windowHeight = iframeWindow.height();
+        var visibleBorder = top + (windowHeight / 3);
+
+
+        var lastInvisibleID = headersWithID.attr('id')
+        // find the last header which is (even slightly) invisible
+        $.each(headersWithID, function (key) {
+
+          var offset = $(this).offset().top;
+
+          // is invisible?
+          if (offset < visibleBorder) {
+            lastInvisibleID = $(this).attr('id');
+          } else {
+            return false;
+          }
+        });
+        connector.scrolled(lastInvisibleID);
+      }
+
+
+    });
   }
 
   this.onStateChange = function () {
