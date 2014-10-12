@@ -15,19 +15,15 @@
  */
 package annis.gui.components;
 
-import com.google.common.base.Joiner;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.Label;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
@@ -60,7 +56,8 @@ public class NavigateableSinglePage extends VerticalLayout
 
   private final Map<String, MenuItem> menuItemRegistry = new HashMap<>();
 
-  private MenuItem lastSelectedItem;
+//  private MenuItem lastSelectedItem;
+  private String lastSelectedID;
 
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
 
@@ -75,10 +72,18 @@ public class NavigateableSinglePage extends VerticalLayout
 
   }
 
+  @Override
+  public void attach()
+  {
+    super.attach();
+    iframe.scrollToElement(lastSelectedID);
+  }
+  
+  
+
   private void onScroll(String headerID)
   {
-    MenuItem toSelect = menuItemRegistry.get(headerID);
-    selectChapterInNavigation(toSelect);
+    selectChapterInNavigation(headerID);
   }
 
   public void setSource(String source)
@@ -166,20 +171,26 @@ public class NavigateableSinglePage extends VerticalLayout
     return child;
   }
   
-  private void selectChapterInNavigation(MenuItem toSelect)
+  private void selectChapterInNavigation(String idToSelect)
   {
-    if (navigation != null)
+    if (navigation != null && menuItemRegistry != null && idToSelect != null)
     {
       MenuItem navRoot = navigation.getItems().get(0);
+      MenuItem toSelect = menuItemRegistry.get(idToSelect);
+      
       if (toSelect != null)
       {
         navRoot.setText(toSelect.getText());
         toSelect.setStyleName("huge-selected");
-        if (lastSelectedItem != null && lastSelectedItem != toSelect)
+        if(lastSelectedID != null)
         {
-          lastSelectedItem.setStyleName("huge");
+          MenuItem lastSelectedItem = menuItemRegistry.get(lastSelectedID);
+          if (lastSelectedItem != null && lastSelectedItem != toSelect)
+          {
+            lastSelectedItem.setStyleName("huge");
+          }
         }
-        lastSelectedItem = toSelect;
+        lastSelectedID = idToSelect;
       }
     }
   }
@@ -200,7 +211,7 @@ public class NavigateableSinglePage extends VerticalLayout
       if (id != null)
       {
         iframe.scrollToElement(id);
-        selectChapterInNavigation(selectedItem);
+        selectChapterInNavigation(id);
       }
     }
 
@@ -228,7 +239,10 @@ public class NavigateableSinglePage extends VerticalLayout
 
     public void scrollToElement(String id)
     {
-      callFunction("scrollToElement", id);
+      if(id != null)
+      {
+        callFunction("scrollToElement", id);
+      }
     }
 
     @Override

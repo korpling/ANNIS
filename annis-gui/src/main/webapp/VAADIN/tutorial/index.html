@@ -1,14 +1,672 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Frameset//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<!DOCTYPE html>
 <html>
-<head>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-<title>ANNIS Tutorial</title>
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-</head>
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <title>ANNIS tutorial</title>
+    <link href="ANNIS_tutorial.css" rel="stylesheet" type="text/css">
+  </head>
 
-<frameset rows="75,100%">
-   <frame src="tutorial_nav.html" name="tutnav" frameborder="0">
-   <frame src="interface.html" name="tutframe" frameborder="0">
-</frameset><noframes></noframes>
+  <body>
 
+    <div id="tutorialcontent">
+
+      <h1 id="annis_interface">ANNIS interface</h1>
+
+      <h2 id="using_interface">Using the ANNIS Interface</h2>
+      The ANNIS interface is comprised of several areas, the most important of which are the search form and the results tab.
+      <h3>The Search Form</h3>
+      <img src="searchform.png" alt="ANNIS search form">
+      <p>The Search Form can be found on the left of the interface window. It's bottom part shows the list of currently available corpora.
+        By clicking on the line with the corpus name, it is possible to select which corpora should be searched in (hold down 'ctrl' to select multiple corpora simultaneously).
+        You may also configure groups of corpora or type in the filter box to view subsets of the corpora (see the ANNIS User Guide for details).
+      </p>
+      <p>
+        The "AQL" field at the top of the form is used for inputting queries manually (see the tutorials on the ANNIS Query Language from the ANNIS website).
+        As soon as one or several corpora are selected and a query is entered or modified, the query will be validated automatically and possible errors in the query syntax will be commented on in the "Status" box below.
+      </p>
+      <p>
+        Once a valid query has been entered, pressing the "Search" button will retrieve the number of matching positions and documents in the selected corpora in the Status box and open the Result tab to display the first set of matches.</p>
+      <img src="searchoptions.png" alt="ANNIS search options">
+      <p>
+        In order to get more control over the search you can click on "Search
+        Options" to unfold more detailed search options.  The context
+        surrounding the matching expressions in the result list ist determined
+        by the "Left Context" and "Right Context" options and can be changed on each side (by default up to 20 tokens). Some corpora allow longer spans, depending on their configuration.
+        Entire texts can also be viewed using special document visualizations or by clicking on the document icon next to each corpus name.</p>
+      <h3>The Result Window</h3>
+      <img src="search_bar.png" alt="ANNIS result window toolbar" >
+      <p>The result window shows search results in pages of 10 hits each by
+        default (this can be changed in the Search Form). The toolbar at the
+        top of the window allows you to navigate between these pages.  The
+        "Token Annotations" button on the toolbar allows you to toggle the
+        token based annotations, such as lemmas and parts-of-speech, on or off
+        for you convenience.  You can use hyperlinks to your queries by copying
+        the current browser URL for e-mail or citation purposes, allowing others to reproduce your
+        query.</p>
+      <p>If your corpus contains multiple alternative text layers or segmentations (e.g. normalized and un-normalized text),
+        you may switch between these on the fly by using the "base text" menu.</p>
+      <img src="KWIC_narrow.png" alt="KWIC concordance in ANNIS">
+      <p>
+        The result list itself initially shows a KWIC (key word in context)
+        concordance of matching positions in the selected corpora, with the
+        matching region marked red and the context in black on either side. Context can be adjusted for
+        individual search results up to the maximum allowed for the current corpus.
+        Token annotations are displayed in gray under each token, and hovering
+        over them with the mouse will show the annotation name and
+        namespace. More complex annotation levels can be expanded, if
+        available, by clicking on the plus icon next to the level's name,
+        e.g. dependencies and information structure for the annotations in the dependency tree and grid
+        views in the picture below. </p>
+      <img src="annotation_levels.png" alt="visualization of different annotation levels">
+
+      <h2 id="query_builder">Using the ANNIS Query Builder</h2>
+      <p>To open the graphical query builder, click on the <strong>Query Builder</strong> button. On the left-hand side of the toolbar at the top of the query builder canvans, you will see the <strong>Add Node</strong> button.
+        Use this button to define nodes to be searched for (tokens, non-terminal nodes or annotations). Creating nodes and modifying them on the canvas will immediately update the AQL field in the Search Form with your query, though updating the query on the Search Form will not create a new graph in the Query Builder. </p>
+      <img src="query_builder_empty.png" alt="The Query Builder tab and the Create Node button">
+      <p>In each node you create you may click on  <img src="list-add.png" alt="The Add Node button"> to specify an annotation value. The annotation name can be typed in or selected from a drop down list. The operator field in the middle allows you to choose between an exact match
+        (the '=' symbol) or wildcard search using Regular Expressions (the '~' symbol). The annotation value is given on the right, and should <strong>NOT</strong> be surrounded by quotations (see the example below).
+        It is also possible to specify multiple annotations applying to the same position by clicking on <img src="list-add.png" alt="The Add Node button"> multiple times. Clicking on <img src="edit-clear.png" alt="The Clear all nodes button"> will delete the values in the node.
+        To search for word forms, simply choose "tok" as the field name on the left. A node with no data entered will match any node, that is an underspecified token or non-terminal node or annotation.</p>
+      <img src="node.png" alt="Query Builder node">
+      <p>
+        To specify the relationship between nodes, first click on the "Add Edge" link at the top left of one node, and then click the "Dock" link which becomes available on the other nodes.
+        An edge will connect the nodes with an extra box from which operators may be selected (see below). For operators allowing additional labels (e.g. the dominance operator <code>&gt;</code> allows edge labels to be specified),
+        you may type directly into the edge's operator box, as in the example with a "func" label in the image below. Note that the node clicked on first (where the "Edge" button was clicked) will be the first node in the resulting
+        quey, i.e. if this is the first node it will dominate the second node (<code>#1 &gt; #2</code>) and not the other way around, as also represented by the arrows along the edge.</p>
+      <img src="edge.png" alt="Connecting nodes with an edge">
+
+      <h1 id="annis_query_language">ANNIS Query language</h1>
+
+      <h2 id="searching_word_forms">Searching for Word Forms</h2>
+      <p>
+        To search for word forms in ANNIS, simply select a corpus (in this
+        example the small PCC2 demo corpus) and enter a search string between
+        double quotation marks, e.g.:</p>
+      <div class="indent">
+        <code>"statisch"</code>
+      </div>
+      <p>Note that the search is <strong>case
+          sensitive</strong>, so it will not
+        find cases of capitalized 'Statisch', for example at the beginning of a
+        sentence. In order to find both options, you can either look for one
+        form OR the other using the pipe sign ( <code>|</code>
+        ):
+      </p>
+
+      <div class="indent">
+        <code>"statisch" | "Statisch"</code>
+      </div>
+
+
+      <p>or else you can use <a href="regex.html">regular
+          expressions</a>, which must be
+        surrounded by slashes ( <code>/</code>
+        ) instead of quotation marks:</p>
+
+      <div class="indent">
+        <code>/[Ss]tatisch/</code>
+      </div>
+
+      <p>To look for a sequence of
+        multiple word forms, enter your search terms separated by <code>&amp;</code>
+        and then specify that the relation between the elements is one of <strong>precedence</strong>,
+        as signified by the period ( <strong><code>.</code></strong>
+        ) operator:</p>
+
+      <div class="indent">
+        <code>"so" &amp; "statisch"
+          &amp; #1 . #2</code>
+      </div>
+
+      <p>The expression <code>#1
+          . #2</code> signifies that the first
+        element ("so") precedes the second element ("statisch"). Alternatively, you can also place the operator directly between the search elements as a <strong>shortcut</strong>. The following shortcut query is equivalent:
+      </p>
+
+      <div class="indent">
+        <code>"so" . "statisch"</code>
+      </div>
+
+      <p>
+        For <strong>indirect
+          precedence </strong>(where other
+        tokens may stand between the search terms), use the <strong><code>.*</code></strong>
+        operator:</p>
+
+      <div class="indent">
+        <code>/[Ss]o/ &amp; "statisch"
+          &amp; "wie" &amp; #1 . #2 &amp; #2 .* #3 </code>
+        <p><b>OR using shortcuts:</b></p>
+        <code>/[Ss]o/ . "statisch" .* "wie"</code>
+      </div>
+
+
+      <p>The queries above find sequences
+        beginning with either "So" or "so", followed directly by "statisch",
+        which must be followed either directly or indirectly (.*) by "wie". A
+        range of allowed distances can also be specified numerically as follows:</p>
+
+      <div class="indent">
+        <code>/[Ss]tatisch/ &amp; "wie"
+          &amp; #1 .1,5 #2</code>
+        <p><b>OR:</b></p>
+        <code>/[Ss]tatisch/ .1,5 "wie"</code>
+      </div>
+
+      <p>Meaning the two words may
+        appear at a distance of 1 to 5 tokens. The operator <code>.*</code>
+        allows a distance of up to 50 tokens by default, so searching with <code>.1,50</code>
+        is the same as using <code>.*</code>
+        instead. Greater distances (e.g. <code>.1,100</code>
+        for 'within 100 tokens') should always be specified explicitly.</p>
+      <p>
+        Finally, we can add metadata restrictions to the query, which filter
+        out documents not matching our definitions. Metadata attributes must be
+        preceded by the prefix meta:: and may not be bound (i.e. they are not
+        referred to as #1 etc. and the numbering of other elements ignores
+        their existence):
+      </p>
+
+      <div class="indent">
+        <code>
+          /[Ss]tatisch/ &amp; "wie" &amp; #1 .1,5 #2 &amp; meta::Genre="Sport"
+        </code>
+      </div>
+
+      <p>To view metadata for a search result or for a corpus, press the "i"
+        icon next to it in the result window or in the search form
+        respectively.
+      </p>
+
+      <h2 id="searching_for_annotations">Searching for Annotations</h2>
+      <p>Annotations may be searched for using an annotation name and value. The names of the annotations vary from corpus to corpus,
+        though many corpora contain part-of-speech and lemma annotations with the names <code>pos</code> and <code>lemma</code> respectively (annotation names are <strong>case sensitive</strong>).
+        For example, to search for all forms of the German verb <em>sein </em>'to be' in a corpus with lemma annotation such as PCC2, simply select the PCC2 corpus and enter:</p>
+      <div class="indent">
+        <code>lemma="sein"</code>
+      </div>
+      <p>
+        Negative searches are also possible using != instead of =. For negated tokens (word forms) use the reserved attribute tok. For example:
+      </p>
+      <div class="indent">
+        <code>
+          lemma!="sein"
+        </code>
+        <p>
+          or:
+        </p>
+        <code>
+          tok!="ist"
+        </code>
+      </div>
+      <p>
+        Metadata can also be negated similarly:
+      </p>
+      <div class="indent">
+        <code>
+          lemma="sein" &amp; meta::Genre!="Sport"
+        </code>
+      </div>
+
+      <p>To only find finite forms of this verb in PCC2, use the part-of-speech (pos) annotation concurrently, and specify that both the lemma and pos should apply to the same element:</p>
+      <div class="indent">
+        <code>lemma="sein" &amp; pos="VAFIN" &amp; #1 _=_ #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>lemma="sein" _=_ pos="VAFIN" </code>
+      </div>
+
+      <p>The expression <code>#1 _=_ #2</code> uses the span identity operator to specify that the first annotation and the second annotation apply to exactly the same position in the corpus.
+        Annotations can also apply to longer spans than a single token: for example, in PCC2, the annotation <code>Inf-Stat</code> signifies the information structure status of a discourse referent.
+        This annotation can also apply to phrases longer than one token. The following query finds spans containing new discourse referents, not previously mentioned in the text:</p>
+
+      <div class="indent">
+        <code>exmaralda:Inf-Stat="new"</code>
+      </div>
+
+      <p>If the corpus contains no more than one annotation type named <code>Inf-Stat</code>, the optional namespace (in this case <code>exmaralda:</code>) may be dropped; if there are multiple annotations with the same name but different namespaces,
+        dropping the namespace will find all of those annotations. In order to view the span of tokens to which this annotation applies, enter the and click on &quot;Search&quot;, then open the exmaralda annotation level to view the grid containing the span.
+        Further operators can test the relationships between potentially overlapping annotations in spans.
+        For example, the operator <code>_i_</code> examines whether one annotation fully contains the span of another annotation (the <em>i</em> stands for 'includes'):</p>
+      <div class="indent">
+        <code>Topic="ab" &amp; Inf-Stat="new" &amp; #1 _i_ #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>Topic="ab" _i_ Inf-Stat="new"</code>
+      </div>
+
+      <p>This query finds aboutness topics (<code>Topic="ab"</code>) containing information structurally new discourse referents.</p>
+
+      <h2 id="searching_regex">Searching using Regular Expressions</h2>
+      <p>
+        When searching for word forms and annotation values, it is possible to employ wildcards as placeholders for a variety of characters, using Regular Expression syntax (see <a href="http://www.regular-expressions.info/" target="new_w">here</a> for detailed information). To search for wildcards use slashes instead of quotation marks to surround your search term. For example, you can use the <strong>period (<code>.</code>)</strong> to replace any single character:
+      </p>
+      <div class="indent">
+        <code>tok=/de./</code>
+      </div>
+      <p>
+        This finds word forms such as "der", "dem", "den" etc. It is also possible to make characters optional by following them with a <strong>question mark (<code>?</code>)</strong>. The following example finds cases of "das" and "dass", since the second "s" is optional:
+      </p>
+      <div class="indent">
+        <code>tok=/dass?/</code>
+      </div>
+      <p>
+        It is also possible to specify an arbitrary number of repetitions, with an <strong>asterisk (<code>*</code>)</strong> signifying zero or more occurrences and a <strong>plus (<code>+</code>)</strong> signifying at least one occurrence. For example, the first query below finds "da", "das", and "dass" (since the asterisk means zero or more times the preceding "s"), while the second finds "das" and "dass", since at least one "s" must be found:
+      </p>
+      <div class="indent">
+        <code>tok=/das*/</code><br><br>
+        <code>tok=/das+/</code>
+      </div>
+      <p>
+        It is possible to combine these operators with the period operator to mean any number of occurrences of an arbitrary character. For example, the query below searches for pos (part-of-speech) annotations that begin with "VA", corresponding to all forms of auxiliary verbs. The string "VA" means that the result must begin with "VA", the period stands for any character, and the asterisk means that 'any character' can be repeated zero or more time, as above.
+      </p>
+      <div class="indent">
+        <code>pos=/VA.*/</code>
+      </div>
+      <p>
+        This finds both finite verbs ("VAFIN") and non-finite ones ("VAINF"). It is also possible to search for explicit alternatives by either specifying characters in <strong>square brackets</strong> or longer strings in <strong>round brackets separated by pipe signs</strong>. The first example below finds either "dem" or "der" (i.e. "de" followed by either "m" or "r") while the second example finds lemma annotations that are either "sein" or "werden".
+      </p>
+      <div class="indent">
+        <code>tok=/de[mr]/</code><br><br>
+        <code>lemma=/(sein|werden)/</code>
+      </div>
+      <p>
+        Finally, negative searches can be used as usual with the exclamation point, and regular expressions can generally be used also in edge annotations. For example, if we search for trees (see also <a href="trees.html">Searching for Trees</a>) where a node dominates another node with edges not containing an object, we can use a wildcard to rule out all edges labels beginning with "O" for object:
+      </p>
+      <div class="indent">
+        <code>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2</code>
+      </div>
+
+      <h2 id="searching_trees">Searching for Trees</h2>
+      <p>In corpora containing hierarchical structures, annotations such as syntax trees can be searched for by defining terminal or none-terminal node annotations and their values.
+        A simple search for prepostional phrases in the small PCC2 demo corpus looks like this:</p>
+      <div class="indent">
+        <code>tiger:cat="PP"</code>
+      </div>
+      <p>If the corpus contains no more than one annotation called <code>cat</code>, the optional namespace, in this case <code>tiger:</code>, may be dropped. This finds all PP nodes in the corpus. To find all PP nodes directly dominating a proper name, a second element can be specified with the appropriate part-of-speech (pos) value:</p>
+      <div class="indent">
+        <code>cat="PP" &amp; pos="NE" &amp; #1 &gt; #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>cat="PP" &gt; pos="NE"</code>
+      </div>
+      <p>The operator <strong>&gt;</strong> signifies <strong>direct dominance</strong>, which must hold between the first and the second element.
+        Once the Result Tab is shown you may open the "tiger" annotation level to see the corresponding tree.
+      </p>
+      <img src="tree_expanded.png">
+      <p>
+        Note that since the context is set to a number of tokens left and right of the search term, the tree for the whole sentence may not be retrieved. To do this, you may want to specifically search for the
+        sentence dominating the PP. To do so, specify the sentence in another element and use the <strong>indirect dominance </strong>( <strong>&gt;* </strong>) operator:</p>
+      <div class="indent">
+        <code>cat="S" &amp; cat="PP" &amp; pos="NE" &amp; #1 &gt;* #2 &amp; #2 &gt; #3</code>
+        <p>OR (using a shortcut):</p>
+        <code>cat="S" &gt;* cat="PP" &gt; pos="NE"</code>
+      </div>
+
+      <p>If the annotations in the corpus support it, you may also look for edge labels. Using the following query will find all adjunct modifiers of a VP, dominated by the VP node through an edge labeled MO.
+        Since we do not know anything about the modifying node, whether it is a non-terminal node or a token, we simply use the <code>node</code> element as a place holder.
+        This element can match any node or annotation in the graph:</p>
+
+      <div class="indent">
+        <code>cat="VP" &amp; node &amp; #1 &gt;[tiger:func="MO"] #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>cat="VP" &gt;[tiger:func="MO"] node</code>
+      </div>
+      <p>
+        It is also possible to negate the label of the dominance edge as in the following query:
+      </p>
+      <div class="indent">
+        <code>
+          cat="VP" & node & #1 >[tiger:func!="MO"] #2
+        </code>
+        <p>OR (using a shortcut):</p>
+        <code>
+          cat="VP" &gt;[tiger:func!="MO"] node
+        </code>
+      </div>
+      <p>
+        which finds all VPs dominating a node with a label other than MO.
+      </p>
+
+      <h2 id="searching_pointing_relations">Searching for Pointing Relations</h2>
+      <p>Pointing relations are used to express an arbitrary directed
+        relationship between two elements (terminals or non-terminals) without
+        implying dominance or coverage inheritance.  For instance, in the pcc2
+        demo corpus, elements in the <code>mmax:</code> namespace may point to
+        each other to express coreference or anaphoric relations.  The
+        following query searches for two <code>np_form</code> annotations, which
+        specify for example whether a nominal phrase is pronominal, definite
+        or indefinite.
+      </p>
+      <div class="indent">
+        <code>mmax:np_form="pper" & <br>mmax:np_form="defnp" & <br>#1
+          -&gt;anaphor_antecedent #2</code>
+      </div>
+      <p>
+        Using the pointing relation operator <code>-&gt;</code> with the
+        type <code>anaphor_antecedent</code>, the first <code>np_form</code>, which
+        should be a personal pronoun (<code>pper</code>), is said to be the
+        anaphor to its antecedent, the second np_form, which is definite
+        (<code>defnp</code>).  To see a visualization of the coreference
+        relations, open the mmax annotation level in the example corpus. In
+        the image below, one of the matches for the above query is highlighted
+        in red (die Seeburger und einige Groß-Glienicker ... sie 'the
+        Seeburgers and some Groß-Glienickers... they'). Other discourse
+        referents in the text (marked with an underline) may be clicked on,
+        causing coreferential chains containing them to be highlighted as
+        well. Note that discourse referents may overlap, leading to multiple
+        underlines: Die Seeburger 'the Seeburgers' is a shorter discourse
+        referent overlapping with the larger one ('the Seeburgers and some
+        Groß-Glienickers'), and each referent has its own
+        underline. Annotations of the coreference edges of each relation can
+        be viewed by hovering of the appropriate underline.
+      </p>
+
+      <img src="coref.gif">
+
+      <p>
+        Another way to use pointing relations is found in syntactic dependency trees. The queries in this case can use both pointing relation types and annotations, as in the following query:
+      </p>
+
+      <div class="indent">
+        <code>pos="VVFIN" & tok & #1 -&gt;dep[func="obja"] #2</code>
+        <p>OR (using a shortcut):</p>
+        <code>pos="VVFIN" -&gt;dep[func="obja"] tok</code>
+      </div>
+
+      <p>
+        This query searches for a finite verb (with the part-of-speech VVFIN)
+        and a token, with a pointing relation of the type 'dep' (for
+        dependency) between the two, annotated with 'func="obja"' (the
+        function Object, Accusative). The result can be viewed with the
+        dependency arch visualizer, which shows the verb gibt 'gives' and its
+        object Wunder 'miracles'.
+      </p>
+
+      <img src="dep_vis.gif">
+
+      <h2 id="exporting">Exporting Results</h2>
+      <p>
+        To export search results, open the menu "More" between the Search and History buttons and select "Export":</p>
+      <img src="export.png">
+      <p>Enter the query whose results you want to export as usual in the AQL box. Note that you <strong>do not need to carry out the query first</strong>. You can enter the query and export without pressing Search before. Several exporter modules can be selected from the Export tab shown below.</p>
+      <img src="export2.png">
+
+      <p>
+        The SimpleTextExporter simply gives the text for all tokens in each search result, including context, in a one-row-per-hit format. The tokens covered by the match area are marked with square brackets and the results are numbered, as in the following example:</p>
+      <pre>
+          1. Tor zum 1:0 für die [Ukraine] stürzte der 1,62 Meter große <br>
+          2. der 1,62 Meter große Gennadi [Subow] die deutsche Nationalelf vorübergehend in <br>
+          3. und Reputation kämpfenden Mannschaft von [Rudi] Völler der Weg zur Weltmeisterschaft <br>
+          4. Reputation kämpfenden Mannschaft von Rudi [Völler] der Weg zur Weltmeisterschaft endgültig <br>
+          5. die deutschen Nationalkicker einen " [Rudi] Riese " auf der Bank <br>
+      </pre>
+      <p>
+        The TextExporter adds all annotations of each token separated by slashes (e.g. dogs/NN/dog for the token dogs annotated with a part-of-speech NN and a lemma dog).
+      </p>
+      <p>
+        The GridExporter adds all annotations available for the span of retrieved tokens, with each annotation layer in a separate line. Annotations are separated by spaces and the hierarchical order of annotations is lost, though the span of tokens covered by each annotation may optionally be given in square brackets (to turn this off use the optional parameter <code>numbers=false</code> in the ‘Parameters’ box). The user can specify annotation layers to be exported in the additional ‘Annotation Keys’ box, and annotation names should be separated by comas, as in the image above. Metadata annotations can also be exported by entering “metakeys=” and a list of comma separated metadata names in the Parameters box. If nothing is specified, all available annotations and no metadata will be exported. Multiple options are separated by a semicolon, e.g. the Parameters <code>metakeys=Genre,Titel;numbers=false</code>. An example output with token numbers looks as follows. </p>
+      <pre>1.	tok	 ein Dialog angestoßen . 
+	cat	 VP[1-6] NP[1-5] 
+	pos	 ART[1-1] NN[2-2] VVPP[6-6] $.[7-7] </pre>
+      <p>
+        Meaning that the annotation cat="NP" applies to tokens 1-5 in the search result, and so on. Note that when specifying annotation layers, if the reserved name 'tok' is not specified, the tokens themselves will not be exported (annotations only).
+      </p>
+      <p>The WekaExporter outputs the
+        format used by the WEKA machine learning
+        tool (http://www.cs.waikato.ac.nz/ml/weka/). Only the attributes
+        of the search elements (#1, #2 etc. in AQL) are outputted, and are
+        separated by commas. The order and name of the attributes is declared
+        in the beginning of the export text, as in this example:
+      </p>
+      <pre>@relation name
+
+@attribute #1_id string
+@attribute #1_span string
+@attribute #1_anno_tiger:cat string
+@attribute #2_id string
+@attribute #2_span string
+@attribute #2_anno_tiger:lemma string
+@attribute #2_anno_tiger:morph string
+@attribute #2_anno_tiger:pos string
+
+@data
+
+'58762617','die beiden geladenen Jugendlichen','NP','58762624','geladenen','geladen','Pos.Nom.Pl.*','ADJA'
+'58762652','keine böse Absicht','NP','58762656','böse','böse','Pos.Nom.Sg.Fem','ADJA'
+'58762886','eine große Chance','NP','58762889','große','groß','Pos.Nom.Sg.Fem','ADJA'
+'58763054','die Dallgower Gemeindevertreter','NP','58763062','Dallgower','Dallgower','Pos.*.*.*','ADJA'
+'58763386','Döberitzer Heide','NP','58763389','Döberitzer','Döberitzer','Pos.*.*.*','ADJA'</pre>
+      <p>The export shows the properties
+        of an NP node dominating a token with
+        the part-of-speech ADJA. Since the token also has other attributes,
+        such as the lemma, the token text and morphology, these are also
+        retrieved. </p>
+
+      <p>It is also possible to output metadata annotations per hit using the WekaExporter. To do so, use the parameter metakeys=meta1,meta2 etc. For example, if your documents have a metadata annotation called 'genre', you may export it for each search result as a further column using metakeys=Genre in the parameters box.
+      </p>
+      <p>
+        The CSVExporter behaves much like the WekaExporter, except that the Weka header specifying the content of the columns is not used (useful for importing into spreadsheet programs such as Excel or Calc).
+      </p>
+
+      <p>Note that exporting may be slow in both exporters if the
+        result set is very large.
+      </p>
+
+      <h2 id="frequency_analysis">Frequency Analysis</h2>
+      <p>
+        To perform a frequency analysis, enter the query whose results you want to analyze as usual in the AQL box. Note that you <strong>do not need to carry out the query first</strong>. Next, open the menu “More” between the Search and History buttons and select “Frequency Analysis”:
+
+      </p>
+      <img src="export.png">
+      <p>The interface will open the frequency analysis tab shown below. Initially, rows will be generated for the nodes present in the query. For example, two rows are automatically generated for the following query, which finds any pair of consecutive tokens: </p>
+      <div class="indent">
+        <code>tok . tok</code><br><br>
+      </div>
+      <img src="freq.png">
+
+      <p>
+        Clicking on “Perform frequency analysis” will produce a breakdown of all consecutive token bigrams in the corpus. The frequency graph will only show the first 500 elements, but the table below it will give the entire list of values, which can also be <strong>exported as a CSV file</strong>.
+      </p>
+      <img src="freq2.png">
+      <p>
+        To edit the analysis or analyze a new query, click the <strong>New Analysis</strong> button. It is also possible to <strong>add annotations</strong> to the analysis that were not in the original query, provided that these are expected to belong to some other node in the query. For example, the tokens in the pcc2 corpus also have part-of-speech, lemma and morphological information. We can replace the lines in the analysis specifying that tok values should be counted with pos values, which gives us part-of-speech bigrams. We can also add a lemma annotation belonging to the first search element, by clicking the Add button and entering the node definition number and annotation name we are interested in:
+      </p>
+      <img src="freq3.png">
+      <p>
+        As a result, we will get a count for each combination of values grouped by the first and second tokens parts-of-speech, as well as the first token’s lemma.
+      </p>
+
+      <h2 id="operators">Complete List of Operators</h2>
+      The ANNIS Query Language (AQL) currently includes the following operators:<br>
+      <br>
+      <table border="1" class="operator-list">
+        <tr><td height="20"><strong>Operator</strong></td>
+          <td><strong>Description</strong></td>
+          <td colspan="3"><strong>Illustration</strong></td>
+          <td><strong>Notes</strong></td>
+        </tr>
+        <tr><td height="38"><code>.</code></td><td>direct precedence</td><td colspan="3"><center>
+          <img src="A-pred-B.svg" alt="A B" />
+        </center></td><td>For non-terminal nodes, precedence is determined by the right most and left most terminal children</td></tr>
+        <tr><td height="38"><code>.*</code></td><td>indirect precedence</td>
+          <td colspan="3">          
+            <center><img src="A-pred-ind-B.svg" alt="A x y z B" /></center>
+          </td><td>For specific sizes of precedence spans, <code>.n,m</code> can be used, e.g. <code>.3,4</code> - between 3 and 4 token distance</td></tr>
+    <tr><td height="56"><code>&gt;</code></td><td>direct dominance</td><td colspan="3"><center>
+      <img src="A-dom-B.svg" alt="A - B" />
+    </center></td>
+    <td>A specific edge type may be specifed, e.g.: <code>&gt;secedge</code> to find secondary edges. Edges labels are specified in brackets, e.g. <code>&gt;[func="OA"]</code> for an edge with the function 'object, accusative'</td>
+    </tr>
+    <tr>
+      <td height="92"><code>&gt;*</code></td>
+      <td>indirect dominance</td>
+      <td colspan="3"><center>
+      <img src="A-dom-ind-B.svg" alt="A - ... - B" />
+    </center></td>
+    <td>For specific distance of dominance, <code>&gt;n,m</code> can be used, e.g. <code>&gt;3,4</code> - dominates with 3 to 4 edges distance</td>
+    </tr>
+    <tr><td height="38"><code>_=_</code></td><td>identical coverage</td><td colspan="3"><center>
+    <img src="A-cov-ident-B.svg" alt="A _=_ B" />  
+    </center></td>
+    <td>Applies when two annotation cover the exact same span of tokens </td>
+    </tr>
+    <tr>
+      <td height="38"><code>_i_</code></td>
+      <td>inclusion</td>
+      <td colspan="3"><center>
+      <img src="A-cov-incl-B.svg" alt="A _i_ B" />  
+    </center></td>
+    <td>Applies when one annotation covers a span identical to or larger than another </td>
+    </tr>
+    <tr>
+      <td height="38"><code>_o_</code></td>
+      <td>overlap</td>
+      <td colspan="3"><center>
+        <img src="A-cov-over-B.svg" alt="A _o_ B" />  
+    </center></td>
+    <td>For overlap only on the left or right side, use <code>_ol_</code> and <code>_or_</code> respectively </td>
+    </tr>
+    <tr>
+      <td height="38"><code>_l_</code></td>
+      <td>left aligned</td>
+      <td width="15">&nbsp;</td>
+      <td colspan="2" valign="top">	<div align="left">
+          <img src="A-cov-left-B.svg" alt="A _l_ B" />  
+        </div></td>
+      <td>Both elements span an area beginning with the same token </td>
+    </tr>
+    <tr>
+      <td height="38"><code>_r_</code></td>
+      <td>right aligned</td>
+      <td colspan="2" valign="top"><div align="right">
+          <img src="A-cov-right-B.svg" alt="A _r_ B" />  
+        </div></td>
+      <td width="26">&nbsp;</td>
+      <td>Both elements span an area ending with the same token </td>
+    </tr>
+    <tr>
+      <td height="38"><code>^</code></td>
+      <td>Directly near</td>
+      <td colspan="3"><div style="text-align: left"><strong>AB</strong> or<br/> <strong>BA</strong></div>
+      </td>
+      <td>Elements stand next to each other in some order. Use <code>^n,m</code> or <code>^*</code> to specify possible distance in tokens as shown below.</td>
+    </tr>
+    <tr>
+      <td height="38"><code>^*</code></td>
+      <td>Indirectly near</td>
+      <td colspan="3"><div style="text-align: left"><strong>A</strong> x y z <strong>B</strong> or<br/> <strong>B</strong> x y z <strong>A</strong></div>
+      </td>
+      <td>Elements appear near each other in some order within 50 tokens (by default). Use <code>^n,m</code> to specify exact distance range.</td>
+    </tr>
+
+    <tr>
+      <td height="38">==</td>
+      <td>Value identity</td>
+      <td colspan="3"><center>
+      <strong>A = B</strong>
+    </center></td>
+    <td>The value of the annotation or token A is identical to that of B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td>
+    </tr>
+    <tr>
+      <td height="38">!=</td>
+      <td>Value difference</td>
+      <td colspan="3"><center>
+      <strong>A ≠ B</strong>
+    </center></td>
+    <td>The value of the annotation or token A is different from B (this operator does not bind, i.e. the nodes must be connected by some other criteria too)</td>
+    </tr>
+
+    <tr>
+      <td height="38"><code>-&gt;LABEL</code></td>
+      <td>labeled pointing relation</td>
+      <td colspan="3"><center>
+        <img src="A-point-direct-B.svg" alt="A --LABEL--> B" />  
+    </center></td><td>A labeled, directed relationship between two elements. Annotations can be specified with
+      <code>-&gt;LABEL[annotation="VALUE"]</code>
+    </td>
+    </tr>
+
+    <tr>
+      <td height="38"><code>-&gt;LABEL *</code></td>
+      <td>indirect pointing relation</td>
+      <td colspan="3"><center>
+      <img src="A-point-ind-B.svg" alt="A --LABEL--> ... --LABEL--> B" />
+    </center></td><td>An indirect labeled relationship between two elements. The length of the chain may be specified with
+      <code>-&gt;LABEL n,m</code> for relation chains of length n to m
+
+    </td>
+    </tr>
+    <tr>
+      <td height="38"><code>&gt;@l</code></td>
+      <td>left-most child</td>
+      <td colspan="3"><center>
+        <img src="A-left-B.svg" alt="A >@l B" />
+    </center></td><td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td height="38"><code>&gt;@r</code></td>
+      <td>right-most child</td>
+      <td colspan="3"><center>
+      <img src="A-right-B.svg" alt="A >@r B" />
+    </center></td>
+    <td>&nbsp;</td>
+    </tr>
+    <tr>
+      <td>$</td>
+      <td>Common parent node</td>
+      <td colspan="3"><center>
+      <img src="A-parent-B.svg" alt="A $ B" />
+    </center></td>
+    <td>&nbsp;</td>
+    </tr>
+    <tr><td>$*</td><td>Common ancestor node</td><td colspan="3"><center>
+      <img src="A-ancestor-B.svg" alt="A $* B" />
+      </center></td>
+    <td>&nbsp;</td></tr>
+
+    <tr>
+      <td>
+        #x:arity=n
+      </td>
+      <td>
+        Arity
+      </td>
+      <td colspan="3" align="center">
+       <img src="A-arity.svg" alt="#x:arity=n " />
+      </td>
+      <td>Specifies the amount of directly dominated children that the searched node has </td>
+    </tr>
+    <tr>
+      <td valign="middle">
+        #x:tokenarity=n
+      </td>
+      <td valign="middle">
+        Tokenarity
+      </td>
+      <td colspan="3" align="center" valign="middle">
+        <img src="A-tokenarity.svg" alt="#x:tokenarity=n " />
+      </td>
+      <td>Specifies the length of the span of tokens covered by the node</td>
+    </tr>
+
+
+    <tr>
+      <td valign="middle">
+        #x:root
+      </td>
+      <td valign="middle">
+        Root
+      </td>
+      <td colspan="3" align="center" valign="middle">
+        ___<br>x<br>...
+      </td>
+      <td>Specifies that the node is not dominated by any other node within its namespace</td>
+    </tr>
+
+
+  </table>
+
+</div> <!-- end tutorial content -->
+
+</body>
 </html>

@@ -16,13 +16,11 @@
 package annis.gui.tutorial;
 
 import annis.gui.components.NavigateableSinglePage;
-import com.google.common.base.Strings;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import java.net.URI;
 import java.net.URISyntaxException;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -64,7 +62,7 @@ public class TutorialPanel extends VerticalLayout
         appURI.getUserInfo(),
         appURI.getHost(),
         appURI.getPort(),
-        oldPath + "/VAADIN/tutorial/index_singlepage.html", 
+        oldPath + "/VAADIN/tutorial/index.html", 
         null,
         null);
       embedded.setSource(tutorialURI.toASCIIString());
