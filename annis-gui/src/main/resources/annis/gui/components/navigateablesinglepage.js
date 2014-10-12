@@ -24,23 +24,19 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
   function addScrollListener(iframe) {
     
     iframe.on("load", function() {
-      console.log("IFRAME WAS LOADED!");
       
       var iframeContent = iframe.contents();
       iframeContent.on('scroll', function() {
         
-        console.log("scrolled");
-
         if (!ignoreScroll)
         {
-          console.log("scroll not ignored");
           // find ID of the first header which is inside the visible range
           var headersWithID = iframeContent.find("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
 
           if (headersWithID.length > 0)
           {
             var top = iframeContent.scrollTop();
-            var windowHeight = iframeContent.height();
+            var windowHeight = iframe.height();
             var visibleBorder = top + (windowHeight / 4);
 
 
