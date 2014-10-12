@@ -77,21 +77,8 @@ public class NavigateableSinglePage extends VerticalLayout
 
   private void onScroll(String headerID)
   {
-    if (navigation != null)
-    {
-      MenuItem navRoot = navigation.getItems().get(0);
-      MenuItem toSelect = menuItemRegistry.get(headerID);
-      if (toSelect != null)
-      {
-        navRoot.setText(toSelect.getText());
-        toSelect.setStyleName("huge-selected");
-        if (lastSelectedItem != null && lastSelectedItem != toSelect)
-        {
-          lastSelectedItem.setStyleName("huge");
-        }
-        lastSelectedItem = toSelect;
-      }
-    }
+    MenuItem toSelect = menuItemRegistry.get(headerID);
+    selectChapterInNavigation(toSelect);
   }
 
   public void setSource(String source)
@@ -178,6 +165,24 @@ public class NavigateableSinglePage extends VerticalLayout
     child.setStyleName("huge");
     return child;
   }
+  
+  private void selectChapterInNavigation(MenuItem toSelect)
+  {
+    if (navigation != null)
+    {
+      MenuItem navRoot = navigation.getItems().get(0);
+      if (toSelect != null)
+      {
+        navRoot.setText(toSelect.getText());
+        toSelect.setStyleName("huge-selected");
+        if (lastSelectedItem != null && lastSelectedItem != toSelect)
+        {
+          lastSelectedItem.setStyleName("huge");
+        }
+        lastSelectedItem = toSelect;
+      }
+    }
+  }
 
   private class IDSelectionCommand implements MenuBar.Command
   {
@@ -195,6 +200,7 @@ public class NavigateableSinglePage extends VerticalLayout
       if (id != null)
       {
         iframe.scrollToElement(id);
+        selectChapterInNavigation(selectedItem);
       }
     }
 
@@ -219,7 +225,7 @@ public class NavigateableSinglePage extends VerticalLayout
         }
       });
     }
-    
+
     public void scrollToElement(String id)
     {
       callFunction("scrollToElement", id);
