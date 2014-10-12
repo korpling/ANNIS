@@ -56,9 +56,8 @@ public class NavigateableSinglePage extends VerticalLayout
 
   private final Map<String, MenuItem> menuItemRegistry = new HashMap<>();
 
-//  private MenuItem lastSelectedItem;
   private String lastSelectedID;
-
+  
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
 
   public NavigateableSinglePage()
@@ -71,15 +70,6 @@ public class NavigateableSinglePage extends VerticalLayout
     setExpandRatio(iframe, 1.0f);
 
   }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
-    iframe.scrollToElement(lastSelectedID);
-  }
-  
-  
 
   private void onScroll(String headerID)
   {
@@ -233,6 +223,7 @@ public class NavigateableSinglePage extends VerticalLayout
         public void call(JSONArray arguments) throws JSONException
         {
           onScroll(arguments.getString(0));
+          getState().setLastScrollPos(arguments.getInt(1));
         }
       });
     }

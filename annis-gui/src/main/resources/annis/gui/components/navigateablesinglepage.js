@@ -26,7 +26,19 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
     iframe.on("load", function() {
       
       var iframeContent = iframe.contents();
+      // re-select last scrolled position
+      if(connector.getState().lastScrollPos)
+      {
+        ignoreScroll = true;
+        iframeContent.scrollTop(connector.getState().lastScrollPos);
+      }
+
       iframeContent.on('scroll', function() {
+    
+        var top = iframeContent.scrollTop();
+        var lastScrolledPos = top; // remember the last scroll position
+        
+        var lastInvisibleID = null;
         
         if (!ignoreScroll)
         {
@@ -35,12 +47,10 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
 
           if (headersWithID.length > 0)
           {
-            var top = iframeContent.scrollTop();
             var windowHeight = iframe.height();
             var visibleBorder = top + (windowHeight / 4);
 
-
-            var lastInvisibleID = headersWithID.attr('id')
+            lastInvisibleID = headersWithID.attr('id')
             // find the last header which is (even slightly) invisible
             $.each(headersWithID, function(key) {
 
@@ -53,10 +63,12 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
                 return false;
               }
             });
-            connector.scrolled(lastInvisibleID);
-          }
+          } // end if any header found
         } // end if scroll should be ignored once
         ignoreScroll = false;
+        
+        connector.scrolled(lastInvisibleID, lastScrolledPos);
+        
       });
     });
   }
@@ -73,6 +85,7 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
   }
 
   this.scrollToElement = function(id) {
+    
     var iframeContent = rootDiv.find("iframe").contents();
     var element = iframeContent.find("#" + id);
     ignoreScroll = true;    

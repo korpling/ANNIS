@@ -24,6 +24,7 @@ import com.vaadin.shared.ui.JavaScriptComponentState;
 public class IframeState extends JavaScriptComponentState
 {
   private String source;
+  private Integer lastScrollPos;
 
   public String getSource()
   {
@@ -34,5 +35,17 @@ public class IframeState extends JavaScriptComponentState
   {
     this.source = source;
   }
+
+  public Integer getLastScrollPos()
+  {
+    return lastScrollPos;
+  }
+
+  public void setLastScrollPos(Integer lastScrollPos)
+  {
+    this.lastScrollPos = lastScrollPos;
+  }
+  
+  
   
 }
