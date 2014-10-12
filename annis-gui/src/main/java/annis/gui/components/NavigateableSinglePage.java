@@ -16,12 +16,19 @@
 package annis.gui.components;
 
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.ConnectorResource;
+import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
+import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,7 +67,7 @@ public class NavigateableSinglePage extends VerticalLayout
   
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
 
-  public NavigateableSinglePage(String source)
+  public NavigateableSinglePage(File localFile, URI externalURI)
   {
     iframe.setSizeFull();
 
@@ -69,7 +76,7 @@ public class NavigateableSinglePage extends VerticalLayout
 
     setExpandRatio(iframe, 1.0f);
 
-    setSource(source);
+    setSource(localFile, externalURI);
   }
 
   private void onScroll(String headerID)
@@ -77,19 +84,19 @@ public class NavigateableSinglePage extends VerticalLayout
     selectChapterInNavigation(headerID);
   }
 
-  private void setSource(String source)
+  private void setSource(File localFile, URI externalURI)
   {
-    iframe.getState().setSource(source);
+    iframe.getState().setSource(externalURI.toASCIIString());
     if (navigation != null)
     {
       removeComponent(navigation);
     }
     menuItemRegistry.clear();
-    navigation = createMenubarFromHTML(source, menuItemRegistry);
+    navigation = createMenubarFromHTML(localFile, externalURI, menuItemRegistry);
     addComponent(navigation, 0);
   }
 
-  private MenuBar createMenubarFromHTML(String source,
+  private MenuBar createMenubarFromHTML(File localFile, URI externalURI,
     Map<String, MenuItem> idToMenuItem)
   {
 
@@ -98,10 +105,10 @@ public class NavigateableSinglePage extends VerticalLayout
     MenuItem navRoot = mbNavigation.addItem("Choose topic", null);
     navRoot.setStyleName("huge");
 
-    try
+    try(FileInputStream input = new FileInputStream(localFile))
     {
-      Document doc = Jsoup.connect(source).get();
-
+      Document doc = Jsoup.parse(input, "UTF-8", externalURI.toASCIIString());
+      
       ArrayList<MenuItem> itemPath = new ArrayList<>();
       // find all headers that have an ID
       for (Element e : doc.getElementsByAttribute("id"))
@@ -235,6 +242,11 @@ public class NavigateableSinglePage extends VerticalLayout
       {
         callFunction("scrollToElement", id);
       }
+    }
+    
+    public void setSource(Resource res)
+    {
+      setResource("content", res);
     }
 
     @Override

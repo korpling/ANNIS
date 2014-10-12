@@ -19,6 +19,7 @@ import annis.gui.components.NavigateableSinglePage;
 import com.vaadin.server.VaadinService;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import org.slf4j.Logger;
@@ -38,9 +39,15 @@ public class TutorialPanel extends VerticalLayout
   public TutorialPanel()
   {
     setSizeFull();
+    
 
+    String localBasePath = VaadinService.getCurrent()
+                  .getBaseDirectory().getAbsolutePath();
     URI appURI = UI.getCurrent().getPage().getLocation();
     URI tutorialURI;
+    
+    String relativeFile = "/VAADIN/tutorial/index.html";
+    
     try
     {
       String oldPath = appURI.getPath();
@@ -56,10 +63,11 @@ public class TutorialPanel extends VerticalLayout
         appURI.getUserInfo(),
         appURI.getHost(),
         appURI.getPort(),
-        oldPath + "/VAADIN/tutorial/index.html",
+        oldPath + relativeFile,
         null,
         null);
-      embedded = new NavigateableSinglePage(tutorialURI.toASCIIString());
+      embedded = new NavigateableSinglePage(new File(localBasePath + relativeFile), 
+        tutorialURI);
       embedded.setSizeFull();
       addComponent(embedded);
 
