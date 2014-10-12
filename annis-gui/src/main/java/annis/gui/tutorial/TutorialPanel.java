@@ -39,33 +39,30 @@ public class TutorialPanel extends VerticalLayout
   {
     setSizeFull();
 
-    embedded = new NavigateableSinglePage();
-    embedded.setSizeFull();
-    addComponent(embedded);
-
-    String contextPath = VaadinService.getCurrentRequest().getContextPath();
-
     URI appURI = UI.getCurrent().getPage().getLocation();
     URI tutorialURI;
     try
     {
       String oldPath = appURI.getPath();
-      if(oldPath == null)
+      if (oldPath == null)
       {
         oldPath = "";
       }
-      if(oldPath.endsWith("/"))
+      if (oldPath.endsWith("/"))
       {
-        oldPath = oldPath.substring(0, oldPath.length()-1);
+        oldPath = oldPath.substring(0, oldPath.length() - 1);
       }
       tutorialURI = new URI(appURI.getScheme(),
         appURI.getUserInfo(),
         appURI.getHost(),
         appURI.getPort(),
-        oldPath + "/VAADIN/tutorial/index.html", 
+        oldPath + "/VAADIN/tutorial/index.html",
         null,
         null);
-      embedded.setSource(tutorialURI.toASCIIString());
+      embedded = new NavigateableSinglePage(tutorialURI.toASCIIString());
+      embedded.setSizeFull();
+      addComponent(embedded);
+
     }
     catch (URISyntaxException ex)
     {

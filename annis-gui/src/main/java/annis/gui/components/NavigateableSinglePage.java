@@ -60,7 +60,7 @@ public class NavigateableSinglePage extends VerticalLayout
   
   private final static Pattern regexHeader = Pattern.compile("h([1-6])");
 
-  public NavigateableSinglePage()
+  public NavigateableSinglePage(String source)
   {
     iframe.setSizeFull();
 
@@ -69,6 +69,7 @@ public class NavigateableSinglePage extends VerticalLayout
 
     setExpandRatio(iframe, 1.0f);
 
+    setSource(source);
   }
 
   private void onScroll(String headerID)
@@ -76,7 +77,7 @@ public class NavigateableSinglePage extends VerticalLayout
     selectChapterInNavigation(headerID);
   }
 
-  public void setSource(String source)
+  private void setSource(String source)
   {
     iframe.getState().setSource(source);
     if (navigation != null)

@@ -98,16 +98,6 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
     {
       initElement();
     }
-    else
-    {
-      var oldSrc = iframe.attr("src");
-      var newSrc = connector.getState().source;
-      if(oldSrc !== newSrc)
-      {
-        ignoreScroll = true;
-        iframe.attr("src", connector.getState().source);
-      }
-    }
   };
 
 };
