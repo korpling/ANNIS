@@ -194,25 +194,7 @@ public class NavigateableSinglePage extends VerticalLayout
     {
       if (id != null)
       {
-        MenuItem navRoot = navigation.getItems().get(0);
-        String lastSource = iframe.getState().getSource();
-        // remove the fragment part
-        if (lastSource != null)
-        {
-          int hashPos = lastSource.lastIndexOf('#');
-          if (hashPos >= 0)
-          {
-            lastSource = lastSource.substring(0, hashPos);
-          }
-          selectedItem.setStyleName("huge-selected");
-          navRoot.setText(selectedItem.getText());
-          if (lastSelectedItem != null && lastSelectedItem != selectedItem)
-          {
-            lastSelectedItem.setStyleName("huge");
-          }
-          lastSelectedItem = selectedItem;
-          iframe.getState().setSource(lastSource + "#" + id);
-        }
+        iframe.scrollToElement(id);
       }
     }
 
@@ -236,6 +218,11 @@ public class NavigateableSinglePage extends VerticalLayout
           onScroll(arguments.getString(0));
         }
       });
+    }
+    
+    public void scrollToElement(String id)
+    {
+      callFunction("scrollToElement", id);
     }
 
     @Override

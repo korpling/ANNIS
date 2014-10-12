@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function () {
+window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() {
 
   var connector = this;
   var rootDiv = $(this.getElement(this.getConnectorId()));
@@ -22,39 +22,46 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function ()
   var ignoreScroll = false;
 
   function addScrollListener(iframe) {
+    
+    iframe.on("load", function() {
+      console.log("IFRAME WAS LOADED!");
+      
+      var iframeContent = iframe.contents();
+      iframeContent.on('scroll', function() {
+        
+        console.log("scrolled");
 
-    var iframeWindow = $(iframe.get(0).contentWindow);
-    iframeWindow.on('scroll', function () {
-
-      if(!ignoreScroll)
-      {
-        // find ID of the first header which is inside the visible range
-        var headersWithID = $(iframeWindow.get(0).document).find("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
-
-        if (headersWithID.length > 0)
+        if (!ignoreScroll)
         {
-          var top = iframeWindow.scrollTop();
-          var windowHeight = iframeWindow.height();
-          var visibleBorder = top + (windowHeight / 4);
+          console.log("scroll not ignored");
+          // find ID of the first header which is inside the visible range
+          var headersWithID = iframeContent.find("h1[id], h2[id], h3[id], h4[id], h5[id], h6[id]");
+
+          if (headersWithID.length > 0)
+          {
+            var top = iframeContent.scrollTop();
+            var windowHeight = iframeContent.height();
+            var visibleBorder = top + (windowHeight / 4);
 
 
-          var lastInvisibleID = headersWithID.attr('id')
-          // find the last header which is (even slightly) invisible
-          $.each(headersWithID, function (key) {
+            var lastInvisibleID = headersWithID.attr('id')
+            // find the last header which is (even slightly) invisible
+            $.each(headersWithID, function(key) {
 
-            var offset = $(this).offset().top;
+              var offset = $(this).offset().top;
 
-            // is invisible?
-            if (offset < visibleBorder) {
-              lastInvisibleID = $(this).attr('id');
-            } else {
-              return false;
-            }
-          });
-          connector.scrolled(lastInvisibleID);
-        }
-      } // end if scroll should be ignored once
-      ignoreScroll = false;
+              // is invisible?
+              if (offset < visibleBorder) {
+                lastInvisibleID = $(this).attr('id');
+              } else {
+                return false;
+              }
+            });
+            connector.scrolled(lastInvisibleID);
+          }
+        } // end if scroll should be ignored once
+        ignoreScroll = false;
+      });
     });
   }
 
@@ -69,7 +76,14 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function ()
     addScrollListener(iframeElement);
   }
 
-  this.onStateChange = function () {
+  this.scrollToElement = function(id) {
+    var iframeContent = rootDiv.find("iframe").contents();
+    var element = iframeContent.find("#" + id);
+    ignoreScroll = true;    
+    iframeContent.scrollTop(element.offset().top);
+  };
+
+  this.onStateChange = function() {
     var iframe = rootDiv.find("iframe");
     if (iframe.length === 0)
     {
@@ -77,8 +91,13 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function ()
     }
     else
     {
-      ignoreScroll = true;
-      iframe.attr("src", connector.getState().source);      
+      var oldSrc = iframe.attr("src");
+      var newSrc = connector.getState().source;
+      if(oldSrc !== newSrc)
+      {
+        ignoreScroll = true;
+        iframe.attr("src", connector.getState().source);
+      }
     }
   };
 
