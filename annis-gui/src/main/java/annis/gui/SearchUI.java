@@ -40,6 +40,7 @@ import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.escape.Escaper;
@@ -250,13 +251,26 @@ public class SearchUI extends AnnisBaseUI
           = Helper.getAnnisWebResource().path("version").path("revision");
         String revisionService = resRevision.get(String.class);
         String revisionGUI = VersionInfo.getBuildRevision();
+        
         if(!revisionService.equals(revisionGUI))
-        {
+        {        
+          // shorten the strings
+          String commonPrefix = Strings.commonPrefix(revisionService,
+            revisionGUI);
+          int outputLength = Math.max(6, commonPrefix.length()+2);
+          String revisionServiceShort = revisionService.substring(0, 
+            Math.min(revisionService.length()-1, outputLength));
+          String revisionGUIShort = revisionGUI.substring(0, 
+            Math.min(revisionGUI.length()-1, outputLength));
+          
           Notification n = new Notification("Different service revision",
-            "The service uses revision " + revisionService
-            + " but the user interface is using revision  " + revisionGUI
-            + ".",
+            "The service uses revision <code title=\"" + revisionGUI 
+              + "\">" + revisionServiceShort
+            + "</code> but the user interface is using revision  <code title=\"" 
+              + revisionGUI + "\">" + revisionGUIShort
+            + "</code>.",
             Notification.Type.TRAY_NOTIFICATION);
+          n.setHtmlContentAllowed(true);
           n.setDelayMsec(3000);
           n.show(Page.getCurrent());
         }
