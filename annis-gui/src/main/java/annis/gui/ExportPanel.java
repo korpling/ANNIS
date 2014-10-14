@@ -266,6 +266,9 @@ public class ExportPanel extends FormLayout
       + "<code>metakeys=title,documentname</code>) <br />"
       + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
       + "<code>numbers=false</code>)");
+    
+    help4Exporter.put(EXPORTER[4].getClass().getSimpleName(),
+      "The SimpleTextExporter exports only the plain text of every search result. ");
   }
 
   public class ExporterSelectionHelpListener implements
