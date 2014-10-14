@@ -249,8 +249,8 @@ public class ExportPanel extends FormLayout
       + "<code>metakeys=title,documentname</code>)");
 
     help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
-      "The Text Exporter exports just the plain text of every search result and "
-      + "its context, one line per result.");
+      "The Text Exporter exports the token covered by the matched nodes of every search result and "
+      + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
 
     help4Exporter.put(EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
