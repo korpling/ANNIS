@@ -894,7 +894,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   void computeLevel()
   {
-    log.info("computing values for rank.level (dominance and precedence)");
+    log.info("computing values for rank.level (dominance and pointing relations)");
     executeSqlFromScript("level.sql");
 
     log.info("computing values for rank.level (coverage)");
