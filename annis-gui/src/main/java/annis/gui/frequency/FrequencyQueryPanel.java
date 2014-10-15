@@ -87,7 +87,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     queryLayout = new VerticalLayout();
     queryLayout.setWidth("100%");
-    queryLayout.setHeight("-1px");
+    queryLayout.setHeight("100%");
     
     HorizontalLayout queryDescriptionLayout = new HorizontalLayout();
     queryDescriptionLayout.setSpacing(true);
@@ -150,7 +150,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.addComponent(lblErrorOrMsg);
     
     tblFrequencyDefinition.setWidth("100%");
-    tblFrequencyDefinition.setHeight("-1px");
+    tblFrequencyDefinition.setHeight("100%");
     
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
