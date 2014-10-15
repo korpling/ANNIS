@@ -145,7 +145,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         }
 
         // since annis found something, inform the user that subgraphs are created
-        ui.accessSynchronously(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -181,7 +181,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           if (current == 0)
           {
             PollControl.changePollingTime(ui, PollControl.DEFAULT_TIME);
-            ui.accessSynchronously(new Runnable()
+            ui.access(new Runnable()
             {
               @Override
               public void run()

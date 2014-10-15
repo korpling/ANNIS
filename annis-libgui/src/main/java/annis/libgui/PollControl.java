@@ -45,7 +45,7 @@ public class PollControl
   
   public static final int DEFAULT_TIME = 15000;
   private static final ExecutorService exec = Executors.newCachedThreadPool();
-  private static ThreadLocal<UUID> threadUUID = new ThreadLocal<>();
+  private static final ThreadLocal<UUID> threadUUID = new ThreadLocal<>();
 
   private static final Lock lock = new ReentrantLock(true);
   
@@ -115,7 +115,7 @@ public class PollControl
       {
         // get the minimal non-negative time
         int min = DEFAULT_TIME;
-        LinkedList<Integer> numbers = new LinkedList<Integer>(getId2Time(ui).values());
+        LinkedList<Integer> numbers = new LinkedList<>(getId2Time(ui).values());
         for (int time : numbers)
         {
           if(time >= 0 && time < min)
@@ -143,6 +143,7 @@ public class PollControl
    * @param runnable 
    * @param ui The {@link UI} to access or null of the current one should be used.
    * @param pollTime polling time in milliseconds
+   * @return 
    */
   public static  Future<?> runInBackground(int pollTime, UI ui, 
     final Runnable runnable) 
@@ -160,6 +161,7 @@ public class PollControl
    * @param pollTime polling time in milliseconds
    * @param initialWait The initial maximal time in milliseconds to wait for the 
    * job to return. If you don't want to wait set this to <= 0.
+   * @return 
    */
   public static  Future<?> runInBackground(int pollTime, int initialWait, UI ui, 
     final Runnable runnable) 
@@ -172,6 +174,7 @@ public class PollControl
    * a certain polling time which is active during the thread execution 
    * of the {@link Runnable}.
    * 
+   * @param <T>
    * @param callable 
    * @param ui The {@link UI} to access or null of the current one should be used.
    * @param pollTime polling time in milliseconds
@@ -190,6 +193,7 @@ public class PollControl
    * a certain polling time which is active during the thread execution 
    * of the {@link Runnable}.
    * 
+   * @param <T>
    * @param callable 
    * @param ui The {@link UI} to access or null of the current one should be used.
    * @param pollTime polling time in milliseconds
@@ -287,7 +291,7 @@ public class PollControl
       if (id != null)
       {
         TimeMap m = getId2Time(ui);
-        if (m.contains(id))
+        if (m.containsKey(id))
         {
           m.put(id, newPollingTime);
           calculateAndSetPollingTime(ui);
