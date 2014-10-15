@@ -15,19 +15,19 @@
  */
 package annis.libgui;
 
-import com.google.common.collect.MapMaker;
 import com.vaadin.ui.UI;
 import java.util.LinkedList;
 import java.util.UUID;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ConcurrentMap;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,7 +45,10 @@ public class PollControl
   
   public static final int DEFAULT_TIME = 15000;
   private static final ExecutorService exec = Executors.newCachedThreadPool();
+  private static ThreadLocal<UUID> threadUUID = new ThreadLocal<>();
 
+  private static final Lock lock = new ReentrantLock(true);
+  
   private static TimeMap getId2Time(UI ui)
   {
     if(ui != null && ui.getSession() != null)
@@ -63,23 +66,39 @@ public class PollControl
   
   private static UUID setTime(UI ui, int newPollingTime)
   {
-    UUID id = UUID.randomUUID();
-    // it's really unpropable, but just in case check if this ID was used before
-    while(getId2Time(ui).containsKey(id))
+    UUID id;
+    lock.lock();
+    try
     {
       id = UUID.randomUUID();
+      // it's really unpropable, but just in case check if this ID was used before
+      while(getId2Time(ui).containsKey(id))
+      {
+        id = UUID.randomUUID();
+      }
+      getId2Time(ui).put(id, newPollingTime);
+      calculateAndSetPollingTime(ui);
     }
-    getId2Time(ui).put(id, newPollingTime);
-    calculateAndSetPollingTime(ui);
-    
+    finally
+    {
+      lock.unlock();
+    }
     return id;
   }
 
   private static void unsetTime(UUID id, UI ui)
   {
-    if(getId2Time(ui).remove(id) != null)
+    lock.lock();
+    try
     {
-      calculateAndSetPollingTime(ui);
+      if(getId2Time(ui).remove(id) != null)
+      {
+        calculateAndSetPollingTime(ui);
+      }
+    }
+    finally
+    {
+      lock.unlock();
     }
   }
 
@@ -191,6 +210,8 @@ public class PollControl
     if(ui != null && callable != null)
     {
       final UI finalUI = ui;
+      
+      
       final UUID id = setTime(finalUI, pollTime);
       
       Future<T> result = exec.submit(new Callable<T>()
@@ -198,6 +219,8 @@ public class PollControl
         @Override
         public T call() throws Exception
         {
+          threadUUID.set(id);
+          
           T result = null;
           try
           {
@@ -210,15 +233,7 @@ public class PollControl
           }
           finally
           {
-            finalUI.access(new Runnable()
-            {
-
-              @Override
-              public void run()
-              {
-                unsetTime(id, finalUI);
-              }
-            });
+            unsetTime(id, finalUI);
           }
           return result;
         }
@@ -247,6 +262,42 @@ public class PollControl
     }
     
     return null;
+  }
+  
+  /** 
+   * If called from a thread that is under control of {@link PollControl}
+   * this function can change the polling time.
+   * 
+   * It has no effect otherwise.
+   * 
+   * @param ui
+   * @param newPollingTime 
+   * 
+   * @see #runInBackground(int, com.vaadin.ui.UI, java.lang.Runnable) 
+   * @see #runInBackground(int, int, com.vaadin.ui.UI, java.lang.Runnable) 
+   * @see #callInBackground(int, com.vaadin.ui.UI, java.util.concurrent.Callable) 
+   * @see #callInBackground(int, int, com.vaadin.ui.UI, java.util.concurrent.Callable) 
+   */
+  public static void changePollingTime(UI ui, int newPollingTime)
+  {
+    lock.lock();
+    try
+    {
+      UUID id = threadUUID.get();
+      if (id != null)
+      {
+        TimeMap m = getId2Time(ui);
+        if (m.contains(id))
+        {
+          m.put(id, newPollingTime);
+          calculateAndSetPollingTime(ui);
+        }
+      }
+    }
+    finally
+    {
+      lock.unlock();
+    }
   }
   
   public static class TimeMap extends ConcurrentHashMap<UUID, Integer>
