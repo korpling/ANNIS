@@ -24,7 +24,6 @@ import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.components.CssRenderInfo;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -234,6 +233,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
+    tblCorpora.setPageLength(1);
     
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
@@ -617,6 +617,7 @@ public class CorpusListPanel extends VerticalLayout implements
   /**
    * Select the corpora
    * @param corpora Corpora to select
+   * @param delayScroll 
    */
   public void selectCorpora(Set<String> corpora)
   {
@@ -634,7 +635,8 @@ public class CorpusListPanel extends VerticalLayout implements
       if (!corpora.isEmpty())
       {
         String firstCorpusName = corpora.iterator().next();
-        tblCorpora.setCurrentPageFirstItemId(firstCorpusName);
+        int idx = corpusContainer.indexOfId(firstCorpusName);
+        tblCorpora.setCurrentPageFirstItemIndex(idx);
       }
     }
   }
