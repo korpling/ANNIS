@@ -16,52 +16,63 @@
 package annis.gui.controlpanel;
 
 import com.vaadin.ui.Table;
+import com.vaadin.ui.UI;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
 /**
  * A customized extension of the default Vaadin {@link Table}.
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class CorpusListTable extends Table
 {
-  
+
   public static final String PAGELENGTH_CHANGED_IN_CLIENT_ID = "pageLengthChangedInClient";
 
   private final List<PageLengthChangedInClientListener> pageLengthListeners = new ArrayList<>();
-  
-  public void addPageLengthChangedInClientListener(PageLengthChangedInClientListener listener)
+
+  public void addPageLengthChangedInClientListener(
+    PageLengthChangedInClientListener listener)
   {
     this.pageLengthListeners.add(listener);
   }
-  
-  public void removePageLengthChangedInClientListener(PageLengthChangedInClientListener listener)
+
+  public void removePageLengthChangedInClientListener(
+    PageLengthChangedInClientListener listener)
   {
     this.pageLengthListeners.remove(listener);
   }
-  
 
   @Override
   public void changeVariables(Object source, Map<String, Object> variables)
   {
     int originalPageLength = getPageLength();
-    
+
     super.changeVariables(source, variables);
-    
-    int newPageLength = getPageLength();
-    if(newPageLength != originalPageLength)
+
+    final int newPageLength = getPageLength();
+    if (newPageLength != originalPageLength)
     {
-      // pagelength changed
-      for(PageLengthChangedInClientListener listener : pageLengthListeners)
+      UI.getCurrent().access(new Runnable()
       {
-        listener.pageLengthChangedInClient(newPageLength);
-      }
+
+        @Override
+        public void run()
+        {
+          for (PageLengthChangedInClientListener listener : pageLengthListeners)
+          {
+            listener.pageLengthChangedInClient(newPageLength);
+          }
+        }
+      });
     }
   }
-  
+
   public interface PageLengthChangedInClientListener
   {
+
     void pageLengthChangedInClient(int newPageLength);
   }
 
