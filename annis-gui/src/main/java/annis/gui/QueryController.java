@@ -336,7 +336,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       lastQueryUUID));
 
     getResultPanels().put(lastQueryUUID, newResultView);
-    PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
+    PollControl.runInBackground(500, 250, ui, new ResultFetchJob(preparedQuery,
       newResultView, ui, this));
 
     //
