@@ -97,7 +97,7 @@ public class CorpusListPanel extends VerticalLayout implements
   };
   private BeanContainer<String, AnnisCorpus> corpusContainer;
 
-  private Table tblCorpora;
+  private CorpusListTable tblCorpora;
 
   private QueryController controller;
 
@@ -206,7 +206,7 @@ public class CorpusListPanel extends VerticalLayout implements
     txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
     addComponent(txtFilter);
 
-    tblCorpora = new Table();
+    tblCorpora = new CorpusListTable();
     
     addComponent(tblCorpora);
 
@@ -245,6 +245,20 @@ public class CorpusListPanel extends VerticalLayout implements
           && event.isCtrlKey() && tblCorpora.isSelected(event.getItemId()))
         {
           tblCorpora.setValue(null);
+        }
+      }
+    });
+    tblCorpora.addPageLengthChangedInClientListener(new CorpusListTable.PageLengthChangedInClientListener()
+    {
+
+      @Override
+      public void pageLengthChangedInClient(int newPageLength)
+      {
+        Set<String> selected = getSelectedCorpora();
+        if(selected != null && !selected.isEmpty())
+        {
+          String firstSelected = selected.iterator().next();
+          tblCorpora.setCurrentPageFirstItemId(firstSelected);
         }
       }
     });
@@ -632,7 +646,8 @@ public class CorpusListPanel extends VerticalLayout implements
       tblCorpora.setValue(corpora);
       if (!corpora.isEmpty())
       {
-        tblCorpora.setCurrentPageFirstItemId(corpora.iterator().next());
+        String firstCorpusName = corpora.iterator().next();
+        tblCorpora.setCurrentPageFirstItemId(firstCorpusName);
       }
     }
   }
