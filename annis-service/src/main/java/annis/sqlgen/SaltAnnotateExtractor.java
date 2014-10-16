@@ -1065,14 +1065,14 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     return (SSpan) sourceNode;
   }
 
-  private SRelation createRelation(ResultSet resultSet, SDocumentGraph graph,
+  private void createRelation(ResultSet resultSet, SDocumentGraph graph,
     FastInverseMap<RankID, SNode> nodeByPre, SNode targetNode, AtomicInteger numberOfEdges) throws
     SQLException
   {
     long parent = longValue(resultSet, RANK_TABLE, "parent");
     if (resultSet.wasNull())
     {
-      return null;
+      return;
     }
 
     long pre = longValue(resultSet, RANK_TABLE, "pre");
@@ -1087,7 +1087,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     if (sourceNode == null)
     {
       // the edge is not fully included in the result
-      return null;
+      return;
     }
     
     if("c".equals(type))
@@ -1097,7 +1097,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       {
         // don't create relations for continuous spans at this time, this will
         // be handled in a separate step later
-        return null;
+        return;
       }
     }
 
@@ -1115,10 +1115,12 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           componentID, layer, parent, pre, nodeByPre, numberOfEdges);
       } // end if no existing relation
 
-      // add edge annotations
-      addEdgeAnnotations(resultSet, rel);
+      // add edge annotations if relation was successfully created
+      if(rel != null)
+      {
+        addEdgeAnnotations(resultSet, rel);
+      }
     }
-    return rel;
   }
   
   /**
