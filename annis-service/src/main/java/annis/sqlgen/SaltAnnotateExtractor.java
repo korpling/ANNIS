@@ -878,6 +878,21 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
             sourceNode = recreateNode(SStructure.class, sourceNode);
             updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
           }
+          
+          if (edgeName == null || edgeName.isEmpty())
+          {
+            // check if there is an edge which connects the nodes in the same 
+            // layer but has a non-empty edge name
+            if(handleArtificialDominanceRelation(graph, 
+              sourceNode, targetNode,
+              rel, layer, componentID,
+              pre))
+            {
+              // don't include this relation
+              rel = null;
+            }
+          }
+          
           break;
         case "c":
           SSpanningRelation spanrel = SaltFactory.eINSTANCE.
@@ -916,6 +931,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           rel.addSFeature(sfeatEdge);
 
           rel.setSSource(sourceNode);
+          
           if ("c".equals(type) && !(targetNode instanceof SToken))
           {
             log.warn("invalid edge detected: target node ({}) "
@@ -929,10 +945,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           else
           {
             rel.setSTarget(targetNode);
-            graph.addSRelation(rel);
+            graph.addSRelation(rel);            
+            rel.getSLayers().add(layer);
           }
 
-          rel.getSLayers().add(layer);
         }
       }
       catch (SaltException ex)
@@ -942,6 +958,68 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     return rel;
+  }
+
+  /**
+   * In relANNIS there is a special combined dominance component which has an empty name,
+   * but which should not directly be included in the Salt graph.
+   * 
+   * This functions checks if a dominance edge with empty name has a "mirror" edge which
+   * is inside the same layer and between the same nodes but has an edge name.
+   * If yes the original dominance edge is an artificial one. The function will
+   * return true in this case and update the mirror edge to include information
+   * about the artificial dominance edge.
+   * @param graph 
+   * @param rel
+   * @parem layer
+   * @param componentID 
+   * @param pre
+   * @return True if the dominance edge was an artificial one
+   */
+  private boolean handleArtificialDominanceRelation(SDocumentGraph graph,
+    SNode source, SNode target,
+    SRelation rel, SLayer layer,
+    long componentID, long pre)
+  {
+    List<Edge> mirrorEdges = graph.getEdges(source.getSId(),
+      target.getSId());
+    if (mirrorEdges != null && mirrorEdges.size() > 0)
+    {
+      for (Edge mirror : mirrorEdges)
+
+      {
+        if (mirror != rel && mirror instanceof SRelation)
+        {
+          // check layer
+          SRelation mirrorRel = (SRelation) mirror;
+
+          EList<SLayer> mirrorLayers = mirrorRel.getSLayers();
+          if (mirrorLayers != null)
+          {
+            for (SLayer mirrorLayer : mirrorLayers)
+            {
+              if (mirrorLayer == layer)
+              {
+                        // adjust the feature of the mirror edge to include
+                // information about the artificial dominance edge
+                RelannisEdgeFeature mirrorFeat = RelannisEdgeFeature.
+                  extract(mirrorRel);
+                mirrorFeat.setArtificialDominanceComponent(componentID);
+                mirrorFeat.setArtificialDominancePre(pre);
+                mirrorRel.removeLabel(ANNIS_NS, FEAT_RELANNIS_EDGE);
+                mirrorRel.createSFeature(ANNIS_NS, FEAT_RELANNIS_EDGE,
+                  mirrorFeat,
+                  SDATATYPE.SOBJECT);
+                
+                return true;
+              }
+            }
+          }
+        }
+      }
+    }
+    
+    return false;
   }
   
   private void addEdgeAnnotations(ResultSet resultSet, SRelation rel) 

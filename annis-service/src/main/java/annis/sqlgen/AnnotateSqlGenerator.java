@@ -182,6 +182,7 @@ public class AnnotateSqlGenerator<T>
   {
     StringBuilder sb = new StringBuilder();
     sb.append("solutions.n, ");
+    sb.append(tables(null).aliasedColumn(COMPONENT_TABLE, "name")).append(", ");
     sb.append(tables(null).aliasedColumn(COMPONENT_TABLE, "id")).append(", ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
