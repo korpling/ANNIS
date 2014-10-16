@@ -126,7 +126,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
             createMissingSpanningRelations(graph, nodeByPre, tokenByIndex, 
               componentForSpan,
               numberOfEdges);
-            removeArtificialDominancesEdges(graph);
             createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
             addOrderingRelations(graph, nodeBySegmentationPath);
           }
@@ -201,7 +200,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         createMissingSpanningRelations(graph, nodeByPre, tokenByIndex, 
           componentForSpan,
           numberOfEdges);
-        removeArtificialDominancesEdges(graph);
         createPrimaryTexts(graph, allTextIDs, tokenTexts, tokenByIndex);
         addOrderingRelations(graph, nodeBySegmentationPath);
       }
@@ -212,80 +210,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
 
     return project;
-  }
-  
-  /**
-   * Removes all dominance edges with empty name, where an other edge with name,
-   * the same namespace and the same source and target nodes exists.
-   * @param graph 
-   */
-  private void removeArtificialDominancesEdges(SDocumentGraph graph)
-  {
-    Iterator<SDominanceRelation> itDomReal = graph.getSDominanceRelations().iterator();
-    List<SDominanceRelation> edgesToRemove = new LinkedList<>();
-    while(itDomReal.hasNext())
-    {
-      SDominanceRelation rel = itDomReal.next();
-      
-      RelannisEdgeFeature featEdge = RelannisEdgeFeature.extract(rel);
-      
-      boolean allNull = true;
-      List<String> types = rel.getSTypes();
-      if(types != null)
-      {
-        for(String s : types)
-        {
-          if(s != null)
-          {
-            allNull = false;
-            break;
-          }
-        }
-      } // end if types not null
-      if (allNull)
-      {
-        List<Edge> mirrorEdges = graph.getEdges(rel.getSSource().getSId(), rel.
-          getSTarget().getSId());
-        if (mirrorEdges != null && mirrorEdges.size() > 1)
-        {
-          for (Edge mirror : mirrorEdges)
-          {
-            if (mirror != rel && featEdge != null )
-            {
-              SRelation mirrorRel = (SRelation) mirror;
-              
-              RelannisEdgeFeature mirrorFeat = RelannisEdgeFeature.extract(mirrorRel);
-              if(mirrorFeat != null && mirrorFeat.getArtificialDominanceComponent() == null)
-              {
-                mirrorFeat.setArtificialDominanceComponent(featEdge.getComponentID());
-                mirrorFeat.setArtificialDominancePre(featEdge.getPre());
-                // reset
-                mirrorRel.removeLabel(ANNIS_NS, FEAT_RELANNIS_EDGE);
-                mirrorRel.createSFeature(ANNIS_NS, FEAT_RELANNIS_EDGE, mirrorFeat, SDATATYPE.SOBJECT);
-              }
-            }
-          }
-          // remove this edge
-          edgesToRemove.add(rel);
-        }
-      }
-    }
-    
-    // actually remove the edges
-    for(SDominanceRelation rel : edgesToRemove)
-    {
-      // remove edge from layer (removing it from graph does not remove it from layer...)
-      EList<SLayer> layersOfRel = new BasicEList<>(rel.getSLayers());
-      for(SLayer layer : layersOfRel)
-      {
-        layer.getSRelations().remove(rel);
-      }
-      
-      // remove edge from graph
-      Validate.isTrue( graph.removeEdge(rel), "Edge to remove must exist in graph." );
-      
-    }
-    
   }
   
   
