@@ -60,6 +60,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -659,7 +660,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public Set<String> getSelectedCorpora()
   {
     // make a copy
-    return new HashSet<>((Set<String>) tblCorpora.getValue());
+    return new LinkedHashSet<>((Set<String>) tblCorpora.getValue());
   }
   
   /**
