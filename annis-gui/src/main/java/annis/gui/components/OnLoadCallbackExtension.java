@@ -53,19 +53,11 @@ public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
       {
         if (c != null)
         {
-          UI.getCurrent().access(new Runnable()
+          boolean handled = c.onCompononentLoaded(target);
+          if (!handled)
           {
-            @Override
-            public void run()
-            {
-              boolean handled = c.onCompononentLoaded(target);
-              if (!handled)
-              {
-                callFunction("requestRecall", recallDelay);
-              }
-            }
-          });
-
+            callFunction("requestRecall", recallDelay);
+          }
         }
       }
     });

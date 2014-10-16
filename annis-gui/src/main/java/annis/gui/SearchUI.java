@@ -19,6 +19,7 @@ import annis.VersionInfo;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
+import annis.gui.components.OnLoadCallbackExtension;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
@@ -51,6 +52,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -85,30 +87,30 @@ import org.slf4j.LoggerFactory;
  */
 @Theme("annis")
 public class SearchUI extends AnnisBaseUI
-  implements   MimeTypeErrorListener,
+  implements MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
   ErrorHandler, TabSheet.CloseHandler,
-  LoginListener, Sidebar, 
+  LoginListener, Sidebar,
   TabSheet.SelectedTabChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
-  
-  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-  
+
+  private final static Escaper urlPathEscape = UrlEscapers.
+    urlPathSegmentEscaper();
+
   private transient Cache<String, CorpusConfig> corpusConfigCache;
 
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
-  private final Pattern citationPattern =
-    Pattern.
+  private final Pattern citationPattern
+    = Pattern.
     compile(
-    "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
-    Pattern.MULTILINE | Pattern.DOTALL);
+      "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
+      Pattern.MULTILINE | Pattern.DOTALL);
 
   private MainToolbar toolbar;
-
 
   private ControlPanel controlPanel;
 
@@ -123,34 +125,34 @@ public class SearchUI extends AnnisBaseUI
   private DocBrowserController docBrowserController;
 
   private Set<Component> selectedTabHistory;
-  
+
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private void initTransients()
   {
     corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
   }
-  
+
   public SearchUI()
   {
     initTransients();
   }
-  
+
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
   {
     in.defaultReadObject();
     initTransients();
   }
-    
+
   @Override
   protected void init(VaadinRequest request)
   {
     super.init(request);
     setErrorHandler(this);
 
-    this.selectedTabHistory  = new LinkedHashSet<>();
+    this.selectedTabHistory = new LinkedHashSet<>();
     this.instanceConfig = getInstanceConfig(request);
-    
+
     getPage().setTitle(
       instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
@@ -162,20 +164,20 @@ public class SearchUI extends AnnisBaseUI
     // always get the resize events directly
     setImmediate(true);
 
-    GridLayout mainLayout = new GridLayout(2,2);
+    GridLayout mainLayout = new GridLayout(2, 2);
     setContent(mainLayout);
-    
+
     mainLayout.setSizeFull();
     mainLayout.setMargin(false);
     mainLayout.setRowExpandRatio(1, 1.0f);
     mainLayout.setColumnExpandRatio(1, 1.0f);
-    
+
     toolbar = new MainToolbar(SearchUI.this);
     toolbar.addLoginListener(SearchUI.this);
     addExtension(toolbar.getScreenshotExtension());
 
-    mainLayout.addComponent(toolbar, 0,0, 1, 0);
-   
+    mainLayout.addComponent(toolbar, 0, 0, 1, 0);
+
     final HelpPanel help = new HelpPanel(this);
 
     mainTab = new TabSheet();
@@ -184,7 +186,7 @@ public class SearchUI extends AnnisBaseUI
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(queryController);
     mainTab.addSelectedTabChangeListener(this);
-    
+
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
@@ -193,10 +195,10 @@ public class SearchUI extends AnnisBaseUI
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-    
+
     mainLayout.addComponent(controlPanel, 0, 1);
-    mainLayout.addComponent(mainTab, 1,1);
-    
+    mainLayout.addComponent(mainTab, 1, 1);
+
     addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
@@ -221,22 +223,23 @@ public class SearchUI extends AnnisBaseUI
 
     checkCitation();
     lastQueriedFragment = "";
-    evaluateFragment(getPage().getUriFragment());
-    
+
     checkServiceVersion();
+    evaluateFragment(getPage().getUriFragment());
+
   }
-  
+
   private void checkServiceVersion()
   {
     try
     {
-      WebResource resRelease 
+      WebResource resRelease
         = Helper.getAnnisWebResource().path("version").path("release");
       String releaseService = resRelease.get(String.class);
       String releaseGUI = VersionInfo.getReleaseName();
 
       // check if the release version differs and show a big warning
-      if(!releaseGUI.equals(releaseService))
+      if (!releaseGUI.equals(releaseService))
       {
         Notification.show("Different service version",
           "The service uses version " + releaseService
@@ -247,27 +250,27 @@ public class SearchUI extends AnnisBaseUI
       else
       {
         // show a smaller warning if the revisions are not the same
-        WebResource resRevision 
+        WebResource resRevision
           = Helper.getAnnisWebResource().path("version").path("revision");
         String revisionService = resRevision.get(String.class);
         String revisionGUI = VersionInfo.getBuildRevision();
-        
-        if(!revisionService.equals(revisionGUI))
-        {        
+
+        if (!revisionService.equals(revisionGUI))
+        {
           // shorten the strings
           String commonPrefix = Strings.commonPrefix(revisionService,
             revisionGUI);
-          int outputLength = Math.max(6, commonPrefix.length()+2);
-          String revisionServiceShort = revisionService.substring(0, 
-            Math.min(revisionService.length()-1, outputLength));
-          String revisionGUIShort = revisionGUI.substring(0, 
-            Math.min(revisionGUI.length()-1, outputLength));
-          
+          int outputLength = Math.max(6, commonPrefix.length() + 2);
+          String revisionServiceShort = revisionService.substring(0,
+            Math.min(revisionService.length() - 1, outputLength));
+          String revisionGUIShort = revisionGUI.substring(0,
+            Math.min(revisionGUI.length() - 1, outputLength));
+
           Notification n = new Notification("Different service revision",
-            "The service uses revision <code title=\"" + revisionGUI 
-              + "\">" + revisionServiceShort
-            + "</code> but the user interface is using revision  <code title=\"" 
-              + revisionGUI + "\">" + revisionGUIShort
+            "The service uses revision <code title=\"" + revisionGUI
+            + "\">" + revisionServiceShort
+            + "</code> but the user interface is using revision  <code title=\""
+            + revisionGUI + "\">" + revisionGUIShort
             + "</code>.",
             Notification.Type.TRAY_NOTIFICATION);
           n.setHtmlContentAllowed(true);
@@ -276,17 +279,18 @@ public class SearchUI extends AnnisBaseUI
         }
       }
     }
-    catch(UniformInterfaceException ex)
+    catch (UniformInterfaceException ex)
     {
       log.warn("Could not get the version of the service", ex);
     }
-    catch(ClientHandlerException ex)
+    catch (ClientHandlerException ex)
     {
-      log.warn("Could not get the version of the service because service is not running", ex);
+      log.warn(
+        "Could not get the version of the service because service is not running",
+        ex);
     }
   }
-  
-  
+
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
   {
@@ -295,7 +299,7 @@ public class SearchUI extends AnnisBaseUI
       event.getThrowable());
     // get the source throwable (thus the one that triggered the error)
     Throwable source = event.getThrowable();
-    if(source != null)
+    if (source != null)
     {
       while (source.getCause() != null)
       {
@@ -307,7 +311,7 @@ public class SearchUI extends AnnisBaseUI
 
   public boolean canReportBugs()
   {
-    if(toolbar != null)
+    if (toolbar != null)
     {
       return toolbar.canReportBugs();
     }
@@ -517,8 +521,8 @@ public class SearchUI extends AnnisBaseUI
 
       // filter by actually avaible user corpora in order not to get any exception later
       WebResource res = Helper.getAnnisWebResource();
-      List<AnnisCorpus> userCorpora =
-        res.path("query").path("corpora").
+      List<AnnisCorpus> userCorpora
+        = res.path("query").path("corpora").
         get(new AnnisCorpusListType());
 
       LinkedList<String> userCorporaStrings = new LinkedList<>();
@@ -546,7 +550,8 @@ public class SearchUI extends AnnisBaseUI
         }
         queryController.
           setQuery(
-          new PagedResultQuery(cleft, cright, 0, 10, null, aql, selectedCorpora));
+            new PagedResultQuery(cleft, cright, 0, 10, null, aql,
+              selectedCorpora));
       }
       else
       {
@@ -566,39 +571,39 @@ public class SearchUI extends AnnisBaseUI
     }
 
   }
-  
+
   @Override
   public void updateSidebarState(SidebarState state)
   {
-    if(controlPanel != null && state != null && toolbar != null)
+    if (controlPanel != null && state != null && toolbar != null)
     {
       controlPanel.setVisible(state.isSidebarVisible());
-      
+
       // set cookie
       Cookie c = new Cookie("annis-sidebar-state", state.name());
-      c.setMaxAge(30*24*60*60); // 30 days
-      c.setPath(VaadinService.getCurrentRequest().getContextPath());
+      c.setMaxAge(30 * 24 * 60 * 60); // 30 days
+      c.setPath(Helper.getContext());
       VaadinService.getCurrentResponse().addCookie(c);
     }
   }
-  
 
   @Override
   public void onTabClose(TabSheet tabsheet, Component tabContent)
   {
     // select the tab that was selected before
-    if(tabsheet == mainTab)
+    if (tabsheet == mainTab)
     {
       selectedTabHistory.remove(tabContent);
 
       if (!selectedTabHistory.isEmpty())
       {
         // get the last selected tab
-        Component[] asArray = selectedTabHistory.toArray(new Component[selectedTabHistory.size()]);
-        mainTab.setSelectedTab(asArray[asArray.length-1]);
+        Component[] asArray = selectedTabHistory.toArray(
+          new Component[selectedTabHistory.size()]);
+        mainTab.setSelectedTab(asArray[asArray.length - 1]);
       }
     }
-    
+
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
@@ -608,22 +613,20 @@ public class SearchUI extends AnnisBaseUI
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
-    
+
   }
 
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
   {
     Component tab = event.getTabSheet().getSelectedTab();
-    if(tab != null)
+    if (tab != null)
     {
       // first remove the old element to make sure it is added at the end
       selectedTabHistory.remove(tab);
       selectedTabHistory.add(tab);
     }
   }
-  
-  
 
   public ControlPanel getControlPanel()
   {
@@ -639,7 +642,7 @@ public class SearchUI extends AnnisBaseUI
   {
     return queryController;
   }
-  
+
   public TabSheet getMainTab()
   {
     return mainTab;
@@ -655,8 +658,8 @@ public class SearchUI extends AnnisBaseUI
 
     if (mimeType.startsWith("audio/ogg") || mimeType.startsWith("video/web"))
     {
-      String browserList =
-        "<ul>"
+      String browserList
+        = "<ul>"
         + "<li>Mozilla Firefox: <a href=\"http://www.mozilla.org/firefox\" target=\"_blank\">http://www.mozilla.org/firefox</a></li>"
         + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
         + "</ul>";
@@ -673,22 +676,23 @@ public class SearchUI extends AnnisBaseUI
         && browser.getBrowserMajorVersion() >= 9 && supportedByIE9Plugin.
         contains(mimeType))
       {
-        Notification n =
-        new Notification("Media file type unsupported by your browser",
-          "Please install the WebM plugin for Internet Explorer 9 from "
-          + "<a target=\"_blank\" href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
-          + " or use a browser from the following list "
-          + "(these are known to work with WebM or OGG files)<br/>"
-          + browserList
-          + "<br/><br /><strong>Click on this message to hide it</strong>",
-          Notification.Type.WARNING_MESSAGE, true);
+        Notification n
+          = new Notification("Media file type unsupported by your browser",
+            "Please install the WebM plugin for Internet Explorer 9 from "
+            + "<a target=\"_blank\" href=\"https://tools.google.com/dlpage/webmmf\">https://tools.google.com/dlpage/webmmf</a> "
+            + " or use a browser from the following list "
+            + "(these are known to work with WebM or OGG files)<br/>"
+            + browserList
+            + "<br/><br /><strong>Click on this message to hide it</strong>",
+            Notification.Type.WARNING_MESSAGE, true);
         n.setDelayMsec(15000);
-        
+
         n.show(Page.getCurrent());
       }
       else
       {
-        Notification n = new Notification("Media file type unsupported by your browser",
+        Notification n = new Notification(
+          "Media file type unsupported by your browser",
           "Please use a browser from the following list "
           + "(these are known to work with WebM or OGG files)<br/>"
           + browserList
@@ -708,7 +712,7 @@ public class SearchUI extends AnnisBaseUI
     }
 
   }
-  
+
   public void notifiyQueryStarted()
   {
     toolbar.notifiyQueryStarted();
@@ -719,7 +723,7 @@ public class SearchUI extends AnnisBaseUI
   {
     queryController.updateCorpusSetList();
   }
-  
+
   @Override
   public void onLogout()
   {
@@ -750,14 +754,14 @@ public class SearchUI extends AnnisBaseUI
   {
     evaluateFragment(event.getUriFragment());
   }
-  
+
   /**
-   * Takes a list of raw corpus names as given by the #c parameter and returns
-   * a list of corpus names that are known to exist. 
-   * It also replaces alias names
+   * Takes a list of raw corpus names as given by the #c parameter and returns a
+   * list of corpus names that are known to exist. It also replaces alias names
    * with the real corpus names.
+   *
    * @param originalNames
-   * @return 
+   * @return
    */
   private Set<String> getMappedCorpora(List<String> originalNames)
   {
@@ -770,12 +774,13 @@ public class SearchUI extends AnnisBaseUI
       try
       {
         List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(selectedCorpusName))
+          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(
+              selectedCorpusName))
           .get(new GenericType<List<AnnisCorpus>>()
             {
           });
 
-        if(corporaByName == null || corporaByName.isEmpty())
+        if (corporaByName == null || corporaByName.isEmpty())
         {
           // When we did not get any answer for this corpus we might not have
           // the rights to access it yet. Since we want to preserve the "c"
@@ -841,7 +846,7 @@ public class SearchUI extends AnnisBaseUI
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
-        
+
       }
 
     }
@@ -849,7 +854,7 @@ public class SearchUI extends AnnisBaseUI
     {
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-      
+
       // full query with given context
       queryController.setQuery(new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
@@ -863,7 +868,7 @@ public class SearchUI extends AnnisBaseUI
     {
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-      
+
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
       queryController.executeQuery();
@@ -913,8 +918,6 @@ public class SearchUI extends AnnisBaseUI
       UI.getCurrent().getPage().setUriFragment("");
     }
   }
-
-  
 
   private class CitationRequestHandler implements RequestHandler
   {

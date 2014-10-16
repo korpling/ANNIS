@@ -38,10 +38,6 @@ window.annis_gui_components_OnLoadCallbackExtension = function() {
     {
       component.loaded();
     }
-    else
-    {
-      alert("actually trying to do \"ready\" again");
-    }
     alreadyLoaded = true;
    });
 

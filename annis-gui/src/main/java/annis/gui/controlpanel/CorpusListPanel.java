@@ -24,6 +24,7 @@ import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
+import annis.gui.components.CssRenderInfo;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -98,7 +99,7 @@ public class CorpusListPanel extends VerticalLayout implements
   };
   private BeanContainer<String, AnnisCorpus> corpusContainer;
 
-  private CorpusListTable tblCorpora;
+  private Table tblCorpora;
 
   private QueryController controller;
 
@@ -207,7 +208,7 @@ public class CorpusListPanel extends VerticalLayout implements
     txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
     addComponent(txtFilter);
 
-    tblCorpora = new CorpusListTable();
+    tblCorpora = new Table();
     
     addComponent(tblCorpora);
 
@@ -249,22 +250,7 @@ public class CorpusListPanel extends VerticalLayout implements
         }
       }
     });
-    tblCorpora.addPageLengthChangedInClientListener(new CorpusListTable.PageLengthChangedInClientListener()
-    {
-
-      @Override
-      public void pageLengthChangedInClient(int newPageLength)
-      {
-        Set<String> selected = getSelectedCorpora();
-        if(selected != null && !selected.isEmpty())
-        {
-          String firstSelected = selected.iterator().next();
-          tblCorpora.setCurrentPageFirstItemId(firstSelected);
-        }
-      }
-    });
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
-
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
     setExpandRatio(tblCorpora, 1.0f);
