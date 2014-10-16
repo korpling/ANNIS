@@ -849,90 +849,98 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     return rel;
   }  
   
-  private SRelation createNewRelation(SDocumentGraph graph, SStructuredNode sourceNode, 
-    SNode targetNode, String edgeName, String type, long componentID, 
+  private SRelation createNewRelation(SDocumentGraph graph,
+    SStructuredNode sourceNode,
+    SNode targetNode, String edgeName, String type, long componentID,
     SLayer layer, long parent, long pre,
     FastInverseMap<RankID, SNode> nodeByPre, AtomicInteger numberOfEdges)
   {
-    SRelation rel = null;
-    // create new relation
-    if ("d".equals(type))
-    {
-      SDominanceRelation domrel = SaltFactory.eINSTANCE.createSDominanceRelation();
-      // always set a name by ourself since the SDocumentGraph#basicAddEdge() 
-      // functions otherwise real slow
-      domrel.setSName("sDomRel"+numberOfEdges.incrementAndGet());
-      rel = domrel;
-
-      if (sourceNode != null && !(sourceNode instanceof SStructure))
-      {
-        log.debug("Mismatched source type: should be SStructure");
-        SNode oldNode = sourceNode;
-        sourceNode = recreateNode(SStructure.class, sourceNode);
-        updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
-      }
-    }
-    else if ("c".equals(type))
-    {
-      SSpanningRelation spanrel = SaltFactory.eINSTANCE.createSSpanningRelation();
-      // always set a name by ourself since the SDocumentGraph#basicAddEdge() 
-      // functions is real slow otherwise
-      spanrel.setSName("sSpanRel"+numberOfEdges.incrementAndGet());
-      rel = spanrel;
-      
-      sourceNode = testAndFixNonSpan(sourceNode, nodeByPre);
-      
-    }
-    else if ("p".equals(type))
-    {
-      SPointingRelation pointingrel = SaltFactory.eINSTANCE.createSPointingRelation();
-      pointingrel.setSName("sPointingRel"+numberOfEdges.incrementAndGet());
-      rel = pointingrel;
-    }
-    else
-    {
-      throw new IllegalArgumentException("Invalid type " + type + " for new Edge"); 
-    }
-
-    try
-    {
-      rel.addSType(edgeName);
-
-
-      RelannisEdgeFeature featEdge = new RelannisEdgeFeature();
-      featEdge.setPre(Long.valueOf(pre));
-      featEdge.setComponentID(Long.valueOf(componentID));
-
-      SFeature sfeatEdge = SaltFactory.eINSTANCE.createSFeature();
-      sfeatEdge.setSNS(ANNIS_NS);
-      sfeatEdge.setSName(FEAT_RELANNIS_EDGE);
-      sfeatEdge.setValue(featEdge);
-      rel.addSFeature(sfeatEdge);
-
-      rel.setSSource(sourceNode);
-      if ("c".equals(type) && !(targetNode instanceof SToken))
-      {
-        log.warn("invalid edge detected: target node ({}) "
-          + "of a coverage relation (from: {}, internal id {}) was not a token",
-          new Object[]
-          {
-            targetNode.getSName(), sourceNode == null ? "null" : sourceNode.getSName(), "" + pre
-          });
-      }
-      else
-      {
-        rel.setSTarget(targetNode);
-        graph.addSRelation(rel);
-      }
-      
-      rel.getSLayers().add(layer);
-      
-    }
-    catch (SaltException ex)
-    {
-      log.warn("invalid edge detected", ex);
-    }
     
+    SRelation rel = null;
+
+    if (null != type)
+    // create new relation
+    {
+      
+      switch (type)
+      {
+        case "d":
+          SDominanceRelation domrel = SaltFactory.eINSTANCE.
+            createSDominanceRelation();
+          // always set a name by ourself since the SDocumentGraph#basicAddEdge()
+          // functions otherwise real slow
+          domrel.setSName("sDomRel" + numberOfEdges.incrementAndGet());
+          rel = domrel;
+          if (sourceNode != null && !(sourceNode instanceof SStructure))
+          {
+            log.debug("Mismatched source type: should be SStructure");
+            SNode oldNode = sourceNode;
+            sourceNode = recreateNode(SStructure.class, sourceNode);
+            updateMapAfterRecreatingNode(oldNode, sourceNode, nodeByPre);
+          }
+          break;
+        case "c":
+          SSpanningRelation spanrel = SaltFactory.eINSTANCE.
+            createSSpanningRelation();
+          // always set a name by ourself since the SDocumentGraph#basicAddEdge()
+          // functions is real slow otherwise
+          spanrel.setSName("sSpanRel" + numberOfEdges.incrementAndGet());
+          rel = spanrel;
+          sourceNode = testAndFixNonSpan(sourceNode, nodeByPre);
+          break;
+        case "p":
+          SPointingRelation pointingrel = SaltFactory.eINSTANCE.
+            createSPointingRelation();
+          pointingrel.setSName("sPointingRel" + numberOfEdges.incrementAndGet());
+          rel = pointingrel;
+          break;
+        default:
+          throw new IllegalArgumentException("Invalid type " + type
+            + " for new Edge");
+      }
+
+      try
+      {
+        if(rel != null)
+        {
+          rel.addSType(edgeName);
+
+          RelannisEdgeFeature featEdge = new RelannisEdgeFeature();
+          featEdge.setPre(Long.valueOf(pre));
+          featEdge.setComponentID(Long.valueOf(componentID));
+
+          SFeature sfeatEdge = SaltFactory.eINSTANCE.createSFeature();
+          sfeatEdge.setSNS(ANNIS_NS);
+          sfeatEdge.setSName(FEAT_RELANNIS_EDGE);
+          sfeatEdge.setValue(featEdge);
+          rel.addSFeature(sfeatEdge);
+
+          rel.setSSource(sourceNode);
+          if ("c".equals(type) && !(targetNode instanceof SToken))
+          {
+            log.warn("invalid edge detected: target node ({}) "
+              + "of a coverage relation (from: {}, internal id {}) was not a token",
+              new Object[]
+              {
+                targetNode.getSName(), sourceNode == null ? "null" : sourceNode.
+                  getSName(), "" + pre
+              });
+          }
+          else
+          {
+            rel.setSTarget(targetNode);
+            graph.addSRelation(rel);
+          }
+
+          rel.getSLayers().add(layer);
+        }
+      }
+      catch (SaltException ex)
+      {
+        log.warn("invalid edge detected", ex);
+      }
+    }
+
     return rel;
   }
   
