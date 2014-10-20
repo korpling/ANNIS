@@ -360,7 +360,10 @@ public class AnnotateSqlGenerator<T>
       template.append(")\n");
     }
       
-    template.append("ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre"));
+    template.append("ORDER BY ").
+      append(tas.aliasedColumn(COMPONENT_TABLE, "name")).append(", ").
+      append(tas.aliasedColumn(COMPONENT_TABLE, "id")).append(", ").
+      append(tas.aliasedColumn(RANK_TABLE, "pre"));
     String sql = template.toString().replace(":top", "" + toplevelCorpusID)
       .replace(":document_name", sqlString(documentName));
     return sql;
