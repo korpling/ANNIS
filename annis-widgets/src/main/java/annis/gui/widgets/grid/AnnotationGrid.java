@@ -47,6 +47,8 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   private String tokRowKey = "tok";
   
   private boolean showCaption = true;
+  
+  private boolean showNamespace = false;
 
   /**
    * when true, all html tags are rendered as text and are shown in grid cells.
@@ -139,6 +141,7 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
           target.startTag("row");
           target.addAttribute("caption", anno.getKey());
           target.addAttribute("show-caption", showCaption);
+          target.addAttribute("show-namespace", showNamespace);
 
           ArrayList<GridEvent> rowEvents = row.getEvents();
           // sort the events by their natural order
@@ -288,6 +291,16 @@ public class AnnotationGrid extends AbstractComponent implements LegacyComponent
   public void setShowCaption(boolean showCaption)
   {
     this.showCaption = showCaption;
+  }
+
+  public boolean isShowNamespace()
+  {
+    return showNamespace;
+  }
+
+  public void setShowNamespace(boolean showNamespace)
+  {
+    this.showNamespace = showNamespace;
   }
   
   

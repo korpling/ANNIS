@@ -18,7 +18,7 @@ package annis.gui.flatquerybuilder;
 
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -116,6 +116,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
 
   public FlatQueryBuilder(QueryController cp)
   {
+    setSizeFull();
     launch(cp); 
     
   }
@@ -205,7 +206,8 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     mainLayout.addComponent(toolbar);
     mainLayout.addComponent(advanced);
     setContent(mainLayout);
-    getContent().setSizeFull();   
+    getContent().setWidth("100%");
+    getContent().setHeight("-1px");
   }
 
   @Override

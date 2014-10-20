@@ -35,14 +35,14 @@ import java.util.Set;
 public class AnnotationConditionProvider
 {
 
-  private final Escaper likeEscaper = Escapers.builder()
+  public static final Escaper likeEscaper = Escapers.builder()
     .addEscape('\'', "''")
     .addEscape('%', "\\%")
     .addEscape('_', "\\_")
     .addEscape('\\', "\\\\")
     .build();
 
-  private final Escaper regexEscaper = Escapers.builder()
+  public static final Escaper regexEscaper = Escapers.builder()
     .addEscape('\'', "''")
     .build();
 
@@ -53,11 +53,10 @@ public class AnnotationConditionProvider
    * @param index Index for a specific annotation
    * @param annotation The annotation to add
    * @param table Table to operate on
-   * @param queryData {@link QueryData} of the query
    * @param tas {@link TableAccessStrategy} for the given node.
    */
   public void addAnnotationConditions(List<String> conditions, QueryNode node,
-    int index, QueryAnnotation annotation, String table, QueryData queryData,
+    int index, QueryAnnotation annotation, String table,
     TableAccessStrategy tas)
   {
     TextMatching tm = annotation.getTextMatching();

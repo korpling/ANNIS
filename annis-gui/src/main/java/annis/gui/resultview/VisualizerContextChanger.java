@@ -15,7 +15,7 @@
  */
 package annis.gui.resultview;
 
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.ResolverProvider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.Serializable;

@@ -16,6 +16,7 @@
 package annis.visualizers.htmlvis;
 
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.List;
 
 /**
  *
@@ -24,4 +25,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 public interface SpanMatcher
 {
   public String matchedAnnotation(SNode node);
+  
+  public List<String> getRequiredAnnotationNames();
 }

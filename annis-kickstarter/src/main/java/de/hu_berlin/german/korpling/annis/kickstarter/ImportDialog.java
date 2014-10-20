@@ -15,10 +15,9 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.AdministrationDao;
-import static annis.administration.AdministrationDao.ImportStatus;
-import annis.administration.AdministrationDao.StatementController;
+import annis.administration.StatementController;
 import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;

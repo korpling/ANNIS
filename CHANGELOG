@@ -1,3 +1,9 @@
+Version 3.1.8
+=============
+
+[Bugs]
+ #350 AQL normalization fails for node with two outgoing edge annotations
+
 Version 3.1.7
 =============
 

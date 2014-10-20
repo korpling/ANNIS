@@ -20,8 +20,8 @@ import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.libgui.media.MediaController;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.model.Query;
+import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
@@ -35,6 +35,7 @@ import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Notification;
@@ -326,7 +327,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
     {
       newTab = ui.getMainTab().addTab(newResultView, caption);
       newTab.setClosable(true);
-      newTab.setIcon(new ThemeResource("tango-icons/16x16/system-search.png"));
+      newTab.setIcon(FontAwesome.SEARCH);
     }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();
@@ -335,7 +336,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
       lastQueryUUID));
 
     getResultPanels().put(lastQueryUUID, newResultView);
-    PollControl.runInBackground(500, ui, new ResultFetchJob(preparedQuery,
+    PollControl.runInBackground(500, 250, ui, new ResultFetchJob(preparedQuery,
       newResultView, ui, this));
 
     //
@@ -608,6 +609,14 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
                 Notification.show(
                   errMsg,
                   "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
+                  Notification.Type.WARNING_MESSAGE);
+                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
+              }
+              else if(causeFinal.getResponse().getStatus() == 403)
+              {
+                String errMsg = "You don't have the access rights to query this corpus. "
+                  + "You might want to login to access more corpora.";
+                Notification.show(errMsg, 
                   Notification.Type.WARNING_MESSAGE);
                 ui.getControlPanel().getQueryPanel().setStatus(errMsg);
               }

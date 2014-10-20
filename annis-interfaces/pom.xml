@@ -58,7 +58,7 @@
     <dependency>
       <groupId>de.hu_berlin.german.korpling.saltnpepper</groupId>
       <artifactId>salt-saltCommon</artifactId>
-      <version>1.1.7</version>
+      <version>1.1.8</version>
       <type>bundle</type>
       <exclusions>
         <exclusion>  
@@ -96,7 +96,13 @@
     </dependency>
     
 
-
+    <dependency>
+      <groupId>joda-time</groupId>
+      <artifactId>joda-time</artifactId>
+      <version>2.4</version>
+      <scope>compile</scope>
+    </dependency>
+    
 
     
   </dependencies>

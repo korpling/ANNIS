@@ -17,18 +17,17 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.model.Annotation;
+import com.google.common.collect.ComparisonChain;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +44,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     MetaDataPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   private VerticalLayout layout;
 
@@ -101,7 +102,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
       corpusSelection.setWidth(100, Unit.PERCENTAGE);
       corpusSelection.setHeight("-1px");
-      corpusSelection.addValueChangeListener(this);
+      corpusSelection.addValueChangeListener(MetaDataPanel.this);
 
       selectionLayout.setWidth(100, Unit.PERCENTAGE);
       selectionLayout.setHeight("-1px");
@@ -247,13 +248,26 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
   private List<Annotation> getAllSubcorpora(String toplevelCorpusName)
   {
-
+    List<Annotation> result = new LinkedList<>();
     WebResource res = Helper.getAnnisWebResource();
     try
     {
       res = res.path("meta").path("docnames")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      docs = res.get(new Helper.AnnotationListType());
+        .path(urlPathEscape.escape(toplevelCorpusName));
+      result = res.get(new Helper.AnnotationListType());
+      
+      Collections.sort(result, new Comparator<Annotation>()
+      {
+
+        @Override
+        public int compare(Annotation arg0, Annotation arg1)
+        {
+          return ComparisonChain.start()
+            .compare(arg0.getName(), arg1.getName())
+            .result();
+        }
+      });
+      
     }
     catch (UniformInterfaceException ex)
     {
@@ -269,16 +283,8 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
 
-    return docs;
+    return result;
   }
 
   @Override
@@ -287,7 +293,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     if (lastSelectedItem == null
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
-      lastSelectedItem = event.getProperty().toString();
+      lastSelectedItem = event.getProperty().getValue().toString();
       List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName,
         lastSelectedItem);
 

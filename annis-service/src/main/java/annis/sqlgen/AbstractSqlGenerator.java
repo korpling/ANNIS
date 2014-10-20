@@ -57,7 +57,8 @@ public abstract class AbstractSqlGenerator
   @Override
   public String toSql(QueryData queryData)
   {
-    return toSql(queryData, "");
+    String result = toSql(queryData, "");
+    return result;
   }
 
   @Override
@@ -118,6 +119,7 @@ public abstract class AbstractSqlGenerator
   private void appendSelectClause(StringBuffer sb, QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
+    sb.append(indent);
     sb.append("SELECT ");
     sb.append(selectClauseSqlGenerator.selectClause(queryData, alternative,
       indent));

@@ -845,11 +845,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   @Transactional(readOnly = true)
   public SaltProject retrieveAnnotationGraph(String toplevelCorpusName,
-    String documentName)
+    String documentName, List<String> nodeAnnotationFilter)
   {
+    
+    long toplevelCorpusID = mapCorpusNameToId(toplevelCorpusName);
     SaltProject p
       = graphSqlGenerator.queryAnnotationGraph(getJdbcTemplate(),
-        toplevelCorpusName, documentName);
+        toplevelCorpusID, documentName, nodeAnnotationFilter);
     return p;
   }
 

@@ -196,23 +196,32 @@ public class QueryNode implements Serializable
   /**
    * Copy constructor
    * @param other 
+   * @param copyOutgoingJoins If true the outgoing join list from the other node
+   *                          is copied to the new node.
    */
-  public QueryNode(QueryNode other)
+  public QueryNode(QueryNode other,boolean copyOutgoingJoins)
   {
     this.arity = other.arity;
     this.corpus = other.corpus;
     this.id = other.id;
-    this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
+    if(copyOutgoingJoins)
+    {
+      this.outgoingJoins = new ArrayList<Join>(other.outgoingJoins);
+    }
+    else
+    {
+      this.outgoingJoins = new ArrayList<Join>();
+    }
     // do not copy the ingoing join since this is a property of the joins itself
     // only if they change their target it is allowed to change the state of 
     // the ingoing joins of the query node
-    this.ingoingJoins = new ArrayList<Join>();
+    this.ingoingJoins = new ArrayList<>();
     this.left = other.left;
     this.leftToken = other.leftToken;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
     this.name = other.name;
     this.namespace = other.namespace;
-    this.nodeAnnotations = new TreeSet<QueryAnnotation>(other.nodeAnnotations);
+    this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
     this.partOfEdge = other.partOfEdge;
     this.right = other.right;
     this.rightToken = other.rightToken;
@@ -230,10 +239,12 @@ public class QueryNode implements Serializable
    * Copy constructor that allows to change the ID.
    * @param newId
    * @param other 
+   * @param copyOutgoingJoins If true the outgoing join list from the other node
+   *                          is copied to the new node.
    */
-  public QueryNode(long newId, QueryNode other)
+  public QueryNode(long newId, QueryNode other, boolean copyOutgoingJoins)
   {
-    this(other);
+    this(other, copyOutgoingJoins);
     this.id = newId;
   }
 
@@ -458,7 +469,10 @@ public class QueryNode implements Serializable
       this.setPartOfEdge(true);
 
       QueryNode target = join.getTarget();
-      target.setPartOfEdge(true);
+      if(target != null)
+      {
+        target.setPartOfEdge(true);
+      }
     }
 
     return result;
@@ -616,18 +630,6 @@ public class QueryNode implements Serializable
   public int hashCode()
   {
     return (int) id;
-  }
-  
-  public void clearOutgoingJoins()
-  {
-    for(Join j : outgoingJoins)
-    {
-      if(j.getTarget() != null)
-      {
-        j.getTarget().ingoingJoins.remove(j);
-      }
-    }
-    outgoingJoins.clear();
   }
   
   public boolean removeOutgoingJoin(Join j)

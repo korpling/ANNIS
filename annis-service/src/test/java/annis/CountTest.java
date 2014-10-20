@@ -156,6 +156,10 @@ public class CountTest
       + "& #a ->anaphor_antecedent #b "
       + "& #b ->anaphor_antecedent #c"));
     
+    assertEquals(2, countPcc2("\"wollen\" & tok & tok \n" +
+"& #1 ->dep[func=\"obja\"] #2 \n" +
+"& #1 ->dep[func=\"sbj\"] #3"));
+    
   }
 
   @Test

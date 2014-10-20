@@ -358,7 +358,7 @@ public abstract class AnnisBaseRunner
 
     ThresholdFilter consoleFilter = new ConsoleFilter();
 
-    consoleFilter.setLevel(console ? "INFO" : "WARN");
+    consoleFilter.setLevel(console ? "DEBUG" : "WARN");
     consoleFilter.start();
 
     consoleAppender.addFilter(consoleFilter);

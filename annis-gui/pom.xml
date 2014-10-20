@@ -26,6 +26,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
+    <vaadin.version>7.3.1</vaadin.version>
   </properties>
 
   <build>
@@ -161,27 +162,18 @@
         </dependencies>
       </plugin>
       
-      <!-- workaround for automatically compile SCSS file in maven
-      http://dev.vaadin.com/ticket/10291
-      -->
       <plugin>
-        <groupId>org.codehaus.mojo</groupId>
-        <artifactId>exec-maven-plugin</artifactId>
-        <version>1.2.1</version>
+        <groupId>com.vaadin</groupId>
+        <artifactId>vaadin-maven-plugin</artifactId>
+        <version>${vaadin.version}</version>
         <executions>
           <execution>
-            <phase>generate-sources</phase>
             <goals>
-              <goal>java</goal>
+              <goal>clean</goal>
+              <goal>resources</goal>
+              <goal>update-theme</goal>
+              <goal>compile-theme</goal>
             </goals>
-            <configuration>
-              <classpathScope>compile</classpathScope>
-              <mainClass>com.vaadin.sass.SassCompiler</mainClass>
-              <arguments>
-                <argument>src/main/webapp/VAADIN/themes/annis/styles.scss</argument>
-                <argument>src/main/webapp/VAADIN/themes/annis/styles.css</argument>
-              </arguments>
-            </configuration>
           </execution>
         </executions>
       </plugin>

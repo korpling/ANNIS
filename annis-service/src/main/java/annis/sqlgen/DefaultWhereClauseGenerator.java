@@ -332,7 +332,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     QueryData queryData)
   {
     annoCondition.addAnnotationConditions(conditions, node, index, annotation,
-      table, queryData, tables(node));
+      table, tables(node));
   }
 
   @Override

@@ -54,12 +54,12 @@ public class AboutWindow extends Window
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();
-    logoAnnis.setSource(new ThemeResource("annis-logo-128.png"));
+    logoAnnis.setSource(new ThemeResource("images/annis-logo-128.png"));
     logoAnnis.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoAnnis);
     
     Embedded logoSfb = new Embedded();
-    logoSfb.setSource(new ThemeResource("sfb-logo.jpg"));
+    logoSfb.setSource(new ThemeResource("images/sfb-logo.jpg"));
     logoSfb.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoSfb);
     

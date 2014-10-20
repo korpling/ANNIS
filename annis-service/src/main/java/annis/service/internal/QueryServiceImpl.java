@@ -46,6 +46,7 @@ import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.FrequencyTableQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
 import com.google.common.io.ByteStreams;
 import com.google.mimeparse.MIMEParse;
@@ -83,7 +84,6 @@ import javax.ws.rs.core.StreamingOutput;
 import javax.ws.rs.core.UriInfo;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.shiro.SecurityUtils;
-import org.apache.shiro.authz.AuthorizationException;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -390,6 +390,8 @@ public class QueryServiceImpl implements QueryService
     @DefaultValue("all") @QueryParam("filter") String filterRaw)
   {
     
+    Subject user = SecurityUtils.getSubject();
+    
     // some robustness stuff
     if (matches == null)
     {
@@ -419,7 +421,6 @@ public class QueryServiceImpl implements QueryService
       }
     }
 
-    Subject user = SecurityUtils.getSubject();
     for (String c : corpusNames)
     {
       user.checkPermission("query:subgraph:" + c);
@@ -429,7 +430,7 @@ public class QueryServiceImpl implements QueryService
     
     if(data.getCorpusList() == null || data.getCorpusList().isEmpty())
     {
-      throw new WebApplicationException(400);
+      throw new WebApplicationException(Response.Status.BAD_REQUEST.getStatusCode());
     }
     
     long start = new Date().getTime();
@@ -448,17 +449,25 @@ public class QueryServiceImpl implements QueryService
   })
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
-    @PathParam("doc") String documentName)
+    @PathParam("doc") String documentName,
+    @QueryParam("filternodeanno") String filternodeanno)
   {
 
     Subject user = SecurityUtils.getSubject();
     user.checkPermission("query:subgraph:" + toplevelCorpusName);
 
+    List<String> nodeAnnotationFilter = null;
+    if(filternodeanno != null)
+    {
+      nodeAnnotationFilter = Splitter.on(',').trimResults().omitEmptyStrings()
+        .splitToList(filternodeanno);
+    }
+    
     try
     {
       long start = new Date().getTime();
       SaltProject p = annisDao.retrieveAnnotationGraph(toplevelCorpusName,
-        documentName);
+        documentName, nodeAnnotationFilter);
       long end = new Date().getTime();
       logQuery("GRAPH", toplevelCorpusName, documentName, end - start);
       return p;
@@ -467,7 +476,7 @@ public class QueryServiceImpl implements QueryService
     {
       log.error("error when accessing graph " + toplevelCorpusName + "/"
         + documentName, ex);
-      throw new WebApplicationException(ex);
+      throw new WebApplicationException(ex, 500);
     }
   }
 
@@ -574,10 +583,11 @@ public class QueryServiceImpl implements QueryService
   @Produces("application/xml")
   public CorpusConfig corpusConfig(@PathParam("top") String toplevelName)
   {
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:config:" + toplevelName);
+
     try
     {
-      Subject user = SecurityUtils.getSubject();
-      user.checkPermission("query:config:" + toplevelName);
       Properties tmp = annisDao.getCorpusConfigurationSave(toplevelName);
 
       CorpusConfig corpusConfig = new CorpusConfig();
@@ -585,15 +595,10 @@ public class QueryServiceImpl implements QueryService
 
       return corpusConfig;
     }
-    catch (AuthorizationException ex)
-    {
-      log.error("authorization error", ex);
-      throw new WebApplicationException(401);
-    }
     catch (Exception ex)
     {
       log.error("problems with reading config", ex);
-      throw new WebApplicationException(500);
+      throw new WebApplicationException(ex, 500);
     }
   }
 
@@ -605,23 +610,16 @@ public class QueryServiceImpl implements QueryService
     @DefaultValue("false") @QueryParam("fetchvalues") String fetchValues,
     @DefaultValue("false") @QueryParam("onlymostfrequentvalues") String onlyMostFrequentValues) throws WebApplicationException
   {
-    try
-    {
-      Subject user = SecurityUtils.getSubject();
-      user.checkPermission("query:annotations:" + toplevelCorpus);
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<>();
-      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+    List<Long> corpusList = new ArrayList<>();
+    corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
 
-      return annisDao.listAnnotations(corpusList,
-        Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
-        onlyMostFrequentValues));
-    }
-    catch (Exception ex)
-    {
-      log.error("could not get annotations for {}", toplevelCorpus, ex);
-      throw new WebApplicationException(500);
-    }
+    return annisDao.listAnnotations(corpusList,
+      Boolean.parseBoolean(fetchValues), Boolean.parseBoolean(
+      onlyMostFrequentValues));
+
   }
   
   @GET
@@ -630,21 +628,15 @@ public class QueryServiceImpl implements QueryService
   public SegmentationList segmentationNames(
     @PathParam("top") String toplevelCorpus) throws WebApplicationException
   {
-    try
-    {
-      Subject user = SecurityUtils.getSubject();
-      user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      List<Long> corpusList = new ArrayList<>();
-      corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+    Subject user = SecurityUtils.getSubject();
+    user.checkPermission("query:annotations:" + toplevelCorpus);
 
-      return new SegmentationList(annisDao.listSegmentationNames(corpusList));
-    }
-    catch (Exception ex)
-    {
-      log.error("could not get segmentation names for {}", toplevelCorpus, ex);
-      throw new WebApplicationException(500);
-    }
+    List<Long> corpusList = new ArrayList<>();
+    corpusList.add(annisDao.mapCorpusNameToId(toplevelCorpus));
+
+    return new SegmentationList(annisDao.listSegmentationNames(corpusList));
+
   }
 
   /**
@@ -861,6 +853,8 @@ public class QueryServiceImpl implements QueryService
     @QueryParam("corpora") String rawCorpusNames) throws WebApplicationException
   {
 
+    Subject user = SecurityUtils.getSubject();
+      
     try
     {
       String[] corpusNames;
@@ -881,7 +875,6 @@ public class QueryServiceImpl implements QueryService
       List<String> allowedCorpora = new ArrayList<>();
 
       // filter by which corpora the user is allowed to access
-      Subject user = SecurityUtils.getSubject();
       for (String c : corpusNames)
       {
         if (user.isPermitted("query:*:" + c))
@@ -895,27 +888,9 @@ public class QueryServiceImpl implements QueryService
     }
     catch (Exception ex)
     {
-      throw new WebApplicationException(400);
+      log.error("Problem accessing example queries", ex);
+      throw new WebApplicationException(ex, 500);
     }
-  }
-
-  private String createAnnotateLogParameters(int left, int right, int offset,
-    int limit)
-  {
-    StringBuilder sb = new StringBuilder();
-    sb.append("left: ");
-    sb.append(left);
-    sb.append(", ");
-    sb.append("right: ");
-    sb.append(right);
-    sb.append(", ");
-    sb.append("offset: ");
-    sb.append(offset);
-    sb.append(", ");
-    sb.append("limit: ");
-    sb.append(limit);
-    String logParameters = sb.toString();
-    return logParameters;
   }
 
   private void logQuery(String queryFunction, String toplevelCorpus,
