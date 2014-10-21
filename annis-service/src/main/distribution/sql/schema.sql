@@ -129,7 +129,7 @@ CREATE TABLE media_files
   UNIQUE (corpus_ref, title)
 );
 
-DROP TABLE IF EXISTS corpus_alias;
+DROP TABLE IF EXISTS corpus_alias CASCADE;
 CREATE TABLE corpus_alias
 (
   alias text,

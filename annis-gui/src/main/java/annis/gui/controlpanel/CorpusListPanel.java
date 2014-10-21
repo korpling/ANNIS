@@ -60,6 +60,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
@@ -232,6 +233,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
+    tblCorpora.setPageLength(1);
     
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
@@ -249,7 +251,6 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
-
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
     setExpandRatio(tblCorpora, 1.0f);
@@ -616,6 +617,7 @@ public class CorpusListPanel extends VerticalLayout implements
   /**
    * Select the corpora
    * @param corpora Corpora to select
+   * @param delayScroll 
    */
   public void selectCorpora(Set<String> corpora)
   {
@@ -632,7 +634,9 @@ public class CorpusListPanel extends VerticalLayout implements
       tblCorpora.setValue(corpora);
       if (!corpora.isEmpty())
       {
-        tblCorpora.setCurrentPageFirstItemId(corpora.iterator().next());
+        String firstCorpusName = corpora.iterator().next();
+        int idx = corpusContainer.indexOfId(firstCorpusName);
+        tblCorpora.setCurrentPageFirstItemIndex(idx);
       }
     }
   }
@@ -644,7 +648,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public Set<String> getSelectedCorpora()
   {
     // make a copy
-    return new HashSet<>((Set<String>) tblCorpora.getValue());
+    return new LinkedHashSet<>((Set<String>) tblCorpora.getValue());
   }
   
   /**

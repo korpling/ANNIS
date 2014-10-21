@@ -731,9 +731,14 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private boolean hasRSTType(SRelation e) {
     EList<String> sTypes = e.getSTypes();
 
-    for (String sType : sTypes) {
-      if (getRSTType().equalsIgnoreCase(sType)) {
-        return true;
+    if (sTypes != null)
+    {
+      for (String sType : sTypes)
+      {
+        if (getRSTType().equalsIgnoreCase(sType))
+        {
+          return true;
+        }
       }
     }
     return false;

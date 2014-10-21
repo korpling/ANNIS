@@ -119,13 +119,12 @@ public class ResultViewPanel extends VerticalLayout implements
   private int numberOfResults;
 
   private transient BlockingQueue<SaltProject> projectQueue;
-  
-  private UUID queryId;
- 
-  private PagedResultQuery currentQuery;
-  
-  SearchUI sui = (SearchUI) UI.getCurrent();
 
+  private UUID queryId;
+
+  private PagedResultQuery currentQuery;
+
+  SearchUI sui = (SearchUI) UI.getCurrent();
 
   public ResultViewPanel(QueryController controller,
     PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
@@ -197,9 +196,9 @@ public class ResultViewPanel extends VerticalLayout implements
     Label lblNoResult = new Label("No matches found.");
     lblNoResult.setWidth("100%");
     lblNoResult.addStyleName("result-view-no-content");
-    
+
     resultLayout.addComponent(lblNoResult);
-    
+
     showFinishedSubgraphSearch();
   }
 
@@ -226,7 +225,7 @@ public class ResultViewPanel extends VerticalLayout implements
     this.projectQueue = queue;
     this.currentQuery = q;
     this.numberOfResults = numberOfResults;
-    
+
     paging.setPageSize(q.getLimit(), false);
     paging.setInfo(q.getQuery());
 
@@ -287,14 +286,16 @@ public class ResultViewPanel extends VerticalLayout implements
       }
       else
       {
-        for(SaltProject p : subgraphList)
+        for (SaltProject p : subgraphList)
         {
           updateVariables(p);
           newPanels = createPanels(p, q.getOffset() + currentResults);
           currentResults += newPanels.size();
 
-          String strResults  = numberOfResults > 1 ? "results" : "result";
-          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().getQueryPanel().getLastPublicStatus(), " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");          
+          String strResults = numberOfResults > 1 ? "results" : "result";
+          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().
+            getQueryPanel().getLastPublicStatus(),
+            " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");
 
           if (currentResults == numberOfResults)
           {
@@ -308,15 +309,15 @@ public class ResultViewPanel extends VerticalLayout implements
             panel.setSegmentationLayer(selectedSegmentationLayer);
           }
         }
-        
-        if(currentResults == numberOfResults)
+
+        if (currentResults == numberOfResults)
         {
           showFinishedSubgraphSearch();
         }
 
-
         if (projectQueue != null && !newPanels.isEmpty() && currentResults < numberOfResults)
         {
+          log.debug("adding callback for result " + currentResults);
           // add a callback so we can load the next single result
           OnLoadCallbackExtension ext = new OnLoadCallbackExtension(this, 250);
           ext.extend(newPanels.get(newPanels.size() - 1));
@@ -333,14 +334,14 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showFinishedSubgraphSearch()
   {
     //Search complete, stop progress bar control
-    if (sui.getControlPanel().getQueryPanel().getPiCount() != null )
+    if (sui.getControlPanel().getQueryPanel().getPiCount() != null)
     {
       if (sui.getControlPanel().getQueryPanel().getPiCount().isVisible())
-       {
-           sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
-           sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
-       }
-     }
+      {
+        sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
+        sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
+      }
+    }
     // also remove the info how many results have been fetched
     QueryPanel qp = sui.getControlPanel().getQueryPanel();
     qp.setStatus(qp.getLastPublicStatus());
@@ -356,9 +357,9 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        getVisibleTokenAnnos(), segmentationName, queryId, controller, 
+        getVisibleTokenAnnos(), segmentationName, queryId, controller,
         instanceConfig);
-      
+
       i++;
 
       panel.setWidth("100%");
@@ -407,7 +408,7 @@ public class ResultViewPanel extends VerticalLayout implements
     updateSegmentationLayer(segmentationLayerSet);
     updateVisibleToken(tokenAnnotationLevelSet);
   }
-  
+
   private Set<String> getSegmentationNames(SaltProject p)
   {
     Set<String> result = new TreeSet<>();
@@ -433,7 +434,7 @@ public class ResultViewPanel extends VerticalLayout implements
         } // end if graph not null
       }
     }
-    
+
     return result;
   }
 
@@ -469,7 +470,7 @@ public class ResultViewPanel extends VerticalLayout implements
     {
       // remember old value
       String oldSegmentationLayer = selectedSegmentationLayer;
-      
+
       // set the new selected item
       selectedSegmentationLayer = selectedItem.getText();
 
@@ -481,26 +482,26 @@ public class ResultViewPanel extends VerticalLayout implements
       {
         mi.setChecked(mi == selectedItem);
       }
-      
-      if(oldSegmentationLayer != null)
+
+      if (oldSegmentationLayer != null)
       {
-        if(!oldSegmentationLayer.equals(selectedSegmentationLayer))
+        if (!oldSegmentationLayer.equals(selectedSegmentationLayer))
         {
           setSegmentationLayer(selectedSegmentationLayer);
         }
       }
-      else if(selectedSegmentationLayer != null)
+      else if (selectedSegmentationLayer != null)
       {
         // oldSegmentation is null, but selected is not
         setSegmentationLayer(selectedSegmentationLayer);
       }
-      
+
       //update URL with newly selected segmentation layer
       PagedResultQuery q;
       SearchUI sui = (SearchUI) UI.getCurrent();
-      q = sui.getQueryController().getPreparedQuery();        
+      q = sui.getQueryController().getPreparedQuery();
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
-      q.setSegmentation(selectedSegmentationLayer); 
+      q.setSegmentation(selectedSegmentationLayer);
 
       sui.updateFragment(q);
     }
@@ -570,7 +571,7 @@ public class ResultViewPanel extends VerticalLayout implements
     }
 
     // add new annotations
-    if(tokenAnnotationLevelSet != null)
+    if (tokenAnnotationLevelSet != null)
     {
       for (String s : tokenAnnotationLevelSet)
       {
@@ -587,24 +588,25 @@ public class ResultViewPanel extends VerticalLayout implements
     {
       for (final String a : tokenAnnotationLevelSet)
       {
-        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"), new MenuBar.Command()
-        {
-          @Override
-          public void menuSelected(MenuItem selectedItem)
+        MenuItem miSingleTokAnno = miTokAnnos.addItem(a.replaceFirst("::", ":"),
+          new MenuBar.Command()
           {
-
-            if (selectedItem.isChecked())
+            @Override
+            public void menuSelected(MenuItem selectedItem)
             {
-              tokenAnnoVisible.put(a, Boolean.TRUE);
-            }
-            else
-            {
-              tokenAnnoVisible.put(a, Boolean.FALSE);
-            }
 
-            setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
-          }
-        });
+              if (selectedItem.isChecked())
+              {
+                tokenAnnoVisible.put(a, Boolean.TRUE);
+              }
+              else
+              {
+                tokenAnnoVisible.put(a, Boolean.FALSE);
+              }
+
+              setVisibleTokenAnnosVisible(getVisibleTokenAnnos());
+            }
+          });
 
         miSingleTokAnno.setCheckable(true);
         miSingleTokAnno.setChecked(tokenAnnoVisible.get(a).booleanValue());
@@ -615,24 +617,28 @@ public class ResultViewPanel extends VerticalLayout implements
   @Override
   public boolean onCompononentLoaded(AbstractClientConnector source)
   {
-    if (source != null && projectQueue != null && currentQuery != null)
+    if (source != null)
     {
-      LinkedList<SaltProject> subgraphs = new LinkedList<>();
-      SaltProject p;
-      while((p = projectQueue.poll()) != null)
+      if (projectQueue != null && currentQuery != null)
       {
-        subgraphs.add(p);
-      }
-      if (subgraphs.isEmpty())
-      {
-        log.debug("no SaltProject graph in queue");
-        return false;
-      }
-      log.debug("adding new SaltProject graph");
-      addQueryResult(currentQuery, subgraphs);
-      return true;
+        LinkedList<SaltProject> subgraphs = new LinkedList<>();
+        SaltProject p;
+        while ((p = projectQueue.poll()) != null)
+        {
+          log.debug("Polling queue for SaltProject graph");
+          subgraphs.add(p);
+        }
+        if (subgraphs.isEmpty())
+        {
+          log.debug("no SaltProject graph in queue");
+          return false;
+        }
 
+        log.debug("taken {} SaltProject graph(s) from queue", subgraphs.size());
+        addQueryResult(currentQuery, subgraphs);
+        return true;
 
+      }
     }
 
     return true;

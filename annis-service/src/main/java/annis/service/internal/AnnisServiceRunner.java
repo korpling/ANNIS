@@ -17,6 +17,7 @@ package annis.service.internal;
 
 import annis.AnnisBaseRunner;
 import annis.AnnisXmlContextHelper;
+import annis.dao.AnnisDao;
 import annis.exceptions.AnnisException;
 import annis.utils.Utils;
 import com.sun.jersey.api.core.PackagesResourceConfig;
@@ -55,6 +56,8 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private Server server;
 
   private boolean useAuthentification = true;
+  
+  private GenericXmlApplicationContext ctx;
 
   public AnnisServiceRunner()
   {
@@ -172,7 +175,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   {
 
     // create beans
-    GenericXmlApplicationContext ctx = new GenericXmlApplicationContext();
+    ctx = new GenericXmlApplicationContext();
     ctx.setValidating(false);
     AnnisXmlContextHelper.prepareContext(ctx);
     ctx.load("file:" + Utils.getAnnisFile("conf/spring/Service.xml").
@@ -326,5 +329,34 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   public void setUseAuthentification(boolean useAuthentification)
   {
     this.useAuthentification = useAuthentification;
+  }
+  
+  /**
+   * Set the timeout in milliseconds
+   * @param milliseconds Timeout if greater than zero, disabled timeout if less then zero.
+   */
+  public void setTimeout(int milliseconds)
+  {
+    if(ctx != null)
+    {
+      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      if(dao != null)
+      {
+        dao.setTimeout(milliseconds);
+      }
+    }
+  }
+  
+  public int getTimeout()
+  {
+    if(ctx != null)
+    {
+      AnnisDao dao = (AnnisDao) ctx.getBean("annisDao");
+      if(dao != null)
+      {
+        return dao.getTimeout();
+      }
+    }
+    return -1;
   }
 }

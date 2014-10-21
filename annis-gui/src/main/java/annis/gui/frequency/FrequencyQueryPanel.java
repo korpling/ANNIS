@@ -24,8 +24,6 @@ import annis.model.QueryNode;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 import com.sun.jersey.api.client.GenericType;
@@ -36,7 +34,6 @@ import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.event.FieldEvents;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
@@ -57,7 +54,6 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Set;
 
 /**
@@ -91,7 +87,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     queryLayout = new VerticalLayout();
     queryLayout.setWidth("100%");
-    queryLayout.setHeight("-1px");
+    queryLayout.setHeight("100%");
     
     HorizontalLayout queryDescriptionLayout = new HorizontalLayout();
     queryDescriptionLayout.setSpacing(true);
@@ -154,7 +150,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.addComponent(lblErrorOrMsg);
     
     tblFrequencyDefinition.setWidth("100%");
-    tblFrequencyDefinition.setHeight("-1px");
+    tblFrequencyDefinition.setHeight("100%");
     
     
     tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);

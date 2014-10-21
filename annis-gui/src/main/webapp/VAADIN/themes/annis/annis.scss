@@ -44,25 +44,25 @@ $font-size: 10pt;
 
 @mixin annis {
   @include valo;
-/*  @include annis-base; */
+  /*  @include annis-base; */
   @include partitur;
 
   .hidden {
     display: none;
   }
-  
+
   .result-view-css {
     width: 100%;
   }
-  
+
   .result-view-no-content {
     text-align: center;
   }
-  
+
   .v-table-cell-content-kwic-anno {
     color: grey;
   }
-  
+
   .kwic {
     td {
       color: grey;
@@ -80,7 +80,7 @@ $font-size: 10pt;
       background-color: white;
       border-style:none;
     }
-    
+
   }
 
   .drag-source-enabled {
@@ -121,20 +121,20 @@ $font-size: 10pt;
   .tigerquery-builder-overlay {
     z-index: 10;
   }
-  
+
   textarea.border-layout {
     border-width: 1px;
     border-style: solid;
     border-color: #b3b3b3;
   }
-  
+
   .border-layout {
     border-width: 1px;
     border-style: solid;
     border-color: #b3b3b3;
   }
-  
-  
+
+
   /* Always synchronize with the MatchedNodeColors class! */
   @include match-color(1, rgb(255,0,0)); // Red
   @include match-color(2, rgb(199,21,133)); // MediumVioletRed
@@ -177,7 +177,7 @@ $font-size: 10pt;
     padding: 4px 13px;
     text-overflow: ellipsis;
   }
-  
+
   .exception-message-caption {
     font-size: 18pt;
   }
@@ -187,7 +187,7 @@ $font-size: 10pt;
     border-style: dashed;
     border-width: 1px;
   }
-  
+
   .help-tab {
     .v-accordion-item-caption {
       background-color: #ecffe7;
@@ -201,16 +201,37 @@ $font-size: 10pt;
       color: black;
     }
   } 
- 
+
   .grey-selection tr.v-selected {
     background-color: #808080;
   } 
-  
+
   .info-bar {
     background-color: $annis-color;
     border-style: solid;
     border-color: black;
     border-width: 1px 0px 0px 0px;
+  }
+
+  $huge-menubar-height: 40px;
+
+  .v-menubar-popup {
+
+    .v-menubar-menuitem-huge, .v-menubar-menuitem-huge-selected {
+      line-height: $huge-menubar-height;
+      .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after {
+        line-height: $huge-menubar-height;
+      }
+    }
+    
+    .v-menubar-menuitem-huge-selected {
+      text-decoration: underline;
+    }
+  }
+
+  .v-menubar-huge {
+    line-height: $huge-menubar-height;
+    height: $huge-menubar-height + 2px;
   }
 
 }

@@ -22,6 +22,7 @@ import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
+import annis.libgui.PollControl;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
@@ -144,7 +145,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         }
 
         // since annis found something, inform the user that subgraphs are created
-        ui.accessSynchronously(new Runnable()
+        ui.access(new Runnable()
         {
           @Override
           public void run()
@@ -175,10 +176,12 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
             query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);
+          log.debug("added match {} to queue", current+1);
 
           if (current == 0)
           {
-            ui.accessSynchronously(new Runnable()
+            PollControl.changePollingTime(ui, PollControl.DEFAULT_TIME);
+            ui.access(new Runnable()
             {
               @Override
               public void run()
@@ -197,14 +200,10 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
         }
       } // end if no results
 
-      if (Thread.interrupted())
-      {
-        return;
-      }
     }
     catch (InterruptedException ex)
     {
-      log.warn(null, ex);
+      // just return
     }
     catch (final ExecutionException root)
     {
@@ -249,13 +248,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           }
         }
       });
-    }
-    finally
-    {
-      if (Thread.interrupted())
-      {
-        return;
-      }
-    }
+    } // end catch
   }
 }

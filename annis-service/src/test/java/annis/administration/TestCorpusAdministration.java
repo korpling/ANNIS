@@ -29,6 +29,7 @@ import static org.mockito.MockitoAnnotations.initMocks;
 import org.junit.Before;
 import org.junit.Test;
 import org.mockito.InOrder;
+import org.mockito.Matchers;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 
@@ -37,7 +38,7 @@ public class TestCorpusAdministration
 {
 
   @Mock
-  private DefaultAdministrationDao administrationDao;
+  private AdministrationDao administrationDao;
   private CorpusAdministration administration;
 
   @Before
@@ -47,6 +48,10 @@ public class TestCorpusAdministration
 
     administration = new CorpusAdministration();
     administration.setAdministrationDao(administrationDao);
+    
+    Mockito.when(administrationDao.importCorpus(Matchers.anyString(), Matchers.
+      anyString(), Matchers.anyBoolean(), Matchers.anyBoolean())).thenReturn(
+        Boolean.TRUE);
   }
 
   @Test
@@ -68,6 +73,8 @@ public class TestCorpusAdministration
 
     verifyPostImport(inOrder);
 
+    inOrder.verify(administrationDao).analyzeParentFacts();
+    
     // that should be it
     verifyNoMoreInteractions(administrationDao);
   }
@@ -96,6 +103,8 @@ public class TestCorpusAdministration
     verifyImport(inOrder, path2);
     verifyImport(inOrder, path3);
 
+    inOrder.verify(administrationDao).analyzeParentFacts();
+    
     // that should be it
     verifyNoMoreInteractions(administrationDao);
   }

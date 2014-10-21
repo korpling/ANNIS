@@ -79,7 +79,7 @@ public class Helper
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
 
-  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
+  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<>();
 
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER
     = "Corpus properties does not exist";
@@ -114,8 +114,10 @@ public class Helper
     DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
 
+    ThreadSafeClientConnManager clientConnMgr = new ThreadSafeClientConnManager();
+    clientConnMgr.setDefaultMaxPerRoute(10);
     rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
-      new ThreadSafeClientConnManager());
+      clientConnMgr);
 
     if (userName != null && password != null)
     {

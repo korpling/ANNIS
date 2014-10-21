@@ -102,7 +102,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
 
       corpusSelection.setWidth(100, Unit.PERCENTAGE);
       corpusSelection.setHeight("-1px");
-      corpusSelection.addValueChangeListener(this);
+      corpusSelection.addValueChangeListener(MetaDataPanel.this);
 
       selectionLayout.setWidth(100, Unit.PERCENTAGE);
       selectionLayout.setHeight("-1px");
@@ -293,7 +293,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     if (lastSelectedItem == null
       || !lastSelectedItem.equals(event.getProperty().getValue()))
     {
-      lastSelectedItem = event.getProperty().toString();
+      lastSelectedItem = event.getProperty().getValue().toString();
       List<Annotation> metaData = Helper.getMetaDataDoc(toplevelCorpusName,
         lastSelectedItem);
 

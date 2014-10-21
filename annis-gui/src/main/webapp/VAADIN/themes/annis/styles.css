@@ -304,6 +304,14 @@
  */
 
 /**
+ *
+ *
+ * @param {string} $primary-stylename (v-absolutelayout) - 
+ *
+ * @group absolutelayout
+ */
+
+/**
  * Outputs the selectors and properties for the Accordion component.
  *
  * @param {string} $primary-stylename (v-accordion) - the primary style name for the selectors
@@ -369,6 +377,22 @@
  */
 
 /**
+ *
+ *
+ * @param {string} $primary-stylename (v-customcomponent) - 
+ *
+ * @group customcomponent
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-customlayout) - 
+ *
+ * @group customlayout
+ */
+
+/**
  * Outputs the selectors and properties for the DateField component.
  *
  * @param {string} $primary-stylename (v-datefield) - the primary style name for the selectors
@@ -386,6 +410,14 @@
  */
 
 /**
+ *
+ *
+ * @param {string} $primary-stylename (v-form) - 
+ *
+ * @group form
+ */
+
+/**
  * Outputs the selectors and properties for the FormLayout component.
  *
  * @param {string} $primary-stylename (v-formlayout) - the primary style name for the selectors
@@ -395,9 +427,89 @@
  */
 
 /**
+ *
+ *
+ * @param {string} $primaryStyleName (v-escalator) - 
+ *
+ * @group escalator
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-gridlayout) - 
+ *
+ * @group gridlayout
+ */
+
+/**
  * The font weight for headers.
  * 
  * @group label
+ */
+
+/**
+ *
+ * @group link
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-loginform) - 
+ *
+ * @group loginform
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-menubar) - 
+ * @param {bool} $include-additional-styles - 
+ *
+ * @group menubar
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-nativebutton) - 
+ *
+ * @group nativebutton
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-select) - 
+ *
+ * @group nativeselect
+ */
+
+/**
+ *
+ * @group notification
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-select-optiongroup) - 
+ * @param {bool} $include-additional-styles - 
+ *
+ * @group optiongroup
+ */
+
+/**
+ *
+ *
+ *
+ * @group orderedlayout
+ */
+
+/**
+ *
+ * @group panel
  */
 
 @-webkit-keyframes v-popupview-animate-in {
@@ -420,6 +532,35 @@
 	}
 
 /**
+ *
+ * @group progressbar
+ */
+
+/**
+ *
+ * @group richtextarea
+ */
+
+/**
+ *
+ * @group slider
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-splitpanel) - 
+ * @param {bool} $include-additional-styles - 
+ *
+ * @group splitpanel
+ */
+
+/**
+ *
+ * @group table
+ */
+
+/**
  * Should the tabsheet content changes be animated.
  * 
  * @group tabsheet
@@ -439,8 +580,49 @@
  * @group textarea
  */
 
+/**
+ *
+ * @group tree
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-treetable) - 
+ *
+ * @group treetable
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-select-twincol) - 
+ *
+ * @group twin-column-select
+ */
+
+/**
+ *
+ *
+ * @param {string} $primary-stylename (v-upload) - 
+ *
+ * @group upload
+ */
+
+/**
+ *
+ */
+
+/**
+ * @group window
+ */
+
+/**
+ * @group valo-menu
+ */
+
 .v-vaadin-version:after {
-	content: "7.3.1";
+	content: "7.3.3";
 }
 
 .v-widget {
@@ -526,6 +708,11 @@
 
 .v-ios5.v-webkit .v-scrollable {
 	-webkit-overflow-scrolling: none;
+}
+
+.v-webkit.v-ios .v-browserframe {
+	-webkit-overflow-scrolling: touch;
+	overflow: auto;
 }
 
 .v-assistive-device-only {
@@ -3426,7 +3613,6 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-formlayout > table {
 	border-spacing: 0;
 	position: relative;
-	padding: 0 8px;
 }
 
 .annis .v-formlayout.v-has-width > table, .annis .v-formlayout.v-has-width .v-formlayout-contentcell {
@@ -4643,6 +4829,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #0f63e2;
 }
 
+.annis .v-datefield-popup .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range, .annis .v-datefield-popup .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range:hover {
+	color: #a0a0a0;
+	cursor: not-allowed;
+}
+
 .annis .v-datefield-popup .v-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(133, 133, 133, 0.85);
@@ -4657,7 +4848,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.annis .v-datefield-popup td[class$="year"] button, .annis .v-datefield-popup td[class$="month"] button {
+.annis .v-datefield-popup td[class*="year"] button, .annis .v-datefield-popup td[class*="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -4677,19 +4868,24 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.annis .v-datefield-popup td[class$="year"] button:before, .annis .v-datefield-popup td[class$="month"] button:before {
+.annis .v-datefield-popup td[class*="year"] button:before, .annis .v-datefield-popup td[class*="month"] button:before {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
 }
 
-.annis .v-datefield-popup td[class$="year"] button:hover, .annis .v-datefield-popup td[class$="month"] button:hover {
-	opacity: 1;
-	filter: none ;
+.annis .v-datefield-popup td[class*="year"] button:hover:before, .annis .v-datefield-popup td[class*="month"] button:hover:before {
+	color: #0f63e2;
 }
 
-.annis .v-datefield-popup td[class$="year"] button:hover:before, .annis .v-datefield-popup td[class$="month"] button:hover:before {
-	color: #0f63e2;
+.annis .v-datefield-popup td[class*="year"] button.outside-range, .annis .v-datefield-popup td[class*="month"] button.outside-range {
+	cursor: default;
+	opacity: 0.3;
+	filter: alpha(opacity=30.0) ;
+}
+
+.annis .v-datefield-popup td[class*="year"] button.outside-range:hover:before, .annis .v-datefield-popup td[class*="month"] button.outside-range:hover:before {
+	color: #a0a0a0;
 }
 
 .annis .v-datefield-popup .v-button-prevyear:before {
@@ -4820,6 +5016,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #0f63e2;
 }
 
+.annis .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range, .annis .v-datefield-calendarpanel-day.v-datefield-calendarpanel-day-outside-range:hover {
+	color: #a0a0a0;
+	cursor: not-allowed;
+}
+
 .annis .v-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(133, 133, 133, 0.85);
@@ -4834,7 +5035,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.annis td[class$="year"] button, .annis td[class$="month"] button {
+.annis td[class*="year"] button, .annis td[class*="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -4854,19 +5055,24 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.annis td[class$="year"] button:before, .annis td[class$="month"] button:before {
+.annis td[class*="year"] button:before, .annis td[class*="month"] button:before {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
 }
 
-.annis td[class$="year"] button:hover, .annis td[class$="month"] button:hover {
-	opacity: 1;
-	filter: none ;
+.annis td[class*="year"] button:hover:before, .annis td[class*="month"] button:hover:before {
+	color: #0f63e2;
 }
 
-.annis td[class$="year"] button:hover:before, .annis td[class$="month"] button:hover:before {
-	color: #0f63e2;
+.annis td[class*="year"] button.outside-range, .annis td[class*="month"] button.outside-range {
+	cursor: default;
+	opacity: 0.3;
+	filter: alpha(opacity=30.0) ;
+}
+
+.annis td[class*="year"] button.outside-range:hover:before, .annis td[class*="month"] button.outside-range:hover:before {
+	color: #a0a0a0;
 }
 
 .annis .v-button-prevyear:before {
@@ -5491,6 +5697,11 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #0f63e2;
 }
 
+.annis .v-inline-datefield-calendarpanel-day.v-inline-datefield-calendarpanel-day-outside-range, .annis .v-inline-datefield-calendarpanel-day.v-inline-datefield-calendarpanel-day-outside-range:hover {
+	color: #a0a0a0;
+	cursor: not-allowed;
+}
+
 .annis .v-inline-datefield-calendarpanel-weekdays {
 	height: 18px;
 	color: rgba(133, 133, 133, 0.85);
@@ -5505,7 +5716,7 @@ div.v-layout.v-horizontal.v-widget {
 	white-space: nowrap;
 }
 
-.annis td[class$="year"] button, .annis td[class$="month"] button {
+.annis td[class*="year"] button, .annis td[class*="month"] button {
 	-webkit-appearance: none;
 	-moz-appearance: none;
 	-ms-appearance: none;
@@ -5525,19 +5736,24 @@ div.v-layout.v-horizontal.v-widget {
 	vertical-align: middle;
 }
 
-.annis td[class$="year"] button:before, .annis td[class$="month"] button:before {
+.annis td[class*="year"] button:before, .annis td[class*="month"] button:before {
 	color: #a0a0a0;
 	font-size: 17px;
 	line-height: 20px;
 }
 
-.annis td[class$="year"] button:hover, .annis td[class$="month"] button:hover {
-	opacity: 1;
-	filter: none ;
+.annis td[class*="year"] button:hover:before, .annis td[class*="month"] button:hover:before {
+	color: #0f63e2;
 }
 
-.annis td[class$="year"] button:hover:before, .annis td[class$="month"] button:hover:before {
-	color: #0f63e2;
+.annis td[class*="year"] button.outside-range, .annis td[class*="month"] button.outside-range {
+	cursor: default;
+	opacity: 0.3;
+	filter: alpha(opacity=30.0) ;
+}
+
+.annis td[class*="year"] button.outside-range:hover:before, .annis td[class*="month"] button.outside-range:hover:before {
+	color: #a0a0a0;
 }
 
 .annis .v-button-prevyear:before {
@@ -7399,9 +7615,14 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-table-footer-container, .annis .v-table-caption-container {
 	overflow: hidden;
 	line-height: 1;
+	min-height: 25px;
 	-webkit-box-sizing: border-box;
 	-moz-box-sizing: border-box;
 	box-sizing: border-box;
+}
+
+.v-ie8 .annis .v-table-footer-container, .v-ie8 .annis .v-table-caption-container {
+	min-height: 12px;
 }
 
 .annis .v-table-footer-container {
@@ -11267,6 +11488,10 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #c8c8c8;
 	border-width: 1px;
 	padding: 0px 10px 0px 10px;
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
 }
 
 .annis .partitur_table .header {
@@ -11306,6 +11531,13 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis td.speaker .v-label, .annis td.pdf .v-label {
 	padding: 0px 20px 0px 10px;
+}
+
+.annis .kwic td {
+	-webkit-user-select: text;
+	-moz-user-select: text;
+	-ms-user-select: text;
+	user-select: text;
 }
 
 .annis .kwic td.speaker .v-label, .annis .kwic td.pdf .v-label {
@@ -11618,6 +11850,23 @@ div.v-layout.v-horizontal.v-widget {
 	border-style: solid;
 	border-color: black;
 	border-width: 1px 0px 0px 0px;
+}
+
+.annis .v-menubar-popup .v-menubar-menuitem-huge, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
+	line-height: 40px;
+}
+
+.annis .v-menubar-popup .v-menubar-menuitem-huge .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after, .annis .v-menubar-popup .v-menubar-menuitem-huge-selected .v-menubar-submenu-indicator + .v-menubar-menuitem-caption:after {
+	line-height: 40px;
+}
+
+.annis .v-menubar-popup .v-menubar-menuitem-huge-selected {
+	text-decoration: underline;
+}
+
+.annis .v-menubar-huge {
+	line-height: 40px;
+	height: 42px;
 }
 
 .annis .v-app-loading:before {

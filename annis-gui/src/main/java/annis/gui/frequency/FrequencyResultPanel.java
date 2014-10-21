@@ -76,12 +76,12 @@ public class FrequencyResultPanel extends VerticalLayout
   public static final int MAX_NUMBER_OF_CHART_ITEMS = 100;
   
   private Table tblResult;
-  private Button btDownloadCSV;
-  FrequencyChart chart;
-  private String aql;
-  private Set<String> corpora;
-  private List<FrequencyTableEntry> freqDefinition;
-  final FrequencyQueryPanel queryPanel;
+  private final Button btDownloadCSV;
+  private final FrequencyChart chart;
+  private final String aql;
+  private final Set<String> corpora;
+  private final List<FrequencyTableEntry> freqDefinition;
+  private final FrequencyQueryPanel queryPanel;
   
   private ProgressBar pbQuery;
 
@@ -143,7 +143,7 @@ public class FrequencyResultPanel extends VerticalLayout
       } 
     };
     
-    PollControl.callInBackground(1000, null, r);
+    PollControl.callInBackground(1000, ui, r);
   }
   
   private FrequencyTable loadBeans()
@@ -299,7 +299,7 @@ public class FrequencyResultPanel extends VerticalLayout
         
         tblResult.addItem(cells, "entry-" + line++);
       }
-    };
+    }
     tblResult.addContainerProperty(pbQuery, null, table);
     addLexicalSort(tblResult.getContainerDataSource());
     
