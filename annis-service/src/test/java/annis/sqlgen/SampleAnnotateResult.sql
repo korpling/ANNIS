@@ -116,7 +116,6 @@ CREATE TEMPORARY TABLE mymatch
   "right" integer,
   token_index integer,
   is_token boolean,
-  continuous boolean,
   span character varying,
   left_token integer,
   right_token integer,

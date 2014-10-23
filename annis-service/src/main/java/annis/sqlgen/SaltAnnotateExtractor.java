@@ -848,8 +848,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
           rel.addSType(edgeName);
 
           RelannisEdgeFeature featEdge = new RelannisEdgeFeature();
-          featEdge.setPre(Long.valueOf(pre));
-          featEdge.setComponentID(Long.valueOf(componentID));
+          featEdge.setPre(pre);
+          featEdge.setComponentID(componentID);
 
           SFeature sfeatEdge = SaltFactory.eINSTANCE.createSFeature();
           sfeatEdge.setSNS(ANNIS_NS);

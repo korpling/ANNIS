@@ -51,7 +51,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   private TableAccessStrategy outerQueryTableAccessStrategy;
   
   public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy, 
-    Map<AnnisNode, ComponentEntry> spans) throws SQLException
+    Map<Long, ComponentEntry> spans) throws SQLException
   {
     AnnisNode annisNode = new AnnisNode(longValue(resultSet, NODE_TABLE, "id", tableAccessStrategy));
     
@@ -79,7 +79,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         typeAsString.charAt(0), 
         stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy),
         stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
-      spans.put(annisNode, entry);
+      spans.put(annisNode.getId(), entry);
     }
     
     return annisNode;
@@ -160,7 +160,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     Map<Long, Edge> edgeByRankID = new HashMap<>();
     
     // maps span that are continous to their coverage component
-    Map<List<Long>, Map<AnnisNode, ComponentEntry>> keyToSpanToComponent 
+    Map<List<Long>, Map<Long, ComponentEntry>> keyToSpanToComponent 
       = new HashMap<>();
     
     int rowNum = 0;
@@ -185,7 +185,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       { 
         
         log.debug("starting annotation graph for match: " + key);
-        Map<AnnisNode, ComponentEntry> spans = new HashMap<>();
+        Map<Long, ComponentEntry> spans = new HashMap<>();
         AnnotationGraph graph = new AnnotationGraph();
         graphs.add(graph);
         graphByMatchGroup.put(key, graph);
@@ -207,7 +207,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       }
 
       AnnotationGraph graph = graphByMatchGroup.get(key);
-      Map<AnnisNode, ComponentEntry> spanToComponent = keyToSpanToComponent.
+      Map<Long, ComponentEntry> spanToComponent = keyToSpanToComponent.
         get(key);
       
       graph.setDocumentName(new DocumentNameMapRow().mapRow(
@@ -310,11 +310,11 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         }
       }
       
-      Map<AnnisNode, ComponentEntry> spans = keyToSpanToComponent.get(entry.getKey());
+      Map<Long, ComponentEntry> spans = keyToSpanToComponent.get(entry.getKey());
       // filter out the continuous spans by finding all discontinuous spans
       // discontinuos spans will have a an entry for token
       
-      createMissingSpanningRelations(graph, spans);
+      createMissingSpanningRelations(graph, spans, nodeById);
       
     }
 
@@ -322,13 +322,11 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   }
   
   private void createMissingSpanningRelations(AnnotationGraph graph,
-    Map<AnnisNode, ComponentEntry> allSpans)
+    Map<Long, ComponentEntry> allSpans, Map<Long, AnnisNode> nodeById)
   { 
-    long pre=1;
-      
-    for(Map.Entry<AnnisNode, ComponentEntry> spanEntry : allSpans.entrySet())
+    for(Map.Entry<Long, ComponentEntry> spanEntry : allSpans.entrySet())
     {
-      AnnisNode span = spanEntry.getKey();
+      AnnisNode span = nodeById.get(spanEntry.getKey());
       
       // Check all covered token if there is already a coverage edge between the span
       // and the token. If at least one edge already exists, it must have been
@@ -353,6 +351,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
      
       if(!anyTokenConnected)
       {
+        long pre = 1;
         for(long i=span.getLeftToken(); i <= span.getRightToken(); i++)
         {
           AnnisNode tok = graph.getToken(i);
@@ -371,7 +370,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
             graph.addEdge(edge);
             span.addOutgoingEdge(edge);
             tok.addIncomingEdge(edge);
-          }
+          }     
         }
       }
     } // end for each node
