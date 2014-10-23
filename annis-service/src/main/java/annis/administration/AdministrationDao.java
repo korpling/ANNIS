@@ -812,47 +812,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
       int columnNumber = firstLine == null ? 13
         : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
-      if (version == RelANNISVersion.V4_0)
+      if (version == RelANNISVersion.V4_0 || version == RelANNISVersion.V3_1)
       {
         // new node table with segmentations
         // no special handling needed
         bulkloadTableFromResource(tableInStagingArea("node"),
           new FileSystemResource(nodeTabFile));
-      }
-      else if (version == RelANNISVersion.V3_1)
-      {
-        getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
-        // old node table without segmentations
-        // create temporary table for  bulk import
-        getJdbcTemplate().execute(
-          "CREATE TEMPORARY TABLE _tmpnode"
-          + "\n(\n"
-          + "id bigint,\n"
-          + "text_ref integer,\n"
-          + "corpus_ref integer,\n"
-          + "namespace varchar,\n"
-          + "name varchar,\n"
-          + "\"left\" integer,\n"
-          + "\"right\" integer,\n"
-          + "token_index integer,\n"
-          + "seg_name varchar,\n"
-          + "seg_left integer,\n"
-          + "seg_right integer,\n"
-          + "continuous boolean,\n"
-          + "span varchar\n"
-          + ");");
-
-        bulkloadTableFromResource("_tmpnode",
-          new FileSystemResource(nodeTabFile));
-
-        log.info("copying nodes from temporary helper table into staging area");
-        getJdbcTemplate().execute(
-          "INSERT INTO " + tableInStagingArea("node") + "\n"
-          + "  SELECT id, text_ref, corpus_ref, namespace AS layer, name, \"left\", "
-          + "\"right\", token_index, NULL AS left_token, NULL AS right_token, "
-          + "seg_name AS seg_name, seg_left AS seg_index, "
-          + "span\n"
-          + "FROM _tmpnode");
       }
       else if (version == RelANNISVersion.V3_0)
       {
@@ -881,8 +846,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
         getJdbcTemplate().execute(
           "INSERT INTO " + tableInStagingArea("node") + "\n"
           + "  SELECT id, text_ref, corpus_ref, namespace AS layer, name, \"left\", "
-          + "\"right\", token_index, -1 AS left_token, -1 AS right_token, "
-          + "NULL AS seg_name, NULL AS seg_index, "
+          + "\"right\", token_index, "
+          + "NULL AS seg_name, NULL AS seg_left, NULL AS seg_left, continuous, "
           + "span\n"
           + "FROM _tmpnode");
       }
