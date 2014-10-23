@@ -74,7 +74,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 /**
- * 
+ *
  */
 public class AdministrationDao extends AbstractAdminstrationDao
 {
@@ -86,7 +86,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private boolean temporaryStagingArea;
 
   private DeleteCorpusDao deleteCorpusDao;
-  
+
   /**
    * Searches for textes which are empty or only contains whitespaces. If that
    * is the case the visualizer and no document visualizer are defined in the
@@ -115,7 +115,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
           Properties corpusConf;
           try
           {
-            corpusConf = getAnnisDao().getCorpusConfiguration(toplevelCorpusName);
+            corpusConf = getAnnisDao().
+              getCorpusConfiguration(toplevelCorpusName);
           }
           catch (FileNotFoundException ex)
           {
@@ -248,7 +249,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
   protected void createUser(String username, String password)
   {
     log.info("creating user: " + username);
-    getJdbcTemplate().execute("CREATE USER " + username + " PASSWORD '" + password
+    getJdbcTemplate().execute("CREATE USER " + username + " PASSWORD '"
+      + password
       + "'");
   }
 
@@ -484,8 +486,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * @param path Specifies the path to the corpora, which should be imported.
    * @param aliasName An alias name for this corpus. Can be null.
    * @param overwrite If set to true conflicting top level corpora are deleted.
-   * @param waitForOtherTasks If true wait for other tasks to finish, if false abort.
-   * 
+   * @param waitForOtherTasks If true wait for other tasks to finish, if false
+   * abort.
+   *
    * @return true if successful
    */
   @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW,
@@ -509,25 +512,27 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().update("SET statement_timeout TO 0");
 
     RelANNISVersion relannisVersion = getRelANNISVersion(path);
-    
-    if(relannisVersion == RelANNISVersion.V4_0)
+
+    if (relannisVersion == RelANNISVersion.V4_0)
     {
       return importVersion4(path, aliasName, overwrite, relannisVersion);
     }
-    else if(relannisVersion == RelANNISVersion.V3_0 || relannisVersion == RelANNISVersion.V3_1)
+    else if (relannisVersion == RelANNISVersion.V3_0 || relannisVersion
+      == RelANNISVersion.V3_1)
     {
       return importVersion3(path, aliasName, overwrite, relannisVersion);
     }
-    
+
     log.error("Unknown ANNIS import format version");
     return false;
   }
-  
-  private boolean importVersion4(String path, String aliasName, boolean overwrite,
+
+  private boolean importVersion4(String path, String aliasName,
+    boolean overwrite,
     RelANNISVersion version)
   {
     this.relANNISFileSuffix = ".relannis";
-    createStagingArea(temporaryStagingArea);
+    createStagingAreaV4(temporaryStagingArea);
     bulkImport(path, version);
 
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
@@ -550,10 +555,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
     analyzeStagingTables();
 
 //    removeUnecessarySpanningRelations();
-    
     addUniqueNodeNameAppendix();
  //   adjustRankPrePost();
- //   adjustTextId();
+    //   adjustTextId();
     long corpusID = updateIds();
 
     importBinaryData(path, toplevelCorpusName);
@@ -608,15 +612,16 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     return true;
   }
-  
-  private boolean importVersion3(String path, String aliasName, boolean overwrite, 
+
+  private boolean importVersion3(String path, String aliasName,
+    boolean overwrite,
     RelANNISVersion version)
   {
     this.relANNISFileSuffix = ".tab";
-    
-    createStagingArea(temporaryStagingArea);
-    bulkImport(path, version);
 
+    createStagingAreaV3(temporaryStagingArea);
+    bulkImport(path, version);
+    
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
 
     // remove conflicting top level corpora, when override is set to true.
@@ -637,9 +642,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
     analyzeStagingTables();
 
     computeLeftTokenRightToken();
-    
+
     removeUnecessarySpanningRelations();
-    
+
     addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
@@ -697,7 +702,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     return true;
   }
-  
 
   ///// Subtasks of importing a corpus
   protected void dropIndexes()
@@ -710,12 +714,20 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  void createStagingArea(boolean useTemporary)
+  void createStagingAreaV4(boolean useTemporary)
   {
-    log.info("creating staging area");
+    log.info("creating staging area for import format version 4");
     MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
       ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area.sql", args);
+  }
+  
+  void createStagingAreaV3(boolean useTemporary)
+  {
+    log.info("creating staging area for import format version 3.0/3.1");
+    MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
+      ? "TEMPORARY" : "UNLOGGED");
+    executeSqlFromScript("staging_area_v3.sql", args);
   }
 
   /**
@@ -738,8 +750,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * </ul>
    *
    * @param path The path to the relANNIS. The files have to have this suffix
-   * @param version
-   * {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
+   * @param version {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
    */
   void bulkImport(String path, RelANNISVersion version)
   {
@@ -808,9 +819,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
         bulkloadTableFromResource(tableInStagingArea("node"),
           new FileSystemResource(nodeTabFile));
       }
-      else if(version == RelANNISVersion.V3_1)
+      else if (version == RelANNISVersion.V3_1)
       {
-         getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
+        getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
         // create temporary table for  bulk import
         getJdbcTemplate().execute(
@@ -870,15 +881,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
         getJdbcTemplate().execute(
           "INSERT INTO " + tableInStagingArea("node") + "\n"
           + "  SELECT id, text_ref, corpus_ref, namespace AS layer, name, \"left\", "
-          + "\"right\", token_index, NULL AS left_token, NULL AS right_token, "
+          + "\"right\", token_index, -1 AS left_token, -1 AS right_token, "
           + "NULL AS seg_name, NULL AS seg_index, "
           + "span\n"
           + "FROM _tmpnode");
       }
       else
       {
-        throw new RuntimeException("Illegal number of columns in node" 
-          + relANNISFileSuffix +  ", "
+        throw new RuntimeException("Illegal number of columns in node"
+          + relANNISFileSuffix + ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
         }
@@ -1041,7 +1052,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   void computeLevel()
   {
-    log.info("computing values for rank.level (dominance and pointing relations)");
+    log.info(
+      "computing values for rank.level (dominance and pointing relations)");
     executeSqlFromScript("level.sql");
 
     log.info("computing values for rank.level (coverage)");
@@ -1280,8 +1292,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("analyzing parent facts table");
     getJdbcTemplate().execute("ANALYZE facts");
   }
-  
-  
 
   void createFacts(long corpusID)
   {
@@ -1374,19 +1384,20 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   /**
-   * Lists the corpora using the connection information of a 
-   * given "database.properties". file
+   * Lists the corpora using the connection information of a given
+   * "database.properties". file
+   *
    * @param databaseProperties
-   * @return 
+   * @return
    */
   public List<Map<String, Object>> listCorpusStats(File databaseProperties)
   {
     List<Map<String, Object>> result = new LinkedList<>();
-    
+
     DataSource origDataSource = getDataSource().getInnerDataSource();
     try
     {
-      if(databaseProperties != null)
+      if (databaseProperties != null)
       {
         getDataSource().setInnerDataSource(createDataSource(databaseProperties));
       }
@@ -1395,7 +1406,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     catch (IOException | URISyntaxException | DataAccessException ex)
     {
-      if(databaseProperties == null)
+      if (databaseProperties == null)
       {
         log.error("Could not query corpus list", ex);
       }
@@ -1426,9 +1437,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   /**
-   * Provides a list where the keys are the aliases and the values are the corpus names.
+   * Provides a list where the keys are the aliases and the values are the
+   * corpus names.
+   *
    * @param databaseProperties
-   * @return 
+   * @return
    */
   public Multimap<String, String> listCorpusAlias(File databaseProperties)
   {
@@ -1437,14 +1450,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
     DataSource origDataSource = getDataSource().getInnerDataSource();
     try
     {
-      if(databaseProperties != null)
+      if (databaseProperties != null)
       {
         getDataSource().setInnerDataSource(createDataSource(databaseProperties));
       }
       result = getJdbcTemplate().query(
         "SELECT a.alias AS alias, c.name AS corpus\n"
         + "FROM corpus_alias AS a, corpus AS c\n" + "WHERE\n"
-        + " a.corpus_ref = c.id", new ResultSetExtractor<Multimap<String, String>>()
+        + " a.corpus_ref = c.id",
+        new ResultSetExtractor<Multimap<String, String>>()
         {
 
           @Override
@@ -1453,7 +1467,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
           DataAccessException
           {
             Multimap<String, String> data = TreeMultimap.create();
-            while(rs.next())
+            while (rs.next())
             {
               // alias -> corpus name
               data.put(rs.getString(1), rs.getString(2));
@@ -1465,7 +1479,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     catch (IOException | URISyntaxException | DataAccessException ex)
     {
-      if(databaseProperties == null)
+      if (databaseProperties == null)
       {
         log.error(
           "Could not query corpus list", ex);
@@ -1556,7 +1570,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + ");",
       alias, corpusID);
   }
-  
+
   public void addCorpusAlias(String corpusName, String alias)
   {
     getJdbcTemplate().update(
@@ -1717,7 +1731,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       return false;
     }
   }
-  
+
   /**
    * Retrieves the name of the top level corpus in the corpus.tab file.
    *
@@ -1755,7 +1769,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   ///// Getter / Setter
-
   public boolean isTemporaryStagingArea()
   {
     return temporaryStagingArea;
@@ -1769,7 +1782,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
   /**
    * Get the name and version of the schema this @{link AdministrationDao} is
    * configured to work with.
-   * @return 
+   *
+   * @return
    */
   public String getSchemaVersion()
   {
@@ -2103,7 +2117,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.deleteCorpusDao = deleteCorpusDao;
   }
-  
 
   /**
    * Checks, if a already exists a corpus with the same name of the top level
@@ -2123,21 +2136,21 @@ public class AdministrationDao extends AbstractAdminstrationDao
       throw new ConflictingCorpusException(msg);
     }
   }
-  
+
   private RelANNISVersion getRelANNISVersion(String path)
   {
     File pathDir = new File(path);
-    if(pathDir.isDirectory())
+    if (pathDir.isDirectory())
     {
       // check for existance of "relannis.version" file
       File versionFile = new File(pathDir, "relannis.version");
-      if(versionFile.isFile() && versionFile.exists())
+      if (versionFile.isFile() && versionFile.exists())
       {
         try
         {
           // read the first line
           String firstLine = Files.readFirstLine(versionFile, Charsets.UTF_8);
-          if("4.0".equals(firstLine.trim()))
+          if ("4.0".equals(firstLine.trim()))
           {
             return RelANNISVersion.V4_0;
           }
@@ -2151,17 +2164,17 @@ public class AdministrationDao extends AbstractAdminstrationDao
       {
         // we have to distinguish between 3.0 and 3.1
         File nodeTab = new File(pathDir, "node.tab");
-        if(nodeTab.isFile() && nodeTab.exists())
+        if (nodeTab.isFile() && nodeTab.exists())
         {
           try
           {
             String firstLine = Files.readFirstLine(nodeTab, Charsets.UTF_8);
             List<String> cols = Splitter.on('\t').splitToList(firstLine);
-            if(cols.size() == 13)
+            if (cols.size() == 13)
             {
               return RelANNISVersion.V3_1;
             }
-            else if(cols.size() == 10)
+            else if (cols.size() == 10)
             {
               return RelANNISVersion.V3_0;
             }
@@ -2176,7 +2189,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return RelANNISVersion.UNKNOWN;
   }
 
-
   public static class ConflictingCorpusException extends AnnisException
   {
 
@@ -2185,6 +2197,5 @@ public class AdministrationDao extends AbstractAdminstrationDao
       super(msg);
     }
   }
-
 
 }

@@ -1,7 +1,4 @@
 -- This will set the "continous" property of the spans correctly
-
-ALTER TABLE _node ADD COLUMN continuous boolean;
-
 UPDATE _node AS parent_node SET continuous = false
 WHERE 
 parent_node.continuous = true 
