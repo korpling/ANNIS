@@ -155,15 +155,14 @@ CREATE TABLE corpus_stats
 
 
 DROP VIEW IF EXISTS corpus_info CASCADE;
-CREATE VIEW corpus_info AS SELECT 
-    min(corpus_stats.name) AS "name",
-    corpus_stats.id AS id,
+CREATE VIEW corpus_info AS 
+SELECT min(corpus_stats.name::text) AS name,
+    corpus_stats.id,
     min(corpus_stats.text) AS text,
     min(corpus_stats.tokens) AS tokens,
-    min(corpus_stats.source_path) AS source_path,
-    array_agg(a.alias) AS alias
-FROM corpus_stats, corpus_alias AS a
-WHERE corpus_stats.id = a.corpus_ref
+    min(corpus_stats.source_path::text) AS source_path,
+    array_remove(array_agg(a.alias), NULL) AS alias
+FROM corpus_stats LEFT JOIN corpus_alias AS a ON (corpus_stats.id = a.corpus_ref)
 GROUP BY corpus_stats.id;
 
 DROP TYPE IF EXISTS resolver_visibility CASCADE;
