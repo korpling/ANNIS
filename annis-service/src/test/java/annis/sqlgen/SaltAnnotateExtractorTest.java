@@ -114,9 +114,9 @@ public class SaltAnnotateExtractorTest
     ECollections.sort(layers, new NameComparator());
 
     assertEquals(6, layers.size());
-    assertEquals("dep", layers.get(0).getSName());
-    assertEquals("exmaralda", layers.get(1).getSName());
-    assertEquals("merged", layers.get(2).getSName());
+    assertEquals("default_ns", layers.get(0).getSName());
+    assertEquals("dep", layers.get(1).getSName());
+    assertEquals("exmaralda", layers.get(2).getSName());
     assertEquals("mmax", layers.get(3).getSName());
     assertEquals("rst", layers.get(4).getSName());
     assertEquals("tiger", layers.get(5).getSName());
@@ -167,7 +167,7 @@ public class SaltAnnotateExtractorTest
     assertEquals("const_60", n.get(8).getSName());
     assertEquals("const_61", n.get(9).getSName());
 
-    n = g.getSLayerByName("merged").get(0).getSNodes();
+    n = g.getSLayerByName("default_ns").get(0).getSNodes();
     ECollections.sort(n, new NameComparator());
     assertEquals(12, n.size());
     assertEquals("tok_150", n.get(0).getSName());
