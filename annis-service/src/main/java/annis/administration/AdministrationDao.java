@@ -512,22 +512,23 @@ public class AdministrationDao extends AbstractAdminstrationDao
     
     if(relannisVersion == RelANNISVersion.V4_0)
     {
-      return importVersion4(path, aliasName, overwrite);
+      return importVersion4(path, aliasName, overwrite, relannisVersion);
     }
     else if(relannisVersion == RelANNISVersion.V3_0 || relannisVersion == RelANNISVersion.V3_1)
     {
-      return importVersion3(path, aliasName, overwrite);
+      return importVersion3(path, aliasName, overwrite, relannisVersion);
     }
     
     log.error("Unknown ANNIS import format version");
     return false;
   }
   
-  private boolean importVersion4(String path, String aliasName, boolean overwrite)
+  private boolean importVersion4(String path, String aliasName, boolean overwrite,
+    RelANNISVersion version)
   {
     this.relANNISFileSuffix = ".relannis";
     createStagingArea(temporaryStagingArea);
-    bulkImport(path);
+    bulkImport(path, version);
 
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
 
@@ -548,8 +549,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     computeTopLevelCorpus();
     analyzeStagingTables();
 
- //   computeLeftTokenRightToken();
-    
 //    removeUnecessarySpanningRelations();
     
     addUniqueNodeNameAppendix();
@@ -610,12 +609,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return true;
   }
   
-  private boolean importVersion3(String path, String aliasName, boolean overwrite)
+  private boolean importVersion3(String path, String aliasName, boolean overwrite, 
+    RelANNISVersion version)
   {
     this.relANNISFileSuffix = ".tab";
     
     createStagingArea(temporaryStagingArea);
-    bulkImport(path);
+    bulkImport(path, version);
 
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
 
@@ -738,9 +738,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * </ul>
    *
    * @param path The path to the relANNIS. The files have to have this suffix
+   * @param version
    * {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
    */
-  void bulkImport(String path)
+  void bulkImport(String path, RelANNISVersion version)
   {
     log.info("bulk-loading data");
 
@@ -777,7 +778,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       }
       else if (table.equalsIgnoreCase("node"))
       {
-        bulkImportNode(path);
+        bulkImportNode(path, version);
       }
       else
       {
@@ -787,7 +788,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  private void bulkImportNode(String path)
+  private void bulkImportNode(String path, RelANNISVersion version)
   {
     // check column number by reading first line
     File nodeTabFile = new File(path, "node" + relANNISFileSuffix);
@@ -800,14 +801,49 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
       int columnNumber = firstLine == null ? 13
         : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
-      if (columnNumber == 13)
+      if (version == RelANNISVersion.V4_0)
       {
         // new node table with segmentations
         // no special handling needed
         bulkloadTableFromResource(tableInStagingArea("node"),
           new FileSystemResource(nodeTabFile));
       }
-      else if (columnNumber == 10)
+      else if(version == RelANNISVersion.V3_1)
+      {
+         getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
+        // old node table without segmentations
+        // create temporary table for  bulk import
+        getJdbcTemplate().execute(
+          "CREATE TEMPORARY TABLE _tmpnode"
+          + "\n(\n"
+          + "id bigint,\n"
+          + "text_ref integer,\n"
+          + "corpus_ref integer,\n"
+          + "namespace varchar,\n"
+          + "name varchar,\n"
+          + "\"left\" integer,\n"
+          + "\"right\" integer,\n"
+          + "token_index integer,\n"
+          + "seg_name varchar,\n"
+          + "seg_left integer,\n"
+          + "seg_right integer,\n"
+          + "continuous boolean,\n"
+          + "span varchar\n"
+          + ");");
+
+        bulkloadTableFromResource("_tmpnode",
+          new FileSystemResource(nodeTabFile));
+
+        log.info("copying nodes from temporary helper table into staging area");
+        getJdbcTemplate().execute(
+          "INSERT INTO " + tableInStagingArea("node") + "\n"
+          + "  SELECT id, text_ref, corpus_ref, namespace AS layer, name, \"left\", "
+          + "\"right\", token_index, NULL AS left_token, NULL AS right_token, "
+          + "seg_name AS seg_name, seg_left AS seg_index, "
+          + "span\n"
+          + "FROM _tmpnode");
+      }
+      else if (version == RelANNISVersion.V3_0)
       {
         getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
@@ -818,13 +854,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
           + "id bigint,\n"
           + "text_ref integer,\n"
           + "corpus_ref integer,\n"
-          + "namespace varchar(100),\n"
-          + "name varchar(100),\n"
+          + "namespace varchar,\n"
+          + "name varchar,\n"
           + "\"left\" integer,\n"
           + "\"right\" integer,\n"
           + "token_index integer,\n"
           + "continuous boolean,\n"
-          + "span varchar(2000)\n"
+          + "span varchar\n"
           + ");");
 
         bulkloadTableFromResource("_tmpnode",
@@ -833,10 +869,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
         log.info("copying nodes from temporary helper table into staging area");
         getJdbcTemplate().execute(
           "INSERT INTO " + tableInStagingArea("node") + "\n"
-          + "  SELECT id, text_ref, corpus_ref, namespace, name, \"left\", "
-          + "\"right\", token_index, "
-          + "NULL AS seg_name, NULL AS seg_left, NULL AS seg_right, "
-          + "continuous, span\n"
+          + "  SELECT id, text_ref, corpus_ref, namespace AS layer, name, \"left\", "
+          + "\"right\", token_index, NULL AS left_token, NULL AS right_token, "
+          + "NULL AS seg_name, NULL AS seg_index, "
+          + "span\n"
           + "FROM _tmpnode");
       }
       else

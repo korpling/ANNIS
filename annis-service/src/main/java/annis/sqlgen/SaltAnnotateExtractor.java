@@ -277,7 +277,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       long pre=1;
       RelannisNodeFeature featSpan = RelannisNodeFeature.extract(span);      
       ComponentEntry spanComponent = componentForSpan.get(span.getSId());
-      if(spanComponent != null && featSpan != null && featSpan.isContinuous())
+      if(spanComponent != null && featSpan != null)
       {
         for(long i=featSpan.getLeftToken(); i <= featSpan.getRightToken(); i++)
         {
@@ -541,7 +541,6 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     val.setTokenIndex(longValue(resultSet, "node", "token_index"));
     val.setSegIndex(longValue(resultSet, "node", "seg_index"));
     val.setSegName(stringValue(resultSet, "node", "seg_name"));
-    val.setContinuous(booleanValue(resultSet, "node", "continuous"));
     feat.setSValue(val);
     
     node.addSFeature(feat);
@@ -1022,21 +1021,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       // the edge is not fully included in the result
       return;
     }
-    
-    if("c".equals(type))
-    {
-      RelannisNodeFeature srcFeat = RelannisNodeFeature.extract(sourceNode);
-      if(srcFeat != null && srcFeat.isContinuous())
-      {
-        // don't create relations for continuous spans at this time, this will
-        // be handled in a separate step later
-        return;
-      }
-    }
 
     SLayer layer = findOrAddSLayer(edgeNamespace, graph);
 
-    SRelation rel = null;
+    SRelation rel;
     if (!resultSet.wasNull())
     {
 

@@ -79,7 +79,6 @@ CREATE TABLE facts (
   "right" integer,
   token_index integer,
   is_token boolean,
-  continuous boolean,
   span varchar,
   left_token integer,
   right_token integer,

@@ -94,8 +94,8 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |id|bigint|X|X|primary key|
 |text_ref|integer||X|foreign key to text.id|
 |corpus_ref|integer||X|foreign key to corpus.id|
-|layer|text||||
-|name|text||||
+|layer|text| | | |
+|name|text| | | |
 |left|integer||X|position of first covered character|
 |right|integer||X|position of last covered character|
 |token_index|integer|||index of this token (if it is a token, otherwise NULL)|
@@ -130,10 +130,12 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |id|bigint|X|X|primary key|
 |pre|integer||X| the preorder of the target node. the root of the component tree should always have a pre-order of 0|
 |post|integer||X|the post-order or the target node|
-|node_ref|bigint||X|the node.id of the target node, |
+|node_ref|bigint||X|the node.id of the target node|
 |component_ref|bigint||X||
 |parent|bigint|||*id* of the parent rank entry|
 |level|integer||| level of this rank entry (not node!) in the component tree | 
+
+Rank entries with the type 'c' (coverage spans) *must* be ommitted, if the referenced node is a token and if the parent coverage span is continuous. Continuous means the range of covered token has no gaps, thus it includes all token between the first and the last covered token. The idea behind this is, that you can recover the needed information using the "left_token" and "right_token" from the span together with the "token_index" (all in the node.relannis table) if the span is continuous.
 
 node_annotation.relannis
 ------------------------
