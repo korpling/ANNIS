@@ -308,7 +308,7 @@ public class GridComponent extends Panel
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
-        showTokenAnnotations, annos, mediaAnnotations, isUnsettingValueForMedia(),
+        showTokenAnnotations, annos, mediaAnnotations, isAddingPlaybackRow(),
         (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
@@ -361,7 +361,7 @@ public class GridComponent extends Panel
     return false;
   }
   
-  protected boolean isUnsettingValueForMedia()
+  protected boolean isAddingPlaybackRow()
   {
     return false;
   }

@@ -85,7 +85,7 @@ public class KWICComponent extends GridComponent implements KWICInterface
   }
 
   @Override
-  protected boolean isUnsettingValueForMedia()
+  protected boolean isAddingPlaybackRow()
   {
     return true;
   }
