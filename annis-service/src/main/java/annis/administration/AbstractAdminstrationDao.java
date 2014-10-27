@@ -28,7 +28,9 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.logging.Level;
 import java.util.regex.Matcher;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -299,6 +301,27 @@ public abstract class AbstractAdminstrationDao
       return null;
     }
   }
+  
+  /**
+   * Closes all open idle connections if the data source is a connection pool.
+   * This can be used if a another database action needs full access to a database,
+   * e.g. when deleting and then creating it
+   */
+  public void closeAllConnections()
+  {
+    if(dataSource.getInnerDataSource() instanceof BasicDataSource)
+    {
+      BasicDataSource dataSourcePool = (BasicDataSource) dataSource.getInnerDataSource();
+      try
+      {
+        dataSourcePool.close();
+      }
+      catch (SQLException ex)
+      {
+        log.error("Could not close idle connections of connection pool", ex);
+      }
+    }
+  }
 
   public AnnisDao getAnnisDao()
   {
@@ -309,7 +332,6 @@ public abstract class AbstractAdminstrationDao
   {
     this.annisDao = annisDao;
   }
-  
   
 
 }

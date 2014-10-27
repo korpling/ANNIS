@@ -36,6 +36,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JOptionPane;
 import javax.swing.SwingWorker;
 import org.slf4j.LoggerFactory;
+import org.springframework.dao.DataAccessException;
 
 /**
  *
@@ -83,6 +84,8 @@ public class InitDialog extends javax.swing.JDialog
         
         URI uri = new URI(rawDataSourceURI.substring("jdbc:".length()));
         
+        corpusAdministration.closeAllConnections();
+        
         corpusAdministration.initializeDatabase(
           uri.getHost(), "" + uri.getPort(),
           uri.getPath().substring(1), // remove / at beginning
@@ -101,7 +104,7 @@ public class InitDialog extends javax.swing.JDialog
 
         return "";
       }
-      catch (IOException | URISyntaxException ex)
+      catch (DataAccessException | IOException | URISyntaxException ex)
       { 
         parent.setVisible(false);
         ImportStatus importStatus = corpusAdministration.getAdministrationDao().initImportStatus();
