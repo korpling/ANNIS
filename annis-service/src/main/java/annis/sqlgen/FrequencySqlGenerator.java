@@ -51,7 +51,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 {
 
   private SolutionSqlGenerator solutionSqlGenerator;
-
+  
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
   {
@@ -241,9 +241,10 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       else
       {
         // filter by selected key
-        conditions.add("(splitanno(v" + i + ".node_qannotext))[2] = '" + e.
-          getKey().replaceAll("'",
-            "''") + "'");
+        conditions.add("v" + i + ".node_annotext LIKE '"
+          + AnnotationConditionProvider.likeEscaper.escape(e.
+            getKey())
+          + ":%'");
         conditions.add("v" + i + ".n_na_sample IS TRUE");
 
       }
