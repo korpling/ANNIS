@@ -99,5 +99,15 @@ window.annis_gui_components_NavigateableSinglePage_IFrameComponent = function() 
       initElement();
     }
   };
+  
+  this.printFrame = function() {
+    var iframe = rootDiv.find("iframe");
+    if(iframe.length > 0)
+    {
+      var iframewindow= iframe[0].contentWindow? iframe[0].contentWindow : iframe[0].contentDocument.defaultView;
+      iframewindow.focus();
+      iframewindow.print();
+    }
+  };
 
 };

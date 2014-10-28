@@ -32,6 +32,7 @@ body {
   padding: 0px;
 }
 
+
 h1, h2, h3, h4, h5, h6 {
   color: #344053;
 }
@@ -164,7 +165,18 @@ img {   padding:1px;
 
 #tutorialcontent a:hover { color: #0033FF; }
 
-
-
-
 div.indent{padding-left:20px}
+
+
+
+@media print {
+  body {
+    background-color: white;
+  }
+  
+  #tutorialcontent {
+    border-style: none;
+    border-width: 0px;
+    background-color: white;
+  }
+}
