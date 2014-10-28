@@ -166,7 +166,7 @@ public class Match implements Serializable
     {
       URI uri;
       
-      String id;
+      String id = "";
       String anno = null;
       if(singleMatch.startsWith("salt:/"))
       {
@@ -176,13 +176,27 @@ public class Match implements Serializable
       {
         // split into the annotation namespace/name and the salt URI
         List<String> components = annoIDSplitter.splitToList(singleMatch);
-        Preconditions.checkArgument(components.size() == 3, "A match containing "
-          + "annotation information always has to have the form "
-          + "'ns::name::salt:/....");
         
-        id = components.get(2);
-        String ns = components.get(0);
-        String name = components.get(1);
+        int componentsSize = components.size();
+        
+        
+        Preconditions.checkArgument(componentsSize == 3 || componentsSize == 2, "A match containing "
+          + "annotation information always has to have the form "
+          + "ns::name::salt:/....  or name::salt:/....");
+        
+        String ns = "";
+        String name = "";
+        if(componentsSize == 3)
+        {
+          id = components.get(2);
+          ns = components.get(0);
+          name = components.get(1);
+        }
+        else if(componentsSize == 2)
+        {
+          id = components.get(1);
+          name = components.get(0);
+        }
         if(ns.isEmpty())
         {
           anno = name;
