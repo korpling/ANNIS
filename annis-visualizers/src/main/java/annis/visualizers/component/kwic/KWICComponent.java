@@ -60,6 +60,14 @@ public class KWICComponent extends GridComponent implements KWICInterface
   }
 
   @Override
+  protected boolean canShowEmptyTokenWarning()
+  {
+    return true;
+  }
+  
+  
+
+  @Override
   protected boolean isShowingSpanAnnotations()
   {
     // never show span annotations
