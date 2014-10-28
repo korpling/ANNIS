@@ -83,16 +83,12 @@
     font-size: 9pt;
   }
 
-  .speaker, .pdf {
-    .v-label {
-      position: relative;
-    }
-  }
-
   td.speaker, td.pdf {
-    .v-label {
-      padding: 0px 20px 0px 10px;
-    }
+    padding: 0px 20px 0px 10px;
+  }
+  
+  .empty_token_hint {
+    font-style: italic;
   }
 
   .kwic {
@@ -101,34 +97,30 @@
       @include user-select(text);
     }
 
-    td.speaker, td.pdf {
-      .v-label {
-        padding: 0px;
-      }
-    }
-
     .speaker, .pdf {
-      .v-label:before {
-        position:relative;
-        top:0px;
-        right: 0px;
-      }
+      padding: 0px;
     }
-  }
 
-  .speaker  .v-label:before {
+    .speaker:before, .pdf:before {
+      position:relative;
+      top:0px;
+      left: 10px;
+    }
+  } // end kwic
+
+  .speaker:before {
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
 
-    position:absolute;
+    margin-right: 5px;
+    
     color: #96B2D3;
     top:0px;
-    right: 2px;
     content: "\f028";
   }
 
-  .pdf  .v-label:before {
+  .pdf:before {
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;

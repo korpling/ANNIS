@@ -11525,12 +11525,12 @@ div.v-layout.v-horizontal.v-widget {
 	font-size: 9pt;
 }
 
-.annis .speaker .v-label, .annis .pdf .v-label {
-	position: relative;
+.annis td.speaker, .annis td.pdf {
+	padding: 0px 20px 0px 10px;
 }
 
-.annis td.speaker .v-label, .annis td.pdf .v-label {
-	padding: 0px 20px 0px 10px;
+.annis .empty_token_hint {
+	font-style: italic;
 }
 
 .annis .kwic td {
@@ -11540,28 +11540,27 @@ div.v-layout.v-horizontal.v-widget {
 	user-select: text;
 }
 
-.annis .kwic td.speaker .v-label, .annis .kwic td.pdf .v-label {
+.annis .kwic .speaker, .annis .kwic .pdf {
 	padding: 0px;
 }
 
-.annis .kwic .speaker .v-label:before, .annis .kwic .pdf .v-label:before {
+.annis .kwic .speaker:before, .annis .kwic .pdf:before {
 	position: relative;
 	top: 0px;
-	right: 0px;
+	left: 10px;
 }
 
-.annis .speaker .v-label:before {
+.annis .speaker:before {
 	font-family: FontAwesome;
 	font-style: normal;
 	font-weight: normal;
-	position: absolute;
+	margin-right: 5px;
 	color: #96B2D3;
 	top: 0px;
-	right: 2px;
 	content: "\f028";
 }
 
-.annis .pdf .v-label:before {
+.annis .pdf:before {
 	font-family: FontAwesome;
 	font-style: normal;
 	font-weight: normal;
@@ -11601,7 +11600,7 @@ div.v-layout.v-horizontal.v-widget {
 	color: black;
 }
 
-.annis .kwic .speaker div {
+.annis .kwic td.speaker {
 	min-width: 32px;
 	min-height: 32px;
 }

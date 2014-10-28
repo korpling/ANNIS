@@ -175,7 +175,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         // get node data
         SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath,
-          key);
+          key, nodeByPre);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long componentID = longValue(resultSet, COMPONENT_TABLE, "id");
         if (!resultSet.wasNull())
@@ -393,7 +393,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     SDocumentGraph graph, TreeSet<Long> allTextIDs, TreeMap<Long, String> tokenTexts,
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
-    SolutionKey<?> key) throws SQLException
+    SolutionKey<?> key,
+    FastInverseMap<RankID, SNode> nodeByPre) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     String saltID = stringValue(resultSet, NODE_TABLE, "salt_id");
@@ -404,6 +405,8 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     long internalID = longValue(resultSet, "node", "id");
 
+    String edgeType = stringValue(resultSet, COMPONENT_TABLE, "type");
+    
     long tokenIndex = longValue(resultSet, NODE_TABLE, "token_index");
     boolean isToken = !resultSet.wasNull();
 
@@ -446,6 +449,10 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       allTextIDs.add(textRef);
       
     }
+    else if("c".equals(edgeType))
+    {
+      node = testAndFixNonSpan(node, nodeByPre);
+    }
 
     String nodeAnnoValue =
       stringValue(resultSet, NODE_ANNOTATION_TABLE, "value");
@@ -454,7 +461,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     String nodeAnnoName = stringValue(resultSet, NODE_ANNOTATION_TABLE, "name");
     if (!resultSet.wasNull())
     {
-      String fullName = (nodeAnnoNameSpace == null ? "" : (nodeAnnoNameSpace
+      String fullName = (nodeAnnoNameSpace == null || nodeAnnoNameSpace.isEmpty() ? "" : (nodeAnnoNameSpace
         + "::")) + nodeAnnoName;
       SAnnotation anno = node.getSAnnotation(fullName);
       if (anno == null)
