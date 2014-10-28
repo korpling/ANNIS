@@ -234,6 +234,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
     tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
     tblCorpora.setPageLength(1);
+    tblCorpora.setCacheRate(3);
     
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
