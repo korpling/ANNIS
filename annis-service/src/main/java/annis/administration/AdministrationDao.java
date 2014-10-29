@@ -323,7 +323,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    *
    * @return
    */
-  @Transactional(readOnly = true, propagation = Propagation.NESTED)
+  @Transactional(readOnly = true, propagation = Propagation.REQUIRED)
   public String getDatabaseSchemaVersion()
   {
     try

@@ -16,19 +16,20 @@
 package annis.gui.components;
 
 import com.vaadin.annotations.JavaScript;
-import com.vaadin.server.ConnectorResource;
 import com.vaadin.server.Resource;
 import com.vaadin.ui.AbstractJavaScriptComponent;
+import com.vaadin.ui.Alignment;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.net.URI;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -60,6 +61,8 @@ public class NavigateableSinglePage extends VerticalLayout
   private final IFrameComponent iframe = new IFrameComponent();
 
   private MenuBar navigation;
+  private final HorizontalLayout toolLayout;
+  private final Button btPrint;
 
   private final Map<String, MenuItem> menuItemRegistry = new HashMap<>();
 
@@ -72,6 +75,24 @@ public class NavigateableSinglePage extends VerticalLayout
     iframe.setSizeFull();
 
     setSpacing(true);
+    
+    btPrint = new Button("Print");
+    btPrint.setStyleName(ValoTheme.BUTTON_LINK);
+    btPrint.setEnabled(false);
+    btPrint.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        iframe.printFrame();
+      }
+    });
+    
+    this.toolLayout = new HorizontalLayout(btPrint);
+    this.toolLayout.setComponentAlignment(btPrint, Alignment.MIDDLE_CENTER);
+    
+    addComponent(toolLayout);
     addComponent(iframe);
 
     setExpandRatio(iframe, 1.0f);
@@ -89,11 +110,12 @@ public class NavigateableSinglePage extends VerticalLayout
     iframe.getState().setSource(externalURI.toASCIIString());
     if (navigation != null)
     {
-      removeComponent(navigation);
+      toolLayout.removeComponent(navigation);
     }
     menuItemRegistry.clear();
     navigation = createMenubarFromHTML(localFile, externalURI, menuItemRegistry);
-    addComponent(navigation, 0);
+    toolLayout.addComponent(navigation, 0);
+    btPrint.setEnabled(true);
   }
 
   private MenuBar createMenubarFromHTML(File localFile, URI externalURI,
@@ -247,6 +269,11 @@ public class NavigateableSinglePage extends VerticalLayout
     public void setSource(Resource res)
     {
       setResource("content", res);
+    }
+    
+    public void printFrame()
+    {
+      callFunction("printFrame");
     }
 
     @Override

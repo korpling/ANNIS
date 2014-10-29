@@ -18,12 +18,12 @@ package annis.sqlgen;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.model.QueryNode.TextMatching;
-import annis.ql.parser.QueryData;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import com.google.common.base.Objects;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 
@@ -49,13 +49,12 @@ public class AnnotationConditionProvider
   /**
    * Adds annotation conditions for a single node.
    * @param conditions Condition list where the conditions should be added to
-   * @param node Node which has annotations
    * @param index Index for a specific annotation
    * @param annotation The annotation to add
    * @param table Table to operate on
    * @param tas {@link TableAccessStrategy} for the given node.
    */
-  public void addAnnotationConditions(List<String> conditions, QueryNode node,
+  public void addAnnotationConditions(Collection<String> conditions,
     int index, QueryAnnotation annotation, String table,
     TableAccessStrategy tas)
   {
@@ -113,7 +112,7 @@ public class AnnotationConditionProvider
     }
   }
 
-  public void addEqualValueConditions(List<String> conditions, QueryNode node,
+  public void addEqualValueConditions(Collection<String> conditions, QueryNode node,
     QueryNode target, TableAccessStrategy tasNode, TableAccessStrategy tasTarget,
     boolean equal)
   {

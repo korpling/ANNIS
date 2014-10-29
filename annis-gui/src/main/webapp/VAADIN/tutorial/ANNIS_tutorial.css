@@ -23,7 +23,7 @@
 }
 
 body {
-  font: 400 13px/1.55 "Open Sans",sans-serif;
+  font: 400 15px/1.55 "Open Sans",sans-serif;
   color: black;
   background-color: #ECF0F6;
   cursor: default;
@@ -31,6 +31,7 @@ body {
   margin: 20px;
   padding: 0px;
 }
+
 
 h1, h2, h3, h4, h5, h6 {
   color: #344053;
@@ -164,7 +165,18 @@ img {   padding:1px;
 
 #tutorialcontent a:hover { color: #0033FF; }
 
-
-
-
 div.indent{padding-left:20px}
+
+
+
+@media print {
+  body {
+    background-color: white;
+  }
+  
+  #tutorialcontent {
+    border-style: none;
+    border-width: 0px;
+    background-color: white;
+  }
+}

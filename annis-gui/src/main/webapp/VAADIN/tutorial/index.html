@@ -98,7 +98,7 @@
       </div>
 
 
-      <p>or else you can use <a href="regex.html">regular
+      <p>or else you can use <a href="#searching_regex">regular
           expressions</a>, which must be
         surrounded by slashes ( <code>/</code>
         ) instead of quotation marks:</p>
@@ -269,7 +269,7 @@
         <code>lemma=/(sein|werden)/</code>
       </div>
       <p>
-        Finally, negative searches can be used as usual with the exclamation point, and regular expressions can generally be used also in edge annotations. For example, if we search for trees (see also <a href="trees.html">Searching for Trees</a>) where a node dominates another node with edges not containing an object, we can use a wildcard to rule out all edges labels beginning with "O" for object:
+        Finally, negative searches can be used as usual with the exclamation point, and regular expressions can generally be used also in edge annotations. For example, if we search for trees (see also <a href="#searching_trees">Searching for Trees</a>) where a node dominates another node with edges not containing an object, we can use a wildcard to rule out all edges labels beginning with "O" for object:
       </p>
       <div class="indent">
         <code>cat="VP" &amp; cat &amp; #1 >[func!=/O.*/] #2</code>
