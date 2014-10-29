@@ -174,7 +174,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
         // get node data
         SNode node = createOrFindNewNode(resultSet, graph, allTextIDs, tokenTexts,
           tokenByIndex, nodeBySegmentationPath,
-          key, nodeByPre);
+          key, nodeByRankID);
         long pre = longValue(resultSet, RANK_TABLE, "pre");
         long rankID = longValue(resultSet, RANK_TABLE, "id");
         long componentID = longValue(resultSet, COMPONENT_TABLE, "id");
@@ -398,7 +398,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     TreeMap<Long, SToken> tokenByIndex, 
     TreeMap<String, TreeMap<Long, String>> nodeBySegmentationPath,
     SolutionKey<?> key,
-    FastInverseMap<RankID, SNode> nodeByPre) throws SQLException
+    FastInverseMap<Long, SNode> nodeByRankID) throws SQLException
   {
     String name = stringValue(resultSet, NODE_TABLE, "node_name");
     String saltID = stringValue(resultSet, NODE_TABLE, "salt_id");
@@ -455,7 +455,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
     }
     else if("c".equals(edgeType))
     {
-      node = testAndFixNonSpan(node, nodeByPre);
+      node = testAndFixNonSpan(node, nodeByRankID);
     }
 
     String nodeAnnoValue =
