@@ -44,7 +44,7 @@ usage:
 
 
 * delete:   Delete a list of corpora.
-    Specify the IDs of one or more corpora as arguments.
+    Specify the IDs or the names of one or more corpora as arguments.
 
 * list:    List all top-level corpora.
 
