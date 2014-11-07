@@ -317,10 +317,8 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-//    doSet("seg to dipl");
-    doCorpus("pcc2 exmaralda");
-    doSql("count \"wollen\" & tok & tok & #1 ->dep[func=\"obja\"] #2 & #1 -> dep[func=\"sbj\"] #3");
-    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
+    doCorpus("pcc2");
+    doSubgraph("exmaralda::Inf-Stat::salt:/pcc2/4282/#sSpan14");
   }
 
   public void doParse(String annisQuery)

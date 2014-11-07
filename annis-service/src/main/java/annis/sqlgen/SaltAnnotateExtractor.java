@@ -449,7 +449,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
       allTextIDs.add(textRef);
       
     }
-    else if("c".equals(edgeType))
+    else if("c".equals(edgeType) && isToken == false)
     {
       node = testAndFixNonSpan(node, nodeByPre);
     }
