@@ -50,7 +50,7 @@ public class TutorialPanel extends VerticalLayout
     
     try
     {
-      String oldPath = appURI.getPath();
+      String oldPath = VaadinService.getCurrentRequest().getContextPath();
       if (oldPath == null)
       {
         oldPath = "";
