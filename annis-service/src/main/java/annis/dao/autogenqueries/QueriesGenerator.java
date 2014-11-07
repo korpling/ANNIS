@@ -25,6 +25,7 @@ import annis.service.objects.MatchGroup;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -265,19 +266,25 @@ public class QueriesGenerator
       {
         if (getTableInsertSelect().containsKey("example_queries"))
         {
-          StringBuilder sql = new StringBuilder();
-          sql.append("INSERT INTO example_queries (");
-          sql.append(getTableInsertSelect().get("example_queries")).append(") ");
-          sql.append("VALUES (\n");
-          sql.append("'").append(exampleQuery.getExampleQuery()).append("', ");
-          sql.append("'").append(exampleQuery.getDescription()).append("', ");
-          sql.append("'").append(exampleQuery.getType()).append("', ");
-          sql.append("'").append(exampleQuery.getNodes()).append("', ");
-          sql.append("'").append("{}").append("', ");
-          sql.append("'").append(corpusIds.get(0)).append("'");
-          sql.append("\n)");
+          
+          Object[] values = new Object[]
+          { 
+            exampleQuery.getExampleQuery(),
+            exampleQuery.getDescription(),
+            exampleQuery.getType() == null ? "" : exampleQuery.getType(),
+            exampleQuery.getNodes(),
+            "{}",
+            corpusIds.get(0)
+          };
+          int[] argTypes = new int[]
+          {
+            Types.VARCHAR, Types.VARCHAR, Types.VARCHAR, Types.INTEGER,
+            Types.VARCHAR, Types.INTEGER
+          };
 
-          getJdbcTemplate().execute(sql.toString());
+          getJdbcTemplate().update("INSERT INTO example_queries(" 
+            + getTableInsertSelect().get("example_queries") 
+            + ") VALUES(?, ?, ?, ?, ?::text[], ?)", values, argTypes);
           log.info("generated example query: {}", exampleQuery.getExampleQuery());
         }
       }
