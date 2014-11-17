@@ -115,16 +115,6 @@ public class CorpusAdministration
       schemeFixer.checkAndFix();
     }
   }
-  
-  /**
-   * Closes all open idle connections if the data source is a connection pool.
-   * This can be used if a another database action needs full access to a
-   * database, e.g. when deleting and then creating it
-   */
-  public void closeAllConnections()
-  {
-    administrationDao.closeAllConnections();
-  }
 
   /**
    * Imports several corpora and catches a possible thrown
