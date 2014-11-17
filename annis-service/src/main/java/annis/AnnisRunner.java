@@ -317,8 +317,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doCorpus("pcc2");
-    doSubgraph("exmaralda::Inf-Stat::salt:/pcc2/4282/#sSpan14");
+    doExport("pcc2 /tmp/saltexport");
   }
 
   public void doParse(String annisQuery)

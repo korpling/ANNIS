@@ -100,6 +100,8 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.emf.common.util.BasicEList;
+import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.XMLResource;
@@ -1041,25 +1043,26 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     
     SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
     
-    File rootDirectory = new File(outputDirectory, toplevelCorpus);
+    File documentRootDir = new File(outputDirectory, toplevelCorpus);
     
-    if(!rootDirectory.exists())
+    
+    if(!outputDirectory.exists())
     {
-      if(!rootDirectory.mkdirs())
+      if(!outputDirectory.mkdirs())
       {
         log.warn("Could not create output directory \"{}\" for exporting the corpus",
           outputDirectory.getAbsolutePath());
       }
     }
     
-    File projectFile = new File(rootDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
+    File projectFile = new File(outputDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
     URI saltProjectFileURI = URI.createFileURI(projectFile.getAbsolutePath());
     Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
     
     List<Annotation> docs = listDocuments(toplevelCorpus);
     for(Annotation docAnno  : docs)
     {
-      SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getCorpusName(), null);
+      SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
       if(docProject != null && docProject.getSCorpusGraphs() != null
         && !docProject.getSCorpusGraphs().isEmpty())
       {
@@ -1067,10 +1070,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         // TODO: we could re-use the actuall corpus structure instead of just adding a flat list of documents
         if(docCorpusGraph.getSDocuments() != null)
         {
-          for(SDocument doc : docCorpusGraph.getSDocuments())
+          EList<SDocument> docsForCorpusGraph = 
+            new BasicEList<>(docCorpusGraph.getSDocuments());
+          for(SDocument doc : docsForCorpusGraph)
           {
+            log.info("Saving document {}", doc.getSName());
             doc.saveSDocumentGraph(URI.createFileURI(
-              new File(rootDirectory, doc.getSName() + "." 
+              new File(documentRootDir, doc.getSName() + "." 
                 + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
             
             corpusGraph.addSDocument(rootCorpus, doc);
@@ -1080,6 +1086,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     } // end for each document
     
     // save the actual SaltProject
+    log.info("Saving corpus structure");
     try 
 		{//must be done after all, because it doesn't work, if not all SDocumentGraph objects 
 			XMLResource xmlProjectResource= (XMLResource) resource;
@@ -1090,7 +1097,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 		catch (IOException e) 
 		{
 			throw new SaltResourceException("Cannot save salt project to given uri \"" 
-        + rootDirectory.getAbsolutePath() + "\"", e);
+        + outputDirectory.getAbsolutePath() + "\"", e);
 		}
   }
   
