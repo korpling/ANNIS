@@ -59,7 +59,13 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.impl.SaltFactoryImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltResourceException;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,6 +100,9 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.xmi.XMLResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1021,6 +1030,71 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
     return false;
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public void exportCorpus(String toplevelCorpus, File outputDirectory)
+  {
+    SaltProject corpusProject = SaltFactory.eINSTANCE.createSaltProject();
+    SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+    corpusGraph.setSaltProject(corpusProject);
+    
+    SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
+    
+    File rootDirectory = new File(outputDirectory, toplevelCorpus);
+    
+    if(!rootDirectory.exists())
+    {
+      if(!rootDirectory.mkdirs())
+      {
+        log.warn("Could not create output directory \"{}\" for exporting the corpus",
+          outputDirectory.getAbsolutePath());
+      }
+    }
+    
+    File projectFile = new File(rootDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
+    URI saltProjectFileURI = URI.createFileURI(projectFile.getAbsolutePath());
+    Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
+    
+    List<Annotation> docs = listDocuments(toplevelCorpus);
+    for(Annotation docAnno  : docs)
+    {
+      SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getCorpusName(), null);
+      if(docProject != null && docProject.getSCorpusGraphs() != null
+        && !docProject.getSCorpusGraphs().isEmpty())
+      {
+        SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
+        // TODO: we could re-use the actuall corpus structure instead of just adding a flat list of documents
+        if(docCorpusGraph.getSDocuments() != null)
+        {
+          for(SDocument doc : docCorpusGraph.getSDocuments())
+          {
+            doc.saveSDocumentGraph(URI.createFileURI(
+              new File(rootDirectory, doc.getSName() + "." 
+                + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
+            
+            corpusGraph.addSDocument(rootCorpus, doc);
+          }
+        }
+      }
+    } // end for each document
+    
+    // save the actual SaltProject
+    try 
+		{//must be done after all, because it doesn't work, if not all SDocumentGraph objects 
+			XMLResource xmlProjectResource= (XMLResource) resource;
+			xmlProjectResource.getContents().add(corpusProject);
+			xmlProjectResource.setEncoding("UTF-8");
+			xmlProjectResource.save(null);
+		}//must be done after all, because it doesn't work, if not all SDocumentGraph objects  
+		catch (IOException e) 
+		{
+			throw new SaltResourceException("Cannot save salt project to given uri \"" 
+        + rootDirectory.getAbsolutePath() + "\"", e);
+		}
+  }
+  
+  
 
   public AnnisParserAntlr getAqlParser()
   {
