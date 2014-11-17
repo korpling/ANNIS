@@ -1060,6 +1060,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
     
     List<Annotation> docs = listDocuments(toplevelCorpus);
+    int i=1;
     for(Annotation docAnno  : docs)
     {
       SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
@@ -1067,14 +1068,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         && !docProject.getSCorpusGraphs().isEmpty())
       {
         SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
-        // TODO: we could re-use the actuall corpus structure instead of just adding a flat list of documents
+        // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
         if(docCorpusGraph.getSDocuments() != null)
         {
           EList<SDocument> docsForCorpusGraph = 
             new BasicEList<>(docCorpusGraph.getSDocuments());
           for(SDocument doc : docsForCorpusGraph)
           {
-            log.info("Saving document {}", doc.getSName());
+            log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
             doc.saveSDocumentGraph(URI.createFileURI(
               new File(documentRootDir, doc.getSName() + "." 
                 + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
@@ -1083,6 +1084,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
           }
         }
       }
+      i++;
     } // end for each document
     
     // save the actual SaltProject
