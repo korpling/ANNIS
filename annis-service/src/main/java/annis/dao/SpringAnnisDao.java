@@ -1071,16 +1071,14 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
         if(docCorpusGraph.getSDocuments() != null)
         {
-          EList<SDocument> docsForCorpusGraph = 
-            new BasicEList<>(docCorpusGraph.getSDocuments());
-          for(SDocument doc : docsForCorpusGraph)
+          for(SDocument doc : docCorpusGraph.getSDocuments())
           {
             log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
             doc.saveSDocumentGraph(URI.createFileURI(
               new File(documentRootDir, doc.getSName() + "." 
                 + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
             
-            corpusGraph.addSDocument(rootCorpus, doc);
+            corpusGraph.createSDocument(rootCorpus, doc.getSName());
           }
         }
       }
