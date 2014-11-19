@@ -1065,6 +1065,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     int i=1;
     for(Annotation docAnno  : docs)
     {
+      log.info("Loading document {} from database ({}/{})", docAnno.getName(), i, docs.size());
       SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
       if(docProject != null && docProject.getSCorpusGraphs() != null
         && !docProject.getSCorpusGraphs().isEmpty())
@@ -1075,7 +1076,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         {
           for(SDocument doc : docCorpusGraph.getSDocuments())
           {
-            
+            log.info("Removing SFeatures from {} ({}/{})", docAnno.getName(), i, docs.size());
             // remove all ANNIS specific features that require a special Java class
             SDocumentGraph graph = doc.getSDocumentGraph();
             if(graph != null)
