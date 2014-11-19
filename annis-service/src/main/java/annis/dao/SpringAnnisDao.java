@@ -21,6 +21,7 @@ import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
+import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryData;
@@ -66,6 +67,9 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltR
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -100,8 +104,6 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
-import org.eclipse.emf.common.util.BasicEList;
-import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.xmi.XMLResource;
@@ -1073,6 +1075,27 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
         {
           for(SDocument doc : docCorpusGraph.getSDocuments())
           {
+            
+            // remove all ANNIS specific features that require a special Java class
+            SDocumentGraph graph = doc.getSDocumentGraph();
+            if(graph != null)
+            {
+              if(graph.getSNodes() != null)
+              {
+                for(SNode n : graph.getSNodes())
+                {
+                  n.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE);
+                }
+              }
+              if(graph.getSRelations() != null)
+              {
+                for(SRelation e : graph.getSRelations())
+                {
+                  e.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_EDGE);
+                }
+              }
+            }
+            
             log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
             doc.saveSDocumentGraph(URI.createFileURI(
               new File(documentRootDir, doc.getSName() + "." 
