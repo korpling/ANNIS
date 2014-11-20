@@ -15,9 +15,7 @@
  */
 package annis.sqlgen;
 
-import org.springframework.jdbc.core.ResultSetExtractor;
-
-public interface SqlGenerator<QueryType, ResultType> extends ResultSetExtractor<ResultType> 
+public interface SqlGenerator<QueryType>
 {
 
 	String toSql(QueryType queryData);

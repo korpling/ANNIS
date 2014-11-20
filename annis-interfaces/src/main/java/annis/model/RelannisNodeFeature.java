@@ -50,6 +50,8 @@ public class RelannisNodeFeature implements Serializable
   private String segName;
   
   private Long matchedNode;
+  
+  private boolean continuous;
 
   public long getInternalID()
   {
@@ -153,6 +155,18 @@ public class RelannisNodeFeature implements Serializable
     this.segName = segName;
   }
 
+  public boolean isContinuous()
+  {
+    return continuous;
+  }
+
+  public void setContinuous(boolean continuous)
+  {
+    this.continuous = continuous;
+  }
+  
+  
+
   /**
    * Returns the number of the query node if matched or null if otherwise.
    * @return 
@@ -184,6 +198,7 @@ public class RelannisNodeFeature implements Serializable
       "segIndex=" + segIndex + "," +
       "segName=" + segName + ", " +
       "matchedNode=" + (matchedNode == null ? "[none]" : matchedNode) +
+      "continuous=" + continuous +
       "]"
       ;
     

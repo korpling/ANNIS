@@ -37,9 +37,11 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
     StringBuilder sb = new StringBuilder();
     sb.append(
       "SELECT docs.name as name, docs.pre as pre, docs.path_name as path_name FROM corpus this, corpus docs\n");
-    sb.append("WHERE").append("	this.name = ':toplevel'\n")
-      .append("AND	this.pre < docs.pre\n")
-      .append("AND	this.post > docs.post\n")
+    sb.append("WHERE\n")
+      .append("this.name = ':toplevel'\n")
+      .append("AND this.top_level IS TRUE\n")
+      .append("AND this.pre < docs.pre\n")
+      .append("AND this.post > docs.post\n")
       .append("AND docs.type = 'DOCUMENT'\n");
 
     return sb.toString().replace(":toplevel", topLevelCorpusName);
@@ -52,7 +54,7 @@ public class ListDocumentsSqlHelper implements ParameterizedRowMapper<Annotation
     annotation.setName(rs.getString("name"));
     annotation.setPre(rs.getInt("pre"));
     Array annotationPathArray = rs.getArray("path_name");
-    List<String> annotationPath = new LinkedList<String>();
+    List<String> annotationPath = new LinkedList<>();
     if(annotationPathArray.getBaseType() == Types.VARCHAR)
     {
       annotationPath = Arrays.asList((String[]) annotationPathArray.getArray());

@@ -18,10 +18,10 @@ package annis.gui.querybuilder;
 import annis.gui.querybuilder.NodeWindow.SimpleNewItemHandler;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.server.ThemeResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  *
@@ -49,9 +49,9 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     setSizeFull();
     
     // HACK: use our own border since the one from chameleon does not really work
-    addStyleName(ChameleonTheme.PANEL_BORDERLESS);
+    addStyleName(ValoTheme.PANEL_BORDERLESS);
     addStyleName("border-layout");
-    addStyleName("solid-white-background");
+    addStyleName("white-panel");
     
     VerticalLayout vLayout = new VerticalLayout();
     setContent(vLayout);
@@ -68,15 +68,18 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     toolbar.addComponent(lblTitle);
     toolbar.setComponentAlignment(lblTitle, Alignment.MIDDLE_LEFT);
+    toolbar.setExpandRatio(lblTitle, 1.0f);
     
     btClose = new Button();
-    btClose.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-    btClose.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btClose.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btClose.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+    btClose.addStyleName(ValoTheme.BUTTON_SMALL);
+    btClose.setIcon(FontAwesome.TIMES_CIRCLE);
+    btClose.setWidth("-1px");
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
+    toolbar.setExpandRatio(btClose, 0.0f);
     
     cbOperator = new ComboBox();
     cbOperator.setNewItemsAllowed(false);

@@ -54,7 +54,7 @@ public class RelANNISHelper
    */
   public static Map<String, ZipEntry> corporaInZipfile(ZipFile zip) throws IOException
   {
-    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
+    Map<String, ZipEntry> result = new HashMap<>();
     
     for(ZipEntry e : getRelANNISEntry(zip, "corpus", "tab"))
     {
@@ -67,15 +67,11 @@ public class RelANNISHelper
   
   public static Map<String, ZipEntry> corporaInZipfile(File f) throws IOException
   {
-    Map<String, ZipEntry> result = new HashMap<String, ZipEntry>();
-    ZipFile zip = new ZipFile(f);
+    Map<String, ZipEntry> result = new HashMap<>();
     try
+    (ZipFile zip = new ZipFile(f)) 
     {
       result.putAll(corporaInZipfile(zip));
-    }
-    finally
-    {
-      zip.close();
     }
     
     return result;
@@ -83,7 +79,7 @@ public class RelANNISHelper
   
   public static Map<String, File> corporaInDirectory(File d) throws IOException
   {
-    Map<String, File> result = new HashMap<String, File>();
+    Map<String, File> result = new HashMap<>();
     
 
     FluentIterable<File> it = Files.fileTreeTraverser().postOrderTraversal(d);
@@ -162,7 +158,7 @@ public class RelANNISHelper
   public static List<ZipEntry> getRelANNISEntry(ZipFile file, String table,
     String fileEnding)
   {
-    List<ZipEntry> allMatchingEntries = new ArrayList<ZipEntry>();
+    List<ZipEntry> allMatchingEntries = new ArrayList<>();
     
     if (fileEnding == null)
     {

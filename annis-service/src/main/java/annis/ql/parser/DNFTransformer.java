@@ -129,8 +129,8 @@ public class DNFTransformer
         LogicClause rightParentAnd = new LogicClause(LogicClause.Operator.AND);
         
         // replicate the original "&" token to both new AND nodes
-        leftParentAnd.setContent(new ArrayList<Token>(node.getContent()));
-        rightParentAnd.setContent(new ArrayList<Token>(node.getContent()));
+        leftParentAnd.setContent(new ArrayList<>(node.getContent()));
+        rightParentAnd.setContent(new ArrayList<>(node.getContent()));
         
         node.setOp(LogicClause.Operator.OR);
         node.setContent(orToken);
@@ -167,7 +167,7 @@ public class DNFTransformer
       return;
     }
     
-    LinkedList<LogicClause> childListCopy = new LinkedList<LogicClause>(clause.getChildren());
+    LinkedList<LogicClause> childListCopy = new LinkedList<>(clause.getChildren());
     
     clause.clearChildren();
     
@@ -199,7 +199,7 @@ public class DNFTransformer
   {
     if(top.getOp() == LogicClause.Operator.LEAF || top.getOp() == LogicClause.Operator.AND)
     {
-      List<LogicClause> children = new ArrayList<LogicClause>();
+      List<LogicClause> children = new ArrayList<>();
       findAllChildrenForOp(top, children, LogicClause.Operator.AND);
       
       List<? extends Token> orginalAndContent = top.getContent();
@@ -220,7 +220,7 @@ public class DNFTransformer
     else if(top.getOp() == LogicClause.Operator.OR)
     { 
       // first flatten the OR operator
-      List<LogicClause> allOrNodes = new ArrayList<LogicClause>();
+      List<LogicClause> allOrNodes = new ArrayList<>();
       findAllChildrenForOp(top, allOrNodes, LogicClause.Operator.OR, true);
       
       top.clearChildren();
@@ -246,7 +246,7 @@ public class DNFTransformer
         else if (subclause.getOp() == LogicClause.Operator.AND)
         {
 
-          List<LogicClause> children = new ArrayList<LogicClause>();
+          List<LogicClause> children = new ArrayList<>();
           findAllChildrenForOp(subclause, children, LogicClause.Operator.AND);
 
           subclause.clearChildren();

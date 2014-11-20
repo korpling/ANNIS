@@ -93,7 +93,7 @@ public class TestTableFormatter {
 	
 	@Test
 	public void empty() {
-		assertThat(tableFormatter.formatAsTable(new ArrayList<Object>()), is("(empty)"));
+		assertThat(tableFormatter.formatAsTable(new ArrayList<>()), is("(empty)"));
 	}
 	
 	@Test
@@ -104,7 +104,7 @@ public class TestTableFormatter {
 	@SuppressWarnings("unchecked")
 	@Test
 	public void emptyCollection() {
-		assertThat(tableFormatter.formatAsTable(Arrays.asList(new ArrayList<Object>())), is("(no columns to print)"));
+		assertThat(tableFormatter.formatAsTable(Arrays.asList(new ArrayList<>())), is("(no columns to print)"));
 	}
 	
 	@Test

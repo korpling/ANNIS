@@ -122,11 +122,10 @@ public class ResourceServlet extends HttpServlet implements Plugin
             response.setCharacterEncoding("UTF-8");
           }
           OutputStream bufferedOut = new BufferedOutputStream(outStream);
-          InputStream resourceInStream = new BufferedInputStream(resource.openStream());
-
           try
+          (InputStream resourceInStream = new BufferedInputStream(resource.openStream())) 
           {
-            int v = -1;
+            int v;
             while((v = resourceInStream.read()) != -1)
             {
               bufferedOut.write(v);
@@ -134,7 +133,6 @@ public class ResourceServlet extends HttpServlet implements Plugin
           }
           finally
           {
-            resourceInStream.close();
             bufferedOut.flush();
             outStream.flush();
           }

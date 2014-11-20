@@ -102,7 +102,7 @@ public class CorpusBrowserEntry implements CitationProvider, Serializable
   @Override
   public Set<String> getCorpora()
   {
-    Set<String> result = new HashSet<String>();
+    Set<String> result = new HashSet<>();
     result.add(corpus.getName());
     return result;
   }

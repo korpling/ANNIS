@@ -32,7 +32,7 @@ public enum HorizontalOrientation {
 		return new Comparator<AnnisNode>() {
 			@Override
 			public int compare(AnnisNode o1, AnnisNode o2) {
-				return directionModifier * (o1.getTokenIndex().intValue() - o2.getTokenIndex().intValue());
+        return directionModifier * (int) (o1.getLeftToken() - o2.getLeftToken());
 			}
 		};	
 	}

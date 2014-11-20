@@ -24,8 +24,7 @@ import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
-import annis.gui.frequency.FrequencyResultPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -38,14 +37,13 @@ import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
@@ -69,7 +67,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
   // the view name
   public static final String NAME = "query";
-  public static final String OK_STATUS = "Status: Ok";
 
   private TextArea txtQuery;
   private TextArea txtStatus;
@@ -90,8 +87,9 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     super(4,5);
     
     this.controller = ui.getQueryController();
-    this.lastPublicStatus = OK_STATUS;
-    this.history = new LinkedList<HistoryEntry>();
+    this.lastPublicStatus = "Welcome to ANNIS! "
+      + "A tutorial is available on the right side.";
+    this.history = new LinkedList<>();
 
     setSpacing(true);
     setMargin(false);
@@ -128,7 +126,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     txtStatus = new TextArea();
     txtStatus.setValue(this.lastPublicStatus);
     txtStatus.setWidth("100%");
-    txtStatus.setHeight(3.5f, Unit.EM);
+    txtStatus.setHeight(4.0f, Unit.EM);
     txtStatus.addStyleName("border-layout");
     txtStatus.setReadOnly(true);
     
@@ -140,6 +138,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
 
     btShowResult = new Button("Search");
+    btShowResult.setIcon(FontAwesome.SEARCH);
     btShowResult.setWidth("100%");
     btShowResult.addClickListener(new ShowResultClickListener());
     btShowResult.setDescription("<strong>Show Result</strong><br />Ctrl + Enter");
@@ -201,17 +200,17 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       btShowKeyboard = new Button();
       btShowKeyboard.setWidth("100%");
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
-      btShowKeyboard.addStyleName(ChameleonTheme.BUTTON_SMALL);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
+      btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
       btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     
     Button btShowQueryBuilder = new Button("Query<br />Builder");
     btShowQueryBuilder.setHtmlContentAllowed(true);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_SMALL);
-    btShowQueryBuilder.addStyleName(ChameleonTheme.BUTTON_ICON_ON_TOP);
-    btShowQueryBuilder.setIcon(new ThemeResource("tango-icons/32x32/document-properties.png"));
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_SMALL);
+    btShowQueryBuilder.addStyleName(ValoTheme.BUTTON_ICON_ALIGN_TOP);
+    btShowQueryBuilder.setIcon(new ThemeResource("images/tango-icons/32x32/document-properties.png"));
     btShowQueryBuilder.addClickListener(new ShowQueryBuilderClickListener(ui));
     
     VerticalLayout moreActionsLayout = new VerticalLayout();
@@ -228,17 +227,19 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    moreActionsLayout.addComponent(btShowResultNewTab);
     
     Button btShowExport = new Button("Export", new ShowExportClickListener(ui));
+    btShowExport.setIcon(FontAwesome.DOWNLOAD);
     btShowExport.setWidth("100%");
     moreActionsLayout.addComponent(btShowExport);
     
     Button btShowFrequency = new Button("Frequency Analysis", new ShowFrequencyClickListener(ui));
+    btShowFrequency.setIcon(FontAwesome.BAR_CHART_O);
     btShowFrequency.setWidth("100%");
     moreActionsLayout.addComponent(btShowFrequency);
     
     
     /*
      * We use the grid layout for a better rendering efficiency, but this comes
-     * with the cost of some complexitiy when defining the positions of the
+     * with the cost of some complexity when defining the positions of the
      * elements in the layout.
      * 
      * This grid hopefully helps a little bit in understanding the "magic"
@@ -251,6 +252,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * MOR: "More actions" button 
      * HIST: "History" button
      * STAT: Text field with the real status
+     * PROG: indefinite progress bar (spinning circle)
      * 
      *   \  0  |  1  |  2  |  3  
      * --+-----+---+---+---+-----
@@ -260,13 +262,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
      * --+-----+-----+-----+-----
      * 2 | SEA | MOR | HIST|     
      * --+-----+-----+-----+-----
-     * 3 | STAT| STAT| STAT| STAT
+     * 3 | STAT| STAT| STAT| PROG
      */
     addComponent(txtQuery, 0, 0, 2, 1);
-    addComponent(txtStatus, 0, 3, 3, 3);
+    addComponent(txtStatus, 0, 3, 2, 3);
     addComponent(btShowResult, 0, 2);
     addComponent(btMoreActions, 1, 2);
     addComponent(btHistory, 2, 2);
+    addComponent(piCount, 3, 3);
     addComponent(btShowQueryBuilder, 3, 0);
     if(btShowKeyboard != null)
     {
@@ -364,7 +367,14 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 
           if ("ok".equalsIgnoreCase(result))
           {
-            txtStatus.setValue(lastPublicStatus);
+            if(getQueryController().getSelectedCorpora().isEmpty())
+            {
+              txtStatus.setValue("Please select a corpus from the list below, then click on \"Search\".");
+            }
+            else
+            {
+              txtStatus.setValue("Valid query, click on \"Search\" to start searching.");
+            }
           }
           else
           {
@@ -457,18 +467,8 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       {
         if(!piCount.isVisible())
         {
-          replaceComponent(txtStatus, piCount);
           piCount.setVisible(true);
           piCount.setEnabled(true);
-        }
-      }
-      else
-      {
-        if(piCount.isVisible())
-        {
-          replaceComponent(piCount, txtStatus);
-          piCount.setVisible(false);
-          piCount.setEnabled(false);
         }
       }
       
@@ -488,6 +488,18 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
   }
 
+    public void setStatus(String status, String resultStatus)
+  {
+    if(txtStatus != null)
+    {
+      txtStatus.setReadOnly(false);
+      txtStatus.setValue(status + resultStatus);
+      lastPublicStatus = status;
+      txtStatus.setReadOnly(true);
+    }
+  }
+
+  
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
@@ -529,7 +541,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(panel, "Export");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+        tab.setIcon(FontAwesome.DOWNLOAD);
       }
       
       
@@ -565,7 +577,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(frequencyPanel, "Frequency Analysis");
-        tab.setIcon(new ThemeResource("tango-icons/16x16/x-office-spreadsheet.png"));
+        tab.setIcon(FontAwesome.BAR_CHART_O);
       }
       
       
@@ -601,7 +613,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
       if(tab == null)
       {
         tab = tabSheet.addTab(queryBuilder, "Query Builder", 
-          new ThemeResource("tango-icons/16x16/document-properties.png"));
+          new ThemeResource("images/tango-icons/16x16/document-properties.png"));
         
         ui.addAction(new ShortcutListener("^Query builder")
         {
@@ -622,8 +634,20 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     
   }
 
+  public String getLastPublicStatus()
+  {
+    return lastPublicStatus;
+  }
+
   public QueryController getQueryController()
   {
     return this.controller;
   }
+
+  public ProgressBar getPiCount()
+  {
+    return piCount;
+  }
+  
+  
 }

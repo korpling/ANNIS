@@ -75,10 +75,10 @@ public class VisualizerInputTest
     
     File tmpFile = File.createTempFile("testSingeResultPanel", ".salt");
     FileOutputStream fOut = new FileOutputStream(tmpFile);
-    ObjectOutputStream oOut = new ObjectOutputStream(fOut);
-    
-    oOut.writeObject(visInput);
-    oOut.close();
+    try (ObjectOutputStream oOut = new ObjectOutputStream(fOut))
+    {
+      oOut.writeObject(visInput);
+    }
     
     FileInputStream fIn = new FileInputStream(tmpFile);
     ObjectInputStream oIn = new ObjectInputStream(fIn);

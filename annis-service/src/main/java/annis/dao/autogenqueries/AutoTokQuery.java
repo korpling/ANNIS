@@ -52,7 +52,7 @@ public class AutoTokQuery extends AbstractAutoQuery
   @Override
   public void analyzingQuery(SaltProject saltProject)
   {
-    List<SToken> tokens = new ArrayList<SToken>();
+    List<SToken> tokens = new ArrayList<>();
     for (SCorpusGraph g : saltProject.getSCorpusGraphs())
     {
       if (g != null)

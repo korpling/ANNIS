@@ -24,7 +24,7 @@ public class OptimizedConnectorBundleLoaderFactory extends
   ConnectorBundleLoaderFactory
 {
 
-  private Set<String> eagerConnectors = new HashSet<String>();
+  private Set<String> eagerConnectors = new HashSet<>();
 
   
   {

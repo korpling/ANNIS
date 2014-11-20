@@ -51,7 +51,7 @@ public class TestUtils {
    * @return A {@link HashSet} containing the specified items.
    */
   public static <T> Set<T> newSet(T... items) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     for (T item : items) {
       set.add(item);
     }
@@ -66,7 +66,7 @@ public class TestUtils {
    * @return An empty typed set.
    */
   public static <T> Set<T> emptySetOf(Class<T> clazz) {
-    Set<T> set = new HashSet<T>();
+    Set<T> set = new HashSet<>();
     return set;
   }
 

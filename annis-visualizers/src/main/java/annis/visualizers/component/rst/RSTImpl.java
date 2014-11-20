@@ -33,7 +33,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraphTraverseHandler;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SProcessingAnnotation;
@@ -42,13 +41,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Stack;
 import java.util.TreeSet;
 import java.util.UUID;
-import java.util.concurrent.atomic.AtomicInteger;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
 import org.json.JSONArray;
@@ -306,7 +306,8 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private JSONObject createJsonEntry(SNode currNode) {
     JSONObject jsonData = new JSONObject();
     StringBuilder sb = new StringBuilder();
-    EList<SToken> token = new BasicEList<SToken>();
+    // use a hash set so we don't get any duplicate entries
+    LinkedHashSet<SToken> token = new LinkedHashSet<>();
     EList<Edge> edges;
 
     if (currNode instanceof SStructure) {
@@ -324,21 +325,17 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
           continue;
         }
 
-        /**
-         * Check if the SRelation points at a SToken and in this case check if,
-         * only follow the edge with sType for avoiding double entries of SToken
-         * in the token list
-         */
-        if (sedge.getSTarget() instanceof SToken
-                && sedge.getSTypes() != null
-                && sedge.getSTypes().size() > 0) {
+        if (sedge.getSTarget() instanceof SToken) 
+        {
           token.add((SToken) sedge.getSTarget());
         }
       }
 
       // build strings
-      for (int i = 0; i < token.size(); i++) {
-        SToken tok = token.get(i);
+      Iterator<SToken> tokIterator = token.iterator();
+      while(tokIterator.hasNext())
+      {
+        SToken tok = tokIterator.next();
         String text = getText(tok);
         String color = getHTMLColor(tok);
 
@@ -348,7 +345,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
           sb.append("<span>");
         }
 
-        if (i < token.size() - 1) {
+        if (tokIterator.hasNext()) {
           sb.append(text).append(" ");
         } else {
           sb.append(text);
@@ -415,11 +412,11 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
             if (st.size() > 1) {
               tmp = st.pop();
-              st.peek().append("children", node);
+              getOrCreateArray(st.peek(), "children").put(node);
               sortChildren(st.peek());
               st.push(tmp);
             } else {
-              result.append("children", node);
+              getOrCreateArray(result, "children").put(node);
             }
 
             setSentenceSpan(node, st.peek());
@@ -430,7 +427,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       }
 
       if (!isAppendedToParent) {
-        root.append("children", node);
+        getOrCreateArray(root, "children").put(node);
         setSentenceSpan(node, root);
         sortChildren(root);
       }
@@ -445,9 +442,9 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   public void nodeReached(GRAPH_TRAVERSE_TYPE traversalType,
           String traversalId,
           SNode currNode, SRelation sRelation, SNode fromNode, long order) {
-    if (CommonHelper.checkSLayer(namespace, currNode)) {
-      st.push(createJsonEntry(currNode));
-    }
+    
+    st.push(createJsonEntry(currNode));
+
   }
 
   @Override
@@ -457,7 +454,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
 
     if (st.size() == 1) {
       try {
-        result.append("children", st.pop());
+        getOrCreateArray(result, "children").put(st.pop());
         sortChildren(result);
       } catch (JSONException ex) {
         log.error("Problems with adding roots", ex);
@@ -475,8 +472,22 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
     if (currNode instanceof SToken) {
       return false;
     }
+    else if (CommonHelper.checkSLayer(namespace, currNode)) {
+      return true;
+    }
 
-    return true;
+    return false;
+  }
+  
+  private JSONArray getOrCreateArray(JSONObject parent, String key) throws JSONException
+  {
+    JSONArray array = parent.has(key) ? parent.getJSONArray(key) : null;
+    if(array == null)
+    {
+        array = new JSONArray();
+        parent.put(key, array);
+    }
+    return array;
   }
 
   /**
@@ -544,40 +555,43 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
       }
 
       sTypes = ((SRelation) edge).getSTypes();
+      String sTypeAsString = "edge";
+      if(sTypes != null && !sTypes.isEmpty())
+      {
+        sTypeAsString = sTypes.get(0);
+      }
+
+      JSONObject jsonEdge = new JSONObject();
+      edgeData.put(jsonEdge);
+
+      jsonEdge.put("sType", sTypeAsString);
 
 
-      if (sTypes != null && sTypes.size() > 0) {
-        JSONObject jsonEdge = new JSONObject();
-        edgeData.put(jsonEdge);
-
-        jsonEdge.put("sType", sTypes.get(0));
-
-
-        if (((SRelation) edge).getTarget() instanceof SNode) {
-          /**
-           * Invert the direction of the RST-edge.
-           */
-          if (getRSTType().equals(sTypes.get(0))) {
-            jsonEdge.put("to", getUniStrId(node));
-            jsonEdge.put("from",
-                    getUniStrId((SNode) ((SRelation) edge).getTarget()));
-          } else {
-            jsonEdge.put("from", getUniStrId(node));
-            jsonEdge.put("to",
-                    getUniStrId((SNode) ((SRelation) edge).getTarget()));
-          }
+      if (((SRelation) edge).getTarget() instanceof SNode) {
+        /**
+         * Invert the direction of the RST-edge.
+         */
+        if (getRSTType().equals(sTypeAsString)) {
+          jsonEdge.put("to", getUniStrId(node));
+          jsonEdge.put("from",
+                  getUniStrId((SNode) ((SRelation) edge).getTarget()));
         } else {
-          throw new JSONException("could not cast to SNode");
+          jsonEdge.put("from", getUniStrId(node));
+          jsonEdge.put("to",
+                  getUniStrId((SNode) ((SRelation) edge).getTarget()));
         }
+      } else {
+        throw new JSONException("could not cast to SNode");
+      }
 
-        annos = ((SRelation) edge).getSAnnotations();
+      annos = ((SRelation) edge).getSAnnotations();
 
-        if (annos != null) {
-          for (SAnnotation anno : annos) {
-            jsonEdge.append("annotation", anno.getSValueSTEXT());
-          }
+      if (annos != null) {
+        for (SAnnotation anno : annos) {
+          getOrCreateArray(jsonEdge, "annotation").put(anno.getSValueSTEXT());
         }
       }
+
     }
 
     return edgeData;
@@ -587,7 +601,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
    * Build a unique HTML id.
    */
   private String getUniStrId(SNode node) {
-    return visId + "_" + node.getSName();
+    return visId + "_" + node.getSId();
   }
 
   /**
@@ -720,9 +734,18 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
   private boolean hasRSTType(SRelation e) {
     EList<String> sTypes = e.getSTypes();
 
-    for (String sType : sTypes) {
-      if (getRSTType().equalsIgnoreCase(sType)) {
-        return true;
+    if(e.getSTarget() instanceof SToken && e.getSTypes() == null)
+    {
+      return true;
+    }
+    else if (sTypes != null)
+    {
+      for (String sType : sTypes)
+      {
+        if (getRSTType().equalsIgnoreCase(sType))
+        {
+          return true;
+        }
       }
     }
     return false;

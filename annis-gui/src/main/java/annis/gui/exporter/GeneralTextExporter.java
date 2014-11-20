@@ -18,7 +18,9 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.libgui.Helper;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
@@ -26,8 +28,11 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
+import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
+import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -37,7 +42,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.Serializable;
 import java.io.Writer;
-import java.net.URLEncoder;
 import java.rmi.RemoteException;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -50,6 +54,8 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(GeneralTextExporter.class);
 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, String keysAsString, String argsAsString,
@@ -59,19 +65,19 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
-      LinkedList<String> keys = new LinkedList<String>();
+      LinkedList<String> keys = new LinkedList<>();
 
       if (keysAsString == null || keysAsString.isEmpty())
       {
         // auto set
         keys.add("tok");
-        List<AnnisAttribute> attributes = new LinkedList<AnnisAttribute>();
+        List<AnnisAttribute> attributes = new LinkedList<>();
         
         for(String corpus : corpora)
         {
           attributes.addAll(
             annisResource.path("corpora")
-              .path(URLEncoder.encode(corpus, "UTF-8"))
+              .path(urlPathEscape.escape(corpus))
               .path("annotations")
               .queryParam("fetchvalues", "false")
               .queryParam("onlymostfrequentvalues", "false")
@@ -105,7 +111,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         }
       }
 
-      Map<String, String> args = new HashMap<String, String>();
+      Map<String, String> args = new HashMap<>();
       for (String s : argsAsString.split("&"))
       {
         String[] splitted = s.split("=", 2);
@@ -218,22 +224,8 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("finished");
 
     }
-    catch (AnnisQLSemanticsException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisQLSyntaxException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (AnnisCorpusAccessException ex)
-    {
-      log.error(
-        null, ex);
-    }
-    catch (RemoteException ex)
+    catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
+      | AnnisCorpusAccessException | RemoteException  ex)
     {
       log.error(
         null, ex);
@@ -248,7 +240,21 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   public void convertText(AnnisResultSet queryResult, LinkedList<String> keys,
     Map<String, String> args, Writer out, int offset) throws IOException
   {
+    Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+    
+    List<String> metaKeys = new LinkedList<>();
+    if(args.containsKey("metakeys"))
+    {
+      Iterable<String> it = 
+        Splitter.on(",").trimResults().split(args.get("metakeys"));
+      for(String s : it)
+      {
+        metaKeys.add(s);
+      }
+    }
+    
     int counter = 0;
+
     for (AnnisResult annisResult : queryResult)
     {
       Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
@@ -279,9 +285,49 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 
       }
       out.append("\n");
+    
+      if(!metaKeys.isEmpty())
+      {
+        String[] path = annisResult.getPath();
+        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+      }
+      out.append("\n");
     }
+
   }
 
+  public void appendMetaData(Writer out, 
+    List<String> metaKeys,
+    String toplevelCorpus, String documentName,
+    Map<String, Map<String, Annotation>> metadataCache)
+    throws IOException
+  {
+    Map<String, Annotation> metaData = new HashMap<>();
+    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
+    {
+      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
+    }
+    else
+    {
+      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
+      for(Annotation anno : asList)
+      {
+        metaData.put(anno.getQualifiedName(), anno);
+        metaData.put(anno.getName(), anno);
+      }
+      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
+    }
+    
+    for(String key : metaKeys)
+    {
+      Annotation anno = metaData.get(key);
+      if(anno != null)
+      {
+        out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
+      }
+    }
+  }
+  
   @Override
   public boolean isCancelable()
   {

@@ -66,4 +66,5 @@ public class MetaDataColumn implements Serializable {
   {
     this.name = name;
   }
+  
 }

@@ -5,7 +5,7 @@ ANNIS, which stands for ANNotation of Information Structure, has been designed t
 Since information structure interacts with linguistic phenomena on many levels, ANNIS addresses the SFB's need to concurrently annotate, query and visualize data from such varied areas as syntax, semantics, morphology, prosody, referentiality, lexis and more. For project working with spoken language, support for audio / video annotations is also required.
 
 * Homepage (including user and administration documentation): http://www.sfb632.uni-potsdam.de/annis/
-* Developer Documentation: http://korpling.github.io/ANNIS/
+* Developer Documentation: http://korpling.github.io/ANNIS/doc/
 * Code: https://github.com/korpling/ANNIS
 * Bug and issue tracking: https://github.com/korpling/ANNIS/issues
 

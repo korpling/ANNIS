@@ -70,21 +70,25 @@ public class QueryNode implements Serializable
   public enum TextMatching
   {
 
-    EXACT_EQUAL("=", "\"", "="), 
-    REGEXP_EQUAL("~", "/", "="), 
-    EXACT_NOT_EQUAL("<>", "\"", "!="), 
-    REGEXP_NOT_EQUAL("!~", "/", "!=");
+    EXACT_EQUAL("=", "\"", "=", false, false), 
+    REGEXP_EQUAL("~", "/", "=", true, false), 
+    EXACT_NOT_EQUAL("<>", "\"", "!=", false, true), 
+    REGEXP_NOT_EQUAL("!~", "/", "!=", true, true);
     
     private String sqlOperator;
     private String annisQuote;
     private String aqlOperator;
+    private boolean regex;
+    private boolean negated;
 
     private TextMatching(String sqlOperator, String annisQuote, 
-      String aqlOperator)
+      String aqlOperator, boolean regex, boolean negated)
     {
       this.sqlOperator = sqlOperator;
       this.annisQuote = annisQuote;
       this.aqlOperator = aqlOperator;
+      this.regex = regex;
+      this.negated = negated;
     }
 
     @Override
@@ -107,6 +111,18 @@ public class QueryNode implements Serializable
     {
       return aqlOperator;
     }
+
+    public boolean isRegex()
+    {
+      return regex;
+    }
+
+    public boolean isNegated()
+    {
+      return negated;
+    }
+    
+    
   };
 
   public static class Range implements Serializable
@@ -199,13 +215,13 @@ public class QueryNode implements Serializable
     // do not copy the ingoing join since this is a property of the joins itself
     // only if they change their target it is allowed to change the state of 
     // the ingoing joins of the query node
-    this.ingoingJoins = new ArrayList<Join>();
+    this.ingoingJoins = new ArrayList<>();
     this.left = other.left;
     this.leftToken = other.leftToken;
     this.matchedNodeInQuery = other.matchedNodeInQuery;
     this.name = other.name;
     this.namespace = other.namespace;
-    this.nodeAnnotations = new TreeSet<QueryAnnotation>(other.nodeAnnotations);
+    this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
     this.partOfEdge = other.partOfEdge;
     this.right = other.right;
     this.rightToken = other.rightToken;

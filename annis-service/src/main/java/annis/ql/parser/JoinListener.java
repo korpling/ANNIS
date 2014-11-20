@@ -30,6 +30,7 @@ import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
+import annis.sqlgen.model.Near;
 import annis.sqlgen.model.NotEqualValue;
 import annis.sqlgen.model.Overlap;
 import annis.sqlgen.model.PointingRelation;
@@ -72,7 +73,7 @@ public class JoinListener extends AqlParserBaseListener
   private final List<Map<Interval, QueryNode>> tokenPositions;
   private int alternativeIndex;
   
-  private ArrayList<QueryNode> relationChain = new ArrayList<QueryNode>();
+  private ArrayList<QueryNode> relationChain = new ArrayList<>();
   private int relationIdx;
  
   /**
@@ -188,6 +189,23 @@ public class JoinListener extends AqlParserBaseListener
     
   }
 
+    @Override
+  public void enterDirectNear(
+    AqlParser.DirectNearContext ctx)
+  {
+    QueryNode left = relationChain.get(relationIdx);
+    QueryNode right = relationChain.get(relationIdx+1);
+
+    
+    String segmentationName = null;
+    if(ctx.layer != null)
+    {
+      segmentationName=ctx.layer.getText();
+    }
+    left.addOutgoingJoin(new Near(right, 1, segmentationName));
+    
+  }
+  
   @Override
   public void enterEqualvalue(AqlParser.EqualvalueContext ctx)
   {
@@ -233,6 +251,31 @@ public class JoinListener extends AqlParserBaseListener
     }
   }
 
+  
+  @Override
+  public void enterIndirectNear(
+    AqlParser.IndirectNearContext ctx)
+  {
+    QueryNode left = relationChain.get(relationIdx);
+    QueryNode right = relationChain.get(relationIdx+1);
+
+    String segmentationName = null;
+    if(ctx.layer != null)
+    {
+      segmentationName=ctx.layer.getText();
+    }
+    
+    if (precedenceBound > 0)
+    {
+      left.addOutgoingJoin(
+        new Near(right, 1, precedenceBound, segmentationName));
+    }
+    else
+    {
+      left.addOutgoingJoin(new Near(right, segmentationName));
+    }
+  }
+  
   @Override
   public void enterRangePrecedence(AqlParser.RangePrecedenceContext ctx)
   {
@@ -259,6 +302,32 @@ public class JoinListener extends AqlParserBaseListener
     }
   }
 
+    @Override
+  public void enterRangeNear(AqlParser.RangeNearContext ctx)
+  {
+    QueryNode left = relationChain.get(relationIdx);
+    QueryNode right = relationChain.get(relationIdx+1);
+
+    QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
+    if(range.getMin() == 0 || range.getMax() == 0)
+    {
+       throw new AnnisQLSyntaxException("Distance can't be 0");
+    }
+    else
+    {
+      String segmentationName = null;
+      if(ctx.layer != null)
+      {
+        segmentationName=ctx.layer.getText();
+      }
+      
+      left.addOutgoingJoin(
+            new Near(right, range.getMin(), range.getMax(),
+            segmentationName));
+      
+    }
+  }
+  
   @Override
   public void enterIdenticalCoverage(AqlParser.IdenticalCoverageContext ctx)
   {
@@ -412,7 +481,7 @@ public class JoinListener extends AqlParserBaseListener
   }
 
   @Override
-  public void enterCommonParent(AqlParser.CommonParentContext ctx)
+  public void enterCommonparent(AqlParser.CommonparentContext ctx)
   {
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
@@ -420,10 +489,11 @@ public class JoinListener extends AqlParserBaseListener
     String label = ctx.label == null ? null : ctx.label.getText();
     
     left.addOutgoingJoin(new Sibling(right, label));
+    left.addOutgoingJoin(new Sibling(right, label));
   }
 
   @Override
-  public void enterCommonAncestor(AqlParser.CommonAncestorContext ctx)
+  public void enterCommonancestor(AqlParser.CommonancestorContext ctx)
   {
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
@@ -497,7 +567,7 @@ public class JoinListener extends AqlParserBaseListener
   private LinkedList<QueryAnnotation> fromEdgeAnnotation(
     AqlParser.EdgeSpecContext ctx)
   {
-    LinkedList<QueryAnnotation> annos = new LinkedList<QueryAnnotation>();
+    LinkedList<QueryAnnotation> annos = new LinkedList<>();
     for(AqlParser.EdgeAnnoContext annoCtx : ctx.edgeAnno())
     {
       String namespace = annoCtx.qName().namespace == null

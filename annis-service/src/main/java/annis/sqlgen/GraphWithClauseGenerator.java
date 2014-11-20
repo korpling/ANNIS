@@ -41,7 +41,7 @@ import java.util.LinkedList;
  *
  * Salt ids are simple URI and are defined like this:
  *
- * <p>{@code salt:/corp1/corp2/doc1}</p>.
+ * <p>{@code salt:/corp1/corp2/doc1#node}</p>.
  *
  * The leading / of the URI is a must, // would cause an error, because
  * authorities are currently not supported.
@@ -51,7 +51,7 @@ import java.util.LinkedList;
  */
 public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 {
-  
+    
   private String selectForNode(
     TableAccessStrategy tas, AnnotateQueryData annotateQueryData,
     int match,
@@ -98,11 +98,12 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   
   private String fromForNode(
     TableAccessStrategy tas, String indent,
-      int nodeNr)
+      int nodeNr, List<Long> corpusList)
   {
+    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent);
     StringBuilder sb = new StringBuilder();
     sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(" AS ")
+        .append(factsSQL).append(" AS ")
         .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
         .append(tas.tableName(CORPUS_TABLE)).append(nodeNr);
@@ -127,8 +128,8 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
 
       // filter the node with the right name
       sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".node_name = ")
-        .append("'").append(uri.getFragment()).append("'").append(" AND\n");
+        .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(".salt_id = ")
+        .append("'").append(generateNodeID(uri)).append("'").append(" AND\n");
 
       // use the toplevel partioning
       sb.append(indent)
@@ -146,7 +147,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     sb.append(indent).append("SELECT ").append(
       selectForNode(tas, annoQueryData, match, nodeNr, indent+TABSTOP)).append("\n");
-    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr, corpusList)).append("\n");
     sb.append(indent).append("WHERE\n").append(whereForNode(uri, tas, corpusList , indent+TABSTOP, nodeNr)).append("\n");
     sb.append(indent).append("LIMIT 1\n");
   
@@ -169,7 +170,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     // only work with the first element
     Validate.isTrue(!listOfSaltURIs.isEmpty());
     
-    List<String> subselects = new LinkedList<String>();
+    List<String> subselects = new LinkedList<>();
     
     
     String indent2 = indent + TABSTOP;
@@ -214,5 +215,10 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     sb.append("}");
     
     return  sqlString(sb.toString());
+  }
+  
+  private String generateNodeID(URI uri)
+  { 
+    return uri.getFragment();
   }
 }

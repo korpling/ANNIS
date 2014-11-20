@@ -17,7 +17,7 @@ package annis.gui;
 
 import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -35,15 +35,13 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.*;
 import org.slf4j.LoggerFactory;
-
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 /**
  *
  * @author thomas
@@ -53,6 +51,8 @@ public class CorpusBrowserPanel extends Panel
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     CorpusBrowserPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    *
@@ -94,19 +94,19 @@ public class CorpusBrowserPanel extends Panel
     setContent(accordion);
     accordion.setSizeFull();
 
-    containerNodeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerNodeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerNodeAnno.setItemSorter(new ExampleSorter());
 
-    containerEdgeType = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeType = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeType.setItemSorter(new ExampleSorter());
 
-    containerEdgeAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerEdgeAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerEdgeAnno.setItemSorter(new ExampleSorter());
 
-    containerMetaAnno = new BeanItemContainer<CorpusBrowserEntry>(
+    containerMetaAnno = new BeanItemContainer<>(
       CorpusBrowserEntry.class);
     containerMetaAnno.setItemSorter(new ExampleSorter());
 
@@ -131,10 +131,10 @@ public class CorpusBrowserPanel extends Panel
     boolean stripNodeAnno = true;
     boolean stripEdgeName = true;
     boolean stripEdgeAnno = true;
-    HashSet<String> nodeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeAnnoNames = new HashSet<String>();
-    HashSet<String> edgeNames = new HashSet<String>();
-    HashSet<String> fullEdgeNames = new HashSet<String>();
+    HashSet<String> nodeAnnoNames = new HashSet<>();
+    HashSet<String> edgeAnnoNames = new HashSet<>();
+    HashSet<String> edgeNames = new HashSet<>();
+    HashSet<String> fullEdgeNames = new HashSet<>();
     boolean hasDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
@@ -193,7 +193,7 @@ public class CorpusBrowserPanel extends Panel
     }
 
     // secound round, fill the actual containers
-    Set<String> metaAnnosKey = new HashSet<String>();
+    Set<String> metaAnnosKey = new HashSet<>();
     for (AnnisAttribute a : attributes)
     {
       // if the annotation name is already in the example skip this.
@@ -310,14 +310,14 @@ public class CorpusBrowserPanel extends Panel
 
   private List<AnnisAttribute> fetchAnnos(String toplevelCorpus)
   {
-    Collection<AnnisAttribute> result = new ArrayList<AnnisAttribute>();
+    Collection<AnnisAttribute> result = new ArrayList<>();
     try
     {
       WebResource service = Helper.getAnnisWebResource();
       if (service != null)
       {
         WebResource query = service.path("query").path("corpora")
-          .path(URLEncoder.encode(toplevelCorpus, "UTF-8"))
+          .path(urlPathEscape.escape(toplevelCorpus))
           .path("annotations")
           .queryParam("fetchvalues", "true")
           .queryParam("onlymostfrequentvalues", "true");
@@ -338,15 +338,7 @@ public class CorpusBrowserPanel extends Panel
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error("UTF-8 encoding is not supported on server, this is weird", ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    return new LinkedList<AnnisAttribute>(result);
+    return new LinkedList<>(result);
   }
 
   public static class ExampleTable extends Table
@@ -397,7 +389,7 @@ public class CorpusBrowserPanel extends Panel
 
       CorpusBrowserEntry cbe = (CorpusBrowserEntry) event.getProperty().
         getValue();
-      Set<String> corpusNameSet = new HashSet<String>();
+      Set<String> corpusNameSet = new HashSet<>();
       corpusNameSet.add(corpus.getName());
       if (controller != null && cbe != null)
       {

@@ -123,7 +123,7 @@ public class TestAbstractFromClauseGenerator {
 		List<Long> corpora = Lists.newArrayList(corpusID);
     
     Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
-    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    Map<String, Boolean> tablePartioned = new HashMap<>();
     tablePartioned.put(table, Boolean.TRUE);
     
     TableAccessStrategy tas = new TableAccessStrategy(node);
@@ -151,10 +151,10 @@ public class TestAbstractFromClauseGenerator {
     long corpusID = uniqueInt(0, Integer.MAX_VALUE);
 		List<Long> corporaNonEmpty = Lists.newArrayList(corpusID);
     List<Long> multipleCorpora = Lists.newArrayList(uniqueLong(), corpusID, uniqueLong());
-    List<Long> corpusEmpty = new LinkedList<Long>();
+    List<Long> corpusEmpty = new LinkedList<>();
     
     Map<String, String> tableAliases = setupTableAliases(node, table, tableAlias, count);
-    Map<String, Boolean> tablePartioned = new HashMap<String, Boolean>();
+    Map<String, Boolean> tablePartioned = new HashMap<>();
     tablePartioned.put(table, Boolean.TRUE);
     
     TableAccessStrategy tas = new TableAccessStrategy(node);
@@ -216,7 +216,7 @@ public class TestAbstractFromClauseGenerator {
 	// simulate that count copies of the table (alias) are required
 	private Map<String, String> setupTableAliases(QueryNode node, String table, String tableAlias, int count) 
   {
-		HashMap<String, String> tableAliases = new HashMap<String, String>();
+		HashMap<String, String> tableAliases = new HashMap<>();
 		tableAliases.put(table, tableAlias);
     if(count > 0)
     {

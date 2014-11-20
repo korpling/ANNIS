@@ -40,7 +40,7 @@ public class ListCorpusSqlHelper implements ParameterizedRowMapper<AnnisCorpus>
   
   public String createSqlQueryWithList(int numberOfIds)
   {
-    List<String> questionMarks = new ArrayList<String>();
+    List<String> questionMarks = new ArrayList<>();
     for(int i=0; i < numberOfIds; i++)
     {
       questionMarks.add("?");

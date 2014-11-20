@@ -55,14 +55,10 @@ public class CSVExporter implements Exporter, Serializable
         res = res.queryParam("metakeys", argsAsString.substring("metakeys".length()+1));
       }
       
-      InputStream result = res.get(InputStream.class);
       try
+      (InputStream result = res.get(InputStream.class)) 
       {
         IOUtils.copy(result, out);
-      }
-      finally
-      {
-        result.close();
       }
       
       out.flush();

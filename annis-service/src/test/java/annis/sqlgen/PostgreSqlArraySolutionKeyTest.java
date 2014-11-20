@@ -25,7 +25,7 @@ public class PostgreSqlArraySolutionKeyTest
 {
 
   // class under test
-  private PostgreSqlArraySolutionKey<String> key = new PostgreSqlArraySolutionKey<String>();
+  private PostgreSqlArraySolutionKey<String> key = new PostgreSqlArraySolutionKey<>();
   
   // test data
   @Mock private TableAccessStrategy tableAccessStrategy;

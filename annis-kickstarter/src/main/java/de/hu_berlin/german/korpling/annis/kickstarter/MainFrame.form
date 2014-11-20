@@ -34,7 +34,11 @@
                   <Component id="lblStatusService" alignment="1" pref="376" max="32767" attributes="0"/>
                   <Component id="pbStart" alignment="0" pref="376" max="32767" attributes="0"/>
                   <Component id="btLaunch" alignment="0" pref="376" max="32767" attributes="0"/>
-                  <Component id="btExit" alignment="1" min="-2" max="-2" attributes="0"/>
+                  <Group type="102" alignment="1" attributes="0">
+                      <Component id="cbDisableTimeout" max="32767" attributes="0"/>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="btExit" min="-2" max="-2" attributes="0"/>
+                  </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
@@ -56,7 +60,10 @@
               <EmptySpace max="-2" attributes="0"/>
               <Component id="btLaunch" min="-2" max="-2" attributes="0"/>
               <EmptySpace max="-2" attributes="0"/>
-              <Component id="btExit" min="-2" max="-2" attributes="0"/>
+              <Group type="103" groupAlignment="3" attributes="0">
+                  <Component id="btExit" alignment="3" min="-2" max="-2" attributes="0"/>
+                  <Component id="cbDisableTimeout" alignment="3" min="-2" max="-2" attributes="0"/>
+              </Group>
               <EmptySpace max="-2" attributes="0"/>
           </Group>
       </Group>
@@ -154,6 +161,17 @@
       </Properties>
       <Events>
         <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="btExitActionPerformed"/>
+      </Events>
+    </Component>
+    <Component class="javax.swing.JCheckBox" name="cbDisableTimeout">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="disable query timeout"/>
+        <Property name="toolTipText" type="java.lang.String" value="If this checkbox is active no query timeout will be applied. Please note the only way to abort the query is either the automatic timeout or by closing the ANNIS kickstarter."/>
+        <Property name="enabled" type="boolean" value="false"/>
+        <Property name="name" type="java.lang.String" value="cbDisableTimeout" noResource="true"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="cbDisableTimeoutActionPerformed"/>
       </Events>
     </Component>
   </SubComponents>

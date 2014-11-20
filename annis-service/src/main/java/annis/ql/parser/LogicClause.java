@@ -52,7 +52,7 @@ public class LogicClause
   public LogicClause()
   {
     this.op = Operator.LEAF;
-    this.children = new ArrayList<LogicClause>();
+    this.children = new ArrayList<>();
     this.content = null;
     this.parent = null;
   }
@@ -72,7 +72,7 @@ public class LogicClause
     this();
     this.op = other.op;
     this.parent = other.parent;
-    this.content = new ArrayList<Token>(other.content);
+    this.content = new ArrayList<>(other.content);
     this.children.addAll(other.children);
   }
 
@@ -151,7 +151,7 @@ public class LogicClause
   
   public List<Token> getCoveredToken()
   {
-    List<Token> result = new LinkedList<Token>();
+    List<Token> result = new LinkedList<>();
     
     if(content != null && !content.isEmpty()
       && (op == Operator.AND || op == Operator.OR))
@@ -201,7 +201,7 @@ public class LogicClause
       return Joiner.on(" \n| \n").join(children);
     }
     
-    LinkedList<String> texts = new LinkedList<String>();
+    LinkedList<String> texts = new LinkedList<>();
     if(content != null)
     {
       for(Token t : content)

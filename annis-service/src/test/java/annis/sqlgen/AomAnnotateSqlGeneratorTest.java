@@ -75,7 +75,7 @@ public class AomAnnotateSqlGeneratorTest
     // given
     stubNodeResultSet();
     // when
-    AnnisNode actual = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode actual = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     AnnisNode expected = new AnnisNode(ID, CORPUS_REF, TEXT_REF, LEFT, RIGHT, NODE_NAMESPACE, NODE_NAME, TOKEN_INDEX, SPAN, LEFT_TOKEN, RIGHT_TOKEN);
     assertThat(actual, is(expected));
@@ -88,7 +88,7 @@ public class AomAnnotateSqlGeneratorTest
     stubNodeResultSet();
     given(resultSet.wasNull()).willReturn(true);
     // when
-    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     assertThat(node.isToken(), is(false));
   }
@@ -100,7 +100,7 @@ public class AomAnnotateSqlGeneratorTest
     stubNodeResultSet();
     given(resultSet.wasNull()).willReturn(false);
     // when
-    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy);
+    AnnisNode node = generator.mapNode(resultSet, tableAccessStrategy, null);
     // then
     assertThat(node.isToken(), is(true));
   }

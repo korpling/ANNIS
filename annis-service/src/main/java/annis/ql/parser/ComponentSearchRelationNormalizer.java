@@ -81,7 +81,7 @@ public class ComponentSearchRelationNormalizer implements QueryDataTransformer
   {
     Multimap<QueryNode, Join> joins = createJoinMap(nodes);
 
-    LinkedList<QueryNode> nodeCopy = new LinkedList<QueryNode>(nodes);
+    LinkedList<QueryNode> nodeCopy = new LinkedList<>(nodes);
     
     for(QueryNode n : nodeCopy)
     {

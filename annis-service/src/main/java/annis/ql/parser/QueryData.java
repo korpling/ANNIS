@@ -51,11 +51,11 @@ public class QueryData implements Cloneable
 
   public QueryData()
   {
-    alternatives = new ArrayList<List<QueryNode>>();
-    corpusList = new ArrayList<Long>();
-    documents = new ArrayList<Long>();
-    metaData = new ArrayList<QueryAnnotation>();
-    extensions = new HashSet<Object>();
+    alternatives = new ArrayList<>();
+    corpusList = new ArrayList<>();
+    documents = new ArrayList<>();
+    metaData = new ArrayList<>();
+    extensions = new HashSet<>();
   }
 
   @Override
@@ -120,7 +120,7 @@ public class QueryData implements Cloneable
    */
   public static String toAQL(List<QueryNode> alternative)
   {
-    List<String> fragments = new LinkedList<String>();
+    List<String> fragments = new LinkedList<>();
     
     for(QueryNode n : alternative)
     {
@@ -261,7 +261,7 @@ public class QueryData implements Cloneable
 
   public <T> List<T> getExtensions(Class<T> clazz)
   {
-    List<T> result = new LinkedList<T>();
+    List<T> result = new LinkedList<>();
 
     for (Object o : extensions)
     {

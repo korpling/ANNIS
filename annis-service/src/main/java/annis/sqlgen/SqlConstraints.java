@@ -78,10 +78,21 @@ public class SqlConstraints
     return lhs + " " + op + " " + rhs;
   }
 
+   public static String mirrorJoin(String op, String lhs, String rhs)
+  {
+    return "(" + lhs + " " + op + " " + rhs + " OR " + rhs + " " + op + " " + lhs + ")";
+  }
+
   public static String numberJoin(String op, String lhs, String rhs, int offset)
   {
     String plus = offset >= 0 ? " + " : " - ";
     return join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset));
+  }
+
+  public static String numberMirrorJoin(String op, String lhs, String rhs, int offset)
+  {
+    String plus = offset >= 0 ? " + " : " - ";
+    return "(" + join(op, lhs, rhs) + plus + String.valueOf(Math.abs(offset)) + " OR " + join(op, rhs, lhs) + plus + String.valueOf(Math.abs(offset)) + ")";
   }
 
   public static String bitSelect(String column, boolean[] bits)
@@ -119,6 +130,39 @@ public class SqlConstraints
       return lhs + " " + betweenPredicate + " " + rhs + minPlus
         + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
         + String.valueOf(Math.abs(max));
+    }
+  }
+
+    public static String betweenMirror(String lhs, String rhs, int min, int max)
+  {
+    if ((disableBetweenSymmetricPredicate || disableBetweenPredicate)
+      && min > max)
+    {
+      int tmp = min;
+      min = max;
+      max = tmp;
+    }
+    String minPlus = min >= 0 ? " + " : " - ";
+    String maxPlus = max >= 0 ? " + " : " - ";
+    if (disableBetweenPredicate)
+    {
+      return "((" + lhs + " >= " + rhs + minPlus + String.valueOf(Math.abs(min))
+        + " AND " + lhs + " <= " + rhs + maxPlus
+        + String.valueOf(Math.abs(max)) + ") OR (" 
+        + rhs + " >= " + lhs + minPlus + String.valueOf(Math.abs(min))
+        + " AND " + rhs + " <= " + lhs + maxPlus
+        + String.valueOf(Math.abs(max)) + "))";
+    }
+    else
+    {
+      String betweenPredicate = disableBetweenSymmetricPredicate ? "BETWEEN"
+        : "BETWEEN SYMMETRIC";
+      return "((" + lhs + " " + betweenPredicate + " " + rhs + minPlus
+        + String.valueOf(Math.abs(min)) + " AND " + rhs + maxPlus
+        + String.valueOf(Math.abs(max)) + ") OR ("
+        + rhs + " " + betweenPredicate + " " + lhs + minPlus
+        + String.valueOf(Math.abs(min)) + " AND " + lhs + maxPlus
+        + String.valueOf(Math.abs(max)) + "))";
     }
   }
 

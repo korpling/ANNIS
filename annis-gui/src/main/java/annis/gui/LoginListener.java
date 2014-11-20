@@ -15,6 +15,8 @@
  */
 package annis.gui;
 
+import com.sun.jersey.api.client.WebResource;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
@@ -23,5 +25,6 @@ public interface LoginListener
 {
 
   public void onLogin();
+  public void onLogout();
   
 }

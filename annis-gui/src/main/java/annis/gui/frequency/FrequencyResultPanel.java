@@ -24,8 +24,6 @@ import annis.service.objects.FrequencyTableEntryType;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
-import com.google.common.base.Objects;
-import com.google.common.collect.ComparisonChain;
 import com.google.common.collect.Ordering;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -36,8 +34,8 @@ import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
 import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
@@ -45,7 +43,7 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -78,12 +76,12 @@ public class FrequencyResultPanel extends VerticalLayout
   public static final int MAX_NUMBER_OF_CHART_ITEMS = 100;
   
   private Table tblResult;
-  private Button btDownloadCSV;
-  FrequencyChart chart;
-  private String aql;
-  private Set<String> corpora;
-  private List<FrequencyTableEntry> freqDefinition;
-  final FrequencyQueryPanel queryPanel;
+  private final Button btDownloadCSV;
+  private final FrequencyChart chart;
+  private final String aql;
+  private final Set<String> corpora;
+  private final List<FrequencyTableEntry> freqDefinition;
+  private final FrequencyQueryPanel queryPanel;
   
   private ProgressBar pbQuery;
 
@@ -119,8 +117,8 @@ public class FrequencyResultPanel extends VerticalLayout
     setComponentAlignment(btDownloadCSV, Alignment.TOP_RIGHT);
     
     btDownloadCSV.setVisible(false);
-    btDownloadCSV.setIcon(new ThemeResource("../runo/icons/16/document-txt.png"));
-    btDownloadCSV.addStyleName(ChameleonTheme.BUTTON_SMALL);
+    btDownloadCSV.setIcon(FontAwesome.DOWNLOAD);
+    btDownloadCSV.addStyleName(ValoTheme.BUTTON_SMALL);
     
     final UI ui = UI.getCurrent();
     // actually start query
@@ -145,7 +143,7 @@ public class FrequencyResultPanel extends VerticalLayout
       } 
     };
     
-    PollControl.callInBackground(1000, null, r);
+    PollControl.callInBackground(1000, ui, r);
   }
   
   private FrequencyTable loadBeans()
@@ -207,7 +205,7 @@ public class FrequencyResultPanel extends VerticalLayout
     if (clippedTable.getEntries().size() > MAX_NUMBER_OF_CHART_ITEMS)
     {
       List<FrequencyTable.Entry> entries
-        = new ArrayList<FrequencyTable.Entry>(clippedTable.getEntries());
+        = new ArrayList<>(clippedTable.getEntries());
 
       clippedTable = new FrequencyTable();
       clippedTable.setEntries(entries.subList(0,
@@ -301,7 +299,7 @@ public class FrequencyResultPanel extends VerticalLayout
         
         tblResult.addItem(cells, "entry-" + line++);
       }
-    };
+    }
     tblResult.addContainerProperty(pbQuery, null, table);
     addLexicalSort(tblResult.getContainerDataSource());
     
@@ -367,38 +365,38 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         File tmpFile = File.createTempFile("annis-frequency", ".txt");
         tmpFile.deleteOnExit();
-        Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8);
-        
-        CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
-        
-        // write headers
-        ArrayList<String> header = new ArrayList<String>();
-        if(data.getEntries().size() > 0)
+        try (Writer writer = new OutputStreamWriter(new FileOutputStream(tmpFile), Charsets.UTF_8))
         {
-          for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
+          CSVWriter csv = new CSVWriter(writer, '\t', CSVWriter.NO_QUOTE_CHARACTER, '\\');
+          
+          // write headers
+          ArrayList<String> header = new ArrayList<>();
+          if(data.getEntries().size() > 0)
           {
-            FrequencyTableEntry e = freqDefinition.get(i);
-            String caption = "#" + e.getReferencedNode() + " ("
-              + (e.getType() == FrequencyTableEntryType.span
-              ? "spanned text" : e.getKey())
-              + ")";
-            
-            header.add(caption);
+            for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
+            {
+              FrequencyTableEntry e = freqDefinition.get(i);
+              String caption = "#" + e.getReferencedNode() + " ("
+                + (e.getType() == FrequencyTableEntryType.span
+                ? "spanned text" : e.getKey())
+                + ")";
+              
+              header.add(caption);
+            }
+          }
+          // add count
+          header.add("count");
+          csv.writeNext(header.toArray(new String[0]));
+          
+          // write entries
+          for (FrequencyTable.Entry e : data.getEntries())
+          {
+            ArrayList<String> d = new ArrayList<>();
+            d.addAll(Arrays.asList(e.getTupel()));
+            d.add("" + e.getCount());
+            csv.writeNext(d.toArray(new String[0]));
           }
         }
-        // add count
-        header.add("count");
-        csv.writeNext(header.toArray(new String[0]));
-        
-        // write entries
-        for (FrequencyTable.Entry e : data.getEntries())
-        {
-          ArrayList<String> d = new ArrayList<String>();
-          d.addAll(Arrays.asList(e.getTupel()));
-          d.add("" + e.getCount());
-          csv.writeNext(d.toArray(new String[0]));
-        }
-        writer.close();
         
         return new FileInputStream(tmpFile);
 

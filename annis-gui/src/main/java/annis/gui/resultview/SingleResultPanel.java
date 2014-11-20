@@ -20,7 +20,7 @@ import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
 import annis.gui.QueryController;
-import annis.gui.model.PagedResultQuery;
+import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
@@ -28,7 +28,9 @@ import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
@@ -41,7 +43,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
@@ -84,8 +86,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private static final String INITIAL_OPEN = "initial_open";
 
-  private static final ThemeResource ICON_RESOURCE = new ThemeResource(
-    "info.gif");
+  private static final Resource ICON_RESOURCE = FontAwesome.INFO_CIRCLE;
 
   private transient SDocument result;
 
@@ -153,7 +154,7 @@ public class SingleResultPanel extends CssLayout implements
     setHeight("-1px");
 
     infoBar = new HorizontalLayout();
-    infoBar.addStyleName("docPath");
+    infoBar.addStyleName("info-bar");
     infoBar.setWidth("100%");
     infoBar.setHeight("-1px");
 
@@ -162,7 +163,7 @@ public class SingleResultPanel extends CssLayout implements
     lblNumber.setSizeUndefined();
 
     btInfo = new Button();
-    btInfo.setStyleName(ChameleonTheme.BUTTON_LINK);
+    btInfo.setStyleName(ValoTheme.BUTTON_BORDERLESS);
     btInfo.setIcon(ICON_RESOURCE);
     btInfo.addClickListener((Button.ClickListener) this);
     infoBar.addComponent(btInfo);
@@ -192,7 +193,7 @@ public class SingleResultPanel extends CssLayout implements
     infoBar.setExpandRatio(lblPath, 1.0f);
     infoBar.setSpacing(true);
 
-    this.visualizerState = new HashMap<Long, Boolean>();
+    this.visualizerState = new HashMap<>();
 
     // init context combox
     lftCtxCombo = new ComboBox();
@@ -204,6 +205,9 @@ public class SingleResultPanel extends CssLayout implements
     lftCtxCombo.setNullSelectionAllowed(false);
     rghtCtxCombo.setNullSelectionAllowed(false);
 
+    lftCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    rghtCtxCombo.addStyleName(ValoTheme.COMBOBOX_SMALL);
+    
     IndexedContainer lftCtxContainer = new IndexedContainer();
     IndexedContainer rghtCtxContainer = new IndexedContainer();
 
@@ -312,8 +316,8 @@ public class SingleResultPanel extends CssLayout implements
 
   private void calculateHelperVariables()
   {
-    markedExactMap = new HashMap<String, String>();
-    markedCoveredMap = new HashMap<String, String>();
+    markedExactMap = new HashMap<>();
+    markedCoveredMap = new HashMap<>();
 
     if (result != null)
     {
@@ -369,7 +373,7 @@ public class SingleResultPanel extends CssLayout implements
   private Map<String, Long> calculateMarkedAndCoveredIDs(
     SDocument doc, List<SNode> segNodes)
   {
-    Map<String, Long> initialCovered = new HashMap<String, Long>();
+    Map<String, Long> initialCovered = new HashMap<>();
 
     // add all covered nodes
     for (SNode n : doc.getSDocumentGraph().getSNodes())
@@ -393,7 +397,7 @@ public class SingleResultPanel extends CssLayout implements
     if (segmentationName != null)
     {
       // filter token
-      Map<SToken, Long> coveredToken = new HashMap<SToken, Long>();
+      Map<SToken, Long> coveredToken = new HashMap<>();
       for (Map.Entry<String, Long> e : covered.entrySet())
       {
         SNode n = doc.getSDocumentGraph().getSNode(e.getKey());
@@ -474,8 +478,8 @@ public class SingleResultPanel extends CssLayout implements
       ResolverEntry[] entries 
         = resolverProvider == null ? new ResolverEntry[0] 
         : resolverProvider.getResolverEntries(result);
-      visualizers = new LinkedList<VisualizerPanel>();
-      List<VisualizerPanel> openVisualizers = new LinkedList<VisualizerPanel>();
+      visualizers = new LinkedList<>();
+      List<VisualizerPanel> openVisualizers = new LinkedList<>();
 
       List<SNode> segNodes = CommonHelper.getSortedSegmentationNodes(
         segmentationName,
@@ -665,7 +669,7 @@ public class SingleResultPanel extends CssLayout implements
     {
       this.matchedAndCovered = initialMatches;
 
-      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<SNode, Long>(
+      Map<SNode, Long> sortedByOverlappedTokenIntervall = new TreeMap<>(
         new Comparator<SNode>()
         {
           @Override
@@ -712,7 +716,7 @@ public class SingleResultPanel extends CssLayout implements
       currentMatchPos = 1;
       if (initialMatches.size() > 0)
       {
-        graph.traverse(new BasicEList<SNode>(sortedByOverlappedTokenIntervall.
+        graph.traverse(new BasicEList<>(sortedByOverlappedTokenIntervall.
           keySet()),
           GRAPH_TRAVERSE_TYPE.TOP_DOWN_DEPTH_FIRST, "CoveredMatchesCalculator",
           (SGraphTraverseHandler) this, true);

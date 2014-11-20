@@ -36,6 +36,7 @@ import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
 
 /**
  *
- * @author thomas
+ * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class ExportPanel extends FormLayout
 {
@@ -74,7 +75,7 @@ public class ExportPanel extends FormLayout
     new SimpleTextExporter()
   };
 
-  private final Map<String, String> help4Exporter = new HashMap<String, String>();
+  private final Map<String, String> help4Exporter = new HashMap<>();
 
   private final ComboBox cbExporter;
 
@@ -120,7 +121,6 @@ public class ExportPanel extends FormLayout
     
     setWidth("99%");
     setHeight("-1px");
-    addStyleName("contextsensible-formlayout");
 
     initHelpMessages();
 
@@ -128,7 +128,7 @@ public class ExportPanel extends FormLayout
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    exporterMap = new HashMap<String, Exporter>();
+    exporterMap = new HashMap<>();
     for (Exporter e : EXPORTER)
     {
       String name = e.getClass().getSimpleName();
@@ -180,13 +180,12 @@ public class ExportPanel extends FormLayout
     addComponent(new HelpButton(txtParameters));
 
     btExport = new Button("Perform Export");
-    btExport.setIcon(new ThemeResource(
-      "tango-icons/16x16/media-playback-start.png"));
+    btExport.setIcon(FontAwesome.PLAY);
     btExport.setDisableOnClick(true);
     btExport.addClickListener(new ExportButtonListener());
 
     btCancel = new Button("Cancel Export");
-    btCancel.setIcon(new ThemeResource("tango-icons/16x16/process-stop.png"));
+    btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
     Exporter exporter = exporterMap.get((String) cbExporter.getValue());
@@ -197,7 +196,7 @@ public class ExportPanel extends FormLayout
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
-    btDownload.setIcon(new ThemeResource("tango-icons/16x16/document-save.png"));
+    btDownload.setIcon(FontAwesome.DOWNLOAD);
     btDownload.setDisableOnClick(true);
     btDownload.setEnabled(false);
 
@@ -210,7 +209,7 @@ public class ExportPanel extends FormLayout
     addComponent(vLayout);
 
     progressBar = new ProgressBar();
-    progressBar.setEnabled(false);
+    progressBar.setVisible(false);
     progressBar.setIndeterminate(true);
     vLayout.addComponent(progressBar);
 
@@ -250,8 +249,8 @@ public class ExportPanel extends FormLayout
       + "<code>metakeys=title,documentname</code>)");
 
     help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
-      "The Text Exporter exports just the plain text of every search result and "
-      + "its context, one line per result.");
+      "The Text Exporter exports the token covered by the matched nodes of every search result and "
+      + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
 
     help4Exporter.put(EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
@@ -267,6 +266,9 @@ public class ExportPanel extends FormLayout
       + "<code>metakeys=title,documentname</code>) <br />"
       + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
       + "<code>numbers=false</code>)");
+    
+    help4Exporter.put(EXPORTER[4].getClass().getSimpleName(),
+      "The SimpleTextExporter exports only the plain text of every search result. ");
   }
 
   public class ExporterSelectionHelpListener implements
@@ -372,7 +374,7 @@ public class ExportPanel extends FormLayout
         e.setCorpora(corpusListPanel.getSelectedCorpora());
         e.setQuery(queryPanel.getQuery());
         controller.addHistoryEntry(e);
-        progressBar.setEnabled(true);
+        progressBar.setVisible(true);
         progressLabel.setValue("");
 
         if (exporter.isCancelable())
@@ -431,11 +433,11 @@ public class ExportPanel extends FormLayout
       final File currentTmpFile = File.createTempFile("annis-export", ".txt");
       currentTmpFile.deleteOnExit();
 
-      OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");
+      
 
       final AtomicBoolean success = new AtomicBoolean(false);
-      try
+      try(OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
         exporter.convertText(queryPanel.getQuery(),
           (Integer) cbLeftContext.getValue(),
@@ -449,8 +451,6 @@ public class ExportPanel extends FormLayout
       }
       finally
       {
-        outWriter.close();
-
         ui.access(new Runnable()
         {
           @Override
@@ -458,7 +458,7 @@ public class ExportPanel extends FormLayout
           {
             btExport.setEnabled(true);
             btCancel.setEnabled(false);
-            progressBar.setEnabled(false);
+            progressBar.setVisible(false);
             progressLabel.setValue("");
 
             // copy the result to the class member in order to delete if

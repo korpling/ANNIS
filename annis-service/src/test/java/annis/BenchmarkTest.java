@@ -60,7 +60,10 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
 // TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
-  "file:src/main/distribution/conf/spring/Common.xml"
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/SqlGenerator.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml"
+  
 }, loader = AnnisXmlContextLoader.class)
 @BenchmarkOptions(callgc = false, benchmarkRounds = 5, warmupRounds = 5)
 @BenchmarkMethodChart(filePrefix = "annis-benchmark")
@@ -116,7 +119,7 @@ public class BenchmarkTest
   private List<Long> getCorpusIDs(String corpus)
   {
     // (and check if it's there, otherwise ignore these tests)
-    List<String> corpusNames = new LinkedList<String>();
+    List<String> corpusNames = new LinkedList<>();
     corpusNames.add(corpus);
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(corpusNames);
     return corpusIDs;
@@ -128,7 +131,7 @@ public class BenchmarkTest
     assumeTrue(pcc2CorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
 
     assertEquals(1, p.getSCorpusGraphs().size());
   }
@@ -139,9 +142,9 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
     provider.writeTo(p, SaltProject.class, null, null,
-      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<Object>(),
+      typeXMI, new StringKeyIgnoreCaseMultivaluedMap<>(),
       nullStream);
   }
 
@@ -151,7 +154,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("pcc2",
-        "4282");
+        "4282", null);
     provider.writeTo(p, SaltProject.class, null, null,
       typeBinary, null,
       nullStream);
@@ -163,7 +166,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
 
     assertEquals(1, p.getSCorpusGraphs().size());
   }
@@ -174,7 +177,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
     provider.writeTo(p, SaltProject.class, null, null,
       typeXMI, null,
       nullStream);
@@ -186,7 +189,7 @@ public class BenchmarkTest
     assumeTrue(ridgesCorpusID.size() > 0);
 
     SaltProject p = annisDao.retrieveAnnotationGraph("Ridges_Herbology_Version_2.0",
-        "sonderbares.kraeuterbuch.16175.11-21");
+        "sonderbares.kraeuterbuch.16175.11-21", null);
     provider.writeTo(p, SaltProject.class, null, null,
       new MediaType("application", "xmi+binary"), null,
       nullStream);

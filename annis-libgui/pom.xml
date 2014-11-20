@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.1.8</version>
+    <version>3.2.0</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-libgui</artifactId>
@@ -13,7 +13,7 @@
   <description>Base project for a Vaadin based GUI.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.1.13</vaadin.version>
+    <vaadin.version>7.3.5</vaadin.version>
   </properties>
   
     
@@ -38,12 +38,13 @@
       <artifactId>vaadin-themes</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
+    <!--
     <dependency>
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-theme-compiler</artifactId>
       <version>${vaadin.version}</version>
     </dependency>
-    
+    -->
     <dependency>
       <groupId>de.hu-berlin.german.korpling.annis</groupId>
       <artifactId>annis-widgets</artifactId>

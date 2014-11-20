@@ -15,13 +15,6 @@
  */
 package annis.security;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.Properties;
-import java.util.Set;
-import java.util.TreeSet;
 import org.apache.commons.lang3.Validate;
 import org.apache.shiro.authc.AuthenticationException;
 import org.apache.shiro.authc.AuthenticationInfo;
@@ -37,127 +30,99 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 
 /**
- * A realm for the property based user authentification and authorization pattern
- * used by ANNIS.
- * 
+ * A realm for the property based user authentification and authorization
+ * pattern used by ANNIS.
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionResolverAware
+public class ANNISUserRealm extends AuthorizingRealm implements
+  RolePermissionResolverAware
 {
-  private final static org.slf4j.Logger log = LoggerFactory.getLogger(ANNISUserRealm.class);
-  
-  private String resourcePath;
-  private String defaultUserRole = "user";
-  private String anonymousUser = "anonymous";
+
+  private final static org.slf4j.Logger log = LoggerFactory.getLogger(
+    ANNISUserRealm.class);
+
+  private ANNISUserConfigurationManager confManager;
+
+  private String defaultUserRole = Group.DEFAULT_USER_ROLE;
+
+  private String anonymousUser = Group.ANONYMOUS;
 
   public ANNISUserRealm()
   {
     // define a default credentials matcher
-    HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(Sha256Hash.ALGORITHM_NAME);
+    HashedCredentialsMatcher matcher = new HashedCredentialsMatcher(
+      Sha256Hash.ALGORITHM_NAME);
     matcher.setHashIterations(1);
     setCredentialsMatcher(matcher);
   }
-  
-  private Properties getPropertiesForUser(String userName)
-  {
-     // load user info from file
-    if(resourcePath != null)
-    {
-        
-      File userDir = new File(resourcePath, "users");
-      if(userDir.isDirectory())
-      {
-        // get the file which corresponds to the user
-        File userFile = new File(userDir.getAbsolutePath(), userName);
-        if(userFile.isFile() && userFile.canRead())
-        {
-          FileInputStream userFileIO = null;
-          try
-          {
-            Properties userProps = new Properties();
 
-            userFileIO = new FileInputStream(userFile);
-            userProps.load(userFileIO);
-            return userProps;
-          }
-          catch (IOException ex)
-          {
-            log.error(null, ex);
-          }
-          finally
-          {
-            if (userFileIO != null)
-            {
-              try
-              {
-                userFileIO.close();
-              }
-              catch (IOException ex)
-              {
-                log.error(null, ex);
-              }
-            }
-          }
-        }
-
-      }
-    } // end if resourcePath not null
-    
-    return null;
-  }
-  
   @Override
-  protected AuthorizationInfo doGetAuthorizationInfo(PrincipalCollection principals)
+  protected AuthorizationInfo doGetAuthorizationInfo(
+    PrincipalCollection principals)
   {
     Validate.isInstanceOf(String.class, principals.getPrimaryPrincipal());
     String userName = (String) principals.getPrimaryPrincipal();
-    
-    
-    Set<String> roles = new TreeSet<String>();
-    roles.add(userName);  
-    if(!userName.equals(anonymousUser))
+
+    SimpleAuthorizationInfo info = new SimpleAuthorizationInfo();
+
+    User user = confManager.getUser(userName);
+
+    if(user != null)
     {
-      Properties userProps = getPropertiesForUser(userName);
-    
-      String groupsRaw = userProps.getProperty("groups", "").trim();
-      roles.addAll(Arrays.asList(groupsRaw.split("\\s*,\\s*")));
-      
-      roles.add(defaultUserRole);
+      // only add any user role/permission if account is not expired
+      if(user.getExpires() == null || user.getExpires().isAfterNow())
+      { 
+        info.addRole(userName);
+
+        info.addRoles(user.getGroups());
+        info.addRole(defaultUserRole);
+
+        // add any manual given permissions
+        info.addStringPermissions(user.getPermissions());
+      }
     }
-    return new SimpleAuthorizationInfo(roles);
+    else if(userName.equals(anonymousUser))
+    {
+      info.addRole(anonymousUser);
+    }
+    return info;
   }
 
   @Override
   protected AuthenticationInfo doGetAuthenticationInfo(AuthenticationToken token) throws AuthenticationException
   {
     Validate.isInstanceOf(String.class, token.getPrincipal());
-    
+
     String userName = (String) token.getPrincipal();
-    if(userName.equals(anonymousUser))
+    if (userName.equals(anonymousUser))
     {
       // for anonymous users the user name equals the Password, so hash the user name
       Sha256Hash hash = new Sha256Hash(userName);
-      return new SimpleAuthenticationInfo(userName, hash.getBytes(), ANNISUserRealm.class.getName());
+      return new SimpleAuthenticationInfo(userName, hash.getBytes(),
+        ANNISUserRealm.class.getName());
     }
-    
-    Properties userProps = getPropertiesForUser(userName);
-    if(userProps != null)
-    {
-      String password = userProps.getProperty("password");
-      if(password != null)
+
+    User user = confManager.getUser(userName);
+    if (user != null)
+    { 
+      String passwordHash = user.getPasswordHash();
+      if (passwordHash != null)
       {
-        if(password.startsWith("$"))
+        if (passwordHash.startsWith("$"))
         {
           Shiro1CryptFormat fmt = new Shiro1CryptFormat();
-          Hash hashCredentials = fmt.parse(password);
-          if(hashCredentials instanceof SimpleHash)
+          Hash hashCredentials = fmt.parse(passwordHash);
+          if (hashCredentials instanceof SimpleHash)
           {
             SimpleHash simpleHash = (SimpleHash) hashCredentials;
 
-            Validate.isTrue(simpleHash.getIterations() == 1, "Hash iteration count must be 1 for every password hash!");
+            Validate.isTrue(simpleHash.getIterations() == 1,
+              "Hash iteration count must be 1 for every password hash!");
 
             // actually set the information from the user file
             SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
@@ -171,24 +136,23 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
         {
           // fallback unsalted hex hash
           SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
-            token.getPrincipal(), password, ANNISUserRealm.class.getName());
+            token.getPrincipal(), passwordHash, ANNISUserRealm.class.getName());
           return info;
         }
-        
+
       }
     }
     return null;
   }
-  
 
-  public String getResourcePath()
+  public ANNISUserConfigurationManager getConfManager()
   {
-    return resourcePath;
+    return confManager;
   }
 
-  public void setResourcePath(String resourcePath)
+  public void setConfManager(ANNISUserConfigurationManager confManager)
   {
-    this.resourcePath = resourcePath;
+    this.confManager = confManager;
   }
 
   public String getDefaultUserRole()
@@ -210,5 +174,5 @@ public class ANNISUserRealm extends AuthorizingRealm implements RolePermissionRe
   {
     this.anonymousUser = anonymousUser;
   }
-  
+
 }

@@ -37,7 +37,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   
   public AnnotatedMatchIterator(ResultSet rs, RowMapper<AnnotatedSpan> mapper)
   {
-    this.itSpan = new ResultSetTypedIterator<AnnotatedSpan>(rs, mapper);
+    this.itSpan = new ResultSetTypedIterator<>(rs, mapper);
     this.lastSpan = null;
   }
   
@@ -59,7 +59,7 @@ public class AnnotatedMatchIterator implements Iterator<AnnotatedMatch>
   @Override
   public AnnotatedMatch next()
   {
-    List<Long> key = new ArrayList<Long>();
+    List<Long> key = new ArrayList<>();
     AnnotatedSpan[] matchedSpans = new AnnotatedSpan[0];
     
     if(lastSpan != null)

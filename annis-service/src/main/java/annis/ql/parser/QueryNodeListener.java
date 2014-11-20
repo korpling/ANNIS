@@ -44,7 +44,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   
   private QueryData data = null;
 
-  private final List<QueryNode> currentAlternative = new ArrayList<QueryNode>();
+  private final List<QueryNode> currentAlternative = new ArrayList<>();
 
   private long aliasCount = 0l;
   private String lastVariableDefinition = null;
@@ -55,7 +55,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
   private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
-  private final List<QueryAnnotation> metaData = new ArrayList<QueryAnnotation>();
+  private final List<QueryAnnotation> metaData = new ArrayList<>();
 
   public QueryNodeListener()
   {
@@ -75,7 +75,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   public void enterOrTop(AqlParser.OrTopContext ctx)
   {
     data = new QueryData();
-    tokenPositions = new ArrayList<Map<Interval, QueryNode>>();
+    tokenPositions = new ArrayList<>();
   }
 
   @Override
@@ -89,8 +89,8 @@ public class QueryNodeListener extends AqlParserBaseListener
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(new ArrayList<QueryNode>(currentAlternative));
-    tokenPositions.add(new HashMap<Interval, QueryNode>(currentTokenPosition));
+    data.addAlternative(new ArrayList<>(currentAlternative));
+    tokenPositions.add(new HashMap<>(currentTokenPosition));
   }
 
   

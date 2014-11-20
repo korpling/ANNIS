@@ -21,11 +21,15 @@ import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MetaDataColumn;
 import annis.service.objects.OrderBy;
 import annis.service.objects.Visualizer;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -55,9 +59,11 @@ public class DocBrowserTable extends Table
 
   private Logger log = LoggerFactory.getLogger(DocBrowserTable.class);
 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   private final DocBrowserPanel docBrowserPanel;
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
+  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
 
   /**
    * Represents the config of the doc visualizer. If there are meta data names
@@ -109,7 +115,7 @@ public class DocBrowserTable extends Table
       List<String> pathList = a.getAnnotationPath();
       if (pathList == null)
       {
-        pathList = new LinkedList<String>();
+        pathList = new LinkedList<>();
       }
 
       Collections.reverse(pathList);
@@ -167,8 +173,6 @@ public class DocBrowserTable extends Table
       setColumnHeader((String) colName, (String) colName);
     }
 
-    setColumnWidth("info", 26);
-
     sortByMetaData(metaCols.sortColumns);
   }
 
@@ -219,7 +223,7 @@ public class DocBrowserTable extends Table
     addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     // init metadata cache
-    docMetaDataCache = new HashMap<String, Map<String, List<Annotation>>>();
+    docMetaDataCache = new HashMap<>();
 
     addStyleName("docvis-table");
 
@@ -229,7 +233,7 @@ public class DocBrowserTable extends Table
   public Button generateInfoButtonCell(final String docName)
   {
     Button btn = new Button();
-    btn.setStyleName(BaseTheme.BUTTON_LINK);
+    btn.setStyleName(ChameleonTheme.BUTTON_BORDERLESS);
     btn.setIcon(INFO_ICON);
     btn.addClickListener(new Button.ClickListener()
     {
@@ -411,9 +415,9 @@ public class DocBrowserTable extends Table
       // get the metadata for the corpus
       WebResource res = Helper.getAnnisWebResource();
       res = res.path("meta/corpus/").path(
-        docBrowserPanel.getCorpus()).path("closure");
+        urlPathEscape.escape(docBrowserPanel.getCorpus())).path("closure");
       
-      Map<String, List<Annotation>> metaDataMap = new HashMap<String, List<Annotation>>();
+      Map<String, List<Annotation>> metaDataMap = new HashMap<>();
       
       // create a document -> metadata map
       for (Annotation a : res.get(new Helper.AnnotationListType()))
@@ -444,7 +448,7 @@ public class DocBrowserTable extends Table
 
   private String generateCell(List<String> path, MetaDataCol metaDatum)
   {
-    List<Annotation> metaData = new LinkedList<Annotation>();
+    List<Annotation> metaData = new LinkedList<>();
     if (path != null && !path.isEmpty())
     {
       metaData = getDocMetaData(path.get(path.size()-1));
@@ -480,8 +484,8 @@ public class DocBrowserTable extends Table
 
     public MetaColumns()
     {
-      this.visibleColumns = new ArrayList<MetaDataCol>();
-      this.sortColumns = new ArrayList<MetaDataCol>();
+      this.visibleColumns = new ArrayList<>();
+      this.sortColumns = new ArrayList<>();
     }
   }
 

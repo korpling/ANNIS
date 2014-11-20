@@ -24,6 +24,7 @@ import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
 import annis.libgui.media.PDFViewer;
+import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
 import annis.resolver.ResolverEntry;
@@ -37,9 +38,14 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import static annis.model.AnnisConstants.*;
+import com.google.common.base.Joiner;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.UniformInterfaceException;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import com.vaadin.server.StreamResource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Notification;
@@ -47,20 +53,16 @@ import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SGraph;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
-import java.net.URLEncoder;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.concurrent.Callable;
@@ -88,11 +90,9 @@ public class VisualizerPanel extends CssLayout
 
   private final Logger log = LoggerFactory.getLogger(VisualizerPanel.class);
 
-  public static final ThemeResource ICON_COLLAPSE = new ThemeResource(
-    "icon-collapse.gif");
+  public static final Resource ICON_COLLAPSE = FontAwesome.MINUS_SQUARE_O;
 
-  public static final ThemeResource ICON_EXPAND = new ThemeResource(
-    "icon-expand.gif");
+  public static final Resource ICON_EXPAND = FontAwesome.PLUS_SQUARE_O;
 
   private String corpusName;
 
@@ -137,6 +137,8 @@ public class VisualizerPanel extends CssLayout
   private InstanceConfig instanceConfig;
 
   private VisualizerContextChanger visCtxChanger;
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    * This Constructor should be used for {@link ComponentVisualizerPlugin}
@@ -278,9 +280,9 @@ public class VisualizerPanel extends CssLayout
   {
     if(tokenIDs == null || graph == null)
     {
-      return new LinkedList<SToken>();
+      return new LinkedList<>();
     }
-    ArrayList<SToken> r = new ArrayList<SToken>(tokenIDs.size());
+    ArrayList<SToken> r = new ArrayList<>(tokenIDs.size());
     for(String t : tokenIDs)
     {
       SNode n = graph.getSNode(t);
@@ -347,8 +349,14 @@ public class VisualizerPanel extends CssLayout
       && result != null
       && result.getSDocumentGraph().getSNodes().size() > 0)
     {
+      List<String> nodeAnnoFilter = null;
+      if(visPlugin instanceof FilteringVisualizerPlugin)
+      {
+        nodeAnnoFilter = ((FilteringVisualizerPlugin) visPlugin).getFilteredNodeAnnotationNames(
+          corpusName, documentName, input.getMappings());
+      }
       SaltProject p = getDocument(result.getSCorpusGraph().getSRootCorpus().
-        get(0).getSName(), result.getSName());
+        get(0).getSName(), result.getSName(), nodeAnnoFilter);
 
       SDocument wholeDocument = p.getSCorpusGraphs().get(0).getSDocuments()
         .get(0);
@@ -390,22 +398,23 @@ public class VisualizerPanel extends CssLayout
     }
   }
 
-  private SaltProject getDocument(String toplevelCorpusName, String documentName)
+  private SaltProject getDocument(String toplevelCorpusName, String documentName,
+    List<String> nodeAnnoFilter)
   {
     SaltProject txt = null;
     try
     {
-      toplevelCorpusName = URLEncoder.encode(toplevelCorpusName, "UTF-8");
-      documentName = URLEncoder.encode(documentName, "UTF-8");
-      WebResource annisResource = Helper.getAnnisWebResource();
-      txt = annisResource.path("query").path("graph").path(toplevelCorpusName).
-        path(documentName).get(SaltProject.class);
+      toplevelCorpusName = urlPathEscape.escape(toplevelCorpusName);
+      documentName = urlPathEscape.escape(documentName);
+      WebResource res = Helper.getAnnisWebResource().path("query").path("graph").path(toplevelCorpusName).
+        path(documentName);
+      if(nodeAnnoFilter != null)
+      {
+        res = res.queryParam("filternodeanno", Joiner.on(",").join(nodeAnnoFilter));
+      }
+      txt = res.get(SaltProject.class);
     }
-    catch (RuntimeException e)
-    {
-      log.error("General remote service exception", e);
-    }
-    catch (Exception e)
+    catch (ClientHandlerException | UniformInterfaceException e)
     {
       log.error("General remote service exception", e);
     }

@@ -68,7 +68,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
     this.sb = sb;
     this.level = level;    
     vm = (sb.isRegEx()) ? ValueMode.REGEX : ValueMode.NORMAL;
-    values = new ConcurrentSkipListMap<String, String>();
+    values = new ConcurrentSkipListMap<>();
     for(String v : sq.getAvailableAnnotationLevels(level))
     {      
       values.put(v, sq.escapeRegexCharacters(v));
@@ -126,7 +126,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
     String fm = sq.getFilterMechanism();
     if (!"generic".equals(fm))
     {
-      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<String>();       
+      ConcurrentSkipListSet<String> notInYet = new ConcurrentSkipListSet<>();       
       String txt = event.getText();
       if (!txt.equals(""))
       {
@@ -166,7 +166,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
     else
     {
       String txt = event.getText();
-      HashMap<Integer, Collection> levdistvals = new HashMap<Integer, Collection>();
+      HashMap<Integer, Collection> levdistvals = new HashMap<>();
       if (txt.length() > 1)
       {
         scb.removeAllItems();
@@ -177,12 +177,12 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
             levdistvals.get(d).add(s);
           }
           if (!levdistvals.containsKey(d)){
-            Set<String> newc = new TreeSet<String>();
+            Set<String> newc = new TreeSet<>();
             newc.add(s);
             levdistvals.put(d, newc);
           }
         }
-        SortedSet<Integer> keys = new TreeSet<Integer>(levdistvals.keySet());
+        SortedSet<Integer> keys = new TreeSet<>(levdistvals.keySet());
         for(Integer k : keys.subSet(0, 10)){
           List<String> valueList = new ArrayList(levdistvals.get(k));
           Collections.sort(valueList, String.CASE_INSENSITIVE_ORDER);

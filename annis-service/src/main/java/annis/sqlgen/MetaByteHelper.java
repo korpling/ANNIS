@@ -51,7 +51,7 @@ public class MetaByteHelper implements ResultSetExtractor<List<AnnisBinaryMetaDa
   public List<AnnisBinaryMetaData> extractData(ResultSet rs) throws
     DataAccessException
   {
-    List<AnnisBinaryMetaData> result = new LinkedList<AnnisBinaryMetaData>();
+    List<AnnisBinaryMetaData> result = new LinkedList<>();
     try
     {
       while (rs.next())

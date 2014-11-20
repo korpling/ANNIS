@@ -19,30 +19,27 @@ import annis.gui.ExampleQueriesPanel;
 import annis.gui.CorpusBrowserPanel;
 import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
-import annis.security.AnnisUserConfig;
+import annis.security.UserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
-import com.google.common.collect.Collections2;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.DefaultItemSorter;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ItemClickEvent;
-import com.vaadin.server.ExternalResource;
+import com.vaadin.server.FontAwesome;
+import com.vaadin.server.Resource;
 import static com.vaadin.server.Sizeable.UNITS_EM;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
@@ -54,7 +51,6 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Link;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
 import com.vaadin.ui.Table;
@@ -62,15 +58,14 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
-import com.vaadin.ui.themes.BaseTheme;
-import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
 import javax.ws.rs.core.Response;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -84,10 +79,9 @@ public class CorpusListPanel extends VerticalLayout implements
   private static final org.slf4j.Logger log = LoggerFactory.
     getLogger(CorpusListPanel.class);
 
-  private static final ThemeResource INFO_ICON = new ThemeResource("info.gif");
+  private static final Resource INFO_ICON = FontAwesome.INFO_CIRCLE;
 
-  private static final ThemeResource DOC_ICON = new ThemeResource(
-    "document_ico.png");
+  private static final Resource DOC_ICON = FontAwesome.FILE_TEXT_O;
 
   public static final String ALL_CORPORA = "All";
 
@@ -112,9 +106,9 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private TextField txtFilter;
 
-  private transient AnnisUserConfig userConfig;
+  private transient UserConfig userConfig;
 
-  private List<AnnisCorpus> allCorpora = new LinkedList<AnnisCorpus>();
+  private List<AnnisCorpus> allCorpora = new LinkedList<>();
 
   private InstanceConfig instanceConfig;
   
@@ -143,6 +137,7 @@ public class CorpusListPanel extends VerticalLayout implements
     cbSelection.setDescription("Choose corpus selection set");
     cbSelection.setWidth("100%");
     cbSelection.setHeight("-1px");
+    cbSelection.addStyleName(ValoTheme.COMBOBOX_SMALL);
     cbSelection.setInputPrompt("Add new corpus selection set");
     cbSelection.setNullSelectionAllowed(false);
     cbSelection.setNewItemsAllowed(true);
@@ -185,10 +180,10 @@ public class CorpusListPanel extends VerticalLayout implements
           // select the first item
           List<String> filteredIDs = corpusContainer.getItemIds();
 
-          Set<String> selectedAndFiltered = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndFiltered = new HashSet<>(selectedIDs);
           selectedAndFiltered.retainAll(filteredIDs);
 
-          Set<String> selectedAndOutsideFilter = new HashSet<String>(selectedIDs);
+          Set<String> selectedAndOutsideFilter = new HashSet<>(selectedIDs);
           selectedAndOutsideFilter.removeAll(filteredIDs);
 
           for (String id : selectedAndOutsideFilter)
@@ -209,13 +204,14 @@ public class CorpusListPanel extends VerticalLayout implements
     });
     txtFilter.setWidth("100%");
     txtFilter.setHeight("-1px");
+    txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
     addComponent(txtFilter);
 
     tblCorpora = new Table();
     
     addComponent(tblCorpora);
 
-    corpusContainer = new BeanContainer<String, AnnisCorpus>(AnnisCorpus.class);
+    corpusContainer = new BeanContainer<>(AnnisCorpus.class);
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
@@ -236,7 +232,9 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setColumnExpandRatio("name", 0.6f);
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
     tblCorpora.setColumnExpandRatio("tokenCount", 0.25f);
-    tblCorpora.setColumnWidth("info", 19);
+    tblCorpora.addStyleName(ValoTheme.TABLE_SMALL);
+    tblCorpora.setPageLength(1);
+    tblCorpora.setCacheRate(3);
     
     tblCorpora.addActionHandler((Action.Handler) this);
     tblCorpora.setImmediate(true);
@@ -254,7 +252,6 @@ public class CorpusListPanel extends VerticalLayout implements
       }
     });
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
-
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
     setExpandRatio(tblCorpora, 1.0f);
@@ -270,9 +267,9 @@ public class CorpusListPanel extends VerticalLayout implements
           Notification.Type.HUMANIZED_MESSAGE);
       }
     });
-    btReload.setIcon(new ThemeResource("tango-icons/16x16/view-refresh.png"));
+    btReload.setIcon(FontAwesome.REFRESH);
     btReload.setDescription("Reload corpus list");
-    btReload.addStyleName(ChameleonTheme.BUTTON_ICON_ONLY);
+    btReload.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
 
     selectionLayout.addComponent(btReload);
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
@@ -305,13 +302,6 @@ public class CorpusListPanel extends VerticalLayout implements
               + "(use button at upper right corner) to see more corpora.",
               Notification.Type.HUMANIZED_MESSAGE);
           }
-          else if (Helper.getUser() == null)
-          {
-            Notification.
-              show(
-              "You can login (use button at upper right corner) to get access to more corpora",
-              Notification.Type.TRAY_NOTIFICATION);
-          }
         }
       }
 
@@ -319,7 +309,7 @@ public class CorpusListPanel extends VerticalLayout implements
       cbSelection.removeAllItems();
       cbSelection.addItem(ALL_CORPORA);
 
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -331,7 +321,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
 
       // add the corpus set names in sorted order
-      TreeSet<String> corpusSetNames = new TreeSet<String>();
+      TreeSet<String> corpusSetNames = new TreeSet<>();
       for (CorpusSet cs : corpusSets)
       {
         corpusSetNames.add(cs.getName());
@@ -381,7 +371,7 @@ public class CorpusListPanel extends VerticalLayout implements
       CorpusSet selectedCS = null;
 
       // TODO: use map
-      List<CorpusSet> corpusSets = new LinkedList<CorpusSet>();
+      List<CorpusSet> corpusSets = new LinkedList<>();
       if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
       {
         corpusSets.addAll(instanceConfig.getCorpusSets());
@@ -401,7 +391,7 @@ public class CorpusListPanel extends VerticalLayout implements
       }
       if (selectedCS != null)
       {
-        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<AnnisCorpus>();
+        LinkedList<AnnisCorpus> shownCorpora = new LinkedList<>();
         for (AnnisCorpus c : allCorpora)
         {
           if (selectedCS.getCorpora().contains(c.getName()))
@@ -437,7 +427,8 @@ public class CorpusListPanel extends VerticalLayout implements
    * @return True if successful
    */
   private boolean queryServerForCorpusList()
-  {
+  {    
+    allCorpora.clear();
     try
     {
       loadFromRemote();
@@ -462,18 +453,19 @@ public class CorpusListPanel extends VerticalLayout implements
         Notification.show("You are not authorized to get the corpus list.", ex.
           getMessage(), Notification.Type.WARNING_MESSAGE);
       }
+      else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+        getStatusCode())
+      {
+        Notification.show("Your account has expired.", ex.
+          getMessage(), Notification.Type.WARNING_MESSAGE);
+        return true;
+      }
       else
       {
         log.error(null, ex);
         Notification.show("Remote exception: " + ex.getLocalizedMessage(),
           Notification.Type.TRAY_NOTIFICATION);
       }
-    }
-    catch (Exception ex)
-    {
-      log.error(null, ex);
-      Notification.show("Exception: " + ex.getLocalizedMessage(),
-        Notification.Type.TRAY_NOTIFICATION);
     }
     return false;
   }
@@ -483,7 +475,7 @@ public class CorpusListPanel extends VerticalLayout implements
     WebResource rootRes = Helper.getAnnisWebResource();
     // get the current corpus configuration
     this.userConfig = rootRes.path("admin").path("userconfig").
-      get(AnnisUserConfig.class);
+      get(UserConfig.class);
   }
 
   private void storeChangesRemote()
@@ -546,7 +538,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public Action[] getActions(Object target, Object sender)
   {
     String corpusName = (String) target;
-    LinkedList<Action> result = new LinkedList<Action>();
+    LinkedList<Action> result = new LinkedList<>();
 
     if (target == null)
     {
@@ -622,37 +614,11 @@ public class CorpusListPanel extends VerticalLayout implements
     }
   }
   
-  public static class CorpusSorter extends DefaultItemSorter
-  {
-
-    @Override
-    protected int compareProperty(Object propertyId, boolean sortDirection,
-      Item item1, Item item2)
-    {
-      if ("name".equals(propertyId))
-      {
-        String val1 = (String) item1.getItemProperty(propertyId).getValue();
-        String val2 = (String) item2.getItemProperty(propertyId).getValue();
-
-        if (sortDirection)
-        {
-          return val1.compareToIgnoreCase(val2);
-        }
-        else
-        {
-          return val2.compareToIgnoreCase(val1);
-        }
-      }
-      else
-      {
-        return super.compareProperty(propertyId, sortDirection, item1, item2);
-      }
-    }
-  }
 
   /**
    * Select the corpora
    * @param corpora Corpora to select
+   * @param delayScroll 
    */
   public void selectCorpora(Set<String> corpora)
   {
@@ -669,7 +635,9 @@ public class CorpusListPanel extends VerticalLayout implements
       tblCorpora.setValue(corpora);
       if (!corpora.isEmpty())
       {
-        tblCorpora.setCurrentPageFirstItemId(corpora.iterator().next());
+        String firstCorpusName = corpora.iterator().next();
+        int idx = corpusContainer.indexOfId(firstCorpusName);
+        tblCorpora.setCurrentPageFirstItemIndex(idx);
       }
     }
   }
@@ -680,17 +648,8 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getSelectedCorpora()
   {
-    Set<String> result = new HashSet<String>();
-
-    for (String id : corpusContainer.getItemIds())
-    {
-      if (tblCorpora.isSelected(id))
-      {
-        result.add(id);
-      }
-    }
-
-    return result;
+    // make a copy
+    return new LinkedHashSet<>((Set<String>) tblCorpora.getValue());
   }
   
   /**
@@ -700,7 +659,7 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getVisibleCorpora()
   {
-    return new HashSet<String>(corpusContainer.getItemIds());
+    return new HashSet<>(corpusContainer.getItemIds());
   }
   
   /**
@@ -724,7 +683,7 @@ public class CorpusListPanel extends VerticalLayout implements
       if (ui.getDocBrowserController().docsAvailable(id))
       {
         Button l = new Button();
-        l.setStyleName(BaseTheme.BUTTON_LINK);
+        l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
         l.setIcon(DOC_ICON);
 
         l.setDescription("opens the document browser for " + id);
@@ -751,7 +710,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
       final Button l = new Button();
-      l.setStyleName(BaseTheme.BUTTON_LINK);
+      l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
       l.setIcon(INFO_ICON);
       l.setDescription("show metadata and annotations for " + id);
       l.addClickListener(new Button.ClickListener()

@@ -21,9 +21,13 @@ SEMICOLON : ';';
 EQUALS : '=';
 TOK : 'tok';
 VALUE : 'value';
+ESCAPED_VALUE : 'escaped_value';
 ANNO : 'anno';
+META : 'meta';
 STYLE : 'style';
 COLON : ':';
+BEGIN : 'annis:BEGIN';
+END : 'annis:END';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
@@ -34,10 +38,15 @@ innervalue: ~(QUOTE)+;
 value : QUOTE innervalue QUOTE;
 
 innertype: ~(QUOTE)+;
+
+innermeta: ~(QUOTE|WS|NEWLINE)+;
+
 type
   : VALUE # typeValue
+  | ESCAPED_VALUE # typeEscapedValue
   | ANNO # typeAnno
   | QUOTE innertype QUOTE # typeConstant
+  | META COLON COLON innermeta # typeMeta
   ;
 
 element 
@@ -51,7 +60,9 @@ qName
   : (namespace=ID COLON)? name=ID;
 
 condition
-  : qName # conditionName
+  : BEGIN # conditionBegin
+  | END # conditionEnd
+  | qName # conditionName
   | TOK # conditionTok
   | qName EQUALS value # conditionNameAndValue
   | EQUALS value # conditionValue

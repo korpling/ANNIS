@@ -37,8 +37,8 @@ public class TestSubQueryCorpusSelectionStrategy {
 	
 	@Before
 	public void setup() {
-		corpusList = new ArrayList<Long>();
-		metaData = new ArrayList<QueryAnnotation>();
+		corpusList = new ArrayList<>();
+		metaData = new ArrayList<>();
 		strategy = new SubQueryCorpusSelectionStrategy();
 	}
 

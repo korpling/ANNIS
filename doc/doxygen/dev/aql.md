@@ -101,6 +101,24 @@ A & B & #1 _r_ #2
 
 Both elements span an area ending with the same token.
 
+## directly near: "^" ## {#dev-aql-directnear}
+
+\verbatim
+A & B & #1 ^ #2
+\endverbatim
+
+Elements are next to each other in any order (A-B or B-A). For non-terminal nodes, adjacency is determined by the right most and left most terminal children.
+
+## indirectly near: "^*" ## {#dev-aql-indirectnear}
+
+\verbatim
+A & B & #1 ^* #2
+A & B & #1 ^4 #2
+A & B & #1 ^2,4 #2
+\endverbatim
+
+For specific sizes of proximity spans, `.n,m` can be used, e.g. `.3,4` - between 3 and 4 token distance in either order (A...B or B...A)
+
 ## labeled direct pointing relation: "->LABEL" ## {#dev-aql-directpoint}
 
 ![(Illustration)](A-point-direct-B.svg)

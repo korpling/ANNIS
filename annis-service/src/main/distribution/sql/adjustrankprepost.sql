@@ -17,3 +17,6 @@ UPDATE _rank AS r SET
 ;
 
 DROP TABLE _premin;
+
+-- the old index on pre is not working any longer since we renamed it to "id"
+CREATE INDEX tmpidx_rank_pre2 ON _rank (pre, component_ref);

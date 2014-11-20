@@ -4,8 +4,47 @@
 drop table if exists mymatch;
 create temporary table mymatch as (
 
+WITH
+  matches AS
+  (
+    (
+    SELECT 1 AS n, 2 AS nodeNr,
+      facts2.id AS id, facts2.text_ref AS text, facts2.left_token - 5 AS min, facts2.right_token + 5 AS max, facts2.corpus_ref AS corpus
+    FROM
+      facts_343 AS facts2, corpus AS corpus2
+    WHERE
+      corpus2.path_name = '{4282, pcc2}' AND
+      facts2.corpus_ref = corpus2.id AND
+      facts2.salt_id = 'tok_156' AND
+      facts2.toplevel_corpus IN ( 343) 
+    LIMIT 1
+    )
+    UNION ALL
+    (
+    SELECT 1 AS n, 1 AS nodeNr,
+      facts1.id AS id, facts1.text_ref AS text, facts1.left_token - 5 AS min, facts1.right_token + 5 AS max, facts1.corpus_ref AS corpus
+    FROM
+      facts_343 AS facts1, corpus AS corpus1
+    WHERE
+      corpus1.path_name = '{4282, pcc2}' AND
+      facts1.corpus_ref = corpus1.id AND
+      facts1.salt_id = 'tok_155' AND
+      facts1.toplevel_corpus IN ( 343) 
+    LIMIT 1
+    )
+  ),
+  keys AS (
+    SELECT n, array_agg(id ORDER BY nodenr ASC) AS "key" FROM matches
+    GROUP BY n
+  ),
+  solutions AS
+  (
+    SELECT keys.key AS key, matches.n AS n, matches.text, matches.corpus, matches.min, matches.max
+    FROM matches, keys
+    WHERE keys.n = matches.n
+  )
 SELECT DISTINCT
-  ARRAY[solutions.id1, solutions.id2] AS key,
+  solutions."key",
   0 AS "matchstart",
   solutions.n,
   facts.id AS "id",
@@ -14,6 +53,7 @@ SELECT DISTINCT
   facts.toplevel_corpus AS "toplevel_corpus",
   facts.node_namespace AS "node_namespace",
   facts.node_name AS "node_name",
+  facts.salt_id AS "salt_id",
   facts.left AS "left",
   facts.right AS "right",
   facts.token_index AS "token_index",
@@ -22,6 +62,8 @@ SELECT DISTINCT
   facts.span AS "span",
   facts.left_token AS "left_token",
   facts.right_token AS "right_token",
+  facts.seg_name AS "seg_name",
+  facts.seg_index AS "seg_index",
   facts.pre AS "pre",
   facts.post AS "post",
   facts.parent AS "parent",
@@ -31,51 +73,23 @@ SELECT DISTINCT
   facts.edge_type AS "edge_type",
   facts.edge_name AS "edge_name",
   facts.edge_namespace AS "edge_namespace",
-  node_anno."namespace" AS node_annotation_namespace,
-  node_anno."name" AS node_annotation_name,
-  node_anno."val" AS node_annotation_value,
-  edge_anno."namespace" AS edge_annotation_namespace,
-  edge_anno."name" AS edge_annotation_name,
-  edge_anno."val" AS edge_annotation_value,
+  (splitanno(node_qannotext))[1] as node_annotation_namespace,
+  (splitanno(node_qannotext))[2] as node_annotation_name,
+  (splitanno(node_qannotext))[3] as node_annotation_value,
+  (splitanno(edge_qannotext))[1] as edge_annotation_namespace,
+  (splitanno(edge_qannotext))[2] as edge_annotation_name,
+  (splitanno(edge_qannotext))[3] as edge_annotation_value  ,
   corpus.path_name AS path
 FROM
-  (
-    SELECT row_number() OVER () as n, inn.*    FROM (
-      SELECT DISTINCT
-        facts1.id AS id1, facts1.text_ref AS text1, facts1.left_token - 5 AS min1, facts1.right_token + 5 AS max1, facts1.corpus_ref AS corpus1, facts1.node_name AS name1, 
-        facts2.id AS id2, facts2.text_ref AS text2, facts2.left_token - 5 AS min2, facts2.right_token + 5 AS max2, facts2.corpus_ref AS corpus2, facts2.node_name AS name2
-      FROM
-        facts AS facts1,
-        facts AS facts2
-      WHERE
-        -- annotations can always only be inside a subcorpus/document AND
-        -- artificial node subview AND
-        -- artificial node-node_annotation subview AND
-        facts1.n_sample IS TRUE AND
-        facts1.right_token = facts2.left_token - 1 AND
-        facts1.span = 'das' AND
-        facts1.text_ref = facts2.text_ref AND
-        facts1.toplevel_corpus IN (2) AND
-        facts2.n_na_sample IS TRUE AND
-        facts2.node_anno_ref= ANY(getAnnoByNameVal('pos', 'VVFIN', ARRAY[2], 'node')) AND
-        facts2.toplevel_corpus IN (2)
-      ORDER BY id1, id2
-      LIMIT 10 OFFSET 0
-
-    ) AS inn
-  ) AS solutions,
-  facts AS facts
-  LEFT OUTER JOIN annotation_pool AS node_anno ON  (facts.node_anno_ref = node_anno.id AND facts.toplevel_corpus = node_anno.toplevel_corpus AND node_anno.toplevel_corpus IN (2))
-  LEFT OUTER JOIN annotation_pool AS edge_anno ON (facts.edge_anno_ref = edge_anno.id AND facts.toplevel_corpus = edge_anno.toplevel_corpus AND edge_anno.toplevel_corpus IN (2)),
+  solutions,
+  facts_343 AS facts,
   corpus
 WHERE
-  facts.toplevel_corpus IN (2) AND
-facts.text_ref IN (solutions.text1, solutions.text2) AND
-  (
-    facts.left_token <= ANY(ARRAY[solutions.max1, solutions.max2]) AND facts.right_token >= ANY(ARRAY[solutions.min1, solutions.min2])
-  ) AND
+  facts.toplevel_corpus IN (343) AND
+  (facts.left_token <= solutions."max" AND facts.right_token >= solutions."min" AND facts.text_ref = solutions.text AND facts.corpus_ref = solutions.corpus)
+ AND
   corpus.id = facts.corpus_ref
-ORDER BY solutions.n, facts.pre
+ORDER BY solutions.n, facts.edge_name, facts.component_id, facts.pre
 
 );
 

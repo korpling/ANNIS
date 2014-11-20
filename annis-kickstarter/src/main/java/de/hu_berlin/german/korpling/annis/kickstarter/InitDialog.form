@@ -124,7 +124,6 @@
     </Component>
     <Component class="javax.swing.JCheckBox" name="cbMigrate">
       <Properties>
-        <Property name="selected" type="boolean" value="true"/>
         <Property name="text" type="java.lang.String" value="migrate already imported corpora (will take same time as re-import)"/>
       </Properties>
       <Events>

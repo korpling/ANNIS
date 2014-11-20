@@ -23,14 +23,15 @@ import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -71,6 +72,8 @@ public class SearchOptionsPanel extends FormLayout
 
   private static final Logger log = LoggerFactory.getLogger(
     SearchOptionsPanel.class);
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
   /**
    * Holds all available corpus configuarations, including the defautl
@@ -113,10 +116,8 @@ public class SearchOptionsPanel extends FormLayout
     setWidth("100%");
     setHeight("-1px");
 
-    addStyleName("contextsensible-formlayout");
-
     // init the config cache
-    lastSelection = new HashMap<String, CorpusConfig>();
+    lastSelection = new HashMap<>();
 
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
@@ -317,7 +318,7 @@ public class SearchOptionsPanel extends FormLayout
   private static List<String> getSegmentationNamesFromService(
     Set<String> corpora)
   {
-    List<String> segNames = new ArrayList<String>();
+    List<String> segNames = new ArrayList<>();
     WebResource service = Helper.getAnnisWebResource();
     if (service != null)
     {
@@ -326,16 +327,22 @@ public class SearchOptionsPanel extends FormLayout
         try
         {
           SegmentationList segList
-            = service.path("query").path("corpora").path(URLEncoder.encode(
-                corpus,
-                "UTF-8"))
+            = service.path("query").path("corpora").path(urlPathEscape.escape(
+                corpus))
             .path("segmentation-names")
             .get(SegmentationList.class);
           segNames.addAll(segList.getSegmentatioNames());
         }
-        catch (UnsupportedEncodingException ex)
+        catch(UniformInterfaceException ex)
         {
-          log.error(null, ex);
+          if(ex.getResponse().getStatus() == 403)
+          {
+            log.debug("Did not have access rights to query segmentation names for corpus", ex);
+          }
+          else
+          {
+            log.warn("Could not query segmentation names for corpus", ex);
+          }
         }
       }
 
@@ -649,7 +656,7 @@ public class SearchOptionsPanel extends FormLayout
     boolean keepCustomValues)
   {
 
-    Set<Integer> tmpResultsPerPage = new TreeSet<Integer>();
+    Set<Integer> tmpResultsPerPage = new TreeSet<>();
     if (keepCustomValues)
     {
       Collection<?> itemIds = cbResultsPerPage.getItemIds();
@@ -698,7 +705,7 @@ public class SearchOptionsPanel extends FormLayout
      * The sorting via index container is much to complex for me, so I sort the
      * items first and put them afterwards into the combo boxes.
      */
-    SortedSet<Integer> steps = new TreeSet<Integer>();
+    SortedSet<Integer> steps = new TreeSet<>();
 
     if (keepCustomValues)
     {
@@ -752,7 +759,7 @@ public class SearchOptionsPanel extends FormLayout
    */
   private static String buildKey(Set<String> corpusNames)
   {
-    SortedSet<String> names = new TreeSet<String>(corpusNames);
+    SortedSet<String> names = new TreeSet<>(corpusNames);
     StringBuilder key = new StringBuilder();
 
     for (String name : names)

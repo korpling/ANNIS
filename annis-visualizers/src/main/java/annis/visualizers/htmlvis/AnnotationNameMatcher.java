@@ -15,10 +15,14 @@
  */
 package annis.visualizers.htmlvis;
 
+import com.google.common.collect.Lists;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import org.apache.commons.lang3.Validate;
 
 /**
@@ -62,5 +66,13 @@ public class AnnotationNameMatcher implements SpanMatcher
   {
     return annotationName;
   }
+
+  @Override
+  public List<String> getRequiredAnnotationNames()
+  {
+    return Arrays.asList(annotationName);
+  }
+  
+  
   
 }

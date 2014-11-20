@@ -31,7 +31,7 @@ public class PostgreSqlArraySolutionKey<BaseType> extends AbstractSolutionKey<Ba
   public List<String> generateOuterQueryColumns(
     TableAccessStrategy tableAccessStrategy, int size)
   {
-    List<String> columns = new ArrayList<String>();
+    List<String> columns = new ArrayList<>();
     String nameAlias = tableAccessStrategy.aliasedColumn("solutions",
       getIdColumnName());
     columns.add(createKeyArray(nameAlias, keyColumnName, size));

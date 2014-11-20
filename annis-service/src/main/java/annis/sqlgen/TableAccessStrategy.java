@@ -52,8 +52,8 @@ public class TableAccessStrategy {
   private Map<String, Boolean> tablePartitioned;
 	
 	public TableAccessStrategy() {
-		this.tableAliases = new HashMap<String, String>();
-		this.columnAliases = new HashMap<String, Map<String,String>>();
+		this.tableAliases = new HashMap<>();
+		this.columnAliases = new HashMap<>();
 		
 	}
 	
@@ -65,9 +65,9 @@ public class TableAccessStrategy {
   /** Copy constructor */
   public TableAccessStrategy(TableAccessStrategy tas)
   {
-    this.tableAliases = new HashMap<String, String>(tas.getTableAliases());
-    this.columnAliases = new HashMap<String, Map<String, String>>(tas.getColumnAliases());
-    this.tablePartitioned = new HashMap<String, Boolean>();
+    this.tableAliases = new HashMap<>(tas.getTableAliases());
+    this.columnAliases = new HashMap<>(tas.getColumnAliases());
+    this.tablePartitioned = new HashMap<>();
     this.node = tas.getNode();
   }
 

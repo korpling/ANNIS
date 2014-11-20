@@ -39,7 +39,7 @@ public class GridEvent implements Serializable
 
   private Long match;
 
-  private List<String> coveredIDs;
+  private final List<String> coveredIDs;
 
   // used for a tooltip in the frontend
   private String tooltip;
@@ -71,7 +71,7 @@ public class GridEvent implements Serializable
     this.right = right;
     this.value = value;
 
-    this.coveredIDs = new LinkedList<String>();
+    this.coveredIDs = new LinkedList<>();
   }
   
   /**
@@ -85,7 +85,7 @@ public class GridEvent implements Serializable
     this.left = orig.left;
     this.right = orig.right;
     this.match = orig.match;
-    this.coveredIDs = new ArrayList<String>(orig.coveredIDs);
+    this.coveredIDs = new ArrayList<>(orig.coveredIDs);
     this.tooltip = orig.tooltip;
     this.startTime = orig.startTime;
     this.endTime = orig.endTime;

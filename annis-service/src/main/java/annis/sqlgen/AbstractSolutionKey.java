@@ -28,7 +28,7 @@ public class AbstractSolutionKey<BaseType>
   public List<String> generateInnerQueryColumns(
     TableAccessStrategy tableAccessStrategy, int index)
   {
-    List<String> columns = new ArrayList<String>();
+    List<String> columns = new ArrayList<>();
     columns.add(tableAccessStrategy.aliasedColumn(NODE_TABLE, idColumnName)
       + " AS " + idColumnName + index);
     return columns;
