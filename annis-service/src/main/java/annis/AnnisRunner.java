@@ -317,7 +317,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doExport("pcc2 /tmp/saltexport");
+    doExport("RIDGES_Herbology_Version4.0 /tmp/ridgessalt");
   }
 
   public void doParse(String annisQuery)
