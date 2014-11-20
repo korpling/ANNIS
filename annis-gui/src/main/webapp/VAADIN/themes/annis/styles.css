@@ -11662,6 +11662,10 @@ div.v-layout.v-horizontal.v-widget {
 	border-color: #b3b3b3;
 }
 
+.annis .white-panel {
+	background-color: white;
+}
+
 .annis .v-table-cell-content-match_1 {
 	color: red;
 }
