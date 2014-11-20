@@ -5,6 +5,7 @@ Changelog is also available on GitHub:
 https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.0+is%3Aclosed
 
 [Bugs]
+ #368 AQL operator window broken in Query Builder
  #363 Tutorial doesn't work in an added instance
  #362 Wrapping in the discourse visualizer fails when line ends in non-maximally underscored element
  #359 Example query builder does not escape parameters
@@ -35,10 +36,10 @@ https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.0+is%3Aclosed
  #307 Selective HTML visualizer graph fetching
  #306 Export metadata also in Text and SimpleText exporters
  #290 New AQL operator: "near"
- #256 Undesired token annotations should be hidable in the KWIC view using mappings
 
 [Other]
  #344 Properly seperate matches in matches for nodes and matches for annotation on nodes
+
 
 Version 3.1.8
 =============
