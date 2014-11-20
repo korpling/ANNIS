@@ -1,5 +1,5 @@
 
-Lists of 58 third-party dependencies.
+Lists of 57 third-party dependencies.
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Classic Module (ch.qos.logback:logback-classic:1.0.13 - http://logback.qos.ch)
      (Eclipse Public License - v 1.0) (GNU Lesser General Public License) Logback Core Module (ch.qos.logback:logback-core:1.0.13 - http://logback.qos.ch)
      (The Apache Software License, Version 2.0) FindBugs-jsr305 (com.google.code.findbugs:jsr305:1.3.9 - http://findbugs.sourceforge.net/)
@@ -32,7 +32,6 @@ Lists of 58 third-party dependencies.
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
      (Apache 2) Joda-Time (joda-time:joda-time:2.4 - http://www.joda.org/joda-time/)
      (Common Public License Version 1.0) JUnit (junit:junit:4.11 - http://junit.org)
-     (The Apache Software License, Version 2.0) Apache Log4j (log4j:log4j:1.2.16 - http://logging.apache.org/log4j/1.2/)
      (Apache License V2.0) larvalabs collections (net.sourceforge.collections:collections-generic:4.01 - http://collections.sourceforge.net)
      (New BSD License) JSPF Core (net.xeoh.plugins:jspf-core:1.0.2 - http://code.google.com/p/jspf/)
      (The Apache Software License, Version 2.0) Commons Email (org.apache.commons:commons-email:1.3.2 - http://commons.apache.org/proper/commons-email/)

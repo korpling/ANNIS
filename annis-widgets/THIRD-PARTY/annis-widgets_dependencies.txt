@@ -1,5 +1,5 @@
 
-Lists of 74 third-party dependencies.
+Lists of 73 third-party dependencies.
      (The Apache Software License, Version 2.0) ant (ant:ant:1.6.5 - http://www.apache.org/ant/)
      (Apache License Version 2.0) ant-launcher (ant:ant-launcher:1.6.5 - no url defined)
      (The Apache Software License, Version 2.0) FindBugs-jsr305 (com.google.code.findbugs:jsr305:1.3.9 - http://findbugs.sourceforge.net/)
@@ -29,7 +29,6 @@ Lists of 74 third-party dependencies.
      (Apache License, Version 2.0) Bean Validation API (javax.validation:validation-api:1.0.0.GA - no url defined)
      (CDDL License) jsr311-api (javax.ws.rs:jsr311-api:1.1.1 - https://jsr311.dev.java.net)
      (Apache 2) Joda-Time (joda-time:joda-time:2.4 - http://www.joda.org/joda-time/)
-     (The Apache Software License, Version 2.0) Apache Log4j (log4j:log4j:1.2.16 - http://logging.apache.org/log4j/1.2/)
      (GNU Lesser General Public License) CSS Parser (net.sourceforge.cssparser:cssparser:0.9.11 - http://cssparser.sourceforge.net/)
      (The Apache Software License, Version 2.0) Neko HTML (net.sourceforge.nekohtml:nekohtml:1.9.19 - http://nekohtml.sourceforge.net/)
      (New BSD License) JSPF Core (net.xeoh.plugins:jspf-core:1.0.2 - http://code.google.com/p/jspf/)
