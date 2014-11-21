@@ -110,17 +110,20 @@ public class VSimpleCanvas extends Composite implements Paintable
 
         if("clear".equals(child.getTag()))
         {
-          context.clearRect(0, 0, 2000, 2000);
+          context.clearRect(0, 0, context.getCanvas().getWidth(), context.getCanvas().getHeight());
         }
         else if("line".equals(child.getTag()))
         {
+          context.setGlobalAlpha(1.0);
+          context.setLineWidth(1.0);
+          context.setStrokeStyle("black");
           context.beginPath();
           context.moveTo(child.getIntAttribute("from_x"),
             child.getIntAttribute("from_y"));
           context.lineTo(child.getIntAttribute("to_x"),
             child.getIntAttribute("to_y"));
-          context.stroke();
           context.closePath();
+          context.stroke();
         }
         // todo: more commands :)
       }

@@ -51,6 +51,7 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     // HACK: use our own border since the one from chameleon does not really work
     addStyleName(ValoTheme.PANEL_BORDERLESS);
     addStyleName("border-layout");
+    addStyleName("white-panel");
     
     VerticalLayout vLayout = new VerticalLayout();
     setContent(vLayout);
@@ -67,15 +68,18 @@ public class EdgeWindow extends Panel implements Button.ClickListener
     
     toolbar.addComponent(lblTitle);
     toolbar.setComponentAlignment(lblTitle, Alignment.MIDDLE_LEFT);
+    toolbar.setExpandRatio(lblTitle, 1.0f);
     
     btClose = new Button();
     btClose.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     btClose.addStyleName(ValoTheme.BUTTON_SMALL);
     btClose.setIcon(FontAwesome.TIMES_CIRCLE);
+    btClose.setWidth("-1px");
     btClose.addListener((Button.ClickListener) this);
     toolbar.addComponent(btClose);
     
     toolbar.setComponentAlignment(btClose, Alignment.MIDDLE_RIGHT);
+    toolbar.setExpandRatio(btClose, 0.0f);
     
     cbOperator = new ComboBox();
     cbOperator.setNewItemsAllowed(false);
