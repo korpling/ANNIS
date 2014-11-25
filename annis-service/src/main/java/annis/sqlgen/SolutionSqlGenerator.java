@@ -107,7 +107,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       cols.add("NULL::integer AS cat" + i);
       if (outputNodeName)
       {
-        cols.add("NULL::varchar AS node_name" + i);
+        cols.add("NULL::varchar AS salt_id" + i);
       }
     }
 
