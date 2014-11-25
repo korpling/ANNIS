@@ -28,9 +28,7 @@ import annis.security.UserConfig;
 import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,9 +53,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -237,7 +237,11 @@ public class AdminServiceImpl implements AdminService
 
         Shiro1CryptFormat format = new Shiro1CryptFormat();
 
-        Sha256Hash hash = new Sha256Hash(newPassword, null, 1);
+        SecureRandomNumberGenerator generator
+          = new SecureRandomNumberGenerator();
+        ByteSource salt = generator.nextBytes(128/8); // 128 bit
+        
+        Sha256Hash hash = new Sha256Hash(newPassword, salt, 1);
         user.setPasswordHash(format.format(hash));
 
         if (confManager.writeUser(user))

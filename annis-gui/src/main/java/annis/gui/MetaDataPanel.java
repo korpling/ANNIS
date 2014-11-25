@@ -25,6 +25,7 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.*;
 import com.vaadin.ui.Table.ColumnGenerator;
 import com.vaadin.ui.themes.ChameleonTheme;
@@ -162,25 +163,19 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
   private Table setupTable(BeanItemContainer<Annotation> metaData)
   {
     final BeanItemContainer<Annotation> mData = metaData;
+    mData.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
     Table tblMeta = new Table();
     tblMeta.setContainerDataSource(mData);
     tblMeta.addGeneratedColumn("genname", new MetaTableNameGenerator(mData));
     tblMeta.addGeneratedColumn("genvalue", new MetaTableValueGenerator(mData));
 
 
-    tblMeta.setVisibleColumns(new String[]
-    {
-      "genname", "genvalue"
-    });
+    tblMeta.setVisibleColumns("genname", "genvalue");
 
-    tblMeta.setColumnHeaders(new String[]
-    {
-      "Name", "Value"
-    });
+    tblMeta.setColumnHeaders("Name", "Value");
     tblMeta.setSizeFull();
     tblMeta.setColumnWidth("genname", -1);
     tblMeta.setColumnExpandRatio("genvalue", 1.0f);
-    tblMeta.setSortContainerPropertyId("name");
     tblMeta.addStyleName(ChameleonTheme.TABLE_STRIPED);
     return tblMeta;
   }
@@ -366,7 +361,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
   }  
 
-  private static class MetaTableNameGenerator implements ColumnGenerator
+  public static class MetaTableNameGenerator implements ColumnGenerator
   {
 
     private final BeanItemContainer<Annotation> mData;
@@ -392,7 +387,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     }
   }
 
-  private static class MetaTableValueGenerator implements ColumnGenerator
+  public static class MetaTableValueGenerator implements ColumnGenerator
   {
 
     private final BeanItemContainer<Annotation> mData;
@@ -407,7 +402,7 @@ public class MetaDataPanel extends Panel implements Property.ValueChangeListener
     public Component generateCell(Table source, Object itemId, Object columnId)
     {
       Annotation anno = mData.getItem(itemId).getBean();
-      Label l = new Label(anno.getValue(), Label.CONTENT_RAW);
+      Label l = new Label(anno.getValue(), ContentMode.HTML);
       return l;
     }
   }

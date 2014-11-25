@@ -1,3 +1,17 @@
+Version 3.2.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.1+is%3Aclosed
+
+[Bugs]
+ #375 admin UI: generated hash is not salted
+ #374 admin UI: upload button available after failed login attempt
+ #373 Highlighting failure in disjunction
+ #372 Disjunction fails depending on order
+ #371 Parallel query leads to spurious context tokens in tree view
+ #370 Metadata in doc browser does not render HTM
+
 Version 3.2.0
 =============
 
