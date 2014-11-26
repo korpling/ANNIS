@@ -1039,6 +1039,10 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Transactional(readOnly = true)
   public void exportCorpus(String toplevelCorpus, File outputDirectory)
   {
+    
+    // check if the corpus really exists
+    mapCorpusNameToId(toplevelCorpus);
+    
     SaltProject corpusProject = SaltFactory.eINSTANCE.createSaltProject();
     SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
     corpusGraph.setSaltProject(corpusProject);
