@@ -67,8 +67,17 @@ public abstract class AbstractSqlGenerator
     Assert.notEmpty(queryData.getAlternatives(), "BUG: no alternatives");
 
     // push alternative down
-    List<QueryNode> alternative = queryData.getAlternatives().get(0);
-
+    List<QueryNode> alternative = queryData.getAlternatives().get(0);;
+    // find the first alternative which has the maximum width in order to make sure
+    // getMaxWidth() and alternative.size() are always the same
+    for(List<QueryNode> a :  queryData.getAlternatives())
+    {
+      if(a.size() == queryData.getMaxWidth())
+      {
+        alternative = a;
+        break;
+      }
+    }
     StringBuffer sb = new StringBuffer();
     sb.append(indent);
     sb.append(createSqlForAlternative(queryData, alternative, indent));
