@@ -235,6 +235,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
 
     log.debug("dropping possible existing database");
+    closeAllConnections(database);
     getJdbcTemplate().execute("DROP DATABASE IF EXISTS " + database);
 
   }
@@ -360,7 +361,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return true;
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.NEVER)
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword, boolean useSSL, String pgSchema)
@@ -372,7 +372,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       getDataSource().setInnerDataSource(createDataSource(host, port,
         defaultDatabase, superUser, superPassword, useSSL, pgSchema));
 
-      createDatabaseAndUserInTransaction(database, user, password);
+      createDatabaseAndUser(database, user, password);
     }
     // switch to new database as new user for the rest of the initialization procedure
     getDataSource().setInnerDataSource(createDataSource(host, port, database,
@@ -395,12 +395,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
       }
     }
 
-    createSchemaInTransaction();
+    setupDatabase();
 
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  private void createDatabaseAndUserInTransaction(String database,
+  private void createDatabaseAndUser(String database,
     String user, String password)
   {
     dropDatabase(database);
@@ -411,8 +410,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     installPlPgSql();
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  private void createSchemaInTransaction()
+  private void setupDatabase()
   {
     createFunctionUniqueToplevelCorpusName();
     createSchema();
@@ -1252,9 +1250,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
   /**
    * Update the statistics for the "facts" table as a whole.
    */
+  @Transactional(propagation = Propagation.REQUIRED)
   public void analyzeParentFacts()
   {
     log.info("analyzing parent facts table");
+    // explicitly unset any timeout. Since this function might be called independent
+    // from the import process we have to set it manually.
+    getJdbcTemplate().update("SET statement_timeout TO 0");
     getJdbcTemplate().execute("ANALYZE facts");
   }
 

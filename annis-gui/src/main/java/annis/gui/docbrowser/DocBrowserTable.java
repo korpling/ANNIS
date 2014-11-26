@@ -15,6 +15,7 @@
  */
 package annis.gui.docbrowser;
 
+import annis.gui.MetaDataPanel;
 import annis.libgui.Helper;
 import annis.model.Annotation;
 import annis.service.objects.DocumentBrowserConfig;
@@ -26,11 +27,10 @@ import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
@@ -250,37 +250,28 @@ public class DocBrowserTable extends Table
            * namespace and ordinary value. Namespaces "NULL" are ignored.
            */
           // create datasource and bind it to a table
-          IndexedContainer container = new IndexedContainer();
-          container.addContainerProperty("key", String.class, "");
-          container.addContainerProperty("value", String.class, "");
-
-          for (Annotation a : annos)
-          {
-            String key = a.getQualifiedName();
-            String value = a.getValue();
-            Item row = container.addItem(key);
-            row.getItemProperty("key").setValue(key);
-            row.getItemProperty("value").setValue(value);
-          }
-
+          BeanItemContainer<Annotation> metaContainer
+            = new BeanItemContainer<>(Annotation.class);
+          metaContainer.addAll(annos);
+          metaContainer.sort(new Object[] {"namespace", "name"}, new boolean[] {true, true});
+          
           Table metaTable = new Table();
-          metaTable.setContainerDataSource(container);
+          metaTable.setContainerDataSource(metaContainer);
+          metaTable.addGeneratedColumn("genname",
+            new MetaDataPanel.MetaTableNameGenerator(metaContainer));
+          metaTable.addGeneratedColumn("genvalue",
+            new MetaDataPanel.MetaTableValueGenerator(metaContainer));
 
-          metaTable.sort(new Object[]
-          {
-            "key"
-          }, new boolean[]
-          {
-            true
-          });
+          metaTable.setVisibleColumns("genname", "genvalue");
 
-          // style the table
-          metaTable.setVisibleColumns(new Object[]
+          metaTable.setColumnHeaders(new String[]
           {
-            "key", "value"
+            "Name", "Value"
           });
-          metaTable.setColumnHeaders("name", "value");
           metaTable.setSizeFull();
+          metaTable.setColumnWidth("genname", -1);
+          metaTable.setColumnExpandRatio("genvalue", 1.0f);
+          metaTable.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
           // create and style the extra window for the metadata table
           Window metaWin = new Window();

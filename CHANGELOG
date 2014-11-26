@@ -1,3 +1,60 @@
+Version 3.2.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.1+is%3Aclosed
+
+[Bugs]
+ #375 admin UI: generated hash is not salted
+ #374 admin UI: upload button available after failed login attempt
+ #373 Highlighting failure in disjunction
+ #372 Disjunction fails depending on order
+ #371 Parallel query leads to spurious context tokens in tree view
+ #370 Metadata in doc browser does not render HTM
+
+Version 3.2.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.0+is%3Aclosed
+
+[Bugs]
+ #368 AQL operator window broken in Query Builder
+ #363 Tutorial doesn't work in an added instance
+ #362 Wrapping in the discourse visualizer fails when line ends in non-maximally underscored element
+ #359 Example query builder does not escape parameters
+ #357 ANNIS locks too many tables if querying multiple corpora
+ #356 arch_dependency visualizer doesn't filter namespace/layer
+ #355 Ignore resolver_vis_map entries with wrong corpus name on import
+ #334 correct the info text for the "TextExporter" and "SimpleTextExporter"
+ #330 "_c" parameter lost if corpus needs login
+ #320 don't add invalid queries to warn.log
+ #311 Corpus names don't allow spaces
+ #291 Reload of restricted corpus URL after logout leads to null pointer exception
+
+[Enhancements]
+ #366 feature request: allow deleting via corpus name
+ #354 Issue333 html vis element order
+ #352 configure login-page
+ #351 expiration of accounts
+ #348 Allow to display namespace in grid
+ #347 Provide adminstration interface
+ #346 Allow to copy corpora from existing installation
+ #345 Allow to use different (PostgreSQL) schema
+ #339 Removed progress bar from result view panel
+ #338 arch_dependency visualizer does not scroll
+ #335 Checkbox to disable time-out in Kickstarter
+ #333 HTML visualizer: set element order for annotations w/ identical coverage
+ #318 new "annotext" scheme
+ #317 remove rank entries for continuous spans on import
+ #307 Selective HTML visualizer graph fetching
+ #306 Export metadata also in Text and SimpleText exporters
+ #290 New AQL operator: "near"
+
+[Other]
+ #344 Properly seperate matches in matches for nodes and matches for annotation on nodes
+
+
 Version 3.1.8
 =============
 

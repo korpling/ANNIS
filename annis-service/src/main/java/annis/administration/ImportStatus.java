@@ -15,6 +15,7 @@
  */
 package annis.administration;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -22,7 +23,7 @@ import java.util.Map;
  * Collects the exceptions (throwables) from an import process and provides
  * several methods for extracting them.
  */
-public interface ImportStatus
+public interface ImportStatus extends Serializable
 {
 
   /**

@@ -37,6 +37,7 @@ import annis.service.objects.MatchAndDocumentCount;
 import annis.sqlgen.SqlGenerator;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -334,4 +335,6 @@ public interface AnnisDao
    * @param props The properties
    */
   public void setCorpusConfiguration(String topLevelCorpus, Properties props);
+  
+  public void exportCorpus(String toplevelCorpus, File outputDirectory);
 }

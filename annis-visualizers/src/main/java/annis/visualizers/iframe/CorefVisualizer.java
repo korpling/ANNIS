@@ -651,7 +651,7 @@ public class CorefVisualizer extends WriterVisualizer
               Td tdBlank = new Td();
               trBlank.appendChild(tdBlank);
               
-              tdBlank.setCSSClass("blank");
+              trBlank.setCSSClass("line");
             }
             else
             {
@@ -689,6 +689,7 @@ public class CorefVisualizer extends WriterVisualizer
               
               Table tableLineContainer = new Table();
               tdLineContainer.appendChild(tableLineContainer);
+              trLineContainer.setCSSClass("line");
               
               tableLineContainer.setCSSClass("linecontainer");
               
@@ -698,7 +699,7 @@ public class CorefVisualizer extends WriterVisualizer
               Td tdLine = new Td();
               trLine.appendChild(tdLine);
               
-              tdLine.setCSSClass("line");
+              tdLine.setCSSClass("clickableline");
               tdLine.setStyle("background-color: #" + Integer.toHexString(color) + "; " + style + addition);
               tdLine.setAttribute("onclick", onclick);
               tdLine.setAttribute("annis:pr_left", left);
@@ -723,13 +724,7 @@ public class CorefVisualizer extends WriterVisualizer
         {
           if (currentlinkcount < maxlinkcount)
           {
-            Tr trSpace = new Tr();
-            tableSingleTok.appendChild(trSpace);
-
-            Td tdSpace = new Td();
-            trSpace.appendChild(tdSpace);
-
-            tdSpace.setStyle("height: " + (maxlinkcount - currentlinkcount) * 5 + "px;");
+            addEmptyLines(tableSingleTok, maxlinkcount - currentlinkcount);
           }
         }
       }
@@ -751,18 +746,25 @@ public class CorefVisualizer extends WriterVisualizer
         
         if (maxlinkcount > 0)
         {
-          Tr trSpace = new Tr();
-          tableSingleTok.appendChild(trSpace);
-
-          Td tdSpace = new Td();
-          trSpace.appendChild(tdSpace);
-
-          tdSpace.setStyle("height: " + maxlinkcount * 5 + "px;");
+          addEmptyLines(tableSingleTok, maxlinkcount);
         }
       }
     } // end for each token
     
     return result;
+  }
+  
+  private void addEmptyLines(Table parentTable, int numberOfLines)
+  {
+    for(int i=0; i < numberOfLines; i++)
+    {
+      Tr trSpace = new Tr();
+      parentTable.appendChild(trSpace);
+      Td tdSpace = new Td();
+      trSpace.appendChild(tdSpace);
+
+      trSpace.setCSSClass("line");
+    }
   }
 
   /**

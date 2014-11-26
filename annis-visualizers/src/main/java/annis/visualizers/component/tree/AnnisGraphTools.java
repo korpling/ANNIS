@@ -26,6 +26,9 @@ import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 
@@ -51,16 +54,49 @@ public class AnnisGraphTools implements Serializable
     String terminalNamespace =  input.getMappings().getProperty(
       TigerTreeVisualizer.TERMINAL_NS_KEY);
     
-    List<DirectedGraph<AnnisNode, Edge>> resultGraphs =
-      new ArrayList<DirectedGraph<AnnisNode, Edge>>();
+    List<DirectedGraph<AnnisNode, Edge>> resultGraphs = new ArrayList<>();
 
+    List<AnnisNode> rootNodes = new LinkedList<>();
+    
     for (AnnisNode n : ag.getNodes())
     {
       if (isRootNode(n, namespace))
       {
-        resultGraphs.add(extractGraph(ag, n, terminalNamespace, terminalName));
+        rootNodes.add(n);
       }
     }
+    
+    //sort root nodes according to their left-most covered token
+    HorizontalOrientation orientation = detectLayoutDirection(ag);
+    if (orientation == HorizontalOrientation.LEFT_TO_RIGHT)
+    {
+      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      {
+        @Override
+        public int compare(AnnisNode o1, AnnisNode o2)
+        {
+          return Long.compare(o1.getLeftToken(), o2.getLeftToken());
+        }
+      }
+      );
+    }
+    else if (orientation == HorizontalOrientation.RIGHT_TO_LEFT)
+    {
+      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      {
+        @Override
+        public int compare(AnnisNode o1, AnnisNode o2)
+        {
+          return Long.compare(o2.getLeftToken(), o1.getLeftToken());
+        }
+      }
+      );
+    }
+    for(AnnisNode r : rootNodes)
+    {
+      resultGraphs.add(extractGraph(ag, r, terminalNamespace, terminalName));
+    }
+    
     return resultGraphs;
   }
 

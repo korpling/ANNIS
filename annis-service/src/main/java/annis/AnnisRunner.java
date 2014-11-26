@@ -317,10 +317,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-//    doSet("seg to dipl");
-    doCorpus("pcc2 exmaralda");
-    doSql("count \"wollen\" & tok & tok & #1 ->dep[func=\"obja\"] #2 & #1 -> dep[func=\"sbj\"] #3");
-    //doSql("annotate \"das\" . tok . pos=\"ADJD\" . \"und\"");
+    doExport("RIDGES_Herbology_Version4.0 /tmp/ridgessalt");
   }
 
   public void doParse(String annisQuery)
@@ -1147,10 +1144,20 @@ public class AnnisRunner extends AnnisBaseRunner
     }
 
     Validate.isTrue(splitted.size() > 1,
-      "must have to arguments (toplevel corpus name and document name");
+      "must have two arguments (toplevel corpus name and document name");
     SaltProject p = annisDao.retrieveAnnotationGraph(splitted.get(0), 
       splitted.get(1), annoFilter);
     System.out.println(printSaltAsXMI(p));
+  }
+  
+  public void doExport(String args)
+  {
+    List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
+      .limit(2)
+      .splitToList(args);
+    Validate.isTrue(splitted.size() == 2, "must have two arguments: toplevel corpus name and output directory");
+    
+    annisDao.exportCorpus(splitted.get(0), new File(splitted.get(1)));
   }
 
   public void doQuit(String dummy)

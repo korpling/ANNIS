@@ -67,7 +67,7 @@ public class CommonHelperTest
   @Test
   public void testEmbeddedSerializationOfSDocument() throws IOException, ClassNotFoundException
   {
-    SaltProject project = SampleGenerator.createCompleteSaltproject();
+    SaltProject project = SampleGenerator.createSaltProject();
     SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
     
     

@@ -23,6 +23,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Connection;
+import java.sql.DatabaseMetaData;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -303,24 +304,41 @@ public abstract class AbstractAdminstrationDao
   }
   
   /**
-   * Closes all open idle connections if the data source is a connection pool.
+   * Closes all open idle connections. The current data source
+   * must have superuser rights.
+   * 
    * This can be used if a another database action needs full access to a database,
    * e.g. when deleting and then creating it
+   * @param databasename
    */
-  public void closeAllConnections()
+  protected void closeAllConnections(String databasename)
   {
-    if(dataSource.getInnerDataSource() instanceof BasicDataSource)
+    String sql
+      = "SELECT pg_terminate_backend(pg_stat_activity.pid)\n"
+      + "FROM pg_stat_activity\n"
+      + "WHERE pg_stat_activity.datname = ?\n"
+      + "  AND pid <> pg_backend_pid();";
+    try(Connection conn = getDataSource().getConnection())
     {
-      BasicDataSource dataSourcePool = (BasicDataSource) dataSource.getInnerDataSource();
-      try
+      DatabaseMetaData meta = conn.getMetaData();
+      
+      if(meta.getDatabaseMajorVersion() == 9 
+        && meta.getDatabaseMinorVersion() <= 1)
       {
-        dataSourcePool.close();
-      }
-      catch (SQLException ex)
-      {
-        log.error("Could not close idle connections of connection pool", ex);
+        sql
+          = "SELECT pg_terminate_backend(pg_stat_activity.procpid)\n"
+          + "FROM pg_stat_activity\n"
+          + "WHERE pg_stat_activity.datname = ?\n"
+          + "  AND procpid <> pg_backend_pid();";
       }
     }
+    catch(SQLException ex)
+    {
+      log.warn("Could not get the PostgreSQL version", ex);
+    }
+    
+    getJdbcTemplate().queryForRowSet(sql, databasename);
+
   }
 
   public AnnisDao getAnnisDao()

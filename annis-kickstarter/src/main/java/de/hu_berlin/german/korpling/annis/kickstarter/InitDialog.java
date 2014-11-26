@@ -84,8 +84,6 @@ public class InitDialog extends javax.swing.JDialog
         
         URI uri = new URI(rawDataSourceURI.substring("jdbc:".length()));
         
-        corpusAdministration.closeAllConnections();
-        
         corpusAdministration.initializeDatabase(
           uri.getHost(), "" + uri.getPort(),
           uri.getPath().substring(1), // remove / at beginning

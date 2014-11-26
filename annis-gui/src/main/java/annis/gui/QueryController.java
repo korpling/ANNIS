@@ -79,7 +79,7 @@ public class QueryController implements TabSheet.SelectedTabChangeListener,
 
   private final ListOrderedSet<HistoryEntry> history;
 
-  private Future<MatchAndDocumentCount> futureCount;
+  private transient Future<MatchAndDocumentCount> futureCount;
 
   private UUID lastQueryUUID;
 
