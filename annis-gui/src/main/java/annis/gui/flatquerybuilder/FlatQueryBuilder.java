@@ -1323,7 +1323,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
       {
        type = RelationType.PRECEDENCE; 
       }
-      else if((op.equals("=")) || (op.equals("_=_")))
+      else if((operator.equals("=")) || (operator.equals("_=_")))
       {
         type = RelationType.EQUALITY;
         if(o1>o2)
@@ -1337,7 +1337,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
           throw new EqualityConstraintException(in);
         }
       }
-      else if(op.equals("_i_"))
+      else if(operator.equals("_i_"))
       {
         type = RelationType.INCLUSION;
       }

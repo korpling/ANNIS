@@ -247,7 +247,7 @@ public class ImportDialog extends javax.swing.JDialog
       }
     }
   }
-  private CorpusAdministration corpusAdministration;
+  private transient CorpusAdministration corpusAdministration;
 
   private ImportStatus importStatus;
 
