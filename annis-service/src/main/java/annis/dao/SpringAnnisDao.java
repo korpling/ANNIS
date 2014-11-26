@@ -1049,6 +1049,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
     
     SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
     
+    // add all root metadata
+    for(Annotation metaAnno : listCorpusAnnotations(toplevelCorpus))
+    {
+      rootCorpus.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+        metaAnno.getValue());
+    }
+    
     File documentRootDir = new File(outputDirectory, toplevelCorpus);
     
     
@@ -1074,6 +1081,9 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
       if(docProject != null && docProject.getSCorpusGraphs() != null
         && !docProject.getSCorpusGraphs().isEmpty())
       {
+        List<Annotation> docMetaData = listCorpusAnnotations(toplevelCorpus,
+          docAnno.getName(), true);
+        
         SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
         // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
         if(docCorpusGraph.getSDocuments() != null)
@@ -1106,7 +1116,13 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
               new File(documentRootDir, doc.getSName() + "." 
                 + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
             
-            corpusGraph.createSDocument(rootCorpus, doc.getSName());
+            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getSName());
+            log.info("Adding metadata to document {} ({}/{})", doc.getSName(), i, docs.size());
+            for(Annotation metaAnno : docMetaData)
+            {
+              docCopy.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+                metaAnno.getValue());
+            }
           }
         }
       }

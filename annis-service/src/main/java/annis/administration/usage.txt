@@ -44,7 +44,7 @@ usage:
 
 * export: Export a corpus as SaltXML
   Specificy the corpus name and the output directory as arguments.
-  Metadata, subcorpora and linked (media) files are not supported yet.
+  Non-Terminal subcorpora and linked (media) files are not supported yet.
 
 
 * delete:   Delete a list of corpora.
