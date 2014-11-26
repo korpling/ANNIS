@@ -35,7 +35,7 @@ public class ListCorpusAnnotationsSqlHelper implements
 
     if (exclude && !toplevelCorpusName.equals(corpusName))
     {
-      template = "SELECT "
+      template = "SELECT DISTINCT "
         + "doc.type, doc.name as corpus_name, doc.pre AS corpus_pre, ca.name, "
         + "ca.value, ca.namespace"
         + "\nFROM corpus_annotation ca, corpus doc, corpus toplevel "
@@ -51,7 +51,7 @@ public class ListCorpusAnnotationsSqlHelper implements
     }
     else
     {
-      template = "SELECT parent.type, parent.name AS corpus_name, "
+      template = "SELECT DISTINCT parent.type, parent.name AS corpus_name, "
         + "parent.pre AS corpus_pre, ca.name, ca.value, ca.namespace "
         + "\nFROM corpus_annotation ca, corpus parent, corpus this, corpus toplevel "
         + "\nWHERE this.name = :docname \n"
