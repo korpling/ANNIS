@@ -35,16 +35,12 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
-import annis.administration.ImportStatus;
 import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
-import com.google.common.base.Joiner;
 import java.io.File;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
@@ -97,6 +93,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       doImport(commandArgs);
 
+    }
+    else if("export".equals(command))
+    {
+      doExport(commandArgs);
     }
     else if ("delete".equals(command))
     {
@@ -382,6 +382,34 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       HelpFormatter helpFormatter = new HelpFormatter();
       helpFormatter.printHelp("annis-admin.sh import [OPTION] DIR1 DIR2 ...",
+        options);
+    }
+  }
+  
+  private void doExport(List<String> commandArgs)
+  {
+    Options options = new OptionBuilder()
+      .createOptions();
+
+    try
+    {
+
+      CommandLineParser parser = new PosixParser();
+      CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
+        new String[commandArgs.size()]));
+
+      if (cmdLine.getArgs().length < 2)
+      {
+        throw new ParseException(
+          "Needs two arguments: corpus name and output folder");
+      }
+      annisDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
+      
+    }
+    catch (ParseException ex)
+    {
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh export CORPUS DIR ...",
         options);
     }
   }
