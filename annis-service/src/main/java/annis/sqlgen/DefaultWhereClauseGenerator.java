@@ -304,7 +304,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     innerSelect +=
         "WHERE parent="
-      + tables(node).aliasedColumn(RANK_TABLE, "pre")
+      + tables(node).aliasedColumn(RANK_TABLE, "id")
       + " AND component_id = " + tables(node).aliasedColumn(RANK_TABLE,
         "component_id")
       + " AND corpus_ref="
