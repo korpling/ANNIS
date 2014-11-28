@@ -104,6 +104,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |seg_index|integer|||index of this segment (if it is a segment, i.e. there is some SOrderingRelation connected to this node)|
 |seg_name|text|||name of the segment path this segment belongs to|
 |span|text|||for tokens or node with a segmentation index: substring of the covered original text|
+|root|boolean||X|True if this node has no parents in *all* components|
 
 component.relannis
 ------------------

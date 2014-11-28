@@ -67,7 +67,8 @@ CREATE :tmp TABLE _node
   right_token integer NOT NULL,
 	seg_index     integer,        -- index of this segment (if it is a segment, i.e. there is some SOrderingRelation connected to this node)
   seg_name    varchar,      -- segmentation name
-	span			varchar			-- for tokens: substring in _text.text (indexed for text search), else: NULL
+	span			varchar,			-- for tokens: substring in _text.text (indexed for text search), else: NULL
+  root boolean NOT NULL
 );
 
 -- connected components of the annotation graph

@@ -81,7 +81,7 @@ FROM
     _rank.pre AS pre,
     _rank.post AS post,
     _rank.parent AS parent,
-    _rank.root AS root,
+    _node.root AS root,
     _rank.level AS level,
 
     _component.id AS component_id,
