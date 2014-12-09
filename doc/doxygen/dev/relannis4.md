@@ -37,9 +37,10 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |id|integer|X|X|primary key|
 |name | text|X|X|unique name (per corpus)|
 |type | text||X|CORPUS, DOCUMENT|
-|version | text|||version number (not used)|
+|version | text|||version number (currently not used)|
 |pre|integer||X|pre order of the corpus tree|
 |post|integer||X|post order of the corpus tree|
+|top_level|boolean||X|true for the toplevel corpus|
 
 corpus_annotation.relannis
 --------------------------

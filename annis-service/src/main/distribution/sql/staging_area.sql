@@ -24,7 +24,8 @@ CREATE :tmp TABLE _corpus
 	type		varchar NOT NULL,		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
 	version		varchar,				-- version number (not used)
 	pre			integer	NOT NULL,		-- pre and post order of the corpus tree
-	post		integer	NOT NULL
+	post		integer	NOT NULL,
+  top_level boolean NOT NULL
 );
 
 -- corpus annotations

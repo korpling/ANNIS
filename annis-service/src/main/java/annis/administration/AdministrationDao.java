@@ -549,11 +549,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
-    computeTopLevelCorpus();
+    extendNodeToplevelCorpus();
     analyzeStagingTables();
 
     addUniqueNodeNameAppendix();
-
+    
     long corpusID = updateIds();
 
     importBinaryData(path, toplevelCorpusName);
@@ -565,8 +565,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     computeCorpusStatistics(path);
     updateCorpusStatsId(corpusID);
-    computeSpanFromSegmentation();
-
+    
     applyConstraints();
     analyzeStagingTables();
 
@@ -633,6 +632,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
     computeTopLevelCorpus();
+    extendNodeToplevelCorpus();
     analyzeStagingTables();
 
     computeLeftTokenRightToken();
@@ -868,6 +868,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     log.info("computing top-level corpus");
     executeSqlFromScript("toplevel_corpus.sql");
+  }
+  
+  void extendNodeToplevelCorpus()
+  {
+    log.info("extend node to contain top-level corpus");
+    executeSqlFromScript("extend_node_toplevel.sql");
   }
 
   void importBinaryData(String path, String toplevelCorpusName)
