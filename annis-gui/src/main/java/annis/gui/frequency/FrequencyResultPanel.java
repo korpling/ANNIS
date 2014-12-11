@@ -278,12 +278,9 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
         FrequencyTableEntry e = freqDefinition.get(i-1);
-        String caption = "#" + e.getReferencedNode() + " ("
-          + (e.getType() == FrequencyTableEntryType.span 
-            ? "spanned text" : e.getKey())
-          + ")";
         
-        tblResult.setColumnHeader("tupel-"+ i, caption);
+        
+        tblResult.setColumnHeader("tupel-"+ i, getCaption(e));
       }
       
       tblResult.addContainerProperty("count", Long.class, -1l);
@@ -349,6 +346,27 @@ public class FrequencyResultPanel extends VerticalLayout
     }
   }
   
+  public static String getCaption(FrequencyTableEntry e)
+  {
+    String caption;
+    switch (e.getType())
+    {
+      case annotation:
+        caption = "#" + e.getReferencedNode() + " ("
+          + e.getKey() + ")";
+        break;
+      case span:
+        caption = "#" + e.getReferencedNode() + " (spanned text)";
+        break;
+      case meta:
+        caption = "meta (" + e.getKey() + ")";
+        break;
+      default:
+        caption = "<unknown>";
+    }
+    return caption;
+  }
+  
   public static class CSVResource implements StreamResource.StreamSource
   {
     private final FrequencyTable data;
@@ -377,12 +395,7 @@ public class FrequencyResultPanel extends VerticalLayout
             for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
             {
               FrequencyTableEntry e = freqDefinition.get(i);
-              String caption = "#" + e.getReferencedNode() + " ("
-                + (e.getType() == FrequencyTableEntryType.span
-                ? "spanned text" : e.getKey())
-                + ")";
-              
-              header.add(caption);
+              header.add(getCaption(e));
             }
           }
           // add count
