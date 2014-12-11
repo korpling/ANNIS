@@ -26,6 +26,7 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Function;
+import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
 import com.google.common.escape.Escaper;
@@ -244,9 +245,20 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     {
       if (e.getType() == FrequencyTableEntryType.meta)
       {
-        // TODO: suppport namespaces
-        conditions.add("v" + i + ".name = '" + escaper.escape(e.getKey())
-          + "'");
+        List<String> qName = Splitter.on(':').limit(2).omitEmptyStrings()
+          .splitToList(e.getKey());
+        if(qName.size() == 2)
+        {
+          conditions.add("v" + i + ".namespace = '" + escaper.escape(qName.get(0))
+            + "'");
+          conditions.add("v" + i + ".name = '" + escaper.escape(qName.get(1))
+            + "'");
+        }
+        else
+        {
+          conditions.add("v" + i + ".name = '" + escaper.escape(qName.get(0))
+            + "'");
+        }
         conditions.add("v" + i + ".corpus_ref = solutions.corpus_ref");
       }
       else
