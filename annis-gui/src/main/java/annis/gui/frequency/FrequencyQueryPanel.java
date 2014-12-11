@@ -17,21 +17,26 @@ package annis.gui.frequency;
 
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
+import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
+import annis.service.objects.AnnisAttribute;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
+import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.shared.ui.label.ContentMode;
@@ -55,6 +60,9 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -62,7 +70,12 @@ import java.util.Set;
  */
 public class FrequencyQueryPanel extends VerticalLayout implements Serializable, FieldEvents.TextChangeListener
 {
+  
+  private static final Logger log = LoggerFactory.getLogger(FrequencyQueryPanel.class);
+  
   private Table tblFrequencyDefinition;
+  private final IndexedContainer metaNamesContainer;
+  private final Property<Set> selectedMetaData;
   private final Button btAdd;
   private final Button btReset;
   private final CheckBox cbAutomaticMode;
@@ -165,17 +178,27 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     tblFrequencyDefinition.setRowHeaderMode(Table.RowHeaderMode.INDEX);
     
-    if(controller != null)
-    {
-      createAutomaticEntriesForQuery(controller.getQueryDraft());
-      updateQueryInfo(controller.getQueryDraft());
-    }
     
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
     tblFrequencyDefinition.setColumnExpandRatio("comment", 0.5f);
     
     queryLayout.addComponent(tblFrequencyDefinition);
+    
+    selectedMetaData = new ObjectProperty<Set>(new TreeSet<String>());
+    metaNamesContainer = new IndexedContainer();
+    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect(metaNamesContainer);
+    metaSelect.setPropertyDataSource(selectedMetaData);
+    metaSelect.setCaption("Metadata");
+    
+    queryLayout.addComponent(metaSelect);
+    
+    
+    if(controller != null)
+    {
+      createAutomaticEntriesForQuery(controller.getQueryDraft());
+      updateQueryInfo(controller.getQueryDraft());
+    }
     
     HorizontalLayout layoutButtons = new HorizontalLayout();
     
@@ -372,6 +395,43 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
       });
     }
+  }
+  
+  public Set<String> getAvailableMetaNames()
+  {
+    Set<String> result = new TreeSet<>();
+    WebResource service = Helper.getAnnisWebResource();
+    // get current corpus selection
+    Set<String> corpusSelection = controller.getSelectedCorpora();
+    if (service != null)
+    {
+      try
+      {
+        List<AnnisAttribute> atts = new LinkedList<>();
+
+        for (String corpus : corpusSelection)
+        {
+          atts.addAll(service.path("query").path("corpora").path(corpus)
+            .path("annotations")
+            .get(new GenericType<List<AnnisAttribute>>()
+              {
+            })
+          );
+        }
+        for (AnnisAttribute a : atts)
+        {
+          if (a.getType() == AnnisAttribute.Type.meta)
+          {
+            result.add(a.getName());
+          }
+        }
+      }
+      catch (ClientHandlerException | UniformInterfaceException ex)
+      {
+        log.error(null, ex);
+      }
+    }
+    return result;
   }
   
   private Object[] createNewTableRow(
@@ -578,6 +638,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   private void updateQueryInfo(String query)
   {
+    metaNamesContainer.removeAllItems();
+    for(String m : getAvailableMetaNames())
+    {
+      metaNamesContainer.addItem(m);
+    }
+    
     Set<String> selectedCorpora = controller.getSelectedCorpora();
     if(selectedCorpora.isEmpty())
     {
