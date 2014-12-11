@@ -17,13 +17,41 @@ package annis.sqlgen.extensions;
 
 import annis.service.objects.FrequencyTableEntry;
 import annis.sqlgen.FrequencySqlGenerator;
-import java.io.Serializable;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
 import java.util.ArrayList;
+import java.util.Iterator;
 
 /**
  * This is an extension to be used as argument for {@link FrequencySqlGenerator}
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
 {
+
+  public static FrequencyTableQueryData parse(String completeDefinition)
+  {
+    FrequencyTableQueryData result = new FrequencyTableQueryData();
+    Iterator<String> it = Splitter.on(',').trimResults().omitEmptyStrings().
+      split(completeDefinition).iterator();
+    while (it.hasNext())
+    {
+      String f = it.next();
+      FrequencyTableEntry entry = FrequencyTableEntry.parse(f);
+      if (entry != null)
+      {
+        result.add(entry);
+      }
+    }
+    return result;
+  }
+
+  @Override
+  public String toString()
+  {
+    return Joiner.on(',').join(this);
+  }
+  
+  
 }

@@ -69,8 +69,10 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.SqlGeneratorAndExtractor;
+import annis.sqlgen.extensions.FrequencyTableQueryData;
 import com.google.common.base.Splitter;
 import java.util.Properties;
 
@@ -115,6 +117,8 @@ public class AnnisRunner extends AnnisBaseRunner
   private String segmentationLayer = null;
   
   private SubgraphFilter filter = SubgraphFilter.all;
+  
+  private FrequencyTableQueryData frequencyDef = null;
 
   private List<Long> corpusList;
 
@@ -317,7 +321,9 @@ public class AnnisRunner extends AnnisBaseRunner
 
   public void doDebug(String ignore)
   {
-    doExport("RIDGES_Herbology_Version4.0 /tmp/ridgessalt");
+    doCorpus("pcc2");
+    doSet("freq-def to 1:tok, 2:lemma");
+    doFrequency("tok . tok");
   }
 
   public void doParse(String annisQuery)
@@ -907,6 +913,17 @@ public class AnnisRunner extends AnnisBaseRunner
         filter = SubgraphFilter.valueOf(value);
       }
     }
+    else if("freq-def".equals(setting))
+    {
+      if(show)
+      {
+        value = (frequencyDef == null ? "<not set>" : frequencyDef.toString());
+      }
+      else
+      {
+          frequencyDef = FrequencyTableQueryData.parse(value);
+      }
+    }
     else
     {
       out.println("ERROR: unknown option: " + setting);
@@ -975,6 +992,17 @@ public class AnnisRunner extends AnnisBaseRunner
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer, filter));
     }
+    else if(queryFunction != null && queryFunction.matches("(sql_)?frequency"))
+    {
+      if(frequencyDef == null)
+      {
+        out.println("You have to set the 'freq-def' property first");
+      }
+      else
+      {
+        queryData.addExtension(frequencyDef);
+      }
+    }
 
 
     if (annisQuery != null)
@@ -1014,6 +1042,15 @@ public class AnnisRunner extends AnnisBaseRunner
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
     MatchGroup group = new MatchGroup(matches);
     out.println(group.toString());
+  }
+  
+  public void doFrequency(String definitions)
+  {    
+    FrequencyTable result = annisDao.frequency(analyzeQuery(definitions, "frequency"));
+    for(FrequencyTable.Entry e : result.getEntries())
+    {
+      out.println(e.toString());
+    }
   }
 
   public void doSubgraph(String saltIds)

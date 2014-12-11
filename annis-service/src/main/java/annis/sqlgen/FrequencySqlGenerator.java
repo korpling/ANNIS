@@ -183,7 +183,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
           .append("v").append(i).append(".")
           .append(tas.columnName(NODE_ANNOTATION_TABLE, "qannotext"));
       }
-      else
+      else if(e.getType() == FrequencyTableEntryType.span)
       {
         sb.append("('annis:tok:' || ").append("v").append(i).append(".").append(
           tas.columnName(NODE_TABLE,
@@ -243,7 +243,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       {
         conditions.add("v" + i + ".n_sample IS TRUE");
       }
-      else
+      else if(e.getType() == FrequencyTableEntryType.annotation)
       {
         // filter by selected key
         conditions.add("v" + i + ".node_annotext LIKE '"
