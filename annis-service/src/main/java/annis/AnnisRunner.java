@@ -72,7 +72,7 @@ import annis.ql.parser.AnnisParserAntlr;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.SqlGeneratorAndExtractor;
-import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Splitter;
 import java.util.Properties;
 
@@ -118,7 +118,7 @@ public class AnnisRunner extends AnnisBaseRunner
   
   private SubgraphFilter filter = SubgraphFilter.all;
   
-  private FrequencyTableQueryData frequencyDef = null;
+  private FrequencyTableQuery frequencyDef = null;
 
   private List<Long> corpusList;
 
@@ -921,7 +921,7 @@ public class AnnisRunner extends AnnisBaseRunner
       }
       else
       {
-          frequencyDef = FrequencyTableQueryData.parse(value);
+          frequencyDef = FrequencyTableQuery.parse(value);
       }
     }
     else

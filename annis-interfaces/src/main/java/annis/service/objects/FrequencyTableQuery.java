@@ -13,26 +13,25 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.extensions;
+package annis.service.objects;
 
 import annis.service.objects.FrequencyTableEntry;
-import annis.sqlgen.FrequencySqlGenerator;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import java.util.ArrayList;
 import java.util.Iterator;
 
 /**
- * This is an extension to be used as argument for {@link FrequencySqlGenerator}
+ * This is an a list of several {@link FrequencyTableEntry} entries.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
+public class FrequencyTableQuery extends ArrayList<FrequencyTableEntry>
 {
 
-  public static FrequencyTableQueryData parse(String completeDefinition)
+  public static FrequencyTableQuery parse(String completeDefinition)
   {
-    FrequencyTableQueryData result = new FrequencyTableQueryData();
+    FrequencyTableQuery result = new FrequencyTableQuery();
     Iterator<String> it = Splitter.on(',').trimResults().omitEmptyStrings().
       split(completeDefinition).iterator();
     while (it.hasNext())

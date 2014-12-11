@@ -25,6 +25,7 @@ import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -75,7 +76,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   private Table tblFrequencyDefinition;
   private final IndexedContainer metaNamesContainer;
-  private final Property<Set> selectedMetaData;
+  private final Property<Set<String>> selectedMetaData;
   private final Button btAdd;
   private final Button btReset;
   private final CheckBox cbAutomaticMode;
@@ -185,7 +186,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
-    selectedMetaData = new ObjectProperty<Set>(new TreeSet<String>());
+    selectedMetaData = new ObjectProperty<Set<String>>(new TreeSet<String>());
     metaNamesContainer = new IndexedContainer();
     PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect(metaNamesContainer);
     metaSelect.setPropertyDataSource(selectedMetaData);
@@ -314,7 +315,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        ArrayList<FrequencyTableEntry> freqDefinition = new ArrayList<>();
+        FrequencyTableQuery freqDefinition = new FrequencyTableQuery();
         for(Object oid : tblFrequencyDefinition.getItemIds())
         {
           FrequencyTableEntry entry = new FrequencyTableEntry();
@@ -333,6 +334,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           {
             entry.setType(FrequencyTableEntryType.annotation);
           }
+          freqDefinition.add(entry);
+        }
+        // addiotionally add meta data columns
+        for(String m : selectedMetaData.getValue())
+        {
+          FrequencyTableEntry entry = new FrequencyTableEntry();
+          entry.setType(FrequencyTableEntryType.meta);
+          entry.setKey(m);
           freqDefinition.add(entry);
         }
         
@@ -497,7 +506,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   
 
-  public void executeFrequencyQuery(List<FrequencyTableEntry> freqDefinition)
+  public void executeFrequencyQuery(FrequencyTableQuery freqDefinition)
   {
     if (controller != null && controller.getPreparedQuery() != null)
     {

@@ -24,7 +24,7 @@ import annis.service.objects.FrequencyTableEntryType;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
@@ -101,9 +101,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   public String groupByAttributes(QueryData queryData,
     List<QueryNode> alternative)
   {
-    FrequencyTableQueryData ext;
-    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(
-      FrequencyTableQueryData.class);
+    FrequencyTableQuery ext;
+    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
     Validate.notNull(freqQueryData);
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);
@@ -125,9 +124,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   public String fromClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    FrequencyTableQueryData ext;
-    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(
-      FrequencyTableQueryData.class);
+    FrequencyTableQuery ext;
+    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
     Validate.notNull(freqQueryData);
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);
@@ -180,9 +178,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   {
     TableAccessStrategy tas = tables(null);
 
-    FrequencyTableQueryData ext;
-    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(
-      FrequencyTableQueryData.class);
+    FrequencyTableQuery ext;
+    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
     Validate.notNull(freqQueryData);
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);
@@ -226,9 +223,8 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   {
     Set<String> conditions = new LinkedHashSet<>();
 
-    FrequencyTableQueryData ext;
-    List<FrequencyTableQueryData> freqQueryData = queryData.getExtensions(
-      FrequencyTableQueryData.class);
+    FrequencyTableQuery ext;
+    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
     Validate.notNull(freqQueryData);
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);

@@ -44,7 +44,7 @@ import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.service.objects.FrequencyTableQuery;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -340,7 +340,7 @@ public class QueryServiceImpl implements QueryService
     }
     
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    FrequencyTableQueryData ext = FrequencyTableQueryData.parse(rawFields);
+    FrequencyTableQuery ext = FrequencyTableQuery.parse(rawFields);
     data.addExtension(ext);
     
     long start = new Date().getTime();
