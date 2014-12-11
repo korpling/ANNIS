@@ -648,10 +648,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private void updateQueryInfo(String query)
   {
     metaNamesContainer.removeAllItems();
-    for(String m : getAvailableMetaNames())
+    Set<String> allMetaNames = getAvailableMetaNames();
+    Set<String> oldSelection = new TreeSet<String>(selectedMetaData.getValue());
+    for(String m : allMetaNames)
     {
       metaNamesContainer.addItem(m);
     }
+    // remove all selections that are no longer present
+    oldSelection.retainAll(allMetaNames);
+    selectedMetaData.setValue(oldSelection);
     
     Set<String> selectedCorpora = controller.getSelectedCorpora();
     if(selectedCorpora.isEmpty())
