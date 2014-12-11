@@ -53,18 +53,26 @@ public class FrequencyTableEntry implements Serializable
       splitToList(definition);
     if (splitted.size() == 2)
     {
-    
       FrequencyTableEntry entry = new FrequencyTableEntry();
 
-      entry.setReferencedNode(splitted.get(0));
-      if ("tok".equals(splitted.get(1)))
+      if ("meta".equals(splitted.get(0)))
       {
-        entry.setType(FrequencyTableEntryType.span);
+        entry.setReferencedNode(null);
+        entry.setType(FrequencyTableEntryType.meta);
+        entry.setKey(splitted.get(1));
       }
       else
       {
-        entry.setType(FrequencyTableEntryType.annotation);
-        entry.setKey(splitted.get(1));
+        entry.setReferencedNode(splitted.get(0));
+        if ("tok".equals(splitted.get(1)))
+        {
+          entry.setType(FrequencyTableEntryType.span);
+        }
+        else
+        {
+          entry.setType(FrequencyTableEntryType.annotation);
+          entry.setKey(splitted.get(1));
+        }
       }
       return entry;
     }
@@ -105,7 +113,16 @@ public class FrequencyTableEntry implements Serializable
   @Override
   public String toString()
   {
-    return referencedNode + ":" + (type == FrequencyTableEntryType.span ? "tok" : key);
+    switch(type)
+    {
+      case span:
+        return referencedNode + ":tok";
+      case annotation:
+        return referencedNode + ":" + key;
+      case meta:
+        return "meta:" + key;
+    }
+    return super.toString();
   }
   
   

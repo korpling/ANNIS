@@ -28,6 +28,8 @@ import annis.sqlgen.extensions.FrequencyTableQueryData;
 import com.google.common.base.Function;
 import com.google.common.collect.ImmutableMap;
 import com.google.common.collect.Maps;
+import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
@@ -51,6 +53,10 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 {
 
   private SolutionSqlGenerator solutionSqlGenerator;
+  
+  public static final Escaper escaper = Escapers.builder()
+    .addEscape('\'', "''")
+    .build();
   
   @Override
   public FrequencyTable extractData(ResultSet rs) throws SQLException, DataAccessException
@@ -133,7 +139,7 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 
     sb.append(getSolutionSqlGenerator().toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
-
+    
     int i = 1;
     Iterator<FrequencyTableEntry> itEntry = ext.iterator();
     while (itEntry.hasNext())
@@ -142,10 +148,18 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
 
       sb.append(indent).append(TABSTOP);
 
-      String factsSql = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+      String tableSql;
+      if(e.getType() == FrequencyTableEntryType.meta)
+      {
+        tableSql = "corpus_annotation";
+      }
+      else
+      {
+        tableSql = SelectedFactsFromClauseGenerator.selectedFactsSQL(
         queryData.getCorpusList(), indent);
+      }
       
-      sb.append(factsSql);
+      sb.append(tableSql);
       sb.append(" AS v").append(i);
 
       if (itEntry.hasNext())
@@ -189,6 +203,14 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
           tas.columnName(NODE_TABLE,
             "span)"));
       }
+      else if(e.getType() == FrequencyTableEntryType.meta)
+      {
+        sb.append("('annis_meta:'")
+          .append(" || COALESCE(v").append(i).append(".").append("namespace").append(", '')")
+          .append(" || v").append(i).append(".").append("\"name\"")
+          .append(" || ':'")
+          .append(" || v").append(i).append(".").append("\"value\")");
+      }
       sb.append(" AS value").append(i).append(", ");
       i++;
     }
@@ -224,34 +246,46 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     int i = 1;
     for (FrequencyTableEntry e : ext)
     {
-      // general partition restriction
-      conditions.add("v" + i + ".toplevel_corpus IN (" + StringUtils.join(
-        queryData.getCorpusList(), ",") + ")");
-      // specificly join on top level corpus
-      conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
-      // join on node ID
-      QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
-      if (referencedNode == null)
+      if (e.getType() == FrequencyTableEntryType.meta)
       {
-        throw new AnnisQLSemanticsException("No such node \""
-          + e.getReferencedNode() + "\". "
-          + "Your query contains " + alternative.size() + " node(s), make sure no node definition numbers are greater than this number");
+        // TODO: suppport namespaces
+        conditions.add("v" + i + ".name = '" + escaper.escape(e.getKey())
+          + "'");
+        conditions.add("v" + i + ".corpus_ref = solutions.corpus_ref");
       }
-      conditions.add("v" + i + ".id = solutions.id" + referencedNode.getId());
-
-      if (e.getType() == FrequencyTableEntryType.span)
+      else
       {
-        conditions.add("v" + i + ".n_sample IS TRUE");
-      }
-      else if(e.getType() == FrequencyTableEntryType.annotation)
-      {
-        // filter by selected key
-        conditions.add("v" + i + ".node_annotext LIKE '"
-          + AnnotationConditionProvider.likeEscaper.escape(e.
-            getKey())
-          + ":%'");
-        conditions.add("v" + i + ".n_na_sample IS TRUE");
+        // general partition restriction
+        conditions.add("v" + i + ".toplevel_corpus IN (" + StringUtils.join(
+          queryData.getCorpusList(), ",") + ")");
+        // specificly join on top level corpus
+        conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
 
+        // join on node ID
+        QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
+        if (referencedNode == null)
+        {
+          throw new AnnisQLSemanticsException("No such node \""
+            + e.getReferencedNode() + "\". "
+            + "Your query contains " + alternative.size()
+            + " node(s), make sure no node definition numbers are greater than this number");
+        }
+        conditions.add("v" + i + ".id = solutions.id" + referencedNode.getId());
+
+        if (e.getType() == FrequencyTableEntryType.span)
+        {
+          conditions.add("v" + i + ".n_sample IS TRUE");
+        }
+        else if (e.getType() == FrequencyTableEntryType.annotation)
+        {
+        // TODO: support namespaces
+          // filter by selected key
+          conditions.add("v" + i + ".node_annotext LIKE '"
+            + AnnotationConditionProvider.likeEscaper.escape(e.
+              getKey())
+            + ":%'");
+          conditions.add("v" + i + ".n_na_sample IS TRUE");
+        }
       }
       i++;
     }
