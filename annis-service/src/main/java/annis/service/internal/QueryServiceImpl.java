@@ -44,7 +44,7 @@ import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.service.objects.FrequencyTableQuery;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -339,31 +339,8 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:matrix:" + c);
     }
     
-    
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    String[] fields = rawFields.split("\\s*,\\s*");
-    FrequencyTableQueryData ext = new FrequencyTableQueryData();
-    for(String f: fields)
-    {
-      String[] splitted = f.split(":", 2);
-      
-      if(splitted.length == 2)
-      {
-        FrequencyTableEntry entry = new FrequencyTableEntry();
-      
-        entry.setReferencedNode(splitted[0]);
-        if("tok".equals(splitted[1]))
-        {
-          entry.setType(FrequencyTableEntryType.span);
-        }
-        else
-        {
-          entry.setType(FrequencyTableEntryType.annotation);
-          entry.setKey(splitted[1]);
-        }
-        ext.add(entry);
-      }
-    }
+    FrequencyTableQuery ext = FrequencyTableQuery.parse(rawFields);
     data.addExtension(ext);
     
     long start = new Date().getTime();

@@ -21,6 +21,7 @@ import annis.libgui.PollControl;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import annis.service.objects.FrequencyTableQuery;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
@@ -80,14 +81,14 @@ public class FrequencyResultPanel extends VerticalLayout
   private final FrequencyChart chart;
   private final String aql;
   private final Set<String> corpora;
-  private final List<FrequencyTableEntry> freqDefinition;
+  private final FrequencyTableQuery freqDefinition;
   private final FrequencyQueryPanel queryPanel;
   
   private ProgressBar pbQuery;
 
   public FrequencyResultPanel(String aql,
     Set<String> corpora,
-    final List<FrequencyTableEntry> freqDefinition, FrequencyQueryPanel queryPanel)
+    final FrequencyTableQuery freqDefinition, FrequencyQueryPanel queryPanel)
   {
     this.aql = aql;
     this.corpora = corpora;
@@ -156,7 +157,7 @@ public class FrequencyResultPanel extends VerticalLayout
       annisResource = annisResource.path("query").path("search").path("frequency")
         .queryParam("q", aql)  
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("fields", createFieldsString());
+        .queryParam("fields", freqDefinition.toString());
 
       result = annisResource.get(FrequencyTable.class);
     }
@@ -277,12 +278,9 @@ public class FrequencyResultPanel extends VerticalLayout
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
         FrequencyTableEntry e = freqDefinition.get(i-1);
-        String caption = "#" + e.getReferencedNode() + " ("
-          + (e.getType() == FrequencyTableEntryType.span 
-            ? "spanned text" : e.getKey())
-          + ")";
         
-        tblResult.setColumnHeader("tupel-"+ i, caption);
+        
+        tblResult.setColumnHeader("tupel-"+ i, getCaption(e));
       }
       
       tblResult.addContainerProperty("count", Long.class, -1l);
@@ -348,6 +346,27 @@ public class FrequencyResultPanel extends VerticalLayout
     }
   }
   
+  public static String getCaption(FrequencyTableEntry e)
+  {
+    String caption;
+    switch (e.getType())
+    {
+      case annotation:
+        caption = "#" + e.getReferencedNode() + " ("
+          + e.getKey() + ")";
+        break;
+      case span:
+        caption = "#" + e.getReferencedNode() + " (spanned text)";
+        break;
+      case meta:
+        caption = "meta (" + e.getKey() + ")";
+        break;
+      default:
+        caption = "<unknown>";
+    }
+    return caption;
+  }
+  
   public static class CSVResource implements StreamResource.StreamSource
   {
     private final FrequencyTable data;
@@ -376,12 +395,7 @@ public class FrequencyResultPanel extends VerticalLayout
             for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
             {
               FrequencyTableEntry e = freqDefinition.get(i);
-              String caption = "#" + e.getReferencedNode() + " ("
-                + (e.getType() == FrequencyTableEntryType.span
-                ? "spanned text" : e.getKey())
-                + ")";
-              
-              header.add(caption);
+              header.add(getCaption(e));
             }
           }
           // add count
