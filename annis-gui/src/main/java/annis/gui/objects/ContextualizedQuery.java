@@ -18,8 +18,9 @@ package annis.gui.objects;
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
+ * @param <T>
  */
-public class ContextualizedQuery extends Query
+public class ContextualizedQuery<T extends ContextualizedQuery> extends Query<T>
 {
   private int contextLeft;
   private int contextRight;
@@ -58,6 +59,18 @@ public class ContextualizedQuery extends Query
   public void setSegmentation(String segmentation)
   {
     this.segmentation = segmentation;
+  }
+  
+  public T left(int left)
+  {
+    this.contextLeft = left;
+    return (T) this;
+  }
+  
+  public T right(int right)
+  {
+    this.contextRight = right;
+    return (T) this;
   }
   
   

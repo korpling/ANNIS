@@ -15,13 +15,14 @@
  */
 package annis.gui.objects;
 
+import com.google.common.base.Splitter;
 import java.util.List;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ExportQuery extends ContextualizedQuery
+public class ExportQuery extends ContextualizedQuery<ExportQuery>
 {
   private String exporterName;
   
@@ -58,5 +59,23 @@ public class ExportQuery extends ContextualizedQuery
     this.exporterName = exporterName;
   }
   
+  public ExportQuery annotationKeys(String annotationKeys)
+  {
+    this.annotationKeys = Splitter.on(',').omitEmptyStrings()
+        .trimResults().splitToList(annotationKeys);
+    return this;
+  }
+  
+  public ExportQuery params(String parameters)
+  {
+    this.parameters = parameters;
+    return this;
+  }
+  
+  public ExportQuery exporter(String exporter)
+  {
+    this.exporterName = exporter;
+    return this;
+  }
   
 }

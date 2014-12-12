@@ -23,9 +23,10 @@ import java.util.Set;
 /**
  * Helper class to construct new {@link Query} objects (or one of the child classes)
  * @author Thomas Krause <krauseto@hu-berlin.de>
- * @param <T>
+ * @param <T> The type of the class to generate
+ * @param <QG> The final type of the generator
  */
-public class QueryGenerator<T extends Query>
+public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
 {
   private T current;
   
@@ -37,98 +38,95 @@ public class QueryGenerator<T extends Query>
     this.current = current;
   }
   
-  public static QueryGenerator<PagedResultQuery> paged()
+  public static PagedQueryGenerator paged()
   {
-    QueryGenerator<PagedResultQuery> gen = new PagedQueryGenerator<>(new PagedResultQuery());
-    gen.current = new PagedResultQuery();
-    return gen;
+    return new PagedQueryGenerator();
   }
   
-  public static ExportQueryGenerator<? extends ExportQuery> export()
+  public static ExportQueryGenerator export()
   {
-    ExportQueryGenerator<ExportQuery> gen = new ExportQueryGenerator<>(new ExportQuery());
-    return gen;
+    return new ExportQueryGenerator();
   }
   
-  public static FrequencyQueryGenerator<? extends FrequencyQuery> frequency()
+  public static FrequencyQueryGenerator frequency()
   {
-    FrequencyQueryGenerator<FrequencyQuery> gen = new FrequencyQueryGenerator<>(new FrequencyQuery());
-    return gen;
+    return new FrequencyQueryGenerator();
   }
   
-  public QueryGenerator<? extends T> query(String aql)
+  public QG query(String aql)
   {
     current.setQuery(aql);
-    return this;
+    return (QG) this;
   }
   
-  public QueryGenerator<? extends T> corpora(Set<String> corpora)
+  public QG corpora(Set<String> corpora)
   {
     current.setCorpora(new LinkedHashSet<>(corpora));
-    return this;
+    return (QG) this;
   }
+  
   
   protected T getCurrent()
   {
     return current;
   }
   
-  public static class ContextQueryGenerator<T extends ContextualizedQuery> extends QueryGenerator<T>
+  public static class ContextQueryGenerator<T extends ContextualizedQuery, QG extends ContextQueryGenerator<T, QG>> 
+    extends QueryGenerator<T, QG>
   { 
     private ContextQueryGenerator(T query)
     {
       super(query);
     }
-    public ContextQueryGenerator<? extends ContextualizedQuery> left(int left)
-    {
-      getCurrent().setContextLeft(left);
-      return this;
-    }
-    public ContextQueryGenerator<? extends ContextualizedQuery> right(int right)
+    
+    public QG right(int right)
     {
       getCurrent().setContextRight(right);
-      return this;
+      return (QG) this;
     }
-    public ContextQueryGenerator<? extends ContextualizedQuery> segmentation(String segmentation)
+    public QG segmentation(String segmentation)
     {
       getCurrent().setSegmentation(segmentation);
-      return this;
+      return (QG) this;
     }
     
   }
   
-  public static class PagedQueryGenerator<T extends PagedResultQuery> extends ContextQueryGenerator<T>
+  public static class PagedQueryGenerator
+     extends ContextQueryGenerator<PagedResultQuery, PagedQueryGenerator>
   {
-    private PagedQueryGenerator(T query)
+    private PagedQueryGenerator()
     {
-      super(query);
+      super(new PagedResultQuery());
     }
-    public PagedQueryGenerator<? extends PagedResultQuery> limit(int limit)
+    public PagedQueryGenerator limit(int limit)
     {
       getCurrent().setLimit(limit);
-      return this;
+      return (PagedQueryGenerator) this;
     }
     
-    public PagedQueryGenerator<? extends PagedResultQuery> offset(int offset)
+    public PagedQueryGenerator offset(int offset)
     {
       getCurrent().setOffset(offset);
-      return this;
+      return (PagedQueryGenerator) this;
     }
   }
   
-  public static class ExportQueryGenerator<T extends ExportQuery> extends ContextQueryGenerator<T>
+  
+  public static class ExportQueryGenerator
+     extends ContextQueryGenerator<ExportQuery, ExportQueryGenerator>
   {
-    private ExportQueryGenerator(T query)
+    private ExportQueryGenerator()
     {
-      super(query);
+      super(new ExportQuery());
     }
-    public ExportQueryGenerator<? extends ExportQuery> exporter(String name)
+    public ExportQueryGenerator exporter(String name)
     {
       getCurrent().setExporterName(name);
       return this;
     }
     
-    public ExportQueryGenerator<? extends ExportQuery> annotations(String annotationKeys)
+    public ExportQueryGenerator annotations(String annotationKeys)
     {
       List<String> asList = Splitter.on(',').omitEmptyStrings()
         .trimResults().splitToList(annotationKeys);
@@ -136,18 +134,19 @@ public class QueryGenerator<T extends Query>
       return this;
     }
     
-    public ExportQueryGenerator<? extends ExportQuery> param(String parameters)
+    public ExportQueryGenerator param(String parameters)
     {
       getCurrent().setParameters(parameters);
       return this;
     }
   }
   
-  public static class FrequencyQueryGenerator<T extends FrequencyQuery> extends QueryGenerator<T>
+  public static class FrequencyQueryGenerator
+     extends QueryGenerator<FrequencyQuery, FrequencyQueryGenerator>
   {
-    private FrequencyQueryGenerator(T query)
+    private FrequencyQueryGenerator()
     {
-      super(query);
+      super(new FrequencyQuery());
     }
     
   }
