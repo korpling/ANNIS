@@ -532,6 +532,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
+    addDocumentNameMetaData();
     long corpusID = updateIds();
 
     importBinaryData(path, toplevelCorpusName);
@@ -933,6 +934,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("computing path information of the corpus tree for corpus with ID "
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
+  }
+  
+  void addDocumentNameMetaData()
+  {
+    log.info("add the document name as metadata");
+    executeSqlFromScript("adddocmetadata.sql");
   }
 
   protected void adjustRankPrePost()
@@ -1412,6 +1419,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + ");",
       alias, corpusID);
   }
+ 
   
   public void addCorpusAlias(String corpusName, String alias)
   {
