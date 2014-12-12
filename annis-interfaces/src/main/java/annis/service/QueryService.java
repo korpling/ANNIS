@@ -18,9 +18,6 @@ package annis.service;
 import annis.service.objects.MatchGroup;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 /**
@@ -59,9 +56,6 @@ public interface QueryService
    * @param corpora A comma separated list of corpus names
    * @return A XML represenation of the total matches and the number of documents that contain matches.
    */
-  @GET
-  @Path("search/count")
-  @Produces("application/xml")
   public Response count(String q,String corpora);
   
   /**
