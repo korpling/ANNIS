@@ -67,17 +67,5 @@ public class Query<T extends Query> implements Serializable
     this.corpora = corpora;
   }
   
-  // method chaining
-  public T corpora(Set<String> corpora)
-  {
-    this.corpora = new LinkedHashSet<>(corpora);
-    return (T) this;
-  }
-  public T query(String aql)
-  {
-    this.query = aql;
-    return (T) this;
-  }
-  
   
 }

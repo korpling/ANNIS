@@ -61,17 +61,4 @@ public class ContextualizedQuery<T extends ContextualizedQuery> extends Query<T>
     this.segmentation = segmentation;
   }
   
-  public T left(int left)
-  {
-    this.contextLeft = left;
-    return (T) this;
-  }
-  
-  public T right(int right)
-  {
-    this.contextRight = right;
-    return (T) this;
-  }
-  
-  
 }
