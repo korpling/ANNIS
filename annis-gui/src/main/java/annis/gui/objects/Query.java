@@ -20,7 +20,11 @@ import java.util.HashSet;
 import java.util.Set;
 
 /**
- * A POJO representing a query
+ * A POJO representing a query.
+ * 
+ * This objects holds all relevant information about the state of the UI
+ * related to querying, e.g. the AQL, the search options and the type of the query.
+ * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Query implements Serializable

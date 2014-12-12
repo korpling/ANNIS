@@ -25,14 +25,13 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class PagedResultQuery extends Query implements Cloneable
+public class PagedResultQuery extends ContextualizedQuery implements Cloneable
 {
-  private int contextLeft;
-  private int contextRight;
+  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
+  
   private int offset;
   private int limit;
-  private String segmentation;
-  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
+  
 
   public PagedResultQuery()
   {
@@ -43,32 +42,11 @@ public class PagedResultQuery extends Query implements Cloneable
     int limit, String segmentation, String query,
     Set<String> corpora)
   {
-    super(query, corpora);
-    this.contextLeft = contextLeft;
-    this.contextRight = contextRight;
+    super.setContextLeft(contextLeft);
+    super.setContextRight(contextRight);
+    super.setSegmentation(segmentation);
     this.offset = offset;
     this.limit = limit;
-    this.segmentation = segmentation;
-  }
-  
-  public int getContextLeft()
-  {
-    return contextLeft;
-  }
-
-  public void setContextLeft(int contextLeft)
-  {
-    this.contextLeft = contextLeft;
-  }
-
-  public int getContextRight()
-  {
-    return contextRight;
-  }
-
-  public void setContextRight(int contextRight)
-  {
-    this.contextRight = contextRight;
   }
 
   public int getOffset()
@@ -91,15 +69,6 @@ public class PagedResultQuery extends Query implements Cloneable
     this.limit = limit;
   }
 
-  public String getSegmentation()
-  {
-    return segmentation;
-  }
-
-  public void setSegmentation(String segmentation)
-  {
-    this.segmentation = segmentation;
-  }
   
   @Override
   public PagedResultQuery clone()
