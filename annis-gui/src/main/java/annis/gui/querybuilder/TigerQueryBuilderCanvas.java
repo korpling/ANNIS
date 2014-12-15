@@ -16,7 +16,7 @@
 package annis.gui.querybuilder;
 
 import annis.libgui.Helper;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
@@ -61,9 +61,9 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private QueryController controller;
+  private LegacyQueryController controller;
 
-  public TigerQueryBuilderCanvas(QueryController controller)
+  public TigerQueryBuilderCanvas(LegacyQueryController controller)
   {
     this.controller = controller;
 

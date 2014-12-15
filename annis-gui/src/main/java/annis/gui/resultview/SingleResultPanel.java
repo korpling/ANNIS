@@ -19,7 +19,7 @@ import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
@@ -112,7 +112,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private UUID queryId;
 
-  private QueryController queryController;
+  private LegacyQueryController queryController;
 
   private int resultNumber;
 
@@ -136,7 +136,7 @@ public class SingleResultPanel extends CssLayout implements
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos, String segmentationName, UUID queryId,
-    QueryController controller, InstanceConfig instanceConfig)
+    LegacyQueryController controller, InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;

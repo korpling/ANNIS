@@ -16,7 +16,7 @@
 package annis.gui.frequency;
 
 import annis.gui.CorpusSelectionChangeListener;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
@@ -86,12 +86,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private final QueryController controller;
+  private final LegacyQueryController controller;
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
   
-  public FrequencyQueryPanel(final QueryController controller)
+  public FrequencyQueryPanel(final LegacyQueryController controller)
   {
     this.controller = controller;
     

@@ -15,7 +15,7 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
@@ -34,7 +34,7 @@ import java.util.List;
  * find command and hopefully this query is bit faster.
  *
  * @see ResultFetchJob
- * @see QueryController
+ * @see LegacyQueryController
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */

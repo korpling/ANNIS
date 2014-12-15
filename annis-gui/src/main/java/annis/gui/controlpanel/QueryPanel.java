@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.ExportPanel;
 import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
@@ -31,6 +31,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -57,7 +58,7 @@ import org.vaadin.hene.popupbutton.PopupButton;
  *
  * @author thomas
  */
-public class QueryPanel extends GridLayout implements TextChangeListener,
+public class QueryPanel extends GridLayout implements 
   ValueChangeListener
 {
 
@@ -74,7 +75,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
   private ListSelect lstHistory;
-  private QueryController controller;
+  private LegacyQueryController controller;
   private ProgressBar piCount;
   private String lastPublicStatus;
   private List<HistoryEntry> history;
@@ -86,7 +87,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
   {
     super(4,5);
     
-    this.controller = ui.getQueryController();
+    this.controller = ui.getLegacyQueryController();
     this.lastPublicStatus = "Welcome to ANNIS! "
       + "A tutorial is available on the right side.";
     this.history = new LinkedList<>();
@@ -101,6 +102,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new TextArea();
+    txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
@@ -109,7 +111,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
 //    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setRows(10);
     txtQuery.setTextChangeTimeout(500);
-    txtQuery.addTextChangeListener((TextChangeListener) this);
+    txtQuery.setImmediate(true);
 
     final VirtualKeyboard virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
@@ -316,8 +318,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       txtQuery.setValue(query);
     }
-
-    validateQuery(query);
   }
 
   public String getQuery()
@@ -328,12 +328,6 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     }
     return "";
   }
-
-  @Override
-  public void textChange(TextChangeEvent event)
-  {
-    validateQuery(event.getText());
-  }
   
   public void notifyFrequencyTabClose()
   {
@@ -341,84 +335,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     frequencyPanel = null;
   }
 
-
-  private void validateQuery(String query)
-  {
-    txtStatus.setReadOnly(false);
-    
-    if(query.isEmpty())
-    {
-      txtStatus.setValue("Empty query");
-    }
-    else
-    {
-      // validate query
-      try
-      {
-        AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-        Future<String> future = annisResource.path("query").path("check").queryParam("q", query)
-          .get(String.class);
-
-        // wait for maximal one seconds
-
-        try
-        {
-          String result = future.get(1, TimeUnit.SECONDS);
-
-          if ("ok".equalsIgnoreCase(result))
-          {
-            if(getQueryController().getSelectedCorpora().isEmpty())
-            {
-              txtStatus.setValue("Please select a corpus from the list below, then click on \"Search\".");
-            }
-            else
-            {
-              txtStatus.setValue("Valid query, click on \"Search\" to start searching.");
-            }
-          }
-          else
-          {
-            txtStatus.setValue(result);
-          }
-        }
-        catch (InterruptedException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (ExecutionException ex)
-        {
-          if(ex.getCause() instanceof UniformInterfaceException)
-          {
-            UniformInterfaceException cause = (UniformInterfaceException) ex.
-              getCause();
-            if (cause.getResponse().getStatus() == 400)
-            {
-              txtStatus.setValue(cause.getResponse().getEntity(String.class));
-            }
-            else
-            {
-              log.error(
-                "Exception when communicating with service", ex);
-              ExceptionDialog.show(ex,
-                "Exception when communicating with service.");
-            }
-          }
-        }
-        catch (TimeoutException ex)
-        {
-          txtStatus.setValue("Validation of query took too long.");
-        }
-
-      }
-      catch(ClientHandlerException ex)
-      {
-        log.error(
-            "Could not connect to web service", ex);
-          ExceptionDialog.show(ex, "Could not connect to web service");
-      }
-    }
-    txtStatus.setReadOnly(true);
-  }
+  
 
   @Override
   public void valueChange(ValueChangeEvent event)
@@ -532,7 +449,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
+        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getLegacyQueryController());
       }
       
       final TabSheet tabSheet = ui.getMainTab();
@@ -567,7 +484,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
+        frequencyPanel = new FrequencyQueryPanel(ui.getLegacyQueryController());
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       
@@ -605,7 +522,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     {
       if(queryBuilder == null)
       {
-         queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
+         queryBuilder = new QueryBuilderChooser(ui.getLegacyQueryController(), ui, ui.getInstanceConfig());
       }
       final TabSheet tabSheet = ui.getMainTab();
       Tab tab = tabSheet.getTab(queryBuilder);
@@ -639,7 +556,7 @@ public class QueryPanel extends GridLayout implements TextChangeListener,
     return lastPublicStatus;
   }
 
-  public QueryController getQueryController()
+  public LegacyQueryController getQueryController()
   {
     return this.controller;
   }

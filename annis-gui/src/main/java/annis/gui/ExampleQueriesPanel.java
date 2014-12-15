@@ -403,7 +403,7 @@ public class ExampleQueriesPanel extends Table
 
           Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
-          QueryController controller = ui.getQueryController();
+          LegacyQueryController controller = ui.getLegacyQueryController();
           if (controller != null)
           {
             controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));

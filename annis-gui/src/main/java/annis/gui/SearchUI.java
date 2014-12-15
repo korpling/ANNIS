@@ -32,6 +32,7 @@ import annis.gui.objects.Query;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.QueryUIState;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
@@ -114,7 +115,8 @@ public class SearchUI extends AnnisBaseUI
 
   private TabSheet mainTab;
 
-  private QueryController queryController;
+  private LegacyQueryController legacyQueryController;
+  private final QueryController queryController;
 
   private String lastQueriedFragment;
 
@@ -125,6 +127,8 @@ public class SearchUI extends AnnisBaseUI
   private Set<Component> selectedTabHistory;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
+  
+  private final QueryUIState queryState = new QueryUIState();
 
   private void initTransients()
   {
@@ -134,6 +138,7 @@ public class SearchUI extends AnnisBaseUI
   public SearchUI()
   {
     initTransients();
+    queryController = new QueryController(this);
   }
 
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -157,7 +162,7 @@ public class SearchUI extends AnnisBaseUI
     // init a doc browser controller
     docBrowserController = new DocBrowserController(this);
 
-    queryController = new QueryController(this);
+    legacyQueryController = new LegacyQueryController(this);
 
     // always get the resize events directly
     setImmediate(true);
@@ -182,13 +187,13 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
-    mainTab.addSelectedTabChangeListener(queryController);
+    mainTab.addSelectedTabChangeListener(legacyQueryController);
     mainTab.addSelectedTabChangeListener(this);
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
-    controlPanel = new ControlPanel(queryController, instanceConfig,
+    controlPanel = new ControlPanel(legacyQueryController, instanceConfig,
       help.getExamples(), this);
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
@@ -546,14 +551,14 @@ public class SearchUI extends AnnisBaseUI
           log.error(
             "could not parse context value", ex);
         }
-        queryController.
+        legacyQueryController.
           setQuery(
             new PagedResultQuery(cleft, cright, 0, 10, null, aql,
               selectedCorpora));
       }
       else
       {
-        queryController.setQuery(new Query(aql, selectedCorpora));
+        legacyQueryController.setQuery(new Query(aql, selectedCorpora));
       }
 
       // remove all currently openend sub-windows
@@ -605,7 +610,7 @@ public class SearchUI extends AnnisBaseUI
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
-      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
+      getLegacyQueryController().notifyTabClose((ResultViewPanel) tabContent);
     }
     else if (tabContent instanceof FrequencyQueryPanel)
     {
@@ -636,9 +641,9 @@ public class SearchUI extends AnnisBaseUI
     return instanceConfig;
   }
 
-  public QueryController getQueryController()
+  public LegacyQueryController getLegacyQueryController()
   {
-    return queryController;
+    return legacyQueryController;
   }
 
   public TabSheet getMainTab()
@@ -719,13 +724,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onLogin()
   {
-    queryController.updateCorpusSetList();
+    legacyQueryController.updateCorpusSetList();
   }
 
   @Override
   public void onLogout()
   {
-    queryController.updateCorpusSetList();
+    legacyQueryController.updateCorpusSetList();
   }
 
   @Override
@@ -854,13 +859,13 @@ public class SearchUI extends AnnisBaseUI
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       // full query with given context
-      queryController.setQuery(new PagedResultQuery(
+      legacyQueryController.setQuery(new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
         Integer.parseInt(args.get("cr")),
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery();
+      legacyQueryController.executeQuery();
     }
     else
     {
@@ -868,8 +873,8 @@ public class SearchUI extends AnnisBaseUI
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       // use default context
-      queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery();
+      legacyQueryController.setQuery(new Query(args.get("q"), corpora));
+      legacyQueryController.executeQuery();
     }
   }
 
@@ -946,4 +951,10 @@ public class SearchUI extends AnnisBaseUI
   {
     return docBrowserController;
   }
+
+  public QueryUIState getQueryState()
+  {
+    return queryState;
+  }
+  
 }

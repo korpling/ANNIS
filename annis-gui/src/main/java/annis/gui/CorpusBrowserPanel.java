@@ -79,10 +79,10 @@ public class CorpusBrowserPanel extends Panel
 
   private CitationLinkGenerator citationGenerator;
 
-  private QueryController controller;
+  private LegacyQueryController controller;
 
   public CorpusBrowserPanel(final AnnisCorpus corpus,
-    QueryController controller)
+    LegacyQueryController controller)
   {
     super("Available annotations");
     this.corpus = corpus;

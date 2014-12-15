@@ -17,7 +17,7 @@ package annis.gui.resultview;
 
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
@@ -96,7 +96,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private TreeMap<String, Boolean> tokenAnnoVisible;
 
-  private QueryController controller;
+  private LegacyQueryController controller;
 
   private String selectedSegmentationLayer;
 
@@ -126,7 +126,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   SearchUI sui = (SearchUI) UI.getCurrent();
 
-  public ResultViewPanel(QueryController controller,
+  public ResultViewPanel(LegacyQueryController controller,
     PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
   {
     this.tokenAnnoVisible = new TreeMap<>();
@@ -499,7 +499,7 @@ public class ResultViewPanel extends VerticalLayout implements
       //update URL with newly selected segmentation layer
       PagedResultQuery q;
       SearchUI sui = (SearchUI) UI.getCurrent();
-      q = sui.getQueryController().getPreparedQuery();
+      q = sui.getLegacyQueryController().getPreparedQuery();
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
       q.setSegmentation(selectedSegmentationLayer);
 

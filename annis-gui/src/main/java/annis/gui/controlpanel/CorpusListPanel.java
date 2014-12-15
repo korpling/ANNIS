@@ -22,7 +22,7 @@ import annis.libgui.Helper;
 import annis.security.UserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.SearchUI;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.Sets;
@@ -100,7 +100,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private Table tblCorpora;
 
-  private QueryController controller;
+  private LegacyQueryController controller;
 
   private ComboBox cbSelection;
 
@@ -112,7 +112,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private InstanceConfig instanceConfig;
   
-  public CorpusListPanel(final QueryController controller,
+  public CorpusListPanel(final LegacyQueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
     SearchUI ui)
   {
@@ -217,6 +217,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
 
     tblCorpora.setContainerDataSource(corpusContainer);
+    tblCorpora.setPropertyDataSource(ui.getQueryState().getSelectedCorpora());
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
     tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());

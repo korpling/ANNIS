@@ -17,7 +17,7 @@
 package annis.gui.flatquerybuilder;
 
 import annis.gui.CorpusSelectionChangeListener;
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
@@ -64,7 +64,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private MenuBar addMenuSpan;
   private MenuBar addMenuMeta;
   
-  private QueryController cp;
+  private LegacyQueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout languagenodes;
   private HorizontalLayout span;
@@ -114,14 +114,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private String LANG_CAPTION = "Linguistic sequence";
   private String ADVANCED_CAPTION = "Advanced settings"; 
 
-  public FlatQueryBuilder(QueryController cp)
+  public FlatQueryBuilder(LegacyQueryController cp)
   {
     setSizeFull();
     launch(cp); 
     
   }
 
-  private void launch(QueryController cp)
+  private void launch(LegacyQueryController cp)
   {
     this.cp = cp;
     rsc = new ReducingStringComparator();

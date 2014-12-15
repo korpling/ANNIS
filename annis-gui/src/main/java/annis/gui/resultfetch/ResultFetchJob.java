@@ -15,7 +15,7 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.QueryController;
+import annis.gui.LegacyQueryController;
 import annis.gui.SearchUI;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.PagedResultQuery;
@@ -62,11 +62,11 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   protected PagedResultQuery query;
 
   protected SearchUI ui;
-  private final QueryController queryController;
+  private final LegacyQueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel,
-    SearchUI ui, QueryController controller)
+    SearchUI ui, LegacyQueryController controller)
   {
     this.resultPanel = resultPanel;
     this.query = query;

@@ -41,10 +41,10 @@ public class HistoryPanel extends Panel
 
   private Table tblHistory;
   private BeanItemContainer<HistoryEntry> containerHistory;
-  private QueryController controller;
+  private LegacyQueryController controller;
   private CitationLinkGenerator citationGenerator;
 
-  public HistoryPanel(List<HistoryEntry> history, QueryController controller)
+  public HistoryPanel(List<HistoryEntry> history, LegacyQueryController controller)
   {
     this.controller = controller;
     

@@ -103,14 +103,14 @@ public class ExportPanel extends FormLayout
 
   private transient Stopwatch exportTime = new Stopwatch();
 
-  private final QueryController controller;
+  private final LegacyQueryController controller;
 
   private transient Future<File> exportFuture = null;
 
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
-    QueryController controller)
+    LegacyQueryController controller)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
