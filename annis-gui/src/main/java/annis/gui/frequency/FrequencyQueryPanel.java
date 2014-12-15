@@ -506,9 +506,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
   public void executeFrequencyQuery(FrequencyTableQuery freqDefinition)
   {
-    if (controller != null && controller.getLegacy().getPreparedQuery() != null)
+    if (controller != null && controller.getQuery() != null)
     {
-      PagedResultQuery preparedQuery = controller.getLegacy().getPreparedQuery();
+      PagedResultQuery preparedQuery = controller.getQuery();
       
       if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
       {

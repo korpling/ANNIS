@@ -120,18 +120,20 @@ public class ResultViewPanel extends VerticalLayout implements
   private transient BlockingQueue<SaltProject> projectQueue;
 
   private PagedResultQuery currentQuery;
+  private PagedResultQuery initialQuery;
 
   private final SearchUI sui;
 
   public ResultViewPanel(SearchUI ui,
-    PluginSystem ps, InstanceConfig instanceConfig)
+    PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
   {
     this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
     this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
-
+    this.initialQuery = initialQuery;
+    
     cacheResolver
       = Collections.synchronizedMap(
         new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
@@ -354,7 +356,7 @@ public class ResultViewPanel extends VerticalLayout implements
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
         getVisibleTokenAnnos(), segmentationName, controller,
-        instanceConfig);
+        instanceConfig, initialQuery);
 
       i++;
 
@@ -437,7 +439,7 @@ public class ResultViewPanel extends VerticalLayout implements
   public void setCount(int count)
   {
     paging.setCount(count, false);
-    paging.setStartNumber(controller.getLegacy().getPreparedQuery().getOffset());
+    paging.setStartNumber(initialQuery.getOffset());
   }
 
   public SortedSet<String> getVisibleTokenAnnos()
@@ -493,9 +495,7 @@ public class ResultViewPanel extends VerticalLayout implements
       }
 
       //update URL with newly selected segmentation layer
-      PagedResultQuery q;
-      SearchUI sui = (SearchUI) UI.getCurrent();
-      q = sui.getQueryController().getLegacy().getPreparedQuery();
+      PagedResultQuery q = initialQuery.clone();
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
       q.setSegmentation(selectedSegmentationLayer);
 

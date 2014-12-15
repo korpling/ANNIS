@@ -174,10 +174,13 @@ public class QueryController implements Serializable
     }
   }
   
-  public void executeSearch(boolean replaceOldTab)
+  /**
+   * Get the current query as it is defined by the UI controls.
+   * @return 
+   */
+  public PagedResultQuery getQuery()
   {
-    // construct a query from the current properties
-    PagedResultQuery pagedQuery = QueryGenerator.paged()
+    return QueryGenerator.paged()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
       .left(state.getRightContext().getValue())
@@ -185,6 +188,12 @@ public class QueryController implements Serializable
       .segmentation(state.getBaseText().getValue())
       .limit(state.getLimit().getValue())
       .build();
+  }
+  
+  public void executeSearch(boolean replaceOldTab)
+  {
+    // construct a query from the current properties
+    PagedResultQuery pagedQuery = getQuery();
 
     ui.getControlPanel().getQueryPanel().setStatus("Searching...");
     
@@ -216,7 +225,7 @@ public class QueryController implements Serializable
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
-      ui.getInstanceConfig());
+      ui.getInstanceConfig(), pagedQuery);
 
     TabSheet.Tab newTab;
 

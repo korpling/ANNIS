@@ -129,11 +129,14 @@ public class SingleResultPanel extends CssLayout implements
     SingleResultPanel.class);
 
   private InstanceConfig instanceConfig;
+  
+  private final PagedResultQuery query;
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos, String segmentationName,
-    QueryController controller, InstanceConfig instanceConfig)
+    QueryController controller, InstanceConfig instanceConfig,
+    PagedResultQuery query)
   {
     this.ps = ps;
     this.result = result;
@@ -143,6 +146,7 @@ public class SingleResultPanel extends CssLayout implements
     this.resolverProvider = resolverProvider;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.instanceConfig = instanceConfig;
+    this.query = query;
 
     calculateHelperVariables();
 
@@ -217,7 +221,7 @@ public class SingleResultPanel extends CssLayout implements
       rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
     }
 
-    int lftContextIdx = queryController == null ? 0 : queryController.getLegacy().getPreparedQuery().getContextLeft();
+    int lftContextIdx = query == null ? 0 : query.getContextLeft();
     lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
@@ -227,7 +231,7 @@ public class SingleResultPanel extends CssLayout implements
       true
     });
 
-    int rghtCtxIdx = queryController == null ? 0 : queryController.getLegacy().getPreparedQuery().getContextRight();
+    int rghtCtxIdx = query == null ? 0 : query.getContextRight();
     rghtCtxContainer.addItem(rghtCtxIdx);
 
     rghtCtxContainer.sort(new Object[]

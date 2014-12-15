@@ -16,31 +16,20 @@
 package annis.gui;
 
 import annis.gui.resultfetch.SingleResultFetchJob;
-import annis.libgui.Helper;
 import annis.gui.beans.HistoryEntry;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.media.MediaController;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.Query;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.PollControl;
 import annis.gui.resultfetch.ResultFetchJob;
-import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinSession;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.TabSheet.Tab;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.LinkedList;
@@ -48,11 +37,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.apache.commons.collections15.set.ListOrderedSet;
-import org.apache.commons.lang3.StringUtils;
-import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -108,10 +94,13 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
 
   private List<CorpusSelectionChangeListener> corpusSelChangeListeners
     = new LinkedList<>();
+  
+  private final QueryController parent;
 
   public LegacyQueryController(SearchUI ui)
   {
     this.ui = ui;
+    this.parent = ui.getQueryController();
     this.history = new ListOrderedSet<>();
   }
   
@@ -208,17 +197,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
   public Set<String> getSelectedCorpora()
   {
     return ui.getControlPanel().getCorpusList().getSelectedCorpora();
-  }
-
-  /**
-   * Get the query that is currently prepared for execution, but not executed
-   * yet.
-   *
-   * @return
-   */
-  public PagedResultQuery getPreparedQuery()
-  {
-    return preparedQuery;
   }
 
   /**
