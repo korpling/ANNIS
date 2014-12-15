@@ -223,7 +223,7 @@ public class QueryController implements Serializable
     if(replaceOldTab)
     {
       // remove old panel from view
-      ui.getMainTab().removeComponent(oldPanel);
+      ui.closeTab(oldPanel);
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
@@ -237,19 +237,11 @@ public class QueryController implements Serializable
     String caption = existingResultPanels.isEmpty()
       ? "Query Result" : "Query Result #" + (existingResultPanels.size() + 1);
 
-    if (replaceOldTab && oldPanel != null)
-    {
-      ui.getMainTab().replaceComponent(oldPanel, newResultView);
-      newTab = ui.getMainTab().getTab(newResultView);
+    
+    newTab = ui.getMainTab().addTab(newResultView, caption);
+    newTab.setClosable(true);
+    newTab.setIcon(FontAwesome.SEARCH);
 
-      newTab.setCaption(caption);
-    }
-    else
-    {
-      newTab = ui.getMainTab().addTab(newResultView, caption);
-      newTab.setClosable(true);
-      newTab.setIcon(FontAwesome.SEARCH);
-    }
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();
 

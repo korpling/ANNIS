@@ -614,6 +614,12 @@ public class SearchUI extends AnnisBaseUI
     }
 
   }
+  
+  public void closeTab(Component c)
+  {
+    selectedTabHistory.remove(c);
+    mainTab.removeComponent(c);
+  }
 
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
@@ -631,7 +637,7 @@ public class SearchUI extends AnnisBaseUI
   {
     for(Component c : selectedTabHistory)
     {
-      if(c instanceof ResultViewPanel)
+      if(c instanceof ResultViewPanel && mainTab.getTab(c) != null)
       {
         return (ResultViewPanel) c;
       }
