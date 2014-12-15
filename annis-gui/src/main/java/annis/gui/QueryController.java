@@ -60,7 +60,7 @@ public class QueryController implements Serializable
   }
   
   
-  private void validateQuery(String query)
+  public void validateQuery(String query)
   {
     QueryPanel qp = ui.getControlPanel().getQueryPanel();
     if(query == null || query.isEmpty())

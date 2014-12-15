@@ -45,6 +45,9 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     super.setContextLeft(contextLeft);
     super.setContextRight(contextRight);
     super.setSegmentation(segmentation);
+    super.setQuery(query);
+    super.setCorpora(corpora);
+    
     this.offset = offset;
     this.limit = limit;
   }

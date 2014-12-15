@@ -83,7 +83,7 @@ public class QueryPanel extends GridLayout implements
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
   
-  public QueryPanel(SearchUI ui)
+  public QueryPanel(final SearchUI ui)
   {
     super(4,5);
     
@@ -111,7 +111,15 @@ public class QueryPanel extends GridLayout implements
 //    txtQuery.setHeight(10f, Unit.EM);
     txtQuery.setRows(10);
     txtQuery.setTextChangeTimeout(500);
-    txtQuery.setImmediate(true);
+    txtQuery.addTextChangeListener(new TextChangeListener()
+    {
+
+      @Override
+      public void textChange(TextChangeEvent event)
+      {
+        ui.getQueryController().validateQuery(event.getText());
+      }
+    });
 
     final VirtualKeyboard virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)

@@ -646,6 +646,12 @@ public class SearchUI extends AnnisBaseUI
     return legacyQueryController;
   }
 
+  public QueryController getQueryController()
+  {
+    return queryController;
+  }
+  
+
   public TabSheet getMainTab()
   {
     return mainTab;
