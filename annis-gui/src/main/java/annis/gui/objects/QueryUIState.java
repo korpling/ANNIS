@@ -40,7 +40,7 @@ public class QueryUIState
   private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
-  private final ObjectProperty<String> baseText = new ObjectProperty<>(null);
+  private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
   
   private final Map<QueryType, Future<?>> executedTasks = 
     new EnumMap<>(QueryType.class);
