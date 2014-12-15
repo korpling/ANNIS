@@ -164,16 +164,6 @@ public class SearchOptionsPanel extends FormLayout
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
     
-    
-    if(getUI() instanceof SearchUI)
-    {
-      SearchUI ui = (SearchUI) getUI();
-      cbLeftContext.setPropertyDataSource(ui.getQueryState().getLeftContext());
-      cbRightContext.setPropertyDataSource(ui.getQueryState().getRightContext());
-      cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
-      cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
-    }
-
     addComponent(cbLeftContext);
 
     addComponent(cbRightContext);
@@ -237,6 +227,23 @@ public class SearchOptionsPanel extends FormLayout
     cbResultsPerPage.setNewItemHandler(new CustomResultSize(cbResultsPerPage,
       resultsPerPage));
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    if(getUI() instanceof SearchUI)
+    {
+      SearchUI ui = (SearchUI) getUI();
+      cbLeftContext.setPropertyDataSource(ui.getQueryState().getLeftContext());
+      cbRightContext.setPropertyDataSource(ui.getQueryState().getRightContext());
+      cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
+      cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
+    }
+  }
+  
+  
 
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora, final UI ui)
