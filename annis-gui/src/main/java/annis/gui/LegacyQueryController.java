@@ -134,23 +134,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
     }
   }
 
-  private void updateMatches(UUID uuid, PagedResultQuery newQuery)
-  {
-    ResultViewPanel panel = getResultPanels().get(uuid);
-    if (panel != null && preparedQuery != null)
-    {
-//      prepareExecuteQuery();
-      
-      getQueries().put(uuid, newQuery);
-      
-      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-      
-      lastMatchFuture = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery, panel, ui));
-    }
-  }
-
   public void corpusSelectionChangedInBackground()
   {
     ui.getControlPanel().getSearchOptions()
@@ -253,31 +236,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
       counts = new HashMap<>();
     }
     return counts;
-  }
-
-  private class SpecificPagingCallback implements PagingCallback
-  {
-
-    private final UUID uuid;
-
-    public SpecificPagingCallback(UUID uuid)
-    {
-      this.uuid = uuid;
-    }
-
-    @Override
-    public void switchPage(int offset, int limit)
-    {
-      PagedResultQuery query = getQueries().get(uuid);
-      if (query != null)
-      {
-        query.setOffset(offset);
-        query.setLimit(limit);
-
-        // execute the result query again
-        updateMatches(uuid, query);
-      }
-    }
   }
 
   

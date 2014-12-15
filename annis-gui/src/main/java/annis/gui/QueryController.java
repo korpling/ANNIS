@@ -22,6 +22,7 @@ import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.gui.objects.QueryUIState;
+import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
@@ -42,6 +43,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -226,6 +228,8 @@ public class QueryController implements Serializable
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), pagedQuery);
+    newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
+      newResultView));
 
     TabSheet.Tab newTab;
 
@@ -360,6 +364,19 @@ public class QueryController implements Serializable
     return legacy;
   }
   
+  private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
+  {
+    if (panel != null)
+    {
+      
+      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+      
+      Future<?> future = PollControl.runInBackground(500, ui,
+        new ResultFetchJob(newQuery, panel, ui));
+      state.getExecutedTasks().put(QueryUIState.QueryType.FIND, future);
+    }
+  }
   
   private class CountCallback implements Runnable
   {
@@ -473,6 +490,32 @@ public class QueryController implements Serializable
             ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
           }
         });
+      }
+    }
+  }
+  
+  private class SpecificPagingCallback implements PagingCallback
+  {
+    
+    private final PagedResultQuery query;
+    private final ResultViewPanel panel;
+
+    public SpecificPagingCallback(PagedResultQuery query, ResultViewPanel panel)
+    {
+      this.query = query.clone();
+      this.panel = panel;
+    }
+
+    @Override
+    public void switchPage(int offset, int limit)
+    {
+      if (query != null)
+      {
+        query.setOffset(offset);
+        query.setLimit(limit);
+
+        // execute the result query again
+        updateMatches(query, panel);
       }
     }
   }
