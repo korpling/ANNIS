@@ -16,7 +16,7 @@
 package annis.gui.querybuilder;
 
 import annis.libgui.Helper;
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
@@ -61,9 +61,9 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private LegacyQueryController controller;
+  private final QueryController controller;
 
-  public TigerQueryBuilderCanvas(LegacyQueryController controller)
+  public TigerQueryBuilderCanvas(QueryController controller)
   {
     this.controller = controller;
 
@@ -112,7 +112,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getLegacy().getSelectedCorpora();
 
     if (service != null)
     {

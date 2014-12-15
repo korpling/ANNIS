@@ -18,9 +18,8 @@ package annis.gui.objects;
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
- * @param <T>
  */
-public class ContextualizedQuery<T extends ContextualizedQuery> extends Query<T>
+public class ContextualizedQuery extends Query
 {
   private int contextLeft;
   private int contextRight;

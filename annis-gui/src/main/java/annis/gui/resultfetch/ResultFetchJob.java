@@ -62,16 +62,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   protected PagedResultQuery query;
 
   protected SearchUI ui;
-  private final LegacyQueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel,
-    SearchUI ui, LegacyQueryController controller)
+    SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
-    this.queryController = controller;
     
     res = Helper.getAnnisAsyncWebResource();
     
@@ -114,9 +112,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       // get the matches
       result = futureMatches.get();
       
-      // store the matches for later purposes
-      queryController.setMatches(result);
-
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty())
       {

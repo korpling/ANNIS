@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -47,7 +48,7 @@ public class ControlPanel extends VerticalLayout
   private SearchUI ui;
 
 
-  public ControlPanel(LegacyQueryController controller, InstanceConfig instanceConfig,
+  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
     ExampleQueriesPanel autoGenQueries, SearchUI ui)
   {
     this.ui = ui;

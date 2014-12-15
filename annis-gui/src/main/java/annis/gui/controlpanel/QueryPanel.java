@@ -19,12 +19,14 @@ import annis.gui.ExportPanel;
 import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
 import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.Query;
+import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -74,11 +76,11 @@ public class QueryPanel extends GridLayout implements
   private Button btShowResult;
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
-  private ListSelect lstHistory;
-  private LegacyQueryController controller;
+  private final ListSelect lstHistory;
+  private QueryController controller;
+  private final QueryUIState state;
   private ProgressBar piCount;
   private String lastPublicStatus;
-  private List<HistoryEntry> history;
   private Window historyWindow;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
@@ -87,11 +89,12 @@ public class QueryPanel extends GridLayout implements
   {
     super(4,5);
     
-    this.controller = ui.getLegacyQueryController();
+    this.controller = ui.getQueryController();
     this.lastPublicStatus = "Welcome to ANNIS! "
       + "A tutorial is available on the right side.";
-    this.history = new LinkedList<>();
 
+    this.state = ui.getQueryState();
+    
     setSpacing(true);
     setMargin(false);
 
@@ -178,7 +181,8 @@ public class QueryPanel extends GridLayout implements
           historyWindow.setWidth("400px");
           historyWindow.setHeight("250px");
         }
-        historyWindow.setContent(new HistoryPanel(history, controller));
+        historyWindow.setContent(new HistoryPanel(state.getHistory(), 
+          ui.getQueryController()));
 
         if(UI.getCurrent().getWindows().contains(historyWindow))
         {
@@ -298,15 +302,13 @@ public class QueryPanel extends GridLayout implements
     
   }
 
-  public void updateShortHistory(List<HistoryEntry> history)
+  public void updateShortHistory()
   {
-    this.history = history;
-
     lstHistory.removeAllItems();
 
     int counter = 0;
 
-    for(HistoryEntry e : history)
+    for(Query q : state.getHistory().getItemIds())
     {
       if(counter >= MAX_HISTORY_MENU_ITEMS)
       {
@@ -314,7 +316,7 @@ public class QueryPanel extends GridLayout implements
       }
       else
       {
-        lstHistory.addItem(e);
+        lstHistory.addItem(q);
       }
       counter++;
     }
@@ -349,10 +351,10 @@ public class QueryPanel extends GridLayout implements
   public void valueChange(ValueChangeEvent event)
   {
     btHistory.setPopupVisible(false);
-    HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
-    if(controller != null && e != null)
+    Object q = event.getProperty().getValue();
+    if(controller != null && q instanceof Query)
     {
-      controller.setQuery(new Query(e.getQuery(), e.getCorpora()));
+      controller.setQuery((Query) q);
     }
   }
 
@@ -364,8 +366,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(controller != null)
       {
-        controller.setQuery((txtQuery.getValue()));
-        controller.executeQuery();
+        controller.executeSearch(true);
       }
     }
   }
@@ -457,7 +458,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getLegacyQueryController());
+        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
       }
       
       final TabSheet tabSheet = ui.getMainTab();
@@ -492,7 +493,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getLegacyQueryController());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       
@@ -530,7 +531,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(queryBuilder == null)
       {
-         queryBuilder = new QueryBuilderChooser(ui.getLegacyQueryController(), ui, ui.getInstanceConfig());
+         queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
       }
       final TabSheet tabSheet = ui.getMainTab();
       Tab tab = tabSheet.getTab(queryBuilder);
@@ -562,11 +563,6 @@ public class QueryPanel extends GridLayout implements
   public String getLastPublicStatus()
   {
     return lastPublicStatus;
-  }
-
-  public LegacyQueryController getQueryController()
-  {
-    return this.controller;
   }
 
   public ProgressBar getPiCount()

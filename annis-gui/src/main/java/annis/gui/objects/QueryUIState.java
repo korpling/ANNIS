@@ -15,9 +15,13 @@
  */
 package annis.gui.objects;
 
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
+import java.util.EnumMap;
 import java.util.LinkedHashSet;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.Future;
 
 /**
  * Helper class to bundle all query relevant state information of the UI.
@@ -26,20 +30,61 @@ import java.util.Set;
 public class QueryUIState
 {
   
+  public enum QueryType {COUNT, FIND, FREQUENCY, EXPORT}
+  
   private final ObjectProperty<String> aql = new ObjectProperty<>("");
-  private final ObjectProperty<? extends Set<String>> selectedCorpora 
-    = new ObjectProperty<>(new LinkedHashSet<String>());
-
+  private final ObjectProperty<Set<String>> selectedCorpora 
+    = new ObjectProperty<Set<String>>(new LinkedHashSet<String>());
+  
+  private final ObjectProperty<Integer> leftContext = new ObjectProperty<>(5);
+  private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
+  
+  private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
+  private final ObjectProperty<String> baseText = new ObjectProperty<>(null);
+  
+  private final Map<QueryType, Future<?>> executedTasks = 
+    new EnumMap<>(QueryType.class);
+  
+  private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
+  
   public ObjectProperty<String> getAql()
   {
     return aql;
   }
 
-  public ObjectProperty<? extends Set<String>> getSelectedCorpora()
+  public ObjectProperty<Set<String>> getSelectedCorpora()
   {
     return selectedCorpora;
   }
-  
-  
-  
+
+  public ObjectProperty<Integer> getLeftContext()
+  {
+    return leftContext;
+  }
+
+  public ObjectProperty<Integer> getRightContext()
+  {
+    return rightContext;
+  }
+
+  public ObjectProperty<Integer> getLimit()
+  {
+    return limit;
+  }
+
+  public ObjectProperty<String> getBaseText()
+  {
+    return baseText;
+  }
+
+  public Map<QueryType, Future<?>> getExecutedTasks()
+  {
+    return executedTasks;
+  }
+
+  public BeanItemContainer<Query> getHistory()
+  {
+    return history;
+  }
+ 
 }

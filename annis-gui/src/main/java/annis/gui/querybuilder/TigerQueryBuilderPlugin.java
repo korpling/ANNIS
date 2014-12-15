@@ -15,7 +15,7 @@
  */
 package annis.gui.querybuilder;
 
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -48,7 +48,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
   }
 
   @Override
-  public TigerQueryBuilder createComponent(LegacyQueryController controller)
+  public TigerQueryBuilder createComponent(QueryController controller)
   {
     return new TigerQueryBuilder(controller);
   }
@@ -60,7 +60,7 @@ public class TigerQueryBuilderPlugin implements QueryBuilderPlugin<TigerQueryBui
     private Button btClearAll;
     private TigerQueryBuilderCanvas queryBuilder;
 
-    public TigerQueryBuilder(LegacyQueryController controller)
+    public TigerQueryBuilder(QueryController controller)
     {
       setStyleName(ChameleonTheme.PANEL_BORDERLESS);
 

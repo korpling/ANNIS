@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.beans.HistoryEntry;
 import annis.gui.objects.Query;
+import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -40,11 +41,11 @@ public class HistoryPanel extends Panel
 {
 
   private Table tblHistory;
-  private BeanItemContainer<HistoryEntry> containerHistory;
-  private LegacyQueryController controller;
-  private CitationLinkGenerator citationGenerator;
+  private QueryController controller;
+  private final CitationLinkGenerator citationGenerator;
 
-  public HistoryPanel(List<HistoryEntry> history, LegacyQueryController controller)
+  public HistoryPanel(final BeanItemContainer<Query> containerHistory, 
+    QueryController controller)
   {
     this.controller = controller;
     
@@ -54,8 +55,6 @@ public class HistoryPanel extends Panel
     setSizeFull();
     layout.setSizeFull();
 
-    containerHistory = new BeanItemContainer(HistoryEntry.class);
-    containerHistory.addAll(history);
 
     tblHistory = new Table();
 
@@ -77,10 +76,7 @@ public class HistoryPanel extends Panel
     citationGenerator = new CitationLinkGenerator();
     tblHistory.addGeneratedColumn("genlink", citationGenerator);
 
-    tblHistory.setVisibleColumns(new String[]
-      {
-        "gennumber", "query", "genlink"
-      });
+    tblHistory.setVisibleColumns("gennumber", "query", "genlink");
     tblHistory.setColumnHeader("gennumber", "#");
     tblHistory.setColumnHeader("query", "Query");
     tblHistory.setColumnHeader("genlink", "URL");
@@ -94,11 +90,11 @@ public class HistoryPanel extends Panel
   @Override
   public void valueChange(ValueChangeEvent event)
   {
-    HistoryEntry e = (HistoryEntry) event.getProperty().getValue();
+    Query q = (Query) event.getProperty().getValue();
     
-    if(e != null && controller != null)
+    if(q != null && controller != null)
     {
-      controller.setQuery(new Query(e.getQuery(), new HashSet<>(e.getCorpora())));
+      controller.setQuery(q);
     }
   }
 
@@ -107,7 +103,7 @@ public class HistoryPanel extends Panel
   {
     if(controller != null && event.isDoubleClick())
     {
-      controller.executeQuery();
+      controller.executeSearch(true);
       if(getParent() instanceof Window)
       {
         UI.getCurrent().removeWindow((Window) getParent());

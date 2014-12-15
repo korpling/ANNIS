@@ -18,6 +18,7 @@ package annis.gui.querybuilder;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.ui.ComboBox;
@@ -38,7 +39,7 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
   private PluginSystem pluginSystem;
-  private LegacyQueryController controller;
+  private QueryController controller;
   private ComboBox cbChooseBuilder;
   private Map<String, String> short2caption;
   private Map<String, QueryBuilderPlugin> pluginRegistry;
@@ -47,7 +48,7 @@ public class QueryBuilderChooser extends Panel implements Property.ValueChangeLi
   private InstanceConfig instanceConfig;
   private Component component;
   
-  public QueryBuilderChooser(LegacyQueryController controller, PluginSystem pluginSystem,
+  public QueryBuilderChooser(QueryController controller, PluginSystem pluginSystem,
     InstanceConfig instanceConfig)
   {
     this.controller = controller;

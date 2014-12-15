@@ -17,7 +17,6 @@ package annis.gui.objects;
 
 import java.io.Serializable;
 import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.Set;
 
 /**
@@ -27,9 +26,8 @@ import java.util.Set;
  * related to querying, e.g. the AQL, the search options and the type of the query.
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
- * @param <T>
  */
-public class Query<T extends Query> implements Serializable
+public class Query implements Serializable
 {
   private String query;
   private Set<String> corpora;

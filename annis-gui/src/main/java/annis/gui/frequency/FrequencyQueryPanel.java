@@ -16,7 +16,7 @@
 package annis.gui.frequency;
 
 import annis.gui.CorpusSelectionChangeListener;
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.Helper;
@@ -53,7 +53,6 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -86,12 +85,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private FrequencyResultPanel resultPanel;
   private Button btShowQuery;
   private VerticalLayout queryLayout;
-  private final LegacyQueryController controller;
+  private final QueryController controller;
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
   
-  public FrequencyQueryPanel(final LegacyQueryController controller)
+  public FrequencyQueryPanel(final QueryController controller)
   {
     this.controller = controller;
     
@@ -197,8 +196,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     if(controller != null)
     {
-      createAutomaticEntriesForQuery(controller.getQueryDraft());
-      updateQueryInfo(controller.getQueryDraft());
+      createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
+      updateQueryInfo(controller.getLegacy().getQueryDraft());
     }
     
     HorizontalLayout layoutButtons = new HorizontalLayout();
@@ -228,7 +227,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
         if(controller != null)
         {
-          List<QueryNode> nodes = parseQuery(controller.getQueryDraft());
+          List<QueryNode> nodes = parseQuery(controller.getLegacy().getQueryDraft());
           nr = Math.min(nr, nodes.size()-1);
           int id = counter++;
           tblFrequencyDefinition.addItem(createNewTableRow(
@@ -270,7 +269,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           tblFrequencyDefinition.removeAllItems();
           if(controller != null)
           {
-            createAutomaticEntriesForQuery(controller.getQueryDraft());
+            createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
           }
         }
       }
@@ -288,7 +287,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         tblFrequencyDefinition.removeAllItems();
         if(controller != null)
         {
-          createAutomaticEntriesForQuery(controller.getQueryDraft());
+          createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
         }
       }
     });
@@ -347,7 +346,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         
         if(controller != null)
         {
-          controller.setQueryFromUI();
           try
           {
             executeFrequencyQuery(freqDefinition);
@@ -390,7 +388,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
    
     if(controller != null)
     {
-      controller.addCorpusSelectionChangeListener(new CorpusSelectionChangeListener()
+      controller.getLegacy().addCorpusSelectionChangeListener(new CorpusSelectionChangeListener()
       {
 
         @Override
@@ -398,9 +396,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if (cbAutomaticMode.getValue())
           {
-            createAutomaticEntriesForQuery(controller.getQueryDraft());
+            createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
           }
-          updateQueryInfo(controller.getQueryDraft());
+          updateQueryInfo(controller.getLegacy().getQueryDraft());
         }
       });
     }
@@ -411,7 +409,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = controller.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getLegacy().getSelectedCorpora();
     if (service != null)
     {
       try
@@ -508,9 +506,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
   public void executeFrequencyQuery(FrequencyTableQuery freqDefinition)
   {
-    if (controller != null && controller.getPreparedQuery() != null)
+    if (controller != null && controller.getLegacy().getPreparedQuery() != null)
     {
-      PagedResultQuery preparedQuery = controller.getPreparedQuery();
+      PagedResultQuery preparedQuery = controller.getLegacy().getPreparedQuery();
       
       if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
       {
@@ -658,7 +656,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     oldSelection.retainAll(allMetaNames);
     selectedMetaData.setValue(oldSelection);
     
-    Set<String> selectedCorpora = controller.getSelectedCorpora();
+    Set<String> selectedCorpora = controller.getLegacy().getSelectedCorpora();
     if(selectedCorpora.isEmpty())
     {
       lblCorpusList.setValue("none");

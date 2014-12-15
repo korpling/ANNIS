@@ -18,6 +18,7 @@ package annis.gui.flatquerybuilder;
 
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
@@ -64,7 +65,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private MenuBar addMenuSpan;
   private MenuBar addMenuMeta;
   
-  private LegacyQueryController cp;
+  private QueryController cp;
   private HorizontalLayout language;
   private HorizontalLayout languagenodes;
   private HorizontalLayout span;
@@ -114,14 +115,14 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   private String LANG_CAPTION = "Linguistic sequence";
   private String ADVANCED_CAPTION = "Advanced settings"; 
 
-  public FlatQueryBuilder(LegacyQueryController cp)
+  public FlatQueryBuilder(QueryController cp)
   {
     setSizeFull();
     launch(cp); 
     
   }
 
-  private void launch(LegacyQueryController cp)
+  private void launch(QueryController cp)
   {
     this.cp = cp;
     rsc = new ReducingStringComparator();
@@ -221,7 +222,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   public void attach()
   {
     super.attach();
-    cp.addCorpusSelectionChangeListener(this);
+    cp.getLegacy().addCorpusSelectionChangeListener(this);
   }
   
   
@@ -230,7 +231,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   public void detach()
   {
     super.detach();
-    cp.removeCorpusSelectionChangeListener(this);
+    cp.getLegacy().removeCorpusSelectionChangeListener(this);
   }
   
   
@@ -507,7 +508,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
-    if (cp.getSelectedCorpora().isEmpty())
+    if (cp.getLegacy().getSelectedCorpora().isEmpty())
     {
       Notification.show(NO_CORPORA_WARNING);
     }
@@ -658,7 +659,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
     if (service != null)
     {
       try
@@ -698,7 +699,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Collection<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
     if (service != null)
     {
       try
@@ -753,7 +754,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
     if (service != null)
     {
       try
@@ -793,7 +794,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getSelectedCorpora();
+    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
     if (service != null)
     {
       try
@@ -904,7 +905,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
      */
   {
     /*get clean query from control panel text field*/
-    String tq = cp.getQueryDraft().replace("\n", " ").replace("\r", "");
+    String tq = cp.getLegacy().getQueryDraft().replace("\n", " ").replace("\r", "");
     //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)

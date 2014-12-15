@@ -28,7 +28,7 @@ import java.util.Set;
  */
 public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
 {
-  private T current;
+  private final T current;
   
   /**
    * It's not allowed to construct a query generator on your own.
@@ -77,6 +77,12 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     private ContextQueryGenerator(T query)
     {
       super(query);
+    }
+    
+    public QG left(int left)
+    {
+      getCurrent().setContextLeft(left);
+      return (QG) this;
     }
     
     public QG right(int right)

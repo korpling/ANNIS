@@ -115,7 +115,6 @@ public class SearchUI extends AnnisBaseUI
 
   private TabSheet mainTab;
 
-  private LegacyQueryController legacyQueryController;
   private final QueryController queryController;
 
   private String lastQueriedFragment;
@@ -162,8 +161,6 @@ public class SearchUI extends AnnisBaseUI
     // init a doc browser controller
     docBrowserController = new DocBrowserController(this);
 
-    legacyQueryController = new LegacyQueryController(this);
-
     // always get the resize events directly
     setImmediate(true);
 
@@ -187,13 +184,13 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
-    mainTab.addSelectedTabChangeListener(legacyQueryController);
+    mainTab.addSelectedTabChangeListener(queryController.getLegacy());
     mainTab.addSelectedTabChangeListener(this);
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
-    controlPanel = new ControlPanel(legacyQueryController, instanceConfig,
+    controlPanel = new ControlPanel(queryController, instanceConfig,
       help.getExamples(), this);
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
@@ -551,14 +548,13 @@ public class SearchUI extends AnnisBaseUI
           log.error(
             "could not parse context value", ex);
         }
-        legacyQueryController.
-          setQuery(
+        queryController.setQuery(
             new PagedResultQuery(cleft, cright, 0, 10, null, aql,
               selectedCorpora));
       }
       else
       {
-        legacyQueryController.setQuery(new Query(aql, selectedCorpora));
+        queryController.setQuery(new Query(aql, selectedCorpora));
       }
 
       // remove all currently openend sub-windows
@@ -610,7 +606,7 @@ public class SearchUI extends AnnisBaseUI
     tabsheet.removeComponent(tabContent);
     if (tabContent instanceof ResultViewPanel)
     {
-      getLegacyQueryController().notifyTabClose((ResultViewPanel) tabContent);
+      queryController.getLegacy().notifyTabClose((ResultViewPanel) tabContent);
     }
     else if (tabContent instanceof FrequencyQueryPanel)
     {
@@ -630,6 +626,18 @@ public class SearchUI extends AnnisBaseUI
       selectedTabHistory.add(tab);
     }
   }
+  
+  public ResultViewPanel getLastSelectedResultView()
+  {
+    for(Component c : selectedTabHistory)
+    {
+      if(c instanceof ResultViewPanel)
+      {
+        return (ResultViewPanel) c;
+      }
+    }
+    return null;
+  }
 
   public ControlPanel getControlPanel()
   {
@@ -639,11 +647,6 @@ public class SearchUI extends AnnisBaseUI
   public InstanceConfig getInstanceConfig()
   {
     return instanceConfig;
-  }
-
-  public LegacyQueryController getLegacyQueryController()
-  {
-    return legacyQueryController;
   }
 
   public QueryController getQueryController()
@@ -730,13 +733,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onLogin()
   {
-    legacyQueryController.updateCorpusSetList();
+    queryController.getLegacy().updateCorpusSetList();
   }
 
   @Override
   public void onLogout()
   {
-    legacyQueryController.updateCorpusSetList();
+    queryController.getLegacy().updateCorpusSetList();
   }
 
   @Override
@@ -865,13 +868,13 @@ public class SearchUI extends AnnisBaseUI
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       // full query with given context
-      legacyQueryController.setQuery(new PagedResultQuery(
+      queryController.setQuery(new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
         Integer.parseInt(args.get("cr")),
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      legacyQueryController.executeQuery();
+      queryController.executeSearch(true);
     }
     else
     {
@@ -879,8 +882,8 @@ public class SearchUI extends AnnisBaseUI
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       // use default context
-      legacyQueryController.setQuery(new Query(args.get("q"), corpora));
-      legacyQueryController.executeQuery();
+      queryController.setQuery(new Query(args.get("q"), corpora));
+      queryController.executeSearch(true);
     }
   }
 

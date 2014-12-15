@@ -26,6 +26,7 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
+import annis.gui.objects.Query;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import com.google.common.base.Stopwatch;
@@ -103,14 +104,14 @@ public class ExportPanel extends FormLayout
 
   private transient Stopwatch exportTime = new Stopwatch();
 
-  private final LegacyQueryController controller;
+  private final QueryController controller;
 
   private transient Future<File> exportFuture = null;
 
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
-    LegacyQueryController controller)
+    QueryController controller)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
@@ -370,10 +371,8 @@ public class ExportPanel extends FormLayout
           return;
         }
 
-        HistoryEntry e = new HistoryEntry();
-        e.setCorpora(corpusListPanel.getSelectedCorpora());
-        e.setQuery(queryPanel.getQuery());
-        controller.addHistoryEntry(e);
+        // TODO: add history entry
+//        controller.addHistoryEntry(new Query, null));
         progressBar.setVisible(true);
         progressLabel.setValue("");
 

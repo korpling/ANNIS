@@ -19,7 +19,7 @@ import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
 import annis.gui.MetaDataPanel;
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
@@ -31,7 +31,6 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -67,7 +66,7 @@ import java.util.Random;
 import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.UUID;
+import org.apache.commons.lang3.NotImplementedException;
 import org.apache.commons.lang3.StringUtils;
 import org.eclipse.emf.common.util.BasicEList;
 import org.eclipse.emf.common.util.EList;
@@ -110,9 +109,7 @@ public class SingleResultPanel extends CssLayout implements
 
   private String documentName;
 
-  private UUID queryId;
-
-  private LegacyQueryController queryController;
+  private QueryController queryController;
 
   private int resultNumber;
 
@@ -135,15 +132,14 @@ public class SingleResultPanel extends CssLayout implements
 
   public SingleResultPanel(final SDocument result, int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
-    Set<String> visibleTokenAnnos, String segmentationName, UUID queryId,
-    LegacyQueryController controller, InstanceConfig instanceConfig)
+    Set<String> visibleTokenAnnos, String segmentationName,
+    QueryController controller, InstanceConfig instanceConfig)
   {
     this.ps = ps;
     this.result = result;
     this.segmentationName = segmentationName;
     this.queryController = controller;
     this.resultNumber = resultNumber;
-    this.queryId = queryId;
     this.resolverProvider = resolverProvider;
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.instanceConfig = instanceConfig;
@@ -221,7 +217,7 @@ public class SingleResultPanel extends CssLayout implements
       rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
     }
 
-    int lftContextIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextLeft();
+    int lftContextIdx = queryController == null ? 0 : queryController.getLegacy().getPreparedQuery().getContextLeft();
     lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
@@ -231,7 +227,7 @@ public class SingleResultPanel extends CssLayout implements
       true
     });
 
-    int rghtCtxIdx = queryController == null ? 0 : queryController.getPreparedQuery().getContextRight();
+    int rghtCtxIdx = queryController == null ? 0 : queryController.getLegacy().getPreparedQuery().getContextRight();
     rghtCtxContainer.addItem(rghtCtxIdx);
 
     rghtCtxContainer.sort(new Object[]
@@ -258,9 +254,9 @@ public class SingleResultPanel extends CssLayout implements
     rghtCtxCombo.setNewItemHandler(new AddNewItemHandler(rghtCtxCombo));
 
     lftCtxCombo.addValueChangeListener(
-      new ContextChangeListener(queryId, resultNumber, true));
+      new ContextChangeListener(resultNumber, true));
     rghtCtxCombo.addValueChangeListener(
-      new ContextChangeListener(queryId, resultNumber, false));
+      new ContextChangeListener(resultNumber, false));
 
     Label leftCtxLabel = new Label("left context: ");
     Label rightCtxLabel = new Label("right context: ");
@@ -550,12 +546,14 @@ public class SingleResultPanel extends CssLayout implements
   }
 
   @Override
-  public void changeContext(UUID queryId, int resultNumber, int context,
+  public void changeContext(int resultNumber, int context,
     boolean left)
   {
     //delegates the task to the query controller.
-    queryController.changeCtx(queryId, resultNumber, context,
-      (VisualizerContextChanger) this, left);
+    
+    //TODO: implement change context
+    throw new NotImplementedException("context change not implemented yet");
+//    queryController.changeCtx(queryId, resultNumber, context, (VisualizerContextChanger) this, left);
   }
 
   private static class AddNewItemHandler implements AbstractSelect.NewItemHandler
@@ -622,11 +620,9 @@ public class SingleResultPanel extends CssLayout implements
 
     boolean left;
 
-    UUID queryId;
 
-    public ContextChangeListener(UUID queryId, int resultNumber, boolean left)
+    public ContextChangeListener(int resultNumber, boolean left)
     {
-      this.queryId = queryId;
       this.resultNumber = resultNumber;
       this.left = left;
     }
@@ -638,7 +634,7 @@ public class SingleResultPanel extends CssLayout implements
       lftCtxCombo.setEnabled(false);
       rghtCtxCombo.setEnabled(false);
       int ctx = Integer.parseInt(event.getProperty().getValue().toString());
-      changeContext(queryId, resultNumber, ctx, left);
+      changeContext(resultNumber, ctx, left);
     }
   }
 

@@ -17,7 +17,7 @@ package annis.gui.resultview;
 
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
@@ -61,7 +61,6 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -96,7 +95,7 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private TreeMap<String, Boolean> tokenAnnoVisible;
 
-  private LegacyQueryController controller;
+  private QueryController controller;
 
   private String selectedSegmentationLayer;
 
@@ -120,21 +119,18 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private transient BlockingQueue<SaltProject> projectQueue;
 
-  private UUID queryId;
-
   private PagedResultQuery currentQuery;
 
-  SearchUI sui = (SearchUI) UI.getCurrent();
+  private final SearchUI sui;
 
-  public ResultViewPanel(LegacyQueryController controller,
-    PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
+  public ResultViewPanel(SearchUI ui,
+    PluginSystem ps, InstanceConfig instanceConfig)
   {
+    this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
-    this.queryId = queryId;
-    this.controller = controller;
-    this.selectedSegmentationLayer = controller.getPreparedQuery().
-      getSegmentation();
+    this.controller = ui.getQueryController();
+    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
 
     cacheResolver
       = Collections.synchronizedMap(
@@ -357,7 +353,7 @@ public class ResultViewPanel extends VerticalLayout implements
       SingleResultPanel panel = new SingleResultPanel(corpusGraph.
         getSDocuments().get(0),
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        getVisibleTokenAnnos(), segmentationName, queryId, controller,
+        getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig);
 
       i++;
@@ -441,7 +437,7 @@ public class ResultViewPanel extends VerticalLayout implements
   public void setCount(int count)
   {
     paging.setCount(count, false);
-    paging.setStartNumber(controller.getPreparedQuery().getOffset());
+    paging.setStartNumber(controller.getLegacy().getPreparedQuery().getOffset());
   }
 
   public SortedSet<String> getVisibleTokenAnnos()
@@ -499,7 +495,7 @@ public class ResultViewPanel extends VerticalLayout implements
       //update URL with newly selected segmentation layer
       PagedResultQuery q;
       SearchUI sui = (SearchUI) UI.getCurrent();
-      q = sui.getLegacyQueryController().getPreparedQuery();
+      q = sui.getQueryController().getLegacy().getPreparedQuery();
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
       q.setSegmentation(selectedSegmentationLayer);
 

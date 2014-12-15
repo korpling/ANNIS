@@ -15,7 +15,7 @@
  */
 package annis.gui.flatquerybuilder;
 
-import annis.gui.LegacyQueryController;
+import annis.gui.QueryController;
 import annis.gui.querybuilder.QueryBuilderPlugin;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 
@@ -42,7 +42,7 @@ public class FlatQueryBuilderPlugin implements QueryBuilderPlugin<FlatQueryBuild
   }
 
   @Override
-  public FlatQueryBuilder createComponent(LegacyQueryController controlPanel)
+  public FlatQueryBuilder createComponent(QueryController controlPanel)
   {
     FlatQueryBuilder qb = new FlatQueryBuilder(controlPanel);
     return qb;

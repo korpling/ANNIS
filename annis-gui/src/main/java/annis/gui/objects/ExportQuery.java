@@ -22,7 +22,7 @@ import java.util.List;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class ExportQuery extends ContextualizedQuery<ExportQuery>
+public class ExportQuery extends ContextualizedQuery
 {
   private String exporterName;
   
