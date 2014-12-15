@@ -183,8 +183,8 @@ public class QueryController implements Serializable
     return QueryGenerator.paged()
       .query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
-      .left(state.getRightContext().getValue())
-      .right(state.getLeftContext().getValue())
+      .left(state.getLeftContext().getValue())
+      .right(state.getRightContext().getValue())
       .segmentation(state.getBaseText().getValue())
       .limit(state.getLimit().getValue())
       .build();
