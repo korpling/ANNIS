@@ -16,24 +16,17 @@
 package annis.gui.controlpanel;
 
 import annis.gui.ExportPanel;
-import annis.libgui.Helper;
 import annis.gui.HistoryPanel;
-import annis.gui.LegacyQueryController;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.beans.HistoryEntry;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.components.VirtualKeyboard;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
-import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
@@ -47,12 +40,6 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -84,6 +71,9 @@ public class QueryPanel extends GridLayout implements
   private Window historyWindow;
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
+  
+  private final BeanItemContainer<Query> historyContainer =
+    new BeanItemContainer<>(Query.class);;
   
   public QueryPanel(final SearchUI ui)
   {
@@ -161,14 +151,16 @@ public class QueryPanel extends GridLayout implements
 
     VerticalLayout historyListLayout = new VerticalLayout();
     historyListLayout.setSizeUndefined();
-
+    
     lstHistory = new ListSelect();
     lstHistory.setWidth("200px");
     lstHistory.setNullSelectionAllowed(false);
     lstHistory.setValue(null);
     lstHistory.addValueChangeListener((ValueChangeListener) this);
     lstHistory.setImmediate(true);
-
+    lstHistory.setContainerDataSource(historyContainer);
+    lstHistory.setItemCaptionPropertyId("query");
+    
     Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener()
     {
       @Override
@@ -304,7 +296,7 @@ public class QueryPanel extends GridLayout implements
 
   public void updateShortHistory()
   {
-    lstHistory.removeAllItems();
+    historyContainer.removeAllItems();
 
     int counter = 0;
 
@@ -316,7 +308,7 @@ public class QueryPanel extends GridLayout implements
       }
       else
       {
-        lstHistory.addItem(q);
+        historyContainer.addBean(q);
       }
       counter++;
     }
