@@ -217,8 +217,9 @@ public class CorpusListPanel extends VerticalLayout implements
 
 
     tblCorpora.setContainerDataSource(corpusContainer);
+    tblCorpora.setMultiSelect(true);
     tblCorpora.setPropertyDataSource(ui.getQueryState().getSelectedCorpora());
-
+  
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
     tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
 
@@ -228,7 +229,6 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setHeight("100%");
     tblCorpora.setWidth("100%");
     tblCorpora.setSelectable(true);
-    tblCorpora.setMultiSelect(true);
     tblCorpora.setNullSelectionAllowed(false);
     tblCorpora.setColumnExpandRatio("name", 0.6f);
     tblCorpora.setColumnExpandRatio("textCount", 0.15f);
