@@ -26,6 +26,7 @@ import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
+import annis.service.objects.Match;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
@@ -93,46 +94,49 @@ public class SingleResultPanel extends CssLayout implements
 
   private Map<String, String> markedExactMap;
 
-  private PluginSystem ps;
+  private final PluginSystem ps;
 
   private List<VisualizerPanel> visualizers;
 
-  private Button btInfo;
+  private final Button btInfo;
 
-  private List<String> path;
+  private final List<String> path;
 
   private String segmentationName;
 
-  private HorizontalLayout infoBar;
+  private final HorizontalLayout infoBar;
 
-  private String corpusName;
+  private final String corpusName;
 
-  private String documentName;
+  private final String documentName;
 
-  private QueryController queryController;
+  private final QueryController queryController;
 
-  private int resultNumber;
+  private final int resultNumber;
 
-  private ResolverProvider resolverProvider;
+  private final ResolverProvider resolverProvider;
 
-  private Set<String> visibleTokenAnnos;
+  private final Set<String> visibleTokenAnnos;
 
   private ProgressBar reloadVisualizer;
 
-  private ComboBox lftCtxCombo;
+  private final ComboBox lftCtxCombo;
 
-  private ComboBox rghtCtxCombo;
+  private final ComboBox rghtCtxCombo;
 
-  private Map<Long, Boolean> visualizerState;
+  private final Map<Long, Boolean> visualizerState;
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SingleResultPanel.class);
 
-  private InstanceConfig instanceConfig;
+  private final InstanceConfig instanceConfig;
   
-  private final PagedResultQuery query;
+  private PagedResultQuery query;
+  private final Match match;
 
-  public SingleResultPanel(final SDocument result, int resultNumber,
+  public SingleResultPanel(final SDocument result, 
+    Match match,
+    int resultNumber,
     ResolverProvider resolverProvider, PluginSystem ps,
     Set<String> visibleTokenAnnos, String segmentationName,
     QueryController controller, InstanceConfig instanceConfig,
@@ -147,6 +151,7 @@ public class SingleResultPanel extends CssLayout implements
     this.visibleTokenAnnos = visibleTokenAnnos;
     this.instanceConfig = instanceConfig;
     this.query = query;
+    this.match = match;
 
     calculateHelperVariables();
 
@@ -328,12 +333,12 @@ public class SingleResultPanel extends CssLayout implements
         {
 
           SFeature featMatched = n.getSFeature(ANNIS_NS, FEAT_MATCHEDNODE);
-          Long match = featMatched == null ? null : featMatched.
+          Long matchNum = featMatched == null ? null : featMatched.
             getSValueSNUMERIC();
 
-          if (match != null)
+          if (matchNum != null)
           {
-            int color = Math.max(0, Math.min((int) match.longValue() - 1,
+            int color = Math.max(0, Math.min((int) matchNum.longValue() - 1,
               MatchedNodeColors.values().length - 1));
             RelannisNodeFeature feat = RelannisNodeFeature.extract(n);
             if (feat != null)
@@ -555,9 +560,7 @@ public class SingleResultPanel extends CssLayout implements
   {
     //delegates the task to the query controller.
     
-    //TODO: implement change context
-    throw new NotImplementedException("context change not implemented yet");
-//    queryController.changeCtx(queryId, resultNumber, context, (VisualizerContextChanger) this, left);
+    queryController.changeContext(query, match, resultNumber, context, this, left);
   }
 
   private static class AddNewItemHandler implements AbstractSelect.NewItemHandler
@@ -844,6 +847,7 @@ public class SingleResultPanel extends CssLayout implements
   @Override
   public void updateResult(SaltProject p, PagedResultQuery query)
   {
+    this.query = query;
     if (p != null
       && p.getSCorpusGraphs() != null
       && !p.getSCorpusGraphs().isEmpty()

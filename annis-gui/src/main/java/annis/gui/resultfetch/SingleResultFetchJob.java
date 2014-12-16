@@ -42,11 +42,11 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
   Runnable
 {
 
-  private VisualizerContextChanger visContextChanger;
+  private final VisualizerContextChanger visContextChanger;
 
-  private Match match;
+  private final Match match;
 
-  private PagedResultQuery query;
+  private final PagedResultQuery query;
 
   public SingleResultFetchJob(Match match, PagedResultQuery query,
     VisualizerContextChanger visContextChanger)

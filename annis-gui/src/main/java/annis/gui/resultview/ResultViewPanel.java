@@ -31,7 +31,9 @@ import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
@@ -40,7 +42,6 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -49,6 +50,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -62,6 +65,8 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -121,7 +126,6 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private PagedResultQuery currentQuery;
   private PagedResultQuery initialQuery;
-
   private final SearchUI sui;
 
   public ResultViewPanel(SearchUI ui,
@@ -352,8 +356,18 @@ public class ResultViewPanel extends VerticalLayout implements
     int i = 0;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      SingleResultPanel panel = new SingleResultPanel(corpusGraph.
-        getSDocuments().get(0),
+      SDocument doc = corpusGraph.getSDocuments().get(0);
+      Match m = new Match();
+      try
+      {
+        m = CommonHelper.extractMatch(doc);
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error("Invalid Syntax in match", ex);
+      }
+      
+      SingleResultPanel panel = new SingleResultPanel(doc, m,
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
         getVisibleTokenAnnos(), segmentationName, controller,
         instanceConfig, initialQuery);

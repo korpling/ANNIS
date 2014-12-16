@@ -240,67 +240,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
 
   
 
-  public void changeCtx(UUID queryID, int offset, int context,
-    VisualizerContextChanger visCtxChange, boolean left)
-  {
-
-    PagedResultQuery query;
-
-    if (queries.containsKey(queryID) && resultPanels.containsKey(queryID))
-    {
-      if (updatedQueries == null)
-      {
-        updatedQueries = new HashMap<>();
-      }
-
-      if (!updatedQueries.containsKey(queryID))
-      {
-        updatedQueries.put(queryID, new HashMap<Integer, PagedResultQuery>());
-      }
-
-      if (!updatedQueries.get(queryID).containsKey(offset))
-      {
-        query = (PagedResultQuery) queries.get(queryID).clone();
-        updatedQueries.get(queryID).put(offset, query);
-      }
-      else
-      {
-        query = updatedQueries.get(queryID).get(offset);
-      }
-
-      if (left)
-      {
-        query.setContextLeft(context);
-      }
-      else
-      {
-        query.setContextRight(context);
-      }
-
-      query.setOffset(offset);
-      query.setLimit(1);
-
-      if (matches != null && matches.getMatches() != null
-        && !matches.getMatches().isEmpty())
-      {
-        // The size is the match list corresponds to the page size of the 
-        // result view, thus we can make an index shift to the right position of 
-        // match in the match list via modulo of size of the match list.
-        List<Match> extractMatches = matches.getMatches();
-        Match m = extractMatches.get(offset % extractMatches.size());
-
-        PollControl.runInBackground(500, ui,
-          new SingleResultFetchJob(m, query,
-            visCtxChange));
-      }
-    }
-    else
-    {
-      log.warn("no query with {} found");
-      return;
-    }
-  }
-
   public void setMatches(MatchGroup matches)
   {
     this.matches = matches;

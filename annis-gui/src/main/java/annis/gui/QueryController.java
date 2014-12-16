@@ -24,11 +24,14 @@ import annis.gui.objects.QueryGenerator;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
+import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
+import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -41,6 +44,7 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
@@ -368,6 +372,31 @@ public class QueryController implements Serializable
         new ResultFetchJob(newQuery, panel, ui));
       state.getExecutedTasks().put(QueryUIState.QueryType.FIND, future);
     }
+  }
+  
+  public void changeContext(PagedResultQuery originalQuery, 
+    Match match,
+    int offset, int newContext,
+    VisualizerContextChanger visCtxChange, boolean left)
+  {
+
+    PagedResultQuery newQuery = originalQuery.clone();
+    if (left)
+    {
+      newQuery.setContextLeft(newContext);
+    }
+    else
+    {
+      newQuery.setContextRight(newContext);
+    }
+
+    newQuery.setOffset(offset);
+    
+    PollControl.runInBackground(500, ui,
+      new SingleResultFetchJob(match, newQuery,
+        visCtxChange));
+
+
   }
   
   private class CountCallback implements Runnable
