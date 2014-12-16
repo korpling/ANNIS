@@ -45,9 +45,10 @@ public class QueryUIState
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
   
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
-  private final ObjectProperty<List<String>> annotationKeys 
+  private final ObjectProperty<List<String>> exportAnnotationKeys 
     = new ObjectProperty<List<String>>(new ArrayList<String>());
-  private final ObjectProperty<String> parameters = new ObjectProperty<>("");
+  private final ObjectProperty<String> exportParameters = 
+    new ObjectProperty<>("");
   
   private final Map<QueryType, Future<?>> executedTasks = 
     new EnumMap<>(QueryType.class);
@@ -99,14 +100,14 @@ public class QueryUIState
     return exporterName;
   }
 
-  public ObjectProperty<List<String>> getAnnotationKeys()
+  public ObjectProperty<List<String>> getExportAnnotationKeys()
   {
-    return annotationKeys;
+    return exportAnnotationKeys;
   }
 
-  public ObjectProperty<String> getParameters()
+  public ObjectProperty<String> getExportParameters()
   {
-    return parameters;
+    return exportParameters;
   }
   
   

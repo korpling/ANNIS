@@ -18,6 +18,7 @@ package annis.gui.exporter;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.WebResource;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -27,7 +28,7 @@ import java.util.Set;
 public interface Exporter
 {
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight, 
-   Set<String> corpora, String keysAsString, String argsAsString, 
+   Set<String> corpora, List<String> keys, String args, 
    WebResource annisResource, Writer out, EventBus eventBus);
   
   public boolean isCancelable();

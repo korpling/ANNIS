@@ -227,9 +227,9 @@ public class ExportPanel extends FormLayout
       state.getExporterName().setValue(EXPORTER[0].getClass().getSimpleName());
       
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
-      txtAnnotationKeys.setPropertyDataSource(state.getAnnotationKeys());
-      txtParameters.setPropertyDataSource(state.getParameters());
+      txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
       
+      txtParameters.setPropertyDataSource(state.getExportParameters());
       
     }
   }
@@ -458,8 +458,8 @@ public class ExportPanel extends FormLayout
           (Integer) cbLeftContext.getValue(),
           (Integer) cbRightContext.getValue(),
           corpusListPanel.getSelectedCorpora(),
-          txtAnnotationKeys.getValue(),
-          txtParameters.getValue(),
+          state.getExportAnnotationKeys().getValue(),
+          state.getExportParameters().getValue(),
           Helper.getAnnisWebResource().path("query"),
           outWriter, eventBus);
         success.set(true);
