@@ -132,11 +132,9 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
       return this;
     }
     
-    public ExportQueryGenerator annotations(String annotationKeys)
+    public ExportQueryGenerator annotations(List<String> annotationKeys)
     {
-      List<String> asList = Splitter.on(',').omitEmptyStrings()
-        .trimResults().splitToList(annotationKeys);
-      getCurrent().setAnnotationKeys(asList);
+      getCurrent().setAnnotationKeys(annotationKeys);
       return this;
     }
     

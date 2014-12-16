@@ -24,6 +24,12 @@ import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.Exporter;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
+import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.WekaExporter;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
@@ -95,6 +101,15 @@ public class SearchUI extends AnnisBaseUI
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
+  
+  public static final Exporter[] EXPORTER = new Exporter[]
+  {
+    new WekaExporter(),
+    new CSVExporter(),
+    new TextExporter(),
+    new GridExporter(),
+    new SimpleTextExporter()
+  };
 
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();

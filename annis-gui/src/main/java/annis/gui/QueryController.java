@@ -17,8 +17,14 @@ package annis.gui;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
+import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.WekaExporter;
 import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.ExportQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryGenerator;
@@ -39,8 +45,6 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property;
-import com.vaadin.server.FileDownloader;
-import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
@@ -52,6 +56,7 @@ import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -78,6 +83,8 @@ public class QueryController implements Serializable
 
   private final LegacyQueryController legacy;
   
+  private final Map<String, Exporter> exporterMap = new HashMap<>();
+  
   public QueryController(SearchUI ui)
   {
     this.ui = ui;
@@ -93,6 +100,12 @@ public class QueryController implements Serializable
         validateQuery(QueryController.this.state.getAql().getValue());
       }
     });
+    
+    for (Exporter e : SearchUI.EXPORTER)
+    {
+      String name = e.getClass().getSimpleName();
+      exporterMap.put(name, e);
+    }
   }
   
   
@@ -193,7 +206,7 @@ public class QueryController implements Serializable
    * Get the current query as it is defined by the UI controls.
    * @return 
    */
-  public PagedResultQuery getQuery()
+  public PagedResultQuery getSearchQuery()
   {
     return QueryGenerator.paged()
       .query(state.getAql().getValue())
@@ -205,14 +218,44 @@ public class QueryController implements Serializable
       .build();
   }
   
+  /**
+   * Get the current query as it is defined by the UI controls.
+   * @return 
+   */
+  public ExportQuery getExportQuery()
+  {
+    return QueryGenerator.export()
+      .query(state.getAql().getValue())
+      .corpora(state.getSelectedCorpora().getValue())
+      .left(state.getLeftContext().getValue())
+      .right(state.getRightContext().getValue())
+      .segmentation(state.getBaseText().getValue())
+      .exporter(state.getExporterName().getValue())
+      .annotations(state.getExportAnnotationKeys().getValue())
+      .param(state.getExportParameters().getValue())
+      .build();
+  }
+  
   public void executeSearch(boolean replaceOldTab)
   {
     // construct a query from the current properties
-    PagedResultQuery pagedQuery = getQuery();
+    PagedResultQuery pagedQuery = getSearchQuery();
 
     ui.getControlPanel().getQueryPanel().setStatus("Searching...");
     
-    prepareExecuteQuery(pagedQuery);
+    cancelSearch();
+
+    // cleanup resources
+    VaadinSession session = VaadinSession.getCurrent();
+    session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
+    if (session.getAttribute(MediaController.class) != null)
+    {
+      session.getAttribute(MediaController.class).clearMediaPlayers();
+    }
+
+    ui.updateFragment(pagedQuery);
+
+    addHistoryEntry(pagedQuery);
 
     if (pagedQuery.getCorpora() == null || pagedQuery.getCorpora().
       isEmpty())
@@ -286,7 +329,7 @@ public class QueryController implements Serializable
     
   }
   
-  public void executeExport(Exporter exporter, ExportPanel panel, EventBus eventBus)
+  public void executeExport(ExportPanel panel, EventBus eventBus)
   {
     Future exportFuture = state.getExecutedTasks().get(QueryUIState.QueryType.EXPORT);
     if (exportFuture != null && !exportFuture.isDone())
@@ -294,8 +337,11 @@ public class QueryController implements Serializable
       exportFuture.cancel(true);
     }
     
+    ExportQuery query = getExportQuery();
+    
     exportFuture = PollControl.callInBackground(1000, null,
-      new ExportBackgroundJob(exporter, ui, eventBus, panel));
+      new ExportBackgroundJob(query,
+        getExporterByName(query.getExporterName()), ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
   
@@ -309,6 +355,11 @@ public class QueryController implements Serializable
         log.warn("Could not cancel export");
       }
     }
+  }
+  
+  public Exporter getExporterByName(String name)
+  {
+    return exporterMap.get(name);
   }
   
   private List<ResultViewPanel> getResultPanels()
@@ -326,33 +377,12 @@ public class QueryController implements Serializable
   }
   
   /**
-   * Common actions for preparing the executions of a query.
-   */
-  private void prepareExecuteQuery(PagedResultQuery pagedQuery)
-  {
-    cancelQueries();
-
-    // cleanup resources
-    VaadinSession session = VaadinSession.getCurrent();
-    session.setAttribute(IFrameResourceMap.class, new IFrameResourceMap());
-    if (session.getAttribute(MediaController.class) != null)
-    {
-      session.getAttribute(MediaController.class).clearMediaPlayers();
-    }
-
-    ui.updateFragment(pagedQuery);
-
-    addHistoryEntry(pagedQuery);
-
-  }
-  
-  /**
    * Cancel queries from the client side.
    *
    * Important: This does not magically cancel the query on the server side, so
    * don't use this to implement a "real" query cancelation.
    */
-  private void cancelQueries()
+  private void cancelSearch()
   {
     // don't spin forever when canceled
     ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
@@ -581,19 +611,21 @@ public class QueryController implements Serializable
   private static class ExportBackgroundJob implements Callable<File>
   {
 
-    private final Exporter exporter;
-    private final SearchUI ui;
     private final EventBus eventBus;
     private final ExportPanel panel;
+    private final ExportQuery query;
+    private final UI ui;
+    private final Exporter exporter;
     
 
-    public ExportBackgroundJob(Exporter exporter, SearchUI ui, EventBus eventBus,
+    public ExportBackgroundJob(ExportQuery query, Exporter exporter, UI ui, EventBus eventBus,
       ExportPanel panel)
     {
-      this.exporter = exporter;
-      this.ui = ui;
+      this.query = query;
       this.eventBus = eventBus;
       this.panel = panel;
+      this.ui = ui;
+      this.exporter = exporter;
     }
 
     @Override
@@ -606,12 +638,12 @@ public class QueryController implements Serializable
       try(OutputStreamWriter outWriter
         = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
-        exporter.convertText(ui.getQueryState().getAql().getValue(),
-          ui.getQueryState().getLeftContext().getValue(),
-          ui.getQueryState().getRightContext().getValue(),
-          ui.getQueryState().getSelectedCorpora().getValue(),
-          ui.getQueryState().getExportAnnotationKeys().getValue(),
-          ui.getQueryState().getExportParameters().getValue(),
+        exporter.convertText(query.getQuery(),
+          query.getContextLeft(),
+          query.getContextRight(),
+          query.getCorpora(),
+          query.getAnnotationKeys(),
+          query.getParameters(),
           Helper.getAnnisWebResource().path("query"),
           outWriter, eventBus);
         success.set(true);
