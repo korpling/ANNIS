@@ -15,11 +15,35 @@
  */
 package annis.gui.objects;
 
+import java.util.Objects;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class FrequencyQuery extends Query
 {
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(getCorpora(), getQuery());
+  }
+
   
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final FrequencyQuery other = (FrequencyQuery) obj;
+    
+    return Objects.equals(this.getQuery(), other.getQuery())
+      && Objects.equals(this.getCorpora(), other.getCorpora());
+  }
 }

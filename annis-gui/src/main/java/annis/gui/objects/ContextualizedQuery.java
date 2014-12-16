@@ -15,6 +15,8 @@
  */
 package annis.gui.objects;
 
+import java.util.Objects;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
@@ -59,5 +61,38 @@ public class ContextualizedQuery extends Query
   {
     this.segmentation = segmentation;
   }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(getCorpora(), getQuery(), contextLeft, contextRight, segmentation);
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final ContextualizedQuery other = (ContextualizedQuery) obj;
+    return 
+      Objects.equals(getQuery(), other.getQuery())
+      && Objects.equals(getCorpora(), other.getCorpora())
+      && Objects.equals(contextLeft, other.contextLeft)
+      && Objects.equals(contextRight, other.contextRight)
+      && Objects.equals(segmentation, other.segmentation);
+  }
+
+  
+
+  
+  
+  
+  
   
 }

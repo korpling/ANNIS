@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 
@@ -87,5 +88,34 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     }
     
     return c;
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(getCorpora(), getQuery(), getContextLeft(), getContextRight(), getSegmentation(), 
+      getLimit(), getOffset());
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final PagedResultQuery other = (PagedResultQuery) obj;
+    return
+      Objects.equals(getQuery(), other.getQuery())
+      && Objects.equals(getCorpora(), other.getCorpora())
+      && Objects.equals(getContextLeft(), other.getContextLeft())
+      && Objects.equals(getContextRight(), other.getContextRight())
+      && Objects.equals(getSegmentation(), other.getSegmentation())
+      && Objects.equals(getLimit(), other.getLimit())
+      && Objects.equals(getOffset(), other.getOffset());
   }
 }

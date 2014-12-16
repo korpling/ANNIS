@@ -17,6 +17,7 @@ package annis.gui.objects;
 
 import com.google.common.base.Splitter;
 import java.util.List;
+import java.util.Objects;
 
 /**
  *
@@ -76,6 +77,36 @@ public class ExportQuery extends ContextualizedQuery
   {
     this.exporterName = exporter;
     return this;
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(getCorpora(), getQuery(), getContextLeft(), getContextRight(), getSegmentation(), 
+      getAnnotationKeys(), getExporterName(), getParameters());
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final ExportQuery other = (ExportQuery) obj;
+    return 
+      Objects.equals(getQuery(), other.getQuery())
+      && Objects.equals(getCorpora(), other.getCorpora())
+      && Objects.equals(getContextLeft(), other.getContextLeft())
+      && Objects.equals(getContextRight(), other.getContextRight())
+      && Objects.equals(getSegmentation(), other.getSegmentation())
+      && Objects.equals(getAnnotationKeys(), other.getAnnotationKeys())
+      && Objects.equals(getExporterName(), other.getExporterName())
+      && Objects.equals(getParameters(), other.getParameters());
   }
   
 }

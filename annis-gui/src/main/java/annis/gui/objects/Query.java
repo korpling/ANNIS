@@ -17,6 +17,7 @@ package annis.gui.objects;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
@@ -64,6 +65,33 @@ public class Query implements Serializable
   {
     this.corpora = corpora;
   }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(corpora, query);
+  }
+
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final Query other = (Query) obj;
+    
+    return Objects.equals(this.query, other.query)
+      && Objects.equals(this.corpora, other.corpora);
+  }
+
+  
+  
   
   
 }
