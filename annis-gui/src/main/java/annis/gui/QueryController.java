@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
+import annis.gui.exporter.Exporter;
 import annis.gui.objects.ContextualizedQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
@@ -33,23 +34,32 @@ import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
+import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property;
+import com.vaadin.server.FileDownloader;
+import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -267,7 +277,8 @@ public class QueryController implements Serializable
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    PollControl.runInBackground(500, ui, new CountCallback(newResultView, pagedQuery.getLimit()));
+    PollControl.runInBackground(500, ui, 
+      new CountCallback(newResultView, pagedQuery.getLimit(), ui));
 
     //
     // end execute count
@@ -275,10 +286,29 @@ public class QueryController implements Serializable
     
   }
   
-  public void executeExport()
+  public void executeExport(Exporter exporter, ExportPanel panel, EventBus eventBus)
   {
+    Future exportFuture = state.getExecutedTasks().get(QueryUIState.QueryType.EXPORT);
+    if (exportFuture != null && !exportFuture.isDone())
+    {
+      exportFuture.cancel(true);
+    }
     
-    
+    exportFuture = PollControl.callInBackground(1000, null,
+      new ExportBackgroundJob(exporter, ui, eventBus, panel));
+    state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
+  }
+  
+  public void cancelExport()
+  {
+    Future exportFuture = state.getExecutedTasks().get(QueryUIState.QueryType.EXPORT);
+    if (exportFuture != null && !exportFuture.isDone())
+    {
+      if(!exportFuture.cancel(true))
+      {
+        log.warn("Could not cancel export");
+      }
+    }
   }
   
   private List<ResultViewPanel> getResultPanels()
@@ -404,22 +434,24 @@ public class QueryController implements Serializable
 
   }
   
-  private class CountCallback implements Runnable
+  private static class CountCallback implements Runnable
   {
 
     private final ResultViewPanel panel;
     private final int pageSize;
+    private final SearchUI ui;
 
-    public CountCallback(ResultViewPanel panel, int pageSize)
+    public CountCallback(ResultViewPanel panel, int pageSize, SearchUI ui)
     {
       this.panel = panel;
       this.pageSize = pageSize;
+      this.ui = ui;
     }
 
     @Override
     public void run()
     {
-       Future futureCount = state.getExecutedTasks().get(
+       Future futureCount = ui.getQueryState().getExecutedTasks().get(
          QueryUIState.QueryType.COUNT);
 
       final MatchAndDocumentCount countResult;
@@ -451,7 +483,7 @@ public class QueryController implements Serializable
           countResult = tmpCountResult;
         }
 
-        state.getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
+        ui.getQueryState().getExecutedTasks().remove(QueryUIState.QueryType.COUNT);
 
         final UniformInterfaceException causeFinal = cause;
         ui.accessSynchronously(new Runnable()
@@ -544,6 +576,63 @@ public class QueryController implements Serializable
         updateMatches(query, panel);
       }
     }
+  }
+  
+  private static class ExportBackgroundJob implements Callable<File>
+  {
+
+    private final Exporter exporter;
+    private final SearchUI ui;
+    private final EventBus eventBus;
+    private final ExportPanel panel;
+    
+
+    public ExportBackgroundJob(Exporter exporter, SearchUI ui, EventBus eventBus,
+      ExportPanel panel)
+    {
+      this.exporter = exporter;
+      this.ui = ui;
+      this.eventBus = eventBus;
+      this.panel = panel;
+    }
+
+    @Override
+    public File call() throws Exception
+    {
+      final File currentTmpFile = File.createTempFile("annis-export", ".txt");
+      currentTmpFile.deleteOnExit();
+
+      final AtomicBoolean success = new AtomicBoolean(false);
+      try(OutputStreamWriter outWriter
+        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
+      {
+        exporter.convertText(ui.getQueryState().getAql().getValue(),
+          ui.getQueryState().getLeftContext().getValue(),
+          ui.getQueryState().getRightContext().getValue(),
+          ui.getQueryState().getSelectedCorpora().getValue(),
+          ui.getQueryState().getExportAnnotationKeys().getValue(),
+          ui.getQueryState().getExportParameters().getValue(),
+          Helper.getAnnisWebResource().path("query"),
+          outWriter, eventBus);
+        success.set(true);
+      }
+      finally
+      {
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            if(panel != null)
+            {
+              panel.showResult(currentTmpFile, success.get());
+            }
+          }
+        });
+      }
+      return currentTmpFile;
+    }
+
   }
   
 }

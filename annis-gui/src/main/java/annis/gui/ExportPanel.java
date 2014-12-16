@@ -27,7 +27,6 @@ import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.gui.objects.QueryUIState;
-import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
@@ -43,9 +42,7 @@ import com.vaadin.ui.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -106,8 +103,6 @@ public class ExportPanel extends FormLayout
   private final QueryController controller;
   private final QueryUIState state;
 
-  private transient Future<File> exportFuture = null;
-
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
@@ -119,7 +114,7 @@ public class ExportPanel extends FormLayout
     this.state = state;
 
     this.eventBus = new EventBus();
-    this.eventBus.register(this);
+    this.eventBus.register(ExportPanel.this);
     
     setWidth("99%");
     setHeight("-1px");
@@ -353,6 +348,49 @@ public class ExportPanel extends FormLayout
       }
     }
   }
+  
+  public void showResult(File currentTmpFile, boolean success)
+  {
+    btExport.setEnabled(true);
+    btCancel.setEnabled(false);
+    progressBar.setVisible(false);
+    progressLabel.setValue("");
+
+            // copy the result to the class member in order to delete if
+    // when not longer needed
+    tmpOutputFile = currentTmpFile;
+
+    if (tmpOutputFile == null)
+    {
+      Notification.show("Could not create the Exporter",
+        "The server logs might contain more information about this "
+        + "so you should contact the provider of this ANNIS installation "
+        + "for help.", Notification.Type.ERROR_MESSAGE);
+    }
+    else if (!success)
+    {
+      // we were aborted, don't do anything
+      Notification.show("Export cancelled",
+        Notification.Type.WARNING_MESSAGE);
+    }
+    else
+    {
+      if (downloader != null && btDownload.getExtensions().contains(
+        downloader))
+      {
+        btDownload.removeExtension(downloader);
+      }
+      downloader = new FileDownloader(new FileResource(
+        tmpOutputFile));
+
+      downloader.extend(btDownload);
+      btDownload.setEnabled(true);
+
+      Notification.show("Export finished",
+        "Click on the button right to the export button to actually download the file.",
+        Notification.Type.HUMANIZED_MESSAGE);
+    }
+  }
 
   private class ExportButtonListener implements Button.ClickListener
   {
@@ -369,12 +407,8 @@ public class ExportPanel extends FormLayout
         }
       }
       tmpOutputFile = null;
-      if (exportFuture != null && !exportFuture.isDone())
-      {
-        exportFuture.cancel(true);
-      }
-      exportFuture = null;
-
+      
+      
       String exporterName = (String) cbExporter.getValue();
       final Exporter exporter = exporterMap.get(exporterName);
       if (exporter != null)
@@ -389,6 +423,7 @@ public class ExportPanel extends FormLayout
 
         // TODO: add history entry
 //        controller.addHistoryEntry(new Query, null));
+        btDownload.setEnabled(false);
         progressBar.setVisible(true);
         progressLabel.setValue("");
 
@@ -397,18 +432,17 @@ public class ExportPanel extends FormLayout
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
+        
+        controller.executeExport(exporter , ExportPanel.this, eventBus);
 
-        exportFuture = PollControl.callInBackground(1000, null,
-          new BackgroundJob(exporter, ui));
-        if (exportFuture != null)
+        
+        if (exportTime == null)
         {
-          if (exportTime == null)
-          {
-            exportTime = new Stopwatch();
-          }
-          exportTime.reset();
-          exportTime.start();
+          exportTime = Stopwatch.createUnstarted();
         }
+        exportTime.reset();
+        exportTime.start();
+        
       }
     }
   }
@@ -419,101 +453,7 @@ public class ExportPanel extends FormLayout
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if (exportFuture != null)
-      {
-        if (!exportFuture.cancel(true))
-        {
-          log.warn("Could not cancel export");
-        }
-      }
-    }
-
-  }
-
-  private class BackgroundJob implements Callable<File>
-  {
-
-    private final Exporter exporter;
-    private final UI ui;
-
-    public BackgroundJob(Exporter exporter, UI ui)
-    {
-      this.exporter = exporter;
-      this.ui = ui;
-    }
-
-    @Override
-    public File call() throws Exception
-    {
-      final File currentTmpFile = File.createTempFile("annis-export", ".txt");
-      currentTmpFile.deleteOnExit();
-
-      
-
-      final AtomicBoolean success = new AtomicBoolean(false);
-      try(OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
-      {
-        exporter.convertText(queryPanel.getQuery(),
-          (Integer) cbLeftContext.getValue(),
-          (Integer) cbRightContext.getValue(),
-          corpusListPanel.getSelectedCorpora(),
-          state.getExportAnnotationKeys().getValue(),
-          state.getExportParameters().getValue(),
-          Helper.getAnnisWebResource().path("query"),
-          outWriter, eventBus);
-        success.set(true);
-      }
-      finally
-      {
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            btExport.setEnabled(true);
-            btCancel.setEnabled(false);
-            progressBar.setVisible(false);
-            progressLabel.setValue("");
-
-            // copy the result to the class member in order to delete if
-            // when not longer needed
-            tmpOutputFile = currentTmpFile;
-
-            if (tmpOutputFile == null)
-            {
-              Notification.show("Could not create the Exporter",
-                "The server logs might contain more information about this "
-                + "so you should contact the provider of this ANNIS installation "
-                + "for help.", Notification.Type.ERROR_MESSAGE);
-            }
-            else if (!success.get())
-            {
-              // we were aborted, don't do anything
-              Notification.show("Export cancelled",
-                Notification.Type.WARNING_MESSAGE);
-            }
-            else
-            {
-              if (downloader != null && btDownload.getExtensions().contains(
-                downloader))
-              {
-                btDownload.removeExtension(downloader);
-              }
-              downloader = new FileDownloader(new FileResource(
-                tmpOutputFile));
-
-              downloader.extend(btDownload);
-              btDownload.setEnabled(true);
-
-              Notification.show("Export finished",
-                "Click on the button right to the export button to actually download the file.",
-                Notification.Type.HUMANIZED_MESSAGE);
-            }
-          }
-        });
-      }
-      return currentTmpFile;
+      controller.cancelExport();
     }
 
   }
