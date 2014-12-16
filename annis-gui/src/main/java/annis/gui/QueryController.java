@@ -17,12 +17,7 @@ package annis.gui;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
-import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
-import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.SimpleTextExporter;
-import annis.gui.exporter.TextExporter;
-import annis.gui.exporter.WekaExporter;
 import annis.gui.objects.ContextualizedQuery;
 import annis.gui.objects.ExportQuery;
 import annis.gui.objects.PagedResultQuery;
@@ -200,6 +195,12 @@ public class QueryController implements Serializable
     {
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
     }
+    if(q instanceof ExportQuery)
+    {
+      state.getExporterName().setValue(((ExportQuery) q).getExporterName());
+      state.getExportAnnotationKeys().setValue(((ExportQuery) q).getAnnotationKeys());
+      state.getExportParameters().setValue(((ExportQuery) q).getParameters());
+    }
   }
   
   /**
@@ -338,6 +339,8 @@ public class QueryController implements Serializable
     }
     
     ExportQuery query = getExportQuery();
+    
+    addHistoryEntry(query);
     
     exportFuture = PollControl.callInBackground(1000, null,
       new ExportBackgroundJob(query,
