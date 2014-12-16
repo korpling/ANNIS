@@ -44,10 +44,8 @@ import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -112,7 +110,8 @@ public class QueryController implements Serializable
 
           if ("ok".equalsIgnoreCase(result))
           {
-            if(state.getSelectedCorpora().getValue().isEmpty())
+            if(state.getSelectedCorpora().getValue() == null 
+              || state.getSelectedCorpora().getValue().isEmpty())
             {
               qp.setStatus("Please select a corpus from the list below, then click on \"Search\".");
             }
@@ -273,6 +272,11 @@ public class QueryController implements Serializable
     //
     // end execute count
     //
+    
+  }
+  
+  public void executeExport()
+  {
     
   }
   
