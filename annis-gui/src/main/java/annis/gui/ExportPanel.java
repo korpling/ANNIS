@@ -15,18 +15,18 @@
  */
 package annis.gui;
 
-import annis.gui.beans.HistoryEntry;
 import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
+import annis.gui.converter.CommaSeperatedStringConverterList;
 import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
-import annis.gui.objects.Query;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import com.google.common.base.Stopwatch;
@@ -38,7 +38,6 @@ import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import java.io.*;
@@ -105,17 +104,19 @@ public class ExportPanel extends FormLayout
   private transient Stopwatch exportTime = new Stopwatch();
 
   private final QueryController controller;
+  private final QueryUIState state;
 
   private transient Future<File> exportFuture = null;
 
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
-    QueryController controller)
+    QueryController controller, QueryUIState state)
   {
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
     this.controller = controller;
+    this.state = state;
 
     this.eventBus = new EventBus();
     this.eventBus.register(this);
@@ -164,7 +165,7 @@ public class ExportPanel extends FormLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-
+    
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
 
@@ -216,6 +217,21 @@ public class ExportPanel extends FormLayout
 
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
+    
+    if(state != null)
+    {
+      cbLeftContext.setPropertyDataSource(state.getLeftContext());
+      cbRightContext.setPropertyDataSource(state.getRightContext());
+      cbExporter.setPropertyDataSource(state.getExporterName());
+      
+      state.getExporterName().setValue(EXPORTER[0].getClass().getSimpleName());
+      
+      txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
+      txtAnnotationKeys.setPropertyDataSource(state.getAnnotationKeys());
+      txtParameters.setPropertyDataSource(state.getParameters());
+      
+      
+    }
   }
 
   @Override

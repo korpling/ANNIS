@@ -450,7 +450,8 @@ public class QueryPanel extends GridLayout implements
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), ui.getQueryController());
+        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), 
+          ui.getQueryController(), ui.getQueryState());
       }
       
       final TabSheet tabSheet = ui.getMainTab();

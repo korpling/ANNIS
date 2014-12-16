@@ -15,8 +15,8 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.converter.CommaSeperatedStringConverter;
-import annis.gui.admin.converter.TreeSetConverter;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
+import annis.gui.converter.TreeSetConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
@@ -59,7 +59,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selectableContainer.sort(null, null);
     
     txtValue = new TextField();
-    txtValue.setConverter(new CommaSeperatedStringConverter());
+    txtValue.setConverter(new CommaSeperatedStringConverterSet());
     txtValue.setWidth("100%");
 
     selector = new TwinColSelect();

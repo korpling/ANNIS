@@ -17,8 +17,10 @@ package annis.gui.objects;
 
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
+import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Future;
@@ -41,6 +43,11 @@ public class QueryUIState
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
+  
+  private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
+  private final ObjectProperty<List<String>> annotationKeys 
+    = new ObjectProperty<List<String>>(new ArrayList<String>());
+  private final ObjectProperty<String> parameters = new ObjectProperty<>("");
   
   private final Map<QueryType, Future<?>> executedTasks = 
     new EnumMap<>(QueryType.class);
@@ -86,5 +93,22 @@ public class QueryUIState
   {
     return history;
   }
+
+  public ObjectProperty<String> getExporterName()
+  {
+    return exporterName;
+  }
+
+  public ObjectProperty<List<String>> getAnnotationKeys()
+  {
+    return annotationKeys;
+  }
+
+  public ObjectProperty<String> getParameters()
+  {
+    return parameters;
+  }
+  
+  
  
 }

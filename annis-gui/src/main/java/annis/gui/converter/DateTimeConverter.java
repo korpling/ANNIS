@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package annis.gui.admin.converter;
+package annis.gui.converter;
 
 import com.vaadin.data.util.converter.Converter;
 import java.util.Date;
