@@ -45,6 +45,7 @@ public class QueryUIState
   private final ObjectProperty<Integer> rightContext = new ObjectProperty<>(5);
   
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
+  private final ObjectProperty<Integer> offset = new ObjectProperty<>(0);
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
   
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
@@ -88,6 +89,11 @@ public class QueryUIState
     return limit;
   }
 
+  public ObjectProperty<Integer> getOffset()
+  {
+    return offset;
+  }
+  
   public ObjectProperty<String> getBaseText()
   {
     return baseText;

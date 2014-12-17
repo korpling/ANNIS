@@ -205,6 +205,7 @@ public class QueryController implements Serializable
     }
     if (q instanceof PagedResultQuery)
     {
+      state.getOffset().setValue(((PagedResultQuery) q).getOffset());
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
     }
     if (q instanceof ExportQuery)
@@ -230,6 +231,7 @@ public class QueryController implements Serializable
       .right(state.getRightContext().getValue())
       .segmentation(state.getBaseText().getValue())
       .limit(state.getLimit().getValue())
+      .offset(state.getOffset().getValue())
       .build();
   }
 
@@ -486,6 +488,8 @@ public class QueryController implements Serializable
     if (panel != null)
     {
 
+      ui.updateFragment(newQuery);
+      
       ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
       ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
 
