@@ -78,8 +78,8 @@ public class AboutWindow extends Window
     layout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Homepage: "
-      + "<a href=\"http://www.sfb632.uni-potsdam.de/annis/\">"
-      + "http://www.sfb632.uni-potsdam.de/annis/</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://annis-tools.org/\">"
+      + "http://annis-tools.org/</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
     layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     
