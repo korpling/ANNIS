@@ -414,6 +414,8 @@ public class QueryController implements Serializable
       .corpora(state.getSelectedCorpora().getValue())
       .def(freqDefinition).build();
     
+    addHistoryEntry(query);
+    
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
     
     freqFuture = PollControl.callInBackground(1000, ui, job);
