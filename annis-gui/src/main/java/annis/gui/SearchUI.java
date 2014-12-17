@@ -102,7 +102,7 @@ public class SearchUI extends AnnisBaseUI
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
   
-  public static final Exporter[] EXPORTER = new Exporter[]
+  static final Exporter[] EXPORTER = new Exporter[]
   {
     new WekaExporter(),
     new CSVExporter(),

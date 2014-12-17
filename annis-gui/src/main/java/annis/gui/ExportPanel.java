@@ -66,8 +66,6 @@ public class ExportPanel extends FormLayout
 
   private final Button btCancel;
 
-  private final QueryPanel queryPanel;
-
   private final CorpusListPanel corpusListPanel;
 
   private File tmpOutputFile;
@@ -83,17 +81,14 @@ public class ExportPanel extends FormLayout
   private transient Stopwatch exportTime = Stopwatch.createUnstarted();
 
   private final QueryController controller;
-  private final QueryUIState state;
 
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
     QueryController controller, QueryUIState state)
   {
-    this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
     this.controller = controller;
-    this.state = state;
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);

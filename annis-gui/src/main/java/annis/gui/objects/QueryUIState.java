@@ -19,6 +19,7 @@ import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.LinkedHashSet;
@@ -32,7 +33,7 @@ import java.util.concurrent.Future;
  * Helper class to bundle all query relevant state information of the UI.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class QueryUIState
+public class QueryUIState implements Serializable
 {
   
   public enum QueryType {COUNT, FIND, FREQUENCY, EXPORT}
