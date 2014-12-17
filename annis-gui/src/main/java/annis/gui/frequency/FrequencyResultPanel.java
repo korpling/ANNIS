@@ -17,19 +17,13 @@ package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
 import annis.gui.objects.FrequencyQuery;
-import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
-import annis.service.objects.FrequencyTableQuery;
 import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.AbstractBeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
@@ -40,10 +34,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.ByteArrayInputStream;
@@ -62,9 +54,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -83,8 +72,6 @@ public class FrequencyResultPanel extends VerticalLayout
   private final FrequencyQueryPanel queryPanel;
   private final FrequencyQuery query;
   
-  private final ProgressBar pbQuery;
-
   public FrequencyResultPanel(FrequencyTable table, FrequencyQuery query, FrequencyQueryPanel queryPanel)
   {
     this.query = query;
@@ -92,14 +79,6 @@ public class FrequencyResultPanel extends VerticalLayout
     
     setSizeFull();
     
-    pbQuery = new ProgressBar();
-    pbQuery.setCaption("Please wait, the frequencies analysis can take some time");
-    pbQuery.setIndeterminate(true);
-    pbQuery.setEnabled(true);
-    
-    addComponent(pbQuery);
-    setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
-  
     chart = new FrequencyChart(this);
     chart.setHeight("350px");
     chart.setVisible(false);
@@ -232,14 +211,11 @@ public class FrequencyResultPanel extends VerticalLayout
         tblResult.addItem(cells, "entry-" + line++);
       }
     }
-    tblResult.addContainerProperty(pbQuery, null, table);
     addLexicalSort(tblResult.getContainerDataSource());
     
     addComponent(tblResult);
     setExpandRatio(tblResult, 1.0f);
     
-    pbQuery.setEnabled(true);
-    removeComponent(pbQuery);
   }
   
   private void addLexicalSort(Container container)

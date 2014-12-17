@@ -19,17 +19,12 @@ import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.FrequencyQuery;
-import annis.gui.objects.PagedResultQuery;
-import annis.gui.objects.QueryGenerator;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
-import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Joiner;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
@@ -38,14 +33,11 @@ import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Container;
-import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
-import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -55,7 +47,7 @@ import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -95,6 +87,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblCorpusList;
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
+  
+  private final ProgressBar pbQuery = new ProgressBar();
   
   private final QueryUIState state;
 
@@ -335,6 +329,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
             {
               removeComponent(resultPanel);
             }
+            queryLayout.setVisible(false);
+            
+            pbQuery.setCaption(
+              "Please wait, the frequencies analysis can take some time");
+            pbQuery.setIndeterminate(true);
+            pbQuery.setEnabled(true);
+            pbQuery.setVisible(true);
+            
             controller.executeFrequency(FrequencyQueryPanel.this);
           }
           catch(Exception ex)
@@ -368,11 +370,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     });
     btShowQuery.setVisible(false);
     
+    pbQuery.setVisible(false);
+    addComponent(pbQuery);
+    
     addComponent(queryLayout);
     addComponent(btShowQuery);
     
     setComponentAlignment(btShowQuery, Alignment.TOP_CENTER);
-   
+    setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
+
     if(controller != null)
     {
       controller.getLegacy().addCorpusSelectionChangeListener(new CorpusSelectionChangeListener()
@@ -441,6 +447,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   public void showResult(FrequencyTable result, FrequencyQuery query)
   {
+    pbQuery.setVisible(false);
     resultPanel = new FrequencyResultPanel(result, query, this);
     addComponent(resultPanel);
     setExpandRatio(resultPanel, 1.0f);
