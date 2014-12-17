@@ -486,7 +486,8 @@ public class QueryPanel extends GridLayout implements
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(),
+        ui.getQueryState());
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       

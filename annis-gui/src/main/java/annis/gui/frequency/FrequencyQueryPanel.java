@@ -21,6 +21,7 @@ import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.QueryGenerator;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
@@ -35,12 +36,12 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.Property.ValueChangeEvent;
+import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ObjectProperty;
-import com.vaadin.data.validator.IntegerValidator;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractField;
@@ -48,6 +49,9 @@ import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.CheckBox;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.DefaultFieldFactory;
+import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -77,7 +81,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   
   private Table tblFrequencyDefinition;
   private final IndexedContainer metaNamesContainer;
-  private final Property<Set<String>> selectedMetaData;
   private final Button btAdd;
   private final Button btReset;
   private final CheckBox cbAutomaticMode;
@@ -92,9 +95,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   private final Label lblAQL;
   private final Label lblErrorOrMsg;
   
-  public FrequencyQueryPanel(final QueryController controller)
+  private final QueryUIState state;
+
+  
+  public FrequencyQueryPanel(final QueryController controller, QueryUIState state)
   {
     this.controller = controller;
+    this.state = state;
     
     setWidth("99%");
     setHeight("99%");
@@ -132,7 +139,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setSortEnabled(false);
     tblFrequencyDefinition.setSelectable(true);
     tblFrequencyDefinition.setMultiSelect(true);
-    //tblFrequencyDefinition.setEditable(true);
+    tblFrequencyDefinition.setTableFieldFactory(new FieldFactory(tblFrequencyDefinition));
+    tblFrequencyDefinition.setEditable(true);
     tblFrequencyDefinition.addValueChangeListener(new Property.ValueChangeListener() 
     {
       @Override
@@ -166,11 +174,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     tblFrequencyDefinition.setWidth("100%");
     tblFrequencyDefinition.setHeight("100%");
-    
-    
-    tblFrequencyDefinition.addContainerProperty("nr", TextField.class, null);
-    tblFrequencyDefinition.addContainerProperty("annotation", TextField.class, null);
-    tblFrequencyDefinition.addContainerProperty("comment", String.class, "manually created");
+  
+   
+    tblFrequencyDefinition.setContainerDataSource(state.getFrequencyTableDefinition());
     
     tblFrequencyDefinition.setColumnHeader("nr", "Node number/name");
     tblFrequencyDefinition.setColumnHeader("annotation", "Selected annotation of node");
@@ -184,13 +190,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     tblFrequencyDefinition.setColumnExpandRatio("nr", 0.15f);
     tblFrequencyDefinition.setColumnExpandRatio("annotation", 0.35f);
     tblFrequencyDefinition.setColumnExpandRatio("comment", 0.5f);
+    tblFrequencyDefinition.setVisibleColumns("nr", "annotation", "comment");
     
     queryLayout.addComponent(tblFrequencyDefinition);
     
-    selectedMetaData = new ObjectProperty<Set<String>>(new TreeSet<String>());
     metaNamesContainer = new IndexedContainer();
     PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect(metaNamesContainer);
-    metaSelect.setPropertyDataSource(selectedMetaData);
+    metaSelect.setPropertyDataSource(state.getFrequencyMetaData());
     metaSelect.setCaption("Metadata");
     
     queryLayout.addComponent(metaSelect);
@@ -216,11 +222,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         // get the highest number of values from the existing defitions
         for(Object id : tblFrequencyDefinition.getItemIds())
         {
-          AbstractField textNr = (AbstractField) tblFrequencyDefinition.getItem(id)
+          String textNr = (String) tblFrequencyDefinition.getItem(id)
             .getItemProperty("nr").getValue();
           try
           {
-            nr = Math.max(nr, Integer.parseInt((String) textNr.getValue()));
+            nr = Math.max(nr, Integer.parseInt(textNr));
           }
           catch(NumberFormatException ex)
           {
@@ -232,10 +238,12 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           List<QueryNode> nodes = parseQuery(controller.getLegacy().getQueryDraft());
           nr = Math.min(nr, nodes.size()-1);
           int id = counter++;
-          tblFrequencyDefinition.addItem(createNewTableRow(
-            tblFrequencyDefinition, id,
-            "" +(nr+1),
-            FrequencyTableEntryType.span, "", ""), id);
+          UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
+          entry.setAnnotation("tok");
+          entry.setComment("");
+          entry.setNr("" + (nr+1));
+          FrequencyQueryPanel.this.state
+            .getFrequencyTableDefinition().addItem(id, entry);
         }
       }
     });
@@ -316,29 +324,18 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
+        BeanContainer<Integer, UserGeneratedFrequencyEntry> container = 
+          FrequencyQueryPanel.this.state.getFrequencyTableDefinition();
         FrequencyTableQuery freqDefinition = new FrequencyTableQuery();
-        for(Object oid : tblFrequencyDefinition.getItemIds())
+        for(Integer id : container.getItemIds())
         {
-          FrequencyTableEntry entry = new FrequencyTableEntry();
-          
-          Item item = tblFrequencyDefinition.getItem(oid);
-          AbstractField textNr = (AbstractField) item.getItemProperty("nr").getValue();
-          AbstractField textKey = (AbstractField) item.getItemProperty("annotation").getValue();
-          
-          entry.setKey((String) textKey.getValue());
-          entry.setReferencedNode((String) textNr.getValue());
-          if(textKey.getValue() != null && "tok".equals(textKey.getValue()))
-          {
-            entry.setType(FrequencyTableEntryType.span);
-          }
-          else
-          {
-            entry.setType(FrequencyTableEntryType.annotation);
-          }
-          freqDefinition.add(entry);
+          UserGeneratedFrequencyEntry userGen = 
+            container.getItem(id).getBean();
+          freqDefinition.add(userGen.toFrequencyTableEntry());
         }
-        // addiotionally add meta data columns
-        for(String m : selectedMetaData.getValue())
+        // additionally add meta data columns
+        for(String m : 
+          FrequencyQueryPanel.this.state.getFrequencyMetaData().getValue())
         {
           FrequencyTableEntry entry = new FrequencyTableEntry();
           entry.setType(FrequencyTableEntryType.meta);
@@ -442,57 +439,6 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     return result;
   }
-  
-  private Object[] createNewTableRow(
-    final Table tbl, final Object rowID,
-    String nodeVariable, FrequencyTableEntryType type, 
-    String annotation, String comment)
-  {
-    TextField txtNode = new TextField();
-    txtNode.setValue(nodeVariable);
-    txtNode.addValidator(new IntegerValidator("Node reference must be a valid number"));
-    txtNode.setWidth("100%");
-    if(tbl != null && rowID != null)
-    {
-      txtNode.addFocusListener(new FieldEvents.FocusListener()
-      {
-        @Override
-        public void focus(FieldEvents.FocusEvent event)
-        {
-          tbl.setValue(null);
-          tbl.select(rowID);
-        }
-      });
-    }
-    
-    final TextField txtAnno = new TextField();
-    
-    if(type == FrequencyTableEntryType.span)
-    {
-      txtAnno.setInputPrompt("tok");
-      txtAnno.setValue("tok");
-    }
-    else
-    {
-      txtAnno.setValue(annotation);
-    }
-    
-    txtAnno.setWidth("100%");
-    if(tbl != null && rowID != null)
-    {
-      txtAnno.addFocusListener(new FieldEvents.FocusListener()
-      {
-        @Override
-        public void focus(FieldEvents.FocusEvent event)
-        {
-          tbl.setValue(null);
-          tbl.select(rowID);
-        }
-      });
-    }
-    
-    return new Object[] {txtNode, txtAnno, comment == null ? ""  : comment};
-  }
 
   @Override
   public void textChange(FieldEvents.TextChangeEvent event)
@@ -564,7 +510,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     try
     { 
 
-      tblFrequencyDefinition.removeAllItems();
+      state.getFrequencyTableDefinition().removeAllItems();
       lblErrorOrMsg.setVisible(false);
       
       counter = 0;
@@ -617,26 +563,23 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           if(n.getNodeAnnotations().isEmpty())
           {
             int id = counter++;
-            tblFrequencyDefinition.addItem(
-              createNewTableRow(
-                tblFrequencyDefinition, id,
-                n.getVariable(),
-                FrequencyTableEntryType.span, "",
-                "automatically created from " + n.toAQLNodeFragment()),
-              id);
+            
+            UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
+            entry.setAnnotation("tok");
+            entry.setComment("automatically created from " + n.toAQLNodeFragment());
+            entry.setNr(n.getVariable());
+            state.getFrequencyTableDefinition().addItem(id, entry);
           }
           else
           {
             int id = counter++;
             QueryAnnotation firstAnno = n.getNodeAnnotations().iterator().next();
-            tblFrequencyDefinition.addItem(
-              createNewTableRow(
-                tblFrequencyDefinition, id,
-                n.getVariable(),
-                FrequencyTableEntryType.annotation, firstAnno.getName(),
-                "automatically created from " + n.toAQLNodeFragment()),
-              id);
-
+            
+            UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
+            entry.setAnnotation(firstAnno.getName());
+            entry.setComment("automatically created from " + n.toAQLNodeFragment());
+            entry.setNr(n.getVariable());
+            state.getFrequencyTableDefinition().addItem(id, entry);
           }
         }
       }
@@ -652,14 +595,14 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   {
     metaNamesContainer.removeAllItems();
     Set<String> allMetaNames = getAvailableMetaNames();
-    Set<String> oldSelection = new TreeSet<String>(selectedMetaData.getValue());
+    Set<String> oldSelection = new TreeSet<>(state.getFrequencyMetaData().getValue());
     for(String m : allMetaNames)
     {
       metaNamesContainer.addItem(m);
     }
     // remove all selections that are no longer present
     oldSelection.retainAll(allMetaNames);
-    selectedMetaData.setValue(oldSelection);
+    state.getFrequencyMetaData().setValue(oldSelection);
     
     Set<String> selectedCorpora = controller.getLegacy().getSelectedCorpora();
     if(selectedCorpora.isEmpty())
@@ -685,6 +628,52 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   {
     btShowFrequencies.setEnabled(true);
     btShowQuery.setVisible(true);
+  }
+  
+  public static class FieldFactory extends DefaultFieldFactory
+  {
+    
+    public Table tbl;
+
+    public FieldFactory(Table tbl)
+    {
+      this.tbl = tbl;
+    }
+    
+    @Override
+    public Field createField(Container container, final Object itemId,
+      Object propertyId, Component uiContext)
+    {
+      if ("nr".equals(propertyId) || "annotation".equals(propertyId))
+      {
+        TextField txt = new TextField(container.getContainerProperty(itemId,
+          propertyId));
+        txt.setWidth("100%");
+        if (tbl != null)
+        {
+          txt.addFocusListener(new FieldEvents.FocusListener()
+          {
+
+            @Override
+            public void focus(FieldEvents.FocusEvent event)
+            {
+              tbl.setValue(null);
+              tbl.select(itemId);
+            }
+          });
+        }
+        
+        return txt;
+      }
+      else if("comment".equals(propertyId))
+      {
+        // explicitly request a read-only label
+        return null;
+      }
+      
+      return super.createField(container, itemId, propertyId, uiContext);
+    }
+    
   }
   
 }

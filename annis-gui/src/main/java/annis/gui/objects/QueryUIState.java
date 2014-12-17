@@ -15,6 +15,8 @@
  */
 package annis.gui.objects;
 
+import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Future;
 
 /**
@@ -52,6 +55,11 @@ public class QueryUIState
   
   private final Map<QueryType, Future<?>> executedTasks = 
     new EnumMap<>(QueryType.class);
+  
+  private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition
+    = new BeanContainer<>(UserGeneratedFrequencyEntry.class);
+  private final ObjectProperty<Set<String>> frequencyMetaData = 
+    new ObjectProperty<Set<String>> (new TreeSet<String>());
   
   private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
   
@@ -108,6 +116,16 @@ public class QueryUIState
   public ObjectProperty<String> getExportParameters()
   {
     return exportParameters;
+  }
+
+  public BeanContainer<Integer, UserGeneratedFrequencyEntry> getFrequencyTableDefinition()
+  {
+    return frequencyTableDefinition;
+  }
+
+  public ObjectProperty<Set<String>> getFrequencyMetaData()
+  {
+    return frequencyMetaData;
   }
   
   
