@@ -15,6 +15,10 @@
  */
 package annis.gui;
 
+import annis.gui.controller.ExportBackgroundJob;
+import annis.gui.controller.CountCallback;
+import annis.gui.controller.FrequencyBackgroundJob;
+import annis.gui.controller.SpecificPagingCallback;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.exporter.Exporter;
@@ -27,7 +31,6 @@ import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryGenerator;
 import annis.gui.objects.QueryUIState;
-import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
@@ -36,7 +39,6 @@ import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
-import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -46,7 +48,6 @@ import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
@@ -54,21 +55,15 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.UI;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.OutputStreamWriter;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -303,7 +298,7 @@ public class QueryController implements Serializable
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), pagedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
-      newResultView));
+      ui, newResultView));
 
     TabSheet.Tab newTab;
 
@@ -483,21 +478,6 @@ public class QueryController implements Serializable
     ui.getControlPanel().getQueryPanel().updateShortHistory();
   }
 
-  private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)
-  {
-    if (panel != null)
-    {
-
-      ui.updateFragment(newQuery);
-      
-      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-
-      Future<?> future = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery, panel, ui));
-      state.getExecutedTasks().put(QueryUIState.QueryType.FIND, future);
-    }
-  }
 
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
@@ -528,293 +508,7 @@ public class QueryController implements Serializable
     return ui.getQueryState();
   }
 
-  private static class CountCallback implements Runnable
-  {
 
-    private final ResultViewPanel panel;
 
-    private final int pageSize;
-
-    private final SearchUI ui;
-
-    public CountCallback(ResultViewPanel panel, int pageSize, SearchUI ui)
-    {
-      this.panel = panel;
-      this.pageSize = pageSize;
-      this.ui = ui;
-    }
-
-    @Override
-    public void run()
-    {
-      Future futureCount = ui.getQueryState().getExecutedTasks().get(
-        QueryUIState.QueryType.COUNT);
-
-      final MatchAndDocumentCount countResult;
-      MatchAndDocumentCount tmpCountResult = null;
-      if (futureCount != null)
-      {
-        UniformInterfaceException cause = null;
-        try
-        {
-          tmpCountResult = (MatchAndDocumentCount) futureCount.get();
-        }
-        catch (InterruptedException ex)
-        {
-          log.warn(null, ex);
-        }
-        catch (ExecutionException root)
-        {
-          if (root.getCause() instanceof UniformInterfaceException)
-          {
-            cause = (UniformInterfaceException) root.getCause();
-          }
-          else
-          {
-            log.error("Unexcepted ExecutionException cause", root);
-          }
-        }
-        finally
-        {
-          countResult = tmpCountResult;
-        }
-
-        ui.getQueryState().getExecutedTasks().remove(
-          QueryUIState.QueryType.COUNT);
-
-        final UniformInterfaceException causeFinal = cause;
-        ui.accessSynchronously(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            if (causeFinal == null)
-            {
-              if (countResult != null)
-              {
-                String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
-                String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
-
-                ui.getControlPanel().getQueryPanel().setStatus("" + countResult.
-                  getMatchCount() + " " + matchesString
-                  + "\nin " + countResult.getDocumentCount() + " " + documentString);
-                if (countResult.getMatchCount() > 0 && panel != null)
-                {
-                  panel.getPaging().setPageSize(pageSize, false);
-                  panel.setCount(countResult.getMatchCount());
-                }
-              }
-            }
-            else
-            {
-              if (causeFinal.getResponse().getStatus() == 400)
-              {
-                String errMsg = causeFinal.getResponse().getEntity(String.class);
-                Notification.show("parsing error",
-                  errMsg, Notification.Type.WARNING_MESSAGE);
-                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-              }
-              else if (causeFinal.getResponse().getStatus() == 504) // gateway timeout
-              {
-                String errMsg = "Timeout: query execution took too long.";
-                Notification.show(
-                  errMsg,
-                  "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                  Notification.Type.WARNING_MESSAGE);
-                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-              }
-              else if (causeFinal.getResponse().getStatus() == 403)
-              {
-                String errMsg = "You don't have the access rights to query this corpus. "
-                  + "You might want to login to access more corpora.";
-                Notification.show(errMsg,
-                  Notification.Type.WARNING_MESSAGE);
-                ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-              }
-              else
-              {
-                log.error("Unexpected exception:  " + causeFinal.
-                  getLocalizedMessage(), causeFinal);
-                ExceptionDialog.show(causeFinal);
-
-                ui.getControlPanel().getQueryPanel().setStatus(
-                  "Unexpected exception:  " + causeFinal.getMessage());
-              }
-            } // end if cause != null
-
-            ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
-          }
-        });
-      }
-    }
-  }
-
-  private class SpecificPagingCallback implements PagingCallback
-  {
-
-    private final PagedResultQuery query;
-
-    private final ResultViewPanel panel;
-
-    public SpecificPagingCallback(PagedResultQuery query, ResultViewPanel panel)
-    {
-      this.query = query.clone();
-      this.panel = panel;
-    }
-
-    @Override
-    public void switchPage(int offset, int limit)
-    {
-      if (query != null)
-      {
-        query.setOffset(offset);
-        query.setLimit(limit);
-
-        // execute the result query again
-        updateMatches(query, panel);
-      }
-    }
-  }
-
-  private static class ExportBackgroundJob implements Callable<File>
-  {
-
-    private final EventBus eventBus;
-
-    private final ExportPanel panel;
-
-    private final ExportQuery query;
-
-    private final UI ui;
-
-    private final Exporter exporter;
-
-    public ExportBackgroundJob(ExportQuery query, Exporter exporter, UI ui,
-      EventBus eventBus,
-      ExportPanel panel)
-    {
-      this.query = query;
-      this.eventBus = eventBus;
-      this.panel = panel;
-      this.ui = ui;
-      this.exporter = exporter;
-    }
-
-    @Override
-    public File call() throws Exception
-    {
-      final File currentTmpFile = File.createTempFile("annis-export", ".txt");
-      currentTmpFile.deleteOnExit();
-
-      final AtomicBoolean success = new AtomicBoolean(false);
-      try (OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
-      {
-        exporter.convertText(query.getQuery(),
-          query.getLeftContext(),
-          query.getRightContext(),
-          query.getCorpora(),
-          query.getAnnotationKeys(),
-          query.getParameters(),
-          Helper.getAnnisWebResource().path("query"),
-          outWriter, eventBus);
-        success.set(true);
-      }
-      finally
-      {
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            if (panel != null)
-            {
-              panel.showResult(currentTmpFile, success.get());
-            }
-          }
-        });
-      }
-      return currentTmpFile;
-    }
-
-  }
-
-  private static class FrequencyBackgroundJob implements
-    Callable<FrequencyTable>
-  {
-
-    private final UI ui;
-
-    private final FrequencyQuery query;
-
-    private final FrequencyQueryPanel panel;
-
-    public FrequencyBackgroundJob(UI ui, FrequencyQuery query,
-      FrequencyQueryPanel panel)
-    {
-      this.ui = ui;
-      this.query = query;
-      this.panel = panel;
-    }
-
-    @Override
-    public FrequencyTable call() throws Exception
-    {
-      final FrequencyTable t = loadBeans();
-
-      ui.access(new Runnable()
-      {
-
-        @Override
-        public void run()
-        {
-          panel.showResult(t, query);
-        }
-      });
-
-      return t;
-    }
-
-    private FrequencyTable loadBeans()
-    {
-      FrequencyTable result = new FrequencyTable();
-
-      WebResource annisResource = Helper.getAnnisWebResource();
-      try
-      {
-        annisResource = annisResource.path("query").path("search").path(
-          "frequency")
-          .queryParam("q", query.getQuery())
-          .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
-          .queryParam("fields", query.getFrequencyDefinition().toString());
-
-        result = annisResource.get(FrequencyTable.class);
-      }
-      catch (UniformInterfaceException ex)
-      {
-        String message;
-        if (ex.getResponse().getStatus() == 400)
-        {
-          message = ex.getResponse().getEntity(String.class);
-        }
-        else if (ex.getResponse().getStatus() == 504) // gateway timeout
-        {
-          message = "Timeout: query exeuction took too long";
-        }
-        else
-        {
-          message = "unknown error: " + ex;
-          log.error(ex.getResponse().getEntity(String.class), ex);
-        }
-        Notification.show(message, Notification.Type.WARNING_MESSAGE);
-      }
-      catch (ClientHandlerException ex)
-      {
-        log.error("could not execute REST call to query frequency", ex);
-      }
-
-      return result;
-    }
-  }
 
 }
