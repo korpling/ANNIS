@@ -199,7 +199,6 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
-    mainTab.addSelectedTabChangeListener(queryController.getLegacy());
     mainTab.addSelectedTabChangeListener(this);
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
@@ -619,11 +618,7 @@ public class SearchUI extends AnnisBaseUI
     }
 
     tabsheet.removeComponent(tabContent);
-    if (tabContent instanceof ResultViewPanel)
-    {
-      queryController.getLegacy().notifyTabClose((ResultViewPanel) tabContent);
-    }
-    else if (tabContent instanceof FrequencyQueryPanel)
+    if (tabContent instanceof FrequencyQueryPanel)
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }

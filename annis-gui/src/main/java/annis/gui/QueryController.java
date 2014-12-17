@@ -88,15 +88,12 @@ public class QueryController implements Serializable
 
   private final QueryUIState state;
 
-  private final LegacyQueryController legacy;
-
   private final Map<String, Exporter> exporterMap = new HashMap<>();
 
   public QueryController(SearchUI ui)
   {
     this.ui = ui;
     this.state = ui.getQueryState();
-    this.legacy = new LegacyQueryController(ui);
 
     this.state.getAql().addValueChangeListener(
       new Property.ValueChangeListener()
@@ -483,11 +480,6 @@ public class QueryController implements Serializable
     state.getHistory().removeItem(q);
     state.getHistory().addItemAt(0, q);
     ui.getControlPanel().getQueryPanel().updateShortHistory();
-  }
-
-  public LegacyQueryController getLegacy()
-  {
-    return legacy;
   }
 
   private void updateMatches(PagedResultQuery newQuery, ResultViewPanel panel)

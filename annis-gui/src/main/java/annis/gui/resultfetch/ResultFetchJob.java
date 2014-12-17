@@ -15,9 +15,7 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.LegacyQueryController;
 import annis.gui.SearchUI;
-import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;

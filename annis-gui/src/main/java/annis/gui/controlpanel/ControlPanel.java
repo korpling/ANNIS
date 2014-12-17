@@ -17,7 +17,6 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
-import annis.gui.LegacyQueryController;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import com.vaadin.ui.*;

@@ -15,7 +15,6 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.LegacyQueryController;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
