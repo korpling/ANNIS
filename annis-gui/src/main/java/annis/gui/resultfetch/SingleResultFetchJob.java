@@ -75,7 +75,7 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
     subList.add(match);
     SaltProject p = executeQuery(subgraphRes,
       new MatchGroup(subList),
-      query.getContextLeft(), query.getContextRight(),
+      query.getLeftContext(), query.getRightContext(),
       query.getSegmentation(), SubgraphFilter.all);
 
     visContextChanger.updateResult(p, query);

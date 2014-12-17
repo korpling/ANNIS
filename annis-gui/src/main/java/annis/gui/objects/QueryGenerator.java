@@ -82,13 +82,13 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     
     public QG left(int left)
     {
-      getCurrent().setContextLeft(left);
+      getCurrent().setLeftContext(left);
       return (QG) this;
     }
     
     public QG right(int right)
     {
-      getCurrent().setContextRight(right);
+      getCurrent().setRightContext(right);
       return (QG) this;
     }
     public QG segmentation(String segmentation)

@@ -199,9 +199,8 @@ public class QueryController implements Serializable
     if (q instanceof ContextualizedQuery)
     {
       state.getLeftContext().
-        setValue(((ContextualizedQuery) q).getContextLeft());
-      state.getRightContext().setValue(((ContextualizedQuery) q).
-        getContextRight());
+        setValue(((ContextualizedQuery) q).getLeftContext());
+      state.getRightContext().setValue(((ContextualizedQuery) q).getRightContext());
       state.getBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
@@ -505,11 +504,11 @@ public class QueryController implements Serializable
     PagedResultQuery newQuery = originalQuery.clone();
     if (left)
     {
-      newQuery.setContextLeft(newContext);
+      newQuery.setLeftContext(newContext);
     }
     else
     {
-      newQuery.setContextRight(newContext);
+      newQuery.setRightContext(newContext);
     }
 
     newQuery.setOffset(offset);
@@ -708,8 +707,8 @@ public class QueryController implements Serializable
         = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
       {
         exporter.convertText(query.getQuery(),
-          query.getContextLeft(),
-          query.getContextRight(),
+          query.getLeftContext(),
+          query.getRightContext(),
           query.getCorpora(),
           query.getAnnotationKeys(),
           query.getParameters(),

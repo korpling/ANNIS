@@ -82,7 +82,7 @@ public class ExportQuery extends ContextualizedQuery
   @Override
   public int hashCode()
   {
-    return Objects.hash(getCorpora(), getQuery(), getContextLeft(), getContextRight(), getSegmentation(), 
+    return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
       getAnnotationKeys(), getExporterName(), getParameters());
   }
 
@@ -101,8 +101,8 @@ public class ExportQuery extends ContextualizedQuery
     return 
       Objects.equals(getQuery(), other.getQuery())
       && Objects.equals(getCorpora(), other.getCorpora())
-      && Objects.equals(getContextLeft(), other.getContextLeft())
-      && Objects.equals(getContextRight(), other.getContextRight())
+      && Objects.equals(getLeftContext(), other.getLeftContext())
+      && Objects.equals(getRightContext(), other.getRightContext())
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getAnnotationKeys(), other.getAnnotationKeys())
       && Objects.equals(getExporterName(), other.getExporterName())

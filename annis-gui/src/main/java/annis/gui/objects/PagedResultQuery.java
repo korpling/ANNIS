@@ -43,8 +43,8 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     int limit, String segmentation, String query,
     Set<String> corpora)
   {
-    super.setContextLeft(contextLeft);
-    super.setContextRight(contextRight);
+    super.setLeftContext(contextLeft);
+    super.setRightContext(contextRight);
     super.setSegmentation(segmentation);
     super.setQuery(query);
     super.setCorpora(corpora);
@@ -93,7 +93,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   @Override
   public int hashCode()
   {
-    return Objects.hash(getCorpora(), getQuery(), getContextLeft(), getContextRight(), getSegmentation(), 
+    return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
       getLimit(), getOffset());
   }
 
@@ -112,8 +112,8 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     return
       Objects.equals(getQuery(), other.getQuery())
       && Objects.equals(getCorpora(), other.getCorpora())
-      && Objects.equals(getContextLeft(), other.getContextLeft())
-      && Objects.equals(getContextRight(), other.getContextRight())
+      && Objects.equals(getLeftContext(), other.getLeftContext())
+      && Objects.equals(getRightContext(), other.getRightContext())
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getLimit(), other.getLimit())
       && Objects.equals(getOffset(), other.getOffset());

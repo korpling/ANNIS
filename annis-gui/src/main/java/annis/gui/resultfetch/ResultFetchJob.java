@@ -165,7 +165,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           subList.add(m);
           final SaltProject p = executeQuery(subgraphRes, 
             new MatchGroup(subList), 
-            query.getContextLeft(), query.getContextRight(),
+            query.getLeftContext(), query.getRightContext(),
             query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);

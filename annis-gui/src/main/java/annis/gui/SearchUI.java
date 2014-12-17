@@ -915,7 +915,7 @@ public class SearchUI extends AnnisBaseUI
   public void updateFragment(PagedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
-      q.getContextLeft(), q.getContextRight(),
+      q.getLeftContext(), q.getRightContext(),
       q.getSegmentation(), q.getOffset(), q.getLimit());
 
     // set our fragment

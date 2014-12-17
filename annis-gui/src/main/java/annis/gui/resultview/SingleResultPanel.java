@@ -226,7 +226,7 @@ public class SingleResultPanel extends CssLayout implements
       rghtCtxContainer.addItem(i).getItemProperty("number").setValue(i);
     }
 
-    int lftContextIdx = query == null ? 0 : query.getContextLeft();
+    int lftContextIdx = query == null ? 0 : query.getLeftContext();
     lftCtxContainer.addItemAt(lftContextIdx, lftContextIdx);
     lftCtxContainer.sort(new Object[]
     {
@@ -236,7 +236,7 @@ public class SingleResultPanel extends CssLayout implements
       true
     });
 
-    int rghtCtxIdx = query == null ? 0 : query.getContextRight();
+    int rghtCtxIdx = query == null ? 0 : query.getRightContext();
     rghtCtxContainer.addItem(rghtCtxIdx);
 
     rghtCtxContainer.sort(new Object[]

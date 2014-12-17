@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import annis.gui.beans.CitationProvider;
 import java.util.Objects;
 
 /**
@@ -23,8 +24,8 @@ import java.util.Objects;
  */
 public class ContextualizedQuery extends Query
 {
-  private int contextLeft;
-  private int contextRight;
+  private int leftContext;
+  private int rightContext;
   private String segmentation;
   
   public ContextualizedQuery()
@@ -32,24 +33,24 @@ public class ContextualizedQuery extends Query
     
   }
 
-  public int getContextLeft()
+  public int getLeftContext()
   {
-    return contextLeft;
+    return leftContext;
   }
 
-  public void setContextLeft(int contextLeft)
+  public void setLeftContext(int leftContext)
   {
-    this.contextLeft = contextLeft;
+    this.leftContext = leftContext;
   }
 
-  public int getContextRight()
+  public int getRightContext()
   {
-    return contextRight;
+    return rightContext;
   }
 
-  public void setContextRight(int contextRight)
+  public void setRightContext(int rightContext)
   {
-    this.contextRight = contextRight;
+    this.rightContext = rightContext;
   }
 
   public String getSegmentation()
@@ -65,7 +66,7 @@ public class ContextualizedQuery extends Query
   @Override
   public int hashCode()
   {
-    return Objects.hash(getCorpora(), getQuery(), contextLeft, contextRight, segmentation);
+    return Objects.hash(getCorpora(), getQuery(), leftContext, rightContext, segmentation);
   }
 
   @Override
@@ -83,8 +84,8 @@ public class ContextualizedQuery extends Query
     return 
       Objects.equals(getQuery(), other.getQuery())
       && Objects.equals(getCorpora(), other.getCorpora())
-      && Objects.equals(contextLeft, other.contextLeft)
-      && Objects.equals(contextRight, other.contextRight)
+      && Objects.equals(leftContext, other.leftContext)
+      && Objects.equals(rightContext, other.rightContext)
       && Objects.equals(segmentation, other.segmentation);
   }
 
