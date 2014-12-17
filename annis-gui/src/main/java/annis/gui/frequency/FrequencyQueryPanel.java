@@ -18,7 +18,9 @@ package annis.gui.frequency;
 import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
+import annis.gui.objects.FrequencyQuery;
 import annis.gui.objects.PagedResultQuery;
+import annis.gui.objects.QueryGenerator;
 import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
@@ -526,8 +528,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       {
         removeComponent(resultPanel);
       }
-      resultPanel = new FrequencyResultPanel(preparedQuery.getQuery(), preparedQuery.getCorpora(),
-        freqDefinition, this);
+      FrequencyQuery query = QueryGenerator
+        .frequency().query(preparedQuery.getQuery())
+        .corpora(preparedQuery.getCorpora())
+        .def(freqDefinition).build();
+      resultPanel = new FrequencyResultPanel(query, this);
       addComponent(resultPanel);
       setExpandRatio(resultPanel, 1.0f);
       

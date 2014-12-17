@@ -16,6 +16,7 @@
 package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
+import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.service.objects.FrequencyTable;
@@ -79,20 +80,14 @@ public class FrequencyResultPanel extends VerticalLayout
   private Table tblResult;
   private final Button btDownloadCSV;
   private final FrequencyChart chart;
-  private final String aql;
-  private final Set<String> corpora;
-  private final FrequencyTableQuery freqDefinition;
   private final FrequencyQueryPanel queryPanel;
+  private final FrequencyQuery query;
   
   private ProgressBar pbQuery;
 
-  public FrequencyResultPanel(String aql,
-    Set<String> corpora,
-    final FrequencyTableQuery freqDefinition, FrequencyQueryPanel queryPanel)
+  public FrequencyResultPanel(FrequencyQuery query, FrequencyQueryPanel queryPanel)
   {
-    this.aql = aql;
-    this.corpora = corpora;
-    this.freqDefinition = freqDefinition;
+    this.query = query;
     this.queryPanel = queryPanel;
     
     setSizeFull();
@@ -155,9 +150,9 @@ public class FrequencyResultPanel extends VerticalLayout
     try
     {
       annisResource = annisResource.path("query").path("search").path("frequency")
-        .queryParam("q", aql)  
-        .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("fields", freqDefinition.toString());
+        .queryParam("q", query.getQuery())  
+        .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+        .queryParam("fields", query.getFrequencyDefinition().toString());
 
       result = annisResource.get(FrequencyTable.class);
     }
@@ -197,7 +192,7 @@ public class FrequencyResultPanel extends VerticalLayout
 
     btDownloadCSV.setVisible(true);
     FileDownloader downloader = new FileDownloader(
-      new StreamResource(new CSVResource(table, freqDefinition),
+      new StreamResource(new CSVResource(table, query.getFrequencyDefinition()),
         "frequency.txt"));
     downloader.extend(btDownloadCSV);
 
@@ -224,7 +219,7 @@ public class FrequencyResultPanel extends VerticalLayout
   {    
     StringBuilder sb = new StringBuilder();
     
-    ListIterator<FrequencyTableEntry> it = freqDefinition.listIterator();
+    ListIterator<FrequencyTableEntry> it = query.getFrequencyDefinition().listIterator();
     while(it.hasNext())
     {
       FrequencyTableEntry e = it.next();
@@ -261,7 +256,7 @@ public class FrequencyResultPanel extends VerticalLayout
     
     tblResult.setCaption(table.getEntries().size() 
       + " items with a total sum of " + table.getSum()
-      + " (query on " + Joiner.on(", ").join(this.corpora) + ")"
+      + " (query on " + Joiner.on(", ").join(query.getCorpora()) + ")"
     );
     
     tblResult.setSelectable(true);
@@ -277,7 +272,7 @@ public class FrequencyResultPanel extends VerticalLayout
       for(int i=1; i <= tupelCount; i++)
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
-        FrequencyTableEntry e = freqDefinition.get(i-1);
+        FrequencyTableEntry e = query.getFrequencyDefinition().get(i-1);
         
         
         tblResult.setColumnHeader("tupel-"+ i, getCaption(e));

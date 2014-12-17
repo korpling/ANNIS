@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Splitter;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -151,6 +152,12 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     private FrequencyQueryGenerator()
     {
       super(new FrequencyQuery());
+    }
+    
+     public FrequencyQueryGenerator def(FrequencyTableQuery def)
+    {
+      getCurrent().setFrequencyDefinition(def);
+      return this;
     }
     
   }

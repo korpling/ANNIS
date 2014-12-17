@@ -1,3 +1,4 @@
+
 /*
  * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
@@ -15,6 +16,7 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.FrequencyTableQuery;
 import java.util.Objects;
 
 /**
@@ -23,10 +25,25 @@ import java.util.Objects;
  */
 public class FrequencyQuery extends Query
 {
+  
+  private FrequencyTableQuery frequencyDefinition;
+
+  public FrequencyTableQuery getFrequencyDefinition()
+  {
+    return frequencyDefinition;
+  }
+
+  public void setFrequencyDefinition(FrequencyTableQuery frequencyDefinition)
+  {
+    this.frequencyDefinition = frequencyDefinition;
+  }
+  
+  
+  
   @Override
   public int hashCode()
   {
-    return Objects.hash(getCorpora(), getQuery());
+    return Objects.hash(getCorpora(), getQuery(), getFrequencyDefinition());
   }
 
   
@@ -44,6 +61,7 @@ public class FrequencyQuery extends Query
     final FrequencyQuery other = (FrequencyQuery) obj;
     
     return Objects.equals(this.getQuery(), other.getQuery())
-      && Objects.equals(this.getCorpora(), other.getCorpora());
+      && Objects.equals(this.getCorpora(), other.getCorpora())
+      && Objects.equals(this.getFrequencyDefinition(), other.getFrequencyDefinition());
   }
 }
