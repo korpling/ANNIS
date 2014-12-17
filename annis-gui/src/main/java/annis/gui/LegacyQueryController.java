@@ -92,9 +92,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
 
   private int maxShortID;
 
-  private List<CorpusSelectionChangeListener> corpusSelChangeListeners
-    = new LinkedList<>();
-  
   private final QueryController parent;
 
   public LegacyQueryController(SearchUI ui)
@@ -104,59 +101,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
     this.history = new ListOrderedSet<>();
   }
   
-
-  public void updateCorpusSetList()
-  {
-    ui.getControlPanel().getCorpusList().updateCorpusSetList();
-  }
-
-
-  public void addCorpusSelectionChangeListener(
-    CorpusSelectionChangeListener listener)
-  {
-    if (corpusSelChangeListeners == null)
-    {
-      corpusSelChangeListeners = new LinkedList<>();
-    }
-    corpusSelChangeListeners.add(listener);
-  }
-
-  public void removeCorpusSelectionChangeListener(
-    CorpusSelectionChangeListener listener)
-  {
-    if (corpusSelChangeListeners == null)
-    {
-      corpusSelChangeListeners = new LinkedList<>();
-    }
-    else
-    {
-      corpusSelChangeListeners.remove(listener);
-    }
-  }
-
-  public void corpusSelectionChangedInBackground()
-  {
-    ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfigurationInBackground(ui.getControlPanel().
-        getCorpusList().
-        getSelectedCorpora(), ui);
-
-    // Since there is a serious lag when selecting the corpus don't update
-    // the corpus fragment any longer.
-    // The user can manually get the corpus link with the corpus explorer.
-    //ui.updateFragementWithSelectedCorpus(getSelectedCorpora());
-
-    if (corpusSelChangeListeners != null)
-    {
-
-      Set<String> selected = getSelectedCorpora();
-      for (CorpusSelectionChangeListener listener : corpusSelChangeListeners)
-      {
-        listener.onCorpusSelectionChanged(selected);
-      }
-    }
-  }
-
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
   {

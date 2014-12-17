@@ -17,6 +17,7 @@ package annis.gui.querybuilder;
 
 import annis.libgui.AnnisBaseUI;
 import annis.gui.QueryController;
+import annis.gui.objects.QueryUIState;
 import com.vaadin.ui.Component;
 import java.io.Serializable;
 import net.xeoh.plugins.base.Plugin;

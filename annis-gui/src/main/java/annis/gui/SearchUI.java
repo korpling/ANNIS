@@ -754,13 +754,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onLogin()
   {
-    queryController.getLegacy().updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList();
   }
 
   @Override
   public void onLogout()
   {
-    queryController.getLegacy().updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList();
   }
 
   @Override

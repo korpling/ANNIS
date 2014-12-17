@@ -16,8 +16,6 @@
  */
 package annis.gui.flatquerybuilder;
 
-import annis.gui.CorpusSelectionChangeListener;
-import annis.gui.LegacyQueryController;
 import annis.gui.QueryController;
 import annis.gui.objects.Query;
 import annis.libgui.Helper;
@@ -26,6 +24,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Property;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
@@ -50,7 +49,7 @@ import org.slf4j.LoggerFactory;
  * @author martin klotz (martin.klotz@hu-berlin.de)
  * @author tom ruette (tom.ruette@hu-berlin.de)
  */
-public class FlatQueryBuilder extends Panel implements Button.ClickListener, CorpusSelectionChangeListener
+public class FlatQueryBuilder extends Panel implements Button.ClickListener, Property.ValueChangeListener
 {
   private static final Logger log = LoggerFactory.getLogger(FlatQueryBuilder.class);
   
@@ -109,12 +108,12 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
     + "hits are sorted and filtered according to different mechanisms. Please "
     + "choose a filtering mechanism here.";
   
-  private String TOOLBAR_CAPTION = "Toolbar";
-  private String META_CAPTION = "Meta information";
-  private String SPAN_CAPTION = "Scope";
-  private String LANG_CAPTION = "Linguistic sequence";
-  private String ADVANCED_CAPTION = "Advanced settings"; 
-
+  private static final String TOOLBAR_CAPTION = "Toolbar";
+  private static final String META_CAPTION = "Meta information";
+  private static final String SPAN_CAPTION = "Scope";
+  private static final String LANG_CAPTION = "Linguistic sequence";
+  private static final String ADVANCED_CAPTION = "Advanced settings"; 
+  
   public FlatQueryBuilder(QueryController cp)
   {
     setSizeFull();
@@ -212,17 +211,17 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   }
 
   @Override
-  public void onCorpusSelectionChanged(
-    Set<String> selectedCorpora)
+  public void valueChange(Property.ValueChangeEvent event)
   {
+    
     initialize();
   }
-
+  
   @Override
   public void attach()
   {
     super.attach();
-    cp.getLegacy().addCorpusSelectionChangeListener(this);
+    cp.getState().getSelectedCorpora().addValueChangeListener(this);
   }
   
   
@@ -231,7 +230,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Cor
   public void detach()
   {
     super.detach();
-    cp.getLegacy().removeCorpusSelectionChangeListener(this);
+    cp.getState().getSelectedCorpora().removeValueChangeListener(this);
   }
   
   

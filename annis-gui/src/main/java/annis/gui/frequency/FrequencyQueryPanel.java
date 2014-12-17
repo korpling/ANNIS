@@ -15,7 +15,6 @@
  */
 package annis.gui.frequency;
 
-import annis.gui.CorpusSelectionChangeListener;
 import annis.gui.QueryController;
 import annis.gui.admin.PopupTwinColumnSelect;
 import annis.gui.objects.FrequencyQuery;
@@ -381,11 +380,11 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
 
     if(controller != null)
     {
-      controller.getLegacy().addCorpusSelectionChangeListener(new CorpusSelectionChangeListener()
+      state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
       {
 
         @Override
-        public void onCorpusSelectionChanged(Set<String> selectedCorpora)
+        public void valueChange(ValueChangeEvent event)
         {
           if (cbAutomaticMode.getValue())
           {

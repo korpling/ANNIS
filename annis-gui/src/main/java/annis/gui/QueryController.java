@@ -389,7 +389,7 @@ public class QueryController implements Serializable
     {
       freqFuture.cancel(true);
     }
-    
+
     BeanContainer<Integer, UserGeneratedFrequencyEntry> container
       = state.getFrequencyTableDefinition();
 
@@ -413,11 +413,11 @@ public class QueryController implements Serializable
       .frequency().query(state.getAql().getValue())
       .corpora(state.getSelectedCorpora().getValue())
       .def(freqDefinition).build();
-    
+
     addHistoryEntry(query);
-    
+
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
-    
+
     freqFuture = PollControl.callInBackground(1000, ui, job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
   }
@@ -526,6 +526,11 @@ public class QueryController implements Serializable
       new SingleResultFetchJob(match, newQuery,
         visCtxChange));
 
+  }
+  
+  public QueryUIState getState()
+  {
+    return ui.getQueryState();
   }
 
   private static class CountCallback implements Runnable
@@ -742,12 +747,15 @@ public class QueryController implements Serializable
   private static class FrequencyBackgroundJob implements
     Callable<FrequencyTable>
   {
-    
+
     private final UI ui;
+
     private final FrequencyQuery query;
+
     private final FrequencyQueryPanel panel;
-    
-    public FrequencyBackgroundJob(UI ui, FrequencyQuery query, FrequencyQueryPanel panel)
+
+    public FrequencyBackgroundJob(UI ui, FrequencyQuery query,
+      FrequencyQueryPanel panel)
     {
       this.ui = ui;
       this.query = query;
@@ -771,7 +779,7 @@ public class QueryController implements Serializable
 
       return t;
     }
-    
+
     private FrequencyTable loadBeans()
     {
       FrequencyTable result = new FrequencyTable();
@@ -810,9 +818,8 @@ public class QueryController implements Serializable
         log.error("could not execute REST call to query frequency", ex);
       }
 
-    return result;
-  }
-
+      return result;
+    }
   }
 
 }
