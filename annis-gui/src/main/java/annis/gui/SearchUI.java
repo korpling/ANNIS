@@ -19,12 +19,17 @@ import annis.VersionInfo;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.components.OnLoadCallbackExtension;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
+import annis.gui.exporter.CSVExporter;
+import annis.gui.exporter.Exporter;
+import annis.gui.exporter.GridExporter;
+import annis.gui.exporter.SimpleTextExporter;
+import annis.gui.exporter.TextExporter;
+import annis.gui.exporter.WekaExporter;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.MediaControllerImpl;
@@ -33,6 +38,7 @@ import annis.gui.objects.Query;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.frequency.FrequencyQueryPanel;
+import annis.gui.objects.QueryUIState;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
@@ -52,7 +58,6 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
@@ -96,6 +101,15 @@ public class SearchUI extends AnnisBaseUI
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
+  
+  public static final Exporter[] EXPORTER = new Exporter[]
+  {
+    new WekaExporter(),
+    new CSVExporter(),
+    new TextExporter(),
+    new GridExporter(),
+    new SimpleTextExporter()
+  };
 
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
@@ -116,7 +130,7 @@ public class SearchUI extends AnnisBaseUI
 
   private TabSheet mainTab;
 
-  private QueryController queryController;
+  private final QueryController queryController;
 
   private String lastQueriedFragment;
 
@@ -127,6 +141,8 @@ public class SearchUI extends AnnisBaseUI
   private Set<Component> selectedTabHistory;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
+  
+  private final QueryUIState queryState = new QueryUIState();
 
   private void initTransients()
   {
@@ -136,6 +152,7 @@ public class SearchUI extends AnnisBaseUI
   public SearchUI()
   {
     initTransients();
+    queryController = new QueryController(this);
   }
 
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -158,8 +175,6 @@ public class SearchUI extends AnnisBaseUI
 
     // init a doc browser controller
     docBrowserController = new DocBrowserController(this);
-
-    queryController = new QueryController(this);
 
     // always get the resize events directly
     setImmediate(true);
@@ -184,7 +199,6 @@ public class SearchUI extends AnnisBaseUI
     mainTab.setSizeFull();
     mainTab.setCloseHandler(this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
-    mainTab.addSelectedTabChangeListener(queryController);
     mainTab.addSelectedTabChangeListener(this);
 
     Tab helpTab = mainTab.addTab(help, "Help/Examples");
@@ -548,8 +562,7 @@ public class SearchUI extends AnnisBaseUI
           log.error(
             "could not parse context value", ex);
         }
-        queryController.
-          setQuery(
+        queryController.setQuery(
             new PagedResultQuery(cleft, cright, 0, 10, null, aql,
               selectedCorpora));
       }
@@ -605,15 +618,17 @@ public class SearchUI extends AnnisBaseUI
     }
 
     tabsheet.removeComponent(tabContent);
-    if (tabContent instanceof ResultViewPanel)
-    {
-      getQueryController().notifyTabClose((ResultViewPanel) tabContent);
-    }
-    else if (tabContent instanceof FrequencyQueryPanel)
+    if (tabContent instanceof FrequencyQueryPanel)
     {
       controlPanel.getQueryPanel().notifyFrequencyTabClose();
     }
 
+  }
+  
+  public void closeTab(Component c)
+  {
+    selectedTabHistory.remove(c);
+    mainTab.removeComponent(c);
   }
 
   @Override
@@ -626,6 +641,18 @@ public class SearchUI extends AnnisBaseUI
       selectedTabHistory.remove(tab);
       selectedTabHistory.add(tab);
     }
+  }
+  
+  public ResultViewPanel getLastSelectedResultView()
+  {
+    for(Component c : selectedTabHistory)
+    {
+      if(c instanceof ResultViewPanel && mainTab.getTab(c) != null)
+      {
+        return (ResultViewPanel) c;
+      }
+    }
+    return null;
   }
 
   public ControlPanel getControlPanel()
@@ -642,6 +669,7 @@ public class SearchUI extends AnnisBaseUI
   {
     return queryController;
   }
+  
 
   public TabSheet getMainTab()
   {
@@ -721,13 +749,13 @@ public class SearchUI extends AnnisBaseUI
   @Override
   public void onLogin()
   {
-    queryController.updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList();
   }
 
   @Override
   public void onLogout()
   {
-    queryController.updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList();
   }
 
   @Override
@@ -862,7 +890,7 @@ public class SearchUI extends AnnisBaseUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora));
-      queryController.executeQuery();
+      queryController.executeSearch(true);
     }
     else
     {
@@ -871,7 +899,7 @@ public class SearchUI extends AnnisBaseUI
 
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeQuery();
+      queryController.executeSearch(true);
     }
   }
 
@@ -887,7 +915,7 @@ public class SearchUI extends AnnisBaseUI
   public void updateFragment(PagedResultQuery q)
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
-      q.getContextLeft(), q.getContextRight(),
+      q.getLeftContext(), q.getRightContext(),
       q.getSegmentation(), q.getOffset(), q.getLimit());
 
     // set our fragment
@@ -948,4 +976,10 @@ public class SearchUI extends AnnisBaseUI
   {
     return docBrowserController;
   }
+
+  public QueryUIState getQueryState()
+  {
+    return queryState;
+  }
+  
 }

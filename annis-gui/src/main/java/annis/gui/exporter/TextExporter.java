@@ -34,7 +34,7 @@ public class TextExporter extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys, 
+  public void convertText(AnnisResultSet queryResult, List<String> keys, 
     Map<String,String> args, Writer out, int offset) throws IOException
   {
     

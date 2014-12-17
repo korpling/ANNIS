@@ -17,8 +17,6 @@ package annis.service.objects;
 
 import com.google.common.base.Splitter;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.List;
 
 /**

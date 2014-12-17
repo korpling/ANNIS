@@ -61,7 +61,7 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private QueryController controller;
+  private final QueryController controller;
 
   public TigerQueryBuilderCanvas(QueryController controller)
   {
@@ -112,7 +112,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
 
     if (service != null)
     {

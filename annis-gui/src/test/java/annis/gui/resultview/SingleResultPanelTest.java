@@ -69,7 +69,7 @@ public class SingleResultPanelTest
     SaltProject project = SampleGenerator.createSaltProject();
     SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
     
-    SingleResultPanel o = new SingleResultPanel(doc, 0, null, null,
+    SingleResultPanel o = new SingleResultPanel(doc, null, 0, null, null,
       null, null, null, null, null);
     
     File tmpFile = File.createTempFile("testSingeResultPanel", ".salt");

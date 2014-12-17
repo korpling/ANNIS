@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui.admin.converter;
+package annis.gui.converter;
 
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Locale;
 import java.util.TreeSet;
 
@@ -25,7 +28,7 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CommaSeperatedStringConverter implements Converter<String, TreeSet>
+public class CommaSeperatedStringConverterList implements Converter<String, List>
 {
 
   private static final Splitter splitter = Splitter.on(',').trimResults().
@@ -34,10 +37,10 @@ public class CommaSeperatedStringConverter implements Converter<String, TreeSet>
   private static final Joiner joiner = Joiner.on(", ");
 
   @Override
-  public TreeSet convertToModel(String value,
-    Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
+  public List convertToModel(String value,
+    Class<? extends List> targetType, Locale locale) throws ConversionException
   {
-    TreeSet<String> result = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    List<String> result = new ArrayList<>();
     for(String s : splitter.split(value))
     {
       result.add(s);
@@ -46,7 +49,7 @@ public class CommaSeperatedStringConverter implements Converter<String, TreeSet>
   }
 
   @Override
-  public String convertToPresentation(TreeSet value,
+  public String convertToPresentation(List value,
     Class<? extends String> targetType, Locale locale) throws ConversionException
   {
     return joiner.join(value);
@@ -59,9 +62,9 @@ public class CommaSeperatedStringConverter implements Converter<String, TreeSet>
   }
 
   @Override
-  public Class<TreeSet> getModelType()
+  public Class<List> getModelType()
   {
-    return TreeSet.class;
+    return List.class;
   }
   
 }
