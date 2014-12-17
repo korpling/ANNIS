@@ -16,9 +16,11 @@
 package annis.gui.objects;
 
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.visualizers.component.tree.TigerTreeVisualizer;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;
+import java.io.IOException;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.EnumMap;
@@ -55,8 +57,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<String> exportParameters = 
     new ObjectProperty<>("");
   
-  private final Map<QueryType, Future<?>> executedTasks = 
-    new EnumMap<>(QueryType.class);
+  private transient Map<QueryType, Future<?>> executedTasks;
   
   private final BeanContainer<Integer, UserGeneratedFrequencyEntry> frequencyTableDefinition
     = new BeanContainer<>(UserGeneratedFrequencyEntry.class);
@@ -64,6 +65,22 @@ public class QueryUIState implements Serializable
     new ObjectProperty<Set<String>> (new TreeSet<String>());
   
   private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
+  
+  public QueryUIState()
+  {
+    initTransients();
+  }
+  
+  private void initTransients()
+  {
+    executedTasks = new EnumMap<>(QueryType.class);
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
+  }
   
   public ObjectProperty<String> getAql()
   {
