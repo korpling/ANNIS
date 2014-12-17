@@ -32,7 +32,6 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   
   private int offset;
   private int limit;
-  
 
   public PagedResultQuery()
   {

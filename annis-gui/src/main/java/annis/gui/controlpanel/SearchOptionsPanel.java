@@ -19,6 +19,7 @@ import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.gui.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.PollControl;
@@ -249,9 +250,9 @@ public class SearchOptionsPanel extends FormLayout
       cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
       cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
       
-      BeanItemContainer<QueryUIState.OrderType> orderContainer 
-        = new BeanItemContainer<>(QueryUIState.OrderType.class, 
-          Lists.newArrayList(QueryUIState.OrderType.values()));
+      BeanItemContainer<OrderType> orderContainer 
+        = new BeanItemContainer<>(OrderType.class, 
+          Lists.newArrayList(OrderType.values()));
       cbOrder.setContainerDataSource(orderContainer);
       cbOrder.setPropertyDataSource(ui.getQueryState().getOrder());
       

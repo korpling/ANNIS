@@ -40,7 +40,6 @@ public class QueryUIState implements Serializable
   
   public enum QueryType {COUNT, FIND, FREQUENCY, EXPORT}
   
-  public enum OrderType {normal, random, inverted}
   
   private final ObjectProperty<String> aql = new ObjectProperty<>("");
   private final ObjectProperty<Set<String>> selectedCorpora 
