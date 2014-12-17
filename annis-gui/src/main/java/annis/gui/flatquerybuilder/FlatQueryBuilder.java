@@ -904,7 +904,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
      */
   {
     /*get clean query from control panel text field*/
-    String tq = cp.getLegacy().getQueryDraft().replace("\n", " ").replace("\r", "");
+    String tq = cp.getState().getAql().getValue().replace("\n", " ").replace("\r", "");
     //TODO VALIDATE QUERY: (NOT SUFFICIENT YET)
     boolean valid = (!tq.equals(""));
     if(!(query.equals(tq)) & valid)

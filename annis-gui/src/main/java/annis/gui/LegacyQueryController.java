@@ -137,11 +137,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
     }
   }
 
-  public String getQueryDraft()
-  {
-    return ui.getControlPanel().getQueryPanel().getQuery();
-  }
-
   private Map<UUID, PagedResultQuery> getQueries()
   {
     if (queries == null)

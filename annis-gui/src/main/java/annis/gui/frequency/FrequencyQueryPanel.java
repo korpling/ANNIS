@@ -198,8 +198,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     
     if(controller != null)
     {
-      createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
-      updateQueryInfo(controller.getLegacy().getQueryDraft());
+      createAutomaticEntriesForQuery(state.getAql().getValue());
+      updateQueryInfo(state.getAql().getValue());
     }
     
     HorizontalLayout layoutButtons = new HorizontalLayout();
@@ -229,7 +229,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         }
         if(controller != null)
         {
-          List<QueryNode> nodes = parseQuery(controller.getLegacy().getQueryDraft());
+          List<QueryNode> nodes = parseQuery(FrequencyQueryPanel.this.state.getAql().getValue());
           nr = Math.min(nr, nodes.size()-1);
           int id = counter++;
           UserGeneratedFrequencyEntry entry = new UserGeneratedFrequencyEntry();
@@ -273,7 +273,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
           tblFrequencyDefinition.removeAllItems();
           if(controller != null)
           {
-            createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
+            createAutomaticEntriesForQuery(
+              FrequencyQueryPanel.this.state.getAql().getValue());
           }
         }
       }
@@ -291,7 +292,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         tblFrequencyDefinition.removeAllItems();
         if(controller != null)
         {
-          createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
+          createAutomaticEntriesForQuery(
+            FrequencyQueryPanel.this.state.getAql().getValue());
         }
       }
     });
@@ -388,9 +390,9 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
         {
           if (cbAutomaticMode.getValue())
           {
-            createAutomaticEntriesForQuery(controller.getLegacy().getQueryDraft());
+            createAutomaticEntriesForQuery(FrequencyQueryPanel.this.state.getAql().getValue());
           }
-          updateQueryInfo(controller.getLegacy().getQueryDraft());
+          updateQueryInfo(FrequencyQueryPanel.this.state.getAql().getValue());
         }
       });
     }
