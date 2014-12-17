@@ -112,7 +112,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
 
     if (service != null)
     {

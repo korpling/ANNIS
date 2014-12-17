@@ -507,7 +507,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   @Override
   public void buttonClick(Button.ClickEvent event)
   {
-    if (cp.getLegacy().getSelectedCorpora().isEmpty())
+    if (cp.getState().getSelectedCorpora().getValue().isEmpty())
     {
       Notification.show(NO_CORPORA_WARNING);
     }
@@ -658,7 +658,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
     {
       try
@@ -698,7 +698,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
     Collection<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
     {
       try
@@ -753,7 +753,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
     {
       try
@@ -793,7 +793,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = cp.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = cp.getState().getSelectedCorpora().getValue();
     if (service != null)
     {
       try

@@ -401,7 +401,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     Set<String> result = new TreeSet<>();
     WebResource service = Helper.getAnnisWebResource();
     // get current corpus selection
-    Set<String> corpusSelection = controller.getLegacy().getSelectedCorpora();
+    Set<String> corpusSelection = state.getSelectedCorpora().getValue();
     if (service != null)
     {
       try
@@ -572,7 +572,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     oldSelection.retainAll(allMetaNames);
     state.getFrequencyMetaData().setValue(oldSelection);
     
-    Set<String> selectedCorpora = controller.getLegacy().getSelectedCorpora();
+    Set<String> selectedCorpora = state.getSelectedCorpora().getValue();
     if(selectedCorpora.isEmpty())
     {
       lblCorpusList.setValue("none");

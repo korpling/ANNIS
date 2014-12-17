@@ -15,15 +15,9 @@
  */
 package annis.gui;
 
-import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.beans.HistoryEntry;
 import annis.gui.objects.PagedResultQuery;
-import annis.gui.paging.PagingCallback;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.resultview.VisualizerContextChanger;
-import annis.libgui.PollControl;
-import annis.gui.resultfetch.ResultFetchJob;
-import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
 import com.google.common.collect.BiMap;
@@ -32,8 +26,6 @@ import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
@@ -119,11 +111,6 @@ public class LegacyQueryController implements TabSheet.SelectedTabChangeListener
         }
       }
     }
-  }
-
-  public Set<String> getSelectedCorpora()
-  {
-    return ui.getControlPanel().getCorpusList().getSelectedCorpora();
   }
 
   /**
