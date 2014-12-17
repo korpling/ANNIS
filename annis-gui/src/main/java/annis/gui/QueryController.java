@@ -382,6 +382,14 @@ public class QueryController implements Serializable
 
   public void executeFrequency(FrequencyQueryPanel panel)
   {
+    // kill old request
+    Future freqFuture = state.getExecutedTasks().get(
+      QueryUIState.QueryType.FREQUENCY);
+    if (freqFuture != null && !freqFuture.isDone())
+    {
+      freqFuture.cancel(true);
+    }
+    
     BeanContainer<Integer, UserGeneratedFrequencyEntry> container
       = state.getFrequencyTableDefinition();
 
@@ -408,7 +416,8 @@ public class QueryController implements Serializable
     
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
     
-    PollControl.callInBackground(1000, ui, job);
+    freqFuture = PollControl.callInBackground(1000, ui, job);
+    state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
   }
 
   public Exporter getExporterByName(String name)
