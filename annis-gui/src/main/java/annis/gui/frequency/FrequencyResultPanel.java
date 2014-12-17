@@ -83,9 +83,9 @@ public class FrequencyResultPanel extends VerticalLayout
   private final FrequencyQueryPanel queryPanel;
   private final FrequencyQuery query;
   
-  private ProgressBar pbQuery;
+  private final ProgressBar pbQuery;
 
-  public FrequencyResultPanel(FrequencyQuery query, FrequencyQueryPanel queryPanel)
+  public FrequencyResultPanel(FrequencyTable table, FrequencyQuery query, FrequencyQueryPanel queryPanel)
   {
     this.query = query;
     this.queryPanel = queryPanel;
@@ -116,71 +116,10 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setIcon(FontAwesome.DOWNLOAD);
     btDownloadCSV.addStyleName(ValoTheme.BUTTON_SMALL);
     
-    final UI ui = UI.getCurrent();
-    // actually start query
-    Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
-    {
-      @Override
-      public FrequencyTable call() throws Exception
-      {
-        final FrequencyTable t = loadBeans();
-        
-        ui.access(new Runnable()
-        {
-
-          @Override
-          public void run()
-          {
-            showResult(t);
-          }
-        });
-        
-        return t;
-      } 
-    };
-    
-    PollControl.callInBackground(1000, ui, r);
+    showResult(table);
   }
   
-  private FrequencyTable loadBeans()
-  {
-    FrequencyTable result = new FrequencyTable();
-      
-    WebResource annisResource = Helper.getAnnisWebResource();
-    try
-    {
-      annisResource = annisResource.path("query").path("search").path("frequency")
-        .queryParam("q", query.getQuery())  
-        .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
-        .queryParam("fields", query.getFrequencyDefinition().toString());
-
-      result = annisResource.get(FrequencyTable.class);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      String message;
-      if (ex.getResponse().getStatus() == 400)
-      {
-        message = ex.getResponse().getEntity(String.class);
-      }
-      else if (ex.getResponse().getStatus() == 504) // gateway timeout
-      {
-        message = "Timeout: query exeuction took too long";
-      }
-      else
-      {
-        message = "unknown error: " + ex;
-        log.error(ex.getResponse().getEntity(String.class), ex);
-      }
-      Notification.show(message, Notification.Type.WARNING_MESSAGE);      
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error("could not execute REST call to query frequency", ex);
-    }
-
-    return result;
-  }
+  
   
   private void showResult(FrequencyTable table)
   {

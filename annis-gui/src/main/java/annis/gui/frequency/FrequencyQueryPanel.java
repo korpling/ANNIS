@@ -26,6 +26,7 @@ import annis.libgui.Helper;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -324,30 +325,17 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        BeanContainer<Integer, UserGeneratedFrequencyEntry> container = 
-          FrequencyQueryPanel.this.state.getFrequencyTableDefinition();
-        FrequencyTableQuery freqDefinition = new FrequencyTableQuery();
-        for(Integer id : container.getItemIds())
-        {
-          UserGeneratedFrequencyEntry userGen = 
-            container.getItem(id).getBean();
-          freqDefinition.add(userGen.toFrequencyTableEntry());
-        }
-        // additionally add meta data columns
-        for(String m : 
-          FrequencyQueryPanel.this.state.getFrequencyMetaData().getValue())
-        {
-          FrequencyTableEntry entry = new FrequencyTableEntry();
-          entry.setType(FrequencyTableEntryType.meta);
-          entry.setKey(m);
-          freqDefinition.add(entry);
-        }
+        
         
         if(controller != null)
         {
           try
           {
-            executeFrequencyQuery(freqDefinition);
+            if (resultPanel != null)
+            {
+              removeComponent(resultPanel);
+            }
+            controller.executeFrequency(FrequencyQueryPanel.this);
           }
           catch(Exception ex)
           {
@@ -451,39 +439,13 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
   }
   
   
-
-  public void executeFrequencyQuery(FrequencyTableQuery freqDefinition)
+  public void showResult(FrequencyTable result, FrequencyQuery query)
   {
-    if (controller != null && controller.getSearchQuery() != null)
-    {
-      PagedResultQuery preparedQuery = controller.getSearchQuery();
-      
-      if (preparedQuery.getCorpora()== null || preparedQuery.getCorpora().isEmpty())
-      {
-        Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
-        btShowFrequencies.setEnabled(true);
-        return;
-      }
-      if ("".equals(preparedQuery.getQuery()))
-      {
-        Notification.show("Empty query",  Notification.Type.WARNING_MESSAGE);
-        btShowFrequencies.setEnabled(true);
-        return;
-      }
-      if(resultPanel != null)
-      {
-        removeComponent(resultPanel);
-      }
-      FrequencyQuery query = QueryGenerator
-        .frequency().query(preparedQuery.getQuery())
-        .corpora(preparedQuery.getCorpora())
-        .def(freqDefinition).build();
-      resultPanel = new FrequencyResultPanel(query, this);
-      addComponent(resultPanel);
-      setExpandRatio(resultPanel, 1.0f);
-      
-      queryLayout.setVisible(false);
-    }
+    resultPanel = new FrequencyResultPanel(result, query, this);
+    addComponent(resultPanel);
+    setExpandRatio(resultPanel, 1.0f);
+
+    queryLayout.setVisible(false);
   }
   
   private List<QueryNode> parseQuery(String query)
