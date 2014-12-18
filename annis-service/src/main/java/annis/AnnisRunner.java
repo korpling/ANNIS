@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +48,6 @@ import annis.dao.objects.AnnotatedMatch;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
@@ -73,6 +71,7 @@ import annis.service.objects.FrequencyTable;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.SqlGeneratorAndExtractor;
 import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 import com.google.common.base.Splitter;
 import java.util.Properties;
 
@@ -113,6 +112,8 @@ public class AnnisRunner extends AnnisBaseRunner
   private int left = 5;
 
   private int right = 5;
+  
+  private OrderType order = OrderType.normal;
 
   private String segmentationLayer = null;
   
@@ -815,6 +816,17 @@ public class AnnisRunner extends AnnisBaseRunner
         offset = Integer.parseInt(value);
       }
     }
+    else if("order".equals(setting))
+    {
+      if(show)
+      {
+        value = order.toString();
+      }
+      else
+      {
+        order = OrderType.valueOf(value);
+      }
+    }
     else if ("left".equals(setting))
     {
       if (show)
@@ -985,7 +997,7 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer, filter));
-      queryData.addExtension(new LimitOffsetQueryData(offset, limit));
+      queryData.addExtension(new LimitOffsetQueryData(offset, limit, order));
     }
     else if (queryFunction != null && queryFunction.matches("(sql_)?subgraph"))
     {

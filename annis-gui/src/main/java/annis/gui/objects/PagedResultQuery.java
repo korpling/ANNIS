@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.OrderType;
 import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -32,7 +33,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   
   private int offset;
   private int limit;
-  
+  private OrderType order = OrderType.normal;
 
   public PagedResultQuery()
   {
@@ -73,6 +74,17 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
     this.limit = limit;
   }
 
+  public OrderType getOrder()
+  {
+    return order;
+  }
+
+  public void setOrder(OrderType order)
+  {
+    this.order = order;
+  }
+
+  
   
   @Override
   public PagedResultQuery clone()
@@ -94,7 +106,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   public int hashCode()
   {
     return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
-      getLimit(), getOffset());
+      getLimit(), getOffset(), getOrder());
   }
 
   @Override
@@ -116,6 +128,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
       && Objects.equals(getRightContext(), other.getRightContext())
       && Objects.equals(getSegmentation(), other.getSegmentation())
       && Objects.equals(getLimit(), other.getLimit())
-      && Objects.equals(getOffset(), other.getOffset());
+      && Objects.equals(getOffset(), other.getOffset())
+      && Objects.equals(getOrder(), other.getOrder());
   }
 }

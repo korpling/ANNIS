@@ -18,6 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.libgui.PollControl;
 import annis.service.objects.CorpusConfig;
@@ -26,8 +27,10 @@ import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -91,8 +94,10 @@ public class SearchOptionsPanel extends FormLayout
   private final ComboBox cbResultsPerPage;
 
   private final ComboBox cbSegmentation;
+  
+  private final ComboBox cbOrder;
+  
   // TODO: make this configurable
-
   private static final List<Integer> PREDEFINED_PAGE_SIZES = ImmutableList.of(
     1, 2, 5, 10, 20, 25
   );
@@ -164,14 +169,16 @@ public class SearchOptionsPanel extends FormLayout
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
     
+    cbOrder = new ComboBox("Order");
+    cbOrder.setNewItemsAllowed(false);
+    cbOrder.setNullSelectionAllowed(false);
+    cbOrder.setImmediate(true);
+    
     addComponent(cbLeftContext);
-
     addComponent(cbRightContext);
-
-    addComponent(
-      new HelpButton(cbSegmentation));
-
+    addComponent(new HelpButton(cbSegmentation));
     addComponent(cbResultsPerPage);
+    addComponent(cbOrder);
 
     corpusConfigurations = Helper.getCorpusConfigs();
 
@@ -240,6 +247,13 @@ public class SearchOptionsPanel extends FormLayout
       cbRightContext.setPropertyDataSource(ui.getQueryState().getRightContext());
       cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
       cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
+      
+      BeanItemContainer<OrderType> orderContainer 
+        = new BeanItemContainer<>(OrderType.class, 
+          Lists.newArrayList(OrderType.values()));
+      cbOrder.setContainerDataSource(orderContainer);
+      cbOrder.setPropertyDataSource(ui.getQueryState().getOrder());
+      
     }
   }
   

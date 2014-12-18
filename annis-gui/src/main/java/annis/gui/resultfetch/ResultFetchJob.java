@@ -76,6 +76,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 

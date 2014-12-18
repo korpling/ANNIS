@@ -15,8 +15,8 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.OrderType;
 import annis.service.objects.FrequencyTableQuery;
-import com.google.common.base.Splitter;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
@@ -115,6 +115,12 @@ public class QueryGenerator<T extends Query, QG extends QueryGenerator<T, QG>>
     public PagedQueryGenerator offset(int offset)
     {
       getCurrent().setOffset(offset);
+      return (PagedQueryGenerator) this;
+    }
+    
+    public PagedQueryGenerator order(OrderType order)
+    {
+      getCurrent().setOrder(order);
       return (PagedQueryGenerator) this;
     }
   }

@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.OrderType;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.visualizers.component.tree.TigerTreeVisualizer;
 import com.vaadin.data.util.BeanContainer;
@@ -40,6 +41,7 @@ public class QueryUIState implements Serializable
   
   public enum QueryType {COUNT, FIND, FREQUENCY, EXPORT}
   
+  
   private final ObjectProperty<String> aql = new ObjectProperty<>("");
   private final ObjectProperty<Set<String>> selectedCorpora 
     = new ObjectProperty<Set<String>>(new LinkedHashSet<String>());
@@ -50,6 +52,8 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Integer> limit = new ObjectProperty<>(10);
   private final ObjectProperty<Integer> offset = new ObjectProperty<>(0);
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
+  
+  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.normal);
   
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
   private final ObjectProperty<List<String>> exportAnnotationKeys 
@@ -150,6 +154,11 @@ public class QueryUIState implements Serializable
   public ObjectProperty<Set<String>> getFrequencyMetaData()
   {
     return frequencyMetaData;
+  }
+
+  public ObjectProperty<OrderType> getOrder()
+  {
+    return order;
   }
   
   
