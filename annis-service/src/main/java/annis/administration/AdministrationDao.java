@@ -554,6 +554,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     addUniqueNodeNameAppendix();
     
+    addDocumentNameMetaData();
     long corpusID = updateIds();
 
     importBinaryData(path, toplevelCorpusName);
