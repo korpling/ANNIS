@@ -1,5 +1,5 @@
 /*
- * Copyright 2012 SFB 632.
+ * Copyright 2014 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.extensions;
-
-import annis.service.objects.FrequencyTableEntry;
-import annis.sqlgen.FrequencySqlGenerator;
-import java.io.Serializable;
-import java.util.ArrayList;
+package annis.service.objects;
 
 /**
- * This is an extension to be used as argument for {@link FrequencySqlGenerator}
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
+public enum OrderType
 {
+  normal, random, inverted
+  
 }

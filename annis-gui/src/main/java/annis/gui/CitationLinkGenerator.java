@@ -16,16 +16,18 @@
 package annis.gui;
 
 import annis.gui.beans.CitationProvider;
+import annis.gui.objects.ContextualizedQuery;
+import annis.gui.objects.Query;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import java.io.Serializable;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  *
@@ -41,12 +43,17 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
     btLink.setStyleName(BaseTheme.BUTTON_LINK);
     btLink.setIcon(FontAwesome.LINK);
     btLink.setDescription("show citation link");
-    btLink.addListener(this);
+    btLink.addClickListener(this);
 
     if(itemId instanceof CitationProvider)
     {
       final CitationProvider citationProvider = (CitationProvider) itemId;
-      btLink.addListener(new LinkClickListener(citationProvider));
+      btLink.addClickListener(new LinkClickListener(citationProvider));
+    }
+    else if(itemId instanceof Query)
+    {
+      final CitationProvider citationProvider = new CitationProviderForQuery((Query) itemId);
+      btLink.addClickListener(new LinkClickListener(citationProvider));
     }
 
     return btLink;
@@ -55,6 +62,58 @@ public class CitationLinkGenerator implements Table.ColumnGenerator,
   @Override
   public void buttonClick(ClickEvent event)
   {
+  }
+  
+  private static class CitationProviderForQuery implements CitationProvider
+  {
+    private final Query query;
+
+    public CitationProviderForQuery(Query query)
+    {
+      this.query = query;
+    }
+
+    @Override
+    public String getQuery()
+    {
+      if(query == null)
+      {
+        return null;
+      }
+      return query.getQuery();
+    }
+
+    @Override
+    public Set<String> getCorpora()
+    {
+      if(query == null)
+      {
+        return new HashSet<>();
+      }
+      return query.getCorpora();
+    }
+
+    @Override
+    public int getLeftContext()
+    {
+      if(query instanceof ContextualizedQuery)
+      {
+        return ((ContextualizedQuery) query).getLeftContext();
+      }
+      return 5;
+    }
+
+    @Override
+    public int getRightContext()
+    {
+      if(query instanceof ContextualizedQuery)
+      {
+        return ((ContextualizedQuery) query).getRightContext();
+      }
+      return 5;
+    }
+    
+    
   }
 
   private static class LinkClickListener implements Button.ClickListener, Serializable

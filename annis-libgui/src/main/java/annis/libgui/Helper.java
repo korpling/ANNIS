@@ -20,6 +20,7 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
@@ -317,13 +318,22 @@ public class Helper
     }
     return "";
   }
-
+  
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation,
     int start, int limit)
   {
-    List<String> result = new ArrayList<String>();
+    return citationFragment(aql, corpora, contextLeft, contextRight,
+      segmentation, start, limit, OrderType.normal);
+  }
+
+  public static List<String> citationFragment(String aql,
+    Set<String> corpora, int contextLeft, int contextRight,
+    String segmentation,
+    int start, int limit, OrderType order)
+  {
+    List<String> result = new ArrayList<>();
     try
     {
       result.add("_q=" + encodeBase64URL(aql));
@@ -341,6 +351,10 @@ public class Helper
       {
         result.add("_seg="
           + encodeBase64URL(segmentation));
+      }
+      if(order != OrderType.normal)
+      {
+        result.add("o=" + order.toString());
       }
     }
     catch (UnsupportedEncodingException ex)

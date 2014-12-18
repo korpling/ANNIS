@@ -15,9 +15,7 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
@@ -62,16 +60,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   protected PagedResultQuery query;
 
   protected SearchUI ui;
-  private final QueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel,
-    SearchUI ui, QueryController controller)
+    SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
-    this.queryController = controller;
     
     res = Helper.getAnnisAsyncWebResource();
     
@@ -80,6 +76,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 
@@ -114,9 +111,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       // get the matches
       result = futureMatches.get();
       
-      // store the matches for later purposes
-      queryController.setMatches(result);
-
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty())
       {
@@ -172,7 +166,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           subList.add(m);
           final SaltProject p = executeQuery(subgraphRes, 
             new MatchGroup(subList), 
-            query.getContextLeft(), query.getContextRight(),
+            query.getLeftContext(), query.getRightContext(),
             query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);

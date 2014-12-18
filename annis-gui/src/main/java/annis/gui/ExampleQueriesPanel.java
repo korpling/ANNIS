@@ -407,7 +407,7 @@ public class ExampleQueriesPanel extends Table
           if (controller != null)
           {
             controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-            controller.executeQuery();
+            controller.executeSearch(true);
           }
         }
       });

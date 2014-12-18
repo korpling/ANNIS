@@ -37,17 +37,18 @@ import net.xeoh.plugins.base.util.PluginManagerUtil;
  */
 public class QueryBuilderChooser extends Panel implements Property.ValueChangeListener
 {
-  private PluginSystem pluginSystem;
-  private QueryController controller;
-  private ComboBox cbChooseBuilder;
-  private Map<String, String> short2caption;
-  private Map<String, QueryBuilderPlugin> pluginRegistry;
+  private final PluginSystem pluginSystem;
+  private final QueryController controller;
+  private final ComboBox cbChooseBuilder;
+  private final Map<String, String> short2caption;
+  private final Map<String, QueryBuilderPlugin> pluginRegistry;
   private Component lastComponent;
-  private VerticalLayout layout;
-  private InstanceConfig instanceConfig;
+  private final VerticalLayout layout;
+  private final InstanceConfig instanceConfig;
   private Component component;
   
-  public QueryBuilderChooser(QueryController controller, PluginSystem pluginSystem,
+  public QueryBuilderChooser(QueryController controller,
+    PluginSystem pluginSystem,
     InstanceConfig instanceConfig)
   {
     this.controller = controller;

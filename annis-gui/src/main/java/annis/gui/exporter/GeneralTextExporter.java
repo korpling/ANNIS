@@ -58,18 +58,17 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, String keysAsString, String argsAsString,
+    Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
     try
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
-      LinkedList<String> keys = new LinkedList<>();
-
-      if (keysAsString == null || keysAsString.isEmpty())
+      if (keys == null || keys.isEmpty())
       {
         // auto set
+        keys = new LinkedList<>();
         keys.add("tok");
         List<AnnisAttribute> attributes = new LinkedList<>();
         
@@ -99,15 +98,6 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
               keys.add(namespaceAndName[0]);
             }
           }
-        }
-      }
-      else
-      {
-        // manually specified
-        String[] keysSplitted = keysAsString.split("\\,");
-        for (String k : keysSplitted)
-        {
-          keys.add(k.trim());
         }
       }
 
@@ -237,7 +227,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
     }
   }
 
-  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys,
+  public void convertText(AnnisResultSet queryResult, List<String> keys,
     Map<String, String> args, Writer out, int offset) throws IOException
   {
     Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();

@@ -16,8 +16,7 @@
 package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
-import annis.libgui.Helper;
-import annis.libgui.PollControl;
+import annis.gui.objects.FrequencyQuery;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
@@ -25,9 +24,6 @@ import au.com.bytecode.opencsv.CSVWriter;
 import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Ordering;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.Container;
 import com.vaadin.data.util.AbstractBeanContainer;
 import com.vaadin.data.util.DefaultItemSorter;
@@ -38,10 +34,8 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.StreamResource;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.ByteArrayInputStream;
@@ -60,9 +54,6 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Locale;
-import java.util.Set;
-import java.util.concurrent.Callable;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -78,32 +69,16 @@ public class FrequencyResultPanel extends VerticalLayout
   private Table tblResult;
   private final Button btDownloadCSV;
   private final FrequencyChart chart;
-  private final String aql;
-  private final Set<String> corpora;
-  private final List<FrequencyTableEntry> freqDefinition;
   private final FrequencyQueryPanel queryPanel;
+  private final FrequencyQuery query;
   
-  private ProgressBar pbQuery;
-
-  public FrequencyResultPanel(String aql,
-    Set<String> corpora,
-    final List<FrequencyTableEntry> freqDefinition, FrequencyQueryPanel queryPanel)
+  public FrequencyResultPanel(FrequencyTable table, FrequencyQuery query, FrequencyQueryPanel queryPanel)
   {
-    this.aql = aql;
-    this.corpora = corpora;
-    this.freqDefinition = freqDefinition;
+    this.query = query;
     this.queryPanel = queryPanel;
     
     setSizeFull();
     
-    pbQuery = new ProgressBar();
-    pbQuery.setCaption("Please wait, the frequencies analysis can take some time");
-    pbQuery.setIndeterminate(true);
-    pbQuery.setEnabled(true);
-    
-    addComponent(pbQuery);
-    setComponentAlignment(pbQuery, Alignment.TOP_CENTER);
-  
     chart = new FrequencyChart(this);
     chart.setHeight("350px");
     chart.setVisible(false);
@@ -120,71 +95,10 @@ public class FrequencyResultPanel extends VerticalLayout
     btDownloadCSV.setIcon(FontAwesome.DOWNLOAD);
     btDownloadCSV.addStyleName(ValoTheme.BUTTON_SMALL);
     
-    final UI ui = UI.getCurrent();
-    // actually start query
-    Callable<FrequencyTable> r = new Callable<FrequencyTable>() 
-    {
-      @Override
-      public FrequencyTable call() throws Exception
-      {
-        final FrequencyTable t = loadBeans();
-        
-        ui.access(new Runnable()
-        {
-
-          @Override
-          public void run()
-          {
-            showResult(t);
-          }
-        });
-        
-        return t;
-      } 
-    };
-    
-    PollControl.callInBackground(1000, ui, r);
+    showResult(table);
   }
   
-  private FrequencyTable loadBeans()
-  {
-    FrequencyTable result = new FrequencyTable();
-      
-    WebResource annisResource = Helper.getAnnisWebResource();
-    try
-    {
-      annisResource = annisResource.path("query").path("search").path("frequency")
-        .queryParam("q", aql)  
-        .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("fields", createFieldsString());
-
-      result = annisResource.get(FrequencyTable.class);
-    }
-    catch (UniformInterfaceException ex)
-    {
-      String message;
-      if (ex.getResponse().getStatus() == 400)
-      {
-        message = ex.getResponse().getEntity(String.class);
-      }
-      else if (ex.getResponse().getStatus() == 504) // gateway timeout
-      {
-        message = "Timeout: query exeuction took too long";
-      }
-      else
-      {
-        message = "unknown error: " + ex;
-        log.error(ex.getResponse().getEntity(String.class), ex);
-      }
-      Notification.show(message, Notification.Type.WARNING_MESSAGE);      
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.error("could not execute REST call to query frequency", ex);
-    }
-
-    return result;
-  }
+  
   
   private void showResult(FrequencyTable table)
   {
@@ -196,7 +110,7 @@ public class FrequencyResultPanel extends VerticalLayout
 
     btDownloadCSV.setVisible(true);
     FileDownloader downloader = new FileDownloader(
-      new StreamResource(new CSVResource(table, freqDefinition),
+      new StreamResource(new CSVResource(table, query.getFrequencyDefinition()),
         "frequency.txt"));
     downloader.extend(btDownloadCSV);
 
@@ -223,7 +137,7 @@ public class FrequencyResultPanel extends VerticalLayout
   {    
     StringBuilder sb = new StringBuilder();
     
-    ListIterator<FrequencyTableEntry> it = freqDefinition.listIterator();
+    ListIterator<FrequencyTableEntry> it = query.getFrequencyDefinition().listIterator();
     while(it.hasNext())
     {
       FrequencyTableEntry e = it.next();
@@ -260,7 +174,7 @@ public class FrequencyResultPanel extends VerticalLayout
     
     tblResult.setCaption(table.getEntries().size() 
       + " items with a total sum of " + table.getSum()
-      + " (query on " + Joiner.on(", ").join(this.corpora) + ")"
+      + " (query on " + Joiner.on(", ").join(query.getCorpora()) + ")"
     );
     
     tblResult.setSelectable(true);
@@ -276,13 +190,10 @@ public class FrequencyResultPanel extends VerticalLayout
       for(int i=1; i <= tupelCount; i++)
       {
         tblResult.addContainerProperty("tupel-" + i, String.class, "");
-        FrequencyTableEntry e = freqDefinition.get(i-1);
-        String caption = "#" + e.getReferencedNode() + " ("
-          + (e.getType() == FrequencyTableEntryType.span 
-            ? "spanned text" : e.getKey())
-          + ")";
+        FrequencyTableEntry e = query.getFrequencyDefinition().get(i-1);
         
-        tblResult.setColumnHeader("tupel-"+ i, caption);
+        
+        tblResult.setColumnHeader("tupel-"+ i, getCaption(e));
       }
       
       tblResult.addContainerProperty("count", Long.class, -1l);
@@ -300,14 +211,11 @@ public class FrequencyResultPanel extends VerticalLayout
         tblResult.addItem(cells, "entry-" + line++);
       }
     }
-    tblResult.addContainerProperty(pbQuery, null, table);
     addLexicalSort(tblResult.getContainerDataSource());
     
     addComponent(tblResult);
     setExpandRatio(tblResult, 1.0f);
     
-    pbQuery.setEnabled(true);
-    removeComponent(pbQuery);
   }
   
   private void addLexicalSort(Container container)
@@ -348,6 +256,27 @@ public class FrequencyResultPanel extends VerticalLayout
     }
   }
   
+  public static String getCaption(FrequencyTableEntry e)
+  {
+    String caption;
+    switch (e.getType())
+    {
+      case annotation:
+        caption = "#" + e.getReferencedNode() + " ("
+          + e.getKey() + ")";
+        break;
+      case span:
+        caption = "#" + e.getReferencedNode() + " (spanned text)";
+        break;
+      case meta:
+        caption = "meta (" + e.getKey() + ")";
+        break;
+      default:
+        caption = "<unknown>";
+    }
+    return caption;
+  }
+  
   public static class CSVResource implements StreamResource.StreamSource
   {
     private final FrequencyTable data;
@@ -376,12 +305,7 @@ public class FrequencyResultPanel extends VerticalLayout
             for(int i=0; i < data.getEntries().iterator().next().getTupel().length; i++)
             {
               FrequencyTableEntry e = freqDefinition.get(i);
-              String caption = "#" + e.getReferencedNode() + " ("
-                + (e.getType() == FrequencyTableEntryType.span
-                ? "spanned text" : e.getKey())
-                + ")";
-              
-              header.add(caption);
+              header.add(getCaption(e));
             }
           }
           // add count

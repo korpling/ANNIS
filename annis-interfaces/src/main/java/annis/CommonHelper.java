@@ -16,8 +16,9 @@
 package annis;
 
 import annis.model.AnnisConstants;
-import annis.service.objects.MatchGroup;
+import annis.service.objects.Match;
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -47,6 +48,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -500,6 +502,37 @@ public class CommonHelper
     }
 
     return result;
+  }
+  
+  public static Match extractMatch(SDocument doc) throws URISyntaxException
+  {
+    Splitter idSplit = Splitter.on(',').trimResults();
+    Match m = null;
+
+    // get the matched node IDs
+    SFeature featIDs = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDIDS);
+    
+    if (featIDs != null)
+    {
+      LinkedList<URI> idList = new LinkedList<>();
+      for(String rawID : idSplit.split(featIDs.getSValueSTEXT()))
+      {
+        idList.add(new URI(rawID));
+      }
+      SFeature featAnnos = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDANNOS);
+      if(featAnnos == null)
+      {
+        m = new Match(idList);
+      }
+      else
+      {
+        m = new Match(idList, idSplit.splitToList(featAnnos.getSValueSTEXT()));
+      }
+    }
+
+    return m;
   }
 
   // TODO: remove if really not needed

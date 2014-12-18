@@ -44,7 +44,8 @@ import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.sqlgen.extensions.FrequencyTableQueryData;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -207,7 +208,8 @@ public class QueryServiceImpl implements QueryService
   public Response find(@QueryParam("q") String query,
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
-    @DefaultValue("-1") @QueryParam("limit") String limitRaw) throws IOException
+    @DefaultValue("-1") @QueryParam("limit") String limitRaw,
+    @DefaultValue("normal") @QueryParam("order") String orderRaw) throws IOException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
@@ -223,9 +225,24 @@ public class QueryServiceImpl implements QueryService
     int offset = Integer.parseInt(offsetRaw);
     int limit = Integer.parseInt(limitRaw);
     
+    OrderType order;
+    try
+    {
+      order = OrderType.valueOf(orderRaw.toLowerCase());
+    }
+    catch(IllegalArgumentException ex)
+    {
+      throw new WebApplicationException(
+        Response.status(Response.Status.BAD_REQUEST).type(
+        MediaType.TEXT_PLAIN).entity(
+        "parameter 'order' has the invalid value '" + orderRaw + "'. It should be one of"
+          + " 'normal', 'random' or 'inverted").
+        build());
+    }
+    
     final QueryData data = queryDataFromParameters(query, rawCorpusNames);
     data.setCorpusConfiguration(annisDao.getCorpusConfiguration());
-    data.addExtension(new LimitOffsetQueryData(offset, limit));
+    data.addExtension(new LimitOffsetQueryData(offset, limit, order));
     
     String acceptHeader = request.getHeader(HttpHeaders.ACCEPT);
     if (acceptHeader == null || acceptHeader.trim().isEmpty())
@@ -339,31 +356,8 @@ public class QueryServiceImpl implements QueryService
       user.checkPermission("query:matrix:" + c);
     }
     
-    
     QueryData data = queryDataFromParameters(query, rawCorpusNames);
-    String[] fields = rawFields.split("\\s*,\\s*");
-    FrequencyTableQueryData ext = new FrequencyTableQueryData();
-    for(String f: fields)
-    {
-      String[] splitted = f.split(":", 2);
-      
-      if(splitted.length == 2)
-      {
-        FrequencyTableEntry entry = new FrequencyTableEntry();
-      
-        entry.setReferencedNode(splitted[0]);
-        if("tok".equals(splitted[1]))
-        {
-          entry.setType(FrequencyTableEntryType.span);
-        }
-        else
-        {
-          entry.setType(FrequencyTableEntryType.annotation);
-          entry.setKey(splitted[1]);
-        }
-        ext.add(entry);
-      }
-    }
+    FrequencyTableQuery ext = FrequencyTableQuery.parse(rawFields);
     data.addExtension(ext);
     
     long start = new Date().getTime();

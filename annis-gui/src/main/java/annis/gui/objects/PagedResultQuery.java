@@ -15,6 +15,8 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.OrderType;
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 
@@ -25,14 +27,13 @@ import org.slf4j.LoggerFactory;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class PagedResultQuery extends Query implements Cloneable
+public class PagedResultQuery extends ContextualizedQuery implements Cloneable
 {
-  private int contextLeft;
-  private int contextRight;
+  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
+  
   private int offset;
   private int limit;
-  private String segmentation;
-  private final static Logger log = LoggerFactory.getLogger(PagedResultQuery.class);
+  private OrderType order = OrderType.normal;
 
   public PagedResultQuery()
   {
@@ -43,32 +44,14 @@ public class PagedResultQuery extends Query implements Cloneable
     int limit, String segmentation, String query,
     Set<String> corpora)
   {
-    super(query, corpora);
-    this.contextLeft = contextLeft;
-    this.contextRight = contextRight;
+    super.setLeftContext(contextLeft);
+    super.setRightContext(contextRight);
+    super.setSegmentation(segmentation);
+    super.setQuery(query);
+    super.setCorpora(corpora);
+    
     this.offset = offset;
     this.limit = limit;
-    this.segmentation = segmentation;
-  }
-  
-  public int getContextLeft()
-  {
-    return contextLeft;
-  }
-
-  public void setContextLeft(int contextLeft)
-  {
-    this.contextLeft = contextLeft;
-  }
-
-  public int getContextRight()
-  {
-    return contextRight;
-  }
-
-  public void setContextRight(int contextRight)
-  {
-    this.contextRight = contextRight;
   }
 
   public int getOffset()
@@ -91,15 +74,17 @@ public class PagedResultQuery extends Query implements Cloneable
     this.limit = limit;
   }
 
-  public String getSegmentation()
+  public OrderType getOrder()
   {
-    return segmentation;
+    return order;
   }
 
-  public void setSegmentation(String segmentation)
+  public void setOrder(OrderType order)
   {
-    this.segmentation = segmentation;
+    this.order = order;
   }
+
+  
   
   @Override
   public PagedResultQuery clone()
@@ -115,5 +100,35 @@ public class PagedResultQuery extends Query implements Cloneable
     }
     
     return c;
+  }
+  
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(getCorpora(), getQuery(), getLeftContext(), getRightContext(), getSegmentation(), 
+      getLimit(), getOffset(), getOrder());
+  }
+
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final PagedResultQuery other = (PagedResultQuery) obj;
+    return
+      Objects.equals(getQuery(), other.getQuery())
+      && Objects.equals(getCorpora(), other.getCorpora())
+      && Objects.equals(getLeftContext(), other.getLeftContext())
+      && Objects.equals(getRightContext(), other.getRightContext())
+      && Objects.equals(getSegmentation(), other.getSegmentation())
+      && Objects.equals(getLimit(), other.getLimit())
+      && Objects.equals(getOffset(), other.getOffset())
+      && Objects.equals(getOrder(), other.getOrder());
   }
 }

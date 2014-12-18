@@ -15,8 +15,10 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
+import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.libgui.PollControl;
 import annis.service.objects.CorpusConfig;
@@ -25,8 +27,10 @@ import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
+import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -90,8 +94,10 @@ public class SearchOptionsPanel extends FormLayout
   private final ComboBox cbResultsPerPage;
 
   private final ComboBox cbSegmentation;
+  
+  private final ComboBox cbOrder;
+  
   // TODO: make this configurable
-
   private static final List<Integer> PREDEFINED_PAGE_SIZES = ImmutableList.of(
     1, 2, 5, 10, 20, 25
   );
@@ -122,6 +128,7 @@ public class SearchOptionsPanel extends FormLayout
     cbLeftContext = new ComboBox("Left Context");
     cbRightContext = new ComboBox("Right Context");
     cbResultsPerPage = new ComboBox("Results Per Page");
+    
     
     cbLeftContext.setNullSelectionAllowed(false);
     cbRightContext.setNullSelectionAllowed(false);
@@ -161,15 +168,17 @@ public class SearchOptionsPanel extends FormLayout
       + "Some corpora might offer further context definitions, e.g. in "
       + "syllables, word forms belonging to different speakers, normalized or "
       + "diplomatic segmentations of a manuscript, etc.");
-
+    
+    cbOrder = new ComboBox("Order");
+    cbOrder.setNewItemsAllowed(false);
+    cbOrder.setNullSelectionAllowed(false);
+    cbOrder.setImmediate(true);
+    
     addComponent(cbLeftContext);
-
     addComponent(cbRightContext);
-
-    addComponent(
-      new HelpButton(cbSegmentation));
-
+    addComponent(new HelpButton(cbSegmentation));
     addComponent(cbResultsPerPage);
+    addComponent(cbOrder);
 
     corpusConfigurations = Helper.getCorpusConfigs();
 
@@ -225,6 +234,30 @@ public class SearchOptionsPanel extends FormLayout
     cbResultsPerPage.setNewItemHandler(new CustomResultSize(cbResultsPerPage,
       resultsPerPage));
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    if(getUI() instanceof SearchUI)
+    {
+      SearchUI ui = (SearchUI) getUI();
+      cbLeftContext.setPropertyDataSource(ui.getQueryState().getLeftContext());
+      cbRightContext.setPropertyDataSource(ui.getQueryState().getRightContext());
+      cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
+      cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
+      
+      BeanItemContainer<OrderType> orderContainer 
+        = new BeanItemContainer<>(OrderType.class, 
+          Lists.newArrayList(OrderType.values()));
+      cbOrder.setContainerDataSource(orderContainer);
+      cbOrder.setPropertyDataSource(ui.getQueryState().getOrder());
+      
+    }
+  }
+  
+  
 
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora, final UI ui)
@@ -453,91 +486,6 @@ public class SearchOptionsPanel extends FormLayout
     return String.valueOf(value);
   }
 
-  public void setLeftContext(int context)
-  {
-    if(!cbLeftContext.containsId(context))
-    {
-      cbLeftContext.addItem(context);
-    }
-    cbLeftContext.setValue(context);
-  }
-
-  public int getLeftContext()
-  {
-    int result = 5;
-    try
-    {
-      result = (Integer) cbLeftContext.getValue();
-    }
-    catch (NumberFormatException ex)
-    {
-      log.warn("Invalid integer submitted to search options ComboBox", ex);
-    }
-
-    return Math.max(0, result);
-  }
-
-  public int getRightContext()
-  {
-    int result = 5;
-    try
-    {
-      result = (Integer) cbRightContext.getValue();
-    }
-    catch (NumberFormatException ex)
-    {
-      log.warn("Invalid integer submitted to search options ComboBox", ex);
-    }
-
-    return Math.max(0, result);
-  }
-
-  public void setRightContext(int context)
-  {
-    if(!cbRightContext.containsId(context))
-    {
-      cbRightContext.addItem(context);
-    }
-    cbRightContext.setValue(context);
-  }
-  
-  public int getResultsPerPage()
-  {
-    int result = 10;
-    try
-    {
-      result = (Integer) cbResultsPerPage.getValue();
-    }
-    catch (NumberFormatException ex)
-    {
-      log.warn("Invalid integer submitted to search options ComboBox", ex);
-    }
-
-    return Math.max(1, result);
-  }
-  
-  public void setResultsPerPage(int resultsPerPage)
-  {
-    if(!cbResultsPerPage.containsId(resultsPerPage))
-    {
-      cbResultsPerPage.addItem(resultsPerPage);
-    }
-    cbResultsPerPage.setValue(resultsPerPage);
-  }
-
-  public String getSegmentationLayer()
-  {
-    return (String) cbSegmentation.getValue();
-  }
-
-  public void setSegmentationLayer(String layer)
-  {
-    if(!cbSegmentation.containsId(layer) && layer != null)
-    {
-      cbSegmentation.addItem(layer);
-    }
-    cbSegmentation.setValue(layer);
-  }
 
   /**
    * Builds a config for selection of one or muliple corpora.
@@ -799,10 +747,10 @@ public class SearchOptionsPanel extends FormLayout
         {
           int i = Integer.parseInt((String) resultPerPage);
 
-          if (i < 0)
+          if (i < 1)
           {
             throw new IllegalArgumentException(
-              "result number has to be a positive number or 0");
+              "result number has to be a positive number greater or equal than 1");
           }
 
           updateResultsPerPage(i, true);

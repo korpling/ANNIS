@@ -31,7 +31,9 @@ import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
+import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
@@ -40,7 +42,6 @@ import com.vaadin.ui.MenuBar;
 import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -49,6 +50,8 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,8 +64,9 @@ import java.util.Set;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.UUID;
 import java.util.concurrent.BlockingQueue;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
@@ -120,22 +124,20 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private transient BlockingQueue<SaltProject> projectQueue;
 
-  private UUID queryId;
-
   private PagedResultQuery currentQuery;
+  private PagedResultQuery initialQuery;
+  private final SearchUI sui;
 
-  SearchUI sui = (SearchUI) UI.getCurrent();
-
-  public ResultViewPanel(QueryController controller,
-    PluginSystem ps, UUID queryId, InstanceConfig instanceConfig)
+  public ResultViewPanel(SearchUI ui,
+    PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
   {
+    this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
-    this.queryId = queryId;
-    this.controller = controller;
-    this.selectedSegmentationLayer = controller.getPreparedQuery().
-      getSegmentation();
-
+    this.controller = ui.getQueryController();
+    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
+    this.initialQuery = initialQuery;
+    
     cacheResolver
       = Collections.synchronizedMap(
         new HashMap<HashSet<SingleResolverRequest>, List<ResolverEntry>>());
@@ -354,11 +356,21 @@ public class ResultViewPanel extends VerticalLayout implements
     int i = 0;
     for (SCorpusGraph corpusGraph : p.getSCorpusGraphs())
     {
-      SingleResultPanel panel = new SingleResultPanel(corpusGraph.
-        getSDocuments().get(0),
+      SDocument doc = corpusGraph.getSDocuments().get(0);
+      Match m = new Match();
+      try
+      {
+        m = CommonHelper.extractMatch(doc);
+      }
+      catch (URISyntaxException ex)
+      {
+        log.error("Invalid Syntax in match", ex);
+      }
+      
+      SingleResultPanel panel = new SingleResultPanel(doc, m,
         i + offset, new ResolverProviderImpl(cacheResolver), ps,
-        getVisibleTokenAnnos(), segmentationName, queryId, controller,
-        instanceConfig);
+        getVisibleTokenAnnos(), segmentationName, controller,
+        instanceConfig, initialQuery);
 
       i++;
 
@@ -441,7 +453,7 @@ public class ResultViewPanel extends VerticalLayout implements
   public void setCount(int count)
   {
     paging.setCount(count, false);
-    paging.setStartNumber(controller.getPreparedQuery().getOffset());
+    paging.setStartNumber(initialQuery.getOffset());
   }
 
   public SortedSet<String> getVisibleTokenAnnos()
@@ -497,9 +509,7 @@ public class ResultViewPanel extends VerticalLayout implements
       }
 
       //update URL with newly selected segmentation layer
-      PagedResultQuery q;
-      SearchUI sui = (SearchUI) UI.getCurrent();
-      q = sui.getQueryController().getPreparedQuery();
+      PagedResultQuery q = initialQuery.clone();
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
       q.setSegmentation(selectedSegmentationLayer);
 

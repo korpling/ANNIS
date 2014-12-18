@@ -68,7 +68,7 @@ public class Match implements Serializable
     }
   }
   
-  public Match(Collection<URI> originalIDs, List<String> originalAnnos)
+  public Match(Collection<URI> originalIDs, Collection<String> originalAnnos)
   {
     saltIDs = new ArrayList<>(originalIDs);
     annos = new ArrayList<>(originalAnnos);

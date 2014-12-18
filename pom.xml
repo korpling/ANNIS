@@ -21,7 +21,7 @@
     annotations is also required.
   </description>
 
-  <url>http://www.sfb632.uni-potsdam.de/annis/</url>
+  <url>http://annis-tools.org/</url>
 
   <scm>
     <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>

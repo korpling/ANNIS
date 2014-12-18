@@ -15,6 +15,8 @@
  */
 package annis.sqlgen.extensions;
 
+import annis.service.objects.OrderType;
+
 /**
  *
  * @author benjamin
@@ -22,14 +24,25 @@ package annis.sqlgen.extensions;
 public class LimitOffsetQueryData
 {
 
-  private int offset;
-  private int limit;
+  private final int offset;
+  private final int limit;
+  private final OrderType order;
 
   public LimitOffsetQueryData(int offset, int limit)
   {
     this.offset = offset;
     this.limit = limit;
+    this.order = OrderType.normal;
   }
+
+  public LimitOffsetQueryData(int offset, int limit, OrderType order)
+  {
+    this.offset = offset;
+    this.limit = limit;
+    this.order = order;
+  }
+  
+  
 
   public int getLimit()
   {
@@ -45,4 +58,10 @@ public class LimitOffsetQueryData
   {
     return offset != 0 || limit != 0;
   }
+
+  public OrderType getOrder()
+  {
+    return order;
+  }
+  
 }
