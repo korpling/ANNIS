@@ -47,6 +47,7 @@ import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.OrderType;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -883,13 +884,27 @@ public class SearchUI extends AnnisBaseUI
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
-      // full query with given context
-      queryController.setQuery(new PagedResultQuery(
+      PagedResultQuery query = new PagedResultQuery(
         Integer.parseInt(args.get("cl")),
         Integer.parseInt(args.get("cr")),
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
-        args.get("q"), corpora));
+        args.get("q"), corpora);
+      
+      if(args.get("o") != null)
+      {
+        try
+        {
+          query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
+        }
+        catch(IllegalArgumentException ex)
+        {
+          log.warn("Could not parse query fragment argument for order", ex);
+        }
+      }
+      
+      // full query with given context
+      queryController.setQuery(query);
       queryController.executeSearch(true);
     }
     else
@@ -916,7 +931,7 @@ public class SearchUI extends AnnisBaseUI
   {
     List<String> args = Helper.citationFragment(q.getQuery(), q.getCorpora(),
       q.getLeftContext(), q.getRightContext(),
-      q.getSegmentation(), q.getOffset(), q.getLimit());
+      q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder());
 
     // set our fragment
     lastQueriedFragment = StringUtils.join(args, "&");

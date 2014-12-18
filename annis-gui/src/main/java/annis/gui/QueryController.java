@@ -202,6 +202,7 @@ public class QueryController implements Serializable
     {
       state.getOffset().setValue(((PagedResultQuery) q).getOffset());
       state.getLimit().setValue(((PagedResultQuery) q).getLimit());
+      state.getOrder().setValue(((PagedResultQuery) q).getOrder());
     }
     if (q instanceof ExportQuery)
     {
