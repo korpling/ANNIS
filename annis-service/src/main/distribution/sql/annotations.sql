@@ -1,7 +1,5 @@
 --- :id is replaced by code
 
-SET enable_hashagg = false;
-
 DROP TABLE IF EXISTS annotations_:id;
 
 CREATE TABLE annotations_:id
@@ -47,7 +45,3 @@ FROM _node AS n
 WHERE n.seg_name IS NOT NULL
 GROUP BY(n.seg_name)
 ;
-
-
-
-SET enable_hashagg = true;
