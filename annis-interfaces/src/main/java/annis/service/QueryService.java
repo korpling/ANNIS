@@ -111,6 +111,9 @@ public interface QueryService
    * @param corpora A comma separated list of corpus names
    * @param offset Optional offset from where to start the matches. Default is 0.
    * @param limit Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1.
+   * @param order Optional order how the results should be sorted. Can be either "normal", "random" or "inverted"
+   *  "normal" is the default ordering, "inverted" inverses the default ordering and "random" is a non-stable
+   *  (thus you will get different results for the same offset and limit) random ordering.
    * @return
    * @throws IOException 
    */
@@ -118,7 +121,8 @@ public interface QueryService
     String q,
     String corpora,
     String offset,
-    String limit) throws IOException;
+    String limit,
+    String order) throws IOException;
   
   /**
    * Get a graph as {@link SaltProject} from a set of (matched) Salt IDs.

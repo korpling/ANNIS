@@ -15,6 +15,7 @@
  */
 package annis.gui.objects;
 
+import annis.service.objects.OrderType;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
 import annis.visualizers.component.tree.TigerTreeVisualizer;
 import com.vaadin.data.util.BeanContainer;

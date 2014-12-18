@@ -19,7 +19,7 @@ import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
-import annis.gui.objects.OrderType;
+import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.PollControl;
