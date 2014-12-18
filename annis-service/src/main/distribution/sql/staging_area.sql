@@ -20,9 +20,9 @@ DROP TABLE IF EXISTS _example_queries;
 CREATE :tmp TABLE _corpus
 (
 	id 			integer NOT NULL,		-- primary key
-	name		varchar NOT NULL,		-- unique name
-	type		varchar NOT NULL,		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
-	version		varchar,				-- version number (not used)
+	name		varchar NOT NULL COLLATE "C",		-- unique name
+	type		varchar NOT NULL COLLATE "C",		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
+	version		varchar COLLATE "C",				-- version number (not used)
 	pre			integer	NOT NULL,		-- pre and post order of the corpus tree
 	post		integer	NOT NULL,
   top_level boolean NOT NULL
@@ -45,7 +45,7 @@ CREATE :tmp TABLE _text
 (
   corpus_ref	integer NOT NULL,		-- foreign key to _corpus.id
 	id 		integer NOT NULL,			-- primary key
-	name	varchar,					-- name (not used)
+	name	varchar COLLATE "C",					-- name (not used)
 	text 	text							-- text contents (not used)
 );
 
@@ -60,14 +60,14 @@ CREATE :tmp TABLE _node
 	text_ref 		integer NOT NULL,	-- foreign key to _text.id
 	corpus_ref		integer NOT NULL,	-- foreign key to _corpus.id
 	layer		varchar,			--  layer in which the node is contained
-	name 			varchar NOT NULL,	-- name of the node
+	name 			varchar NOT NULL COLLATE "C",	-- name of the node
 	"left" 			integer NOT NULL,		-- start of covered substring in _text.text (inclusive)
 	"right" 		integer NOT NULL,		-- end of covered substring in _text.text (inclusive)
 	token_index		integer,				-- token number in _text.text, NULL if node is not a token
   left_token integer NOT NULL,
   right_token integer NOT NULL,
 	seg_index     integer,        -- index of this segment (if it is a segment, i.e. there is some SOrderingRelation connected to this node)
-  seg_name    varchar,      -- segmentation name
+  seg_name    varchar COLLATE "C",      -- segmentation name
 	span			varchar,			-- for tokens: substring in _text.text (indexed for text search), else: NULL
   root boolean NOT NULL
 );
