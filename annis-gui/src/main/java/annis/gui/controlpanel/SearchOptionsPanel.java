@@ -15,13 +15,11 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
-import annis.gui.objects.QueryUIState;
 import annis.libgui.PollControl;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
@@ -33,7 +31,6 @@ import com.google.gwt.thirdparty.guava.common.collect.Lists;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
@@ -175,6 +172,7 @@ public class SearchOptionsPanel extends FormLayout
     cbOrder = new ComboBox("Order");
     cbOrder.setNewItemsAllowed(false);
     cbOrder.setNullSelectionAllowed(false);
+    cbOrder.setImmediate(true);
     
     addComponent(cbLeftContext);
     addComponent(cbRightContext);

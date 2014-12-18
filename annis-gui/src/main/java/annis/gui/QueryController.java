@@ -227,6 +227,7 @@ public class QueryController implements Serializable
       .segmentation(state.getBaseText().getValue())
       .limit(state.getLimit().getValue())
       .offset(state.getOffset().getValue())
+      .order(state.getOrder().getValue())
       .build();
   }
 
