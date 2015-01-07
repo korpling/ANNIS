@@ -22,6 +22,7 @@ import annis.administration.DeleteCorpusDao;
 import annis.dao.AnnisDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
+import annis.security.ANNISUserRealm;
 import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
@@ -172,17 +173,16 @@ public class AdminServiceImpl implements AdminService
         .build();
     }
 
-    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    
+    ANNISUserRealm userRealm = getUserRealm();
+    if (userRealm != null)
     {
-      ANNISUserConfigurationManager confManager = getConfManager();
-      if (confManager != null)
+      if (userRealm.updateUser(user))
       {
-        if (confManager.writeUser(user))
-        {
-          return Response.ok().build();
-        }
+        return Response.ok().build();
       }
     }
+    
     return Response
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not update/create user")
@@ -224,32 +224,32 @@ public class AdminServiceImpl implements AdminService
     Subject requestingUser = SecurityUtils.getSubject();
     requestingUser.checkPermission("admin:write:user");
 
-    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    
+    ANNISUserConfigurationManager confManager = getConfManager();
+    ANNISUserRealm userRealm = getUserRealm();
+    if (confManager != null && userRealm != null)
     {
-      ANNISUserConfigurationManager confManager = getConfManager();
-      if (confManager != null)
+      User user = confManager.getUser(userName);
+      if (user == null)
       {
-        User user = confManager.getUser(userName);
-        if (user == null)
-        {
-          return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
 
-        Shiro1CryptFormat format = new Shiro1CryptFormat();
+      Shiro1CryptFormat format = new Shiro1CryptFormat();
 
-        SecureRandomNumberGenerator generator
-          = new SecureRandomNumberGenerator();
-        ByteSource salt = generator.nextBytes(128/8); // 128 bit
-        
-        Sha256Hash hash = new Sha256Hash(newPassword, salt, 1);
-        user.setPasswordHash(format.format(hash));
+      SecureRandomNumberGenerator generator
+        = new SecureRandomNumberGenerator();
+      ByteSource salt = generator.nextBytes(128/8); // 128 bit
 
-        if (confManager.writeUser(user))
-        {
-          return Response.ok().entity(user).build();
-        }
+      Sha256Hash hash = new Sha256Hash(newPassword, salt, 1);
+      user.setPasswordHash(format.format(hash));
+
+      if (userRealm.updateUser(user))
+      {
+        return Response.ok().entity(user).build();
       }
     }
+
     return Response
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not change password")
@@ -492,6 +492,17 @@ public class AdminServiceImpl implements AdminService
         = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).
         getConfManager();
       return confManager;
+    }
+    return null;
+  }
+  
+  private ANNISUserRealm getUserRealm()
+  {
+    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserRealm userRealm
+        = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).getANNISUserRealm();
+      return userRealm;
     }
     return null;
   }
