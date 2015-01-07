@@ -199,4 +199,48 @@ public interface AdminService
     User requestBody,
     @PathParam("userName") String userName);
   
+  /**
+   * 
+   * Get an existing user.
+   * 
+   * <h3>Path(s)</h3>
+   * <ol>
+   * <li>GET annis/admin/users/<b>{userName}</b></li>
+   * </ol>
+   * 
+   * <h3>MIME</h3>
+   * 
+   * produces:<br/>
+   * <code>application/xml</code>:<br />
+   * This method return the user information in XML. The fields correspond to
+   * the fields of the  [single user configuration file](@ref admin-configure-userformat). 
+   * Please have a look at the [general user configuration information](@ref admin-configure-userformat) for
+   * a more detailed explanation.<br />
+   * {@code
+   * <user>
+   *   <!-- User name (must be the same as the "userName" parameter) -->
+   *   <name>myusername</name>
+   *   <!-- hashed password in the Shiro1CryptFormat -->
+   *   <passwordHash>$shiro1$SHA-256$1$tQNwU[...]</passwordHash>
+   *   <!-- A list of groups the users should belong to. -->
+   *   <group>group1</group>
+   *   <group>group2</group>
+   *   <group>group3</group>
+   *   <!-- A list of explicit permission the users should have. -->
+   *   <permission>admin:*</permission>
+   *   <permission>query:*</permission>
+   *   <!-- Optional expiration date encoded in the ISO-8601 standard</a> -->
+   *   <expires>2015-02-12T00:00:00.000+01:00</expires>
+   * </user>
+   * }
+   * 
+   * @param userName The name of the user
+   * 
+   * @see http://shiro.apache.org/static/current/apidocs/org/apache/shiro/crypto/hash/format/Shiro1CryptFormat.html
+   * @see http://en.wikipedia.org/wiki/ISO_8601
+   * @return 
+   */
+  public User getUser(
+    @PathParam("userName") String userName);
+  
 }
