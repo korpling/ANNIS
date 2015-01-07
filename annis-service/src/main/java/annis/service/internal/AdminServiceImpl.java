@@ -189,6 +189,31 @@ public class AdminServiceImpl implements AdminService
       .build();
   }
 
+  @GET
+  @Path("users/{userName}")
+  @Produces("application/xml")
+  @Override
+  public User getUser(@PathParam("userName")
+    String userName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:read:user");
+    
+    ANNISUserConfigurationManager conf = getConfManager();
+    if(conf != null)
+    {
+      User u = conf.getUser(userName);
+      if(u == null)
+      {
+        throw new WebApplicationException(Response.Status.NOT_FOUND);
+      }
+      return conf.getUser(userName);
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+  
+  
+
   @DELETE
   @Path("users/{userName}")
   public Response deleteUser(@PathParam("userName") String userName)
