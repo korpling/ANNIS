@@ -62,6 +62,11 @@ public class DeleteCorpusDao extends AbstractAdminstrationDao
       log.error("Another import is currently running");
       return;
     }
+    
+    if(ids == null || ids.isEmpty())
+    {
+      return;
+    }
 
     File dataDir = getRealDataDir();
 
