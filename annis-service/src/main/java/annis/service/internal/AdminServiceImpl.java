@@ -131,7 +131,7 @@ public class AdminServiceImpl implements AdminService
     user.checkPermission("admin:write:userconfig");
 
     String userName = (String) user.getPrincipal();
-
+    
     adminDao.storeUserConfig(userName, config.getValue());
     return Response.ok().build();
   }
@@ -172,7 +172,17 @@ public class AdminServiceImpl implements AdminService
         .entity("Username in object is not the same as in path")
         .build();
     }
-
+    
+    // if any permission is an adminstrative one the
+    // requesting user needs more than just a "admin:write:user" permission"
+    for(String permission : user.getPermissions())
+    {
+      if(permission.startsWith("admin:"))
+      {
+        requestingUser.checkPermission("admin:write:adminuser");
+        break;
+      }
+    }
     
     ANNISUserRealm userRealm = getUserRealm();
     if (userRealm != null)
@@ -207,7 +217,12 @@ public class AdminServiceImpl implements AdminService
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
-      return conf.getUser(userName);
+      
+      // remove the password hash from the result, we don't want someone with
+      // lower adminstration rights to crack it
+      u.setPasswordHash("");
+      
+      return u;
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
