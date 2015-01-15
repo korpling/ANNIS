@@ -217,7 +217,12 @@ public class AdminServiceImpl implements AdminService
       {
         throw new WebApplicationException(Response.Status.NOT_FOUND);
       }
-      return conf.getUser(userName);
+      
+      // remove the password hash from the result, we don't want someone with
+      // lower adminstration rights to crack it
+      u.setPasswordHash("");
+      
+      return u;
     }
     throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
   }
