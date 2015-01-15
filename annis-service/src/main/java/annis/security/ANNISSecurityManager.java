@@ -16,6 +16,7 @@
 
 package annis.security;
 
+import org.apache.shiro.realm.Realm;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
 
 /**
@@ -34,6 +35,22 @@ public class ANNISSecurityManager extends DefaultWebSecurityManager
   public void setConfManager(ANNISUserConfigurationManager confManager)
   {
     this.confManager = confManager;
+  }
+  
+  public ANNISUserRealm getANNISUserRealm()
+  {
+    if(getRealms() != null)
+    {
+      for(Realm r : getRealms())
+      {
+        if(r instanceof ANNISUserRealm)
+        {
+          return (ANNISUserRealm) r;
+        }
+      }
+    }
+    
+    return null;
   }
   
   
