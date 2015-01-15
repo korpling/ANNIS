@@ -100,6 +100,8 @@ admin:import:<b>{corpusname}</b> | Allow to @ref annis.service.AdminService#impo
 admin:query-import:finished | Allow to @ref annis.service.AdminService#finishedImport "check if an import has finished".
 admin:query-import:running | Allow to list the @ref annis.service.AdminService#currentImports "currently running imports".
 admin:write:user | Allow to the @ref annis.service.AdminService#updateOrCreateUser "update or create" users.
+admin:read:user | Allow get the information about a user (like groups or additionally permissions).
+admin:write:adminuser | Additional permission to @ref annis.service.AdminService#updateOrCreateUser "update or create" users with adminstration rights (thus having an extra permission thats starts "admin:").
 
 
 #### Querying ####
