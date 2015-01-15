@@ -1,3 +1,19 @@
+Version 3.2.2
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.2.2+is%3Aclosed
+
+[Bugs]
+ #384 user that should be restricted to create new users can gain adminstration rights
+ #381 fullscreen does not work for login window
+ #380 can't import corpus if another corpus has a document with the same name
+ #379 Authorization cache not cleared if new password is set
+
+[Enhancements]
+ #383 allow to query the User object of administration API
+ #382 update links to homepage
+
 Version 3.2.1
 =============
 
