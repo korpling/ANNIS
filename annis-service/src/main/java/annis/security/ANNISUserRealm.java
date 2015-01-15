@@ -30,6 +30,7 @@ import org.apache.shiro.crypto.hash.SimpleHash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
+import org.apache.shiro.subject.SimplePrincipalCollection;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 
@@ -143,6 +144,23 @@ public class ANNISUserRealm extends AuthorizingRealm implements
       }
     }
     return null;
+  }
+  
+  public boolean updateUser(User user)
+  {
+    if(getConfManager().writeUser(user))
+    {
+      clearCacheForUser(user.getName());
+      return true;
+    }
+    return false;
+  }
+  
+  public void clearCacheForUser(String userName)
+  {
+    SimplePrincipalCollection principals = new SimplePrincipalCollection(userName, 
+      ANNISUserRealm.class.getName());
+    clearCache(principals);
   }
 
   public ANNISUserConfigurationManager getConfManager()

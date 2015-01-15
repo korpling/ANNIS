@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -26,7 +26,7 @@
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <netbeans.hint.deploy.server>Tomcat</netbeans.hint.deploy.server>
-    <vaadin.version>7.3.5</vaadin.version>
+    <vaadin.version>7.3.8</vaadin.version>
   </properties>
 
   <build>

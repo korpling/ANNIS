@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-libgui</artifactId>
@@ -13,7 +13,7 @@
   <description>Base project for a Vaadin based GUI.</description>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.3.5</vaadin.version>
+    <vaadin.version>7.3.8</vaadin.version>
   </properties>
   
     

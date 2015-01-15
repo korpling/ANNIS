@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.2.1</version>
+    <version>3.2.2</version>
   </parent>
 
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
@@ -16,7 +16,7 @@
 
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <vaadin.version>7.3.5</vaadin.version>
+    <vaadin.version>7.3.8</vaadin.version>
   </properties>
 
   <build>
@@ -147,6 +147,7 @@
       <groupId>com.vaadin</groupId>
       <artifactId>vaadin-client</artifactId>
       <version>${vaadin.version}</version>
+      <scope>provided</scope>
     </dependency>
     <dependency>
       <groupId>com.vaadin</groupId>

@@ -172,7 +172,7 @@ public class MainToolbar extends HorizontalLayout
         
         BrowserFrame frame = new BrowserFrame("login", loginRes);
         frame.setWidth("100%");
-        frame.setHeight("200px");
+        frame.setHeight("100%");
 
         windowLogin = new Window("ANNIS Login", frame);
         windowLogin.setModal(true);

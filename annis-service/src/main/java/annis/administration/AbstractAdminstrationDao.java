@@ -187,7 +187,7 @@ public abstract class AbstractAdminstrationDao
    */
   protected boolean existConflictingTopLevelCorpus(String topLevelCorpusName)
   {
-    String sql = "SELECT count(name) as amount FROM corpus WHERE name='"
+    String sql = "SELECT count(name) as amount FROM corpus WHERE top_level=true AND name='"
       + topLevelCorpusName + "'";
     Integer numberOfCorpora = getJdbcTemplate().query(sql,
       new ResultSetExtractor<Integer>()
