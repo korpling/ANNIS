@@ -574,17 +574,17 @@ public class VisualizerPanel extends CssLayout
         target.createSFeature(sfeature.getNamespace(), sfeature.getName(),
           sfeature.getSValueSTEXT());
         log.debug("copy SFeature {} value {}", sfeature.getQName(), sfeature.
-          getValueString());
+          getSValue().toString());
       }
       else if (copyIfExists)
       {
         SFeature targetFeature = target.getSFeature(featureNameSpace,
           featureName);
-        targetFeature.setValue(sfeature.getValue());
+        targetFeature.setSValue(sfeature.getSValue());
 
         log.debug("overwriting SFeature {} value {}", sfeature.getQName(),
           sfeature.
-          getValueString());
+          getSValue().toString());
       }
     }
   }
