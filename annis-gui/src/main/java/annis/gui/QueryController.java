@@ -39,14 +39,17 @@ import annis.libgui.Helper;
 import annis.libgui.PollControl;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
+import annis.model.AqlParseError;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
 import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
+import com.google.common.base.Joiner;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
@@ -161,7 +164,9 @@ public class QueryController implements Serializable
               getCause();
             if (cause.getResponse().getStatus() == 400)
             {
-              qp.setStatus(cause.getResponse().getEntity(String.class));
+              List<AqlParseError> errors = 
+                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
+              qp.setStatus(Joiner.on("\n").join(errors));
             }
             else
             {

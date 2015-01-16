@@ -637,9 +637,10 @@ public class QueryServiceImpl implements QueryService
    * Return true if this is a valid query or throw exception when invalid
    *
    * @param query Query to check for validity
-   * @return
+   * @return Either "ok" or an error message.
    */
   @GET
+  @Produces("text/plain")
   @Path("check")
   public String check(@QueryParam("q") String query)
   {
