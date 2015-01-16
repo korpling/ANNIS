@@ -154,7 +154,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   private void validate(String query)
   {
     setErrors(null);
-    getState().nodeMappings = new HashMap<>();
+    getState().nodeMappings = new TreeMap<>();
     if(query == null || query.isEmpty())
     {
       // don't validate the empty query
@@ -201,7 +201,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
   
-  private Map<String, Integer> mapQueryNodes(List<QueryNode> nodes)
+  private TreeMap<String, Integer> mapQueryNodes(List<QueryNode> nodes)
   {
     Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
    
@@ -216,7 +216,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       orderedNodeSet.add(n.getId());
     }
     
-    Map<String, Integer> result = new TreeMap<>();
+    TreeMap<String, Integer> result = new TreeMap<>();
     for(TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
     {
       int newID=1;

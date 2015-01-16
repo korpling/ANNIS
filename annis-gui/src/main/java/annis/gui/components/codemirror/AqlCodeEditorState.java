@@ -18,10 +18,9 @@ package annis.gui.components.codemirror;
 
 import annis.model.AqlParseError;
 import com.vaadin.shared.ui.JavaScriptComponentState;
-import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
+import java.util.TreeMap;
 
 /**
  *
@@ -35,6 +34,6 @@ public class AqlCodeEditorState extends JavaScriptComponentState
   public String clientText = "";
   public String inputPrompt = "";
   public List<AqlParseError> errors = new LinkedList<>();
-  public Map<String, Integer> nodeMappings = new HashMap<>();
+  public TreeMap<String, Integer> nodeMappings = new TreeMap<>();
 
 }
