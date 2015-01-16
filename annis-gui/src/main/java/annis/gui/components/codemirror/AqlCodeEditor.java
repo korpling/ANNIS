@@ -107,8 +107,12 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
+    String oldText = getState().text;
     getState().text = this.dataSource.getValue();
-    markAsDirty();
+    if(oldText == null || !oldText.equals(getState().text))
+    {
+      markAsDirty();
+    }
   }
 
   private class TextChangedFunction implements JavaScriptFunction
@@ -118,10 +122,11 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     public void call(JSONArray args) throws JSONException
     {
       getState().text = args.getString(0);
+      getPropertyDataSource().setValue(args.getString(0));
       getState().clientText = getState().text;
       
-      validate(getState().text);
-      final String textCopy = getState().text;
+      validate(dataSource.getValue());
+      final String textCopy = dataSource.getValue();
       final int cursorPos = args.getInt(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
       {
