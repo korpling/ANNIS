@@ -150,6 +150,11 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   private void validate(String query)
   {
     setErrors(null);
+    if(query == null || query.isEmpty())
+    {
+      // don't validate the empty query
+      return;
+    }
     try
     {
       AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
