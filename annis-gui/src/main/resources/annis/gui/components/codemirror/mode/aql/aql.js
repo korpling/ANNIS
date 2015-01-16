@@ -67,7 +67,7 @@ CodeMirror.defineMode("aql", function() {
         }
         else if(stream.match(/[a-zA-Z][a-zA-Z0-9]*/))
         {
-          if (state.numberOfNodes < 8)
+          if (state.numberOfNodes < 16)
           {
             state.numberOfNodes++;
           }
