@@ -85,11 +85,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       for(var i=0; i < connector.getState().errors.length; i++)
       {
         var err = connector.getState().errors[i];
-        var endColumn = err.endColumn;
-        if(err.startLine === err.endLine && err.startColumn === endColumn)
-        {
-          endColumn += 1;
-        }
+        var endColumn = err.endColumn+1;
         errorList.push({
           from: CodeMirror.Pos(err.startLine-1, err.startColumn),
           to: CodeMirror.Pos(err.endLine-1, endColumn),
