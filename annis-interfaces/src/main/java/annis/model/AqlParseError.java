@@ -56,14 +56,35 @@ public class AqlParseError
     this.message = message;
     this.startLine = 1;
     this.endLine = 1;
-    this.startColumn = 0;
-    this.endColumn = 0;
+    this.startColumn = 1;
+    this.endColumn = 1;
   }
 
   @Override
   public String toString()
   {
-    return "line " + startLine + ":" + startColumn + " " + message;
+    if(startLine == endLine)
+    {
+      if(startColumn == endColumn)
+      {
+        return "line " + startLine + ":" + startColumn + " " + message;
+      }
+      else
+      {
+        return "line " + startLine + ":" + startColumn + "-" + endColumn + " " + message;
+      }
+    }
+    else
+    {
+      if(startColumn == endColumn)
+      {
+        return "line " + startLine + "-" + endLine + ":" + startColumn + " " + message;
+      }
+      else
+      {
+        return "line " + startLine + "-" + endLine + ":" + startColumn + "-" + endColumn + " " + message;
+      }
+    }
   }
   
   

@@ -86,7 +86,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       {
         var err = connector.getState().errors[i];
         var endColumn = err.endColumn;
-        if(err.startColumn === endColumn)
+        if(err.startLine === err.endLine && err.startColumn === endColumn)
         {
           endColumn += 1;
         }
