@@ -41,24 +41,29 @@ import org.slf4j.LoggerFactory;
 public class QueryNodeListener extends AqlParserBaseListener
 {
   private static final Logger log = LoggerFactory.getLogger(QueryNodeListener.class);
+
+  private Map<Interval, Long> nodeIntervalToID;
   
   private QueryData data = null;
 
   private final List<QueryNode> currentAlternative = new ArrayList<>();
 
-  private long aliasCount = 0l;
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
   
   private List<Map<Interval, QueryNode>> tokenPositions;
   private final Map<Interval, QueryNode> currentTokenPosition = Maps.newHashMap();
-  private final Map<Interval, Long> globalTokenPositions = Maps.newHashMap();
   
   private final List<QueryAnnotation> metaData = new ArrayList<>();
 
-  public QueryNodeListener()
+  public QueryNodeListener(Map<Interval, Long> nodeIntervalToID)
   {
+    this.nodeIntervalToID = nodeIntervalToID;
+    if(this.nodeIntervalToID == null)
+    {
+      this.nodeIntervalToID = new HashMap<>();
+    }
   }
 
   public QueryData getQueryData()
@@ -270,11 +275,11 @@ public class QueryNodeListener extends AqlParserBaseListener
 
   private QueryNode newNode(ParserRuleContext ctx)
   {
-    Long existingID = globalTokenPositions.get(ctx.getSourceInterval());
+    Long existingID = nodeIntervalToID.get(ctx.getSourceInterval());
     
     if(existingID == null)
     {
-      existingID = ++aliasCount;
+      throw new IllegalStateException("Could not find a node ID for interval " + ctx.getSourceInterval().toString());
     }
     
     QueryNode n = new QueryNode(existingID);
@@ -291,7 +296,6 @@ public class QueryNodeListener extends AqlParserBaseListener
     currentAlternative.add(n);
     localNodes.put(n.getVariable(), n);
     currentTokenPosition.put(ctx.getSourceInterval(), n);
-    globalTokenPositions.put(ctx.getSourceInterval(), n.getId());
     
     return n;
   }

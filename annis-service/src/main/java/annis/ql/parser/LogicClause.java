@@ -198,7 +198,7 @@ public class LogicClause
     }
     else if(op == Operator.OR)
     {
-      return Joiner.on(" \n| \n").join(children);
+      return "(" + Joiner.on(" \n| \n").join(children) + ")";
     }
     
     LinkedList<String> texts = new LinkedList<>();
