@@ -21,6 +21,7 @@ import annis.model.AqlParseError;
 import com.google.common.collect.Lists;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
@@ -183,13 +184,10 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
             getCause();
           if (cause.getResponse().getStatus() == 400)
           {
-            AqlParseError testError = new AqlParseError();
-            testError.startLine = 0;
-            testError.endLine = 0;
-            testError.startColumn = 1;
-            testError.endColumn = 4;
-            testError.message = cause.getResponse().getEntity(String.class);
-            setErrors(Lists.newArrayList(testError));
+            List<AqlParseError> errorsFromServer = 
+                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
+            
+            setErrors(errorsFromServer);
           }
         }
       }
@@ -267,11 +265,11 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   {
     if (errors == null)
     {
-      getState().errors = new LinkedList<AqlParseError>();
+      getState().errors = new LinkedList<>();
     }
     else
     {
-      getState().errors = new ArrayList<AqlParseError>(errors);
+      getState().errors = new ArrayList<>(errors);
     }
     markAsDirty();
   }
