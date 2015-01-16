@@ -20,6 +20,8 @@ import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
 import annis.gui.components.VirtualKeyboard;
+import annis.gui.components.VirtualKeyboardCodeEditor;
+import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
@@ -58,7 +60,7 @@ public class QueryPanel extends GridLayout implements
   // the view name
   public static final String NAME = "query";
 
-  private TextArea txtQuery;
+  private AqlCodeEditor txtQuery;
   private TextArea txtStatus;
   private Button btShowResult;
   //private Button btShowResultNewTab;
@@ -94,15 +96,14 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(2, 0.0f);
     setColumnExpandRatio(3, 0.0f);
 
-    txtQuery = new TextArea();
+    txtQuery = new AqlCodeEditor();
     txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
-//    txtQuery.setHeight(10f, Unit.EM);
-    txtQuery.setRows(10);
+    txtQuery.setHeight(15f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
     txtQuery.addTextChangeListener(new TextChangeListener()
     {
@@ -114,14 +115,14 @@ public class QueryPanel extends GridLayout implements
       }
     });
 
-    final VirtualKeyboard virtualKeyboard;
+    final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
     {
       virtualKeyboard = null;
     }
     else
     {
-      virtualKeyboard = new VirtualKeyboard();
+      virtualKeyboard = new VirtualKeyboardCodeEditor();
       virtualKeyboard.setKeyboardLayout(ui.getInstanceConfig().getKeyboardLayout());
       virtualKeyboard.extend(txtQuery);
     }
@@ -421,9 +422,9 @@ public class QueryPanel extends GridLayout implements
   private static class ShowKeyboardClickListener implements ClickListener
   {
 
-    private final VirtualKeyboard virtualKeyboard;
+    private final VirtualKeyboardCodeEditor virtualKeyboard;
 
-    public ShowKeyboardClickListener(VirtualKeyboard virtualKeyboard)
+    public ShowKeyboardClickListener(VirtualKeyboardCodeEditor virtualKeyboard)
     {
       this.virtualKeyboard = virtualKeyboard;
     }

@@ -17,6 +17,7 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.RawAqlPreParser;
@@ -48,7 +49,7 @@ public class AnnisParserAntlr
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    final List<String> errors = new LinkedList<>();
+    final List<AqlParseError> errors = new LinkedList<>();
     
 
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
@@ -56,12 +57,12 @@ public class AnnisParserAntlr
     // bring first into DNF
     RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
     rawParser.removeErrorListeners();
-    rawParser.addErrorListener(new StringListErrorListener(errors));
+    rawParser.addErrorListener(new AqlParseErrorListener(errors));
     
     RawAqlPreParser.StartContext treeRaw = rawParser.start();
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
     //treeRaw.inspect(rawParser);
     
@@ -78,7 +79,7 @@ public class AnnisParserAntlr
     AqlParser parserDNF = new AqlParser(new CommonTokenStream(source));
     
     parserDNF.removeErrorListeners();
-    parserDNF.addErrorListener(new StringListErrorListener(errors));
+    parserDNF.addErrorListener(new AqlParseErrorListener(errors));
 
     AqlParser.StartContext treeDNF = parserDNF.start();
     
@@ -86,7 +87,7 @@ public class AnnisParserAntlr
     
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
       
     ParseTreeWalker walker = new ParseTreeWalker();
@@ -136,10 +137,10 @@ public class AnnisParserAntlr
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
     
-    final List<String> errors = new LinkedList<>();
+    final List<AqlParseError> errors = new LinkedList<>();
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new StringListErrorListener(errors));
+    parser.addErrorListener(new AqlParseErrorListener(errors));
 
     ParseTree tree = parser.start();
     
@@ -149,7 +150,7 @@ public class AnnisParserAntlr
     }
     else
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
   }
   
@@ -190,6 +191,34 @@ public class AnnisParserAntlr
       if(errors != null)
       {
         errors.add("line " + line + ":" + charPositionInLine + " " + msg);
+      }
+    }
+  }
+  
+  public static class AqlParseErrorListener extends BaseErrorListener
+  {
+    private final List<AqlParseError> errors;
+
+    public AqlParseErrorListener(List<AqlParseError> errors)
+    {
+      this.errors = errors;
+    }
+    
+     @Override
+    public void syntaxError(Recognizer recognizer, Token offendingSymbol,
+      int line, int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        int startColumn = charPositionInLine;
+        int endColumn = offendingSymbol.getStopIndex();
+        if(endColumn < startColumn)
+        {
+          // the token might be on a differnt line
+          endColumn = startColumn;
+        }
+        
+        errors.add(new AqlParseError(line, startColumn, line, endColumn, msg));
       }
     }
   }

@@ -63,7 +63,6 @@ public class QueryNode implements Serializable
   private String variable;
   private Range arity;
   private Range tokenArity;
-  private Long matchedNodeInQuery;
   private boolean artificial;
   private Integer alternativeNumber;
   
@@ -218,7 +217,6 @@ public class QueryNode implements Serializable
     this.ingoingJoins = new ArrayList<>();
     this.left = other.left;
     this.leftToken = other.leftToken;
-    this.matchedNodeInQuery = other.matchedNodeInQuery;
     this.name = other.name;
     this.namespace = other.namespace;
     this.nodeAnnotations = new TreeSet<>(other.nodeAnnotations);
@@ -847,16 +845,6 @@ public class QueryNode implements Serializable
   public void setTokenArity(Range tokenArity)
   {
     this.tokenArity = tokenArity;
-  }
-
-  public Long getMatchedNodeInQuery()
-  {
-    return matchedNodeInQuery;
-  }
-
-  public void setMatchedNodeInQuery(Long matchedNodeInQuery)
-  {
-    this.matchedNodeInQuery = matchedNodeInQuery;
   }
 
   /**
