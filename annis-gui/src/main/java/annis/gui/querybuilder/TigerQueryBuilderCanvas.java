@@ -102,7 +102,7 @@ public class TigerQueryBuilderCanvas extends Panel
 
   public void updateQuery()
   {
-    controller.setQuery(new Query(getAQLQuery(), null));
+    controller.getState().getAql().setValue(getAQLQuery());
   }
 
   public Set<String> getAvailableAnnotationNames()
@@ -114,7 +114,7 @@ public class TigerQueryBuilderCanvas extends Panel
     // get current corpus selection
     Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
 
-    if (service != null)
+    if (service != null && corpusSelection != null)
     {
       try
       {
