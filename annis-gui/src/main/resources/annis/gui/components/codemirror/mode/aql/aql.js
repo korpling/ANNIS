@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-CodeMirror.defineMode("aql", function() {
+CodeMirror.defineMode("aql", function(config, parserConfig) {
   return {
     token: function(stream, state) {
       
@@ -71,7 +71,12 @@ CodeMirror.defineMode("aql", function() {
           {
             state.numberOfNodes++;
           }
-          return "node_" + state.numberOfNodes;
+          var mappedNode = state.numberOfNodes;
+          if(state.nodeMappings[mappedNode])
+          {
+            mappedNode = state.nodeMappings[mappedNode];
+          }
+          return "node_" + mappedNode;
         }
       }
       
@@ -84,7 +89,8 @@ CodeMirror.defineMode("aql", function() {
     startState: function() {
       return {
         position : "def",       // Current position, "def" or "quote",
-        numberOfNodes : 0  // number of ndes that have been detected yet
+        numberOfNodes : 0,  // number of ndes that have been detected yet
+        nodeMappings : parserConfig.nodeMappings // maps an absolute node number to a relative one (e.g. for OR queries)
       };
     }
 

@@ -15,10 +15,9 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.gui.components.ExceptionDialog;
 import annis.libgui.Helper;
 import annis.model.AqlParseError;
-import com.google.common.collect.Lists;
+import annis.model.QueryNode;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
@@ -31,8 +30,13 @@ import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -110,6 +114,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   {
     String oldText = getState().text;
     getState().text = this.dataSource.getValue();
+    
     if(oldText == null || !oldText.equals(getState().text))
     {
       markAsDirty();
@@ -150,6 +155,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   private void validate(String query)
   {
     setErrors(null);
+    getState().nodeMappings = new HashMap<>();
     if(query == null || query.isEmpty())
     {
       // don't validate the empty query
@@ -158,25 +164,16 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     try
     {
       AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-      Future<String> future = annisResource.path("query").path("check").
+      Future<List<QueryNode>> future = annisResource.path("query").path("parse/nodes").
         queryParam("q", query)
-        .get(String.class);
+        .get(new GenericType<List<QueryNode>>(){});
 
       // wait for maximal one seconds
       try
       {
-        String result = future.get(1, TimeUnit.SECONDS);
-
-        if (!"ok".equalsIgnoreCase(result))
-        {
-          AqlParseError testError = new AqlParseError();
-          testError.startLine = 0;
-          testError.endLine = 0;
-          testError.startColumn = 0;
-          testError.endColumn = 4;
-          testError.message = result;
-          setErrors(Lists.newArrayList(testError));
-        }
+        List<QueryNode> result = future.get(1, TimeUnit.SECONDS);
+        
+        getState().nodeMappings = mapQueryNodes(result);
       }
       catch (InterruptedException ex)
       {
@@ -203,6 +200,36 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     catch (ClientHandlerException ex)
     {
     }
+  }
+  
+  private Map<String, Integer> mapQueryNodes(List<QueryNode> nodes)
+  {
+    Map<Integer, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
+   
+    int globalID = 1;
+    for (QueryNode n : nodes)
+    {
+      TreeSet<Integer> nodeSet = alternative2Nodes.get(n.getAlternativeNumber());
+      if(nodeSet == null)
+      {
+        nodeSet = new TreeSet<>();
+        alternative2Nodes.put(n.getAlternativeNumber(), nodeSet);
+      }
+      nodeSet.add(globalID);
+      globalID++;
+    }
+    
+    Map<String, Integer> result = new TreeMap<>();
+    for(TreeSet<Integer> nodeSet : alternative2Nodes.values())
+    {
+      int newID=1;
+      for(int originalID : nodeSet)
+      {
+        result.put("" + originalID, newID);
+        newID++;
+      }
+    }
+    return result;
   }
 
   public void setInputPrompt(String prompt)

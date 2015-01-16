@@ -31,7 +31,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     var cmTextArea = CodeMirror(rootDiv,
     {
-      mode: 'aql', 
+      mode: {
+        name : 'aql',
+        nodeMappings : {}
+      }, 
       lineNumbers: false,
       lineWrapping: true,
       matchBrackets: true,
@@ -70,6 +73,12 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     {
       var cursor = cmTextArea.getCursor();
       
+      var newMode = {
+        name: 'aql',
+        nodeMappings : connector.getState().nodeMappings
+      };
+      
+      cmTextArea.setOption('mode', newMode);
       cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
       
       if(connector.getState().clientText !== connector.getState().text)

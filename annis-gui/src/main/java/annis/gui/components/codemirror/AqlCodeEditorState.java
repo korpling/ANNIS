@@ -18,8 +18,10 @@ package annis.gui.components.codemirror;
 
 import annis.model.AqlParseError;
 import com.vaadin.shared.ui.JavaScriptComponentState;
+import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -32,6 +34,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState
   /** The last string as sent by the client **/
   public String clientText = "";
   public String inputPrompt = "";
-  public List<AqlParseError> errors = new LinkedList<AqlParseError>();
+  public List<AqlParseError> errors = new LinkedList<>();
+  public Map<String, Integer> nodeMappings = new HashMap<>();
 
 }
