@@ -90,7 +90,10 @@ public class AnnisParserAntlr
     }
       
     ParseTreeWalker walker = new ParseTreeWalker();
-    QueryNodeListener nodeListener = new QueryNodeListener();
+    NodeIDListener idListener = new NodeIDListener();
+    walker.walk(idListener, treeDNF);
+    
+    QueryNodeListener nodeListener = new QueryNodeListener(idListener.getNodeIntervalToID());
 
     try
     {

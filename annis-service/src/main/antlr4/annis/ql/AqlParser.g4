@@ -82,12 +82,12 @@ pointing
 
 spanrelation
   : IDENT_COV # IdenticalCoverage
-	|	LEFT_ALIGN # LeftAlign
-	|	RIGHT_ALIGN # RightAlign
-	|	INCLUSION # Inclusion
-	|	OVERLAP # Overlap
-	|	RIGHT_OVERLAP # RightOverlap
-	| LEFT_OVERLAP # LeftOverlap
+  |	LEFT_ALIGN # LeftAlign
+  |	RIGHT_ALIGN # RightAlign
+  |	INCLUSION # Inclusion
+  |	OVERLAP # Overlap
+  |	RIGHT_OVERLAP # RightOverlap
+  | LEFT_OVERLAP # LeftOverlap
 ; 
 
 commonparent
@@ -130,25 +130,25 @@ n_ary_linguistic_term
 
 	
 unary_linguistic_term
-	:	left=REF ROOT # RootTerm
-	|	left=REF ARITY EQ rangeSpec # ArityTerm
-	|	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
-	;
+  :	left=REF ROOT # RootTerm
+  |	left=REF ARITY EQ rangeSpec # ArityTerm
+  |	left=REF TOKEN_ARITY EQ rangeSpec # TokenArityTerm
+  ;
 
 variableExpr
   : qName op=(EQ|NEQ) txt=textSpec # AnnoEqTextExpr
   | TOK # TokOnlyExpr 
   | NODE # NodeExpr
   | TOK op=(EQ|NEQ) txt=textSpec # TokTextExpr
-	|	txt=textSpec # TextOnly // shortcut for tok="..."
+  | txt=textSpec # TextOnly // shortcut for tok="..."
   | qName # AnnoOnlyExpr
   ;
 
 expr
   : VAR_DEF variableExpr # NamedVariableTermExpr
   | variableExpr # VariableTermExpr
-	|	unary_linguistic_term # UnaryTermExpr
-	|	n_ary_linguistic_term #  BinaryTermExpr
+  | unary_linguistic_term # UnaryTermExpr
+  | n_ary_linguistic_term #  BinaryTermExpr
   | META DOUBLECOLON id=qName op=(EQ|NEQ) txt=textSpec # MetaTermExpr 
   ;
 
