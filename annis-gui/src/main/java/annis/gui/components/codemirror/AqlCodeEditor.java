@@ -35,6 +35,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -202,27 +203,26 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   
   private Map<String, Integer> mapQueryNodes(List<QueryNode> nodes)
   {
-    Map<Integer, ArrayList<String>> alternative2Nodes = new HashMap<>();
+    Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
    
-    // we assume the nodes are ordered as they occured in the original query
     for (QueryNode n : nodes)
     {
-      ArrayList<String> nodeList = alternative2Nodes.get(n.getAlternativeNumber());
-      if(nodeList == null)
+      TreeSet<Long> orderedNodeSet = alternative2Nodes.get(n.getAlternativeNumber());
+      if(orderedNodeSet == null)
       {
-        nodeList = new ArrayList<>();
-        alternative2Nodes.put(n.getAlternativeNumber(), nodeList);
+        orderedNodeSet = new TreeSet<>();
+        alternative2Nodes.put(n.getAlternativeNumber(), orderedNodeSet);
       }
-      nodeList.add(n.getVariable());
+      orderedNodeSet.add(n.getId());
     }
     
     Map<String, Integer> result = new TreeMap<>();
-    for(ArrayList<String> nodeList : alternative2Nodes.values())
+    for(TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
     {
       int newID=1;
-      for(String var : nodeList)
+      for(long var : orderedNodeSet)
       {
-        result.put(var, newID);
+        result.put("" + var, newID);
         newID++;
       }
     }
