@@ -103,7 +103,7 @@ public class QueryPanel extends GridLayout implements
     txtQuery.addStyleName("corpus-font-force");
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
-    txtQuery.setHeight(11f, Unit.EM);
+    txtQuery.setHeight(15f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
     txtQuery.addTextChangeListener(new TextChangeListener()
     {
