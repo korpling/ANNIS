@@ -36,8 +36,8 @@ public class BasicAuthOrAnonymousFilter extends BasicHttpAuthenticationFilter
 
   private static final Logger log = LoggerFactory.getLogger(BasicAuthOrAnonymousFilter.class);
   
-  private String anonymousUser = "anonymous";
-  private String anonymousPassword = "anonymous"; 
+  private String anonymousUser = Group.ANONYMOUS;
+  private String anonymousPassword = Group.ANONYMOUS; 
   
   @Override
   protected String getAuthzHeader(ServletRequest request)

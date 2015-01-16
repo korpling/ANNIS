@@ -15,16 +15,12 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.SearchUI;
-import static annis.gui.resultfetch.ResultFetchJob.log;
-import annis.gui.model.PagedResultQuery;
-import annis.gui.resultview.ResultViewPanel;
+import annis.gui.objects.PagedResultQuery;
 import annis.gui.resultview.VisualizerContextChanger;
 import annis.libgui.Helper;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
@@ -37,7 +33,7 @@ import java.util.List;
  * find command and hopefully this query is bit faster.
  *
  * @see ResultFetchJob
- * @see QueryController
+ * @see LegacyQueryController
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
@@ -45,11 +41,11 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
   Runnable
 {
 
-  private VisualizerContextChanger visContextChanger;
+  private final VisualizerContextChanger visContextChanger;
 
-  private Match match;
+  private final Match match;
 
-  private PagedResultQuery query;
+  private final PagedResultQuery query;
 
   public SingleResultFetchJob(Match match, PagedResultQuery query,
     VisualizerContextChanger visContextChanger)
@@ -79,7 +75,7 @@ public class SingleResultFetchJob extends AbstractResultFetchJob implements
     subList.add(match);
     SaltProject p = executeQuery(subgraphRes,
       new MatchGroup(subList),
-      query.getContextLeft(), query.getContextRight(),
+      query.getLeftContext(), query.getRightContext(),
       query.getSegmentation(), SubgraphFilter.all);
 
     visContextChanger.updateResult(p, query);

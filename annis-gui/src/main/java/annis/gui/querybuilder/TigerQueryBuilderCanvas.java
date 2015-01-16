@@ -17,8 +17,7 @@ package annis.gui.querybuilder;
 
 import annis.libgui.Helper;
 import annis.gui.QueryController;
-import annis.gui.controlpanel.ControlPanel;
-import annis.gui.model.Query;
+import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
 import annis.service.objects.AnnisAttribute;
@@ -62,7 +61,7 @@ public class TigerQueryBuilderCanvas extends Panel
   private AbsoluteDropHandler handler;
   private int number = 0;
   private NodeWindow preparedEdgeSource = null;
-  private QueryController controller;
+  private final QueryController controller;
 
   public TigerQueryBuilderCanvas(QueryController controller)
   {
@@ -82,14 +81,14 @@ public class TigerQueryBuilderCanvas extends Panel
     area.addStyleName("no-box-drag-hints");
 
     canvas = new SimpleCanvas();
-    canvas.setWidth("2000px");
-    canvas.setHeight("2000px");
+    canvas.setSizeFull();
     canvas.addStyleName("tigerquery-builder-canvas");
 
     handler = new AbsoluteDropHandler(this, area);
 
     DragAndDropWrapper areaPane = new DragAndDropWrapper(area);
-    areaPane.setSizeFull();
+    areaPane.setWidth("2000px");
+    areaPane.setHeight("2000px");
     areaPane.setDropHandler(handler);
 
     area.addComponent(canvas, "top:0px;left:0px");
@@ -113,7 +112,7 @@ public class TigerQueryBuilderCanvas extends Panel
     WebResource service = Helper.getAnnisWebResource();
 
     // get current corpus selection
-    Set<String> corpusSelection = controller.getSelectedCorpora();
+    Set<String> corpusSelection = controller.getState().getSelectedCorpora().getValue();
 
     if (service != null)
     {

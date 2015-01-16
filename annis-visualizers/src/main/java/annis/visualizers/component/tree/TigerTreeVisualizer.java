@@ -40,12 +40,17 @@ import net.xeoh.plugins.base.annotations.PluginImplementation;
 /**
  * Visualizes a constituent syntax tree.
  * 
+ * <p>
  * Mappings:<br />
  * The annotation names to be displayed in non terminal nodes can be 
  * set e.g. using <b>node_key:cat</b> for an annotation called cat (the default), and 
  * similarly the edge labels using <b>edge_key:func</b> for an edge label called 
- * <b>func</b> (the default). Instructions are separated using semicolons.
+ * <b>func</b> (the default). Instructions are separated using semicolons. <br /><br />
  * 
+ * With the mapping <b>terminal_name</b> and <b>terminal_ns</b> you can
+ * select span nodes with the corresponding annotations as terminal elements
+ * instead of the default tokens.
+ * </p>
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @PluginImplementation
@@ -59,7 +64,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
   private final DefaultLabeler labeler;
   private transient DefaultStyler styler;
   private AnnisGraphTools graphtools;
-
+  public static final String TERMINAL_NAME_KEY = "terminal_name";
+  public static final String TERMINAL_NS_KEY = "terminal_ns";
+  
   public class DefaultStyler implements TreeElementStyler
   {
 
@@ -69,10 +76,10 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     public static final int TOKEN_SPACING = 15;
     public static final int VEDGE_OVERLAP_THRESHOLD = 20;
     private final Java2dBackend backend;
-
+    
     public DefaultStyler(Java2dBackend backend_)
     {
-      backend = backend_;
+      this.backend = backend_;
     }
 
     public int getLabelPadding()
@@ -80,9 +87,9 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       return LABEL_PADDING;
     }
 
-    public GraphicsBackend.Font getFont(AnnisNode n)
+    public GraphicsBackend.Font getFont(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+      if(AnnisGraphTools.isTerminal(n, input))
       {
         return backend.getFont(Font.SANS_SERIF, 12, java.awt.Font.PLAIN);
       }
@@ -114,7 +121,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
         {
         }
 
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Rectangle(Color.WHITE, backColor, DEFAULT_PEN_STYLE, getLabelPadding());
         }
@@ -125,7 +132,7 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
       }
       else
       {
-        if(n.isToken())
+        if(AnnisGraphTools.isTerminal(n, input))
         {
           return new Shape.Invisible(getLabelPadding());
         }
@@ -227,14 +234,25 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
     @Override
     public String getLabel(AnnisNode n, VisualizerInput input)
     {
-      if(n.isToken())
+    
+      if(AnnisGraphTools.isTerminal(n, input))
       {
-        String spannedText = n.getSpannedText();
-        if(spannedText == null || "".equals(spannedText))
-        {
-          spannedText = " ";
+        String terminalName = input.getMappings().getProperty(TERMINAL_NAME_KEY);
+        if(terminalName == null)
+        {        
+          
+          String spannedText = n.getSpannedText();
+          if (spannedText == null || "".equals(spannedText))
+          {
+            spannedText = " ";
+          }
+          return spannedText;
         }
-        return spannedText;
+        else
+        {
+          String terminalNamespace = input.getMappings().getProperty(TERMINAL_NS_KEY);
+          return extractAnnotation(n.getNodeAnnotations(), terminalNamespace, terminalName); 
+        }
       }
       else
       {
@@ -254,14 +272,13 @@ public class TigerTreeVisualizer extends AbstractImageVisualizer
 
     private String extractAnnotation(Set<Annotation> annotations, String namespace, String featureName)
     {
-      for(Annotation a : annotations)
+      String result = AnnisGraphTools.extractAnnotation(annotations, namespace,
+        featureName);
+      if(result == null)
       {
-        if(a.getNamespace().equals(namespace) && a.getName().equals(featureName))
-        {
-          return a.getValue();
-        }
+        result = "--";
       }
-      return "--";
+      return result;
     }
   }
 

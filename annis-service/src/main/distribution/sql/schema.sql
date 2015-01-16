@@ -129,6 +129,13 @@ CREATE TABLE media_files
   UNIQUE (corpus_ref, title)
 );
 
+DROP TABLE IF EXISTS corpus_alias CASCADE;
+CREATE TABLE corpus_alias
+(
+  alias text,
+  corpus_ref bigint references corpus(id) ON DELETE CASCADE,
+   PRIMARY KEY (alias, corpus_ref)
+);
 
 -- stats
 DROP TABLE IF EXISTS corpus_stats CASCADE;
@@ -148,14 +155,15 @@ CREATE TABLE corpus_stats
 
 
 DROP VIEW IF EXISTS corpus_info CASCADE;
-CREATE VIEW corpus_info AS SELECT
-  name,
-  id,
-  text,
-  tokens,
-  source_path
-FROM
-  corpus_stats;
+CREATE VIEW corpus_info AS 
+SELECT min(corpus_stats.name::text) AS name,
+    corpus_stats.id,
+    min(corpus_stats.text) AS text,
+    min(corpus_stats.tokens) AS tokens,
+    min(corpus_stats.source_path::text) AS source_path,
+    array_remove(array_agg(a.alias), NULL) AS alias
+FROM corpus_stats LEFT JOIN corpus_alias AS a ON (corpus_stats.id = a.corpus_ref)
+GROUP BY corpus_stats.id;
 
 DROP TYPE IF EXISTS resolver_visibility CASCADE;
 CREATE TYPE resolver_visibility AS ENUM (

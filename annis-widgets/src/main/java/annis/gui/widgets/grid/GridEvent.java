@@ -39,7 +39,7 @@ public class GridEvent implements Serializable
 
   private Long match;
 
-  private List<String> coveredIDs;
+  private final List<String> coveredIDs;
 
   // used for a tooltip in the frontend
   private String tooltip;

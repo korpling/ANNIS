@@ -23,10 +23,10 @@ import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.ArrayList;
 import java.util.Collection;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.themes.ValoTheme;
 
 /**
  *
@@ -136,7 +136,7 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     sbtoolbar.addComponent(negSearchBox);
     // close the searchbox
     btClose = new Button(BUTTON_CLOSE_LABEL, (Button.ClickListener) this);
-    btClose.setStyleName(ChameleonTheme.BUTTON_SMALL);    
+    btClose.setStyleName(ValoTheme.BUTTON_SMALL);    
     
     HorizontalLayout titleBar = new HorizontalLayout();
     titleBar.setWidth(vnframe.getWidth(), vnframe.getWidthUnits());
@@ -147,7 +147,7 @@ public class SearchBox extends Panel implements Button.ClickListener/*,
     
     btAdd = new Button(LABEL_BUTTON_ADD);
     btAdd.addClickListener((Button.ClickListener)this);
-    btAdd.setStyleName(ChameleonTheme.BUTTON_SMALL);
+    btAdd.setStyleName(ValoTheme.BUTTON_SMALL);
     
     vnframe.addComponent(titleBar);
     vnframe.addComponent(sb);    

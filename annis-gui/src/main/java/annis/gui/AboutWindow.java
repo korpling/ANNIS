@@ -54,12 +54,12 @@ public class AboutWindow extends Window
     HorizontalLayout hLayout = new HorizontalLayout();
     
     Embedded logoAnnis = new Embedded();
-    logoAnnis.setSource(new ThemeResource("annis-logo-128.png"));
+    logoAnnis.setSource(new ThemeResource("images/annis-logo-128.png"));
     logoAnnis.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoAnnis);
     
     Embedded logoSfb = new Embedded();
-    logoSfb.setSource(new ThemeResource("sfb-logo.jpg"));
+    logoSfb.setSource(new ThemeResource("images/sfb-logo.jpg"));
     logoSfb.setType(Embedded.TYPE_IMAGE);    
     hLayout.addComponent(logoSfb);
     
@@ -78,8 +78,8 @@ public class AboutWindow extends Window
     layout.addComponent(new Label("ANNIS is a project of the "
       + "<a href=\"http://www.sfb632.uni-potsdam.de/\">SFB632</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Homepage: "
-      + "<a href=\"http://www.sfb632.uni-potsdam.de/annis/\">"
-      + "http://www.sfb632.uni-potsdam.de/annis/</a>.", Label.CONTENT_XHTML));
+      + "<a href=\"http://annis-tools.org/\">"
+      + "http://annis-tools.org/</a>.", Label.CONTENT_XHTML));
     layout.addComponent(new Label("Version: " + VersionInfo.getVersion()));
     layout.addComponent(new Label("Vaadin-Version: " + Version.getFullVersion()));
     

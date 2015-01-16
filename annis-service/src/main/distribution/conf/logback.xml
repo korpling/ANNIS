@@ -86,20 +86,22 @@
     </rollingPolicy>
   </appender>
 
+  <logger name="annis" level="INFO"/>
+  <logger name="annis.administration" level="INFO"/>
+  <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>
+  <logger name="annis.benchmarking" level="DEBUG"/>
   <logger name="org.springframework" level="WARN"/>
   <logger name="org.apache.shiro" level="WARN"/>
   <logger name="com.sun.jersey" level="WARN" />
   <logger name="net.sf.ehcache" level="WARN" />
-  <logger name="annis.administration.CorpusAdministration" level="INFO"/>
-  <logger name="annis.administrations" level="WARN"/>
-  <logger name="annis.service.internal.AnnisServiceRunner" level="INFO"/>
-  <logger name="annis.benchmarking" level="DEBUG"/>
+  <!-- for debugging the Spring transaction management set this to DEBUG" -->
+  <logger name="org.springframework.jdbc.datasource.DataSourceTransactionManager" level="WARN"/>
 
   <logger name="QueryLog" level="INFO">
     <appender-ref ref="QUERYLOG"/>
   </logger>
 
-  <root level="DEBUG">
+  <root level="INFO">
     <appender-ref ref="LOGFILE"/>
     <appender-ref ref="ERROR"/>
     <!--<appender-ref ref="DEBUG"/>-->

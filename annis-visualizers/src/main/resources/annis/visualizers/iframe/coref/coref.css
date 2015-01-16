@@ -43,18 +43,19 @@ table {
   white-space:nowrap;
 }
 
+.line {
+  height: 7px;
+  overflow: hidden;
+}
+
 .linecontainer {
   width: 100%;
   border-collapse: collapse;
 }
 
-td.line {
+td.clickableline {
   width: 100%;
   height: 3px;
-}
-
-td.blank {
-  height: 5px;
 }
 
 td.space {

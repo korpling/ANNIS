@@ -21,6 +21,7 @@ SEMICOLON : ';';
 EQUALS : '=';
 TOK : 'tok';
 VALUE : 'value';
+ESCAPED_VALUE : 'escaped_value';
 ANNO : 'anno';
 META : 'meta';
 STYLE : 'style';
@@ -42,6 +43,7 @@ innermeta: ~(QUOTE|WS|NEWLINE)+;
 
 type
   : VALUE # typeValue
+  | ESCAPED_VALUE # typeEscapedValue
   | ANNO # typeAnno
   | QUOTE innertype QUOTE # typeConstant
   | META COLON COLON innermeta # typeMeta

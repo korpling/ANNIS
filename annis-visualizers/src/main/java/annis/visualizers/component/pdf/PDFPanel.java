@@ -21,12 +21,12 @@ import static annis.libgui.PDFPageHelper.PAGE_NUMBER_SEPERATOR;
 import static annis.libgui.PDFPageHelper.PAGE_NO_VALID_NUMBER;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisBinaryMetaData;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.ui.AbstractJavaScriptComponent;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.List;
 import java.util.UUID;
 import org.apache.commons.lang3.Validate;
@@ -49,6 +49,9 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
   private static final Logger log = LoggerFactory.getLogger(PDFPanel.class);
 
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  private final static Escaper urlParamEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   private VisualizerInput input;
 
   private int firstPage;
@@ -105,12 +108,8 @@ public class PDFPanel extends AbstractJavaScriptComponent {
 
     String corpusName = corpusPath.get(corpusPath.size() - 1);
     String documentName = corpusPath.get(0);
-    try {
-      corpusName = URLEncoder.encode(corpusName, "UTF-8");
-      documentName = URLEncoder.encode(documentName, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      log.error("UTF-8 was not known as encoding, expect non-working audio", ex);
-    }
+    corpusName = urlPathEscape.escape(corpusName);
+    documentName = urlPathEscape.escape(documentName);
 
     WebResource resMeta = Helper.getAnnisWebResource().path(
             "meta/binary").path(corpusName).path(documentName);
@@ -131,14 +130,8 @@ public class PDFPanel extends AbstractJavaScriptComponent {
             "There must be at least one binary file for the document with a video mime type");
 
     String mimeTypeEncoded = mimeType;
-    try {
-      mimeTypeEncoded = URLEncoder.encode(mimeType, "UTF-8");
-    } catch (UnsupportedEncodingException ex) {
-      log.error(
-              "UTF-8 was not known as encoding, expect strange things will happen",
-              ex);
-    }
-
+    mimeTypeEncoded = urlParamEscape.escape(mimeType);
+    
     return input.getContextPath() + "/Binary?"
             + "documentName=" + documentName
             + "&toplevelCorpusName=" + corpusName

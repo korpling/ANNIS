@@ -21,8 +21,6 @@ import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.media.PDFController;
 import com.vaadin.server.VaadinSession;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
-import java.util.Map;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +36,10 @@ import org.slf4j.LoggerFactory;
  * <b>annos: anno_name1, anno_name2, anno_name3</b> to specify the order or
  * annotation layers. If <b>anno:</b> is used, additional annotation layers not
  * present in the list will not be visualized. If mappings is left empty, layers
- * will be ordered alphabetically.
+ * will be ordered alphabetically. You can also use regular expressions in the <b>annos</b>
+ * mapping by enclosing it in slashes like in <code>annos:/.*::v.+/,/(ns1::a|ns1::b|ns2::c)/</code>.
+ * Please note that the regular expressions have to match the whole qualified name including the
+ * namespace.
  * </li>
  * <li>
  * <b>tok_anno:true</b> can be used to also display the annotations of the
@@ -48,7 +49,10 @@ import org.slf4j.LoggerFactory;
  * <b>hide_tok:true</b> switches the line with the token value off.
  * </li>
  * <li>
- * <code>pdf_page_key: name of the annotation that contains the pdf page number</code>
+ * <b>show_ns:true</b> always show the namespace of the annotations.
+ * </li>
+ * <li>
+ * <b>pdf_page_key</b>: name of the annotation that contains the pdf page number
  * </li>
  * </ul>
  *

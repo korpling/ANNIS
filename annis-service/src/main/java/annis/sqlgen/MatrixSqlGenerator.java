@@ -213,9 +213,7 @@ public class MatrixSqlGenerator
   @Override
   public String fromClause(QueryData queryData,
     List<QueryNode> alternative, String indent)
-  {
-    TableAccessStrategy tas = tables(null);
-    
+  {    
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");
@@ -224,16 +222,17 @@ public class MatrixSqlGenerator
     sb.append(solutionSqlGenerator.toSql(queryData, indent + TABSTOP));
     sb.append(indent).append(") AS solutions,\n");
 
+    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+      queryData.getCorpusList(), indent);
+    
     sb.append(indent).append(TABSTOP);
-    sb.append(
-      AbstractFromClauseGenerator.tableAliasDefinition(tas, 
-        null, NODE_TABLE, 1, queryData.getCorpusList()));
+    sb.append(factsSQL).append(" AS facts");
 
     sb.append("\n");
 
     TableAccessStrategy tables = tables(null);
 
-    addFromOuterJoins(sb, queryData, tables, indent);
+    addFromOuterJoins(sb, queryData, tables, indent, alternative);
     sb.append(",\n");
 
     sb.append(indent).append(TABSTOP);
@@ -243,7 +242,7 @@ public class MatrixSqlGenerator
   }
 
   protected void addFromOuterJoins(StringBuilder sb, QueryData queryData,
-    TableAccessStrategy tas, String indent)
+    TableAccessStrategy tas, String indent, List<QueryNode> alternative)
   {
 
     List<MatrixQueryData> matrixExtList = queryData.getExtensions(
@@ -276,10 +275,18 @@ public class MatrixSqlGenerator
     
     List<Long> corpusList = queryData.getCorpusList();
 
-    String factsName = tas.partitionTableName(NODE_TABLE, corpusList);
+    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
+      queryData.getCorpusList(), indent);
 
+    String corpusListString = StringUtils.
+        join(corpusList, ", ");
+    if(corpusList.isEmpty())
+    {
+      corpusListString = "NULL";
+    }
+    
     sb.append(indent).append(TABSTOP);
-    sb.append("LEFT OUTER JOIN ").append(factsName).append(" AS node_anno")
+    sb.append("LEFT OUTER JOIN ").append(factsSQL).append(" AS node_anno")
       .append(" ON  (")
       .append(tas.aliasedColumn(NODE_TABLE, "id")).append(
         " = node_anno.id AND ")
@@ -287,8 +294,7 @@ public class MatrixSqlGenerator
       .append(tas.aliasedColumn(NODE_TABLE,
           "toplevel_corpus")).append(
         " = node_anno.toplevel_corpus AND ")
-      .append("node_anno.toplevel_corpus IN (").append(StringUtils.
-        join(corpusList, ", "))
+      .append("node_anno.toplevel_corpus IN (").append(corpusListString)
       .append("))");
 
     sb.append("\n");

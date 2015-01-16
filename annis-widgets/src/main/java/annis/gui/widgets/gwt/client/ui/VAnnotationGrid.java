@@ -190,8 +190,17 @@ public class VAnnotationGrid extends Composite implements Paintable
     
     
     String caption = row.getStringAttribute("caption");
-    String[] captionSplit = caption.split("::");
-    String name = captionSplit[captionSplit.length - 1];
+    boolean showNamespace = row.getBooleanAttribute("show-namespace");
+    String name;
+    if(showNamespace)
+    {
+      name = caption;
+    }
+    else
+    {
+      String[] captionSplit = caption.split("::");
+      name = captionSplit[captionSplit.length - 1];
+    }
     
     boolean showCaption = row.getBooleanAttribute("show-caption");
 
@@ -224,18 +233,12 @@ public class VAnnotationGrid extends Composite implements Paintable
       // jumped over by using colspan
       int col = left + startColumn - colspanOffset;
 
+      table.setHTML(rowNumber, col, value);
+      
       if (event.hasAttribute("tooltip"))
       {
-        VLabel label = new VLabel(escapeHTML ? Util.escapeHTML(value) : value);
-        label.setTitle(event.getStringAttribute("tooltip"));
-
-        // add a label with a title as table cell
-        table.setWidget(rowNumber, col, label);
-      }
-      else
-      {
-        // don't use label since it will produce an extra "div"
-        table.setHTML(rowNumber, col, value);
+        Element tdElement = table.getCellFormatter().getElement(rowNumber, col);
+        tdElement.setTitle(event.getStringAttribute("tooltip"));
       }
       
       position2id.put(new Position(rowNumber, col), id);

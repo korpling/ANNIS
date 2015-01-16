@@ -63,8 +63,8 @@ public class TestAnnotateSqlGenerator
     }
 
     @Override
-    public String getDocumentQuery(String toplevelCorpusName,
-      String documentName)
+    public String getDocumentQuery(long toplevelCorpusID,
+      String documentName, List<String> nodeAnnoFilter)
     {
       throw new UnsupportedOperationException();
     }
@@ -390,12 +390,13 @@ public class TestAnnotateSqlGenerator
   public void shouldOrderByKeyComponentAndPreValue()
   {
     // given
+    String edgeNameAlias = createColumnAlias(COMPONENT_TABLE, "name");
     String preAlias = createColumnAlias(RANK_TABLE, "pre");
     String idAlias = createColumnAlias(COMPONENT_TABLE, "id");
     // when
     String actual = generator.orderByClause(queryData, alternative, INDENT);
     // then
-    String expected = "solutions.n, " + idAlias + ", " + preAlias;
+    String expected = "solutions.n, " + edgeNameAlias + ", " + idAlias + ", " + preAlias;
     assertThat(actual, is(expected));
   }
   

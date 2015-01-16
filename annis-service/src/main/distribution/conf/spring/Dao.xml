@@ -119,10 +119,8 @@
   
   <bean id="sqlScriptSessionModifierBase" class="annis.dao.ScriptFileSqlSessionModifier" lazy-init="true">
     <property name="scriptFile" value="modify_session.sql"/>
-
-    <!-- missing: administrationDao -->
   </bean>
-
+    
   <!-- BEGIN EXPORTS -->
 
   <!-- exported bean: AnnisDao -->
@@ -176,13 +174,25 @@
   </bean>
  
   <!-- exported Database API for administration tasks -->
-  <bean id="administrationDao" class="annis.administration.DefaultAdministrationDao" lazy-init="true">
-    <property name="scriptPath" value="$dev{annis.script-path}"/>
-    <property name="externalFilesPath" value="${annis.external-data-path}"/>
+ <bean id="adminDaoBase" class="annis.administration.AbstractAdminstrationDao" abstract="true" lazy-init="true">
+  <property name="scriptPath" value="$dev{annis.script-path}"/>
+  <property name="externalFilesPath" value="${annis.external-data-path}"/>
+  <property name="dataSource" ref="dataSource" />
+  <property name="annisDao" ref="annisDao" />
+ </bean>
+
+ <bean id="deleteCorpusDao" class="annis.administration.DeleteCorpusDao" lazy-init="true"
+      parent="adminDaoBase">
+  
+ </bean>
+ 
+ <bean id="administrationDao" class="annis.administration.AdministrationDao" lazy-init="true"
+        parent="adminDaoBase">
+    
     <property name="temporaryStagingArea" value="$dev{annis.import.temporary-staging-area}" />
     <property name="generateExampleQueries" value="${annis.import.example-queries}" />
-    <property name="annisDao" ref="annisDao" />
-    <property name="dataSource" ref="dataSource" />
+    <property name="deleteCorpusDao" ref="deleteCorpusDao" />
+    
     <property name="mimeTypeMapping">
       <util:map>
         <entry key="webm" value="video/webm"/>

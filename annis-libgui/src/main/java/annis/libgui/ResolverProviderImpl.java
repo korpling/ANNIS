@@ -17,21 +17,17 @@ package annis.libgui;
 
 import annis.resolver.ResolverEntry;
 import annis.resolver.SingleResolverRequest;
-import com.sun.jersey.api.client.ClientHandlerException;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.Serializable;
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -51,6 +47,8 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
     
     private Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver;
 
+    private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+    
     public ResolverProviderImpl(Map<HashSet<SingleResolverRequest>, List<ResolverEntry>> cacheResolver) {
         this.cacheResolver = cacheResolver;
     }
@@ -101,25 +99,29 @@ public class ResolverProviderImpl implements ResolverProvider, Serializable
             WebResource resResolver = Helper.getAnnisWebResource()
                     .path("query").path("resolver");
 
-            for (SingleResolverRequest r : resolverRequests) {
-                List<ResolverEntry> tmp;
-                try {
-                    String corpusName = URLEncoder.encode(r.getCorpusName(), "UTF-8");
-                    String namespace = r.getNamespace();
-                    String type = r.getType() == null ? null : r.getType().toString();
-                    if (corpusName != null && namespace != null && type != null) {
-                        WebResource res = resResolver.path(corpusName).path(namespace).path(type);
-                        try {
-                            tmp = res.get(new ResolverEntryListType());
-                            resolverList.addAll(tmp);
-                        } catch (Exception ex) {
-                            log.error("could not query resolver entries: "
-                                    + res.toString(), ex);
-                        }
-                    }
-                } catch (UniformInterfaceException | ClientHandlerException | UnsupportedEncodingException ex) {
-                    log.error(null, ex);
-                }
+          for (SingleResolverRequest r : resolverRequests)
+          {
+            List<ResolverEntry> tmp;
+
+            String corpusName = urlPathEscape.escape(r.getCorpusName());
+            String namespace = r.getNamespace();
+            String type = r.getType() == null ? null : r.getType().toString();
+            if (corpusName != null && namespace != null && type != null)
+            {
+              WebResource res = resResolver.path(corpusName).path(namespace).
+                path(type);
+              try
+              {
+                tmp = res.get(new ResolverEntryListType());
+                resolverList.addAll(tmp);
+              }
+              catch (Exception ex)
+              {
+                log.error("could not query resolver entries: "
+                  + res.toString(), ex);
+              }
+            }
+
             }
             visSet.addAll(resolverList);
             cacheResolver.put(resolverRequests, resolverList);

@@ -70,7 +70,7 @@ import org.slf4j.LoggerFactory;
  */
 public class EventExtractor {
 
-  private static Logger log = LoggerFactory.getLogger(EventExtractor.class);
+  private static final Logger log = LoggerFactory.getLogger(EventExtractor.class);
 
   /**
    * Converts Salt document graph to rows.
@@ -80,7 +80,7 @@ public class EventExtractor {
    * @param showTokenAnnos
    * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
    * @param annotationNames
-   * @param unsetValueForMedia
+   * @param replaceValueWithMediaIcon If true the actual value is removed and an icon for playing the media file is shown instead.
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
    * @param pdfController makes status of all pdfviewer available for the
@@ -91,7 +91,7 @@ public class EventExtractor {
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, 
-          Set<String> mediaLayer, boolean unsetValueForMedia,
+          Set<String> mediaLayer, boolean replaceValueWithMediaIcon,
           long startTokenIndex, long endTokenIndex,
           PDFController pdfController, STextualDS text) 
   {
@@ -118,7 +118,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true, mediaLayer, unsetValueForMedia);
+            true, mediaLayer, replaceValueWithMediaIcon);
         }
       } // end for each span
     }
@@ -131,7 +131,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
-            mediaLayer, unsetValueForMedia);
+            mediaLayer, replaceValueWithMediaIcon);
         }
       }
     }
@@ -168,7 +168,7 @@ public class EventExtractor {
   public static void removeEmptySpace(LinkedHashMap<String, 
     ArrayList<Row>> rowsByAnnotation, Row tokenRow)
   {
-    List<Range<Integer>> gaps = new LinkedList<Range<Integer>>();
+    List<Range<Integer>> gaps = new LinkedList<>();
 
     BitSet totalOccupancyGrid = new BitSet();
     for(Map.Entry<String, ArrayList<Row>> layer : rowsByAnnotation.entrySet())
@@ -222,7 +222,7 @@ public class EventExtractor {
         ArrayList<Row> rows = rowEntry.getValue();
         for(Row r : rows)
         {
-          List<GridEvent> eventsCopy = new LinkedList<GridEvent>(r.getEvents());
+          List<GridEvent> eventsCopy = new LinkedList<>(r.getEvents());
           for(GridEvent e : eventsCopy)
           {
             if(e.getLeft() >= g.upperEndpoint())
@@ -257,7 +257,7 @@ public class EventExtractor {
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     boolean addMatch,
-    Set<String> mediaLayer, boolean unsetValueForMedia)
+    Set<String> mediaLayer, boolean replaceValueWithMediaIcon)
   {
 
     List<String> matchedAnnos = new ArrayList<>();
@@ -373,7 +373,7 @@ public class EventExtractor {
           double[] startEndTime = TimeHelper.getOverlappedTime(node);
           if (startEndTime.length == 1)
           {
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime());
@@ -384,7 +384,7 @@ public class EventExtractor {
           {
             event.setStartTime(startEndTime[0]);
             event.setEndTime(startEndTime[1]);
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime() + "-"
@@ -441,7 +441,7 @@ public class EventExtractor {
   public static List<String> computeDisplayAnnotations(VisualizerInput input,
           Class<? extends SNode> type) {
     if (input == null) {
-      return new LinkedList<String>();
+      return new LinkedList<>();
     }
 
     SDocumentGraph graph = input.getDocument().getSDocumentGraph();
@@ -449,7 +449,7 @@ public class EventExtractor {
     Set<String> annoPool = SToken.class.isAssignableFrom(type) ?
       getAnnotationLevelSet(graph, null, type)
       : getAnnotationLevelSet(graph, input.getNamespace(), type);
-    List<String> annos = new LinkedList<String>(annoPool);
+    List<String> annos = new LinkedList<>(annoPool);
 
     String annosConfiguration = input.getMappings().getProperty(
             MAPPING_ANNOS_KEY);
@@ -464,7 +464,7 @@ public class EventExtractor {
           // check if they match
           Pattern regex = Pattern.compile(StringUtils.strip(s, "/"));
 
-          LinkedList<String> matchingAnnos = new LinkedList<String>();
+          LinkedList<String> matchingAnnos = new LinkedList<>();
           for (String a : annoPool) {
             if (regex.matcher(a).matches()) {
               matchingAnnos.add(a);
@@ -518,7 +518,7 @@ public class EventExtractor {
    */
   private static Set<String> getAnnotationLevelSet(SDocumentGraph graph,
           String namespace, Class<? extends SNode> type) {
-    Set<String> result = new TreeSet<String>();
+    Set<String> result = new TreeSet<>();
 
     if (graph != null) {
       EList<? extends SNode> nodes;
@@ -717,7 +717,7 @@ public class EventExtractor {
       int lastTokenIndex = -1;
 
       // sort the coveredIDs
-      LinkedList<String> sortedCoveredToken = new LinkedList<String>(event.
+      LinkedList<String> sortedCoveredToken = new LinkedList<>(event.
         getCoveredIDs());
       Collections.sort(sortedCoveredToken, new Comparator<String>()
       {
@@ -755,7 +755,7 @@ public class EventExtractor {
       });
 
       // first calculate all gaps
-      List<GridEvent> gaps = new LinkedList<GridEvent>();
+      List<GridEvent> gaps = new LinkedList<>();
       for (String id : sortedCoveredToken)
       {
 

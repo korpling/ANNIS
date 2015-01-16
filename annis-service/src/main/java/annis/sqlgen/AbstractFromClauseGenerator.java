@@ -17,10 +17,8 @@ package annis.sqlgen;
 
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-import annis.service.objects.AnnisCorpus;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 
 public abstract class AbstractFromClauseGenerator 
 	extends TableAccessStrategyFactory 

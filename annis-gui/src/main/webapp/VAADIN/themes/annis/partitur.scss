@@ -5,66 +5,67 @@
     border-collapse:collapse;
     font-family:arial,tahoma,helvetica,sans-serif;
     font-style:normal;
+
+    .tok {
+      text-align:center;
+    }
+
+    .highlight-target {
+      background-color:#faf755;
+    }
+
+    td.header {
+
+      margin:0px;
+      padding:2px;
+      font-weight:bold;
+      border-style:dotted;
+      border-color:rgb(200,200,200);
+      border-width:1px;
+    }
+
+    td.gap {
+      background-image: url("images/hatching.png");
+      background-repeat: repeat;
+      border-style: solid;
+      border-color: black;
+    }
+
+    td.space {
+      background-image: url("images/space.png");
+      background-repeat: repeat-y;
+      border-style: none;
+      background-position: center;
+    }
+
+    td {
+      margin:0px;
+      background-color:rgb(255,255,255);
+      border-style:dotted;
+      border-color:rgb(200,200,200);
+      border-width:1px;
+      padding:0px 10px 0px 10px;
+      @include user-select(text);
+    }
+
+    .header {
+      /* always use the default fonts for the header */
+      font-family: arial, tahoma, helvetica, sans-serif;
+    }
+
+    td.single_event {
+      background-color:rgb(230,230,230);
+      border-color:rgb(0,0,0);
+      border-style:solid;
+      border-width:1px;
+    }
+
+    td.highlight-source {
+      background-color:rgb(200,200,200);
+    }
+
   }
 
-  .partitur_table .tok {
-    text-align:center;
-  }
-
-  .partitur_table .highlight-target {
-    background-color:#faf755;
-  }
-
-  .partitur_table td.header {
-
-    margin:0px;
-    padding:2px;
-    font-weight:bold;
-    border-style:dotted;
-    border-color:rgb(200,200,200);
-    border-width:1px;
-  }
-
-
-  .partitur_table td.gap {
-    background-image: url("hatching.png");
-    background-repeat: repeat;
-    border-style: solid;
-    border-color: black;
-  }
-  
-  .partitur_table td.space {
-    background-image: url("space.png");
-    background-repeat: repeat-y;
-    border-style: none;
-    background-position: center;
-  }
-
-
-  .partitur_table td {
-    margin:0px;
-    background-color:rgb(255,255,255);
-    border-style:dotted;
-    border-color:rgb(200,200,200);
-    border-width:1px;
-    padding:0px 10px 0px 10px;
-  }
-
-  .partitur_table .header {
-    /* always use the default fonts for the header */
-    font-family: arial, tahoma, helvetica, sans-serif;
-  }
-
-  .partitur_table td.single_event {
-    background-color:rgb(230,230,230);
-    border-color:rgb(0,0,0);
-    border-style:solid;
-    border-width:1px;
-  }
-  
-  .partitur_table td.highlight-source {
-    background-color:rgb(200,200,200);
-  }
 
   .checkedItem:before {
     content: url('check.gif');
@@ -82,12 +83,52 @@
     font-size: 9pt;
   }
 
-  .speaker {
-    background: url("speaker.png") no-repeat right;
+  td.speaker, td.pdf {
+    padding: 0px 20px 0px 10px;
+  }
+  
+  .empty_token_hint {
+    font-style: italic;
   }
 
-  .pdf {
-    background: url("pdf.png") no-repeat right;
+  .kwic {
+
+    td {
+      @include user-select(text);
+    }
+
+    .speaker, .pdf {
+      padding: 0px;
+    }
+
+    .speaker:before, .pdf:before {
+      position:relative;
+      top:0px;
+      left: 10px;
+    }
+  } // end kwic
+
+  .speaker:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+
+    margin-right: 5px;
+    
+    color: #96B2D3;
+    top:0px;
+    content: "\f028";
+  }
+
+  .pdf:before {
+    font-family: FontAwesome;
+    font-style: normal;
+    font-weight: normal;
+    position:absolute;
+    color: red;
+    top:0px;
+    right: 2px;
+    content: "\f1c1";
   }
 
   .speaker, .speaker div, .pdf,  .pdf div {

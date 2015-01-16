@@ -20,7 +20,10 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -77,7 +80,7 @@ public class Helper
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
 
-  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
+  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<>();
 
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER
     = "Corpus properties does not exist";
@@ -89,14 +92,16 @@ public class Helper
     + "<li>the ANNIS service is not running</li>"
     + "<li>the corpus properties are not well defined</li></ul>"
     + "<p>Please ask the responsible admin or consult the ANNIS "
-    + "<a href=\"http://korpling.github.io/ANNIS\">Documentation</a>.</p></div>";
+    + "<a href=\"http://korpling.github.io/ANNIS/doc/\">Documentation</a>.</p></div>";
 
   private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER
     = "Problems with parsing the document browser configuration.";
 
   private static final String ERROR_MESSAGE_DOCUMENT_BROWSER_BODY
     = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
-
+  
+  private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
   /**
    * Creates an authentificiated REST client
    *
@@ -110,8 +115,10 @@ public class Helper
     DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
 
+    ThreadSafeClientConnManager clientConnMgr = new ThreadSafeClientConnManager();
+    clientConnMgr.setDefaultMaxPerRoute(10);
     rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
-      new ThreadSafeClientConnManager());
+      clientConnMgr);
 
     if (userName != null && password != null)
     {
@@ -311,13 +318,22 @@ public class Helper
     }
     return "";
   }
-
+  
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation,
     int start, int limit)
   {
-    List<String> result = new ArrayList<String>();
+    return citationFragment(aql, corpora, contextLeft, contextRight,
+      segmentation, start, limit, OrderType.normal);
+  }
+
+  public static List<String> citationFragment(String aql,
+    Set<String> corpora, int contextLeft, int contextRight,
+    String segmentation,
+    int start, int limit, OrderType order)
+  {
+    List<String> result = new ArrayList<>();
     try
     {
       result.add("_q=" + encodeBase64URL(aql));
@@ -335,6 +351,10 @@ public class Helper
       {
         result.add("_seg="
           + encodeBase64URL(segmentation));
+      }
+      if(order != OrderType.normal)
+      {
+        result.add("o=" + order.toString());
       }
     }
     catch (UnsupportedEncodingException ex)
@@ -437,8 +457,8 @@ public class Helper
     try
     {
       res = res.path("meta").path("doc")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
-      res = res.path(URLEncoder.encode(documentName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName));
+      res = res.path(urlPathEscape.escape(documentName));
 
       result = res.get(new GenericType<List<Annotation>>()
       {
@@ -456,14 +476,6 @@ public class Helper
       log.error(null, ex);
       Notification.show(
         "Remote exception: " + ex.getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
     return result;
@@ -486,11 +498,11 @@ public class Helper
     try
     {
       res = res.path("meta").path("doc")
-        .path(URLEncoder.encode(toplevelCorpusName, "UTF-8"));
+        .path(urlPathEscape.escape(toplevelCorpusName));
 
       if (documentName != null)
       {
-        res = res.path(documentName);
+        res = res.path(urlPathEscape.escape(documentName));
       }
 
       if (documentName != null && !toplevelCorpusName.equals(documentName))
@@ -516,14 +528,6 @@ public class Helper
         "Remote exception: " + ex.getLocalizedMessage(),
         Notification.Type.WARNING_MESSAGE);
     }
-    catch (UnsupportedEncodingException ex)
-    {
-      log.error(null, ex);
-      Notification.show(
-        "UTF-8 encoding is not supported on server, this is weird: " + ex.
-        getLocalizedMessage(),
-        Notification.Type.WARNING_MESSAGE);
-    }
     return result;
   }
 
@@ -533,17 +537,10 @@ public class Helper
     {
       DocumentBrowserConfig docBrowserConfig = Helper.getAnnisWebResource().path("query")
         .path("corpora").path("doc_browser_config")
-        .path(URLEncoder.encode(corpus, "UTF-8"))
+        .path(urlPathEscape.escape(corpus))
         .get(DocumentBrowserConfig.class);
 
       return docBrowserConfig;
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      new Notification(ERROR_MESSAGE_DOCUMENT_BROWSER_HEADER,
-        ERROR_MESSAGE_DOCUMENT_BROWSER_BODY, Notification.Type.WARNING_MESSAGE,
-        true).show(Page.getCurrent());
-      log.error("problems with fetching document browsing", ex);
     }
     catch (UniformInterfaceException ex)
     {
@@ -587,14 +584,8 @@ public class Helper
     try
     {
       corpusConfig = Helper.getAnnisWebResource().path("query")
-        .path("corpora").path(URLEncoder.encode(corpus, "UTF-8"))
+        .path("corpora").path(urlPathEscape.escape(corpus))
         .path("config").get(CorpusConfig.class);
-    }
-    catch (UnsupportedEncodingException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
     }
     catch (UniformInterfaceException ex)
     {

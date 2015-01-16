@@ -24,6 +24,8 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
@@ -59,15 +61,54 @@ import org.json.JSONException;
     "AqlCodeEditor.css"
   })
 public class AqlCodeEditor extends AbstractJavaScriptComponent
-  implements FieldEvents.TextChangeNotifier
+  implements FieldEvents.TextChangeNotifier, Property.Viewer, Property.ValueChangeListener
 {
 
   private int timeout;
+  private Property<String> dataSource;
 
   public AqlCodeEditor()
   {
     addFunction("textChanged", new TextChangedFunction());
     addStyleName("aql-code-editor");
+    
+    AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty("", String.class));
+  }
+
+  @Override
+  public void setPropertyDataSource(Property newDataSource)
+  {
+    if(newDataSource == null)
+    {
+      throw new IllegalArgumentException("Data source must not be null");
+    }
+    
+    if(this.dataSource instanceof Property.ValueChangeNotifier)
+    {
+      ((Property.ValueChangeNotifier) this.dataSource).removeValueChangeListener(this);
+    }
+        
+    this.dataSource = newDataSource;
+   
+    if (newDataSource instanceof Property.ValueChangeNotifier)
+    {
+      ((Property.ValueChangeNotifier) this.dataSource).
+        addValueChangeListener(this);
+    }
+
+  }
+
+  @Override
+  public Property getPropertyDataSource()
+  {
+    return this.dataSource;
+  }
+
+  @Override
+  public void valueChange(Property.ValueChangeEvent event)
+  {
+    getState().text = this.dataSource.getValue();
+    markAsDirty();
   }
 
   private class TextChangedFunction implements JavaScriptFunction
@@ -203,13 +244,12 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
   public String getValue()
   {
-    return getState().text;
+    return dataSource.getValue();
   }
 
   public void setValue(String value)
   {
-    getState().text = value;
-    markAsDirty();
+    dataSource.setValue(value);
   }
 
   @Override

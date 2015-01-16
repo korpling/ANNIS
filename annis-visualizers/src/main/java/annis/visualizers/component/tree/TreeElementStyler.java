@@ -24,7 +24,7 @@ import java.awt.Stroke;
 
   public interface TreeElementStyler {
 	
-	Font getFont(AnnisNode n);
+	Font getFont(AnnisNode n, VisualizerInput input);
 	Font getFont(Edge e);
 	
 	Color getTextBrush(AnnisNode n, VisualizerInput input);

@@ -131,11 +131,16 @@ public class AnnisNode implements Serializable
 
     setSpannedText(span);
   }
-
+  
   public static String qName(String namespace, String name)
   {
+    return qName(namespace, name, ":");
+  }
+
+  public static String qName(String namespace, String name, String seperator)
+  {
     return name == null ? null : (namespace == null ? name : namespace
-      + ":" + name);
+      + seperator + name);
   }
 
   public void setSpannedText(String spannedText)

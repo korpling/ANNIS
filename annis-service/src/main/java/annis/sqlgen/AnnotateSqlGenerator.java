@@ -15,6 +15,7 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryAnnotation;
 import static annis.sqlgen.TableAccessStrategy.*;
 
 import java.util.HashSet;
@@ -31,9 +32,14 @@ import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
+import com.google.common.base.Joiner;
+import com.google.common.base.Splitter;
+import static com.google.common.collect.Multimaps.index;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.ResultSetExtractor;
 
@@ -61,7 +67,8 @@ public class AnnotateSqlGenerator<T>
   // helper to extract the corpus path from a JDBC result set
   private CorpusPathExtractor corpusPathExtractor;
   private String matchedNodesViewName;
-
+  
+  
   public AnnotateSqlGenerator()
   {
   }
@@ -80,10 +87,11 @@ public class AnnotateSqlGenerator<T>
   }
 
   public T queryAnnotationGraph(
-    JdbcTemplate jdbcTemplate, String toplevelCorpusName, String documentName)
+    JdbcTemplate jdbcTemplate, long toplevelCorpusID, String documentName,
+     List<String> nodeAnnotationFilter)
   {
-    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusName,
-      documentName), this);
+    return (T) jdbcTemplate.query(getDocumentQuery(toplevelCorpusID,
+      documentName, nodeAnnotationFilter), this);
   }
 
   public String getMatchedNodesViewName()
@@ -174,6 +182,7 @@ public class AnnotateSqlGenerator<T>
   {
     StringBuilder sb = new StringBuilder();
     sb.append("solutions.n, ");
+    sb.append(tables(null).aliasedColumn(COMPONENT_TABLE, "name")).append(", ");
     sb.append(tables(null).aliasedColumn(COMPONENT_TABLE, "id")).append(", ");
     String preColumn = tables(null).aliasedColumn(RANK_TABLE, "pre");
     sb.append(preColumn);
@@ -288,24 +297,74 @@ public class AnnotateSqlGenerator<T>
     return fields;
   }
 
-  public String getDocumentQuery(String toplevelCorpusName, String documentName)
+  public String getDocumentQuery(long toplevelCorpusID, String documentName,
+     List<String> nodeAnnotationFilter)
   {
     TableAccessStrategy tas = createTableAccessStrategy();
     List<String> fields = getSelectFields();
     
-    String template = "SELECT DISTINCT \n"
+    boolean filter = false;
+    Set<String> qualifiedNodeAnnos = new LinkedHashSet<>();
+    Set<String> unqualifiedNodeAnnos = new LinkedHashSet<>();
+    if(nodeAnnotationFilter != null)
+    {
+      Splitter namespaceSplitter = Splitter.on("::").trimResults().limit(2);
+      filter = true;
+      for(String anno : nodeAnnotationFilter)
+      {
+        List<String> splitted = namespaceSplitter.splitToList(anno);
+        if(splitted.size() > 1)
+        {
+          qualifiedNodeAnnos.add(
+            AnnotationConditionProvider.regexEscaper.escape(splitted.get(0)) 
+            + ":" 
+            + AnnotationConditionProvider.regexEscaper.escape(splitted.get(1)));
+        }
+        else
+        {
+          unqualifiedNodeAnnos.add(
+            AnnotationConditionProvider.regexEscaper.escape(splitted.get(0)));
+        }
+      }
+    }
+    
+    
+    StringBuilder template = new StringBuilder();
+    template.append("SELECT DISTINCT \n"
       + "\tARRAY[-1::bigint] AS key, ARRAY[''::varchar] AS key_names, 0 as matchstart, "
       +  StringUtils.join(fields, ", ") +", "
       + "c.path_name as path, c.path_name[1] as document_name\n"
       + "FROM\n"
-      + "\t" + AbstractFromClauseGenerator.tableAliasDefinition(tas, null, NODE_TABLE, 1, null) + ",\n"
+      + "\tfacts_:top AS facts,\n"
       + "\tcorpus as c, corpus as toplevel\n"
       + "WHERE\n"
-      + "\ttoplevel.name = :toplevel_name AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
+      + "\ttoplevel.id = :top AND c.name = :document_name AND " + tas.aliasedColumn(NODE_TABLE, "corpus_ref") + " = c.id\n"
       + "\tAND toplevel.top_level IS TRUE\n"
-      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n"
-      + "ORDER BY "  + tas.aliasedColumn(RANK_TABLE, "pre");
-    String sql = template.replace(":toplevel_name", sqlString(toplevelCorpusName))
+      + "\tAND c.pre >= toplevel.pre AND c.post <= toplevel.post\n");
+    
+    if(filter)
+    {
+      
+      template.append("\tAND (is_token IS TRUE");
+      
+      if(!qualifiedNodeAnnos.isEmpty())
+      {
+        String orExpr = Joiner.on(")|(").join(qualifiedNodeAnnos);
+        template.append(" OR node_qannotext ~ '(^((").append(orExpr).append(")):(.*)$)' ");
+      }
+      if(!unqualifiedNodeAnnos.isEmpty())
+      {
+        String orExpr = Joiner.on(")|(").join(unqualifiedNodeAnnos);
+        template.append(" OR node_annotext ~ '(^((").append(orExpr).append(")):(.*)$)' ");
+      }
+      template.append(")\n");
+    }
+      
+    template.append("ORDER BY ").
+      append(tas.aliasedColumn(COMPONENT_TABLE, "name")).append(", ").
+      append(tas.aliasedColumn(COMPONENT_TABLE, "id")).append(", ").
+      append(tas.aliasedColumn(RANK_TABLE, "pre"));
+    String sql = template.toString().replace(":top", "" + toplevelCorpusID)
       .replace(":document_name", sqlString(documentName));
     return sql;
     
@@ -369,6 +428,6 @@ public class AnnotateSqlGenerator<T>
   public void setResultExtractor(ResultSetExtractor<T> resultExtractor)
   {
     this.resultExtractor = resultExtractor;
-  }
+  }  
 
 }

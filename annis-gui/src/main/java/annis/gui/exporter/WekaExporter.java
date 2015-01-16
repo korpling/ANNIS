@@ -25,6 +25,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -37,7 +38,7 @@ public class WekaExporter implements Exporter, Serializable
 
   @Override
   public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, String keysAsString, String argsAsString,
+    Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
     //this is a full result export

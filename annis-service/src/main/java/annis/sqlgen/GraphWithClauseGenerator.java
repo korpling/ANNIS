@@ -98,11 +98,12 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
   
   private String fromForNode(
     TableAccessStrategy tas, String indent,
-      int nodeNr)
+      int nodeNr, List<Long> corpusList)
   {
+    String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(corpusList, indent);
     StringBuilder sb = new StringBuilder();
     sb.append(indent)
-        .append(tas.tableName(NODE_TABLE)).append(" AS ")
+        .append(factsSQL).append(" AS ")
         .append(tas.tableName(NODE_TABLE)).append(nodeNr).append(", ")
         .append(tas.tableName(CORPUS_TABLE)).append(" AS ")
         .append(tas.tableName(CORPUS_TABLE)).append(nodeNr);
@@ -146,7 +147,7 @@ public class GraphWithClauseGenerator extends CommonAnnotateWithClauseGenerator
     
     sb.append(indent).append("SELECT ").append(
       selectForNode(tas, annoQueryData, match, nodeNr, indent+TABSTOP)).append("\n");
-    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr)).append("\n");
+    sb.append(indent).append("FROM\n").append(fromForNode(tas, indent+TABSTOP, nodeNr, corpusList)).append("\n");
     sb.append(indent).append("WHERE\n").append(whereForNode(uri, tas, corpusList , indent+TABSTOP, nodeNr)).append("\n");
     sb.append(indent).append("LIMIT 1\n");
   

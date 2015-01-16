@@ -35,16 +35,12 @@ import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
 import annis.UsageException;
-import annis.administration.AdministrationDao.ImportStatus;
 import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.utils.Utils;
-import com.google.common.base.Joiner;
 import java.io.File;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
-import java.util.Set;
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.HelpFormatter;
 import org.slf4j.Logger;
@@ -97,6 +93,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       doImport(commandArgs);
 
+    }
+    else if("export".equals(command))
+    {
+      doExport(commandArgs);
     }
     else if ("delete".equals(command))
     {
@@ -385,6 +385,34 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         options);
     }
   }
+  
+  private void doExport(List<String> commandArgs)
+  {
+    Options options = new OptionBuilder()
+      .createOptions();
+
+    try
+    {
+
+      CommandLineParser parser = new PosixParser();
+      CommandLine cmdLine = parser.parse(options, commandArgs.toArray(
+        new String[commandArgs.size()]));
+
+      if (cmdLine.getArgs().length < 2)
+      {
+        throw new ParseException(
+          "Needs two arguments: corpus name and output folder");
+      }
+      annisDao.exportCorpus(cmdLine.getArgs()[0], new File(cmdLine.getArgs()[1]));
+      
+    }
+    catch (ParseException ex)
+    {
+      HelpFormatter helpFormatter = new HelpFormatter();
+      helpFormatter.printHelp("annis-admin.sh export CORPUS DIR ...",
+        options);
+    }
+  }
 
   private void doDelete(List<String> commandArgs)
   {
@@ -436,76 +464,13 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       if (cmdLine.getArgList().isEmpty())
       {
         throw new ParseException(
-          "You need to specifiy where to find the database.properties file is located.");
+          "You need to specifiy where to find the database.properties file.");
       }
       
       File dbProperties = new File(cmdLine.getArgs()[0]);
-      if(dbProperties.isFile() && dbProperties.canRead())
-      {
-        // find the corpus paths
-        List<Map<String, Object>> corpora = corpusAdministration.listCorpusStats(dbProperties);
-        List<String> corpusPaths = new LinkedList<>();
-        for(Map<String, Object> c : corpora)
-        {
-          String sourcePath = (String) c.get("source_path");
-          if(sourcePath != null)
-          {
-            corpusPaths.add(sourcePath);
-          }
-        }
-        
-        if(corpusPaths.isEmpty())
-        {
-          log.warn("No corpora found");
-        }
-        else
-        {
-          log.info("The following corpora will be imported:\n"
-            + "---------------\n"
-            + "{}\n"
-            + "---------------\n",
-            Joiner.on("\n").join(corpusPaths));
-
-          //import each corpus
-          ImportStatus status = corpusAdministration.importCorporaSave(
-            cmdLine.hasOption("overwrite"), null, 
-            cmdLine.getOptionValue("mail"), 
-            false,
-            corpusPaths);
-
-          // report the successful or failure failed
-          Set<String> successfullCorpora = new LinkedHashSet<>(corpusPaths);
-          Set<String> failedCorpora = new LinkedHashSet<>(status.getAllThrowable().keySet());
-          successfullCorpora.removeAll(failedCorpora);
-
-          if(failedCorpora.isEmpty())
-          {
-            log.info("All corpora imported without errors:\n"
-              + "---------------\n"
-              + "{}\n"
-              + "---------------\n",
-              Joiner.on("\n").join(successfullCorpora));
-          }
-          else
-          {
-
-            log.error("Errors occured during import, not all corpora have been imported.\n"
-              + "---------------\n"
-              + "Success:\n"
-              + "{}\n"
-              + "---------------\n"
-              + "Failed:\n"
-              + "{}\n"
-              + "---------------\n", 
-              Joiner.on("\n").join(successfullCorpora),
-              Joiner.on("\n").join(failedCorpora));
-          }
-        }
-      }
-      else
-      {
-        log.error("Can not read the database configuration file {}", dbProperties.getAbsolutePath());
-      }
+      corpusAdministration.copyFromOtherInstance(dbProperties, 
+        cmdLine.hasOption("overwrite"),
+        cmdLine.getOptionValue("mail"));
       
       
     }

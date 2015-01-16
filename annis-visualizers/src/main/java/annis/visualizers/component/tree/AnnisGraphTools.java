@@ -19,13 +19,18 @@ import annis.CommonHelper;
 import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import edu.uci.ics.jung.graph.DirectedGraph;
 import edu.uci.ics.jung.graph.DirectedSparseGraph;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 public class AnnisGraphTools implements Serializable
 {
@@ -44,30 +49,74 @@ public class AnnisGraphTools implements Serializable
     AnnotationGraph ag = input.getResult().getGraph();
     String namespace = input.getMappings().getProperty("node_ns", input.
       getNamespace());
-    List<DirectedGraph<AnnisNode, Edge>> resultGraphs =
-      new ArrayList<DirectedGraph<AnnisNode, Edge>>();
+    String terminalName =  input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NAME_KEY);
+    String terminalNamespace =  input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NS_KEY);
+    
+    List<DirectedGraph<AnnisNode, Edge>> resultGraphs = new ArrayList<>();
 
+    List<AnnisNode> rootNodes = new LinkedList<>();
+    
     for (AnnisNode n : ag.getNodes())
     {
       if (isRootNode(n, namespace))
       {
-        resultGraphs.add(extractGraph(ag, n));
+        rootNodes.add(n);
       }
     }
+    
+    //sort root nodes according to their left-most covered token
+    HorizontalOrientation orientation = detectLayoutDirection(ag);
+    if (orientation == HorizontalOrientation.LEFT_TO_RIGHT)
+    {
+      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      {
+        @Override
+        public int compare(AnnisNode o1, AnnisNode o2)
+        {
+          return Long.compare(o1.getLeftToken(), o2.getLeftToken());
+        }
+      }
+      );
+    }
+    else if (orientation == HorizontalOrientation.RIGHT_TO_LEFT)
+    {
+      Collections.sort(rootNodes, new Comparator<AnnisNode>()
+      {
+        @Override
+        public int compare(AnnisNode o1, AnnisNode o2)
+        {
+          return Long.compare(o2.getLeftToken(), o1.getLeftToken());
+        }
+      }
+      );
+    }
+    for(AnnisNode r : rootNodes)
+    {
+      resultGraphs.add(extractGraph(ag, r, terminalNamespace, terminalName));
+    }
+    
     return resultGraphs;
   }
 
-  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n)
+  private boolean copyNode(DirectedGraph<AnnisNode, Edge> graph, AnnisNode n,
+     String terminalNamespace, String terminalName)
   {
-    boolean addToGraph = n.isToken();
-    for (Edge e : n.getOutgoingEdges())
+    boolean addToGraph = AnnisGraphTools.isTerminal(n, input);
+    
+    if(!addToGraph)
     {
-      if (includeEdge(e) && copyNode(graph, e.getDestination()))
+      for (Edge e : n.getOutgoingEdges())
       {
-        addToGraph |= true;
-        graph.addEdge(e, n, e.getDestination());
+        if (includeEdge(e) && copyNode(graph, e.getDestination(), terminalNamespace, terminalName))
+        {
+          addToGraph |= true;
+          graph.addEdge(e, n, e.getDestination());
+        }
       }
     }
+    
     if (addToGraph)
     {
       graph.addVertex(n);
@@ -91,13 +140,34 @@ public class AnnisGraphTools implements Serializable
     }
     return true;
   }
-
-  private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
-    AnnisNode n)
+  
+  public static boolean isTerminal(AnnisNode n, VisualizerInput input)
   {
-    DirectedGraph<AnnisNode, Edge> graph =
-      new DirectedSparseGraph<AnnisNode, Edge>();
-    copyNode(graph, n);
+    String terminalName = (input == null ? null : input.getMappings().getProperty(
+      TigerTreeVisualizer.TERMINAL_NAME_KEY));
+    
+    if(terminalName == null)
+    {
+      return n.isToken();
+    }
+    else
+    {
+      String terminalNamespace = (input == null ? null : input.getMappings().getProperty(
+        TigerTreeVisualizer.TERMINAL_NS_KEY));
+
+      String annoValue = extractAnnotation(n.getNodeAnnotations(),
+        terminalNamespace,
+        terminalName);
+      
+      return annoValue != null;
+    }
+  }
+  private DirectedGraph<AnnisNode, Edge> extractGraph(AnnotationGraph ag,
+    AnnisNode n, String terminalNamespace, String terminalName)
+  {
+    DirectedGraph<AnnisNode, Edge> graph
+      = new DirectedSparseGraph<AnnisNode, Edge>();
+    copyNode(graph, n, terminalNamespace, terminalName);
     for (Edge e : ag.getEdges())
     {
       if (hasEdgeSubtype(e, getSecEdgeSubType()) && graph.
@@ -173,5 +243,28 @@ public class AnnisGraphTools implements Serializable
   public String getSecEdgeSubType()
   {
     return input.getMappings().getProperty("secedge_type", SECEDGE_SUBTYPE);
+  }
+  
+  public static String extractAnnotation(Set<Annotation> annotations,
+    String namespace, String featureName)
+  {
+    for (Annotation a : annotations)
+    {
+      if(namespace == null)
+      {
+        if (a.getName().equals(featureName))
+        {
+          return a.getValue();
+        }
+      }
+      else
+      {
+        if (a.getNamespace().equals(namespace) && a.getName().equals(featureName))
+        {
+          return a.getValue();
+        }
+      }
+    }
+    return null;
   }
 }
