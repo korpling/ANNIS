@@ -31,12 +31,10 @@ import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
-import java.util.TreeSet;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -204,28 +202,27 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   
   private Map<String, Integer> mapQueryNodes(List<QueryNode> nodes)
   {
-    Map<Integer, TreeSet<Integer>> alternative2Nodes = new HashMap<>();
+    Map<Integer, ArrayList<String>> alternative2Nodes = new HashMap<>();
    
-    int globalID = 1;
+    // we assume the nodes are ordered as they occured in the original query
     for (QueryNode n : nodes)
     {
-      TreeSet<Integer> nodeSet = alternative2Nodes.get(n.getAlternativeNumber());
-      if(nodeSet == null)
+      ArrayList<String> nodeList = alternative2Nodes.get(n.getAlternativeNumber());
+      if(nodeList == null)
       {
-        nodeSet = new TreeSet<>();
-        alternative2Nodes.put(n.getAlternativeNumber(), nodeSet);
+        nodeList = new ArrayList<>();
+        alternative2Nodes.put(n.getAlternativeNumber(), nodeList);
       }
-      nodeSet.add(globalID);
-      globalID++;
+      nodeList.add(n.getVariable());
     }
     
     Map<String, Integer> result = new TreeMap<>();
-    for(TreeSet<Integer> nodeSet : alternative2Nodes.values())
+    for(ArrayList<String> nodeList : alternative2Nodes.values())
     {
       int newID=1;
-      for(int originalID : nodeSet)
+      for(String var : nodeList)
       {
-        result.put("" + originalID, newID);
+        result.put(var, newID);
         newID++;
       }
     }

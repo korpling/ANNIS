@@ -61,11 +61,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "operator";
         }
-        else if(stream.match(/#[0-9a-zA-Z]+/))
-        {
-          return "variable-2";
-        }
-        else if(stream.match(/[a-zA-Z][a-zA-Z0-9]*/))
+        else if(stream.match(/([0-9a-zA-Z]+#)?[a-zA-Z][a-zA-Z0-9]*/))
         {
           if (state.numberOfNodes < 16)
           {
@@ -77,6 +73,10 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
             mappedNode = state.nodeMappings[mappedNode];
           }
           return "node_" + mappedNode;
+        }
+        else if(stream.match(/#[0-9a-zA-Z]+/))
+        {
+          return "variable-2";
         }
       }
       
