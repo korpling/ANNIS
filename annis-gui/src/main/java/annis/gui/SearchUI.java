@@ -35,11 +35,16 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
+import annis.visualizers.htmlvis.HTMLVis;
+
 import static annis.libgui.Helper.*;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
+import annis.service.objects.Visualizer;
+import annis.visualizers.htmlvis.VisualizationDefinition;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
 import com.google.common.escape.Escaper;
@@ -60,6 +65,7 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.ui.label.ContentMode;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -221,6 +227,7 @@ public class SearchUI extends AnnisBaseUI
     checkCitation();
     lastQueriedFragment = "";
     evaluateFragment(getPage().getUriFragment());
+    evaluateFragmentVis(getPage().getUriFragment());
     
     checkServiceVersion();
   }
@@ -735,6 +742,7 @@ public class SearchUI extends AnnisBaseUI
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
     evaluateFragment(event.getUriFragment());
+    evaluateFragmentVis(event.getUriFragment());
   }
   
   /**
@@ -827,6 +835,8 @@ public class SearchUI extends AnnisBaseUI
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
+        //new Notification("hello zangsir", "<div><ul><li>corpus: "+ corpora + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+        
         
       }
 
@@ -834,6 +844,10 @@ public class SearchUI extends AnnisBaseUI
     else if (args.get("cl") != null && args.get("cr") != null)
     {
       // do not change the manually selected search options
+      //String a = args.get("cl");
+      //String b = args.get("cr");
+      //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
       
       // full query with given context
@@ -845,7 +859,7 @@ public class SearchUI extends AnnisBaseUI
         args.get("q"), corpora));
       queryController.executeQuery();
     }
-    else
+    else if (args.get("q") != null)
     {
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
@@ -931,4 +945,126 @@ public class SearchUI extends AnnisBaseUI
   {
     return docBrowserController;
   }
+  
+  
+  
+   private void evaluateFragmentVis(String fragment)
+  {
+    // do nothing if not changed
+    if (fragment == null || fragment.isEmpty() || fragment.equals(
+      lastQueriedFragment))
+    {
+      return;
+    }
+
+    Map<String, String> args = Helper.parseFragment(fragment);
+
+    Set<String> corpora = new TreeSet<>();
+    
+    //parse corpus name, if there are multiple corpora designated
+    if (args.containsKey("c"))
+    {
+      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
+      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
+    }
+    
+    if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
+    {
+      String vis = args.get("vis");
+      String doc = args.get("doc");
+      String sty = args.get("sty");
+      
+      
+    
+    //get other parameters: -visualizer(htmldoc),-document name(11299),-style(infstr) //both config and css
+    
+    //example html doc url:-visualizer(html), v=aHRtbA== ,-document name(11299), d=MTEyOTkNCg==,-style(infstr) //both config and css, s=aW5mc3Ry
+
+    //hence: #_c=cGNjMg==&v=aHRtbA==&doc=MTEyOTkNCg==&sty=aW5mc3Ry
+    
+    
+    //notification: new Notification("hello zangsir", "how are you", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+    
+    new Notification("HTML visualizer", 
+      "<div><h2>HTML document visualizer parameters:</h2>"
+      + "<ul><li>corpus: " + corpora + "</li>"
+      + "<li>document: " + doc + "</li>"
+      + "<li>style sheet: " + sty + "</li>"
+      + "<li>visualizer: " + vis + "</li></ul>"
+      + "</div>",
+      Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      
+    //we already have this in the current class searchUI:    
+    //docBrowserController = new DocBrowserController(this);
+
+    // get input parameters
+    HTMLVis visualizer;
+    visualizer = new HTMLVis();
+    
+    VisualizerInput input;
+    Visualizer config;    
+    config = new Visualizer();
+    config.setDisplayName(" ");
+    config.setMappings("config:" + sty);
+    config.setNamespace(null);
+    config.setType(vis);
+    
+    
+    
+    String corpus = args.get("c");
+    
+    //input = createInput(corpus, doc, config, visualizer.isUsingRawText(), nodeAnnoFilter);
+    input = docBrowserController.createInput(corpus, doc, config, false, null);
+    VisualizationDefinition[] definitions = visualizer.parseDefinitions(corpus, input.getMappings());
+
+    //createComponent: doesn't work, 
+    //Component vislz;
+    //vislz = visualizer.createComponent(input, null);
+    //display document in notification, works:
+    String htmlcode;
+    htmlcode = visualizer.createHTML(input.getSResult().getSDocumentGraph(),definitions);
+    new Notification("HTML visualizer", htmlcode,Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+    
+
+
+    //panel.setContent(
+    //new Label("This is a Label inside a Panel. There is " +
+             // "enough text in the label to make the text " +
+              //"wrap when it exceeds the width of the panel."));
+    
+    Label lblResult = new Label(htmlcode, ContentMode.HTML);
+    //using label
+    Panel panel = new Panel(lblResult);
+    panel.setWidth("700px");
+    
+    //VerticalLayout panelContent = new VerticalLayout();
+    //panel.setContent(panelContent);
+
+
+    // Set the panel as the content of the UI
+    setContent(panel);
+    
+    
+    //lblResult.setSizeUndefined();
+    //lblResult.setValue(visualizer.createHTML(input.getSResult().getSDocumentGraph(), definitions));
+    //panel.setContent(lblResult);
+    //VerticalLayout wLayout = new VerticalLayout();
+    //setContent(wLayout);
+    //wLayout.setSizeFull();
+    //wLayout.addComponent(lblResult);
+    
+    
+    
+
+    }
+    
+    
+  }
+
+  
+  
+  
+  
 }
+
+
