@@ -16,6 +16,7 @@
 
 package annis.model;
 
+import java.io.Serializable;
 import javax.xml.bind.annotation.XmlRootElement;
 
 /**
@@ -23,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
-public class AqlParseError
+public class AqlParseError implements Serializable
 {
   public int startLine;
   public int startColumn;
