@@ -19,8 +19,8 @@ package annis.gui.components.codemirror;
 import annis.model.AqlParseError;
 import com.vaadin.shared.ui.JavaScriptComponentState;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.TreeMap;
 
@@ -35,8 +35,8 @@ public class AqlCodeEditorState extends JavaScriptComponentState
   /** The last string as sent by the client **/
   public String clientText = "";
   public String inputPrompt = "";
-  public List<AqlParseError> errors = new LinkedList<>();
-  public TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
+  public final List<AqlParseError> errors = new ArrayList<>();
+  public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
   
   /**
    * An explictly {@link Serializable} {@link Comparator} for strings.

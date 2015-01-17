@@ -154,7 +154,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   private void validate(String query)
   {
     setErrors(null);
-    getState().nodeMappings = new TreeMap<>();
+    getState().nodeMappings.clear();
     if(query == null || query.isEmpty())
     {
       // don't validate the empty query
@@ -172,7 +172,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       {
         List<QueryNode> result = future.get(1, TimeUnit.SECONDS);
         
-        getState().nodeMappings = mapQueryNodes(result);
+        getState().nodeMappings.putAll(mapQueryNodes(result));
       }
       catch (InterruptedException ex)
       {
@@ -291,14 +291,11 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   }
 
   public void setErrors(List<AqlParseError> errors)
-  {
-    if (errors == null)
+  {    
+    getState().errors.clear();
+    if (errors != null)
     {
-      getState().errors = new LinkedList<>();
-    }
-    else
-    {
-      getState().errors = new ArrayList<>(errors);
+      getState().errors.addAll(errors);
     }
     markAsDirty();
   }
