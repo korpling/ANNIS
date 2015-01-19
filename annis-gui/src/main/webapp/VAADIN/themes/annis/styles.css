@@ -11817,6 +11817,10 @@ div.v-layout.v-horizontal.v-widget {
 	height: 42px;
 }
 
+.annis .cm-s-default .cm-string, .annis .cm-s-default .cm-string-2 {
+	color: #811b00;
+}
+
 .annis .v-app-loading:before {
 	background-image: url(images/annisloading.gif);
 	margin-top: -100px;
