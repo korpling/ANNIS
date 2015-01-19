@@ -49,6 +49,11 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
           state.position = "string-2";
           return "string-2";
         }
+        else if (stream.match("["))
+        {
+          state.position = "edge-anno";
+          return "property";
+        }
         else if(stream.match("&") || stream.match("|"))
         {
           return "operator"
@@ -57,26 +62,40 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "bracket";
         }
-        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->)|(>@l)|(>@r)|(>\*)|(>)|(\$\*)|(\$)/))
+        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->( )?[a-zA-Z0-9,]+)|(>@l)|(>@r)|(>( )?[a-zA-Z0-9,]*\*)|(>( )?[a-zA-Z0-9,]*)|(\$\*)|(\$)/))
         {
           return "operator";
         }
         else if(stream.match(/([0-9a-zA-Z]+#)?[a-zA-Z][a-zA-Z0-9]*/))
         {
-          if (state.numberOfNodes < 16)
+          if(state.position === "edge-anno")
           {
-            state.numberOfNodes++;
+            // dont count edge annotations as nodes
+            return "def";
           }
-          var mappedNode = state.numberOfNodes;
-          if(state.nodeMappings[mappedNode])
+          else
           {
-            mappedNode = state.nodeMappings[mappedNode];
+            if (state.numberOfNodes < 16)
+            {
+              state.numberOfNodes++;
+            }
+            var mappedNode = state.numberOfNodes;
+            if(state.nodeMappings[mappedNode])
+            {
+              mappedNode = state.nodeMappings[mappedNode];
+            }
+            return "node_" + mappedNode;
           }
-          return "node_" + mappedNode;
         }
         else if(stream.match(/#[0-9a-zA-Z]+/))
         {
           return "variable-2";
+        }
+        
+        // clearing the edge-anno state if necessary
+        if (state.position === "edge-anno" && stream.match("]"))
+        {
+          state.position = "def";
         }
       }
       
