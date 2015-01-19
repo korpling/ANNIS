@@ -62,7 +62,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "bracket";
         }
-        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->( )?[a-zA-Z0-9,]+)|(>@l)|(>@r)|(>( )?[a-zA-Z0-9,]*\*)|(>( )?[a-zA-Z0-9,]*)|(\$\*)|(\$)/))
+        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->[a-zA-Z0-9,]+)|(>@l)|(>@r)|(>[a-zA-Z0-9,]*( )*\*)|(>[a-zA-Z0-9,]*)|(\$\*)|(\$)/))
         {
           return "operator";
         }
