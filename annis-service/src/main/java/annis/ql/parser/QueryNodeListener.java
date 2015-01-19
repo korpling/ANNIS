@@ -27,6 +27,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TreeMap;
 import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -46,8 +47,11 @@ public class QueryNodeListener extends AqlParserBaseListener
   
   private QueryData data = null;
 
-  private final List<QueryNode> currentAlternative = new ArrayList<>();
-
+  /**
+   * Maps the node ID to the query node.
+   */
+  private final TreeMap<Long, QueryNode> currentAlternative = new TreeMap<>();
+  
   private String lastVariableDefinition = null;
 
   private final Multimap<String, QueryNode> localNodes = HashMultimap.create();
@@ -94,7 +98,7 @@ public class QueryNodeListener extends AqlParserBaseListener
   @Override
   public void exitAndExpr(AqlParser.AndExprContext ctx)
   {
-    data.addAlternative(new ArrayList<>(currentAlternative));
+    data.addAlternative(new ArrayList<>(currentAlternative.values()));
     tokenPositions.add(new HashMap<>(currentTokenPosition));
   }
 
@@ -293,7 +297,7 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     lastVariableDefinition = null;
     
-    currentAlternative.add(n);
+    currentAlternative.put(existingID, n);
     localNodes.put(n.getVariable(), n);
     currentTokenPosition.put(ctx.getSourceInterval(), n);
     
