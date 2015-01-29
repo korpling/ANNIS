@@ -978,13 +978,6 @@ public class SearchUI extends AnnisBaseUI
     
     //get other parameters: -visualizer(htmldoc),-document name(11299),-style(infstr) //both config and css
     
-    //example html doc url:-visualizer(html), v=aHRtbA== ,-document name(11299), d=MTEyOTkNCg==,-style(infstr) //both config and css, s=aW5mc3Ry
-
-    //hence: #_c=cGNjMg==&v=aHRtbA==&doc=MTEyOTkNCg==&sty=aW5mc3Ry
-    
-    
-    //notification: new Notification("hello zangsir", "how are you", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-    
     new Notification("HTML visualizer", 
       "<div><h2>HTML document visualizer parameters:</h2>"
       + "<ul><li>corpus: " + corpora + "</li>"
@@ -1010,48 +1003,27 @@ public class SearchUI extends AnnisBaseUI
     config.setType(vis);
     
     
-    
     String corpus = args.get("c");
     
     //input = createInput(corpus, doc, config, visualizer.isUsingRawText(), nodeAnnoFilter);
     input = docBrowserController.createInput(corpus, doc, config, false, null);
     VisualizationDefinition[] definitions = visualizer.parseDefinitions(corpus, input.getMappings());
 
-    //createComponent: doesn't work, 
-    //Component vislz;
-    //vislz = visualizer.createComponent(input, null);
+
     //display document in notification, works:
     String htmlcode;
     htmlcode = visualizer.createHTML(input.getSResult().getSDocumentGraph(),definitions);
-    new Notification("HTML visualizer", htmlcode,Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+    //new Notification("HTML visualizer", htmlcode,Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
     
-
-
-    //panel.setContent(
-    //new Label("This is a Label inside a Panel. There is " +
-             // "enough text in the label to make the text " +
-              //"wrap when it exceeds the width of the panel."));
     
     Label lblResult = new Label(htmlcode, ContentMode.HTML);
     //using label
     Panel panel = new Panel(lblResult);
     panel.setWidth("700px");
     
-    //VerticalLayout panelContent = new VerticalLayout();
-    //panel.setContent(panelContent);
-
-
     // Set the panel as the content of the UI
     setContent(panel);
-    
-    
-    //lblResult.setSizeUndefined();
-    //lblResult.setValue(visualizer.createHTML(input.getSResult().getSDocumentGraph(), definitions));
-    //panel.setContent(lblResult);
-    //VerticalLayout wLayout = new VerticalLayout();
-    //setContent(wLayout);
-    //wLayout.setSizeFull();
-    //wLayout.addComponent(lblResult);
+   
     
     
     
