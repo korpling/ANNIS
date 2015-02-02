@@ -950,6 +950,10 @@ public class SearchUI extends AnnisBaseUI
   
    private void evaluateFragmentVis(String fragment)
   {
+    ////example local testing query url
+    ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
+    //http://localhost:8084/annis-gui/#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
+
     // do nothing if not changed
     if (fragment == null || fragment.isEmpty() || fragment.equals(
       lastQueriedFragment))
@@ -968,6 +972,7 @@ public class SearchUI extends AnnisBaseUI
       corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
     }
     
+    //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
     if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
     {
       String vis = args.get("vis");
@@ -975,8 +980,6 @@ public class SearchUI extends AnnisBaseUI
       String sty = args.get("sty");
       
       
-    
-    //get other parameters: -visualizer(htmldoc),-document name(11299),-style(infstr) //both config and css
     
     new Notification("HTML visualizer", 
       "<div><h2>HTML document visualizer parameters:</h2>"
@@ -987,9 +990,7 @@ public class SearchUI extends AnnisBaseUI
       + "</div>",
       Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
       
-    //we already have this in the current class searchUI:    
-    //docBrowserController = new DocBrowserController(this);
-
+   
     // get input parameters
     HTMLVis visualizer;
     visualizer = new HTMLVis();
@@ -1001,28 +1002,15 @@ public class SearchUI extends AnnisBaseUI
     config.setMappings("config:" + sty);
     config.setNamespace(null);
     config.setType(vis);
-    
-    
+        
     String corpus = args.get("c");
-    
-    //input = createInput(corpus, doc, config, visualizer.isUsingRawText(), nodeAnnoFilter);
+    //create input    
     input = docBrowserController.createInput(corpus, doc, config, false, null);
-    VisualizationDefinition[] definitions = visualizer.parseDefinitions(corpus, input.getMappings());
-
-
-    //display document in notification, works:
-    String htmlcode;
-    htmlcode = visualizer.createHTML(input.getSResult().getSDocumentGraph(),definitions);
-    //new Notification("HTML visualizer", htmlcode,Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-    
-    
-    Label lblResult = new Label(htmlcode, ContentMode.HTML);
-    //using label
-    Panel panel = new Panel(lblResult);
-    panel.setWidth("700px");
+    //create components, put in a panel
+    Panel viszr = visualizer.createComponent(input, null);
     
     // Set the panel as the content of the UI
-    setContent(panel);
+    setContent(viszr);
    
     
     
