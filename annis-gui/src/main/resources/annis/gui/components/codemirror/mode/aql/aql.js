@@ -15,7 +15,8 @@
  */
 CodeMirror.defineMode("aql", function(config, parserConfig) {
   
-  var regexID = /[a-zA-Z_]([a-zA-Z0-9_-])*/;
+  var regexMeta = /meta::([a-zA-Z_]([a-zA-Z0-9_-])*:)?([a-zA-Z_]([a-zA-Z0-9_-])*)/;
+  var regexID = /([a-zA-Z_]([a-zA-Z0-9_-])*:)?([a-zA-Z_]([a-zA-Z0-9_-])*)/;
   
   function getNodeClassForString(state)
   {
@@ -142,6 +143,10 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           state.behindAssignment = true;
           return "operator";
+        }
+        else if(stream.match(regexMeta))
+        {
+          return "def";
         }
         else if(stream.match(regexID))
         {
