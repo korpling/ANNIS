@@ -14,6 +14,22 @@
  * limitations under the License.
  */
 CodeMirror.defineMode("aql", function(config, parserConfig) {
+  
+  var regexID = /[a-zA-Z_]([a-zA-Z0-9_-])*/
+  
+  function addNode(state) {
+    if (state.numberOfNodes < 16)
+    {
+      state.numberOfNodes++;
+    }
+    var mappedNode = state.numberOfNodes;
+    if (state.nodeMappings[mappedNode])
+    {
+      mappedNode = state.nodeMappings[mappedNode];
+    }
+    return "node_" + mappedNode;
+  }
+  
   return {
     token: function(stream, state) {
       
@@ -24,8 +40,17 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         if(stream.match("\""))
         {
           state.position = "def";
-          // the closing quote character should be still highlighted as such
-          return "string";
+          if(state.behindAssignment)
+          {
+             state.behindAssignment = false;
+            // the closing quote character should be still highlighted as such
+            return "string";
+          }
+          else
+          {
+            addNode(state);
+            return "string";
+          }
         }
       }
       else if(state.position === "string-2")
@@ -33,15 +58,24 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         if(stream.match("/"))
         {
           state.position = "def";
-          // the closing quote character should be still highlighted as such
-          return "string-2";
+          if(state.behindAssignment)
+          {
+            state.behindAssignment = false;
+            // the closing quote character should be still highlighted as such
+            return "string-2";
+          }
+          else
+          {
+            addNodde(state);
+            return "string-2";
+          }
         }
       }
       else
       {
         if(stream.match("\""))
         {
-          state.position = "string"
+          state.position = "string";
           return "string";
         }
         else if (stream.match("/"))
@@ -66,7 +100,12 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "operator";
         }
-        else if(stream.match(/([0-9a-zA-Z]+#)?[a-zA-Z][a-zA-Z0-9]*/))
+        else if(stream.match("=") || stream.match("!="))
+        {
+          state.behindAssignment = true;
+          return "operator";
+        }
+        else if(stream.match(regexID))
         {
           if(state.position === "edge-anno")
           {
@@ -75,16 +114,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
           }
           else
           {
-            if (state.numberOfNodes < 16)
-            {
-              state.numberOfNodes++;
-            }
-            var mappedNode = state.numberOfNodes;
-            if(state.nodeMappings[mappedNode])
-            {
-              mappedNode = state.nodeMappings[mappedNode];
-            }
-            return "node_" + mappedNode;
+            return addNode(state);
           }
         }
         else if(stream.match(/#[0-9a-zA-Z]+/))
@@ -107,8 +137,9 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
 
     startState: function() {
       return {
-        position : "def",       // Current position, "def" or "quote",
-        numberOfNodes : 0,  // number of ndes that have been detected yet
+        position : "def",       // Current position, "def" or "quote"
+        behindAssignment: false, // if true we are behind an assignment
+        numberOfNodes : 0,  // number of nodes that have been detected yet
         nodeMappings : parserConfig.nodeMappings // maps an absolute node number to a relative one (e.g. for OR queries)
       };
     }
