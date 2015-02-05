@@ -15,19 +15,35 @@
  */
 CodeMirror.defineMode("aql", function(config, parserConfig) {
   
-  var regexID = /[a-zA-Z_]([a-zA-Z0-9_-])*/
+  var regexID = /[a-zA-Z_]([a-zA-Z0-9_-])*/;
   
-  function addNode(state) {
-    if (state.numberOfNodes < 16)
+  function getNodeClassForString(state)
+  {
+    if(state.behindAssignment)
     {
-      state.numberOfNodes++;
+      return state.position;
     }
+    else
+    {
+      return getNodeClass(state);
+    }
+  }
+  
+  function getNodeClass(state) {
     var mappedNode = state.numberOfNodes;
     if (state.nodeMappings[mappedNode])
     {
       mappedNode = state.nodeMappings[mappedNode];
     }
     return "node_" + mappedNode;
+  }
+  
+  function addNode(state) {
+    if (state.numberOfNodes < 16)
+    {
+      state.numberOfNodes++;
+    }
+    return getNodeClass(state);
   }
   
   return {
@@ -48,9 +64,13 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
           }
           else
           {
-            addNode(state);
-            return "string";
+            return getNodeClass(state);
           }
+        }
+        else
+        {
+          stream.next();
+          return getNodeClassForString(state, "string");
         }
       }
       else if(state.position === "string-2")
@@ -66,9 +86,13 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
           }
           else
           {
-            addNodde(state);
-            return "string-2";
+            return getNodeClass(state);
           }
+        }
+        else
+        {
+          stream.next();
+          return getNodeClassForString(state, "string-2");
         }
       }
       else
@@ -76,12 +100,26 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         if(stream.match("\""))
         {
           state.position = "string";
-          return "string";
+          if(state.behindAssignment)
+          {
+            return "string";
+          }
+          else
+          {
+            return addNode(state);
+          }
         }
         else if (stream.match("/"))
         {
           state.position = "string-2";
-          return "string-2";
+          if(state.behindAssignment)
+          {
+           return "string-2";
+          }
+          else
+          {
+            return addNode(state);
+          }
         }
         else if (stream.match("["))
         {
