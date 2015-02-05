@@ -15,8 +15,8 @@
  */
 CodeMirror.defineMode("aql", function(config, parserConfig) {
   
-  var regexMeta = /meta::([a-zA-Z_]([a-zA-Z0-9_-])*:)?([a-zA-Z_]([a-zA-Z0-9_-])*)/;
-  var regexID = /([a-zA-Z_]([a-zA-Z0-9_-])*:)?([a-zA-Z_]([a-zA-Z0-9_-])*)/;
+  var regexMeta = /meta::([a-zA-Z_]([a-zA-Z0-9_\-])*:)?([a-zA-Z_]([a-zA-Z0-9_\-])*)/;
+  var regexID = /([a-zA-Z_]([a-zA-Z0-9_\-])*:)?([a-zA-Z_]([a-zA-Z0-9_\-])*)/;
   
   function getNodeClassForString(state)
   {
@@ -135,7 +135,7 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "bracket";
         }
-        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->[a-zA-Z0-9,]+)|(>@l)|(>@r)|(>[a-zA-Z0-9,]*( )*\*)|(>[a-zA-Z0-9,]*)|(\$\*)|(\$)/))
+        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->[a-zA-Z0-9_,\-]+)|(>@l)|(>@r)|(>[a-zA-Z0-9_,\-]*( )*\*)|(>[a-zA-Z0-9,_\-]*)|(\$\*)|(\$)/))
         {
           return "operator";
         }
