@@ -15,18 +15,36 @@
  */
 package annis.exceptions;
 
+import annis.model.AqlParseError;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
 
-public class AnnisQLSemanticsException extends AnnisException {
-	
+public class AnnisQLSemanticsException extends AnnisException
+{
 
-	public AnnisQLSemanticsException() {
-		super();
-	}
+  private List<AqlParseError> errors = new LinkedList<AqlParseError>();
 
-	public AnnisQLSemanticsException(String message) {
-		super(message);
-	}
+  public AnnisQLSemanticsException()
+  {
+    super();
+  }
 
+  public AnnisQLSemanticsException(String message)
+  {
+    super(message);
+    errors.add(new AqlParseError(message));
+  }
+  
+  public AnnisQLSemanticsException(String message, List<AqlParseError> errors)
+  {
+    super(message);
+    this.errors = new ArrayList<AqlParseError>(errors);
+  }
 
-	
+  public List<AqlParseError> getErrors()
+  {
+    return errors;
+  }
+
 }
