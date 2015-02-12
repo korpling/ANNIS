@@ -61,7 +61,7 @@ public class BinaryRequestHandler implements RequestHandler
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if(request.getPathInfo().startsWith("/Binary"))
+    if(request.getPathInfo() != null && request.getPathInfo().startsWith("/Binary"))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {

@@ -21,11 +21,11 @@
   </context-param>
   
   <servlet>
-    <servlet-name>Search</servlet-name>
+    <servlet-name>VaadinUI</servlet-name>
     <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
     <init-param>
-      <param-name>UI</param-name>
-      <param-value>annis.gui.SearchUI</param-value>
+      <param-name>UIProvider</param-name>
+      <param-value>annis.gui.AnnisUIProvider</param-value>
     </init-param>
     <init-param>
       <description>
@@ -35,23 +35,7 @@
       <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
     </init-param>
   </servlet>
-  
-  <servlet>
-    <servlet-name>Admin</servlet-name>
-    <servlet-class>com.vaadin.server.VaadinServlet</servlet-class>
-    <init-param>
-      <param-name>UI</param-name>
-      <param-value>annis.gui.AdminUI</param-value>
-    </init-param>
-    <init-param>
-      <description>
-        Application widgetset
-      </description>
-      <param-name>widgetset</param-name>        	
-      <param-value>annis.gui.widgets.gwt.AnnisWidgetSet</param-value>
-    </init-param>
-  </servlet>
-
+ 
   <servlet>
     <servlet-name>CitationRedirectionServlet</servlet-name>
     <servlet-class>annis.gui.servlets.CitationRedirectionServlet</servlet-class>
@@ -62,13 +46,8 @@
   </servlet>
 
   <servlet-mapping>
-    <servlet-name>Search</servlet-name>
+    <servlet-name>VaadinUI</servlet-name>
     <url-pattern>/*</url-pattern>
-  </servlet-mapping>
-  
-  <servlet-mapping>
-    <servlet-name>Admin</servlet-name>
-    <url-pattern>/admin/*</url-pattern>
   </servlet-mapping>
   
   <servlet-mapping>
