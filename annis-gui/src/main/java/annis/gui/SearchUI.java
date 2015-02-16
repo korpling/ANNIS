@@ -38,12 +38,15 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
+import annis.visualizers.htmlvis.HTMLVis;
 import static annis.libgui.Helper.*;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
+import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.OrderType;
+import annis.service.objects.Visualizer;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -234,6 +237,7 @@ public class SearchUI extends CommonUI
 
     checkServiceVersion();
     evaluateFragment(getPage().getUriFragment());
+    evaluateFragmentVis(getPage().getUriFragment());
 
   }
 
@@ -775,6 +779,7 @@ public class SearchUI extends CommonUI
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
     evaluateFragment(event.getUriFragment());
+    evaluateFragmentVis(event.getUriFragment());
   }
 
   /**
@@ -868,13 +873,16 @@ public class SearchUI extends CommonUI
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
-
       }
 
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
       // do not change the manually selected search options
+      //String a = args.get("cl");
+      //String b = args.get("cr");
+      //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       PagedResultQuery query = new PagedResultQuery(
@@ -900,7 +908,7 @@ public class SearchUI extends CommonUI
       queryController.setQuery(query);
       queryController.executeSearch(true);
     }
-    else
+    else if (args.get("q") != null)
     {
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
@@ -985,9 +993,76 @@ public class SearchUI extends CommonUI
     return docBrowserController;
   }
 
+
   public QueryUIState getQueryState()
   {
     return queryState;
-  }
+  }  
   
+  
+  private void evaluateFragmentVis(String fragment)
+  {
+    ////example local testing query url
+    ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
+    //http://localhost:8084/annis-gui/#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
+
+    // do nothing if not changed
+    if (fragment == null || fragment.isEmpty() || fragment.equals(
+      lastQueriedFragment))
+    {
+      return;
+    }
+
+    Map<String, String> args = Helper.parseFragment(fragment);
+
+    Set<String> corpora = new TreeSet<>();
+
+    //parse corpus name, if there are multiple corpora designated
+    if (args.containsKey("c"))
+    {
+      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
+      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
+    }
+
+    //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
+    if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
+    {
+      String vis = args.get("vis");
+      String doc = args.get("doc");
+      String sty = args.get("sty");
+
+      new Notification("HTML visualizer",
+        "<div><h2>HTML document visualizer parameters:</h2>"
+        + "<ul><li>corpus: " + corpora + "</li>"
+        + "<li>document: " + doc + "</li>"
+        + "<li>style sheet: " + sty + "</li>"
+        + "<li>visualizer: " + vis + "</li></ul>"
+        + "</div>",
+        Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+
+      // get input parameters
+      HTMLVis visualizer;
+      visualizer = new HTMLVis();
+
+      VisualizerInput input;
+      Visualizer config;
+      config = new Visualizer();
+      config.setDisplayName(" ");
+      config.setMappings("config:" + sty);
+      config.setNamespace(null);
+      config.setType(vis);
+
+      String corpus = args.get("c");
+      //create input    
+      input = docBrowserController.createInput(corpus, doc, config, false, null);
+      //create components, put in a panel
+      Panel viszr = visualizer.createComponent(input, null);
+
+      // Set the panel as the content of the UI
+      setContent(viszr);
+
+    }
+  }
 }
+
+

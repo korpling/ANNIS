@@ -170,7 +170,7 @@ public class DocBrowserController implements Serializable
    * @return a {@link VisualizerInput} input, which is usable for rendering the
    * whole document.
    */
-  private VisualizerInput createInput(String corpus, String docName,
+  public VisualizerInput createInput(String corpus, String docName,
     Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter)
   {
     VisualizerInput input = new VisualizerInput();

@@ -221,7 +221,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
     }
   }
   
-  private VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
+  public VisualizationDefinition[] parseDefinitions(String toplevelCorpusName,
     Properties mappings)
   {
     InputStream inStreamConfigRaw = null;
@@ -275,7 +275,7 @@ public class HTMLVis extends AbstractVisualizer<Panel>
   
   
 
-  private String createHTML(SDocumentGraph graph,
+  public String createHTML(SDocumentGraph graph,
     VisualizationDefinition[] definitions)
   {
     SortedMap<Long, SortedSet<OutputItem>> outputStartTags
