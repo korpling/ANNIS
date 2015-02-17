@@ -51,7 +51,7 @@ public class LoginServletRequestHandler implements RequestHandler
   public boolean handleRequest(VaadinSession session, VaadinRequest request,
     VaadinResponse response) throws IOException
   {
-    if("/login".equals(request.getPathInfo()))
+    if(request.getPathInfo() != null && request.getPathInfo().contains("login"))
     {
       if("GET".equalsIgnoreCase(request.getMethod()))
       {

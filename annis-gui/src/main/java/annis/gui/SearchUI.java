@@ -16,10 +16,7 @@
 package annis.gui;
 
 import annis.VersionInfo;
-import annis.gui.requesthandler.ResourceRequestHandler;
-import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.components.ExceptionDialog;
-import annis.libgui.AnnisBaseUI;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
@@ -39,7 +36,6 @@ import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.QueryUIState;
-import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
 import static annis.libgui.Helper.*;
@@ -92,7 +88,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-public class SearchUI extends AnnisBaseUI
+public class SearchUI extends CommonUI
   implements MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
   ErrorHandler, TabSheet.CloseHandler,
@@ -224,11 +220,8 @@ public class SearchUI extends AnnisBaseUI
     });
 
     getPage().addUriFragmentChangedListener(this);
-
-    getSession().addRequestHandler(new CitationRequestHandler());
-    getSession().addRequestHandler(new ResourceRequestHandler());
-    getSession().addRequestHandler(new LoginServletRequestHandler());
-    getSession().addRequestHandler(new BinaryRequestHandler());
+    
+    getSession().addRequestHandler(new SearchUI.CitationRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
 
