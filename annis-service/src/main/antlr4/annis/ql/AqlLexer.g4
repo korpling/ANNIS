@@ -15,10 +15,6 @@
  */
 lexer grammar AqlLexer;
 
-@lexer::members {
-	boolean ignoreWS = true;
-}
-
 // additional tokens
 tokens {
 	RANGE,
@@ -27,56 +23,59 @@ tokens {
 	DOM
 }
   
-TOK:'tok' {ignoreWS = true;};
-NODE:'node' {ignoreWS = true;};
-META:'meta' {ignoreWS = true;};
-AND:'&' {ignoreWS = true;};
-OR:'|' {ignoreWS = true;};
-EQ_VAL:'==' {ignoreWS = true;};
-EQ: '=' {ignoreWS = true;};
-NEQ:'!=' {ignoreWS = true;};
-DOMINANCE: '>' {ignoreWS = false;};
-POINTING:'->' {ignoreWS = false;};
-PRECEDENCE:'.' {ignoreWS = false;};
-NEAR:'^' {ignoreWS = true;};
-IDENT_COV:'_=_' {ignoreWS = true;};
-INCLUSION:'_i_' {ignoreWS = true;};
-OVERLAP:'_o_' {ignoreWS = true;};
-LEFT_ALIGN:'_l_' {ignoreWS = true;};
-RIGHT_ALIGN:'_r_' {ignoreWS = true;};
-LEFT_OVERLAP:'_ol_' {ignoreWS = true;};
-RIGHT_OVERLAP:'_or_' {ignoreWS = true;};
-LEFT_CHILD:'@l' {ignoreWS = true;};
-RIGHT_CHILD:'@r' {ignoreWS = true;};
-COMMON_PARENT:'$' {ignoreWS = true;};
-IDENTITY:'_ident_' {ignoreWS = true;};
-ROOT:':root' {ignoreWS = true;};
-ARITY:':arity' {ignoreWS = true;};
-TOKEN_ARITY:':tokenarity' {ignoreWS = true;};
-COMMA:',' {ignoreWS = true;};
-STAR:'*' {ignoreWS = true;};
-BRACE_OPEN:'(' {ignoreWS = true;};
-BRACE_CLOSE:')' {ignoreWS = true;};
-BRACKET_OPEN:'[' {ignoreWS = true;};
-BRACKET_CLOSE:']' {ignoreWS = true;};
-COLON:':' {ignoreWS = true;};
-DOUBLECOLON:'::' {ignoreWS = true;};
+TOK:'tok';
+NODE:'node';
+META:'meta';
+AND:'&';
+OR:'|';
+EQ_VAL:'==';
+EQ: '=';
+NEQ:'!=';
+NAMED_DOMINANCE: DOMINANCE ID;
+DOMINANCE: '>';
+POINTING:'->' ID;
+NAMED_PRECEDENCE: PRECEDENCE ID;
+PRECEDENCE:'.';
+NAMED_NEAR: NEAR ID;
+NEAR:'^';
+IDENT_COV:'_=_';
+INCLUSION:'_i_';
+OVERLAP:'_o_';
+LEFT_ALIGN:'_l_';
+RIGHT_ALIGN:'_r_';
+LEFT_OVERLAP:'_ol_';
+RIGHT_OVERLAP:'_or_';
+LEFT_CHILD:'@l';
+RIGHT_CHILD:'@r';
+COMMON_PARENT:'$';
+IDENTITY:'_ident_';
+ROOT:':root';
+ARITY:':arity';
+TOKEN_ARITY:':tokenarity';
+COMMA:',';
+STAR:'*';
+BRACE_OPEN:'(';
+BRACE_CLOSE:')';
+BRACKET_OPEN:'[';
+BRACKET_CLOSE:']';
+COLON:':';
+DOUBLECOLON:'::';
 
 
-WS  :   [ \t\r\n]+ {if(ignoreWS) { skip();} ignoreWS=true;};  
+WS  :   [ \t\r\n]+ -> skip;  
 
 VAR_DEF
-	:	[a-zA-Z] [0-9a-zA-Z]* '#' {ignoreWS = true;}
+	:	[a-zA-Z] [0-9a-zA-Z]* '#'
 	;
 
 REF
-	:	'#' [0-9a-zA-Z]+ {ignoreWS = true;}
+	:	'#' [0-9a-zA-Z]+
 	;
 
-ID  :	[a-zA-Z_] [a-zA-Z0-9_-]* {ignoreWS = true;}
+ID  :	[a-zA-Z_] [a-zA-Z0-9_-]*
     ;
 
-DIGITS : [0-9]+ {ignoreWS = true;};
+DIGITS : [0-9]+;
 
 
 START_TEXT_REGEX : '/' -> pushMode(IN_REGEX);

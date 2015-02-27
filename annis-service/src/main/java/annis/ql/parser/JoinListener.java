@@ -51,6 +51,7 @@ import java.util.Map;
 import org.antlr.v4.runtime.ParserRuleContext;
 import org.antlr.v4.runtime.Token;
 import org.antlr.v4.runtime.misc.Interval;
+import org.antlr.v4.runtime.tree.TerminalNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -181,13 +182,14 @@ public class JoinListener extends AqlParserBaseListener
 
     
     String segmentationName = null;
-    if(ctx.layer != null)
+    if(ctx.NAMED_PRECEDENCE() != null)
     {
-      segmentationName=ctx.layer.getText();
+      segmentationName=ctx.NAMED_PRECEDENCE().getText().substring(1);
     }
     left.addOutgoingJoin(new Precedence(right, 1, segmentationName));
     
   }
+  
 
     @Override
   public void enterDirectNear(
@@ -197,11 +199,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode right = relationChain.get(relationIdx+1);
 
     
-    String segmentationName = null;
-    if(ctx.layer != null)
-    {
-      segmentationName=ctx.layer.getText();
-    }
+    String segmentationName = getLayerName(ctx.NAMED_NEAR());
     left.addOutgoingJoin(new Near(right, 1, segmentationName));
     
   }
@@ -234,11 +232,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
 
-    String segmentationName = null;
-    if(ctx.layer != null)
-    {
-      segmentationName=ctx.layer.getText();
-    }
+    String segmentationName = getLayerName(ctx.NAMED_PRECEDENCE());
     
     if (precedenceBound > 0)
     {
@@ -259,11 +253,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
 
-    String segmentationName = null;
-    if(ctx.layer != null)
-    {
-      segmentationName=ctx.layer.getText();
-    }
+    String segmentationName = getLayerName(ctx.NAMED_NEAR());
     
     if (precedenceBound > 0)
     {
@@ -289,11 +279,7 @@ public class JoinListener extends AqlParserBaseListener
     }
     else
     {
-      String segmentationName = null;
-      if(ctx.layer != null)
-      {
-        segmentationName=ctx.layer.getText();
-      }
+      String segmentationName = getLayerName(ctx.NAMED_PRECEDENCE());
       
       left.addOutgoingJoin(
             new Precedence(right, range.getMin(), range.getMax(),
@@ -315,11 +301,7 @@ public class JoinListener extends AqlParserBaseListener
     }
     else
     {
-      String segmentationName = null;
-      if(ctx.layer != null)
-      {
-        segmentationName=ctx.layer.getText();
-      }
+      String segmentationName = getLayerName(ctx.NAMED_NEAR());
       
       left.addOutgoingJoin(
             new Near(right, range.getMin(), range.getMax(),
@@ -376,7 +358,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    String layer = ctx.layer == null ? null : ctx.layer.getText();    
+    String layer = getLayerName(ctx.NAMED_DOMINANCE());    
 
     Join j;
     
@@ -411,7 +393,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
 
-    String layer = ctx.layer == null ? null : ctx.layer.getText();
+    String layer = getLayerName(ctx.NAMED_DOMINANCE());
    
     left.addOutgoingJoin(new Dominance(right, layer));
   }
@@ -422,7 +404,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    String layer = ctx.layer == null ? null : ctx.layer.getText();
+    String layer = getLayerName(ctx.NAMED_DOMINANCE());
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
@@ -437,7 +419,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    String label = ctx.label == null ? null : ctx.label.getText();
+    String label = getLayerName(ctx.POINTING(), 2);
     
     Join j = new PointingRelation(right, label, 1);
     if (ctx.anno != null)
@@ -459,7 +441,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    String label = ctx.label == null ? null : ctx.label.getText();
+    String label = getLayerName(ctx.POINTING(), 2);
    
     left.addOutgoingJoin(new PointingRelation(right, label));
     
@@ -471,7 +453,7 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode left = relationChain.get(relationIdx);
     QueryNode right = relationChain.get(relationIdx+1);
     
-    String label = ctx.label == null ? null : ctx.label.getText();
+    String label = getLayerName(ctx.POINTING(), 2);
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
@@ -581,6 +563,20 @@ public class JoinListener extends AqlParserBaseListener
       
     }
     return annos;
+  }
+  
+  private String getLayerName(TerminalNode node)
+  {
+    return getLayerName(node, 1);
+  }
+  
+  private String getLayerName(TerminalNode node, int lengthOfOperator)
+  {
+    if(node == null || node.getText() == null)
+    {
+      return null;
+    }
+    return node.getText().substring(lengthOfOperator);
   }
   
   private QueryNode node(AqlParser.RefOrNodeContext ctx)
