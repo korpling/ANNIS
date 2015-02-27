@@ -20,6 +20,7 @@ import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
 import com.google.common.base.Splitter;
+import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
@@ -112,13 +113,22 @@ public class EmbeddedVisUI extends CommonUI
       visConfig.setNamespace(null);
       visConfig.setType("htmldoc");
 
-      //create input    
-      input = DocBrowserController.createInput(corpus, doc, visConfig, false, null);
-      //create components, put in a panel
-      Panel viszr = visualizer.createComponent(input, null);
+      //create input
+      try
+      {
+        input = DocBrowserController.createInput(corpus, doc, visConfig, false, null);
+        //create components, put in a panel
+        Panel viszr = visualizer.createComponent(input, null);
 
-      // Set the panel as the content of the UI
-      setContent(viszr);
+        // Set the panel as the content of the UI
+        setContent(viszr);
+      }
+      catch(UniformInterfaceException ex)
+      {
+        setContent(new Label("Could not query document, error was \"" 
+          + ex.getMessage() + "\" (detailed error is available in the server log-files "));
+        log.error("Could not get document for embedded visualizer", ex);
+      }
 
     }
     else
