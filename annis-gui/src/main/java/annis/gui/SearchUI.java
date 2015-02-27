@@ -1031,14 +1031,6 @@ public class SearchUI extends CommonUI
       String doc = args.get("doc");
       String sty = args.get("sty");
 
-      new Notification("HTML visualizer",
-        "<div><h2>HTML document visualizer parameters:</h2>"
-        + "<ul><li>corpus: " + corpora + "</li>"
-        + "<li>document: " + doc + "</li>"
-        + "<li>style sheet: " + sty + "</li>"
-        + "<li>visualizer: " + vis + "</li></ul>"
-        + "</div>",
-        Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
       // get input parameters
       HTMLVis visualizer;
