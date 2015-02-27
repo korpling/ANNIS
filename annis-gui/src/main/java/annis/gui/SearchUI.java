@@ -107,7 +107,7 @@ public class SearchUI extends CommonUI
     new GridExporter(),
     new SimpleTextExporter()
   };
-
+  
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
 
@@ -776,7 +776,7 @@ public class SearchUI extends CommonUI
   {
     evaluateFragment(event.getUriFragment());
   }
-
+  
   /**
    * Takes a list of raw corpus names as given by the #c parameter and returns a
    * list of corpus names that are known to exist. It also replaces alias names
@@ -868,13 +868,16 @@ public class SearchUI extends CommonUI
       else
       {
         getControlPanel().getCorpusList().selectCorpora(corpora);
-
       }
 
     }
     else if (args.get("cl") != null && args.get("cr") != null)
     {
       // do not change the manually selected search options
+      //String a = args.get("cl");
+      //String b = args.get("cr");
+      //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+      
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       PagedResultQuery query = new PagedResultQuery(
@@ -900,7 +903,7 @@ public class SearchUI extends CommonUI
       queryController.setQuery(query);
       queryController.executeSearch(true);
     }
-    else
+    else if (args.get("q") != null)
     {
       // do not change the manually selected search options
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
@@ -985,9 +988,12 @@ public class SearchUI extends CommonUI
     return docBrowserController;
   }
 
+
   public QueryUIState getQueryState()
   {
     return queryState;
-  }
+  }  
   
 }
+
+
