@@ -57,6 +57,10 @@
       <url>http://korpling.german.hu-berlin.de/maven2/</url>
     </repository>
   </repositories>
+  
+  <properties>
+    <servlet.version>2.5</servlet.version>
+  </properties>
 
   <build>
 
