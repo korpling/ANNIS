@@ -126,7 +126,7 @@ public class EmbeddedVisUI extends CommonUI
       catch(UniformInterfaceException ex)
       {
         setContent(new Label("Could not query document, error was \"" 
-          + ex.getMessage() + "\" (detailed error is available in the server log-files "));
+          + ex.getMessage() + "\" (detailed error is available in the server log-files)"));
         log.error("Could not get document for embedded visualizer", ex);
       }
 
