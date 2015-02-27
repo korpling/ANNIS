@@ -96,25 +96,24 @@ public class EmbeddedVisUI extends CommonUI
       return;
     }
 
-    //get other parameters: -style(sty) 
-    if (args.get("sty") != null && args.get("sty").length > 0)
+    if (args.get("config") != null && args.get("config").length > 0)
     {
-      String sty = args.get("sty")[0];
+      String config = args.get("config")[0];
 
       // get input parameters
       HTMLVis visualizer;
       visualizer = new HTMLVis();
 
       VisualizerInput input;
-      Visualizer config;
-      config = new Visualizer();
-      config.setDisplayName(" ");
-      config.setMappings("config:" + sty);
-      config.setNamespace(null);
-      config.setType("htmldoc");
+      Visualizer visConfig;
+      visConfig = new Visualizer();
+      visConfig.setDisplayName(" ");
+      visConfig.setMappings("config:" + config);
+      visConfig.setNamespace(null);
+      visConfig.setType("htmldoc");
 
       //create input    
-      input = DocBrowserController.createInput(corpus, doc, config, false, null);
+      input = DocBrowserController.createInput(corpus, doc, visConfig, false, null);
       //create components, put in a panel
       Panel viszr = visualizer.createComponent(input, null);
 
@@ -128,9 +127,7 @@ public class EmbeddedVisUI extends CommonUI
         + "<p>"
         + "The following arguments are required:"
         + "<ul>"
-        + "<li><code>sty</code>: the internal style to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
-        + "<li><code>c</code>: corpus name</li>"
-        + "<li><code>doc</code>: name of the document to visualize</li>"
+        + "<li><code>config</code>: the internal config file to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
         + "</ul>"
         + "</p>", 
         ContentMode.HTML ));
