@@ -71,7 +71,7 @@ near
 dominance
 	: DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
 	| DOMINANCE (layer=ID)? STAR # IndirectDominance
-	| DOMINANCE (layer=ID)? rangeSpec # RangeDominance
+	| DOMINANCE (layer=ID COMMA?)? rangeSpec # RangeDominance
 	;
 	
 pointing
