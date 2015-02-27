@@ -38,15 +38,12 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
-import annis.visualizers.htmlvis.HTMLVis;
 import static annis.libgui.Helper.*;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
-import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.OrderType;
-import annis.service.objects.Visualizer;
 import com.google.common.base.Strings;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -110,7 +107,9 @@ public class SearchUI extends CommonUI
     new GridExporter(),
     new SimpleTextExporter()
   };
-
+  
+  private final static Escaper urlPathEscape = UrlEscapers.
+    urlPathSegmentEscaper();
 
   private transient Cache<String, CorpusConfig> corpusConfigCache;
 
@@ -776,6 +775,58 @@ public class SearchUI extends CommonUI
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
     evaluateFragment(event.getUriFragment());
+  }
+  
+  /**
+   * Takes a list of raw corpus names as given by the #c parameter and returns a
+   * list of corpus names that are known to exist. It also replaces alias names
+   * with the real corpus names.
+   *
+   * @param originalNames
+   * @return
+   */
+  private Set<String> getMappedCorpora(List<String> originalNames)
+  {
+    WebResource rootRes = Helper.getAnnisWebResource();
+    Set<String> mappedNames = new HashSet<>();
+    // iterate over given corpora and map names if necessary
+    for (String selectedCorpusName : originalNames)
+    {
+      // get the real corpus descriptions by the name (which could be an alias)
+      try
+      {
+        List<AnnisCorpus> corporaByName
+          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(
+              selectedCorpusName))
+          .get(new GenericType<List<AnnisCorpus>>()
+            {
+          });
+
+        if (corporaByName == null || corporaByName.isEmpty())
+        {
+          // When we did not get any answer for this corpus we might not have
+          // the rights to access it yet. Since we want to preserve the "c"
+          // parameter in the string we should still remember it.
+          // See https://github.com/korpling/ANNIS/issues/330
+          mappedNames.add(selectedCorpusName);
+        }
+        else
+        {
+          for (AnnisCorpus c : corporaByName)
+          {
+            mappedNames.add(c.getName());
+          }
+        }
+      }
+      catch (ClientHandlerException ex)
+      {
+        String msg = "alias mapping does not work for alias: "
+          + selectedCorpusName;
+        log.error(msg, ex);
+        Notification.show(msg, Notification.Type.TRAY_NOTIFICATION);
+      }
+    }
+    return mappedNames;
   }
 
   private void evaluateFragment(String fragment)

@@ -63,15 +63,6 @@ public class EmbeddedVisUI extends CommonUI implements Page.UriFragmentChangedLi
 
     Map<String, String> args = Helper.parseFragment(fragment);
 
-    Set<String> corpora = new TreeSet<>();
-
-    //parse corpus name, if there are multiple corpora designated
-    if (args.containsKey("c"))
-    {
-      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
-      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
-    }
-
     //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
     if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
     {
