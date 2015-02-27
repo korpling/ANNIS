@@ -111,8 +111,6 @@ public class SearchUI extends CommonUI
     new SimpleTextExporter()
   };
 
-  private final static Escaper urlPathEscape = UrlEscapers.
-    urlPathSegmentEscaper();
 
   private transient Cache<String, CorpusConfig> corpusConfigCache;
 
@@ -237,7 +235,6 @@ public class SearchUI extends CommonUI
 
     checkServiceVersion();
     evaluateFragment(getPage().getUriFragment());
-    evaluateFragmentVis(getPage().getUriFragment());
 
   }
 
@@ -779,59 +776,6 @@ public class SearchUI extends CommonUI
   public void uriFragmentChanged(UriFragmentChangedEvent event)
   {
     evaluateFragment(event.getUriFragment());
-    evaluateFragmentVis(event.getUriFragment());
-  }
-
-  /**
-   * Takes a list of raw corpus names as given by the #c parameter and returns a
-   * list of corpus names that are known to exist. It also replaces alias names
-   * with the real corpus names.
-   *
-   * @param originalNames
-   * @return
-   */
-  private Set<String> getMappedCorpora(List<String> originalNames)
-  {
-    WebResource rootRes = Helper.getAnnisWebResource();
-    Set<String> mappedNames = new HashSet<>();
-    // iterate over given corpora and map names if necessary
-    for (String selectedCorpusName : originalNames)
-    {
-      // get the real corpus descriptions by the name (which could be an alias)
-      try
-      {
-        List<AnnisCorpus> corporaByName
-          = rootRes.path("query").path("corpora").path(urlPathEscape.escape(
-              selectedCorpusName))
-          .get(new GenericType<List<AnnisCorpus>>()
-            {
-          });
-
-        if (corporaByName == null || corporaByName.isEmpty())
-        {
-          // When we did not get any answer for this corpus we might not have
-          // the rights to access it yet. Since we want to preserve the "c"
-          // parameter in the string we should still remember it.
-          // See https://github.com/korpling/ANNIS/issues/330
-          mappedNames.add(selectedCorpusName);
-        }
-        else
-        {
-          for (AnnisCorpus c : corporaByName)
-          {
-            mappedNames.add(c.getName());
-          }
-        }
-      }
-      catch (ClientHandlerException ex)
-      {
-        String msg = "alias mapping does not work for alias: "
-          + selectedCorpusName;
-        log.error(msg, ex);
-        Notification.show(msg, Notification.Type.TRAY_NOTIFICATION);
-      }
-    }
-    return mappedNames;
   }
 
   private void evaluateFragment(String fragment)
@@ -999,62 +943,6 @@ public class SearchUI extends CommonUI
     return queryState;
   }  
   
-  
-  private void evaluateFragmentVis(String fragment)
-  {
-    ////example local testing query url
-    ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
-    //http://localhost:8084/annis-gui/#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
-
-    // do nothing if not changed
-    if (fragment == null || fragment.isEmpty() || fragment.equals(
-      lastQueriedFragment))
-    {
-      return;
-    }
-
-    Map<String, String> args = Helper.parseFragment(fragment);
-
-    Set<String> corpora = new TreeSet<>();
-
-    //parse corpus name, if there are multiple corpora designated
-    if (args.containsKey("c"))
-    {
-      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
-      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
-    }
-
-    //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
-    if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
-    {
-      String vis = args.get("vis");
-      String doc = args.get("doc");
-      String sty = args.get("sty");
-
-
-      // get input parameters
-      HTMLVis visualizer;
-      visualizer = new HTMLVis();
-
-      VisualizerInput input;
-      Visualizer config;
-      config = new Visualizer();
-      config.setDisplayName(" ");
-      config.setMappings("config:" + sty);
-      config.setNamespace(null);
-      config.setType(vis);
-
-      String corpus = args.get("c");
-      //create input    
-      input = docBrowserController.createInput(corpus, doc, config, false, null);
-      //create components, put in a panel
-      Panel viszr = visualizer.createComponent(input, null);
-
-      // Set the panel as the content of the UI
-      setContent(viszr);
-
-    }
-  }
 }
 
 

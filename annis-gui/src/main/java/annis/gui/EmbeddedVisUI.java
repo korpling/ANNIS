@@ -1,0 +1,107 @@
+/*
+ * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+package annis.gui;
+
+import annis.gui.docbrowser.DocBrowserController;
+import annis.libgui.Helper;
+import annis.libgui.visualizers.VisualizerInput;
+import annis.service.objects.Visualizer;
+import annis.visualizers.htmlvis.HTMLVis;
+import com.vaadin.server.Page;
+import com.vaadin.server.VaadinRequest;
+import com.vaadin.ui.Panel;
+import java.util.Arrays;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
+
+/**
+ *
+ * @author Thomas Krause <krauseto@hu-berlin.de>
+ */
+public class EmbeddedVisUI extends CommonUI implements Page.UriFragmentChangedListener
+{
+
+  @Override
+  protected void init(VaadinRequest request)
+  {
+    super.init(request);
+    evaluateFragmentVis(getPage().getUriFragment());
+  }
+  
+  
+  @Override
+  public void uriFragmentChanged(Page.UriFragmentChangedEvent event)
+  {
+    evaluateFragmentVis(getPage().getUriFragment());
+  }
+  
+  private void evaluateFragmentVis(String fragment)
+  {
+    ////example local testing query url
+    ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
+    //http://localhost:8084/annis-gui/embeddedvis#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
+
+    // do nothing for empty fragments
+    if (fragment == null || fragment.isEmpty() )
+    {
+      return;
+    }
+
+    Map<String, String> args = Helper.parseFragment(fragment);
+
+    Set<String> corpora = new TreeSet<>();
+
+    //parse corpus name, if there are multiple corpora designated
+    if (args.containsKey("c"))
+    {
+      String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
+      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
+    }
+
+    //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
+    if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
+    {
+      String vis = args.get("vis");
+      String doc = args.get("doc");
+      String sty = args.get("sty");
+
+
+      // get input parameters
+      HTMLVis visualizer;
+      visualizer = new HTMLVis();
+
+      VisualizerInput input;
+      Visualizer config;
+      config = new Visualizer();
+      config.setDisplayName(" ");
+      config.setMappings("config:" + sty);
+      config.setNamespace(null);
+      config.setType(vis);
+
+      String corpus = args.get("c");
+      //create input    
+      input = DocBrowserController.createInput(corpus, doc, config, false, null);
+      //create components, put in a panel
+      Panel viszr = visualizer.createComponent(input, null);
+
+      // Set the panel as the content of the UI
+      setContent(viszr);
+
+    }
+  }
+  
+}

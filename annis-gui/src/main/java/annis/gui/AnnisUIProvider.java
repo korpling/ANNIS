@@ -33,6 +33,10 @@ public class AnnisUIProvider extends UIProvider
     {
       return AdminUI.class;
     }
+    else if("/embeddedvis".equals(event.getRequest().getPathInfo()))
+    {
+      return EmbeddedVisUI.class;
+    }
     else
     {
       return SearchUI.class;
