@@ -16,19 +16,19 @@
 package annis.gui;
 
 import annis.gui.docbrowser.DocBrowserController;
-import annis.libgui.Helper;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
-import com.vaadin.server.Page;
+import com.google.common.base.Splitter;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
-import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import java.util.TreeSet;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -36,37 +36,70 @@ import java.util.TreeSet;
  */
 public class EmbeddedVisUI extends CommonUI
 {
+  private static final Logger log = LoggerFactory.getLogger(EmbeddedVisUI.class);
+  
+  public static final String PREFIX = "/embeddedvis";
+  
 
   @Override
   protected void init(VaadinRequest request)
   {
     super.init(request);
-    evalParams(request.getParameterMap());
+    
+    String rawPath = request.getPathInfo();
+    List<String> splittedPath = new LinkedList<>();
+    if(rawPath != null)
+    {
+      rawPath = rawPath.substring(PREFIX.length());
+      splittedPath = Splitter.on("/").omitEmptyStrings().trimResults().limit(
+        3).splitToList(rawPath);
+    }
+    
+    if(splittedPath.size() >= 3)
+    {
+      if("htmldoc".equals(splittedPath.get(0)))
+      {
+        showHtmlDoc(splittedPath.get(1), splittedPath.get(2), request.getParameterMap());
+      }
+      else
+      {
+        setContent(new Label("unknown visualizer \"" + splittedPath.get(0) + "\", only \"htmldoc\" is supported yet."));
+      }
+    }
+    else
+    {
+      displayGeneralHelp();
+    }
+  }
+  
+  private void displayGeneralHelp()
+  {
+    setContent(new Label("<h1>Path not complete</h1>"
+      + "<p>"
+      + "You have to specify what visualizer to use and which document of which corpus you want to visualizer by giving the correct path:<br />"
+      + "<code>http://example.com/annis/embeddedvis/&lt;vis&gt;/&lt;corpus&gt;/&lt;doc&gt;</code>"
+      + "<ul>"
+      + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
+      + "<li><code>corpus</code>: corpus name</li>"
+      + "<li><code>doc</code>: name of the document to visualize</li>"
+      + "</ul>"
+      + "</p>",
+      ContentMode.HTML));
   }
   
   
-  private void evalParams(Map<String, String[]> args)
+  private void showHtmlDoc(String corpus, String doc, Map<String, String[]> args)
   {
-    ////example local testing query url
-    ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
-    //http://localhost:8084/annis-gui/embeddedvis#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
-
     // do nothing for empty fragments
     if (args == null || args.isEmpty() )
     {
       return;
     }
 
-    //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
-    if (args.get("vis") != null && args.get("vis").length > 0
-      && args.get("doc") != null && args.get("doc").length > 0
-      && args.get("sty") != null && args.get("sty").length > 0
-      && args.get("c") != null && args.get("c").length > 0)
+    //get other parameters: -style(sty) 
+    if (args.get("sty") != null && args.get("sty").length > 0)
     {
-      String vis = args.get("vis")[0];
-      String doc = args.get("doc")[0];
       String sty = args.get("sty")[0];
-      String corpus = args.get("c")[0];
 
       // get input parameters
       HTMLVis visualizer;
@@ -78,7 +111,7 @@ public class EmbeddedVisUI extends CommonUI
       config.setDisplayName(" ");
       config.setMappings("config:" + sty);
       config.setNamespace(null);
-      config.setType(vis);
+      config.setType("htmldoc");
 
       //create input    
       input = DocBrowserController.createInput(corpus, doc, config, false, null);
@@ -91,11 +124,11 @@ public class EmbeddedVisUI extends CommonUI
     }
     else
     {
-      setContent(new Label("<h1>Missing required argument</h1>"
+      setContent(new Label("<h1>Missing required argument for visualizer \"htmldoc\"</h1>"
         + "<p>"
         + "The following arguments are required:"
         + "<ul>"
-        + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
+        + "<li><code>sty</code>: the internal style to use (same as <a href=\"http://korpling.github.io/ANNIS/doc/classannis_1_1visualizers_1_1htmlvis_1_1HTMLVis.html\">\"config\" mapping parameter)</a></li>"
         + "<li><code>c</code>: corpus name</li>"
         + "<li><code>doc</code>: name of the document to visualize</li>"
         + "</ul>"

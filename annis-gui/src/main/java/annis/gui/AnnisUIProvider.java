@@ -29,11 +29,12 @@ public class AnnisUIProvider extends UIProvider
   @Override
   public Class<? extends UI> getUIClass(UIClassSelectionEvent event)
   {
-    if("/admin".equals(event.getRequest().getPathInfo()))
+    String path = event.getRequest().getPathInfo();
+    if("/admin".equals(path))
     {
       return AdminUI.class;
     }
-    else if("/embeddedvis".equals(event.getRequest().getPathInfo()))
+    else if(path != null && path.startsWith(EmbeddedVisUI.PREFIX))
     {
       return EmbeddedVisUI.class;
     }
