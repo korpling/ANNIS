@@ -22,6 +22,8 @@ import annis.service.objects.Visualizer;
 import annis.visualizers.htmlvis.HTMLVis;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.ui.label.ContentMode;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import java.util.Arrays;
 import java.util.Map;
@@ -32,44 +34,39 @@ import java.util.TreeSet;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class EmbeddedVisUI extends CommonUI implements Page.UriFragmentChangedListener
+public class EmbeddedVisUI extends CommonUI
 {
 
   @Override
   protected void init(VaadinRequest request)
   {
     super.init(request);
-    evaluateFragmentVis(getPage().getUriFragment());
+    evalParams(request.getParameterMap());
   }
   
   
-  @Override
-  public void uriFragmentChanged(Page.UriFragmentChangedEvent event)
-  {
-    evaluateFragmentVis(getPage().getUriFragment());
-  }
-  
-  private void evaluateFragmentVis(String fragment)
+  private void evalParams(Map<String, String[]> args)
   {
     ////example local testing query url
     ////corpus=shenoute.a22, vis=htmldoc, doc=YA421-428, sty=“config:dipl"
     //http://localhost:8084/annis-gui/embeddedvis#_c=c2hlbm91dGUuYTIy&vis=htmldoc&_doc=WUE0MjEtNDI4&_sty=ZGlwbA==
 
     // do nothing for empty fragments
-    if (fragment == null || fragment.isEmpty() )
+    if (args == null || args.isEmpty() )
     {
       return;
     }
 
-    Map<String, String> args = Helper.parseFragment(fragment);
-
     //get other parameters: -visualizer(htmldoc),-document name(doc),-style(sty) 
-    if (args.get("vis") != null && args.get("doc") != null && args.get("sty") != null)
+    if (args.get("vis") != null && args.get("vis").length > 0
+      && args.get("doc") != null && args.get("doc").length > 0
+      && args.get("sty") != null && args.get("sty").length > 0
+      && args.get("c") != null && args.get("c").length > 0)
     {
-      String vis = args.get("vis");
-      String doc = args.get("doc");
-      String sty = args.get("sty");
-
+      String vis = args.get("vis")[0];
+      String doc = args.get("doc")[0];
+      String sty = args.get("sty")[0];
+      String corpus = args.get("c")[0];
 
       // get input parameters
       HTMLVis visualizer;
@@ -83,7 +80,6 @@ public class EmbeddedVisUI extends CommonUI implements Page.UriFragmentChangedLi
       config.setNamespace(null);
       config.setType(vis);
 
-      String corpus = args.get("c");
       //create input    
       input = DocBrowserController.createInput(corpus, doc, config, false, null);
       //create components, put in a panel
@@ -92,6 +88,19 @@ public class EmbeddedVisUI extends CommonUI implements Page.UriFragmentChangedLi
       // Set the panel as the content of the UI
       setContent(viszr);
 
+    }
+    else
+    {
+      setContent(new Label("<h1>Missing required argument</h1>"
+        + "<p>"
+        + "The following arguments are required:"
+        + "<ul>"
+        + "<li><code>vis</code>: visualizer name (currently only \"htmldoc\" is supported)</li>"
+        + "<li><code>c</code>: corpus name</li>"
+        + "<li><code>doc</code>: name of the document to visualize</li>"
+        + "</ul>"
+        + "</p>", 
+        ContentMode.HTML ));
     }
   }
   
