@@ -19,9 +19,13 @@ import annis.gui.SearchUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
+import annis.model.AqlParseError;
 import annis.service.objects.MatchAndDocumentCount;
+import com.google.common.base.Joiner;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.ui.Notification;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.slf4j.Logger;
@@ -109,7 +113,10 @@ public class CountCallback implements Runnable
           {
             if (causeFinal.getResponse().getStatus() == 400)
             {
-              String errMsg = causeFinal.getResponse().getEntity(String.class);
+              List<AqlParseError> errors = 
+                causeFinal.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
+              String errMsg = Joiner.on("\n").join(errors);
+              
               Notification.show("parsing error", errMsg,
                 Notification.Type.WARNING_MESSAGE);
               ui.getControlPanel().getQueryPanel().setStatus(errMsg);
