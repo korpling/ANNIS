@@ -57,27 +57,27 @@ refOrNode
   ;
 
 precedence
-	: PRECEDENCE (layer=ID)? # DirectPrecedence
-	| PRECEDENCE (layer=ID)? STAR # IndirectPrecedence
-	| PRECEDENCE (layer=ID COMMA?)? rangeSpec #RangePrecedence
+	: (PRECEDENCE | NAMED_PRECEDENCE) # DirectPrecedence
+	| (PRECEDENCE | NAMED_PRECEDENCE) STAR # IndirectPrecedence
+	| (PRECEDENCE | NAMED_PRECEDENCE) COMMA? rangeSpec #RangePrecedence
 	;
 
 near
-	: NEAR (layer=ID)? # DirectNear
-	| NEAR (layer=ID)? STAR # IndirectNear
-	| NEAR (layer=ID COMMA?)? rangeSpec #RangeNear
+	: (NEAR | NAMED_NEAR) # DirectNear
+	| (NEAR | NAMED_NEAR) STAR # IndirectNear
+	| (NEAR | NAMED_NEAR)COMMA? rangeSpec #RangeNear
 	;
 
 dominance
-	: DOMINANCE (layer=ID)?  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
-	| DOMINANCE (layer=ID)? STAR # IndirectDominance
-	| DOMINANCE (layer=ID)? rangeSpec # RangeDominance
+	: (DOMINANCE | NAMED_DOMINANCE)  (LEFT_CHILD | RIGHT_CHILD)? (anno=edgeSpec)? # DirectDominance
+	| (DOMINANCE | NAMED_DOMINANCE) STAR # IndirectDominance
+	| (DOMINANCE | NAMED_DOMINANCE) COMMA? rangeSpec # RangeDominance
 	;
 	
 pointing
-	: POINTING label=ID (anno=edgeSpec)? # DirectPointing
-	| POINTING label=ID (anno=edgeSpec)? STAR # IndirectPointing
-	| POINTING label=ID (anno=edgeSpec)? COMMA? rangeSpec # RangePointing
+	: POINTING (anno=edgeSpec)? # DirectPointing
+	| POINTING (anno=edgeSpec)? STAR # IndirectPointing
+	| POINTING (anno=edgeSpec)? COMMA? rangeSpec # RangePointing
 	;
 
 spanrelation

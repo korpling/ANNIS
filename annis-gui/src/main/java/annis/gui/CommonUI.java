@@ -27,7 +27,8 @@ import com.vaadin.server.VaadinRequest;
  */
 public class CommonUI extends AnnisBaseUI
 {
-
+  //private static final Logger log = LoggerFactory.getLogger(CommonUI.class);
+  
   @Override
   protected void init(VaadinRequest request)
   {
@@ -38,5 +39,6 @@ public class CommonUI extends AnnisBaseUI
     getSession().addRequestHandler(new BinaryRequestHandler());
 
   }
+  
   
 }

@@ -18,6 +18,11 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
   var regexMeta = /meta::([a-zA-Z_]([a-zA-Z0-9_\-])*:)?([a-zA-Z_]([a-zA-Z0-9_\-])*)/;
   var regexID = /([a-zA-Z_]([a-zA-Z0-9_\-])*:)?([a-zA-Z_]([a-zA-Z0-9_\-])*)/;
   
+  var regexLeftRightChild = />([a-zA-Z_][a-zA-Z0-9_\-]*)?(@(l|r)?)/;
+  var regexPrecedenceNearPointingDom = /((\.)|(\^)|(->)|(>))([a-zA-Z_][a-zA-Z0-9_\-]*)?(\s*(\*)|([ \t,0-9]+))?/;
+  
+  var regexSimpleOperators = /(==)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(_ol_)|(_or_)/;
+  
   function getNodeClassForString(state)
   {
     if(state.behindAssignment)
@@ -135,7 +140,15 @@ CodeMirror.defineMode("aql", function(config, parserConfig) {
         {
           return "bracket";
         }
-        else if(stream.match(/(\.\*)|(\.)|(_=_)|(_i_)|(_o_)|(_l_)|(_r_)|(->[a-zA-Z0-9_,\-]+)|(>@l)|(>@r)|(>[a-zA-Z0-9_,\-]*( )*\*)|(>[a-zA-Z0-9,_\-]*)|(\$\*)|(\$)/))
+        else if(stream.match(regexSimpleOperators))
+        {
+          return "operator";
+        }
+        else if(stream.match(regexLeftRightChild))
+        {
+          return "operator";
+        }
+        else if(stream.match(regexPrecedenceNearPointingDom))
         {
           return "operator";
         }

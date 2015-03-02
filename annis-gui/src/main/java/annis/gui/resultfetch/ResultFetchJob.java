@@ -21,10 +21,13 @@ import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import annis.model.AqlParseError;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -215,8 +218,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               UniformInterfaceException ex = (UniformInterfaceException) cause;
               if (ex.getResponse().getStatus() == 400)
               {
-                paging.setInfo("parsing error: " + ex.getResponse().
-                  getEntity(String.class));
+                List<AqlParseError> errors
+                  = ex.getResponse().getEntity(
+                    new GenericType<List<AqlParseError>>()
+                    {
+                    });
+                String errMsg = Joiner.on(" | ").join(errors);
+
+                paging.setInfo("parsing error: " + errMsg);
               }
               else if (ex.getResponse().getStatus() == 504)
               {
