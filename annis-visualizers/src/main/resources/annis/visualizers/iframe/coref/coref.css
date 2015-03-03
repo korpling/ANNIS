@@ -66,4 +66,5 @@ table.token {
   float:left;
   font-size: 87.5%;
   border-collapse: collapse;
+  height: 23px;
 }
