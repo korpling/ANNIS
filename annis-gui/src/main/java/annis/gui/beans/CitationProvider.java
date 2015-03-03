@@ -15,8 +15,6 @@
  */
 package annis.gui.beans;
 
-import annis.service.objects.AnnisCorpus;
-import java.util.Map;
 import java.util.Set;
 
 /**

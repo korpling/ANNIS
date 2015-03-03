@@ -12,7 +12,7 @@ The ANNIS server version can be installed on UNIX based server, or else under
 Windows using Cygwin [http://www.cygwin.com/], the freely available UNIX
 emulator. To install the ANNIS server:
 
-1. Download and install PostgreSQL 9.2 for your operating system from 
+1. Download and install PostgreSQL 9.3 or a newer version for your operating system from 
 http://www.postgresql.org/download/ and **make a note of the administrator
 password** you set during the installation.
 \note Under Linux, you might have to set the PostgreSQL password

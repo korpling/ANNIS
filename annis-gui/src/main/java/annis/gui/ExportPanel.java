@@ -15,19 +15,13 @@
  */
 package annis.gui;
 
-import annis.gui.beans.HistoryEntry;
 import annis.gui.components.HelpButton;
 import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.controlpanel.SearchOptionsPanel;
-import annis.gui.exporter.CSVExporter;
+import annis.gui.converter.CommaSeperatedStringConverterList;
 import annis.gui.exporter.Exporter;
-import annis.gui.exporter.GridExporter;
-import annis.gui.exporter.SimpleTextExporter;
-import annis.gui.exporter.TextExporter;
-import annis.gui.exporter.WekaExporter;
-import annis.libgui.Helper;
-import annis.libgui.PollControl;
+import annis.gui.objects.QueryUIState;
 import com.google.common.base.Stopwatch;
 import com.google.common.eventbus.EventBus;
 import com.google.common.eventbus.Subscribe;
@@ -37,15 +31,11 @@ import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.server.FileDownloader;
 import com.vaadin.server.FileResource;
 import com.vaadin.server.FontAwesome;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.*;
 import java.io.*;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
-import java.util.concurrent.Future;
-import java.util.concurrent.atomic.AtomicBoolean;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -66,15 +56,6 @@ public class ExportPanel extends FormLayout
 
   private final TextField txtParameters;
 
-  private static final Exporter[] EXPORTER = new Exporter[]
-  {
-    new WekaExporter(),
-    new CSVExporter(),
-    new TextExporter(),
-    new GridExporter(),
-    new SimpleTextExporter()
-  };
-
   private final Map<String, String> help4Exporter = new HashMap<>();
 
   private final ComboBox cbExporter;
@@ -84,10 +65,6 @@ public class ExportPanel extends FormLayout
   private final Button btExport;
 
   private final Button btCancel;
-
-  private final Map<String, Exporter> exporterMap;
-
-  private final QueryPanel queryPanel;
 
   private final CorpusListPanel corpusListPanel;
 
@@ -101,23 +78,20 @@ public class ExportPanel extends FormLayout
 
   private final transient EventBus eventBus;
 
-  private transient Stopwatch exportTime = new Stopwatch();
+  private transient Stopwatch exportTime = Stopwatch.createUnstarted();
 
   private final QueryController controller;
-
-  private transient Future<File> exportFuture = null;
 
   private UI ui;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
-    QueryController controller)
+    QueryController controller, QueryUIState state)
   {
-    this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
     this.controller = controller;
 
     this.eventBus = new EventBus();
-    this.eventBus.register(this);
+    this.eventBus.register(ExportPanel.this);
     
     setWidth("99%");
     setHeight("-1px");
@@ -128,14 +102,13 @@ public class ExportPanel extends FormLayout
     cbExporter.setNewItemsAllowed(false);
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
-    exporterMap = new HashMap<>();
-    for (Exporter e : EXPORTER)
+    
+    for(Exporter e : SearchUI.EXPORTER)
     {
-      String name = e.getClass().getSimpleName();
-      exporterMap.put(name, e);
-      cbExporter.addItem(name);
+      cbExporter.addItem(e.getClass().getSimpleName());
     }
-    cbExporter.setValue(EXPORTER[0].getClass().getSimpleName());
+    
+    cbExporter.setValue(SearchUI.EXPORTER[0].getClass().getSimpleName());
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
@@ -163,7 +136,7 @@ public class ExportPanel extends FormLayout
 
     cbLeftContext.setValue(5);
     cbRightContext.setValue(5);
-
+    
     addComponent(cbLeftContext);
     addComponent(cbRightContext);
 
@@ -188,11 +161,7 @@ public class ExportPanel extends FormLayout
     btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
-    Exporter exporter = exporterMap.get((String) cbExporter.getValue());
-    if(exporter != null)
-    {
-      btCancel.setVisible(exporter.isCancelable());
-    }
+    btCancel.setVisible(SearchUI.EXPORTER[0].isCancelable());
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
@@ -215,6 +184,21 @@ public class ExportPanel extends FormLayout
 
     progressLabel = new Label();
     vLayout.addComponent(progressLabel);
+    
+    if(state != null)
+    {
+      cbLeftContext.setPropertyDataSource(state.getLeftContext());
+      cbRightContext.setPropertyDataSource(state.getRightContext());
+      cbExporter.setPropertyDataSource(state.getExporterName());
+      
+      state.getExporterName().setValue(SearchUI.EXPORTER[0].getClass().getSimpleName());
+      
+      txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
+      txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
+      
+      txtParameters.setPropertyDataSource(state.getExportParameters());
+      
+    }
   }
 
   @Override
@@ -228,7 +212,7 @@ public class ExportPanel extends FormLayout
 
   private void initHelpMessages()
   {
-    help4Exporter.put(EXPORTER[0].getClass().getSimpleName(),
+    help4Exporter.put(SearchUI.EXPORTER[0].getClass().getSimpleName(),
       "The WEKA Exporter exports only the "
       + "values of the elements searched for by the user, ignoring the context "
       + "around search results. The values for all annotations of each of the "
@@ -239,7 +223,7 @@ public class ExportPanel extends FormLayout
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)");
 
-    help4Exporter.put(EXPORTER[1].getClass().getSimpleName(),
+    help4Exporter.put(SearchUI.EXPORTER[1].getClass().getSimpleName(),
       "The CSV Exporter exports only the "
       + "values of the elements searched for by the user, ignoring the context "
       + "around search results. The values for all annotations of each of the "
@@ -248,11 +232,11 @@ public class ExportPanel extends FormLayout
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)");
 
-    help4Exporter.put(EXPORTER[2].getClass().getSimpleName(),
+    help4Exporter.put(SearchUI.EXPORTER[2].getClass().getSimpleName(),
       "The Text Exporter exports the token covered by the matched nodes of every search result and "
       + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
 
-    help4Exporter.put(EXPORTER[3].getClass().getSimpleName(),
+    help4Exporter.put(SearchUI.EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
       + "context. Each annotation layer is represented in a separate line, and the "
       + "tokens covered by each annotation are given as number ranges after each "
@@ -267,7 +251,7 @@ public class ExportPanel extends FormLayout
       + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
       + "<code>numbers=false</code>)");
     
-    help4Exporter.put(EXPORTER[4].getClass().getSimpleName(),
+    help4Exporter.put(SearchUI.EXPORTER[4].getClass().getSimpleName(),
       "The SimpleTextExporter exports only the plain text of every search result. ");
   }
 
@@ -289,7 +273,7 @@ public class ExportPanel extends FormLayout
         cbExporter.setDescription("No help available for this exporter");
       }
       
-      Exporter exporter = exporterMap.get((String) event.getProperty().getValue());
+      Exporter exporter = controller.getExporterByName((String) event.getProperty().getValue());
       if(exporter != null)
       {
         btCancel.setVisible(exporter.isCancelable());
@@ -336,6 +320,49 @@ public class ExportPanel extends FormLayout
       }
     }
   }
+  
+  public void showResult(File currentTmpFile, boolean success)
+  {
+    btExport.setEnabled(true);
+    btCancel.setEnabled(false);
+    progressBar.setVisible(false);
+    progressLabel.setValue("");
+
+    // copy the result to the class member in order to delete if
+    // when not longer needed
+    tmpOutputFile = currentTmpFile;
+
+    if (tmpOutputFile == null)
+    {
+      Notification.show("Could not create the Exporter",
+        "The server logs might contain more information about this "
+        + "so you should contact the provider of this ANNIS installation "
+        + "for help.", Notification.Type.ERROR_MESSAGE);
+    }
+    else if (!success)
+    {
+      // we were aborted, don't do anything
+      Notification.show("Export cancelled",
+        Notification.Type.WARNING_MESSAGE);
+    }
+    else
+    {
+      if (downloader != null && btDownload.getExtensions().contains(
+        downloader))
+      {
+        btDownload.removeExtension(downloader);
+      }
+      downloader = new FileDownloader(new FileResource(
+        tmpOutputFile));
+
+      downloader.extend(btDownload);
+      btDownload.setEnabled(true);
+
+      Notification.show("Export finished",
+        "Click on the button right to the export button to actually download the file.",
+        Notification.Type.HUMANIZED_MESSAGE);
+    }
+  }
 
   private class ExportButtonListener implements Button.ClickListener
   {
@@ -352,14 +379,10 @@ public class ExportPanel extends FormLayout
         }
       }
       tmpOutputFile = null;
-      if (exportFuture != null && !exportFuture.isDone())
-      {
-        exportFuture.cancel(true);
-      }
-      exportFuture = null;
-
+      
+      
       String exporterName = (String) cbExporter.getValue();
-      final Exporter exporter = exporterMap.get(exporterName);
+      final Exporter exporter = controller.getExporterByName(exporterName);
       if (exporter != null)
       {
         if (corpusListPanel.getSelectedCorpora().isEmpty())
@@ -370,10 +393,7 @@ public class ExportPanel extends FormLayout
           return;
         }
 
-        HistoryEntry e = new HistoryEntry();
-        e.setCorpora(corpusListPanel.getSelectedCorpora());
-        e.setQuery(queryPanel.getQuery());
-        controller.addHistoryEntry(e);
+        btDownload.setEnabled(false);
         progressBar.setVisible(true);
         progressLabel.setValue("");
 
@@ -382,18 +402,17 @@ public class ExportPanel extends FormLayout
           btCancel.setEnabled(true);
           btCancel.setDisableOnClick(true);
         }
+        
+        controller.executeExport(ExportPanel.this, eventBus);
 
-        exportFuture = PollControl.callInBackground(1000, null,
-          new BackgroundJob(exporter, ui));
-        if (exportFuture != null)
+        
+        if (exportTime == null)
         {
-          if (exportTime == null)
-          {
-            exportTime = new Stopwatch();
-          }
-          exportTime.reset();
-          exportTime.start();
+          exportTime = Stopwatch.createUnstarted();
         }
+        exportTime.reset();
+        exportTime.start();
+        
       }
     }
   }
@@ -404,101 +423,7 @@ public class ExportPanel extends FormLayout
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if (exportFuture != null)
-      {
-        if (!exportFuture.cancel(true))
-        {
-          log.warn("Could not cancel export");
-        }
-      }
-    }
-
-  }
-
-  private class BackgroundJob implements Callable<File>
-  {
-
-    private final Exporter exporter;
-    private final UI ui;
-
-    public BackgroundJob(Exporter exporter, UI ui)
-    {
-      this.exporter = exporter;
-      this.ui = ui;
-    }
-
-    @Override
-    public File call() throws Exception
-    {
-      final File currentTmpFile = File.createTempFile("annis-export", ".txt");
-      currentTmpFile.deleteOnExit();
-
-      
-
-      final AtomicBoolean success = new AtomicBoolean(false);
-      try(OutputStreamWriter outWriter
-        = new OutputStreamWriter(new FileOutputStream(currentTmpFile), "UTF-8");)
-      {
-        exporter.convertText(queryPanel.getQuery(),
-          (Integer) cbLeftContext.getValue(),
-          (Integer) cbRightContext.getValue(),
-          corpusListPanel.getSelectedCorpora(),
-          txtAnnotationKeys.getValue(),
-          txtParameters.getValue(),
-          Helper.getAnnisWebResource().path("query"),
-          outWriter, eventBus);
-        success.set(true);
-      }
-      finally
-      {
-        ui.access(new Runnable()
-        {
-          @Override
-          public void run()
-          {
-            btExport.setEnabled(true);
-            btCancel.setEnabled(false);
-            progressBar.setVisible(false);
-            progressLabel.setValue("");
-
-            // copy the result to the class member in order to delete if
-            // when not longer needed
-            tmpOutputFile = currentTmpFile;
-
-            if (tmpOutputFile == null)
-            {
-              Notification.show("Could not create the Exporter",
-                "The server logs might contain more information about this "
-                + "so you should contact the provider of this ANNIS installation "
-                + "for help.", Notification.Type.ERROR_MESSAGE);
-            }
-            else if (!success.get())
-            {
-              // we were aborted, don't do anything
-              Notification.show("Export cancelled",
-                Notification.Type.WARNING_MESSAGE);
-            }
-            else
-            {
-              if (downloader != null && btDownload.getExtensions().contains(
-                downloader))
-              {
-                btDownload.removeExtension(downloader);
-              }
-              downloader = new FileDownloader(new FileResource(
-                tmpOutputFile));
-
-              downloader.extend(btDownload);
-              btDownload.setEnabled(true);
-
-              Notification.show("Export finished",
-                "Click on the button right to the export button to actually download the file.",
-                Notification.Type.HUMANIZED_MESSAGE);
-            }
-          }
-        });
-      }
-      return currentTmpFile;
+      controller.cancelExport();
     }
 
   }

@@ -10,3 +10,4 @@ List of third-party JavaScript dependencies.
      (Apache License, Version 2.0) pdf.js (http://mozilla.github.io/pdf.js/)
      (MIT License) MediaElement.js (http://mediaelementjs.com/)
      (MIT License) Flotr2 (http://www.humblesoftware.com/flotr2/)
+     (MIT License) CodeMirror (http://codemirror.net)

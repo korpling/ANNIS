@@ -15,7 +15,7 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.converter.DateTimeConverter;
+import annis.gui.converter.DateTimeConverter;
 import com.vaadin.data.Property;
 import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Component;

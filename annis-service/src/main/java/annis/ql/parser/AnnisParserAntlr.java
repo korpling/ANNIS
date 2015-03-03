@@ -17,12 +17,14 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
 import annis.ql.AqlLexer;
 import annis.ql.AqlParser;
 import annis.ql.RawAqlPreParser;
 import com.google.common.base.Joiner;
 import java.util.LinkedList;
 import java.util.List;
+import org.antlr.v4.runtime.ANTLRErrorListener;
 import org.antlr.v4.runtime.ANTLRInputStream;
 import org.antlr.v4.runtime.BaseErrorListener;
 import org.antlr.v4.runtime.CommonTokenStream;
@@ -48,20 +50,22 @@ public class AnnisParserAntlr
 
   public QueryData parse(String aql, List<Long> corpusList)
   {
-    final List<String> errors = new LinkedList<>();
+    final List<AqlParseError> errors = new LinkedList<>();
     
 
     AqlLexer lexerNonDNF = new AqlLexer(new ANTLRInputStream(aql));
+    lexerNonDNF.removeErrorListeners();
+    lexerNonDNF.addErrorListener(new AqlLexerErrorListener(errors));
     
     // bring first into DNF
     RawAqlPreParser rawParser = new RawAqlPreParser(new CommonTokenStream(lexerNonDNF));
     rawParser.removeErrorListeners();
-    rawParser.addErrorListener(new StringListErrorListener(errors));
+    rawParser.addErrorListener(new AqlParseErrorListener(errors));
     
     RawAqlPreParser.StartContext treeRaw = rawParser.start();
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
     //treeRaw.inspect(rawParser);
     
@@ -78,7 +82,7 @@ public class AnnisParserAntlr
     AqlParser parserDNF = new AqlParser(new CommonTokenStream(source));
     
     parserDNF.removeErrorListeners();
-    parserDNF.addErrorListener(new StringListErrorListener(errors));
+    parserDNF.addErrorListener(new AqlParseErrorListener(errors));
 
     AqlParser.StartContext treeDNF = parserDNF.start();
     
@@ -86,11 +90,14 @@ public class AnnisParserAntlr
     
     if (!errors.isEmpty())
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
       
     ParseTreeWalker walker = new ParseTreeWalker();
-    QueryNodeListener nodeListener = new QueryNodeListener();
+    NodeIDListener idListener = new NodeIDListener();
+    walker.walk(idListener, treeDNF);
+    
+    QueryNodeListener nodeListener = new QueryNodeListener(idListener.getNodeIntervalToID());
 
     try
     {
@@ -133,10 +140,10 @@ public class AnnisParserAntlr
     AqlParser parser = new AqlParser(new CommonTokenStream(
       lexer));
     
-    final List<String> errors = new LinkedList<>();
+    final List<AqlParseError> errors = new LinkedList<>();
 
     parser.removeErrorListeners();
-    parser.addErrorListener(new StringListErrorListener(errors));
+    parser.addErrorListener(new AqlParseErrorListener(errors));
 
     ParseTree tree = parser.start();
     
@@ -146,7 +153,7 @@ public class AnnisParserAntlr
     }
     else
     {
-      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors));
+      throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
   }
   
@@ -189,6 +196,61 @@ public class AnnisParserAntlr
         errors.add("line " + line + ":" + charPositionInLine + " " + msg);
       }
     }
+  }
+  
+  public static class AqlLexerErrorListener implements ANTLRErrorListener<Integer>
+  {
+
+    private final List<AqlParseError> errors;
+
+    public AqlLexerErrorListener(List<AqlParseError> errors)
+    {
+      this.errors = errors;
+    }
+    
+    
+    
+    @Override
+    public <T extends Integer> void syntaxError(
+      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
+      int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        errors.add(new AqlParseError(line, charPositionInLine, line, charPositionInLine, msg));
+      }
+    }
+    
+  }
+  
+  public static class AqlParseErrorListener extends BaseErrorListener
+  {
+    private final List<AqlParseError> errors;
+
+    public AqlParseErrorListener(List<AqlParseError> errors)
+    {
+      this.errors = errors;
+    }
+
+    @Override
+    public <T extends Token> void syntaxError(
+      Recognizer<T, ?> recognizer, T offendingSymbol, int line,
+      int charPositionInLine, String msg, RecognitionException e)
+    {
+      if(errors != null)
+      {
+        int startColumn = charPositionInLine;
+        int endColumn = offendingSymbol.getStopIndex();
+        if(endColumn < startColumn)
+        {
+          // the token might be on a differnt line
+          endColumn = startColumn;
+        }
+        
+        errors.add(new AqlParseError(line, startColumn, line, endColumn, msg));
+      }
+    }
+    
   }
   
 }

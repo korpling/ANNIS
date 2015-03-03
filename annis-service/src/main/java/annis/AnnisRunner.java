@@ -28,7 +28,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.TreeSet;
 
 import org.apache.commons.io.output.FileWriterWithEncoding;
 import org.apache.commons.lang3.StringUtils;
@@ -49,7 +48,6 @@ import annis.dao.objects.AnnotatedMatch;
 import annis.dao.MetaDataFilter;
 import annis.model.Annotation;
 import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
@@ -69,8 +67,11 @@ import java.io.FileInputStream;
 import java.io.InputStreamReader;
 import annis.dao.autogenqueries.QueriesGenerator;
 import annis.ql.parser.AnnisParserAntlr;
+import annis.service.objects.FrequencyTable;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.SqlGeneratorAndExtractor;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 import com.google.common.base.Splitter;
 import java.util.Properties;
 
@@ -111,10 +112,14 @@ public class AnnisRunner extends AnnisBaseRunner
   private int left = 5;
 
   private int right = 5;
+  
+  private OrderType order = OrderType.normal;
 
   private String segmentationLayer = null;
   
   private SubgraphFilter filter = SubgraphFilter.all;
+  
+  private FrequencyTableQuery frequencyDef = null;
 
   private List<Long> corpusList;
 
@@ -318,7 +323,8 @@ public class AnnisRunner extends AnnisBaseRunner
   public void doDebug(String ignore)
   {
     doCorpus("pcc2");
-    doSubgraph("exmaralda::Inf-Stat::salt:/pcc2/4282/#sSpan14");
+    doSet("freq-def to 1:tok, 2:lemma");
+    doFrequency("tok . tok");
   }
 
   public void doParse(String annisQuery)
@@ -810,6 +816,17 @@ public class AnnisRunner extends AnnisBaseRunner
         offset = Integer.parseInt(value);
       }
     }
+    else if("order".equals(setting))
+    {
+      if(show)
+      {
+        value = order.toString();
+      }
+      else
+      {
+        order = OrderType.valueOf(value);
+      }
+    }
     else if ("left".equals(setting))
     {
       if (show)
@@ -908,6 +925,17 @@ public class AnnisRunner extends AnnisBaseRunner
         filter = SubgraphFilter.valueOf(value);
       }
     }
+    else if("freq-def".equals(setting))
+    {
+      if(show)
+      {
+        value = (frequencyDef == null ? "<not set>" : frequencyDef.toString());
+      }
+      else
+      {
+          frequencyDef = FrequencyTableQuery.parse(value);
+      }
+    }
     else
     {
       out.println("ERROR: unknown option: " + setting);
@@ -969,12 +997,23 @@ public class AnnisRunner extends AnnisBaseRunner
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer, filter));
-      queryData.addExtension(new LimitOffsetQueryData(offset, limit));
+      queryData.addExtension(new LimitOffsetQueryData(offset, limit, order));
     }
     else if (queryFunction != null && queryFunction.matches("(sql_)?subgraph"))
     {
       queryData.addExtension(new AnnotateQueryData(left, right,
         segmentationLayer, filter));
+    }
+    else if(queryFunction != null && queryFunction.matches("(sql_)?frequency"))
+    {
+      if(frequencyDef == null)
+      {
+        out.println("You have to set the 'freq-def' property first");
+      }
+      else
+      {
+        queryData.addExtension(frequencyDef);
+      }
     }
 
 
@@ -1015,6 +1054,15 @@ public class AnnisRunner extends AnnisBaseRunner
     List<Match> matches = annisDao.find(analyzeQuery(annisQuery, "find"));
     MatchGroup group = new MatchGroup(matches);
     out.println(group.toString());
+  }
+  
+  public void doFrequency(String definitions)
+  {    
+    FrequencyTable result = annisDao.frequency(analyzeQuery(definitions, "frequency"));
+    for(FrequencyTable.Entry e : result.getEntries())
+    {
+      out.println(e.toString());
+    }
   }
 
   public void doSubgraph(String saltIds)
@@ -1145,10 +1193,20 @@ public class AnnisRunner extends AnnisBaseRunner
     }
 
     Validate.isTrue(splitted.size() > 1,
-      "must have to arguments (toplevel corpus name and document name");
+      "must have two arguments (toplevel corpus name and document name");
     SaltProject p = annisDao.retrieveAnnotationGraph(splitted.get(0), 
       splitted.get(1), annoFilter);
     System.out.println(printSaltAsXMI(p));
+  }
+  
+  public void doExport(String args)
+  {
+    List<String> splitted = Splitter.on(' ').trimResults().omitEmptyStrings()
+      .limit(2)
+      .splitToList(args);
+    Validate.isTrue(splitted.size() == 2, "must have two arguments: toplevel corpus name and output directory");
+    
+    annisDao.exportCorpus(splitted.get(0), new File(splitted.get(1)));
   }
 
   public void doQuit(String dummy)

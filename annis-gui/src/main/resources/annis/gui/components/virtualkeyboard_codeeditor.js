@@ -1,5 +1,5 @@
-/*
- * Copyright 2012 SFB 632.
+/* 
+ * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,17 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.sqlgen.extensions;
 
-import annis.service.objects.FrequencyTableEntry;
-import annis.sqlgen.FrequencySqlGenerator;
-import java.io.Serializable;
-import java.util.ArrayList;
-
-/**
- * This is an extension to be used as argument for {@link FrequencySqlGenerator}
- * @author Thomas Krause <krauseto@hu-berlin.de>
- */
-public class FrequencyTableQueryData extends ArrayList<FrequencyTableEntry>
-{
+window.annis_gui_components_VirtualKeyboardCodeEditor = function() {
+    var component = this;
+  
+    function getElem()
+    {
+      return component.getElement(component.getParentId()).children[0];
+    }
+  
+    $(getElem()).bind("langchanged", function(e, newlang) {
+      component.updateLang(newlang);
+    });
+    
+    this.onStateChange = function() {
+      getElem().lang = this.getState().keyboardLayout;
+    }
+    
+    this.show = function () {
+      VKI_show(getElem());
+    }
 }

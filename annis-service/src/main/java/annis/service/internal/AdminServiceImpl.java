@@ -22,15 +22,14 @@ import annis.administration.DeleteCorpusDao;
 import annis.dao.AnnisDao;
 import annis.security.ANNISSecurityManager;
 import annis.security.ANNISUserConfigurationManager;
+import annis.security.ANNISUserRealm;
 import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
 import annis.utils.RelANNISHelper;
 import com.google.common.base.Joiner;
-import com.google.common.collect.FluentIterable;
 import com.google.common.io.ByteStreams;
-import com.google.common.io.Files;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
@@ -55,9 +54,11 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.Response;
 import javax.xml.bind.JAXBElement;
 import org.apache.shiro.SecurityUtils;
+import org.apache.shiro.crypto.SecureRandomNumberGenerator;
 import org.apache.shiro.crypto.hash.Sha256Hash;
 import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.subject.Subject;
+import org.apache.shiro.util.ByteSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -130,7 +131,7 @@ public class AdminServiceImpl implements AdminService
     user.checkPermission("admin:write:userconfig");
 
     String userName = (String) user.getPrincipal();
-
+    
     adminDao.storeUserConfig(userName, config.getValue());
     return Response.ok().build();
   }
@@ -171,23 +172,62 @@ public class AdminServiceImpl implements AdminService
         .entity("Username in object is not the same as in path")
         .build();
     }
-
-    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    
+    // if any permission is an adminstrative one the
+    // requesting user needs more than just a "admin:write:user" permission"
+    for(String permission : user.getPermissions())
     {
-      ANNISUserConfigurationManager confManager = getConfManager();
-      if (confManager != null)
+      if(permission.startsWith("admin:"))
       {
-        if (confManager.writeUser(user))
-        {
-          return Response.ok().build();
-        }
+        requestingUser.checkPermission("admin:write:adminuser");
+        break;
       }
     }
+    
+    ANNISUserRealm userRealm = getUserRealm();
+    if (userRealm != null)
+    {
+      if (userRealm.updateUser(user))
+      {
+        return Response.ok().build();
+      }
+    }
+    
     return Response
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not update/create user")
       .build();
   }
+
+  @GET
+  @Path("users/{userName}")
+  @Produces("application/xml")
+  @Override
+  public User getUser(@PathParam("userName")
+    String userName)
+  {
+    Subject requestingUser = SecurityUtils.getSubject();
+    requestingUser.checkPermission("admin:read:user");
+    
+    ANNISUserConfigurationManager conf = getConfManager();
+    if(conf != null)
+    {
+      User u = conf.getUser(userName);
+      if(u == null)
+      {
+        throw new WebApplicationException(Response.Status.NOT_FOUND);
+      }
+      
+      // remove the password hash from the result, we don't want someone with
+      // lower adminstration rights to crack it
+      u.setPasswordHash("");
+      
+      return u;
+    }
+    throw new WebApplicationException(Response.Status.INTERNAL_SERVER_ERROR);
+  }
+  
+  
 
   @DELETE
   @Path("users/{userName}")
@@ -224,28 +264,32 @@ public class AdminServiceImpl implements AdminService
     Subject requestingUser = SecurityUtils.getSubject();
     requestingUser.checkPermission("admin:write:user");
 
-    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    
+    ANNISUserConfigurationManager confManager = getConfManager();
+    ANNISUserRealm userRealm = getUserRealm();
+    if (confManager != null && userRealm != null)
     {
-      ANNISUserConfigurationManager confManager = getConfManager();
-      if (confManager != null)
+      User user = confManager.getUser(userName);
+      if (user == null)
       {
-        User user = confManager.getUser(userName);
-        if (user == null)
-        {
-          return Response.status(Response.Status.NOT_FOUND).build();
-        }
+        return Response.status(Response.Status.NOT_FOUND).build();
+      }
 
-        Shiro1CryptFormat format = new Shiro1CryptFormat();
+      Shiro1CryptFormat format = new Shiro1CryptFormat();
 
-        Sha256Hash hash = new Sha256Hash(newPassword, null, 1);
-        user.setPasswordHash(format.format(hash));
+      SecureRandomNumberGenerator generator
+        = new SecureRandomNumberGenerator();
+      ByteSource salt = generator.nextBytes(128/8); // 128 bit
 
-        if (confManager.writeUser(user))
-        {
-          return Response.ok().entity(user).build();
-        }
+      Sha256Hash hash = new Sha256Hash(newPassword, salt, 1);
+      user.setPasswordHash(format.format(hash));
+
+      if (userRealm.updateUser(user))
+      {
+        return Response.ok().entity(user).build();
       }
     }
+
     return Response
       .status(Response.Status.INTERNAL_SERVER_ERROR)
       .entity("Could not change password")
@@ -488,6 +532,17 @@ public class AdminServiceImpl implements AdminService
         = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).
         getConfManager();
       return confManager;
+    }
+    return null;
+  }
+  
+  private ANNISUserRealm getUserRealm()
+  {
+    if (SecurityUtils.getSecurityManager() instanceof ANNISSecurityManager)
+    {
+      ANNISUserRealm userRealm
+        = ((ANNISSecurityManager) SecurityUtils.getSecurityManager()).getANNISUserRealm();
+      return userRealm;
     }
     return null;
   }

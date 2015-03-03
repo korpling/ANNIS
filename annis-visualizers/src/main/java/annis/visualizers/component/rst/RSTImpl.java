@@ -381,7 +381,7 @@ public class RSTImpl extends Panel implements SGraphTraverseHandler {
         SProcessingAnnotation sentence_idx = currNode.
                 getSProcessingAnnotation(SENTENCE_INDEX + "::" + SENTENCE_INDEX);
         int index = sentence_idx == null ? -1 : Integer.parseInt(sentence_idx.
-                getValueString());
+                getSValueSTEXT());
 
         data.put(SENTENCE_LEFT, index);
         data.put(SENTENCE_RIGHT, index);

@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,14 +15,33 @@
  */
 package annis.gui;
 
-import java.io.Serializable;
-import java.util.Set;
+import com.vaadin.server.UIClassSelectionEvent;
+import com.vaadin.server.UIProvider;
+import com.vaadin.ui.UI;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface CorpusSelectionChangeListener extends Serializable
+public class AnnisUIProvider extends UIProvider
 {
-  public void onCorpusSelectionChanged(Set<String> selectedCorpora);
+
+  @Override
+  public Class<? extends UI> getUIClass(UIClassSelectionEvent event)
+  {
+    String path = event.getRequest().getPathInfo();
+    if("/admin".equals(path))
+    {
+      return AdminUI.class;
+    }
+    else if(path != null && path.startsWith(EmbeddedVisUI.PREFIX))
+    {
+      return EmbeddedVisUI.class;
+    }
+    else
+    {
+      return SearchUI.class;
+    }
+  }
+  
 }

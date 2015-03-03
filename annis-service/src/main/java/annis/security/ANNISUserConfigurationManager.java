@@ -54,7 +54,7 @@ public class ANNISUserConfigurationManager
   private final Map<String, Group> groups = new TreeMap<>();
 
   private Date lastTimeReloaded = null;
-
+  
   private final ReadWriteLock lock = new ReentrantReadWriteLock();
 
   private void checkConfiguration()

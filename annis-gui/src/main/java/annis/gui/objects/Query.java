@@ -17,10 +17,15 @@ package annis.gui.objects;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.Objects;
 import java.util.Set;
 
 /**
- * A POJO representing a query
+ * A POJO representing a query.
+ * 
+ * This objects holds all relevant information about the state of the UI
+ * related to querying, e.g. the AQL, the search options and the type of the query.
+ * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class Query implements Serializable
@@ -60,6 +65,33 @@ public class Query implements Serializable
   {
     this.corpora = corpora;
   }
+
+  @Override
+  public int hashCode()
+  {
+    return Objects.hash(corpora, query);
+  }
+
+  
+  @Override
+  public boolean equals(Object obj)
+  {
+    if (obj == null)
+    {
+      return false;
+    }
+    if (getClass() != obj.getClass())
+    {
+      return false;
+    }
+    final Query other = (Query) obj;
+    
+    return Objects.equals(this.query, other.query)
+      && Objects.equals(this.corpora, other.corpora);
+  }
+
+  
+  
   
   
 }

@@ -15,7 +15,9 @@
  */
 package annis.service.objects;
 
+import com.google.common.base.Splitter;
 import java.io.Serializable;
+import java.util.List;
 
 /**
  *
@@ -29,6 +31,53 @@ public class FrequencyTableEntry implements Serializable
 
   private String referencedNode;
 
+  public FrequencyTableEntry()
+  {
+    
+  }
+  
+  /**
+   * A constructor that takes the raw definition as argument.
+   * 
+   * A definition consists of two parts: the referenced node and the annotation 
+   * name or "tok" separated by ":" 
+   * @param definition 
+   * @return 
+   */
+  public static FrequencyTableEntry parse(String definition)
+  {
+    List<String> splitted
+      = Splitter.on(':').trimResults().omitEmptyStrings().limit(2).
+      splitToList(definition);
+    if (splitted.size() == 2)
+    {
+      FrequencyTableEntry entry = new FrequencyTableEntry();
+
+      if ("meta".equals(splitted.get(0)))
+      {
+        entry.setReferencedNode(null);
+        entry.setType(FrequencyTableEntryType.meta);
+        entry.setKey(splitted.get(1));
+      }
+      else
+      {
+        entry.setReferencedNode(splitted.get(0));
+        if ("tok".equals(splitted.get(1)))
+        {
+          entry.setType(FrequencyTableEntryType.span);
+        }
+        else
+        {
+          entry.setType(FrequencyTableEntryType.annotation);
+          entry.setKey(splitted.get(1));
+        }
+      }
+      return entry;
+    }
+    return null;
+  }
+  
+  
   public FrequencyTableEntryType getType()
   {
     return type;
@@ -58,5 +107,22 @@ public class FrequencyTableEntry implements Serializable
   {
     this.referencedNode = referencedNode;
   }
+
+  @Override
+  public String toString()
+  {
+    switch(type)
+    {
+      case span:
+        return referencedNode + ":tok";
+      case annotation:
+        return referencedNode + ":" + key;
+      case meta:
+        return "meta:" + key;
+    }
+    return super.toString();
+  }
+  
+  
   
 }

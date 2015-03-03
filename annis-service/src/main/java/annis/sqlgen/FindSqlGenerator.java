@@ -73,15 +73,18 @@ public class FindSqlGenerator extends AbstractSqlGenerator
     sb.append(indent2).append("solution.*,\n");
     
     // add node annotation namespace and name for each query node
+    int i=0;
     Iterator<QueryNode> itNodes = alternative.iterator();
     while(itNodes.hasNext())
     {
+      i++;
+      
       QueryNode n = itNodes.next();
       TableAccessStrategy tas = tables(n);
       sb.append(indent2).append(annoCondition.getNodeAnnoNamespaceSQL(tas))
-        .append(" AS node_annotation_ns").append(n.getId()).append(",\n");
+        .append(" AS node_annotation_ns").append(i).append(",\n");
       sb.append(indent2).append(annoCondition.getNodeAnnoNameSQL(tas))
-        .append(" AS node_annotation_name").append(n.getId()).append(",\n");
+        .append(" AS node_annotation_name").append(i).append(",\n");
       
       // corpus path is only needed once
       sb.append(indent2).append("c.path_name AS path_name");
@@ -108,9 +111,12 @@ public class FindSqlGenerator extends AbstractSqlGenerator
     
     Preconditions.checkArgument(!alternative.isEmpty(), "There must be at least one query node in the alternative");
     // add the left joins with the annotation category table
+    int i=0;
     Iterator<QueryNode> itNodes = alternative.iterator();
     while(itNodes.hasNext())
     {
+      i++;
+      
       QueryNode n = itNodes.next();
       sb.append(indent)
         .append("LEFT JOIN annotation_category AS annotation_category")
@@ -119,7 +125,7 @@ public class FindSqlGenerator extends AbstractSqlGenerator
         .append(n.getId())
         .append(".toplevel_corpus")
         .append(" AND solution.cat")
-        .append(n.getId())
+        .append(i)
         .append(" = annotation_category")
         .append(n.getId())
         .append(".id")
@@ -210,17 +216,21 @@ public class FindSqlGenerator extends AbstractSqlGenerator
           try
           {
             int number = Integer.parseInt(numberAsString);
-            saltIDs.put(number, rs.getString(column));
+            String saltIDForNode = rs.getString(column);
+            if(saltIDForNode != null)
+            {
+              saltIDs.put(number, rs.getString(column));
 
-            String annoNamespace = rs.getString("node_annotation_ns" + number);
-            if (annoNamespace != null)
-            {
-              nodeAnnoNamespaces.put(number, annoNamespace);
-            }
-            String annoName = rs.getString("node_annotation_name" + number);
-            if (annoName != null)
-            {
-              nodeAnnoNames.put(number, annoName);
+              String annoNamespace = rs.getString("node_annotation_ns" + number);
+              if (annoNamespace != null)
+              {
+                nodeAnnoNamespaces.put(number, annoNamespace);
+              }
+              String annoName = rs.getString("node_annotation_name" + number);
+              if (annoName != null)
+              {
+                nodeAnnoNames.put(number, annoName);
+              }
             }
 
           }

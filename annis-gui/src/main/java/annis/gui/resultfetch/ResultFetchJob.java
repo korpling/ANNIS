@@ -15,18 +15,19 @@
  */
 package annis.gui.resultfetch;
 
-import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import annis.model.AqlParseError;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
+import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.AsyncWebResource;
+import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
@@ -62,16 +63,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
   protected PagedResultQuery query;
 
   protected SearchUI ui;
-  private final QueryController queryController;
 
   public ResultFetchJob(PagedResultQuery query,
     ResultViewPanel resultPanel,
-    SearchUI ui, QueryController controller)
+    SearchUI ui)
   {
     this.resultPanel = resultPanel;
     this.query = query;
     this.ui = ui;
-    this.queryController = controller;
     
     res = Helper.getAnnisAsyncWebResource();
     
@@ -80,6 +79,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))
+      .queryParam("order", query.getOrder().toString())
       .accept(MediaType.APPLICATION_XML_TYPE)
       .get(MatchGroup.class);
 
@@ -114,9 +114,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
       // get the matches
       result = futureMatches.get();
       
-      // store the matches for later purposes
-      queryController.setMatches(result);
-
       // get the subgraph for each match, when the result is not empty
       if (result.getMatches().isEmpty())
       {
@@ -172,7 +169,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
           subList.add(m);
           final SaltProject p = executeQuery(subgraphRes, 
             new MatchGroup(subList), 
-            query.getContextLeft(), query.getContextRight(),
+            query.getLeftContext(), query.getRightContext(),
             query.getSegmentation(), SubgraphFilter.all);
 
           queue.put(p);
@@ -221,8 +218,14 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
               UniformInterfaceException ex = (UniformInterfaceException) cause;
               if (ex.getResponse().getStatus() == 400)
               {
-                paging.setInfo("parsing error: " + ex.getResponse().
-                  getEntity(String.class));
+                List<AqlParseError> errors
+                  = ex.getResponse().getEntity(
+                    new GenericType<List<AqlParseError>>()
+                    {
+                    });
+                String errMsg = Joiner.on(" | ").join(errors);
+
+                paging.setInfo("parsing error: " + errMsg);
               }
               else if (ex.getResponse().getStatus() == 504)
               {

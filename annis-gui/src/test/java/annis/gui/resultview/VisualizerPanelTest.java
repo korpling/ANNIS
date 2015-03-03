@@ -67,7 +67,7 @@ public class VisualizerPanelTest
   @Test
   public void testSerializationOfSDocument() throws IOException, ClassNotFoundException
   {
-    SaltProject project = SampleGenerator.createCompleteSaltproject();
+    SaltProject project = SampleGenerator.createSaltProject();
     SDocument doc = project.getSCorpusGraphs().get(0).getSDocuments().get(0);
     
     VisualizerPanel o = new VisualizerPanel(null, doc, null, null, null, null,

@@ -231,6 +231,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
 
     log.debug("dropping possible existing database");
+    closeAllConnections(database);
     getJdbcTemplate().execute("DROP DATABASE IF EXISTS " + database);
 
   }
@@ -355,7 +356,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     return true;
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.NEVER)
   public void initializeDatabase(String host, String port, String database,
     String user, String password, String defaultDatabase, String superUser,
     String superPassword, boolean useSSL, String pgSchema)
@@ -367,7 +367,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       getDataSource().setInnerDataSource(createDataSource(host, port,
         defaultDatabase, superUser, superPassword, useSSL, pgSchema));
 
-      createDatabaseAndUserInTransaction(database, user, password);
+      createDatabaseAndUser(database, user, password);
     }
     // switch to new database as new user for the rest of the initialization procedure
     getDataSource().setInnerDataSource(createDataSource(host, port, database,
@@ -390,12 +390,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
       }
     }
 
-    createSchemaInTransaction();
+    setupDatabase();
 
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  private void createDatabaseAndUserInTransaction(String database,
+  private void createDatabaseAndUser(String database,
     String user, String password)
   {
     dropDatabase(database);
@@ -406,8 +405,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     installPlPgSql();
   }
 
-  @Transactional(readOnly = false, propagation = Propagation.REQUIRES_NEW)
-  private void createSchemaInTransaction()
+  private void setupDatabase()
   {
     createFunctionUniqueToplevelCorpusName();
     createSchema();
@@ -534,6 +532,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     addUniqueNodeNameAppendix();
     adjustRankPrePost();
     adjustTextId();
+    addDocumentNameMetaData();
     long corpusID = updateIds();
 
     importBinaryData(path, toplevelCorpusName);
@@ -935,6 +934,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("computing path information of the corpus tree for corpus with ID "
       + corpusID);
     executeSqlFromScript("compute_corpus_path.sql", args);
+  }
+  
+  void addDocumentNameMetaData()
+  {
+    log.info("add the document name as metadata");
+    executeSqlFromScript("adddocmetadata.sql");
   }
 
   protected void adjustRankPrePost()
@@ -1414,6 +1419,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       + ");",
       alias, corpusID);
   }
+ 
   
   public void addCorpusAlias(String corpusName, String alias)
   {

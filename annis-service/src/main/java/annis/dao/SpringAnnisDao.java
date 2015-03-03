@@ -21,6 +21,7 @@ import annis.WekaHelper;
 import annis.examplequeries.ExampleQuery;
 import annis.service.objects.FrequencyTable;
 import annis.exceptions.AnnisException;
+import annis.model.AnnisConstants;
 import annis.model.Annotation;
 import annis.ql.parser.AnnisParserAntlr;
 import annis.ql.parser.QueryData;
@@ -59,7 +60,16 @@ import com.google.common.base.Charsets;
 import com.google.common.base.Joiner;
 import com.google.common.base.Preconditions;
 import com.google.common.io.ByteStreams;
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.impl.SaltFactoryImpl;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.exceptions.SaltResourceException;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -94,6 +104,9 @@ import java.util.UUID;
 import org.apache.commons.io.IOUtils;
 import org.codehaus.jackson.map.DeserializationConfig;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
+import org.eclipse.emf.ecore.xmi.XMLResource;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -1021,6 +1034,118 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
     return false;
   }
+
+  @Override
+  @Transactional(readOnly = true)
+  public void exportCorpus(String toplevelCorpus, File outputDirectory)
+  {
+    
+    // check if the corpus really exists
+    mapCorpusNameToId(toplevelCorpus);
+    
+    SaltProject corpusProject = SaltFactory.eINSTANCE.createSaltProject();
+    SCorpusGraph corpusGraph = SaltFactory.eINSTANCE.createSCorpusGraph();
+    corpusGraph.setSaltProject(corpusProject);
+    
+    SCorpus rootCorpus = corpusGraph.createSCorpus(null, toplevelCorpus);
+    
+    // add all root metadata
+    for(Annotation metaAnno : listCorpusAnnotations(toplevelCorpus))
+    {
+      rootCorpus.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+        metaAnno.getValue());
+    }
+    
+    File documentRootDir = new File(outputDirectory, toplevelCorpus);
+    
+    
+    if(!outputDirectory.exists())
+    {
+      if(!outputDirectory.mkdirs())
+      {
+        log.warn("Could not create output directory \"{}\" for exporting the corpus",
+          outputDirectory.getAbsolutePath());
+      }
+    }
+    
+    File projectFile = new File(outputDirectory, "saltProject"+"."+ SaltFactory.FILE_ENDING_SALT);
+    URI saltProjectFileURI = URI.createFileURI(projectFile.getAbsolutePath());
+    Resource resource= SaltFactoryImpl.getResourceSet().createResource(saltProjectFileURI);
+    
+    List<Annotation> docs = listDocuments(toplevelCorpus);
+    int i=1;
+    for(Annotation docAnno  : docs)
+    {
+      log.info("Loading document {} from database ({}/{})", docAnno.getName(), i, docs.size());
+      SaltProject docProject = retrieveAnnotationGraph(toplevelCorpus, docAnno.getName(), null);
+      if(docProject != null && docProject.getSCorpusGraphs() != null
+        && !docProject.getSCorpusGraphs().isEmpty())
+      {
+        List<Annotation> docMetaData = listCorpusAnnotations(toplevelCorpus,
+          docAnno.getName(), true);
+        
+        SCorpusGraph docCorpusGraph = docProject.getSCorpusGraphs().get(0);
+        // TODO: we could re-use the actual corpus structure instead of just adding a flat list of documents
+        if(docCorpusGraph.getSDocuments() != null)
+        {
+          for(SDocument doc : docCorpusGraph.getSDocuments())
+          {
+            log.info("Removing SFeatures from {} ({}/{})", docAnno.getName(), i, docs.size());
+            // remove all ANNIS specific features that require a special Java class
+            SDocumentGraph graph = doc.getSDocumentGraph();
+            if(graph != null)
+            {
+              if(graph.getSNodes() != null)
+              {
+                for(SNode n : graph.getSNodes())
+                {
+                  n.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_NODE);
+                }
+              }
+              if(graph.getSRelations() != null)
+              {
+                for(SRelation e : graph.getSRelations())
+                {
+                  e.removeLabel(AnnisConstants.ANNIS_NS, AnnisConstants.FEAT_RELANNIS_EDGE);
+                }
+              }
+            }
+            
+            log.info("Saving document {} ({}/{})", doc.getSName(), i, docs.size());
+            doc.saveSDocumentGraph(URI.createFileURI(
+              new File(documentRootDir, doc.getSName() + "." 
+                + SaltFactory.FILE_ENDING_SALT).getAbsolutePath()));
+            
+            SDocument docCopy = corpusGraph.createSDocument(rootCorpus, doc.getSName());
+            log.info("Adding metadata to document {} ({}/{})", doc.getSName(), i, docs.size());
+            for(Annotation metaAnno : docMetaData)
+            {
+              docCopy.createSMetaAnnotation(metaAnno.getNamespace(), metaAnno.getName(),
+                metaAnno.getValue());
+            }
+          }
+        }
+      }
+      i++;
+    } // end for each document
+    
+    // save the actual SaltProject
+    log.info("Saving corpus structure");
+    try 
+		{//must be done after all, because it doesn't work, if not all SDocumentGraph objects 
+			XMLResource xmlProjectResource= (XMLResource) resource;
+			xmlProjectResource.getContents().add(corpusProject);
+			xmlProjectResource.setEncoding("UTF-8");
+			xmlProjectResource.save(null);
+		}//must be done after all, because it doesn't work, if not all SDocumentGraph objects  
+		catch (IOException e) 
+		{
+			throw new SaltResourceException("Cannot save salt project to given uri \"" 
+        + outputDirectory.getAbsolutePath() + "\"", e);
+		}
+  }
+  
+  
 
   public AnnisParserAntlr getAqlParser()
   {
