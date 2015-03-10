@@ -39,6 +39,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SToken;
 import java.util.TreeMap;
 import static annis.CommonHelper.*;
+import annis.libgui.Helper;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import java.util.Map.Entry;
@@ -166,7 +167,7 @@ public class GridTreeVisualizer extends AbstractVisualizer<Panel> {
 
             // add some css formatting
             grid.addStyleName("partitur_table");
-            grid.addStyleName("corpus-font-force");
+            grid.addStyleName(Helper.CORPUS_FONT_FORCE);
 
         }
 

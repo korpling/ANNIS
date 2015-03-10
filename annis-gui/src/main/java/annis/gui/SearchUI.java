@@ -346,7 +346,7 @@ public class SearchUI extends CommonUI
       {
         injectUniqueCSS(
           "@import url(" + cfg.getUrl() + ");\n"
-          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
+          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "' !imporant , monospace !important; }\n"
           + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
