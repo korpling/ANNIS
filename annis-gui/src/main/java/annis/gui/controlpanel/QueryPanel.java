@@ -101,7 +101,15 @@ public class QueryPanel extends GridLayout implements
     txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
-    txtQuery.addStyleName(Helper.CORPUS_FONT);
+    if(ui.getInstanceFont() == null)
+    {
+      txtQuery.addStyleName("default-query-font");
+    }
+    else
+    {
+      txtQuery.addStyleName(Helper.CORPUS_FONT);
+    }
+    
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(15f, Unit.EM);

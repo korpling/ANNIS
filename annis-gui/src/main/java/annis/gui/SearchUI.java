@@ -994,6 +994,15 @@ public class SearchUI extends CommonUI
     return queryState;
   }  
   
+  public FontConfig getInstanceFont()
+  {
+    if (instanceConfig != null && instanceConfig.getFont() != null)
+    {
+      return instanceConfig.getFont();
+    }
+    return null;
+  }
+  
 }
 
 
