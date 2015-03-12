@@ -136,7 +136,7 @@ public class ExampleQueriesPanel extends Table
         ExampleQuery eQ = (ExampleQuery) itemId;
         Label l = new Label(eQ.getDescription());
         l.setContentMode(ContentMode.TEXT);
-        l.addStyleName("corpus-font-force");
+        l.addStyleName(Helper.CORPUS_FONT_FORCE);
         return l;
       }
     });
@@ -378,7 +378,7 @@ public class ExampleQueriesPanel extends Table
       btn.setCaption(eQ.getExampleQuery());
       btn.setDescription("show results for \"" + eQ.getExampleQuery()
         + "\" in " + eQ.getCorpusName());
-      btn.addStyleName("corpus-font-force");
+      btn.addStyleName(Helper.CORPUS_FONT_FORCE);
       
       btn.addClickListener(new Button.ClickListener()
       {

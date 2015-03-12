@@ -227,6 +227,16 @@ $font-size: 10pt;
       text-decoration: underline;
       color: #3137F5;
     }
+    
+    .v-disabled .v-captiontext  {
+      color: lightgray;
+      text-decoration: none;
+    }
+    
+    .v-disabled .v-icon  {
+      color: lightgray;
+    }
+    
     .v-accordion-item-open .v-captiontext {
       text-decoration: none;
       color: black;
@@ -263,6 +273,10 @@ $font-size: 10pt;
   .v-menubar-huge {
     line-height: $huge-menubar-height;
     height: $huge-menubar-height + 2px;
+  }
+  
+  .default-query-font {
+    font-family: monospace;
   }
   
   /* Code mirror theme changes */

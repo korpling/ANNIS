@@ -26,6 +26,7 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
+import annis.libgui.Helper;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -100,7 +101,15 @@ public class QueryPanel extends GridLayout implements
     txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
-    txtQuery.addStyleName("corpus-font-force");
+    if(ui.getInstanceFont() == null)
+    {
+      txtQuery.addStyleName("default-query-font");
+    }
+    else
+    {
+      txtQuery.addStyleName(Helper.CORPUS_FONT);
+    }
+    
     txtQuery.addStyleName("keyboardInput");
     txtQuery.setWidth("100%");
     txtQuery.setHeight(15f, Unit.EM);

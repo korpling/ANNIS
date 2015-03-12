@@ -11412,10 +11412,9 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: FontAwesome;
 	font-style: normal;
 	font-weight: normal;
-	position: absolute;
+	margin-right: 5px;
 	color: red;
 	top: 0px;
-	right: 2px;
 	content: "\f1c1";
 }
 
@@ -11787,6 +11786,15 @@ div.v-layout.v-horizontal.v-widget {
 	color: #3137F5;
 }
 
+.annis .help-tab .v-disabled .v-captiontext {
+	color: lightgray;
+	text-decoration: none;
+}
+
+.annis .help-tab .v-disabled .v-icon {
+	color: lightgray;
+}
+
 .annis .help-tab .v-accordion-item-open .v-captiontext {
 	text-decoration: none;
 	color: black;
@@ -11818,6 +11826,10 @@ div.v-layout.v-horizontal.v-widget {
 .annis .v-menubar-huge {
 	line-height: 40px;
 	height: 42px;
+}
+
+.annis .default-query-font {
+	font-family: monospace;
 }
 
 .annis .cm-s-default .cm-string, .annis .cm-s-default .cm-string-2 {

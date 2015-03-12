@@ -15,6 +15,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.libgui.Helper;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.OptionGroup;
 import com.vaadin.data.Item;
@@ -61,7 +62,7 @@ public class MetaBox extends Panel implements Button.ClickListener
     
     l.setMultiSelect(true);
     l.setNullSelectionAllowed(true); 
-    l.addStyleName("corpus-font-force");
+    l.addStyleName(Helper.CORPUS_FONT_FORCE);
     l.setImmediate(true);
     
     tcs = l;

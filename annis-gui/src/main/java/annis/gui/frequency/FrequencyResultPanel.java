@@ -17,6 +17,7 @@ package annis.gui.frequency;
 
 import annis.gui.components.FrequencyChart;
 import annis.gui.objects.FrequencyQuery;
+import annis.libgui.Helper;
 import annis.service.objects.FrequencyTable;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
@@ -179,7 +180,7 @@ public class FrequencyResultPanel extends VerticalLayout
     
     tblResult.setSelectable(true);
     tblResult.setMultiSelect(false);
-    tblResult.addStyleName("corpus-font-force");
+    tblResult.addStyleName(Helper.CORPUS_FONT_FORCE);
     
     if(!table.getEntries().isEmpty())
     {

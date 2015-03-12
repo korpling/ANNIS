@@ -15,6 +15,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.libgui.Helper;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.event.FieldEvents;
@@ -80,7 +81,7 @@ public class SpanBox extends Panel implements Button.ClickListener, FieldEvents.
     sb.addComponent(tf);
     this.cb = new SensitiveComboBox();
     cb.setWidth(SB_CB_WIDTH);
-    cb.addStyleName("corpus-font-force");
+    cb.addStyleName(Helper.CORPUS_FONT_FORCE);
     // configure & load content
     cb.setImmediate(true);
     cb.setNewItemsAllowed(true);
