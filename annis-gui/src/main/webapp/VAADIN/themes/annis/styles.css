@@ -11412,10 +11412,9 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: FontAwesome;
 	font-style: normal;
 	font-weight: normal;
-	position: absolute;
+	margin-right: 5px;
 	color: red;
 	top: 0px;
-	right: 2px;
 	content: "\f1c1";
 }
 

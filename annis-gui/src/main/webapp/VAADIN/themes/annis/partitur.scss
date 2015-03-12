@@ -119,15 +119,16 @@
     top:0px;
     content: "\f028";
   }
-
+  
   .pdf:before {
     font-family: FontAwesome;
     font-style: normal;
     font-weight: normal;
-    position:absolute;
+
+    margin-right: 5px;
+    
     color: red;
     top:0px;
-    right: 2px;
     content: "\f1c1";
   }
 
