@@ -510,6 +510,12 @@ public class QueryController implements Serializable
 
   }
   
+  public void corpusSelectionChangedInBackground()
+  {
+    ui.getControlPanel().getSearchOptions()
+      .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora().getValue(), ui);
+  }
+  
   public QueryUIState getState()
   {
     return ui.getQueryState();

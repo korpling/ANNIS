@@ -361,7 +361,7 @@ public class CorpusBrowserPanel extends Panel
           CorpusBrowserEntry corpusBrowserEntry = (CorpusBrowserEntry) itemId;
           Label l = new Label(corpusBrowserEntry.getExample());
           l.setContentMode(ContentMode.TEXT);
-          l.addStyleName("corpus-font-force");
+          l.addStyleName(Helper.CORPUS_FONT_FORCE);
           return l;
         }
       });

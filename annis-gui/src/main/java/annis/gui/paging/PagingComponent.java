@@ -16,6 +16,7 @@
 package annis.gui.paging;
 
 import annis.gui.util.ANNISFontIcon;
+import annis.libgui.Helper;
 import com.vaadin.ui.themes.ChameleonTheme;
 import com.vaadin.data.Validator;
 import com.vaadin.data.validator.AbstractStringValidator;
@@ -367,7 +368,7 @@ public class PagingComponent extends Panel implements
   {
     if (text != null && text.length() > 0)
     {
-      String prefix = "Result for: <span class=\"corpus-font-force\">";
+      String prefix = "Result for: <span class=\"" + Helper.CORPUS_FONT_FORCE + "\">";
       lblInfo.setDescription(prefix + text.replaceAll("\n", " ") + "</span>");
       lblInfo.setValue(text.length() < 50 ? prefix + StringEscapeUtils.
         escapeHtml4(text.substring(0, text.length())) : prefix + StringEscapeUtils.

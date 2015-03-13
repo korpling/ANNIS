@@ -129,7 +129,7 @@ public class GridComponent extends Panel
     String resultID = input.getId();
     grid = new AnnotationGrid(mediaController, pdfController, resultID);
     grid.addStyleName(getMainStyle());
-    grid.addStyleName("corpus-font-force");
+    grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
     grid.setShowNamespace(Boolean.parseBoolean(input.getMappings().
