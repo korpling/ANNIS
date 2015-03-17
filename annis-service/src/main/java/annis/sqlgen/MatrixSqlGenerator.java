@@ -203,11 +203,11 @@ public class MatrixSqlGenerator
   {
     return "array_agg(DISTINCT coalesce("
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "namespace")
-      + " || ':', '') || "
+      + " || ':', ':') || "
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "name")
-      + " || ':' || encode("
+      + " || ':' || "
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "value")
-      + "::bytea, 'base64')) AS metadata";
+      + ") AS metadata";
   }
 
   @Override
