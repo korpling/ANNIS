@@ -17,12 +17,13 @@ package annis.gui.frequency;
 
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
+import java.io.Serializable;
 
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserGeneratedFrequencyEntry
+public class UserGeneratedFrequencyEntry implements Serializable
 {
   private String nr;
   private String annotation;

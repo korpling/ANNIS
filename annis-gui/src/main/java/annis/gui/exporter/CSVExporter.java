@@ -37,7 +37,7 @@ public class CSVExporter implements Exporter, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CSVExporter.class);
 
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys,String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
@@ -63,6 +63,8 @@ public class CSVExporter implements Exporter, Serializable
       }
       
       out.flush();
+      
+      return true;
     }
     catch(UniformInterfaceException ex)
     {
@@ -79,6 +81,7 @@ public class CSVExporter implements Exporter, Serializable
     {
       log.error(null, ex);
     }
+    return false;
   }
 
   @Override
