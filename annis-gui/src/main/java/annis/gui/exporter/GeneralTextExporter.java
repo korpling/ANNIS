@@ -57,7 +57,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
@@ -132,15 +132,9 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         String currentLine;
         int offset=0;
         // 2. iterate over all matches and get the sub-graph for a group of matches
-        while((currentLine = inReader.readLine()) != null)
-        {
-          
-          if(Thread.currentThread().isInterrupted())
-          {
-            // return from loop and abort export
-            break;
-          }
-          
+        while(!Thread.currentThread().isInterrupted() 
+          && (currentLine = inReader.readLine()) != null)
+        { 
           Match match = Match.parseFromString(currentLine);
 
           currentMatches.getMatches().add(match);
@@ -177,11 +171,18 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 
             if(eventBus != null)
             {
-              eventBus.post(Integer.valueOf(offset+1));
+              eventBus.post(offset+1);
             }
           }
           offset++;
         } // end for each line
+        
+        if (Thread.interrupted())
+        {
+          // return from loop and abort export
+          log.info("Exporter job was interrupted");
+          return false;
+        }
         
         // query the left over matches
         if (!currentMatches.getMatches().isEmpty())
@@ -212,6 +213,8 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       out.append("\n");
       out.append("\n");
       out.append("finished");
+      
+      return true;
 
     }
     catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
@@ -225,6 +228,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       log.error(
         null, ex);
     }
+    return false;
   }
 
   public void convertText(AnnisResultSet queryResult, List<String> keys,

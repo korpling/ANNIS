@@ -287,9 +287,10 @@ public class ExportPanel extends FormLayout
   {
     if(ui != null)
     {
-      ui.access(new Runnable()
+      // if we ui access() here it seems to confuse the isInterrupted() flag
+      // of the parent thread and cancelling won't work any longer
+      ui.accessSynchronously(new Runnable()
       {
-
         @Override
         public void run()
         {
