@@ -72,6 +72,7 @@ public class Edge implements Serializable
       }
     }
   };
+  private long id;
   private AnnisNode source;
   private AnnisNode destination;
   private long pre;
@@ -252,4 +253,16 @@ public class Edge implements Serializable
   {
     this.destination = destination;
   }
+
+  public long getId()
+  {
+    return id;
+  }
+
+  public void setId(long id)
+  {
+    this.id = id;
+  }
+  
+  
 }

@@ -1,7 +1,5 @@
 --- :id is replaced by code
 
-SET enable_hashagg = false;
-
 DROP TABLE IF EXISTS annotations_:id;
 
 CREATE TABLE annotations_:id
@@ -33,11 +31,11 @@ GROUP BY namespace, name, value
 UNION ALL
 
 SELECT DISTINCT :id, e.namespace, e.name, e.value, count(r.id) as occurences,
-  'edge', c.type, c.namespace, c.name
+  'edge', c.type, c.layer, c.name
 FROM _rank as r JOIN _component as c ON (r.component_ref = c.id) LEFT OUTER JOIN _edge_annotation as e ON (e.rank_ref = r.id)
 WHERE 
       c.name IS NOT NULL
-GROUP BY e.namespace, e.name, e.value, c.type, c.namespace, c.name
+GROUP BY e.namespace, e.name, e.value, c.type, c.layer, c.name
 
 UNION ALL
 
@@ -47,7 +45,3 @@ FROM _node AS n
 WHERE n.seg_name IS NOT NULL
 GROUP BY(n.seg_name)
 ;
-
-
-
-SET enable_hashagg = true;

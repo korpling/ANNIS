@@ -275,7 +275,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
 
     TableAccessStrategy tas = tables(null);
 
-    conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
+    conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
       tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
     List<Long> corpusList = queryData.getCorpusList();
@@ -304,7 +304,7 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     
     innerSelect +=
         "WHERE parent="
-      + tables(node).aliasedColumn(RANK_TABLE, "pre")
+      + tables(node).aliasedColumn(RANK_TABLE, "id")
       + " AND component_id = " + tables(node).aliasedColumn(RANK_TABLE,
         "component_id")
       + " AND corpus_ref="
@@ -683,10 +683,10 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // direct
     if (min == 1 && max == 1)
     {
-      conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "pre"),
+      conditions.add(join("=", tables(node).aliasedColumn(RANK_TABLE, "id"),
         tables(target).aliasedColumn(RANK_TABLE, "parent")));
 
-      // indirect
+      // indirect"
     }
     else
     {
@@ -740,20 +740,20 @@ public class DefaultWhereClauseGenerator extends AbstractWhereClauseGenerator
     // fugly
     List<Long> corpusList = queryData.getCorpusList();
     TableAccessStrategy tas = tables(null);
-    String pre1 = tables(node).aliasedColumn(RANK_TABLE, "pre");
+    String id1 = tables(node).aliasedColumn(RANK_TABLE, "id");
     String componentID1 = tables(node).aliasedColumn(COMPONENT_TABLE, "id");
     String corpusRef1 = tables(node).aliasedColumn(NODE_TABLE, "corpus_ref");
     
     String parent = tas.column("children", tas.columnName(RANK_TABLE, "parent"));
-    String pre = tas.column("children", tas.columnName(RANK_TABLE, "pre"));
+    String id = tas.column("children", tas.columnName(RANK_TABLE, "id"));
     String componentID = tas.column("children", tas.columnName(COMPONENT_TABLE, "id"));;
     String corpusRef = tas.column("children", tas.columnName(NODE_TABLE, "corpus_ref"));;
     
     
     StringBuffer sb = new StringBuffer();
-    sb.append("(SELECT count(DISTINCT " + pre + ")\n");
+    sb.append("(SELECT count(DISTINCT " + id + ")\n");
     sb.append("\tFROM " + tas.tableName(RANK_TABLE) + " AS children\n");
-    sb.append("\tWHERE " + parent + " = " + pre1 
+    sb.append("\tWHERE " + parent + " = " + id1 
       + " AND " + componentID1 + " = " + componentID
       + " AND " + corpusRef1 + " = " + corpusRef
       + " AND toplevel_corpus IN("

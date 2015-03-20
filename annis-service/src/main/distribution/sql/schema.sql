@@ -79,12 +79,12 @@ CREATE TABLE facts (
   "right" integer,
   token_index integer,
   is_token boolean,
-  continuous boolean,
   span varchar,
   left_token integer,
   right_token integer,
   seg_name varchar,
   seg_index integer,
+  rank_id bigint,
   pre integer, -- pre-order value
   post integer, -- post-order value
   parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots

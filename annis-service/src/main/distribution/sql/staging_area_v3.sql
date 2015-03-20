@@ -20,12 +20,11 @@ DROP TABLE IF EXISTS _example_queries;
 CREATE :tmp TABLE _corpus
 (
 	id 			integer NOT NULL,		-- primary key
-	name		varchar NOT NULL COLLATE "C",		-- unique name
-	type		varchar NOT NULL COLLATE "C",		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
-	version		varchar COLLATE "C",				-- version number (not used)
+	name		varchar NOT NULL,		-- unique name
+	type		varchar NOT NULL,		-- CORPUS, DOCUMENT, SUBDOCUMENT (not used)
+	version		varchar,				-- version number (not used)
 	pre			integer	NOT NULL,		-- pre and post order of the corpus tree
-	post		integer	NOT NULL,
-  top_level boolean NOT NULL
+	post		integer	NOT NULL
 );
 
 -- corpus annotations
@@ -43,9 +42,8 @@ CREATE :tmp TABLE _corpus_annotation
 -- stores each source text in its entirety
 CREATE :tmp TABLE _text
 (
-  corpus_ref	integer NOT NULL,		-- foreign key to _corpus.id
 	id 		integer NOT NULL,			-- primary key
-	name	varchar COLLATE "C",					-- name (not used)
+	name	varchar,					-- name (not used)
 	text 	text							-- text contents (not used)
 );
 
@@ -59,17 +57,16 @@ CREATE :tmp TABLE _node
 	id 				bigint	NOT NULL,	-- primary key
 	text_ref 		integer NOT NULL,	-- foreign key to _text.id
 	corpus_ref		integer NOT NULL,	-- foreign key to _corpus.id
-	layer		varchar,			--  layer in which the node is contained
-	name 			varchar NOT NULL COLLATE "C",	-- name of the node
+	layer		varchar,
+	name 			varchar NOT NULL,	-- name (not used)
 	"left" 			integer NOT NULL,		-- start of covered substring in _text.text (inclusive)
 	"right" 		integer NOT NULL,		-- end of covered substring in _text.text (inclusive)
 	token_index		integer,				-- token number in _text.text, NULL if node is not a token
-  left_token integer NOT NULL,
-  right_token integer NOT NULL,
-	seg_index     integer,        -- index of this segment (if it is a segment, i.e. there is some SOrderingRelation connected to this node)
-  seg_name    varchar COLLATE "C",      -- segmentation name
-	span			varchar,			-- for tokens: substring in _text.text (indexed for text search), else: NULL
-  root boolean NOT NULL
+	seg_name    varchar,      -- segmentation name
+	seg_index     integer,        -- most left segmentation index of covered token
+	seg_right    integer,        -- most right segmentation index of covered token
+	continuous		boolean,				-- true if spanned text in _text.text is continuous (not used)
+	span			varchar			-- for tokens: substring in _text.text (indexed for text search), else: NULL
 );
 
 -- connected components of the annotation graph
@@ -78,10 +75,9 @@ CREATE :tmp TABLE _node
 CREATE :tmp TABLE _component
 (
 	id			integer NOT NULL,		-- primary key
-	type		char(1),			-- edge type: c, d, P, NULL
-	layer	varchar,				-- layer in which the edge is contained
-	name		varchar       --The sType of the component, e.g anaphoric for a some kind of pointing relation component
-
+	type		char(1),					-- edge type: c, d, P, NULL
+	layer	varchar,		
+	name		varchar
 );
 
 -- pre and post order of the annotation graph
@@ -89,13 +85,11 @@ CREATE :tmp TABLE _component
 -- component and rank together model edges in the annotation graph
 CREATE :tmp TABLE _rank
 (
-  id        bigint NOT NULL,
 	pre				integer	NOT NULL,	-- pre and post order of the annotation ODAG
 	post			integer	NOT NULL,
 	node_ref		bigint	NOT NULL,	-- foreign key to _node.id
-	component_ref	bigint NOT NULL,	-- foreign key to _component.id
-	parent			bigint NULL,		-- foreign key to _rank.id, NULL for root nodes
-  level       integer         -- level of this rank entry (not node!) in the component tree
+	component_ref	integer NOT NULL,	-- foreign key to _component.id
+	parent			integer NULL		-- foreign key to _rank.pre, NULL for root nodes
 );
 
 -- node annotations
@@ -113,7 +107,7 @@ CREATE :tmp TABLE _node_annotation
 -- unique combinantion of node_ref, namespace and name
 CREATE :tmp TABLE _edge_annotation
 (
-	rank_ref		bigint	NOT NULL,	-- foreign key to _rank.id
+	rank_ref		bigint	NOT NULL,	-- foreign key to _rank.pre
 	namespace		varchar,
 	name			varchar NOT NULL,
 	value			varchar
@@ -147,3 +141,4 @@ CREATE :tmp TABLE _example_queries
   "example_query" TEXT NOT NULL,
   "description" TEXT NOT NULL
 );
+

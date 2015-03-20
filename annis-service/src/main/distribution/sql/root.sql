@@ -1,10 +1,10 @@
 -- compute real roots
 -- actually, roots of components that are not actual roots should link parent to their parent node (even though it is in another component)
 
-ALTER TABLE _rank ADD root boolean;
+ALTER TABLE _node ADD root boolean;
 
-UPDATE _rank top SET root=
-(SELECT count(distinct _rank.parent) = 0 FROM _rank WHERE _rank.node_ref = top.node_ref);
+UPDATE _node n SET root=
+(SELECT count(distinct _rank.parent) = 0 FROM _rank WHERE _rank.node_ref = n.id);
 
 -- rank was changed, reanalyze it
-ANALYZE _rank;
+ANALYZE _node;

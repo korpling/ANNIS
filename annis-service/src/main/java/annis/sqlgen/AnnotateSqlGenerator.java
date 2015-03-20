@@ -269,12 +269,12 @@ public class AnnotateSqlGenerator<T>
     {
       addSelectClauseAttribute(fields, NODE_TABLE, "is_token");
     }
-    addSelectClauseAttribute(fields, NODE_TABLE, "continuous");
     addSelectClauseAttribute(fields, NODE_TABLE, "span");
     addSelectClauseAttribute(fields, NODE_TABLE, "left_token");
     addSelectClauseAttribute(fields, NODE_TABLE, "right_token");
     addSelectClauseAttribute(fields, NODE_TABLE, "seg_name");
     addSelectClauseAttribute(fields, NODE_TABLE, "seg_index");
+    addSelectClauseAttribute(fields, RANK_TABLE, "id");
     addSelectClauseAttribute(fields, RANK_TABLE, "pre");
     addSelectClauseAttribute(fields, RANK_TABLE, "post");
     addSelectClauseAttribute(fields, RANK_TABLE, "parent");

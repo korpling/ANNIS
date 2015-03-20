@@ -29,11 +29,12 @@ import annis.model.Annotation;
 import annis.model.AnnotationGraph;
 import annis.model.Edge;
 import annis.model.Edge.EdgeType;
+import java.util.HashSet;
 
 import org.springframework.jdbc.core.ResultSetExtractor;
 
-import annis.sqlgen.SaltAnnotateExtractor.RankID;
 import java.util.Map.Entry;
+import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,7 +51,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   private TableAccessStrategy outerQueryTableAccessStrategy;
   
   public AnnisNode mapNode(ResultSet resultSet, TableAccessStrategy tableAccessStrategy, 
-    Map<Long, ComponentEntry> continuousSpans) throws SQLException
+    Map<Long, ComponentEntry> spans) throws SQLException
   {
     AnnisNode annisNode = new AnnisNode(longValue(resultSet, NODE_TABLE, "id", tableAccessStrategy));
     
@@ -67,19 +68,18 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     annisNode.setLeftToken(longValue(resultSet, NODE_TABLE, "left_token", tableAccessStrategy));
     annisNode.setRightToken(longValue(resultSet, NODE_TABLE, "right_token", tableAccessStrategy));
     
-    boolean continuous = booleanValue(resultSet, NODE_TABLE, "continuous",
-      tableAccessStrategy);
+    
     String typeAsString = stringValue(resultSet, COMPONENT_TABLE, "type",
       tableAccessStrategy);
     
-    if(continuousSpans != null && "c".equals(typeAsString) && continuous)
+    if(spans != null && "c".equals(typeAsString))
     {
       ComponentEntry entry = new ComponentEntry(
         longValue(resultSet, COMPONENT_TABLE, "id", tableAccessStrategy), 
         typeAsString.charAt(0), 
         stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy),
         stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
-      continuousSpans.put(annisNode.getId(), entry);
+      spans.put(annisNode.getId(), entry);
     }
     
     return annisNode;
@@ -96,6 +96,9 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     edge.setNamespace(stringValue(resultSet, COMPONENT_TABLE, "namespace", tableAccessStrategy));
     edge.setName(stringValue(resultSet, COMPONENT_TABLE, "name", tableAccessStrategy));
     edge.setDestination(new AnnisNode(longValue(resultSet, RANK_TABLE, "node_ref", tableAccessStrategy)));
+    edge.setComponentID(longValue(resultSet, COMPONENT_TABLE, "id",
+      tableAccessStrategy));
+    edge.setId(longValue(resultSet, RANK_TABLE, "id", tableAccessStrategy));
     
     // create nodes for src with rank value (parent) as id.
     // this must later be fixed by AnnotationGraphDaoHelper.fixSourceNodeIds().
@@ -154,12 +157,12 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     Map<Long, AnnisNode> nodeById = new HashMap<>();
 
     // fn: edge pre order value -> edge
-    Map<RankID, Edge> edgeByPre = new HashMap<>();
+    Map<Long, Edge> edgeByRankID = new HashMap<>();
     
     // maps span that are continous to their coverage component
-    Map<List<Long>, Map<Long, ComponentEntry>> continuousSpansForGraph 
+    Map<List<Long>, Map<Long, ComponentEntry>> keyToSpanToComponent 
       = new HashMap<>();
-
+    
     int rowNum = 0;
     
     while (resultSet.next())
@@ -182,16 +185,16 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       { 
         
         log.debug("starting annotation graph for match: " + key);
-        Map<Long, ComponentEntry> continuousSpans = new HashMap<>();
+        Map<Long, ComponentEntry> spans = new HashMap<>();
         AnnotationGraph graph = new AnnotationGraph();
         graphs.add(graph);
         graphByMatchGroup.put(key, graph);
-        continuousSpansForGraph.put(key, continuousSpans);
+        keyToSpanToComponent.put(key, spans);
 
         // clear mapping functions for this graph
         // assumes that the result set is sorted by key, pre
         nodeById.clear();
-        edgeByPre.clear();
+        edgeByRankID.clear();
 
         // set the matched keys
         for (Long l : key)
@@ -204,7 +207,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       }
 
       AnnotationGraph graph = graphByMatchGroup.get(key);
-      Map<Long, ComponentEntry> continuousSpans = continuousSpansForGraph.
+      Map<Long, ComponentEntry> spanToComponent = keyToSpanToComponent.
         get(key);
       
       graph.setDocumentName(new DocumentNameMapRow().mapRow(
@@ -214,7 +217,7 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       graph.setPath((String[]) path.getArray());
 
       // get node data
-      AnnisNode node = mapNode(resultSet, tableAccessStrategy, continuousSpans);
+      AnnisNode node = mapNode(resultSet, tableAccessStrategy, spanToComponent);
 
       // add node to graph if it is new, else get known copy
       long id = node.getId();
@@ -251,13 +254,12 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
       Edge edge = mapEdge(resultSet, tableAccessStrategy);
 
       // add edge to graph if it is new, else get known copy
-      long pre = edge.getPre();
-      long componentID = edge.getComponentID();
-      if (!edgeByPre.containsKey(new RankID(componentID, pre)))
+      long rank_id = edge.getId();
+      if (!edgeByRankID.containsKey(rank_id))
       {
         // fix source references in edge
         edge.setDestination(node);
-        fixNodes(edge, edgeByPre, nodeById);
+        fixNodes(edge, edgeByRankID, nodeById);
 
         // add edge to src and dst nodes
         node.addIncomingEdge(edge);
@@ -268,12 +270,12 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         }
 
         log.debug("new edge: " + edge);
-        edgeByPre.put(new RankID(componentID, pre), edge);
+        edgeByRankID.put(edge.getId(), edge);
         graph.addEdge(edge);
       }
       else
       {
-        edge = edgeByPre.get(new RankID(componentID, pre));
+        edge = edgeByRankID.get(rank_id);
       }
 
       // add annotation data
@@ -308,8 +310,11 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
         }
       }
       
-      Map<Long, ComponentEntry> continuousSpans = continuousSpansForGraph.get(entry.getKey());
-      createMissingSpanningRelations(graph, continuousSpans, nodeById);
+      Map<Long, ComponentEntry> spans = keyToSpanToComponent.get(entry.getKey());
+      // filter out the continuous spans by finding all discontinuous spans
+      // discontinuos spans will have a an entry for token
+      
+      createMissingSpanningRelations(graph, spans, nodeById);
       
     }
 
@@ -317,60 +322,61 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
   }
   
   private void createMissingSpanningRelations(AnnotationGraph graph,
-    Map<Long, ComponentEntry> continuousSpans,
-    Map<Long, AnnisNode> nodeById)
+    Map<Long, ComponentEntry> allSpans, Map<Long, AnnisNode> nodeById)
   { 
-    if(continuousSpans == null || nodeById == null)
+    for(Map.Entry<Long, ComponentEntry> spanEntry : allSpans.entrySet())
     {
-      return;
-    }
-    for(Map.Entry<Long, ComponentEntry> spanEntry : continuousSpans.entrySet())
-    {
-      Long spanID = spanEntry.getKey();
-        long pre=1;
-      AnnisNode span = nodeById.get(spanID);
-      if(span != null)
+      AnnisNode span = nodeById.get(spanEntry.getKey());
+      
+      // Check all covered token if there is already a coverage edge between the span
+      // and the token. If at least one edge already exists, it must have been
+      // a discontinuos span and we don't need to add any missing edges.
+      boolean anyTokenConnected = false;
+      for(long i=span.getLeftToken(); i <= span.getRightToken() && !anyTokenConnected; i++)
       {
+        AnnisNode token = graph.getToken(i);
+        // the span border might be behind the result set, so ignore this entries
+        if(token != null)
+        {
+          for (Edge e : token.getIncomingEdges())
+          {
+            if (e.getSource() == span && e.getEdgeType() == EdgeType.COVERAGE)
+            {
+              anyTokenConnected = true;
+              break;
+            }
+          }
+        }
+      }
+     
+      if(!anyTokenConnected)
+      {
+        long pre = 1;
         for(long i=span.getLeftToken(); i <= span.getRightToken(); i++)
         {
           AnnisNode tok = graph.getToken(i);
           if(tok != null)
           {
-            boolean missing = true;
-            for(Edge tokenInEdge : tok.getIncomingEdges())
-            {
-              if(tokenInEdge.getEdgeType() == EdgeType.COVERAGE 
-                && tokenInEdge.getSource() != null 
-                && span.getId() == tokenInEdge.getSource().getId())
-              {
-                missing = false;
-                break;
-              }
-            }
+            Edge edge = new Edge();
+            ComponentEntry component = spanEntry.getValue();
 
-            if(missing)
-            {
-              Edge edge = new Edge();
-              ComponentEntry component = spanEntry.getValue();
-
-              edge.setPre(pre++);
-              edge.setComponentID(component.getId());
-              edge.setEdgeType(EdgeType.COVERAGE);
-              edge.setNamespace(component.getNamespace());
-              edge.setName(null);
-              edge.setDestination(tok);
-              edge.setSource(span);
-              graph.addEdge(edge);
-              span.addOutgoingEdge(edge);
-              tok.addIncomingEdge(edge);
-            }
-          } // end if token exists
-        } // end for each covered token index
+            edge.setPre(pre++);
+            edge.setComponentID(component.getId());
+            edge.setEdgeType(EdgeType.COVERAGE);
+            edge.setNamespace(component.getNamespace());
+            edge.setName(null);
+            edge.setDestination(tok);
+            edge.setSource(span);
+            graph.addEdge(edge);
+            span.addOutgoingEdge(edge);
+            tok.addIncomingEdge(edge);
+          }     
+        }
       }
     } // end for each node
   }
 
-  protected void fixNodes(Edge edge, Map<RankID, Edge> edgeByPre,
+  protected void fixNodes(Edge edge, Map<Long, Edge> edgeByRankID,
     Map<Long, AnnisNode> nodeById)
   {
     // pull source node from parent edge
@@ -379,8 +385,8 @@ public class AomAnnotateExtractor implements ResultSetExtractor<List<AnnotationG
     {
       return;
     }
-    long pre = source.getId();
-    Edge parentEdge = edgeByPre.get(new RankID(edge.getComponentID(), pre));
+    long nodeID = source.getId();
+    Edge parentEdge = edgeByRankID.get(nodeID);
     AnnisNode parent = parentEdge != null
       ? parentEdge.getDestination() : null;
     // log.debug("looking for node with rank.pre = 

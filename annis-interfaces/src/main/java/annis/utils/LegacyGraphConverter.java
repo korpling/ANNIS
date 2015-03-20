@@ -148,7 +148,7 @@ public class LegacyGraphConverter
     annoGraph.setPath(pathList.toArray(new String[pathList.size()]));
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
-    Map<Node, AnnisNode> allNodes = new HashMap<>();
+    Map<SNode, AnnisNode> allNodes = new HashMap<>();
 
     for (SNode sNode : docGraph.getSNodes())
     {
@@ -172,7 +172,7 @@ public class LegacyGraphConverter
         
         if (sNode instanceof SToken)
         {
-          BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+          BasicEList<STYPE_NAME> textualRelation = new BasicEList<>();
           textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
           EList<SDataSourceSequence> seqList =
             docGraph.getOverlappedDSSequences(sNode,
@@ -252,11 +252,11 @@ public class LegacyGraphConverter
   }
   
   private static void addEdge(SRelation rel, long pre, long componentID, 
-    Map<Node, AnnisNode> allNodes, AnnotationGraph annoGraph)
+    Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
   {
     Edge aEdge = new Edge();
-    aEdge.setSource(allNodes.get(rel.getSource()));
-    aEdge.setDestination(allNodes.get(rel.getTarget()));
+    aEdge.setSource(allNodes.get(rel.getSSource()));
+    aEdge.setDestination(allNodes.get(rel.getSTarget()));
 
     aEdge.setEdgeType(EdgeType.UNKNOWN);
     aEdge.setPre(pre);

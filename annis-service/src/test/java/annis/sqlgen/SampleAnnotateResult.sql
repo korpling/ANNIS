@@ -1,5 +1,5 @@
 -- "das" & pos="VVFIN" & #1 . #2 
--- queried on pcc2 v2 (only one match)
+-- queried on pcc2 v6 (only one match)
 
 drop table if exists mymatch;
 create temporary table mymatch as (
@@ -11,12 +11,12 @@ WITH
     SELECT 1 AS n, 2 AS nodeNr,
       facts2.id AS id, facts2.text_ref AS text, facts2.left_token - 5 AS min, facts2.right_token + 5 AS max, facts2.corpus_ref AS corpus
     FROM
-      facts_343 AS facts2, corpus AS corpus2
+      facts_2 AS facts2, corpus AS corpus2
     WHERE
       corpus2.path_name = '{4282, pcc2}' AND
       facts2.corpus_ref = corpus2.id AND
       facts2.salt_id = 'tok_156' AND
-      facts2.toplevel_corpus IN ( 343) 
+      facts2.toplevel_corpus IN ( 2) 
     LIMIT 1
     )
     UNION ALL
@@ -24,12 +24,12 @@ WITH
     SELECT 1 AS n, 1 AS nodeNr,
       facts1.id AS id, facts1.text_ref AS text, facts1.left_token - 5 AS min, facts1.right_token + 5 AS max, facts1.corpus_ref AS corpus
     FROM
-      facts_343 AS facts1, corpus AS corpus1
+      facts_2 AS facts1, corpus AS corpus1
     WHERE
       corpus1.path_name = '{4282, pcc2}' AND
       facts1.corpus_ref = corpus1.id AND
       facts1.salt_id = 'tok_155' AND
-      facts1.toplevel_corpus IN ( 343) 
+      facts1.toplevel_corpus IN ( 2) 
     LIMIT 1
     )
   ),
@@ -58,12 +58,12 @@ SELECT DISTINCT
   facts.right AS "right",
   facts.token_index AS "token_index",
   facts.is_token AS "is_token",
-  facts.continuous AS "continuous",
   facts.span AS "span",
   facts.left_token AS "left_token",
   facts.right_token AS "right_token",
   facts.seg_name AS "seg_name",
   facts.seg_index AS "seg_index",
+  facts.rank_id AS "rank_id",
   facts.pre AS "pre",
   facts.post AS "post",
   facts.parent AS "parent",
@@ -82,14 +82,15 @@ SELECT DISTINCT
   corpus.path_name AS path
 FROM
   solutions,
-  facts_343 AS facts,
+  facts_2 AS facts,
   corpus
 WHERE
-  facts.toplevel_corpus IN (343) AND
+  facts.toplevel_corpus IN (2) AND
   (facts.left_token <= solutions."max" AND facts.right_token >= solutions."min" AND facts.text_ref = solutions.text AND facts.corpus_ref = solutions.corpus)
  AND
   corpus.id = facts.corpus_ref
 ORDER BY solutions.n, facts.edge_name, facts.component_id, facts.pre
+
 
 );
 
@@ -115,7 +116,6 @@ CREATE TEMPORARY TABLE mymatch
   "right" integer,
   token_index integer,
   is_token boolean,
-  continuous boolean,
   span character varying,
   left_token integer,
   right_token integer,

@@ -1,5 +1,4 @@
 -- This will set the "continous" property of the spans correctly
-
 UPDATE _node AS parent_node SET continuous = false
 WHERE 
 parent_node.continuous = true 
