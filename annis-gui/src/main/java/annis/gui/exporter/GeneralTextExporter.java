@@ -102,7 +102,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       }
 
       Map<String, String> args = new HashMap<>();
-      for (String s : argsAsString.split("&"))
+      for (String s : argsAsString.split("&|;"))
       {
         String[] splitted = s.split("=", 2);
         String key = splitted[0];
