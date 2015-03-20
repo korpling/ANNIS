@@ -16,6 +16,7 @@
 package annis.gui;
 
 import annis.gui.objects.Query;
+import annis.libgui.Helper;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -72,6 +73,7 @@ public class HistoryPanel extends Panel
     citationGenerator = new CitationLinkGenerator();
     tblHistory.addGeneratedColumn("genlink", citationGenerator);
 
+    tblHistory.addStyleName(Helper.CORPUS_FONT);
     tblHistory.setVisibleColumns("gennumber", "query", "genlink");
     tblHistory.setColumnHeader("gennumber", "#");
     tblHistory.setColumnHeader("query", "Query");
