@@ -33,8 +33,7 @@ UPDATE _node
 SET 
  id = (SELECT "new" FROM _nodeidmapping WHERE "old" = id) 
       + COALESCE((SELECT max_node_id FROM corpus_stats WHERE id = :id),0),
- corpus_ref = corpus_ref + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0),
- toplevel_corpus = toplevel_corpus + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0);
+ corpus_ref = corpus_ref + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0);
     
 UPDATE _text SET corpus_ref = corpus_ref + COALESCE((SELECT max_corpus_id FROM corpus_stats WHERE id = :id),0);
     

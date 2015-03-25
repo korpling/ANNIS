@@ -549,7 +549,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
-    extendNodeToplevelCorpus();
     analyzeStagingTables();
 
     addUniqueNodeNameAppendix();
@@ -633,7 +632,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
     computeTopLevelCorpus();
-    extendNodeToplevelCorpus();
     analyzeStagingTables();
 
     computeLeftTokenRightToken();
@@ -870,12 +868,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     log.info("computing top-level corpus");
     executeSqlFromScript("toplevel_corpus.sql");
-  }
-  
-  void extendNodeToplevelCorpus()
-  {
-    log.info("extend node to contain top-level corpus");
-    executeSqlFromScript("extend_node_toplevel.sql");
   }
 
   void importBinaryData(String path, String toplevelCorpusName)
@@ -1132,7 +1124,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     log.info("query for the new corpus ID");
     long result = getJdbcTemplate().queryForLong(
-      "SELECT MAX(toplevel_corpus) FROM _node");
+      "SELECT MAX(id) FROM _corpus WHERE top_level IS TRUE");
     log.info("new corpus ID is " + result);
     return result;
   }

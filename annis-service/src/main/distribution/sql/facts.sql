@@ -63,7 +63,7 @@ FROM
     _node.id AS id,
     _node.text_ref AS text_ref,
     _node.corpus_ref AS corpus_ref,
-    _node.toplevel_corpus AS toplevel_corpus,
+    :id AS toplevel_corpus,
     _node.layer AS node_namespace,
     _node.name AS node_name,
     concat(_node.name, _node.unique_name_appendix) AS salt_id,
@@ -121,7 +121,5 @@ FROM
       AND annotation_category.namespace IS NOT DISTINCT FROM _node_annotation.namespace
       AND annotation_category.toplevel_corpus = :id
     )
-  WHERE
-    _node.toplevel_corpus = :id
 ) as tmp
 ;
