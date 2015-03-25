@@ -27,7 +27,6 @@ import com.google.common.base.Splitter;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.TreeMultimap;
 import com.google.common.io.Files;
-import com.google.common.io.Resources;
 import java.io.*;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -44,7 +43,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import javax.sql.DataSource;
@@ -545,7 +543,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       checkTopLevelCorpus();
     }
 
-    createStagingAreaIndexes();
+    createStagingAreaIndexes(version);
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
@@ -627,7 +625,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       checkTopLevelCorpus();
     }
 
-    createStagingAreaIndexes();
+    createStagingAreaIndexes(version);
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
@@ -858,10 +856,17 @@ public class AdministrationDao extends AbstractAdminstrationDao
         }
   }
 
-  void createStagingAreaIndexes()
+  void createStagingAreaIndexes(RelANNISVersion version)
   {
     log.info("creating indexes for staging area");
-    executeSqlFromScript("indexes_staging.sql");
+    if(version == RelANNISVersion.V4_0)
+    {
+      executeSqlFromScript("indexes_staging_v4.sql");
+    }
+    else
+    {
+      executeSqlFromScript("indexes_staging_v3.sql");
+    }
   }
 
   void computeTopLevelCorpus()

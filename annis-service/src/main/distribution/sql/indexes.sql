@@ -71,7 +71,7 @@ CREATE INDEX idx__facts_edge_annotext__:id
 CREATE INDEX idx__facts__edge_qannotext__:id
   ON facts_:id
   USING btree
-  (edge_annotext varchar_pattern_ops, corpus_ref);
+  (edge_qannotext varchar_pattern_ops, corpus_ref);
 
 CREATE INDEX idx__facts_node_name__:id
   ON facts_:id
