@@ -548,8 +548,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
       FILE_RESOLVER_VIS_MAP));
     analyzeStagingTables();
-
-    addUniqueNodeNameAppendix();
     
     addDocumentNameMetaData();
     long corpusID = updateIds();
@@ -576,7 +574,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createAnnoCategory(corpusID);
 
     // create the new facts table partition
-    createFacts(corpusID);
+    createFacts(corpusID, version);
 
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
@@ -667,7 +665,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createAnnoCategory(corpusID);
 
     // create the new facts table partition
-    createFacts(corpusID);
+    createFacts(corpusID, version);
 
     // the entries, which where here done, are possible after generating facts
     updateCorpusStatistic(corpusID);
@@ -1267,13 +1265,21 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().execute("ANALYZE facts");
   }
 
-  void createFacts(long corpusID)
+  void createFacts(long corpusID, RelANNISVersion version)
   {
 
     MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    executeSqlFromScript("facts.sql", args);
+    if(version == RelANNISVersion.V4_0) 
+    {
+      executeSqlFromScript("facts.sql", args);
+    }
+    else
+    {
+      executeSqlFromScript("facts_v3.sql", args);
+    }
+    
 
     clusterFacts(corpusID);
 

@@ -66,7 +66,7 @@ FROM
     :id AS toplevel_corpus,
     _node.layer AS node_namespace,
     _node.name AS node_name,
-    _node.name AS salt_id,
+    concat(_node.name, _node.unique_name_appendix) AS salt_id,
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
