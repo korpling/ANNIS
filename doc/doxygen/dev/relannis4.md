@@ -5,19 +5,13 @@ RelANNIS version 4.0 proposal {#dev-relannis4}
 
 \warning This is work in process and will be updated frequently.
 
-Objective
-=========
-
-We need to add the possibility for multiple segmentation ("tokenization") to relANNIS. This is correlated with the effort to add the order-relation to Salt.
-There are also some more small improvements (like versioning) that should be addressed.
-
 File format
 ============
 
-A relANNIS corpus is a ZIP-file with the file-ending ".zip".
+A relANNIS corpus can be either a zip file or a directory.
 
-Files inside zip file
-=====================
+Files inside zip file/directory
+===============================
 
 relannis.version
 ----------------
@@ -51,20 +45,6 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |column | type | unique | not NULL | description |
 |-------|------|--------|----------|------------|
 |corpus_ref|integer||X|foreign key to corpus.id|
-|namespace | text| | | |
-|name|text| | | |
-|value|text| | | |
-
-text_annotation.relannis
-------------------------
-
-Contains meta-data on the texts.
-
-_TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sql-copy.html#AEN64040_
-|column | type | unique | not NULL | description |
-|-------|------|--------|----------|------------|
-|corpus_ref|integer||X|foreign key to corpus.id|
-|text_ref|integer| |X|foreign key to text.id|
 |namespace | text| | | |
 |name|text| | | |
 |value|text| | | |
