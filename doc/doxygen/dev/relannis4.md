@@ -1,9 +1,19 @@
-RelANNIS version 4.0 proposal {#dev-relannis4}
-==============================
+RelANNIS import format version 4.0 {#dev-relannis4}
+===================================
 
 [TOC]
 
 \warning This is work in process and will be updated frequently.
+
+Remarkable differences to Salt
+==============================
+
+The relANNIS import format is inspired by the Salt meta-data model an ANNIS uses Salt internally to represent a matched graph from the database. However there are some restrictions which relANNIS has but Salt doesn't.
+
+* node names must be unique per document
+* document names must be unique per top-level corpus
+* a relANNIS corpus contains only one top-level corpus
+* there are no meta-data for nodes
 
 File format
 ============
@@ -76,7 +86,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |text_ref|integer||X|foreign key to text.id|
 |corpus_ref|integer||X|foreign key to corpus.id|
 |layer|text| | | |
-|name|text| | | |
+|name|text| | | A human readable identfier of the node. Must be unique for each document. |
 |left|integer||X|position of first covered character|
 |right|integer||X|position of last covered character|
 |token_index|integer|||index of this token (if it is a token, otherwise NULL)|
@@ -171,6 +181,6 @@ ExtData folder
 
 Contains the media files that are connected with this corpus including their binary content.
 
-Each file directly inside the ExtData folder belongs to the toplevel corpus. The folder structure corresponds to the corpus/document tree and each file is associated to a document according to the folder it is part of.
-
+Each file directly inside the ExtData folder belongs to the toplevel corpus.
+A sub-folder corresponds to a document and each file inside a sub-folder belongs to the document with the same name.
 
