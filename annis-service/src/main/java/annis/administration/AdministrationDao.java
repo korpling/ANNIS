@@ -1305,8 +1305,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     clusterFacts(corpusID);
 
-    log.info("indexing the new facts table (corpus with ID " + corpusID + ")");
+    log.info("indexing the new facts table (general indexes)");
     executeSqlFromScript("indexes.sql", args);
+    
+    log.info("indexing the new facts table (edge related indexes)");
+    executeSqlFromScript("indexes_edge.sql", args);
 
   }
 
