@@ -1299,24 +1299,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
       executeSqlFromScript("facts_v3.sql", args);
     }
     
-
-    clusterFacts(corpusID);
-
     log.info("indexing the new facts table (general indexes)");
     executeSqlFromScript("indexes.sql", args);
     
     log.info("indexing the new facts table (edge related indexes)");
     executeSqlFromScript("indexes_edge.sql", args);
-
-  }
-
-  void clusterFacts(long corpusID)
-  {
-    MapSqlParameterSource args = makeArgs().addValue(":id", corpusID);
-
-    log.info("clustering materialized facts table for corpus with ID "
-      + corpusID);
-    executeSqlFromScript("cluster.sql", args);
 
   }
 
