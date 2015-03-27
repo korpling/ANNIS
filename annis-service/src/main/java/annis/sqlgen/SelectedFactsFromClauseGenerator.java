@@ -73,9 +73,11 @@ public class SelectedFactsFromClauseGenerator extends AbstractFromClauseGenerato
     String indent)
   {
     List<String> tables = new LinkedList<>();
+    int idx=0;
     for(Long corpusID : corpusList)
     {
-      tables.add("SELECT * FROM facts_" + corpusID);
+      tables.add("SELECT *, " + idx + "::int AS sourceIdx FROM facts_" + corpusID);
+      idx++;
     }
     
     String indent2 = indent + AbstractSqlGenerator.TABSTOP;

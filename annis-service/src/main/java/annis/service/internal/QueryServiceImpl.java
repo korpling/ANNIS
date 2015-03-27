@@ -58,6 +58,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
@@ -964,6 +965,11 @@ public class QueryServiceImpl implements QueryService
     throws WebApplicationException
   {
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    
+    // we don't care in which order the corpus list was given, we always sort the names
+    // this ensures a stable ordering and less surprises when the UI changes it's behavior
+    Collections.sort(corpusNames);
+    
     List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(
       corpusNames);
     if (corpusIDs.size() != corpusNames.size())

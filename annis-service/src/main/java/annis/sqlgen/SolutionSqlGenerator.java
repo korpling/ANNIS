@@ -163,6 +163,20 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
         "corpus_ref")
         + " AS corpus_ref");
     }
+    
+    if(queryData.getCorpusList().size() > 1)
+    {
+      if(needsDistinct)
+      {
+        cols.add("min(" + tables(alternative.get(0)).aliasedColumn(TableAccessStrategy.FACTS_TABLE, "sourceIdx") 
+          +  ") AS sourceIdx");
+      }
+      else
+      {
+        cols.add(tables(alternative.get(0)).aliasedColumn(TableAccessStrategy.FACTS_TABLE, "sourceIdx") +  " AS sourceIdx");
+      }
+    }
+    
     String colIndent = indent + TABSTOP + TABSTOP;
 
     return "\n" + colIndent + StringUtils.join(cols, ",\n" + colIndent);
@@ -198,7 +212,16 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
         appendix = " ASC";
       }
       
+      
+      List<Long> corpusList = queryData.getCorpusList();
       List<String> ids = new ArrayList<>();
+      
+      if(corpusList.size() > 1)
+      {
+        // add the artificial "source index" which corresponds to the toplevel corpus name
+        ids.add("sourceIdx");
+      }
+      // add the node ID for each output node an the category ID
       for (int i = 1; i <= queryData.getMaxWidth(); ++i)
       {
         ids.add("id" + i +  appendix);
