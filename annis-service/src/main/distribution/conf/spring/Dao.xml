@@ -101,8 +101,8 @@
     <entry key="corpus_annotation" value="(corpus_ref + :offset_corpus_id), namespace, name, value"/>
     <entry key="corpus_stats" value="name, (id + :offset_corpus_id), text, tokens, 
 (max_corpus_id + :offset_corpus_id), (max_corpus_pre + :offset_corpus_post), 
-(max_corpus_post + :offset_corpus_post), (max_component_id + :offset_component_id), 
-max_node_id, source_path" />
+(max_corpus_post + :offset_corpus_post), 
+(max_node_id + :offset_node_id), source_path" />
     <entry key="media_files" value="filename, (corpus_ref + :offset_corpus_id), mime_type, title" />
   </util:map>
 
@@ -112,7 +112,7 @@ max_node_id, source_path" />
     <entry key="example_queries" value="example_query, description, &quot;type&quot;, nodes, used_ops, corpus_ref" />
     <entry key="corpus" value="id, name, type, version, pre, post, top_level" />
     <entry key="corpus_annotation" value="corpus_ref, namespace, name, value"/>
-    <entry key="corpus_stats" value="name, id, text, tokens, max_corpus_id, max_corpus_pre, max_corpus_post, max_component_id, max_node_id, source_path" />
+    <entry key="corpus_stats" value="name, id, text, tokens, max_corpus_id, max_corpus_pre, max_corpus_post, max_node_id, source_path" />
     <entry key="media_files" value="filename, corpus_ref, mime_type, title" />
   </util:map>
 

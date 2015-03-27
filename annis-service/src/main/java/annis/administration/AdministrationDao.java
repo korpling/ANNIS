@@ -575,7 +575,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     createAnnotations(corpusID);
 
     createAnnoCategory(corpusID);
-
+    
     // create the new facts table partition
     createFacts(corpusID, version, offsets);
 
@@ -1157,18 +1157,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
     long offsetCorpusID = getJdbcTemplate().queryForObject(
       "SELECT COALESCE((SELECT max(max_corpus_id)+1 FROM corpus_stats),0)",
       Long.class);
-    long offsetComponentID = getJdbcTemplate().queryForObject(
-      "SELECT COALESCE((SELECT max(max_component_id)+1 FROM corpus_stats),0)",
-      Long.class);
     long offsetCorpusPost = getJdbcTemplate().queryForObject(
       "SELECT COALESCE((SELECT max(max_corpus_post)+1 FROM corpus_stats),0)",
       Long.class);
+    
     long offsetNodeID = getJdbcTemplate().queryForObject(
       "SELECT COALESCE((SELECT max(max_node_id)+1 FROM corpus_stats),0)",
       Long.class);
-
-    return new Offsets(offsetCorpusID, offsetNodeID, offsetComponentID,
-      offsetCorpusPost);
+    
+    return new Offsets(offsetCorpusID, offsetCorpusPost, offsetNodeID);
   }
 
   void insertCorpus(long corpusID, Offsets offsets)
@@ -2208,31 +2205,19 @@ public class AdministrationDao extends AbstractAdminstrationDao
   public static class Offsets
   {
     private final long corpusID;
-    private final long nodeID;
-    private final long componentID;
     private final long corpusPost;
+    private final long nodeID;
 
-    public Offsets(long corpusID, long nodeID, long componentID, long corpusPost)
+    public Offsets(long corpusID, long corpusPost, long nodeID)
     {
       this.corpusID = corpusID;
-      this.nodeID = nodeID;
-      this.componentID = componentID;
       this.corpusPost = corpusPost;
+      this.nodeID = nodeID;
     }
 
     public long getCorpusID()
     {
       return corpusID;
-    }
-
-    public long getNodeID()
-    {
-      return nodeID;
-    }
-
-    public long getComponentID()
-    {
-      return componentID;
     }
 
     public long getCorpusPost()
@@ -2244,7 +2229,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       return new MapSqlParameterSource()
         .addValue(":offset_corpus_id", corpusID)
-        .addValue(":offset_component_id", componentID)
         .addValue(":offset_corpus_post", corpusPost)
         .addValue(":offset_node_id", nodeID);
     }
