@@ -60,9 +60,10 @@ SELECT
 FROM
 (
   SELECT
-    _node.id AS id,
+    ((SELECT "new" FROM _nodeidmapping WHERE "old" = _node.id LIMIT 1) 
+      + :offset_node_id) AS id,
     _node.text_ref AS text_ref,
-    _node.corpus_ref AS corpus_ref,
+    (_node.corpus_ref + :offset_corpus_id) AS corpus_ref,
     :id AS toplevel_corpus,
     _node.layer AS node_namespace,
     _node.name AS node_name,
@@ -84,7 +85,7 @@ FROM
     _node.root AS root,
     _rank.level AS level,
 
-    _component.id AS component_id,
+    (_component.id + :offset_component_id) AS component_id,
     _component.type AS edge_type,
     _component.layer AS edge_namespace,
     _component.name AS edge_name,
