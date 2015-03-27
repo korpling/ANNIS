@@ -543,7 +543,8 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
       checkTopLevelCorpus();
     }
-
+    
+    applyConstraints();
     createStagingAreaIndexes(version);
 
     fixResolverVisMapTable(toplevelCorpusName, tableInStagingArea(
@@ -565,7 +566,6 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     computeCorpusStatistics(path);
     
-    applyConstraints();
     analyzeStagingTables();
 
     insertCorpus(corpusID, offsets);
