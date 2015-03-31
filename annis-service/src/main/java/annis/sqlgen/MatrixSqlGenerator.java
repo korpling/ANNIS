@@ -331,6 +331,9 @@ public class MatrixSqlGenerator
     conditions.add(tables.aliasedColumn(TEXT_TABLE, "corpus_ref") + " = "
       + tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
+    conditions.add(tables.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = "
+      + "solutions.toplevel_corpus");
+    
 
     // nodes selected by id
     sb.setLength(0);
