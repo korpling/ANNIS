@@ -29,9 +29,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
 import java.util.regex.Matcher;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.io.FileSystemResource;
@@ -97,6 +95,50 @@ public abstract class AbstractAdminstrationDao
   {
     return new MapSqlParameterSource();
   }
+  
+  /**
+   * executes an SQL string, substituting the
+   * parameters found in args
+   *
+   * @param sql
+   * @param args
+   * @return
+   */
+  protected PreparedStatement executeSql(String sql,
+    MapSqlParameterSource args)
+  {
+    // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
+    Map<String, Object> parameters = args != null ? args.getValues()
+      : new HashMap();
+
+    for (Map.Entry<String, Object> placeHolderEntry : parameters.entrySet())
+    {
+      String key = placeHolderEntry.getKey();
+      String value = placeHolderEntry.getValue().toString();
+      log.debug("substitution for parameter '" + key + "' in SQL script: "
+        + value);
+      sql = sql.replaceAll(key, Matcher.quoteReplacement(value));
+    }
+    
+    log.debug("Executing SQL\n{}", sql);
+    
+    CancelableStatements cancelableStats
+      = new CancelableStatements(
+        sql, statementController);
+
+    // register the statement, so we could try to interrupt it in the gui.
+    if (statementController != null)
+    {
+      statementController.registerStatement(cancelableStats.statement);
+    }
+    else
+    {
+      log.debug("statement controller is not initialized");
+    }
+    jdbcTemplate.execute(cancelableStats, cancelableStats);
+    return cancelableStats.statement;
+
+  }
 
   /**
    * executes an SQL script from $ANNIS_HOME/scripts, substituting the
@@ -114,23 +156,8 @@ public abstract class AbstractAdminstrationDao
     {
       Resource resource = new FileSystemResource(fScript);
       log.debug("executing SQL script: " + resource.getFilename());
-      String sql = readSqlFromResource(resource, args);
-      CancelableStatements cancelableStats
-        = new CancelableStatements(
-          sql, statementController);
-
-      // register the statement, so we could try to interrupt it in the gui.
-      if (statementController != null)
-      {
-        statementController.registerStatement(cancelableStats.statement);
-      }
-      else
-      {
-        log.debug("statement controller is not initialized");
-      }
-
-      jdbcTemplate.execute(cancelableStats, cancelableStats);
-      return cancelableStats.statement;
+      String sql = readSqlFromResource(resource);
+      return executeSql(sql, args);
     }
     else
     {
@@ -141,12 +168,8 @@ public abstract class AbstractAdminstrationDao
   
     // reads the content from a resource into a string
   @SuppressWarnings("unchecked")
-  private String readSqlFromResource(Resource resource,
-    MapSqlParameterSource args)
+  private String readSqlFromResource(Resource resource)
   {
-    // XXX: uses raw type, what are the parameters to Map in MapSqlParameterSource?
-    Map<String, Object> parameters = args != null ? args.getValues()
-      : new HashMap();
 
     try (BufferedReader reader = new BufferedReader(new InputStreamReader(
       new FileInputStream(
@@ -160,16 +183,7 @@ public abstract class AbstractAdminstrationDao
       {
         sqlBuf.append(line).append("\n");
       }
-      String sql = sqlBuf.toString();
-      for (Map.Entry<String, Object> placeHolderEntry : parameters.entrySet())
-      {
-        String key = placeHolderEntry.getKey();
-        String value = placeHolderEntry.getValue().toString();
-        log.debug("substitution for parameter '" + key + "' in SQL script: "
-          + value);
-        sql = sql.replaceAll(key, Matcher.quoteReplacement(value));
-      }
-      return sql;
+      return sqlBuf.toString();
       }
       catch (IOException e)
       {

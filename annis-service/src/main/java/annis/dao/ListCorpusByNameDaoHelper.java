@@ -23,6 +23,8 @@ import org.apache.commons.lang3.Validate;
 import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 
 import static annis.sqlgen.SqlConstraints.sqlString;
+import com.google.common.base.Joiner;
+import java.util.LinkedList;
 
 public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMapper<Long>
 {
@@ -40,9 +42,23 @@ public class ListCorpusByNameDaoHelper extends ParameterizedSingleColumnRowMappe
 
     // build sql query
     StringBuilder sb = new StringBuilder();
-    sb.append("SELECT id FROM corpus WHERE name IN ( ");
-    sb.append(StringUtils.join(corpusNamesSqlStrings, ", "));
-    sb.append(" ) AND top_level = 't'");
+    
+    List<String> singeCorpusSelect = new LinkedList<>();
+    int idx=0;
+    for(String c : corpusNamesSqlStrings)
+    {
+      singeCorpusSelect.add("SELECT id, " 
+        + idx + "::int AS sourceIdx FROM corpus WHERE name=" + c 
+        + " AND top_level IS TRUE");
+      idx++;
+    }
+    
+    sb.append("SELECT tmp.id FROM\n");
+    sb.append("(\n");
+    Joiner.on("\nUNION\n").appendTo(sb, singeCorpusSelect);
+    sb.append(") AS tmp\n");
+    sb.append("ORDER BY tmp.sourceIdx");
+    
     return sb.toString();
   }
 }

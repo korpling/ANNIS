@@ -60,9 +60,9 @@ SELECT
 FROM
 (
   SELECT
-    _node.id AS id,
+    ((SELECT "new" FROM _nodeidmapping WHERE "old" = _node.id LIMIT 1) + :offset_node_id) AS id,
     _node.text_ref AS text_ref,
-    _node.corpus_ref AS corpus_ref,
+    (_node.corpus_ref + :offset_corpus_id) AS corpus_ref,
     :id AS toplevel_corpus,
     _node.layer AS node_namespace,
     _node.name AS node_name,
@@ -122,4 +122,5 @@ FROM
       AND annotation_category.toplevel_corpus = :id
     )
 ) as tmp
+ORDER BY n_sample, corpus_ref, is_token
 ;
