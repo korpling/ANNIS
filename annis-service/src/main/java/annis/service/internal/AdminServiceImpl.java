@@ -483,7 +483,7 @@ public class AdminServiceImpl implements AdminService
           job.setStatusEmail(statusMail);
           job.setAlias(alias);
 
-          corpusAdmin.sendStatusMail(statusMail, caption,
+          corpusAdmin.sendImportStatusMail(statusMail, caption,
             ImportJob.Status.WAITING, null);
 
           try
