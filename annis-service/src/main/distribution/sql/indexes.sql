@@ -113,9 +113,9 @@ CREATE INDEX idx_distinct_helper_:id ON facts_:id(id, corpus_ref, text_ref, left
   WITH (FILLFACTOR=100);
 
 -- allow simple searches (node, tok etc)
-CREATE INDEX idx__sample_n__:id ON facts_:id(n_sample)
+CREATE INDEX idx__sample_n__:id ON facts_:id(n_sample, corpus_ref)
   WITH (FILLFACTOR=100);
-CREATE INDEX idx__sample_n_tok__:id ON facts_:id(n_sample)
+CREATE INDEX idx__sample_n_tok__:id ON facts_:id(n_sample, corpus_ref)
   WITH (FILLFACTOR=100) WHERE is_token = TRUE;
-CREATE INDEX idx__sample_n_na__:id ON facts_:id(n_na_sample)
+CREATE INDEX idx__sample_n_na__:id ON facts_:id(n_na_sample, corpus_ref)
   WITH (FILLFACTOR=100);
