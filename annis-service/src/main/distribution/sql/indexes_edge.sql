@@ -7,14 +7,14 @@ CREATE INDEX idx__facts_component_id__:id
 CREATE INDEX idx__facts_edge_name__:id
   ON facts_:id
   USING btree
-  (edge_name varchar_pattern_ops, corpus_ref)
+  (edge_name, corpus_ref)
   WITH (FILLFACTOR=100);
 
 
 CREATE INDEX idx__facts_edge_namespace__:id
   ON facts_:id
   USING btree
-  (edge_namespace varchar_pattern_ops, corpus_ref)
+  (edge_namespace, corpus_ref)
   WITH (FILLFACTOR=100);
 
 
@@ -33,13 +33,13 @@ CREATE INDEX idx__facts_level__:id
 CREATE INDEX idx__facts_edge_annotext__:id
   ON facts_:id
   USING btree
-  (edge_annotext varchar_pattern_ops, corpus_ref)
+  (edge_annotext, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts__edge_qannotext__:id
   ON facts_:id
   USING btree
-  (edge_qannotext varchar_pattern_ops, corpus_ref)
+  (edge_qannotext, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_parent__:id
