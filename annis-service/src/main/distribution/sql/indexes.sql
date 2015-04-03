@@ -28,25 +28,25 @@ CREATE INDEX idx__facts_left_token__:id
 CREATE INDEX idx__facts_node_annotext__:id
   ON facts_:id
   USING btree
-  (node_annotext, corpus_ref)
+  (node_annotext varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts__q_node_qannotext__:id
   ON facts_:id
   USING btree
-  (node_qannotext, corpus_ref)
+  (node_qannotext varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_node_name__:id
   ON facts_:id
   USING btree
-  (node_name, corpus_ref)
+  (node_name varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_node_namespace__:id
   ON facts_:id
   USING btree
-  (node_namespace, corpus_ref)
+  (node_namespace varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_right__:id
@@ -83,7 +83,7 @@ CREATE INDEX idx__facts_seg_index_index__:id
 CREATE INDEX idx__facts_span__:id
   ON facts_:id
   USING btree
-  (span, corpus_ref)
+  (span varchar_pattern_ops, corpus_ref)
   WITH (FILLFACTOR=100);
 
 CREATE INDEX idx__facts_token_index__:id
