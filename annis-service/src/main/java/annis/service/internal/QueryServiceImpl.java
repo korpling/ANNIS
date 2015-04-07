@@ -431,7 +431,11 @@ public class QueryServiceImpl implements QueryService
     long start = new Date().getTime();
     SaltProject p = annisDao.graph(data);
     long end = new Date().getTime();
-    logQuery("SUBGRAPH", "", corpusNamesList, end - start);
+    String options =
+      "matches: " + matches.toString()
+      + ", seg: " + segmentation + ", left: " + left + ", right: " + right 
+      + ", filter: " + filter;
+    logQuery("SUBGRAPH", "", corpusNamesList, end - start, options);
 
     return p;
   }
