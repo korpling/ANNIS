@@ -144,13 +144,17 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
             WebResource res = subgraphRes
               .queryParam("left", "" + contextLeft)
               .queryParam("right","" + contextRight);
+            
+            if(args.containsKey("segmentation"))
+            {
+              res = res.queryParam("segmentation", args.get("segmentation"));
+            }
 
             SubgraphFilter filter = getSubgraphFilter();
             if(filter != null)
             {
               res = res.queryParam("filter", filter.name());
             }
-            // TODO: segmentation?
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.start();
@@ -190,13 +194,16 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           WebResource res = subgraphRes
             .queryParam("left", "" + contextLeft)
             .queryParam("right", "" + contextRight);
+          if(args.containsKey("segmentation"))
+          {
+            res = res.queryParam("segmentation", args.get("segmentation"));
+          }
 
           SubgraphFilter filter = getSubgraphFilter();
           if (filter != null)
           {
             res = res.queryParam("filter", filter.name());
           }
-        // TODO: segmentation?
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
           convertText(LegacyGraphConverter.convertToResultSet(p),
