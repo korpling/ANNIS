@@ -190,8 +190,8 @@ public class LegacyGraphConverter
             String seqDSData = (String) seqDS.getSData();
             Preconditions.checkNotNull(seqDSData, "casted SSequentalDS data is null for token %s", sNode.getSId());
             
-            Preconditions.checkNotNull(seqDS.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
-            Preconditions.checkNotNull(seqDS.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
             
             int start = seq.getSStart();
             int end = seq.getSEnd();
