@@ -51,6 +51,7 @@ import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSequentialDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.net.URI;
 import org.eclipse.emf.common.util.BasicEList;
@@ -182,7 +183,9 @@ public class LegacyGraphConverter
           {
             SDataSourceSequence seq = seqList.get(0);
             Preconditions.checkNotNull(seq, "SDataSourceSequence is null for supposed token %s", sNode.getSId());
-            Preconditions.checkNotNull(seq.getSSequentialDS(), "SSequentalDS is null for supposed token %s", sNode.getSId());
+            SSequentialDS seqDS = seq.getSSequentialDS();
+            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for supposed token %s", sNode.getSId());
+            Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for supposed token %s", sNode.getSId());
             aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
               substring(seq.getSStart(), seq.getSEnd()));
             aNode.setToken(true);
