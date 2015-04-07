@@ -186,13 +186,21 @@ public class LegacyGraphConverter
             SSequentialDS seqDS = seq.getSSequentialDS();
             Preconditions.checkNotNull(seqDS, "SSequentalDS is null for token %s", sNode.getSId());
             Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for token %s", sNode.getSId());
-            String seqDSData = (String) seqDS.getSData();
-            Preconditions.checkNotNull(seqDS.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
-            Preconditions.checkNotNull(seqDS.getSEnd(), "SSequentalDS start is null for supposed token %s", sNode.getSId());
             
-            String spannedText = seqDSData.substring(seq.getSStart(), seq.getSEnd());
+            String seqDSData = (String) seqDS.getSData();
+            Preconditions.checkNotNull(seqDSData, "casted SSequentalDS data is null for token %s", sNode.getSId());
+            
+            Preconditions.checkNotNull(seqDS.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seqDS.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
+            
+            int start = seqDS.getSStart();
+            int end = seqDS.getSEnd();
+            
+            Preconditions.checkState(start >= 0 && start <= end && end <= seqDSData.length(), "Illegal start or end of textual DS for token (start %s, end: %s)", sNode.getSId(), start, end);
+            
+            String spannedText = seqDSData.substring(start, end);
             Preconditions.checkNotNull(spannedText, "spanned text is null for supposed token %s (start: %s, end: %s)",
-              sNode.getSId(), seq.getSStart(), seq.getSEnd());
+              sNode.getSId(), start, end);
             
             
             aNode.setSpannedText(spannedText);
