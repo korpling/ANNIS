@@ -49,6 +49,7 @@ import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
+import com.google.common.base.Preconditions;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.net.URI;
@@ -180,6 +181,8 @@ public class LegacyGraphConverter
           if (seqList != null)
           {
             SDataSourceSequence seq = seqList.get(0);
+            Preconditions.checkNotNull(seq, "SDataSourceSequence is null for supposed token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq.getSSequentialDS(), "SSequentalDS is null for supposed token %s", sNode.getSId());
             aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
               substring(seq.getSStart(), seq.getSEnd()));
             aNode.setToken(true);
