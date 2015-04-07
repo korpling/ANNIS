@@ -46,19 +46,19 @@ public class NodeWindow extends Panel implements Button.ClickListener
     "=", "~", "!=", "!~"
   };
   
-  private Set<String> annoNames;
+  private final Set<String> annoNames;
   
-  private TigerQueryBuilderCanvas parent;
-  private Button btEdge;
-  private Button btAdd;
-  private Button btClear;
-  private Button btClose;
-  private Button btMove;
-  private HorizontalLayout toolbar;
-  private List<ConstraintLayout> constraints;
+  private final TigerQueryBuilderCanvas parent;
+  private final Button btEdge;
+  private final Button btAdd;
+  private final Button btClear;
+  private final Button btClose;
+  private final Button btMove;
+  private final HorizontalLayout toolbar;
+  private final List<ConstraintLayout> constraints;
   private boolean prepareEdgeDock;
-  private int id;
-  private VerticalLayout vLayout;
+  private final int id;
+  private final VerticalLayout vLayout;
 
   public NodeWindow(int id, TigerQueryBuilderCanvas parent)
   {
@@ -269,11 +269,11 @@ public class NodeWindow extends Panel implements Button.ClickListener
   implements LayoutClickListener, ValueChangeListener
   {
 
-    private TigerQueryBuilderCanvas parent;
-    private ComboBox cbName;
-    private ComboBox cbOperator;
-    private TextField txtValue;
-    private Button btDelete;
+    private final TigerQueryBuilderCanvas parent;
+    private final ComboBox cbName;
+    private final ComboBox cbOperator;
+    private final TextField txtValue;
+    private final Button btDelete;
 
     public ConstraintLayout(TigerQueryBuilderCanvas parent, Set<String> annoNames)
     {
@@ -310,7 +310,7 @@ public class NodeWindow extends Panel implements Button.ClickListener
       txtValue.setImmediate(true);
       txtValue.addListener((ValueChangeListener) this);
       
-      cbOperator.setWidth("3em");
+      cbOperator.setWidth("4em");
       cbName.setWidth("100%");
       txtValue.setWidth("100%");
 
