@@ -193,8 +193,8 @@ public class LegacyGraphConverter
             Preconditions.checkNotNull(seqDS.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
             Preconditions.checkNotNull(seqDS.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
             
-            int start = seqDS.getSStart();
-            int end = seqDS.getSEnd();
+            int start = seq.getSStart();
+            int end = seq.getSEnd();
             
             Preconditions.checkState(start >= 0 && start <= end && end <= seqDSData.length(), "Illegal start or end of textual DS for token (start %s, end: %s)", sNode.getSId(), start, end);
             
