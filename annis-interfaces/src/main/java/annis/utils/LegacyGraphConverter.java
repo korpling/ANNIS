@@ -182,12 +182,14 @@ public class LegacyGraphConverter
           if (seqList != null)
           {
             SDataSourceSequence seq = seqList.get(0);
-            Preconditions.checkNotNull(seq, "SDataSourceSequence is null for supposed token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq, "SDataSourceSequence is null for token %s", sNode.getSId());
             SSequentialDS seqDS = seq.getSSequentialDS();
-            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for supposed token %s", sNode.getSId());
-            Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for supposed token %s", sNode.getSId());
-            aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
-              substring(seq.getSStart(), seq.getSEnd()));
+            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for token %s", sNode.getSId());
+            String seqDSData = (String) seqDS.getSData();
+            Preconditions.checkNotNull(seqDS.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seqDS.getSEnd(), "SSequentalDS start is null for supposed token %s", sNode.getSId());
+            aNode.setSpannedText(seqDSData.substring(seq.getSStart(), seq.getSEnd()));
             aNode.setToken(true);
             aNode.setTokenIndex(feat.getTokenIndex());
           }
