@@ -90,7 +90,7 @@
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-apache-client4</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
       <!-- do not use commons logging -->
       <exclusions>
         <exclusion>
