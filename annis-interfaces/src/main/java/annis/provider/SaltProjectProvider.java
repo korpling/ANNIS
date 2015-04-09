@@ -130,6 +130,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     try
     {
       resource.save(new BufferedOutputStream(entityStream, 512*1024), options); 
+      entityStream.flush();
     }
     catch(Exception ex)
     {
