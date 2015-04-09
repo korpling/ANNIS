@@ -464,7 +464,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
-    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", query)
+    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeTemplate(query))
       .get(new GenericType<List<QueryNode>>() {});
     
     return nodes;

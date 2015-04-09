@@ -51,6 +51,7 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
+import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
@@ -125,7 +126,7 @@ public class QueryController implements Serializable
       {
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", query)
+          queryParam("q", Helper.encodeTemplate(query))
           .get(String.class);
 
         // wait for maximal one seconds
@@ -334,9 +335,8 @@ public class QueryController implements Serializable
 
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
-      queryParam(
-        "q", pagedQuery.getQuery()).queryParam("corpora",
-        StringUtils.join(pagedQuery.getCorpora(), ",")).get(
+      queryParam("q", Helper.encodeTemplate(pagedQuery.getQuery()))
+      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 

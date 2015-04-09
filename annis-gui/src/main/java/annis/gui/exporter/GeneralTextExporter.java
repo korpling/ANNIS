@@ -118,7 +118,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       // 1. Get all the matches as Salt ID
       InputStream matchStream = annisResource.path("search/find/")
-        .queryParam("q", queryAnnisQL)
+        .queryParam("q", Helper.encodeTemplate(queryAnnisQL))
         .queryParam("corpora", StringUtils.join(corpora, ","))
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
