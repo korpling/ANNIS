@@ -201,13 +201,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       ServletContextHandler context =
         new ServletContextHandler(ServletContextHandler.NO_SESSIONS);
       context.setContextPath("/");
-      // enable gzip compression
-      context.setInitParameter(
-        "com.sun.jersey.spi.container.ContainerRequestFilters",
-        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      context.setInitParameter(
-        "com.sun.jersey.spi.container.ContainerResponseFilters",
-        "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
 
       server.setHandler(context);
       server.setThreadPool(new ExecutorThreadPool());
@@ -240,11 +233,6 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       EnumSet<DispatcherType> gzipDispatcher = EnumSet.
         of(DispatcherType.REQUEST);
       context.addFilter(GzipFilter.class, "/*", gzipDispatcher);
-      // enable compression
-      //context.setInitParameter("com.sun.jersey.spi.container.ContainerRequestFilters",
-      //  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
-      //context.setInitParameter("com.sun.jersey.spi.container.ContainerResponseFilters",
-      ///  "com.sun.jersey.api.container.filter.GZIPContentEncodingFilter");
 
       // configure Apache Shiro with the web application
       context.addEventListener(new EnvironmentLoaderListener());

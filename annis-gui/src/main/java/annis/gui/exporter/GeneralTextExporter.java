@@ -123,9 +123,9 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       
-      BufferedReader inReader = new BufferedReader(new InputStreamReader(
-        matchStream, "UTF-8"));
-      try
+     
+      try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
+        matchStream, "UTF-8")))
       {
         WebResource subgraphRes = annisResource.path("search/subgraph");
         MatchGroup currentMatches = new MatchGroup();
@@ -211,10 +211,6 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         }
         offset = 0;
         
-      }
-      finally
-      {
-        inReader.close();
       }
       
       out.append("\n");
