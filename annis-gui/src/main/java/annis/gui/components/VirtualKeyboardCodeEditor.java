@@ -22,8 +22,7 @@ import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.shared.JavaScriptExtensionState;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.TextArea;
-import org.json.JSONArray;
+import elemental.json.JsonArray;
 import org.json.JSONException;
 
 /**
@@ -91,7 +90,7 @@ public class VirtualKeyboardCodeEditor extends AbstractJavaScriptExtension
     }
 
     @Override
-    public void call(JSONArray arguments) throws JSONException
+    public void call(JsonArray arguments) throws JSONException
     {
       ((VKState) getState()).setKeyboardLayout(arguments.getString(0));
     }

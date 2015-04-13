@@ -21,10 +21,10 @@ import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import elemental.json.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -66,9 +66,9 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
     addFunction("selectRow", new JavaScriptFunction() {
 
       @Override
-      public void call(JSONArray arguments) throws JSONException
+      public void call(JsonArray arguments) throws JSONException
       {
-        freqPanel.selectRow(arguments.getInt(0));
+        freqPanel.selectRow((int) arguments.getNumber(0));
       }
     });
     
