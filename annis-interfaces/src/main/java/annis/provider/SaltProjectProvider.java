@@ -255,17 +255,58 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     @Override
     public int read() throws IOException
     {
-      return this.delegate.read();
+      return delegate.read();
     }
+    
+    
+    @Override
+    public int read(byte[] b) throws IOException
+    {
+      return delegate.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException
+    {
+      return delegate.read(b, off, len);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException
+    {
+      delegate.reset();
+    }
+
+    @Override
+    public long skip(long n) throws IOException
+    {
+      return delegate.skip(n);
+    }
+    
 
     @Override
     public void close() throws IOException
     {
       // ignore
     }
-    
-    
 
+    @Override
+    public int available() throws IOException
+    {
+      return delegate.available();
+    }
+
+    @Override
+    public boolean markSupported()
+    {
+      return delegate.markSupported();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit)
+    {
+      delegate.mark(readlimit);
+    }
   }
 
 }
