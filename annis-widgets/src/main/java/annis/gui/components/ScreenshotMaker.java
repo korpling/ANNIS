@@ -25,6 +25,7 @@ import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.UI;
+import elemental.json.JsonArray;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Validate;
 import org.slf4j.Logger;
@@ -47,8 +48,9 @@ public class ScreenshotMaker extends AbstractJavaScriptExtension
     
     addFunction("finishedScreenshot", new JavaScriptFunction() 
     {
+
       @Override
-      public void call(JSONArray arguments) throws JSONException
+      public void call(JsonArray arguments)
       {
         parseAndCallback(arguments.getString(0), callback);
       }
