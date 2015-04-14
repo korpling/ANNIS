@@ -47,8 +47,7 @@ attris = {
   },
   "depline":	{
     "stroke": '#999',
-    "stroke-width":'1',
-    "stroke-dasharray": ""
+    "stroke-width":'1'
   },
   "deptext":	{
     "font": '12px "Times"',
