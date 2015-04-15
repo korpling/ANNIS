@@ -26,17 +26,24 @@ import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import annis.service.objects.FrequencyTableQuery;
 import com.google.common.base.Function;
+import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import com.google.common.escape.Escaper;
 import com.google.common.escape.Escapers;
 import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
+import java.util.HashSet;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.Validate;
@@ -82,13 +89,20 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       {
         String colVal = rs.getString(i);
         
-        String[] splitted = colVal.split(":", 3);
-        if(splitted.length > 0)
+        if(colVal == null)
         {
-          colVal = splitted[splitted.length-1];
+          tupel[i-1] = "";
         }
+        else
+        {
+          String[] splitted = colVal.split(":", 3);
+          if(splitted.length > 0)
+          {
+            colVal = splitted[splitted.length-1];
+          }
 
-        tupel[i - 1] = colVal;
+          tupel[i - 1] = colVal;
+        }
       } // end for each column (except last "count" column) 
 
       result.addEntry(new FrequencyTable.Entry(tupel, count));
@@ -131,21 +145,26 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
     Validate.notEmpty(freqQueryData);
     ext = freqQueryData.get(0);
 
+    Multimap<FrequencyTableEntry, String> conditions = conditionsForEntries(ext, queryData, alternative);
+
+    
     StringBuilder sb = new StringBuilder();
 
     sb.append(indent).append("(\n");
     sb.append(indent);
 
     sb.append(getSolutionSqlGenerator().toSql(queryData, indent + TABSTOP));
-    sb.append(indent).append(") AS solutions,\n");
+    sb.append(indent).append(") AS solutions\n");
     
     int i = 1;
     Iterator<FrequencyTableEntry> itEntry = ext.iterator();
     while (itEntry.hasNext())
     {
       FrequencyTableEntry e = itEntry.next();
+      
 
       sb.append(indent).append(TABSTOP);
+      sb.append("LEFT JOIN ");
 
       String tableSql;
       if(e.getType() == FrequencyTableEntryType.meta)
@@ -160,17 +179,90 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
       
       sb.append(tableSql);
       sb.append(" AS v").append(i);
-
-      if (itEntry.hasNext())
-      {
-        sb.append(",");
-      }
-
-      sb.append("\n");
-
+      
+      sb.append(" ON (");
+      sb.append(Joiner.on(" AND ").join(conditions.get(e)));
+      sb.append(")\n");
       i++;
     }
     return sb.toString();
+  }
+  
+  private Multimap<FrequencyTableEntry, String> conditionsForEntries(
+    List<FrequencyTableEntry> frequencyEntries,
+    QueryData queryData, List<QueryNode> alternative)
+  {
+    Multimap<FrequencyTableEntry, String> conditions = LinkedHashMultimap.create();
+    int i = 1;
+
+    ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(
+      alternative.iterator(), new Function<QueryNode, String>()
+      {
+        @Override
+        public String apply(QueryNode input)
+        {
+          return input.getVariable();
+        }
+      });
+
+    for (FrequencyTableEntry e : frequencyEntries)
+    {
+      if (e.getType() == FrequencyTableEntryType.meta)
+      {
+        List<String> qName = Splitter.on(':').limit(2).omitEmptyStrings()
+          .splitToList(e.getKey());
+        if (qName.size() == 2)
+        {
+          conditions.put(e, "v" + i + ".namespace = '" + escaper.escape(qName.
+            get(0))
+            + "'");
+          conditions.put(e, "v" + i + ".name = '" + escaper.escape(qName.get(1))
+            + "'");
+        }
+        else
+        {
+          conditions.put(e, "v" + i + ".name = '" + escaper.escape(qName.get(0))
+            + "'");
+        }
+        conditions.put(e, "v" + i + ".corpus_ref = solutions.corpus_ref");
+      }
+      else
+      {
+        // general partition restriction
+        conditions.put(e, "v" + i + ".toplevel_corpus IN (" + StringUtils.join(
+          queryData.getCorpusList(), ",") + ")");
+        // specificly join on top level corpus
+        conditions.put(e, "v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
+
+        // join on node ID
+        QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
+        if (referencedNode == null)
+        {
+          throw new AnnisQLSemanticsException("No such node \""
+            + e.getReferencedNode() + "\". "
+            + "Your query contains " + alternative.size()
+            + " node(s), make sure no node definition numbers are greater than this number");
+        }
+        conditions.put(e, "v" + i + ".id = solutions.id" + referencedNode.getId());
+
+        if (e.getType() == FrequencyTableEntryType.span)
+        {
+          conditions.put(e, "v" + i + ".n_sample IS TRUE");
+        }
+        else if (e.getType() == FrequencyTableEntryType.annotation)
+        {
+          // TODO: support namespaces
+          // filter by selected key
+          conditions.put(e, "v" + i + ".node_annotext LIKE '"
+            + AnnotationConditionProvider.likeEscaper.escape(e.
+              getKey())
+            + ":%'");
+          conditions.put(e, "v" + i + ".n_na_sample IS TRUE");
+        }
+      }
+      i++;
+    }
+    return conditions;
   }
 
   @Override
@@ -222,83 +314,17 @@ public class FrequencySqlGenerator extends AbstractSqlGenerator
   public Set<String> whereConditions(QueryData queryData,
     List<QueryNode> alternative, String indent)
   {
-    Set<String> conditions = new LinkedHashSet<>();
+//    Set<String> conditions = new LinkedHashSet<>();
+//
+//    FrequencyTableQuery ext;
+//    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
+//    Validate.notNull(freqQueryData);
+//    Validate.notEmpty(freqQueryData);
+//    ext = freqQueryData.get(0);
+//
+//    Set<String> conditions = conditionsForEntries(ext, queryData, alternative);
 
-    FrequencyTableQuery ext;
-    List<FrequencyTableQuery> freqQueryData = queryData.getExtensions(FrequencyTableQuery.class);
-    Validate.notNull(freqQueryData);
-    Validate.notEmpty(freqQueryData);
-    ext = freqQueryData.get(0);
-
-    ImmutableMap<String, QueryNode> idxNodeVariables = Maps.uniqueIndex(
-      alternative.iterator(), new Function<QueryNode, String>()
-      {
-        @Override
-        public String apply(QueryNode input)
-        {
-          return input.getVariable();
-        }
-      });
-
-    int i = 1;
-    for (FrequencyTableEntry e : ext)
-    {
-      if (e.getType() == FrequencyTableEntryType.meta)
-      {
-        List<String> qName = Splitter.on(':').limit(2).omitEmptyStrings()
-          .splitToList(e.getKey());
-        if(qName.size() == 2)
-        {
-          conditions.add("v" + i + ".namespace = '" + escaper.escape(qName.get(0))
-            + "'");
-          conditions.add("v" + i + ".name = '" + escaper.escape(qName.get(1))
-            + "'");
-        }
-        else
-        {
-          conditions.add("v" + i + ".name = '" + escaper.escape(qName.get(0))
-            + "'");
-        }
-        conditions.add("v" + i + ".corpus_ref = solutions.corpus_ref");
-      }
-      else
-      {
-        // general partition restriction
-        conditions.add("v" + i + ".toplevel_corpus IN (" + StringUtils.join(
-          queryData.getCorpusList(), ",") + ")");
-        // specificly join on top level corpus
-        conditions.add("v" + i + ".toplevel_corpus = solutions.toplevel_corpus");
-
-        // join on node ID
-        QueryNode referencedNode = idxNodeVariables.get(e.getReferencedNode());
-        if (referencedNode == null)
-        {
-          throw new AnnisQLSemanticsException("No such node \""
-            + e.getReferencedNode() + "\". "
-            + "Your query contains " + alternative.size()
-            + " node(s), make sure no node definition numbers are greater than this number");
-        }
-        conditions.add("v" + i + ".id = solutions.id" + referencedNode.getId());
-
-        if (e.getType() == FrequencyTableEntryType.span)
-        {
-          conditions.add("v" + i + ".n_sample IS TRUE");
-        }
-        else if (e.getType() == FrequencyTableEntryType.annotation)
-        {
-        // TODO: support namespaces
-          // filter by selected key
-          conditions.add("v" + i + ".node_annotext LIKE '"
-            + AnnotationConditionProvider.likeEscaper.escape(e.
-              getKey())
-            + ":%'");
-          conditions.add("v" + i + ".n_na_sample IS TRUE");
-        }
-      }
-      i++;
-    }
-
-    return conditions;
+    return new HashSet<>();
   }
 
   public SolutionSqlGenerator getSolutionSqlGenerator()
