@@ -27,9 +27,11 @@ import annis.model.AnnisConstants;
 import annis.model.RelannisNodeFeature;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
+import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
+import com.vaadin.ui.themes.ValoTheme;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
@@ -73,6 +75,7 @@ public class GridComponent extends Panel
   private Set<String> manuallySelectedTokenAnnos;
   private String segmentationName;
   private final transient STextualDS enforcedText;
+  private final Label lblEmptyToken;
   
   public enum ElementType
   {
@@ -95,6 +98,10 @@ public class GridComponent extends Panel
     layout.setSizeUndefined();
     addStyleName(ChameleonTheme.PANEL_BORDERLESS);
     
+    lblEmptyToken = new Label("(Empty token list, you may want to select another base text from the menu above.)");
+    lblEmptyToken.setVisible(false);
+    lblEmptyToken.addStyleName("empty_token_hint");
+    layout.addComponent(lblEmptyToken);
     if (input != null)
     {
       this.manuallySelectedTokenAnnos = input.getVisibleTokenAnnos();
@@ -122,7 +129,7 @@ public class GridComponent extends Panel
     String resultID = input.getId();
     grid = new AnnotationGrid(mediaController, pdfController, resultID);
     grid.addStyleName(getMainStyle());
-    grid.addStyleName("corpus-font-force");
+    grid.addStyleName(Helper.CORPUS_FONT_FORCE);
     grid.setEscapeHTML(Boolean.parseBoolean(input.getMappings().
       getProperty(MAPPING_ESCAPE_HTML, "true")));
     grid.setShowNamespace(Boolean.parseBoolean(input.getMappings().
@@ -175,6 +182,20 @@ public class GridComponent extends Panel
     
     EventExtractor.removeEmptySpace(rowsByAnnotation, tokenRow);
     
+    // check if the token row only contains empty values
+    boolean tokenRowIsEmpty = true;
+    for(GridEvent tokenEvent : tokenRow.getEvents())
+    {
+      if(tokenEvent.getValue() != null && !tokenEvent.getValue().trim().isEmpty())
+      {
+        tokenRowIsEmpty = false;
+        break;
+      }
+    }
+    if(!isHidingToken() && canShowEmptyTokenWarning())
+    {
+      lblEmptyToken.setVisible(tokenRowIsEmpty);
+    }
     grid.setRowsByAnnotation(rowsByAnnotation);
     grid.setTokenIndexOffset(tokenOffsetForText.get());
   }
@@ -308,7 +329,7 @@ public class GridComponent extends Panel
     
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation
       = EventExtractor.parseSalt(input, showSpanAnnotations, 
-        showTokenAnnotations, annos, mediaAnnotations, isUnsettingValueForMedia(),
+        showTokenAnnotations, annos, mediaAnnotations, isAddingPlaybackRow(),
         (int) startIndex, (int) endIndex, pdfController, enforcedText);
     
     return rowsByAnnotation;
@@ -361,7 +382,12 @@ public class GridComponent extends Panel
     return false;
   }
   
-  protected boolean isUnsettingValueForMedia()
+  protected boolean isAddingPlaybackRow()
+  {
+    return false;
+  }
+  
+  protected boolean canShowEmptyTokenWarning()
   {
     return false;
   }

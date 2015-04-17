@@ -16,8 +16,8 @@
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
 import annis.AnnisBaseRunner;
-import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
+import annis.administration.ImportStatus;
 import annis.service.internal.AnnisServiceRunner;
 import annis.utils.Utils;
 import java.awt.Color;
@@ -60,6 +60,7 @@ public class MainFrame extends javax.swing.JFrame
     @Override
     protected String doInBackground() throws Exception
     {
+      runner = null;
       setProgress(1);
       try
       {
@@ -78,9 +79,10 @@ public class MainFrame extends javax.swing.JFrame
     {
 
       // starts RMI service at bean creation
-      AnnisServiceRunner runner = new AnnisServiceRunner();
+      runner = new AnnisServiceRunner();
       runner.setUseAuthentification(false);
       runner.start(true);
+     
     }
 
     private void startJetty() throws Exception
@@ -143,6 +145,8 @@ public class MainFrame extends javax.swing.JFrame
   private CorpusAdministration corpusAdministration;
   private SwingWorker<String, String> serviceWorker;
   private boolean wasStarted = false;
+  private AnnisServiceRunner runner;
+  private int oldTimeout;
 
   /**
    * Creates new form MainFrame
@@ -236,6 +240,7 @@ public class MainFrame extends javax.swing.JFrame
             "/de/hu_berlin/german/korpling/annis/kickstarter/crystal_icons/button_ok.png")));
           btLaunch.setEnabled(true);
           btLaunch.setForeground(Color.blue);
+          cbDisableTimeout.setEnabled(true);
         }
         else
         {
@@ -248,7 +253,7 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (Exception ex)
       {
-        AdministrationDao.ImportStatus importStatus = corpusAdministration
+        ImportStatus importStatus = corpusAdministration
           .getAdministrationDao().initImportStatus();
         importStatus.addException("unknown exception", ex);
         new ExceptionDialog(importStatus).setVisible(true);
@@ -272,6 +277,7 @@ public class MainFrame extends javax.swing.JFrame
     btLaunch = new javax.swing.JButton();
     pbStart = new javax.swing.JProgressBar();
     btExit = new javax.swing.JButton();
+    cbDisableTimeout = new javax.swing.JCheckBox();
 
     setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
     setTitle("ANNIS Kickstarter");
@@ -364,6 +370,18 @@ public class MainFrame extends javax.swing.JFrame
       }
     });
 
+    cbDisableTimeout.setText("disable query timeout");
+    cbDisableTimeout.setToolTipText("If this checkbox is active no query timeout will be applied. Please note the only way to abort the query is either the automatic timeout or by closing the ANNIS kickstarter.");
+    cbDisableTimeout.setEnabled(false);
+    cbDisableTimeout.setName("cbDisableTimeout"); // NOI18N
+    cbDisableTimeout.addActionListener(new java.awt.event.ActionListener()
+    {
+      public void actionPerformed(java.awt.event.ActionEvent evt)
+      {
+        cbDisableTimeoutActionPerformed(evt);
+      }
+    });
+
     javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
     getContentPane().setLayout(layout);
     layout.setHorizontalGroup(
@@ -377,7 +395,10 @@ public class MainFrame extends javax.swing.JFrame
           .addComponent(lblStatusService, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(pbStart, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
           .addComponent(btLaunch, javax.swing.GroupLayout.DEFAULT_SIZE, 376, Short.MAX_VALUE)
-          .addComponent(btExit, javax.swing.GroupLayout.Alignment.TRAILING))
+          .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
+            .addComponent(cbDisableTimeout, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+            .addComponent(btExit)))
         .addContainerGap())
     );
     layout.setVerticalGroup(
@@ -396,7 +417,9 @@ public class MainFrame extends javax.swing.JFrame
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
         .addComponent(btLaunch, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-        .addComponent(btExit)
+        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+          .addComponent(btExit)
+          .addComponent(cbDisableTimeout))
         .addContainerGap())
     );
 
@@ -443,7 +466,7 @@ public class MainFrame extends javax.swing.JFrame
       }
       catch (IOException | URISyntaxException ex)
       {
-       AdministrationDao.ImportStatus importStatus = corpusAdministration
+       ImportStatus importStatus = corpusAdministration
           .getAdministrationDao().initImportStatus();
         importStatus.addException("unknown exception", ex);
         new ExceptionDialog(importStatus).setVisible(true);
@@ -471,6 +494,26 @@ public class MainFrame extends javax.swing.JFrame
       this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
 
     }//GEN-LAST:event_btLaunchMouseExited
+
+  private void cbDisableTimeoutActionPerformed(java.awt.event.ActionEvent evt)//GEN-FIRST:event_cbDisableTimeoutActionPerformed
+  {//GEN-HEADEREND:event_cbDisableTimeoutActionPerformed
+    
+    if(runner != null)
+    {
+      if(cbDisableTimeout.isSelected())
+      {
+        // unset timeout
+        oldTimeout = runner.getTimeout();
+        runner.setTimeout(-1);
+      }
+      else
+      {
+        // restore timeout
+        runner.setTimeout(oldTimeout);
+      }
+    }
+    
+  }//GEN-LAST:event_cbDisableTimeoutActionPerformed
 
 
   private boolean isInitialized()
@@ -515,6 +558,7 @@ public class MainFrame extends javax.swing.JFrame
   private javax.swing.JButton btInit;
   private javax.swing.JButton btLaunch;
   private javax.swing.JButton btList;
+  private javax.swing.JCheckBox cbDisableTimeout;
   private javax.swing.JLabel lblStatusService;
   private javax.swing.JProgressBar pbStart;
   // End of variables declaration//GEN-END:variables

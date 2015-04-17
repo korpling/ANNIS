@@ -80,7 +80,7 @@ public class EventExtractor {
    * @param showTokenAnnos
    * @param mediaLayer  A set of all annotation layers which should be treated as special media layer.
    * @param annotationNames
-   * @param unsetValueForMedia
+   * @param replaceValueWithMediaIcon If true the actual value is removed and an icon for playing the media file is shown instead.
    * @param startTokenIndex token index of the first token in the match
    * @param endTokenIndex token index of the last token in the match
    * @param pdfController makes status of all pdfviewer available for the
@@ -91,7 +91,7 @@ public class EventExtractor {
   public static LinkedHashMap<String, ArrayList<Row>> parseSalt(
           VisualizerInput input, boolean showSpanAnnos, boolean showTokenAnnos,
           List<String> annotationNames, 
-          Set<String> mediaLayer, boolean unsetValueForMedia,
+          Set<String> mediaLayer, boolean replaceValueWithMediaIcon,
           long startTokenIndex, long endTokenIndex,
           PDFController pdfController, STextualDS text) 
   {
@@ -118,7 +118,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(span, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation,
-            true, mediaLayer, unsetValueForMedia);
+            true, mediaLayer, replaceValueWithMediaIcon);
         }
       } // end for each span
     }
@@ -131,7 +131,7 @@ public class EventExtractor {
         {
           addAnnotationsForNode(tok, graph, startTokenIndex, endTokenIndex,
             pdfController, pageNumberHelper, eventCounter, rowsByAnnotation, false,
-            mediaLayer, unsetValueForMedia);
+            mediaLayer, replaceValueWithMediaIcon);
         }
       }
     }
@@ -257,7 +257,7 @@ public class EventExtractor {
     AtomicInteger eventCounter,
     LinkedHashMap<String, ArrayList<Row>> rowsByAnnotation,
     boolean addMatch,
-    Set<String> mediaLayer, boolean unsetValueForMedia)
+    Set<String> mediaLayer, boolean replaceValueWithMediaIcon)
   {
 
     List<String> matchedAnnos = new ArrayList<>();
@@ -373,7 +373,7 @@ public class EventExtractor {
           double[] startEndTime = TimeHelper.getOverlappedTime(node);
           if (startEndTime.length == 1)
           {
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime());
@@ -384,7 +384,7 @@ public class EventExtractor {
           {
             event.setStartTime(startEndTime[0]);
             event.setEndTime(startEndTime[1]);
-            if (unsetValueForMedia)
+            if (replaceValueWithMediaIcon)
             {
               event.setValue(" ");
               event.setTooltip("play excerpt " + event.getStartTime() + "-"

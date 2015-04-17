@@ -15,6 +15,7 @@
  */
 package annis.gui.exporter;
 
+import annis.libgui.Helper;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -25,6 +26,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
 import java.io.Writer;
+import java.util.List;
 import java.util.Set;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -36,8 +38,8 @@ public class CSVExporter implements Exporter, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CSVExporter.class);
 
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, String keysAsString, String argsAsString,
+  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
+    Set<String> corpora, List<String> keys,String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
     //this is a full result export
@@ -47,7 +49,7 @@ public class CSVExporter implements Exporter, Serializable
       WebResource res = annisResource.path("search").path("matrix")
         .queryParam("csv", "true")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL);
+        .queryParam("q", Helper.encodeTemplate(queryAnnisQL));
       
       
       if(argsAsString.startsWith("metakeys="))
@@ -62,6 +64,8 @@ public class CSVExporter implements Exporter, Serializable
       }
       
       out.flush();
+      
+      return true;
     }
     catch(UniformInterfaceException ex)
     {
@@ -78,6 +82,7 @@ public class CSVExporter implements Exporter, Serializable
     {
       log.error(null, ex);
     }
+    return false;
   }
 
   @Override

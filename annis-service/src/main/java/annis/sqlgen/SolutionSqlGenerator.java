@@ -25,7 +25,9 @@ import org.apache.commons.lang3.Validate;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.internal.QueryServiceImpl;
+import annis.service.objects.OrderType;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -107,7 +109,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
       cols.add("NULL::integer AS cat" + i);
       if (outputNodeName)
       {
-        cols.add("NULL::varchar AS node_name" + i);
+        cols.add("NULL::varchar AS salt_id" + i);
       }
     }
 
@@ -161,6 +163,20 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
         "corpus_ref")
         + " AS corpus_ref");
     }
+    
+    if(queryData.getCorpusList().size() > 1)
+    {
+      if(needsDistinct)
+      {
+        cols.add("min(" + tables(alternative.get(0)).aliasedColumn(TableAccessStrategy.FACTS_TABLE, "sourceIdx") 
+          +  ") AS sourceIdx");
+      }
+      else
+      {
+        cols.add(tables(alternative.get(0)).aliasedColumn(TableAccessStrategy.FACTS_TABLE, "sourceIdx") +  " AS sourceIdx");
+      }
+    }
+    
     String colIndent = indent + TABSTOP + TABSTOP;
 
     return "\n" + colIndent + StringUtils.join(cols, ",\n" + colIndent);
@@ -170,16 +186,52 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    List<String> ids = new ArrayList<>();
-    for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+    OrderType order = OrderType.normal;
+    
+    List<LimitOffsetQueryData> ext = queryData.getExtensions(
+      LimitOffsetQueryData.class);
+    
+    if(!ext.isEmpty())
     {
-      ids.add("id" + i);
-      if (annoCondition != null)
-      {
-        ids.add("cat" + i);
-      }
+      order = ext.get(0).getOrder();
     }
-    return StringUtils.join(ids, ", ");
+    
+    if(order == OrderType.random)
+    {
+      return "random()";
+    }
+    else
+    {
+      String appendix = "";
+      if(order == OrderType.inverted)
+      {
+        appendix = " DESC";
+      }
+      else if(order == OrderType.normal)
+      {
+        appendix = " ASC";
+      }
+      
+      
+      List<Long> corpusList = queryData.getCorpusList();
+      List<String> ids = new ArrayList<>();
+      
+      if(corpusList.size() > 1)
+      {
+        // add the artificial "source index" which corresponds to the toplevel corpus name
+        ids.add("sourceIdx");
+      }
+      // add the node ID for each output node an the category ID
+      for (int i = 1; i <= queryData.getMaxWidth(); ++i)
+      {
+        ids.add("id" + i +  appendix);
+        if (annoCondition != null)
+        {
+          ids.add("cat" + i + appendix);
+        }
+      }
+      return StringUtils.join(ids, ", ");
+    }
   }
 
   @Override

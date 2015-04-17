@@ -18,7 +18,9 @@ package annis.gui.exporter;
 import annis.exceptions.AnnisCorpusAccessException;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.libgui.Helper;
 import annis.model.AnnisNode;
+import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
 import annis.service.ifaces.AnnisResultSet;
 import annis.service.objects.AnnisAttribute;
@@ -26,6 +28,7 @@ import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
 import annis.service.objects.SubgraphFilter;
 import annis.utils.LegacyGraphConverter;
+import com.google.common.base.Splitter;
 import com.google.common.base.Stopwatch;
 import com.google.common.escape.Escaper;
 import com.google.common.eventbus.EventBus;
@@ -54,19 +57,18 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
   @Override
-  public void convertText(String queryAnnisQL, int contextLeft, int contextRight,
-    Set<String> corpora, String keysAsString, String argsAsString,
+  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
+    Set<String> corpora, List<String> keys, String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
     try
     {
       // int count = service.getCount(corpusIdList, queryAnnisQL);
       
-      LinkedList<String> keys = new LinkedList<>();
-
-      if (keysAsString == null || keysAsString.isEmpty())
+      if (keys == null || keys.isEmpty())
       {
         // auto set
+        keys = new LinkedList<>();
         keys.add("tok");
         List<AnnisAttribute> attributes = new LinkedList<>();
         
@@ -98,18 +100,9 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           }
         }
       }
-      else
-      {
-        // manually specified
-        String[] keysSplitted = keysAsString.split("\\,");
-        for (String k : keysSplitted)
-        {
-          keys.add(k.trim());
-        }
-      }
 
       Map<String, String> args = new HashMap<>();
-      for (String s : argsAsString.split("&"))
+      for (String s : argsAsString.split("&|;"))
       {
         String[] splitted = s.split("=", 2);
         String key = splitted[0];
@@ -125,29 +118,23 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       // 1. Get all the matches as Salt ID
       InputStream matchStream = annisResource.path("search/find/")
-        .queryParam("q", queryAnnisQL)
+        .queryParam("q", Helper.encodeTemplate(queryAnnisQL))
         .queryParam("corpora", StringUtils.join(corpora, ","))
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       
-      BufferedReader inReader = new BufferedReader(new InputStreamReader(
-        matchStream, "UTF-8"));
-      try
+     
+      try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
+        matchStream, "UTF-8")))
       {
         WebResource subgraphRes = annisResource.path("search/subgraph");
         MatchGroup currentMatches = new MatchGroup();
         String currentLine;
         int offset=0;
         // 2. iterate over all matches and get the sub-graph for a group of matches
-        while((currentLine = inReader.readLine()) != null)
-        {
-          
-          if(Thread.currentThread().isInterrupted())
-          {
-            // return from loop and abort export
-            break;
-          }
-          
+        while(!Thread.currentThread().isInterrupted() 
+          && (currentLine = inReader.readLine()) != null)
+        { 
           Match match = Match.parseFromString(currentLine);
 
           currentMatches.getMatches().add(match);
@@ -157,13 +144,17 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
             WebResource res = subgraphRes
               .queryParam("left", "" + contextLeft)
               .queryParam("right","" + contextRight);
+            
+            if(args.containsKey("segmentation"))
+            {
+              res = res.queryParam("segmentation", args.get("segmentation"));
+            }
 
             SubgraphFilter filter = getSubgraphFilter();
             if(filter != null)
             {
               res = res.queryParam("filter", filter.name());
             }
-            // TODO: segmentation?
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.start();
@@ -184,11 +175,18 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 
             if(eventBus != null)
             {
-              eventBus.post(Integer.valueOf(offset+1));
+              eventBus.post(offset+1);
             }
           }
           offset++;
         } // end for each line
+        
+        if (Thread.interrupted())
+        {
+          // return from loop and abort export
+          log.info("Exporter job was interrupted");
+          return false;
+        }
         
         // query the left over matches
         if (!currentMatches.getMatches().isEmpty())
@@ -196,13 +194,16 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           WebResource res = subgraphRes
             .queryParam("left", "" + contextLeft)
             .queryParam("right", "" + contextRight);
+          if(args.containsKey("segmentation"))
+          {
+            res = res.queryParam("segmentation", args.get("segmentation"));
+          }
 
           SubgraphFilter filter = getSubgraphFilter();
           if (filter != null)
           {
             res = res.queryParam("filter", filter.name());
           }
-        // TODO: segmentation?
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
           convertText(LegacyGraphConverter.convertToResultSet(p),
@@ -211,14 +212,12 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         offset = 0;
         
       }
-      finally
-      {
-        inReader.close();
-      }
       
       out.append("\n");
       out.append("\n");
       out.append("finished");
+      
+      return true;
 
     }
     catch (AnnisQLSemanticsException | AnnisQLSyntaxException 
@@ -232,12 +231,27 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       log.error(
         null, ex);
     }
+    return false;
   }
 
-  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys,
+  public void convertText(AnnisResultSet queryResult, List<String> keys,
     Map<String, String> args, Writer out, int offset) throws IOException
   {
+    Map<String, Map<String, Annotation>> metadataCache = new HashMap<>();
+    
+    List<String> metaKeys = new LinkedList<>();
+    if(args.containsKey("metakeys"))
+    {
+      Iterable<String> it = 
+        Splitter.on(",").trimResults().split(args.get("metakeys"));
+      for(String s : it)
+      {
+        metaKeys.add(s);
+      }
+    }
+    
     int counter = 0;
+
     for (AnnisResult annisResult : queryResult)
     {
       Set<Long> matchedNodeIds = annisResult.getGraph().getMatchedNodeIds();
@@ -268,9 +282,49 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
 
       }
       out.append("\n");
+    
+      if(!metaKeys.isEmpty())
+      {
+        String[] path = annisResult.getPath();
+        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+      }
+      out.append("\n");
     }
+
   }
 
+  public void appendMetaData(Writer out, 
+    List<String> metaKeys,
+    String toplevelCorpus, String documentName,
+    Map<String, Map<String, Annotation>> metadataCache)
+    throws IOException
+  {
+    Map<String, Annotation> metaData = new HashMap<>();
+    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
+    {
+      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
+    }
+    else
+    {
+      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
+      for(Annotation anno : asList)
+      {
+        metaData.put(anno.getQualifiedName(), anno);
+        metaData.put(anno.getName(), anno);
+      }
+      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
+    }
+    
+    for(String key : metaKeys)
+    {
+      Annotation anno = metaData.get(key);
+      if(anno != null)
+      {
+        out.append("\tmeta::" + key + "\t" + anno.getValue()).append("\n");
+      }
+    }
+  }
+  
   @Override
   public boolean isCancelable()
   {

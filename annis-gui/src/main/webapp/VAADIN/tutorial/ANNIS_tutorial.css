@@ -1,139 +1,182 @@
-	body {
-		margin: 20px;
-		padding: 0px;
-		background-color:#F0F0F0;
-		font-family: Verdana, Arial, Helvetica, sans-serif;
-		font-size:14px;
-		 }
-		 
-	.code { font-family:monospace;}
-	.comment {color:#999999;}
+@font-face {
+	font-family: "Open Sans";
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Light-webfont.eot);
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Light-webfont.eot?#iefix) format("embedded-opentype"), url(../themes/valo/fonts/open-sans/OpenSans-Light-webfont.woff) format("woff"), url(../themes/valo/fonts/open-sans/OpenSans-Light-webfont.ttf) format("truetype");
+	font-weight: 300;
+	font-style: normal;
+}
 
-	pre {text-indent: 30px}
+@font-face {
+	font-family: "Open Sans";
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Regular-webfont.eot);
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Regular-webfont.eot?#iefix) format("embedded-opentype"), url(../themes/valo/fonts/open-sans/OpenSans-Regular-webfont.woff) format("woff"), url(../themes/valo/fonts/open-sans/OpenSans-Regular-webfont.ttf) format("truetype");
+	font-weight: 400;
+	font-style: normal;
+}
 
-	img {   padding:1px;
-   border:1px solid #021a40;
-   background-color:#ffffff;}
+@font-face {
+	font-family: "Open Sans";
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Semibold-webfont.eot);
+	src: url(../themes/valo/fonts/open-sans/OpenSans-Semibold-webfont.eot?#iefix) format("embedded-opentype"), url(../themes/valo/fonts/open-sans/OpenSans-Semibold-webfont.woff) format("woff"), url(../themes/valo/fonts/open-sans/OpenSans-Semibold-webfont.ttf) format("truetype");
+	font-weight: 600;
+	font-style: normal;
+}
 
-	#tabmenu {
-		color: #000000;
-		border-bottom: 2px solid black;
-		margin: 12px 0px 0px 0px;
-		padding: 0px;
-		z-index: 1;
-		padding-left: 10px }
+body {
+  font: 400 15px/1.55 "Open Sans",sans-serif;
+  color: black;
+  background-color: #ECF0F6;
+  cursor: default;
 
-	#tabmenu li {
-		display: inline;
-		overflow: hidden;
-		list-style-type: none; }
-
-	#tabmenu a, a.active {
-		color: #E8E9BE;
-		background-color:#0000CC;
-		font: bold 1em Verdana, sans-serif;
-		border: 2px solid black;
-		padding: 2px 5px 0px 5px;
-		margin: 0;
-		text-decoration: none; }
+  margin: 20px;
+  padding: 0px;
+}
 
 
-	#tabmenu a:hover {
-		color: #fff;
-		background: #ADC09F; }
+h1, h2, h3, h4, h5, h6 {
+  color: #344053;
+}
 
-	#tabmenu a:visited {
-		color: #E8E9BE; }
-		
-	#tabmenu a.active {
-		color:#000000;
-		background: #DCE5EE;
-		border-bottom: 3px solid #DCE5EE; }
+.comment {color:#999999;}
 
+.operator-list img {
+        border:0px;
+        background-color: rgba(255,255,255,0);}
 
-	#tabmenu a.active:hover {
-		background: #DCE5EE;
-		color: #000000; }
-		
-	#tabmenu a.active:visited {
-		background: #DCE5EE;
-		color: #000000; }
+img {   padding:1px;
+        border:1px solid #021a40;
+        background-color:#ffffff;}
 
-	#content {font: verdana, sans-serif;
-		text-align: justify;
-		background: #DCE5EE;
-		padding: 20px;
-		border: 2px solid black;
-		border-top: none;
-		z-index: 2;	}
+#tabmenu {
+  color: #000000;
+  border-bottom: 2px solid black;
+  margin: 12px 0px 0px 0px;
+  padding: 0px;
+  z-index: 1;
+  padding-left: 10px }
 
-	#content a {
-		color: #000099; }
+#tabmenu li {
+  display: inline;
+  overflow: hidden;
+  list-style-type: none; }
 
-	#content a:hover { color: #0033FF; }
-
-	#tutorialmenu {
-		color: #000000;
-		border-right: 0px solid black;
-		margin: 4px -2px 0px 12px;
-		padding: 0px;
-		z-index: 1;
-		padding-bottom: 10px }
-
-		
-	#tutorialmenu li {
-		display: inline;
-		overflow: hidden;
-		list-style-type: none; }
-
-	#tutorialmenu a, a.active {
-		color: #E8E9BE;
-		background-color:#0000CC;
-		font: bold 1em Verdana, sans-serif;
-		border: 2px solid black;
-		padding: 2px 0px 2px 5px;
-		margin: 0;
-		text-decoration: none; }
+#tabmenu a, a.active {
+  color: #E8E9BE;
+  background-color:#0000CC;
+  font: bold 1em Verdana, sans-serif;
+  border: 2px solid black;
+  padding: 2px 5px 0px 5px;
+  margin: 0;
+  text-decoration: none; }
 
 
-	#tutorialmenu a:hover {
-		color: #fff;
-		background: #ADC09F; }
+#tabmenu a:hover {
+  color: #fff;
+  background: #ADC09F; }
 
-	#tutorialmenu a:visited {
-		color: #E8E9BE;
-		border-top: 2px solid black; }
-		
-	#tutorialmenu a.active {
-		color:#000000;
-		background: #DCE5EE;
-		border-bottom: 2px solid;
-		border-right:none;
-		border-top: 2px solid black; }
+#tabmenu a:visited {
+  color: #E8E9BE; }
+
+#tabmenu a.active {
+  color:#000000;
+  background: #DCE5EE;
+  border-bottom: 3px solid #DCE5EE; }
 
 
-	#tutorialmenu a.active:hover {
-		background: #DCE5EE;
-		color: #000000; }
-		
-	#tutorialmenu a.active:visited {
-		background: #DCE5EE;
-		color: #000000; }
-		
-		
-	#tutorialcontent {font: verdana, sans-serif;
-		text-align: justify;
-		background-color: #DCE5EE;
-		padding: 20px;
-		border: 2px solid black;
-		z-index: 3;	}
+#tabmenu a.active:hover {
+  background: #DCE5EE;
+  color: #000000; }
 
-	#tutorialcontent a {
-		color: #000099; }
+#tabmenu a.active:visited {
+  background: #DCE5EE;
+  color: #000000; }
 
-	#tutorialcontent a:hover { color: #0033FF; }
+#content {font: verdana, sans-serif;
+          text-align: justify;
+          background: #DCE5EE;
+          padding: 20px;
+          border: 2px solid black;
+          border-top: none;
+          z-index: 2;	}
+
+#content a {
+  color: #000099; }
+
+#content a:hover { color: #0033FF; }
+
+#tutorialmenu {
+  color: #000000;
+  border-right: 0px solid black;
+  margin: 4px -2px 0px 12px;
+  padding: 0px;
+  z-index: 1;
+  padding-bottom: 10px }
 
 
+#tutorialmenu li {
+  display: inline;
+  overflow: hidden;
+  list-style-type: none; }
 
+#tutorialmenu a, a.active {
+  color: #E8E9BE;
+  background-color:#0000CC;
+  font: bold 1em Verdana, sans-serif;
+  border: 2px solid black;
+  padding: 2px 0px 2px 5px;
+  margin: 0;
+  text-decoration: none; }
+
+
+#tutorialmenu a:hover {
+  color: #fff;
+  background: #ADC09F; }
+
+#tutorialmenu a:visited {
+  color: #E8E9BE;
+  border-top: 2px solid black; }
+
+#tutorialmenu a.active {
+  color:#000000;
+  background: #DCE5EE;
+  border-bottom: 2px solid;
+  border-right:none;
+  border-top: 2px solid black; }
+
+
+#tutorialmenu a.active:hover {
+  background: #DCE5EE;
+  color: #000000; }
+
+#tutorialmenu a.active:visited {
+  background: #DCE5EE;
+  color: #000000; }
+
+
+#tutorialcontent {font: verdana, sans-serif;
+                  text-align: justify;
+                  background-color: #DCE5EE;
+                  padding: 20px;
+                  border: 2px solid black;
+                  z-index: 3;	}
+
+#tutorialcontent a {
+  color: #000099; }
+
+#tutorialcontent a:hover { color: #0033FF; }
 
 div.indent{padding-left:20px}
+
+
+
+@media print {
+  body {
+    background-color: white;
+  }
+  
+  #tutorialcontent {
+    border-style: none;
+    border-width: 0px;
+    background-color: white;
+  }
+}

@@ -118,6 +118,7 @@ public class TestAnnotateSqlGenerator
 
     Map<String, String> edgeColumns = new HashMap<>();
     edgeColumns.put("node_ref", "id");
+    edgeColumns.put("id", "rank_id");
 
     Map<String, String> componentColumns = new HashMap<>();
     componentColumns.put("id", "component_id");
@@ -390,12 +391,13 @@ public class TestAnnotateSqlGenerator
   public void shouldOrderByKeyComponentAndPreValue()
   {
     // given
+    String edgeNameAlias = createColumnAlias(COMPONENT_TABLE, "name");
     String preAlias = createColumnAlias(RANK_TABLE, "pre");
     String idAlias = createColumnAlias(COMPONENT_TABLE, "id");
     // when
     String actual = generator.orderByClause(queryData, alternative, INDENT);
     // then
-    String expected = "solutions.n, " + idAlias + ", " + preAlias;
+    String expected = "solutions.n, " + edgeNameAlias + ", " + idAlias + ", " + preAlias;
     assertThat(actual, is(expected));
   }
   

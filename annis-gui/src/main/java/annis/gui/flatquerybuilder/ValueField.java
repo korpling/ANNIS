@@ -15,6 +15,7 @@
  */
 package annis.gui.flatquerybuilder;
 
+import annis.libgui.Helper;
 import com.vaadin.event.FieldEvents.TextChangeEvent;
 import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.shared.ui.combobox.FilteringMode;
@@ -58,7 +59,7 @@ public class ValueField extends Panel implements TextChangeListener, Button.Clic
   
   /*LABELS AND STRINGS*/
   private static final String BUTTON_LABEL_REMOVE = "X";
-  private static final String SCB_STYLE_NAME = "corpus-font-force";
+  private static final String SCB_STYLE_NAME = Helper.CORPUS_FONT_FORCE;
   private static final String SCB_WIDTH = "130px";
   
   public ValueField(FlatQueryBuilder sq, SearchBox sb, String level)

@@ -172,7 +172,7 @@ public class MainToolbar extends HorizontalLayout
         
         BrowserFrame frame = new BrowserFrame("login", loginRes);
         frame.setWidth("100%");
-        frame.setHeight("200px");
+        frame.setHeight("100%");
 
         windowLogin = new Window("ANNIS Login", frame);
         windowLogin.setModal(true);
@@ -560,18 +560,23 @@ public class MainToolbar extends HorizontalLayout
     @Override
     public void call(JSONArray arguments) throws JSONException
     {
-      for(LoginListener l : loginListeners)
+      if (isLoggedIn())
       {
-        try
+        for (LoginListener l : loginListeners)
         {
-          l.onLogin();
+          try
+          {
+            l.onLogin();
+          }
+          catch (Exception ex)
+          {
+            log.error("exception thrown while notifying login listeners", ex);
+          }
         }
-        catch(Exception ex)
-        {
-          log.error("excption thrown while notifying login listeners", ex);
-        }
+       
       }
       onLogin();
+
     }
   }
 

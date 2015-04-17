@@ -15,7 +15,7 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.AdministrationDao.ImportStatus;
+import annis.administration.ImportStatus;
 import annis.administration.CorpusAdministration;
 import java.util.LinkedList;
 import java.util.List;

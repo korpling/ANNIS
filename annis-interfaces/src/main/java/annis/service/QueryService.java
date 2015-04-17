@@ -18,9 +18,6 @@ package annis.service;
 import annis.service.objects.MatchGroup;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.io.IOException;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
 import javax.ws.rs.core.Response;
 
 /**
@@ -59,9 +56,6 @@ public interface QueryService
    * @param corpora A comma separated list of corpus names
    * @return A XML represenation of the total matches and the number of documents that contain matches.
    */
-  @GET
-  @Path("search/count")
-  @Produces("application/xml")
   public Response count(String q,String corpora);
   
   /**
@@ -117,6 +111,9 @@ public interface QueryService
    * @param corpora A comma separated list of corpus names
    * @param offset Optional offset from where to start the matches. Default is 0.
    * @param limit Optional limit of the number of returned matches. Set to -1 if unlimited. Default is -1.
+   * @param order Optional order how the results should be sorted. Can be either "normal", "random" or "inverted"
+   *  "normal" is the default ordering, "inverted" inverses the default ordering and "random" is a non-stable
+   *  (thus you will get different results for the same offset and limit) random ordering.
    * @return
    * @throws IOException 
    */
@@ -124,7 +121,8 @@ public interface QueryService
     String q,
     String corpora,
     String offset,
-    String limit) throws IOException;
+    String limit,
+    String order) throws IOException;
   
   /**
    * Get a graph as {@link SaltProject} from a set of (matched) Salt IDs.

@@ -57,12 +57,11 @@ public interface VisualizerContextChanger extends Serializable
    * Sends a new query to the ANNIS-Service in order to increase/decrease the
    * context of a single result.
    *
-   * @param queryId The id of the ordinary query.
    * @param resultNumber the number of the result.
    * @param context The size of the context.
    * @param left Which context must be change. If true the left context is
    * changed, otherwise the right one.
    */
-  public void changeContext(UUID queryId, int resultNumber, int context,
+  public void changeContext(int resultNumber, int context,
     boolean left);
 }

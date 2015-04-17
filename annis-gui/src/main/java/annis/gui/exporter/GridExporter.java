@@ -15,7 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.libgui.Helper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;
@@ -34,7 +33,7 @@ public class GridExporter extends GeneralTextExporter
 {
 
   @Override
-  public void convertText(AnnisResultSet queryResult, LinkedList<String> keys, 
+  public void convertText(AnnisResultSet queryResult, List<String> keys, 
     Map<String,String> args, Writer out, int offset) throws IOException
   {
     
@@ -132,43 +131,13 @@ public class GridExporter extends GeneralTextExporter
       if(!metaKeys.isEmpty())
       {
         String[] path = annisResult.getPath();
-        appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
+        super.appendMetaData(out, metaKeys, path[path.length-1], annisResult.getDocumentName(), metadataCache);
       }
       out.append("\n\n");
     }
   }
   
-  private void appendMetaData(Writer out, 
-    List<String> metaKeys,
-    String toplevelCorpus, String documentName,
-    Map<String, Map<String, Annotation>> metadataCache)
-    throws IOException
-  {
-    Map<String, Annotation> metaData = new HashMap<>();
-    if(metadataCache.containsKey(toplevelCorpus + ":" + documentName))
-    {
-      metaData = metadataCache.get(toplevelCorpus + ":" + documentName);
-    }
-    else
-    {
-      List<Annotation> asList = Helper.getMetaData(toplevelCorpus, documentName);
-      for(Annotation anno : asList)
-      {
-        metaData.put(anno.getQualifiedName(), anno);
-        metaData.put(anno.getName(), anno);
-      }
-      metadataCache.put(toplevelCorpus + ":" + documentName, metaData);
-    }
-    
-    for(String key : metaKeys)
-    {
-      Annotation anno = metaData.get(key);
-      if(anno != null)
-      {
-        out.append("\tmeta:" + key + "\t" + anno.getValue()).append("\n");
-      }
-    }
-  }
+  
 
   @Override
   public SubgraphFilter getSubgraphFilter()

@@ -15,7 +15,7 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.converter.DateTimeConverter;
+import annis.gui.converter.DateTimeConverter;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;

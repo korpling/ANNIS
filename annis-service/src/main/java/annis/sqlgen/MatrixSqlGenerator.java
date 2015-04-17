@@ -203,11 +203,11 @@ public class MatrixSqlGenerator
   {
     return "array_agg(DISTINCT coalesce("
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "namespace")
-      + " || ':', '') || "
+      + " || ':', ':') || "
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "name")
-      + " || ':' || encode("
+      + " || ':' || "
       + tas.aliasedColumn(CORPUS_ANNOTATION_TABLE, "value")
-      + "::bytea, 'base64')) AS metadata";
+      + ") AS metadata";
   }
 
   @Override
@@ -223,7 +223,7 @@ public class MatrixSqlGenerator
     sb.append(indent).append(") AS solutions,\n");
 
     String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
-      queryData, indent);
+      queryData.getCorpusList(), indent);
     
     sb.append(indent).append(TABSTOP);
     sb.append(factsSQL).append(" AS facts");
@@ -276,7 +276,7 @@ public class MatrixSqlGenerator
     List<Long> corpusList = queryData.getCorpusList();
 
     String factsSQL = SelectedFactsFromClauseGenerator.selectedFactsSQL(
-      queryData, indent);
+      queryData.getCorpusList(), indent);
 
     String corpusListString = StringUtils.
         join(corpusList, ", ");
@@ -331,6 +331,9 @@ public class MatrixSqlGenerator
     conditions.add(tables.aliasedColumn(TEXT_TABLE, "corpus_ref") + " = "
       + tables.aliasedColumn(NODE_TABLE, "corpus_ref"));
 
+    conditions.add(tables.aliasedColumn(NODE_TABLE, "toplevel_corpus") + " = "
+      + "solutions.toplevel_corpus");
+    
 
     // nodes selected by id
     sb.setLength(0);

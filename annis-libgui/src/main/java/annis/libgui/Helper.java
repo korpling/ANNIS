@@ -20,8 +20,10 @@ import annis.provider.SaltProjectProvider;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -29,6 +31,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
@@ -79,7 +82,7 @@ public class Helper
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     Helper.class);
 
-  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<Client>();
+  private static final ThreadLocal<Client> anonymousClient = new ThreadLocal<>();
 
   private static final String ERROR_MESSAGE_CORPUS_PROPS_HEADER
     = "Corpus properties does not exist";
@@ -101,6 +104,10 @@ public class Helper
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
+  private final static Escaper jerseyTemplateEscape = Escapers.builder()
+    .addEscape('{', "%7B")
+    .addEscape('}', "%7D").build();
+  
   /**
    * Creates an authentificiated REST client
    *
@@ -114,8 +121,10 @@ public class Helper
     DefaultApacheHttpClient4Config rc = new DefaultApacheHttpClient4Config();
     rc.getClasses().add(SaltProjectProvider.class);
 
+    ThreadSafeClientConnManager clientConnMgr = new ThreadSafeClientConnManager();
+    clientConnMgr.setDefaultMaxPerRoute(10);
     rc.getProperties().put(ApacheHttpClient4Config.PROPERTY_CONNECTION_MANAGER,
-      new ThreadSafeClientConnManager());
+      clientConnMgr);
 
     if (userName != null && password != null)
     {
@@ -315,13 +324,22 @@ public class Helper
     }
     return "";
   }
-
+  
   public static List<String> citationFragment(String aql,
     Set<String> corpora, int contextLeft, int contextRight,
     String segmentation,
     int start, int limit)
   {
-    List<String> result = new ArrayList<String>();
+    return citationFragment(aql, corpora, contextLeft, contextRight,
+      segmentation, start, limit, OrderType.normal);
+  }
+
+  public static List<String> citationFragment(String aql,
+    Set<String> corpora, int contextLeft, int contextRight,
+    String segmentation,
+    int start, int limit, OrderType order)
+  {
+    List<String> result = new ArrayList<>();
     try
     {
       result.add("_q=" + encodeBase64URL(aql));
@@ -339,6 +357,10 @@ public class Helper
       {
         result.add("_seg="
           + encodeBase64URL(segmentation));
+      }
+      if(order != OrderType.normal)
+      {
+        result.add("o=" + order.toString());
       }
     }
     catch (UnsupportedEncodingException ex)
@@ -804,7 +826,17 @@ public class Helper
     return "true".equalsIgnoreCase(
         disableRtl);
   }
-
+  
+  /**
+   * This will percent encode Jersey template argument braces (enclosed in "{...}").
+   * @param v
+   * @return 
+   */
+  public static String encodeTemplate(String v)
+  {
+    String encoded = jerseyTemplateEscape.escape(v);
+    return encoded;
+  }
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
    */

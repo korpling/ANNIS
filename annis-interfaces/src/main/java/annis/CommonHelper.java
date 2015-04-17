@@ -16,8 +16,9 @@
 package annis;
 
 import annis.model.AnnisConstants;
-import annis.service.objects.MatchGroup;
+import annis.service.objects.Match;
 import com.google.common.base.Charsets;
+import com.google.common.base.Splitter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.GRAPH_TRAVERSE_TYPE;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -41,11 +42,13 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
+import java.net.URISyntaxException;
 import java.net.URLDecoder;
 import java.util.*;
 import org.apache.commons.lang3.StringUtils;
@@ -135,18 +138,18 @@ public class CommonHelper
     {
       // get the very first node of the order relation chain
       Set<SNode> startNodes = new LinkedHashSet<SNode>();
-      
-      for(SNode n : graph.getSNodes())
+
+      for (SNode n : graph.getSNodes())
       {
-        SFeature feat = 
-          n.getSFeature(AnnisConstants.ANNIS_NS, 
+        SFeature feat
+          = n.getSFeature(AnnisConstants.ANNIS_NS,
             AnnisConstants.FEAT_FIRST_NODE_SEGMENTATION_CHAIN);
-        if(feat != null && segName.equalsIgnoreCase(feat.getSValueSTEXT()))
+        if (feat != null && segName.equalsIgnoreCase(feat.getSValueSTEXT()))
         {
           startNodes.add(n);
         }
       }
-      
+
       Set<String> alreadyAdded = new HashSet<String>();
 
       // add all nodes on the order relation chain beginning from the start node
@@ -158,14 +161,14 @@ public class CommonHelper
           token.add(current);
           EList<Edge> out = graph.getOutEdges(current.getSId());
           current = null;
-          if(out != null)
+          if (out != null)
           {
-            for(Edge e : out)
+            for (Edge e : out)
             {
-              if(e instanceof SOrderRelation)
+              if (e instanceof SOrderRelation)
               {
                 current = ((SOrderRelation) e).getSTarget();
-                if(alreadyAdded.contains(current.getSId()))
+                if (alreadyAdded.contains(current.getSId()))
                 {
                   // abort if cycle detected
                   current = null;
@@ -349,8 +352,8 @@ public class CommonHelper
   }
 
   /**
-   * Finds the {@link STextualDS} for a given node. The node must
-   * dominate a token of this text.
+   * Finds the {@link STextualDS} for a given node. The node must dominate a
+   * token of this text.
    *
    * @param node
    * @return
@@ -379,15 +382,17 @@ public class CommonHelper
     }
     return null;
   }
-  
+
   /**
-   * Returns a file name that is safe to use and does not have any invalid characters.
+   * Returns a file name that is safe to use and does not have any invalid
+   * characters.
+   *
    * @param orig
-   * @return 
+   * @return
    */
   public static String getSafeFileName(String orig)
   {
-    if(orig != null)
+    if (orig != null)
     {
       return orig.replaceAll("[^0-9A-Za-z-]", "_");
     }
@@ -411,7 +416,7 @@ public class CommonHelper
     {
       for (SCorpusGraph g : p.getSCorpusGraphs())
       {
-        if(g.getSRootCorpus() != null)
+        if (g.getSRootCorpus() != null)
         {
           for (SCorpus c : g.getSRootCorpus())
           {
@@ -421,64 +426,72 @@ public class CommonHelper
       }
     }
 
-
     return names;
   }
-  
-  public static void writeSDocument(SDocument doc, ObjectOutputStream out) 
+
+  public static void writeSDocument(SDocument doc, ObjectOutputStream out)
     throws IOException
   {
     XMIResourceImpl res = new XMIResourceImpl();
     res.getContents().add(doc);
-    
+
     // also add the SDocumentGraph of the document
     res.getContents().add(doc.getSDocumentGraph());
-    
+
     ByteArrayOutputStream byteOut = new ByteArrayOutputStream();
-    
+
     res.save(byteOut, res.getDefaultSaveOptions());
-    
+
     out.writeUTF(byteOut.toString("UTF-8"));
   }
-  
-  public static SDocument readSDocument(ObjectInputStream in) 
+
+  public static SDocument readSDocument(ObjectInputStream in)
     throws IOException
   {
     XMIResourceImpl res = new XMIResourceImpl();
-    
-    byte[] asBytes = in.readUTF().getBytes(Charsets.UTF_8);
-    ByteArrayInputStream byteIn = new ByteArrayInputStream(asBytes);
-    
-    res.load(byteIn, res.getDefaultLoadOptions());
-    
-    
-    TreeIterator<EObject> itContents = res.getAllContents();
-    while(itContents.hasNext())
+
+    try
     {
-      EObject o = itContents.next();
-      if(o instanceof SDocument)
+      byte[] asBytes = in.readUTF().getBytes(Charsets.UTF_8);
+      ByteArrayInputStream byteIn = new ByteArrayInputStream(asBytes);
+
+      res.load(byteIn, res.getDefaultLoadOptions());
+
+      TreeIterator<EObject> itContents = res.getAllContents();
+      while (itContents.hasNext())
       {
-        return (SDocument) o;
+        EObject o = itContents.next();
+        if (o instanceof SDocument)
+        {
+          return (SDocument) o;
+        }
       }
     }
+    catch(EOFException ex)
+    {
+      log.warn("Empty document string");
+    }
+
     return SaltCommonFactory.eINSTANCE.createSDocument();
   }
-  
+
   /**
-   * Takes a map of salt node IDs to a value and return a new map that
-   * uses the SNodes as keys instead of the IDs.
+   * Takes a map of salt node IDs to a value and return a new map that uses the
+   * SNodes as keys instead of the IDs.
+   *
    * @param <V>
    * @param map
    * @param graph
-   * @return 
+   * @return
    */
-  public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map, SDocumentGraph graph)
+  public static <V> Map<SNode, V> createSNodeMapFromIDs(Map<String, V> map,
+    SDocumentGraph graph)
   {
     HashMap<SNode, V> result = new LinkedHashMap<>();
-    
-    if(map != null && graph != null)
+
+    if (map != null && graph != null)
     {
-      for(Map.Entry<String, V> e : map.entrySet())
+      for (Map.Entry<String, V> e : map.entrySet())
       {
         SNode n = graph.getSNode(e.getKey());
         if (n != null)
@@ -487,10 +500,41 @@ public class CommonHelper
         }
       }
     }
-    
+
     return result;
   }
   
+  public static Match extractMatch(SDocument doc) throws URISyntaxException
+  {
+    Splitter idSplit = Splitter.on(',').trimResults();
+    Match m = null;
+
+    // get the matched node IDs
+    SFeature featIDs = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDIDS);
+    
+    if (featIDs != null)
+    {
+      LinkedList<URI> idList = new LinkedList<>();
+      for(String rawID : idSplit.split(featIDs.getSValueSTEXT()))
+      {
+        idList.add(new URI(rawID));
+      }
+      SFeature featAnnos = doc.getSFeature(AnnisConstants.ANNIS_NS,
+      AnnisConstants.FEAT_MATCHEDANNOS);
+      if(featAnnos == null)
+      {
+        m = new Match(idList);
+      }
+      else
+      {
+        m = new Match(idList, idSplit.splitToList(featAnnos.getSValueSTEXT()));
+      }
+    }
+
+    return m;
+  }
+
   // TODO: remove if really not needed
 //  public static SNode[] getMatchedNodes(SDocument doc)
 //  {

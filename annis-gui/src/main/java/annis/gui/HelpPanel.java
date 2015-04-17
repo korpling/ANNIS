@@ -25,8 +25,8 @@ import com.vaadin.ui.Accordion;
  */
 public class HelpPanel extends Accordion
 {
-  private TutorialPanel tutorial;
-  private ExampleQueriesPanel examples;
+  private final TutorialPanel tutorial;
+  private final ExampleQueriesPanel examples;
   
   public HelpPanel(SearchUI parent)
   {

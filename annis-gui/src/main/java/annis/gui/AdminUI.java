@@ -26,13 +26,11 @@ import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.model.CorpusManagement;
-import annis.libgui.AnnisBaseUI;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
@@ -47,7 +45,7 @@ import java.util.List;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-public class AdminUI extends AnnisBaseUI implements UIView, LoginListener,
+public class AdminUI extends CommonUI implements UIView, LoginListener,
   Page.UriFragmentChangedListener, TabSheet.SelectedTabChangeListener
 {
 

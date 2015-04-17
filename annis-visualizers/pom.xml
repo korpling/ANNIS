@@ -4,7 +4,7 @@
   <parent>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
     <artifactId>annis-all</artifactId>
-    <version>3.2.0-SNAPSHOT</version>
+    <version>3.3.0-SNAPSHOT</version>
   </parent>
   <groupId>de.hu-berlin.german.korpling.annis</groupId>
   <artifactId>annis-visualizers</artifactId>
@@ -94,6 +94,13 @@
       <artifactId>antlr4</artifactId>
       <version>4.2.2</version>
       <scope>compile</scope>
+    </dependency>
+    
+    <dependency>
+      <groupId>javax.servlet</groupId>
+      <artifactId>servlet-api</artifactId>
+      <version>${servlet.version}</version>
+      <scope>provided</scope>
     </dependency>
     
     

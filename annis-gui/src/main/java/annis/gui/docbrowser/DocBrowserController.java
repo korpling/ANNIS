@@ -170,7 +170,7 @@ public class DocBrowserController implements Serializable
    * @return a {@link VisualizerInput} input, which is usable for rendering the
    * whole document.
    */
-  private VisualizerInput createInput(String corpus, String docName,
+  public static VisualizerInput createInput(String corpus, String docName,
     Visualizer config, boolean isUsingRawText, List<String> nodeAnnoFilter)
   {
     VisualizerInput input = new VisualizerInput();
@@ -217,7 +217,7 @@ public class DocBrowserController implements Serializable
     return input;
   }
 
-  private Properties parseMappings(Visualizer config)
+  private static Properties parseMappings(Visualizer config)
   {
     Properties mappings = new Properties();
 
@@ -317,7 +317,7 @@ public class DocBrowserController implements Serializable
             // create and format visualizer
             
             Component vis = visualizer.createComponent(input, null);
-            vis.addStyleName("corpus-font-force");
+            vis.addStyleName(Helper.CORPUS_FONT_FORCE);
             vis.setPrimaryStyleName("docviewer");
             vis.setCaption(canonicalTitle);
             vis.setWidth(100, Unit.PERCENTAGE);

@@ -130,6 +130,7 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     try
     {
       resource.save(new BufferedOutputStream(entityStream, 512*1024), options); 
+      entityStream.flush();
     }
     catch(Exception ex)
     {
@@ -162,11 +163,11 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     long startTime = System.currentTimeMillis();
     if(APPLICATION_XMI_BINARY.isCompatible(mediaType))
     {
-      resource = loadBinary(entityStream);
+      resource = loadBinary(new NonCloseableInputStream(entityStream));
     }
     else
     {
-      resource = loadXMI(entityStream);
+      resource = loadXMI(new NonCloseableInputStream(entityStream));
     }
     long endTime = System.currentTimeMillis();
     log.debug("Loading XMI (" + mediaType.toString() +  ") needed {} ms", endTime-startTime);
@@ -228,6 +229,84 @@ public class SaltProjectProvider implements MessageBodyWriter<SaltProject>,
     resource.load(entityStream, options);
     
     return resource;
+  }
+  
+  /**
+   * An {@link InputStream} that delegates all of the actions
+   * to a delegate object but can't be closed.
+   * 
+   * In {@link SaltProjectProvider#readFrom(java.lang.Class, java.lang.reflect.Type, java.lang.annotation.Annotation[], javax.ws.rs.core.MediaType, javax.ws.rs.core.MultivaluedMap, java.io.InputStream) } we have to make
+   * sure the provided {@link InputStream} is not closed. Unfurtunally the
+   * SAX parser will always close the stream and there seems to be no option to
+   * avoid that. Thus we use this hack where the {@link #close() }
+   * function does nothing.
+   */
+  public static class NonCloseableInputStream extends InputStream
+  {
+    
+    private final InputStream delegate;
+
+    public NonCloseableInputStream(InputStream delegate)
+    {
+      this.delegate = delegate;
+    }
+
+    
+    @Override
+    public int read() throws IOException
+    {
+      return delegate.read();
+    }
+    
+    
+    @Override
+    public int read(byte[] b) throws IOException
+    {
+      return delegate.read(b);
+    }
+
+    @Override
+    public int read(byte[] b, int off, int len) throws IOException
+    {
+      return delegate.read(b, off, len);
+    }
+
+    @Override
+    public synchronized void reset() throws IOException
+    {
+      delegate.reset();
+    }
+
+    @Override
+    public long skip(long n) throws IOException
+    {
+      return delegate.skip(n);
+    }
+    
+
+    @Override
+    public void close() throws IOException
+    {
+      // ignore
+    }
+
+    @Override
+    public int available() throws IOException
+    {
+      return delegate.available();
+    }
+
+    @Override
+    public boolean markSupported()
+    {
+      return delegate.markSupported();
+    }
+
+    @Override
+    public synchronized void mark(int readlimit)
+    {
+      delegate.mark(readlimit);
+    }
   }
 
 }

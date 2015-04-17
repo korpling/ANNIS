@@ -14,7 +14,7 @@ UPDATE _rank c SET "level"=
       _component.type IN ('d', 'p')   
     UNION ALL
     
-    SELECT a.pre, a.parent, a.component_ref FROM _rank a, levelcalc l WHERE l.parent = a.pre AND l.component_ref = a.component_ref
+    SELECT a.pre, a.parent, a.component_ref FROM _rank a, levelcalc l WHERE l.parent = a.id AND l.component_ref = a.component_ref
   )
   SELECT count(*) - 1 as "level" FROM levelcalc
 )

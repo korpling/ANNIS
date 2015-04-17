@@ -24,7 +24,6 @@ import java.util.Map;
 import org.springframework.transaction.annotation.Transactional;
 import annis.AnnisRunnerException;
 import annis.CommonHelper;
-import annis.administration.AdministrationDao.ImportStatus;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
 import annis.utils.RelANNISHelper;
@@ -40,7 +39,6 @@ import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.logging.Level;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipException;
 import java.util.zip.ZipFile;
@@ -61,6 +59,7 @@ public class CorpusAdministration
 {
 
   private AdministrationDao administrationDao;
+  private DeleteCorpusDao deleteCorpusDao;
 
   private SchemeFixer schemeFixer;
 
@@ -88,7 +87,7 @@ public class CorpusAdministration
       }
     }
     log.info("Deleting corpora: " + ids);
-    administrationDao.deleteCorpora(ids, true);
+    deleteCorpusDao.deleteCorpora(ids, true);
     log.info("Finished deleting corpora: " + ids);
   }
 
@@ -201,6 +200,7 @@ public class CorpusAdministration
     } // end for each given path
 
     // import each corpus separately
+    boolean anyCorpusImported = false;
     for (File r : roots)
     {
       try
@@ -210,24 +210,25 @@ public class CorpusAdministration
           overwrite, waitForOtherTasks))
         {
           log.info("Finished import from: " + r.getPath());
-          sendStatusMail(statusEmailAdress, r.getPath(),
+          sendImportStatusMail(statusEmailAdress, r.getPath(),
             ImportJob.Status.SUCCESS, null);
+          anyCorpusImported = true;
         }
         else
         {
           importStats.setStatus(false);
-          sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+          sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
             null);
         }
       }
 
-      catch (DefaultAdministrationDao.ConflictingCorpusException ex)
+      catch (AdministrationDao.ConflictingCorpusException ex)
       {
         importStats.setStatus(false);
         importStats.addException(r.getPath(), ex);
         log.error("Error on conflicting top level corpus name for {}", r.
           getPath());
-        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+        sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
           ex.
           getMessage());
       }
@@ -244,11 +245,14 @@ public class CorpusAdministration
         importStats.setStatus(false);
         importStats.addException(r.getPath(), ex);
         log.error("Error on importing corpus", ex);
-        sendStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
+        sendImportStatusMail(statusEmailAdress, r.getPath(), ImportJob.Status.ERROR,
           ex.getMessage());
       }
+    } // end for each corpus
+    if(anyCorpusImported)
+    {
+      administrationDao.analyzeParentFacts();
     }
-
     return importStats;
   }
 
@@ -341,14 +345,14 @@ public class CorpusAdministration
     return outDir;
   }
 
-  public static class ImportStatsImpl implements AdministrationDao.ImportStatus
+  public static class ImportStatsImpl implements ImportStatus
   {
 
-    private boolean status = true;
+    boolean status = true;
 
     private final static String SEPERATOR = "--------------------------\n";
 
-    private final Map<String, List<Throwable>> exceptions;
+    final Map<String, List<Throwable>> exceptions;
 
     public ImportStatsImpl()
     {
@@ -505,7 +509,7 @@ public class CorpusAdministration
     }
   }
 
-  public void sendStatusMail(String adress, String corpusPath,
+  public void sendImportStatusMail(String adress, String corpusPath,
     ImportJob.Status status, String additionalInfo)
   {
     if (adress == null || corpusPath == null)
@@ -566,6 +570,98 @@ public class CorpusAdministration
           .append(
             "\" was scheduled and is currently waiting for other imports to "
             + "finish. As soon as the previous imports are finished this import "
+            + "job will be executed.\n");
+      }
+      else
+      {
+        // we don't know how to handle this, just don't send a message
+        return;
+      }
+      if (additionalInfo != null && !additionalInfo.isEmpty())
+      {
+        sbMsg.append("Addtional information:\n");
+        sbMsg.append(additionalInfo).append("\n");
+      }
+
+      sbMsg.append("\n\nSincerely yours,\n\nthe ANNIS import service.");
+      mail.setMsg(sbMsg.toString());
+      mail.setHostName("localhost");
+      mail.setFrom(statusMailSender);
+
+      mail.send();
+      log.info("Send status ({}) mail to {}.", new String[]
+      {
+        status.name(), adress
+      });
+
+    }
+    catch (AddressException | EmailException ex)
+    {
+      log.warn("Could not send mail: " + ex.getMessage());
+    }
+  }
+  
+  public void sendCopyStatusMail(String adress, String origDBFile,
+    ImportJob.Status status, String additionalInfo)
+  {
+    if (adress == null || origDBFile == null)
+    {
+      return;
+    }
+
+    // check valid properties
+    if (statusMailSender == null || statusMailSender.isEmpty())
+    {
+      log.warn("Could not send status mail because \"annis.mail-sender\" "
+        + "property was not configured in conf/annis-service-properties.");
+      return;
+    }
+
+    try
+    {
+      SimpleEmail mail = new SimpleEmail();
+      List<InternetAddress> to = new LinkedList<>();
+      to.add(new InternetAddress(adress));
+
+      StringBuilder sbMsg = new StringBuilder();
+      sbMsg.append("Dear Sir or Madam,\n");
+      sbMsg.append("\n");
+      sbMsg.append(
+        "this is the requested status update to the ANNIS corpus import "
+        + "you have started. Please note that this message is automated and "
+        + "if you have any question regarding the import you have to ask the "
+        + "administrator of the ANNIS instance directly.\n\n");
+
+      mail.setTo(to);
+      if (status == ImportJob.Status.SUCCESS)
+      {
+        mail.setSubject(
+          "ANNIS copy finished successfully (" + origDBFile + ")");
+        sbMsg.append("Status:\nThe corpora from \"").append(origDBFile)
+          .append("\" were successfully imported and can be used from now on.\n");
+      }
+      else if (status == ImportJob.Status.ERROR)
+      {
+        mail.setSubject("ANNIS copy *failed* (" + origDBFile + ")");
+        sbMsg.append("Status:\nUnfortunally the corpora from \"").append(origDBFile).
+          append(
+            "\" could not be imported successfully. "
+            + "You may ask the administrator of the ANNIS installation for "
+            + "assistance why the corpus import failed.\n");
+      }
+      else if (status == ImportJob.Status.RUNNING)
+      {
+        mail.setSubject("ANNIS copy started (" + origDBFile + ")");
+        sbMsg.append("Status:\nThe import of the corpora from \"").append(origDBFile)
+          .append("\" was started.\n");
+      }
+      else if (status == ImportJob.Status.WAITING)
+      {
+        mail.setSubject("ANNIS copy was scheduled (" + origDBFile + ")");
+        sbMsg.append("Status:\nThe import of the corpora from \"").append(origDBFile)
+          .append(
+            "\" was scheduled and is currently waiting for other imports to "
+            + "finish. As soon as the previous imports are finished this copy "
             + "job will be executed.\n");
       }
       else
@@ -682,6 +778,11 @@ public class CorpusAdministration
           + "{}\n"
           + "---------------\n",
           Joiner.on("\n").join(corpusPaths));
+        sendCopyStatusMail(mail, dbProperties.getAbsolutePath(), ImportJob.Status.RUNNING,
+          "The following corpora will be imported:\n"
+          + "---------------\n"
+          + Joiner.on("\n").join(corpusPaths) + "\n"
+          + "---------------\n");
 
 
         // remember the corpus alias table
@@ -691,7 +792,7 @@ public class CorpusAdministration
         //import each corpus
         ImportStatus status = importCorporaSave(
           overwrite, null,
-          mail,
+          null,
           false,
           corpusPaths);
 
@@ -715,6 +816,12 @@ public class CorpusAdministration
             + "{}\n"
             + "---------------\n",
             Joiner.on("\n").join(successfullCorpora));
+          sendCopyStatusMail(mail, dbProperties.getAbsolutePath(),
+            ImportJob.Status.SUCCESS,
+            "All corpora imported without errors:\n"
+            + "---------------\n"
+            + Joiner.on("\n").join(corpusPaths) + "\n"
+            + "---------------\n");
         }
         else
         {
@@ -730,6 +837,16 @@ public class CorpusAdministration
               + "---------------\n",
             Joiner.on("\n").join(successfullCorpora),
             Joiner.on("\n").join(failedCorpora));
+          sendCopyStatusMail(mail, dbProperties.getAbsolutePath(), ImportJob.Status.ERROR,
+            
+            "Errors occured during import, not all corpora have been imported.\n"
+              + "---------------\n"
+              + "Success:\n"
+              +  Joiner.on("\n").join(successfullCorpora) + "\n"
+              + "---------------\n"
+              + "Failed:\n"
+              + Joiner.on("\n").join(failedCorpora) + "\n"
+              + "---------------\n");
         }
       }
     }
@@ -800,5 +917,17 @@ public class CorpusAdministration
   {
     this.schemeFixer = schemeFixer;
   }
+
+  public DeleteCorpusDao getDeleteCorpusDao()
+  {
+    return deleteCorpusDao;
+  }
+
+  public void setDeleteCorpusDao(DeleteCorpusDao deleteCorpusDao)
+  {
+    this.deleteCorpusDao = deleteCorpusDao;
+  }
+  
+  
 
 }

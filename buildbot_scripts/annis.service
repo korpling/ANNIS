@@ -1,0 +1,15 @@
+[Unit]
+Description=ANNIS Corpus Visualizer
+After=syslog.target
+
+[Service]
+Type=forking
+Environment=ANNIS_HOME=/opt/annis
+ExecStart=/bin/sh /opt/annis/bin/annis-service.sh start
+ExecStop=/bin/sh /opt/annis/bin/annis-service.sh stop
+StandardOutput=null
+RemainAfterExit=yes
+
+[Install]
+WantedBy=multi-user.target
+

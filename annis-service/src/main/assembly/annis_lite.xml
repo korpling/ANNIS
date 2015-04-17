@@ -12,6 +12,10 @@
       <directory>src/main/distribution/</directory>
       <excludes>
         <exclude>bin/</exclude>
+        <exclude>log/annis.log</exclude>
+        <exclude>log/debug.log</exclude>
+        <exclude>log/error.log</exclude>
+        <exclude>log/query.log</exclude>
       </excludes>
       <outputDirectory>/</outputDirectory>
     </fileSet>

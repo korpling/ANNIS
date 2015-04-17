@@ -29,12 +29,12 @@ INSERT INTO facts_:id
   "right",
   token_index,
   is_token,
-  continuous,
   span,
   left_token,
   right_token,
   seg_name,
   seg_index,
+  rank_id,
   pre,
   post,
   parent,
@@ -60,33 +60,33 @@ SELECT
 FROM
 (
   SELECT
-    _node.id AS id,
+    ((SELECT "new" FROM _nodeidmapping WHERE "old" = _node.id LIMIT 1) + :offset_node_id)AS id,
     _node.text_ref AS text_ref,
-    _node.corpus_ref AS corpus_ref,
-    _node.toplevel_corpus AS toplevel_corpus,
-    _node.namespace AS node_namespace,
+    (_node.corpus_ref + :offset_corpus_id) AS corpus_ref,
+    :id AS toplevel_corpus,
+    _node.layer AS node_namespace,
     _node.name AS node_name,
-    concat(_node.name, _node.unique_name_appendix) AS salt_id,
+    _node.name AS salt_id,
     _node."left" AS "left",
     _node."right" AS "right",
     _node.token_index AS token_index,
     (_node.token_index IS NOT NULL AND _node.seg_name IS NULL) AS is_token,
-    _node.continuous AS continuous,
     _node.span AS span,
     _node.left_token AS left_token,
     _node.right_token AS right_token,
     _node.seg_name AS seg_name,
-    _node.seg_left AS seg_index,
+    _node.seg_index AS seg_index,
 
+    _rank.id AS rank_id,
     _rank.pre AS pre,
     _rank.post AS post,
     _rank.parent AS parent,
-    _rank.root AS root,
+    _node.root AS root,
     _rank.level AS level,
 
-    _component.id AS component_id,
+    _component.id  AS component_id,
     _component.type AS edge_type,
-    _component.namespace AS edge_namespace,
+    _component.layer AS edge_namespace,
     _component.name AS edge_name,
     annotation_category.id AS node_anno_category,
     (
@@ -121,7 +121,6 @@ FROM
       AND annotation_category.namespace IS NOT DISTINCT FROM _node_annotation.namespace
       AND annotation_category.toplevel_corpus = :id
     )
-  WHERE
-    _node.toplevel_corpus = :id
 ) as tmp
+ORDER BY n_sample, corpus_ref, is_token
 ;
