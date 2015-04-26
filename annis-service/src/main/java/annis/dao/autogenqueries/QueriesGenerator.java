@@ -183,13 +183,16 @@ public class QueriesGenerator
     corpusIds = new ArrayList<>();
     corpusIds.add(corpusId);
     List<String> corpusNames = getAnnisDao().mapCorpusIdsToNames(corpusIds);
-    corpusName = corpusNames.get(0);
-
-    if (queryBuilder != null)
+    if(!corpusNames.isEmpty())
     {
-      for (QueryBuilder qB : queryBuilder)
+      corpusName = corpusNames.get(0);
+
+      if (queryBuilder != null)
       {
-        generateQuery(qB);
+        for (QueryBuilder qB : queryBuilder)
+        {
+          generateQuery(qB);
+        }
       }
     }
   }

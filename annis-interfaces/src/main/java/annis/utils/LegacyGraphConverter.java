@@ -49,7 +49,9 @@ import annis.model.RelannisEdgeFeature;
 import annis.model.RelannisNodeFeature;
 import annis.service.objects.AnnisResultSetImpl;
 import annis.service.objects.Match;
+import com.google.common.base.Preconditions;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSequentialDS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import java.net.URI;
 import org.eclipse.emf.common.util.BasicEList;
@@ -148,7 +150,7 @@ public class LegacyGraphConverter
     annoGraph.setPath(pathList.toArray(new String[pathList.size()]));
     annoGraph.setDocumentName(docGraph.getSDocument().getSName());
 
-    Map<Node, AnnisNode> allNodes = new HashMap<>();
+    Map<SNode, AnnisNode> allNodes = new HashMap<>();
 
     for (SNode sNode : docGraph.getSNodes())
     {
@@ -172,7 +174,7 @@ public class LegacyGraphConverter
         
         if (sNode instanceof SToken)
         {
-          BasicEList<STYPE_NAME> textualRelation = new BasicEList<STYPE_NAME>();
+          BasicEList<STYPE_NAME> textualRelation = new BasicEList<>();
           textualRelation.add(STYPE_NAME.STEXT_OVERLAPPING_RELATION);
           EList<SDataSourceSequence> seqList =
             docGraph.getOverlappedDSSequences(sNode,
@@ -180,8 +182,28 @@ public class LegacyGraphConverter
           if (seqList != null)
           {
             SDataSourceSequence seq = seqList.get(0);
-            aNode.setSpannedText(((String) seq.getSSequentialDS().getSData()).
-              substring(seq.getSStart(), seq.getSEnd()));
+            Preconditions.checkNotNull(seq, "SDataSourceSequence is null for token %s", sNode.getSId());
+            SSequentialDS seqDS = seq.getSSequentialDS();
+            Preconditions.checkNotNull(seqDS, "SSequentalDS is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seqDS.getSData(), "SSequentalDS data is null for token %s", sNode.getSId());
+            
+            String seqDSData = (String) seqDS.getSData();
+            Preconditions.checkNotNull(seqDSData, "casted SSequentalDS data is null for token %s", sNode.getSId());
+            
+            Preconditions.checkNotNull(seq.getSStart(), "SSequentalDS start is null for token %s", sNode.getSId());
+            Preconditions.checkNotNull(seq.getSEnd(), "SSequentalDS end is null for supposed token %s", sNode.getSId());
+            
+            int start = seq.getSStart();
+            int end = seq.getSEnd();
+            
+            Preconditions.checkState(start >= 0 && start <= end && end <= seqDSData.length(), "Illegal start or end of textual DS for token (start %s, end: %s)", sNode.getSId(), start, end);
+            
+            String spannedText = seqDSData.substring(start, end);
+            Preconditions.checkNotNull(spannedText, "spanned text is null for supposed token %s (start: %s, end: %s)",
+              sNode.getSId(), start, end);
+            
+            
+            aNode.setSpannedText(spannedText);
             aNode.setToken(true);
             aNode.setTokenIndex(feat.getTokenIndex());
           }
@@ -252,11 +274,11 @@ public class LegacyGraphConverter
   }
   
   private static void addEdge(SRelation rel, long pre, long componentID, 
-    Map<Node, AnnisNode> allNodes, AnnotationGraph annoGraph)
+    Map<SNode, AnnisNode> allNodes, AnnotationGraph annoGraph)
   {
     Edge aEdge = new Edge();
-    aEdge.setSource(allNodes.get(rel.getSource()));
-    aEdge.setDestination(allNodes.get(rel.getTarget()));
+    aEdge.setSource(allNodes.get(rel.getSSource()));
+    aEdge.setDestination(allNodes.get(rel.getSTarget()));
 
     aEdge.setEdgeType(EdgeType.UNKNOWN);
     aEdge.setPre(pre);

@@ -794,21 +794,6 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
   @Override
   public QueryData parseAQL(String aql, List<Long> corpusList)
   {
-    // test the new AntLR based parser
-//    AqlLexer lexer = new AqlLexer(new ANTLRStringStream(aql));
-//    AqlParser parser = new AqlParser(new CommonTokenStream(lexer));
-//    CommonTree tree;
-//    try
-//    {
-//      tree = (CommonTree) parser.start().getTree();
-//      
-//      log.info("parsed {} with result {}", aql, tree.toStringTree());
-//    }
-//    catch (RecognitionException ex)
-//    {
-//      log.error("parsing error for {}: {}", aql, ex.getMessage());
-//    }
-
     // parse the query
     return aqlParser.parse(aql, corpusList);
   }

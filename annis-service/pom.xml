@@ -197,35 +197,35 @@
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-server</artifactId>
-      <version>8.1.14.v20131031</version>
+      <version>8.1.16.v20140903</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlet</artifactId>
-      <version>8.1.14.v20131031</version>
+      <version>8.1.16.v20140903</version>
     </dependency>
     <dependency>
       <groupId>org.eclipse.jetty</groupId>
       <artifactId>jetty-servlets</artifactId>
-      <version>8.1.14.v20131031</version>
+      <version>8.1.16.v20140903</version>
     </dependency>
     
     
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-server</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
     </dependency>
 
     <dependency>
       <groupId>com.sun.jersey</groupId>
       <artifactId>jersey-json</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
     </dependency>
     <dependency>
       <groupId>com.sun.jersey.contribs</groupId>
       <artifactId>jersey-spring</artifactId>
-      <version>1.18</version>
+      <version>1.19</version>
       <exclusions>
         <exclusion>  
           <groupId>org.springframework</groupId>  

@@ -155,18 +155,6 @@ public class RelannisNodeFeature implements Serializable
     this.segName = segName;
   }
 
-  public boolean isContinuous()
-  {
-    return continuous;
-  }
-
-  public void setContinuous(boolean continuous)
-  {
-    this.continuous = continuous;
-  }
-  
-  
-
   /**
    * Returns the number of the query node if matched or null if otherwise.
    * @return 

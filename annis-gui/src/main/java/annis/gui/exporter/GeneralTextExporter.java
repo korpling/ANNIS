@@ -102,7 +102,7 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       }
 
       Map<String, String> args = new HashMap<>();
-      for (String s : argsAsString.split("&"))
+      for (String s : argsAsString.split("&|;"))
       {
         String[] splitted = s.split("=", 2);
         String key = splitted[0];
@@ -118,14 +118,14 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
       
       // 1. Get all the matches as Salt ID
       InputStream matchStream = annisResource.path("search/find/")
-        .queryParam("q", queryAnnisQL)
+        .queryParam("q", Helper.encodeTemplate(queryAnnisQL))
         .queryParam("corpora", StringUtils.join(corpora, ","))
         .accept(MediaType.TEXT_PLAIN_TYPE)
         .get(InputStream.class);
       
-      BufferedReader inReader = new BufferedReader(new InputStreamReader(
-        matchStream, "UTF-8"));
-      try
+     
+      try(BufferedReader inReader = new BufferedReader(new InputStreamReader(
+        matchStream, "UTF-8")))
       {
         WebResource subgraphRes = annisResource.path("search/subgraph");
         MatchGroup currentMatches = new MatchGroup();
@@ -144,13 +144,17 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
             WebResource res = subgraphRes
               .queryParam("left", "" + contextLeft)
               .queryParam("right","" + contextRight);
+            
+            if(args.containsKey("segmentation"))
+            {
+              res = res.queryParam("segmentation", args.get("segmentation"));
+            }
 
             SubgraphFilter filter = getSubgraphFilter();
             if(filter != null)
             {
               res = res.queryParam("filter", filter.name());
             }
-            // TODO: segmentation?
 
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.start();
@@ -190,13 +194,16 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
           WebResource res = subgraphRes
             .queryParam("left", "" + contextLeft)
             .queryParam("right", "" + contextRight);
+          if(args.containsKey("segmentation"))
+          {
+            res = res.queryParam("segmentation", args.get("segmentation"));
+          }
 
           SubgraphFilter filter = getSubgraphFilter();
           if (filter != null)
           {
             res = res.queryParam("filter", filter.name());
           }
-        // TODO: segmentation?
 
           SaltProject p = res.post(SaltProject.class, currentMatches);
           convertText(LegacyGraphConverter.convertToResultSet(p),
@@ -204,10 +211,6 @@ public abstract class GeneralTextExporter implements Exporter, Serializable
         }
         offset = 0;
         
-      }
-      finally
-      {
-        inReader.close();
       }
       
       out.append("\n");

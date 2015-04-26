@@ -15,6 +15,7 @@
  */
 package annis.gui.exporter;
 
+import annis.libgui.Helper;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -47,7 +48,7 @@ public class WekaExporter implements Exporter, Serializable
     {
       WebResource res = annisResource.path("search").path("matrix")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", queryAnnisQL);
+        .queryParam("q", Helper.encodeTemplate(queryAnnisQL));
       
       
       if(argsAsString.startsWith("metakeys="))

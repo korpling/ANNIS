@@ -13,11 +13,11 @@ CREATE TABLE corpus
   id         integer PRIMARY KEY,
   name       varchar NOT NULL, -- UNIQUE,
   type       varchar NOT NULL,
-  version    varchar,
+  version    varchar COLLATE "C",
   pre        integer NOT NULL UNIQUE,
   post       integer NOT NULL UNIQUE,
   top_level  boolean NOT NULL,  -- true for roots of the corpus forest
-  path_name  varchar[]
+  path_name  varchar[] COLLATE "C"
 );
 COMMENT ON COLUMN corpus.id IS 'primary key';
 COMMENT ON COLUMN corpus.name IS 'name of the corpus';
@@ -29,9 +29,9 @@ DROP TABLE IF EXISTS corpus_annotation CASCADE;
 CREATE TABLE corpus_annotation
 (
   corpus_ref  integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
-  namespace   varchar,
-  name        varchar NOT NULL,
-  value       varchar,
+  namespace   varchar COLLATE "C",
+  name        varchar COLLATE "C" NOT NULL,
+  value       varchar COLLATE "C",
   UNIQUE (corpus_ref, namespace, name)
 );
 COMMENT ON COLUMN corpus_annotation.corpus_ref IS 'foreign key to corpus.id';
@@ -44,8 +44,8 @@ CREATE TABLE text
 (
   corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   id    integer,
-  name  varchar,
-  text  text,
+  name  varchar COLLATE "C",
+  text  text COLLATE "C",
   toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
   PRIMARY KEY(corpus_ref, id)
 );
@@ -57,8 +57,8 @@ DROP TABLE IF EXISTS annotation_category CASCADE;
 CREATE TABLE annotation_category
 (
   id SERIAL,
-  namespace character varying,
-  name character varying NOT NULL,
+  namespace character varying COLLATE "C",
+  name character varying COLLATE "C" NOT NULL,
   toplevel_corpus integer NOT NULL,
   PRIMARY KEY (id),
   FOREIGN KEY (toplevel_corpus) REFERENCES corpus (id) ON DELETE CASCADE,
@@ -72,33 +72,33 @@ CREATE TABLE facts (
   text_ref integer,
   corpus_ref integer REFERENCES corpus(id) ON DELETE CASCADE,
   toplevel_corpus integer REFERENCES corpus(id) ON DELETE CASCADE,
-  node_namespace varchar,
-  node_name varchar,
-  salt_id varchar,
+  node_namespace varchar COLLATE "C",
+  node_name varchar COLLATE "C",
+  salt_id varchar COLLATE "C",
   "left" integer,
   "right" integer,
   token_index integer,
   is_token boolean,
-  continuous boolean,
-  span varchar,
+  span varchar COLLATE "C",
   left_token integer,
   right_token integer,
-  seg_name varchar,
+  seg_name varchar COLLATE "C",
   seg_index integer,
+  rank_id bigint,
   pre integer, -- pre-order value
   post integer, -- post-order value
   parent integer, -- foreign key to rank.pre of the parent node, or NULL for roots
   root boolean,
   "level" integer,
   component_id integer, -- component id
-  edge_type character(1), -- edge type of this component
-  edge_namespace varchar, -- optional namespace of the edges’ names
-  edge_name varchar, -- name of the edges in this component
+  edge_type character(1) COLLATE "C", -- edge type of this component
+  edge_namespace varchar COLLATE "C", -- optional namespace of the edges’ names
+  edge_name varchar COLLATE "C", -- name of the edges in this component
   node_anno_category INTEGER REFERENCES annotation_category(id),
-  node_annotext varchar, -- the combined name and value of the annotation, separated by ":"
-  node_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
-  edge_annotext varchar, -- the combined name and value of the annotation, separated by ":"
-  edge_qannotext varchar, -- the combined qualified name (with namespace) of the annotation, separated by ":"
+  node_annotext varchar COLLATE "C", -- the combined name and value of the annotation, separated by ":"
+  node_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
+  edge_annotext varchar COLLATE "C", -- the combined name and value of the annotation, separated by ":"
+  edge_qannotext varchar COLLATE "C", -- the combined qualified name (with namespace) of the annotation, separated by ":"
   n_sample boolean,
   n_na_sample boolean,
   PRIMARY KEY (fid)
@@ -122,17 +122,17 @@ COMMENT ON COLUMN facts.edge_name IS 'name of the edges in this component';
 DROP TABLE IF EXISTS media_files CASCADE;
 CREATE TABLE media_files
 (
-  filename  text NOT NULL,
+  filename  text COLLATE "C" NOT NULL,
   corpus_ref  integer NOT NULL REFERENCES corpus(id) ON DELETE CASCADE,
-  mime_type varchar NOT NULL,
-  title varchar NOT NULL,
+  mime_type varchar COLLATE "C" NOT NULL,
+  title varchar COLLATE "C" NOT NULL,
   UNIQUE (corpus_ref, title)
 );
 
 DROP TABLE IF EXISTS corpus_alias CASCADE;
 CREATE TABLE corpus_alias
 (
-  alias text,
+  alias text COLLATE "C",
   corpus_ref bigint references corpus(id) ON DELETE CASCADE,
    PRIMARY KEY (alias, corpus_ref)
 );
@@ -148,9 +148,8 @@ CREATE TABLE corpus_stats
   max_corpus_id integer  NULL,
   max_corpus_pre integer NULL,
   max_corpus_post integer NULL,
-  max_component_id integer NULL,
   max_node_id bigint NULL,
-  source_path varchar -- original path to the folder containing the relANNIS sources
+  source_path varchar COLLATE "C" -- original path to the folder containing the relANNIS sources
 );
 
 
@@ -178,12 +177,12 @@ DROP TABLE IF EXISTS resolver_vis_map CASCADE;
 CREATE TABLE resolver_vis_map
 (
   "id"   serial PRIMARY KEY,
-  "corpus"   varchar,
-  "version"   varchar,
-  "namespace"  varchar,
-  "element"    varchar CHECK (element = 'node' OR element = 'edge'),
-  "vis_type"   varchar NOT NULL,
-  "display_name"   varchar NOT NULL,
+  "corpus"   varchar COLLATE "C",
+  "version"   varchar COLLATE "C",
+  "namespace"  varchar COLLATE "C",
+  "element"    varchar COLLATE "C" CHECK (element = 'node' OR element = 'edge'),
+  "vis_type"   varchar COLLATE "C" NOT NULL,
+  "display_name"   varchar COLLATE "C" NOT NULL,
   "visibility"     resolver_visibility NOT NULL DEFAULT 'hidden',
   "order" integer default '0',
   "mappings" varchar,
@@ -204,14 +203,14 @@ DROP TABLE IF EXISTS annotations CASCADE;
 CREATE TABLE annotations
 (
   id bigserial NOT NULL,
-  namespace varchar,
-  "name" varchar,
-  "value" varchar,
+  namespace varchar COLLATE "C",
+  "name" varchar COLLATE "C",
+  "value" varchar COLLATE "C",
   occurences bigint,
-  "type" varchar,
+  "type" varchar COLLATE "C",
   "subtype" char(1),
-  edge_namespace varchar,
-  edge_name varchar,
+  edge_namespace varchar COLLATE "C",
+  edge_name varchar COLLATE "C",
   toplevel_corpus integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE,
   PRIMARY KEY (id)
 );
@@ -229,10 +228,10 @@ DROP TABLE IF EXISTS example_queries;
 CREATE TABLE example_queries
 (
   "id" serial PRIMARY KEY,
-  "example_query" TEXT NOT NULL,
-  "description" TEXT NOT NULL,
-  "type" TEXT NOT NULL,
+  "example_query" TEXT COLLATE "C" NOT NULL,
+  "description" TEXT COLLATE "C" NOT NULL,
+  "type" TEXT COLLATE "C" NOT NULL,
   "nodes" INTEGER NOT NULL,
-  "used_ops" TEXT[] NOT NULL,
+  "used_ops" TEXT[] COLLATE "C" NOT NULL,
   "corpus_ref" integer NOT NULL REFERENCES corpus (id) ON DELETE CASCADE
 );

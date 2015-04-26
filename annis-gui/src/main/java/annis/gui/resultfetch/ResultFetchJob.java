@@ -30,6 +30,7 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.uri.UriComponent;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import java.util.List;
@@ -75,7 +76,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
     res = Helper.getAnnisAsyncWebResource();
     
     futureMatches = res.path("query").path("search").path("find")
-      .queryParam("q", query.getQuery())
+      .queryParam("q", Helper.encodeTemplate(query.getQuery()))
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))

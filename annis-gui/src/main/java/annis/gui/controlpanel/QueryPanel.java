@@ -170,6 +170,7 @@ public class QueryPanel extends GridLayout implements
     lstHistory.setImmediate(true);
     lstHistory.setContainerDataSource(historyContainer);
     lstHistory.setItemCaptionPropertyId("query");
+    lstHistory.addStyleName(Helper.CORPUS_FONT);
     
     Button btShowMoreHistory = new Button("Show more details", new Button.ClickListener()
     {

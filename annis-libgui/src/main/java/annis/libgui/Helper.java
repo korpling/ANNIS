@@ -23,6 +23,7 @@ import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import com.google.common.escape.Escaper;
+import com.google.common.escape.Escapers;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.Client;
@@ -30,6 +31,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
@@ -101,6 +103,10 @@ public class Helper
     = "<div><p>Maybe there is a syntax error in the json file.</p></div>";
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
+  
+  private final static Escaper jerseyTemplateEscape = Escapers.builder()
+    .addEscape('{', "%7B")
+    .addEscape('}', "%7D").build();
   
   /**
    * Creates an authentificiated REST client
@@ -820,7 +826,17 @@ public class Helper
     return "true".equalsIgnoreCase(
         disableRtl);
   }
-
+  
+  /**
+   * This will percent encode Jersey template argument braces (enclosed in "{...}").
+   * @param v
+   * @return 
+   */
+  public static String encodeTemplate(String v)
+  {
+    String encoded = jerseyTemplateEscape.escape(v);
+    return encoded;
+  }
   /**
    * Casts a list of Annotations to the Type <code>List<Annotation></code>
    */

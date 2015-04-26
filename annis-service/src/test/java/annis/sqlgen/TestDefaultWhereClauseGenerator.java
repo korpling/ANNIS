@@ -191,7 +191,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new Dominance(node42, 1));
     // then
     checkEdgeConditions(componentPredicate, "d", null,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
@@ -206,7 +206,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new Dominance(node42, componentName, 1));
     // then
     checkEdgeConditions(componentPredicate, "d", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
@@ -225,7 +225,7 @@ public class TestDefaultWhereClauseGenerator
         "value3", TextMatching.REGEXP_EQUAL));
     // then
     checkEdgeConditions(componentPredicate, "d", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
     checkWhereConditions(
         node42,
         "_rank_annotation42.qannotext ~ '^(namespace3:name3:(value3))$'"
@@ -297,8 +297,8 @@ public class TestDefaultWhereClauseGenerator
         componentPredicate,
         "d",
         null,
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
+        join("=", "_rank23.id", "_rank42.parent"),
+        "_node42.left_token IN (SELECT min(lrsub.left_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
       + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
       + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
   }
@@ -317,8 +317,8 @@ public class TestDefaultWhereClauseGenerator
         componentPredicate,
         "d",
         null,
-        join("=", "_rank23.pre", "_rank42.parent"),
-        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.pre AND "
+        join("=", "_rank23.id", "_rank42.parent"),
+        "_node42.right_token IN (SELECT max(lrsub.right_token) FROM _node AS lrsub, _rank AS lrsub_rank WHERE parent=_rank23.id AND "
       + "component_id = _rank23.component_id AND corpus_ref=_node42.corpus_ref AND lrsub.toplevel_corpus IN(NULL)"
       + " AND lrsub_rank.toplevel_corpus IN(NULL) AND lrsub_rank.node_ref = lrsub.id)");
   }
@@ -335,7 +335,7 @@ public class TestDefaultWhereClauseGenerator
     node23.addOutgoingJoin(new PointingRelation(node42, componentName, 1));
     // then
     checkEdgeConditions(componentPredicate, "p", componentName,
-        join("=", "_rank23.pre", "_rank42.parent"));
+        join("=", "_rank23.id", "_rank42.parent"));
   }
 
   /**
