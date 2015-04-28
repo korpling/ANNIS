@@ -27,8 +27,12 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.slf4j.Logger;
@@ -56,7 +60,7 @@ public class RelANNISHelper
   {
     Map<String, ZipEntry> result = new HashMap<>();
     
-    for(ZipEntry e : getRelANNISEntry(zip, "corpus", "tab"))
+    for(ZipEntry e : getRelANNISEntry(zip, "corpus"))
     {
       String name = extractToplevelCorpusNames(zip.getInputStream(e));
       result.put(name, e);
@@ -151,22 +155,26 @@ public class RelANNISHelper
    *
    * @param file
    * @param table The table to search for.
-   * @param fileEnding The ending of corpus tab files (if null "tab" is used as
+   * @param fileEndings The possible endings of corpus tab files (if null "tab" and "relannis" are used as
    * default.
    * @return
    */
   public static List<ZipEntry> getRelANNISEntry(ZipFile file, String table,
-    String fileEnding)
+    String ... fileEndings)
   {
     List<ZipEntry> allMatchingEntries = new ArrayList<>();
     
-    if (fileEnding == null)
+    if (fileEndings == null || fileEndings.length == 0)
     {
-      fileEnding = "tab";
+      fileEndings = new String[] {"tab", "relannis"};
     }
-
-    final String fullName = table + "." + fileEnding;
-
+    
+    final List<String> fullNames = new LinkedList<>();
+    for(String e : fileEndings)
+    {
+      fullNames.add(table + "." + e);
+    }
+    
     Enumeration<? extends ZipEntry> entries = file.entries();
     while (entries.hasMoreElements())
     {
@@ -177,10 +185,12 @@ public class RelANNISHelper
         if (name != null)
         {
           name = name.replaceAll("\\\\", "/");
-          if (fullName.equalsIgnoreCase(name) || entry.getName().endsWith(
-            "/" + fullName))
+          for(String n : fullNames)
           {
-            allMatchingEntries.add(entry);
+            if(n.equalsIgnoreCase(name) || entry.getName().endsWith("/" + n))
+            {
+              allMatchingEntries.add(entry);
+            }
           }
         }
       }
