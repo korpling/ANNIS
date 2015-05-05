@@ -31,7 +31,7 @@ END : 'annis:END';
 QUOTE : '"';
 NEWLINE : '\n';
 COMMENT : '#' ~('\n')+ -> skip;
-ID: [a-zA-Z\_\-*?]+;
+ID: [a-zA-Z0-9\_\-*?]+;
 TXT : (.)+?;
 
 innervalue: ~(QUOTE)+;
