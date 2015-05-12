@@ -104,15 +104,6 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selector.setPropertyDataSource(getPropertyDataSource());    
   }
 
-  public void addPredefinedSelectableItems(Collection<String> predefined)
-  {
-    for(String s : predefined)
-    {
-      selectableContainer.addItem(predefined);
-    }
-    selectableContainer.sort(null, null);
-  }
-
   @Override
   public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
   {
