@@ -54,6 +54,8 @@ import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.ObjectProperty;
+import static com.vaadin.event.ShortcutAction.KeyCode.T;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.Component;
@@ -62,12 +64,15 @@ import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
+import static javafx.scene.input.KeyCode.T;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,9 +129,21 @@ public class QueryController implements Serializable
       // validate query
       try
       {
+        String corpus = "";
+        if (state.getSelectedCorpora().getValue() != null
+              && !state.getSelectedCorpora().getValue().isEmpty())
+        {
+        Set<String> corpusNames = state.getSelectedCorpora().getValue();
+        //List<String> corpusNames = new LinkedList<>();
+        //corpusNames.addAll(corpora);
+        //get the first corpus now, later we could deal with multiple corpora selected
+        corpus = corpusNames.iterator().next();
+        }
+       
+        
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeTemplate(query))
+          queryParam("q", Helper.encodeTemplate(query)).queryParam("c",corpus)
           .get(String.class);
 
         // wait for maximal one seconds
@@ -136,6 +153,9 @@ public class QueryController implements Serializable
 
           if ("ok".equalsIgnoreCase(result))
           {
+           
+            
+            
             if (state.getSelectedCorpora().getValue() == null
               || state.getSelectedCorpora().getValue().isEmpty())
             {
