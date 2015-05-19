@@ -25,6 +25,7 @@ import annis.gui.exporter.CSVExporter;
 import annis.gui.exporter.Exporter;
 import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
+import annis.gui.exporter.OrfeoExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
 import annis.libgui.media.MediaController;
@@ -101,6 +102,7 @@ public class SearchUI extends CommonUI
   
   static final Exporter[] EXPORTER = new Exporter[]
   {
+    new OrfeoExporter(),
     new WekaExporter(),
     new CSVExporter(),
     new TextExporter(),
