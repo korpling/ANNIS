@@ -1581,6 +1581,8 @@ var VKI_attach, VKI_show, VKI_close;
                         } catch(e) { self.VKI_target.range = document.selection.createRange(); }
                         if (!self.VKI_target.range.text.length) self.VKI_target.range.moveStart('character', -1);
                         self.VKI_target.range.text = "";
+                      } else if(self.VKI_target.CodeMirror) {
+                        self.VKI_target.CodeMirror.execCommand("delCharBefore");
                       } else self.VKI_target.value = self.VKI_target.value.substr(0, self.VKI_target.value.length - 1);
                       if (self.VKI_shift) self.VKI_modify("Shift");
                       if (self.VKI_altgr) self.VKI_modify("AltGr");
@@ -1590,7 +1592,12 @@ var VKI_attach, VKI_show, VKI_close;
                     break;
                   case "Enter":
                     VKI_addListener(td, 'click', function() {
-                      if (self.VKI_target.nodeName != "TEXTAREA") {
+                      if(self.VKI_target.CodeMirror) {
+                        // don't try to submit a for code mirror "textarea"
+                        self.VKI_target.CodeMirror.execCommand("newlineAndIndent");
+                        return true;
+                      }
+                      else if (self.VKI_target.nodeName != "TEXTAREA") {
                         if (self.VKI_enterSubmit && self.VKI_target.form) {
                           for (var z = 0, subm = false; z < self.VKI_target.form.elements.length; z++)
                             if (self.VKI_target.form.elements[z].type == "submit") subm = true;

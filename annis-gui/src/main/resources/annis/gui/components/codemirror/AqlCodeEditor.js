@@ -40,7 +40,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       matchBrackets: true,
       gutters: ["CodeMirror-lint-markers"],
       lint: true,
-      placeholder: ""
+      placeholder: "",
+      inputStyle: 'textarea'
     });
         
     this.sendTextIfNecessary = function() 
