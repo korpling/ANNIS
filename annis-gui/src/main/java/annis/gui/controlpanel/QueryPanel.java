@@ -19,7 +19,6 @@ import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.SearchUI;
-import annis.gui.components.VirtualKeyboard;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -219,7 +218,7 @@ public class QueryPanel extends GridLayout implements
       btShowKeyboard.setDescription("Click to show a virtual keyboard");
       btShowKeyboard.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
       btShowKeyboard.addStyleName(ValoTheme.BUTTON_SMALL);
-      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboard.class, "keyboard.png"));
+      btShowKeyboard.setIcon(new ClassResource(VirtualKeyboardCodeEditor.class, "keyboard.png"));
       btShowKeyboard.addClickListener(new ShowKeyboardClickListener(virtualKeyboard));
     }
     

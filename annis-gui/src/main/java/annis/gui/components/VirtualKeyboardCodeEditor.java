@@ -22,7 +22,6 @@ import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.shared.JavaScriptExtensionState;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.TextArea;
 import org.json.JSONArray;
 import org.json.JSONException;
 
