@@ -33,4 +33,5 @@ public interface Exporter
   
   public boolean isCancelable();
   
+  public String getHelpMessage();
 }
