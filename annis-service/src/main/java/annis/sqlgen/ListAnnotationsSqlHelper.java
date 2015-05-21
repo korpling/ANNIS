@@ -45,7 +45,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + "  select *, row_number() OVER (PARTITION BY namespace, name, edge_namespace, edge_name) as row_num\n"
       + "  FROM\n"
       + "  (\n"
-      + "    select distinct\n"
+      + "    select\n"
       + "    namespace, name, \"type\", subtype, edge_name, edge_namespace, "
       + "    occurences, :value AS value\n"
       + "    FROM annotations\n"
