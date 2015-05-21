@@ -40,7 +40,7 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
   public String createSqlQuery(List<Long> corpusList,
     boolean listValues, boolean onlyMostFrequentValue)
   {
-    String sql = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
+    String sqlAnnos = "select namespace, name, value, \"type\", subtype, edge_namespace, edge_name from\n"
       + "(\n"
       + "  select *, row_number() OVER (PARTITION BY namespace, name, edge_namespace, edge_name) as row_num\n"
       + "  FROM\n"
@@ -57,21 +57,27 @@ public class ListAnnotationsSqlHelper implements ResultSetExtractor
       + ") as tableFreq\n";
     if ((listValues && onlyMostFrequentValue) || !listValues)
     {
-      sql += "where row_num = 1";
+      sqlAnnos += "where row_num = 1";
     }
 
     // fetch corpus annotations
-    sql += "\nUNION"
-      + "\nSELECT distinct"
-      + "\nm.namespace, m.name, :value, 'meta' as \"type\", 'm' as subtype, "
-      + "\n'' as edge_namespace, '' as ege_name"
-      + "\nFROM corpus_annotation as m, corpus c, corpus p"
-      + "\n WHERE p.id IN (:corpora)"
-      + "\nAND c.pre > p.pre"
-      + "\nAND c.post < p.post"
-      + "\nAND m.corpus_ref = c.id"
-      + "\nORDER BY name, edge_namespace, edge_name";
+    String sqlMeta =  
+      "SELECT namespace, name, value, \"type\", subtype, edge_namespace, edge_name\n"
+      + "FROM\n" + "(\n" + "	SELECT\n"
+      + "	m.namespace AS namespace, m.name AS \"name\", :value AS value, 'meta'::varchar as \"type\", 'm'::char(1) as subtype, \n"
+      + "	''::varchar as edge_namespace, ''::varchar as edge_name, row_number() OVER (PARTITION BY m.namespace, m.name) as row_num\n"
+      + "	FROM corpus_annotation as m, corpus c, corpus p\n"
+      + "	 WHERE p.id IN (:corpora)\n" + "	AND c.pre > p.pre\n"
+      + "	AND c.post < p.post\n" + "	AND m.corpus_ref = c.id\n"
+      + ") as metaFreq\n";
+    if ((listValues && onlyMostFrequentValue) || !listValues)
+    {
+      sqlMeta += "WHERE row_num = 1";
+    }
+    
 
+    String sql = sqlAnnos + "\nUNION\n" + sqlMeta +  "\nORDER BY name, edge_namespace, edge_name";
+    
     sql = sql.replaceAll(":corpora", StringUtils.join(corpusList, ", "));
     sql = sql.replaceAll(":value", listValues ? "value" : "NULL::varchar");
 
