@@ -15,6 +15,7 @@
  */
 package annis.gui.resultview;
 
+import annis.libgui.Helper;
 import annis.libgui.ResolverProvider;
 import annis.CommonHelper;
 import annis.libgui.MatchedNodeColors;
@@ -24,6 +25,7 @@ import annis.gui.objects.PagedResultQuery;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
 import static annis.model.AnnisConstants.*;
+import annis.model.Annotation;
 import annis.model.RelannisNodeFeature;
 import annis.resolver.ResolverEntry;
 import annis.service.objects.Match;
@@ -32,6 +34,7 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.Resource;
+import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.AbstractSelect;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
@@ -184,13 +187,51 @@ public class SingleResultPanel extends CssLayout implements
 
     MinMax minMax = getIds(result.getSDocumentGraph());
 
+    // If there is a metadata field named 'url', it is the sample page address.
+    String samplePageUrl = null;
+    if (documentName != null)
+    {
+      try
+      {
+        List<Annotation> metadata = Helper.getMetaData(corpusName, documentName);
+        if (metadata != null)
+        {
+          for (Annotation ann : metadata)
+          {
+            if ("url".equals(ann.getName()))
+            {
+              samplePageUrl = ann.getValue();
+              break;
+            }
+          }
+        }
+      }
+      catch (NullPointerException e)
+      {
+        // Unfortunately the call to getMetaData causes a null pointer exception
+        // in test context only. Ignore it.
+      }
+    }
+
     // build label
     StringBuilder sb = new StringBuilder("Path: ");
-    sb.append(StringUtils.join(path, " > "));
+    if (samplePageUrl == null)
+    {
+      sb.append(StringUtils.join(path, " > "));
+    }
+    else
+    {
+      for (int i = 0; i < path.size() - 1; i++)
+      {
+        sb.append(path.get(i)).append(" &gt; ");
+      }
+      sb.append("<a href=\""+samplePageUrl+"\">"+path.get(path.size() - 1)+"</a>");
+    }
     sb.append(" (" + minMax.segName + " ").append(minMax.min);
     sb.append(" - ").append(minMax.max).append(")");
 
-    Label lblPath = new Label(sb.toString());
+    Label lblPath = new Label(sb.toString(),
+            samplePageUrl == null ? ContentMode.TEXT : ContentMode.HTML);
 
     lblPath.setWidth("100%");
     lblPath.setHeight("-1px");
