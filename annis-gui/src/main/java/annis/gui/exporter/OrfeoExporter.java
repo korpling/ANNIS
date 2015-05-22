@@ -24,12 +24,13 @@ import com.google.common.base.Splitter;
 import java.io.IOException;
 import java.io.Writer;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
 
-public class GridExporter extends GeneralTextExporter
+public class OrfeoExporter extends GeneralTextExporter
 {
 
   @Override
@@ -63,6 +64,8 @@ public class GridExporter extends GeneralTextExporter
       }
     }
 
+	String speakerChange = args.containsKey("c") ? args.get("c") : null;
+
     int counter = 0;
     for (AnnisResult annisResult : queryResult)
     {
@@ -70,12 +73,21 @@ public class GridExporter extends GeneralTextExporter
         new HashMap<>();
 
       counter++;
-      out.append((counter + offset) + ".");
+      out.append((counter + offset) + ". \t");
 
-      long tokenOffset = annisResult.getGraph().getTokens().get(0).getTokenIndex() - 1;
-      for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
-      {
+	  List<AnnisNode> tokenList = annisResult.getGraph().getTokens();
+	  long tokenOffset = tokenList.get(0).getTokenIndex() - 1;
+	  for (int i = annisResult.getPath().length - 1; i >= 0; i--)
+	  {
+		out.append(annisResult.getPath()[i]);
+		if (i > 0)
+		  out.append(" > ");
+	  }
+	  long lastTokenIndex = tokenList.get(tokenList.size() - 1).getTokenIndex();
+	  out.append(" (tokens ").append((tokenOffset + 2) + "-" + (lastTokenIndex + 1)).append(")\n");
 
+	  for (AnnisNode resolveNode : annisResult.getGraph().getNodes())
+	  {
         for (Annotation resolveAnnotation : resolveNode.getNodeAnnotations())
         {
           String k = resolveAnnotation.getName();
@@ -97,13 +109,33 @@ public class GridExporter extends GeneralTextExporter
         if ("tok".equals(k))
         {
           out.append("\t" + k + "\t ");
-          for (AnnisNode annisNode : annisResult.getGraph().getTokens())
-          {
-            out.append(annisNode.getSpannedText() + " ");
-          }
-          out.append("\n");
-        }
-        else
+		  if (annos.get("speaker") != null && speakerChange != null) {
+			String prev = null;
+			Iterator<Span> it = annos.get("speaker").values().iterator();
+			for (AnnisNode annisNode : annisResult.getGraph().getTokens()) {
+			  String speaker = it.next().getValue();
+			  if (prev == null)
+			  {
+				prev = speaker;
+			  }
+			  else if (!prev.equals(speaker))
+			  {
+				out.append(speakerChange+" ");
+				prev = speaker;
+			  }
+			  out.append(annisNode.getSpannedText() + " ");
+			}
+		  }
+		  else
+		  {
+			for (AnnisNode annisNode : annisResult.getGraph().getTokens())
+			{
+			  out.append(annisNode.getSpannedText() + " ");
+			}
+		  }
+		  out.append("\n");
+		}
+        else if ("pos".equalsIgnoreCase(k) || "lemma".equalsIgnoreCase(k))
         {
           if(annos.get(k) != null)
           {
@@ -138,21 +170,13 @@ public class GridExporter extends GeneralTextExporter
   }
 
   @Override
-  public String getHelpMessage()
-  {
-	return "The Grid Exporter can export all annotations of a search result and its "
-			+ "context. Each annotation layer is represented in a separate line, and the "
-			+ "tokens covered by each annotation are given as number ranges after each "
-			+ "annotation in brackets. To suppress token numbers, input numbers=false "
-			+ "into the parameters box below. To display only a subset of annotations "
-			+ "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
-			+ "to show tokens and the "
-			+ "annotations pos and cat.<br /><br />"
-			+ "Parameters: <br/>"
-			+ "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-			+ "<code>metakeys=title,documentname</code>) <br />"
-			+ "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
-			+ "<code>numbers=false</code>)";
+  public String getHelpMessage() {
+	return "The Orfeo exporter is a modification of GridExporter with a few differences:<br/><br/>"
+			+ "The path of the sample and the indices of the tokens in the context are included.<br/>"
+			+ "Annotation layers other than POS and lemma are omitted.<br/>"
+			+ "If speaker annotation is available (layer <em>speaker</em>) and the parameter <em>c</em>"
+			+ " is defined, then the string in that parameter is used within the token list"
+			+ " to indicate speaker changes.";
   }
 
   @Override

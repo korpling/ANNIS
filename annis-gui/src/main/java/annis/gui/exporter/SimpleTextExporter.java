@@ -29,5 +29,10 @@ public class SimpleTextExporter extends GeneralTextExporter
   {
     return SubgraphFilter.token;
   }
-  
+
+  @Override
+  public String getHelpMessage()
+  {
+	return "The SimpleTextExporter exports only the plain text of every search result. ";
+  }
 }

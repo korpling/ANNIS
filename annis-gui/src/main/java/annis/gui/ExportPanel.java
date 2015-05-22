@@ -212,47 +212,10 @@ public class ExportPanel extends FormLayout
 
   private void initHelpMessages()
   {
-    help4Exporter.put(SearchUI.EXPORTER[0].getClass().getSimpleName(),
-      "The WEKA Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). At the top of "
-      + "the export, the names of the columns are given in order according to "
-      + "the WEKA format.<br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchUI.EXPORTER[1].getClass().getSimpleName(),
-      "The CSV Exporter exports only the "
-      + "values of the elements searched for by the user, ignoring the context "
-      + "around search results. The values for all annotations of each of the "
-      + "found nodes is given in a comma-separated table (CSV). <br/><br/>"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>)");
-
-    help4Exporter.put(SearchUI.EXPORTER[2].getClass().getSimpleName(),
-      "The Text Exporter exports the token covered by the matched nodes of every search result and "
-      + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
-
-    help4Exporter.put(SearchUI.EXPORTER[3].getClass().getSimpleName(),
-      "The Grid Exporter can export all annotations of a search result and its "
-      + "context. Each annotation layer is represented in a separate line, and the "
-      + "tokens covered by each annotation are given as number ranges after each "
-      + "annotation in brackets. To suppress token numbers, input numbers=false "
-      + "into the parameters box below. To display only a subset of annotations "
-      + "in any order use the \"Annotation keys\" text field, input e.g. \"tok,pos,cat\" "
-      + "to show tokens and the "
-      + "annotations pos and cat.<br /><br />"
-      + "Parameters: <br/>"
-      + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
-      + "<code>metakeys=title,documentname</code>) <br />"
-      + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
-      + "<code>numbers=false</code>)");
-    
-    help4Exporter.put(SearchUI.EXPORTER[4].getClass().getSimpleName(),
-      "The SimpleTextExporter exports only the plain text of every search result. ");
+	for (Exporter exp : SearchUI.EXPORTER)
+	{
+	  help4Exporter.put(exp.getClass().getSimpleName(), exp.getHelpMessage());
+	}
   }
 
   public class ExporterSelectionHelpListener implements
