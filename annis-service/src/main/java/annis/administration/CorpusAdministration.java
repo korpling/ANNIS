@@ -26,7 +26,7 @@ import annis.AnnisRunnerException;
 import annis.CommonHelper;
 import annis.exceptions.AnnisException;
 import annis.service.objects.ImportJob;
-import annis.utils.RelANNISHelper;
+import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Multimap;
 import com.google.common.io.ByteStreams;
@@ -160,7 +160,7 @@ public class CorpusAdministration
 
           // get the names of all corpora included in the ZIP file
           // in order to get a folder name
-          Map<String, ZipEntry> corpora = RelANNISHelper.corporaInZipfile(zip);
+          Map<String, ZipEntry> corpora = ANNISFormatHelper.corporaInZipfile(zip);
 
           // unzip and add all resulting corpora to import list
           log.info("Unzipping " + f.getPath());
@@ -188,7 +188,7 @@ public class CorpusAdministration
       {
         try
         {
-          roots.addAll(RelANNISHelper.corporaInDirectory(f).values());
+          roots.addAll(ANNISFormatHelper.corporaInDirectory(f).values());
         }
         catch (IOException ex)
         {
@@ -257,7 +257,7 @@ public class CorpusAdministration
   }
 
   /**
-   * Extract the zipped relANNIS corpus files to an output directory.
+   * Extract the zipped ANNIS corpus files to an output directory.
    *
    * @param outDir The ouput directory.
    * @param zip ZIP-file to extract.
@@ -284,7 +284,7 @@ public class CorpusAdministration
       } // end if directory
       else
       {
-        if ("corpus.tab".equals(outFile.getName()) || "corpus.relannis".equals(
+        if ("corpus.tab".equals(outFile.getName()) || "corpus.annis".equals(
           outFile.getName()))
         {
           rootDirs.add(outFile.getParentFile());

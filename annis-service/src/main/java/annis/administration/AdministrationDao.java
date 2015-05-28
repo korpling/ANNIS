@@ -173,7 +173,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private Map<String, String> tableInsertFrom;
 
   // all files have to carry this suffix.
-  private String relANNISFileSuffix = ".annis";
+  private String annisFileSuffix = ".annis";
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
@@ -309,7 +309,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("populating the schemas with default values");
     bulkloadTableFromResource("resolver_vis_map",
       new FileSystemResource(new File(getScriptPath(),
-          FILE_RESOLVER_VIS_MAP + relANNISFileSuffix)));
+          FILE_RESOLVER_VIS_MAP + annisFileSuffix)));
     // update the sequence
     executeSqlFromScript("update_resolver_sequence.sql");
 
@@ -478,7 +478,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   }
 
   /**
-   * Reads relAnnis files from several directories.
+   * Reads ANNIS files from several directories.
    *
    * @param path Specifies the path to the corpora, which should be imported.
    * @param aliasName An alias name for this corpus. Can be null.
@@ -508,16 +508,16 @@ public class AdministrationDao extends AbstractAdminstrationDao
     // explicitly unset any timeout
     getJdbcTemplate().update("SET statement_timeout TO 0");
 
-    RelANNISVersion relannisVersion = getRelANNISVersion(path);
+    ANNISFormatVersion annisFormatVersion = getANNISFormatVersion(path);
 
-    if (relannisVersion == RelANNISVersion.V3_3)
+    if (annisFormatVersion == ANNISFormatVersion.V3_3)
     {
-      return importVersion4(path, aliasName, overwrite, relannisVersion);
+      return importVersion4(path, aliasName, overwrite, annisFormatVersion);
     }
-    else if (relannisVersion == RelANNISVersion.V3_1 || relannisVersion
-      == RelANNISVersion.V3_2)
+    else if (annisFormatVersion == ANNISFormatVersion.V3_1 || annisFormatVersion
+      == ANNISFormatVersion.V3_2)
     {
-      return importVersion3(path, aliasName, overwrite, relannisVersion);
+      return importVersion3(path, aliasName, overwrite, annisFormatVersion);
     }
 
     log.error("Unknown ANNIS import format version");
@@ -526,9 +526,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private boolean importVersion4(String path, String aliasName,
     boolean overwrite,
-    RelANNISVersion version)
+    ANNISFormatVersion version)
   {
-    this.relANNISFileSuffix = ".annis";
+    this.annisFileSuffix = ".annis";
     createStagingAreaV33(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -604,9 +604,9 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   private boolean importVersion3(String path, String aliasName,
     boolean overwrite,
-    RelANNISVersion version)
+    ANNISFormatVersion version)
   {
-    this.relANNISFileSuffix = ".tab";
+    this.annisFileSuffix = ".tab";
 
     createStagingAreaV32(temporaryStagingArea);
     bulkImport(path, version);
@@ -738,10 +738,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
    *
    * </ul>
    *
-   * @param path The path to the relANNIS. The files have to have this suffix
+   * @param path The path to the ANNIS files. The files have to have this suffix
    * @param version {@link DefaultAdministrationDao#REL_ANNIS_FILE_SUFFIX}
    */
-  void bulkImport(String path, RelANNISVersion version)
+  void bulkImport(String path, ANNISFormatVersion version)
   {
     log.info("bulk-loading data");
 
@@ -754,10 +754,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
       // check if example query exists. If not copy it from the resource folder.
       else if (table.equalsIgnoreCase(EXAMPLE_QUERIES_TAB))
       {
-        File f = new File(path, table + relANNISFileSuffix);
+        File f = new File(path, table + annisFileSuffix);
         if (f.exists())
         {
-          log.info(table + relANNISFileSuffix + " file exists");
+          log.info(table + annisFileSuffix + " file exists");
           bulkloadTableFromResource(tableInStagingArea(table),
             new FileSystemResource(f));
 
@@ -773,7 +773,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
             generateExampleQueries = EXAMPLE_QUERIES_CONFIG.TRUE;
           }
 
-          log.info(table + relANNISFileSuffix + " file not found");
+          log.info(table + annisFileSuffix + " file not found");
         }
       }
       else if (table.equalsIgnoreCase("node"))
@@ -783,15 +783,15 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         bulkloadTableFromResource(tableInStagingArea(table),
-          new FileSystemResource(new File(path, table + relANNISFileSuffix)));
+          new FileSystemResource(new File(path, table + annisFileSuffix)));
       }
     }
   }
 
-  private void bulkImportNode(String path, RelANNISVersion version)
+  private void bulkImportNode(String path, ANNISFormatVersion version)
   {
     // check column number by reading first line
-    File nodeTabFile = new File(path, "node" + relANNISFileSuffix);
+    File nodeTabFile = new File(path, "node" + annisFileSuffix);
     try (BufferedReader reader
       = new BufferedReader(new InputStreamReader(
           new FileInputStream(nodeTabFile), "UTF-8"));)
@@ -801,14 +801,14 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
       int columnNumber = firstLine == null ? 13
         : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
-      if (version == RelANNISVersion.V3_3 || version == RelANNISVersion.V3_2)
+      if (version == ANNISFormatVersion.V3_3 || version == ANNISFormatVersion.V3_2)
       {
         // new node table with segmentations
         // no special handling needed
         bulkloadTableFromResource(tableInStagingArea("node"),
           new FileSystemResource(nodeTabFile));
       }
-      else if (version == RelANNISVersion.V3_1)
+      else if (version == ANNISFormatVersion.V3_1)
       {
         getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
@@ -843,7 +843,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       else
       {
         throw new RuntimeException("Illegal number of columns in node"
-          + relANNISFileSuffix + ", "
+          + annisFileSuffix + ", "
           + "should be 13 or 10 but was " + columnNumber);
       }
         }
@@ -853,10 +853,10 @@ public class AdministrationDao extends AbstractAdminstrationDao
         }
   }
 
-  void createStagingAreaIndexes(RelANNISVersion version)
+  void createStagingAreaIndexes(ANNISFormatVersion version)
   {
     log.info("creating indexes for staging area");
-    if(version == RelANNISVersion.V3_3)
+    if(version == ANNISFormatVersion.V3_3)
     {
       executeSqlFromScript("indexes_staging_v33.sql");
     }
@@ -1284,13 +1284,13 @@ public class AdministrationDao extends AbstractAdminstrationDao
     getJdbcTemplate().execute("ANALYZE facts");
   }
 
-  void createFacts(long corpusID, RelANNISVersion version, Offsets offsets)
+  void createFacts(long corpusID, ANNISFormatVersion version, Offsets offsets)
   {
     MapSqlParameterSource args = offsets.makeArgs()
       .addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    if(version == RelANNISVersion.V3_3) 
+    if(version == ANNISFormatVersion.V3_3) 
     {
       executeSqlFromScript("facts.sql", args);
     }
@@ -1871,7 +1871,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
    * version has an additional column for visibility status of the
    * visualization.
    *
-   * @param path The path to the relAnnis file.
+   * @param path The path to the ANNIS file.
    * @param table The final table in the database of the resolver_vis_map table.
    */
   private void importResolverVisMapTable(String path, String table)
@@ -1880,7 +1880,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     {
 
       // count cols for detecting old resolver_vis_map table format
-      File resolver_vis_tab = new File(path, table + relANNISFileSuffix);
+      File resolver_vis_tab = new File(path, table + annisFileSuffix);
 
       if (!resolver_vis_tab.isFile())
       {
@@ -1911,7 +1911,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
         // new format
         case 9:
           bulkloadTableFromResource(tableInStagingArea(table),
-            new FileSystemResource(new File(path, table + relANNISFileSuffix)));
+            new FileSystemResource(new File(path, table + annisFileSuffix)));
           break;
         default:
           log.error("invalid amount of cols");
@@ -2127,7 +2127,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  private RelANNISVersion getRelANNISVersion(String path)
+  private ANNISFormatVersion getANNISFormatVersion(String path)
   {
     File pathDir = new File(path);
     if (pathDir.isDirectory())
@@ -2142,12 +2142,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
           String firstLine = Files.readFirstLine(versionFile, Charsets.UTF_8);
           if ("3.3".equals(firstLine.trim()))
           {
-            return RelANNISVersion.V3_3;
+            return ANNISFormatVersion.V3_3;
           }
         }
         catch (IOException ex)
         {
-          log.warn("Could not read relannis.version file", ex);
+          log.warn("Could not read annis.version file", ex);
         }
       }
       else
@@ -2162,11 +2162,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
             List<String> cols = Splitter.on('\t').splitToList(firstLine);
             if (cols.size() == 13)
             {
-              return RelANNISVersion.V3_2;
+              return ANNISFormatVersion.V3_2;
             }
             else if (cols.size() == 10)
             {
-              return RelANNISVersion.V3_1;
+              return ANNISFormatVersion.V3_1;
             }
           }
           catch (IOException ex)
@@ -2176,7 +2176,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
         }
       }
     }
-    return RelANNISVersion.UNKNOWN;
+    return ANNISFormatVersion.UNKNOWN;
   }
 
   public static class ConflictingCorpusException extends AnnisException

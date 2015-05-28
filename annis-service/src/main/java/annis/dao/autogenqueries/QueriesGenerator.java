@@ -157,7 +157,7 @@ public class QueriesGenerator
    * queries.
    *
    * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    *
    * @param delete Deletes the already existing example queries in the database.
    */
@@ -176,7 +176,7 @@ public class QueriesGenerator
    * queries.
    *
    * @param corpusId Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    */
   public void generateQueries(long corpusId)
   {
@@ -202,7 +202,7 @@ public class QueriesGenerator
    * queries.
    *
    * @param name Determines the corpus, for which the example queries are
-   * generated for. It must be the final relAnnis id of the corpus.
+   * generated for. It must be the final ANNIS id of the corpus.
    */
   public void generateQueries(String name, boolean delete)
   {

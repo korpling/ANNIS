@@ -27,7 +27,7 @@ import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
-import annis.utils.RelANNISHelper;
+import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
 import java.io.File;
@@ -459,7 +459,7 @@ public class AdminServiceImpl implements AdminService
       {
         ByteStreams.copy(request.getInputStream(), tmpOut);
       }
-      Set<String> allNames = RelANNISHelper.corporaInZipfile(tmpZip).keySet();
+      Set<String> allNames = ANNISFormatHelper.corporaInZipfile(tmpZip).keySet();
 
       if (!allNames.isEmpty())
       {

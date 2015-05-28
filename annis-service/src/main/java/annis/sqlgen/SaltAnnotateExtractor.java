@@ -895,7 +895,7 @@ public class SaltAnnotateExtractor implements AnnotateExtractor<SaltProject>
   }
 
   /**
-   * In relANNIS there is a special combined dominance component which has an empty name,
+   * In ANNIS there is a special combined dominance component which has an empty name,
    * but which should not directly be included in the Salt graph.
    * 
    * This functions checks if a dominance edge with empty name has a "mirror" edge which

@@ -288,7 +288,7 @@ public interface AnnisDao
   public List<ExampleQuery> getExampleQueries(List<Long> corpusIDs);
 
   /**
-   * Returns the raw text from the text.tab file of the relAnnis format.
+   * Returns the raw text from the text.tab file of the ANNIS format.
    *
    * @param topLevelCorpus The name of the corpus.
    * @param documentName The name of the document

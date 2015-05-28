@@ -27,12 +27,9 @@ import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.Enumeration;
 import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 import org.slf4j.Logger;
@@ -42,11 +39,11 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class RelANNISHelper
+public class ANNISFormatHelper
 {
 
   private static final Logger log = LoggerFactory.
-    getLogger(RelANNISHelper.class);
+    getLogger(ANNISFormatHelper.class);
 
   
   /**
@@ -60,7 +57,7 @@ public class RelANNISHelper
   {
     Map<String, ZipEntry> result = new HashMap<>();
     
-    for(ZipEntry e : getRelANNISEntry(zip, "corpus"))
+    for(ZipEntry e : getANNISEntry(zip, "corpus"))
     {
       String name = extractToplevelCorpusNames(zip.getInputStream(e));
       result.put(name, e);
@@ -151,22 +148,22 @@ public class RelANNISHelper
   }
 
   /**
-   * Find the directories containing the real relannis tab files for a zip file.
+   * Find the directories containing the real ANNIS tab files for a zip file.
    *
    * @param file
    * @param table The table to search for.
-   * @param fileEndings The possible endings of corpus tab files (if null "tab" and "relannis" are used as
+   * @param fileEndings The possible endings of corpus tab files (if null "tab" and "annis" are used as
    * default.
    * @return
    */
-  public static List<ZipEntry> getRelANNISEntry(ZipFile file, String table,
+  public static List<ZipEntry> getANNISEntry(ZipFile file, String table,
     String ... fileEndings)
   {
     List<ZipEntry> allMatchingEntries = new ArrayList<>();
     
     if (fileEndings == null || fileEndings.length == 0)
     {
-      fileEndings = new String[] {"tab", "relannis"};
+      fileEndings = new String[] {"tab", "annis"};
     }
     
     final List<String> fullNames = new LinkedList<>();
