@@ -21,5 +21,5 @@ package annis.administration;
  */
 public enum RelANNISVersion
 {
-  V3_0, V3_1, V4_0, UNKNOWN;
+  V3_1, V3_2, V3_3, UNKNOWN;
 }

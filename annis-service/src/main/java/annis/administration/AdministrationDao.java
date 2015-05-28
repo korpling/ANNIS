@@ -173,7 +173,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   private Map<String, String> tableInsertFrom;
 
   // all files have to carry this suffix.
-  private String relANNISFileSuffix = ".relannis";
+  private String relANNISFileSuffix = ".annis";
   /**
    * Optional tab for example queries. If this tab not exist, a dummy file from
    * the resource folder is used.
@@ -510,12 +510,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
     RelANNISVersion relannisVersion = getRelANNISVersion(path);
 
-    if (relannisVersion == RelANNISVersion.V4_0)
+    if (relannisVersion == RelANNISVersion.V3_3)
     {
       return importVersion4(path, aliasName, overwrite, relannisVersion);
     }
-    else if (relannisVersion == RelANNISVersion.V3_0 || relannisVersion
-      == RelANNISVersion.V3_1)
+    else if (relannisVersion == RelANNISVersion.V3_1 || relannisVersion
+      == RelANNISVersion.V3_2)
     {
       return importVersion3(path, aliasName, overwrite, relannisVersion);
     }
@@ -528,7 +528,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     boolean overwrite,
     RelANNISVersion version)
   {
-    this.relANNISFileSuffix = ".relannis";
+    this.relANNISFileSuffix = ".annis";
     createStagingAreaV4(temporaryStagingArea);
     bulkImport(path, version);
 
@@ -705,7 +705,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
   void createStagingAreaV4(boolean useTemporary)
   {
-    log.info("creating staging area for import format version 4");
+    log.info("creating staging area for import format version 3.3");
     MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
       ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area.sql", args);
@@ -713,7 +713,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   
   void createStagingAreaV3(boolean useTemporary)
   {
-    log.info("creating staging area for import format version 3.0/3.1");
+    log.info("creating staging area for import format version 3.1/3.2");
     MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
       ? "TEMPORARY" : "UNLOGGED");
     executeSqlFromScript("staging_area_v3.sql", args);
@@ -801,14 +801,14 @@ public class AdministrationDao extends AbstractAdminstrationDao
 
       int columnNumber = firstLine == null ? 13
         : StringUtils.splitPreserveAllTokens(firstLine, '\t').length;
-      if (version == RelANNISVersion.V4_0 || version == RelANNISVersion.V3_1)
+      if (version == RelANNISVersion.V3_3 || version == RelANNISVersion.V3_2)
       {
         // new node table with segmentations
         // no special handling needed
         bulkloadTableFromResource(tableInStagingArea("node"),
           new FileSystemResource(nodeTabFile));
       }
-      else if (version == RelANNISVersion.V3_0)
+      else if (version == RelANNISVersion.V3_1)
       {
         getJdbcTemplate().execute("DROP TABLE IF EXISTS _tmpnode;");
         // old node table without segmentations
@@ -856,7 +856,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   void createStagingAreaIndexes(RelANNISVersion version)
   {
     log.info("creating indexes for staging area");
-    if(version == RelANNISVersion.V4_0)
+    if(version == RelANNISVersion.V3_3)
     {
       executeSqlFromScript("indexes_staging_v4.sql");
     }
@@ -1290,7 +1290,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       .addValue(":id", corpusID);
 
     log.info("creating materialized facts table for corpus with ID " + corpusID);
-    if(version == RelANNISVersion.V4_0) 
+    if(version == RelANNISVersion.V3_3) 
     {
       executeSqlFromScript("facts.sql", args);
     }
@@ -2132,17 +2132,17 @@ public class AdministrationDao extends AbstractAdminstrationDao
     File pathDir = new File(path);
     if (pathDir.isDirectory())
     {
-      // check for existance of "relannis.version" file
-      File versionFile = new File(pathDir, "relannis.version");
+      // check for existance of "annis.version" file
+      File versionFile = new File(pathDir, "annis.version");
       if (versionFile.isFile() && versionFile.exists())
       {
         try
         {
           // read the first line
           String firstLine = Files.readFirstLine(versionFile, Charsets.UTF_8);
-          if ("4.0".equals(firstLine.trim()))
+          if ("3.3".equals(firstLine.trim()))
           {
-            return RelANNISVersion.V4_0;
+            return RelANNISVersion.V3_3;
           }
         }
         catch (IOException ex)
@@ -2152,7 +2152,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
       }
       else
       {
-        // we have to distinguish between 3.0 and 3.1
+        // we have to distinguish between 3.1 and 3.2
         File nodeTab = new File(pathDir, "node.tab");
         if (nodeTab.isFile() && nodeTab.exists())
         {
@@ -2162,11 +2162,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
             List<String> cols = Splitter.on('\t').splitToList(firstLine);
             if (cols.size() == 13)
             {
-              return RelANNISVersion.V3_1;
+              return RelANNISVersion.V3_2;
             }
             else if (cols.size() == 10)
             {
-              return RelANNISVersion.V3_0;
+              return RelANNISVersion.V3_1;
             }
           }
           catch (IOException ex)
