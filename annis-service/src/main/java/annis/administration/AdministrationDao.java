@@ -529,7 +529,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     RelANNISVersion version)
   {
     this.relANNISFileSuffix = ".annis";
-    createStagingAreaV4(temporaryStagingArea);
+    createStagingAreaV33(temporaryStagingArea);
     bulkImport(path, version);
 
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
@@ -608,7 +608,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
   {
     this.relANNISFileSuffix = ".tab";
 
-    createStagingAreaV3(temporaryStagingArea);
+    createStagingAreaV32(temporaryStagingArea);
     bulkImport(path, version);
     
     String toplevelCorpusName = getTopLevelCorpusFromTmpArea();
@@ -703,7 +703,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
   }
 
-  void createStagingAreaV4(boolean useTemporary)
+  void createStagingAreaV33(boolean useTemporary)
   {
     log.info("creating staging area for import format version 3.3");
     MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
@@ -711,12 +711,12 @@ public class AdministrationDao extends AbstractAdminstrationDao
     executeSqlFromScript("staging_area.sql", args);
   }
   
-  void createStagingAreaV3(boolean useTemporary)
+  void createStagingAreaV32(boolean useTemporary)
   {
     log.info("creating staging area for import format version 3.1/3.2");
     MapSqlParameterSource args = makeArgs().addValue(":tmp", useTemporary
       ? "TEMPORARY" : "UNLOGGED");
-    executeSqlFromScript("staging_area_v3.sql", args);
+    executeSqlFromScript("staging_area_v32.sql", args);
   }
 
   /**
@@ -858,11 +858,11 @@ public class AdministrationDao extends AbstractAdminstrationDao
     log.info("creating indexes for staging area");
     if(version == RelANNISVersion.V3_3)
     {
-      executeSqlFromScript("indexes_staging_v4.sql");
+      executeSqlFromScript("indexes_staging_v33.sql");
     }
     else
     {
-      executeSqlFromScript("indexes_staging_v3.sql");
+      executeSqlFromScript("indexes_staging_v32.sql");
     }
   }
 
@@ -1296,7 +1296,7 @@ public class AdministrationDao extends AbstractAdminstrationDao
     }
     else
     {
-      executeSqlFromScript("facts_v3.sql", args);
+      executeSqlFromScript("facts_v32.sql", args);
     }
     
     log.info("indexing the new facts table (general indexes)");
