@@ -263,14 +263,14 @@ public class FrequencyResultPanel extends VerticalLayout
     switch (e.getType())
     {
       case annotation:
-        caption = "#" + e.getReferencedNode() + " ("
-          + e.getKey() + ")";
+        caption = "#" + e.getReferencedNode() + "|"
+          + e.getKey();
         break;
       case span:
-        caption = "#" + e.getReferencedNode() + " (spanned text)";
+        caption = "#" + e.getReferencedNode() + "|spanned text";
         break;
       case meta:
-        caption = "meta (" + e.getKey() + ")";
+        caption = "meta|" + e.getKey();
         break;
       default:
         caption = "<unknown>";
