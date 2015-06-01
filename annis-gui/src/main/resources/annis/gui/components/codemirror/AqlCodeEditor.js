@@ -90,6 +90,15 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         cmTextArea.setCursor(cursor);
       }
       
+      // apply parent code class
+      if(connector.getState().textareaClass && connector.getState().textareaClass !== "") {
+        var c = connector.getState().textareaClass;
+        if(!$(cmTextArea.getWrapperElement()).find("pre").hasClass(c)) {
+          $(cmTextArea.getWrapperElement()).find("pre").addClass(c);
+        }
+      } 
+      
+      
       // copy all error messages
       errorList = [];
       for(var i=0; i < connector.getState().errors.length; i++)

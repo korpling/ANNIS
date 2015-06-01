@@ -37,6 +37,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState
   public String inputPrompt = "";
   public final List<AqlParseError> errors = new ArrayList<>();
   public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
+  public String textareaClass;
   
   /**
    * An explictly {@link Serializable} {@link Comparator} for strings.

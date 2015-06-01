@@ -103,10 +103,12 @@ public class QueryPanel extends GridLayout implements
     if(ui.getInstanceFont() == null)
     {
       txtQuery.addStyleName("default-query-font");
+      txtQuery.setTextareaStyle("default-query-font");
     }
     else
     {
       txtQuery.addStyleName(Helper.CORPUS_FONT_FORCE);
+      txtQuery.setTextareaStyle(Helper.CORPUS_FONT_FORCE);
     }
     
     txtQuery.addStyleName("keyboardInput");

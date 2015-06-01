@@ -76,6 +76,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     
     AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty("", String.class));
   }
+  
 
   @Override
   public void setPropertyDataSource(Property newDataSource)
@@ -250,6 +251,14 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     addListener(FieldEvents.TextChangeListener.EVENT_ID,
       FieldEvents.TextChangeEvent.class,
       listener, FieldEvents.TextChangeListener.EVENT_METHOD);
+  }
+  
+  public String getTextareaStyle() {
+    return getState().textareaClass == null ? "" : getState().textareaClass;
+  }
+  
+  public void setTextareaStyle(String style) {
+    getState().textareaClass = "".equals(style) ? null : style;
   }
 
   @Override
