@@ -186,7 +186,7 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
   public String orderByClause(QueryData queryData, List<QueryNode> alternative,
     String indent)
   {
-    OrderType order = OrderType.normal;
+    OrderType order = OrderType.ascending;
     
     List<LimitOffsetQueryData> ext = queryData.getExtensions(
       LimitOffsetQueryData.class);
@@ -203,11 +203,11 @@ public class SolutionSqlGenerator extends AbstractUnionSqlGenerator
     else
     {
       String appendix = "";
-      if(order == OrderType.inverted)
+      if(order == OrderType.descending)
       {
         appendix = " DESC";
       }
-      else if(order == OrderType.normal)
+      else if(order == OrderType.ascending)
       {
         appendix = " ASC";
       }

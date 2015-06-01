@@ -33,7 +33,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
   
   private int offset;
   private int limit;
-  private OrderType order = OrderType.normal;
+  private OrderType order = OrderType.ascending;
 
   public PagedResultQuery()
   {

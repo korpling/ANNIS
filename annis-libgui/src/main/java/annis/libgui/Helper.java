@@ -331,7 +331,7 @@ public class Helper
     int start, int limit)
   {
     return citationFragment(aql, corpora, contextLeft, contextRight,
-      segmentation, start, limit, OrderType.normal);
+      segmentation, start, limit, OrderType.ascending);
   }
 
   public static List<String> citationFragment(String aql,
@@ -358,7 +358,7 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
-      if(order != OrderType.normal)
+      if(order != OrderType.ascending)
       {
         result.add("o=" + order.toString());
       }
