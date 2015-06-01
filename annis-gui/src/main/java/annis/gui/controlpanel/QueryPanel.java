@@ -106,7 +106,7 @@ public class QueryPanel extends GridLayout implements
     }
     else
     {
-      txtQuery.addStyleName(Helper.CORPUS_FONT);
+      txtQuery.addStyleName(Helper.CORPUS_FONT_FORCE);
     }
     
     txtQuery.addStyleName("keyboardInput");
