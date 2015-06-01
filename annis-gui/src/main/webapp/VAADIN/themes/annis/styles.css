@@ -11828,6 +11828,14 @@ div.v-layout.v-horizontal.v-widget {
 	height: 42px;
 }
 
+.annis .v-tabsheet-tabs .v-tabsheet-tabitem-selected .v-caption {
+	cursor: default;
+}
+
+.annis .v-tabsheet-tabs .v-tabsheet-tabitem-selected .v-caption .v-icon, .annis .v-tabsheet-tabs .v-tabsheet-tabitem-selected .v-caption .v-captiontext {
+	color: #4C607F;
+}
+
 .annis .default-query-font {
 	font-family: monospace;
 }

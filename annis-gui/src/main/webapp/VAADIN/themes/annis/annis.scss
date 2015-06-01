@@ -275,6 +275,18 @@ $font-size: 10pt;
     height: $huge-menubar-height + 2px;
   }
   
+  .v-tabsheet-tabs {
+    .v-tabsheet-tabitem-selected {
+      .v-caption {
+        cursor: default;
+        .v-icon, .v-captiontext {
+          color: #4C607F;
+        }
+      }
+      
+    }
+  }
+  
   .default-query-font {
     font-family: monospace;
   }
