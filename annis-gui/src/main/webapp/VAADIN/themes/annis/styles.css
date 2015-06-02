@@ -1271,11 +1271,6 @@ div.v-layout.v-horizontal.v-widget {
 	text-align: center;
 }
 
-.v-app {
-	width: 100%;
-	height: 100%;
-}
-
 .annis.v-app, .annis.v-app-loading {
 	font: 400 13px/1.55 "Open Sans", sans-serif;
 	color: #344053;

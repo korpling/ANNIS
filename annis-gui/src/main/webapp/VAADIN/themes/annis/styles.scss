@@ -3,11 +3,6 @@
 @include v-font(ANNISFontIcon,
 '../../../../annis/fonts/annisicon');
 
-.v-app {
-  width: 100%;
-  height: 100%;
-}
-
 .annis {
   @include annis;
 }
