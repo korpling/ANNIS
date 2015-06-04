@@ -68,16 +68,17 @@ If no bugs are left to fix go to the next section.
 
 Finish phase {#dev-release-finish}
 -------------
-1. Tag the release and merge it into the `master` branch, publish the new `master` branch
-2. Deploy release to our Maven server
+1. Deploy release to the Sonatype Maven server
 \code{.sh}
-mvn deploy
+mvn deploy -P release
 \endcode
-3. Regenerate this documentation and copy it to the github page (via the gh-page repository)
+2. Examine the Staging repository on https://oss.sonatype.org and close it (thus triggering a deployment to maven central).
+3. Tag the release and merge it into the `master` branch, publish the new `master` branch
+4. Regenerate this documentation and copy it to the github page (via the gh-page repository)
 \code{.sh}
 cd doc/
 doxygen
 cd ..
 \endcode
-4. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](@ref dev-release-version-update)
+5. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](@ref dev-release-version-update)
 
