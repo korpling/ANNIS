@@ -38,7 +38,7 @@ Creating a changelog entry {#dev-release-changelog}
 3. execute this script
 5. add the output to the `CHANGELOG` file
 
-Release Cycle {#dev-release-cycle}
+Release Process {#dev-release-process}
 =============
 
 Initialization phase {#dev-release-init}
@@ -81,4 +81,4 @@ doxygen
 cd ..
 \endcode
 5. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](@ref dev-release-version-update)
-
+6. Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well.
