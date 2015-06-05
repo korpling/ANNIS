@@ -270,6 +270,9 @@ public class SingleResultPanel extends CssLayout implements
     Label leftCtxLabel = new Label("left context: ");
     Label rightCtxLabel = new Label("right context: ");
 
+    leftCtxLabel.setWidth("-1px");
+    rightCtxLabel.setWidth("-1px");
+    
     HorizontalLayout ctxLayout = new HorizontalLayout();
     ctxLayout.setSpacing(true);
     ctxLayout.addComponents(leftCtxLabel, lftCtxCombo, rightCtxLabel,
