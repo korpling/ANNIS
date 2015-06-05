@@ -126,7 +126,7 @@ public class QueryController implements Serializable
       {
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeTemplate(query))
+          queryParam("q", Helper.encodeJersey(query))
           .get(String.class);
 
         // wait for maximal one seconds
@@ -335,7 +335,7 @@ public class QueryController implements Serializable
 
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
-      queryParam("q", Helper.encodeTemplate(pagedQuery.getQuery()))
+      queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
       .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);

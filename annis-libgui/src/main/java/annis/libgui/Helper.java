@@ -104,9 +104,11 @@ public class Helper
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
   
-  private final static Escaper jerseyTemplateEscape = Escapers.builder()
+  private final static Escaper jerseyExtraEscape = Escapers.builder()
     .addEscape('{', "%7B")
-    .addEscape('}', "%7D").build();
+    .addEscape('}', "%7D")
+    .addEscape('%', "%25")
+    .build();
   
   /**
    * Creates an authentificiated REST client
@@ -828,13 +830,16 @@ public class Helper
   }
   
   /**
-   * This will percent encode Jersey template argument braces (enclosed in "{...}").
+   * This will percent encode Jersey template argument braces (enclosed in "{...}") and
+   * the percent character.
+   * Both would not be esccaped by jersey and/or would cause an error when
+   * this is not a valid template.
    * @param v
    * @return 
    */
-  public static String encodeTemplate(String v)
+  public static String encodeJersey(String v)
   {
-    String encoded = jerseyTemplateEscape.escape(v);
+    String encoded = jerseyExtraEscape.escape(v);
     return encoded;
   }
   /**

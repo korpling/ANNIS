@@ -74,7 +74,7 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
     try
     {
       annisResource = annisResource.path("query").path("search").
-        path("frequency").queryParam("q", Helper.encodeTemplate(query.getQuery())).
+        path("frequency").queryParam("q", Helper.encodeJersey(query.getQuery())).
         queryParam("corpora", StringUtils.join(query.getCorpora(), ",")).
         queryParam("fields", query.getFrequencyDefinition().toString());
       result = annisResource.get(FrequencyTable.class);

@@ -76,7 +76,7 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
     res = Helper.getAnnisAsyncWebResource();
     
     futureMatches = res.path("query").path("search").path("find")
-      .queryParam("q", Helper.encodeTemplate(query.getQuery()))
+      .queryParam("q", Helper.encodeJersey(query.getQuery()))
       .queryParam("offset", "" + query.getOffset())
       .queryParam("limit", "" + query.getLimit())
       .queryParam("corpora", StringUtils.join(query.getCorpora(), ","))

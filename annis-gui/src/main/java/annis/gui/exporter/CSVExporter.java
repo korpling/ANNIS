@@ -49,7 +49,7 @@ public class CSVExporter implements Exporter, Serializable
       WebResource res = annisResource.path("search").path("matrix")
         .queryParam("csv", "true")
         .queryParam("corpora", StringUtils.join(corpora, ","))
-        .queryParam("q", Helper.encodeTemplate(queryAnnisQL));
+        .queryParam("q", Helper.encodeJersey(queryAnnisQL));
       
       
       if(argsAsString.startsWith("metakeys="))

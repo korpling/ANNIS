@@ -163,7 +163,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     {
       AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
       Future<List<QueryNode>> future = annisResource.path("query").path("parse/nodes").
-        queryParam("q", Helper.encodeTemplate(query))
+        queryParam("q", Helper.encodeJersey(query))
         .get(new GenericType<List<QueryNode>>(){});
 
       // wait for maximal one seconds

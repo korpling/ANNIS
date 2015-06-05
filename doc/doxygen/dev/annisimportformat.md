@@ -12,10 +12,11 @@ The ANNIS import format is inspired by the Salt meta-data model an ANNIS uses Sa
 * document names must be unique per top-level corpus
 * a ANNIS corpus contains only one top-level corpus
 * there are no meta-data for nodes
-* string identifiers such as annotation or layer names have a limited number of allowed characters and must match the regular expression
+* string identifiers such as annotation or layer names have a limited number of allowed characters and should match the regular expression
   \verbatim
 [a-zA-Z_][a-zA-Z0-9_-]*
   \endverbatim
+  in order to be searchable with AQL
 
 File format
 ============
