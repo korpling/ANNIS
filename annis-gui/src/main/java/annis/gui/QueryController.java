@@ -389,6 +389,19 @@ public class QueryController implements Serializable
     {
       freqFuture.cancel(true);
     }
+    
+    if ("".equals(state.getAql().getValue()))
+    {
+      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
+    }
+    else if (state.getSelectedCorpora().getValue().isEmpty())
+    {
+      Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
+    }
 
     BeanContainer<Integer, UserGeneratedFrequencyEntry> container
       = state.getFrequencyTableDefinition();

@@ -364,9 +364,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        btShowQuery.setVisible(false);
-        queryLayout.setVisible(true);
-        resultPanel.setVisible(false);
+        showQueryDefinitionPanel();
       }
     });
     btShowQuery.setVisible(false);
@@ -454,6 +452,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     setExpandRatio(resultPanel, 1.0f);
 
     queryLayout.setVisible(false);
+  }
+  
+  public void showQueryDefinitionPanel()
+  {
+    btShowFrequencies.setEnabled(true);
+    pbQuery.setVisible(false);
+    btShowQuery.setVisible(false);
+    queryLayout.setVisible(true);
+    resultPanel.setVisible(false);
   }
   
   private List<QueryNode> parseQuery(String query)
