@@ -1,3 +1,41 @@
+Version 3.3.0
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.0+is%3Aclosed
+
+
+[Bugs]
+ #412 Umlaut at beginning or end of annotation name doesn't trigger a parser error
+ #411 Whole UI is scrolled when using "page down"
+ #407 Corpus information hangs, then 504 error
+ #404 HTML visualization config parser error
+ #397 Exception when "{" is part of the query
+ #396 Matrix export slow when multiple corpora selected
+ #395 Embedded font not working in query history
+ #394 Frequencies fails on disjoint AQL
+ #391 Export of metadata fails in CSV and Weka exporters
+ #389 Login window contains ANNIS main interface
+
+[Enhancements]
+ #410 Selected tab in main view should not look like a link
+ #408 Moved help messages of exporters into the exporter classes themselves.
+ #398 Added systemd unit file for ANNIS service.
+ #392 Can't set numbers=false and metakeys simultaneously in Grid exporter
+ #385 Syntax highlighting in AQL text editor
+ #378 search for document name
+ #376 Export corpora from database to SaltXML
+ #319 support relANNIS 3.3 format
+ #285 Refactor the current query settings logic
+ #282 Frequency analysis on metadata
+ #268 Limit and random result subsets
+ #78 Farben und Rauten harmonisieren
+
+[Other]
+ #409 Corrected reference to old pcc2 query in German. 
+ #388 Embedding visualizations in external web pages - issue#226(1b)
+
+
 Version 3.2.3
 =============
 
