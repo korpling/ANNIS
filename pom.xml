@@ -24,7 +24,9 @@
   <url>http://annis-tools.org/</url>
 
   <scm>
+    <connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
+    <url>https://github.com/korpling/ANNIS</url>
   </scm>
 
   <organization>
