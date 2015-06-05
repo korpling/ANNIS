@@ -338,9 +338,12 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     File builtin = new File(baseDir, "WEB-INF/lib/annis-visualizers-" 
       + VersionInfo.getReleaseName() + ".jar");
-    pluginManager.addPluginsFrom(builtin.toURI());
-    log.info("added plugins from {}", builtin.getPath());
-    
+    if(builtin.canRead()) { 
+      pluginManager.addPluginsFrom(builtin.toURI());
+      log.info("added built-in plugins from  {}", builtin.getPath());
+    } else {
+      log.warn("could not find built-in plugin file {}", builtin.getPath());
+    }
     File basicPlugins = new File(baseDir, "WEB-INF/plugins");
     if (basicPlugins.isDirectory())
     {
