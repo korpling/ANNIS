@@ -210,7 +210,7 @@ public class QueryServiceImpl implements QueryService
     @QueryParam("corpora") String rawCorpusNames,
     @DefaultValue("0") @QueryParam("offset") String offsetRaw,
     @DefaultValue("-1") @QueryParam("limit") String limitRaw,
-    @DefaultValue("normal") @QueryParam("order") String orderRaw) throws IOException
+    @DefaultValue("ascending") @QueryParam("order") String orderRaw) throws IOException
   {
     requiredParameter(query, "q", "AnnisQL query");
     requiredParameter(rawCorpusNames, "corpora",
@@ -237,7 +237,7 @@ public class QueryServiceImpl implements QueryService
         Response.status(Response.Status.BAD_REQUEST).type(
         MediaType.TEXT_PLAIN).entity(
         "parameter 'order' has the invalid value '" + orderRaw + "'. It should be one of"
-          + " 'normal', 'random' or 'inverted").
+          + " 'ascending', 'random' or 'descending").
         build());
     }
     
