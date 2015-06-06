@@ -31,6 +31,7 @@ import org.apache.shiro.crypto.hash.format.Shiro1CryptFormat;
 import org.apache.shiro.realm.AuthorizingRealm;
 import org.apache.shiro.subject.PrincipalCollection;
 import org.apache.shiro.subject.SimplePrincipalCollection;
+import org.apache.shiro.util.SimpleByteSource;
 import org.joda.time.DateTime;
 import org.slf4j.LoggerFactory;
 
@@ -129,7 +130,7 @@ public class ANNISUserRealm extends AuthorizingRealm implements
             SimpleAuthenticationInfo info = new SimpleAuthenticationInfo(
               userName,
               simpleHash.getBytes(), ANNISUserRealm.class.getName());
-            info.setCredentialsSalt(simpleHash.getSalt());
+            info.setCredentialsSalt(new SerializableByteSource(simpleHash.getSalt()));
             return info;
           }
         }
