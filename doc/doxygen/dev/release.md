@@ -68,11 +68,10 @@ If no bugs are left to fix go to the next section.
 
 Finish phase {#dev-release-finish}
 -------------
-1. Deploy release to the Sonatype Maven server
+1. Deploy release to Maven Central
 \code{.sh}
 mvn deploy -P release
 \endcode
-2. Examine the Staging repository on https://oss.sonatype.org and close it (thus triggering a deployment to maven central).
 3. Tag the release and merge it into the `master` branch, publish the new `master` branch
 4. Regenerate this documentation and copy it to the github page (via the gh-page repository)
 \code{.sh}
