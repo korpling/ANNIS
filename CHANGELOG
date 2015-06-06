@@ -1,3 +1,15 @@
+Version 3.3.1
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.1+is%3Aclosed
+
+[Bugs]
+ #415 Adding groups after creating a new user will invalidate password (admin UI)
+ #414 NotSerializableException in authorization cache
+ #413 Text export not working in ANNIS 3.3.0
+
+
 Version 3.3.0
 =============
 
