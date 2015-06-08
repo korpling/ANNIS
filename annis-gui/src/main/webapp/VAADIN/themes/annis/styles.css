@@ -664,7 +664,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.4.5";
+	content: "7.4.7";
 }
 
 .v-widget {
@@ -8040,10 +8040,16 @@ div.v-layout.v-horizontal.v-widget {
 
 .annis .v-table-row {
 	background-color: white;
+	cursor: pointer;
 }
 
 .annis .v-table-row-odd {
 	background-color: #f5f5f5;
+	cursor: pointer;
+}
+
+.annis .v-table-body-noselection .v-table-row, .annis .v-table-body-noselection .v-table-row-odd {
+	cursor: default;
 }
 
 .annis .v-table [class*="-row"].v-selected {
