@@ -25,6 +25,10 @@ import org.apache.shiro.util.SimpleByteSource;
  */
 public class SerializableByteSource extends SimpleByteSource implements Serializable
 {
+  public SerializableByteSource()
+  {
+    super(new byte[0]);
+  }
 
   public SerializableByteSource(ByteSource source)
   {
