@@ -45,10 +45,10 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
+import elemental.json.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
 import javax.servlet.http.Cookie;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 
@@ -558,7 +558,7 @@ public class MainToolbar extends HorizontalLayout
   {
 
     @Override
-    public void call(JSONArray arguments) throws JSONException
+    public void call(JsonArray arguments) throws JSONException
     {
       if (isLoggedIn())
       {
