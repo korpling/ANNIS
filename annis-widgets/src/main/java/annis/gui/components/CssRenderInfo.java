@@ -16,11 +16,12 @@
 package annis.gui.components;
 
 import com.vaadin.annotations.JavaScript;
+import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.JavaScriptFunction;
-import elemental.json.JsonArray;
+import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -35,11 +36,12 @@ public class CssRenderInfo extends AbstractJavaScriptExtension
     addFunction("publishResults", new JavaScriptFunction()
     {
       @Override
-      public void call(JsonArray arguments) throws JSONException
+      public void call(JSONArray arguments) throws JSONException
       {
         if (callback != null)
         {
-          callback.renderInfoReceived((int) arguments.getNumber(0), (int) arguments.getNumber(1));
+          callback.renderInfoReceived(arguments.getInt(0), arguments.getInt(
+            1));
         }
       }
     });

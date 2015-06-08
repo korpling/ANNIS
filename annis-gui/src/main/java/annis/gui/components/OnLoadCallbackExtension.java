@@ -20,7 +20,6 @@ import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.UI;
-import elemental.json.JsonArray;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
@@ -50,7 +49,7 @@ public class OnLoadCallbackExtension extends AbstractJavaScriptExtension
     addFunction("loaded", new JavaScriptFunction()
     {
       @Override
-      public void call(JsonArray arguments) throws JSONException
+      public void call(JSONArray arguments) throws JSONException
       {
         if (c != null)
         {

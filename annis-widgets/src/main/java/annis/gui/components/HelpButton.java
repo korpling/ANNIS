@@ -37,7 +37,7 @@ import org.apache.commons.lang3.Validate;
 public class HelpButton<T> extends CustomComponent implements Field<T>,
   Button.ClickListener
 {
-  private final Field<T> field;
+  private Field<T> field;
   public HelpButton(Field<T> field)
   {
     Validate.notNull(field);
@@ -60,7 +60,6 @@ public class HelpButton<T> extends CustomComponent implements Field<T>,
     
   }
 
-
   @Override
   public void buttonClick(ClickEvent event)
   {
@@ -77,20 +76,6 @@ public class HelpButton<T> extends CustomComponent implements Field<T>,
     notify.setDelayMsec(-1);
     notify.show(UI.getCurrent().getPage());
   }
-  
-  @Override
-  public void clear()
-  {
-    field.clear();
-  }
-
-  @Override
-  public boolean isEmpty()
-  {
-    return field.isEmpty();
-  }
-  
-  
   
   @Override
   public boolean isRequired()
