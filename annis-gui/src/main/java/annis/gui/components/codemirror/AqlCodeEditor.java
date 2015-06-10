@@ -127,7 +127,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     {
       getState().text = args.getString(0);
       getPropertyDataSource().setValue(args.getString(0));
-      getState().clientText = getState().text;
       
       validate(dataSource.getValue());
       final String textCopy = dataSource.getValue();

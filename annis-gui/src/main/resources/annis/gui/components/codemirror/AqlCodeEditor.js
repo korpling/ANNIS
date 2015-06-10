@@ -52,7 +52,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         window.clearTimeout(changeDelayTimerID);
       }
       
-      if(connector.getState().clientText !== current)
+      if(connector.getState().text !== current)
       {
         var cursor = cmTextArea.getCursor();
         // calculate the absolute cursor position
