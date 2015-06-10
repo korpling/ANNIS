@@ -19,7 +19,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     var rootDiv = this.getElement(this.getConnectorId());
     
     var changeDelayTimerID = null;
-    var lastSentText = "";
     
     var changeDelayTime = 500;
     
@@ -53,7 +52,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         window.clearTimeout(changeDelayTimerID);
       }
       
-      if(lastSentText !== current)
+      if(connector.getState().clientText !== current)
       {
         var cursor = cmTextArea.getCursor();
         // calculate the absolute cursor position
@@ -66,7 +65,6 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
         absPos += cursor.ch;
         
         connector.textChanged(current, absPos);
-        lastSentText = current;
       }
     };
     
@@ -82,7 +80,7 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       cmTextArea.setOption('mode', newMode);
       cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
       
-      if(connector.getState().clientText !== connector.getState().text)
+      if(cmTextArea.getValue() !== connector.getState().text)
       {
         cmTextArea.setValue(connector.getState().text);
 
