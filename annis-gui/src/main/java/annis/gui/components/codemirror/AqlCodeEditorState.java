@@ -32,8 +32,6 @@ public class AqlCodeEditorState extends JavaScriptComponentState
 {
   /** The current text of the editor **/
   public String text = "";
-  /** The last string as sent by the client **/
-  public String clientText = "";
   public String inputPrompt = "";
   public final List<AqlParseError> errors = new ArrayList<>();
   public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
