@@ -257,8 +257,12 @@ public class QueryController implements Serializable
       .build();
   }
 
-  public void executeSearch(boolean replaceOldTab)
+  public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
   {
+    if(startFromFirstPage)
+    {
+      getState().getOffset().setValue(0);
+    }
     // construct a query from the current properties
     PagedResultQuery pagedQuery = getSearchQuery();
 

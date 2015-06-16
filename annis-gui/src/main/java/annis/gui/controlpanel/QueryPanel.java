@@ -370,7 +370,7 @@ public class QueryPanel extends GridLayout implements
     {
       if(controller != null)
       {
-        controller.executeSearch(true);
+        controller.executeSearch(true, true);
       }
     }
   }
