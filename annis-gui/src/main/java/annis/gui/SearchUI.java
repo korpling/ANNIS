@@ -901,7 +901,7 @@ public class SearchUI extends CommonUI
       
       // full query with given context
       queryController.setQuery(query);
-      queryController.executeSearch(true);
+      queryController.executeSearch(true, false);
     }
     else if (args.get("q") != null)
     {
@@ -910,7 +910,7 @@ public class SearchUI extends CommonUI
 
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeSearch(true);
+      queryController.executeSearch(true, true);
     }
   }
 
