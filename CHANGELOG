@@ -1,3 +1,15 @@
+Version 3.3.2
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.2+is%3Aclosed
+
+[Bugs]
+ #419 server install documentation says ANNIS requires JDK 7 only, but later versions should work as well
+ #418 Page offset is not reset when executing a new query
+ #417 AQL lost when query panel hidden.
+ #416 Don't replace count result output with validation message
+
 Version 3.3.1
 =============
 
