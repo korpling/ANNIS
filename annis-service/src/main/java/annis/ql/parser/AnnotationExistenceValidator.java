@@ -124,7 +124,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer {
 
   private CorpusConfig defaultCorpusConfig;
   
-  private Set<String> result = new TreeSet<>();
+  //private Set<String> result = new TreeSet<>();
   private String name;
   @Context
   private UriInfo uriInfo;
@@ -146,9 +146,9 @@ public class AnnotationExistenceValidator implements QueryDataTransformer {
       
     if ((corpusList != null) && !corpusList.isEmpty()){
         // get first corpus name
-        List<AnnisCorpus> mycorpora = annisDao.listCorpora();
-        String firstcorpusname =  mycorpora.get(0).getName();
-
+        //List<AnnisCorpus> mycorpora = annisDao.listCorpora();
+        //String firstcorpusname =  mycorpora.get(0).getName();
+        Set<String> result = new TreeSet<>();
 
         /*get a list of all annotations in a similar way that TigerQueryBuilder gets it through 
         QueryServiceImpl in annisDao.listAnnotations()*/
@@ -159,14 +159,11 @@ public class AnnotationExistenceValidator implements QueryDataTransformer {
             {
               if (a.getType() == AnnisAttribute.Type.node)
               {
-
-
                 result.add(a.getName().split(":")[1]);
                 //result is a set of strings of available annotations
               }
             }
-        //result.add("tok");
-        //result.add("node");
+
         for (List<QueryNode> alternative : data.getAlternatives())
         {
           QueryNode n = alternative.get(0);
@@ -182,7 +179,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer {
               Boolean vflag = result.contains(name);
               if (!vflag){
                  throw new AnnisQLSemanticsException(
-                      "Node name " + name + " is not a valid annotation name in corpus " + firstcorpusname);
+                      "Node name " + name + " is not a valid annotation name in selected corpora ");
               }
           }
 
