@@ -1,3 +1,13 @@
+Version 3.3.3
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.3+is%3Aclosed
+
+[Bugs]
+ #421 AQL errors not cleared when new query is set from server side
+ #420 Text in AQL editor might get replaced with an older version
+
 Version 3.3.2
 =============
 
