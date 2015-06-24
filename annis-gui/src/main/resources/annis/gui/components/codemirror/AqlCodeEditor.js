@@ -22,6 +22,8 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
     
     var changeDelayTime = 500;
     
+    var lastServerRequestCounter = 0;
+    
     var errorList = [];
 
     CodeMirror.registerHelper("lint", "aql", function(text) {
@@ -80,8 +82,10 @@ window.annis_gui_components_codemirror_AqlCodeEditor = function() {
       cmTextArea.setOption('mode', newMode);
       cmTextArea.setOption("placeholder", connector.getState().inputPrompt);
       
-      if(cmTextArea.getValue() !== connector.getState().text)
+      // set the text from the server defined state if a new request was made
+      if(lastServerRequestCounter < connector.getState().serverRequestCounter)
       {
+        lastServerRequestCounter = connector.getState().serverRequestCounter;
         cmTextArea.setValue(connector.getState().text);
 
         // restore the cursor position
