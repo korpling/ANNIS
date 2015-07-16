@@ -15,43 +15,21 @@
  */
 package annis.gui.controller;
 
-import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
-import annis.gui.LoginListener;
-import annis.gui.MainToolbar;
 import annis.gui.SearchUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.AnnisBaseUI;
-import annis.libgui.AnnisUser;
-import annis.libgui.Helper;
 import annis.model.AqlParseError;
 import annis.service.objects.MatchAndDocumentCount;
-
 import com.google.common.base.Joiner;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.server.ExternalResource;
-import com.vaadin.server.Resource;
-import com.vaadin.server.VaadinSession;
-import com.vaadin.shared.ui.window.WindowMode;
-import com.vaadin.ui.Alignment;
-import com.vaadin.ui.BrowserFrame;
-import com.vaadin.ui.Button;
 import com.vaadin.ui.Notification;
-import com.vaadin.ui.UI;
-import com.vaadin.ui.Window;
-import com.vaadin.server.AbstractClientConnector;
-
-import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 
 /**
  *
@@ -67,10 +45,6 @@ public class CountCallback implements Runnable
   private final int pageSize;
 
   private final SearchUI ui;
-  
-  private MainToolbar toolbar;
-
-  
 
   public CountCallback(ResultViewPanel panel, int pageSize, SearchUI ui)
   {
@@ -161,11 +135,6 @@ public class CountCallback implements Runnable
               Notification.show(errMsg,
                 Notification.Type.WARNING_MESSAGE);
               ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-           
-              
-              toolbar = ui.getMainToolbar();
-              toolbar.addLoginWindow();
-  
             }
             else
             {
@@ -181,6 +150,5 @@ public class CountCallback implements Runnable
       });
     }
   }
- 
   
 }

@@ -24,7 +24,6 @@ import annis.libgui.AnnisBaseUI;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
-
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
@@ -46,12 +45,9 @@ import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
-
 import java.util.LinkedList;
 import java.util.List;
-
 import javax.servlet.http.Cookie;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
@@ -583,38 +579,5 @@ public class MainToolbar extends HorizontalLayout
 
     }
   }
-  
-  
-  public void addLoginWindow()
-  {
-      Resource loginRes;
-      if(loginURL == null || loginURL.isEmpty())
-      {
-        loginRes = new ExternalResource(
-        Helper.getContext() + "/login");
-      }
-      else
-      {
-        loginRes = new ExternalResource(loginURL);
-      }
-      
-      BrowserFrame frame = new BrowserFrame("login", loginRes);
-      frame.setWidth("100%");
-      frame.setHeight("100%");
-
-      windowLogin = new Window("ANNIS Login", frame);
-      windowLogin.setModal(true);
-      
-      windowLogin.setWidth("400px");
-      windowLogin.setHeight("250px");
-      String loginMaximizedRaw = (String)getSession().getAttribute(LOGIN_MAXIMIZED_KEY);
-      if(Boolean.parseBoolean(loginMaximizedRaw))
-      {
-        windowLogin.setWindowMode(WindowMode.MAXIMIZED);
-      }
-      UI.getCurrent().addWindow(windowLogin);
-      windowLogin.center();
-  }
- 
 
 }
