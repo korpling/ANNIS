@@ -126,7 +126,7 @@ public class QueryController implements Serializable
       {
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeTemplate(query))
+          queryParam("q", Helper.encodeJersey(query))
           .get(String.class);
 
         // wait for maximal one seconds
@@ -257,8 +257,12 @@ public class QueryController implements Serializable
       .build();
   }
 
-  public void executeSearch(boolean replaceOldTab)
+  public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
   {
+    if(startFromFirstPage)
+    {
+      getState().getOffset().setValue(0);
+    }
     // construct a query from the current properties
     PagedResultQuery pagedQuery = getSearchQuery();
 
@@ -335,7 +339,7 @@ public class QueryController implements Serializable
 
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
-      queryParam("q", Helper.encodeTemplate(pagedQuery.getQuery()))
+      queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
       .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
@@ -388,6 +392,19 @@ public class QueryController implements Serializable
     if (freqFuture != null && !freqFuture.isDone())
     {
       freqFuture.cancel(true);
+    }
+    
+    if ("".equals(state.getAql().getValue()))
+    {
+      Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
+    }
+    else if (state.getSelectedCorpora().getValue().isEmpty())
+    {
+      Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+      panel.showQueryDefinitionPanel();
+      return;
     }
 
     BeanContainer<Integer, UserGeneratedFrequencyEntry> container

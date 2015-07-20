@@ -79,6 +79,7 @@ public class UserController
   public void passwordChanged(String userName, String newPassword)
   {
     model.setPassword(userName, newPassword);
+    view.setUserList(model.getUsers());
   }
 
   @Override

@@ -52,7 +52,7 @@ public class QueryUIState implements Serializable
   private final ObjectProperty<Integer> offset = new ObjectProperty<>(0);
   private final ObjectProperty<String> baseText = new ObjectProperty<>(null, String.class);
   
-  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.normal);
+  private final ObjectProperty<OrderType> order = new ObjectProperty<>(OrderType.ascending);
   
   private final ObjectProperty<String> exporterName = new ObjectProperty<>("");
   private final ObjectProperty<List<String>> exportAnnotationKeys 

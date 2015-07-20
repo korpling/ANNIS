@@ -72,7 +72,7 @@ REF
 	:	'#' [0-9a-zA-Z]+
 	;
 
-ID  :	[a-zA-Z_] [a-zA-Z0-9_-]*
+ID  :	[a-zA-Z_\%] [a-zA-Z0-9_\-\%]*
     ;
 
 DIGITS : [0-9]+;

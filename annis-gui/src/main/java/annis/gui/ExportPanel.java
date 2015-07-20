@@ -67,6 +67,7 @@ public class ExportPanel extends FormLayout
   private final Button btCancel;
 
   private final CorpusListPanel corpusListPanel;
+  private final QueryPanel queryPanel;
 
   private File tmpOutputFile;
 
@@ -87,6 +88,7 @@ public class ExportPanel extends FormLayout
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
     QueryController controller, QueryUIState state)
   {
+    this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
     this.controller = controller;
 
@@ -386,7 +388,14 @@ public class ExportPanel extends FormLayout
       final Exporter exporter = controller.getExporterByName(exporterName);
       if (exporter != null)
       {
-        if (corpusListPanel.getSelectedCorpora().isEmpty())
+        if("".equals(queryPanel.getQuery()))
+        {
+          Notification.show("Empty query",
+            Notification.Type.WARNING_MESSAGE);
+          btExport.setEnabled(true);
+          return;
+        }
+        else if (corpusListPanel.getSelectedCorpora().isEmpty())
         {
           Notification.show("Please select a corpus",
             Notification.Type.WARNING_MESSAGE);

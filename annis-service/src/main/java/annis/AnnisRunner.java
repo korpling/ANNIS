@@ -113,7 +113,7 @@ public class AnnisRunner extends AnnisBaseRunner
 
   private int right = 5;
   
-  private OrderType order = OrderType.normal;
+  private OrderType order = OrderType.ascending;
 
   private String segmentationLayer = null;
   

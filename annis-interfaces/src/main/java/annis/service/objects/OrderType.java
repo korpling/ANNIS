@@ -21,6 +21,6 @@ package annis.service.objects;
  */
 public enum OrderType
 {
-  normal, random, inverted
+  ascending, random, descending
   
 }

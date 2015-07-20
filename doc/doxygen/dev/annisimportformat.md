@@ -1,36 +1,39 @@
-RelANNIS import format version 4.0 {#dev-relannis4}
+ANNIS import format version 3.3 {#dev-annisimportformat}
 ===================================
 
 [TOC]
 
-\warning This is work in process and will be updated frequently.
-
 Remarkable differences to Salt
 ==============================
 
-The relANNIS import format is inspired by the Salt meta-data model an ANNIS uses Salt internally to represent a matched graph from the database. However there are some restrictions which relANNIS has but Salt doesn't.
+The ANNIS import format is inspired by the Salt meta-data model an ANNIS uses Salt internally to represent a matched graph from the database. However there are some restrictions which ANNIS has but Salt doesn't.
 
 * node names must be unique per document
 * document names must be unique per top-level corpus
-* a relANNIS corpus contains only one top-level corpus
+* a ANNIS corpus contains only one top-level corpus
 * there are no meta-data for nodes
+* string identifiers such as annotation or layer names have a limited number of allowed characters and should match the regular expression
+  \verbatim
+[a-zA-Z_][a-zA-Z0-9_-]*
+  \endverbatim
+  in order to be searchable with AQL
 
 File format
 ============
 
-A relANNIS corpus can be either a zip file or a directory.
+A ANNIS corpus can be either a zip file or a directory.
 
 Files inside zip file/directory
 ===============================
 
-relannis.version
+annis.version
 ----------------
 
-First line is exactly "4.0", the next lines can contain human readable text.
+First line is exactly "3.3", the next lines can contain human readable text.
 
 _Pure UTF-8 encoded text file_
 
-corpus.relannis
+corpus.annis
 -------------------
 
 Contains structural information about the corpus and its documents.
@@ -46,7 +49,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |post|integer||X|post order of the corpus tree|
 |top_level|boolean||X|true for the toplevel corpus|
 
-corpus_annotation.relannis
+corpus_annotation.annis
 --------------------------
 
 Contains meta-data on the corpus and the documents.
@@ -59,7 +62,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |name|text| | | |
 |value|text| | | |
 
-text.relannis
+text.annis
 -----------------
 
 Describes all texts that are included in the corpus.
@@ -74,7 +77,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 
 primary key: corpus_ref, id
 
-node.relannis
+node.annis
 -------------
 
 Every node in the corpus will have exactly one entry in this table.
@@ -97,7 +100,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |span|text|||for tokens or node with a segmentation index: substring of the covered original text|
 |root|boolean||X|True if this node has no parents in *all* components|
 
-component.relannis
+component.annis
 ------------------
 
 Lists the components (connected sub-graphs) of the graph.
@@ -110,7 +113,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |layer|text||X| Could be set to e.g. "default_layer" if not in any Salt layer|
 |name|text|||The sType of the component, e.g anaphoric for a some kind of pointing relation component|
 
-rank.relannis
+rank.annis
 -------------
 
 A rank entry describes one of the positions of a node in a component tree. There is one rank entry for each edge. Furthermore,
@@ -127,9 +130,9 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |parent|bigint|||*id* of the parent rank entry|
 |level|integer||| level of this rank entry (not node!) in the component tree | 
 
-Rank entries with the type 'c' (coverage spans) *must* be ommitted, if the referenced node is a token and if the parent coverage span is continuous. Continuous means the range of covered token has no gaps, thus it includes all token between the first and the last covered token. The idea behind this is, that you can recover the needed information using the "left_token" and "right_token" from the span together with the "token_index" (all in the node.relannis table) if the span is continuous.
+Rank entries with the type 'c' (coverage spans) *must* be ommitted, if the referenced node is a token and if the parent coverage span is continuous. Continuous means the range of covered token has no gaps, thus it includes all token between the first and the last covered token. The idea behind this is, that you can recover the needed information using the "left_token" and "right_token" from the span together with the "token_index" (all in the node.annis table) if the span is continuous.
 
-node_annotation.relannis
+node_annotation.annis
 ------------------------
 
 Contains all annotations per node.
@@ -145,7 +148,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 
 unique(node_ref, namespace, name)
 
-edge_annotation.relannis
+edge_annotation.annis
 ------------------------
 
 Contains all annotations per edge (which is represented by a rank entry)
@@ -158,7 +161,7 @@ _TAB-separated file as described in http://www.postgresql.org/docs/9.1/static/sq
 |name|text||X| |
 |value|text| | | |
 
-resolver_vis_map.relannis
+resolver_vis_map.annis
 -------------------------
 
 Describes which visualizers to trigger depending of the namespace of a node or edge occuring in the search results.

@@ -346,7 +346,7 @@ public class SearchUI extends CommonUI
       {
         injectUniqueCSS(
           "@import url(" + cfg.getUrl() + ");\n"
-          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "' !imporant , monospace !important; }\n"
+          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
           + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
@@ -367,7 +367,7 @@ public class SearchUI extends CommonUI
           + "}\n"
           + "." + CORPUS_FONT + " .v-table-table {\n"
           + "    font-size: " + cfg.getSize() + ";\n"
-          + "}"
+          + "}\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
           + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
@@ -901,7 +901,7 @@ public class SearchUI extends CommonUI
       
       // full query with given context
       queryController.setQuery(query);
-      queryController.executeSearch(true);
+      queryController.executeSearch(true, false);
     }
     else if (args.get("q") != null)
     {
@@ -910,7 +910,7 @@ public class SearchUI extends CommonUI
 
       // use default context
       queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeSearch(true);
+      queryController.executeSearch(true, true);
     }
   }
 

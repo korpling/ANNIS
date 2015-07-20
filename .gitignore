@@ -11,3 +11,7 @@ target/
 /doc/html/
 /doc/latex/
 /annis-widgets/src/main/webapp/VAADIN/
+rebel.xml
+*.project
+*.classpath
+.settings/

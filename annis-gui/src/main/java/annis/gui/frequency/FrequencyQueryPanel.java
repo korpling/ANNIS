@@ -364,9 +364,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
       @Override
       public void buttonClick(ClickEvent event)
       {
-        btShowQuery.setVisible(false);
-        queryLayout.setVisible(true);
-        resultPanel.setVisible(false);
+        showQueryDefinitionPanel();
       }
     });
     btShowQuery.setVisible(false);
@@ -456,6 +454,15 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.setVisible(false);
   }
   
+  public void showQueryDefinitionPanel()
+  {
+    btShowFrequencies.setEnabled(true);
+    pbQuery.setVisible(false);
+    btShowQuery.setVisible(false);
+    queryLayout.setVisible(true);
+    resultPanel.setVisible(false);
+  }
+  
   private List<QueryNode> parseQuery(String query)
   {
     if(query == null || query.isEmpty())
@@ -464,7 +471,7 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     }
     // let the service parse the query
     WebResource res = Helper.getAnnisWebResource();
-    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeTemplate(query))
+    List<QueryNode> nodes = res.path("query/parse/nodes").queryParam("q", Helper.encodeJersey(query))
       .get(new GenericType<List<QueryNode>>() {});
     
     return nodes;

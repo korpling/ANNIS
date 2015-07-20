@@ -142,7 +142,7 @@ public class SpringAnnisDao extends SimpleJdbcDaoSupport implements AnnisDao,
 
   private FrequencySqlGenerator frequencySqlGenerator;
 
-  // reads the raw text entries of relannis format, originally placed in text.tab
+  // reads the raw text entries of ANNIS format, originally placed in text.tab
   private RawTextSqlHelper rawTextHelper;
 
   private String externalFilesPath;

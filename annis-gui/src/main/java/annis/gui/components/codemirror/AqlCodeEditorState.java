@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.TreeMap;
+import java.util.concurrent.atomic.AtomicLong;
 
 /**
  *
@@ -32,11 +33,15 @@ public class AqlCodeEditorState extends JavaScriptComponentState
 {
   /** The current text of the editor **/
   public String text = "";
-  /** The last string as sent by the client **/
-  public String clientText = "";
   public String inputPrompt = "";
   public final List<AqlParseError> errors = new ArrayList<>();
   public final TreeMap<String, Integer> nodeMappings = new TreeMap<>(new StringComparator());
+  public String textareaClass;
+  
+  /**
+   * Everytime the server wants to set the {@link #text} variable this counter needs to be increased.
+   */
+  public long serverRequestCounter = 0;
   
   /**
    * An explictly {@link Serializable} {@link Comparator} for strings.

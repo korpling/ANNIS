@@ -26,6 +26,8 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import org.eclipse.emf.common.util.EList;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Helper class for getting time annotations on {@link SSpan} from
@@ -34,6 +36,8 @@ import org.eclipse.emf.common.util.EList;
  */
 public class TimeHelper
 {
+  
+  private final static Logger log = LoggerFactory.getLogger(TimeHelper.class);
 
   /**
    * Get start and end time from the overlapped {@link SToken}. The minimum
@@ -75,18 +79,26 @@ public class TimeHelper
     {
 
       SAnnotation anno = tok.getSAnnotation("annis::time");
-      if (anno != null && !anno.getSValueSTEXT().matches(
-        "\\-[0-9]*(\\.[0-9]*)?"))
+      if (anno != null
+        && anno.getSValueSTEXT() != null
+        && !anno.getSValueSTEXT().isEmpty() 
+        && !anno.getSValueSTEXT().matches("\\-[0-9]*(\\.[0-9]*)?"))
       {
-        String[] split = anno.getSValueSTEXT().split("-");
-        if (split.length == 1)
+        try
         {
-          startTimes.add(Double.parseDouble(split[0]));
+          String[] split = anno.getSValueSTEXT().split("-");
+          if (split.length == 1)
+          {
+            startTimes.add(Double.parseDouble(split[0]));
+          }
+          if (split.length == 2)
+          {
+            startTimes.add(Double.parseDouble(split[0]));
+            endTimes.add(Double.parseDouble(split[1]));
+          }
         }
-        if (split.length == 2)
-        {
-          startTimes.add(Double.parseDouble(split[0]));
-          endTimes.add(Double.parseDouble(split[1]));
+        catch(NumberFormatException ex) {
+          log.debug("Invalid time annotation", ex);
         }
       }
 

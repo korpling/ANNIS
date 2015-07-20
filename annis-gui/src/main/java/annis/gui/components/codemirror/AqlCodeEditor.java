@@ -29,9 +29,7 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -42,6 +40,8 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A code editor component for the ANNIQ Query Language.
@@ -68,6 +68,8 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   implements FieldEvents.TextChangeNotifier, Property.Viewer, Property.ValueChangeListener
 {
 
+  private static final Logger log = LoggerFactory.getLogger(AqlCodeEditor.class);
+  
   private int timeout;
   private Property<String> dataSource;
 
@@ -78,6 +80,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     
     AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty("", String.class));
   }
+  
 
   @Override
   public void setPropertyDataSource(Property newDataSource)
@@ -111,11 +114,19 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   @Override
   public void valueChange(Property.ValueChangeEvent event)
   {
+    log.debug("valueChange \"{}\"/\"{}", event.getProperty().getValue(), this.dataSource.getValue());
     String oldText = getState().text;
-    getState().text = this.dataSource.getValue();
+    String newText = this.dataSource.getValue();
     
-    if(oldText == null || !oldText.equals(getState().text))
+    if(oldText == null || !oldText.equals(newText))
     {
+      getState().text = newText;
+      // this is a server side state change and we have to explicitly tell the client we want to change the text
+      getState().serverRequestCounter++;
+      
+      validate(newText);
+      
+      log.debug("invalidating \"{}\"/\"{}\"", oldText, getState().text);
       markAsDirty();
     }
   }
@@ -126,9 +137,9 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     @Override
     public void call(JSONArray args) throws JSONException
     {
+      log.debug("TextChangedFunction \"{}\"", args.getString(0));
       getState().text = args.getString(0);
       getPropertyDataSource().setValue(args.getString(0));
-      getState().clientText = getState().text;
       
       validate(dataSource.getValue());
       final String textCopy = dataSource.getValue();
@@ -164,7 +175,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     {
       AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
       Future<List<QueryNode>> future = annisResource.path("query").path("parse/nodes").
-        queryParam("q", Helper.encodeTemplate(query))
+        queryParam("q", Helper.encodeJersey(query))
         .get(new GenericType<List<QueryNode>>(){});
 
       // wait for maximal one seconds
@@ -252,6 +263,14 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     addListener(FieldEvents.TextChangeListener.EVENT_ID,
       FieldEvents.TextChangeEvent.class,
       listener, FieldEvents.TextChangeListener.EVENT_METHOD);
+  }
+  
+  public String getTextareaStyle() {
+    return getState().textareaClass == null ? "" : getState().textareaClass;
+  }
+  
+  public void setTextareaStyle(String style) {
+    getState().textareaClass = "".equals(style) ? null : style;
   }
 
   @Override

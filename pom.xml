@@ -6,7 +6,7 @@
   <artifactId>annis-all</artifactId>
   <packaging>pom</packaging>
   <name>ANNIS corpus search</name>
-  <version>3.3.0-SNAPSHOT</version>
+  <version>3.4.0-SNAPSHOT</version>
   <description>
     ANNIS is an open source, versatile web browser-based search and
     visualization architecture for complex multilevel linguistic corpora with
@@ -22,9 +22,20 @@
   </description>
 
   <url>http://annis-tools.org/</url>
+  
+   <developers>
+    <developer>
+      <name>Thomas Krause</name>
+      <email>krauseto@hu-berlin.de</email>
+      <organization>Humboldt-Universität zu Berlin</organization>
+      <organizationUrl>https://www.hu-berlin.de</organizationUrl>
+    </developer>
+  </developers>
 
   <scm>
+    <connection>scm:git:https://github.com/korpling/ANNIS.git</connection>
     <developerConnection>scm:git:ssh://git@github.com/korpling/ANNIS.git</developerConnection>
+    <url>https://github.com/korpling/ANNIS</url>
   </scm>
 
   <organization>
@@ -38,16 +49,14 @@
     </license>
   </licenses>
 
-  <distributionManagement>
-    <site>
-      <id>github</id>
-      <url>https://github.com/korpling/ANNIS</url>
-    </site>
-    
+  <distributionManagement>    
+    <snapshotRepository>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/content/repositories/snapshots</url>
+    </snapshotRepository>
     <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
+      <id>ossrh</id>
+      <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
     </repository>
   </distributionManagement>
 
@@ -60,6 +69,7 @@
   
   <properties>
     <servlet.version>2.5</servlet.version>
+    <vaadin.version>7.3.10</vaadin.version>
   </properties>
 
   <build>
@@ -151,7 +161,19 @@
           <doUpdate>false</doUpdate>
         </configuration>
       </plugin>
-      
+      <!--
+      <plugin>
+        <groupId>org.sonatype.plugins</groupId>
+        <artifactId>nexus-staging-maven-plugin</artifactId>
+        <version>1.6.5</version>
+        <extensions>true</extensions>
+        <configuration>
+          <serverId>ossrh</serverId>
+          <nexusUrl>https://oss.sonatype.org/</nexusUrl>
+          <autoReleaseAfterClose>true</autoReleaseAfterClose>
+        </configuration>
+      </plugin>
+      -->
     </plugins>
     <extensions>
       <extension>
@@ -161,6 +183,58 @@
       </extension>
     </extensions>
   </build>
+
+  <profiles>
+    <profile>
+      <id>release</id>
+      <build>
+        <plugins>
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-source-plugin</artifactId>
+            <version>2.4</version>
+            <executions>
+              <execution>
+                <id>attach-sources</id>
+                <goals>
+                  <goal>jar-no-fork</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+      
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-javadoc-plugin</artifactId>
+            <version>2.10.3</version>
+            <executions>
+              <execution>
+                <id>attach-javadocs</id>
+                <goals>
+                  <goal>jar</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+      
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-gpg-plugin</artifactId>
+            <version>1.5</version>
+            <executions>
+              <execution>
+                <id>sign-artifacts</id>
+                <phase>verify</phase>
+                <goals>
+                  <goal>sign</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+        </plugins>
+      </build>
+    </profile>
+  </profiles>
 
   <modules>
     <module>annis-interfaces</module>

@@ -35,7 +35,7 @@ Folder | Description
 ------ | -----------
 `<Installation>/WEB-INF/conf/` | Default configuration inside the deployed web application folder. Should not be changed.
 `$ANNIS_CFG` or `/etc/annis/` | The global configuration folder defined by the environment variable `ANNIS_CFG` or a default path if not set.
-`~/.annis/` | User specific configuration inside the `.annis` sub-folder inside the user's home folder
+`~/.annis/` | User specific configuration inside the `.annis` sub-folder inside the home folder of the user who is running the frontend.
 
 Configuration files can be either in the [Java Properties](http://en.wikipedia.org/w/index.php?title=.properties&oldid=521500688)
 or [JSON](http://www.json.org/) format. Configuration files from the user directory can

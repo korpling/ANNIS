@@ -71,6 +71,7 @@ public class EmbeddedVisUI extends CommonUI
     {
       displayGeneralHelp();
     }
+    addStyleName("loaded-embedded-vis");
   }
   
   private void displayGeneralHelp()

@@ -5,7 +5,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.3.0-SNAPSHOT</version>
+    <version>3.4.0-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -13,15 +13,6 @@
   <name>annis-kickstarter</name>
 
   <packaging>jar</packaging>
-
-  <distributionManagement>
-    <repository>
-      <id>korpling</id>
-      <name>korpling maven repo</name>
-      <url>scpexe://korpling.german.hu-berlin.de/srv/www/maven2/</url>
-    </repository>
-  </distributionManagement>
-
 
   <build>
     <plugins>
