@@ -35,7 +35,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
@@ -131,8 +130,9 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         {
           w.writeStartElement(NS, "graph");
           w.writeAttribute(NS, "edgedefault", "directed");
-          w.writeAttribute(NS, "id", corpusGraph.getSId());
-          writeCorpusStructure(w, corpusGraph, ids);
+          w.writeAttribute(NS, "id", ids.getID(corpusGraph));
+          writeLabels(w, corpusGraph.getLabels(), existingKeys);
+          writeCorpusStructure(w, corpusGraph, ids, existingKeys);
           w.writeEndElement();
         }
       }
@@ -147,7 +147,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   }
   
   private void writeCorpusStructure(XMLStreamWriter w, SCorpusGraph corpusGraph,
-    IDManager ids)
+    IDManager ids, Set<String> existingKeys)
     throws XMLStreamException
   {
     // output each corpus, sub-corpus and document as node
@@ -156,7 +156,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     {
       for (SNode c : corpora)
       {
-        writeNode(w, c, ids);
+        writeNode(w, c, ids, existingKeys);
       }
     }
 
@@ -188,12 +188,42 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
             String id = l.getQName();
             if (!existing.contains(id))
             {
-              w.writeStartElement(NS, "key");
-              w.writeAttribute(NS, "id", l.getQName());
-              w.writeAttribute(NS, "for", "all");
-              w.writeAttribute(NS, "attr.type", "string");
-              w.writeEndElement();
-              existing.add(id);
+              Object o = l.getValue();
+              String type = null;
+              if(o instanceof Boolean)
+              {
+                type = "boolean";
+              }
+              else if(o instanceof Integer)
+              {
+                type = "int";
+              }
+              else if(o instanceof Long)
+              {
+                type = "long";
+              }
+              else if(o instanceof Float)
+              {
+                type = "float";
+              }
+              else if(o instanceof Double)
+              {
+                type = "double";
+              }
+              else if(o instanceof String)
+              {
+                type = "string";
+              }
+              if(type != null)
+              {
+                w.writeStartElement(NS, "key");
+                w.writeAttribute(NS, "id", l.getQName());
+                w.writeAttribute(NS, "for", "all");
+                w.writeAttribute(NS, "attr.type", type);
+
+                w.writeEndElement();
+                existing.add(id);
+              }
             }
           }
         }
@@ -201,30 +231,36 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     }
   }
 
-  private void writeLabels(XMLStreamWriter w, List<Label> labels) 
+  private void writeLabels(XMLStreamWriter w, List<Label> labels,
+    Set<String> existingKeys) 
     throws XMLStreamException
   {
     if(labels != null && !labels.isEmpty())
     {
       for(Label l : labels)
       {
-        w.writeStartElement(NS, "data");
-        w.writeAttribute(NS, "key", l.getQName());
-        w.writeCharacters("" + l.getValue());
-        w.writeEndElement();
+        String key = l.getQName();
+        if(existingKeys.contains(key))
+        {
+          w.writeStartElement(NS, "data");
+          w.writeAttribute(NS, "key", key);
+          w.writeCharacters("" + l.getValue());
+          w.writeEndElement();
+        }
       }
     }
   }
 
   private void writeNode(XMLStreamWriter w, Node c, 
-    IDManager ids) throws XMLStreamException
+    IDManager ids,
+    Set<String> existingKeys) throws XMLStreamException
   {
     w.writeStartElement(NS, "node");
     w.writeAttribute(NS, "id", ids.getID(c));
-    writeLabels(w, c.getLabels());    
+    writeLabels(w, c.getLabels(), existingKeys);    
     if(c instanceof SDocument)
     {
-      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph(), ids);
+      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph(), ids, existingKeys);
     }
     
     w.writeEndElement();
@@ -243,7 +279,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   
   private void writeSDocumentGraph(XMLStreamWriter w, 
     SDocumentGraph g, 
-    IDManager ids) throws XMLStreamException
+    IDManager ids, Set<String> existingKeys) throws XMLStreamException
   {
     List<SNode> nodes = g.getSNodes();
     List<SRelation> relations = g.getSRelations();
@@ -256,7 +292,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       
       for(SNode n : nodes)
       {
-        writeNode(w, n, ids);
+        writeNode(w, n, ids, existingKeys);
       }
       
       if(relations != null)
