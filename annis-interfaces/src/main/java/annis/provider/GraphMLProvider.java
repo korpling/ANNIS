@@ -166,7 +166,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     {
       for(SRelation r : rels)
       {
-        writeEdge(w, r, ids);
+        writeEdge(w, r, ids, existingKeys);
       }
     }
     
@@ -257,6 +257,11 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   {
     w.writeStartElement(NS, "node");
     w.writeAttribute(NS, "id", ids.getID(c));
+    
+    w.writeStartElement(NS, "desc");
+    w.writeCharacters("node " + ids.getID(c));
+    w.writeEndElement();
+    
     writeLabels(w, c.getLabels(), existingKeys);    
     if(c instanceof SDocument)
     {
@@ -267,12 +272,15 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   }
   
   private void writeEdge(XMLStreamWriter w, Edge e, 
-    IDManager ids) throws XMLStreamException
+    IDManager ids, Set<String> existingKeys) throws XMLStreamException
   {
     w.writeStartElement(NS, "edge");
     w.writeAttribute(NS, "id", ids.getID(e));
     w.writeAttribute(NS, "source", ids.getID(e.getSource()));
     w.writeAttribute(NS, "target", ids.getID(e.getTarget()));
+    
+    writeLabels(w, e.getLabels(), existingKeys);
+    
     w.writeEndElement();
   }
   
@@ -299,7 +307,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       {
         for(SRelation e : relations)
         {
-          writeEdge(w, e, ids);
+          writeEdge(w, e, ids, existingKeys);
         }
       }
 
