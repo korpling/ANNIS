@@ -209,13 +209,19 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     }
   }
 
-  private void writeLabels(XMLStreamWriter w, List<Label> labels)
+  private void writeLabels(XMLStreamWriter w, List<Label> labels) 
+    throws XMLStreamException
   {
     if(labels != null && !labels.isEmpty())
     {
-      
+      for(Label l : labels)
+      {
+        w.writeStartElement(NS, "data");
+        w.writeAttribute(NS, "key", l.getQName());
+        w.writeCharacters("" + l.getValue());
+        w.writeEndElement();
+      }
     }
-    // TODO
   }
 
   private void writeNode(XMLStreamWriter w, Node c) throws XMLStreamException
