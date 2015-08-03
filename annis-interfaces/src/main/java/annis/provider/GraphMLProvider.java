@@ -30,9 +30,13 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicInteger;
+import java.util.concurrent.atomic.AtomicLong;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -101,6 +105,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         "schemaLocation", NS + " http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd");
       
       Set<String> existingKeys = new HashSet<>();
+      IDManager ids = new IDManager();
 
       EList<SCorpusGraph> corpusGraphs = t.getSCorpusGraphs();
       if (corpusGraphs != null)
@@ -127,7 +132,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
           w.writeStartElement(NS, "graph");
           w.writeAttribute(NS, "edgedefault", "directed");
           w.writeAttribute(NS, "id", corpusGraph.getSId());
-          writeCorpusStructure(w, corpusGraph);
+          writeCorpusStructure(w, corpusGraph, ids);
           w.writeEndElement();
         }
       }
@@ -141,7 +146,8 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     entityStream.flush();
   }
   
-  private void writeCorpusStructure(XMLStreamWriter w, SCorpusGraph corpusGraph)
+  private void writeCorpusStructure(XMLStreamWriter w, SCorpusGraph corpusGraph,
+    IDManager ids)
     throws XMLStreamException
   {
     // output each corpus, sub-corpus and document as node
@@ -150,7 +156,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     {
       for (SNode c : corpora)
       {
-        writeNode(w, c);
+        writeNode(w, c, ids);
       }
     }
 
@@ -160,26 +166,12 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     {
       for(SRelation r : rels)
       {
-        writeEdge(w, r);
+        writeEdge(w, r, ids);
       }
     }
     
   }
   
-  private String getID(IdentifiableElement e)
-  {
-    String id = e.getId();
-    // remove "salt:/" prefix
-    if(id.startsWith("salt:/"))
-    {
-      id = id.substring("salt:/".length());
-    }
-    // replace some regular used characters that are not valid XML ids
-    id = id.replaceAll("/", "::");
-    id = id.replaceAll("#", "");
-    
-    return id;
-  }
   
   private void writeKeys(XMLStreamWriter w, List<? extends LabelableElement> elements, Set<String> existing)
     throws XMLStreamException
@@ -224,30 +216,34 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     }
   }
 
-  private void writeNode(XMLStreamWriter w, Node c) throws XMLStreamException
+  private void writeNode(XMLStreamWriter w, Node c, 
+    IDManager ids) throws XMLStreamException
   {
     w.writeStartElement(NS, "node");
-    w.writeAttribute(NS, "id", getID(c));
+    w.writeAttribute(NS, "id", ids.getID(c));
     writeLabels(w, c.getLabels());    
     if(c instanceof SDocument)
     {
-      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph());
+      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph(), ids);
     }
     
     w.writeEndElement();
   }
   
-  private void writeEdge(XMLStreamWriter w, Edge e) throws XMLStreamException
+  private void writeEdge(XMLStreamWriter w, Edge e, 
+    IDManager ids) throws XMLStreamException
   {
     w.writeStartElement(NS, "edge");
-    w.writeAttribute(NS, "id", getID(e));
-    w.writeAttribute(NS, "source", getID(e.getSource()));
-    w.writeAttribute(NS, "target", getID(e.getTarget()));
+    w.writeAttribute(NS, "id", ids.getID(e));
+    w.writeAttribute(NS, "source", ids.getID(e.getSource()));
+    w.writeAttribute(NS, "target", ids.getID(e.getTarget()));
     w.writeEndElement();
   }
   
   
-  private void writeSDocumentGraph(XMLStreamWriter w, SDocumentGraph g) throws XMLStreamException
+  private void writeSDocumentGraph(XMLStreamWriter w, 
+    SDocumentGraph g, 
+    IDManager ids) throws XMLStreamException
   {
     List<SNode> nodes = g.getSNodes();
     List<SRelation> relations = g.getSRelations();
@@ -255,24 +251,44 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     if(nodes != null && !nodes.isEmpty())
     {
       w.writeStartElement(NS, "graph");
-      w.writeAttribute(NS, "id", getID(g));
+      w.writeAttribute(NS, "id", ids.getID(g));
       w.writeAttribute(NS, "edgedefault", "directed");
       
       for(SNode n : nodes)
       {
-        writeNode(w, n);
+        writeNode(w, n, ids);
       }
       
       if(relations != null)
       {
         for(SRelation e : relations)
         {
-          writeEdge(w, e);
+          writeEdge(w, e, ids);
         }
       }
 
       w.writeEndElement();
     }
+  }
+  
+  private static class IDManager
+  {
+    private final AtomicLong counter = new AtomicLong(0);
+    
+    private final Map<IdentifiableElement, String> existing = new HashMap<>();
+    
+    private String getID(IdentifiableElement e)
+    {
+     
+      String id = existing.get(e);
+      if(id == null)
+      {
+        id = "_" + counter.getAndIncrement();
+        existing.put(e, id);
+      }
+      return id;
+    }
+    
   }
 
 }
