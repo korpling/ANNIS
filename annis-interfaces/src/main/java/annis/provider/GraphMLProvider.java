@@ -18,6 +18,7 @@ package annis.provider;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.IdentifiableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
+import de.hu_berlin.german.korpling.saltnpepper.salt.graph.LabelableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
@@ -29,8 +30,9 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.HashSet;
 import java.util.List;
-import javax.management.relation.Relation;
+import java.util.Set;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -98,17 +100,28 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       w.writeAttribute("http://www.w3.org/2001/XMLSchema-instance", 
         "schemaLocation", NS + " http://graphml.graphdrawing.org/xmlns/1.1/graphml.xsd");
       
-      // labels we use
-      w.writeStartElement(NS, "key");
-      w.writeAttribute(NS, "id", "name");
-      w.writeAttribute(NS, "for", "node");
-      w.writeAttribute(NS, "attr.type", "string");
-      w.writeEndElement();
-      
-      // write out the corpus structure as the "root" graph
+      Set<String> existingKeys = new HashSet<>();
+
       EList<SCorpusGraph> corpusGraphs = t.getSCorpusGraphs();
       if (corpusGraphs != null)
       {
+        // first get all possible label names and write them as "key"
+        for(SCorpusGraph corpusGraph : corpusGraphs)
+        {
+          writeKeys(w, corpusGraph.getNodes(), existingKeys);
+          writeKeys(w, corpusGraph.getEdges(), existingKeys);
+          List<SDocument> docs = corpusGraph.getSDocuments();
+          if(docs != null)
+          {
+            for(SDocument d : docs)
+            {
+              writeKeys(w, d.getSDocumentGraph().getSNodes(), existingKeys);
+              writeKeys(w, d.getSDocumentGraph().getSRelations(), existingKeys);
+            }
+          }
+        }
+        
+        // write out the corpus structure as the "root" graph
         for (SCorpusGraph corpusGraph : corpusGraphs)
         {
           w.writeStartElement(NS, "graph");
@@ -127,7 +140,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     }
     entityStream.flush();
   }
-
+  
   private void writeCorpusStructure(XMLStreamWriter w, SCorpusGraph corpusGraph)
     throws XMLStreamException
   {
@@ -168,9 +181,40 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     return id;
   }
   
-  
+  private void writeKeys(XMLStreamWriter w, List<? extends LabelableElement> elements, Set<String> existing)
+    throws XMLStreamException
+  {
+    if (elements != null && !elements.isEmpty())
+    {
+      for (LabelableElement e : elements)
+      {
+        List<Label> labels = e.getLabels();
+        if (labels != null && !labels.isEmpty())
+        {
+          for (Label l : labels)
+          {
+            String id = l.getQName();
+            if (!existing.contains(id))
+            {
+              w.writeStartElement(NS, "key");
+              w.writeAttribute(NS, "id", l.getQName());
+              w.writeAttribute(NS, "for", "all");
+              w.writeAttribute(NS, "attr.type", "string");
+              w.writeEndElement();
+              existing.add(id);
+            }
+          }
+        }
+      }
+    }
+  }
+
   private void writeLabels(XMLStreamWriter w, List<Label> labels)
   {
+    if(labels != null && !labels.isEmpty())
+    {
+      
+    }
     // TODO
   }
 
@@ -200,6 +244,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   private void writeSDocumentGraph(XMLStreamWriter w, SDocumentGraph g) throws XMLStreamException
   {
     List<SNode> nodes = g.getSNodes();
+    List<SRelation> relations = g.getSRelations();
     // graphs without nodes are not allowed
     if(nodes != null && !nodes.isEmpty())
     {
@@ -212,7 +257,6 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         writeNode(w, n);
       }
       
-      List<SRelation> relations = g.getSRelations();
       if(relations != null)
       {
         for(SRelation e : relations)
