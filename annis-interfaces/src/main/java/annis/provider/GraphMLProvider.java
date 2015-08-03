@@ -15,14 +15,21 @@
  */
 package annis.provider;
 
+import com.google.common.base.Joiner;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpus;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SIdentifiableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.List;
 import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.MultivaluedMap;
@@ -130,31 +137,93 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     {
       for (SNode c : corpora)
       {
-        writeSCorpusNode(w, c);
+        writeSNode(w, c);
       }
     }
 
     // also output the edges between the (sub-) corpora
-  }
-
-  private void writeSCorpusNode(XMLStreamWriter w, SNode c) throws XMLStreamException
-  {
-    w.writeStartElement(NS, "node");
-    URI id = c.getSElementPath();
-    if(id.fragment() != null)
+    EList<SRelation> rels = corpusGraph.getSRelations();
+    if(rels != null)
     {
-      w.writeAttribute(NS, "id", c.getSElementPath().fragment());
+      for(SRelation r : rels)
+      {
+        writeSRelation(w, r);
+      }
+    }
+    
+  }
+  
+  private String getID(SIdentifiableElement e)
+  {
+    URI uri = e.getSElementPath();
+    if(uri == null)
+    {
+      return e.getSId();
     }
     else
     {
-      w.writeAttribute(NS, "id", id.segment(id.segmentCount()-1));
+      List<String> segments = new ArrayList(uri.segments().length+1);
+      for(String s : uri.segments())
+      {
+        if(!s.isEmpty())
+        {
+          segments.add(s);
+        }
+      }
+      if(uri.fragment() != null)
+      {
+        // append fragments as part of the path
+        segments.add(uri.fragment());
+      }
+      return Joiner.on("::").join(segments);
     }
+  }
+  
+
+  private void writeSNode(XMLStreamWriter w, SNode c) throws XMLStreamException
+  {
+    w.writeStartElement(NS, "node");
+    w.writeAttribute(NS, "id", getID(c));
     
     w.writeStartElement(NS, "data");
     w.writeAttribute(NS, "key", "name");
     w.writeCharacters(c.getSName());
     w.writeEndElement();
+    
+    if(c instanceof SDocument)
+    {
+      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph());
+    }
+    
     w.writeEndElement();
+  }
+  
+  private void writeSRelation(XMLStreamWriter w, SRelation e) throws XMLStreamException
+  {
+    w.writeStartElement(NS, "edge");
+    w.writeAttribute(NS, "id", getID(e));
+    w.writeAttribute(NS, "source", getID(e.getSSource()));
+    w.writeAttribute(NS, "target", getID(e.getSTarget()));
+    w.writeEndElement();
+  }
+  
+  private void writeSDocumentGraph(XMLStreamWriter w, SDocumentGraph g) throws XMLStreamException
+  {
+    EList<SNode> nodes = g.getSNodes();
+    // graphs without nodes are not allowed
+    if(nodes != null && !nodes.isEmpty())
+    {
+      w.writeStartElement(NS, "graph");
+      w.writeAttribute(NS, "id", getID(g));
+      w.writeAttribute(NS, "edgedefault", "directed");
+      
+      for(SNode n : nodes)
+      {
+        writeSNode(w, n);
+      }
+
+      w.writeEndElement();
+    }
   }
 
 }
