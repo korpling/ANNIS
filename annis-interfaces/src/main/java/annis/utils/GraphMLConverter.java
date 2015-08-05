@@ -48,16 +48,16 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class Salt2GraphML
+public class GraphMLConverter
 {
-  private final static Logger log = LoggerFactory.getLogger(Salt2GraphML.class);
+  private final static Logger log = LoggerFactory.getLogger(GraphMLConverter.class);
   
-  public static void convert(OutputStream out, SDocument... docs)
+  public static void convertFromSalt(OutputStream out, SDocument... docs)
   {
-    convert(out, Arrays.asList(docs));
+    convertFromSalt(out, Arrays.asList(docs));
   }
   
-  public static void convert(OutputStream out, List<SDocument> docs)
+  public static void convertFromSalt(OutputStream out, List<SDocument> docs)
   {
     XMLOutputFactory factory = XMLOutputFactory.newFactory();
     try

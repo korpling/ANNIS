@@ -15,7 +15,7 @@
  */
 package annis.provider;
 
-import annis.utils.Salt2GraphML;
+import annis.utils.GraphMLConverter;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.IdentifiableElement;
@@ -108,7 +108,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         }
       }
     }
-    Salt2GraphML.convert(entityStream, docs);
+    GraphMLConverter.convertFromSalt(entityStream, docs);
   }
   
   
