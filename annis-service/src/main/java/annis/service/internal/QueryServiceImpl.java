@@ -373,7 +373,7 @@ public class QueryServiceImpl implements QueryService
   @Produces(
     {
     "application/xml", "application/xmi+xml", "application/xmi+binary",
-      "application/graphml"
+      "application/graphml+xml"
   })
   @Override
   public SaltProject subgraph(
@@ -443,7 +443,8 @@ public class QueryServiceImpl implements QueryService
   @Path("graph/{top}/{doc}")
   @Produces(
     {
-    "application/xml", "application/xmi+xml", "application/xmi+binary"
+    "application/xml", "application/xmi+xml", "application/xmi+binary",
+    "application/graphml+xml"
   })
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,

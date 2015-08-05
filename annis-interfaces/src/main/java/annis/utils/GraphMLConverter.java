@@ -15,14 +15,12 @@
  */
 package annis.utils;
 
-import static annis.provider.GraphMLProvider.NS;
 import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.IdentifiableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.LabelableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Node;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
@@ -51,6 +49,8 @@ import org.slf4j.LoggerFactory;
 public class GraphMLConverter
 {
   private final static Logger log = LoggerFactory.getLogger(GraphMLConverter.class);
+  
+  public final static String NS = "http://graphml.graphdrawing.org/xmlns";
   
   public static void convertFromSalt(OutputStream out, SDocument... docs)
   {
