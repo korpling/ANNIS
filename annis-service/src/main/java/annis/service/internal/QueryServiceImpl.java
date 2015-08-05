@@ -33,8 +33,6 @@ import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.FrequencyTable;
-import annis.service.objects.FrequencyTableEntry;
-import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
 import annis.service.objects.MatchAndDocumentCount;
@@ -374,7 +372,8 @@ public class QueryServiceImpl implements QueryService
   @Consumes({"application/xml", "text/plain"})
   @Produces(
     {
-    "application/xml", "application/xmi+xml", "application/xmi+binary"
+    "application/xml", "application/xmi+xml", "application/xmi+binary",
+      "application/graphml+xml"
   })
   @Override
   public SaltProject subgraph(
@@ -444,7 +443,8 @@ public class QueryServiceImpl implements QueryService
   @Path("graph/{top}/{doc}")
   @Produces(
     {
-    "application/xml", "application/xmi+xml", "application/xmi+binary"
+    "application/xml", "application/xmi+xml", "application/xmi+binary",
+    "application/graphml+xml"
   })
   @Override
   public SaltProject graph(@PathParam("top") String toplevelCorpusName,
