@@ -15,6 +15,7 @@
  */
 package annis.provider;
 
+import de.hu_berlin.german.korpling.saltnpepper.salt.SaltFactory;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.IdentifiableElement;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Label;
@@ -24,6 +25,7 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SCorpusGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sCorpusStructure.SDocument;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
+import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STYPE_NAME;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SRelation;
 import java.io.IOException;
@@ -45,6 +47,7 @@ import javax.xml.stream.XMLOutputFactory;
 import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.XMLStreamWriter;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.EObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -106,6 +109,14 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       Set<String> existingKeys = new HashSet<>();
       IDManager ids = new IDManager();
 
+      // we always use the "salt::type" label 
+      w.writeStartElement(NS, "key");
+      w.writeAttribute(NS, "id", "salt::type");
+      w.writeAttribute(NS, "for", "all");
+      w.writeAttribute(NS, "attr.type", "string");
+      w.writeEndElement();
+      existingKeys.add("salt::type");
+      
       EList<SCorpusGraph> corpusGraphs = t.getSCorpusGraphs();
       if (corpusGraphs != null)
       {
@@ -147,33 +158,6 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     }
     entityStream.flush();
   }
-  
-  private void writeCorpusStructure(XMLStreamWriter w, SCorpusGraph corpusGraph,
-    IDManager ids, Set<String> existingKeys)
-    throws XMLStreamException
-  {
-    // output each corpus, sub-corpus and document as node
-    EList<SNode> corpora = corpusGraph.getSNodes();
-    if (corpora != null)
-    {
-      for (SNode c : corpora)
-      {
-        writeNode(w, c, ids, existingKeys);
-      }
-    }
-
-    // also output the edges between the (sub-) corpora
-    EList<SRelation> rels = corpusGraph.getSRelations();
-    if(rels != null)
-    {
-      for(SRelation r : rels)
-      {
-        writeEdge(w, r, ids, existingKeys);
-      }
-    }
-    
-  }
-  
   
   private void writeKeys(XMLStreamWriter w, List<? extends LabelableElement> elements, Set<String> existing)
     throws XMLStreamException
@@ -252,6 +236,25 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       }
     }
   }
+  
+  /**
+   * Writes a data element describing the type of the object.
+   * @param w
+   * @param o
+   * @throws XMLStreamException 
+   */
+  private void writeType(XMLStreamWriter w, EObject o)
+    throws XMLStreamException
+  {
+    HashSet<STYPE_NAME> types = SaltFactory.eINSTANCE.convertClazzToSTypeName(o.getClass());
+    if(!types.isEmpty())
+    {
+      w.writeStartElement(NS, "data");
+      w.writeAttribute(NS, "key", "salt::type");
+      w.writeCharacters(types.iterator().next().getName());
+      w.writeEndElement();
+    }
+  }
 
   private void writeNode(XMLStreamWriter w, Node c, 
     IDManager ids,
@@ -260,6 +263,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     w.writeStartElement(NS, "node");
     w.writeAttribute(NS, "id", ids.getID(c));
     
+    writeType(w, c);
     writeLabels(w, c.getLabels(), existingKeys);
     w.writeEndElement();
   }
@@ -272,6 +276,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     w.writeAttribute(NS, "source", ids.getID(e.getSource()));
     w.writeAttribute(NS, "target", ids.getID(e.getTarget()));
     
+    writeType(w, e);
     writeLabels(w, e.getLabels(), existingKeys);
     
     w.writeEndElement();
