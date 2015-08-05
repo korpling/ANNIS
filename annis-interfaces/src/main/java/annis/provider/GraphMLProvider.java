@@ -128,12 +128,14 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
         // write out the corpus structure as the "root" graph
         for (SCorpusGraph corpusGraph : corpusGraphs)
         {
-          w.writeStartElement(NS, "graph");
-          w.writeAttribute(NS, "edgedefault", "directed");
-          w.writeAttribute(NS, "id", ids.getID(corpusGraph));
-          writeLabels(w, corpusGraph.getLabels(), existingKeys);
-          writeCorpusStructure(w, corpusGraph, ids, existingKeys);
-          w.writeEndElement();
+          List<SDocument> docs = corpusGraph.getSDocuments();
+          if(docs != null)
+          {
+            for(SDocument d : docs)
+            {
+              writeSDocumentGraph(w, d.getSDocumentGraph(), ids, existingKeys, true);
+            }
+          }
         }
       }
       w.writeEndDocument();
@@ -258,16 +260,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
     w.writeStartElement(NS, "node");
     w.writeAttribute(NS, "id", ids.getID(c));
     
-    w.writeStartElement(NS, "desc");
-    w.writeCharacters("node " + ids.getID(c));
-    w.writeEndElement();
-    
-    writeLabels(w, c.getLabels(), existingKeys);    
-    if(c instanceof SDocument)
-    {
-      writeSDocumentGraph(w, ((SDocument) c).getSDocumentGraph(), ids, existingKeys);
-    }
-    
+    writeLabels(w, c.getLabels(), existingKeys);
     w.writeEndElement();
   }
   
@@ -287,7 +280,7 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
   
   private void writeSDocumentGraph(XMLStreamWriter w, 
     SDocumentGraph g, 
-    IDManager ids, Set<String> existingKeys) throws XMLStreamException
+    IDManager ids, Set<String> existingKeys, boolean includeDocLabels) throws XMLStreamException
   {
     List<SNode> nodes = g.getSNodes();
     List<SRelation> relations = g.getSRelations();
@@ -297,6 +290,11 @@ public class GraphMLProvider implements MessageBodyWriter<SaltProject>
       w.writeStartElement(NS, "graph");
       w.writeAttribute(NS, "id", ids.getID(g));
       w.writeAttribute(NS, "edgedefault", "directed");
+      
+      if(includeDocLabels && g.getSDocument() != null)
+      {
+        writeLabels(w, g.getSDocument().getLabels(), existingKeys);
+      }
       
       for(SNode n : nodes)
       {
