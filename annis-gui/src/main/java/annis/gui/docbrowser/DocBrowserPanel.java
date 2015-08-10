@@ -25,10 +25,18 @@ import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.data.Container;
+import com.vaadin.data.Item;
+import com.vaadin.data.Property;
+import com.vaadin.data.util.ObjectProperty;
+import com.vaadin.data.util.filter.SimpleStringFilter;
+import com.vaadin.event.FieldEvents;
+import static com.vaadin.server.Sizeable.SIZE_UNDEFINED;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.List;
@@ -58,7 +66,7 @@ public class DocBrowserPanel extends Panel
   final ProgressBar progress;
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
-
+  
   /**
    * Normally get the page size from annis-service.properties for the paging
    * component. If something went wrong this value or the amount of documents
@@ -82,6 +90,7 @@ public class DocBrowserPanel extends Panel
     progress = new ProgressBar();
     progress.setIndeterminate(true);
     progress.setSizeFull();
+    
   }
 
   @Override
@@ -140,7 +149,31 @@ public class DocBrowserPanel extends Panel
         {
           table = DocBrowserTable.getDocBrowserTable(DocBrowserPanel.this);
           layout.removeComponent(progress);
+          
+          TextField txtFilter = new TextField();
+          txtFilter.setWidth("100%");
+          txtFilter.setInputPrompt("Filter documents by name");
+          txtFilter.setImmediate(true);
+          txtFilter.setTextChangeTimeout(500);
+          txtFilter.addTextChangeListener(new FieldEvents.TextChangeListener()
+          {
+
+            @Override
+            public void textChange(FieldEvents.TextChangeEvent event)
+            {
+              if (table != null)
+              {
+                table.setContainerFilter(new SimpleStringFilter(
+                  DocBrowserTable.PROP_DOC_NAME, event.getText(), true,
+                  false));
+              }
+            }
+          });
+          
+          layout.addComponent(txtFilter);
           layout.addComponent(table);
+          layout.setExpandRatio(table, 1.0f);
+          
 
           table.setDocNames(docs);
         }
@@ -152,4 +185,5 @@ public class DocBrowserPanel extends Panel
   {
     return corpus;
   }
+
 }
