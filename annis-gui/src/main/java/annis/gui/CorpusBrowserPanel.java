@@ -136,6 +136,7 @@ public class CorpusBrowserPanel extends Panel
     HashSet<String> edgeNames = new HashSet<>();
     HashSet<String> fullEdgeNames = new HashSet<>();
     boolean hasDominance = false;
+    boolean hasEmptyDominance = false;
 
     List<AnnisAttribute> attributes = fetchAnnos(corpus.getName());
 
@@ -160,6 +161,10 @@ public class CorpusBrowserPanel extends Panel
         if (a.getSubtype() == AnnisAttribute.SubType.d)
         {
           hasDominance = true;
+          if(a.getEdgeName() == null || a.getEdgeName().isEmpty())
+          {
+            hasEmptyDominance = true;
+          }
         }
 
         String annoName = killNamespace(a.getName());
@@ -183,7 +188,7 @@ public class CorpusBrowserPanel extends Panel
       edgeNames.add(name);
     }
 
-    if (hasDominance)
+    if (hasDominance && !hasEmptyDominance)
     {
       CorpusBrowserEntry cbe = new CorpusBrowserEntry();
       cbe.setName("(dominance)");
@@ -225,7 +230,14 @@ public class CorpusBrowserPanel extends Panel
         CorpusBrowserEntry cbeEdgeType = new CorpusBrowserEntry();
         String name = stripEdgeName ? killNamespace(a.getEdgeName()) : a.
           getEdgeName();
-        cbeEdgeType.setName(name);
+        if((name == null || name.isEmpty()) && a.getSubtype() == AnnisAttribute.SubType.d)
+        {
+          cbeEdgeType.setName("(dominance)");
+        }
+        else
+        {
+          cbeEdgeType.setName(name);
+        }
         cbeEdgeType.setCorpus(corpus);
         if (a.getSubtype() == AnnisAttribute.SubType.p)
         {
@@ -429,6 +441,10 @@ public class CorpusBrowserPanel extends Panel
 
   private String killNamespace(String qName)
   {
+    if(qName == null)
+    {
+      return "";
+    }
     String[] splitted = qName.split(":");
     return splitted[splitted.length - 1];
   }
