@@ -1214,6 +1214,12 @@ public class AnnisRunner extends AnnisBaseRunner
     System.out.println("bye bye!");
     System.exit(0);
   }
+  
+  public void doExit(String dummy)
+  {
+    System.out.println("bye bye!");
+    System.exit(0);
+  }
 
   private void printAsTable(List<? extends Object> list, String... fields)
   {
