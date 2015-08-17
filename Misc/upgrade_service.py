@@ -53,14 +53,14 @@ extractedenv["ANNIS_HOME"] = extracted;
 
 interactiveCMD = sh.Command(os.path.join(args.dir, "bin", "annis.sh"))
 oldversion = None
-for l in interactiveCMD("version", _env=origenv, iter=True):
+for l in interactiveCMD("version", _env=origenv, _iter=True):
 	oldversion = parseversion(l)
 	if oldversion:
 		print("Old version was ", oldversion)
 		break
 		
 newversion = None
-for l in interactiveCMD("version", _env=extractedenv, iter=True):
+for l in interactiveCMD("version", _env=extractedenv, _iter=True):
 	newversion = parseversion(l)
 	if newversion:
 		print("New version will be ", newversion)
