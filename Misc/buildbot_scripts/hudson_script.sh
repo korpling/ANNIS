@@ -18,4 +18,4 @@ cp -R /etc/annis/user_config/ /home/annis/annis_snapshot_users/
 
 # start service
 chmod u+x Misc/buildbot_scripts/startService.sh
-BUILD_ID=allow_to_run_as_daemon buildbot_scripts/startService.sh /opt/annis/annis3-snapshot/
+BUILD_ID=allow_to_run_as_daemon Misc/buildbot_scripts/startService.sh /opt/annis/annis3-snapshot/
