@@ -71,9 +71,9 @@ if oldversion and newversion:
 		print("Can't update service automatically since the new version is a new feature release!")
 		exit(-10)
 
-print("Stopping old service.")
 serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
 startupresult = serviceCMD("stop", _env=origenv)
+printt(startupresult)
 if startupresult.exit_code != 0:
 	print(startupresult)
 	exit(-3)
@@ -93,12 +93,8 @@ print("Moving new version to old location.")
 shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
 
-
-
-print("Starting new service.")
 startupresult = serviceCMD("start", _env=origenv)
-
+print(startupresult)
 
 if startupresult.exit_code != 0:
-	print(startupresult)
 	exit(-2)
