@@ -59,7 +59,8 @@ else:
 	shutil.rmtree(args.dir)
 
 print("Moving new version to old location.")
-shutil.copytree(extracted, args.dir)
+shutil.move(extracted, args.dir)
+shutil.rmtree(tmp)
 
 print("Starting new service.")
 startupresult = serviceCMD("start", _env=origenv)
@@ -68,7 +69,3 @@ startupresult = serviceCMD("start", _env=origenv)
 if startupresult.exit_code != 0:
 	print(startupresult)
 	exit(-2)
-
-
-#from sh import ls
-#print(ls())
