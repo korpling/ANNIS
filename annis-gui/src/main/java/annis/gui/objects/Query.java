@@ -17,6 +17,7 @@ package annis.gui.objects;
 
 import java.io.Serializable;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -41,8 +42,8 @@ public class Query implements Serializable
   public Query(String query,
     Set<String> corpora)
   {
-    this.query = query;
-    this.corpora = corpora;
+    this.query = query == null ? "" : query;
+    this.corpora = corpora == null ?  new LinkedHashSet<String>() : corpora;
   }
 
   
@@ -53,7 +54,7 @@ public class Query implements Serializable
 
   public void setQuery(String query)
   {
-    this.query = query;
+    this.query = query == null ? "" : query;
   }
 
   public Set<String> getCorpora()
@@ -63,7 +64,7 @@ public class Query implements Serializable
 
   public void setCorpora(Set<String> corpora)
   {
-    this.corpora = corpora;
+    this.corpora = corpora == null ? new LinkedHashSet<String>() : corpora;
   }
 
   @Override

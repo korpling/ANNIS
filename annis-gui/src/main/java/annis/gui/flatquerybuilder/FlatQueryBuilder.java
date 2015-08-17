@@ -498,7 +498,7 @@ public class FlatQueryBuilder extends Panel implements Button.ClickListener, Pro
   public void updateQuery()
   {
     try{
-      cp.setQuery(new Query(getAQLQuery(), null));
+      cp.setQuery(new Query(getAQLQuery(), cp.getState().getSelectedCorpora().getValue()));
     } catch (java.lang.NullPointerException ex) {
       Notification.show(INCOMPLETE_QUERY_WARNING);      
     }
