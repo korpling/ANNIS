@@ -90,7 +90,7 @@ else:
 	shutil.rmtree(args.dir)
 
 print("Copying new version to old location.")
-shutil.copytree(extracted, args.dir)
+shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
 
 startupresult = serviceCMD("start", _env=origenv, _bg=True)
