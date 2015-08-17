@@ -298,7 +298,7 @@
 
 
   <build>
-
+   
     <resources>
       <resource>
         <!-- include everything from src/main/java except *.java files -->
@@ -415,5 +415,6 @@
   <name>annis-service</name>
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <annis.userconfig>/etc/annis/user_config/</annis.userconfig>
   </properties>
 </project>

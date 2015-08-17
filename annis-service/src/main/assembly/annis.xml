@@ -11,8 +11,9 @@
       <excludes>
         <exclude>bin/</exclude>
         <exclude>log/*.log</exclude>
+        <exclude>conf/shiro.ini</exclude>
       </excludes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
       <directory>../</directory>
@@ -21,7 +22,7 @@
         <include>LICENSE</include>
         <include>CHANGELOG</include>
       </includes>
-      <outputDirectory>/</outputDirectory>
+      <outputDirectory></outputDirectory>
     </fileSet>
     <fileSet>
       <directory>THIRD-PARTY</directory>
@@ -31,9 +32,16 @@
       <directory>src/main/distribution/bin/</directory>
       <outputDirectory>bin/</outputDirectory>
       <directoryMode>0755</directoryMode>
-      <fileMode>0544</fileMode>
+      <fileMode>0744</fileMode>
     </fileSet>
   </fileSets>
+  <files>
+     <file>
+      <source>src/main/distribution/conf/shiro.ini</source>
+      <outputDirectory>conf/</outputDirectory>
+      <filtered>true</filtered>
+    </file>
+  </files>
   <dependencySets>
     <dependencySet>
       <outputDirectory>lib/</outputDirectory>
