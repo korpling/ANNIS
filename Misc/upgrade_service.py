@@ -10,8 +10,10 @@ import tempfile
 parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
 parser.add_argument("archive", help="The archive file containing the new ANNIS version.")
-#parser.add_argument("-b", "--backup", help="Perform a backup of already deployed ANNIS instances. This parameter defines also the prefix to use to name the folders."
+parser.add_argument("-b", "--backup", help="Perform a backup of already deployed ANNIS instances. This parameter defines also the prefix to use to name the folders.")
 args = parser.parse_args()
+
+args.dir = os.path.normpath(args.dir)
 
 tmp = tempfile.mkdtemp(prefix="annisservice-upgrade-")
 
@@ -45,8 +47,16 @@ if startupresult.exit_code != 0:
 	print(startupresult)
 	exit(-3)
 
-print("Removing old installation files.")
-shutil.rmtree(args.dir)
+if args.backup:
+	backup = args.backup + "_" + os.path.basename(args.dir)
+	backupPath = os.path.join(os.path.dirname(args.dir), backup)
+	print ("Moving up old installation files to " + backupPath)
+	if os.path.exists(backupPath):
+		shutil.rmtree(backupPath)
+	shutil.move(args.dir, backupPath)
+else:
+	print("Removing old installation files.")
+	shutil.rmtree(args.dir)
 
 print("Moving new version to old location.")
 shutil.copytree(extracted, args.dir)
