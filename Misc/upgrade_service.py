@@ -93,8 +93,10 @@ print("Copying new version to old location.")
 shutil.copytree(extracted, args.dir)
 shutil.rmtree(tmp)
 
-startupresult = serviceCMD("start", _env=origenv)
+startupresult = serviceCMD("start", _env=origenv, _bg=True)
+startupresult.wait()
 print(startupresult)
+
 
 if startupresult.exit_code != 0:
 	exit(-2)
