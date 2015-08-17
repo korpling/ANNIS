@@ -89,8 +89,8 @@ else:
 	print("Removing old installation files.")
 	shutil.rmtree(args.dir)
 
-print("Moving new version to old location.")
-shutil.move(extracted, args.dir)
+print("Copying new version to old location.")
+shutil.copytree(extracted, args.dir)
 shutil.rmtree(tmp)
 
 startupresult = serviceCMD("start", _env=origenv)
