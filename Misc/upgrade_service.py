@@ -39,14 +39,25 @@ origenv = os.environ.copy();
 origenv["ANNIS_HOME"] = args.dir;
 
 print("Stopping old service.")
-origcmd = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
-print(origcmd("stop", _env=origenv))
+serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
+startupresult = serviceCMD("stop", _env=origenv)
+if startupresult.exit_code != 0:
+	print(startupresult)
+	exit(-3)
 
 print("Removing old installation files.")
 shutil.rmtree(args.dir)
 
 print("Moving new version to old location.")
 shutil.copytree(extracted, args.dir)
+
+print("Starting new service.")
+startupresult = serviceCMD("start", _env=origenv)
+
+
+if startupresult.exit_code != 0:
+	print(startupresult)
+	exit(-2)
 
 
 #from sh import ls
