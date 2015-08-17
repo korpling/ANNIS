@@ -6,6 +6,15 @@ import tarfile
 import shutil
 import argparse
 import tempfile
+import re
+
+def parseversion(raw):
+	m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
+	if m:
+		return m.group(1,2,3)
+	else:
+		return None
+		
 
 parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
@@ -39,6 +48,28 @@ shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(ne
 
 origenv = os.environ.copy();
 origenv["ANNIS_HOME"] = args.dir;
+extractedenv = os.environ.copy();
+extractedenv["ANNIS_HOME"] = extracted;
+
+interactiveCMD = sh.Command(os.path.join(args.dir, "bin", "annis.sh"))
+oldversion = None
+for l in interactiveCMD("version", _env=origenv, iter=True):
+	oldversion = parseversion(l)
+	if oldversion:
+		print("Old version was ", oldversion)
+		break
+		
+newversion = None
+for l in interactiveCMD("version", _env=extractedenv, iter=True):
+	newversion = parseversion(l)
+	if newversion:
+		print("New version will be ", newversion)
+		break
+# check if we can update without any database migration
+if oldversion and newversion:
+	if oldversion[0] != newversion[0] or oldversion[1] != newversion[1]:
+		print("Can't update service automatically since the new version is a new feature release!")
+		exit(-10)
 
 print("Stopping old service.")
 serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
@@ -61,6 +92,8 @@ else:
 print("Moving new version to old location.")
 shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
+
+
 
 print("Starting new service.")
 startupresult = serviceCMD("start", _env=origenv)
