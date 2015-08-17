@@ -73,7 +73,7 @@ if oldversion and newversion:
 
 serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
 startupresult = serviceCMD("stop", _env=origenv)
-printt(startupresult)
+print(startupresult)
 if startupresult.exit_code != 0:
 	print(startupresult)
 	exit(-3)
