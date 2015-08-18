@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 
-import sh
-from sh import ErrorReturnCode
+import subprocess
 import os
 import tarfile
 import shutil
@@ -9,13 +8,38 @@ import argparse
 import tempfile
 import re
 
-def parseversion(raw):
-	m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
-	if m:
-		return m.group(1,2,3)
-	else:
-		return None
-		
+def updateEnv(instDir):
+	env = os.environ.copy();
+	env["ANNIS_HOME"] = instDir;
+	return env
+
+def checkDBSchemaVersion(instDir):
+	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
+	p.wait()
+	if p.returncode != 0:
+		print("Can't update service automatically since the new version has a different database scheme!")
+		exit(10)
+
+def startService(instDir):
+	print("Starting service in " + instDir)
+	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.DEVNULL)
+	p.wait()
+	if p.returncode != 0:
+		print("Can't start service in " + instDir)
+		exit(2)		
+
+def stopService(instDir):
+	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	output = p.communicate()
+	print(output)
+	if p.returncode != 0:
+		print("Can't stop service in " + instDir)
+		exit(3)
+	print("Stopped service in " + instDir)
+	
+###################
+# begin main code #
+###################
 
 parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
@@ -47,25 +71,11 @@ print("Copying the config files.")
 shutil.copy2(os.path.join(origconf, "database.properties"), os.path.join(newconf, "database.properties"))
 shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties"))
 
-origenv = os.environ.copy();
-origenv["ANNIS_HOME"] = args.dir;
-extractedenv = os.environ.copy();
-extractedenv["ANNIS_HOME"] = extracted;
-
 # check if we can update without any database migration
-adminCMD = sh.Command(os.path.join(args.dir, "bin", "annis-admin.sh"))
-try: adminCMD("check-db-schema-version", _env=extractedenv)
-except ErrorReturnCode:
-	print("Can't update service automatically since the new version has a different database scheme!")
-	exit(10)
-	
-serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
+print("Check database schema version")
+checkDBSchemaVersion(extracted)
 
-try: startupresult = serviceCMD("stop", _env=origenv)
-except ErrorReturnCode:
-	print(startupresult)
-	exit(3)
-print(startupresult)
+stopService(args.dir)
 
 if args.backup:
 	backup = args.backup + "_" + os.path.basename(args.dir)
@@ -82,10 +92,4 @@ print("Copying new version to old location.")
 shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
 
-try:
-	startupresult = serviceCMD("start", _env=origenv, _bg=True)
-	startupresult.wait()
-except ErrorReturnCode:
-	print(startupresult)
-	exit(2)
-print(startupresult)
+startService(args.dir)
