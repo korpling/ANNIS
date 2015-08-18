@@ -26,7 +26,7 @@
   </Match>
   <Match>
     <And>
-      <Class name="annis.AnnisAdminRunner" />
+      <Class name="annis.administration.AnnisAdminRunner" />
       <Bug pattern="DM_EXIT" />
     </And>
   </Match>
