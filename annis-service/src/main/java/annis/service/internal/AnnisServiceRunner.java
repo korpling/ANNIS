@@ -134,7 +134,10 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     }
     
     // explicitly exit so we can decide if there was an error or not and everything is closed.
-    System.exit(annisServiceRunner.errorCode);
+    if(annisServiceRunner.errorCode != 0)
+    {
+      System.exit(annisServiceRunner.errorCode);
+    }
   }
 
   /**

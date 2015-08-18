@@ -58,6 +58,7 @@ stop() {
 					;;
 				*)
 					echo "AnnisService could not be stopped."
+					exit 1
 			esac
 			;;
 		1)
