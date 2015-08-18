@@ -1,3 +1,12 @@
+Version 3.3.4
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.4+is%3Aclosed
+
+[Bugs]
+ #424  Flat query builder disfunctional
+
 Version 3.3.3
 =============
 
