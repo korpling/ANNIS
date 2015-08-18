@@ -1,6 +1,7 @@
 #!/usr/bin/python3
 
 import sh
+from sh import ErrorReturnCode
 import os
 import tarfile
 import shutil
@@ -51,32 +52,20 @@ origenv["ANNIS_HOME"] = args.dir;
 extractedenv = os.environ.copy();
 extractedenv["ANNIS_HOME"] = extracted;
 
-interactiveCMD = sh.Command(os.path.join(args.dir, "bin", "annis.sh"))
-oldversion = None
-for l in interactiveCMD("version", _env=origenv, _iter=True):
-	oldversion = parseversion(l)
-	if oldversion:
-		print("Old version was ", oldversion)
-		break
-		
-newversion = None
-for l in interactiveCMD("version", _env=extractedenv, _iter=True):
-	newversion = parseversion(l)
-	if newversion:
-		print("New version will be ", newversion)
-		break
 # check if we can update without any database migration
-if oldversion and newversion:
-	if oldversion[0] != newversion[0] or oldversion[1] != newversion[1]:
-		print("Can't update service automatically since the new version is a new feature release!")
-		exit(-10)
-
+adminCMD = sh.Command(os.path.join(args.dir, "bin", "annis-admin.sh"))
+try: adminCMD("check-db-schema-version", _env=extractedenv)
+except ErrorReturnCode:
+	print("Can't update service automatically since the new version has a different database scheme!")
+	exit(10)
+	
 serviceCMD = sh.Command(os.path.join(args.dir, "bin", "annis-service.sh"))
-startupresult = serviceCMD("stop", _env=origenv)
-print(startupresult)
-if startupresult.exit_code != 0:
+
+try: startupresult = serviceCMD("stop", _env=origenv)
+except ErrorReturnCode:
 	print(startupresult)
-	exit(-3)
+	exit(3)
+print(startupresult)
 
 if args.backup:
 	backup = args.backup + "_" + os.path.basename(args.dir)
@@ -93,10 +82,10 @@ print("Copying new version to old location.")
 shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
 
-startupresult = serviceCMD("start", _env=origenv, _bg=True)
-startupresult.wait()
+try:
+	startupresult = serviceCMD("start", _env=origenv, _bg=True)
+	startupresult.wait()
+except ErrorReturnCode:
+	print(startupresult)
+	exit(2)
 print(startupresult)
-
-
-if startupresult.exit_code != 0:
-	exit(-2)
