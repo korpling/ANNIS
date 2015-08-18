@@ -24,6 +24,12 @@
       <Bug pattern="DM_EXIT" />
     </And>
   </Match>
+  <Match>
+    <And>
+      <Class name="annis.AnnisAdminRunner" />
+      <Bug pattern="DM_EXIT" />
+    </And>
+  </Match>
   
   <Match>
     <And>

@@ -570,7 +570,7 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     else
     {
       out.println("Wrong ANNNIS database schema version.");
-      System.exit(-1);
+      System.exit(1);
     }
     
   }
