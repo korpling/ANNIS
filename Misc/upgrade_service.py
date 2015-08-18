@@ -14,7 +14,7 @@ def updateEnv(instDir):
 	return env
 
 def checkDBSchemaVersion(instDir):
-	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
+	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
 	p.wait()
 	if p.returncode != 0:
 		print("Can't update service automatically since the new version has a different database scheme!")
@@ -22,14 +22,14 @@ def checkDBSchemaVersion(instDir):
 
 def startService(instDir):
 	print("Starting service in " + instDir)
-	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.PIPE)
+	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.PIPE)
 	p.communicate()
 	if p.returncode != 0:
 		print("Can't start service in " + instDir)
 		exit(2)		
 
 def stopService(instDir):
-	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
+	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 	output = p.communicate()
 	if p.returncode != 0:
 		print("Can't stop service in " + instDir)
