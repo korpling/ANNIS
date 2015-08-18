@@ -22,8 +22,8 @@ def checkDBSchemaVersion(instDir):
 
 def startService(instDir):
 	print("Starting service in " + instDir)
-	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.DEVNULL)
-	p.wait()
+	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "start"], env=updateEnv(instDir), stdout=subprocess.PIPE)
+	p.communicate()
 	if p.returncode != 0:
 		print("Can't start service in " + instDir)
 		exit(2)		
@@ -31,9 +31,9 @@ def startService(instDir):
 def stopService(instDir):
 	p = subprocess.Popen([os.path.join(args.dir, "bin", "annis-service.sh"), "stop"], env=updateEnv(instDir), stderr=subprocess.PIPE, stdout=subprocess.PIPE)
 	output = p.communicate()
-	print(output)
 	if p.returncode != 0:
 		print("Can't stop service in " + instDir)
+		print(output[0].decode("utf-8"))
 		exit(3)
 	print("Stopped service in " + instDir)
 	
