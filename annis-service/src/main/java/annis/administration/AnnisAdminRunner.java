@@ -126,6 +126,10 @@ public class AnnisAdminRunner extends AnnisBaseRunner
     {
       doCleanupData(commandArgs);
     }
+    else if("check-db-schema-version".equals(command))
+    {
+      doCheckDBSchemaVersion();
+    }
     else
     {
       throw new UsageException("Unknown command: " + command);
@@ -553,6 +557,22 @@ public class AnnisAdminRunner extends AnnisBaseRunner
         queriesGenerator.generateQueries(corpusNames, overwrite);
       }
     }
+  }
+  
+  
+  public void doCheckDBSchemaVersion()
+  {
+    if(corpusAdministration.checkDatabaseSchemaVersion())
+    {
+      out.println("Correct ANNNIS database schema version.");
+      System.exit(0);
+    }
+    else
+    {
+      out.println("Wrong ANNNIS database schema version.");
+      System.exit(-1);
+    }
+    
   }
 
   private void usage(String error)

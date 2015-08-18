@@ -72,3 +72,5 @@ usage:
     will be deleted.
 
 * cleanup-data: Delete files not used by this instance in the data directory.
+
+* check-db-schema-version: Check if the schema used for the databases tables is the correct one. If not re-initialization is necessary.
