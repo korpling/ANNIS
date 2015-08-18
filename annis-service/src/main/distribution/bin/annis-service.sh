@@ -37,6 +37,7 @@ launch() {
 				echo "done." 
 			else
 				echo "FAILED."
+				exit 1
 			fi
 			;;
 		2)
