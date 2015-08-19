@@ -58,7 +58,7 @@ public class ExampleQueriesPanel extends Grid
 {
 
   // first column String
-  private final String EXAMPLE_QUERY = "example query";
+  private final String EXAMPLE_QUERY = "exampleQuery";
 
   //main ui window
   private final SearchUI ui;
@@ -131,20 +131,24 @@ public class ExampleQueriesPanel extends Grid
       setHeaderCaption("open corpus browser");
     getColumn(COLUMN_OPEN_CORPUS_BROWSER).setExpandRatio(0);
 
-    HtmlRenderer queryRenderer = new HtmlRenderer();
-    generatedContainer.addGeneratedProperty("exampleQuery", new QueryColumn());
-    getColumn("exampleQuery").setRenderer(queryRenderer);
-    getColumn("exampleQuery").setHeaderCaption("Example Query");
-    getColumn("exampleQuery").setExpandRatio(1);
-
+    HtmlRenderer descriptionRender = new HtmlRenderer();
+    generatedContainer.addGeneratedProperty("description", new DescriptionGenerator());
+    getColumn("description").setRenderer(descriptionRender);
     getColumn("description").setHeaderCaption("Description");
     getColumn("description").setExpandRatio(2);
+    
+    HtmlRenderer queryRenderer = new HtmlRenderer();
+    generatedContainer.addGeneratedProperty(EXAMPLE_QUERY, new QueryColumn());
+    getColumn(EXAMPLE_QUERY).setRenderer(queryRenderer);
+    getColumn(EXAMPLE_QUERY).setHeaderCaption("Example Query");
+    getColumn(EXAMPLE_QUERY).setExpandRatio(1);
+    
 
     removeColumn("nodes");
     removeColumn("corpusName");
     removeColumn("type");
     removeColumn("usedOperators");
-    setColumnOrder("exampleQuery", "description", COLUMN_OPEN_CORPUS_BROWSER);
+    setColumnOrder(EXAMPLE_QUERY, "description", COLUMN_OPEN_CORPUS_BROWSER);
 
   }
 
@@ -307,7 +311,7 @@ public class ExampleQueriesPanel extends Grid
     public void itemClick(ItemClickEvent event)
     {
       ExampleQuery eq = (ExampleQuery) event.getItemId();
-      if ("exampleQuery".equals(event.getPropertyId()))
+      if (EXAMPLE_QUERY.equals(event.getPropertyId()))
       {
         ControlPanel controlPanel = ui.getControlPanel();
         QueryPanel queryPanel;
@@ -344,55 +348,6 @@ public class ExampleQueriesPanel extends Grid
 
   private class QueryColumn extends PropertyValueGenerator<String>
   {
-    /*
-     @Override
-     public Object generateCell(Table source, Object itemId, Object columnId)
-     {
-     final ExampleQuery eQ = (ExampleQuery) itemId;
-     Button btn = new Button();
-     btn.setDescription("show corpus browser for " + eQ.getCorpusName());
-     btn.addStyleName(ChameleonTheme.BUTTON_LINK);
-     btn.setIcon(SEARCH_ICON);
-     btn.setCaption(eQ.getExampleQuery());
-     btn.setDescription("show results for \"" + eQ.getExampleQuery()
-     + "\" in " + eQ.getCorpusName());
-     btn.addStyleName(Helper.CORPUS_FONT_FORCE);
-      
-     btn.addClickListener(new Button.ClickListener()
-     {
-     @Override
-     public void buttonClick(Button.ClickEvent event)
-     {
-     ControlPanel controlPanel = ui.getControlPanel();
-     QueryPanel queryPanel;
-
-     if (controlPanel == null)
-     {
-     log.error("controlPanel is not initialized");
-     return;
-     }
-
-     queryPanel = controlPanel.getQueryPanel();
-     if (queryPanel == null)
-     {
-     log.error("queryPanel is not initialized");
-     return;
-     }
-
-     Set<String> corpusNameSet = new HashSet<>();
-     corpusNameSet.add(eQ.getCorpusName());
-     QueryController controller = ui.getQueryController();
-     if (controller != null)
-     {
-     controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-     controller.executeSearch(true, true);
-     }
-     }
-     });
-     return btn;
-     }
-     */
-
     @Override
     public String getValue(Item item, Object itemId, Object propertyId)
     {
@@ -428,7 +383,30 @@ public class ExampleQueriesPanel extends Grid
     public String getValue(Item item, Object itemId, Object propertyId)
     {
       ExampleQuery eQ = (ExampleQuery) itemId;
-      return "<a href=\"#\" style=\"display:block; width:100%\" >" + eQ.getCorpusName() + "</a>";
+      return 
+        "<div class=\"example-query-link\">"
+        +"<a>" + eQ.getCorpusName() + "</a>"
+        + "</div>";
+    }
+
+    @Override
+    public Class<String> getType()
+    {
+      return String.class;
+    }
+  }
+  
+  private class DescriptionGenerator extends PropertyValueGenerator<String>
+  {
+
+    @Override
+    public String getValue(Item item, Object itemId, Object propertyId)
+    {
+      ExampleQuery eQ = (ExampleQuery) itemId;
+      return 
+        "<div class=\"" + Helper.CORPUS_FONT_FORCE + "\">"
+        + eQ.getDescription()
+        + "</div>";
     }
 
     @Override
