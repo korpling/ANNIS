@@ -57,9 +57,10 @@ import org.slf4j.LoggerFactory;
  */
 public class ExampleQueriesPanel extends Table
 {
-
-  // first column String
-  private final String EXAMPLE_QUERY = "example query";
+  
+  private final String COLUMN_EXAMPLE_QUERY = "exampleQuery";
+  private final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
+  private final String COLUMN_DESCRIPTION = "description";
 
   //main ui window
   private final SearchUI ui;
@@ -110,9 +111,6 @@ public class ExampleQueriesPanel extends Table
     // Send changes in selection immediately to server.
     setImmediate(true);
 
-    // set clickhandler for execute example query
-    addListener(new ExampleQueryExecuter());
-
     // set custom style
     addStyleName("example-queries-table");
 
@@ -122,13 +120,12 @@ public class ExampleQueriesPanel extends Table
     setWidth(100, Unit.PERCENTAGE);
 
     // configure columns
-    final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
     addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
 
-    addGeneratedColumn("exampleQuery", new QueryColumn());
+    addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
 
-    addGeneratedColumn("description", new ColumnGenerator()
+    addGeneratedColumn(COLUMN_DESCRIPTION, new ColumnGenerator()
     {
       @Override
       public Object generateCell(Table source, Object itemId, Object columnId)
@@ -143,8 +140,8 @@ public class ExampleQueriesPanel extends Table
 
     setVisibleColumns(new Object[]
     {
-      "exampleQuery",
-      "description",
+      COLUMN_EXAMPLE_QUERY,
+      COLUMN_DESCRIPTION,
       COLUMN_OPEN_CORPUS_BROWSER
     });
 
@@ -235,45 +232,6 @@ public class ExampleQueriesPanel extends Table
     });
 
     return btn;
-  }
-
-  /**
-   * Catches click events on the example query column.
-   *
-   * TODO do not use deprecated stuff
-   */
-  private class ExampleQueryExecuter implements ItemClickEvent.ItemClickListener
-  {
-
-    @Override
-    public void itemClick(ItemClickEvent event)
-    {
-      if (event.getButton() == ItemClickEvent.BUTTON_LEFT)
-      {
-        String column = (String) event.getPropertyId();
-        ControlPanel controlPanel = ui.getControlPanel();
-        QueryPanel queryPanel;
-
-        if (controlPanel == null)
-        {
-          log.error("controlPanel is not initialized");
-          return;
-        }
-
-        queryPanel = controlPanel.getQueryPanel();
-        if (queryPanel == null)
-        {
-          log.error("queryPanel is not initialized");
-          return;
-        }
-
-        if (EXAMPLE_QUERY.equals(column))
-        {
-          Property query = event.getItem().getItemProperty(column);
-          queryPanel.setQuery(query.toString());
-        }
-      }
-    }
   }
 
   /**
