@@ -85,9 +85,9 @@ public class ExampleQueriesPanel extends Table
 
   private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
-  public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
+  public ExampleQueriesPanel(SearchUI ui, HelpPanel parentTab)
   {
-    super(caption);
+    super();
     this.ui = ui;
     this.parentTab = parentTab;
 
@@ -118,7 +118,7 @@ public class ExampleQueriesPanel extends Table
     addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     setWidth(100, Unit.PERCENTAGE);
-
+    
     // configure columns
     addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
@@ -151,6 +151,7 @@ public class ExampleQueriesPanel extends Table
     setColumnHeader(getVisibleColumns()[0], "Example Query");
     setColumnHeader(getVisibleColumns()[1], "Description");
     setColumnHeader(getVisibleColumns()[2], "open corpus browser");
+    
   }
 
   @Override

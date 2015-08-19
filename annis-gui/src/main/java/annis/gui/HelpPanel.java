@@ -35,8 +35,7 @@ public class HelpPanel extends Accordion
     tutorial = new TutorialPanel();
     tutorial.setHeight("99%");
     
-    examples = new ExampleQueriesPanel(
-      "example queries", parent, this);
+    examples = new ExampleQueriesPanel(parent, this);
     examples.setHeight("99%");
     
     addTab(tutorial, "Tutorial", FontAwesome.BOOK);
