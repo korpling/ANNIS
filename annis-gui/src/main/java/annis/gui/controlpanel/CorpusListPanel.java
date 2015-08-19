@@ -65,6 +65,8 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 import javax.ws.rs.core.Response;
 import org.slf4j.LoggerFactory;
 
@@ -89,6 +91,8 @@ public class CorpusListPanel extends VerticalLayout implements
   private final ExampleQueriesPanel autoGenQueries;
 
   private SearchUI ui;
+  
+  private final ConcurrentMap<String, Window> openCorpusBrowser = new ConcurrentHashMap<>();
 
   public enum ActionType
   {
@@ -721,8 +725,7 @@ public class CorpusListPanel extends VerticalLayout implements
         {
           if (controller != null)
           {
-            l.setEnabled(false);
-            initCorpusBrowser(id, l);
+            initCorpusBrowser(id);
           }
         }
       });
@@ -796,8 +799,9 @@ public class CorpusListPanel extends VerticalLayout implements
     return tblCorpora;
   }
 
-  public void initCorpusBrowser(String topLevelCorpusName, final Button l)
+  public void initCorpusBrowser(final String topLevelCorpusName)
   {
+    
 
     AnnisCorpus c = corpusContainer.getItem(topLevelCorpusName).getBean();
     MetaDataPanel meta = new MetaDataPanel(c.getName());
@@ -824,6 +828,16 @@ public class CorpusListPanel extends VerticalLayout implements
     
     Window window = new Window("Corpus information for " + c.getName()
       + " (ID: " + c.getId() + ")", infoLayout);
+    
+    Window existingWindow = openCorpusBrowser.putIfAbsent(topLevelCorpusName, window);
+    if (existingWindow != null)
+    {
+      // don't open a window twice
+      existingWindow.focus();
+      return;
+    }
+
+    
     window.setWidth(70, UNITS_EM);
     window.setHeight(45, UNITS_EM);
     window.setResizable(true);
@@ -836,10 +850,7 @@ public class CorpusListPanel extends VerticalLayout implements
       @Override
       public void windowClose(Window.CloseEvent e)
       {
-        if(l != null)
-        {
-          l.setEnabled(true);
-        }
+        openCorpusBrowser.remove(topLevelCorpusName);
       }
     });
 

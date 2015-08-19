@@ -341,7 +341,7 @@ public class ExampleQueriesPanel extends Grid
       else if (COLUMN_OPEN_CORPUS_BROWSER.equals(event.getPropertyId()))
       {
         CorpusListPanel corpusList = ui.getControlPanel().getCorpusList();
-        corpusList.initCorpusBrowser(eq.getCorpusName(), null);
+        corpusList.initCorpusBrowser(eq.getCorpusName());
       }
     }
   }
