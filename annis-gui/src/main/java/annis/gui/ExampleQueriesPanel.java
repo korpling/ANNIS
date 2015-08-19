@@ -38,10 +38,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.Sizeable.Unit;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.SelectionMode;
-import com.vaadin.ui.renderers.ButtonRenderer;
-import com.vaadin.ui.renderers.ClickableRenderer;
 import com.vaadin.ui.renderers.HtmlRenderer;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -90,7 +87,7 @@ public class ExampleQueriesPanel extends Grid
 
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
-    super(caption);
+    super();
     this.ui = ui;
     this.parentTab = parentTab;
 
@@ -111,18 +108,18 @@ public class ExampleQueriesPanel extends Grid
     setSizeFull();
 
     // Don't Allow selecting items from the table.
-    setSelectionMode(SelectionMode.NONE);
+    setSelectionMode(SelectionMode.SINGLE);
 
     // Send changes in selection immediately to server.
-    //grid.setImmediate(true);
+    setImmediate(true);
     // set custom style
-    addStyleName("example-queries-table");
+    //addStyleName("example-queries-table");
 
     // put stripes to the table
-    addStyleName(ChameleonTheme.TABLE_STRIPED);
+    //addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     setWidth(100, Unit.PERCENTAGE);
-
+    
     // configure columns
     addItemClickListener(new GridClickListener());
 
@@ -398,7 +395,7 @@ public class ExampleQueriesPanel extends Grid
     public String getValue(Item item, Object itemId, Object propertyId)
     {
       final ExampleQuery eQ = (ExampleQuery) itemId;
-      return eQ.getExampleQuery();
+      return "<a href=\"#\" style=\"display:block; width:100%\" >" + eQ.getExampleQuery() + "</a>";
     }
 
     @Override
@@ -415,7 +412,7 @@ public class ExampleQueriesPanel extends Grid
     public String getValue(Item item, Object itemId, Object propertyId)
     {
       ExampleQuery eQ = (ExampleQuery) itemId;
-      return eQ.getCorpusName();
+      return "<a href=\"#\" style=\"display:block; width:100%\" >" + eQ.getCorpusName() + "</a>";
     }
 
     @Override
