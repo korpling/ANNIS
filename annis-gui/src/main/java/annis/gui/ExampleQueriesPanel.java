@@ -27,25 +27,25 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
-import com.vaadin.ui.Button;
+import com.vaadin.data.Item;
 import com.vaadin.ui.TabSheet;
-import com.vaadin.ui.Table;
 import com.vaadin.data.util.BeanItemContainer;
+import com.vaadin.data.util.GeneratedPropertyContainer;
+import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
-import com.vaadin.shared.ui.label.ContentMode;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.Label;
-import com.vaadin.ui.themes.BaseTheme;
+import com.vaadin.server.Sizeable.Unit;
+import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.SelectionMode;
+import com.vaadin.ui.renderers.ButtonRenderer;
+import com.vaadin.ui.renderers.ClickableRenderer;
+import com.vaadin.ui.renderers.HtmlRenderer;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +55,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ExampleQueriesPanel extends Table
+public class ExampleQueriesPanel extends Grid
 {
 
   // first column String
@@ -70,7 +70,9 @@ public class ExampleQueriesPanel extends Table
   /**
    * Bean Container for example queries. Key is the corpus name.
    */
-  private final BeanItemContainer<ExampleQuery> egContainer;
+  private final BeanItemContainer<ExampleQuery> exampleQueries;
+
+  private final GeneratedPropertyContainer generatedContainer;
 
   // gets the
   private final static Logger log = LoggerFactory.
@@ -84,6 +86,8 @@ public class ExampleQueriesPanel extends Table
 
   private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
+  private final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
+
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
     super(caption);
@@ -91,8 +95,10 @@ public class ExampleQueriesPanel extends Table
     this.parentTab = parentTab;
 
     //
-    egContainer = new BeanItemContainer<>(ExampleQuery.class);
-    setContainerDataSource(egContainer);
+    exampleQueries = new BeanItemContainer<>(ExampleQuery.class);
+    generatedContainer = new GeneratedPropertyContainer(exampleQueries);
+
+    setContainerDataSource(generatedContainer);
   }
 
   /**
@@ -104,15 +110,11 @@ public class ExampleQueriesPanel extends Table
     // expand the table
     setSizeFull();
 
-    // Allow selecting items from the table.
-    setSelectable(false);
+    // Don't Allow selecting items from the table.
+    setSelectionMode(SelectionMode.NONE);
 
     // Send changes in selection immediately to server.
-    setImmediate(true);
-
-    // set clickhandler for execute example query
-    addListener(new ExampleQueryExecuter());
-
+    //grid.setImmediate(true);
     // set custom style
     addStyleName("example-queries-table");
 
@@ -122,38 +124,29 @@ public class ExampleQueriesPanel extends Table
     setWidth(100, Unit.PERCENTAGE);
 
     // configure columns
-    final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
-    addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
+    addItemClickListener(new GridClickListener());
 
+    generatedContainer.addGeneratedProperty(COLUMN_OPEN_CORPUS_BROWSER,
+      new ShowCorpusBrowser());
+    HtmlRenderer corpusBrowserRenderer = new HtmlRenderer();
+    getColumn(COLUMN_OPEN_CORPUS_BROWSER).setRenderer(corpusBrowserRenderer);
+    getColumn(COLUMN_OPEN_CORPUS_BROWSER).
+      setHeaderCaption("open corpus browser");
 
-    addGeneratedColumn("exampleQuery", new QueryColumn());
+    HtmlRenderer queryRenderer = new HtmlRenderer();
+    generatedContainer.addGeneratedProperty("exampleQuery", new QueryColumn());
+    getColumn("exampleQuery").setRenderer(queryRenderer);
+    getColumn("exampleQuery").setHeaderCaption("Example Query");
 
-    addGeneratedColumn("description", new ColumnGenerator()
-    {
-      @Override
-      public Object generateCell(Table source, Object itemId, Object columnId)
-      {
-        ExampleQuery eQ = (ExampleQuery) itemId;
-        Label l = new Label(eQ.getDescription());
-        l.setContentMode(ContentMode.TEXT);
-        l.addStyleName(Helper.CORPUS_FONT_FORCE);
-        return l;
-      }
-    });
+    getColumn("description").setHeaderCaption("Description");
+    getColumn("description").setExpandRatio(3);
 
-    setVisibleColumns(new Object[]
-    {
-      "exampleQuery",
-      "description",
-      COLUMN_OPEN_CORPUS_BROWSER
-    });
+    removeColumn("nodes");
+    removeColumn("corpusName");
+    removeColumn("type");
+    removeColumn("usedOperators");
+    setColumnOrder("exampleQuery", "description", COLUMN_OPEN_CORPUS_BROWSER);
 
-    setColumnExpandRatio(getVisibleColumns()[0], 0.40f);
-    setColumnExpandRatio(getVisibleColumns()[1], 0.40f);
-
-    setColumnHeader(getVisibleColumns()[0], "Example Query");
-    setColumnHeader(getVisibleColumns()[1], "Description");
-    setColumnHeader(getVisibleColumns()[2], "open corpus browser");
   }
 
   @Override
@@ -175,7 +168,7 @@ public class ExampleQueriesPanel extends Table
   {
     if (examples != null && examples.size() > 0)
     {
-      egContainer.addAll(examples);
+      exampleQueries.addAll(examples);
       showTab();
     }
     else
@@ -192,10 +185,10 @@ public class ExampleQueriesPanel extends Table
     if (parentTab != null)
     {
       tab = parentTab.getTab(this);
-      if(tab != null)
+      if (tab != null)
       {
         // FIXME: this should be added by the constructor or by the panel that adds this tab
-       // tab.getComponent().addStyleName("example-queries-tab");
+        // tab.getComponent().addStyleName("example-queries-tab");
         tab.setEnabled(true);
 
         if (!(parentTab.getSelectedTab() instanceof ResultViewPanel))
@@ -219,63 +212,6 @@ public class ExampleQueriesPanel extends Table
     }
   }
 
-  private Component getOpenCorpusPanel(final String corpusName)
-  {
-    final Button btn = new Button(corpusName);
-   
-    btn.setStyleName(BaseTheme.BUTTON_LINK);
-    btn.addClickListener(new Button.ClickListener()
-    {
-      @Override
-      public void buttonClick(Button.ClickEvent event)
-      {
-        CorpusListPanel corpusList = ui.getControlPanel().getCorpusList();
-        corpusList.initCorpusBrowser(corpusName, btn);
-      }
-    });
-
-    return btn;
-  }
-
-  /**
-   * Catches click events on the example query column.
-   *
-   * TODO do not use deprecated stuff
-   */
-  private class ExampleQueryExecuter implements ItemClickEvent.ItemClickListener
-  {
-
-    @Override
-    public void itemClick(ItemClickEvent event)
-    {
-      if (event.getButton() == ItemClickEvent.BUTTON_LEFT)
-      {
-        String column = (String) event.getPropertyId();
-        ControlPanel controlPanel = ui.getControlPanel();
-        QueryPanel queryPanel;
-
-        if (controlPanel == null)
-        {
-          log.error("controlPanel is not initialized");
-          return;
-        }
-
-        queryPanel = controlPanel.getQueryPanel();
-        if (queryPanel == null)
-        {
-          log.error("queryPanel is not initialized");
-          return;
-        }
-
-        if (EXAMPLE_QUERY.equals(column))
-        {
-          Property query = event.getItem().getItemProperty(column);
-          queryPanel.setQuery(query.toString());
-        }
-      }
-    }
-  }
-
   /**
    * Loads all available example queries.
    */
@@ -290,7 +226,8 @@ public class ExampleQueriesPanel extends Table
    * @param corpusNames Specifies the corpora example queries are fetched for.
    * If it is null or empty all available example queries are fetched.
    */
-  private static List<ExampleQuery> loadExamplesFromRemote(Set<String> corpusNames)
+  private static List<ExampleQuery> loadExamplesFromRemote(
+    Set<String> corpusNames)
   {
     List<ExampleQuery> result = new LinkedList<>();
     WebResource service = Helper.getAnnisWebResource();
@@ -300,17 +237,17 @@ public class ExampleQueriesPanel extends Table
       {
         result = service.path("query").path("corpora").path(
           "example-queries").get(new GenericType<List<ExampleQuery>>()
-        {
-        });
+          {
+          });
       }
       else
       {
         String concatedCorpusNames = StringUtils.join(corpusNames, ",");
         result = service.path("query").path("corpora").path(
           "example-queries").queryParam("corpora", concatedCorpusNames).get(
-          new GenericType<List<ExampleQuery>>()
-        {
-        });
+            new GenericType<List<ExampleQuery>>()
+            {
+            });
       }
     }
     catch (UniformInterfaceException ex)
@@ -338,8 +275,8 @@ public class ExampleQueriesPanel extends Table
       @Override
       public void run()
       {
-        final List<ExampleQuery> result =
-          loadExamplesFromRemote(selectedCorpora);
+        final List<ExampleQuery> result
+          = loadExamplesFromRemote(selectedCorpora);
 
         ui.access(new Runnable()
         {
@@ -349,7 +286,7 @@ public class ExampleQueriesPanel extends Table
             examples = result;
             try
             {
-              removeAllItems();
+              exampleQueries.removeAllItems();
               addItems();
             }
             catch (Exception ex)
@@ -363,66 +300,128 @@ public class ExampleQueriesPanel extends Table
     });
 
   }
-  
-  private class QueryColumn implements Table.ColumnGenerator
+
+  private class GridClickListener implements ItemClickEvent.ItemClickListener
   {
 
     @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    public void itemClick(ItemClickEvent event)
     {
-      final ExampleQuery eQ = (ExampleQuery) itemId;
-      Button btn = new Button();
-      btn.setDescription("show corpus browser for " + eQ.getCorpusName());
-      btn.addStyleName(ChameleonTheme.BUTTON_LINK);
-      btn.setIcon(SEARCH_ICON);
-      btn.setCaption(eQ.getExampleQuery());
-      btn.setDescription("show results for \"" + eQ.getExampleQuery()
-        + "\" in " + eQ.getCorpusName());
-      btn.addStyleName(Helper.CORPUS_FONT_FORCE);
-      
-      btn.addClickListener(new Button.ClickListener()
+      ExampleQuery eq = (ExampleQuery) event.getItemId();
+      if ("exampleQuery".equals(event.getPropertyId()))
       {
-        @Override
-        public void buttonClick(Button.ClickEvent event)
+        ControlPanel controlPanel = ui.getControlPanel();
+        QueryPanel queryPanel;
+
+        if (controlPanel == null)
         {
-          ControlPanel controlPanel = ui.getControlPanel();
-          QueryPanel queryPanel;
-
-          if (controlPanel == null)
-          {
-            log.error("controlPanel is not initialized");
-            return;
-          }
-
-          queryPanel = controlPanel.getQueryPanel();
-          if (queryPanel == null)
-          {
-            log.error("queryPanel is not initialized");
-            return;
-          }
-
-          Set<String> corpusNameSet = new HashSet<>();
-          corpusNameSet.add(eQ.getCorpusName());
-          QueryController controller = ui.getQueryController();
-          if (controller != null)
-          {
-            controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-            controller.executeSearch(true, true);
-          }
+          log.error("controlPanel is not initialized");
+          return;
         }
-      });
-      return btn;
+
+        queryPanel = controlPanel.getQueryPanel();
+        if (queryPanel == null)
+        {
+          log.error("queryPanel is not initialized");
+          return;
+        }
+
+        Set<String> corpusNameSet = new HashSet<>();
+        corpusNameSet.add(eq.getCorpusName());
+        QueryController controller = ui.getQueryController();
+        if (controller != null)
+        {
+          controller.setQuery(new Query(eq.getExampleQuery(), corpusNameSet));
+          controller.executeSearch(true, true);
+        }
+      }
+      else if (COLUMN_OPEN_CORPUS_BROWSER.equals(event.getPropertyId()))
+      {
+        CorpusListPanel corpusList = ui.getControlPanel().getCorpusList();
+        corpusList.initCorpusBrowser(eq.getCorpusName(), null);
+      }
     }
   }
 
-  private class ShowCorpusBrowser implements Table.ColumnGenerator
+  private class QueryColumn extends PropertyValueGenerator<String>
+  {
+    /*
+     @Override
+     public Object generateCell(Table source, Object itemId, Object columnId)
+     {
+     final ExampleQuery eQ = (ExampleQuery) itemId;
+     Button btn = new Button();
+     btn.setDescription("show corpus browser for " + eQ.getCorpusName());
+     btn.addStyleName(ChameleonTheme.BUTTON_LINK);
+     btn.setIcon(SEARCH_ICON);
+     btn.setCaption(eQ.getExampleQuery());
+     btn.setDescription("show results for \"" + eQ.getExampleQuery()
+     + "\" in " + eQ.getCorpusName());
+     btn.addStyleName(Helper.CORPUS_FONT_FORCE);
+      
+     btn.addClickListener(new Button.ClickListener()
+     {
+     @Override
+     public void buttonClick(Button.ClickEvent event)
+     {
+     ControlPanel controlPanel = ui.getControlPanel();
+     QueryPanel queryPanel;
+
+     if (controlPanel == null)
+     {
+     log.error("controlPanel is not initialized");
+     return;
+     }
+
+     queryPanel = controlPanel.getQueryPanel();
+     if (queryPanel == null)
+     {
+     log.error("queryPanel is not initialized");
+     return;
+     }
+
+     Set<String> corpusNameSet = new HashSet<>();
+     corpusNameSet.add(eQ.getCorpusName());
+     QueryController controller = ui.getQueryController();
+     if (controller != null)
+     {
+     controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
+     controller.executeSearch(true, true);
+     }
+     }
+     });
+     return btn;
+     }
+     */
+
+    @Override
+    public String getValue(Item item, Object itemId, Object propertyId)
+    {
+      final ExampleQuery eQ = (ExampleQuery) itemId;
+      return eQ.getExampleQuery();
+    }
+
+    @Override
+    public Class<String> getType()
+    {
+      return String.class;
+    }
+  }
+
+  private class ShowCorpusBrowser extends PropertyValueGenerator<String>
   {
 
     @Override
-    public Object generateCell(Table source, Object itemId, Object columnId)
+    public String getValue(Item item, Object itemId, Object propertyId)
     {
       ExampleQuery eQ = (ExampleQuery) itemId;
-      return getOpenCorpusPanel(eQ.getCorpusName());
+      return eQ.getCorpusName();
+    }
+
+    @Override
+    public Class<String> getType()
+    {
+      return String.class;
     }
   }
 }

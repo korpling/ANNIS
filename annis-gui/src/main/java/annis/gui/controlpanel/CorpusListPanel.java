@@ -836,7 +836,10 @@ public class CorpusListPanel extends VerticalLayout implements
       @Override
       public void windowClose(Window.CloseEvent e)
       {
-        l.setEnabled(true);
+        if(l != null)
+        {
+          l.setEnabled(true);
+        }
       }
     });
 
