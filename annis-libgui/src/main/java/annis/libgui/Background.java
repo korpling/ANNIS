@@ -15,6 +15,7 @@
  */
 package annis.libgui;
 
+import com.vaadin.ui.UI;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -31,17 +32,30 @@ public class Background
   private static final ExecutorService exec = Executors.newCachedThreadPool();
   private static final Logger log = LoggerFactory.getLogger(Background.class);
   
-  public static Future<?> run(Runnable runnable)
+  public static Future<?> run(Runnable job)
   {
-    return call(Executors.callable(runnable));
+    return run(job, null, null);
+  }
+  
+  public static Future<?> run(Runnable job, UI ui, Runnable guiUpdate)
+  {
+    return call(Executors.callable(job), ui, guiUpdate);
   }
   
   public static <T> Future<T> call(
     final Callable<T> callable) 
   {
+    return call(callable, null, null);
+  }
+  
+  public static <T> Future<T> call(
+    final Callable<T> callable, UI ui, final Runnable guiUpdate) 
+  {
     
     if(callable != null)
     { 
+      final UI finalUI = ui == null ? UI.getCurrent() : ui;
+      
       Future<T> result = exec.submit(new Callable<T>()
       {
         @Override
@@ -51,6 +65,10 @@ public class Background
           try
           {
             result = callable.call();
+            if(guiUpdate != null)
+            {
+              finalUI.access(guiUpdate);
+            }
           }
           catch(Exception ex)
           {
