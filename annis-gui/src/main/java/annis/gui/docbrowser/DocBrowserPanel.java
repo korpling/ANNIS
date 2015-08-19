@@ -16,8 +16,8 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.model.Annotation;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.DocumentBrowserConfig;
@@ -25,13 +25,8 @@ import annis.service.objects.Visualizer;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Container;
-import com.vaadin.data.Item;
-import com.vaadin.data.Property;
-import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.FieldEvents;
-import static com.vaadin.server.Sizeable.SIZE_UNDEFINED;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Panel;
@@ -103,7 +98,7 @@ public class DocBrowserPanel extends Panel
     {
       layout.addComponent(progress);
       layout.setComponentAlignment(progress, Alignment.MIDDLE_CENTER);
-      PollControl.runInBackground(100, ui, new LoadingDocs());
+      Background.run(new LoadingDocs());
     }
   }
 

@@ -31,9 +31,9 @@ public class Background
   private static final ExecutorService exec = Executors.newCachedThreadPool();
   private static final Logger log = LoggerFactory.getLogger(Background.class);
   
-  public static void run(Runnable runnable)
+  public static Future<?> run(Runnable runnable)
   {
-    call(Executors.callable(runnable));
+    return call(Executors.callable(runnable));
   }
   
   public static <T> Future<T> call(

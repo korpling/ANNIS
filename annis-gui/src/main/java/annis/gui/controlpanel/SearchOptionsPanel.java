@@ -20,7 +20,7 @@ import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
-import annis.libgui.PollControl;
+import annis.libgui.Background;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.SegmentationList;
@@ -262,7 +262,7 @@ public class SearchOptionsPanel extends FormLayout
   public void updateSearchPanelConfigurationInBackground(
     final Set<String> corpora, final UI ui)
   {
-    PollControl.runInBackground(250, null, new Runnable()
+    Background.run(new Runnable()
     {
       @Override
       public void run()

@@ -20,7 +20,6 @@ import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.model.AqlParseError;
 import annis.service.objects.Match;
 import annis.service.objects.MatchGroup;
@@ -30,7 +29,6 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.uri.UriComponent;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.SaltProject;
 import java.util.LinkedList;
 import java.util.List;
@@ -178,7 +176,6 @@ public class ResultFetchJob extends AbstractResultFetchJob implements Runnable
 
           if (current == 0)
           {
-            PollControl.changePollingTime(ui, PollControl.DEFAULT_TIME);
             ui.access(new Runnable()
             {
               @Override
