@@ -21,21 +21,18 @@ import annis.gui.controlpanel.CorpusListPanel;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.Query;
 import annis.gui.resultview.ResultViewPanel;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.data.Property;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.Table;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
-import com.vaadin.server.ThemeResource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
@@ -45,7 +42,7 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.ExecutorService;
+import javax.swing.text.StyleConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -292,7 +289,7 @@ public class ExampleQueriesPanel extends Table
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    PollControl.runInBackground(100, ui, new Runnable()
+    Background.run(new Runnable()
     {
       @Override
       public void run()

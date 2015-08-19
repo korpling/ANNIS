@@ -53,6 +53,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
@@ -65,6 +66,8 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -88,6 +91,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class SearchUI extends CommonUI
   implements MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
