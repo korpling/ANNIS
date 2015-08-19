@@ -7,11 +7,23 @@ import shutil
 import argparse
 import tempfile
 import re
+import configparser
+import itertools
+
 
 def updateEnv(instDir):
 	env = os.environ.copy();
 	env["ANNIS_HOME"] = instDir;
 	return env
+	
+def getversion(instDir):
+	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh")], env=updateEnv(instDir))
+	
+	m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
+	if m:
+		return m.group(1,2,3)
+	else:
+		return None
 
 def checkDBSchemaVersion(instDir):
 	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
@@ -37,6 +49,16 @@ def stopService(instDir):
 		exit(3)
 	print("Stopped service in " + instDir)
 	
+def readConfigFile(path):
+	with open(path, "r") as f:
+		cstr = "[CONFIG]\n" + f.read()
+	config = configparser.ConfigParser()
+	config.read_string(cstr)
+	return config["CONFIG"]
+	
+def initDatabase(config, instDir):
+	pass
+	
 ###################
 # begin main code #
 ###################
@@ -45,9 +67,17 @@ parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
 parser.add_argument("archive", help="The archive file containing the new ANNIS version.")
 parser.add_argument("-b", "--backup", help="Perform a backup of already deployed ANNIS instances. This parameter defines also the prefix to use to name the folders.")
+parser.add_argument("-t", help="Test stuff", action="store_true")
 args = parser.parse_args()
 
+
 args.dir = os.path.normpath(args.dir)
+
+
+if args.t:
+	c = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
+	
+	exit(0)
 
 tmp = tempfile.mkdtemp(prefix="annisservice-upgrade-")
 
