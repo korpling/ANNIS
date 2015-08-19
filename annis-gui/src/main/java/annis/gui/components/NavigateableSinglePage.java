@@ -27,6 +27,9 @@ import com.vaadin.ui.MenuBar.MenuItem;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
+import elemental.json.JsonObject;
+import elemental.json.JsonType;
+import elemental.json.JsonValue;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -252,7 +255,11 @@ public class NavigateableSinglePage extends VerticalLayout
         @Override
         public void call(JsonArray arguments) throws JSONException
         {
-          onScroll(arguments.getString(0));
+          JsonValue headerID = arguments.get(0);
+          if(headerID.getType() == JsonType.STRING)
+          {
+            onScroll(headerID.asString());
+          }
           getState().setLastScrollPos((int) arguments.getNumber(1));
         }
       });
