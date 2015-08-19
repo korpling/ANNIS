@@ -23,9 +23,9 @@ import com.vaadin.annotations.StyleSheet;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.UI;
+import elemental.json.JsonArray;
 import java.util.HashSet;
 import java.util.Set;
-import org.json.JSONArray;
 import org.json.JSONException;
 
 /**
@@ -64,7 +64,7 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
     addFunction("wasLoaded", new JavaScriptFunction()
     {
       @Override
-      public void call(JSONArray arguments) throws JSONException
+      public void call(JsonArray arguments) throws JSONException
       {
         wasLoaded = true;
         for (Callback c : callbacks)
@@ -81,7 +81,7 @@ public class MediaElementPlayer extends AbstractJavaScriptComponent
   {
 
     @Override
-    public void call(JSONArray arguments) throws JSONException
+    public void call(JsonArray arguments) throws JSONException
     {
       if(UI.getCurrent() instanceof MimeTypeErrorListener)
       {
