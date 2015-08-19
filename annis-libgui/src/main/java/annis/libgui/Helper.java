@@ -35,6 +35,7 @@ import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
+import com.vaadin.server.JsonCodec;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
@@ -42,6 +43,7 @@ import com.vaadin.server.WrappedSession;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.UI;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
+import elemental.json.JsonValue;
 import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -851,5 +853,10 @@ public class Helper
     public AnnotationListType()
     {
     }
+  }
+  
+  public static<T> JsonValue encodeGeneric(Object v)
+  {
+    return JsonCodec.encode(v, null, v.getClass().getGenericSuperclass(), null).getEncodedValue();
   }
 }

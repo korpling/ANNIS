@@ -26,6 +26,7 @@ import java.util.LinkedList;
 import java.util.List;
 import org.apache.commons.lang3.StringUtils;
 import org.json.JSONException;
+import static annis.libgui.Helper.encodeGeneric;
 
 /**
  *
@@ -83,7 +84,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
     super.beforeClientResponse(initial);
     if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
+        lastScale.desc, lastFont, lastFontSize);
     }
   }
   
@@ -114,7 +116,8 @@ public class FrequencyWhiteboard extends AbstractJavaScriptComponent implements 
   {
     if(labels != null && values != null && lastScale != null && lastFont != null)
     {
-      callFunction("showData", labels, values, lastScale.desc, lastFont, lastFontSize);
+      callFunction("showData", encodeGeneric(labels), encodeGeneric(values), 
+        lastScale.desc, lastFont, lastFontSize);
     }
     return true;
   }
