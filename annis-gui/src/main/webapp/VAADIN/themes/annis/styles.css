@@ -12690,6 +12690,12 @@ div.v-layout.v-horizontal.v-widget {
 	font-family: monospace;
 }
 
+.annis .example-query-link {
+	width: 100%;
+	cursor: pointer;
+	color: #0f63e2;
+}
+
 .annis .cm-s-default .cm-string, .annis .cm-s-default .cm-string-2 {
 	color: #811b00;
 }

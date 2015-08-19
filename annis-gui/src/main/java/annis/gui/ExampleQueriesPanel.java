@@ -23,6 +23,8 @@ import annis.gui.objects.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Helper;
 import annis.libgui.PollControl;
+import com.google.common.escape.Escaper;
+import com.google.common.xml.XmlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -81,9 +83,9 @@ public class ExampleQueriesPanel extends Grid
   // hold the parent tab of annis3
   private final HelpPanel parentTab;
 
-  private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
-
   private final String COLUMN_OPEN_CORPUS_BROWSER = "open corpus browser";
+  
+  private final Escaper htmlAttEscp = XmlEscapers.xmlAttributeEscaper();
 
   public ExampleQueriesPanel(String caption, SearchUI ui, HelpPanel parentTab)
   {
@@ -108,15 +110,13 @@ public class ExampleQueriesPanel extends Grid
     setSizeFull();
 
     // Don't Allow selecting items from the table.
-    setSelectionMode(SelectionMode.SINGLE);
+    setSelectionMode(SelectionMode.NONE);
 
     // Send changes in selection immediately to server.
     setImmediate(true);
     // set custom style
-    //addStyleName("example-queries-table");
+    addStyleName("example-queries-table");
 
-    // put stripes to the table
-    //addStyleName(ChameleonTheme.TABLE_STRIPED);
 
     setWidth(100, Unit.PERCENTAGE);
     
@@ -129,14 +129,16 @@ public class ExampleQueriesPanel extends Grid
     getColumn(COLUMN_OPEN_CORPUS_BROWSER).setRenderer(corpusBrowserRenderer);
     getColumn(COLUMN_OPEN_CORPUS_BROWSER).
       setHeaderCaption("open corpus browser");
+    getColumn(COLUMN_OPEN_CORPUS_BROWSER).setExpandRatio(0);
 
     HtmlRenderer queryRenderer = new HtmlRenderer();
     generatedContainer.addGeneratedProperty("exampleQuery", new QueryColumn());
     getColumn("exampleQuery").setRenderer(queryRenderer);
     getColumn("exampleQuery").setHeaderCaption("Example Query");
+    getColumn("exampleQuery").setExpandRatio(1);
 
     getColumn("description").setHeaderCaption("Description");
-    getColumn("description").setExpandRatio(3);
+    getColumn("description").setExpandRatio(2);
 
     removeColumn("nodes");
     removeColumn("corpusName");
@@ -395,7 +397,21 @@ public class ExampleQueriesPanel extends Grid
     public String getValue(Item item, Object itemId, Object propertyId)
     {
       final ExampleQuery eQ = (ExampleQuery) itemId;
-      return "<a href=\"#\" style=\"display:block; width:100%\" >" + eQ.getExampleQuery() + "</a>";
+      
+      
+      
+      String title = "show results for \"" + eQ.getExampleQuery()
+        + "\" in " + eQ.getCorpusName();
+      
+      return 
+          "<div class=\"example-query-link " + Helper.CORPUS_FONT_FORCE + "\" "
+        + "title=\"" + htmlAttEscp.escape(title) + "\">"
+        + FontAwesome.SEARCH.getHtml()
+        + " "
+        + "<a href=\"#\" style=\"width:100%\" >" 
+        + eQ.getExampleQuery() + "</a>"
+        + "</div>"
+        ;
     }
 
     @Override
