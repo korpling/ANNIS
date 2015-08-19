@@ -38,6 +38,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@Deprecated
 public class PollControl
 {
   
