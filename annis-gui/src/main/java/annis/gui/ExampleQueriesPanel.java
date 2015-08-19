@@ -36,14 +36,12 @@ import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import javax.swing.text.StyleConstants;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -156,8 +154,6 @@ public class ExampleQueriesPanel extends Table
     super.attach();
 
     setUpTable();
-
-    loadExamplesFromRemote();
   }
 
   /**
@@ -227,29 +223,6 @@ public class ExampleQueriesPanel extends Table
     });
 
     return btn;
-  }
-
-  /**
-   * Loads all available example queries.
-   */
-  private void loadExamplesFromRemote()
-  {
-    final List<ExampleQuery> examples = new LinkedList<>();
-    Background.run(new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        examples.addAll(loadExamplesFromRemote(null));
-      }
-    }, ui, new Runnable()
-    {
-      @Override
-      public void run()
-      {
-        addItems(examples);
-      }
-    });
   }
 
   /**
