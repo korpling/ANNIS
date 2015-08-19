@@ -29,6 +29,7 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
+import elemental.json.JsonArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -38,7 +39,6 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -135,7 +135,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
   {
 
     @Override
-    public void call(JSONArray args) throws JSONException
+    public void call(JsonArray args) throws JSONException
     {
       log.debug("TextChangedFunction \"{}\"", args.getString(0));
       getState().text = args.getString(0);
@@ -143,7 +143,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       
       validate(dataSource.getValue());
       final String textCopy = dataSource.getValue();
-      final int cursorPos = args.getInt(1);
+      final int cursorPos = (int) args.getNumber(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
       {
 
