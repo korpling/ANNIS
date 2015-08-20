@@ -16,6 +16,7 @@
 
 package annis.security;
 
+import annis.CaseSensitiveOrder;
 import com.google.common.base.Splitter;
 import java.util.List;
 import java.util.Set;
@@ -36,7 +37,7 @@ public class Group
   public static final String DEFAULT_USER_ROLE = "user";
   
   private String name;
-  private Set<String> corpora = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private Set<String> corpora = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
 
   public Group()
   {

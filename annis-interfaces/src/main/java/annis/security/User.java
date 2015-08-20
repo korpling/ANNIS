@@ -16,6 +16,7 @@
 
 package annis.security;
 
+import annis.CaseSensitiveOrder;
 import annis.adapter.DateTimeAdapter;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
@@ -37,8 +38,8 @@ public class User
   
   private String name;
   private String passwordHash;
-  private TreeSet<String> groups = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
-  private TreeSet<String> permissions = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+  private TreeSet<String> groups = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
+  private TreeSet<String> permissions = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
   private DateTime expires;
  
   public User()

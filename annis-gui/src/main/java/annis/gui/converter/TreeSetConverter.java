@@ -16,10 +16,11 @@
 
 package annis.gui.converter;
 
+import annis.CaseSensitiveOrder;
+import com.google.common.base.Preconditions;
 import com.vaadin.data.util.converter.Converter;
 import java.util.Collection;
 import java.util.Locale;
-import java.util.Set;
 import java.util.TreeSet;
 
 /**
@@ -28,15 +29,16 @@ import java.util.TreeSet;
  */
 public class TreeSetConverter implements Converter<Object, TreeSet>
 {
-
   @Override
   public TreeSet convertToModel(Object value,
     Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
   {
-    TreeSet result = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+    TreeSet result = new TreeSet(CaseSensitiveOrder.INSTANCE);
     if(value instanceof Collection)
     {
       result.addAll((Collection) value);
+      Preconditions.checkState(result.size() == ((Collection) value).size(), 
+        "Collection which was used with the TreeSetConverter had duplicate entries.");
     }
     else
     {

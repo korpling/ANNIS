@@ -15,6 +15,7 @@
  */
 package annis.gui.converter;
 
+import annis.CaseSensitiveOrder;
 import com.google.common.base.Joiner;
 import com.google.common.base.Splitter;
 import com.vaadin.data.util.converter.Converter;
@@ -37,7 +38,7 @@ public class CommaSeperatedStringConverterSet implements Converter<String, TreeS
   public TreeSet convertToModel(String value,
     Class<? extends TreeSet> targetType, Locale locale) throws ConversionException
   {
-    TreeSet<String> result = new TreeSet<>(String.CASE_INSENSITIVE_ORDER);
+    TreeSet<String> result = new TreeSet<>(CaseSensitiveOrder.INSTANCE);
     for(String s : splitter.split(value))
     {
       result.add(s);
