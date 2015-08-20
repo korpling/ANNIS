@@ -103,6 +103,7 @@ def copyDatabase(instDir, oldInstDir, mail):
 		print(l, end="")
 	p.communicate()
 	if p.returncode != 0:
+		print("ERROR: copying existing corpora failed: error code " + str(p.returncode))
 		exit(30)
 	
 ###################
