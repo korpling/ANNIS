@@ -49,7 +49,6 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -107,6 +106,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private final QueryController controller;
 
+  private final HorizontalLayout selectionLayout;
   private final ComboBox cbSelection;
 
   private final TextField txtFilter;
@@ -130,9 +130,10 @@ public class CorpusListPanel extends VerticalLayout implements
 
     setSizeFull();
 
-    HorizontalLayout selectionLayout = new HorizontalLayout();
+    selectionLayout = new HorizontalLayout();
     selectionLayout.setWidth("100%");
     selectionLayout.setHeight("-1px");
+    selectionLayout.setVisible(false);
 
     Label lblVisible = new Label("Visible: ");
     lblVisible.setSizeUndefined();
@@ -167,6 +168,7 @@ public class CorpusListPanel extends VerticalLayout implements
     addComponent(selectionLayout);
 
     txtFilter = new TextField();
+    txtFilter.setVisible(false);
     txtFilter.setInputPrompt("Filter");
     txtFilter.setImmediate(true);
     txtFilter.setTextChangeTimeout(500);
@@ -828,9 +830,6 @@ public class CorpusListPanel extends VerticalLayout implements
           @Override
           public void run()
           {
-            tblCorpora.setVisible(true);
-            pbLoadCorpora.setVisible(false);
-
             if (newUserConfig != null && newCorpusList != null)
             {
               allCorpora = newCorpusList;
@@ -909,6 +908,8 @@ public class CorpusListPanel extends VerticalLayout implements
           public void run()
           {
             tblCorpora.setVisible(true);
+            txtFilter.setVisible(true);
+            selectionLayout.setVisible(true);
             pbLoadCorpora.setVisible(false);
 
           }
