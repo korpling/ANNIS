@@ -748,7 +748,7 @@ public class CorpusAdministration
     return administrationDao.listUnusedIndexes();
   }
 
-  public void copyFromOtherInstance(File dbProperties,
+  public boolean copyFromOtherInstance(File dbProperties,
     boolean overwrite, String mail)
   {
     if (dbProperties.isFile() && dbProperties.canRead())
@@ -769,6 +769,7 @@ public class CorpusAdministration
       if (corpusPaths.isEmpty())
       {
         log.warn("No corpora found");
+        return true;
       }
       else
       {
@@ -822,6 +823,7 @@ public class CorpusAdministration
             + "---------------\n"
             + Joiner.on("\n").join(corpusPaths) + "\n"
             + "---------------\n");
+          return true;
         }
         else
         {
@@ -855,6 +857,7 @@ public class CorpusAdministration
       log.error("Can not read the database configuration file {}", dbProperties.
         getAbsolutePath());
     }
+    return false;
   }
 
   ///// Helper

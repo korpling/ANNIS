@@ -468,9 +468,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       }
       
       File dbProperties = new File(cmdLine.getArgs()[0]);
-      corpusAdministration.copyFromOtherInstance(dbProperties, 
+      boolean success = corpusAdministration.copyFromOtherInstance(dbProperties, 
         cmdLine.hasOption("overwrite"),
         cmdLine.getOptionValue("mail"));
+      
+      if(!success)
+      {
+        System.exit(2);
+      }
       
       
     }
