@@ -3,17 +3,49 @@ Upgrading an ANNIS installation {#admin-upgrade}
 
 [TOC]
 
-
-
 These instructions are a guideline for upgrading the installation of ANNIS on a UNIX-like server. 
 If you use the [local ANNIS Kickstarter version](@ref admin-install-kickstarter) 
 just download the new version and re-initialize the database.
 Please read [the installation instructions](@ref admin-install-server) first if you
 haven't done so yet.
+
+
+Automatic upgrade {#admin-upgrade-automatic}
+=================
+
+Upgrading the ANNIS service is more complex than deploying the user interface WAR file.
+Therefore a Python script is available for an automatic upgrade. This script needs as least Python 3.2.
+
+1. Download the latest version of the script from GitHub: https://raw.githubusercontent.com/korpling/ANNIS/master/Misc/upgrade_service.py
+2. Download the new ANNIS release files (```annis-service-<VERSION>.tar.gz``` and ```annis-gui-<VERSION>.war```) 
+3. Run the script \code{.sh}python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz\endcode
+   If the new release uses a new database schema the update might take some time. Thus it might be better to execute the script in the background:
+   \code{.sh}
+   nohup python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz &
+   tail -f nohup.out
+   \endcode
+4. If succesful undeploy the old WAR file and deploy the new one.
+
+
+In case the upgrade script needed to update the database (it will tell you so), 
+you should delete the old schema from your PostgreSQL database by running the 
+following command in your PostgreSQL-Client:
+\code{.sql}
+DROP SCHEMA <oldschema>;
+\endcode
+
+\remarks To learn more about the (additional) parameters of the script run: \code{.sh}python3 upgrade_service.py --help\endcode
+
+Manual upgrade {#admin-upgrade-manual}
+==============
+
+When Python is not available it is still possible to execute the steps
+of the upgrade process manually.
 The upgrade path described here tries to have a minimum downtime.
 
+
 Upgrade for minor version updates {#admin-upgrade-minor}
-===========
+---------------------------------
 
 For minor version updates, e.g. from 3.1.0 to 3.1.1 (thus only
 the last version number changes) you can use the database from the older version
@@ -31,18 +63,16 @@ without any modifications. Thus an upgrade only consists of the following steps
 10. undeploy the old WAR file and deploy the new WAR file
 
 Full upgrade {#admin-upgrade-full}
-===========
+-------------
 
 Whenever the first or second number of the version changes you have to re-import
 the corpora into a newly initialized database.
 
-1. Download
------------
+### 1. Download
 Download both the `annis-service-<VERSION>.tar.gz` and the `annis-gui-<VERSION>.war`
 to a folder of your choice, e.g. `/tmp/`.
 
-2. Install the new service
---------------------------
+### 2. Install the new service
 
 Unzip the annis service to a new  directory (don't delete or stop the old service)
 and install it. 
@@ -64,8 +94,8 @@ The parameter `--schema` allows you to define a new [PostgreSQL schema](http://w
 which will be used for the new installation. 
 A good name could be something like "v32" if the version is 3.2.0.
 
-3. Copy old corpora
--------------------
+### 3. Copy old corpora
+
 With the command
 \code{.sh}
 annis-admin.sh copy <old installation director>/conf/database.properties
@@ -81,20 +111,17 @@ At the end a summary of all successfull and failed imports
 will be given. If there where any errors please try to import the corpus
 manually. When all corpora are imported, proceed to the next step.
 
-4. Switch service
------------------
+### 4. Switch service
 
 Stop the old service and start the
 new service. Remember to set the `ANNIS_HOME` variable to the right value in
 both cases before you call `annis-service.sh start/stop` command.
 
-5. Upgrade front-end
---------------------
+### 5. Upgrade front-end
 
 Undeploy the old WAR file and deploy the new WAR file.
 
-6. Cleanup
-----------
+### 6. Cleanup
 
 If everything works as expected you can delete the old installation files. You
 should also remove the contents of the old database by deleting the schema from the
