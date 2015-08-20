@@ -64,8 +64,9 @@ public class ExampleQueriesPanel extends CssLayout
 
   //main ui window
   private final SearchUI ui;
-  
+
   private final Table table;
+
   private final ProgressBar loadingIndicator;
 
   /**
@@ -90,14 +91,15 @@ public class ExampleQueriesPanel extends CssLayout
     super();
     this.ui = ui;
     this.parentTab = parentTab;
-    
+
     loadingIndicator = new ProgressBar();
     loadingIndicator.setIndeterminate(true);
     loadingIndicator.setCaption("Loading example queries...");
+    loadingIndicator.setVisible(false);
     addComponent(loadingIndicator);
-    
+
     table = new Table();
-    table.setVisible(false);
+    table.setVisible(true);
     //
     egContainer = new BeanItemContainer<>(ExampleQuery.class);
     table.setContainerDataSource(egContainer);
@@ -125,9 +127,9 @@ public class ExampleQueriesPanel extends CssLayout
     // put stripes to the table
     table.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
-
     // configure columns
-    table.addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
+    table.
+      addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
     table.addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
 
@@ -287,34 +289,54 @@ public class ExampleQueriesPanel extends CssLayout
    */
   public void setSelectedCorpusInBackground(final Set<String> selectedCorpora)
   {
-    final List<ExampleQuery> result = new LinkedList<>();
-    Background.run(new Runnable()
+    loadingIndicator.setVisible(true);
+    table.setVisible(false);
+    Background.run(new ExampleFetcher(selectedCorpora));
+  }
+
+  private class ExampleFetcher implements Runnable
+  {
+
+    private final Set<String> selectedCorpora;
+
+    public ExampleFetcher(Set<String> selectedCorpora)
     {
-      @Override
-      public void run()
+      this.selectedCorpora = selectedCorpora;
+    }
+
+    @Override
+    public void run()
+    {
+      final List<ExampleQuery> result = new LinkedList<>();
+      try
       {
         result.addAll(loadExamplesFromRemote(selectedCorpora));
       }
-    }, ui, new Runnable()
-    {
-      @Override
-      public void run()
+      finally
       {
-        loadingIndicator.setVisible(false);
-        table.setVisible(true);
-        
-        try
+        ui.access(new Runnable()
         {
-          table.removeAllItems();
-          addItems(result);
-        }
-        catch (Exception ex)
-        {
-          log.error("removing or adding of example queries failed for {}",
-            selectedCorpora, ex);
-        }
+          @Override
+          public void run()
+          {
+            loadingIndicator.setVisible(false);
+            table.setVisible(true);
+
+            try
+            {
+              table.removeAllItems();
+              addItems(result);
+            }
+            catch (Exception ex)
+            {
+              log.error("removing or adding of example queries failed for {}",
+                selectedCorpora, ex);
+            }
+          }
+        });
       }
-    });
+
+    }
 
   }
 

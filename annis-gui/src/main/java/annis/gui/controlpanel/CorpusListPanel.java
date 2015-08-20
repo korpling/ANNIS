@@ -102,6 +102,7 @@ public class CorpusListPanel extends CssLayout implements
   private BeanContainer<String, AnnisCorpus> corpusContainer;
 
   private final ProgressBar pbLoadCorpora;
+
   private Table tblCorpora;
 
   private final QueryController controller;
@@ -215,7 +216,7 @@ public class CorpusListPanel extends CssLayout implements
     pbLoadCorpora.setCaption("Loading corpus list...");
     pbLoadCorpora.setIndeterminate(true);
     addComponent(pbLoadCorpora);
-    
+
     tblCorpora = new Table();
 
     addComponent(tblCorpora);
@@ -295,7 +296,7 @@ public class CorpusListPanel extends CssLayout implements
     {
       ui.clearCorpusConfigCache();
     }
-    
+
     CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage);
     Background.run(updater);
   }
@@ -800,7 +801,7 @@ public class CorpusListPanel extends CssLayout implements
 
   private class CorpusListUpdater implements Runnable
   {
-    
+
     private final boolean showLoginMessage;
 
     public CorpusListUpdater(boolean showLoginMessage)
@@ -808,92 +809,108 @@ public class CorpusListPanel extends CssLayout implements
       this.showLoginMessage = showLoginMessage;
     }
 
-    
-    
     @Override
     public void run()
     {
       // query in background
-      
-      final UserConfig newUserConfig = getUserConfigFromRemote();
-      final List<AnnisCorpus> newCorpusList = getCorpusListFromServer();
-      // update the GUI
-      ui.access(new Runnable()
-      { 
-        @Override
-        public void run()
+
+      try
+      {
+        final UserConfig newUserConfig = getUserConfigFromRemote();
+        final List<AnnisCorpus> newCorpusList = getCorpusListFromServer();
+        
+        // update the GUI
+        ui.access(new Runnable()
         {
-          tblCorpora.setVisible(true);
-          pbLoadCorpora.setVisible(false);
-          
-          if (newUserConfig != null && newCorpusList != null)
+          @Override
+          public void run()
           {
-            allCorpora = newCorpusList;
-            userConfig = newUserConfig;
-            
-            if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
+            tblCorpora.setVisible(true);
+            pbLoadCorpora.setVisible(false);
+
+            if (newUserConfig != null && newCorpusList != null)
             {
-              if (showLoginMessage)
+              allCorpora = newCorpusList;
+              userConfig = newUserConfig;
+
+              if (VaadinSession.getCurrent().getAttribute(AnnisCorpus.class) == null)
               {
-                if (allCorpora.isEmpty())
+                if (showLoginMessage)
                 {
-                  Notification.show("No corpora found. Please login "
-                    + "(use button at upper right corner) to see more corpora.",
-                    Notification.Type.HUMANIZED_MESSAGE);
+                  if (allCorpora.isEmpty())
+                  {
+                    Notification.show("No corpora found. Please login "
+                      + "(use button at upper right corner) to see more corpora.",
+                      Notification.Type.HUMANIZED_MESSAGE);
+                  }
                 }
               }
-            }
 
-            Object oldSelection = cbSelection.getValue();
-            cbSelection.removeAllItems();
-            cbSelection.addItem(ALL_CORPORA);
+              Object oldSelection = cbSelection.getValue();
+              cbSelection.removeAllItems();
+              cbSelection.addItem(ALL_CORPORA);
 
-            List<CorpusSet> corpusSets = new LinkedList<>();
-            if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
-            {
-              corpusSets.addAll(instanceConfig.getCorpusSets());
-            }
-
-            if (userConfig.getCorpusSets() != null)
-            {
-              corpusSets.addAll(userConfig.getCorpusSets());
-            }
-
-            // add the corpus set names in sorted order
-            TreeSet<String> corpusSetNames = new TreeSet<>();
-            for (CorpusSet cs : corpusSets)
-            {
-              corpusSetNames.add(cs.getName());
-            }
-            for (String s : corpusSetNames)
-            {
-              cbSelection.addItem(s);
-            }
-
-            // restore old selection or select the ALL corpus selection
-            if (oldSelection != null && cbSelection.containsId(oldSelection))
-            {
-              cbSelection.select(oldSelection);
-            }
-            else
-            {
-
-              if (instanceConfig != null && instanceConfig.getDefaultCorpusSet() != null
-                && instanceConfig.getDefaultCorpusSet().length() > 0)
+              List<CorpusSet> corpusSets = new LinkedList<>();
+              if (instanceConfig != null && instanceConfig.getCorpusSets() != null)
               {
-                cbSelection.select(instanceConfig.getDefaultCorpusSet());
+                corpusSets.addAll(instanceConfig.getCorpusSets());
+              }
+
+              if (userConfig.getCorpusSets() != null)
+              {
+                corpusSets.addAll(userConfig.getCorpusSets());
+              }
+
+              // add the corpus set names in sorted order
+              TreeSet<String> corpusSetNames = new TreeSet<>();
+              for (CorpusSet cs : corpusSets)
+              {
+                corpusSetNames.add(cs.getName());
+              }
+              for (String s : corpusSetNames)
+              {
+                cbSelection.addItem(s);
+              }
+
+              // restore old selection or select the ALL corpus selection
+              if (oldSelection != null && cbSelection.containsId(oldSelection))
+              {
+                cbSelection.select(oldSelection);
               }
               else
               {
-                cbSelection.select(ALL_CORPORA);
-              }
-            }
 
-            updateCorpusTable();
-            updateAutoGeneratedQueriesPanel();
-          } // end if querying the server for corpus list was successful
-        }
-      });
+                if (instanceConfig != null && instanceConfig.
+                  getDefaultCorpusSet() != null
+                  && instanceConfig.getDefaultCorpusSet().length() > 0)
+                {
+                  cbSelection.select(instanceConfig.getDefaultCorpusSet());
+                }
+                else
+                {
+                  cbSelection.select(ALL_CORPORA);
+                }
+              }
+
+              updateCorpusTable();
+              updateAutoGeneratedQueriesPanel();
+            } // end if querying the server for corpus list was successful
+          }
+        });
+      }
+      finally
+      {
+        ui.access(new Runnable()
+        {
+          @Override
+          public void run()
+          {
+            tblCorpora.setVisible(true);
+            pbLoadCorpora.setVisible(false);
+
+          }
+        });
+      }
 
     }
 

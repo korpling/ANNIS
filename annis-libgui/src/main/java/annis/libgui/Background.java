@@ -34,28 +34,15 @@ public class Background
   
   public static Future<?> run(Runnable job)
   {
-    return run(job, null, null);
-  }
-  
-  public static Future<?> run(Runnable job, UI ui, Runnable guiUpdate)
-  {
-    return call(Executors.callable(job), ui, guiUpdate);
+    return call(Executors.callable(job));
   }
   
   public static <T> Future<T> call(
     final Callable<T> callable) 
   {
-    return call(callable, null, null);
-  }
-  
-  public static <T> Future<T> call(
-    final Callable<T> callable, UI ui, final Runnable guiUpdate) 
-  {
     
     if(callable != null)
     { 
-      final UI finalUI = ui == null ? UI.getCurrent() : ui;
-      
       Future<T> result = exec.submit(new Callable<T>()
       {
         @Override
@@ -64,11 +51,7 @@ public class Background
           T result = null;
           try
           {
-            result = callable.call();
-            if(guiUpdate != null)
-            {
-              finalUI.access(guiUpdate);
-            }
+            result = callable.call()
           }
           catch(Exception ex)
           {
