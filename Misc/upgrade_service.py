@@ -126,7 +126,6 @@ parser.add_argument("archive", help="The archive file containing the new ANNIS v
 parser.add_argument("-b", "--backup", help="Perform a backup of the files of the existing installation. This parameter defines also the prefix to use for the name of the backup folder.")
 parser.add_argument("-c", "--cleanup-data", action="store_true", help="""This will delete all data files not known to the current instance of ANNIS. 
 If you have multiple parallel installations and did not use different values for the annis.external-data-path variable in the conf/annis-service.properties the data files of the other installations will be lost.""")
-parser.add_argument("--force-db-update", help="Force an update of the database even is this is not necessary", action="store_true")
 parser.add_argument("-m", "--mail", help="Mail adress that should be used for notifications when copying corpora from the existing installation.")
 args = parser.parse_args()
 
@@ -159,7 +158,7 @@ shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(ne
 copiedCorpora=False
 
 print("Check database schema version")
-if args.force_db_update or (not checkDBSchemaVersion(extracted)):
+if (not checkDBSchemaVersion(extracted)):
 	print("======================================================")
 	print("Need to update the database and re-import all corpora.")
 	print("This might take a long time!")
