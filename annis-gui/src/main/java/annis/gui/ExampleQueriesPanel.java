@@ -35,7 +35,9 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.shared.ui.label.ContentMode;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
@@ -51,7 +53,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author Benjamin Weißenfels <b.pixeldrama@gmail.com>
  */
-public class ExampleQueriesPanel extends Table
+public class ExampleQueriesPanel extends CssLayout
 {
 
   private final String COLUMN_EXAMPLE_QUERY = "exampleQuery";
@@ -62,6 +64,9 @@ public class ExampleQueriesPanel extends Table
 
   //main ui window
   private final SearchUI ui;
+  
+  private final Table table;
+  private final ProgressBar loadingIndicator;
 
   /**
    * Bean Container for example queries. Key is the corpus name.
@@ -85,10 +90,18 @@ public class ExampleQueriesPanel extends Table
     super();
     this.ui = ui;
     this.parentTab = parentTab;
-
+    
+    loadingIndicator = new ProgressBar();
+    loadingIndicator.setIndeterminate(true);
+    loadingIndicator.setCaption("Loading example queries...");
+    addComponent(loadingIndicator);
+    
+    table = new Table();
+    table.setVisible(false);
     //
     egContainer = new BeanItemContainer<>(ExampleQuery.class);
-    setContainerDataSource(egContainer);
+    table.setContainerDataSource(egContainer);
+    addComponent(table);
   }
 
   /**
@@ -96,30 +109,29 @@ public class ExampleQueriesPanel extends Table
    */
   private void setUpTable()
   {
-
-    // expand the table
     setSizeFull();
+    // expand the table
+    table.setSizeFull();
 
     // Allow selecting items from the table.
-    setSelectable(false);
+    table.setSelectable(false);
 
     // Send changes in selection immediately to server.
-    setImmediate(true);
+    table.setImmediate(true);
 
     // set custom style
-    addStyleName("example-queries-table");
+    table.addStyleName("example-queries-table");
 
     // put stripes to the table
-    addStyleName(ChameleonTheme.TABLE_STRIPED);
+    table.addStyleName(ChameleonTheme.TABLE_STRIPED);
 
-    setWidth(100, Unit.PERCENTAGE);
 
     // configure columns
-    addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
+    table.addGeneratedColumn(COLUMN_OPEN_CORPUS_BROWSER, new ShowCorpusBrowser());
 
-    addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
+    table.addGeneratedColumn(COLUMN_EXAMPLE_QUERY, new QueryColumn());
 
-    addGeneratedColumn(COLUMN_DESCRIPTION, new ColumnGenerator()
+    table.addGeneratedColumn(COLUMN_DESCRIPTION, new Table.ColumnGenerator()
     {
       @Override
       public Object generateCell(Table source, Object itemId, Object columnId)
@@ -132,19 +144,19 @@ public class ExampleQueriesPanel extends Table
       }
     });
 
-    setVisibleColumns(new Object[]
+    table.setVisibleColumns(new Object[]
     {
       COLUMN_EXAMPLE_QUERY,
       COLUMN_DESCRIPTION,
       COLUMN_OPEN_CORPUS_BROWSER
     });
 
-    setColumnExpandRatio(getVisibleColumns()[0], 0.40f);
-    setColumnExpandRatio(getVisibleColumns()[1], 0.40f);
+    table.setColumnExpandRatio(table.getVisibleColumns()[0], 0.40f);
+    table.setColumnExpandRatio(table.getVisibleColumns()[1], 0.40f);
 
-    setColumnHeader(getVisibleColumns()[0], "Example Query");
-    setColumnHeader(getVisibleColumns()[1], "Description");
-    setColumnHeader(getVisibleColumns()[2], "open corpus browser");
+    table.setColumnHeader(table.getVisibleColumns()[0], "Example Query");
+    table.setColumnHeader(table.getVisibleColumns()[1], "Description");
+    table.setColumnHeader(table.getVisibleColumns()[2], "open corpus browser");
 
   }
 
@@ -288,9 +300,12 @@ public class ExampleQueriesPanel extends Table
       @Override
       public void run()
       {
+        loadingIndicator.setVisible(false);
+        table.setVisible(true);
+        
         try
         {
-          removeAllItems();
+          table.removeAllItems();
           addItems(result);
         }
         catch (Exception ex)
