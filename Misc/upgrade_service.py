@@ -9,7 +9,7 @@ import tempfile
 import re
 import configparser
 import itertools
-
+from urllib.parse import urlparse
 
 def updateEnv(instDir):
 	env = os.environ.copy();
@@ -17,20 +17,18 @@ def updateEnv(instDir):
 	return env
 	
 def getversion(instDir):
-	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh")], env=updateEnv(instDir))
+	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh"), "version"], env=updateEnv(instDir), universal_newlines=True)
 	
-	m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
-	if m:
-		return m.group(1,2,3)
-	else:
-		return None
+	for raw in o.split("\n"):
+		m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
+		if m:
+			return m.group(1,2,3)
+	return None
 
 def checkDBSchemaVersion(instDir):
 	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
 	p.wait()
-	if p.returncode != 0:
-		print("Can't update service automatically since the new version has a different database scheme!")
-		exit(10)
+	return p.returncode == 0
 
 def startService(instDir):
 	print("Starting service in " + instDir)
@@ -55,9 +53,57 @@ def readConfigFile(path):
 	config = configparser.ConfigParser()
 	config.read_string(cstr)
 	return config["CONFIG"]
+
+def initArgsFromConfig(config):
+	urlRaw = config["datasource.url"].strip()
+	if urlRaw.startswith("jdbc:"):
+		urlRaw = urlRaw[len("jdbc:"):]
+	url = urlparse(urlRaw)
+	
+	
+	# append mandatory elements
+	r = ["--host", url.hostname, "--database", url.path[1:],
+		"--user", config["datasource.username"].strip(),
+		"--password", config["datasource.password"].strip()]
+	# optional arguments
+	if config["datasource.ssl"] and config["datasource.ssl"].strip().lower() == "true" :
+		r.append("--ssl")
+	if config["datasource.schema"]:
+		r.append("--schema")
+		r.append(config["datasource.schema"].strip())
+		
+	return r
 	
 def initDatabase(config, instDir):
-	pass
+	
+	a = initArgsFromConfig(config)
+	a.insert(0, os.path.join(instDir, "bin", "annis-admin.sh"))
+	a.insert(1, "init")
+	
+	p = subprocess.Popen(a, env=updateEnv(instDir), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, universal_newlines=True)
+	for l in p.stdout:
+		print(l, end="")
+	p.communicate()
+	if p.returncode != 0:
+		print("ERROR: initialization of database returned error code " + str(p.returncode))
+		exit(20)
+		
+def copyDatabase(instDir, oldInstDir, mail):
+	
+	a = [os.path.join(instDir, "bin", "annis-admin.sh"), "copy", 
+		os.path.join(oldInstDir, "conf", "database.properties")]
+	
+	if mail:
+		a.append("--mail")
+		a.append(mail)
+	
+	p = subprocess.Popen(a, env=updateEnv(instDir), stderr=subprocess.STDOUT, 
+		stdout=subprocess.PIPE, universal_newlines=True)
+	for l in p.stdout:
+		print(l, end="")
+	p.communicate()
+	if p.returncode != 0:
+		exit(30)
 	
 ###################
 # begin main code #
@@ -67,17 +113,12 @@ parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
 parser.add_argument("archive", help="The archive file containing the new ANNIS version.")
 parser.add_argument("-b", "--backup", help="Perform a backup of already deployed ANNIS instances. This parameter defines also the prefix to use to name the folders.")
-parser.add_argument("-t", help="Test stuff", action="store_true")
+parser.add_argument("--force-db-update", help="Force an update of the database even is this is not necessary", action="store_true")
+parser.add_argument("-m", "--mail", help="Mail adress that should be used when for notifications when copying corpora from the existing installation.")
 args = parser.parse_args()
 
 
 args.dir = os.path.normpath(args.dir)
-
-
-if args.t:
-	c = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
-	
-	exit(0)
 
 tmp = tempfile.mkdtemp(prefix="annisservice-upgrade-")
 
@@ -103,7 +144,15 @@ shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(ne
 
 # check if we can update without any database migration
 print("Check database schema version")
-checkDBSchemaVersion(extracted)
+if args.force_db_update or (not checkDBSchemaVersion(extracted)):
+	print("Need to update the database and re-import all corpora. This might take a long time!")
+	dbconfig = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
+	version = getversion(extracted)
+	if version:
+		dbconfig["datasource.schema"] = "annis" + version[0] + version[1]
+		print("New schema name is " + dbconfig["datasource.schema"])
+	initDatabase(dbconfig, extracted)
+	copyDatabase(extracted, args.dir, args.mail)
 
 stopService(args.dir)
 
