@@ -79,6 +79,10 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     addStyleName("aql-code-editor");
     
     AqlCodeEditor.this.setPropertyDataSource(new ObjectProperty("", String.class));
+    
+    // init to one so the client (which starts with 0) at initialization always uses
+    // the the values provided by the server state
+    AqlCodeEditor.this.getState().serverRequestCounter = 1;
   }
   
 
