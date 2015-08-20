@@ -75,7 +75,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class CorpusListPanel extends CssLayout implements
+public class CorpusListPanel extends VerticalLayout implements
   AbstractSelect.NewItemHandler, Action.Handler
 {
 
@@ -282,6 +282,9 @@ public class CorpusListPanel extends CssLayout implements
     selectionLayout.setComponentAlignment(btReload, Alignment.MIDDLE_RIGHT);
 
     tblCorpora.setSortContainerPropertyId("name");
+    
+    setExpandRatio(tblCorpora, 1.0f);
+    
     updateCorpusSetList(true);
   }
 
