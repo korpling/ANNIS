@@ -144,6 +144,8 @@ shutil.copy2(os.path.join(origconf, "database.properties"), os.path.join(newconf
 shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(newconf, "annis-service.properties"))
 
 # check if we can update without any database migration
+copiedCorpora=False
+
 print("Check database schema version")
 if args.force_db_update or (not checkDBSchemaVersion(extracted)):
 	print("======================================================")
@@ -153,10 +155,11 @@ if args.force_db_update or (not checkDBSchemaVersion(extracted)):
 	dbconfig = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
 	version = getversion(extracted)
 	if version:
-		dbconfig["datasource.schema"] = "annis" + version[0] + version[1]
+		dbconfig["datasource.schema"] = "annis_autoupgrade" + version[0] + version[1] + version[2]
 		print("New schema name is " + dbconfig["datasource.schema"])
 	initDatabase(dbconfig, extracted)
 	copyDatabase(extracted, args.dir, args.mail)
+	copiedCorpora = True
 
 stopService(args.dir)
 
@@ -176,3 +179,10 @@ shutil.move(extracted, args.dir)
 shutil.rmtree(tmp)
 
 startService(args.dir)
+
+if copiedCorpora:
+	print("============================================================")
+	print("Finished! Please remember to delete the old database schema.")
+else:
+	print("=========")
+	print("Finished!")
