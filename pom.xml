@@ -68,7 +68,7 @@
   </repositories>
   
   <properties>
-    <servlet.version>2.5</servlet.version>
+    <servlet.version>3.0.1</servlet.version>
     <vaadin.version>7.5.3</vaadin.version>
   </properties>
 

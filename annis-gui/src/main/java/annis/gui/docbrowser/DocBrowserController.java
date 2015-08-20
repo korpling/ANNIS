@@ -16,9 +16,9 @@
 package annis.gui.docbrowser;
 
 import annis.gui.SearchUI;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
-import annis.libgui.PollControl;
 import annis.libgui.visualizers.FilteringVisualizerPlugin;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.libgui.visualizers.VisualizerPlugin;
@@ -133,8 +133,7 @@ public class DocBrowserController implements Serializable
     // register visible visHolder
     this.visibleVisHolder.put(canonicalTitle, visHolder);
 
-    PollControl.runInBackground(100, ui,
-      new DocVisualizerFetcher(corpus, doc, canonicalTitle,
+    Background.run(new DocVisualizerFetcher(corpus, doc, canonicalTitle,
         visConfig.getType(), visHolder, visConfig, btn, UI.getCurrent())
     );
   }

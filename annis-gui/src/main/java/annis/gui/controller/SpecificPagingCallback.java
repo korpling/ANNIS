@@ -21,7 +21,7 @@ import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
 import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
-import annis.libgui.PollControl;
+import annis.libgui.Background;
 import java.util.concurrent.Future;
 
 /**
@@ -63,8 +63,7 @@ public class SpecificPagingCallback implements PagingCallback
       ui.updateFragment(newQuery);
       ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
       ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
-      Future<?> future = PollControl.runInBackground(500, ui,
-        new ResultFetchJob(newQuery, panel, ui));
+      Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
       ui.getQueryState().getExecutedTasks().
         put(QueryUIState.QueryType.FIND, future);
     }

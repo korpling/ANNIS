@@ -35,8 +35,8 @@ import annis.gui.resultfetch.ResultFetchJob;
 import annis.gui.resultfetch.SingleResultFetchJob;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.resultview.VisualizerContextChanger;
+import annis.libgui.Background;
 import annis.libgui.Helper;
-import annis.libgui.PollControl;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
@@ -51,7 +51,6 @@ import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.sun.jersey.api.uri.UriComponent;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.server.FontAwesome;
@@ -325,7 +324,7 @@ public class QueryController implements Serializable
     ui.getMainTab().setSelectedTab(newResultView);
     ui.notifiyQueryStarted();
 
-    PollControl.runInBackground(500, 250, ui, new ResultFetchJob(pagedQuery,
+    Background.run(new ResultFetchJob(pagedQuery,
       newResultView, ui));
 
     //
@@ -344,8 +343,7 @@ public class QueryController implements Serializable
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
-    PollControl.runInBackground(500, ui,
-      new CountCallback(newResultView, pagedQuery.getLimit(), ui));
+    Background.run(new CountCallback(newResultView, pagedQuery.getLimit(), ui));
 
     //
     // end execute count
@@ -365,8 +363,7 @@ public class QueryController implements Serializable
 
     addHistoryEntry(query);
 
-    exportFuture = PollControl.callInBackground(1000, null,
-      new ExportBackgroundJob(query,
+    exportFuture = Background.call(new ExportBackgroundJob(query,
         getExporterByName(query.getExporterName()), ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
@@ -435,7 +432,7 @@ public class QueryController implements Serializable
 
     FrequencyBackgroundJob job = new FrequencyBackgroundJob(ui, query, panel);
 
-    freqFuture = PollControl.callInBackground(1000, ui, job);
+    freqFuture = Background.call(job);
     state.getExecutedTasks().put(QueryUIState.QueryType.FREQUENCY, freqFuture);
   }
 
@@ -521,8 +518,7 @@ public class QueryController implements Serializable
 
     newQuery.setOffset(offset);
 
-    PollControl.runInBackground(500, ui,
-      new SingleResultFetchJob(match, newQuery,
+    Background.run(new SingleResultFetchJob(match, newQuery,
         visCtxChange));
 
   }

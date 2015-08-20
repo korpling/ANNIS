@@ -650,7 +650,7 @@ public class Helper
    */
   public static CorpusConfigMap getCorpusConfigs()
   {
-
+    
     CorpusConfigMap corpusConfigurations = null;
 
     try
@@ -658,17 +658,19 @@ public class Helper
       corpusConfigurations = Helper.getAnnisWebResource().path(
         "query").path("corpora").path("config").get(CorpusConfigMap.class);
     }
-    catch (UniformInterfaceException ex)
+    catch (UniformInterfaceException | ClientHandlerException ex)
     {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
-    }
-    catch (ClientHandlerException ex)
-    {
-      new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
-        ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true)
-        .show(Page.getCurrent());
+      UI.getCurrent().access(new Runnable()
+      {
+
+        @Override
+        public void run()
+        {
+          new Notification(ERROR_MESSAGE_CORPUS_PROPS_HEADER,
+            ERROR_MESSAGE_CORPUS_PROPS, Notification.Type.WARNING_MESSAGE, true).
+            show(Page.getCurrent());
+        }
+      });
     }
 
     if (corpusConfigurations == null)
@@ -677,7 +679,7 @@ public class Helper
     }
 
     corpusConfigurations.put(DEFAULT_CONFIG, getDefaultCorpusConfig());
-
+    
     return corpusConfigurations;
   }
 

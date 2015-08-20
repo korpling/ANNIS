@@ -28,10 +28,13 @@ import annis.gui.admin.view.UIView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -45,6 +48,7 @@ import java.util.List;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class AdminUI extends CommonUI implements UIView, LoginListener,
   Page.UriFragmentChangedListener, TabSheet.SelectedTabChangeListener
 {

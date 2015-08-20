@@ -38,6 +38,7 @@ import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
 import annis.gui.servlets.ResourceServlet;
+import annis.libgui.Background;
 import static annis.libgui.Helper.*;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
@@ -53,6 +54,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ErrorHandler;
@@ -65,6 +67,8 @@ import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
+import com.vaadin.shared.communication.PushMode;
+import com.vaadin.shared.ui.ui.Transport;
 
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -88,6 +92,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
+@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
 public class SearchUI extends CommonUI
   implements MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
@@ -98,7 +103,7 @@ public class SearchUI extends CommonUI
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchUI.class);
-  
+
   static final Exporter[] EXPORTER = new Exporter[]
   {
     new WekaExporter(),
@@ -107,7 +112,7 @@ public class SearchUI extends CommonUI
     new GridExporter(),
     new SimpleTextExporter()
   };
-  
+
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
 
@@ -138,7 +143,7 @@ public class SearchUI extends CommonUI
   private Set<Component> selectedTabHistory;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
-  
+
   private final QueryUIState queryState = new QueryUIState();
 
   private void initTransients()
@@ -220,7 +225,7 @@ public class SearchUI extends CommonUI
     });
 
     getPage().addUriFragmentChangedListener(this);
-    
+
     getSession().addRequestHandler(new SearchUI.CitationRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
@@ -232,72 +237,12 @@ public class SearchUI extends CommonUI
     checkCitation();
     lastQueriedFragment = "";
 
-    checkServiceVersion();
+    Background.run(new VersionChecker());
     evaluateFragment(getPage().getUriFragment());
 
   }
 
-  private void checkServiceVersion()
-  {
-    try
-    {
-      WebResource resRelease
-        = Helper.getAnnisWebResource().path("version").path("release");
-      String releaseService = resRelease.get(String.class);
-      String releaseGUI = VersionInfo.getReleaseName();
-
-      // check if the release version differs and show a big warning
-      if (!releaseGUI.equals(releaseService))
-      {
-        Notification.show("Different service version",
-          "The service uses version " + releaseService
-          + " but the user interface is using version  " + releaseGUI
-          + ". This can produce unwanted errors.",
-          Notification.Type.WARNING_MESSAGE);
-      }
-      else
-      {
-        // show a smaller warning if the revisions are not the same
-        WebResource resRevision
-          = Helper.getAnnisWebResource().path("version").path("revision");
-        String revisionService = resRevision.get(String.class);
-        String revisionGUI = VersionInfo.getBuildRevision();
-
-        if (!revisionService.equals(revisionGUI))
-        {
-          // shorten the strings
-          String commonPrefix = Strings.commonPrefix(revisionService,
-            revisionGUI);
-          int outputLength = Math.max(6, commonPrefix.length() + 2);
-          String revisionServiceShort = revisionService.substring(0,
-            Math.min(revisionService.length() - 1, outputLength));
-          String revisionGUIShort = revisionGUI.substring(0,
-            Math.min(revisionGUI.length() - 1, outputLength));
-
-          Notification n = new Notification("Different service revision",
-            "The service uses revision <code title=\"" + revisionGUI
-            + "\">" + revisionServiceShort
-            + "</code> but the user interface is using revision  <code title=\""
-            + revisionGUI + "\">" + revisionGUIShort
-            + "</code>.",
-            Notification.Type.TRAY_NOTIFICATION);
-          n.setHtmlContentAllowed(true);
-          n.setDelayMsec(3000);
-          n.show(Page.getCurrent());
-        }
-      }
-    }
-    catch (UniformInterfaceException ex)
-    {
-      log.warn("Could not get the version of the service", ex);
-    }
-    catch (ClientHandlerException ex)
-    {
-      log.warn(
-        "Could not get the version of the service because service is not running",
-        ex);
-    }
-  }
+  
 
   @Override
   public void error(com.vaadin.server.ErrorEvent event)
@@ -557,8 +502,8 @@ public class SearchUI extends CommonUI
             "could not parse context value", ex);
         }
         queryController.setQuery(
-            new PagedResultQuery(cleft, cright, 0, 10, null, aql,
-              selectedCorpora));
+          new PagedResultQuery(cleft, cright, 0, 10, null, aql,
+            selectedCorpora));
       }
       else
       {
@@ -618,7 +563,7 @@ public class SearchUI extends CommonUI
     }
 
   }
-  
+
   public void closeTab(Component c)
   {
     selectedTabHistory.remove(c);
@@ -636,12 +581,12 @@ public class SearchUI extends CommonUI
       selectedTabHistory.add(tab);
     }
   }
-  
+
   public ResultViewPanel getLastSelectedResultView()
   {
-    for(Component c : selectedTabHistory)
+    for (Component c : selectedTabHistory)
     {
-      if(c instanceof ResultViewPanel && mainTab.getTab(c) != null)
+      if (c instanceof ResultViewPanel && mainTab.getTab(c) != null)
       {
         return (ResultViewPanel) c;
       }
@@ -663,7 +608,6 @@ public class SearchUI extends CommonUI
   {
     return queryController;
   }
-  
 
   public TabSheet getMainTab()
   {
@@ -776,7 +720,7 @@ public class SearchUI extends CommonUI
   {
     evaluateFragment(event.getUriFragment());
   }
-  
+
   /**
    * Takes a list of raw corpus names as given by the #c parameter and returns a
    * list of corpus names that are known to exist. It also replaces alias names
@@ -799,7 +743,7 @@ public class SearchUI extends CommonUI
           = rootRes.path("query").path("corpora").path(urlPathEscape.escape(
               selectedCorpusName))
           .get(new GenericType<List<AnnisCorpus>>()
-            {
+          {
           });
 
         if (corporaByName == null || corporaByName.isEmpty())
@@ -877,7 +821,7 @@ public class SearchUI extends CommonUI
       //String a = args.get("cl");
       //String b = args.get("cr");
       //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      
+
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       PagedResultQuery query = new PagedResultQuery(
@@ -886,19 +830,19 @@ public class SearchUI extends CommonUI
         Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
         args.get("seg"),
         args.get("q"), corpora);
-      
-      if(args.get("o") != null)
+
+      if (args.get("o") != null)
       {
         try
         {
           query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
         }
-        catch(IllegalArgumentException ex)
+        catch (IllegalArgumentException ex)
         {
           log.warn("Could not parse query fragment argument for order", ex);
         }
       }
-      
+
       // full query with given context
       queryController.setQuery(query);
       queryController.executeSearch(true, false);
@@ -988,12 +932,11 @@ public class SearchUI extends CommonUI
     return docBrowserController;
   }
 
-
   public QueryUIState getQueryState()
   {
     return queryState;
-  }  
-  
+  }
+
   public FontConfig getInstanceFont()
   {
     if (instanceConfig != null && instanceConfig.getFont() != null)
@@ -1002,7 +945,85 @@ public class SearchUI extends CommonUI
     }
     return null;
   }
-  
+
+  private class VersionChecker implements Runnable
+  {
+
+    @Override
+    public void run()
+    {
+      try
+      {
+        WebResource resRelease
+          = Helper.getAnnisWebResource().path("version").path("release");
+        final String releaseService = resRelease.get(String.class);
+        final String releaseGUI = VersionInfo.getReleaseName();
+
+        WebResource resRevision
+          = Helper.getAnnisWebResource().path("version").path("revision");
+        final String revisionService = resRevision.get(String.class);
+        final String revisionGUI = VersionInfo.getBuildRevision();
+
+        // GUI update
+        access(new Runnable()
+        {
+
+          @Override
+          public void run()
+          {
+            // check if the release version differs and show a big warning
+            if (!releaseGUI.equals(releaseService))
+            {
+              Notification.show("Different service version",
+                "The service uses version " + releaseService
+                + " but the user interface is using version  " + releaseGUI
+                + ". This can produce unwanted errors.",
+                Notification.Type.WARNING_MESSAGE);
+            }
+            else
+            {
+              // show a smaller warning if the revisions are not the same
+
+              if (!revisionService.equals(revisionGUI))
+              {
+                // shorten the strings
+                String commonPrefix = Strings.commonPrefix(revisionService,
+                  revisionGUI);
+                int outputLength = Math.max(6, commonPrefix.length() + 2);
+                String revisionServiceShort = revisionService.substring(0,
+                  Math.min(revisionService.length() - 1, outputLength));
+                String revisionGUIShort = revisionGUI.substring(0,
+                  Math.min(revisionGUI.length() - 1, outputLength));
+
+                Notification n = new Notification("Different service revision",
+                  "The service uses revision <code title=\"" + revisionGUI
+                  + "\">" + revisionServiceShort
+                  + "</code> but the user interface is using revision  <code title=\""
+                  + revisionGUI + "\">" + revisionGUIShort
+                  + "</code>.",
+                  Notification.Type.TRAY_NOTIFICATION);
+                n.setHtmlContentAllowed(true);
+                n.setDelayMsec(3000);
+                n.show(Page.getCurrent());
+              }
+            }
+          }
+        });
+
+      }
+      catch (UniformInterfaceException ex)
+      {
+        log.warn("Could not get the version of the service", ex);
+      }
+      catch (ClientHandlerException ex)
+      {
+        log.warn(
+          "Could not get the version of the service because service is not running",
+          ex);
+      }
+
+    }
+
+  }
+
 }
-
-

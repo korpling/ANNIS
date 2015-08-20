@@ -16,10 +16,10 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
 import annis.libgui.PluginSystem;
-import annis.libgui.PollControl;
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaPlayer;
@@ -461,8 +461,7 @@ public class VisualizerPanel extends CssLayout
         new LoadComponentTask());
       
       // run the actual code to load the visualizer
-      PollControl.runInBackground(500, 150, null,
-        new BackgroundJob(future, callback, UI.getCurrent()));
+      Background.run(new BackgroundJob(future, callback, UI.getCurrent()));
 
     } // end if create input was needed
 
