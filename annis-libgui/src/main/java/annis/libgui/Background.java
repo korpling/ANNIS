@@ -51,7 +51,7 @@ public class Background
           T result = null;
           try
           {
-            result = callable.call()
+            result = callable.call();
           }
           catch(Exception ex)
           {
