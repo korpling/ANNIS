@@ -55,6 +55,7 @@ import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Notification.Type;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -90,7 +91,7 @@ public class CorpusListPanel extends CssLayout implements
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
 
-  private SearchUI ui;
+  private final SearchUI ui;
 
   public enum ActionType
   {
@@ -100,19 +101,20 @@ public class CorpusListPanel extends CssLayout implements
   };
   private BeanContainer<String, AnnisCorpus> corpusContainer;
 
+  private final ProgressBar pbLoadCorpora;
   private Table tblCorpora;
 
-  private QueryController controller;
+  private final QueryController controller;
 
-  private ComboBox cbSelection;
+  private final ComboBox cbSelection;
 
-  private TextField txtFilter;
+  private final TextField txtFilter;
 
   private transient UserConfig userConfig;
 
   private List<AnnisCorpus> allCorpora = new LinkedList<>();
 
-  private InstanceConfig instanceConfig;
+  private final InstanceConfig instanceConfig;
 
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
@@ -209,6 +211,11 @@ public class CorpusListPanel extends CssLayout implements
     txtFilter.addStyleName(ValoTheme.TEXTFIELD_SMALL);
     addComponent(txtFilter);
 
+    pbLoadCorpora = new ProgressBar();
+    pbLoadCorpora.setCaption("Loading corpus list...");
+    pbLoadCorpora.setIndeterminate(true);
+    addComponent(pbLoadCorpora);
+    
     tblCorpora = new Table();
 
     addComponent(tblCorpora);
@@ -217,6 +224,7 @@ public class CorpusListPanel extends CssLayout implements
     corpusContainer.setBeanIdProperty("name");
     corpusContainer.setItemSorter(new CorpusSorter());
 
+    tblCorpora.setVisible(false); // don't show list before it was not loaded
     tblCorpora.setContainerDataSource(corpusContainer);
     tblCorpora.setMultiSelect(true);
     tblCorpora.setPropertyDataSource(ui.getQueryState().getSelectedCorpora());
@@ -815,6 +823,9 @@ public class CorpusListPanel extends CssLayout implements
         @Override
         public void run()
         {
+          tblCorpora.setVisible(true);
+          pbLoadCorpora.setVisible(false);
+          
           if (newUserConfig != null && newCorpusList != null)
           {
             allCorpora = newCorpusList;

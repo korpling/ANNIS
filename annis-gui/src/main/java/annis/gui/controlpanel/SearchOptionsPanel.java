@@ -130,7 +130,7 @@ public class SearchOptionsPanel extends FormLayout
     
     pbLoadConfig = new ProgressBar();
     pbLoadConfig.setIndeterminate(true);
-    pbLoadConfig.setCaption("Loading search options");
+    pbLoadConfig.setCaption("Loading search options...");
     addComponent(pbLoadConfig);
     
     cbLeftContext = new ComboBox("Left Context");
