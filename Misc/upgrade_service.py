@@ -17,7 +17,8 @@ def updateEnv(instDir):
 	return env
 	
 def getversion(instDir):
-	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh"), "version"], env=updateEnv(instDir), universal_newlines=True)
+	o = subprocess.check_output([os.path.join(instDir, "bin", "annis.sh"), "version"], 
+		env=updateEnv(instDir), universal_newlines=True, stderr=subprocess.STDOUT)
 	
 	for raw in o.split("\n"):
 		m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
@@ -105,17 +106,28 @@ def copyDatabase(instDir, oldInstDir, mail):
 	if p.returncode != 0:
 		print("ERROR: copying existing corpora failed: error code " + str(p.returncode))
 		exit(30)
+		
+def cleanupData(instDir):
+	
+	
+	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "cleanup-data"], env=updateEnv(instDir), stderr=subprocess.STDOUT, stdout=subprocess.PIPE, universal_newlines=True)
+	for l in p.stdout:
+		print(l, end="")
+	p.communicate()
+
 	
 ###################
 # begin main code #
 ###################
 
-parser = argparse.ArgumentParser(description="Upgrades a ANNIS service.")
+parser = argparse.ArgumentParser(description="Upgrades an ANNIS service.")
 parser.add_argument("dir", help="The directory containing the ANNIS service.")
 parser.add_argument("archive", help="The archive file containing the new ANNIS version.")
-parser.add_argument("-b", "--backup", help="Perform a backup of already deployed ANNIS instances. This parameter defines also the prefix to use to name the folders.")
+parser.add_argument("-b", "--backup", help="Perform a backup of the files of the existing installation. This parameter defines also the prefix to use for the name of the backup folder.")
+parser.add_argument("-c", "--cleanup-data", action="store_true", help="""This will delete all data files not known to the current instance of ANNIS. 
+If you have multiple parallel installations and did not use different values for the annis.external-data-path variable in the conf/annis-service.properties the data files of the other installations will be lost.""")
 parser.add_argument("--force-db-update", help="Force an update of the database even is this is not necessary", action="store_true")
-parser.add_argument("-m", "--mail", help="Mail adress that should be used when for notifications when copying corpora from the existing installation.")
+parser.add_argument("-m", "--mail", help="Mail adress that should be used for notifications when copying corpora from the existing installation.")
 args = parser.parse_args()
 
 
@@ -151,12 +163,12 @@ if args.force_db_update or (not checkDBSchemaVersion(extracted)):
 	print("======================================================")
 	print("Need to update the database and re-import all corpora.")
 	print("This might take a long time!")
-	print("======================================================")
 	dbconfig = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
 	version = getversion(extracted)
 	if version:
 		dbconfig["datasource.schema"] = "annis_autoupgrade" + version[0] + version[1] + version[2]
-		print("New schema name is " + dbconfig["datasource.schema"])
+		print("New schema name: " + dbconfig["datasource.schema"])
+	print("======================================================")
 	initDatabase(dbconfig, extracted)
 	copyDatabase(extracted, args.dir, args.mail)
 	copiedCorpora = True
@@ -181,6 +193,10 @@ shutil.rmtree(tmp)
 startService(args.dir)
 
 if copiedCorpora:
+	
+	if args.cleanup_data:
+		cleanupData(args.dir)
+	
 	print("============================================================")
 	print("Finished! Please remember to delete the old database schema.")
 else:
