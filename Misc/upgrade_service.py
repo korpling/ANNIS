@@ -146,7 +146,10 @@ shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(ne
 # check if we can update without any database migration
 print("Check database schema version")
 if args.force_db_update or (not checkDBSchemaVersion(extracted)):
-	print("Need to update the database and re-import all corpora. This might take a long time!")
+	print("======================================================")
+	print("Need to update the database and re-import all corpora.")
+	print("This might take a long time!")
+	print("======================================================")
 	dbconfig = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
 	version = getversion(extracted)
 	if version:
