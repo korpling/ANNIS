@@ -10,7 +10,7 @@
   </session-config>
   <context-param>
     <param-name>heartbeatInterval</param-name>
-    <param-value>60</param-value>
+    <param-value>15</param-value>
   </context-param>
   <context-param>
     <description>Vaadin production mode</description>
