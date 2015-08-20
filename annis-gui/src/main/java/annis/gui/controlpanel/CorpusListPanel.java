@@ -49,6 +49,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.Component;
+import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.GridLayout;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Label;
@@ -73,7 +74,7 @@ import org.slf4j.LoggerFactory;
  *
  * @author thomas
  */
-public class CorpusListPanel extends VerticalLayout implements
+public class CorpusListPanel extends CssLayout implements
   AbstractSelect.NewItemHandler, Action.Handler
 {
 
@@ -253,10 +254,8 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setItemDescriptionGenerator(new TooltipGenerator());
     tblCorpora.addValueChangeListener(new CorpusTableChangedListener(finalThis));
 
-    setExpandRatio(tblCorpora, 1.0f);
-
     Button btReload = new Button();
-    btReload.addListener(new Button.ClickListener()
+    btReload.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(ClickEvent event)
