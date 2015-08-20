@@ -16,6 +16,7 @@
 
 package annis.gui.admin.model;
 
+import annis.CaseSensitiveOrder;
 import annis.security.Group;
 import com.google.common.collect.ImmutableSet;
 import com.sun.jersey.api.client.GenericType;
@@ -24,7 +25,6 @@ import com.sun.jersey.api.client.WebResource;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -38,7 +38,7 @@ public class GroupManagement
   
   private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
   
-  private final Map<String, Group> groups = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final Map<String, Group> groups = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
   private WebResource rootResource;
   
   public void clear()

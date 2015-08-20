@@ -16,6 +16,7 @@
 
 package annis.gui.admin.model;
 
+import annis.CaseSensitiveOrder;
 import annis.security.Group;
 import annis.security.User;
 import com.sun.jersey.api.client.GenericType;
@@ -37,7 +38,7 @@ public class UserManagement
 {
   private WebResource rootResource;
 
-  private final Map<String, User> users = new TreeMap<>(String.CASE_INSENSITIVE_ORDER);
+  private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
   private final TreeSet<String> usedGroupNames = new TreeSet<>();
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);

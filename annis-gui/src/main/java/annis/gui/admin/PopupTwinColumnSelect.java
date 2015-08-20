@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.CaseSensitiveOrder;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.TreeSetConverter;
 import com.vaadin.data.Container;
@@ -111,7 +112,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     if (newFieldValue != null
       && !(newFieldValue instanceof TreeSet))
     {
-      TreeSet sortedSet = new TreeSet(String.CASE_INSENSITIVE_ORDER);
+      TreeSet sortedSet = new TreeSet(CaseSensitiveOrder.INSTANCE);
       sortedSet.addAll((Collection) newFieldValue);
       newFieldValue = sortedSet;
     }
@@ -139,7 +140,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     {
       if(itemId1 instanceof String && itemId2 instanceof String)
       {
-        return String.CASE_INSENSITIVE_ORDER.compare((String) itemId1, (String) itemId2);
+        return CaseSensitiveOrder.INSTANCE.compare((String) itemId1, (String) itemId2);
       }
       else
       {
