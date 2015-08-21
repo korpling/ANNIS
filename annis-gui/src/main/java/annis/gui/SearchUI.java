@@ -17,6 +17,7 @@ package annis.gui;
 
 import annis.VersionInfo;
 import annis.gui.components.ExceptionDialog;
+import annis.gui.components.SettingsStorage;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
@@ -80,7 +81,6 @@ import java.util.*;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import javax.servlet.http.Cookie;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
@@ -145,7 +145,7 @@ public class SearchUI extends CommonUI
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private final QueryUIState queryState = new QueryUIState();
-
+  
   private void initTransients()
   {
     corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
@@ -239,7 +239,7 @@ public class SearchUI extends CommonUI
 
     Background.run(new VersionChecker());
     evaluateFragment(getPage().getUriFragment());
-
+  
   }
 
   
@@ -532,10 +532,7 @@ public class SearchUI extends CommonUI
       controlPanel.setVisible(state.isSidebarVisible());
 
       // set cookie
-      Cookie c = new Cookie("annis-sidebar-state", state.name());
-      c.setMaxAge(30 * 24 * 60 * 60); // 30 days
-      c.setPath(Helper.getContext());
-      VaadinService.getCurrentResponse().addCookie(c);
+      getSettings().set("annis-sidebar-state", state.name(), 30);
     }
   }
 
@@ -945,7 +942,7 @@ public class SearchUI extends CommonUI
     }
     return null;
   }
-
+  
   private class VersionChecker implements Runnable
   {
 

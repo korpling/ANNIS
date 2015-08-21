@@ -15,11 +15,14 @@
  */
 package annis.gui;
 
+import annis.gui.components.SettingsStorage;
 import annis.gui.requesthandler.BinaryRequestHandler;
 import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.libgui.AnnisBaseUI;
 import com.vaadin.server.VaadinRequest;
+import java.util.LinkedList;
+import java.util.List;
 
 /**
  *
@@ -28,6 +31,9 @@ import com.vaadin.server.VaadinRequest;
 public class CommonUI extends AnnisBaseUI
 {
   //private static final Logger log = LoggerFactory.getLogger(CommonUI.class);
+  
+  private SettingsStorage settings;
+  
   
   @Override
   protected void init(VaadinRequest request)
@@ -38,6 +44,16 @@ public class CommonUI extends AnnisBaseUI
     getSession().addRequestHandler(new ResourceRequestHandler());
     getSession().addRequestHandler(new BinaryRequestHandler());
 
+    settings = new SettingsStorage(this);
+  }
+  
+  public SettingsStorage getSettings()
+  {
+    if(settings == null)
+    {
+      settings = new SettingsStorage(this);
+    }
+    return settings;
   }
   
   

@@ -20,6 +20,7 @@ import static annis.gui.SidebarState.AUTO_VISIBLE;
 import static annis.gui.SidebarState.HIDDEN;
 import static annis.gui.SidebarState.VISIBLE;
 import annis.gui.components.ScreenshotMaker;
+import annis.gui.components.SettingsStorage;
 import annis.libgui.AnnisBaseUI;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
@@ -30,7 +31,6 @@ import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Resource;
 import com.vaadin.server.ThemeResource;
-import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.Alignment;
@@ -48,22 +48,22 @@ import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
 import java.util.LinkedList;
 import java.util.List;
-import javax.servlet.http.Cookie;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 
 /**
- * The ANNIS main toolbar.
- * Handles login, showing the sidebar (if it exists), the screenshot making
- * and some information windows.
+ * The ANNIS main toolbar. Handles login, showing the sidebar (if it exists),
+ * the screenshot making and some information windows.
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class MainToolbar extends HorizontalLayout
-  implements LoginListener, ScreenshotMaker.ScreenshotCallback
+  implements LoginListener, ScreenshotMaker.ScreenshotCallback,
+  SettingsStorage.LoadedListener
 {
+
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     MainToolbar.class);
-
 
   private Button btSidebar;
 
@@ -80,28 +80,30 @@ public class MainToolbar extends HorizontalLayout
   private Window windowLogin;
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
-  
+
   private final List<LoginListener> loginListeners = new LinkedList<>();
 
   private Throwable lastBugReportCause;
-  
+
   private Sidebar sidebar;
-    
+
   private ScreenshotMaker screenshotExtension;
-  
+
   public static final String BUG_MAIL_KEY = "bug-e-mail";
+
   public static final String LOGIN_URL_KEY = "login-url";
+
   public static final String LOGIN_MAXIMIZED_KEY = "login-window-maximized";
-  
+
   private final String loginURL;
-  
+
   public MainToolbar(Sidebar sidebar)
   {
     this.sidebar = sidebar;
-    
-    this.loginURL = (String) 
-      VaadinSession.getCurrent().getAttribute(LOGIN_URL_KEY);
-    
+
+    this.loginURL = (String) VaadinSession.getCurrent().getAttribute(
+      LOGIN_URL_KEY);
+
     String bugmail = (String) VaadinSession.getCurrent().getAttribute(
       BUG_MAIL_KEY);
     if (bugmail != null && !bugmail.isEmpty()
@@ -114,8 +116,12 @@ public class MainToolbar extends HorizontalLayout
     {
       this.bugEMailAddress = null;
     }
-    
-    regenerateStateFromCookies();
+
+    UI ui = UI.getCurrent();
+    if (ui instanceof CommonUI)
+    {
+      ((CommonUI) ui).getSettings().addedLoadedListener(MainToolbar.this);
+    }
 
     setWidth("100%");
     setHeight("-1px");
@@ -160,27 +166,28 @@ public class MainToolbar extends HorizontalLayout
       public void buttonClick(Button.ClickEvent event)
       {
         Resource loginRes;
-        if(loginURL == null || loginURL.isEmpty())
+        if (loginURL == null || loginURL.isEmpty())
         {
           loginRes = new ExternalResource(
-          Helper.getContext() + "/login");
+            Helper.getContext() + "/login");
         }
         else
         {
           loginRes = new ExternalResource(loginURL);
         }
-        
+
         BrowserFrame frame = new BrowserFrame("login", loginRes);
         frame.setWidth("100%");
         frame.setHeight("100%");
 
         windowLogin = new Window("ANNIS Login", frame);
         windowLogin.setModal(true);
-        
+
         windowLogin.setWidth("400px");
         windowLogin.setHeight("250px");
-        String loginMaximizedRaw = (String)getSession().getAttribute(LOGIN_MAXIMIZED_KEY);
-        if(Boolean.parseBoolean(loginMaximizedRaw))
+        String loginMaximizedRaw = (String) getSession().getAttribute(
+          LOGIN_MAXIMIZED_KEY);
+        if (Boolean.parseBoolean(loginMaximizedRaw))
         {
           windowLogin.setWindowMode(WindowMode.MAXIMIZED);
         }
@@ -196,7 +203,7 @@ public class MainToolbar extends HorizontalLayout
       {
         // logout
         Helper.setUser(null);
-        for(LoginListener l : loginListeners)
+        for (LoginListener l : loginListeners)
         {
           l.onLogout();
         }
@@ -231,7 +238,7 @@ public class MainToolbar extends HorizontalLayout
       }
     });
 
-    if(sidebar != null)
+    if (sidebar != null)
     {
       addComponent(btSidebar);
       setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
@@ -300,41 +307,39 @@ public class MainToolbar extends HorizontalLayout
             }
             break;
         }
-        
+
         updateSidebarState();
       }
     });
-    
+
     screenshotExtension = new ScreenshotMaker(this);
-    
+
     JavaScript.getCurrent().addFunction("annis.gui.logincallback",
       new LoginCloseCallback());
-    
+
     updateSidebarState();
     MainToolbar.this.updateUserInformation();
   }
-  
-  
-  
+
   private void updateSidebarState()
   {
-    if(sidebar != null && btSidebar != null)
+    if (sidebar != null && btSidebar != null)
     {
       btSidebar.setIcon(sidebarState.getIcon());
       sidebar.updateSidebarState(sidebarState);
     }
   }
-  
+
   public void notifiyQueryStarted()
   {
-    if(sidebarState == SidebarState.AUTO_VISIBLE)
+    if (sidebarState == SidebarState.AUTO_VISIBLE)
     {
       sidebarState = SidebarState.AUTO_HIDDEN;
     }
-    
+
     updateSidebarState();
   }
-  
+
   public void addLoginListener(LoginListener listener)
   {
     this.loginListeners.add(listener);
@@ -354,7 +359,7 @@ public class MainToolbar extends HorizontalLayout
   private void addLoginButton()
   {
     VaadinSession session = VaadinSession.getCurrent();
-    if(session != null)
+    if (session != null)
     {
       DeploymentConfiguration configuration = session.getConfiguration();
 
@@ -372,38 +377,34 @@ public class MainToolbar extends HorizontalLayout
       }
     }
   }
-  
-  private void regenerateStateFromCookies()
+
+  @Override
+  public void onSettingsLoaded(SettingsStorage settings)
   {
-    Cookie[] cookies = VaadinService.getCurrentRequest().getCookies();
-    if(cookies != null)
+    String sidebarStateSetting = settings.get("annis-sidebar-state");
+    if (sidebarStateSetting != null)
     {
-      for(Cookie c : cookies )
+      try
       {
-        if("annis-sidebar-state".equals(c.getName()))
+        sidebarState = SidebarState.valueOf(sidebarStateSetting);
+        // don't be invisible
+        if (sidebarState == SidebarState.AUTO_HIDDEN)
         {
-          try
-          {
-            sidebarState = SidebarState.valueOf(c.getValue());
-            // don't be invisible
-            if(sidebarState == SidebarState.AUTO_HIDDEN)
-            {
-              sidebarState = SidebarState.AUTO_VISIBLE;
-            }
-            else if(sidebarState == SidebarState.HIDDEN)
-            {
-              sidebarState = SidebarState.VISIBLE;
-            }
-          }
-          catch(IllegalArgumentException ex)
-          {
-            log.debug("Invalid cookie for sidebar state", ex);
-          }
+          sidebarState = SidebarState.AUTO_VISIBLE;
         }
+        else if (sidebarState == SidebarState.HIDDEN)
+        {
+          sidebarState = SidebarState.VISIBLE;
+        }
+      }
+      catch (IllegalArgumentException ex)
+      {
+        log.debug("Invalid cookie for sidebar state", ex);
       }
     }
     updateSidebarState();
   }
+
 
   public void updateUserInformation()
   {
@@ -474,9 +475,7 @@ public class MainToolbar extends HorizontalLayout
   {
     updateUserInformation();
   }
-  
-  
-  
+
   public boolean canReportBugs()
   {
     return this.bugEMailAddress != null;
@@ -490,18 +489,19 @@ public class MainToolbar extends HorizontalLayout
   public void reportBug(Throwable cause)
   {
     lastBugReportCause = cause;
-    if(screenshotExtension.isAttached())
+    if (screenshotExtension.isAttached())
     {
       screenshotExtension.makeScreenshot();
       btBugReport.setCaption("problem report is initialized...");
     }
     else
     {
-      Notification.show("This user interface does not allow screenshots. Can't report bug.", 
+      Notification.show(
+        "This user interface does not allow screenshots. Can't report bug.",
         Notification.Type.ERROR_MESSAGE);
     }
   }
-  
+
   @Override
   public void screenshotReceived(byte[] imageData, String mimeType)
   {
@@ -510,9 +510,9 @@ public class MainToolbar extends HorizontalLayout
 
     if (bugEMailAddress != null)
     {
-      ReportBugWindow reportBugWindow =
-        new ReportBugWindow(bugEMailAddress, imageData, mimeType,
-        lastBugReportCause);
+      ReportBugWindow reportBugWindow
+        = new ReportBugWindow(bugEMailAddress, imageData, mimeType,
+          lastBugReportCause);
 
       reportBugWindow.setModal(true);
       reportBugWindow.setResizable(true);
@@ -526,8 +526,6 @@ public class MainToolbar extends HorizontalLayout
   {
     return screenshotExtension;
   }
-  
-  
 
   private static class AboutClickListener implements Button.ClickListener
   {
@@ -553,7 +551,7 @@ public class MainToolbar extends HorizontalLayout
   {
     return Helper.getUser() != null;
   }
-  
+
   private class LoginCloseCallback implements JavaScriptFunction
   {
 
@@ -573,7 +571,7 @@ public class MainToolbar extends HorizontalLayout
             log.error("exception thrown while notifying login listeners", ex);
           }
         }
-       
+
       }
       onLogin();
 
