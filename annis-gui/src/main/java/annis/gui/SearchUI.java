@@ -17,7 +17,6 @@ package annis.gui;
 
 import annis.VersionInfo;
 import annis.gui.components.ExceptionDialog;
-import annis.gui.components.SettingsStorage;
 import annis.libgui.InstanceConfig;
 import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
@@ -65,7 +64,6 @@ import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
-import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
 import com.vaadin.shared.communication.PushMode;
@@ -92,7 +90,7 @@ import org.slf4j.LoggerFactory;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@Push(value = PushMode.AUTOMATIC)
 public class SearchUI extends CommonUI
   implements MimeTypeErrorListener,
   Page.UriFragmentChangedListener,

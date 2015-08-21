@@ -34,7 +34,6 @@ import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -48,7 +47,7 @@ import java.util.List;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @Theme("annis")
-@Push(value = PushMode.AUTOMATIC, transport = Transport.LONG_POLLING)
+@Push(value = PushMode.AUTOMATIC)
 public class AdminUI extends CommonUI implements UIView, LoginListener,
   Page.UriFragmentChangedListener, TabSheet.SelectedTabChangeListener
 {
