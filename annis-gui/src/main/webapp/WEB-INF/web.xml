@@ -6,11 +6,11 @@
          version="3.0">
   <display-name>Annis corpus Search gui</display-name>
   <session-config>
-    <session-timeout>4</session-timeout>
+    <session-timeout>20</session-timeout>
   </session-config>
   <context-param>
     <param-name>heartbeatInterval</param-name>
-    <param-value>15</param-value>
+    <param-value>120</param-value>
   </context-param>
   <context-param>
     <description>Vaadin production mode</description>
