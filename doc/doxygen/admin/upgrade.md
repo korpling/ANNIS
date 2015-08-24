@@ -16,7 +16,8 @@ Automatic upgrade {#admin-upgrade-automatic}
 Upgrading the ANNIS service is more complex than deploying the user interface WAR file.
 Therefore a Python script is available for an automatic upgrade. This script needs as least Python 3.2.
 
-1. Download the latest version of the script from GitHub: https://raw.githubusercontent.com/korpling/ANNIS/master/Misc/upgrade_service.py
+# TODO: replace "develop" with "master" once released
+1. Download the latest version of the script from GitHub: https://raw.githubusercontent.com/korpling/ANNIS/develop/Misc/upgrade_service.py
 2. Download the new ANNIS release files (```annis-service-<VERSION>.tar.gz``` and ```annis-gui-<VERSION>.war```) 
 3. Run the script \code{.sh}python3 upgrade_service.py --cleanup-data <installation-directory> annis-service-<VERSION>.tar.gz\endcode
    If the new release uses a new database schema the update might take some time. Thus it might be better to execute the script in the background:
