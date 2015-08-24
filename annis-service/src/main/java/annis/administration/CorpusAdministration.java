@@ -83,7 +83,7 @@ public class CorpusAdministration
       {
         throw new AnnisRunnerException(
           "Corpus does not exist (or is not a top-level corpus): "
-          + id);
+          + id, 51);
       }
     }
     log.info("Deleting corpora: " + ids);

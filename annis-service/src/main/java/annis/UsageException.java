@@ -24,7 +24,7 @@ package annis;
 public class UsageException extends AnnisRunnerException {
 
 	public UsageException() {
-		super();
+		super(4);
 	}
 
 	public UsageException(String message, Throwable cause) {
@@ -32,11 +32,13 @@ public class UsageException extends AnnisRunnerException {
 	}
 
 	public UsageException(String message) {
-		super(message);
+		super(message, 4);
 	}
 
 	public UsageException(Throwable cause) {
-		super(cause);
+		super(cause, 4);
 	}
 
+
+  
 }
