@@ -26,10 +26,24 @@ def getversion(instDir):
 			return m.group(1,2,3)
 	return None
 
-def checkDBSchemaVersion(instDir):
+def checkDBSchemaVersion(instDir, existingInstDir):
 	p = subprocess.Popen([os.path.join(instDir, "bin", "annis-admin.sh"), "check-db-schema-version"], env=updateEnv(instDir))
 	p.wait()
-	return p.returncode == 0
+	if p.returncode == 0:
+		return True
+	elif p.returncode == 4:
+		print("COMPARING VERSION")
+		# command does (not) yet exist, try comparing the versions
+		versionOld = getversion(existingInstDir)
+		versionNew = getversion(instDir)
+		if versionOld[0] == versionNew[0] and versionOld[1] == versionNew[1]:
+			# if neither the major nor the major version changed, there was no new
+			# database schema introduced
+			return True
+		else:
+			return False
+	else:
+		return False
 
 def startService(instDir):
 	print("Starting service in " + instDir)
@@ -163,7 +177,7 @@ shutil.copy2(os.path.join(origconf, "annis-service.properties"), os.path.join(ne
 copiedCorpora=False
 
 print("Check database schema version")
-if (not checkDBSchemaVersion(extracted)):
+if (not checkDBSchemaVersion(extracted, args.dir)):
 	print("======================================================")
 	print("Need to update the database and re-import all corpora.")
 	print("This might take a long time!")
