@@ -1,3 +1,18 @@
+Version 3.3.5
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.5+is%3Aclosed
+
+[Bugs]
+ #430 Instance font reset in AQL text field
+ #429 exit error codes are uniform and not documented
+ #428 annis-service-distribution.tar.gz can't be read from Python
+ #427 admin UI: sometimes members are removed from group when a new item is added with the popup selector
+ #425 stderr and stdout are not properly closed when annis service can't start
+ #422 regression: AQL lost when query panel hidden
+
+
 Version 3.3.4
 =============
 
