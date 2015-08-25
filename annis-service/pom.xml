@@ -7,7 +7,7 @@
   <parent>
     <artifactId>annis-all</artifactId>
     <groupId>de.hu-berlin.german.korpling.annis</groupId>
-    <version>3.3.4</version>
+    <version>3.3.5</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
 
@@ -349,7 +349,7 @@
 
       <plugin>
         <artifactId>maven-assembly-plugin</artifactId>
-        <version>2.4</version>
+        <version>2.5.5</version>
         <executions>
           <execution>
             <id>create-distribution</id>

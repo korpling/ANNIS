@@ -16,6 +16,7 @@
 package annis.service.internal;
 
 import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
 import annis.AnnisXmlContextHelper;
 import annis.dao.AnnisDao;
 import annis.exceptions.AnnisException;
@@ -50,6 +51,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
   private static AnnisServiceRunner annisServiceRunner;
 
   private boolean isShutdownRequested = false;
+  private int errorCode = 0;
 
   private static Thread mainThread;
 
@@ -131,7 +133,12 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("interrupted in endless loop", ex);
     }
-
+    
+    // explicitly exit so we can decide if there was an error or not and everything is closed.
+    if(annisServiceRunner.errorCode != 0)
+    {
+      System.exit(annisServiceRunner.errorCode);
+    }
   }
 
   /**
@@ -245,12 +252,18 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     catch (IllegalArgumentException ex)
     {
       log.error("IllegalArgumentException at ANNIS service startup", ex);
-      isShutdownRequested = true;;
+      isShutdownRequested = true;
+      errorCode = 101;
     }
     catch (NullPointerException ex)
     {
       log.error("NullPointerException at ANNIS service startup", ex);
       isShutdownRequested = true;
+      errorCode = 101;
+    }
+    catch(AnnisRunnerException ex)
+    {
+      errorCode = ex.getExitCode();
     }
 
   }
@@ -271,6 +284,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
       if (server == null)
       {
         isShutdownRequested = true;
+        errorCode = 100;
       }
       else
       {
@@ -281,6 +295,7 @@ public class AnnisServiceRunner extends AnnisBaseRunner
     {
       log.error("could not start ANNIS REST service", ex);
       isShutdownRequested = true;
+      errorCode = 100;
 
       if (rethrowExceptions)
       {

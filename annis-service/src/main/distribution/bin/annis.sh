@@ -2,7 +2,7 @@
 
 if [ -z "$ANNIS_HOME" ]; then
 	echo Please set the environment variable ANNIS_HOME to the Annis distribution directory.
-	exit
+	exit 2
 fi
 
 # build classpath

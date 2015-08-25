@@ -342,12 +342,16 @@ public class SearchUI extends CommonUI
     {
       FontConfig cfg = instanceConfig.getFont();
 
+      String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ?
+        "" :  "@import url(" + cfg.getUrl() + ");\n";
+      
       if (cfg.getSize() == null || cfg.getSize().isEmpty())
       {
         injectUniqueCSS(
-          "@import url(" + cfg.getUrl() + ");\n"
+          url
           + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
           + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
+          + "div." + CORPUS_FONT + " .CodeMirror pre {font-family: '" + cfg.getName() + "', monospace; }\n"
           // this one is for the virtual keyboard
           + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
           + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
@@ -356,12 +360,16 @@ public class SearchUI extends CommonUI
       else
       {
         injectUniqueCSS(
-          "@import url(" + cfg.getUrl() + ");\n"
+          url
           + "." + CORPUS_FONT_FORCE + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
           + "  font-size: " + cfg.getSize() + " !important;\n"
           + "}\n"
           + "." + CORPUS_FONT + " {\n"
+          + "  font-family: '" + cfg.getName() + "', monospace;\n"
+          + "  font-size: " + cfg.getSize() + ";\n"
+          + "}\n"
+          + "div." + CORPUS_FONT + " .CodeMirror pre" + " {\n"
           + "  font-family: '" + cfg.getName() + "', monospace;\n"
           + "  font-size: " + cfg.getSize() + ";\n"
           + "}\n"

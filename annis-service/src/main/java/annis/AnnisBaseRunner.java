@@ -97,39 +97,27 @@ public abstract class AnnisBaseRunner
     return ctx.getBean(beanName);
   }
 
-  public void run(String[] args)
+  public void run(String[] args) throws IOException
   {
-    try
+  
+    // run interactive if no argument is given
+    if (args.length == 0)
     {
-      // run interactive if no argument is given
-      if (args.length == 0)
-      {
-        runInteractive();
-        return;
+      runInteractive();
+      return;
 
-        // else, every argument is a command
-      }
-      else
+      // else, every argument is a command
+    }
+    else
+    {
+      for (String cmd : args)
       {
-        for (String cmd : args)
-        {
-          // split into command name and arguments
-          String[] split = cmd.split("\\s+", 2);
+        // split into command name and arguments
+        String[] split = cmd.split("\\s+", 2);
 
-          System.out.println("running command '" + cmd + "'");
-          runCommand(split[0], split.length >= 2 ? split[1] : "");
-        }
+        System.out.println("running command '" + cmd + "'");
+        runCommand(split[0], split.length >= 2 ? split[1] : "");
       }
-    }
-    catch (AnnisRunnerException e)
-    {
-      log.error("Uncaught exception", e);
-      error("Uncaught exception: " + e.getMessage());
-    }
-    catch (Throwable e)
-    {
-      log.warn("Uncaught exception", e);
-      error(e);
     }
   }
 
@@ -318,16 +306,14 @@ public abstract class AnnisBaseRunner
     annisHomePath = System.getProperty("annis.home");
     if (annisHomePath == null)
     {
-      System.out.println(
-        "Please set the annis.home property to the Annis distribution directory.");
-      System.exit(1);
+      throw new AnnisRunnerException(
+        "Please set the annis.home property to the ANNIS distribution directory.", 2);
     }
     File file = new File(annisHomePath);
     if (!file.exists() || !file.isDirectory())
     {
-      System.out.println("The directory '" + annisHomePath
-        + "' does not exist or is not a directory.");
-      System.exit(2);
+      throw new AnnisRunnerException("The directory '" + annisHomePath
+        + "' does not exist or is not a directory.", 3);
     }
   }
 

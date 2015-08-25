@@ -11,3 +11,4 @@ You will find instructions how to install and configure ANNIS (either on a serve
 - \subpage admin-configure-postgresql
 - \subpage admin-multiple-servers
 - \subpage admin-configure-customlogin
+- \subpage admin-errorcodes

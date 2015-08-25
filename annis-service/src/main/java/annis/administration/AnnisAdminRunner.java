@@ -34,6 +34,7 @@ import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.Resource;
 
 import annis.AnnisBaseRunner;
+import annis.AnnisRunnerException;
 import annis.UsageException;
 import annis.corpuspathsearch.Search;
 import annis.dao.AnnisDao;
@@ -61,8 +62,21 @@ public class AnnisAdminRunner extends AnnisBaseRunner
   public static void main(String[] args)
   {
     // get Runner from Spring
-    AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.
-      getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
+    try
+    {
+      AnnisBaseRunner.getInstance("annisAdminRunner", "file:" + Utils.
+        getAnnisFile("conf/spring/Admin.xml").getAbsolutePath()).run(args);
+    }
+    catch(AnnisRunnerException ex)
+    {
+      log.error(ex.getMessage() + " (error code " + ex.getExitCode() + ")", ex);
+      System.exit(ex.getExitCode());
+    }
+    catch(Throwable ex)
+    {
+      log.error(ex.getMessage(), ex);
+      System.exit(1);
+    }
   }
 
   @Override
@@ -468,9 +482,14 @@ public class AnnisAdminRunner extends AnnisBaseRunner
       }
       
       File dbProperties = new File(cmdLine.getArgs()[0]);
-      corpusAdministration.copyFromOtherInstance(dbProperties, 
+      boolean success = corpusAdministration.copyFromOtherInstance(dbProperties, 
         cmdLine.hasOption("overwrite"),
         cmdLine.getOptionValue("mail"));
+      
+      if(!success)
+      {
+        throw new AnnisRunnerException(50);
+      }
       
       
     }
