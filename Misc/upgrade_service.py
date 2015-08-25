@@ -32,7 +32,6 @@ def checkDBSchemaVersion(instDir, existingInstDir):
 	if p.returncode == 0:
 		return True
 	elif p.returncode == 4:
-		print("COMPARING VERSION")
 		# command does (not) yet exist, try comparing the versions
 		versionOld = getversion(existingInstDir)
 		versionNew = getversion(instDir)
