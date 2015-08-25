@@ -27,7 +27,6 @@ Updating the version {#dev-release-version-update}
 \code{.sh}
 mvn -N versions:update-child-modules
 \endcode
-3. Set the `ANNIS_VERSION` variable in the `buildbot_scripts/copyService.sh` script file.
 4. Set the `PROJECT_NUMBER` variable in the `doc/Doxyfile` documentation descriptor file.
 
 Creating a changelog entry {#dev-release-changelog}
