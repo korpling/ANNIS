@@ -1,0 +1,7 @@
+This is a stripped down version of Pygments 2.0.2 (http://pygments.org/)
+
+It has support for AQL syntax an can be used to for 
+syntax highlighting of AQL in publications and presentations.
+All other lexers except for the custom AQL one have been removed to 
+save space.
+The original license (see LICENSE file) still applies.
