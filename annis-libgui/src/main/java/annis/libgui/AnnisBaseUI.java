@@ -99,7 +99,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
-  private final EventBus loginDataLostBus = new EventBus();
+  private transient EventBus loginDataLostBus;
   
   @Override
   protected void init(VaadinRequest request)
@@ -505,6 +505,10 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
 
   public EventBus getLoginDataLostBus()
   {
+    if(loginDataLostBus == null)
+    {
+      loginDataLostBus = new EventBus();
+    }
     return loginDataLostBus;
   }
   
