@@ -1,3 +1,14 @@
+Version 3.3.6
+=============
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.3.6+is%3Aclosed
+
+[Bugs]
+ #434 AnnisUser does not implement Serializable
+ #433 Authentifaction errors for result
+ #431 Error in regular expression triggers exception
+
 Version 3.3.5
 =============
 

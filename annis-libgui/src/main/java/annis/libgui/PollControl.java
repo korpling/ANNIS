@@ -44,7 +44,6 @@ public class PollControl
   private static final Logger log = LoggerFactory.getLogger(PollControl.class);
   
   public static final int DEFAULT_TIME = 15000;
-  private static final ExecutorService exec = Executors.newCachedThreadPool();
   private static final ThreadLocal<UUID> threadUUID = new ThreadLocal<>();
 
   private static final Lock lock = new ReentrantLock(true);
@@ -217,7 +216,9 @@ public class PollControl
       
       
       final UUID id = setTime(finalUI, pollTime);
-      
+      // create a new thread for every job to ensure that Vaadin.getSession() works
+      // as expected
+      ExecutorService exec = Executors.newSingleThreadExecutor();
       Future<T> result = exec.submit(new Callable<T>()
       {
         @Override

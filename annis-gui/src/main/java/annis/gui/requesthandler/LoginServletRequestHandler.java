@@ -18,6 +18,7 @@ package annis.gui.requesthandler;
 import annis.libgui.AnnisBaseUI;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.LoginDataLostException;
 import com.google.common.base.Charsets;
 import com.google.common.io.CharStreams;
 import com.google.common.io.Resources;
@@ -145,16 +146,15 @@ public class LoginServletRequestHandler implements RequestHandler
 
       String webserviceURL = (String) annisServiceURLObject;
 
-      Client client = Helper.createRESTClient(username, password);
-
       try
       {
-        WebResource res = client.resource(webserviceURL)
+        AnnisUser user = new AnnisUser(username, password);
+        WebResource res = user.getClient().resource(webserviceURL)
           .path("admin").path("is-authenticated");
         if ("true".equalsIgnoreCase(res.get(String.class)))
         {
           // everything ok, save this user configuration for re-use
-          Helper.setUser(new AnnisUser(username, client));
+          Helper.setUser(user);
         }
       }
       catch (ClientHandlerException ex)
@@ -162,6 +162,12 @@ public class LoginServletRequestHandler implements RequestHandler
         session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
           "Authentification error: " + ex.getMessage());
         response.setStatus(502); // bad gateway
+      }
+      catch (LoginDataLostException ex)
+      {
+        session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+          "Lost password in memory. Sorry.");
+        response.setStatus(500); // server error
       }
       catch (UniformInterfaceException ex)
       {

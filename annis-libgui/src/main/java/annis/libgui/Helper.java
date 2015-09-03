@@ -31,7 +31,6 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.sun.jersey.api.uri.UriComponent;
 import com.sun.jersey.client.apache4.ApacheHttpClient4;
 import com.sun.jersey.client.apache4.config.ApacheHttpClient4Config;
 import com.sun.jersey.client.apache4.config.DefaultApacheHttpClient4Config;
@@ -208,7 +207,20 @@ public class Helper
 
     if (user != null)
     {
-      return user.getClient().resource(uri);
+      try
+      {
+        return user.getClient().resource(uri);
+      }
+      catch (LoginDataLostException ex)
+      {
+        log.error("Could not restore the login-data from session, user will invalidated", ex);
+        setUser(null);
+        UI ui = UI.getCurrent();
+        if(ui instanceof AnnisBaseUI)
+        {
+          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
+        }
+      }
     }
 
     // use the anonymous client
@@ -234,7 +246,20 @@ public class Helper
 
     if (user != null)
     {
-      return user.getClient().asyncResource(uri);
+      try
+      {
+        return user.getClient().asyncResource(uri);
+      }
+      catch (LoginDataLostException ex)
+      {
+        log.error("Could not restore the login-data from session, user will invalidated", ex);
+        setUser(null);
+        UI ui = UI.getCurrent();
+        if(ui instanceof AnnisBaseUI)
+        {
+          ((AnnisBaseUI) ui).getLoginDataLostBus().post(ex);
+        }
+      }
     }
 
     // use the anonymous client
