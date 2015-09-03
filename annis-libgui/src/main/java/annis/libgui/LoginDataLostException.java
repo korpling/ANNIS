@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -13,16 +13,16 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package annis.gui;
+package annis.libgui;
 
 /**
- *
+ * This indicates the login-data is not available any longer.
+ * 
+ * If this exception was thrown the user interface should show
+ * to the user that he/she is effectivly logged out.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface LoginListener
+public class LoginDataLostException extends Exception
 {
-
-  public void onLogin();
-  public void onLogout();
   
 }

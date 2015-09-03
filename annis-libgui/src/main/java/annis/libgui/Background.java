@@ -29,7 +29,6 @@ import org.slf4j.LoggerFactory;
  */
 public class Background
 {
-  private static final ExecutorService exec = Executors.newCachedThreadPool();
   private static final Logger log = LoggerFactory.getLogger(Background.class);
   
   public static Future<?> run(Runnable job)
@@ -43,6 +42,9 @@ public class Background
     
     if(callable != null)
     { 
+      // create a new thread for every job to ensure that Vaadin.getSession() works
+      // as expected
+      ExecutorService exec = Executors.newSingleThreadExecutor();
       Future<T> result = exec.submit(new Callable<T>()
       {
         @Override

@@ -22,9 +22,9 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
 import ch.qos.logback.core.joran.spi.JoranException;
 import com.google.common.base.Charsets;
+import com.google.common.eventbus.EventBus;
 import com.google.common.hash.Hashing;
 import com.google.common.io.Files;
-import com.sun.jersey.api.client.Client;
 import com.vaadin.annotations.Theme;
 import com.vaadin.sass.internal.ScssStylesheet;
 import com.vaadin.server.ClassResource;
@@ -36,9 +36,6 @@ import com.vaadin.server.VaadinService;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.ui.UI;
 import java.io.*;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -102,6 +99,8 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
   
   private TreeSet<String> alreadyAddedCSS = new TreeSet<String>();
   
+  private final EventBus loginDataLostBus = new EventBus();
+  
   @Override
   protected void init(VaadinRequest request)
   {  
@@ -112,9 +111,9 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
     
     // store the webservice URL property explicitly in the session in order to 
     // access it from the "external" servlets
-    getSession().getSession().setAttribute(WEBSERVICEURL_KEY, 
-    getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
-    
+    getSession().getSession().setAttribute(WEBSERVICEURL_KEY,
+      getSession().getAttribute(Helper.KEY_WEB_SERVICE_URL));
+
     getSession().setAttribute(CONTEXT_PATH, request.getContextPath());
     alreadyAddedCSS.clear();
     
@@ -384,9 +383,7 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       String remoteUser = request.getRemoteUser();
       if(remoteUser != null)
       { 
-        // treat as anonymous user
-        Client client = Helper.createRESTClient();;
-        Helper.setUser(new AnnisUser(remoteUser, client, true));
+        Helper.setUser(new AnnisUser(remoteUser, null, true));
       }
   }
   
@@ -503,7 +500,13 @@ public class AnnisBaseUI extends UI implements PluginSystem, Serializable
       checkIfRemoteLoggedIn(request);
       // we never write any information in this handler
       return false;
-    }
-    
+    }  
   }
+
+  public EventBus getLoginDataLostBus()
+  {
+    return loginDataLostBus;
+  }
+  
+  
 }

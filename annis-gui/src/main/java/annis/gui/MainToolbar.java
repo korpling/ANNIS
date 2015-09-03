@@ -25,6 +25,8 @@ import annis.libgui.AnnisBaseUI;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
 import annis.libgui.Helper;
+import annis.libgui.LoginDataLostException;
+import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
@@ -321,6 +323,30 @@ public class MainToolbar extends HorizontalLayout
     MainToolbar.this.updateUserInformation();
   }
 
+  @Override
+  public void attach()
+  {
+    super.attach();
+    
+    UI ui = UI.getCurrent();
+    if(ui instanceof AnnisBaseUI)
+    {
+      ((AnnisBaseUI) ui).getLoginDataLostBus().register(this);
+    }
+  }
+
+  @Override
+  public void detach()
+  {
+    UI ui = UI.getCurrent();
+    if(ui instanceof AnnisBaseUI)
+    {
+      ((AnnisBaseUI) ui).getLoginDataLostBus().unregister(this);
+    }
+    
+    super.detach();
+  }
+
   private void updateSidebarState()
   {
     if (sidebar != null && btSidebar != null)
@@ -576,6 +602,29 @@ public class MainToolbar extends HorizontalLayout
       onLogin();
 
     }
+  }
+  
+  @Subscribe
+  public void handleLoginDataLostException(LoginDataLostException ex)
+  {
+    
+    Notification.show("Login data was lost, please login again.", 
+      "Due to a server misconfiguration the login-data was lost. Please contact the adminstrator of this ANNIS instance.",
+      Notification.Type.WARNING_MESSAGE);
+    
+    for (LoginListener l : loginListeners)
+    {
+      try
+      {
+        l.onLogout();
+      }
+      catch (Exception loginEx)
+      {
+        log.error("exception thrown while notifying login listeners", loginEx);
+      }
+    }
+    updateUserInformation();
+
   }
 
 }
