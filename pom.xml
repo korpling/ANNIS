@@ -163,7 +163,7 @@
           <shortRevisionLength>10</shortRevisionLength>
         </configuration>
       </plugin>
-      <!--
+      
       <plugin>
         <groupId>org.sonatype.plugins</groupId>
         <artifactId>nexus-staging-maven-plugin</artifactId>
@@ -175,7 +175,7 @@
           <autoReleaseAfterClose>true</autoReleaseAfterClose>
         </configuration>
       </plugin>
-      -->
+      
     </plugins>
     <extensions>
       <extension>
