@@ -15,7 +15,6 @@
  */
 package annis.libgui;
 
-import com.vaadin.ui.UI;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
