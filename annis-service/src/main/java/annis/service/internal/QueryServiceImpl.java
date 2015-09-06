@@ -650,12 +650,13 @@ public class QueryServiceImpl implements QueryService
   @Path("check")
   public String check(@QueryParam("q") String query, @QueryParam("c") String corpusName)
   {
-    //convert string corpus name to id, then to a List<Long>
-    //LinkedList<String> toplevelCorpus= new LinkedList<>();
-    //toplevelCorpus.add(corpusName);
+    //convert string corpus name to id, then to a List<Long>      
     List<Long> corpusList = new ArrayList<>();
     if(!corpusName.isEmpty()){
-        corpusList.add(annisDao.mapCorpusNameToId(corpusName));
+        String[] tokensVal = corpusName.split(",");
+        for(String token : tokensVal) {
+            corpusList.add(annisDao.mapCorpusNameToId(token));
+        }  
     }
     
     annisDao.parseAQL(query, corpusList);
