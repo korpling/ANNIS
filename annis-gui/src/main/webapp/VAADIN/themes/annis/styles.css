@@ -569,6 +569,9 @@
 @keyframes v-popupview-animate-in {
 		0% {
 		-webkit-transform: scale(0);
+		-moz-transform: scale(0);
+		-ms-transform: scale(0);
+		-o-transform: scale(0);
 		transform: scale(0);
 	}
 	}
@@ -664,7 +667,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.5.4";
+	content: "7.5.5";
 }
 
 .v-widget {
