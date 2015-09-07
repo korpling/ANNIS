@@ -32,7 +32,8 @@ public enum ANNISFontIcon implements FontIcon
   FIRST(0xe604),
   MENU_RIGHT(0xe605),
   MENU_LEFT(0xe606),
-  MENU_AUTO(0xe607);
+  MENU_AUTO(0xe607),
+  LOGO(0xe608);
   
   private final int codepoint;
   
