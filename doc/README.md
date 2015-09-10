@@ -10,10 +10,13 @@ The documentation is split in three parts:
 Build
 -----
 
-For the developer documentation you should install Doxygen (http://www.doxygen.org) 
-and call "doxygen" in this directory to compile everything.
-A pre-compiled version is accessable at http://korpling.github.com/ANNIS .
+For the developer documentation you have to install Doxygen (http://www.doxygen.org).
+The "doxygen" executable must be in the system path.
 
-The User and Adminstration Guide are currently in the Docbook format and can be 
-compiled e.g. with the Oxygen XML editor. We plan to switch to the Flat ODT Format
-fore these guides.
+Then you can execute
+```
+mvn clean install exec:exec -P doxygen
+```
+to compile the everything.
+
+A pre-compiled version is accessable at http://korpling.github.com/ANNIS/doc/ .
