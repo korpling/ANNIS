@@ -1,0 +1,4 @@
+var classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_canvas_1_1_annis_attribute_list_type =
+[
+    [ "AnnisAttributeListType", "classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_canvas_1_1_annis_attribute_list_type.html#a21c8f6bd84225dc7a598947d0df4a27c", null ]
+];

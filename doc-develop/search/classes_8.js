@@ -1,0 +1,20 @@
+var searchData=
+[
+  ['identical',['Identical',['../classannis_1_1sqlgen_1_1model_1_1_identical.html',1,'annis::sqlgen::model']]],
+  ['iframeresource',['IFrameResource',['../classannis_1_1libgui_1_1visualizers_1_1_i_frame_resource.html',1,'annis::libgui::visualizers']]],
+  ['iframeresourcemap',['IFrameResourceMap',['../classannis_1_1libgui_1_1visualizers_1_1_i_frame_resource_map.html',1,'annis::libgui::visualizers']]],
+  ['iframestate',['IframeState',['../classannis_1_1gui_1_1components_1_1_iframe_state.html',1,'annis::gui::components']]],
+  ['imagepanel',['ImagePanel',['../classannis_1_1libgui_1_1_image_panel.html',1,'annis::libgui']]],
+  ['importdialog',['ImportDialog',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_import_dialog.html',1,'de::hu_berlin::german::korpling::annis::kickstarter']]],
+  ['importjob',['ImportJob',['../classannis_1_1service_1_1objects_1_1_import_job.html',1,'annis::service::objects']]],
+  ['importpanel',['ImportPanel',['../classannis_1_1gui_1_1admin_1_1_import_panel.html',1,'annis::gui::admin']]],
+  ['importstatus',['ImportStatus',['../interfaceannis_1_1administration_1_1_import_status.html',1,'annis::administration']]],
+  ['importworker',['ImportWorker',['../classannis_1_1service_1_1internal_1_1_import_worker.html',1,'annis::service::internal']]],
+  ['inclusion',['Inclusion',['../classannis_1_1sqlgen_1_1model_1_1_inclusion.html',1,'annis::sqlgen::model']]],
+  ['infogenerator',['InfoGenerator',['../classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel_1_1_info_generator.html',1,'annis::gui::controlpanel::CorpusListPanel']]],
+  ['initdialog',['InitDialog',['../classde_1_1hu__berlin_1_1german_1_1korpling_1_1annis_1_1kickstarter_1_1_init_dialog.html',1,'de::hu_berlin::german::korpling::annis::kickstarter']]],
+  ['instanceconfig',['InstanceConfig',['../classannis_1_1libgui_1_1_instance_config.html',1,'annis::libgui']]],
+  ['invisible',['Invisible',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_shape_1_1_invisible.html',1,'annis::visualizers::component::tree::Shape']]],
+  ['islandpolicies',['IslandPolicies',['../classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies',1,'annis::sqlgen::IslandsPolicy']]],
+  ['islandspolicy',['IslandsPolicy',['../classannis_1_1sqlgen_1_1_islands_policy.html',1,'annis::sqlgen']]]
+];

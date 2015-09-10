@@ -1,0 +1,4 @@
+var classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder_1_1_multiple_assignment_exception =
+[
+    [ "MultipleAssignmentException", "classannis_1_1gui_1_1flatquerybuilder_1_1_flat_query_builder_1_1_multiple_assignment_exception.html#a9ebb7bc4d4004ee6191eaf807d43d0e8", null ]
+];

@@ -1,0 +1,5 @@
+var classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin_1_1_tiger_query_builder_1_1_help_click_listener =
+[
+    [ "HelpClickListener", "classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin_1_1_tiger_query_builder_1_1_help_click_listener.html#a23d52ab7e64d6d0023f782b9f039d392", null ],
+    [ "buttonClick", "classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin_1_1_tiger_query_builder_1_1_help_click_listener.html#af3640331c000582dd9f1c72f5f1820dd", null ]
+];
