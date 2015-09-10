@@ -55,7 +55,9 @@
               <path>.gitignore</path>
             </ignorePathsToDelete>
             <tryUpdate>true</tryUpdate>
-            <checkinComment>update documentation for version ${project.version} (${site.path})\n\nOriginal revision is ${buildNumber})</checkinComment>
+            <checkinComment>update documentation for version ${project.version} (${site.path})
+              
+Original revision is ${buildNumber}.</checkinComment>
           </configuration>
         </plugin>
       </plugins>
