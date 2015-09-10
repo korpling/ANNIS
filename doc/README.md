@@ -15,7 +15,7 @@ The "doxygen" executable must be in the system path.
 
 Then you can execute
 ```
-mvn clean install exec:exec -P doxygen
+mvn clean package -P doxygen
 ```
 to compile the everything.
 
