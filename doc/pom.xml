@@ -15,9 +15,63 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <site.path>doc-develop</site.path>
   </properties>
+
+  <build>
+    <pluginManagement>
+          
+      <plugins>
+            
+        <plugin>
+          <artifactId>maven-resources-plugin</artifactId>
+          <version>2.7</version>
+          <configuration>
+            <outputDirectory>${basedir}/target/doxygen-generated</outputDirectory>
+            <resources>          
+              <resource>
+                <directory>src/doxygen/</directory>
+                <filtering>true</filtering>
+              </resource>
+            </resources>              
+          </configuration>            
+
+        </plugin>
+            
+        <plugin>
+          <groupId>org.apache.maven.plugins</groupId>
+          <artifactId>maven-scm-publish-plugin</artifactId>
+          <version>1.1</version>
+          <extensions>true</extensions>
+          <configuration>              
+            <pubScmUrl>scm:git:ssh://git@github.com/korpling/ANNIS.git</pubScmUrl>
+            <scmBranch>gh-pages</scmBranch>
+            <content>${project.build.directory}/doxygen/</content>
+            <ignorePathsToDelete>
+              <path>doc</path>
+              <path>doc-develop</path>
+              <path>index.html</path>
+              <path>doxygen_sqlite3.db</path>
+              <path>.gitignore</path>
+            </ignorePathsToDelete>
+            <tryUpdate>true</tryUpdate>
+            <checkinComment>update documentation for version ${project.version} (${site.path})</checkinComment>
+          </configuration>
+        </plugin>
+      </plugins>
+    </pluginManagement>
+  </build>
+
   
   <profiles>
+    
+    <profile>
+      <id>release</id>
+      <properties>
+        <site.path>doc</site.path>
+      </properties>
+    </profile>
+    
     <profile>
       <id>doxygen</id>
       
@@ -27,23 +81,13 @@
           <!-- make sure all paths are correct by replacing the properties -->
           <plugin>
             <artifactId>maven-resources-plugin</artifactId>
-            <version>2.7</version>
             <executions>
               <execution>
                 <id>copy-resources</id>
-                <phase>validate</phase>
+                <phase>generate-sources</phase>
                 <goals>
                   <goal>copy-resources</goal>
-                </goals>
-                <configuration>
-                  <outputDirectory>${basedir}/target/doxygen/</outputDirectory>
-                  <resources>          
-                    <resource>
-                      <directory>src/doxygen/</directory>
-                      <filtering>true</filtering>
-                    </resource>
-                  </resources>              
-                </configuration>            
+                </goals>           
               </execution>
             </executions>
           </plugin>
@@ -55,7 +99,7 @@
             <version>1.4.0</version>
             <executions>
               <execution>
-                <phase>package</phase>
+                <phase>compile</phase>
                 <goals>
                   <goal>exec</goal>
                 </goals>
@@ -65,10 +109,52 @@
               <executable>doxygen</executable>
               <workingDirectory>${project.build.directory}/doxygen/</workingDirectory>
               <arguments>
-                <argument>Doxyfile</argument>
+                <argument>${project.build.directory}/doxygen-generated/Doxyfile</argument>
               </arguments>
             </configuration>
           </plugin>
+          
+          <!-- some doxygen versions don't delete the huge doxygen_sqlite3.db file -->
+          <plugin>
+            <artifactId>maven-clean-plugin</artifactId>
+            <version>2.6.1</version>
+            <executions>
+              <execution>
+                <id>remove-doxygen-sqlitedb</id>
+                <phase>prepare-package</phase>
+                <goals>
+                  <goal>clean</goal>
+                </goals>
+                <configuration>
+                  <excludeDefaultDirectories>true</excludeDefaultDirectories>
+                  <filesets>
+                    <fileset>
+                      <directory>${project.build.directory}/doxygen/</directory>
+                      <includes>
+                        <include>**/doxygen_sqlite3.db</include>
+                      </includes>
+                    </fileset>
+                  </filesets>
+                </configuration>
+              </execution>
+            </executions>
+          </plugin>
+          
+          <!-- upload the generated documentation to GitHub -->
+          <plugin>
+            <groupId>org.apache.maven.plugins</groupId>
+            <artifactId>maven-scm-publish-plugin</artifactId>
+            <executions>
+              <execution>
+                <id>scm-publish</id>
+                <phase>deploy</phase>
+                <goals>
+                  <goal>publish-scm</goal>
+                </goals>
+              </execution>
+            </executions>
+          </plugin>
+          
         </plugins>
       </build>
       
