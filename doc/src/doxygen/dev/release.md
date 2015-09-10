@@ -71,6 +71,5 @@ Finish phase {#dev-release-finish}
 mvn deploy -P release,doxygen
 \endcode
 3. Tag the release and merge it into the `master` branch, publish the new `master` branch
-4. Copy the generated documentation (`doc/target/doxygen/html`) to the github page (via the gh-page repository)
 5. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](@ref dev-release-version-update)
 6. Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well.
