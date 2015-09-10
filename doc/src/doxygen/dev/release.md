@@ -27,7 +27,6 @@ Updating the version {#dev-release-version-update}
 \code{.sh}
 mvn -N versions:update-child-modules
 \endcode
-4. Set the `PROJECT_NUMBER` variable in the `doc/Doxyfile` documentation descriptor file.
 
 Creating a changelog entry {#dev-release-changelog}
 --------------------------
@@ -69,14 +68,9 @@ Finish phase {#dev-release-finish}
 -------------
 1. Deploy release to Maven Central
 \code{.sh}
-mvn deploy -P release
+mvn deploy -P release -P doxygen
 \endcode
 3. Tag the release and merge it into the `master` branch, publish the new `master` branch
-4. Regenerate this documentation and copy it to the github page (via the gh-page repository)
-\code{.sh}
-cd doc/
-doxygen
-cd ..
-\endcode
+4. Copy the generated documentation (`doc/target/doxygen/html`) to the github page (via the gh-page repository)
 5. Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the [next SNAPSHOT version](@ref dev-release-version-update)
 6. Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well.
