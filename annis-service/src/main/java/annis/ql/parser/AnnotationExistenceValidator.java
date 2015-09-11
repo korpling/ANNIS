@@ -47,36 +47,17 @@ import org.springframework.stereotype.Component;
  *
  */
 @Component
-@Path("annis/exist")
 public class AnnotationExistenceValidator implements QueryDataTransformer
 {
 
   private final static Logger log = LoggerFactory.getLogger(
-    QueryServiceImpl.class);
-
-  private final static Logger queryLog = LoggerFactory.getLogger("QueryLog");
+    AnnotationExistenceValidator.class);
 
   private AnnisDao annisDao;
 
-  private WekaHelper wekaHelper;
-
-  private int port = 5711;
-
-  private CorpusConfig defaultCorpusConfig;
-
-  //private Set<String> result = new TreeSet<>();
   private String name;
-  @Context
-  private UriInfo uriInfo;
-
-  @Context
-  private HttpServletRequest request;
-
-  @Context
-  private ResourceConfig rc;
 
   @Override
-
   public QueryData transform(QueryData data)
   {
     //shuo code
