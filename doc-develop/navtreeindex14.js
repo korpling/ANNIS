@@ -1,5 +1,9 @@
 var NAVTREEINDEX14 =
 {
+"functions_func_h.html":[3,2,1,7],
+"functions_func_i.html":[3,2,1,8],
+"functions_func_j.html":[3,2,1,9],
+"functions_func_l.html":[3,2,1,10],
 "functions_func_m.html":[3,2,1,11],
 "functions_func_o.html":[3,2,1,12],
 "functions_func_p.html":[3,2,1,13],
@@ -245,9 +249,5 @@ var NAVTREEINDEX14 =
 "interfaceannis_1_1service_1_1ifaces_1_1_annis_token.html#affacf564596040e42058d54a6150b131":[3,0,0,14,0,2,5],
 "interfaceannis_1_1sqlgen_1_1_annotate_extractor.html":[3,0,0,15,10],
 "interfaceannis_1_1sqlgen_1_1_annotate_extractor.html#a8e3cd9d539693dac414c50781160708d":[3,0,0,15,10,0],
-"interfaceannis_1_1sqlgen_1_1_corpus_path_extractor.html":[3,0,0,15,19],
-"interfaceannis_1_1sqlgen_1_1_corpus_path_extractor.html#a4cb0dfac88fcf0ea2f33f5c6c93027c9":[3,0,0,15,19,0],
-"interfaceannis_1_1sqlgen_1_1_from_clause_sql_generator.html":[3,0,0,15,25],
-"interfaceannis_1_1sqlgen_1_1_from_clause_sql_generator.html#a5d2d0d3ee172db454c19ea976d2e6479":[3,0,0,15,25,0],
-"interfaceannis_1_1sqlgen_1_1_group_by_clause_sql_generator.html":[3,0,0,15,27]
+"interfaceannis_1_1sqlgen_1_1_corpus_path_extractor.html":[3,0,0,15,19]
 };

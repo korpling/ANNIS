@@ -109,9 +109,14 @@ $(document).ready(function(){initNavTree('dev-release.html','');});
 <li class="level2"><a href="#dev-release-changelog">Creating a changelog entry </a></li>
 </ul>
 </li>
-<li class="level1"><a href="#dev-release-process">Release Process </a><ul><li class="level2"><a href="#dev-release-init">Initialization phase </a></li>
+<li class="level1"><a href="#dev-release-process">Stable Release Process </a><ul><li class="level2"><a href="#dev-release-init">Initialization phase </a></li>
 <li class="level2"><a href="#dev-release-test">Testing cycle </a></li>
 <li class="level2"><a href="#dev-release-finish">Finish phase </a></li>
+</ul>
+</li>
+<li class="level1"><a href="#dev-release-preview-process">Preview Release Process </a><ul><li class="level2"><a href="#dev-release-preview-init">Initialization phase </a></li>
+<li class="level2"><a href="#dev-release-preview-test">Testing cycle </a></li>
+<li class="level2"><a href="#dev-release-preview-finish">Finish phase </a></li>
 </ul>
 </li>
 </ul>
@@ -120,6 +125,7 @@ $(document).ready(function(){initNavTree('dev-release.html','');});
 Introduction </h1>
 <p>Unfurtunally creating a new release requires some manual work. We used to invoke the Maven Release plugin in the process, but the only real usefull task was the version update and we still needed to do a lot of manual work. Thus we decided to write down the necessary steps to perform a new ANNIS release instead of relaying to a half-working solution with the Maven Release plugin.</p>
 <p>The release process might take several days and includes fixing bugs that are only discovered in the release testing process. <b>Never ever add new features in this release process</b>, there is the separate "develop" branch which you can use for this purposes.</p>
+<p>You must have Doxygen installed to make a release. Otherwise the documentation can't be created.</p>
 <h1><a class="anchor" id="dev-release-general"></a>
 General techniques </h1>
 <h2><a class="anchor" id="dev-release-version-update"></a>
@@ -138,7 +144,7 @@ Creating a changelog entry </h2>
 <li>add the output to the <code>CHANGELOG</code> file</li>
 </ol>
 <h1><a class="anchor" id="dev-release-process"></a>
-Release Process </h1>
+Stable Release Process </h1>
 <h2><a class="anchor" id="dev-release-init"></a>
 Initialization phase </h2>
 <ol type="1">
@@ -164,7 +170,37 @@ Finish phase </h2>
 </div><!-- fragment --></li>
 <li>Tag the release and merge it into the <code>master</code> branch, publish the new <code>master</code> branch</li>
 <li>Reintegrate the "master" branch into the "develop" branch and set the "develop" branch to the <a class="el" href="dev-release.html#dev-release-version-update">next SNAPSHOT version</a></li>
-<li>Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well. </li>
+<li>Create a new release on GitHub including the changelog. Upload the binaries from Maven repository to GitHub release as well.</li>
+</ol>
+<h1><a class="anchor" id="dev-release-preview-process"></a>
+Preview Release Process </h1>
+<p>Preview releases are like named Snapshots of the the <code>develop</code> branch. They have the version number of the next upcoming release but with the appendix "-previewX" (X is a number). An example preview release number is "3.4.0-preview2". Preview releases are not published in the master branch but are deployed to Maven Central.</p>
+<h2><a class="anchor" id="dev-release-preview-init"></a>
+Initialization phase </h2>
+<ol type="1">
+<li>Pull latest updates from the <code>develop</code> branch</li>
+<li>Update the version as described in the <a class="el" href="dev-release.html#dev-release-version-update">general techniques section</a></li>
+<li>Update the licenses in the <code>THIRD-PARTY</code> folder and commit/push to release branch <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;mvn license:add-third-party</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;mvn license:download-licenses</div>
+</div><!-- fragment --></li>
+<li>Add new changelog entry as described in the <a class="el" href="dev-release.html#dev-release-changelog">general techniques section</a>, if some important information is missing create an enhancement issue in GitHub and repeat</li>
+</ol>
+<h2><a class="anchor" id="dev-release-preview-test"></a>
+Testing cycle </h2>
+<ol type="1">
+<li>Build the complete project <em>with</em> tests. <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;mvn clean</div>
+<div class="line"><a name="l00002"></a><span class="lineno">    2</span>&#160;mvn install</div>
+</div><!-- fragment --></li>
+<li>Do manual tests. If you have to fix any bug document it in the issue tracker, <a class="el" href="dev-release.html#dev-release-changelog">update the changelog</a> and start over at step 1. If no bugs are left to fix go to the next section.</li>
+</ol>
+<h2><a class="anchor" id="dev-release-preview-finish"></a>
+Finish phase </h2>
+<ol type="1">
+<li>Deploy release to Maven Central <div class="fragment"><div class="line"><a name="l00001"></a><span class="lineno">    1</span>&#160;mvn deploy -P release,preview,doxygen</div>
+</div><!-- fragment --></li>
+<li>Tag the release and push it to the <code>develop</code> branch. If new commits have been introduced in <code>develop</code> merge them (but don't use rebasing).</li>
+<li>Set the "develop" branch to the <a class="el" href="dev-release.html#dev-release-version-update">previous SNAPSHOT version</a></li>
+<li>Create a new release on GitHub including the changelog. Mark this release as "pre-release". Upload the binaries from Maven repository to GitHub release as well. </li>
 </ol>
 </div></div><!-- contents -->
 </div><!-- doc-content -->
@@ -172,7 +208,7 @@ Finish phase </h2>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><a class="el" href="dev.html">Developing</a></li>
-    <li class="footer">Generated on Thu Sep 10 2015 19:17:49 for ANNIS by
+    <li class="footer">Generated on Fri Sep 11 2015 09:50:27 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>
