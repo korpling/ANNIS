@@ -308,6 +308,7 @@ var annotated =
         [ "DataObject", "classannis_1_1model_1_1_data_object.html", "classannis_1_1model_1_1_data_object" ],
         [ "Edge", "classannis_1_1model_1_1_edge.html", "classannis_1_1model_1_1_edge" ],
         [ "Join", "classannis_1_1model_1_1_join.html", "classannis_1_1model_1_1_join" ],
+        [ "ParsedEntityLocation", "classannis_1_1model_1_1_parsed_entity_location.html", "classannis_1_1model_1_1_parsed_entity_location" ],
         [ "QueryAnnotation", "classannis_1_1model_1_1_query_annotation.html", "classannis_1_1model_1_1_query_annotation" ],
         [ "QueryNode", "classannis_1_1model_1_1_query_node.html", "classannis_1_1model_1_1_query_node" ],
         [ "RelannisEdgeFeature", "classannis_1_1model_1_1_relannis_edge_feature.html", "classannis_1_1model_1_1_relannis_edge_feature" ],
@@ -324,6 +325,7 @@ var annotated =
       [ "ql", null, [
         [ "parser", null, [
           [ "AnnisParserAntlr", "classannis_1_1ql_1_1parser_1_1_annis_parser_antlr.html", "classannis_1_1ql_1_1parser_1_1_annis_parser_antlr" ],
+          [ "AnnotationExistenceValidator", "classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html", "classannis_1_1ql_1_1parser_1_1_annotation_existence_validator" ],
           [ "ComponentSearchRelationNormalizer", "classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html", "classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer" ],
           [ "DNFTransformer", "classannis_1_1ql_1_1parser_1_1_d_n_f_transformer.html", null ],
           [ "JoinListener", "classannis_1_1ql_1_1parser_1_1_join_listener.html", "classannis_1_1ql_1_1parser_1_1_join_listener" ],

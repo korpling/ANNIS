@@ -301,6 +301,7 @@ var hierarchy =
       [ "annis.gui.querybuilder.TigerQueryBuilderPlugin", "classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin.html", null ]
     ] ],
     [ "annis.ql.parser.QueryDataTransformer", "interfaceannis_1_1ql_1_1parser_1_1_query_data_transformer.html", [
+      [ "annis.ql.parser.AnnotationExistenceValidator", "classannis_1_1ql_1_1parser_1_1_annotation_existence_validator.html", null ],
       [ "annis.ql.parser.ComponentSearchRelationNormalizer", "classannis_1_1ql_1_1parser_1_1_component_search_relation_normalizer.html", null ],
       [ "annis.ql.parser.SemanticValidator", "classannis_1_1ql_1_1parser_1_1_semantic_validator.html", null ],
       [ "annis.ql.parser.TransitivePrecedenceOptimizer", "classannis_1_1ql_1_1parser_1_1_transitive_precedence_optimizer.html", null ]
@@ -455,8 +456,8 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
+    [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
@@ -910,6 +911,7 @@ var hierarchy =
         ] ]
       ] ],
       [ "annis.model.Edge", "classannis_1_1model_1_1_edge.html", null ],
+      [ "annis.model.ParsedEntityLocation", "classannis_1_1model_1_1_parsed_entity_location.html", null ],
       [ "annis.model.QueryAnnotation", "classannis_1_1model_1_1_query_annotation.html", null ],
       [ "annis.model.QueryNode", "classannis_1_1model_1_1_query_node.html", null ],
       [ "annis.model.RelannisEdgeFeature", "classannis_1_1model_1_1_relannis_edge_feature.html", null ],

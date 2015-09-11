@@ -12,6 +12,7 @@ var classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor =
     [ "removeTextChangeListener", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a7621aa0b671c1cec52f2eaf2c087494c", null ],
     [ "setErrors", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a256fa306b07c887eea214380db7a26ba", null ],
     [ "setInputPrompt", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#ac08b88b5f7b3d882c0337c46b0f9a9aa", null ],
+    [ "setNodes", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#ab31a1ceea37866836fb9038ac15453ec", null ],
     [ "setPropertyDataSource", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#aa0899e8ce14d15cb7b42a7252d4cecc2", null ],
     [ "setTextareaStyle", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a135499d8dafc652913faa5abab0e3d77", null ],
     [ "setTextChangeTimeout", "classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor.html#a03f195ecea5ee629e299e0c396e09b4b", null ],

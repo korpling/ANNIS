@@ -12,6 +12,7 @@ var classannis_1_1gui_1_1_query_controller =
     [ "getExportQuery", "classannis_1_1gui_1_1_query_controller.html#a59c6f9f1d7f759fca014d9bbe91f122b", null ],
     [ "getSearchQuery", "classannis_1_1gui_1_1_query_controller.html#a792618acea9fff06ad50e97b0dbb580a", null ],
     [ "getState", "classannis_1_1gui_1_1_query_controller.html#adf355dbbae1bc7201d4bfb61b17ab746", null ],
+    [ "reportServiceException", "classannis_1_1gui_1_1_query_controller.html#a873eb5d57df335ac2d2d5aed9bb55b88", null ],
     [ "setQuery", "classannis_1_1gui_1_1_query_controller.html#a873e9bde3708576160ee738ea0f1df64", null ],
-    [ "validateQuery", "classannis_1_1gui_1_1_query_controller.html#ab94d133c1755bfb3e6b373343db90ec9", null ]
+    [ "validateQuery", "classannis_1_1gui_1_1_query_controller.html#af1cab35e286172a02a6c6a7cbcca2f4a", null ]
 ];

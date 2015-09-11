@@ -166,12 +166,12 @@ List&lt; <a class="el" href="classannis_1_1service_1_1objects_1_1_annis_attribut
 <tr class="memitem:a16bc31c5afa446b5631a9c04be85f079"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16bc31c5afa446b5631a9c04be85f079"></a>
 <a class="el" href="classannis_1_1service_1_1objects_1_1_segmentation_list.html">SegmentationList</a>&#160;</td><td class="memItemRight" valign="bottom"><b>segmentationNames</b> (@PathParam(&quot;top&quot;) String toplevelCorpus)  throws WebApplicationException   </td></tr>
 <tr class="separator:a16bc31c5afa446b5631a9c04be85f079"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a9b43eb6a17582c2a522c5fefb9627b75"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_query_service_impl.html#a9b43eb6a17582c2a522c5fefb9627b75">check</a> (@QueryParam(&quot;q&quot;) String query)</td></tr>
-<tr class="memdesc:a9b43eb6a17582c2a522c5fefb9627b75"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if this is a valid query or throw exception when invalid.  <a href="#a9b43eb6a17582c2a522c5fefb9627b75">More...</a><br /></td></tr>
-<tr class="separator:a9b43eb6a17582c2a522c5fefb9627b75"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:aa3988905777e7f59da54390c0b327830"><td class="memItemLeft" align="right" valign="top">Response&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_query_service_impl.html#aa3988905777e7f59da54390c0b327830">parseNodes</a> (@QueryParam(&quot;q&quot;) String query)</td></tr>
-<tr class="memdesc:aa3988905777e7f59da54390c0b327830"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the list of the query nodes if this is a valid query or throw exception when invalid.  <a href="#aa3988905777e7f59da54390c0b327830">More...</a><br /></td></tr>
-<tr class="separator:aa3988905777e7f59da54390c0b327830"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a839fb02c116755e7f7945d601c697674"><td class="memItemLeft" align="right" valign="top">String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_query_service_impl.html#a839fb02c116755e7f7945d601c697674">check</a> (@QueryParam(&quot;q&quot;) String query,@DefaultValue(&quot;&quot;)@QueryParam(&quot;corpora&quot;) String rawCorpusNames)</td></tr>
+<tr class="memdesc:a839fb02c116755e7f7945d601c697674"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return true if this is a valid query or throw exception when invalid.  <a href="#a839fb02c116755e7f7945d601c697674">More...</a><br /></td></tr>
+<tr class="separator:a839fb02c116755e7f7945d601c697674"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:ac296f486dd5dba9f0d4aadeef2e64151"><td class="memItemLeft" align="right" valign="top">Response&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1service_1_1internal_1_1_query_service_impl.html#ac296f486dd5dba9f0d4aadeef2e64151">parseNodes</a> (@QueryParam(&quot;q&quot;) String query,@DefaultValue(&quot;&quot;)@QueryParam(&quot;corpora&quot;) String rawCorpusNames)</td></tr>
+<tr class="memdesc:ac296f486dd5dba9f0d4aadeef2e64151"><td class="mdescLeft">&#160;</td><td class="mdescRight">Return the list of the query nodes if this is a valid query or throw exception when invalid.  <a href="#ac296f486dd5dba9f0d4aadeef2e64151">More...</a><br /></td></tr>
+<tr class="separator:ac296f486dd5dba9f0d4aadeef2e64151"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa678e7c174638df8aaf57da873116c36"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aa678e7c174638df8aaf57da873116c36"></a>
 Response&#160;</td><td class="memItemRight" valign="bottom"><b>binary1</b> (@PathParam(&quot;top&quot;) String toplevelCorpusName,@PathParam(&quot;document&quot;) String corpusName,@PathParam(&quot;offset&quot;) String rawOffset,@PathParam(&quot;length&quot;) String rawLength)</td></tr>
 <tr class="separator:aa678e7c174638df8aaf57da873116c36"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -301,7 +301,7 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
 
 </div>
 </div>
-<a class="anchor" id="a9b43eb6a17582c2a522c5fefb9627b75"></a>
+<a class="anchor" id="a839fb02c116755e7f7945d601c697674"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -309,8 +309,18 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
           <td class="memname">String annis.service.internal.QueryServiceImpl.check </td>
           <td>(</td>
           <td class="paramtype">@QueryParam(&quot;q&quot;) String&#160;</td>
-          <td class="paramname"><em>query</em></td><td>)</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">@DefaultValue(&quot;&quot;)@QueryParam(&quot;corpora&quot;) String&#160;</td>
+          <td class="paramname"><em>rawCorpusNames</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -319,6 +329,7 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>Query to check for validity </td></tr>
+    <tr><td class="paramname">rawCorpusNames</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -546,7 +557,7 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
 
 </div>
 </div>
-<a class="anchor" id="aa3988905777e7f59da54390c0b327830"></a>
+<a class="anchor" id="ac296f486dd5dba9f0d4aadeef2e64151"></a>
 <div class="memitem">
 <div class="memproto">
       <table class="memname">
@@ -554,8 +565,18 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
           <td class="memname">Response annis.service.internal.QueryServiceImpl.parseNodes </td>
           <td>(</td>
           <td class="paramtype">@QueryParam(&quot;q&quot;) String&#160;</td>
-          <td class="paramname"><em>query</em></td><td>)</td>
+          <td class="paramname"><em>query</em>, </td>
+        </tr>
+        <tr>
+          <td class="paramkey"></td>
           <td></td>
+          <td class="paramtype">@DefaultValue(&quot;&quot;)@QueryParam(&quot;corpora&quot;) String&#160;</td>
+          <td class="paramname"><em>rawCorpusNames</em>&#160;</td>
+        </tr>
+        <tr>
+          <td></td>
+          <td>)</td>
+          <td></td><td></td>
         </tr>
       </table>
 </div><div class="memdoc">
@@ -564,6 +585,7 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
 <dl class="params"><dt>Parameters</dt><dd>
   <table class="params">
     <tr><td class="paramname">query</td><td>Query to get the query nodes for </td></tr>
+    <tr><td class="paramname">rawCorpusNames</td><td></td></tr>
   </table>
   </dd>
 </dl>
@@ -599,7 +621,7 @@ Benjamin Weißenfels <a href="#" onclick="location.href='mai'+'lto:'+'b.p'+'ix'+
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>service</b></li><li class="navelem"><b>internal</b></li><li class="navelem"><a class="el" href="classannis_1_1service_1_1internal_1_1_query_service_impl.html">QueryServiceImpl</a></li>
-    <li class="footer">Generated on Fri Sep 11 2015 09:50:28 for ANNIS by
+    <li class="footer">Generated on Sat Sep 12 2015 01:33:52 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

@@ -9,7 +9,7 @@ var searchData=
   ['cannotcreatetransactionmapper',['CannotCreateTransactionMapper',['../classannis_1_1rest_1_1provider_1_1_cannot_create_transaction_mapper.html',1,'annis::rest::provider']]],
   ['casesensitiveorder',['CaseSensitiveOrder',['../classannis_1_1_case_sensitive_order.html',1,'annis']]],
   ['changecontext',['changeContext',['../classannis_1_1gui_1_1resultview_1_1_single_result_panel.html#a3c249e8082ef1d7f19982a4ed40fbc0e',1,'annis.gui.resultview.SingleResultPanel.changeContext()'],['../interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#a6c377d15f3ddffab34fc878a8200594a',1,'annis.gui.resultview.VisualizerContextChanger.changeContext()']]],
-  ['check',['check',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a9b43eb6a17582c2a522c5fefb9627b75',1,'annis::service::internal::QueryServiceImpl']]],
+  ['check',['check',['../classannis_1_1service_1_1internal_1_1_query_service_impl.html#a839fb02c116755e7f7945d601c697674',1,'annis::service::internal::QueryServiceImpl']]],
   ['checkandfix',['checkAndFix',['../classannis_1_1administration_1_1_scheme_fixer.html#ae29f591d3274d0a0bf70b6af693b2da2',1,'annis::administration::SchemeFixer']]],
   ['checkandremovetoplevelcorpus',['checkAndRemoveTopLevelCorpus',['../classannis_1_1administration_1_1_delete_corpus_dao.html#aad36d1ec954745bb6894f8b2b42b5c40',1,'annis::administration::DeleteCorpusDao']]],
   ['checkdatabaseversion',['checkDatabaseVersion',['../interfaceannis_1_1dao_1_1_annis_dao.html#ab1342ed279fa20c842797971535f0bb3',1,'annis.dao.AnnisDao.checkDatabaseVersion()'],['../classannis_1_1dao_1_1_spring_annis_dao.html#a101c2830b3bca3fe14d6dde561c97fff',1,'annis.dao.SpringAnnisDao.checkDatabaseVersion()']]],

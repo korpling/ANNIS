@@ -117,20 +117,25 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1components_1_1cod
 
 <p>Inherits JavaScriptComponentState.</p>
 <table class="memberdecls">
+<tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="nested-classes"></a>
+Classes</h2></td></tr>
+<tr class="memitem:"><td class="memItemLeft" align="right" valign="top">class &#160;</td><td class="memItemRight" valign="bottom"><b>ParseError</b></td></tr>
+<tr class="memdesc:"><td class="mdescLeft">&#160;</td><td class="mdescRight">Class that is suitable of transporting the parse error state via JSON to the client. <br /></td></tr>
+<tr class="separator:"><td class="memSeparator" colspan="2">&#160;</td></tr>
+</table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-attribs"></a>
 Public Attributes</h2></td></tr>
 <tr class="memitem:ade39c51ad7eaa6ae82af1b9197ef4c56"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ade39c51ad7eaa6ae82af1b9197ef4c56"></a>
 String&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html#ade39c51ad7eaa6ae82af1b9197ef4c56">text</a> = &quot;&quot;</td></tr>
-<tr class="memdesc:ade39c51ad7eaa6ae82af1b9197ef4c56"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current text of the editor. <br /></td></tr>
+<tr class="memdesc:ade39c51ad7eaa6ae82af1b9197ef4c56"><td class="mdescLeft">&#160;</td><td class="mdescRight">The current text of the editor *. <br /></td></tr>
 <tr class="separator:ade39c51ad7eaa6ae82af1b9197ef4c56"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ace09604b73e0a3bb235f987c660150e1"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ace09604b73e0a3bb235f987c660150e1"></a>
 String&#160;</td><td class="memItemRight" valign="bottom"><b>inputPrompt</b> = &quot;&quot;</td></tr>
 <tr class="separator:ace09604b73e0a3bb235f987c660150e1"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ae5188582ff83e25b9f4be52e9e206dad"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ae5188582ff83e25b9f4be52e9e206dad"></a>
-final List&lt; <a class="el" href="classannis_1_1model_1_1_aql_parse_error.html">AqlParseError</a> &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>errors</b> = new ArrayList&lt;&gt;()</td></tr>
-<tr class="separator:ae5188582ff83e25b9f4be52e9e206dad"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a8343c3184887e4eeec0001ba615130ba"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8343c3184887e4eeec0001ba615130ba"></a>
-final TreeMap&lt; String, Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>nodeMappings</b> = new TreeMap&lt;&gt;(new StringComparator())</td></tr>
+<tr class="memitem:a55d48d389bdbad3d170868070107e457"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a55d48d389bdbad3d170868070107e457"></a>
+final List&lt; ParseError &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>errors</b> = new ArrayList&lt;&gt;()</td></tr>
+<tr class="separator:a55d48d389bdbad3d170868070107e457"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a8343c3184887e4eeec0001ba615130ba"><td class="memItemLeft" align="right" valign="top">final TreeMap&lt; String, Integer &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>nodeMappings</b></td></tr>
 <tr class="separator:a8343c3184887e4eeec0001ba615130ba"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a3d3381bb5f1a706dd7a7ad305f4f23"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a8a3d3381bb5f1a706dd7a7ad305f4f23"></a>
 String&#160;</td><td class="memItemRight" valign="bottom"><b>textareaClass</b></td></tr>
@@ -142,13 +147,28 @@ long&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="clas
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
-</div></div><!-- contents -->
+</div><h2 class="groupheader">Member Data Documentation</h2>
+<a class="anchor" id="a8343c3184887e4eeec0001ba615130ba"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">final TreeMap&lt;String, Integer&gt; annis.gui.components.codemirror.AqlCodeEditorState.nodeMappings</td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<b>Initial value:</b><div class="fragment"><div class="line">= <span class="keyword">new</span> TreeMap&lt;&gt;(</div>
+<div class="line">    <span class="keyword">new</span> StringComparator())</div>
+</div><!-- fragment -->
+</div>
+</div>
+</div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>components</b></li><li class="navelem"><b>codemirror</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1components_1_1codemirror_1_1_aql_code_editor_state.html">AqlCodeEditorState</a></li>
-    <li class="footer">Generated on Fri Sep 11 2015 09:50:27 for ANNIS by
+    <li class="footer">Generated on Sat Sep 12 2015 01:33:52 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>
