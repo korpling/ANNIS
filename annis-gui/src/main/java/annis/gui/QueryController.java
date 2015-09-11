@@ -40,6 +40,7 @@ import annis.libgui.Helper;
 import annis.libgui.media.MediaController;
 import annis.libgui.visualizers.IFrameResourceMap;
 import annis.model.AqlParseError;
+import annis.model.QueryNode;
 import annis.service.objects.FrequencyTableEntry;
 import annis.service.objects.FrequencyTableEntryType;
 import annis.service.objects.FrequencyTableQuery;
@@ -61,6 +62,7 @@ import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -115,6 +117,11 @@ public class QueryController implements Serializable
   public void validateQuery(String query)
   {
     QueryPanel qp = ui.getControlPanel().getQueryPanel();
+    
+    // reset status
+    qp.setErrors(null);
+    qp.setNodes(null);
+    
     if (query == null || query.isEmpty())
     {
       qp.setStatus("Empty query");
@@ -126,40 +133,40 @@ public class QueryController implements Serializable
       {
         String corpora = "";
         if (state.getSelectedCorpora().getValue() != null
-              && !state.getSelectedCorpora().getValue().isEmpty())
+          && !state.getSelectedCorpora().getValue().isEmpty())
         {
-            Set<String> corpusNames = state.getSelectedCorpora().getValue();
-            corpora = Joiner.on(",").join(corpusNames);
+          Set<String> corpusNames = state.getSelectedCorpora().getValue();
+          corpora = Joiner.on(",").join(corpusNames);
         }
-        
+
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-        Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeJersey(query)).queryParam("corpora",corpora)
-          .get(String.class);
+        Future<List<QueryNode>> future = annisResource.path("query").path(
+          "parse/nodes").
+          queryParam("q", Helper.encodeJersey(query)).queryParam("corpora",
+            corpora)
+          .get(new GenericType<List<QueryNode>>()
+          {
+          });
 
         // wait for maximal one seconds
         try
         {
-          String result = future.get(1, TimeUnit.SECONDS);
+          List<QueryNode> nodes = future.get(1, TimeUnit.SECONDS);
 
-          if ("ok".equalsIgnoreCase(result))
+          qp.setNodes(nodes);
+          
+          if (state.getSelectedCorpora().getValue() == null
+            || state.getSelectedCorpora().getValue().isEmpty())
           {
-            if (state.getSelectedCorpora().getValue() == null
-              || state.getSelectedCorpora().getValue().isEmpty())
-            {
-              qp.setStatus(
-                "Please select a corpus from the list below, then click on \"Search\".");
-            }
-            else
-            {
-              qp.setStatus(
-                "Valid query, click on \"Search\" to start searching.");
-            }
+            qp.setStatus(
+              "Please select a corpus from the list below, then click on \"Search\".");
           }
           else
           {
-            qp.setStatus(result);
+            qp.setStatus(
+              "Valid query, click on \"Search\" to start searching.");
           }
+
         }
         catch (InterruptedException ex)
         {
@@ -173,9 +180,13 @@ public class QueryController implements Serializable
               getCause();
             if (cause.getResponse().getStatus() == 400)
             {
-              List<AqlParseError> errors = 
-                cause.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
+              List<AqlParseError> errors
+                = cause.getResponse().getEntity(
+                  new GenericType<List<AqlParseError>>()
+                  {
+                  });
               qp.setStatus(Joiner.on("\n").join(errors));
+              qp.setErrors(errors);
             }
             else
             {
@@ -209,7 +220,8 @@ public class QueryController implements Serializable
     {
       state.getLeftContext().
         setValue(((ContextualizedQuery) q).getLeftContext());
-      state.getRightContext().setValue(((ContextualizedQuery) q).getRightContext());
+      state.getRightContext().setValue(((ContextualizedQuery) q).
+        getRightContext());
       state.getBaseText().setValue(((ContextualizedQuery) q).getSegmentation());
     }
     if (q instanceof PagedResultQuery)
@@ -267,7 +279,7 @@ public class QueryController implements Serializable
 
   public void executeSearch(boolean replaceOldTab, boolean startFromFirstPage)
   {
-    if(startFromFirstPage)
+    if (startFromFirstPage)
     {
       getState().getOffset().setValue(0);
     }
@@ -348,7 +360,8 @@ public class QueryController implements Serializable
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
       queryParam("q", Helper.encodeJersey(pagedQuery.getQuery()))
-      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).get(
+      .queryParam("corpora", StringUtils.join(pagedQuery.getCorpora(), ",")).
+      get(
         MatchAndDocumentCount.class);
     state.getExecutedTasks().put(QueryUIState.QueryType.COUNT, futureCount);
 
@@ -373,7 +386,7 @@ public class QueryController implements Serializable
     addHistoryEntry(query);
 
     exportFuture = Background.call(new ExportBackgroundJob(query,
-        getExporterByName(query.getExporterName()), ui, eventBus, panel));
+      getExporterByName(query.getExporterName()), ui, eventBus, panel));
     state.getExecutedTasks().put(QueryUIState.QueryType.EXPORT, exportFuture);
   }
 
@@ -399,7 +412,7 @@ public class QueryController implements Serializable
     {
       freqFuture.cancel(true);
     }
-    
+
     if ("".equals(state.getAql().getValue()))
     {
       Notification.show("Empty query", Notification.Type.WARNING_MESSAGE);
@@ -408,7 +421,8 @@ public class QueryController implements Serializable
     }
     else if (state.getSelectedCorpora().getValue().isEmpty())
     {
-      Notification.show("Please select a corpus", Notification.Type.WARNING_MESSAGE);
+      Notification.show("Please select a corpus",
+        Notification.Type.WARNING_MESSAGE);
       panel.showQueryDefinitionPanel();
       return;
     }
@@ -508,7 +522,6 @@ public class QueryController implements Serializable
     ui.getControlPanel().getQueryPanel().updateShortHistory();
   }
 
-
   public void changeContext(PagedResultQuery originalQuery,
     Match match,
     int offset, int newContext,
@@ -528,22 +541,20 @@ public class QueryController implements Serializable
     newQuery.setOffset(offset);
 
     Background.run(new SingleResultFetchJob(match, newQuery,
-        visCtxChange));
+      visCtxChange));
 
   }
-  
+
   public void corpusSelectionChangedInBackground()
   {
     ui.getControlPanel().getSearchOptions()
-      .updateSearchPanelConfigurationInBackground(getState().getSelectedCorpora().getValue(), ui);
+      .updateSearchPanelConfigurationInBackground(getState().
+        getSelectedCorpora().getValue(), ui);
   }
-  
+
   public QueryUIState getState()
   {
     return ui.getQueryState();
   }
-
-
-
 
 }

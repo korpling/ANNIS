@@ -15,16 +15,8 @@
  */
 package annis.gui.components.codemirror;
 
-import annis.gui.SearchUI;
-import annis.gui.objects.QueryUIState;
-import annis.libgui.Helper;
 import annis.model.AqlParseError;
 import annis.model.QueryNode;
-import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.AsyncWebResource;
-import com.sun.jersey.api.client.ClientHandlerException;
-import com.sun.jersey.api.client.GenericType;
-import com.sun.jersey.api.client.UniformInterfaceException;
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.annotations.StyleSheet;
 import com.vaadin.data.Property;
@@ -32,18 +24,12 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.event.FieldEvents;
 import com.vaadin.ui.AbstractJavaScriptComponent;
 import com.vaadin.ui.JavaScriptFunction;
-import com.vaadin.ui.UI;
 import elemental.json.JsonArray;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.concurrent.ExecutionException;
-import java.util.concurrent.Future;
-import java.util.concurrent.TimeUnit;
-import java.util.concurrent.TimeoutException;
 import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -137,8 +123,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       // this is a server side state change and we have to explicitly tell the client we want to change the text
       getState().serverRequestCounter++;
 
-      validate(newText);
-
       log.debug("invalidating \"{}\"/\"{}\"", oldText, getState().text);
       markAsDirty();
     }
@@ -154,7 +138,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       getState().text = args.getString(0);
       getPropertyDataSource().setValue(args.getString(0));
 
-      validate(dataSource.getValue());
       final String textCopy = dataSource.getValue();
       final int cursorPos = (int) args.getNumber(1);
       fireEvent(new FieldEvents.TextChangeEvent(AqlCodeEditor.this)
@@ -175,89 +158,18 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     }
   }
 
-  private void validate(String query)
+  public void setNodes(List<QueryNode> nodes)
   {
-    setErrors(null);
     getState().nodeMappings.clear();
-    if (query == null || query.isEmpty())
+    if(nodes != null)
     {
-      // don't validate the empty query
-      return;
-    }
-    try
-    {
-
-      AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
-      Future<List<QueryNode>> future = annisResource.path("query").path(
-        "parse/nodes").
-        queryParam("q", Helper.encodeJersey(query))
-        .queryParam("corpora", getCorpusListParam())
-        .get(new GenericType<List<QueryNode>>()
-        {
-        });
-
-      // wait for maximal one seconds
-      try
-      {
-        List<QueryNode> result = future.get(1, TimeUnit.SECONDS);
-
-        getState().nodeMappings.putAll(mapQueryNodes(result));
-      }
-      catch (InterruptedException | TimeoutException ex)
-      {
-      }
-      catch (ExecutionException ex)
-      {
-        if (ex.getCause() instanceof UniformInterfaceException)
-        {
-          UniformInterfaceException cause = (UniformInterfaceException) ex.
-            getCause();
-          if (cause.getResponse().getStatus() == 400)
-          {
-            List<AqlParseError> errorsFromServer
-              = cause.getResponse().getEntity(
-                new GenericType<List<AqlParseError>>()
-                {
-                });
-
-            setErrors(errorsFromServer);
-          }
-        }
-      }
-    }
-    catch (ClientHandlerException ex)
-    {
+      getState().nodeMappings.putAll(mapQueryNodes(nodes));
     }
   }
-  
-  /**
-   * Check if corpora are selected if yes, concatenate their names to a comma separated list
-   * suitable as "corpora" parameter for the "parseNodes" REST API function.
-   * @return The list as string or the empty string if list could not be retrieved.
-   */
-  private String getCorpusListParam()
-  {
-    String corpora = "";
-        
-    UI ui = UI.getCurrent();
-    if(ui instanceof SearchUI)
-    {
-      QueryUIState uiState = ((SearchUI) ui).getQueryState();
-      if(uiState != null)
-      {
-        if (uiState.getSelectedCorpora().getValue() != null
-              && !uiState.getSelectedCorpora().getValue().isEmpty())
-        {
-            Set<String> corpusNames = uiState.getSelectedCorpora().getValue();
-            corpora = Joiner.on(",").join(corpusNames);
-        }
-      }
-    }
-    return corpora;
-  }  
 
   private TreeMap<String, Integer> mapQueryNodes(List<QueryNode> nodes)
   {
+    TreeMap<String, Integer> result = new TreeMap<>();
     Map<Integer, TreeSet<Long>> alternative2Nodes = new HashMap<>();
 
     for (QueryNode n : nodes)
@@ -272,7 +184,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
       orderedNodeSet.add(n.getId());
     }
 
-    TreeMap<String, Integer> result = new TreeMap<>();
     for (TreeSet<Long> orderedNodeSet : alternative2Nodes.values())
     {
       int newID = 1;
@@ -282,6 +193,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
         newID++;
       }
     }
+
     return result;
   }
 
@@ -361,7 +273,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     getState().errors.clear();
     if (errors != null)
     {
-      for(AqlParseError e : errors)
+      for (AqlParseError e : errors)
       {
         getState().errors.add(new AqlCodeEditorState.ParseError(e));
       }

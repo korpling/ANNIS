@@ -26,6 +26,8 @@ import annis.gui.objects.Query;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.QueryBuilderChooser;
 import annis.libgui.Helper;
+import annis.model.AqlParseError;
+import annis.model.QueryNode;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
@@ -42,6 +44,7 @@ import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
+import java.util.List;
 import org.slf4j.LoggerFactory;
 import org.vaadin.hene.popupbutton.PopupButton;
 
@@ -342,6 +345,17 @@ public class QueryPanel extends GridLayout implements
     }
     return "";
   }
+  
+  public void setNodes(List<QueryNode> nodes)
+  {
+    txtQuery.setNodes(nodes);
+  }
+  
+  public void setErrors(List<AqlParseError> errors)
+  {
+    txtQuery.setErrors(errors);
+  }
+  
   
   public void notifyFrequencyTabClose()
   {
