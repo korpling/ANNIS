@@ -16,7 +16,9 @@
 
 package annis.ql.parser;
 
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -45,6 +47,7 @@ import com.google.common.collect.Maps;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -95,8 +98,10 @@ public class JoinListener extends AqlParserBaseListener
       alternativeNodes[i] = Maps.newHashMap();
       for(QueryNode n : alternative)
       {
-        Preconditions.checkArgument(!alternativeNodes[i].containsKey(n.getVariable()), 
-          "A node variable name is only allowed once per normalized alternative");
+        if(alternativeNodes[i].containsKey(n.getVariable()))
+        {
+          throw new AnnisQLSemanticsException(n, "A node variable name is only allowed once per normalized alternative");
+        }
         alternativeNodes[i].put(n.getVariable(), n);
       }
       i++;
