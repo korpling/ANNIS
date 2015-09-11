@@ -16,6 +16,7 @@
 package annis.exceptions;
 
 import annis.model.AqlParseError;
+import annis.model.ParsedEntityLocation;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -34,6 +35,12 @@ public class AnnisQLSemanticsException extends AnnisException
   {
     super(message);
     errors.add(new AqlParseError(message));
+  }
+  
+  public AnnisQLSemanticsException(ParsedEntityLocation location, String message)
+  {
+    super(message);
+    errors.add(new AqlParseError(location, message));
   }
   
   public AnnisQLSemanticsException(String message, List<AqlParseError> errors)
