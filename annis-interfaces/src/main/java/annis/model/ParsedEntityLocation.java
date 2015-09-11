@@ -16,18 +16,20 @@
 package annis.model;
 
 import java.io.Serializable;
+import javax.xml.bind.annotation.XmlRootElement;
 
 /**
  * The location of some entity in the query when it was parsed.
  * Can be used to define e.g. error locations.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
+@XmlRootElement
 public class ParsedEntityLocation implements Serializable
 {
-  private final int startLine;
-  private final int startColumn;
-  private final int endLine;
-  private final int endColumn;
+  private int startLine;
+  private int startColumn;
+  private int endLine;
+  private  int endColumn;
   
   public ParsedEntityLocation()
   {
@@ -64,6 +66,55 @@ public class ParsedEntityLocation implements Serializable
   {
     return endColumn;
   }
+
+  public void setStartLine(int startLine)
+  {
+    this.startLine = startLine;
+  }
+
+  public void setStartColumn(int startColumn)
+  {
+    this.startColumn = startColumn;
+  }
+
+  public void setEndLine(int endLine)
+  {
+    this.endLine = endLine;
+  }
+
+  public void setEndColumn(int endColumn)
+  {
+    this.endColumn = endColumn;
+  }
+  
+  @Override
+  public String toString()
+  {
+    if (startLine == endLine)
+    {
+      if (startColumn == endColumn)
+      {
+        return startLine + ":" + startColumn;
+      }
+      else
+      {
+        return startLine + ":" + startColumn + "-" + endColumn;
+      }
+    }
+    else
+    {
+      if (startColumn == endColumn)
+      {
+        return startLine + "-" + endLine + ":" + startColumn;
+      }
+      else
+      {
+        return startLine + "-" + endLine + ":" + startColumn + "-" + endColumn;
+      }
+    }
+  }
+  
+  
   
   
 }

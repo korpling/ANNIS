@@ -26,32 +26,19 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class AqlParseError implements Serializable
 {
 
-  public int startLine;
+  private ParsedEntityLocation location;
 
-  public int startColumn;
-
-  public int endLine;
-
-  public int endColumn;
-
-  public String message;
+  private String message;
 
   public AqlParseError()
   {
-    this.startLine = 1;
-    this.endLine = 1;
-    this.startColumn = 0;
-    this.endColumn = 0;
+    this.location = new ParsedEntityLocation();
     this.message = "";
   }
 
-  public AqlParseError(int startLine, int startColumn, int endLine,
-    int endColumn, String message)
+  public AqlParseError(ParsedEntityLocation location, String message)
   {
-    this.startLine = startLine;
-    this.startColumn = startColumn;
-    this.endLine = endLine;
-    this.endColumn = endColumn;
+    this.location = location;
     this.message = message;
   }
 
@@ -59,19 +46,11 @@ public class AqlParseError implements Serializable
   {
     if (n != null && n.getParseLocation() != null)
     {
-      ParsedEntityLocation loc = n.getParseLocation();
-
-      this.startLine = loc.getStartLine();
-      this.startColumn = loc.getStartColumn();
-      this.endLine = loc.getEndLine();
-      this.endColumn = loc.getEndColumn();
+      this.location = n.getParseLocation();
     }
     else
     {
-      this.startLine = 1;
-      this.endLine = 1;
-      this.startColumn = 0;
-      this.endColumn = 0;
+      this.location = new ParsedEntityLocation();
     }
     this.message = message;
   }
@@ -79,37 +58,33 @@ public class AqlParseError implements Serializable
   public AqlParseError(String message)
   {
     this.message = message;
-    this.startLine = 1;
-    this.endLine = 1;
-    this.startColumn = 1;
-    this.endColumn = 1;
+    this.location = new ParsedEntityLocation();
   }
 
   @Override
   public String toString()
   {
-    if (startLine == endLine)
-    {
-      if (startColumn == endColumn)
-      {
-        return "line " + startLine + ":" + startColumn + " " + message;
-      }
-      else
-      {
-        return "line " + startLine + ":" + startColumn + "-" + endColumn + " " + message;
-      }
-    }
-    else
-    {
-      if (startColumn == endColumn)
-      {
-        return "line " + startLine + "-" + endLine + ":" + startColumn + " " + message;
-      }
-      else
-      {
-        return "line " + startLine + "-" + endLine + ":" + startColumn + "-" + endColumn + " " + message;
-      }
-    }
+    return "line " + location.toString() + " " + message;
   }
 
+  public ParsedEntityLocation getLocation()
+  {
+    return location;
+  }
+
+  public String getMessage()
+  {
+    return message;
+  }
+
+  public void setLocation(ParsedEntityLocation location)
+  {
+    this.location = location;
+  }
+
+  public void setMessage(String message)
+  {
+    this.message = message;
+  }
+  
 }

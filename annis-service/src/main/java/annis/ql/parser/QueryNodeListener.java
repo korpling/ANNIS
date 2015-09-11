@@ -298,10 +298,7 @@ public class QueryNodeListener extends AqlParserBaseListener
     }
     lastVariableDefinition = null;
     
-    ParsedEntityLocation location = new ParsedEntityLocation(
-      ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), 
-      ctx.getStop().getLine(), ctx.getStop().getLine());
-    n.setParseLocation(location);
+    n.setParseLocation(AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()));
     
     currentAlternative.put(existingID, n);
     localNodes.put(n.getVariable(), n);

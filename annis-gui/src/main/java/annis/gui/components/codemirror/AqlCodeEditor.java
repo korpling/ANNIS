@@ -203,7 +203,7 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
 
         getState().nodeMappings.putAll(mapQueryNodes(result));
       }
-      catch (InterruptedException ex)
+      catch (InterruptedException | TimeoutException ex)
       {
       }
       catch (ExecutionException ex)
@@ -223,9 +223,6 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
             setErrors(errorsFromServer);
           }
         }
-      }
-      catch (TimeoutException ex)
-      {
       }
     }
     catch (ClientHandlerException ex)
@@ -364,7 +361,10 @@ public class AqlCodeEditor extends AbstractJavaScriptComponent
     getState().errors.clear();
     if (errors != null)
     {
-      getState().errors.addAll(errors);
+      for(AqlParseError e : errors)
+      {
+        getState().errors.add(new AqlCodeEditorState.ParseError(e));
+      }
     }
     markAsDirty();
   }
