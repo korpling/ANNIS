@@ -64,11 +64,8 @@ import java.util.LinkedList;
 import javax.annotation.Resource;
 import org.junit.Assert;
 import org.springframework.dao.DataAccessException;
-import org.springframework.test.web.ModelAndViewAssert;
-import org.springframework.validation.BindingResultUtils;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-// TODO: do not test context only for annopool
 @ContextConfiguration(locations =
 {
   "file:src/main/distribution/conf/spring/Common.xml",

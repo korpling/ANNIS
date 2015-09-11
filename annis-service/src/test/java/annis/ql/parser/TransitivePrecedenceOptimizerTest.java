@@ -15,6 +15,7 @@
  */
 package annis.ql.parser;
 
+import annis.AnnisXmlContextLoader;
 import annis.model.QueryNode;
 import annis.model.Join;
 import annis.sqlgen.model.Precedence;
@@ -35,8 +36,12 @@ import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(locations={"classpath:annis/ql/parser/AnnisParser-context.xml", 
-  "classpath:annis/AutowiredContext.xml"})
+@ContextConfiguration(locations={
+  "file:src/main/distribution/conf/spring/Common.xml",
+  "file:src/main/distribution/conf/spring/Dao.xml",
+  "classpath:annis/ql/parser/AnnisParser-context.xml", 
+  "classpath:annis/AutowiredContext.xml"},
+  loader = AnnisXmlContextLoader.class)
 public class TransitivePrecedenceOptimizerTest
 {
   private boolean postProcessorExists = false;
