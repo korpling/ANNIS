@@ -17,8 +17,6 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
-import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -47,7 +45,6 @@ import com.google.common.collect.Maps;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -285,6 +282,12 @@ public class JoinListener extends AqlParserBaseListener
          AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
          "Distance can't be 0");
     }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
+    }
     else
     {
       String segmentationName = getLayerName(ctx.NAMED_PRECEDENCE());
@@ -309,6 +312,12 @@ public class JoinListener extends AqlParserBaseListener
       throw new AnnisQLSemanticsException(
          AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
          "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
     }
     else
     {
@@ -418,8 +427,18 @@ public class JoinListener extends AqlParserBaseListener
     String layer = getLayerName(ctx.NAMED_DOMINANCE());
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
-    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
-    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    if(range.getMin() == 0 || range.getMax() == 0)
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
+    }
     
     left.addOutgoingJoin(addParsedLocation(ctx, new Dominance(right, layer, range.getMin(), range.getMax())));
   }
@@ -467,8 +486,18 @@ public class JoinListener extends AqlParserBaseListener
     String label = getLayerName(ctx.POINTING(), 2);
    
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
-    Preconditions.checkArgument(range.getMax() != 0, "Distance can't be 0");
-    Preconditions.checkArgument(range.getMin() != 0, "Distance can't be 0");
+    if(range.getMin() == 0 || range.getMax() == 0)
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
+    }
+    else if(range.getMin() > range.getMax())
+    {
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Minimal distance can't be larger than maximal distance");
+    }
     
     left.addOutgoingJoin(addParsedLocation(ctx, new PointingRelation(right, label, range.getMin(), range.getMax())));
   }
