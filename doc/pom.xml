@@ -74,6 +74,14 @@ Original revision is ${buildNumber}.</checkinComment>
       </properties>
     </profile>
     
+    <!-- preview releases still push their documentation to doc-develop -->
+    <profile>
+      <id>preview</id>
+      <properties>
+        <site.path>doc-develop</site.path>
+      </properties>
+    </profile>
+    
     <profile>
       <id>doxygen</id>
       
