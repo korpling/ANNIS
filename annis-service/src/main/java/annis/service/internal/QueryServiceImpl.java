@@ -649,7 +649,7 @@ public class QueryServiceImpl implements QueryService
   @Produces("text/plain")
   @Path("check")
   public String check(@QueryParam("q") String query, 
-    @DefaultValue("") @QueryParam("c") String rawCorpusNames)
+    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames)
   {
     Subject user = SecurityUtils.getSubject();
     List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);

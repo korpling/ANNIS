@@ -124,31 +124,17 @@ public class QueryController implements Serializable
       // validate query
       try
       {
-        String corpus = "";
-
-        
+        String corpora = "";
         if (state.getSelectedCorpora().getValue() != null
               && !state.getSelectedCorpora().getValue().isEmpty())
         {
-            // Create a new StringBuilder.
-            StringBuilder builder = new StringBuilder();
             Set<String> corpusNames = state.getSelectedCorpora().getValue();
-            //List<String> corpusNames = new LinkedList<>();
-            //corpusNames.addAll(corpora);
-            //get the first corpus now, later we could deal with multiple corpora selected
-            //corpus = corpusNames.iterator().next();
-        
-            for (String c:corpusNames){
-              builder.append(c+',');
-            }
-            corpus = builder.toString();
-            corpus = corpus.substring(0,corpus.length()-1);
+            corpora = Joiner.on(",").join(corpusNames);
         }
-       
         
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<String> future = annisResource.path("query").path("check").
-          queryParam("q", Helper.encodeJersey(query)).queryParam("c",corpus)
+          queryParam("q", Helper.encodeJersey(query)).queryParam("corpora",corpora)
           .get(String.class);
 
         // wait for maximal one seconds
@@ -158,9 +144,6 @@ public class QueryController implements Serializable
 
           if ("ok".equalsIgnoreCase(result))
           {
-           
-            
-            
             if (state.getSelectedCorpora().getValue() == null
               || state.getSelectedCorpora().getValue().isEmpty())
             {
