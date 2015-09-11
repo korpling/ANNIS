@@ -15,7 +15,6 @@
  */
 package annis.ql.parser;
 
-import annis.WekaHelper;
 
 import annis.exceptions.AnnisQLSemanticsException;
 
@@ -25,15 +24,8 @@ import annis.dao.AnnisDao;
 import annis.model.QueryAnnotation;
 import java.util.List;
 import java.util.Set;
-import annis.service.internal.QueryServiceImpl;
 import annis.service.objects.AnnisAttribute;
-import annis.service.objects.CorpusConfig;
-import com.sun.jersey.api.core.ResourceConfig;
 import java.util.TreeSet;
-import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.Path;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.UriInfo;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
@@ -54,8 +46,6 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
     AnnotationExistenceValidator.class);
 
   private AnnisDao annisDao;
-
-  private String name;
 
   @Override
   public QueryData transform(QueryData data)
@@ -87,6 +77,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
 
       for (List<QueryNode> alternative : data.getAlternatives())
       {
+        String name = null;
         QueryNode n = alternative.get(0);
         Set<QueryAnnotation> m = n.getNodeAnnotations();
         if (m.iterator().hasNext())
