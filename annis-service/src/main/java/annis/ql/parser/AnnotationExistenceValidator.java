@@ -15,7 +15,6 @@
  */
 package annis.ql.parser;
 
-import annis.model.ParsedEntityLocation;
 import annis.exceptions.AnnisQLSemanticsException;
 
 import annis.model.QueryNode;
@@ -27,7 +26,6 @@ import java.util.List;
 import java.util.Set;
 import annis.service.objects.AnnisAttribute;
 import java.util.LinkedList;
-import java.util.Map;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,7 +53,7 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
   {
     List<Long> corpusList = data.getCorpusList();
 
-    if ((corpusList != null) && !corpusList.isEmpty())
+    if (annisDao != null && (corpusList != null) && !corpusList.isEmpty())
     {
       // get first corpus name
       //List<AnnisCorpus> mycorpora = annisDao.listCorpora();

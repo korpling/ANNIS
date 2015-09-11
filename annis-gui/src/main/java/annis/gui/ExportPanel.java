@@ -324,7 +324,7 @@ public class ExportPanel extends FormLayout
     }
   }
   
-  public void showResult(File currentTmpFile, boolean success)
+  public void showResult(File currentTmpFile, boolean manuallyCancelled)
   {
     btExport.setEnabled(true);
     btCancel.setEnabled(false);
@@ -342,7 +342,7 @@ public class ExportPanel extends FormLayout
         + "so you should contact the provider of this ANNIS installation "
         + "for help.", Notification.Type.ERROR_MESSAGE);
     }
-    else if (!success)
+    else if (manuallyCancelled)
     {
       // we were aborted, don't do anything
       Notification.show("Export cancelled",

@@ -111,39 +111,7 @@ public class CountCallback implements Runnable
           }
           else
           {
-            if (causeFinal.getResponse().getStatus() == 400)
-            {
-              List<AqlParseError> errors = 
-                causeFinal.getResponse().getEntity(new GenericType<List<AqlParseError>>() {});
-              String errMsg = Joiner.on("\n").join(errors);
-              
-              Notification.show("parsing error", errMsg,
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else if (causeFinal.getResponse().getStatus() == 504)
-            {
-              String errMsg = "Timeout: query execution took too long.";
-              Notification.show(errMsg,
-                "Try to simplyfiy your query e.g. by replacing \"node\" with an annotation name or adding more constraints between the nodes.",
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else if (causeFinal.getResponse().getStatus() == 403)
-            {
-              String errMsg = "You don't have the access rights to query this corpus. " + "You might want to login to access more corpora.";
-              Notification.show(errMsg,
-                Notification.Type.WARNING_MESSAGE);
-              ui.getControlPanel().getQueryPanel().setStatus(errMsg);
-            }
-            else
-            {
-              log.error("Unexpected exception:  " + causeFinal.getLocalizedMessage(),
-                causeFinal);
-              ExceptionDialog.show(causeFinal);
-              ui.getControlPanel().getQueryPanel().
-                setStatus("Unexpected exception:  " + causeFinal.getMessage());
-            }
+            ui.getQueryController().reportServiceException(causeFinal, true);
           } // end if cause != null
           ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
         }

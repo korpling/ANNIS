@@ -38,11 +38,10 @@ public class CSVExporter implements Exporter, Serializable
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(CSVExporter.class);
 
   @Override
-  public boolean convertText(String queryAnnisQL, int contextLeft, int contextRight,
+  public Exception convertText(String queryAnnisQL, int contextLeft, int contextRight,
     Set<String> corpora, List<String> keys,String argsAsString,
     WebResource annisResource, Writer out, EventBus eventBus)
   {
-    //this is a full result export
     
     try
     {
@@ -65,24 +64,12 @@ public class CSVExporter implements Exporter, Serializable
       
       out.flush();
       
-      return true;
+      return null;
     }
-    catch(UniformInterfaceException ex)
+    catch(UniformInterfaceException | ClientHandlerException | IOException ex)
     {
-      log.error(null, ex);
-      Notification n = new Notification("Service exception", ex.getResponse().getEntity(String.class),
-        Notification.Type.WARNING_MESSAGE, true);
-      n.show(Page.getCurrent());
+      return ex;
     }
-    catch(ClientHandlerException ex)
-    {
-      log.error(null, ex);
-    }
-    catch (IOException ex)
-    {
-      log.error(null, ex);
-    }
-    return false;
   }
 
   @Override

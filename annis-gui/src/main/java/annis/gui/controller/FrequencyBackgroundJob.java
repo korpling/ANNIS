@@ -15,6 +15,7 @@
  */
 package annis.gui.controller;
 
+import annis.gui.SearchUI;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;
@@ -38,13 +39,13 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
   private static final Logger log = LoggerFactory.getLogger(
     FrequencyBackgroundJob.class);
   
-  private final UI ui;
+  private final SearchUI ui;
 
   private final FrequencyQuery query;
 
   private final FrequencyQueryPanel panel;
 
-  public FrequencyBackgroundJob(UI ui, FrequencyQuery query,
+  public FrequencyBackgroundJob(SearchUI ui, FrequencyQuery query,
     FrequencyQueryPanel panel)
   {
     this.ui = ui;
@@ -79,23 +80,16 @@ public class FrequencyBackgroundJob implements Callable<FrequencyTable>
         queryParam("fields", query.getFrequencyDefinition().toString());
       result = annisResource.get(FrequencyTable.class);
     }
-    catch (UniformInterfaceException ex)
+    catch (final UniformInterfaceException ex)
     {
-      String message;
-      if (ex.getResponse().getStatus() == 400)
+      ui.access(new Runnable()
       {
-        message = ex.getResponse().getEntity(String.class);
-      }
-      else if (ex.getResponse().getStatus() == 504)
-      {
-        message = "Timeout: query exeuction took too long";
-      }
-      else
-      {
-        message = "unknown error: " + ex;
-        log.error(ex.getResponse().getEntity(String.class), ex);
-      }
-      Notification.show(message, Notification.Type.WARNING_MESSAGE);
+        @Override
+        public void run()
+        {
+          ui.getQueryController().reportServiceException(ex, true);
+        }
+      });
     }
     catch (ClientHandlerException ex)
     {

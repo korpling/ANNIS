@@ -62,10 +62,8 @@ import com.vaadin.ui.TabSheet;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -103,7 +101,7 @@ public class QueryController implements Serializable
         @Override
         public void valueChange(Property.ValueChangeEvent event)
         {
-          validateQuery(QueryController.this.state.getAql().getValue());
+          validateQuery();
         }
       });
 
@@ -114,36 +112,29 @@ public class QueryController implements Serializable
     }
   }
 
-  public void validateQuery(String query)
+  public void validateQuery()
   {
     QueryPanel qp = ui.getControlPanel().getQueryPanel();
-    
+
     // reset status
     qp.setErrors(null);
     qp.setNodes(null);
-    
+
+    String query = state.getAql().getValue();
     if (query == null || query.isEmpty())
     {
       qp.setStatus("Empty query");
+
     }
     else
     {
       // validate query
       try
       {
-        String corpora = "";
-        if (state.getSelectedCorpora().getValue() != null
-          && !state.getSelectedCorpora().getValue().isEmpty())
-        {
-          Set<String> corpusNames = state.getSelectedCorpora().getValue();
-          corpora = Joiner.on(",").join(corpusNames);
-        }
-
         AsyncWebResource annisResource = Helper.getAnnisAsyncWebResource();
         Future<List<QueryNode>> future = annisResource.path("query").path(
-          "parse/nodes").
-          queryParam("q", Helper.encodeJersey(query)).queryParam("corpora",
-            corpora)
+          "parse/nodes")
+          .queryParam("q", Helper.encodeJersey(query))
           .get(new GenericType<List<QueryNode>>()
           {
           });
@@ -154,7 +145,7 @@ public class QueryController implements Serializable
           List<QueryNode> nodes = future.get(1, TimeUnit.SECONDS);
 
           qp.setNodes(nodes);
-          
+
           if (state.getSelectedCorpora().getValue() == null
             || state.getSelectedCorpora().getValue().isEmpty())
           {
@@ -176,25 +167,13 @@ public class QueryController implements Serializable
         {
           if (ex.getCause() instanceof UniformInterfaceException)
           {
-            UniformInterfaceException cause = (UniformInterfaceException) ex.
-              getCause();
-            if (cause.getResponse().getStatus() == 400)
-            {
-              List<AqlParseError> errors
-                = cause.getResponse().getEntity(
-                  new GenericType<List<AqlParseError>>()
-                  {
-                  });
-              qp.setStatus(Joiner.on("\n").join(errors));
-              qp.setErrors(errors);
-            }
-            else
-            {
-              log.error(
-                "Exception when communicating with service", ex);
-              ExceptionDialog.show(ex,
-                "Exception when communicating with service.");
-            }
+            reportServiceException((UniformInterfaceException) ex.getCause(),
+              false);
+          }
+          else
+          {
+            // something unknown, report
+            ExceptionDialog.show(ex);
           }
         }
         catch (TimeoutException ex)
@@ -210,6 +189,61 @@ public class QueryController implements Serializable
         ExceptionDialog.show(ex, "Could not connect to web service");
       }
     }
+  }
+
+  /**
+   * Show errors that occured during the exeuction of a query to the user.
+   *
+   * @param ex The exception to report in the user interface
+   * @param showNotification If true a notification is shown instead of only
+   * displaying the error in the status label.
+   */
+  public void reportServiceException(UniformInterfaceException ex,
+    boolean showNotification)
+  {
+    QueryPanel qp = ui.getControlPanel().getQueryPanel();
+
+    String caption = null;
+    String description = null;
+
+    if (ex.getResponse().getStatus() == 400)
+    {
+      List<AqlParseError> errors
+        = ex.getResponse().getEntity(
+          new GenericType<List<AqlParseError>>()
+          {
+          });
+      caption = "Parsing error";
+      description = Joiner.on("\n").join(errors);
+      qp.setStatus(description);
+      qp.setErrors(errors);
+    }
+    else if (ex.getResponse().getStatus() == 504)
+    {
+      caption = "Timeout";
+      description = "Query execution took too long.";
+      qp.setStatus(caption + ": " + description);
+    }
+    else if (ex.getResponse().getStatus() == 403)
+    {
+      caption = "You don't have the access rights to query this corpus. " 
+        + "You might want to login to access more corpora.";
+      qp.setStatus(caption);
+    }
+    else
+    {
+      log.error(
+        "Exception when communicating with service", ex);
+      qp.setStatus("Unexpected exception:  " + ex.getMessage());
+      ExceptionDialog.show(ex,
+        "Exception when communicating with service.");
+    }
+
+    if (showNotification && caption != null)
+    {
+      Notification.show(caption, description, Notification.Type.WARNING_MESSAGE);
+    }
+
   }
 
   public void setQuery(Query q)
@@ -374,6 +408,7 @@ public class QueryController implements Serializable
 
   public void executeExport(ExportPanel panel, EventBus eventBus)
   {
+
     Future exportFuture = state.getExecutedTasks().get(
       QueryUIState.QueryType.EXPORT);
     if (exportFuture != null && !exportFuture.isDone())

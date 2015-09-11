@@ -118,15 +118,6 @@ public class QueryPanel extends GridLayout implements
     txtQuery.setWidth("100%");
     txtQuery.setHeight(15f, Unit.EM);
     txtQuery.setTextChangeTimeout(500);
-    txtQuery.addTextChangeListener(new TextChangeListener()
-    {
-
-      @Override
-      public void textChange(TextChangeEvent event)
-      {
-        ui.getQueryController().validateQuery(event.getText());
-      }
-    });
 
     final VirtualKeyboardCodeEditor virtualKeyboard;
     if(ui.getInstanceConfig().getKeyboardLayout() == null)
