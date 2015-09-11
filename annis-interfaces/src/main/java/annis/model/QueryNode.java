@@ -65,6 +65,7 @@ public class QueryNode implements Serializable
   private Range tokenArity;
   private boolean artificial;
   private Integer alternativeNumber;
+  private ParsedEntityLocation parseLocation;
   
   public enum TextMatching
   {
@@ -875,5 +876,15 @@ public class QueryNode implements Serializable
     this.alternativeNumber = alternativeNumber;
   }
 
+  public ParsedEntityLocation getParseLocation()
+  {
+    return parseLocation;
+  }
+
+  public void setParseLocation(ParsedEntityLocation parseLocation)
+  {
+    this.parseLocation = parseLocation;
+  }
+  
   
 }

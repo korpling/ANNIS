@@ -23,7 +23,7 @@ import java.util.List;
 public class AnnisQLSemanticsException extends AnnisException
 {
 
-  private List<AqlParseError> errors = new LinkedList<AqlParseError>();
+  private List<AqlParseError> errors = new LinkedList<>();
 
   public AnnisQLSemanticsException()
   {
@@ -39,7 +39,7 @@ public class AnnisQLSemanticsException extends AnnisException
   public AnnisQLSemanticsException(String message, List<AqlParseError> errors)
   {
     super(message);
-    this.errors = new ArrayList<AqlParseError>(errors);
+    this.errors = new ArrayList<>(errors);
   }
 
   public List<AqlParseError> getErrors()

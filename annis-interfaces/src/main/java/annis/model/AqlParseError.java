@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.model;
 
 import java.io.Serializable;
@@ -26,11 +25,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class AqlParseError implements Serializable
 {
+
   public int startLine;
+
   public int startColumn;
+
   public int endLine;
+
   public int endColumn;
-  
+
   public String message;
 
   public AqlParseError()
@@ -52,6 +55,27 @@ public class AqlParseError implements Serializable
     this.message = message;
   }
 
+  public AqlParseError(QueryNode n, String message)
+  {
+    if (n != null && n.getParseLocation() != null)
+    {
+      ParsedEntityLocation loc = n.getParseLocation();
+
+      this.startLine = loc.getStartLine();
+      this.startColumn = loc.getStartColumn();
+      this.endLine = loc.getEndLine();
+      this.endColumn = loc.getEndColumn();
+    }
+    else
+    {
+      this.startLine = 1;
+      this.endLine = 1;
+      this.startColumn = 0;
+      this.endColumn = 0;
+    }
+    this.message = message;
+  }
+
   public AqlParseError(String message)
   {
     this.message = message;
@@ -64,9 +88,9 @@ public class AqlParseError implements Serializable
   @Override
   public String toString()
   {
-    if(startLine == endLine)
+    if (startLine == endLine)
     {
-      if(startColumn == endColumn)
+      if (startColumn == endColumn)
       {
         return "line " + startLine + ":" + startColumn + " " + message;
       }
@@ -77,7 +101,7 @@ public class AqlParseError implements Serializable
     }
     else
     {
-      if(startColumn == endColumn)
+      if (startColumn == endColumn)
       {
         return "line " + startLine + "-" + endLine + ":" + startColumn + " " + message;
       }
@@ -87,7 +111,5 @@ public class AqlParseError implements Serializable
       }
     }
   }
-  
-  
-  
+
 }

@@ -15,15 +15,19 @@
  */
 package annis.ql.parser;
 
+import annis.model.ParsedEntityLocation;
 import annis.exceptions.AnnisQLSemanticsException;
 
 import annis.model.QueryNode;
 
 import annis.dao.AnnisDao;
+import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
 import java.util.List;
 import java.util.Set;
 import annis.service.objects.AnnisAttribute;
+import java.util.LinkedList;
+import java.util.Map;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -49,7 +53,6 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
   @Override
   public QueryData transform(QueryData data)
   {
-    //shuo code
     List<Long> corpusList = data.getCorpusList();
 
     if ((corpusList != null) && !corpusList.isEmpty())
@@ -73,6 +76,8 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
           //result is a set of strings of available annotations
         }
       }
+      
+      List<AqlParseError> errors = new LinkedList<>();
 
       for (List<QueryNode> alternative : data.getAlternatives())
       {
@@ -87,19 +92,17 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
             String name = m.iterator().next().getName();
             if (!result.contains(name))
             {
-              throw new AnnisQLSemanticsException(
-                "Node name " + name
-                + " is not a valid annotation name in selected corpora ");
+              errors.add(new AqlParseError(n,
+                "\"" + name + "\""
+                + " is not a valid annotation name in selected corpora "));
             }
           }
-
-          /*TODO : augmentation: in order to be able to display errors for more than one 
-           annotations, we can aggregate them in a Set <Boolean> vflag and then 
-           throw the error outside of the loop if the set is not empty.
-           */
         }
       }
-
+      if(!errors.isEmpty())
+      {
+        throw new AnnisQLSemanticsException("Invalid annotation names detected.", errors);
+      }
     }
     return data;
 

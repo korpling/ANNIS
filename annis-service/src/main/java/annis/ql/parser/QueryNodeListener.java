@@ -16,6 +16,7 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.model.ParsedEntityLocation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -296,6 +297,11 @@ public class QueryNodeListener extends AqlParserBaseListener
       n.setVariable(lastVariableDefinition);
     }
     lastVariableDefinition = null;
+    
+    ParsedEntityLocation location = new ParsedEntityLocation(
+      ctx.getStart().getLine(), ctx.getStart().getCharPositionInLine(), 
+      ctx.getStop().getLine(), ctx.getStop().getLine());
+    n.setParseLocation(location);
     
     currentAlternative.put(existingID, n);
     localNodes.put(n.getVariable(), n);
