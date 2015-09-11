@@ -642,24 +642,27 @@ public class QueryServiceImpl implements QueryService
    * Return true if this is a valid query or throw exception when invalid
    *
    * @param query Query to check for validity
-   * @param corpusName
+   * @param rawCorpusNames
    * @return Either "ok" or an error message.
    */
   @GET
   @Produces("text/plain")
   @Path("check")
-  public String check(@QueryParam("q") String query, @QueryParam("c") String corpusName)
+  public String check(@QueryParam("q") String query, 
+    @DefaultValue("") @QueryParam("c") String rawCorpusNames)
   {
-    //convert string corpus name to id, then to a List<Long>      
-    List<Long> corpusList = new ArrayList<>();
-    if(!corpusName.isEmpty()){
-        String[] tokensVal = corpusName.split(",");
-        for(String token : tokensVal) {
-            corpusList.add(annisDao.mapCorpusNameToId(token));
-        }  
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for (String c : corpusNames)
+    {
+      user.checkPermission("query:parse:" + c);
     }
+    Collections.sort(corpusNames);
     
-    annisDao.parseAQL(query, corpusList);
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(
+      corpusNames);
+    
+    annisDao.parseAQL(query, corpusIDs);
     return "ok";
   }
   
@@ -668,14 +671,27 @@ public class QueryServiceImpl implements QueryService
    * or throw exception when invalid
    *
    * @param query Query to get the query nodes for
+   * @param rawCorpusNames 
    * @return
    */
   @GET
   @Path("parse/nodes")
   @Produces("application/xml")
-  public Response parseNodes(@QueryParam("q") String query)
+  public Response parseNodes(@QueryParam("q") String query,
+    @DefaultValue("") @QueryParam("corpora") String rawCorpusNames)
   {
-    QueryData data = annisDao.parseAQL(query, new LinkedList<Long>());
+    Subject user = SecurityUtils.getSubject();
+    List<String> corpusNames = splitCorpusNamesFromRaw(rawCorpusNames);
+    for (String c : corpusNames)
+    {
+      user.checkPermission("query:parse:" + c);
+    }
+    Collections.sort(corpusNames);
+    
+    List<Long> corpusIDs = annisDao.mapCorpusNamesToIds(
+      corpusNames);
+    
+    QueryData data = annisDao.parseAQL(query, corpusIDs);
     List<QueryNode> nodes = new LinkedList<>();
     int i=0;
     for(List<QueryNode> alternative : data.getAlternatives())
