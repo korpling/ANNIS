@@ -141,7 +141,8 @@ public class JoinListener extends AqlParserBaseListener
       QueryNode n = node(ctx.refOrNode(i));
       if(n == null)
       {
-        throw new IllegalArgumentException(
+        throw new AnnisQLSemanticsException(
+          AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()), 
           "invalid reference to '" + ctx.refOrNode(i).getText() + "'");
       }
       relationChain.add(i, n);
@@ -280,7 +281,9 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
     {
-       throw new AnnisQLSyntaxException("Distance can't be 0");
+       throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
     }
     else
     {
@@ -303,7 +306,9 @@ public class JoinListener extends AqlParserBaseListener
     QueryNode.Range range = annisRangeFromARangeSpec(ctx.rangeSpec());
     if(range.getMin() == 0 || range.getMax() == 0)
     {
-       throw new AnnisQLSyntaxException("Distance can't be 0");
+      throw new AnnisQLSemanticsException(
+         AnnisParserAntlr.getLocation(ctx.getStart(), ctx.getStop()),
+         "Distance can't be 0");
     }
     else
     {
