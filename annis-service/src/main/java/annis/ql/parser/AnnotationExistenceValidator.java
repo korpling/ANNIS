@@ -15,7 +15,6 @@
  */
 package annis.ql.parser;
 
-
 import annis.exceptions.AnnisQLSemanticsException;
 
 import annis.model.QueryNode;
@@ -77,32 +76,28 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
 
       for (List<QueryNode> alternative : data.getAlternatives())
       {
-        String name = null;
-        QueryNode n = alternative.get(0);
-        Set<QueryAnnotation> m = n.getNodeAnnotations();
-        if (m.iterator().hasNext())
+        for (QueryNode n : alternative)
         {
-
-          name = m.iterator().next().getName();
-        }
-          //name is the node name string, ready to check if name is in the list of 
-        //available names
-
-        if (name != null && !name.isEmpty())
-        {
-          Boolean vflag = result.contains(name);
-          if (!vflag)
+          Set<QueryAnnotation> m = n.getNodeAnnotations();
+          // always get the first one
+          if(!m.isEmpty())
           {
-            throw new AnnisQLSemanticsException(
-              "Node name " + name
-              + " is not a valid annotation name in selected corpora ");
+            //name is the node name string, ready to check if name is in the list of 
+            //available names
+            String name = m.iterator().next().getName();
+            if (!result.contains(name))
+            {
+              throw new AnnisQLSemanticsException(
+                "Node name " + name
+                + " is not a valid annotation name in selected corpora ");
+            }
           }
-        }
 
-        /*TODO : augmentation: in order to be able to display errors for more than one 
-         annotations, we can aggregate them in a Set <Boolean> vflag and then 
-         throw the error outside of the loop if the set is not empty.
-         */
+          /*TODO : augmentation: in order to be able to display errors for more than one 
+           annotations, we can aggregate them in a Set <Boolean> vflag and then 
+           throw the error outside of the loop if the set is not empty.
+           */
+        }
       }
 
     }
