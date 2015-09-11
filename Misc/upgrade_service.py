@@ -21,9 +21,9 @@ def getversion(instDir):
 		env=updateEnv(instDir), universal_newlines=True, stderr=subprocess.STDOUT)
 	
 	for raw in o.split("\n"):
-		m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-SNAPSHOT)? .*").match(raw)
+		m = re.compile("^([0-9]+)\.([0-9]+)\.([0-9]+)(-([a-zA-Z]+[0-9]*))? .*").match(raw)
 		if m:
-			return m.group(1,2,3)
+			return m.group(1,2,3,5)
 	return None
 
 def checkDBSchemaVersion(instDir, existingInstDir):
@@ -183,7 +183,10 @@ if (not checkDBSchemaVersion(extracted, args.dir)):
 	dbconfig = readConfigFile(os.path.join(args.dir, "conf", "database.properties"))
 	version = getversion(extracted)
 	if version:
-		dbconfig["datasource.schema"] = "annis_autoupgrade" + version[0] + version[1] + version[2]
+		if version[3]:
+			dbconfig["datasource.schema"] = "annisautoupgrade_" + version[0] + "_" + version[1]+ "_" + version[2] + "_" + version[3] 
+		else:
+			dbconfig["datasource.schema"] = "annisautoupgrade_" + version[0] + "_" + version[1]+ "_" + version[2]
 		print("New schema name: " + dbconfig["datasource.schema"])
 	print("======================================================")
 	initDatabase(dbconfig, extracted)
