@@ -642,14 +642,24 @@ public class QueryServiceImpl implements QueryService
    * Return true if this is a valid query or throw exception when invalid
    *
    * @param query Query to check for validity
+   * @param corpusName
    * @return Either "ok" or an error message.
    */
   @GET
   @Produces("text/plain")
   @Path("check")
-  public String check(@QueryParam("q") String query)
+  public String check(@QueryParam("q") String query, @QueryParam("c") String corpusName)
   {
-    annisDao.parseAQL(query, new LinkedList<Long>());
+    //convert string corpus name to id, then to a List<Long>      
+    List<Long> corpusList = new ArrayList<>();
+    if(!corpusName.isEmpty()){
+        String[] tokensVal = corpusName.split(",");
+        for(String token : tokensVal) {
+            corpusList.add(annisDao.mapCorpusNameToId(token));
+        }  
+    }
+    
+    annisDao.parseAQL(query, corpusList);
     return "ok";
   }
   

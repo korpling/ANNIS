@@ -47,7 +47,7 @@ public class AnnisParserAntlr
   private static final Logger log = LoggerFactory.getLogger(AnnisParserAntlr.class);
   private int precedenceBound;
   private List<QueryDataTransformer> postProcessors;
-
+  
   public QueryData parse(String aql, List<Long> corpusList)
   {
     final List<AqlParseError> errors = new LinkedList<>();
@@ -118,7 +118,7 @@ public class AnnisParserAntlr
         {
           data = transformer.transform(data);
         }
-      }
+      }      
       return data;
 
     }
@@ -156,7 +156,7 @@ public class AnnisParserAntlr
       throw new AnnisQLSyntaxException(Joiner.on("\n").join(errors), errors);
     }
   }
-  
+
   public int getPrecedenceBound()
   {
     return precedenceBound;
