@@ -75,7 +75,7 @@ public class AqlCodeEditorState extends JavaScriptComponentState
    * Class that is suitable of transporting the parse error state via JSON to the client.
    */
   @XmlRootElement
-  public static class ParseError
+  public static class ParseError implements Serializable
   {
 
     public int startLine;

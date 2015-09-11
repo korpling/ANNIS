@@ -4,6 +4,15 @@
 
 <FindBugsFilter>
   <Match>
-     <Bug pattern="SE_NO_SERIALVERSIONID" />
+    <Bug pattern="SE_NO_SERIALVERSIONID" />
   </Match>
+  
+  <!-- we know that vaadin is reading the fields but findbugs does not detect this -->
+  <Match>
+    <And>
+      <Bug pattern="URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD" />
+      <Class name="annis.gui.components.codemirror.AqlCodeEditorState"/>
+    </And>
+  </Match>
+  
 </FindBugsFilter>
