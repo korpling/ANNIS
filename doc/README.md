@@ -17,7 +17,7 @@ Then you can execute
 ```
 mvn clean package -P doxygen
 ```
-to compile everything.
+to compile everything. The result will be located in the "target/doxygen" folder.
 
 A pre-compiled version is accessable at http://korpling.github.com/ANNIS/doc/ for the current stable release
 and http://korpling.github.com/ANNIS/doc-develop/ for development versions.
