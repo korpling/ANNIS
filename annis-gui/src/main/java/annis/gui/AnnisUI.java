@@ -99,7 +99,7 @@ public class AnnisUI extends CommonUI
     toolbar = new MainToolbar(null);
     
     searchView = new SearchView(AnnisUI.this);
-    adminView = new AdminView();
+    adminView = new AdminView(AnnisUI.this);
     queryController = new QueryController(searchView, AnnisUI.this);
     
     nav = new Navigator(AnnisUI.this, AnnisUI.this);

@@ -73,11 +73,11 @@ public class ImportPanel extends Panel
   private final Button btDetailedLog;
   
   private File temporaryCorpusFile;
-  private final boolean needsLogin;
   
-  public ImportPanel(boolean needsLogin, boolean isLoggedIn)
+  private boolean kickstarterMode;
+  
+  public ImportPanel()
   {
-    this.needsLogin = needsLogin;
     
     setSizeFull();
    
@@ -110,10 +110,7 @@ public class ImportPanel extends Panel
     upload.setImmediate(true);
     upload.addStartedListener(this);
     upload.addFinishedListener(this);
-    if(needsLogin)
-    {
-      upload.setEnabled(isLoggedIn);
-    }
+    upload.setEnabled(true);
     
     actionBar.addComponent(upload);
     
@@ -428,7 +425,7 @@ public class ImportPanel extends Panel
   @Override
   public void onLogin()
   {
-    if(needsLogin)
+    if(!kickstarterMode)
     {
       upload.setEnabled(true);
     }
@@ -437,9 +434,22 @@ public class ImportPanel extends Panel
   @Override
   public void onLogout()
   {
-    if(needsLogin)
+    if(!kickstarterMode)
     {
       upload.setEnabled(false);
+    }
+  }
+
+  public void updateMode(boolean kickstarterMode, boolean isLoggedIn)
+  {
+    this.kickstarterMode = kickstarterMode;
+    if(kickstarterMode)
+    {
+      upload.setEnabled(true);
+    }
+    else
+    {
+      upload.setEnabled(isLoggedIn);
     }
   }
   

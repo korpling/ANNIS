@@ -48,6 +48,7 @@ import java.util.List;
 public class AdminView extends VerticalLayout implements View,
   UIView, LoginListener, TabSheet.SelectedTabChangeListener
 {
+
   private UserController userController;
 
   private GroupController groupManagementController;
@@ -66,14 +67,13 @@ public class AdminView extends VerticalLayout implements View,
 
   private GroupManagementPanel groupManagementPanel;
 
-  private Navigator navigator;
-  
-  @Override
-  public void enter(ViewChangeListener.ViewChangeEvent event)
+  private final AnnisUI ui;
+
+  public AdminView(AnnisUI ui)
   {
-    this.navigator = event.getNavigator();
+    this.ui = ui;
     Page.getCurrent().setTitle("ANNIS Adminstration");
-    
+
     WebResource rootResource = Helper.getAnnisWebResource();
 
     UserManagement userManagement = new UserManagement();
@@ -84,7 +84,7 @@ public class AdminView extends VerticalLayout implements View,
     corpusManagement.setRootResource(rootResource);
 
     boolean isLoggedIn = Helper.getUser() != null;
-    
+
     corpusAdminPanel = new CorpusAdminPanel();
     corpusController = new CorpusController(corpusManagement, corpusAdminPanel,
       this, isLoggedIn);
@@ -98,47 +98,52 @@ public class AdminView extends VerticalLayout implements View,
       corpusManagement,
       groupManagementPanel, this, userManagementPanel, isLoggedIn);
 
-    
-    boolean kickstarter = Boolean.parseBoolean(
-        getSession().getConfiguration().getInitParameters()
-          .getProperty("kickstarterEnvironment",
-          "false"));
-    
-    importPanel = new ImportPanel(!kickstarter, Helper.getUser() != null);
-    
+    importPanel = new ImportPanel();
+
     tabSheet = new TabSheet();
     tabSheet.addTab(importPanel, "Import Corpus", FontAwesome.UPLOAD);
     tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
-    
-    
-    if(!kickstarter)
-    {
-      tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
-      tabSheet.addTab(groupManagementPanel, "Group management", FontAwesome.USERS);
-    }
+    tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
+    tabSheet.addTab(groupManagementPanel, "Group management",
+        FontAwesome.USERS);
     
     tabSheet.setSizeFull();
 
     tabSheet.addSelectedTabChangeListener(this);
 
-    MainToolbar toolbar = new MainToolbar(null);
-    addExtension(toolbar.getScreenshotExtension());
-    toolbar.addLoginListener(AdminView.this);
+    ui.getToolbar().addLoginListener(AdminView.this);
 
-    addComponents(toolbar, tabSheet);
+    addComponents(ui.getToolbar(), tabSheet);
     setSizeFull();
-    setExpandRatio(toolbar, 0.0f);
+    setExpandRatio(ui.getToolbar(), 0.0f);
     setExpandRatio(tabSheet, 1.0f);
 
     tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
+
+  }
+
+  @Override
+  public void enter(ViewChangeListener.ViewChangeEvent event)
+  {
+
+    boolean kickstarter = Boolean.parseBoolean(
+      getSession().getConfiguration().getInitParameters()
+      .getProperty("kickstarterEnvironment",
+        "false"));
+    
+    importPanel.updateMode(kickstarter, Helper.getUser() != null);
+    
+    // group and user management are not applicable in kickstarter
+    tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
+    tabSheet.getTab(userManagementPanel).setVisible(!kickstarter);
     
     selectTabFromFragment(event.getParameters());
-    
+
   }
-  
+
   private void selectTabFromFragment(String fragment)
   {
-    if(fragment == null)
+    if (fragment == null)
     {
       return;
     }
@@ -165,33 +170,31 @@ public class AdminView extends VerticalLayout implements View,
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
   {
     Component selected = event.getTabSheet().getSelectedTab();
-    
+
     for (UIView.Listener l : listeners)
     {
       l.selectedTabChanged(selected);
     }
-    
+
     // TODO: change view parameter
-    
     /*
-    if(selected == importPanel)
-    {
-      getPage().setUriFragment("import", false);
-    }
-    else if(selected == corpusAdminPanel)
-    {
-      getPage().setUriFragment("corpora", false);
-    }
-    else if(selected == userManagementPanel)
-    {
-      getPage().setUriFragment("users", false);
-    }
-    else if(selected == groupManagementPanel)
-    {
-      getPage().setUriFragment("groups", false);
-    }
-    */
-    
+     if(selected == importPanel)
+     {
+     getPage().setUriFragment("import", false);
+     }
+     else if(selected == corpusAdminPanel)
+     {
+     getPage().setUriFragment("corpora", false);
+     }
+     else if(selected == userManagementPanel)
+     {
+     getPage().setUriFragment("users", false);
+     }
+     else if(selected == groupManagementPanel)
+     {
+     getPage().setUriFragment("groups", false);
+     }
+     */
   }
 
   @Override
@@ -232,7 +235,7 @@ public class AdminView extends VerticalLayout implements View,
       l.loginChanged(Helper.getAnnisWebResource(), true);
     }
     // TODO: make import panel a normal UI view listener
-    if(importPanel != null)
+    if (importPanel != null)
     {
       importPanel.onLogin();
     }
@@ -246,11 +249,10 @@ public class AdminView extends VerticalLayout implements View,
       l.loginChanged(Helper.getAnnisWebResource(), false);
     }
     // TODO: make import panel a normal UI view listener
-    if(importPanel != null)
+    if (importPanel != null)
     {
       importPanel.onLogout();
     }
   }
 
-  
 }
