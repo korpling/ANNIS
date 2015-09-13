@@ -17,7 +17,6 @@
 package annis.gui.admin.model;
 
 import annis.CaseSensitiveOrder;
-import annis.security.Group;
 import annis.security.User;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;

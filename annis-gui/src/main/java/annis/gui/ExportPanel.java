@@ -105,12 +105,12 @@ public class ExportPanel extends FormLayout
     cbExporter.setNullSelectionAllowed(false);
     cbExporter.setImmediate(true);
     
-    for(Exporter e : SearchUI.EXPORTER)
+    for(Exporter e : SearchView.EXPORTER)
     {
       cbExporter.addItem(e.getClass().getSimpleName());
     }
     
-    cbExporter.setValue(SearchUI.EXPORTER[0].getClass().getSimpleName());
+    cbExporter.setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
     cbExporter.addValueChangeListener(new ExporterSelectionHelpListener());
     cbExporter.setDescription(help4Exporter.get((String) cbExporter.getValue()));
 
@@ -163,7 +163,7 @@ public class ExportPanel extends FormLayout
     btCancel.setIcon(FontAwesome.TIMES_CIRCLE);
     btCancel.setEnabled(false);
     btCancel.addClickListener(new CancelButtonListener());
-    btCancel.setVisible(SearchUI.EXPORTER[0].isCancelable());
+    btCancel.setVisible(SearchView.EXPORTER[0].isCancelable());
 
     btDownload = new Button("Download");
     btDownload.setDescription("Click here to start the actual download.");
@@ -193,7 +193,7 @@ public class ExportPanel extends FormLayout
       cbRightContext.setPropertyDataSource(state.getRightContext());
       cbExporter.setPropertyDataSource(state.getExporterName());
       
-      state.getExporterName().setValue(SearchUI.EXPORTER[0].getClass().getSimpleName());
+      state.getExporterName().setValue(SearchView.EXPORTER[0].getClass().getSimpleName());
       
       txtAnnotationKeys.setConverter(new CommaSeperatedStringConverterList());
       txtAnnotationKeys.setPropertyDataSource(state.getExportAnnotationKeys());
@@ -214,7 +214,7 @@ public class ExportPanel extends FormLayout
 
   private void initHelpMessages()
   {
-    help4Exporter.put(SearchUI.EXPORTER[0].getClass().getSimpleName(),
+    help4Exporter.put(SearchView.EXPORTER[0].getClass().getSimpleName(),
       "The WEKA Exporter exports only the "
       + "values of the elements searched for by the user, ignoring the context "
       + "around search results. The values for all annotations of each of the "
@@ -225,7 +225,7 @@ public class ExportPanel extends FormLayout
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)");
 
-    help4Exporter.put(SearchUI.EXPORTER[1].getClass().getSimpleName(),
+    help4Exporter.put(SearchView.EXPORTER[1].getClass().getSimpleName(),
       "The CSV Exporter exports only the "
       + "values of the elements searched for by the user, ignoring the context "
       + "around search results. The values for all annotations of each of the "
@@ -234,11 +234,11 @@ public class ExportPanel extends FormLayout
       + "<em>metakeys</em> - comma seperated list of all meta data to include in the result (e.g. "
       + "<code>metakeys=title,documentname</code>)");
 
-    help4Exporter.put(SearchUI.EXPORTER[2].getClass().getSimpleName(),
+    help4Exporter.put(SearchView.EXPORTER[2].getClass().getSimpleName(),
       "The Text Exporter exports the token covered by the matched nodes of every search result and "
       + "its context, one line per result. Beside the text of the token it also contains all token annotations separated by \"/\".");
 
-    help4Exporter.put(SearchUI.EXPORTER[3].getClass().getSimpleName(),
+    help4Exporter.put(SearchView.EXPORTER[3].getClass().getSimpleName(),
       "The Grid Exporter can export all annotations of a search result and its "
       + "context. Each annotation layer is represented in a separate line, and the "
       + "tokens covered by each annotation are given as number ranges after each "
@@ -253,7 +253,7 @@ public class ExportPanel extends FormLayout
       + "<em>numbers</em> - set to \"false\" if the grid event numbers should not be included in the output (e.g. "
       + "<code>numbers=false</code>)");
     
-    help4Exporter.put(SearchUI.EXPORTER[4].getClass().getSimpleName(),
+    help4Exporter.put(SearchView.EXPORTER[4].getClass().getSimpleName(),
       "The SimpleTextExporter exports only the plain text of every search result. ");
   }
 

@@ -15,7 +15,8 @@
  */
 package annis.gui.controller;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
+import annis.gui.SearchView;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.QueryUIState;
 import annis.gui.paging.PagingCallback;
@@ -34,14 +35,16 @@ public class SpecificPagingCallback implements PagingCallback
 
   private final ResultViewPanel panel;
 
-  private final SearchUI ui;
-
-  public SpecificPagingCallback(PagedResultQuery query, SearchUI ui,
+  private final SearchView searchView;
+  private final AnnisUI ui;
+  
+  public SpecificPagingCallback(PagedResultQuery query, AnnisUI ui, SearchView searchView,
     ResultViewPanel panel)
   {
     this.query = query.clone();
     this.panel = panel;
     this.ui = ui;
+    this.searchView = searchView;
   }
 
   @Override
@@ -60,11 +63,11 @@ public class SpecificPagingCallback implements PagingCallback
   {
     if (panel != null)
     {
-      ui.updateFragment(newQuery);
-      ui.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
-      ui.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
+      searchView.updateFragment(newQuery);
+      searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
+      searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
       Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
-      ui.getQueryState().getExecutedTasks().
+      searchView.getQueryState().getExecutedTasks().
         put(QueryUIState.QueryType.FIND, future);
     }
   }

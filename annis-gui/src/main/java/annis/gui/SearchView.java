@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -8,7 +8,7 @@
  *      http://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
- * distributed under the Licsense is distributed on an "AS IS" BASIS,
+ * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
@@ -16,9 +16,6 @@
 package annis.gui;
 
 import annis.VersionInfo;
-import annis.gui.components.ExceptionDialog;
-import annis.libgui.InstanceConfig;
-import annis.libgui.Helper;
 import annis.gui.controlpanel.ControlPanel;
 import annis.gui.docbrowser.DocBrowserController;
 import annis.gui.exporter.CSVExporter;
@@ -27,19 +24,17 @@ import annis.gui.exporter.GridExporter;
 import annis.gui.exporter.SimpleTextExporter;
 import annis.gui.exporter.TextExporter;
 import annis.gui.exporter.WekaExporter;
-import annis.libgui.media.MediaController;
-import annis.libgui.media.MimeTypeErrorListener;
-import annis.libgui.media.MediaControllerImpl;
+import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
-import annis.gui.querybuilder.TigerQueryBuilderPlugin;
-import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
-import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
-import annis.gui.servlets.ResourceServlet;
 import annis.libgui.Background;
-import static annis.libgui.Helper.*;
+import annis.libgui.Helper;
+import static annis.libgui.Helper.DEFAULT_CONFIG;
+import annis.libgui.media.MediaController;
+import annis.libgui.media.MediaControllerImpl;
+import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
@@ -54,53 +49,55 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
 import com.vaadin.event.ShortcutListener;
-import com.vaadin.server.ErrorHandler;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.Page.UriFragmentChangedEvent;
 import com.vaadin.server.RequestHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.server.VaadinResponse;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.server.WebBrowser;
-import com.vaadin.shared.communication.PushMode;
-import com.vaadin.shared.ui.ui.Transport;
-
-import com.vaadin.ui.*;
-import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.Component;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.Layout;
+import com.vaadin.ui.Notification;
+import com.vaadin.ui.TabSheet;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.LinkedHashSet;
+import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import net.xeoh.plugins.base.PluginManager;
-import net.xeoh.plugins.base.util.uri.ClassURI;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 
 /**
- * GUI for searching in corpora.
+ * The view which shows the search interface.
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Theme("annis")
-@Push(value = PushMode.AUTOMATIC)
-public class SearchUI extends CommonUI
-  implements MimeTypeErrorListener,
+public class SearchView extends GridLayout implements View,
+  MimeTypeErrorListener,
   Page.UriFragmentChangedListener,
-  ErrorHandler, TabSheet.CloseHandler,
+  TabSheet.CloseHandler,
   LoginListener, Sidebar,
   TabSheet.SelectedTabChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
-    SearchUI.class);
+    SearchView.class);
 
   static final Exporter[] EXPORTER = new Exporter[]
   {
@@ -124,18 +121,12 @@ public class SearchUI extends CommonUI
       "AQL\\((.*)\\),CIDS\\(([^)]*)\\)(,CLEFT\\(([^)]*)\\),)?(CRIGHT\\(([^)]*)\\))?",
       Pattern.MULTILINE | Pattern.DOTALL);
 
-  private MainToolbar toolbar;
-
   private ControlPanel controlPanel;
 
   private TabSheet mainTab;
 
-  private final QueryController queryController;
-
   private String lastQueriedFragment;
-
-  private InstanceConfig instanceConfig;
-
+ 
   private DocBrowserController docBrowserController;
 
   private Set<Component> selectedTabHistory;
@@ -143,16 +134,14 @@ public class SearchUI extends CommonUI
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private final QueryUIState queryState = new QueryUIState();
-  
-  private void initTransients()
-  {
-    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
-  }
 
-  public SearchUI()
+  private final AnnisUI ui;
+  
+  public SearchView(AnnisUI ui)
   {
+    super(2, 2);
     initTransients();
-    queryController = new QueryController(this);
+    this.ui = ui;
   }
 
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
@@ -161,39 +150,37 @@ public class SearchUI extends CommonUI
     initTransients();
   }
 
-  @Override
-  protected void init(VaadinRequest request)
+  private void initTransients()
   {
-    super.init(request);
-    setErrorHandler(this);
+    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
+  }
 
+  @Override
+  public void enter(ViewChangeListener.ViewChangeEvent event)
+  {
     this.selectedTabHistory = new LinkedHashSet<>();
-    this.instanceConfig = getInstanceConfig(request);
+    
 
-    getPage().setTitle(
-      instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
+    Page.getCurrent().setTitle(
+      ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
     // init a doc browser controller
-    docBrowserController = new DocBrowserController(this);
+    docBrowserController = new DocBrowserController(ui);
 
     // always get the resize events directly
     setImmediate(true);
 
-    GridLayout mainLayout = new GridLayout(2, 2);
-    setContent(mainLayout);
+    setSizeFull();
+    setMargin(false);
+    setRowExpandRatio(1, 1.0f);
+    setColumnExpandRatio(1, 1.0f);
 
-    mainLayout.setSizeFull();
-    mainLayout.setMargin(false);
-    mainLayout.setRowExpandRatio(1, 1.0f);
-    mainLayout.setColumnExpandRatio(1, 1.0f);
+    ui.getToolbar().addLoginListener(SearchView.this);
+    addExtension(ui.getToolbar().getScreenshotExtension());
 
-    toolbar = new MainToolbar(SearchUI.this);
-    toolbar.addLoginListener(SearchUI.this);
-    addExtension(toolbar.getScreenshotExtension());
+    addComponent(ui.getToolbar(), 0, 0, 1, 0);
 
-    mainLayout.addComponent(toolbar, 0, 0, 1, 0);
-
-    final HelpPanel help = new HelpPanel(this);
+    final HelpPanel help = new HelpPanel(SearchView.this, ui.getQueryController());
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
@@ -201,19 +188,19 @@ public class SearchUI extends CommonUI
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(this);
 
-    Tab helpTab = mainTab.addTab(help, "Help/Examples");
+    TabSheet.Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
-    controlPanel = new ControlPanel(queryController, instanceConfig,
-      help.getExamples(), this);
+    controlPanel = new ControlPanel(ui.getQueryController(), ui.getInstanceConfig(),
+      help.getExamples(), ui);
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
 
-    mainLayout.addComponent(controlPanel, 0, 1);
-    mainLayout.addComponent(mainTab, 1, 1);
+    addComponent(controlPanel, 0, 1);
+    addComponent(mainTab, 1, 1);
 
-    addAction(new ShortcutListener("Tutor^eial")
+    ui.addAction(new ShortcutListener("Tutor^eial")
     {
       @Override
       public void handleAction(Object sender, Object target)
@@ -222,163 +209,21 @@ public class SearchUI extends CommonUI
       }
     });
 
-    getPage().addUriFragmentChangedListener(this);
+    Page.getCurrent().addUriFragmentChangedListener(this);
 
-    getSession().addRequestHandler(new SearchUI.CitationRequestHandler());
+    getSession().addRequestHandler(new CitationRequestHandler());
 
     getSession().setAttribute(MediaController.class, new MediaControllerImpl());
 
     getSession().setAttribute(PDFController.class, new PDFControllerImpl());
 
-    loadInstanceFonts();
-
     checkCitation();
     lastQueriedFragment = "";
 
     Background.run(new VersionChecker());
-    evaluateFragment(getPage().getUriFragment());
-  
+    evaluateFragment(event.getParameters());
   }
 
-  
-
-  @Override
-  public void error(com.vaadin.server.ErrorEvent event)
-  {
-    log.error("Unknown error in some component: " + event.getThrowable().
-      getLocalizedMessage(),
-      event.getThrowable());
-    // get the source throwable (thus the one that triggered the error)
-    Throwable source = event.getThrowable();
-    if (source != null)
-    {
-      while (source.getCause() != null)
-      {
-        source = source.getCause();
-      }
-      ExceptionDialog.show(source);
-    }
-  }
-
-  public boolean canReportBugs()
-  {
-    if (toolbar != null)
-    {
-      return toolbar.canReportBugs();
-    }
-    return false;
-  }
-
-  public void reportBug()
-  {
-    toolbar.reportBug();
-  }
-
-  public void reportBug(Throwable cause)
-  {
-    toolbar.reportBug(cause);
-  }
-
-  private void loadInstanceFonts()
-  {
-    if (instanceConfig != null && instanceConfig.getFont() != null)
-    {
-      FontConfig cfg = instanceConfig.getFont();
-
-      String url = cfg.getUrl() == null || cfg.getUrl().isEmpty() ?
-        "" :  "@import url(" + cfg.getUrl() + ");\n";
-      
-      if (cfg.getSize() == null || cfg.getSize().isEmpty())
-      {
-        injectUniqueCSS(
-          url
-          + "." + CORPUS_FONT_FORCE + " {font-family: '" + cfg.getName() + "', monospace !important; }\n"
-          + "." + CORPUS_FONT + " {font-family: '" + cfg.getName() + "', monospace; }\n"
-          + "div." + CORPUS_FONT + " .CodeMirror pre {font-family: '" + cfg.getName() + "', monospace; }\n"
-          // this one is for the virtual keyboard
-          + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
-          + "}");
-      }
-      else
-      {
-        injectUniqueCSS(
-          url
-          + "." + CORPUS_FONT_FORCE + " {\n"
-          + "  font-family: '" + cfg.getName() + "', monospace !important;\n"
-          + "  font-size: " + cfg.getSize() + " !important;\n"
-          + "}\n"
-          + "." + CORPUS_FONT + " {\n"
-          + "  font-family: '" + cfg.getName() + "', monospace;\n"
-          + "  font-size: " + cfg.getSize() + ";\n"
-          + "}\n"
-          + "div." + CORPUS_FONT + " .CodeMirror pre" + " {\n"
-          + "  font-family: '" + cfg.getName() + "', monospace;\n"
-          + "  font-size: " + cfg.getSize() + ";\n"
-          + "}\n"
-          + "." + CORPUS_FONT + " .v-table-table {\n"
-          + "    font-size: " + cfg.getSize() + ";\n"
-          + "}\n"
-          // this one is for the virtual keyboard
-          + "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-          + "  font-family: '" + cfg.getName() + "', 'Lucida Console','Arial Unicode MS',monospace; "
-          + "}");
-      }
-    }
-    else
-    {
-      injectUniqueCSS(
-        // use original font definition from keyboard.css if no font given
-        "#keyboardInputMaster tbody tr td table tbody tr td {\n"
-        + "  font-family: 'Lucida Console','Arial Unicode MS',monospace;"
-        + "}");
-    }
-  }
-
-  private InstanceConfig getInstanceConfig(VaadinRequest request)
-  {
-    String instance = null;
-    String pathInfo = request.getPathInfo();
-
-    if (pathInfo != null && pathInfo.startsWith("/"))
-    {
-      pathInfo = pathInfo.substring(1);
-    }
-    if (pathInfo != null && pathInfo.endsWith("/"))
-    {
-      pathInfo = pathInfo.substring(0, pathInfo.length() - 1);
-    }
-
-    Map<String, InstanceConfig> allConfigs = loadInstanceConfig();
-
-    if (pathInfo != null && !pathInfo.isEmpty())
-    {
-      instance = pathInfo;
-    }
-
-    if (instance != null && allConfigs.containsKey(instance))
-    {
-      // return the config that matches the parsed name
-      return allConfigs.get(instance);
-    }
-    else if (allConfigs.containsKey("default"))
-    {
-      // return the default config
-      return allConfigs.get("default");
-    }
-    else if (allConfigs.size() > 0)
-    {
-      // just return any existing config as a fallback
-      log.
-        warn(
-          "Instance config {} not found or null and default config is not available.",
-          instance);
-      return allConfigs.values().iterator().next();
-    }
-
-    // default to an empty instance config
-    return new InstanceConfig();
-  }
 
   /**
    * Get a cached version of the {@link CorpusConfig} for a corpus.
@@ -418,15 +263,6 @@ public class SearchUI extends CommonUI
     }
   }
 
-  @Override
-  protected void addCustomUIPlugins(PluginManager pluginManager)
-  {
-    pluginManager.addPluginsFrom(new ClassURI(TigerQueryBuilderPlugin.class).
-      toURI());
-    pluginManager.addPluginsFrom(new ClassURI(FlatQueryBuilderPlugin.class).
-      toURI());
-    pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
-  }
 
   public void checkCitation()
   {
@@ -507,20 +343,20 @@ public class SearchUI extends CommonUI
           log.error(
             "could not parse context value", ex);
         }
-        queryController.setQuery(
+        ui.getQueryController().setQuery(
           new PagedResultQuery(cleft, cright, 0, 10, null, aql,
             selectedCorpora));
       }
       else
       {
-        queryController.setQuery(new Query(aql, selectedCorpora));
+        ui.getQueryController().setQuery(new Query(aql, selectedCorpora));
       }
 
       // remove all currently openend sub-windows
-      Set<Window> all = new HashSet<>(getWindows());
+      Set<Window> all = new HashSet<>(ui.getWindows());
       for (Window w : all)
       {
-        removeWindow(w);
+        ui.removeWindow(w);
       }
     }
     else
@@ -533,12 +369,12 @@ public class SearchUI extends CommonUI
   @Override
   public void updateSidebarState(SidebarState state)
   {
-    if (controlPanel != null && state != null && toolbar != null)
+    if (controlPanel != null && state != null)
     {
       controlPanel.setVisible(state.isSidebarVisible());
 
       // set cookie
-      getSettings().set("annis-sidebar-state", state.name(), 30);
+      ui.getSettings().set("annis-sidebar-state", state.name(), 30);
     }
   }
 
@@ -602,15 +438,6 @@ public class SearchUI extends CommonUI
     return controlPanel;
   }
 
-  public InstanceConfig getInstanceConfig()
-  {
-    return instanceConfig;
-  }
-
-  public QueryController getQueryController()
-  {
-    return queryController;
-  }
 
   public TabSheet getMainTab()
   {
@@ -633,7 +460,7 @@ public class SearchUI extends CommonUI
         + "<li>Google Chrome: <a href=\"http://www.google.com/chrome\" target=\"_blank\">http://www.google.com/chrome</a></li>"
         + "</ul>";
 
-      WebBrowser browser = getPage().getWebBrowser();
+      WebBrowser browser = Page.getCurrent().getWebBrowser();
 
       // IE9 users can install a plugin
       Set<String> supportedByIE9Plugin = new HashSet<>();
@@ -684,7 +511,7 @@ public class SearchUI extends CommonUI
 
   public void notifiyQueryStarted()
   {
-    toolbar.notifiyQueryStarted();
+    ui.getToolbar().notifiyQueryStarted();
   }
 
   @Override
@@ -719,7 +546,7 @@ public class SearchUI extends CommonUI
   }
 
   @Override
-  public void uriFragmentChanged(UriFragmentChangedEvent event)
+  public void uriFragmentChanged(Page.UriFragmentChangedEvent event)
   {
     evaluateFragment(event.getUriFragment());
   }
@@ -847,8 +674,8 @@ public class SearchUI extends CommonUI
       }
 
       // full query with given context
-      queryController.setQuery(query);
-      queryController.executeSearch(true, false);
+      ui.getQueryController().setQuery(query);
+      ui.getQueryController().executeSearch(true, false);
     }
     else if (args.get("q") != null)
     {
@@ -856,8 +683,8 @@ public class SearchUI extends CommonUI
       controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
       // use default context
-      queryController.setQuery(new Query(args.get("q"), corpora));
-      queryController.executeSearch(true, true);
+      ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
+      ui.getQueryController().executeSearch(true, true);
     }
   }
 
@@ -881,8 +708,8 @@ public class SearchUI extends CommonUI
     UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
 
     // reset title
-    getPage().setTitle(
-      instanceConfig.getInstanceDisplayName() + " (ANNIS Corpus Search)");
+    Page.getCurrent().setTitle(
+      ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
   }
 
   /**
@@ -940,15 +767,8 @@ public class SearchUI extends CommonUI
     return queryState;
   }
 
-  public FontConfig getInstanceFont()
-  {
-    if (instanceConfig != null && instanceConfig.getFont() != null)
-    {
-      return instanceConfig.getFont();
-    }
-    return null;
-  }
   
+
   private class VersionChecker implements Runnable
   {
 
@@ -968,7 +788,7 @@ public class SearchUI extends CommonUI
         final String revisionGUI = VersionInfo.getBuildRevision();
 
         // GUI update
-        access(new Runnable()
+        ui.access(new Runnable()
         {
 
           @Override

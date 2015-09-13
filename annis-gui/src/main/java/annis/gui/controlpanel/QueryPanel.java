@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -31,8 +31,6 @@ import annis.model.QueryNode;
 import com.vaadin.data.Property.ValueChangeEvent;
 import com.vaadin.data.Property.ValueChangeListener;
 import com.vaadin.data.util.BeanItemContainer;
-import com.vaadin.event.FieldEvents.TextChangeEvent;
-import com.vaadin.event.FieldEvents.TextChangeListener;
 import com.vaadin.event.ShortcutAction.KeyCode;
 import com.vaadin.event.ShortcutAction.ModifierKey;
 import com.vaadin.event.ShortcutListener;
@@ -80,7 +78,7 @@ public class QueryPanel extends GridLayout implements
   private final BeanItemContainer<Query> historyContainer =
     new BeanItemContainer<>(Query.class);;
   
-  public QueryPanel(final SearchUI ui)
+  public QueryPanel(final AnnisUI ui)
   {
     super(4,5);
     
@@ -88,7 +86,7 @@ public class QueryPanel extends GridLayout implements
     this.lastPublicStatus = "Welcome to ANNIS! "
       + "A tutorial is available on the right side.";
 
-    this.state = ui.getQueryState();
+    this.state = ui.getSearchView().getQueryState();
     
     setSpacing(true);
     setMargin(false);
@@ -100,7 +98,7 @@ public class QueryPanel extends GridLayout implements
     setColumnExpandRatio(3, 0.0f);
 
     txtQuery = new AqlCodeEditor();
-    txtQuery.setPropertyDataSource(ui.getQueryState().getAql());
+    txtQuery.setPropertyDataSource(state.getAql());
     txtQuery.setInputPrompt("Please enter AQL query");
     txtQuery.addStyleName("query");
     if(ui.getInstanceFont() == null)
@@ -454,10 +452,10 @@ public class QueryPanel extends GridLayout implements
   
   private class ShowExportClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     private ExportPanel panel;
     
-    public ShowExportClickListener(SearchUI ui)
+    public ShowExportClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -467,11 +465,11 @@ public class QueryPanel extends GridLayout implements
     {
       if(panel == null)
       {
-        panel = new ExportPanel(QueryPanel.this, ui.getControlPanel().getCorpusList(), 
-          ui.getQueryController(), ui.getQueryState());
+        panel = new ExportPanel(QueryPanel.this, ui.getSearchView().getControlPanel().getCorpusList(), 
+          ui.getQueryController(), state);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(panel);
       
       if(tab == null)
@@ -491,9 +489,9 @@ public class QueryPanel extends GridLayout implements
   
   private class ShowFrequencyClickListener implements ClickListener
   {
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowFrequencyClickListener(SearchUI ui)
+    public ShowFrequencyClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -503,12 +501,11 @@ public class QueryPanel extends GridLayout implements
     {
       if(frequencyPanel == null)
       {
-        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(),
-        ui.getQueryState());
+        frequencyPanel = new FrequencyQueryPanel(ui.getQueryController(), state);
         txtQuery.addTextChangeListener(frequencyPanel);
       }
       
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(frequencyPanel);
       
       if(tab == null)
@@ -530,9 +527,9 @@ public class QueryPanel extends GridLayout implements
   {
     
     private QueryBuilderChooser queryBuilder;
-    private SearchUI ui;
+    private AnnisUI ui;
     
-    public ShowQueryBuilderClickListener(SearchUI ui)
+    public ShowQueryBuilderClickListener(AnnisUI ui)
     {
       this.ui = ui;
     }
@@ -544,7 +541,7 @@ public class QueryPanel extends GridLayout implements
       {
          queryBuilder = new QueryBuilderChooser(ui.getQueryController(), ui, ui.getInstanceConfig());
       }
-      final TabSheet tabSheet = ui.getMainTab();
+      final TabSheet tabSheet = ui.getSearchView().getMainTab();
       Tab tab = tabSheet.getTab(queryBuilder);
       
       if(tab == null)

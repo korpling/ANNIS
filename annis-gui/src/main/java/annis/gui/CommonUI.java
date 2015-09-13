@@ -21,8 +21,6 @@ import annis.gui.requesthandler.LoginServletRequestHandler;
 import annis.gui.requesthandler.ResourceRequestHandler;
 import annis.libgui.AnnisBaseUI;
 import com.vaadin.server.VaadinRequest;
-import java.util.LinkedList;
-import java.util.List;
 
 /**
  *

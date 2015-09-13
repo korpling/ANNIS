@@ -1,5 +1,5 @@
 /*
- * Copyright 2013 Corpuslinguistic working group Humboldt University Berlin.
+ * Copyright 2015 Corpuslinguistic working group Humboldt University Berlin.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,18 +22,17 @@ import annis.gui.admin.UserManagementPanel;
 import annis.gui.admin.controller.CorpusController;
 import annis.gui.admin.controller.GroupController;
 import annis.gui.admin.controller.UserController;
+import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
-import annis.gui.admin.model.CorpusManagement;
 import annis.libgui.Helper;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.annotations.Push;
-import com.vaadin.annotations.Theme;
+import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.View;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.Page;
-import com.vaadin.server.VaadinRequest;
-import com.vaadin.shared.communication.PushMode;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.TabSheet;
@@ -46,14 +45,9 @@ import java.util.List;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-@Theme("annis")
-@Push(value = PushMode.AUTOMATIC)
-public class AdminUI extends CommonUI implements UIView, LoginListener,
-  Page.UriFragmentChangedListener, TabSheet.SelectedTabChangeListener
+public class AdminView extends VerticalLayout implements View,
+  UIView, LoginListener, TabSheet.SelectedTabChangeListener
 {
-
-  private VerticalLayout layout;
-
   private UserController userController;
 
   private GroupController groupManagementController;
@@ -72,12 +66,13 @@ public class AdminUI extends CommonUI implements UIView, LoginListener,
 
   private GroupManagementPanel groupManagementPanel;
 
+  private Navigator navigator;
+  
   @Override
-  protected void init(VaadinRequest request)
+  public void enter(ViewChangeListener.ViewChangeEvent event)
   {
-    super.init(request);
-
-    getPage().setTitle("ANNIS Adminstration");
+    this.navigator = event.getNavigator();
+    Page.getCurrent().setTitle("ANNIS Adminstration");
     
     WebResource rootResource = Helper.getAnnisWebResource();
 
@@ -128,28 +123,17 @@ public class AdminUI extends CommonUI implements UIView, LoginListener,
 
     MainToolbar toolbar = new MainToolbar(null);
     addExtension(toolbar.getScreenshotExtension());
-    toolbar.addLoginListener(AdminUI.this);
+    toolbar.addLoginListener(AdminView.this);
 
-    layout = new VerticalLayout(toolbar, tabSheet);
-    layout.setSizeFull();
+    addComponents(toolbar, tabSheet);
+    setSizeFull();
+    setExpandRatio(toolbar, 0.0f);
+    setExpandRatio(tabSheet, 1.0f);
 
-    layout.setExpandRatio(toolbar, 0.0f);
-    layout.setExpandRatio(tabSheet, 1.0f);
-    
     tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
-
-    setContent(layout);
-
-    getPage().addUriFragmentChangedListener(this);
     
-    selectTabFromFragment(getPage().getUriFragment());
-
-  }
-
-  @Override
-  public void uriFragmentChanged(Page.UriFragmentChangedEvent event)
-  {
-    selectTabFromFragment(event.getUriFragment());
+    selectTabFromFragment(event.getParameters());
+    
   }
   
   private void selectTabFromFragment(String fragment)
@@ -187,6 +171,9 @@ public class AdminUI extends CommonUI implements UIView, LoginListener,
       l.selectedTabChanged(selected);
     }
     
+    // TODO: change view parameter
+    
+    /*
     if(selected == importPanel)
     {
       getPage().setUriFragment("import", false);
@@ -203,6 +190,7 @@ public class AdminUI extends CommonUI implements UIView, LoginListener,
     {
       getPage().setUriFragment("groups", false);
     }
+    */
     
   }
 
@@ -264,4 +252,5 @@ public class AdminUI extends CommonUI implements UIView, LoginListener,
     }
   }
 
+  
 }

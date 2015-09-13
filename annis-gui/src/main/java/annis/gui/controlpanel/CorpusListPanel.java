@@ -23,7 +23,7 @@ import annis.security.UserConfig;
 import annis.libgui.CorpusSet;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Background;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.Sets;
@@ -90,7 +90,7 @@ public class CorpusListPanel extends VerticalLayout implements
   // holds the panels of auto generated queries
   private final ExampleQueriesPanel autoGenQueries;
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   public enum ActionType
   {
@@ -119,7 +119,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
   public CorpusListPanel(final QueryController controller,
     InstanceConfig instanceConfig, ExampleQueriesPanel autoGenQueries,
-    final SearchUI ui)
+    final AnnisUI ui)
   {
     this.controller = controller;
     this.instanceConfig = instanceConfig;
@@ -234,7 +234,7 @@ public class CorpusListPanel extends VerticalLayout implements
     tblCorpora.setVisible(false); // don't show list before it was not loaded
     tblCorpora.setContainerDataSource(corpusContainer);
     tblCorpora.setMultiSelect(true);
-    tblCorpora.setPropertyDataSource(ui.getQueryState().getSelectedCorpora());
+    tblCorpora.setPropertyDataSource(ui.getSearchView().getQueryState().getSelectedCorpora());
 
     tblCorpora.addGeneratedColumn("info", new InfoGenerator());
     tblCorpora.addGeneratedColumn("docs", new DocLinkGenerator());
@@ -303,7 +303,7 @@ public class CorpusListPanel extends VerticalLayout implements
   {
     if (ui != null)
     {
-      ui.clearCorpusConfigCache();
+      ui.getSearchView().clearCorpusConfigCache();
     }
 
     CorpusListUpdater updater = new CorpusListUpdater(showLoginMessage);
@@ -628,7 +628,7 @@ public class CorpusListPanel extends VerticalLayout implements
     {
       final String id = (String) itemId;
 
-      if (ui.getDocBrowserController().docsAvailable(id))
+      if (ui.getSearchView().getDocBrowserController().docsAvailable(id))
       {
         Button l = new Button();
         l.setStyleName(ValoTheme.BUTTON_BORDERLESS);
@@ -640,7 +640,7 @@ public class CorpusListPanel extends VerticalLayout implements
           @Override
           public void buttonClick(ClickEvent event)
           {
-            ui.getDocBrowserController().openDocBrowser(id);
+            ui.getSearchView().getDocBrowserController().openDocBrowser(id);
           }
         });
         return l;

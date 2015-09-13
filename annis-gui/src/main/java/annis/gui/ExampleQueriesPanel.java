@@ -38,6 +38,7 @@ import com.vaadin.ui.Component;
 import com.vaadin.ui.CssLayout;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.HashSet;
@@ -63,7 +64,8 @@ public class ExampleQueriesPanel extends CssLayout
   private final String COLUMN_DESCRIPTION = "description";
 
   //main ui window
-  private final SearchUI ui;
+  private final SearchView searchView;
+  private final QueryController queryController;
 
   private final Table table;
 
@@ -86,10 +88,13 @@ public class ExampleQueriesPanel extends CssLayout
 
   private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
-  public ExampleQueriesPanel(SearchUI ui, HelpPanel parentTab)
+  public ExampleQueriesPanel(SearchView searchView, 
+    QueryController queryController,
+    HelpPanel parentTab)
   {
     super();
-    this.ui = ui;
+    this.searchView = searchView;
+    this.queryController = queryController;
     this.parentTab = parentTab;
 
     loadingIndicator = new ProgressBar();
@@ -231,7 +236,7 @@ public class ExampleQueriesPanel extends CssLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        CorpusListPanel corpusList = ui.getControlPanel().getCorpusList();
+        CorpusListPanel corpusList = searchView.getControlPanel().getCorpusList();
         corpusList.initCorpusBrowser(corpusName, btn);
       }
     });
@@ -291,17 +296,18 @@ public class ExampleQueriesPanel extends CssLayout
   {
     loadingIndicator.setVisible(true);
     table.setVisible(false);
-    Background.run(new ExampleFetcher(selectedCorpora));
+    Background.run(new ExampleFetcher(selectedCorpora, UI.getCurrent()));
   }
 
   private class ExampleFetcher implements Runnable
   {
 
     private final Set<String> selectedCorpora;
-
-    public ExampleFetcher(Set<String> selectedCorpora)
+    private UI ui;
+    public ExampleFetcher(Set<String> selectedCorpora, UI ui)
     {
       this.selectedCorpora = selectedCorpora;
+      this.ui = ui;
     }
 
     @Override
@@ -361,7 +367,7 @@ public class ExampleQueriesPanel extends CssLayout
         @Override
         public void buttonClick(Button.ClickEvent event)
         {
-          ControlPanel controlPanel = ui.getControlPanel();
+          ControlPanel controlPanel = searchView.getControlPanel();
           QueryPanel queryPanel;
 
           if (controlPanel == null)
@@ -379,11 +385,10 @@ public class ExampleQueriesPanel extends CssLayout
 
           Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
-          QueryController controller = ui.getQueryController();
-          if (controller != null)
+          if (queryController != null)
           {
-            controller.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-            controller.executeSearch(true, true);
+            queryController.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
+            queryController.executeSearch(true, true);
           }
         }
       });

@@ -83,16 +83,18 @@ public class QueryController implements Serializable
   private static final Logger log = LoggerFactory.getLogger(
     QueryController.class);
 
-  private final SearchUI ui;
+  private final SearchView searchView;
+  private final AnnisUI ui;
 
   private final QueryUIState state;
 
   private final Map<String, Exporter> exporterMap = new HashMap<>();
 
-  public QueryController(SearchUI ui)
+  public QueryController(SearchView searchView, AnnisUI ui)
   {
+    this.searchView = searchView;
     this.ui = ui;
-    this.state = ui.getQueryState();
+    this.state = searchView.getQueryState();
 
     this.state.getAql().addValueChangeListener(
       new Property.ValueChangeListener()
@@ -105,7 +107,7 @@ public class QueryController implements Serializable
         }
       });
 
-    for (Exporter e : SearchUI.EXPORTER)
+    for (Exporter e : SearchView.EXPORTER)
     {
       String name = e.getClass().getSimpleName();
       exporterMap.put(name, e);
@@ -114,7 +116,7 @@ public class QueryController implements Serializable
 
   public void validateQuery()
   {
-    QueryPanel qp = ui.getControlPanel().getQueryPanel();
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
 
     // reset status
     qp.setErrors(null);
@@ -201,7 +203,7 @@ public class QueryController implements Serializable
   public void reportServiceException(UniformInterfaceException ex,
     boolean showNotification)
   {
-    QueryPanel qp = ui.getControlPanel().getQueryPanel();
+    QueryPanel qp = searchView.getControlPanel().getQueryPanel();
 
     String caption = null;
     String description = null;
@@ -320,7 +322,7 @@ public class QueryController implements Serializable
     // construct a query from the current properties
     PagedResultQuery pagedQuery = getSearchQuery();
 
-    ui.getControlPanel().getQueryPanel().setStatus("Searching...");
+    searchView.getControlPanel().getQueryPanel().setStatus("Searching...");
 
     cancelSearch();
 
@@ -332,7 +334,7 @@ public class QueryController implements Serializable
       session.getAttribute(MediaController.class).clearMediaPlayers();
     }
 
-    ui.updateFragment(pagedQuery);
+    searchView.updateFragment(pagedQuery);
 
     addHistoryEntry(pagedQuery);
 
@@ -354,17 +356,17 @@ public class QueryController implements Serializable
     //
     // begin execute match fetching
     //
-    ResultViewPanel oldPanel = ui.getLastSelectedResultView();
+    ResultViewPanel oldPanel = searchView.getLastSelectedResultView();
     if (replaceOldTab)
     {
       // remove old panel from view
-      ui.closeTab(oldPanel);
+      searchView.closeTab(oldPanel);
     }
 
     ResultViewPanel newResultView = new ResultViewPanel(ui, ui,
       ui.getInstanceConfig(), pagedQuery);
     newResultView.getPaging().addCallback(new SpecificPagingCallback(pagedQuery,
-      ui, newResultView));
+      ui, searchView, newResultView));
 
     TabSheet.Tab newTab;
 
@@ -372,12 +374,12 @@ public class QueryController implements Serializable
     String caption = existingResultPanels.isEmpty()
       ? "Query Result" : "Query Result #" + (existingResultPanels.size() + 1);
 
-    newTab = ui.getMainTab().addTab(newResultView, caption);
+    newTab = searchView.getMainTab().addTab(newResultView, caption);
     newTab.setClosable(true);
     newTab.setIcon(FontAwesome.SEARCH);
 
-    ui.getMainTab().setSelectedTab(newResultView);
-    ui.notifiyQueryStarted();
+    searchView.getMainTab().setSelectedTab(newResultView);
+    searchView.notifiyQueryStarted();
 
     Background.run(new ResultFetchJob(pagedQuery,
       newResultView, ui));
@@ -389,7 +391,7 @@ public class QueryController implements Serializable
     // begin execute count
     //
     // start count query
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(true);
 
     Future<MatchAndDocumentCount> futureCount = res.path("query").path("search").
       path("count").
@@ -502,9 +504,9 @@ public class QueryController implements Serializable
   private List<ResultViewPanel> getResultPanels()
   {
     ArrayList<ResultViewPanel> result = new ArrayList<>();
-    for (int i = 0; i < ui.getMainTab().getComponentCount(); i++)
+    for (int i = 0; i < searchView.getMainTab().getComponentCount(); i++)
     {
-      Component c = ui.getMainTab().getTab(i).getComponent();
+      Component c = searchView.getMainTab().getTab(i).getComponent();
       if (c instanceof ResultViewPanel)
       {
         result.add((ResultViewPanel) c);
@@ -522,7 +524,7 @@ public class QueryController implements Serializable
   private void cancelSearch()
   {
     // don't spin forever when canceled
-    ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+    searchView.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
 
     Map<QueryUIState.QueryType, Future<?>> exec = state.getExecutedTasks();
     // abort last tasks if running
@@ -554,7 +556,7 @@ public class QueryController implements Serializable
     // remove it first in order to let it appear on the beginning of the list
     state.getHistory().removeItem(q);
     state.getHistory().addItemAt(0, q);
-    ui.getControlPanel().getQueryPanel().updateShortHistory();
+    searchView.getControlPanel().getQueryPanel().updateShortHistory();
   }
 
   public void changeContext(PagedResultQuery originalQuery,
@@ -582,14 +584,14 @@ public class QueryController implements Serializable
 
   public void corpusSelectionChangedInBackground()
   {
-    ui.getControlPanel().getSearchOptions()
+    searchView.getControlPanel().getSearchOptions()
       .updateSearchPanelConfigurationInBackground(getState().
         getSelectedCorpora().getValue(), ui);
   }
 
   public QueryUIState getState()
   {
-    return ui.getQueryState();
+    return searchView.getQueryState();
   }
 
 }

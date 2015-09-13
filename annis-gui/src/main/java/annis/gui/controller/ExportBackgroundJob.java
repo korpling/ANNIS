@@ -16,18 +16,16 @@
 package annis.gui.controller;
 
 import annis.gui.ExportPanel;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.exporter.Exporter;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;
 import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.ui.UI;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.util.concurrent.Callable;
-import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  *
@@ -41,13 +39,13 @@ public class ExportBackgroundJob implements Callable<File>
 
   private final ExportQuery query;
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   private final Exporter exporter;
   
   private Exception exportError;
 
-  public ExportBackgroundJob(ExportQuery query, Exporter exporter, SearchUI ui,
+  public ExportBackgroundJob(ExportQuery query, Exporter exporter, AnnisUI ui,
     EventBus eventBus, ExportPanel panel)
   {
     this.query = query;

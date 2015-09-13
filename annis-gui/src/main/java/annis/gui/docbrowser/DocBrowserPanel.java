@@ -15,7 +15,7 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.model.Annotation;
@@ -45,7 +45,7 @@ import org.slf4j.LoggerFactory;
 public class DocBrowserPanel extends Panel
 {
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   private VerticalLayout layout;
 
@@ -69,7 +69,7 @@ public class DocBrowserPanel extends Panel
    */
   private final int PAGE_SIZE = 20;
 
-  private DocBrowserPanel(SearchUI ui, String corpus)
+  private DocBrowserPanel(AnnisUI ui, String corpus)
   {
     this.ui = ui;
     this.corpus = corpus;
@@ -115,14 +115,14 @@ public class DocBrowserPanel extends Panel
    * @return A new wrapper panel for a doc browser. Make sure, that this is not
    * done several times.
    */
-  public static DocBrowserPanel initDocBrowserPanel(SearchUI ui, String corpus)
+  public static DocBrowserPanel initDocBrowserPanel(AnnisUI ui, String corpus)
   {
     return new DocBrowserPanel(ui, corpus);
   }
 
   public void openVis(String doc, Visualizer config, Button btn)
   {
-    ui.getDocBrowserController().openDocVis(corpus, doc, config, btn);
+    ui.getSearchView().getDocBrowserController().openDocVis(corpus, doc, config, btn);
   }
 
   private class LoadingDocs implements Runnable

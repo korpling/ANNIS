@@ -15,7 +15,7 @@
  */
 package annis.gui.docbrowser;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.PluginSystem;
@@ -64,7 +64,7 @@ public class DocBrowserController implements Serializable
   private final Logger log = LoggerFactory.getLogger(DocBrowserController.class);
 
   // holds the complete state of the gui
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
   // track the already initiated doc browsers
   private final Map<String, Component> initedDocBrowsers;
@@ -81,7 +81,7 @@ public class DocBrowserController implements Serializable
   
   private final static Escaper urlPathEscape = UrlEscapers.urlPathSegmentEscaper();
 
-  public DocBrowserController(SearchUI ui)
+  public DocBrowserController(AnnisUI ui)
   {
     this.ui = ui;
     this.initedDocBrowsers = new HashMap<>();
@@ -99,7 +99,7 @@ public class DocBrowserController implements Serializable
     if (visibleVisHolder.containsKey(canonicalTitle))
     {
       Panel visHolder = visibleVisHolder.get(canonicalTitle);
-      ui.getTabSheet().setSelectedTab(visHolder);
+      ui.getSearchView().getTabSheet().setSelectedTab(visHolder);
       return;
     }
 
@@ -124,11 +124,11 @@ public class DocBrowserController implements Serializable
     
     visHolder.setContent(layoutProgress);
     
-    Tab visTab = ui.getTabSheet().addTab(visHolder, tabCaption);
+    Tab visTab = ui.getSearchView().getTabSheet().addTab(visHolder, tabCaption);
     visTab.setDescription(canonicalTitle);
     visTab.setIcon(EYE_ICON);
     visTab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(visTab);
+    ui.getSearchView().getTabSheet().setSelectedTab(visTab);
 
     // register visible visHolder
     this.visibleVisHolder.put(canonicalTitle, visHolder);
@@ -149,11 +149,11 @@ public class DocBrowserController implements Serializable
     }
 
     // init tab and put to front
-    TabSheet.Tab tab = ui.getTabSheet().addTab(initedDocBrowsers.get(corpus),
+    TabSheet.Tab tab = ui.getSearchView().getTabSheet().addTab(initedDocBrowsers.get(corpus),
       corpus);
     tab.setIcon(DOC_ICON);
     tab.setClosable(true);
-    ui.getTabSheet().setSelectedTab(tab);
+    ui.getSearchView().getTabSheet().setSelectedTab(tab);
   }
 
   /**
@@ -338,7 +338,7 @@ public class DocBrowserController implements Serializable
   {
     if (ui != null)
     {
-      CorpusConfig corpusConfig = ui.getCorpusConfigWithCache(id);
+      CorpusConfig corpusConfig = ui.getSearchView().getCorpusConfigWithCache(id);
 
       if (corpusConfig != null)
       {
@@ -351,7 +351,7 @@ public class DocBrowserController implements Serializable
         // get the default config
         else
         {
-          corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
+          corpusConfig = ui.getSearchView().getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
           boolean browseDocuments = Boolean.parseBoolean(
             corpusConfig.getConfig("browse-documents", "true"));
           return browseDocuments;

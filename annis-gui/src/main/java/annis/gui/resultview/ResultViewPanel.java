@@ -18,7 +18,7 @@ package annis.gui.resultview;
 import annis.CommonHelper;
 import annis.libgui.PluginSystem;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.objects.PagedResultQuery;
@@ -126,16 +126,16 @@ public class ResultViewPanel extends VerticalLayout implements
 
   private PagedResultQuery currentQuery;
   private PagedResultQuery initialQuery;
-  private final SearchUI sui;
+  private final AnnisUI sui;
 
-  public ResultViewPanel(SearchUI ui,
+  public ResultViewPanel(AnnisUI ui,
     PluginSystem ps, InstanceConfig instanceConfig, PagedResultQuery initialQuery)
   {
     this.sui = ui;
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
-    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
+    this.selectedSegmentationLayer = ui.getSearchView().getQueryState().getBaseText().getValue();
     this.initialQuery = initialQuery;
     
     cacheResolver
@@ -295,7 +295,7 @@ public class ResultViewPanel extends VerticalLayout implements
           currentResults += newPanels.size();
 
           String strResults = numberOfResults > 1 ? "results" : "result";
-          sui.getControlPanel().getQueryPanel().setStatus(sui.getControlPanel().
+          sui.getSearchView().getControlPanel().getQueryPanel().setStatus(sui.getSearchView().getControlPanel().
             getQueryPanel().getLastPublicStatus(),
             " (showing " + currentResults + "/" + numberOfResults + " " + strResults + ")");
 
@@ -336,16 +336,16 @@ public class ResultViewPanel extends VerticalLayout implements
   public void showFinishedSubgraphSearch()
   {
     //Search complete, stop progress bar control
-    if (sui.getControlPanel().getQueryPanel().getPiCount() != null)
+    if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount() != null)
     {
-      if (sui.getControlPanel().getQueryPanel().getPiCount().isVisible())
+      if (sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().isVisible())
       {
-        sui.getControlPanel().getQueryPanel().getPiCount().setVisible(false);
-        sui.getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
+        sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setVisible(false);
+        sui.getSearchView().getControlPanel().getQueryPanel().getPiCount().setEnabled(false);
       }
     }
     // also remove the info how many results have been fetched
-    QueryPanel qp = sui.getControlPanel().getQueryPanel();
+    QueryPanel qp = sui.getSearchView().getControlPanel().getQueryPanel();
     qp.setStatus(qp.getLastPublicStatus());
   }
 
@@ -513,7 +513,7 @@ public class ResultViewPanel extends VerticalLayout implements
       //if selectedSegmentationLayer is null then tokens are understood as the selected segmentation
       q.setSegmentation(selectedSegmentationLayer);
 
-      sui.updateFragment(q);
+      sui.getSearchView().updateFragment(q);
     }
   }
 

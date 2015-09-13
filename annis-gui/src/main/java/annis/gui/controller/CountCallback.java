@@ -15,7 +15,7 @@
  */
 package annis.gui.controller;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
@@ -44,9 +44,9 @@ public class CountCallback implements Runnable
 
   private final int pageSize;
 
-  private final SearchUI ui;
+  private final AnnisUI ui;
 
-  public CountCallback(ResultViewPanel panel, int pageSize, SearchUI ui)
+  public CountCallback(ResultViewPanel panel, int pageSize, AnnisUI ui)
   {
     this.panel = panel;
     this.pageSize = pageSize;
@@ -56,7 +56,7 @@ public class CountCallback implements Runnable
   @Override
   public void run()
   {
-    Future futureCount = ui.getQueryState().getExecutedTasks().
+    Future futureCount = ui.getSearchView().getQueryState().getExecutedTasks().
       get(QueryUIState.QueryType.COUNT);
     final MatchAndDocumentCount countResult;
     MatchAndDocumentCount tmpCountResult = null;
@@ -86,7 +86,7 @@ public class CountCallback implements Runnable
       {
         countResult = tmpCountResult;
       }
-      ui.getQueryState().getExecutedTasks().
+      ui.getSearchView().getQueryState().getExecutedTasks().
         remove(QueryUIState.QueryType.COUNT);
       final UniformInterfaceException causeFinal = cause;
       ui.accessSynchronously(new Runnable()
@@ -100,7 +100,7 @@ public class CountCallback implements Runnable
             {
               String documentString = countResult.getDocumentCount() > 1 ? "documents" : "document";
               String matchesString = countResult.getMatchCount() > 1 ? "matches" : "match";
-              ui.getControlPanel().getQueryPanel().
+              ui.getSearchView().getControlPanel().getQueryPanel().
                 setStatus("" + countResult.getMatchCount() + " " + matchesString + "\nin " + countResult.getDocumentCount() + " " + documentString);
               if (countResult.getMatchCount() > 0 && panel != null)
               {
@@ -113,7 +113,7 @@ public class CountCallback implements Runnable
           {
             ui.getQueryController().reportServiceException(causeFinal, true);
           } // end if cause != null
-          ui.getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
+          ui.getSearchView().getControlPanel().getQueryPanel().setCountIndicatorEnabled(false);
         }
       });
     }

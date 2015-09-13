@@ -15,11 +15,12 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
 import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
+import annis.gui.objects.QueryUIState;
 import annis.libgui.Background;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
@@ -205,19 +206,22 @@ public class SearchOptionsPanel extends FormLayout
     
     Background.run(new CorpusConfigUpdater(getUI()));
 
-    if (getUI() instanceof SearchUI)
+    if (getUI() instanceof AnnisUI)
     {
-      SearchUI ui = (SearchUI) getUI();
-      cbLeftContext.setPropertyDataSource(ui.getQueryState().getLeftContext());
-      cbRightContext.setPropertyDataSource(ui.getQueryState().getRightContext());
-      cbResultsPerPage.setPropertyDataSource(ui.getQueryState().getLimit());
-      cbSegmentation.setPropertyDataSource(ui.getQueryState().getBaseText());
+      AnnisUI ui = (AnnisUI) getUI();
+     
+      QueryUIState state = ui.getSearchView().getQueryState();
+      
+      cbLeftContext.setPropertyDataSource(state.getLeftContext());
+      cbRightContext.setPropertyDataSource(state.getRightContext());
+      cbResultsPerPage.setPropertyDataSource(state.getLimit());
+      cbSegmentation.setPropertyDataSource(state.getBaseText());
 
       BeanItemContainer<OrderType> orderContainer
         = new BeanItemContainer<>(OrderType.class,
           Lists.newArrayList(OrderType.values()));
       cbOrder.setContainerDataSource(orderContainer);
-      cbOrder.setPropertyDataSource(ui.getQueryState().getOrder());
+      cbOrder.setPropertyDataSource(state.getOrder());
 
     }
   }

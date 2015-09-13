@@ -18,7 +18,7 @@ package annis.gui.controlpanel;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
 import annis.gui.QueryController;
-import annis.gui.SearchUI;
+import annis.gui.AnnisUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
 import com.vaadin.ui.themes.ValoTheme;
@@ -44,11 +44,11 @@ public class ControlPanel extends VerticalLayout
   
   private Tab optionTab;
   private TabSheet optionsTab;
-  private SearchUI ui;
+  private AnnisUI ui;
 
 
   public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
-    ExampleQueriesPanel autoGenQueries, SearchUI ui)
+    ExampleQueriesPanel autoGenQueries, AnnisUI ui)
   {
     this.ui = ui;
     
