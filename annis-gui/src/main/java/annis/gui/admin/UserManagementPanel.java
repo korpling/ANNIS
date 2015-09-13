@@ -15,7 +15,6 @@
  */
 package annis.gui.admin;
 
-import annis.gui.converter.DateTimeConverter;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;
@@ -25,17 +24,15 @@ import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
-import com.vaadin.shared.ui.datefield.Resolution;
-import com.vaadin.ui.AbstractField;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
-import com.vaadin.ui.DateField;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
@@ -45,7 +42,6 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
-import org.joda.time.DateTime;
 
 /**
  *
@@ -56,6 +52,7 @@ public class UserManagementPanel extends Panel
 {
 
   private final VerticalLayout layout;
+  private final HorizontalLayout actionLayout;
 
   private final Table userList;
 
@@ -68,12 +65,19 @@ public class UserManagementPanel extends Panel
   private final IndexedContainer groupsContainer = new IndexedContainer();
   private final IndexedContainer permissionsContainer = new IndexedContainer();
   
+  private ProgressBar progress;
+  
   public UserManagementPanel()
   {
 
     userContainer = new BeanContainer<>(User.class);
     userContainer.setBeanIdProperty("name");
 
+    progress = new ProgressBar();
+    progress.setCaption("Loading user list");
+    progress.setIndeterminate(true);
+    progress.setVisible(false);
+    
     userList = new Table();
     userList.setEditable(true);
     userList.setSelectable(true);
@@ -123,10 +127,10 @@ public class UserManagementPanel extends Panel
       }
     });
 
-    HorizontalLayout actionLayout = new HorizontalLayout(txtUserName,
+    actionLayout = new HorizontalLayout(txtUserName,
       btAddNewUser, btDeleteUser);
 
-    layout = new VerticalLayout(actionLayout, userList);
+    layout = new VerticalLayout(actionLayout, progress, userList);
     layout.setSizeFull();
     layout.setExpandRatio(userList, 1.0f);
     layout.setSpacing(true);
@@ -183,6 +187,14 @@ public class UserManagementPanel extends Panel
     {
       groupsContainer.addItem(g);
     }
+  }
+
+  @Override
+  public void setLoadingAnimation(boolean show)
+  {
+    progress.setVisible(show);
+    userList.setVisible(!show);
+    actionLayout.setEnabled(!show);
   }
   
   

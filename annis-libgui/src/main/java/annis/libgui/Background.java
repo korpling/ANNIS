@@ -15,6 +15,12 @@
  */
 package annis.libgui;
 
+import com.google.common.util.concurrent.FutureCallback;
+import com.google.common.util.concurrent.Futures;
+import com.google.common.util.concurrent.ListenableFuture;
+import com.google.common.util.concurrent.ListeningExecutorService;
+import com.google.common.util.concurrent.MoreExecutors;
+import com.vaadin.ui.UI;
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -33,6 +39,59 @@ public class Background
   public static Future<?> run(Runnable job)
   {
     return call(Executors.callable(job));
+  }
+  
+  /**
+   * Execute the job in the background and provide a callback which is called
+   * when the job is finished.
+   * 
+   * It is guarantied that the callback is executed inside the
+   * of the UI thread.
+   * 
+   * @param <T>
+   * @param job
+   * @param callback 
+   */
+  public static <T> void runWithCallback(Callable<T> job, final FutureCallback<T> callback)
+  {
+    final UI ui = UI.getCurrent();
+    
+    ListeningExecutorService exec = MoreExecutors.listeningDecorator(Executors.newSingleThreadExecutor());
+    ListenableFuture<T> future = exec.submit(job);
+    if(callback != null)
+    {
+      Futures.addCallback(future, new FutureCallback<T>()
+      {
+
+        @Override
+        public void onSuccess(final T result)
+        {
+          ui.access(new Runnable()
+          {
+
+            @Override
+            public void run()
+            {
+              callback.onSuccess(result);
+            }
+          });
+        }
+
+        @Override
+        public void onFailure(final Throwable t)
+        {
+          ui.access(new Runnable()
+          {
+
+            @Override
+            public void run()
+            {
+              callback.onFailure(t);
+            }
+          });
+        }
+      });
+    }
   }
   
   public static <T> Future<T> call(
@@ -68,4 +127,5 @@ public class Background
     
     return null;
   }
+  
 }

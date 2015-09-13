@@ -26,9 +26,10 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
+import annis.libgui.Background;
 import annis.libgui.Helper;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.FontAwesome;
@@ -40,6 +41,7 @@ import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.Callable;
 
 /**
  *
@@ -277,5 +279,13 @@ public class AdminView extends VerticalLayout implements View,
       importPanel.onLogout();
     }
   }
+
+  @Override
+  public <T> void runInBackground(Callable<T> job, final FutureCallback<T> callback)
+  {
+    Background.runWithCallback(job, callback);
+  }
+  
+  
 
 }

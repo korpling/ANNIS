@@ -16,10 +16,13 @@
 
 package annis.gui.admin.view;
 
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.WebResource;
+import java.util.concurrent.Callable;
 
 /**
- *
+ * An general interface for different toplevel ANNIS views.
+ * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public interface UIView
@@ -30,6 +33,15 @@ public interface UIView
   public void showBackgroundInfo(String info, String description);
   public void showWarning(String warning, String description);
   public void showError(String error, String description);
+  
+  /**
+   * Execute a job in the background and call the callback when finished.
+   * The callback must be executed in the same main UI thread.
+   * @param <T>
+   * @param job
+   * @param callback 
+   */
+  public<T> void runInBackground(Callable<T> job, FutureCallback<T> callback);
   
   public interface Listener
   {

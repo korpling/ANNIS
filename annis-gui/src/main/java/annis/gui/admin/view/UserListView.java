@@ -28,6 +28,7 @@ public interface UserListView
 {
   public void setUserList(Collection<User> users);
   
+  public void setLoadingAnimation(boolean show);
   
   public void addListener(Listener listener);
   
