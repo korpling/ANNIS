@@ -24,8 +24,10 @@ import annis.gui.components.SettingsStorage;
 import annis.libgui.AnnisBaseUI;
 import static annis.libgui.AnnisBaseUI.USER_LOGIN_ERROR;
 import annis.libgui.AnnisUser;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import annis.libgui.LoginDataLostException;
+import annis.security.User;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.validator.EmailValidator;
 import com.vaadin.navigator.Navigator;
@@ -49,6 +51,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
+import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 import org.json.JSONException;
@@ -68,10 +71,32 @@ public class MainToolbar extends HorizontalLayout
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     MainToolbar.class);
 
+  public enum NavigationTarget
+  {
+
+    SEARCH(SearchView.NAME, "Search interface", FontAwesome.SEARCH),
+    ADMIN(AdminView.NAME, "Administration", FontAwesome.WRENCH);
+
+    private final String caption;
+
+    private final String state;
+
+    private final Resource icon;
+
+    private NavigationTarget(String state, String caption, Resource icon)
+    {
+      this.caption = caption;
+      this.state = state;
+      this.icon = icon;
+    }
+
+  }
+
   private Button btSidebar;
-  
+
   private Button btNavigate;
-  private String navigationTarget;
+
+  private NavigationTarget navigationTarget;
 
   private final Button btLogin;
 
@@ -157,8 +182,8 @@ public class MainToolbar extends HorizontalLayout
       }
     });
     btBugReport.setVisible(this.bugEMailAddress != null);
-    
-    btNavigate = new Button("Administration", FontAwesome.WRENCH);
+
+    btNavigate = new Button();
     btNavigate.setVisible(false);
     btNavigate.addClickListener(new Button.ClickListener()
     {
@@ -166,8 +191,10 @@ public class MainToolbar extends HorizontalLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        UI.getCurrent().getNavigator().navigateTo(
-          navigationTarget == null ? "" : navigationTarget);
+        if (navigationTarget != null)
+        {
+          UI.getCurrent().getNavigator().navigateTo(navigationTarget.state);
+        }
       }
     });
     lblUserName = new Label("not logged in");
@@ -253,21 +280,20 @@ public class MainToolbar extends HorizontalLayout
       }
     });
 
-    
     addComponent(btSidebar);
     setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
 
     addComponent(btAboutAnnis);
     addComponent(btBugReport);
     addComponent(btNavigate);
-    
+
     addComponent(btOpenSource);
 
     setSpacing(true);
     setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btNavigate, Alignment.MIDDLE_LEFT);
-    
+
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     setExpandRatio(btOpenSource, 1.0f);
 
@@ -343,9 +369,9 @@ public class MainToolbar extends HorizontalLayout
   public void attach()
   {
     super.attach();
-    
+
     UI ui = UI.getCurrent();
-    if(ui instanceof AnnisBaseUI)
+    if (ui instanceof AnnisBaseUI)
     {
       ((AnnisBaseUI) ui).getLoginDataLostBus().register(this);
     }
@@ -355,30 +381,36 @@ public class MainToolbar extends HorizontalLayout
   public void detach()
   {
     UI ui = UI.getCurrent();
-    if(ui instanceof AnnisBaseUI)
+    if (ui instanceof AnnisBaseUI)
     {
       ((AnnisBaseUI) ui).getLoginDataLostBus().unregister(this);
     }
-    
+
     super.detach();
   }
-  
-  public void setNavigationTarget(String navigationTarget, String caption, Resource icon)
+
+  public void setNavigationTarget(NavigationTarget target)
   {
-    if(caption == null || navigationTarget == null)
+    this.navigationTarget = target;
+    btNavigate.setVisible(false);
+
+    if (target == NavigationTarget.ADMIN)
     {
-      btNavigate.setVisible(false);
-      this.navigationTarget = null;
+      // check in background if display is necessary
+      AnnisUser user = Helper.getUser();
+      if (user != null && user.getUserName() != null)
+      {
+        Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(), UI.
+          getCurrent()));
+      }
     }
-    else
+    else if (target != null)
     {
-      this.navigationTarget = navigationTarget;
       btNavigate.setVisible(true);
-      btNavigate.setCaption(caption);
-      btNavigate.setIcon(icon);
+      btNavigate.setCaption(target.caption);
+      btNavigate.setIcon(target.icon);
     }
-    
-    
+
   }
 
   private void updateSidebarState()
@@ -404,7 +436,7 @@ public class MainToolbar extends HorizontalLayout
   {
     this.loginListeners.add(listener);
   }
-  
+
   public void removeLoginListener(LoginListener listener)
   {
     this.loginListeners.remove(listener);
@@ -470,13 +502,19 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
   }
 
-
   public void updateUserInformation()
   {
     if (lblUserName == null)
     {
       return;
     }
+
+    if (navigationTarget == NavigationTarget.ADMIN)
+    {
+      // don't show administration link per default
+      btNavigate.setVisible(false);
+    }
+
     if (isLoggedIn())
     {
       AnnisUser user = Helper.getUser();
@@ -491,6 +529,17 @@ public class MainToolbar extends HorizontalLayout
         }
         // do not show the logout button if the user cannot logout using ANNIS
         btLogout.setVisible(!user.isRemote());
+
+        if (navigationTarget == NavigationTarget.ADMIN)
+        {
+          // check in background if display is necessary
+          if (user.getUserName() != null)
+          {
+            Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(),
+              UI.getCurrent()));
+          }
+        }
+
       }
     }
     else
@@ -590,6 +639,7 @@ public class MainToolbar extends HorizontalLayout
   public ScreenshotMaker getScreenshotExtension()
   {
     return screenshotExtension;
+
   }
 
   private static class AboutClickListener implements Button.ClickListener
@@ -615,6 +665,7 @@ public class MainToolbar extends HorizontalLayout
   public boolean isLoggedIn()
   {
     return Helper.getUser() != null;
+
   }
 
   private class LoginCloseCallback implements JavaScriptFunction
@@ -642,15 +693,15 @@ public class MainToolbar extends HorizontalLayout
 
     }
   }
-  
+
   @Subscribe
   public void handleLoginDataLostException(LoginDataLostException ex)
   {
-    
-    Notification.show("Login data was lost, please login again.", 
+
+    Notification.show("Login data was lost, please login again.",
       "Due to a server misconfiguration the login-data was lost. Please contact the adminstrator of this ANNIS instance.",
       Notification.Type.WARNING_MESSAGE);
-    
+
     for (LoginListener l : loginListeners)
     {
       try
@@ -677,7 +728,63 @@ public class MainToolbar extends HorizontalLayout
     btSidebar.setVisible(sidebar != null);
     updateSidebarState();
   }
-  
-  
+
+  private class CheckIfUserIsAdministratorJob implements Runnable
+  {
+
+    private final String userName;
+
+    private final UI ui;
+
+    public CheckIfUserIsAdministratorJob(String userName, UI ui)
+    {
+      this.userName = userName;
+      this.ui = ui;
+    }
+
+    @Override
+    public void run()
+    {
+      User user = null;
+      try
+      {
+        user = Helper.getAnnisWebResource().path("admin/users").path(
+          userName)
+          .get(User.class);
+      }
+      finally
+      {
+        boolean hasAdmistrationRights = false;
+        if (user != null)
+        {
+          for (String group : user.getGroups())
+          {
+            if (group.startsWith("admin:") || group.startsWith("*:") || group.
+              equals("*"))
+            {
+              // the user has at least some administration rights
+              hasAdmistrationRights = true;
+            }
+          }
+        }
+        if (hasAdmistrationRights)
+        {
+          ui.access(new Runnable()
+          {
+
+            @Override
+            public void run()
+            {
+              // make the administration button visible
+              btNavigate.setCaption(NavigationTarget.ADMIN.caption);
+              btNavigate.setIcon(NavigationTarget.ADMIN.icon);
+              btNavigate.setVisible(true);
+            }
+          });
+        }
+      }
+    }
+
+  }
 
 }

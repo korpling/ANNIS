@@ -20,11 +20,14 @@ import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
+import annis.libgui.AnnisUser;
+import annis.libgui.Background;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.CORPUS_FONT;
 import static annis.libgui.Helper.CORPUS_FONT_FORCE;
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 import annis.libgui.InstanceConfig;
+import annis.security.User;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -58,27 +61,29 @@ public class AnnisUI extends CommonUI
     AnnisUI.class);
 
   private transient Cache<String, CorpusConfig> corpusConfigCache;
-  
+
   private InstanceConfig instanceConfig;
-  
+
   private final QueryUIState queryState = new QueryUIState();
-  
+
   private QueryController queryController;
+
   private SearchView searchView;
+
   private AdminView adminView;
-  
+
   private Navigator nav;
-  
+
   /**
    * A re-usable toolbar for different views.
    */
   private MainToolbar toolbar;
-  
+
   public AnnisUI()
   {
     initTransients();
   }
-  
+
   private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
   {
     in.defaultReadObject();
@@ -95,25 +100,24 @@ public class AnnisUI extends CommonUI
   {
     super.init(request);
     setErrorHandler(this);
-    
+
     this.instanceConfig = getInstanceConfig(request);
-    
+
     toolbar = new MainToolbar();
-    
+
     searchView = new SearchView(AnnisUI.this);
     adminView = new AdminView(AnnisUI.this);
     queryController = new QueryController(searchView, AnnisUI.this);
-    
+
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
     nav.addView(SearchView.NAME, searchView);
     nav.addView(AdminView.NAME, adminView);
     nav.addViewChangeListener(AnnisUI.this);
     loadInstanceFonts();
-    
+
     addExtension(toolbar.getScreenshotExtension());
   }
-  
-  
+
   @Override
   public boolean beforeViewChange(ViewChangeEvent event)
   {
@@ -121,34 +125,32 @@ public class AnnisUI extends CommonUI
     searchView.setToolbar(null);
     adminView.setToolbar(null);
     toolbar.setSidebar(null);
-    
-    if(event.getNewView() == searchView)
+
+    if (event.getNewView() == searchView)
     {
       searchView.setToolbar(toolbar);
       toolbar.setSidebar(searchView);
-      
-      toolbar.setNavigationTarget(AdminView.NAME, "Administration", FontAwesome.WRENCH);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.ADMIN);
     }
-    else if(event.getNewView() == adminView)
+    else if (event.getNewView() == adminView)
     {
       adminView.setToolbar(toolbar);
-      
-      toolbar.setNavigationTarget(SearchView.NAME, "Search interface", FontAwesome.SEARCH);
+      toolbar.setNavigationTarget(MainToolbar.NavigationTarget.SEARCH);
     }
     else
     {
-      toolbar.setNavigationTarget(null, null, null);
+      toolbar.setNavigationTarget(null);
     }
-    
+
     return true;
   }
 
   @Override
   public void afterViewChange(ViewChangeEvent event)
   {
-   
+
   }
-  
+
   public boolean canReportBugs()
   {
     if (toolbar != null)
@@ -230,7 +232,7 @@ public class AnnisUI extends CommonUI
     // default to an empty instance config
     return new InstanceConfig();
   }
-  
+
   private void loadInstanceFonts()
   {
     if (instanceConfig != null && instanceConfig.getFont() != null)
@@ -287,7 +289,7 @@ public class AnnisUI extends CommonUI
         + "}");
     }
   }
-  
+
   @Override
   protected void addCustomUIPlugins(PluginManager pluginManager)
   {
@@ -297,7 +299,7 @@ public class AnnisUI extends CommonUI
       toURI());
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
-  
+
   /**
    * Get a cached version of the {@link CorpusConfig} for a corpus.
    *
@@ -327,7 +329,7 @@ public class AnnisUI extends CommonUI
 
     return config;
   }
-  
+
   public void clearCorpusConfigCache()
   {
     if (corpusConfigCache != null)
@@ -335,7 +337,7 @@ public class AnnisUI extends CommonUI
       corpusConfigCache.invalidateAll();
     }
   }
-  
+
   public FontConfig getInstanceFont()
   {
     if (instanceConfig != null && instanceConfig.getFont() != null)
@@ -349,8 +351,7 @@ public class AnnisUI extends CommonUI
   {
     return instanceConfig;
   }
-  
-  
+
   public QueryController getQueryController()
   {
     return queryController;
@@ -365,8 +366,5 @@ public class AnnisUI extends CommonUI
   {
     return queryState;
   }
-
-  
-  
 
 }
