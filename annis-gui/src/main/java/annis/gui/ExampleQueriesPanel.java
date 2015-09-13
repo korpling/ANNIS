@@ -64,8 +64,7 @@ public class ExampleQueriesPanel extends CssLayout
   private final String COLUMN_DESCRIPTION = "description";
 
   //main ui window
-  private final SearchView searchView;
-  private final QueryController queryController;
+  private final AnnisUI ui;
 
   private final Table table;
 
@@ -88,13 +87,11 @@ public class ExampleQueriesPanel extends CssLayout
 
   private static final Resource SEARCH_ICON = FontAwesome.SEARCH;
 
-  public ExampleQueriesPanel(SearchView searchView, 
-    QueryController queryController,
+  public ExampleQueriesPanel(AnnisUI ui,
     HelpPanel parentTab)
   {
     super();
-    this.searchView = searchView;
-    this.queryController = queryController;
+    this.ui = ui;
     this.parentTab = parentTab;
 
     loadingIndicator = new ProgressBar();
@@ -236,7 +233,7 @@ public class ExampleQueriesPanel extends CssLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        CorpusListPanel corpusList = searchView.getControlPanel().getCorpusList();
+        CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
         corpusList.initCorpusBrowser(corpusName, btn);
       }
     });
@@ -367,7 +364,7 @@ public class ExampleQueriesPanel extends CssLayout
         @Override
         public void buttonClick(Button.ClickEvent event)
         {
-          ControlPanel controlPanel = searchView.getControlPanel();
+          ControlPanel controlPanel = ui.getSearchView().getControlPanel();
           QueryPanel queryPanel;
 
           if (controlPanel == null)
@@ -385,10 +382,10 @@ public class ExampleQueriesPanel extends CssLayout
 
           Set<String> corpusNameSet = new HashSet<>();
           corpusNameSet.add(eQ.getCorpusName());
-          if (queryController != null)
+          if (ui != null && ui.getQueryController() != null)
           {
-            queryController.setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-            queryController.executeSearch(true, true);
+            ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
+            ui.getQueryController().executeSearch(true, true);
           }
         }
       });

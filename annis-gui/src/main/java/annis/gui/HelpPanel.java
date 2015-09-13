@@ -28,14 +28,14 @@ public class HelpPanel extends Accordion
   private final TutorialPanel tutorial;
   private final ExampleQueriesPanel examples;
   
-  public HelpPanel(SearchView parent, QueryController queryController)
+  public HelpPanel(AnnisUI ui)
   {
     setSizeFull();
     
     tutorial = new TutorialPanel();
     tutorial.setHeight("99%");
     
-    examples = new ExampleQueriesPanel(parent, queryController, this);
+    examples = new ExampleQueriesPanel(ui, this);
     examples.setHeight("99%");
     
     addTab(tutorial, "Tutorial", FontAwesome.BOOK);

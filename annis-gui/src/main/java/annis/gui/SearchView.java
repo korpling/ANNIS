@@ -147,8 +147,7 @@ public class SearchView extends GridLayout implements View,
 
     ui.getToolbar().addLoginListener(SearchView.this);
 
-    final HelpPanel help = new HelpPanel(SearchView.this, ui.
-      getQueryController());
+    final HelpPanel help = new HelpPanel(ui);
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
