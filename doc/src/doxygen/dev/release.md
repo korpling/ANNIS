@@ -96,7 +96,8 @@ mvn license:add-third-party
 mvn license:download-licenses
 \endcode
 4. Add new changelog entry as described in the [general techniques section](@ref dev-release-changelog), 
-if some important information is missing create an enhancement issue in GitHub and repeat
+if some important information is missing create an enhancement issue in GitHub and repeat.
+Preview releases have their own milestones and thus also their own changelog section.
 
 Testing cycle {#dev-release-preview-test}
 -------------
