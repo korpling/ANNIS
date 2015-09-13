@@ -31,6 +31,7 @@ import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
+import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
@@ -49,7 +50,7 @@ import org.slf4j.LoggerFactory;
 @Theme("annis")
 @Push(value = PushMode.AUTOMATIC)
 public class AnnisUI extends CommonUI
-  implements ErrorHandler
+  implements ErrorHandler, ViewChangeListener
 {
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
@@ -96,7 +97,7 @@ public class AnnisUI extends CommonUI
     
     this.instanceConfig = getInstanceConfig(request);
     
-    toolbar = new MainToolbar(null);
+    toolbar = new MainToolbar();
     
     searchView = new SearchView(AnnisUI.this);
     adminView = new AdminView(AnnisUI.this);
@@ -105,12 +106,38 @@ public class AnnisUI extends CommonUI
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
     nav.addView("", searchView);
     nav.addView("admin", adminView);
-    
+    nav.addViewChangeListener(AnnisUI.this);
     loadInstanceFonts();
     
-    toolbar.setSidebar(searchView);
-    
     addExtension(toolbar.getScreenshotExtension());
+  }
+  
+  
+  @Override
+  public boolean beforeViewChange(ViewChangeEvent event)
+  {
+    // make sure the toolbar is removed from the old view
+    searchView.setToolbar(null);
+    adminView.setToolbar(null);
+    toolbar.setSidebar(null);
+    
+    if(event.getNewView() == searchView)
+    {
+      searchView.setToolbar(toolbar);
+      toolbar.setSidebar(searchView);
+    }
+    else if(event.getNewView() == adminView)
+    {
+      adminView.setToolbar(toolbar);
+    }
+    
+    return true;
+  }
+
+  @Override
+  public void afterViewChange(ViewChangeEvent event)
+  {
+   
   }
   
   public boolean canReportBugs()
@@ -325,15 +352,11 @@ public class AnnisUI extends CommonUI
     return searchView;
   }
 
-  public MainToolbar getToolbar()
-  {
-    return toolbar;
-  }
-
   public QueryUIState getQueryState()
   {
     return queryState;
   }
+
   
   
 

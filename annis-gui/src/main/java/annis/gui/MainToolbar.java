@@ -99,10 +99,8 @@ public class MainToolbar extends HorizontalLayout
 
   private final String loginURL;
 
-  public MainToolbar(Sidebar sidebar)
+  public MainToolbar()
   {
-    this.sidebar = sidebar;
-
     this.loginURL = (String) VaadinSession.getCurrent().getAttribute(
       LOGIN_URL_KEY);
 
@@ -138,7 +136,6 @@ public class MainToolbar extends HorizontalLayout
 
     btSidebar = new Button();
     btSidebar.setDisableOnClick(true);
-//    btSidebar.addStyleName(ValoTheme.BUTTON_ICON_ONLY);
     btSidebar.addStyleName(ValoTheme.BUTTON_SMALL);
     btSidebar.setDescription("Show and hide search sidebar");
     btSidebar.setIconAlternateText(btSidebar.getDescription());
@@ -240,11 +237,10 @@ public class MainToolbar extends HorizontalLayout
       }
     });
 
-    if (sidebar != null)
-    {
-      addComponent(btSidebar);
-      setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
-    }
+    
+    addComponent(btSidebar);
+    setComponentAlignment(btSidebar, Alignment.MIDDLE_LEFT);
+
     addComponent(btAboutAnnis);
     addComponent(btBugReport);
     addComponent(btOpenSource);
@@ -369,6 +365,11 @@ public class MainToolbar extends HorizontalLayout
   public void addLoginListener(LoginListener listener)
   {
     this.loginListeners.add(listener);
+  }
+  
+  public void removeLoginListener(LoginListener listener)
+  {
+    this.loginListeners.remove(listener);
   }
 
   /**
@@ -635,6 +636,8 @@ public class MainToolbar extends HorizontalLayout
   public void setSidebar(Sidebar sidebar)
   {
     this.sidebar = sidebar;
+    btSidebar.setVisible(sidebar != null);
+    updateSidebarState();
   }
   
   

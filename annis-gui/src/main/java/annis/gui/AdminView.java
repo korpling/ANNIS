@@ -68,6 +68,8 @@ public class AdminView extends VerticalLayout implements View,
   private GroupManagementPanel groupManagementPanel;
 
   private final AnnisUI ui;
+  
+  private MainToolbar toolbar;
 
   public AdminView(AnnisUI ui)
   {
@@ -111,15 +113,33 @@ public class AdminView extends VerticalLayout implements View,
 
     tabSheet.addSelectedTabChangeListener(this);
 
-    ui.getToolbar().addLoginListener(AdminView.this);
-
-    addComponents(ui.getToolbar(), tabSheet);
+    addComponents(tabSheet);
     setSizeFull();
-    setExpandRatio(ui.getToolbar(), 0.0f);
+    
     setExpandRatio(tabSheet, 1.0f);
 
     tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
+  }
+  
+  public void setToolbar(MainToolbar newToolbar)
+  {
+    // remove old one if necessary
+    if(this.toolbar != null)
+    {
+      this.toolbar.removeLoginListener(this);
+      removeComponent(this.toolbar);
+      this.toolbar = null;
+    }
+    
+    // add new toolbar
+    if(newToolbar != null)
+    {
+      this.toolbar = newToolbar;
+      addComponent(this.toolbar, 0);
+      setExpandRatio(this.toolbar, 0.0f);
+      this.toolbar.addLoginListener(this);
+    }
   }
 
   @Override

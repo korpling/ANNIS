@@ -127,6 +127,8 @@ public class SearchView extends GridLayout implements View,
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private final AnnisUI ui;
+  
+  private MainToolbar toolbar;
 
   public SearchView(AnnisUI ui)
   {
@@ -144,8 +146,6 @@ public class SearchView extends GridLayout implements View,
     setMargin(false);
     setRowExpandRatio(1, 1.0f);
     setColumnExpandRatio(1, 1.0f);
-
-    ui.getToolbar().addLoginListener(SearchView.this);
 
     final HelpPanel help = new HelpPanel(ui);
 
@@ -175,9 +175,6 @@ public class SearchView extends GridLayout implements View,
       }
     });
 
-    
-
-    addComponent(ui.getToolbar(), 0, 0, 1, 0);
     addComponent(controlPanel, 0, 1);
     addComponent(mainTab, 1, 1);
   }
@@ -204,6 +201,25 @@ public class SearchView extends GridLayout implements View,
 
     Background.run(new VersionChecker());
     evaluateFragment(event.getParameters());
+  }
+  
+  public void setToolbar(MainToolbar newToolbar)
+  {
+    // remove old one if necessary
+    if(this.toolbar != null)
+    {
+      this.toolbar.removeLoginListener(this);
+      removeComponent(this.toolbar);
+      this.toolbar = null;
+    }
+    
+    // add new toolbar
+    if(newToolbar != null)
+    {
+      this.toolbar = newToolbar;
+      addComponent(this.toolbar, 0, 0, 1, 0);
+      this.toolbar.addLoginListener(this);
+    }
   }
 
   public void checkCitation()
@@ -452,7 +468,10 @@ public class SearchView extends GridLayout implements View,
 
   public void notifiyQueryStarted()
   {
-    ui.getToolbar().notifiyQueryStarted();
+    if(toolbar != null)
+    {
+      toolbar.notifiyQueryStarted();
+    }
   }
 
   @Override

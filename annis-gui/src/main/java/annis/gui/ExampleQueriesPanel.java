@@ -106,6 +106,8 @@ public class ExampleQueriesPanel extends CssLayout
     egContainer = new BeanItemContainer<>(ExampleQuery.class);
     table.setContainerDataSource(egContainer);
     addComponent(table);
+    
+    setUpTable();
   }
 
   /**
@@ -164,13 +166,6 @@ public class ExampleQueriesPanel extends CssLayout
 
   }
 
-  @Override
-  public void attach()
-  {
-    super.attach();
-
-    setUpTable();
-  }
 
   /**
    * Add items if there are any and put the example query tab in the foreground.
