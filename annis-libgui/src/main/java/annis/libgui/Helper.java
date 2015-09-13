@@ -387,7 +387,7 @@ public class Helper
         result.add("_seg="
           + encodeBase64URL(segmentation));
       }
-      if(order != OrderType.ascending)
+      if(order != OrderType.ascending && order != null)
       {
         result.add("o=" + order.toString());
       }
