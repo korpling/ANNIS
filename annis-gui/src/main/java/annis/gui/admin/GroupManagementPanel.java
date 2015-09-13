@@ -20,9 +20,7 @@ import annis.security.Group;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ItemSorter;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -33,6 +31,7 @@ import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.ProgressBar;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.VerticalLayout;
@@ -53,6 +52,9 @@ public class GroupManagementPanel extends Panel
 
   private final Table tblGroups = new Table();
   private final TextField txtGroupName;
+  private final ProgressBar progress;
+  private final HorizontalLayout actionLayout;
+  
 
   private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
     Group.class);
@@ -61,7 +63,11 @@ public class GroupManagementPanel extends Panel
   public GroupManagementPanel()
   {
     groupsContainer.setBeanIdProperty("name");
-    
+
+    progress = new ProgressBar();
+    progress.setCaption("Loading group list");
+    progress.setIndeterminate(true);
+    progress.setVisible(false);
 
     tblGroups.setContainerDataSource(groupsContainer);
     tblGroups.setEditable(true);
@@ -106,16 +112,18 @@ public class GroupManagementPanel extends Panel
       }
     });
 
-    HorizontalLayout actionLayout = new HorizontalLayout(txtGroupName,
+    actionLayout = new HorizontalLayout(txtGroupName,
       btAddNewGroup, btDeleteGroup);
     
-    VerticalLayout layout = new VerticalLayout(actionLayout, tblGroups);
+    VerticalLayout layout = new VerticalLayout(actionLayout, progress, tblGroups);
     layout.setSizeFull();
     layout.setExpandRatio(tblGroups, 1.0f);
+    layout.setExpandRatio(progress, 1.0f);
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(true, false, false, false));
     
     layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
     
     setContent(layout);
     setSizeFull();
@@ -159,7 +167,13 @@ public class GroupManagementPanel extends Panel
     }
   }
   
-  
+  @Override
+  public void setLoadingAnimation(boolean show)
+  {
+    progress.setVisible(show);
+    tblGroups.setVisible(!show);
+    actionLayout.setEnabled(!show);
+  }
 
 
   public class AddGroupHandler implements Action.Handler

@@ -76,7 +76,15 @@ public class UserController
       public void onSuccess(Boolean result)
       {
         view.setLoadingAnimation(false);
-        view.setUserList(model.getUsers());
+        if (result)
+        {
+          view.setUserList(model.getUsers());
+        }
+        else
+        {
+          uiView.showWarning("Cannot get the user list", null);
+          view.setUserList(new LinkedList<User>());
+        }
       }
 
       @Override

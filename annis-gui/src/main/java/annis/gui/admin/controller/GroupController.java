@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin.controller;
 
 import annis.gui.CriticalServiceQueryException;
@@ -25,10 +24,12 @@ import annis.gui.admin.view.UserListView;
 import annis.gui.admin.model.CorpusManagement;
 import annis.security.Group;
 import com.google.common.base.Joiner;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
+import java.util.concurrent.Callable;
 
 /**
  *
@@ -37,13 +38,19 @@ import java.util.TreeSet;
 public class GroupController implements GroupListView.Listener,
   UIView.Listener
 {
+
   private final GroupManagement model;
+
   private final CorpusManagement corpusModel;
+
   private final GroupListView view;
+
   private final UIView uiView;
+
   private final UserListView userView;
+
   private boolean isLoggedIn = false;
-  
+
   public GroupController(GroupManagement model,
     CorpusManagement corpusModel,
     GroupListView view, UIView uiView,
@@ -55,11 +62,11 @@ public class GroupController implements GroupListView.Listener,
     this.uiView = uiView;
     this.userView = userView;
     this.isLoggedIn = isLoggedIn;
-    
+
     this.view.addListener(GroupController.this);
     this.uiView.addListener(GroupController.this);
   }
-  
+
   private void clearModel()
   {
     model.clear();
@@ -69,35 +76,62 @@ public class GroupController implements GroupListView.Listener,
 
   private void fetchDataFromService()
   {
-    if(model.fetchFromService())
+    view.setLoadingAnimation(true);
+    uiView.runInBackground(new Callable<Boolean>()
     {
-      view.setGroupList(model.getGroups());
-    }
-    
-    else
+
+      @Override
+      public Boolean call() throws Exception
+      {
+        boolean result = model.fetchFromService();
+        corpusModel.fetchFromService();
+        return result;
+      }
+    }, new FutureCallback<Boolean>()
     {
-      uiView.showWarning("Cannot get the group list", null);
-      view.setGroupList(new LinkedList<Group>());
-    }
-    
-    try
-    {
-      corpusModel.fetchFromService();
-      view.addAvailableCorpusNames(corpusModel.getCorpusNames());
-    }
-    catch(CriticalServiceQueryException ex)
-    {
-      uiView.showWarning(ex.getMessage(), ex.getDescription());
-    }
-    catch (ServiceQueryException ex)
-    {
-      uiView.showInfo(ex.getMessage(), ex.getDescription());
-    }
-    
-    updateUserUI();
-    
+
+      @Override
+      public void onSuccess(Boolean result)
+      {
+        view.setLoadingAnimation(false);
+        if (result)
+        {
+          view.setGroupList(model.getGroups());
+        }
+        else
+        {
+          uiView.showWarning("Cannot get the group list", null);
+          view.setGroupList(new LinkedList<Group>());
+        }
+        
+        view.addAvailableCorpusNames(corpusModel.getCorpusNames());
+        
+        updateUserUI();
+      }
+
+      @Override
+      public void onFailure(Throwable ex)
+      {
+        view.setLoadingAnimation(false);
+        if(ex instanceof CriticalServiceQueryException)
+        {
+          uiView.showWarning(ex.getMessage(), ((CriticalServiceQueryException) ex).getDescription());
+        }
+        else if(ex instanceof ServiceQueryException)
+        {
+          uiView.showInfo(ex.getMessage(), ((ServiceQueryException)ex).getDescription());
+        }
+        else
+        {
+          uiView.showWarning("Cannot get the group list", ex.getMessage());
+          view.setGroupList(new LinkedList<Group>());
+        }
+        updateUserUI();
+      }
+    });
+
   }
-  
+
   private void updateUserUI()
   {
     Set<String> names = new TreeSet<>(model.getGroupNames());
@@ -111,7 +145,7 @@ public class GroupController implements GroupListView.Listener,
     this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
     corpusModel.setRootResource(annisRootResource);
-    if(isLoggedIn)
+    if (isLoggedIn)
     {
       fetchDataFromService();
     }
@@ -130,11 +164,11 @@ public class GroupController implements GroupListView.Listener,
   @Override
   public void addNewGroup(String groupName)
   {
-    if(groupName == null || groupName.isEmpty())
+    if (groupName == null || groupName.isEmpty())
     {
       uiView.showError("Group name is empty", null);
     }
-    else if(model.getGroup(groupName) != null)
+    else if (model.getGroup(groupName) != null)
     {
       uiView.showError("Group already exists", null);
     }
@@ -144,7 +178,7 @@ public class GroupController implements GroupListView.Listener,
       model.createOrUpdateGroup(g);
       view.setGroupList(model.getGroups());
       view.emptyNewGroupNameTextField();
-      
+
       updateUserUI();
     }
   }
@@ -152,34 +186,33 @@ public class GroupController implements GroupListView.Listener,
   @Override
   public void deleteGroups(Set<String> groupName)
   {
-    for(String g : groupName)
+    for (String g : groupName)
     {
       model.deleteGroup(g);
     }
     view.setGroupList(model.getGroups());
-    
-    if(groupName.size() == 1)
+
+    if (groupName.size() == 1)
     {
-      uiView.showInfo("Group \"" + groupName.iterator().next() +  "\" was deleted", null);
+      uiView.showInfo(
+        "Group \"" + groupName.iterator().next() + "\" was deleted", null);
     }
     else
     {
-      uiView.showInfo("Deleted groups: " + Joiner.on(", ").join(groupName), null);
+      uiView.
+        showInfo("Deleted groups: " + Joiner.on(", ").join(groupName), null);
     }
-    
+
     updateUserUI();
   }
 
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(isLoggedIn && selectedTab == view)
+    if (isLoggedIn && selectedTab == view)
     {
       fetchDataFromService();
     }
   }
-  
-  
-  
-  
+
 }
