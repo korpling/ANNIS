@@ -21,6 +21,7 @@ import annis.security.User;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -33,9 +34,9 @@ import org.slf4j.LoggerFactory;
  * A model that manages users.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserManagement
+public class UserManagement implements Serializable
 {
-  private WebResource rootResource;
+  private WebResourceProvider webResourceProvider;
 
   private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
   private final TreeSet<String> usedGroupNames = new TreeSet<>();
@@ -44,9 +45,10 @@ public class UserManagement
   
   public boolean createOrUpdateUser(User newUser)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users").path(newUser.getName());
+      WebResource res = webResourceProvider.getWebResource()
+        .path("admin/users").path(newUser.getName());
       try
       {
         res.put(newUser);
@@ -65,9 +67,10 @@ public class UserManagement
   
   public void deleteUser(String userName)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users").path(userName);
+      WebResource res = webResourceProvider.getWebResource()
+        .path("admin/users").path(userName);
       res.delete();
       users.remove(userName);
       updateUsedGroupNames();
@@ -76,12 +79,16 @@ public class UserManagement
   
   public User setPassword(String userName, String newPassword)
   {
+    User newUser = null;
 
-    WebResource res = rootResource.path("admin/users").path(userName).path("password");
-    User newUser = res.post(User.class, newPassword);
-    if(newUser != null)
+    if(webResourceProvider != null)
     {
-      users.put(newUser.getName(), newUser);
+      WebResource res = webResourceProvider.getWebResource().path("admin/users").path(userName).path("password");
+      newUser = res.post(User.class, newPassword);
+      if(newUser != null)
+      {
+        users.put(newUser.getName(), newUser);
+      }
     }
     return newUser;
 
@@ -95,9 +102,9 @@ public class UserManagement
   
   public boolean fetchFromService()
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/users");
+      WebResource res = webResourceProvider.getWebResource().path("admin/users");
       users.clear();
       usedGroupNames.clear();
       try
@@ -141,18 +148,17 @@ public class UserManagement
   {
     return usedGroupNames;
   }
-  
-  
-  
-  public WebResource getRootResource()
+
+  public WebResourceProvider getWebResourceProvider()
   {
-    return rootResource;
+    return webResourceProvider;
   }
 
-  public void setRootResource(WebResource rootResource)
+  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
   {
-    this.rootResource = rootResource;
+    this.webResourceProvider = webResourceProvider;
   }
+  
   
   
 }

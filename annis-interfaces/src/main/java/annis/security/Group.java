@@ -18,6 +18,7 @@ package annis.security;
 
 import annis.CaseSensitiveOrder;
 import com.google.common.base.Splitter;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
@@ -29,7 +30,7 @@ import javax.xml.bind.annotation.XmlRootElement;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @XmlRootElement
-public class Group
+public class Group implements Serializable
 {
   
   public static final String WILDCARD = "*";

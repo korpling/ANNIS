@@ -26,9 +26,11 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.view.UIView;
+import annis.gui.admin.model.WebResourceProvider;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
+import com.sun.jersey.api.client.AsyncWebResource;
 import com.sun.jersey.api.client.WebResource;
 import com.vaadin.navigator.View;
 import com.vaadin.navigator.ViewChangeListener;
@@ -48,46 +50,47 @@ import java.util.concurrent.Callable;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class AdminView extends VerticalLayout implements View,
-  UIView, LoginListener, TabSheet.SelectedTabChangeListener
+  UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider
 {
   
   public static final String NAME = "admin";
 
-  private UserController userController;
+  private final UserController userController;
 
-  private GroupController groupManagementController;
+  private final GroupController groupManagementController;
 
-  private CorpusController corpusController;
+  private final CorpusController corpusController;
 
   private final List<UIView.Listener> listeners = new LinkedList<>();
 
-  private TabSheet tabSheet;
+  private final TabSheet tabSheet;
 
-  private ImportPanel importPanel;
+  private final ImportPanel importPanel;
 
-  private CorpusAdminPanel corpusAdminPanel;
+  private final CorpusAdminPanel corpusAdminPanel;
 
-  private UserManagementPanel userManagementPanel;
+  private final UserManagementPanel userManagementPanel;
 
-  private GroupManagementPanel groupManagementPanel;
+  private final GroupManagementPanel groupManagementPanel;
 
   private final AnnisUI ui;
   
   private MainToolbar toolbar;
+  
+  private transient WebResource webResource;
+  private transient AsyncWebResource asyncWebResource;
 
   public AdminView(AnnisUI ui)
   {
     this.ui = ui;
     Page.getCurrent().setTitle("ANNIS Adminstration");
 
-    WebResource rootResource = Helper.getAnnisWebResource();
-
     UserManagement userManagement = new UserManagement();
-    userManagement.setRootResource(rootResource);
+    userManagement.setWebResourceProvider(AdminView.this);
     GroupManagement groupManagement = new GroupManagement();
-    groupManagement.setRootResource(rootResource);
+    groupManagement.setWebResourceProvider(AdminView.this);
     CorpusManagement corpusManagement = new CorpusManagement();
-    corpusManagement.setRootResource(rootResource);
+    corpusManagement.setWebResourceProvider(AdminView.this);
 
     boolean isLoggedIn = Helper.getUser() != null;
 
@@ -115,7 +118,7 @@ public class AdminView extends VerticalLayout implements View,
     
     tabSheet.setSizeFull();
 
-    tabSheet.addSelectedTabChangeListener(this);
+    tabSheet.addSelectedTabChangeListener(AdminView.this);
 
     addComponents(tabSheet);
     setSizeFull();
@@ -256,7 +259,7 @@ public class AdminView extends VerticalLayout implements View,
   {
     for (UIView.Listener l : listeners)
     {
-      l.loginChanged(Helper.getAnnisWebResource(), true);
+      l.loginChanged(true);
     }
     // TODO: make import panel a normal UI view listener
     if (importPanel != null)
@@ -270,7 +273,7 @@ public class AdminView extends VerticalLayout implements View,
   {
     for (UIView.Listener l : listeners)
     {
-      l.loginChanged(Helper.getAnnisWebResource(), false);
+      l.loginChanged(false);
     }
     // TODO: make import panel a normal UI view listener
     if (importPanel != null)
@@ -284,5 +287,36 @@ public class AdminView extends VerticalLayout implements View,
   {
     Background.runWithCallback(job, callback);
   }
+
+  @Override
+  public WebResource getWebResource()
+  {
+    if(webResource == null)
+    {
+      webResource = Helper.getAnnisWebResource();
+    }
+    return webResource;
+  }
+
+  @Override
+  public AsyncWebResource getAsyncWebResource()
+  {
+    if(asyncWebResource == null)
+    {
+      asyncWebResource = Helper.getAnnisAsyncWebResource();
+    }
+    return asyncWebResource;
+  }
+
+  @Override
+  public void invalidateWebResource()
+  {
+    asyncWebResource = null;
+    webResource = null;
+  }
+  
+  
+  
+  
 
 }

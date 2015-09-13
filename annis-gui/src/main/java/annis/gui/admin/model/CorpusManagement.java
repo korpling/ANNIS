@@ -17,7 +17,6 @@ package annis.gui.admin.model;
 
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;
-import annis.libgui.Helper;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableSet;
@@ -25,6 +24,7 @@ import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -37,12 +37,12 @@ import org.slf4j.LoggerFactory;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class CorpusManagement
+public class CorpusManagement implements Serializable
 {
 
   private final Map<String, AnnisCorpus> corpora = new TreeMap<>();
 
-  private WebResource rootResource;
+  private WebResourceProvider webResourceProvider;
 
   private final Logger log = LoggerFactory.getLogger(CorpusManagement.class);
 
@@ -53,13 +53,13 @@ public class CorpusManagement
   
   public void fetchFromService() throws CriticalServiceQueryException, ServiceQueryException
   {
-    if (rootResource != null)
+    if (webResourceProvider != null)
     {
       corpora.clear();
 
       try
       {
-        WebResource rootRes = Helper.getAnnisWebResource();
+        WebResource rootRes = webResourceProvider.getWebResource();
         List<AnnisCorpus> corporaList = rootRes.path("query").path("corpora")
           .get(new GenericType<List<AnnisCorpus>>()
             {
@@ -98,11 +98,11 @@ public class CorpusManagement
   public void delete(String corpusName)
     throws CriticalServiceQueryException, ServiceQueryException
   {
-    if (rootResource != null)
+    if (webResourceProvider != null)
     {
       try
       {
-        WebResource rootRes = Helper.getAnnisWebResource();
+        WebResource rootRes = webResourceProvider.getWebResource();
         rootRes.path("admin").path("corpora").path(corpusName).delete();
         corpora.remove(corpusName);
       }
@@ -147,14 +147,15 @@ public class CorpusManagement
     return ImmutableSet.copyOf(corpora.keySet());
   }
 
-  public WebResource getRootResource()
+  public WebResourceProvider getWebResourceProvider()
   {
-    return rootResource;
+    return webResourceProvider;
   }
 
-  public void setRootResource(WebResource rootResource)
+  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
   {
-    this.rootResource = rootResource;
+    this.webResourceProvider = webResourceProvider;
   }
 
+  
 }

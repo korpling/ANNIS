@@ -155,10 +155,13 @@ public class UserController
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
+  public void loginChanged(boolean isLoggedIn)
   {
     this.isLoggedIn = isLoggedIn;
-    model.setRootResource(annisRootResource);
+    if(model.getWebResourceProvider() != null)
+    {
+      model.getWebResourceProvider().invalidateWebResource();
+    }
     if (isLoggedIn)
     {
       fetchFromService();

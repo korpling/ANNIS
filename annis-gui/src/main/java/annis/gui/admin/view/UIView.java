@@ -17,7 +17,7 @@
 package annis.gui.admin.view;
 
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.concurrent.Callable;
 
 /**
@@ -25,7 +25,7 @@ import java.util.concurrent.Callable;
  * 
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public interface UIView
+public interface UIView extends Serializable
 {
   public void addListener(Listener listener);
   
@@ -43,9 +43,9 @@ public interface UIView
    */
   public<T> void runInBackground(Callable<T> job, FutureCallback<T> callback);
   
-  public interface Listener
+  public interface Listener extends Serializable
   {
-    public void loginChanged(WebResource annisRootResource, boolean isLoggedIn);
+    public void loginChanged(boolean isLoggedIn);
     public void selectedTabChanged(Object selectedTab);
   }
 }

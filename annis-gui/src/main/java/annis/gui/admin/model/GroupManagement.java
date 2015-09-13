@@ -22,6 +22,7 @@ import com.google.common.collect.ImmutableSet;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -30,16 +31,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- *
+ * A model for groups.
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class GroupManagement
+public class GroupManagement implements Serializable
 {
   
   private final Logger log = LoggerFactory.getLogger(GroupManagement.class);
   
   private final Map<String, Group> groups = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
-  private WebResource rootResource;
+  
+  private WebResourceProvider webResourceProvider;
   
   public void clear()
   {
@@ -48,9 +50,10 @@ public class GroupManagement
   
   public boolean fetchFromService()
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/groups");
+      WebResource res = webResourceProvider
+        .getWebResource().path("admin/groups");
       groups.clear();
       try
       {
@@ -71,9 +74,10 @@ public class GroupManagement
   
   public void createOrUpdateGroup(Group newGroup)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/groups").path(newGroup.getName());
+      WebResource res = webResourceProvider.getWebResource()
+        .path("admin/groups").path(newGroup.getName());
       try
       {
         res.put(newGroup);
@@ -89,9 +93,10 @@ public class GroupManagement
   
   public void deleteGroup(String groupName)
   {
-    if(rootResource != null)
+    if(webResourceProvider != null)
     {
-      WebResource res = rootResource.path("admin/groups").path(groupName);
+      WebResource res = webResourceProvider
+        .getWebResource().path("admin/groups").path(groupName);
       res.delete();
       groups.remove(groupName);
     }
@@ -112,17 +117,13 @@ public class GroupManagement
     return ImmutableSet.copyOf(groups.keySet());
   }
 
-  public WebResource getRootResource()
+  public WebResourceProvider getWebResourceProvider()
   {
-    return rootResource;
+    return webResourceProvider;
   }
 
-  public void setRootResource(WebResource rootResource)
+  public void setWebResourceProvider(WebResourceProvider webResourceProvider)
   {
-    this.rootResource = rootResource;
+    this.webResourceProvider = webResourceProvider;
   }
-  
-  
-  
-  
 }

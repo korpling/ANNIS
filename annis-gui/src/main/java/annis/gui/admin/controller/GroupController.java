@@ -26,6 +26,7 @@ import annis.security.Group;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.WebResource;
+import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Set;
 import java.util.TreeSet;
@@ -36,7 +37,7 @@ import java.util.concurrent.Callable;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GroupController implements GroupListView.Listener,
-  UIView.Listener
+  UIView.Listener, Serializable
 {
 
   private final GroupManagement model;
@@ -140,11 +141,17 @@ public class GroupController implements GroupListView.Listener,
   }
 
   @Override
-  public void loginChanged(WebResource annisRootResource, boolean isLoggedIn)
+  public void loginChanged(boolean isLoggedIn)
   {
     this.isLoggedIn = isLoggedIn;
-    model.setRootResource(annisRootResource);
-    corpusModel.setRootResource(annisRootResource);
+    if(model.getWebResourceProvider() != null)
+    {
+      model.getWebResourceProvider().invalidateWebResource();
+    }
+    if(corpusModel.getWebResourceProvider() != null)
+    {
+      corpusModel.getWebResourceProvider().invalidateWebResource();
+    }
     if (isLoggedIn)
     {
       fetchDataFromService();
