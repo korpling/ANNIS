@@ -104,8 +104,8 @@ public class AnnisUI extends CommonUI
     queryController = new QueryController(searchView, AnnisUI.this);
     
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
-    nav.addView("", searchView);
-    nav.addView("admin", adminView);
+    nav.addView(SearchView.NAME, searchView);
+    nav.addView(AdminView.NAME, adminView);
     nav.addViewChangeListener(AnnisUI.this);
     loadInstanceFonts();
     

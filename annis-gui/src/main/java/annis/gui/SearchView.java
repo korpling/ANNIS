@@ -93,6 +93,8 @@ public class SearchView extends GridLayout implements View,
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchView.class);
+  
+  public static final String NAME = "";
 
   static final Exporter[] EXPORTER = new Exporter[]
   {

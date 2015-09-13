@@ -48,6 +48,8 @@ import java.util.List;
 public class AdminView extends VerticalLayout implements View,
   UIView, LoginListener, TabSheet.SelectedTabChangeListener
 {
+  
+  public static final String NAME = "admin";
 
   private UserController userController;
 
@@ -195,26 +197,27 @@ public class AdminView extends VerticalLayout implements View,
     {
       l.selectedTabChanged(selected);
     }
-
-    // TODO: change view parameter
-    /*
-     if(selected == importPanel)
-     {
-     getPage().setUriFragment("import", false);
-     }
-     else if(selected == corpusAdminPanel)
-     {
-     getPage().setUriFragment("corpora", false);
-     }
-     else if(selected == userManagementPanel)
-     {
-     getPage().setUriFragment("users", false);
-     }
-     else if(selected == groupManagementPanel)
-     {
-     getPage().setUriFragment("groups", false);
-     }
-     */
+    if (selected == importPanel)
+    {
+      setFragmentParameter("import");
+    }
+    else if (selected == corpusAdminPanel)
+    {
+      setFragmentParameter("corpora");
+    }
+    else if (selected == userManagementPanel)
+    {
+      setFragmentParameter("users");
+    }
+    else if (selected == groupManagementPanel)
+    {
+      setFragmentParameter("groups");
+    }
+  }
+  
+  private void setFragmentParameter(String param)
+  {
+    Page.getCurrent().setUriFragment("!" + NAME +"/" + param, false);
   }
 
   @Override
