@@ -67,7 +67,7 @@ public class SpecificPagingCallback implements PagingCallback
       searchView.getControlPanel().getQueryPanel().getPiCount().setVisible(true);
       searchView.getControlPanel().getQueryPanel().getPiCount().setEnabled(true);
       Future<?> future = Background.run(new ResultFetchJob(newQuery, panel, ui));
-      searchView.getQueryState().getExecutedTasks().
+      ui.getQueryState().getExecutedTasks().
         put(QueryUIState.QueryType.FIND, future);
     }
   }

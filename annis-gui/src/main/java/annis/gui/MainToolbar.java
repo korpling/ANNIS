@@ -627,4 +627,16 @@ public class MainToolbar extends HorizontalLayout
 
   }
 
+  public Sidebar getSidebar()
+  {
+    return sidebar;
+  }
+
+  public void setSidebar(Sidebar sidebar)
+  {
+    this.sidebar = sidebar;
+  }
+  
+  
+
 }

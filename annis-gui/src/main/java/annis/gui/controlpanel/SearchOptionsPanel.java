@@ -210,7 +210,7 @@ public class SearchOptionsPanel extends FormLayout
     {
       AnnisUI ui = (AnnisUI) getUI();
      
-      QueryUIState state = ui.getSearchView().getQueryState();
+      QueryUIState state = ui.getQueryState();
       
       cbLeftContext.setPropertyDataSource(state.getLeftContext());
       cbRightContext.setPropertyDataSource(state.getRightContext());

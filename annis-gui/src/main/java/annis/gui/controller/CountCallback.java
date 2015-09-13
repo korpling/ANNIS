@@ -56,7 +56,7 @@ public class CountCallback implements Runnable
   @Override
   public void run()
   {
-    Future futureCount = ui.getSearchView().getQueryState().getExecutedTasks().
+    Future futureCount = ui.getQueryState().getExecutedTasks().
       get(QueryUIState.QueryType.COUNT);
     final MatchAndDocumentCount countResult;
     MatchAndDocumentCount tmpCountResult = null;
@@ -86,7 +86,7 @@ public class CountCallback implements Runnable
       {
         countResult = tmpCountResult;
       }
-      ui.getSearchView().getQueryState().getExecutedTasks().
+      ui.getQueryState().getExecutedTasks().
         remove(QueryUIState.QueryType.COUNT);
       final UniformInterfaceException causeFinal = cause;
       ui.accessSynchronously(new Runnable()

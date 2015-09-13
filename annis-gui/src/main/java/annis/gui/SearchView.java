@@ -27,22 +27,17 @@ import annis.gui.exporter.WekaExporter;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.objects.Query;
-import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
-import static annis.libgui.Helper.DEFAULT_CONFIG;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaControllerImpl;
 import annis.libgui.media.MimeTypeErrorListener;
 import annis.libgui.media.PDFController;
 import annis.libgui.media.PDFControllerImpl;
 import annis.service.objects.AnnisCorpus;
-import annis.service.objects.CorpusConfig;
 import annis.service.objects.OrderType;
 import com.google.common.base.Strings;
-import com.google.common.cache.Cache;
-import com.google.common.cache.CacheBuilder;
 import com.google.common.escape.Escaper;
 import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
@@ -111,8 +106,6 @@ public class SearchView extends GridLayout implements View,
   private final static Escaper urlPathEscape = UrlEscapers.
     urlPathSegmentEscaper();
 
-  private transient Cache<String, CorpusConfig> corpusConfigCache;
-
   // regular expression matching, CLEFT and CRIGHT are optional
   // indexes: AQL=1, CIDS=2, CLEFT=4, CRIGHT=6
   private final Pattern citationPattern
@@ -126,46 +119,23 @@ public class SearchView extends GridLayout implements View,
   private TabSheet mainTab;
 
   private String lastQueriedFragment;
- 
+
   private DocBrowserController docBrowserController;
 
   private Set<Component> selectedTabHistory;
 
   public final static int CONTROL_PANEL_WIDTH = 360;
 
-  private final QueryUIState queryState = new QueryUIState();
-
   private final AnnisUI ui;
-  
+
   public SearchView(AnnisUI ui)
   {
     super(2, 2);
-    initTransients();
     this.ui = ui;
-  }
-
-  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
-  {
-    in.defaultReadObject();
-    initTransients();
-  }
-
-  private void initTransients()
-  {
-    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
-  }
-
-  @Override
-  public void enter(ViewChangeListener.ViewChangeEvent event)
-  {
     this.selectedTabHistory = new LinkedHashSet<>();
-    
-
-    Page.getCurrent().setTitle(
-      ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
     // init a doc browser controller
-    docBrowserController = new DocBrowserController(ui);
+    this.docBrowserController = new DocBrowserController(ui);
 
     // always get the resize events directly
     setImmediate(true);
@@ -176,28 +146,26 @@ public class SearchView extends GridLayout implements View,
     setColumnExpandRatio(1, 1.0f);
 
     ui.getToolbar().addLoginListener(SearchView.this);
-    
-    addComponent(ui.getToolbar(), 0, 0, 1, 0);
 
-    final HelpPanel help = new HelpPanel(SearchView.this, ui.getQueryController());
+    final HelpPanel help = new HelpPanel(SearchView.this, ui.
+      getQueryController());
 
     mainTab = new TabSheet();
     mainTab.setSizeFull();
-    mainTab.setCloseHandler(this);
+    mainTab.setCloseHandler(SearchView.this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
-    mainTab.addSelectedTabChangeListener(this);
-
+    mainTab.addSelectedTabChangeListener(SearchView.this);
+    
     TabSheet.Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
-    controlPanel = new ControlPanel(ui.getQueryController(), ui.getInstanceConfig(),
+
+    controlPanel = new ControlPanel(ui.
+      getInstanceConfig(),
       help.getExamples(), ui);
 
     controlPanel.setWidth(CONTROL_PANEL_WIDTH, Layout.Unit.PIXELS);
     controlPanel.setHeight(100f, Layout.Unit.PERCENTAGE);
-
-    addComponent(controlPanel, 0, 1);
-    addComponent(mainTab, 1, 1);
 
     ui.addAction(new ShortcutListener("Tutor^eial")
     {
@@ -207,6 +175,22 @@ public class SearchView extends GridLayout implements View,
         mainTab.setSelectedTab(help);
       }
     });
+
+    
+
+    addComponent(ui.getToolbar(), 0, 0, 1, 0);
+    addComponent(controlPanel, 0, 1);
+    addComponent(mainTab, 1, 1);
+  }
+
+  
+
+  @Override
+  public void enter(ViewChangeListener.ViewChangeEvent event)
+  {
+
+    Page.getCurrent().setTitle(
+      ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
 
     Page.getCurrent().addUriFragmentChangedListener(this);
 
@@ -222,46 +206,6 @@ public class SearchView extends GridLayout implements View,
     Background.run(new VersionChecker());
     evaluateFragment(event.getParameters());
   }
-
-
-  /**
-   * Get a cached version of the {@link CorpusConfig} for a corpus.
-   *
-   * @param corpus
-   * @return
-   */
-  public CorpusConfig getCorpusConfigWithCache(String corpus)
-  {
-    CorpusConfig config = new CorpusConfig();
-    if (corpusConfigCache != null)
-    {
-      config = corpusConfigCache.getIfPresent(corpus);
-      if (config == null)
-      {
-        if (corpus.equals(DEFAULT_CONFIG))
-        {
-          config = Helper.getDefaultCorpusConfig();
-        }
-        else
-        {
-          config = Helper.getCorpusConfig(corpus);
-        }
-
-        corpusConfigCache.put(corpus, config);
-      }
-    }
-
-    return config;
-  }
-
-  public void clearCorpusConfigCache()
-  {
-    if (corpusConfigCache != null)
-    {
-      corpusConfigCache.invalidateAll();
-    }
-  }
-
 
   public void checkCitation()
   {
@@ -436,7 +380,6 @@ public class SearchView extends GridLayout implements View,
   {
     return controlPanel;
   }
-
 
   public TabSheet getMainTab()
   {
@@ -760,13 +703,6 @@ public class SearchView extends GridLayout implements View,
   {
     return docBrowserController;
   }
-
-  public QueryUIState getQueryState()
-  {
-    return queryState;
-  }
-
-  
 
   private class VersionChecker implements Runnable
   {

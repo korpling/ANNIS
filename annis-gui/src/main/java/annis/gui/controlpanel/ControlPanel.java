@@ -17,7 +17,6 @@ package annis.gui.controlpanel;
 
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
 import annis.gui.AnnisUI;
 import com.vaadin.ui.*;
 import com.vaadin.ui.TabSheet.Tab;
@@ -47,7 +46,7 @@ public class ControlPanel extends VerticalLayout
   private AnnisUI ui;
 
 
-  public ControlPanel(QueryController controller, InstanceConfig instanceConfig,
+  public ControlPanel(InstanceConfig instanceConfig,
     ExampleQueriesPanel autoGenQueries, AnnisUI ui)
   {
     this.ui = ui;
@@ -66,7 +65,7 @@ public class ControlPanel extends VerticalLayout
     optionsTab.setWidth("100%");
     optionsTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
-    corpusList = new CorpusListPanel(controller, instanceConfig, autoGenQueries, ui);
+    corpusList = new CorpusListPanel(instanceConfig, autoGenQueries, ui);
     
     searchOptions = new SearchOptionsPanel();
 

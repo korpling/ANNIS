@@ -338,7 +338,7 @@ public class DocBrowserController implements Serializable
   {
     if (ui != null)
     {
-      CorpusConfig corpusConfig = ui.getSearchView().getCorpusConfigWithCache(id);
+      CorpusConfig corpusConfig = ui.getCorpusConfigWithCache(id);
 
       if (corpusConfig != null)
       {
@@ -351,7 +351,7 @@ public class DocBrowserController implements Serializable
         // get the default config
         else
         {
-          corpusConfig = ui.getSearchView().getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
+          corpusConfig = ui.getCorpusConfigWithCache(Helper.DEFAULT_CONFIG);
           boolean browseDocuments = Boolean.parseBoolean(
             corpusConfig.getConfig("browse-documents", "true"));
           return browseDocuments;

@@ -135,7 +135,7 @@ public class ResultViewPanel extends VerticalLayout implements
     this.tokenAnnoVisible = new TreeMap<>();
     this.ps = ps;
     this.controller = ui.getQueryController();
-    this.selectedSegmentationLayer = ui.getSearchView().getQueryState().getBaseText().getValue();
+    this.selectedSegmentationLayer = ui.getQueryState().getBaseText().getValue();
     this.initialQuery = initialQuery;
     
     cacheResolver

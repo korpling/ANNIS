@@ -94,7 +94,7 @@ public class QueryController implements Serializable
   {
     this.searchView = searchView;
     this.ui = ui;
-    this.state = searchView.getQueryState();
+    this.state = ui.getQueryState();
 
     this.state.getAql().addValueChangeListener(
       new Property.ValueChangeListener()
@@ -591,7 +591,7 @@ public class QueryController implements Serializable
 
   public QueryUIState getState()
   {
-    return searchView.getQueryState();
+    return ui.getQueryState();
   }
 
 }

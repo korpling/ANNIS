@@ -17,17 +17,24 @@ package annis.gui;
 
 import annis.gui.components.ExceptionDialog;
 import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
+import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
+import annis.libgui.Helper;
 import static annis.libgui.Helper.CORPUS_FONT;
 import static annis.libgui.Helper.CORPUS_FONT_FORCE;
+import static annis.libgui.Helper.DEFAULT_CONFIG;
 import annis.libgui.InstanceConfig;
+import annis.service.objects.CorpusConfig;
+import com.google.common.cache.Cache;
+import com.google.common.cache.CacheBuilder;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
+import java.io.IOException;
 import java.util.Map;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
@@ -48,11 +55,15 @@ public class AnnisUI extends CommonUI
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     AnnisUI.class);
 
+  private transient Cache<String, CorpusConfig> corpusConfigCache;
+  
   private InstanceConfig instanceConfig;
   
-  private final QueryController queryController;
-  private final SearchView searchView;
-  private final AdminView adminView;
+  private final QueryUIState queryState = new QueryUIState();
+  
+  private QueryController queryController;
+  private SearchView searchView;
+  private AdminView adminView;
   
   private Navigator nav;
   
@@ -63,10 +74,18 @@ public class AnnisUI extends CommonUI
   
   public AnnisUI()
   {
-    searchView = new SearchView(AnnisUI.this);
-    adminView = new AdminView();
-    queryController = new QueryController(searchView, AnnisUI.this);
-    
+    initTransients();
+  }
+  
+  private void readObject(java.io.ObjectInputStream in) throws IOException, ClassNotFoundException
+  {
+    in.defaultReadObject();
+    initTransients();
+  }
+
+  private void initTransients()
+  {
+    corpusConfigCache = CacheBuilder.newBuilder().maximumSize(250).build();
   }
 
   @Override
@@ -75,14 +94,21 @@ public class AnnisUI extends CommonUI
     super.init(request);
     setErrorHandler(this);
     
+    this.instanceConfig = getInstanceConfig(request);
+    
+    toolbar = new MainToolbar(null);
+    
+    searchView = new SearchView(AnnisUI.this);
+    adminView = new AdminView();
+    queryController = new QueryController(searchView, AnnisUI.this);
+    
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
     nav.addView("", searchView);
     nav.addView("admin", adminView);
     
-    this.instanceConfig = getInstanceConfig(request);
     loadInstanceFonts();
     
-    toolbar = new MainToolbar(null);
+    toolbar.setSidebar(searchView);
     
     addExtension(toolbar.getScreenshotExtension());
   }
@@ -236,6 +262,44 @@ public class AnnisUI extends CommonUI
     pluginManager.addPluginsFrom(new ClassURI(ResourceServlet.class).toURI());
   }
   
+  /**
+   * Get a cached version of the {@link CorpusConfig} for a corpus.
+   *
+   * @param corpus
+   * @return
+   */
+  public CorpusConfig getCorpusConfigWithCache(String corpus)
+  {
+    CorpusConfig config = new CorpusConfig();
+    if (corpusConfigCache != null)
+    {
+      config = corpusConfigCache.getIfPresent(corpus);
+      if (config == null)
+      {
+        if (corpus.equals(DEFAULT_CONFIG))
+        {
+          config = Helper.getDefaultCorpusConfig();
+        }
+        else
+        {
+          config = Helper.getCorpusConfig(corpus);
+        }
+
+        corpusConfigCache.put(corpus, config);
+      }
+    }
+
+    return config;
+  }
+  
+  public void clearCorpusConfigCache()
+  {
+    if (corpusConfigCache != null)
+    {
+      corpusConfigCache.invalidateAll();
+    }
+  }
+  
   public FontConfig getInstanceFont()
   {
     if (instanceConfig != null && instanceConfig.getFont() != null)
@@ -264,6 +328,11 @@ public class AnnisUI extends CommonUI
   public MainToolbar getToolbar()
   {
     return toolbar;
+  }
+
+  public QueryUIState getQueryState()
+  {
+    return queryState;
   }
   
   

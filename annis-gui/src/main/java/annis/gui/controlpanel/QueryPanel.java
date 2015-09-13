@@ -19,6 +19,7 @@ import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
 import annis.gui.QueryController;
 import annis.gui.AnnisUI;
+import annis.gui.SearchView;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -67,7 +68,6 @@ public class QueryPanel extends GridLayout implements
   //private Button btShowResultNewTab;
   private PopupButton btHistory;
   private final ListSelect lstHistory;
-  private QueryController controller;
   private final QueryUIState state;
   private ProgressBar piCount;
   private String lastPublicStatus;
@@ -75,18 +75,20 @@ public class QueryPanel extends GridLayout implements
   private PopupButton btMoreActions;
   private FrequencyQueryPanel frequencyPanel;
   
+  private final AnnisUI ui;
+  
   private final BeanItemContainer<Query> historyContainer =
     new BeanItemContainer<>(Query.class);;
   
   public QueryPanel(final AnnisUI ui)
   {
     super(4,5);
+    this.ui = ui;
     
-    this.controller = ui.getQueryController();
     this.lastPublicStatus = "Welcome to ANNIS! "
       + "A tutorial is available on the right side.";
 
-    this.state = ui.getSearchView().getQueryState();
+    this.state = ui.getQueryState();
     
     setSpacing(true);
     setMargin(false);
@@ -359,9 +361,9 @@ public class QueryPanel extends GridLayout implements
   {
     btHistory.setPopupVisible(false);
     Object q = event.getProperty().getValue();
-    if(controller != null && q instanceof Query)
+    if(ui != null && ui.getQueryController() != null && q instanceof Query)
     {
-      controller.setQuery((Query) q);
+      ui.getQueryController().setQuery((Query) q);
     }
   }
 
@@ -371,9 +373,9 @@ public class QueryPanel extends GridLayout implements
     @Override
     public void buttonClick(ClickEvent event)
     {
-      if(controller != null)
+      if(ui != null && ui.getQueryController() != null)
       {
-        controller.executeSearch(true, true);
+        ui.getQueryController().executeSearch(true, true);
       }
     }
   }
