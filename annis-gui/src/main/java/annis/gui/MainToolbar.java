@@ -28,6 +28,7 @@ import annis.libgui.Helper;
 import annis.libgui.LoginDataLostException;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.validator.EmailValidator;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -68,6 +69,9 @@ public class MainToolbar extends HorizontalLayout
     MainToolbar.class);
 
   private Button btSidebar;
+  
+  private Button btNavigate;
+  private String navigationTarget;
 
   private final Button btLogin;
 
@@ -153,7 +157,19 @@ public class MainToolbar extends HorizontalLayout
       }
     });
     btBugReport.setVisible(this.bugEMailAddress != null);
+    
+    btNavigate = new Button("Administration", FontAwesome.WRENCH);
+    btNavigate.setVisible(false);
+    btNavigate.addClickListener(new Button.ClickListener()
+    {
 
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        UI.getCurrent().getNavigator().navigateTo(
+          navigationTarget == null ? "" : navigationTarget);
+      }
+    });
     lblUserName = new Label("not logged in");
     lblUserName.setWidth("-1px");
     lblUserName.setHeight("-1px");
@@ -243,11 +259,15 @@ public class MainToolbar extends HorizontalLayout
 
     addComponent(btAboutAnnis);
     addComponent(btBugReport);
+    addComponent(btNavigate);
+    
     addComponent(btOpenSource);
 
     setSpacing(true);
     setComponentAlignment(btAboutAnnis, Alignment.MIDDLE_LEFT);
     setComponentAlignment(btBugReport, Alignment.MIDDLE_LEFT);
+    setComponentAlignment(btNavigate, Alignment.MIDDLE_LEFT);
+    
     setComponentAlignment(btOpenSource, Alignment.MIDDLE_CENTER);
     setExpandRatio(btOpenSource, 1.0f);
 
@@ -341,6 +361,24 @@ public class MainToolbar extends HorizontalLayout
     }
     
     super.detach();
+  }
+  
+  public void setNavigationTarget(String navigationTarget, String caption, Resource icon)
+  {
+    if(caption == null || navigationTarget == null)
+    {
+      btNavigate.setVisible(false);
+      this.navigationTarget = null;
+    }
+    else
+    {
+      this.navigationTarget = navigationTarget;
+      btNavigate.setVisible(true);
+      btNavigate.setCaption(caption);
+      btNavigate.setIcon(icon);
+    }
+    
+    
   }
 
   private void updateSidebarState()

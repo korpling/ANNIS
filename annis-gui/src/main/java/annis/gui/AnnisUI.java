@@ -33,6 +33,7 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
+import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import java.io.IOException;
@@ -125,10 +126,18 @@ public class AnnisUI extends CommonUI
     {
       searchView.setToolbar(toolbar);
       toolbar.setSidebar(searchView);
+      
+      toolbar.setNavigationTarget(AdminView.NAME, "Administration", FontAwesome.WRENCH);
     }
     else if(event.getNewView() == adminView)
     {
       adminView.setToolbar(toolbar);
+      
+      toolbar.setNavigationTarget(SearchView.NAME, "Search interface", FontAwesome.SEARCH);
+    }
+    else
+    {
+      toolbar.setNavigationTarget(null, null, null);
     }
     
     return true;
