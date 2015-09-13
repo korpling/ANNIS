@@ -30,7 +30,6 @@ import annis.libgui.LoginDataLostException;
 import annis.security.User;
 import com.google.common.eventbus.Subscribe;
 import com.vaadin.data.validator.EmailValidator;
-import com.vaadin.navigator.Navigator;
 import com.vaadin.server.DeploymentConfiguration;
 import com.vaadin.server.ExternalResource;
 import com.vaadin.server.FontAwesome;
@@ -51,7 +50,6 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
-import java.awt.Color;
 import java.util.LinkedList;
 import java.util.List;
 import org.json.JSONException;
@@ -94,7 +92,7 @@ public class MainToolbar extends HorizontalLayout
 
   private Button btSidebar;
 
-  private Button btNavigate;
+  private final Button btNavigate;
 
   private NavigationTarget navigationTarget;
 
@@ -185,12 +183,14 @@ public class MainToolbar extends HorizontalLayout
 
     btNavigate = new Button();
     btNavigate.setVisible(false);
+    btNavigate.setDisableOnClick(true);
     btNavigate.addClickListener(new Button.ClickListener()
     {
 
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
+        btNavigate.setEnabled(true);
         if (navigationTarget != null)
         {
           UI.getCurrent().getNavigator().navigateTo(navigationTarget.state);
