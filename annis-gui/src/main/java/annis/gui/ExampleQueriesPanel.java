@@ -106,7 +106,7 @@ public class ExampleQueriesPanel extends CssLayout
     egContainer = new BeanItemContainer<>(ExampleQuery.class);
     table.setContainerDataSource(egContainer);
     addComponent(table);
-    
+
     setUpTable();
   }
 
@@ -165,7 +165,6 @@ public class ExampleQueriesPanel extends CssLayout
     table.setColumnHeader(table.getVisibleColumns()[2], "open corpus browser");
 
   }
-
 
   /**
    * Add items if there are any and put the example query tab in the foreground.
@@ -228,7 +227,8 @@ public class ExampleQueriesPanel extends CssLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        CorpusListPanel corpusList = ui.getSearchView().getControlPanel().getCorpusList();
+        CorpusListPanel corpusList = ui.getSearchView().getControlPanel().
+          getCorpusList();
         corpusList.initCorpusBrowser(corpusName, btn);
       }
     });
@@ -295,7 +295,9 @@ public class ExampleQueriesPanel extends CssLayout
   {
 
     private final Set<String> selectedCorpora;
+
     private UI ui;
+
     public ExampleFetcher(Set<String> selectedCorpora, UI ui)
     {
       this.selectedCorpora = selectedCorpora;
@@ -359,28 +361,32 @@ public class ExampleQueriesPanel extends CssLayout
         @Override
         public void buttonClick(Button.ClickEvent event)
         {
-          ControlPanel controlPanel = ui.getSearchView().getControlPanel();
-          QueryPanel queryPanel;
-
-          if (controlPanel == null)
+          if (ui != null)
           {
-            log.error("controlPanel is not initialized");
-            return;
-          }
+            ControlPanel controlPanel = ui.getSearchView().getControlPanel();
+            QueryPanel queryPanel;
 
-          queryPanel = controlPanel.getQueryPanel();
-          if (queryPanel == null)
-          {
-            log.error("queryPanel is not initialized");
-            return;
-          }
+            if (controlPanel == null)
+            {
+              log.error("controlPanel is not initialized");
+              return;
+            }
 
-          Set<String> corpusNameSet = new HashSet<>();
-          corpusNameSet.add(eQ.getCorpusName());
-          if (ui != null && ui.getQueryController() != null)
-          {
-            ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(), corpusNameSet));
-            ui.getQueryController().executeSearch(true, true);
+            queryPanel = controlPanel.getQueryPanel();
+            if (queryPanel == null)
+            {
+              log.error("queryPanel is not initialized");
+              return;
+            }
+
+            Set<String> corpusNameSet = new HashSet<>();
+            corpusNameSet.add(eQ.getCorpusName());
+            if (ui.getQueryController() != null)
+            {
+              ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(),
+                corpusNameSet));
+              ui.getQueryController().executeSearch(true, true);
+            }
           }
         }
       });
