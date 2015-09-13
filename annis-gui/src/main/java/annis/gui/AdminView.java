@@ -52,7 +52,7 @@ import java.util.concurrent.Callable;
 public class AdminView extends VerticalLayout implements View,
   UIView, LoginListener, TabSheet.SelectedTabChangeListener, WebResourceProvider
 {
-  
+
   public static final String NAME = "admin";
 
   private final UserController userController;
@@ -73,16 +73,14 @@ public class AdminView extends VerticalLayout implements View,
 
   private final GroupManagementPanel groupManagementPanel;
 
-  private final AnnisUI ui;
-  
   private MainToolbar toolbar;
-  
+
   private transient WebResource webResource;
+
   private transient AsyncWebResource asyncWebResource;
 
   public AdminView(AnnisUI ui)
   {
-    this.ui = ui;
     Page.getCurrent().setTitle("ANNIS Adminstration");
 
     UserManagement userManagement = new UserManagement();
@@ -114,32 +112,32 @@ public class AdminView extends VerticalLayout implements View,
     tabSheet.addTab(corpusAdminPanel, "Corpus management", FontAwesome.LIST_ALT);
     tabSheet.addTab(userManagementPanel, "User management", FontAwesome.USER);
     tabSheet.addTab(groupManagementPanel, "Group management",
-        FontAwesome.USERS);
-    
+      FontAwesome.USERS);
+
     tabSheet.setSizeFull();
 
     tabSheet.addSelectedTabChangeListener(AdminView.this);
 
     addComponents(tabSheet);
     setSizeFull();
-    
+
     setExpandRatio(tabSheet, 1.0f);
 
     tabSheet.addStyleName(ValoTheme.TABSHEET_FRAMED);
 
   }
-  
+
   public void setToolbar(MainToolbar newToolbar)
   {
     // remove old one if necessary
-    if(this.toolbar != null)
+    if (this.toolbar != null)
     {
       removeComponent(this.toolbar);
       this.toolbar = null;
     }
-    
+
     // add new toolbar
-    if(newToolbar != null)
+    if (newToolbar != null)
     {
       this.toolbar = newToolbar;
       addComponent(this.toolbar, 0);
@@ -156,40 +154,52 @@ public class AdminView extends VerticalLayout implements View,
       getSession().getConfiguration().getInitParameters()
       .getProperty("kickstarterEnvironment",
         "false"));
-    
+
     importPanel.updateMode(kickstarter, Helper.getUser() != null);
-    
+
     // group and user management are not applicable in kickstarter
     tabSheet.getTab(groupManagementPanel).setVisible(!kickstarter);
     tabSheet.getTab(userManagementPanel).setVisible(!kickstarter);
-    
-    selectTabFromFragment(event.getParameters());
+
+    Component selectedTab = getComponentForFragment(event.getParameters());
+    if(selectedTab != null && selectedTab != tabSheet.getSelectedTab())
+    {
+      // Select the component given by the fragment, This will call
+      // the selection change handler and thus we don't have
+      // to call the listeners here. 
+      tabSheet.setSelectedTab(selectedTab);
+    }
+    else
+    {
+      // nothing to change in the tab selection, call the listeners manually
+      selectedTab = tabSheet.getSelectedTab();
+      for (UIView.Listener l : listeners)
+      {
+        l.loadedTab(selectedTab);
+      } 
+    }
 
   }
 
-  private void selectTabFromFragment(String fragment)
+  private Component getComponentForFragment(String fragment)
   {
-    if (fragment == null)
+    if (fragment != null)
     {
-      return;
+      switch (fragment)
+      {
+        case "import":
+          return importPanel;
+        case "corpora":
+          return corpusAdminPanel;
+        case "users":
+          return userManagementPanel;
+        case "groups":
+          return groupManagementPanel;
+        default:
+          break;
+      }
     }
-    switch (fragment)
-    {
-      case "import":
-        tabSheet.setSelectedTab(importPanel);
-        break;
-      case "corpora":
-        tabSheet.setSelectedTab(corpusAdminPanel);
-        break;
-      case "users":
-        tabSheet.setSelectedTab(userManagementPanel);
-        break;
-      case "groups":
-        tabSheet.setSelectedTab(groupManagementPanel);
-        break;
-      default:
-        break;
-    }
+    return null;
   }
 
   @Override
@@ -199,7 +209,7 @@ public class AdminView extends VerticalLayout implements View,
 
     for (UIView.Listener l : listeners)
     {
-      l.selectedTabChanged(selected);
+      l.loadedTab(selected);
     }
     if (selected == importPanel)
     {
@@ -218,10 +228,10 @@ public class AdminView extends VerticalLayout implements View,
       setFragmentParameter("groups");
     }
   }
-  
+
   private void setFragmentParameter(String param)
   {
-    Page.getCurrent().setUriFragment("!" + NAME +"/" + param, false);
+    Page.getCurrent().setUriFragment("!" + NAME + "/" + param, false);
   }
 
   @Override
@@ -283,7 +293,8 @@ public class AdminView extends VerticalLayout implements View,
   }
 
   @Override
-  public <T> void runInBackground(Callable<T> job, final FutureCallback<T> callback)
+  public <T> void runInBackground(Callable<T> job,
+    final FutureCallback<T> callback)
   {
     Background.runWithCallback(job, callback);
   }
@@ -291,7 +302,7 @@ public class AdminView extends VerticalLayout implements View,
   @Override
   public WebResource getWebResource()
   {
-    if(webResource == null)
+    if (webResource == null)
     {
       webResource = Helper.getAnnisWebResource();
     }
@@ -301,7 +312,7 @@ public class AdminView extends VerticalLayout implements View,
   @Override
   public AsyncWebResource getAsyncWebResource()
   {
-    if(asyncWebResource == null)
+    if (asyncWebResource == null)
     {
       asyncWebResource = Helper.getAnnisAsyncWebResource();
     }
@@ -314,9 +325,5 @@ public class AdminView extends VerticalLayout implements View,
     asyncWebResource = null;
     webResource = null;
   }
-  
-  
-  
-  
 
 }

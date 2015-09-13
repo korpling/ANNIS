@@ -173,7 +173,7 @@ public class UserController
   }
 
   @Override
-  public void selectedTabChanged(Object selectedTab)
+  public void loadedTab(Object selectedTab)
   {
     if (isLoggedIn && selectedTab == view)
     {

@@ -109,6 +109,9 @@ public class AnnisUI extends CommonUI
     adminView = new AdminView(AnnisUI.this);
     queryController = new QueryController(searchView, AnnisUI.this);
 
+    toolbar.addLoginListener(searchView);
+    toolbar.addLoginListener(adminView);
+    
     nav = new Navigator(AnnisUI.this, AnnisUI.this);
     nav.addView(SearchView.NAME, searchView);
     nav.addView(AdminView.NAME, adminView);

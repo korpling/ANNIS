@@ -219,7 +219,6 @@ public class SearchView extends GridLayout implements View,
     {
       this.toolbar = newToolbar;
       addComponent(this.toolbar, 0, 0, 1, 0);
-      this.toolbar.addLoginListener(this);
     }
   }
 

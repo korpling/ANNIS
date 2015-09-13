@@ -50,6 +50,7 @@ import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
+import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
 import org.json.JSONException;
@@ -110,7 +111,7 @@ public class MainToolbar extends HorizontalLayout
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
-  private final List<LoginListener> loginListeners = new LinkedList<>();
+  private final LinkedHashSet<LoginListener> loginListeners = new LinkedHashSet<>();
 
   private Throwable lastBugReportCause;
 

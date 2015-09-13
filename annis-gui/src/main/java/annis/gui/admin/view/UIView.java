@@ -44,8 +44,8 @@ public interface UIView extends Serializable
   public<T> void runInBackground(Callable<T> job, FutureCallback<T> callback);
   
   public interface Listener extends Serializable
-  {
+  {;
     public void loginChanged(boolean isLoggedIn);
-    public void selectedTabChanged(Object selectedTab);
+    public void loadedTab(Object selectedTab);
   }
 }
