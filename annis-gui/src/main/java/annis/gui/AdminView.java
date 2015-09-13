@@ -177,6 +177,7 @@ public class AdminView extends VerticalLayout implements View,
       {
         l.loadedTab(selectedTab);
       } 
+      setFragmentParameter(getFragmentForComponent(selectedTab));
     }
 
   }
@@ -201,6 +202,27 @@ public class AdminView extends VerticalLayout implements View,
     }
     return null;
   }
+  
+  private String getFragmentForComponent(Component c)
+  {
+    if (c == importPanel)
+    {
+      return "import";
+    }
+    else if (c == corpusAdminPanel)
+    {
+      return "corpora";
+    }
+    else if (c == userManagementPanel)
+    {
+      return "users";
+    }
+    else if (c == groupManagementPanel)
+    {
+      return  "groups";
+    }
+    return "";
+  }
 
   @Override
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
@@ -211,22 +233,7 @@ public class AdminView extends VerticalLayout implements View,
     {
       l.loadedTab(selected);
     }
-    if (selected == importPanel)
-    {
-      setFragmentParameter("import");
-    }
-    else if (selected == corpusAdminPanel)
-    {
-      setFragmentParameter("corpora");
-    }
-    else if (selected == userManagementPanel)
-    {
-      setFragmentParameter("users");
-    }
-    else if (selected == groupManagementPanel)
-    {
-      setFragmentParameter("groups");
-    }
+    setFragmentParameter(getFragmentForComponent(selected));
   }
 
   private void setFragmentParameter(String param)
