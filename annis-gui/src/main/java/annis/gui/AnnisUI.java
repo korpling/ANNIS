@@ -24,6 +24,7 @@ import static annis.libgui.Helper.CORPUS_FONT_FORCE;
 import annis.libgui.InstanceConfig;
 import com.vaadin.annotations.Push;
 import com.vaadin.annotations.Theme;
+import com.vaadin.navigator.Navigator;
 import com.vaadin.server.ErrorHandler;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
@@ -51,6 +52,9 @@ public class AnnisUI extends CommonUI
   
   private final QueryController queryController;
   private final SearchView searchView;
+  private final AdminView adminView;
+  
+  private Navigator nav;
   
   /**
    * A re-usable toolbar for different views.
@@ -60,7 +64,9 @@ public class AnnisUI extends CommonUI
   public AnnisUI()
   {
     searchView = new SearchView(AnnisUI.this);
+    adminView = new AdminView();
     queryController = new QueryController(searchView, AnnisUI.this);
+    
   }
 
   @Override
@@ -69,10 +75,16 @@ public class AnnisUI extends CommonUI
     super.init(request);
     setErrorHandler(this);
     
+    nav = new Navigator(AnnisUI.this, AnnisUI.this);
+    nav.addView("", searchView);
+    nav.addView("admin", adminView);
+    
     this.instanceConfig = getInstanceConfig(request);
     loadInstanceFonts();
     
     toolbar = new MainToolbar(null);
+    
+    addExtension(toolbar.getScreenshotExtension());
   }
   
   public boolean canReportBugs()

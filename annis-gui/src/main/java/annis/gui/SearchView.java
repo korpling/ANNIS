@@ -176,8 +176,7 @@ public class SearchView extends GridLayout implements View,
     setColumnExpandRatio(1, 1.0f);
 
     ui.getToolbar().addLoginListener(SearchView.this);
-    addExtension(ui.getToolbar().getScreenshotExtension());
-
+    
     addComponent(ui.getToolbar(), 0, 0, 1, 0);
 
     final HelpPanel help = new HelpPanel(SearchView.this, ui.getQueryController());
