@@ -210,7 +210,6 @@ public class SearchView extends GridLayout implements View,
     // remove old one if necessary
     if(this.toolbar != null)
     {
-      this.toolbar.removeLoginListener(this);
       removeComponent(this.toolbar);
       this.toolbar = null;
     }
