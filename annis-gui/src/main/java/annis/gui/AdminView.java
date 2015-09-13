@@ -285,7 +285,5 @@ public class AdminView extends VerticalLayout implements View,
   {
     Background.runWithCallback(job, callback);
   }
-  
-  
 
 }

@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package annis.gui.admin.controller;
 
 import annis.gui.admin.model.UserManagement;
@@ -21,9 +20,11 @@ import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.google.common.base.Joiner;
+import com.google.common.util.concurrent.FutureCallback;
 import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.concurrent.Callable;
 
 /**
  *
@@ -32,41 +33,60 @@ import java.util.Set;
 public class UserController
   implements UserListView.Listener, UIView.Listener
 {
-  
+
   private final UserManagement model;
+
   private final UserListView view;
+
   private final UIView uiView;
+
   private boolean isLoggedIn = false;
 
   public UserController(UserManagement model,
     UserListView view, UIView uiView, boolean isLoggedIn)
   {
     this.model = model;
-    this.view = view;    
+    this.view = view;
     this.uiView = uiView;
     this.isLoggedIn = isLoggedIn;
     view.addListener(UserController.this);
     uiView.addListener(UserController.this);
   }
-  
+
   private void clearModel()
   {
     model.clear();
     view.setUserList(model.getUsers());
   }
-  
+
   private void fetchFromService()
   {
-    if(model.fetchFromService())
+    view.setLoadingAnimation(true);
+    uiView.runInBackground(new Callable<Boolean>()
     {
-      view.setUserList(model.getUsers());
-    }
-    
-    else
+
+      @Override
+      public Boolean call() throws Exception
+      {
+        return model.fetchFromService();
+      }
+    }, new FutureCallback<Boolean>()
     {
-      uiView.showWarning("Cannot get the user list", null);
-      view.setUserList(new LinkedList<User>());
-    }
+      @Override
+      public void onSuccess(Boolean result)
+      {
+        view.setLoadingAnimation(false);
+        view.setUserList(model.getUsers());
+      }
+
+      @Override
+      public void onFailure(Throwable t)
+      {
+        view.setLoadingAnimation(false);
+        uiView.showWarning("Cannot get the user list", t.getMessage());
+        view.setUserList(new LinkedList<User>());
+      }
+    });
   }
 
   @Override
@@ -85,11 +105,11 @@ public class UserController
   @Override
   public void addNewUser(String userName)
   {
-    if(userName == null || userName.isEmpty())
+    if (userName == null || userName.isEmpty())
     {
       uiView.showError("User name is empty", null);
     }
-    else if(model.getUser(userName) != null)
+    else if (model.getUser(userName) != null)
     {
       uiView.showError("User already exists", null);
     }
@@ -97,9 +117,9 @@ public class UserController
     {
       // create new user with empty password
       User u = new User(userName);
-      if(model.createOrUpdateUser(u))
+      if (model.createOrUpdateUser(u))
       {
-        view.askForPasswordChange(userName); 
+        view.askForPasswordChange(userName);
         view.setUserList(model.getUsers());
         view.emptyNewUserNameTextField();
       }
@@ -109,15 +129,16 @@ public class UserController
   @Override
   public void deleteUsers(Set<String> userName)
   {
-    for(String u : userName)
+    for (String u : userName)
     {
       model.deleteUser(u);
     }
     view.setUserList(model.getUsers());
-    
-    if(userName.size() == 1)
+
+    if (userName.size() == 1)
     {
-      uiView.showInfo("User \"" + userName.iterator().next() +  "\" was deleted", null);
+      uiView.showInfo("User \"" + userName.iterator().next() + "\" was deleted",
+        null);
     }
     else
     {
@@ -130,7 +151,7 @@ public class UserController
   {
     this.isLoggedIn = isLoggedIn;
     model.setRootResource(annisRootResource);
-    if(isLoggedIn)
+    if (isLoggedIn)
     {
       fetchFromService();
     }
@@ -143,13 +164,11 @@ public class UserController
   @Override
   public void selectedTabChanged(Object selectedTab)
   {
-    if(isLoggedIn && selectedTab == view)
+    if (isLoggedIn && selectedTab == view)
     {
       fetchFromService();
     }
 
   }
-  
-  
-  
+
 }

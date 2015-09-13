@@ -45,8 +45,7 @@ public class Background
    * Execute the job in the background and provide a callback which is called
    * when the job is finished.
    * 
-   * It is guarantied that the callback is executed inside the
-   * of the UI thread.
+   * It is guarantied that the callback is executed inside of the UI thread.
    * 
    * @param <T>
    * @param job

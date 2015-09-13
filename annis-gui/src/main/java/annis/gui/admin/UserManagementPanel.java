@@ -65,7 +65,7 @@ public class UserManagementPanel extends Panel
   private final IndexedContainer groupsContainer = new IndexedContainer();
   private final IndexedContainer permissionsContainer = new IndexedContainer();
   
-  private ProgressBar progress;
+  private final ProgressBar progress;
   
   public UserManagementPanel()
   {
@@ -133,10 +133,12 @@ public class UserManagementPanel extends Panel
     layout = new VerticalLayout(actionLayout, progress, userList);
     layout.setSizeFull();
     layout.setExpandRatio(userList, 1.0f);
+    layout.setExpandRatio(progress, 1.0f);
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(true, false, false, false));
     
     layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
+    layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
     
     setContent(layout);
     setSizeFull();
