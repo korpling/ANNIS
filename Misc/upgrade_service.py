@@ -9,6 +9,7 @@ import tempfile
 import re
 import configparser
 import itertools
+import datetime;
 from urllib.parse import urlparse
 
 def updateEnv(instDir):
@@ -184,7 +185,14 @@ if (not checkDBSchemaVersion(extracted, args.dir)):
 	version = getversion(extracted)
 	if version:
 		if version[3]:
-			dbconfig["datasource.schema"] = "annisautoupgrade_" + version[0] + "_" + version[1]+ "_" + version[2] + "_" + version[3] 
+			if version[3] == "SNAPSHOT":
+				# also use the current date and time as more distinct identifier (SNAPSHOT release IDs aren't unique)
+				dbconfig["datasource.schema"] = "annisautoupgrade_" \
+					+ version[0] + "_" + version[1]+ "_" \
+					+ version[2] + "_" + version[3]  \
+					+ datetime.datetime.now().strftime("%Y%m%d%H%M%S")
+			else:
+				dbconfig["datasource.schema"] = "annisautoupgrade_" + version[0] + "_" + version[1]+ "_" + version[2] + "_" + version[3] 
 		else:
 			dbconfig["datasource.schema"] = "annisautoupgrade_" + version[0] + "_" + version[1]+ "_" + version[2]
 		print("New schema name: " + dbconfig["datasource.schema"])
