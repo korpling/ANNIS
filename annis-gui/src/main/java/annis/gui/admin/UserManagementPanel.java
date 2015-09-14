@@ -51,6 +51,7 @@ import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -63,8 +64,6 @@ public class UserManagementPanel extends Panel
   private final VerticalLayout layout;
 
   private final HorizontalLayout actionLayout;
-
-  private final Table userListTable;
 
   private final Grid userList;
 
@@ -182,26 +181,6 @@ public class UserManagementPanel extends Panel
     permissionsColumn.setConverter(new CommaSeperatedStringConverterSet());
 
     userList.getColumn("expires").setHeaderCaption("Expiration Date");
-   
-    userListTable = new Table();
-    userListTable.setEditable(true);
-    userListTable.setSelectable(true);
-    userListTable.setMultiSelect(true);
-    userListTable.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    userListTable.addStyleName("grey-selection");
-    userListTable.setSizeFull();
-    userListTable.setContainerDataSource(userContainer);
-    userListTable.addGeneratedColumn("changepassword",
-      new PasswordChangeColumnGenerator());
-
-    userListTable.
-      setVisibleColumns("name", "groups", "permissions", "expires",
-        "changepassword");
-    userListTable.
-      setColumnHeaders("Username", "Groups (seperate with comma)",
-        "Additional permissions (seperate with comma)", "Expiration Date", "");
-
-    userListTable.setTableFieldFactory(new FieldFactory());
 
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
@@ -225,7 +204,11 @@ public class UserManagementPanel extends Panel
       public void buttonClick(Button.ClickEvent event)
       {
         // get selected users
-        Set<String> selectedUsers = (Set<String>) userListTable.getValue();
+        Set<String> selectedUsers = new TreeSet<>();
+        for(Object id : userList.getSelectedRows())
+        {
+          selectedUsers.add((String) id);
+        }
         for (UserListView.Listener l : listeners)
         {
           l.deleteUsers(selectedUsers);
@@ -301,7 +284,7 @@ public class UserManagementPanel extends Panel
   public void setLoadingAnimation(boolean show)
   {
     progress.setVisible(show);
-    userListTable.setVisible(!show);
+    userList.setVisible(!show);
     actionLayout.setEnabled(!show);
   }
 
