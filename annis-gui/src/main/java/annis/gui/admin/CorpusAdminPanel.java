@@ -40,7 +40,7 @@ public class CorpusAdminPanel extends Panel
 
   private final List<CorpusListView.Listener> listeners = new LinkedList<>();
 
-  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<String, AnnisCorpus>(
+  private final BeanContainer<String, AnnisCorpus> corpusContainer = new BeanContainer<>(
     AnnisCorpus.class);
 
   public CorpusAdminPanel()
@@ -69,6 +69,7 @@ public class CorpusAdminPanel extends Panel
         Set<String> selection = (Set<String>) tblCorpora.getValue();
         if (selection != null)
         {
+          
           for (CorpusListView.Listener l : listeners)
           {
             l.deleteCorpora(selection);

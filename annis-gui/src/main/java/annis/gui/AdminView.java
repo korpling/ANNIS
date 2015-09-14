@@ -78,7 +78,7 @@ public class AdminView extends VerticalLayout implements View,
   private transient WebResource webResource;
 
   private transient AsyncWebResource asyncWebResource;
-
+  
   public AdminView(AnnisUI ui)
   {
     Page.getCurrent().setTitle("ANNIS Adminstration");

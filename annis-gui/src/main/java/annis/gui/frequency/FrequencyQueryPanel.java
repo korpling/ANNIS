@@ -189,7 +189,8 @@ public class FrequencyQueryPanel extends VerticalLayout implements Serializable,
     queryLayout.addComponent(tblFrequencyDefinition);
     
     metaNamesContainer = new IndexedContainer();
-    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect(metaNamesContainer);
+    PopupTwinColumnSelect metaSelect = new PopupTwinColumnSelect();
+    metaSelect.setSelectableContainer(metaNamesContainer);
     metaSelect.setPropertyDataSource(state.getFrequencyMetaData());
     metaSelect.setCaption("Metadata");
     
