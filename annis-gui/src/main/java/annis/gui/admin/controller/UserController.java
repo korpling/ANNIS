@@ -21,9 +21,9 @@ import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.WebResource;
 import java.util.LinkedList;
 import java.util.Set;
+import java.util.TreeSet;
 import java.util.concurrent.Callable;
 
 /**
@@ -85,6 +85,7 @@ public class UserController
           uiView.showWarning("Cannot get the user list", null);
           view.setUserList(new LinkedList<User>());
         }
+        view.addAvailableGroupNames(model.getUsedGroupNames());
       }
 
       @Override
@@ -93,6 +94,7 @@ public class UserController
         view.setLoadingAnimation(false);
         uiView.showWarning("Cannot get the user list", t.getMessage());
         view.setUserList(new LinkedList<User>());
+        view.addAvailableGroupNames(new TreeSet<String>());
       }
     });
   }

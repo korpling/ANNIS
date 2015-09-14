@@ -18,6 +18,7 @@ package annis.gui.admin;
 import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
@@ -74,8 +75,8 @@ public class EditSingleUser extends Panel
   {
     this.user = user;
     lblUser.setValue(user.getName());
-    groupSelector.setValue(user.getGroups());
-    permissionSelector.setValue(user.getPermissions());
+    groupSelector.setPropertyDataSource(new ObjectProperty(user.getGroups()));
+    permissionSelector.setPropertyDataSource(new ObjectProperty(user.getPermissions()));
   }
 
   public void setGroupsContainer(IndexedContainer groupsContainer)
