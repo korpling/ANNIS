@@ -1,0 +1,18 @@
+{
+  "elements": {
+    "v-panel": {
+      "attributes": {
+        "size-full": {}
+      }
+    },
+    "v-vertical-layout": {
+      "attributes": {
+        "size-full": {}
+      }
+    },
+    "v-button": {
+      "attributes": {
+      }
+    }
+  }
+}

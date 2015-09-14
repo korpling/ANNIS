@@ -57,5 +57,9 @@
         <org-netbeans-modules-web-clientproject-api.js_2e_libs_2e_folder>js/libs</org-netbeans-modules-web-clientproject-api.js_2e_libs_2e_folder>
         <org-netbeans-modules-javascript2-requirejs.enabled>true</org-netbeans-modules-javascript2-requirejs.enabled>
         <org-netbeans-modules-maven-j2ee.netbeans_2e_deploy_2e_on_2e_save>false</org-netbeans-modules-maven-j2ee.netbeans_2e_deploy_2e_on_2e_save>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapObjects>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapObjects>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInitItems>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInitItems>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInit>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapArrayInit>
+        <org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapProperties>WRAP_ALWAYS</org-netbeans-modules-editor-indent.text.x-json.CodeStyle.project.wrapProperties>
     </properties>
 </project-shared-configuration>

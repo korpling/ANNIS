@@ -22,6 +22,7 @@ import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.event.Action;
+import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
@@ -38,6 +39,7 @@ import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -84,6 +86,21 @@ public class UserManagementPanel extends Panel
     userList.setSizeFull();
     userList.setSelectionMode(Grid.SelectionMode.MULTI);
     userList.setColumns("name", "groups", "permissions", "expires");
+    userList.addItemClickListener(new ItemClickEvent.ItemClickListener()
+    {
+
+      @Override
+      public void itemClick(ItemClickEvent event)
+      {
+        User u = userContainer.getItem(event.getItemId()).getBean();
+        Window w = new Window("Edit user \"" + u.getName() + "\"");
+        w.setContent(new EditSingleUser());
+        w.setModal(true);
+        w.setWidth("300px");
+        w.setHeight("400px");
+        UI.getCurrent().addWindow(w);
+      }
+    });
     
     userListTable = new Table();
     userListTable.setEditable(true);
