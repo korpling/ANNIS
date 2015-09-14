@@ -29,6 +29,7 @@ import com.vaadin.ui.Button;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.DefaultFieldFactory;
 import com.vaadin.ui.Field;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.PasswordField;
@@ -54,7 +55,8 @@ public class UserManagementPanel extends Panel
   private final VerticalLayout layout;
   private final HorizontalLayout actionLayout;
 
-  private final Table userList;
+  private final Table userListTable;
+  private final Grid userList;
 
   private final BeanContainer<String, User> userContainer;
 
@@ -78,24 +80,29 @@ public class UserManagementPanel extends Panel
     progress.setIndeterminate(true);
     progress.setVisible(false);
     
-    userList = new Table();
-    userList.setEditable(true);
-    userList.setSelectable(true);
-    userList.setMultiSelect(true);
-    userList.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    userList.addStyleName("grey-selection");
+    userList = new Grid(userContainer);
     userList.setSizeFull();
-    userList.setContainerDataSource(userContainer);
-    userList.addGeneratedColumn("changepassword",
+    userList.setSelectionMode(Grid.SelectionMode.MULTI);
+    userList.setColumns("name", "groups", "permissions", "expires");
+    
+    userListTable = new Table();
+    userListTable.setEditable(true);
+    userListTable.setSelectable(true);
+    userListTable.setMultiSelect(true);
+    userListTable.addStyleName(ChameleonTheme.TABLE_STRIPED);
+    userListTable.addStyleName("grey-selection");
+    userListTable.setSizeFull();
+    userListTable.setContainerDataSource(userContainer);
+    userListTable.addGeneratedColumn("changepassword",
       new PasswordChangeColumnGenerator());
 
-    userList.
+    userListTable.
       setVisibleColumns("name", "groups", "permissions", "expires", "changepassword");
-    userList.
+    userListTable.
       setColumnHeaders("Username", "Groups (seperate with comma)", 
         "Additional permissions (seperate with comma)", "Expiration Date", "");
 
-    userList.setTableFieldFactory(new FieldFactory());
+    userListTable.setTableFieldFactory(new FieldFactory());
     
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
@@ -119,7 +126,7 @@ public class UserManagementPanel extends Panel
       public void buttonClick(Button.ClickEvent event)
       {
         // get selected users
-        Set<String> selectedUsers = (Set<String>) userList.getValue();
+        Set<String> selectedUsers = (Set<String>) userListTable.getValue();
         for (UserListView.Listener l : listeners)
         {
           l.deleteUsers(selectedUsers);
@@ -195,7 +202,7 @@ public class UserManagementPanel extends Panel
   public void setLoadingAnimation(boolean show)
   {
     progress.setVisible(show);
-    userList.setVisible(!show);
+    userListTable.setVisible(!show);
     actionLayout.setEnabled(!show);
   }
   
