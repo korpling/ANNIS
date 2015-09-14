@@ -36,17 +36,17 @@ import com.vaadin.ui.declarative.Design;
 public class EditSingleUser extends Panel
 {
 
-  Label lblUser;
+  private Label lblUser;
 
-  Button btSave;
+  private Button btSave;
 
-  Button btCancel;
+  private Button btCancel;
 
-  PopupTwinColumnSelect groupSelector;
+  private PopupTwinColumnSelect groupSelector;
 
-  PopupTwinColumnSelect permissionSelector;
+  private PopupTwinColumnSelect permissionSelector;
 
-  OptionalDateTimeField expiration;
+  private OptionalDateTimeField expiration;
 
   private User user = new User();
 
