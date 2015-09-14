@@ -15,4 +15,19 @@
     </And>
   </Match>
   
+  <!-- Vaadin will fill the fields -->
+  <Match>
+    <And>
+      <Or>
+        <Bug pattern="UWF_UNWRITTEN_FIELD" />
+        <Bug pattern="NP_UNWRITTEN_FIELD" />
+      </Or>
+      <Or>
+        <Class name="annis.gui.admin.EditSingleGroup"/>
+        <Class name="annis.gui.admin.EditSingleUser"/>  
+      </Or>
+      
+    </And>
+  </Match>
+  
 </FindBugsFilter>

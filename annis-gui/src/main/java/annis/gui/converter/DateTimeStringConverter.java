@@ -19,7 +19,6 @@ package annis.gui.converter;
 import com.vaadin.data.util.converter.Converter;
 import java.util.Locale;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormat;
 import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
@@ -29,10 +28,6 @@ import org.joda.time.format.ISODateTimeFormat;
  */
 public class DateTimeStringConverter implements Converter<String, DateTime>
 {
-  
-  
-  private final DateTimeFormatter formatter = ISODateTimeFormat.date();
-
   @Override
   public DateTime convertToModel(String value,
     Class<? extends DateTime> targetType, Locale locale) throws ConversionException
@@ -41,7 +36,7 @@ public class DateTimeStringConverter implements Converter<String, DateTime>
     {
       return null;
     }
-    return formatter.parseDateTime(value);
+    return ISODateTimeFormat.dateParser().parseDateTime(value);
   }
 
   @Override
@@ -52,7 +47,7 @@ public class DateTimeStringConverter implements Converter<String, DateTime>
     {
       return null;
     }
-    return formatter.print(value);
+    return ISODateTimeFormat.date().print(value);
   }
 
   @Override
