@@ -47,6 +47,7 @@ public class OptionalDateTimeField extends CustomField<DateTime>
     dateField.setConverter(new DateTimeConverter());
     dateField.setDateFormat("yyyy-MM-dd");
     dateField.setImmediate(true);
+    dateField.setPropertyDataSource(OptionalDateTimeField.this);
 
     checkBox = new CheckBox(checkboxCaption);
     checkBox.addValueChangeListener(new ValueChangeListener()
@@ -95,13 +96,6 @@ public class OptionalDateTimeField extends CustomField<DateTime>
     checkBox.setValue(newValue != null);
   }
   
-
-  @Override
-  public void setPropertyDataSource(Property newDataSource)
-  {
-    super.setPropertyDataSource(newDataSource);
-    dateField.setPropertyDataSource(getPropertyDataSource());
-  }
 
   @Override
   public Class<? extends DateTime> getType()
