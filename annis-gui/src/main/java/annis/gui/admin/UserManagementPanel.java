@@ -21,9 +21,12 @@ import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.data.util.TransactionalPropertyWrapper;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -59,9 +62,11 @@ public class UserManagementPanel extends Panel
 {
 
   private final VerticalLayout layout;
+
   private final HorizontalLayout actionLayout;
 
   private final Table userListTable;
+
   private final Grid userList;
 
   private final BeanContainer<String, User> userContainer;
@@ -69,12 +74,13 @@ public class UserManagementPanel extends Panel
   private final List<UserListView.Listener> listeners = new LinkedList<>();
 
   private final TextField txtUserName;
-  
+
   private final IndexedContainer groupsContainer = new IndexedContainer();
+
   private final IndexedContainer permissionsContainer = new IndexedContainer();
-  
+
   private final ProgressBar progress;
-  
+
   public UserManagementPanel()
   {
 
@@ -85,8 +91,9 @@ public class UserManagementPanel extends Panel
     progress.setCaption("Loading user list");
     progress.setIndeterminate(true);
     progress.setVisible(false);
-    
-    GeneratedPropertyContainer generated = new GeneratedPropertyContainer(userContainer);
+
+    GeneratedPropertyContainer generated = new GeneratedPropertyContainer(
+      userContainer);
     generated.addGeneratedProperty("edit", new PropertyValueGenerator<String>()
     {
 
@@ -102,36 +109,47 @@ public class UserManagementPanel extends Panel
         return String.class;
       }
     });
-    
+
     userList = new Grid(generated);
     userList.setSizeFull();
     userList.setSelectionMode(Grid.SelectionMode.MULTI);
     userList.setColumns("name", "groups", "permissions", "expires", "edit");
-    userList.getColumn("edit").setRenderer(new ButtonRenderer(new ClickableRenderer.RendererClickListener()
-    {
-
-      @Override
-      public void click(ClickableRenderer.RendererClickEvent event)
+    userList.getColumn("edit").setRenderer(new ButtonRenderer(
+      new ClickableRenderer.RendererClickListener()
       {
-        User u = userContainer.getItem(event.getItemId()).getBean();
-        Window w = new Window("Edit user \"" + u.getName() + "\"");
-        EditSingleUser edit = new EditSingleUser();
-        edit.setGroupsContainer(groupsContainer);
-        edit.setUser(u);
-        
-        w.setContent(edit);
-        w.setModal(true);
-        w.setWidth("400px");
-        w.setHeight("300px");
-        UI.getCurrent().addWindow(w);
-      }
-    }));
+
+        @Override
+        public void click(ClickableRenderer.RendererClickEvent event)
+        {
+
+          User u = userContainer.getItem(event.getItemId()).getBean();
+          
+         TransactionalPropertyWrapper groups = new TransactionalPropertyWrapper(userContainer.getContainerProperty(
+                event.getItemId(), "groups"));
+         TransactionalPropertyWrapper permissions = 
+            new TransactionalPropertyWrapper(userContainer.getContainerProperty(
+                event.getItemId(), "permissions"));
+         TransactionalPropertyWrapper expires = 
+            new TransactionalPropertyWrapper(userContainer.getContainerProperty(
+                event.getItemId(), "expires"));
+         
+          EditSingleUser edit = new EditSingleUser(u.getName(),
+            groups, permissions, expires, groupsContainer);
+
+          Window w = new Window("Edit user \"" + u.getName() + "\"");
+          w.setContent(edit);
+          w.setModal(true);
+          w.setWidth("400px");
+          w.setHeight("300px");
+          UI.getCurrent().addWindow(w);
+        }
+      }));
     userList.getColumn("name").setHeaderCaption("Username");
     userList.getColumn("groups").setHeaderCaption("Groups");
     userList.getColumn("permissions").setHeaderCaption("Additional permissions");
     userList.getColumn("expires").setHeaderCaption("Expiration Date");
     userList.getColumn("edit").setHeaderCaption("");
-    
+
     userListTable = new Table();
     userListTable.setEditable(true);
     userListTable.setSelectable(true);
@@ -144,13 +162,14 @@ public class UserManagementPanel extends Panel
       new PasswordChangeColumnGenerator());
 
     userListTable.
-      setVisibleColumns("name", "groups", "permissions", "expires", "changepassword");
+      setVisibleColumns("name", "groups", "permissions", "expires",
+        "changepassword");
     userListTable.
-      setColumnHeaders("Username", "Groups (seperate with comma)", 
+      setColumnHeaders("Username", "Groups (seperate with comma)",
         "Additional permissions (seperate with comma)", "Expiration Date", "");
 
     userListTable.setTableFieldFactory(new FieldFactory());
-    
+
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
 
@@ -190,13 +209,13 @@ public class UserManagementPanel extends Panel
     layout.setExpandRatio(progress, 1.0f);
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(true, false, false, false));
-    
+
     layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
-    
+
     setContent(layout);
     setSizeFull();
-    
+
     addActionHandler(new AddUserHandler(txtUserName));
 
   }
@@ -208,7 +227,6 @@ public class UserManagementPanel extends Panel
       l.addNewUser(txtUserName.getValue());
     }
   }
-  
 
   @Override
   public void addListener(UserListView.Listener listener)
@@ -240,7 +258,7 @@ public class UserManagementPanel extends Panel
   @Override
   public void addAvailableGroupNames(Collection<String> groupNames)
   {
-    for(String g : groupNames)
+    for (String g : groupNames)
     {
       groupsContainer.addItem(g);
     }
@@ -258,7 +276,7 @@ public class UserManagementPanel extends Panel
   {
     return listeners;
   }
-  
+
   public class AddUserHandler implements Action.Handler
   {
 
@@ -335,18 +353,19 @@ public class UserManagementPanel extends Panel
           groupsSelector.addValueChangeListener(new UserChangeListener(itemId));
 
           result = groupsSelector;
-          
+
           break;
         case "permissions":
-          
+
           PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect();
           permissionSelector.setSelectableContainer(permissionsContainer);
           permissionSelector.setWidth("100%");
           permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
-          permissionSelector.addValueChangeListener(new UserChangeListener(itemId));
+          permissionSelector.addValueChangeListener(new UserChangeListener(
+            itemId));
 
           result = permissionSelector;
-          
+
           break;
         case "name":
           // explicitly request a read-only label for the name and groups
@@ -355,7 +374,7 @@ public class UserManagementPanel extends Panel
         case "expires":
           OptionalDateTimeField dateField = new OptionalDateTimeField("expires");
           dateField.addValueChangeListener(new UserChangeListener(itemId));
-          
+
           result = dateField;
           break;
         default:
@@ -367,9 +386,10 @@ public class UserManagementPanel extends Panel
     }
 
   }
-  
+
   private class UserChangeListener implements Property.ValueChangeListener
   {
+
     private final Object itemId;
 
     public UserChangeListener(Object itemId)
@@ -385,7 +405,7 @@ public class UserManagementPanel extends Panel
         l.userUpdated(userContainer.getItem(itemId).getBean());
       }
     }
-    
+
   }
 
 }

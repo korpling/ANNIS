@@ -15,9 +15,8 @@
  */
 package annis.gui.admin;
 
-import annis.gui.admin.view.UserListView;
-import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
+import com.vaadin.data.Property;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
@@ -46,29 +45,40 @@ public class EditSingleUser extends Panel
 
   private PopupTwinColumnSelect permissionSelector;
 
-  private OptionalDateTimeField expiration;
+  private OptionalDateTimeField expirationSelector;
 
-  private User user = new User();
-
-
-  public EditSingleUser()
+  public EditSingleUser(
+    String userName,
+    final Property.Transactional groups,
+    final Property.Transactional permissions,
+    final Property.Transactional expires,
+    IndexedContainer groupsContainer)
   {
     Design.read(EditSingleUser.this);
 
+    
+    groupSelector.setSelectableContainer(groupsContainer);
+    
+    groups.startTransaction();
+    permissions.startTransaction();
+    expires.startTransaction();
+
+    // bind the fields
+    lblUser.setPropertyDataSource(new ObjectProperty<>(userName));
+    groupSelector.setPropertyDataSource(groups);
+    permissionSelector.setPropertyDataSource(permissions);
+    expirationSelector.setPropertyDataSource(expires);
+
+    // events
     btSave.addClickListener(new Button.ClickListener()
     {
-
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        if (getParent() instanceof UserManagementPanel)
-        {
-          for (UserListView.Listener l : ((UserManagementPanel) getParent()).getListeners())
-          {
-            l.userUpdated(user);
-          }
-        }
-
+        groups.commit();
+        permissions.commit();
+        expires.commit();
+        
         HasComponents parent = getParent();
         if (parent instanceof Window)
         {
@@ -83,6 +93,10 @@ public class EditSingleUser extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
+        groups.rollback();
+        permissions.rollback();
+        expires.rollback();
+
         HasComponents parent = getParent();
         if (parent instanceof Window)
         {
@@ -91,7 +105,7 @@ public class EditSingleUser extends Panel
       }
     });
 
-    expiration.setCheckboxCaption("expires");
+    expirationSelector.setCheckboxCaption("expires");
 
   }
 
@@ -101,26 +115,4 @@ public class EditSingleUser extends Panel
     super.attach();
   }
 
-  public User getUser()
-  {
-    return user;
-  }
-
-  public void setUser(User user)
-  {
-    this.user = user;
-    lblUser.setValue(user.getName());
-    groupSelector.setPropertyDataSource(new ObjectProperty(user.getGroups()));
-    permissionSelector.setPropertyDataSource(new ObjectProperty(user.
-      getPermissions()));
-    if (user.getExpires() != null)
-    {
-      expiration.setPropertyDataSource(new ObjectProperty(user.getExpires()));
-    }
-  }
-
-  public void setGroupsContainer(IndexedContainer groupsContainer)
-  {
-    groupSelector.setSelectableContainer(groupsContainer);
-  }
 }
