@@ -38,6 +38,7 @@ public interface UserListView extends Serializable
   public void emptyNewUserNameTextField();
   
   public void addAvailableGroupNames(Collection<String> groupNames);
+  public void addAvailablePermissions(Collection<String> permissions);
   
   public interface Listener
   {

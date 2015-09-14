@@ -47,11 +47,13 @@ public class EditSingleUser extends Panel
   private OptionalDateTimeField expirationSelector;
 
   public EditSingleUser(final FieldGroup fields,
-    IndexedContainer groupsContainer)
+    IndexedContainer groupsContainer,
+    IndexedContainer permissionsContainer)
   {
     Design.read(EditSingleUser.this);
 
     groupSelector.setSelectableContainer(groupsContainer);
+    permissionSelector.setSelectableContainer(permissionsContainer);
     
     lblUser.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
 

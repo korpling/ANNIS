@@ -85,6 +85,7 @@ public class UserController implements UserListView.Listener, UIView.Listener
           view.setUserList(new LinkedList<User>());
         }
         view.addAvailableGroupNames(model.getUsedGroupNames());
+        view.addAvailablePermissions(model.getUsedPermissions());
       }
 
       @Override

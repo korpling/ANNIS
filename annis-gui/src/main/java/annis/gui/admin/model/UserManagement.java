@@ -40,6 +40,7 @@ public class UserManagement implements Serializable
 
   private final Map<String, User> users = new TreeMap<>(CaseSensitiveOrder.INSTANCE);
   private final TreeSet<String> usedGroupNames = new TreeSet<>();
+  private final TreeSet<String> usedPermissions = new TreeSet<>();
   
   private final Logger log = LoggerFactory.getLogger(UserManagement.class);
   
@@ -54,7 +55,7 @@ public class UserManagement implements Serializable
         res.put(newUser);
         users.put(newUser.getName(), newUser);
         
-        updateUsedGroupNames();
+        updateUsedGroupNamesAndPermissions();
         return true;
       }
       catch(UniformInterfaceException ex)
@@ -73,7 +74,7 @@ public class UserManagement implements Serializable
         .path("admin/users").path(userName);
       res.delete();
       users.remove(userName);
-      updateUsedGroupNames();
+      updateUsedGroupNamesAndPermissions();
     }
   }
   
@@ -98,6 +99,7 @@ public class UserManagement implements Serializable
   {
     users.clear();
     usedGroupNames.clear();
+    usedPermissions.clear();
   }
   
   public boolean fetchFromService()
@@ -107,6 +109,7 @@ public class UserManagement implements Serializable
       WebResource res = webResourceProvider.getWebResource().path("admin/users");
       users.clear();
       usedGroupNames.clear();
+      usedPermissions.clear();
       try
       {
         List<User> list = res.get(new GenericType<List<User>>() {});
@@ -114,6 +117,7 @@ public class UserManagement implements Serializable
         {
           users.put(u.getName(), u);
           usedGroupNames.addAll(u.getGroups());
+          usedPermissions.addAll(u.getPermissions());
         }
         return true;
       }
@@ -125,12 +129,14 @@ public class UserManagement implements Serializable
     return false;
   }
   
-  private void updateUsedGroupNames()
+  private void updateUsedGroupNamesAndPermissions()
   {
     usedGroupNames.clear();
+    usedPermissions.clear();
     for(User u : users.values())
     {
       usedGroupNames.addAll(u.getGroups());
+      usedPermissions.addAll(u.getPermissions());
     }
   }
   
@@ -147,6 +153,11 @@ public class UserManagement implements Serializable
   public TreeSet<String> getUsedGroupNames()
   {
     return usedGroupNames;
+  }
+  
+  public TreeSet<String> getUsedPermissions()
+  {
+    return usedPermissions;
   }
 
   public WebResourceProvider getWebResourceProvider()

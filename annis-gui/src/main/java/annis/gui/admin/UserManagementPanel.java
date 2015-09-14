@@ -146,7 +146,8 @@ public class UserManagementPanel extends Panel
               getItemId()));
           group.addCommitHandler(new UserCommitHandler(u.getName()));
 
-          EditSingleUser edit = new EditSingleUser(group, groupsContainer);
+          EditSingleUser edit = new EditSingleUser(group, groupsContainer,
+            permissionsContainer);
 
           Window w = new Window("Edit user \"" + u.getName() + "\"");
           w.setContent(edit);
@@ -158,7 +159,7 @@ public class UserManagementPanel extends Panel
       }));
     editColum.setHeaderCaption("");
     editColum.setExpandRatio(0);
-    
+
     Grid.Column passwordColumn = userList.getColumn("changePassword");
     passwordColumn.setRenderer(new ButtonRenderer(
       new ClickableRenderer.RendererClickListener()
@@ -167,7 +168,8 @@ public class UserManagementPanel extends Panel
         @Override
         public void click(ClickableRenderer.RendererClickEvent event)
         {
-          UserManagementPanel.this.askForPasswordChange((String) event.getItemId());
+          UserManagementPanel.this.askForPasswordChange((String) event.
+            getItemId());
         }
       }));
     passwordColumn.setHeaderCaption("");
@@ -211,7 +213,7 @@ public class UserManagementPanel extends Panel
       {
         // get selected users
         Set<String> selectedUsers = new TreeSet<>();
-        for(Object id : userList.getSelectedRows())
+        for (Object id : userList.getSelectedRows())
         {
           selectedUsers.add((String) id);
         }
@@ -285,6 +287,15 @@ public class UserManagementPanel extends Panel
       groupsContainer.addItem(g);
     }
   }
+  
+  @Override
+  public void addAvailablePermissions(Collection<String> permissions)
+  {
+    for (String p : permissions)
+    {
+      permissionsContainer.addItem(p);
+    }
+  }
 
   @Override
   public void setLoadingAnimation(boolean show)
@@ -330,6 +341,7 @@ public class UserManagementPanel extends Panel
       }
     }
   }
+
   private class UserCommitHandler implements FieldGroup.CommitHandler
   {
 
