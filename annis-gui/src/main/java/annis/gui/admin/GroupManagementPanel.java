@@ -155,6 +155,7 @@ public class GroupManagementPanel extends Panel
         {
           selectedGroups.add((String) id);
         }
+        groupsGrid.getSelectionModel().reset();
         for (GroupListView.Listener l : listeners)
         {
           l.deleteGroups(selectedGroups);

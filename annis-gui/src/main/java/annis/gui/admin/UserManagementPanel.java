@@ -210,6 +210,7 @@ public class UserManagementPanel extends Panel
         {
           selectedUsers.add((String) id);
         }
+        userList.getSelectionModel().reset();
         for (UserListView.Listener l : listeners)
         {
           l.deleteUsers(selectedUsers);
