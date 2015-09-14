@@ -39,6 +39,7 @@ public class NewPasswordWindow extends Window
   public NewPasswordWindow(final String userName, final List<UserListView.Listener> listeners)
   {
     setCaption("Set new password for user \"" + userName + "\"");
+    setModal(true);
     
     FormLayout layout = new FormLayout();
     setContent(layout);
