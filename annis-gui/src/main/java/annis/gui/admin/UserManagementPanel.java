@@ -17,6 +17,7 @@ package annis.gui.admin;
 
 import annis.gui.admin.view.UserListView;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
+import annis.gui.converter.DateTimeStringConverter;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
@@ -156,6 +157,7 @@ public class UserManagementPanel extends Panel
         }
       }));
     editColum.setHeaderCaption("");
+    editColum.setExpandRatio(0);
     
     Grid.Column passwordColumn = userList.getColumn("changePassword");
     passwordColumn.setRenderer(new ButtonRenderer(
@@ -169,18 +171,22 @@ public class UserManagementPanel extends Panel
         }
       }));
     passwordColumn.setHeaderCaption("");
+    passwordColumn.setExpandRatio(0);
 
     userList.getColumn("name").setHeaderCaption("Username");
 
-    Grid.Column groupsColum = userList.getColumn("groups");
-    groupsColum.setHeaderCaption("Groups");
-    groupsColum.setConverter(new CommaSeperatedStringConverterSet());
+    Grid.Column groupsColumm = userList.getColumn("groups");
+    groupsColumm.setHeaderCaption("Groups");
+    groupsColumm.setConverter(new CommaSeperatedStringConverterSet());
+    groupsColumm.setExpandRatio(1);
 
     Grid.Column permissionsColumn = userList.getColumn("permissions");
     permissionsColumn.setHeaderCaption("Additional permissions");
     permissionsColumn.setConverter(new CommaSeperatedStringConverterSet());
 
-    userList.getColumn("expires").setHeaderCaption("Expiration Date");
+    Grid.Column expiresColumn = userList.getColumn("expires");
+    expiresColumn.setHeaderCaption("Expiration Date");
+    expiresColumn.setConverter(new DateTimeStringConverter());
 
     txtUserName = new TextField();
     txtUserName.setInputPrompt("New user name");
@@ -324,106 +330,6 @@ public class UserManagementPanel extends Panel
       }
     }
   }
-
-  public class PasswordChangeColumnGenerator implements Table.ColumnGenerator
-  {
-
-    @Override
-    public Object generateCell(Table source, final Object itemId,
-      Object columnId)
-    {
-      PasswordField txtNewPassword = new PasswordField();
-      txtNewPassword.setInputPrompt("New password");
-      Button btChangePassword = new Button("Change password");
-      btChangePassword.addClickListener(new Button.ClickListener()
-      {
-
-        @Override
-        public void buttonClick(Button.ClickEvent event)
-        {
-          askForPasswordChange((String) itemId);
-        }
-      });
-      return btChangePassword;
-    }
-
-  }
-
-  public class FieldFactory extends DefaultFieldFactory
-  {
-
-    @Override
-    public Field<?> createField(Container container, final Object itemId,
-      Object propertyId, Component uiContext)
-    {
-      Field<?> result = null;
-
-      switch ((String) propertyId)
-      {
-        case "groups":
-
-          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect();
-          groupsSelector.setSelectableContainer(groupsContainer);
-          groupsSelector.setWidth("100%");
-          groupsSelector.setCaption("Groups for \"" + itemId + "\"");
-          groupsSelector.addValueChangeListener(new UserChangeListener(itemId));
-
-          result = groupsSelector;
-
-          break;
-        case "permissions":
-
-          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect();
-          permissionSelector.setSelectableContainer(permissionsContainer);
-          permissionSelector.setWidth("100%");
-          permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
-          permissionSelector.addValueChangeListener(new UserChangeListener(
-            itemId));
-
-          result = permissionSelector;
-
-          break;
-        case "name":
-          // explicitly request a read-only label for the name and groups
-          result = null;
-          break;
-        case "expires":
-          OptionalDateTimeField dateField = new OptionalDateTimeField("expires");
-          dateField.addValueChangeListener(new UserChangeListener(itemId));
-
-          result = dateField;
-          break;
-        default:
-          result = super.createField(container, itemId, propertyId, uiContext);
-          break;
-      }
-
-      return result;
-    }
-
-  }
-
-  private class UserChangeListener implements Property.ValueChangeListener
-  {
-
-    private final Object itemId;
-
-    public UserChangeListener(Object itemId)
-    {
-      this.itemId = itemId;
-    }
-
-    @Override
-    public void valueChange(Property.ValueChangeEvent event)
-    {
-      for (UserListView.Listener l : listeners)
-      {
-        l.userUpdated(userContainer.getItem(itemId).getBean());
-      }
-    }
-
-  }
-
   private class UserCommitHandler implements FieldGroup.CommitHandler
   {
 
