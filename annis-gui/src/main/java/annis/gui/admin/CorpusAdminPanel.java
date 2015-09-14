@@ -21,14 +21,14 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
-import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
 
 /**
  *
@@ -47,17 +47,14 @@ public class CorpusAdminPanel extends Panel
   {
     corpusContainer.setBeanIdProperty("name");
 
-    final Table tblCorpora = new Table();
-    tblCorpora.setContainerDataSource(corpusContainer);
-    tblCorpora.setSizeFull();
-    tblCorpora.setSelectable(true);
-    tblCorpora.setMultiSelect(true);
-    tblCorpora.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    tblCorpora.addStyleName("grey-selection");
-    
-    tblCorpora.
-      setVisibleColumns("name", "textCount", "tokenCount", "sourcePath");
-    tblCorpora.setColumnHeaders("Name", "Texts", "Tokens", "Source path");
+    final Grid corporaGrid = new Grid(corpusContainer);
+    corporaGrid.setSizeFull();
+    corporaGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+    corporaGrid.setColumns("name", "textCount", "tokenCount", "sourcePath");
+
+    corporaGrid.getColumn("textCount").setHeaderCaption("Texts");
+    corporaGrid.getColumn("tokenCount").setHeaderCaption("Tokens");
+    corporaGrid.getColumn("sourcePath").setHeaderCaption("Source Path");
 
     Button btDelete = new Button("Delete selected");
     btDelete.addClickListener(new Button.ClickListener()
@@ -66,10 +63,15 @@ public class CorpusAdminPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        Set<String> selection = (Set<String>) tblCorpora.getValue();
-        if (selection != null)
+        Set<String> selection = new TreeSet<>();
+        for (Object o : corporaGrid.getSelectedRows())
         {
-          
+          selection.add((String) o);
+        }
+        corporaGrid.getSelectionModel().reset();
+        if (!selection.isEmpty())
+        {
+
           for (CorpusListView.Listener l : listeners)
           {
             l.deleteCorpora(selection);
@@ -78,14 +80,14 @@ public class CorpusAdminPanel extends Panel
       }
     });
 
-    VerticalLayout layout = new VerticalLayout(btDelete, tblCorpora);
+    VerticalLayout layout = new VerticalLayout(btDelete, corporaGrid);
     layout.setSizeFull();
-    layout.setExpandRatio(tblCorpora, 1.0f);
+    layout.setExpandRatio(corporaGrid, 1.0f);
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(true, false, false, false));
-    
+
     layout.setComponentAlignment(btDelete, Alignment.MIDDLE_CENTER);
-    
+
     setContent(layout);
     setSizeFull();
   }
