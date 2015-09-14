@@ -20,6 +20,7 @@ import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.TreeSetConverter;
 import com.vaadin.data.Container;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
 import com.vaadin.data.util.converter.Converter;
@@ -54,7 +55,8 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     txtValue = new TextField();
     txtValue.setConverter(new CommaSeperatedStringConverterSet());
     txtValue.setWidth("100%");
-
+    txtValue.setPropertyDataSource(PopupTwinColumnSelect.this);
+    
     selector = new TwinColSelect();
     selector.setConverter(new TreeSetConverter());
     selector.setNewItemsAllowed(false);
@@ -62,6 +64,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     selector.setRightColumnCaption("Selected");
     selector.setContainerDataSource(selectableContainer);
     selector.setWidth("44em");
+    selector.setPropertyDataSource(PopupTwinColumnSelect.this);
     
     PopupView popup = new PopupView("Select", selector);
 
@@ -103,13 +106,6 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     return layout;
   }
 
-  @Override
-  public void setPropertyDataSource(Property newDataSource)
-  {
-    super.setPropertyDataSource(newDataSource);
-    txtValue.setPropertyDataSource(getPropertyDataSource());
-    selector.setPropertyDataSource(getPropertyDataSource());    
-  }
 
   @Override
   public void setValue(Set newFieldValue) throws ReadOnlyException, Converter.ConversionException
