@@ -24,10 +24,12 @@ import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ItemSorter;
 import com.vaadin.data.util.converter.Converter;
+import com.vaadin.ui.AbstractTextField;
 import com.vaadin.ui.Component;
 import com.vaadin.ui.CustomField;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.PopupView;
+import com.vaadin.ui.TextArea;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.TwinColSelect;
 import java.util.Collection;
@@ -43,7 +45,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
   private final HorizontalLayout layout;
 
-  private final TextField txtValue;
+  private final AbstractTextField txtValue;
 
   private final TwinColSelect selector;
 
@@ -52,10 +54,11 @@ public class PopupTwinColumnSelect extends CustomField<Set>
   public PopupTwinColumnSelect()
   {
     
-    txtValue = new TextField();
+    txtValue = createTextField();
     txtValue.setConverter(new CommaSeperatedStringConverterSet());
     txtValue.setWidth("100%");
     txtValue.setPropertyDataSource(PopupTwinColumnSelect.this);
+   
     
     selector = new TwinColSelect();
     selector.setConverter(new TreeSetConverter());
@@ -75,6 +78,11 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     layout.setSpacing(true);
     
     addValueChangeListener(new UpdateContainerListener());
+  }
+  
+  protected AbstractTextField createTextField()
+  {
+    return new TextField();
   }
 
   @Override

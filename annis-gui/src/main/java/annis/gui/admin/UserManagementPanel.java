@@ -151,8 +151,8 @@ public class UserManagementPanel extends Panel
           Window w = new Window("Edit user \"" + u.getName() + "\"");
           w.setContent(edit);
           w.setModal(true);
-          w.setWidth("400px");
-          w.setHeight("300px");
+          w.setWidth("500px");
+          w.setHeight("400px");
           UI.getCurrent().addWindow(w);
         }
       }));

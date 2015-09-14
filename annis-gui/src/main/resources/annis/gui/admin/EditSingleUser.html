@@ -21,18 +21,18 @@ limitations under the License.
   </head>
   <body>
   <v-panel size-full>
-    <v-vertical-layout>
+    <v-css-layout>
       <v-form-layout>
         <v-label _id="lblUser" caption="User"></v-label>
-        <annis-popup-twin-column-select _id="groupSelector" caption="Groups"></annis-popup-twin-column-select>
-        <annis-popup-twin-column-select _id="permissionSelector" caption="Additional permissions"></annis-popup-twin-column-select>
+        <annis-popup-twin-column-select-multiline _id="groupSelector" caption="Groups"></annis-popup-twin-column-select-multiline>
+        <annis-popup-twin-column-select-multiline _id="permissionSelector" caption="Additional permissions"></annis-popup-twin-column-select-multiline>
         <annis-optional-date-time-field _id="expirationSelector" caption="Expiration date"></annis-optional-date-time-field>
       </v-form-layout>
       <v-horizontal-layout width="100%">
         <v-button _id="btSave" :center >Save</v-button>
         <v-button _id="btCancel" :center >Cancel</v-button>
       </v-horizontal-layout>
-    </v-vertical-layout>
+    </v-css-layout>
   </v-panel>
 </body>
 </html>

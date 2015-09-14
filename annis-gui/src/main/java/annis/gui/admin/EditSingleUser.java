@@ -15,21 +15,15 @@
  */
 package annis.gui.admin;
 
-import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
-import com.vaadin.data.Property;
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * UI to edit the properties of a single user.
