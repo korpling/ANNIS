@@ -16,17 +16,16 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.UserListView;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
-import com.vaadin.data.fieldgroup.BeanFieldGroup;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
-import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -138,10 +137,18 @@ public class UserManagementPanel extends Panel
         }
       }));
     userList.getColumn("name").setHeaderCaption("Username");
-    userList.getColumn("groups").setHeaderCaption("Groups");
-    userList.getColumn("permissions").setHeaderCaption("Additional permissions");
+    
+    Grid.Column groupsColum = userList.getColumn("groups");
+    groupsColum.setHeaderCaption("Groups");
+    groupsColum.setConverter(new CommaSeperatedStringConverterSet());
+    
+    Grid.Column permissionsColumn = userList.getColumn("permissions");
+    permissionsColumn.setHeaderCaption("Additional permissions");
+    permissionsColumn.setConverter(new CommaSeperatedStringConverterSet());
+    
     userList.getColumn("expires").setHeaderCaption("Expiration Date");
     userList.getColumn("edit").setHeaderCaption("");
+    
 
     userListTable = new Table();
     userListTable.setEditable(true);
