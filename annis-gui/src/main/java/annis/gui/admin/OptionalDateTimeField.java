@@ -81,6 +81,11 @@ public class OptionalDateTimeField extends CustomField<DateTime>
   {
     return layout;
   }
+  
+  public void setCheckboxCaption(String caption)
+  {
+    checkBox.setCaption(caption);
+  }
 
   @Override
   protected void setInternalValue(DateTime newValue)

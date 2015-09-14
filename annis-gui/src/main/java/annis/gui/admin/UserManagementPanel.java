@@ -122,8 +122,8 @@ public class UserManagementPanel extends Panel
         
         w.setContent(edit);
         w.setModal(true);
-        w.setWidth("300px");
-        w.setHeight("400px");
+        w.setWidth("400px");
+        w.setHeight("300px");
         UI.getCurrent().addWindow(w);
       }
     }));

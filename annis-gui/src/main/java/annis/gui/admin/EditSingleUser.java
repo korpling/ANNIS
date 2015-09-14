@@ -20,9 +20,11 @@ import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
 import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
 
 /**
@@ -41,23 +43,48 @@ public class EditSingleUser extends Panel
   Button btCancel;
 
   PopupTwinColumnSelect groupSelector;
+
   PopupTwinColumnSelect permissionSelector;
+  
+  OptionalDateTimeField expiration;
+  
 
   private User user = new User();
 
   public EditSingleUser()
   {
     Design.read(EditSingleUser.this);
-    
+
     btSave.addClickListener(new Button.ClickListener()
     {
 
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        Notification.show("Clicked");
+        
+        HasComponents parent = getParent();
+        if (parent instanceof Window)
+        {
+          ((Window) parent).close();
+        }
       }
     });
+
+    btCancel.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        HasComponents parent = getParent();
+        if (parent instanceof Window)
+        {
+          ((Window) parent).close();
+        }
+      }
+    });
+    
+    expiration.setCheckboxCaption("expires");
   }
 
   @Override
@@ -76,7 +103,12 @@ public class EditSingleUser extends Panel
     this.user = user;
     lblUser.setValue(user.getName());
     groupSelector.setPropertyDataSource(new ObjectProperty(user.getGroups()));
-    permissionSelector.setPropertyDataSource(new ObjectProperty(user.getPermissions()));
+    permissionSelector.setPropertyDataSource(new ObjectProperty(user.
+      getPermissions()));
+    if(user.getExpires() != null)
+    {
+      expiration.setPropertyDataSource(new ObjectProperty(user.getExpires()));
+    }
   }
 
   public void setGroupsContainer(IndexedContainer groupsContainer)
