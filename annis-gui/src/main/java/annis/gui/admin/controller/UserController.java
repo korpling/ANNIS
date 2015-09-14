@@ -30,8 +30,7 @@ import java.util.concurrent.Callable;
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
-public class UserController
-  implements UserListView.Listener, UIView.Listener
+public class UserController implements UserListView.Listener, UIView.Listener
 {
 
   private final UserManagement model;
@@ -160,7 +159,7 @@ public class UserController
   public void loginChanged(boolean isLoggedIn)
   {
     this.isLoggedIn = isLoggedIn;
-    if(model.getWebResourceProvider() != null)
+    if (model.getWebResourceProvider() != null)
     {
       model.getWebResourceProvider().invalidateWebResource();
     }

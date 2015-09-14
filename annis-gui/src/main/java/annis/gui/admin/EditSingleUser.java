@@ -15,6 +15,7 @@
  */
 package annis.gui.admin;
 
+import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.util.IndexedContainer;
@@ -22,7 +23,6 @@ import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
-import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
@@ -45,11 +45,11 @@ public class EditSingleUser extends Panel
   PopupTwinColumnSelect groupSelector;
 
   PopupTwinColumnSelect permissionSelector;
-  
+
   OptionalDateTimeField expiration;
-  
 
   private User user = new User();
+
 
   public EditSingleUser()
   {
@@ -61,7 +61,14 @@ public class EditSingleUser extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        
+        if (getParent() instanceof UserManagementPanel)
+        {
+          for (UserListView.Listener l : ((UserManagementPanel) getParent()).getListeners())
+          {
+            l.userUpdated(user);
+          }
+        }
+
         HasComponents parent = getParent();
         if (parent instanceof Window)
         {
@@ -83,8 +90,9 @@ public class EditSingleUser extends Panel
         }
       }
     });
-    
+
     expiration.setCheckboxCaption("expires");
+
   }
 
   @Override
@@ -105,7 +113,7 @@ public class EditSingleUser extends Panel
     groupSelector.setPropertyDataSource(new ObjectProperty(user.getGroups()));
     permissionSelector.setPropertyDataSource(new ObjectProperty(user.
       getPermissions()));
-    if(user.getExpires() != null)
+    if (user.getExpires() != null)
     {
       expiration.setPropertyDataSource(new ObjectProperty(user.getExpires()));
     }
@@ -115,5 +123,4 @@ public class EditSingleUser extends Panel
   {
     groupSelector.setSelectableContainer(groupsContainer);
   }
-
 }

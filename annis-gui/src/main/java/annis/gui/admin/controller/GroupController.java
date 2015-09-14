@@ -25,7 +25,6 @@ import annis.gui.admin.model.CorpusManagement;
 import annis.security.Group;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;
-import com.sun.jersey.api.client.WebResource;
 import java.io.Serializable;
 import java.util.LinkedList;
 import java.util.Set;
@@ -37,7 +36,7 @@ import java.util.concurrent.Callable;
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 public class GroupController implements GroupListView.Listener,
-  UIView.Listener, Serializable
+  UIView.Listener,  Serializable
 {
 
   private final GroupManagement model;

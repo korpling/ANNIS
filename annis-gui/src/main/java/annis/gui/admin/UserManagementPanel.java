@@ -25,7 +25,6 @@ import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.event.Action;
-import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
@@ -209,6 +208,7 @@ public class UserManagementPanel extends Panel
       l.addNewUser(txtUserName.getValue());
     }
   }
+  
 
   @Override
   public void addListener(UserListView.Listener listener)
@@ -253,8 +253,11 @@ public class UserManagementPanel extends Panel
     userListTable.setVisible(!show);
     actionLayout.setEnabled(!show);
   }
-  
-  
+
+  public List<UserListView.Listener> getListeners()
+  {
+    return listeners;
+  }
   
   public class AddUserHandler implements Action.Handler
   {
