@@ -16,30 +16,36 @@
 package annis.gui.admin;
 
 import annis.gui.admin.view.GroupListView;
+import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.security.Group;
-import com.vaadin.data.Container;
-import com.vaadin.data.Property;
+import com.vaadin.data.Item;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Field;
+import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
+import com.vaadin.ui.renderers.ButtonRenderer;
+import com.vaadin.ui.renderers.ClickableRenderer;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
+import java.util.TreeSet;
+
 /**
  *
  * @author Thomas Krause <krauseto@hu-berlin.de>
@@ -50,16 +56,19 @@ public class GroupManagementPanel extends Panel
 
   private final List<GroupListView.Listener> listeners = new LinkedList<>();
 
-  private final Table tblGroups = new Table();
+  private final Grid groupsGrid = new Grid();
+
   private final TextField txtGroupName;
+
   private final ProgressBar progress;
+
   private final HorizontalLayout actionLayout;
-  
 
   private final BeanContainer<String, Group> groupsContainer = new BeanContainer<>(
     Group.class);
-  
+
   private final IndexedContainer corpusContainer = new IndexedContainer();
+
   public GroupManagementPanel()
   {
     groupsContainer.setBeanIdProperty("name");
@@ -69,18 +78,55 @@ public class GroupManagementPanel extends Panel
     progress.setIndeterminate(true);
     progress.setVisible(false);
 
-    tblGroups.setContainerDataSource(groupsContainer);
-    tblGroups.setEditable(true);
-    tblGroups.setSelectable(true);
-    tblGroups.setMultiSelect(true);
-    tblGroups.setSizeFull();
-    tblGroups.addStyleName(ChameleonTheme.TABLE_STRIPED);
-    tblGroups.addStyleName("grey-selection");
+    GeneratedPropertyContainer generated = new GeneratedPropertyContainer(
+      groupsContainer);
+    generated.addGeneratedProperty("edit", new PropertyValueGenerator<String>()
+    {
 
-    tblGroups.setTableFieldFactory(new FieldFactory());
+      @Override
+      public String getValue(Item item, Object itemId, Object propertyId)
+      {
+        return "Edit";
+      }
 
-    tblGroups.setVisibleColumns("name", "corpora");
-    tblGroups.setColumnHeaders("Name", "Allowed corpora (seperate with comma)");
+      @Override
+      public Class<String> getType()
+      {
+        return String.class;
+      }
+    });
+    groupsGrid.setContainerDataSource(generated);
+    groupsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
+    groupsGrid.setSizeFull();
+    groupsGrid.setColumns("name", "edit", "corpora");
+    
+    Grid.Column editColumn = groupsGrid.getColumn("edit");
+    editColumn.setRenderer(new ButtonRenderer(
+      new ClickableRenderer.RendererClickListener()
+      {
+
+        @Override
+        public void click(ClickableRenderer.RendererClickEvent event)
+        {
+          Group g = groupsContainer.getItem(event.getItemId()).getBean();
+
+          FieldGroup fields = new FieldGroup(groupsContainer.getItem(event.
+              getItemId()));
+          fields.addCommitHandler(new GroupCommitHandler(g.getName()));
+
+          EditSingleGroup edit = new EditSingleGroup(fields, corpusContainer);
+
+          Window w = new Window("Edit group \"" + g.getName() + "\"");
+          w.setContent(edit);
+          w.setModal(true);
+          w.setWidth("500px");
+          w.setHeight("400px");
+          UI.getCurrent().addWindow(w);
+        }
+      }));
+
+    Grid.Column corporaColumn = groupsGrid.getColumn("corpora");;
+    corporaColumn.setConverter(new CommaSeperatedStringConverterSet());
 
     txtGroupName = new TextField();
     txtGroupName.setInputPrompt("New group name");
@@ -103,8 +149,12 @@ public class GroupManagementPanel extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        // get selected users
-        Set<String> selectedGroups = (Set<String>) tblGroups.getValue();
+        // get selected groups
+        Set<String> selectedGroups = new TreeSet<>();
+        for (Object id : groupsGrid.getSelectedRows())
+        {
+          selectedGroups.add((String) id);
+        }
         for (GroupListView.Listener l : listeners)
         {
           l.deleteGroups(selectedGroups);
@@ -114,20 +164,21 @@ public class GroupManagementPanel extends Panel
 
     actionLayout = new HorizontalLayout(txtGroupName,
       btAddNewGroup, btDeleteGroup);
-    
-    VerticalLayout layout = new VerticalLayout(actionLayout, progress, tblGroups);
+
+    VerticalLayout layout = new VerticalLayout(actionLayout, progress,
+      groupsGrid);
     layout.setSizeFull();
-    layout.setExpandRatio(tblGroups, 1.0f);
+    layout.setExpandRatio(groupsGrid, 1.0f);
     layout.setExpandRatio(progress, 1.0f);
     layout.setSpacing(true);
     layout.setMargin(new MarginInfo(true, false, false, false));
-    
+
     layout.setComponentAlignment(actionLayout, Alignment.MIDDLE_CENTER);
     layout.setComponentAlignment(progress, Alignment.TOP_CENTER);
-    
+
     setContent(layout);
     setSizeFull();
-    
+
     addActionHandler(new AddGroupHandler(txtGroupName));
   }
 
@@ -161,24 +212,24 @@ public class GroupManagementPanel extends Panel
   @Override
   public void addAvailableCorpusNames(Collection<String> corpusNames)
   {
-    for(String c : corpusNames)
+    for (String c : corpusNames)
     {
       corpusContainer.addItem(c);
     }
   }
-  
+
   @Override
   public void setLoadingAnimation(boolean show)
   {
     progress.setVisible(show);
-    tblGroups.setVisible(!show);
+    groupsGrid.setVisible(!show);
     actionLayout.setEnabled(!show);
   }
 
-
   public class AddGroupHandler implements Action.Handler
   {
-    private final Action enterKeyShortcutAction 
+
+    private final Action enterKeyShortcutAction
       = new ShortcutAction(null, ShortcutAction.KeyCode.ENTER, null);
 
     private final Object registeredTarget;
@@ -196,59 +247,42 @@ public class GroupManagementPanel extends Panel
         enterKeyShortcutAction
       };
     }
-    
+
     @Override
     public void handleAction(Action action, Object sender, Object target)
     {
-      if(action == enterKeyShortcutAction && target == registeredTarget)
+      if (action == enterKeyShortcutAction && target == registeredTarget)
       {
         handleAdd();
       }
     }
   }
 
-  public class FieldFactory extends DefaultFieldFactory
+  private class GroupCommitHandler implements FieldGroup.CommitHandler
   {
 
-    @Override
-    public Field<?> createField(Container container, final Object itemId,
-      Object propertyId, Component uiContext)
+    private String groupName;
+
+    public GroupCommitHandler(String groupName)
     {
-      Field<?> result = null;
-
-      switch ((String) propertyId)
-      {
-        case "corpora":
-          
-          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
-          selector.setSelectableContainer(corpusContainer);
-          selector.setWidth("100%");
-          selector.setCaption("Corpora for group \"" + itemId  +"\"");
-          selector.addValueChangeListener(new Property.ValueChangeListener()
-          {
-
-            @Override
-            public void valueChange(Property.ValueChangeEvent event)
-            {
-              for (GroupListView.Listener l : listeners)
-              {
-                l.groupUpdated(groupsContainer.getItem(itemId).getBean());
-              }
-            }
-          });
-
-          result = selector;
-          break;
-        case "name":
-          // explicitly request a read-only label for the name
-          result = null;
-          break;
-        default:
-          result = super.createField(container, itemId, propertyId, uiContext);
-          break;
-      }
-
-      return result;
+      this.groupName = groupName;
     }
+
+    @Override
+    public void preCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException
+    {
+
+    }
+
+    @Override
+    public void postCommit(FieldGroup.CommitEvent commitEvent) throws FieldGroup.CommitException
+    {
+      for (GroupListView.Listener l : listeners)
+      {
+        l.groupUpdated(groupsContainer.getItem(groupName).getBean());
+      }
+    }
+
   }
+
 }

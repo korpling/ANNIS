@@ -19,9 +19,7 @@ import annis.gui.admin.view.UserListView;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.DateTimeStringConverter;
 import annis.security.User;
-import com.vaadin.data.Container;
 import com.vaadin.data.Item;
-import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
@@ -32,15 +30,10 @@ import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
-import com.vaadin.ui.Component;
-import com.vaadin.ui.DefaultFieldFactory;
-import com.vaadin.ui.Field;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
-import com.vaadin.ui.PasswordField;
 import com.vaadin.ui.ProgressBar;
-import com.vaadin.ui.Table;
 import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
@@ -128,8 +121,8 @@ public class UserManagementPanel extends Panel
     userList = new Grid(generated);
     userList.setSizeFull();
     userList.setSelectionMode(Grid.SelectionMode.MULTI);
-    userList.setColumns("name", "groups", "permissions", "expires", "edit",
-      "changePassword");
+    userList.setColumns("name", "edit", "changePassword", "expires", "groups",
+      "permissions");
 
     Grid.Column editColum = userList.getColumn("edit");
     editColum.setRenderer(new ButtonRenderer(
@@ -287,7 +280,7 @@ public class UserManagementPanel extends Panel
       groupsContainer.addItem(g);
     }
   }
-  
+
   @Override
   public void addAvailablePermissions(Collection<String> permissions)
   {
