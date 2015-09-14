@@ -120,7 +120,7 @@ public class GroupManagementPanel extends Panel
           w.setContent(edit);
           w.setModal(true);
           w.setWidth("500px");
-          w.setHeight("400px");
+          w.setHeight("250px");
           UI.getCurrent().addWindow(w);
         }
       }));
