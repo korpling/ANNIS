@@ -108,12 +108,31 @@ public class UserManagementPanel extends Panel
         return String.class;
       }
     });
+    generated.addGeneratedProperty("changePassword",
+      new PropertyValueGenerator<String>()
+      {
+
+        @Override
+        public String getValue(Item item, Object itemId, Object propertyId)
+        {
+          return "Change password";
+        }
+
+        @Override
+        public Class<String> getType()
+        {
+          return String.class;
+        }
+      });
 
     userList = new Grid(generated);
     userList.setSizeFull();
     userList.setSelectionMode(Grid.SelectionMode.MULTI);
-    userList.setColumns("name", "groups", "permissions", "expires", "edit");
-    userList.getColumn("edit").setRenderer(new ButtonRenderer(
+    userList.setColumns("name", "groups", "permissions", "expires", "edit",
+      "changePassword");
+
+    Grid.Column editColum = userList.getColumn("edit");
+    editColum.setRenderer(new ButtonRenderer(
       new ClickableRenderer.RendererClickListener()
       {
 
@@ -122,10 +141,11 @@ public class UserManagementPanel extends Panel
         {
 
           User u = userContainer.getItem(event.getItemId()).getBean();
-          
-          FieldGroup group = new FieldGroup(userContainer.getItem(event.getItemId()));
+
+          FieldGroup group = new FieldGroup(userContainer.getItem(event.
+              getItemId()));
           group.addCommitHandler(new UserCommitHandler(u.getName()));
-          
+
           EditSingleUser edit = new EditSingleUser(group, groupsContainer);
 
           Window w = new Window("Edit user \"" + u.getName() + "\"");
@@ -136,20 +156,33 @@ public class UserManagementPanel extends Panel
           UI.getCurrent().addWindow(w);
         }
       }));
-    userList.getColumn("name").setHeaderCaption("Username");
+    editColum.setHeaderCaption("");
     
+    Grid.Column passwordColumn = userList.getColumn("changePassword");
+    passwordColumn.setRenderer(new ButtonRenderer(
+      new ClickableRenderer.RendererClickListener()
+      {
+
+        @Override
+        public void click(ClickableRenderer.RendererClickEvent event)
+        {
+          UserManagementPanel.this.askForPasswordChange((String) event.getItemId());
+        }
+      }));
+    passwordColumn.setHeaderCaption("");
+
+    userList.getColumn("name").setHeaderCaption("Username");
+
     Grid.Column groupsColum = userList.getColumn("groups");
     groupsColum.setHeaderCaption("Groups");
     groupsColum.setConverter(new CommaSeperatedStringConverterSet());
-    
+
     Grid.Column permissionsColumn = userList.getColumn("permissions");
     permissionsColumn.setHeaderCaption("Additional permissions");
     permissionsColumn.setConverter(new CommaSeperatedStringConverterSet());
-    
-    userList.getColumn("expires").setHeaderCaption("Expiration Date");
-    userList.getColumn("edit").setHeaderCaption("");
-    
 
+    userList.getColumn("expires").setHeaderCaption("Expiration Date");
+   
     userListTable = new Table();
     userListTable.setEditable(true);
     userListTable.setSelectable(true);
@@ -407,9 +440,10 @@ public class UserManagementPanel extends Panel
     }
 
   }
-  
+
   private class UserCommitHandler implements FieldGroup.CommitHandler
   {
+
     private final String userName;
 
     public UserCommitHandler(String userName)
@@ -417,11 +451,10 @@ public class UserManagementPanel extends Panel
       this.userName = userName;
     }
 
-    
     @Override
     public void preCommit(FieldGroup.CommitEvent event) throws FieldGroup.CommitException
     {
-     
+
     }
 
     @Override
