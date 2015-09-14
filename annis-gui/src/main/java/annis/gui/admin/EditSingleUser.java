@@ -15,19 +15,72 @@
  */
 package annis.gui.admin;
 
+import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
+import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.ui.Button;
+import com.vaadin.ui.Label;
+import com.vaadin.ui.Notification;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.declarative.Design;
 
 /**
  * UI to edit the properties of a single user.
+ *
  * @author Thomas Krause <krauseto@hu-berlin.de>
  */
 @DesignRoot
 public class EditSingleUser extends Panel
 {
+
+  Label lblUser;
+
+  Button btSave;
+
+  Button btCancel;
+
+  PopupTwinColumnSelect groupSelector;
+  PopupTwinColumnSelect permissionSelector;
+
+  private User user = new User();
+
   public EditSingleUser()
   {
     Design.read(EditSingleUser.this);
+    
+    btSave.addClickListener(new Button.ClickListener()
+    {
+
+      @Override
+      public void buttonClick(Button.ClickEvent event)
+      {
+        Notification.show("Clicked");
+      }
+    });
   }
+
+  @Override
+  public void attach()
+  {
+    super.attach();
+  }
+
+  public User getUser()
+  {
+    return user;
+  }
+
+  public void setUser(User user)
+  {
+    this.user = user;
+    lblUser.setValue(user.getName());
+    groupSelector.setValue(user.getGroups());
+    permissionSelector.setValue(user.getPermissions());
+  }
+
+  public void setGroupsContainer(IndexedContainer groupsContainer)
+  {
+    groupSelector.setSelectableContainer(groupsContainer);
+  }
+
 }

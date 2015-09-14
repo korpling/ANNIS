@@ -220,7 +220,8 @@ public class GroupManagementPanel extends Panel
       {
         case "corpora":
           
-          PopupTwinColumnSelect selector = new PopupTwinColumnSelect(corpusContainer);
+          PopupTwinColumnSelect selector = new PopupTwinColumnSelect();
+          selector.setSelectableContainer(corpusContainer);
           selector.setWidth("100%");
           selector.setCaption("Corpora for group \"" + itemId  +"\"");
           selector.addValueChangeListener(new Property.ValueChangeListener()

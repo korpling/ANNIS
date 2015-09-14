@@ -46,18 +46,10 @@ public class PopupTwinColumnSelect extends CustomField<Set>
 
   private final TwinColSelect selector;
 
-  private final IndexedContainer selectableContainer;
+  private IndexedContainer selectableContainer = new IndexedContainer();
  
-  public PopupTwinColumnSelect(IndexedContainer selectableContainer)
+  public PopupTwinColumnSelect()
   {
-    if(selectableContainer == null)
-    {
-      selectableContainer = new IndexedContainer();
-    }
-    this.selectableContainer = selectableContainer;
-    
-    selectableContainer.setItemSorter(new StringItemSorter());
-    selectableContainer.sort(null, null);
     
     txtValue = new TextField();
     txtValue.setConverter(new CommaSeperatedStringConverterSet());
@@ -88,7 +80,21 @@ public class PopupTwinColumnSelect extends CustomField<Set>
     super.setCaption(caption);
     selector.setCaption(caption);
   }
-  
+
+  public IndexedContainer getSelectableContainer()
+  {
+    return selectableContainer;
+  }
+
+  public void setSelectableContainer(IndexedContainer selectableContainer)
+  {
+    this.selectableContainer = selectableContainer;
+    
+    this.selectableContainer.setItemSorter(new StringItemSorter());
+    this.selectableContainer.sort(new Object[0], new boolean[0]);
+    
+     this.selector.setContainerDataSource(this.selectableContainer);
+  }
   
 
   @Override
@@ -167,7 +173,7 @@ public class PopupTwinColumnSelect extends CustomField<Set>
       {
         selectableContainer.addItem(val);
       }
-      selectableContainer.sort(null, null);
+      selectableContainer.sort(new Object[0], new boolean[0]);
     }
   }
   

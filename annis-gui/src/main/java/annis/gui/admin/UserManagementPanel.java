@@ -116,13 +116,22 @@ public class UserManagementPanel extends Panel
       {
         User u = userContainer.getItem(event.getItemId()).getBean();
         Window w = new Window("Edit user \"" + u.getName() + "\"");
-        w.setContent(new EditSingleUser());
+        EditSingleUser edit = new EditSingleUser();
+        edit.setGroupsContainer(groupsContainer);
+        edit.setUser(u);
+        
+        w.setContent(edit);
         w.setModal(true);
         w.setWidth("300px");
         w.setHeight("400px");
         UI.getCurrent().addWindow(w);
       }
     }));
+    userList.getColumn("name").setHeaderCaption("Username");
+    userList.getColumn("groups").setHeaderCaption("Groups");
+    userList.getColumn("permissions").setHeaderCaption("Additional permissions");
+    userList.getColumn("expires").setHeaderCaption("Expiration Date");
+    userList.getColumn("edit").setHeaderCaption("");
     
     userListTable = new Table();
     userListTable.setEditable(true);
@@ -316,7 +325,8 @@ public class UserManagementPanel extends Panel
       {
         case "groups":
 
-          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect(groupsContainer);
+          PopupTwinColumnSelect groupsSelector = new PopupTwinColumnSelect();
+          groupsSelector.setSelectableContainer(groupsContainer);
           groupsSelector.setWidth("100%");
           groupsSelector.setCaption("Groups for \"" + itemId + "\"");
           groupsSelector.addValueChangeListener(new UserChangeListener(itemId));
@@ -326,7 +336,8 @@ public class UserManagementPanel extends Panel
           break;
         case "permissions":
           
-          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect(permissionsContainer);
+          PopupTwinColumnSelect permissionSelector = new PopupTwinColumnSelect();
+          permissionSelector.setSelectableContainer(permissionsContainer);
           permissionSelector.setWidth("100%");
           permissionSelector.setCaption("Permissions for \"" + itemId + "\"");
           permissionSelector.addValueChangeListener(new UserChangeListener(itemId));

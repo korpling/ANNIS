@@ -17,11 +17,21 @@ limitations under the License.
 <html>
   <head>
     <title></title>
+    <meta name="package-mapping" content="annis:annis.gui.admin" />
   </head>
   <body>
   <v-panel size-full>
     <v-vertical-layout>
-      <v-button>Hello Test</v-button>
+      <v-form-layout>
+        <v-label _id="lblUser" caption="User"></v-label>
+        <annis-popup-twin-column-select _id="groupSelector" caption="Groups"></annis-popup-twin-column-select>
+        <annis-popup-twin-column-select _id="permissionSelector" caption="Additional permissions"></annis-popup-twin-column-select>
+        <annis-optional-date-time-field caption="Expiration date"></annis-optional-date-time-field>
+      </v-form-layout>
+      <v-horizontal-layout width="100%">
+        <v-button _id="btSave" :center >Save</v-button>
+        <v-button _id="btCancel" :center >Cancel</v-button>
+      </v-horizontal-layout>
     </v-vertical-layout>
   </v-panel>
 </body>

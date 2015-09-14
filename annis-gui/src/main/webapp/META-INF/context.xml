@@ -2,6 +2,5 @@
 <Context antiJARLocking="true" path="/annis-gui">
   <Loader delegate="true"/>
   <!-- We don't want session persistence across restarts since the session holds potential login information. -->
-  <Manager pathname="" />
-
+  <Manager pathname=""/>
 </Context>

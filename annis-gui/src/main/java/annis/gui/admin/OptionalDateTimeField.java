@@ -35,6 +35,11 @@ public class OptionalDateTimeField extends CustomField<DateTime>
   private final DateField dateField;
   private final CheckBox checkBox;
   private final HorizontalLayout layout;
+  
+  public OptionalDateTimeField()
+  {
+    this("");
+  }
 
   public OptionalDateTimeField(String checkboxCaption)
   {

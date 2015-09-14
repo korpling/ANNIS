@@ -1,18 +1,29 @@
 {
+  "attributes": {
+    "_id": {},
+    "width": {},
+    ":expand" : {},
+    ":center" : {}
+  },
   "elements": {
     "v-panel": {
       "attributes": {
         "size-full": {}
       }
     },
+    "v-label": {
+      "attributes": {
+        "caption": {}
+      }
+    },
+    "v-form-layout": {},
+    "annis-popup-twin-column-select": {},
     "v-vertical-layout": {
       "attributes": {
         "size-full": {}
       }
     },
-    "v-button": {
-      "attributes": {
-      }
-    }
+    "v-horizontal-layout": {},
+    "v-button": {}
   }
 }
