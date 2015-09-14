@@ -18,9 +18,12 @@ package annis.gui.admin;
 import annis.gui.admin.view.UserListView;
 import annis.security.User;
 import com.vaadin.data.Container;
+import com.vaadin.data.Item;
 import com.vaadin.data.Property;
 import com.vaadin.data.util.BeanContainer;
+import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.data.util.PropertyValueGenerator;
 import com.vaadin.event.Action;
 import com.vaadin.event.ItemClickEvent;
 import com.vaadin.event.ShortcutAction;
@@ -40,6 +43,8 @@ import com.vaadin.ui.TextField;
 import com.vaadin.ui.UI;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.Window;
+import com.vaadin.ui.renderers.ButtonRenderer;
+import com.vaadin.ui.renderers.ClickableRenderer;
 import com.vaadin.ui.themes.ChameleonTheme;
 import java.util.Collection;
 import java.util.LinkedList;
@@ -82,15 +87,32 @@ public class UserManagementPanel extends Panel
     progress.setIndeterminate(true);
     progress.setVisible(false);
     
-    userList = new Grid(userContainer);
-    userList.setSizeFull();
-    userList.setSelectionMode(Grid.SelectionMode.MULTI);
-    userList.setColumns("name", "groups", "permissions", "expires");
-    userList.addItemClickListener(new ItemClickEvent.ItemClickListener()
+    GeneratedPropertyContainer generated = new GeneratedPropertyContainer(userContainer);
+    generated.addGeneratedProperty("edit", new PropertyValueGenerator<String>()
     {
 
       @Override
-      public void itemClick(ItemClickEvent event)
+      public String getValue(Item item, Object itemId, Object propertyId)
+      {
+        return "Edit";
+      }
+
+      @Override
+      public Class<String> getType()
+      {
+        return String.class;
+      }
+    });
+    
+    userList = new Grid(generated);
+    userList.setSizeFull();
+    userList.setSelectionMode(Grid.SelectionMode.MULTI);
+    userList.setColumns("name", "groups", "permissions", "expires", "edit");
+    userList.getColumn("edit").setRenderer(new ButtonRenderer(new ClickableRenderer.RendererClickListener()
+    {
+
+      @Override
+      public void click(ClickableRenderer.RendererClickEvent event)
       {
         User u = userContainer.getItem(event.getItemId()).getBean();
         Window w = new Window("Edit user \"" + u.getName() + "\"");
@@ -100,7 +122,7 @@ public class UserManagementPanel extends Panel
         w.setHeight("400px");
         UI.getCurrent().addWindow(w);
       }
-    });
+    }));
     
     userListTable = new Table();
     userListTable.setEditable(true);
