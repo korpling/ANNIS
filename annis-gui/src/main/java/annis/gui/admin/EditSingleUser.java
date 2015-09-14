@@ -15,8 +15,11 @@
  */
 package annis.gui.admin;
 
+import annis.security.User;
 import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.ui.Button;
@@ -25,6 +28,8 @@ import com.vaadin.ui.Label;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.Window;
 import com.vaadin.ui.declarative.Design;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * UI to edit the properties of a single user.
@@ -47,38 +52,35 @@ public class EditSingleUser extends Panel
 
   private OptionalDateTimeField expirationSelector;
 
-  public EditSingleUser(
-    String userName,
-    final Property.Transactional groups,
-    final Property.Transactional permissions,
-    final Property.Transactional expires,
+  public EditSingleUser(final FieldGroup fields,
     IndexedContainer groupsContainer)
   {
     Design.read(EditSingleUser.this);
 
-    
     groupSelector.setSelectableContainer(groupsContainer);
     
-    groups.startTransaction();
-    permissions.startTransaction();
-    expires.startTransaction();
+    lblUser.setValue((String) fields.getItemDataSource().getItemProperty("name").getValue());
 
     // bind the fields
-    lblUser.setPropertyDataSource(new ObjectProperty<>(userName));
-    groupSelector.setPropertyDataSource(groups);
-    permissionSelector.setPropertyDataSource(permissions);
-    expirationSelector.setPropertyDataSource(expires);
-
+    fields.bind(groupSelector, "groups");
+    fields.bind(permissionSelector, "permissions");
+    fields.bind(expirationSelector, "expires");
+    
     // events
     btSave.addClickListener(new Button.ClickListener()
     {
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        groups.commit();
-        permissions.commit();
-        expires.commit();
-        
+        try
+        {
+          fields.commit();
+        }
+        catch (FieldGroup.CommitException ex)
+        {
+        }
+
+
         HasComponents parent = getParent();
         if (parent instanceof Window)
         {
@@ -93,9 +95,7 @@ public class EditSingleUser extends Panel
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        groups.rollback();
-        permissions.rollback();
-        expires.rollback();
+        fields.discard();
 
         HasComponents parent = getParent();
         if (parent instanceof Window)
@@ -107,12 +107,6 @@ public class EditSingleUser extends Panel
 
     expirationSelector.setCheckboxCaption("expires");
 
-  }
-
-  @Override
-  public void attach()
-  {
-    super.attach();
   }
 
 }

@@ -20,13 +20,13 @@ import annis.security.User;
 import com.vaadin.data.Container;
 import com.vaadin.data.Item;
 import com.vaadin.data.Property;
+import com.vaadin.data.fieldgroup.BeanFieldGroup;
+import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
-import com.vaadin.data.util.BeanItem;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
-import com.vaadin.data.util.ObjectProperty;
 import com.vaadin.data.util.PropertyValueGenerator;
-import com.vaadin.data.util.TransactionalPropertyWrapper;
+import com.vaadin.data.util.PropertysetItem;
 import com.vaadin.event.Action;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
@@ -124,17 +124,10 @@ public class UserManagementPanel extends Panel
 
           User u = userContainer.getItem(event.getItemId()).getBean();
           
-         TransactionalPropertyWrapper groups = new TransactionalPropertyWrapper(userContainer.getContainerProperty(
-                event.getItemId(), "groups"));
-         TransactionalPropertyWrapper permissions = 
-            new TransactionalPropertyWrapper(userContainer.getContainerProperty(
-                event.getItemId(), "permissions"));
-         TransactionalPropertyWrapper expires = 
-            new TransactionalPropertyWrapper(userContainer.getContainerProperty(
-                event.getItemId(), "expires"));
-         
-          EditSingleUser edit = new EditSingleUser(u.getName(),
-            groups, permissions, expires, groupsContainer);
+          FieldGroup group = new FieldGroup(userContainer.getItem(event.getItemId()));
+          group.addCommitHandler(new UserCommitHandler(u.getName()));
+          
+          EditSingleUser edit = new EditSingleUser(group, groupsContainer);
 
           Window w = new Window("Edit user \"" + u.getName() + "\"");
           w.setContent(edit);
@@ -403,6 +396,33 @@ public class UserManagementPanel extends Panel
       for (UserListView.Listener l : listeners)
       {
         l.userUpdated(userContainer.getItem(itemId).getBean());
+      }
+    }
+
+  }
+  
+  private class UserCommitHandler implements FieldGroup.CommitHandler
+  {
+    private final String userName;
+
+    public UserCommitHandler(String userName)
+    {
+      this.userName = userName;
+    }
+
+    
+    @Override
+    public void preCommit(FieldGroup.CommitEvent event) throws FieldGroup.CommitException
+    {
+     
+    }
+
+    @Override
+    public void postCommit(FieldGroup.CommitEvent event) throws FieldGroup.CommitException
+    {
+      for (UserListView.Listener l : listeners)
+      {
+        l.userUpdated(userContainer.getItem(userName).getBean());
       }
     }
 
