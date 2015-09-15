@@ -79,14 +79,14 @@ def initArgsFromConfig(config):
 	# append mandatory elements
 	r = ["--host", url.hostname, "--database", url.path[1:],
 		"--user", config["datasource.username"].strip(),
-		"--password", config["datasource.password"].strip()]
+		"--password", config["datasource.password"].strip(),
+		"--port", str(url.port)]
 	# optional arguments
 	if config["datasource.ssl"] and config["datasource.ssl"].strip().lower() == "true" :
 		r.append("--ssl")
 	if config["datasource.schema"]:
 		r.append("--schema")
 		r.append(config["datasource.schema"].strip())
-		
 	return r
 	
 def initDatabase(config, instDir):
