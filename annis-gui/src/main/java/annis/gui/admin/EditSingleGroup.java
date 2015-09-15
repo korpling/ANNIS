@@ -18,6 +18,7 @@ package annis.gui.admin;
 import com.vaadin.annotations.DesignRoot;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.IndexedContainer;
+import com.vaadin.event.ShortcutAction;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HasComponents;
 import com.vaadin.ui.Label;
@@ -76,6 +77,7 @@ public class EditSingleGroup extends Panel
         }
       }
     });
+    btSave.setClickShortcut(ShortcutAction.KeyCode.ENTER, ShortcutAction.ModifierKey.CTRL);
 
     btCancel.addClickListener(new Button.ClickListener()
     {
