@@ -18,7 +18,9 @@ package annis.gui.admin;
 import annis.gui.admin.view.GroupListView;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.security.Group;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
@@ -120,6 +122,23 @@ public class GroupManagementPanel extends Panel
       }
     });
     filterRow.getCell("name").setComponent(groupFilterField);
+    
+    TextField corpusFilterField = new TextField();
+    corpusFilterField.setInputPrompt("Filter by corpus");
+    corpusFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        groupsContainer.removeContainerFilters("corpora");
+        if(!event.getText().isEmpty())
+        {
+          groupsContainer.addContainerFilter(new StringPatternInSetFilter("corpora", event.getText()));
+        }
+      }
+    });
+    filterRow.getCell("corpora").setComponent(corpusFilterField);
     
     Grid.Column editColumn = groupsGrid.getColumn("edit");
     editColumn.setRenderer(new ButtonRenderer(
@@ -305,6 +324,48 @@ public class GroupManagementPanel extends Panel
       }
     }
 
+  }
+  
+  public static class StringPatternInSetFilter implements Container.Filter
+  {
+    private final Object propertyId;
+    private final String pattern;
+
+    public StringPatternInSetFilter(Object propertyId, String pattern)
+    {
+      this.propertyId = propertyId;
+      this.pattern = pattern.toLowerCase();
+    }
+
+    @Override
+    public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException
+    {
+      Property<?> p = item.getItemProperty(propertyId);
+      if(p.getValue() instanceof Set)
+      {
+        Set val = (Set) p.getValue();
+        for(Object o : val)
+        {
+          if((o.toString().toLowerCase()).contains(pattern))
+          {
+            return true;
+          }
+       }
+      }
+      else
+      {
+        throw new UnsupportedOperationException();
+      }
+      
+      return false;
+    }
+
+    @Override
+    public boolean appliesToProperty(Object propertyId)
+    {
+      return this.propertyId.equals(propertyId);
+    }
+    
   }
 
 }
