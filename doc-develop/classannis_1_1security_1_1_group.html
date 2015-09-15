@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
+   &#160;<span id="projectnumber">3.4.0-preview1</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -117,15 +117,17 @@ $(document).ready(function(){initNavTree('classannis_1_1security_1_1_group.html'
 
 <p>Represents a group.  
  <a href="classannis_1_1security_1_1_group.html#details">More...</a></p>
+
+<p>Inherits Serializable.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
 <tr class="memitem:af01fd0fecb8517ca79d64b5e6dff85ff"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="af01fd0fecb8517ca79d64b5e6dff85ff"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Group</b> (String name)</td></tr>
 <tr class="separator:af01fd0fecb8517ca79d64b5e6dff85ff"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac6a830b07c80ecfd7a3585a44d197fc9"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ac6a830b07c80ecfd7a3585a44d197fc9"></a>
-&#160;</td><td class="memItemRight" valign="bottom"><b>Group</b> (String name, Set&lt; String &gt; corpora)</td></tr>
-<tr class="separator:ac6a830b07c80ecfd7a3585a44d197fc9"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a0f14903f9632b18b916eeeac3fe53351"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a0f14903f9632b18b916eeeac3fe53351"></a>
+&#160;</td><td class="memItemRight" valign="bottom"><b>Group</b> (String name, TreeSet&lt; String &gt; corpora)</td></tr>
+<tr class="separator:a0f14903f9632b18b916eeeac3fe53351"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a056eb29b0e4dec0b4341ef85b8153f39"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a056eb29b0e4dec0b4341ef85b8153f39"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>Group</b> (String name, String corpusNames)</td></tr>
 <tr class="separator:a056eb29b0e4dec0b4341ef85b8153f39"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -135,12 +137,12 @@ String&#160;</td><td class="memItemRight" valign="bottom"><b>getName</b> ()</td>
 <tr class="memitem:aff9038de99e659f8419f09ce84fd7014"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aff9038de99e659f8419f09ce84fd7014"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>setName</b> (String name)</td></tr>
 <tr class="separator:aff9038de99e659f8419f09ce84fd7014"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a16a05c63f40d2b19587017d81e86118a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a16a05c63f40d2b19587017d81e86118a"></a>
-Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getCorpora</b> ()</td></tr>
-<tr class="separator:a16a05c63f40d2b19587017d81e86118a"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ad758d315ad2ae3fd940901cf7085665a"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad758d315ad2ae3fd940901cf7085665a"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>setCorpora</b> (Set&lt; String &gt; corpora)</td></tr>
-<tr class="separator:ad758d315ad2ae3fd940901cf7085665a"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a9d17aebb6676706625258e39c83a7c6f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a9d17aebb6676706625258e39c83a7c6f"></a>
+TreeSet&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getCorpora</b> ()</td></tr>
+<tr class="separator:a9d17aebb6676706625258e39c83a7c6f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:aad08e027cf03c6f7a7f848042d399f4f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="aad08e027cf03c6f7a7f848042d399f4f"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>setCorpora</b> (TreeSet&lt; String &gt; corpora)</td></tr>
+<tr class="separator:aad08e027cf03c6f7a7f848042d399f4f"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table><table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-static-attribs"></a>
 Static Public Attributes</h2></td></tr>
@@ -163,7 +165,7 @@ static final String&#160;</td><td class="memItemRight" valign="bottom"><b>DEFAUL
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>security</b></li><li class="navelem"><a class="el" href="classannis_1_1security_1_1_group.html">Group</a></li>
-    <li class="footer">Generated on Sat Sep 12 2015 01:33:52 for ANNIS by
+    <li class="footer">Generated on Tue Sep 15 2015 22:19:29 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

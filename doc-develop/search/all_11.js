@@ -40,5 +40,7 @@ var searchData=
   ['rstfull',['RSTFull',['../classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_full.html',1,'annis::visualizers::component::rst']]],
   ['rstimpl',['RSTImpl',['../classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_impl.html',1,'annis::visualizers::component::rst']]],
   ['rstpanel',['RSTPanel',['../classannis_1_1visualizers_1_1component_1_1rst_1_1_r_s_t_panel.html',1,'annis::visualizers::component::rst']]],
-  ['running',['RUNNING',['../classannis_1_1service_1_1objects_1_1_import_job.html#a8ce7df3042cde08ba6ece4124405b189',1,'annis::service::objects::ImportJob::Status']]]
+  ['runinbackground',['runInBackground',['../interfaceannis_1_1gui_1_1admin_1_1view_1_1_u_i_view.html#a3199932be7783a5fb2c08d7c446c7eaa',1,'annis::gui::admin::view::UIView']]],
+  ['running',['RUNNING',['../classannis_1_1service_1_1objects_1_1_import_job.html#a8ce7df3042cde08ba6ece4124405b189',1,'annis::service::objects::ImportJob::Status']]],
+  ['runwithcallback',['runWithCallback',['../classannis_1_1libgui_1_1_background.html#a69c34c8e40529fe369ce6c39ce363a51',1,'annis::libgui::Background']]]
 ];

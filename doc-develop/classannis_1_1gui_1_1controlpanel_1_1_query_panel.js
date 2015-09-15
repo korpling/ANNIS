@@ -1,7 +1,7 @@
 var classannis_1_1gui_1_1controlpanel_1_1_query_panel =
 [
     [ "ShowResultClickListener", "classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener.html", "classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener" ],
-    [ "QueryPanel", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#ab272525b7bd4ab495b3bdaf7799a922e", null ],
+    [ "QueryPanel", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#aff0d8fa01b81993cb980b5a42b0e97e0", null ],
     [ "getLastPublicStatus", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#af6f7b5a6c4da11fb05ad9bf451238d8a", null ],
     [ "getPiCount", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#a1c5039440832fcacb01e637f53084c93", null ],
     [ "getQuery", "classannis_1_1gui_1_1controlpanel_1_1_query_panel.html#a3a2bab1b5c83de11d1f4227a24f82f0c", null ],

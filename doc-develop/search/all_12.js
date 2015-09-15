@@ -11,7 +11,7 @@ var searchData=
   ['search',['Search',['../classannis_1_1corpuspathsearch_1_1_search.html',1,'annis::corpuspathsearch']]],
   ['searchbox',['SearchBox',['../classannis_1_1gui_1_1flatquerybuilder_1_1_search_box.html',1,'annis::gui::flatquerybuilder']]],
   ['searchoptionspanel',['SearchOptionsPanel',['../classannis_1_1gui_1_1controlpanel_1_1_search_options_panel.html',1,'annis::gui::controlpanel']]],
-  ['searchui',['SearchUI',['../classannis_1_1gui_1_1_search_u_i.html',1,'annis::gui']]],
+  ['searchview',['SearchView',['../classannis_1_1gui_1_1_search_view.html',1,'annis::gui']]],
   ['segmentationlist',['SegmentationList',['../classannis_1_1service_1_1objects_1_1_segmentation_list.html',1,'annis::service::objects']]],
   ['selectclausesqlgenerator',['SelectClauseSqlGenerator',['../interfaceannis_1_1sqlgen_1_1_select_clause_sql_generator.html',1,'annis::sqlgen']]],
   ['selectclausesqlgenerator_3c_20annis_3a_3aql_3a_3aparser_3a_3aquerydata_20_3e',['SelectClauseSqlGenerator&lt; annis::ql::parser::QueryData &gt;',['../interfaceannis_1_1sqlgen_1_1_select_clause_sql_generator.html',1,'annis::sqlgen']]],

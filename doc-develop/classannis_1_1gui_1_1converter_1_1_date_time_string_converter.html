@@ -4,7 +4,7 @@
 <meta http-equiv="Content-Type" content="text/xhtml;charset=UTF-8"/>
 <meta http-equiv="X-UA-Compatible" content="IE=9"/>
 <meta name="generator" content="Doxygen 1.8.9.1"/>
-<title>ANNIS: annis.gui.admin.GroupManagementPanel.FieldFactory Class Reference</title>
+<title>ANNIS: annis.gui.converter.DateTimeStringConverter Class Reference</title>
 <link href="tabs.css" rel="stylesheet" type="text/css"/>
 <script type="text/javascript" src="jquery.js"></script>
 <script type="text/javascript" src="dynsections.js"></script>
@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
+   &#160;<span id="projectnumber">3.4.0-preview1</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -88,7 +88,7 @@ var searchBox = new SearchBox("searchBox", "search",false,'Search');
   </div>
 </div>
 <script type="text/javascript">
-$(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1_group_management_panel_1_1_field_factory.html','');});
+$(document).ready(function(){initNavTree('classannis_1_1gui_1_1converter_1_1_date_time_string_converter.html','');});
 </script>
 <div id="doc-content">
 <!-- window showing the filter options -->
@@ -108,27 +108,38 @@ $(document).ready(function(){initNavTree('classannis_1_1gui_1_1admin_1_1_group_m
 <div class="header">
   <div class="summary">
 <a href="#pub-methods">Public Member Functions</a> &#124;
-<a href="classannis_1_1gui_1_1admin_1_1_group_management_panel_1_1_field_factory-members.html">List of all members</a>  </div>
+<a href="classannis_1_1gui_1_1converter_1_1_date_time_string_converter-members.html">List of all members</a>  </div>
   <div class="headertitle">
-<div class="title">annis.gui.admin.GroupManagementPanel.FieldFactory Class Reference</div>  </div>
+<div class="title">annis.gui.converter.DateTimeStringConverter Class Reference</div>  </div>
 </div><!--header-->
 <div class="contents">
 
-<p>Inherits DefaultFieldFactory.</p>
+<p>Inherits Converter&lt; String, DateTime &gt;.</p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
-<tr class="memitem:ad2a3cc182237aaf8e3ada8ffc090a840"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ad2a3cc182237aaf8e3ada8ffc090a840"></a>
-Field&lt;?&gt;&#160;</td><td class="memItemRight" valign="bottom"><b>createField</b> (Container container, final Object itemId, Object propertyId, Component uiContext)</td></tr>
-<tr class="separator:ad2a3cc182237aaf8e3ada8ffc090a840"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a1a428d2738929a5fd451b6c62f8bd67f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a1a428d2738929a5fd451b6c62f8bd67f"></a>
+DateTime&#160;</td><td class="memItemRight" valign="bottom"><b>convertToModel</b> (String value, Class&lt;?extends DateTime &gt; targetType, Locale locale)  throws ConversionException   </td></tr>
+<tr class="separator:a1a428d2738929a5fd451b6c62f8bd67f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5f15ccc2ebd730b5946bc979035da300"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5f15ccc2ebd730b5946bc979035da300"></a>
+String&#160;</td><td class="memItemRight" valign="bottom"><b>convertToPresentation</b> (DateTime value, Class&lt;?extends String &gt; targetType, Locale locale)  throws ConversionException   </td></tr>
+<tr class="separator:a5f15ccc2ebd730b5946bc979035da300"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a33daeb2a86391c15c18222f3bf828e0f"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a33daeb2a86391c15c18222f3bf828e0f"></a>
+Class&lt; DateTime &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getModelType</b> ()</td></tr>
+<tr class="separator:a33daeb2a86391c15c18222f3bf828e0f"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a5ee24c1f81b2c64a33c61be5513b4fae"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a5ee24c1f81b2c64a33c61be5513b4fae"></a>
+Class&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><b>getPresentationType</b> ()</td></tr>
+<tr class="separator:a5ee24c1f81b2c64a33c61be5513b4fae"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-</div><!-- contents -->
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><dl class="section author"><dt>Author</dt><dd>Thomas Krause <a href="#" onclick="location.href='mai'+'lto:'+'kra'+'us'+'eto'+'@h'+'u-b'+'er'+'lin'+'.d'+'e'; return false;">kraus<span style="display: none;">.nosp@m.</span>eto@<span style="display: none;">.nosp@m.</span>hu-be<span style="display: none;">.nosp@m.</span>rlin<span style="display: none;">.nosp@m.</span>.de</a> </dd></dl>
+</div></div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
-    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>admin</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1_group_management_panel.html">GroupManagementPanel</a></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1admin_1_1_group_management_panel_1_1_field_factory.html">FieldFactory</a></li>
-    <li class="footer">Generated on Sat Sep 12 2015 01:33:52 for ANNIS by
+    <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>converter</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1converter_1_1_date_time_string_converter.html">DateTimeStringConverter</a></li>
+    <li class="footer">Generated on Tue Sep 15 2015 22:19:29 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

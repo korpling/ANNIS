@@ -5,6 +5,7 @@ var searchData=
   ['dataobject',['DataObject',['../classannis_1_1model_1_1_data_object.html',1,'annis::model']]],
   ['datetimeadapter',['DateTimeAdapter',['../classannis_1_1adapter_1_1_date_time_adapter.html',1,'annis::adapter']]],
   ['datetimeconverter',['DateTimeConverter',['../classannis_1_1gui_1_1converter_1_1_date_time_converter.html',1,'annis::gui::converter']]],
+  ['datetimestringconverter',['DateTimeStringConverter',['../classannis_1_1gui_1_1converter_1_1_date_time_string_converter.html',1,'annis::gui::converter']]],
   ['debugvisualizer',['DebugVisualizer',['../classannis_1_1visualizers_1_1component_1_1graph_1_1_debug_visualizer.html',1,'annis::visualizers::component::graph']]],
   ['defaultstyler',['DefaultStyler',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html',1,'annis::visualizers::component::tree::TigerTreeVisualizer']]],
   ['defaultwhereclausegenerator',['DefaultWhereClauseGenerator',['../classannis_1_1sqlgen_1_1_default_where_clause_generator.html',1,'annis::sqlgen']]],

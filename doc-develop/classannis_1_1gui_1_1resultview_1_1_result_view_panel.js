@@ -1,6 +1,6 @@
 var classannis_1_1gui_1_1resultview_1_1_result_view_panel =
 [
-    [ "ResultViewPanel", "classannis_1_1gui_1_1resultview_1_1_result_view_panel.html#ac8c88d18364577047a3864f179a73350", null ],
+    [ "ResultViewPanel", "classannis_1_1gui_1_1resultview_1_1_result_view_panel.html#ab6e4130bec30e38ab7eca8629dce3909", null ],
     [ "getPaging", "classannis_1_1gui_1_1resultview_1_1_result_view_panel.html#ac134a1b1d36f29861045f1729983d973", null ],
     [ "getVisibleTokenAnnos", "classannis_1_1gui_1_1resultview_1_1_result_view_panel.html#afded96fc19165b48b294f74fd462ff44", null ],
     [ "onCompononentLoaded", "classannis_1_1gui_1_1resultview_1_1_result_view_panel.html#a6c241562636c33880de83b0c7b050b54", null ],

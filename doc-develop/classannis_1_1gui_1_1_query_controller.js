@@ -1,6 +1,6 @@
 var classannis_1_1gui_1_1_query_controller =
 [
-    [ "QueryController", "classannis_1_1gui_1_1_query_controller.html#a9050c05d0cdae96552461eedb5fe85e3", null ],
+    [ "QueryController", "classannis_1_1gui_1_1_query_controller.html#ababb9d14b99b61b5e3292753e5d547d3", null ],
     [ "addHistoryEntry", "classannis_1_1gui_1_1_query_controller.html#ad9075e3d078966717c64bf80219d0831", null ],
     [ "cancelExport", "classannis_1_1gui_1_1_query_controller.html#a60e7fbdc4c20f2950c46801041dd1215", null ],
     [ "changeContext", "classannis_1_1gui_1_1_query_controller.html#a99c03eeca207ad1479d5aa992eb87789", null ],

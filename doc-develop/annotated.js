@@ -62,7 +62,8 @@ var annotated =
           [ "model", null, [
             [ "CorpusManagement", "classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management.html", "classannis_1_1gui_1_1admin_1_1model_1_1_corpus_management" ],
             [ "GroupManagement", "classannis_1_1gui_1_1admin_1_1model_1_1_group_management.html", "classannis_1_1gui_1_1admin_1_1model_1_1_group_management" ],
-            [ "UserManagement", "classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html", "classannis_1_1gui_1_1admin_1_1model_1_1_user_management" ]
+            [ "UserManagement", "classannis_1_1gui_1_1admin_1_1model_1_1_user_management.html", "classannis_1_1gui_1_1admin_1_1model_1_1_user_management" ],
+            [ "WebResourceProvider", "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider.html", "interfaceannis_1_1gui_1_1admin_1_1model_1_1_web_resource_provider" ]
           ] ],
           [ "view", null, [
             [ "CorpusListView", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view.html", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_corpus_list_view" ],
@@ -71,11 +72,14 @@ var annotated =
             [ "UserListView", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view.html", "interfaceannis_1_1gui_1_1admin_1_1view_1_1_user_list_view" ]
           ] ],
           [ "CorpusAdminPanel", "classannis_1_1gui_1_1admin_1_1_corpus_admin_panel.html", "classannis_1_1gui_1_1admin_1_1_corpus_admin_panel" ],
+          [ "EditSingleGroup", "classannis_1_1gui_1_1admin_1_1_edit_single_group.html", "classannis_1_1gui_1_1admin_1_1_edit_single_group" ],
+          [ "EditSingleUser", "classannis_1_1gui_1_1admin_1_1_edit_single_user.html", "classannis_1_1gui_1_1admin_1_1_edit_single_user" ],
           [ "GroupManagementPanel", "classannis_1_1gui_1_1admin_1_1_group_management_panel.html", "classannis_1_1gui_1_1admin_1_1_group_management_panel" ],
           [ "ImportPanel", "classannis_1_1gui_1_1admin_1_1_import_panel.html", "classannis_1_1gui_1_1admin_1_1_import_panel" ],
           [ "NewPasswordWindow", "classannis_1_1gui_1_1admin_1_1_new_password_window.html", "classannis_1_1gui_1_1admin_1_1_new_password_window" ],
           [ "OptionalDateTimeField", "classannis_1_1gui_1_1admin_1_1_optional_date_time_field.html", "classannis_1_1gui_1_1admin_1_1_optional_date_time_field" ],
           [ "PopupTwinColumnSelect", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select.html", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select" ],
+          [ "PopupTwinColumnSelectMultiline", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select_multiline.html", "classannis_1_1gui_1_1admin_1_1_popup_twin_column_select_multiline" ],
           [ "UserManagementPanel", "classannis_1_1gui_1_1admin_1_1_user_management_panel.html", "classannis_1_1gui_1_1admin_1_1_user_management_panel" ]
         ] ],
         [ "beans", null, [
@@ -122,6 +126,7 @@ var annotated =
           [ "CommaSeperatedStringConverterList", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_list.html", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_list" ],
           [ "CommaSeperatedStringConverterSet", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_set.html", "classannis_1_1gui_1_1converter_1_1_comma_seperated_string_converter_set" ],
           [ "DateTimeConverter", "classannis_1_1gui_1_1converter_1_1_date_time_converter.html", "classannis_1_1gui_1_1converter_1_1_date_time_converter" ],
+          [ "DateTimeStringConverter", "classannis_1_1gui_1_1converter_1_1_date_time_string_converter.html", "classannis_1_1gui_1_1converter_1_1_date_time_string_converter" ],
           [ "TreeSetConverter", "classannis_1_1gui_1_1converter_1_1_tree_set_converter.html", "classannis_1_1gui_1_1converter_1_1_tree_set_converter" ]
         ] ],
         [ "docbrowser", null, [
@@ -239,7 +244,8 @@ var annotated =
           [ "SimpleCanvas", "classannis_1_1gui_1_1widgets_1_1_simple_canvas.html", "classannis_1_1gui_1_1widgets_1_1_simple_canvas" ]
         ] ],
         [ "AboutWindow", "classannis_1_1gui_1_1_about_window.html", "classannis_1_1gui_1_1_about_window" ],
-        [ "AdminUI", "classannis_1_1gui_1_1_admin_u_i.html", "classannis_1_1gui_1_1_admin_u_i" ],
+        [ "AdminView", "classannis_1_1gui_1_1_admin_view.html", "classannis_1_1gui_1_1_admin_view" ],
+        [ "AnnisUI", "classannis_1_1gui_1_1_annis_u_i.html", "classannis_1_1gui_1_1_annis_u_i" ],
         [ "AnnisUIProvider", "classannis_1_1gui_1_1_annis_u_i_provider.html", "classannis_1_1gui_1_1_annis_u_i_provider" ],
         [ "CitationLinkGenerator", "classannis_1_1gui_1_1_citation_link_generator.html", "classannis_1_1gui_1_1_citation_link_generator" ],
         [ "CitationWindow", "classannis_1_1gui_1_1_citation_window.html", "classannis_1_1gui_1_1_citation_window" ],
@@ -258,7 +264,7 @@ var annotated =
         [ "MetaDataPanel", "classannis_1_1gui_1_1_meta_data_panel.html", "classannis_1_1gui_1_1_meta_data_panel" ],
         [ "QueryController", "classannis_1_1gui_1_1_query_controller.html", "classannis_1_1gui_1_1_query_controller" ],
         [ "ReportBugWindow", "classannis_1_1gui_1_1_report_bug_window.html", "classannis_1_1gui_1_1_report_bug_window" ],
-        [ "SearchUI", "classannis_1_1gui_1_1_search_u_i.html", "classannis_1_1gui_1_1_search_u_i" ],
+        [ "SearchView", "classannis_1_1gui_1_1_search_view.html", "classannis_1_1gui_1_1_search_view" ],
         [ "ServiceQueryException", "classannis_1_1gui_1_1_service_query_exception.html", "classannis_1_1gui_1_1_service_query_exception" ],
         [ "Sidebar", "interfaceannis_1_1gui_1_1_sidebar.html", "interfaceannis_1_1gui_1_1_sidebar" ],
         [ "SidebarState", "enumannis_1_1gui_1_1_sidebar_state.html", "enumannis_1_1gui_1_1_sidebar_state" ]
