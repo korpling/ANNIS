@@ -19,7 +19,9 @@ import annis.gui.admin.view.UserListView;
 import annis.gui.converter.CommaSeperatedStringConverterSet;
 import annis.gui.converter.DateTimeStringConverter;
 import annis.security.User;
+import com.vaadin.data.Container;
 import com.vaadin.data.Item;
+import com.vaadin.data.Property;
 import com.vaadin.data.fieldgroup.FieldGroup;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
@@ -32,6 +34,7 @@ import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
+import com.vaadin.ui.CheckBox;
 import com.vaadin.ui.Grid;
 import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.HorizontalLayout;
@@ -49,6 +52,7 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Set;
 import java.util.TreeSet;
+import org.joda.time.DateTime;
 
 /**
  *
@@ -145,6 +149,22 @@ public class UserManagementPanel extends Panel
       }
     });
     filterRow.getCell("name").setComponent(userFilterField);
+    
+    CheckBox expiredFilterField = new CheckBox("has expired");
+    expiredFilterField.addValueChangeListener(new Property.ValueChangeListener()
+    {
+
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        userContainer.removeContainerFilters("expires");
+        if((Boolean) event.getProperty().getValue() == true)
+        {
+          userContainer.addContainerFilter(new ExpiredUserFilter("expires"));
+        }
+      }
+    });
+    filterRow.getCell("expires").setComponent(expiredFilterField);
 
     Grid.Column editColum = userList.getColumn("edit");
     editColum.setRenderer(new ButtonRenderer(
@@ -383,6 +403,45 @@ public class UserManagementPanel extends Panel
       }
     }
 
+  }
+  
+  public static class ExpiredUserFilter implements Container.Filter
+  {
+    
+    private final Object propertyId;
+
+    public ExpiredUserFilter(Object propertyId)
+    {
+      this.propertyId = propertyId;
+    }
+    
+    @Override
+    public boolean passesFilter(Object itemId, Item item) throws UnsupportedOperationException
+    {
+      Object expirationDateRaw = item.getItemProperty(propertyId).getValue();
+      if(expirationDateRaw instanceof DateTime)
+      {
+        DateTime expirationDate = (DateTime) expirationDateRaw;
+        
+        return expirationDate.isBeforeNow();
+      }
+      else if(expirationDateRaw == null)
+      {
+        // everything without an explicit date does not expire
+        return false;
+      }
+      else
+      {
+        throw new UnsupportedOperationException();
+      }
+    }
+
+    @Override
+    public boolean appliesToProperty(Object propertyId)
+    {
+      return this.propertyId.equals(propertyId);
+    }
+    
   }
 
 }
