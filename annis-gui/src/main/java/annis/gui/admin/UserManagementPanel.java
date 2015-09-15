@@ -25,12 +25,15 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.Grid;
+import com.vaadin.ui.Grid.HeaderRow;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;
 import com.vaadin.ui.ProgressBar;
@@ -123,6 +126,25 @@ public class UserManagementPanel extends Panel
     userList.setSelectionMode(Grid.SelectionMode.MULTI);
     userList.setColumns("name", "edit", "changePassword", "expires", "groups",
       "permissions");
+    
+    HeaderRow filterRow = userList.appendHeaderRow();
+    TextField userFilterField = new TextField();
+    userFilterField.setInputPrompt("Filter");
+    userFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        userContainer.removeContainerFilters("name");
+        if(!event.getText().isEmpty())
+        {
+          userContainer.addContainerFilter(new SimpleStringFilter("name",
+            event.getText(), true, false));
+        }
+      }
+    });
+    filterRow.getCell("name").setComponent(userFilterField);
 
     Grid.Column editColum = userList.getColumn("edit");
     editColum.setRenderer(new ButtonRenderer(

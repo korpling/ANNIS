@@ -24,7 +24,9 @@ import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.GeneratedPropertyContainer;
 import com.vaadin.data.util.IndexedContainer;
 import com.vaadin.data.util.PropertyValueGenerator;
+import com.vaadin.data.util.filter.SimpleStringFilter;
 import com.vaadin.event.Action;
+import com.vaadin.event.FieldEvents;
 import com.vaadin.event.ShortcutAction;
 import com.vaadin.shared.ui.MarginInfo;
 import com.vaadin.ui.Alignment;
@@ -99,6 +101,25 @@ public class GroupManagementPanel extends Panel
     groupsGrid.setSelectionMode(Grid.SelectionMode.MULTI);
     groupsGrid.setSizeFull();
     groupsGrid.setColumns("name", "edit", "corpora");
+    
+    Grid.HeaderRow filterRow = groupsGrid.appendHeaderRow();
+    TextField groupFilterField = new TextField();
+    groupFilterField.setInputPrompt("Filter");
+    groupFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        groupsContainer.removeContainerFilters("name");
+        if(!event.getText().isEmpty())
+        {
+          groupsContainer.addContainerFilter(new SimpleStringFilter("name",
+            event.getText(), true, false));
+        }
+      }
+    });
+    filterRow.getCell("name").setComponent(groupFilterField);
     
     Grid.Column editColumn = groupsGrid.getColumn("edit");
     editColumn.setRenderer(new ButtonRenderer(
