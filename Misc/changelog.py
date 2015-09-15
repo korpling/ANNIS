@@ -4,7 +4,7 @@ import json
 import io
 from subprocess import call
 
-milestone_id = "29"
+milestone_id = "31"
 
 import http.client
 
@@ -14,7 +14,7 @@ payload = ""
 
 headers = { 'User-Agent': 'python3', 'accept': "application/vnd.github.beta.full+json" }
 
-conn.request("GET", "/repos/korpling/ANNIS/issues?state=closed&milestone=26&sort=created", payload, headers)
+conn.request("GET", "/repos/korpling/ANNIS/issues?state=closed&milestone=" + milestone_id + "&sort=created", payload, headers)
 
 res = conn.getresponse()
 data = res.read()

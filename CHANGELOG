@@ -1,3 +1,20 @@
+Version 3.4.0-preview1
+======================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview1+is%3Aclosed
+
+[Bugs]
+ #437 AQL: in precedence and near operator the "from" value can be large than the "to" value
+
+[Enhancements]
+ #440 Make it possible to switch to administration UI easily
+ #439 Easier upgrade for the service
+ #438 allow to filter documents by name in document list
+ #436 positions of semantic errors should be highlighted in query editor
+ #435 Existence validator
+ #426 enhance UI responsivness by using Vaadin push mechanism
+
 Version 3.3.6
 =============
 
