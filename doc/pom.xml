@@ -15,7 +15,10 @@
   
   <properties>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-    <site.path>doc-develop</site.path>
+	<site.path>doc-develop</site.path>
+	<!-- override in your settings -->
+    <siteMainDirectory>${user.home}</siteMainDirectory>
+	<scmPubCheckoutDirectory>\${siteMainDirectory}/annis-content-scm</scmPubCheckoutDirectory>
   </properties>
 
   <build>
@@ -54,7 +57,8 @@
               <path>doxygen_sqlite3.db</path>
               <path>.gitignore</path>
             </ignorePathsToDelete>
-            <tryUpdate>true</tryUpdate>
+			<tryUpdate>true</tryUpdate>
+			<checkoutDirectory>${scmPubCheckoutDirectory}</checkoutDirectory>
             <checkinComment>update documentation for version ${project.version} (${site.path})
               
 Original revision is ${buildNumber}.</checkinComment>
