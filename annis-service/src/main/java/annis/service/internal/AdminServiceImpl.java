@@ -96,11 +96,21 @@ public class AdminServiceImpl implements AdminService
   @GET
   @Path("is-authenticated")
   @Produces("text/plain")
-  public String isAuthenticated()
+  public Response isAuthenticated()
   {
     Subject user = SecurityUtils.getSubject();
-
-    return Boolean.toString(user.isAuthenticated());
+    Object principal = user.getPrincipal();
+    if(principal instanceof String)
+    {
+      // if a use has an expired account it won't have it's own name as role
+      boolean hasOwnRole = user.hasRole((String) principal);
+      if(!hasOwnRole)
+      {
+        return Response.status(Response.Status.FORBIDDEN).entity("Account expired").build();
+      }
+    }
+    
+    return Response.ok(Boolean.toString(user.isAuthenticated())).build();
   }
 
   /**

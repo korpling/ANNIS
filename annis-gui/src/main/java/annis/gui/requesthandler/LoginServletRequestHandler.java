@@ -176,7 +176,14 @@ public class LoginServletRequestHandler implements RequestHandler
         {
           session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
             "Username or password wrong");
-          response.setStatus(403); // Forbidden
+          response.setStatus(Response.Status.UNAUTHORIZED.getStatusCode());
+        }
+        else if (ex.getResponse().getStatus() == Response.Status.FORBIDDEN.
+          getStatusCode())
+        {
+          session.getSession().setAttribute(AnnisBaseUI.USER_LOGIN_ERROR,
+            "Account has expired");
+          response.setStatus(Response.Status.FORBIDDEN.getStatusCode()); // Forbidden
         }
         else
         {
