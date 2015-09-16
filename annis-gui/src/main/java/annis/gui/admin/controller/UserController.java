@@ -127,6 +127,8 @@ public class UserController implements UserListView.Listener, UIView.Listener
     {
       // create new user with empty password
       User u = new User(userName);
+      // each user should be per default able to see the same corpora as a non-logged in user
+      u.getGroups().add("anonymous");
       if (model.createOrUpdateUser(u))
       {
         view.askForPasswordChange(userName);
