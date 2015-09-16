@@ -165,6 +165,24 @@ public class UserManagementPanel extends Panel
       }
     });
     filterRow.getCell("expires").setComponent(expiredFilterField);
+    
+    TextField groupFilterField = new TextField();
+    groupFilterField.setInputPrompt("Filter by groups");
+    groupFilterField.addTextChangeListener(new FieldEvents.TextChangeListener()
+    {
+
+      @Override
+      public void textChange(FieldEvents.TextChangeEvent event)
+      {
+        userContainer.removeContainerFilters("groups");
+        if(!event.getText().isEmpty())
+        {
+          userContainer.addContainerFilter(new GroupManagementPanel.StringPatternInSetFilter("groups",
+            event.getText()));
+        }
+      }
+    });
+    filterRow.getCell("groups").setComponent(groupFilterField);
 
     Grid.Column editColum = userList.getColumn("edit");
     editColum.setRenderer(new ButtonRenderer(
