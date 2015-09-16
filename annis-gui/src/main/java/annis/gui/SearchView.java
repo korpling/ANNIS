@@ -202,7 +202,7 @@ public class SearchView extends GridLayout implements View,
     lastQueriedFragment = "";
 
     Background.run(new VersionChecker());
-    evaluateFragment(event.getParameters());
+    evaluateFragment(Page.getCurrent().getUriFragment());
   }
   
   public void setToolbar(MainToolbar newToolbar)
