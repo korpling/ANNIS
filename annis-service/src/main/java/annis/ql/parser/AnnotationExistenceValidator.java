@@ -25,6 +25,7 @@ import annis.model.QueryAnnotation;
 import java.util.List;
 import java.util.Set;
 import annis.service.objects.AnnisAttribute;
+import com.google.common.base.Splitter;
 import java.util.LinkedList;
 import java.util.TreeSet;
 import org.slf4j.Logger;
@@ -70,7 +71,8 @@ public class AnnotationExistenceValidator implements QueryDataTransformer
       {
         if (a.getType() == AnnisAttribute.Type.node)
         {
-          result.add(a.getName().split(":")[1]);
+          List<String> splitted = Splitter.on(":").limit(2).omitEmptyStrings().trimResults().splitToList(a.getName());
+          result.add(splitted.get(splitted.size()-1));
           //result is a set of strings of available annotations
         }
       }
