@@ -758,14 +758,6 @@ public class MainToolbar extends HorizontalLayout
         boolean hasAdmistrationRights = false;
         if (user != null)
         {
-          for (String group : user.getGroups())
-          {
-            if (group.equals("*"))
-            {
-              // the user is an adminstrator
-              hasAdmistrationRights = true;
-            }
-          }
           for (String perm : user.getPermissions())
           {
             if (perm.startsWith("*:") || perm.startsWith("admin:"))
