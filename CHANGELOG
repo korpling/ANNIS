@@ -1,3 +1,16 @@
+Version 3.4.0-preview2
+=====================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview2+is%3Aclosed
+
+[Bugs]
+ #443 3.4-0-preview1: query fragment is not longer evaluated
+ #441 annotation existance check fails on annotations without namespace
+
+[Enhancements]
+ #442 add "anonymous" group to each new user per default
+
 Version 3.4.0-preview1
 ======================
 
