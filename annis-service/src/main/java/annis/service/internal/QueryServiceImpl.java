@@ -1020,7 +1020,7 @@ public class QueryServiceImpl implements QueryService
    */
   private List<String> splitCorpusNamesFromRaw(String rawCorpusNames)
   {
-    return Arrays.asList(rawCorpusNames.split(","));
+    return new ArrayList<>(Splitter.on(",").omitEmptyStrings().trimResults().splitToList(rawCorpusNames));
   }
 
   /**
