@@ -16,6 +16,7 @@
 package annis.gui.objects;
 
 import annis.service.objects.OrderType;
+import com.google.common.base.Preconditions;
 import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
@@ -81,6 +82,7 @@ public class PagedResultQuery extends ContextualizedQuery implements Cloneable
 
   public void setOrder(OrderType order)
   {
+    Preconditions.checkNotNull(order, "The order of a paged result query must never be null.");
     this.order = order;
   }
 
