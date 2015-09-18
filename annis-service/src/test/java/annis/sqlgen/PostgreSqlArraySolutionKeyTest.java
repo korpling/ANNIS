@@ -4,22 +4,20 @@ import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.test.TestUtils.createJdbcArray;
 import static annis.test.TestUtils.uniqueInt;
 import static annis.test.TestUtils.uniqueString;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyString;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static java.util.Arrays.asList;
 import java.util.List;
-
+import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.nullValue;
+import static org.junit.Assert.assertThat;
 import org.junit.Before;
 import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyString;
 import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class PostgreSqlArraySolutionKeyTest
 {

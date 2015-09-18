@@ -15,17 +15,15 @@
  */
 package annis.gui.components;
 
-import com.vaadin.ui.JavaScriptFunction;
-import org.json.JSONException;
-
-
 import com.vaadin.annotations.JavaScript;
 import com.vaadin.server.AbstractJavaScriptExtension;
 import com.vaadin.server.ClientConnector;
+import com.vaadin.ui.JavaScriptFunction;
 import com.vaadin.ui.UI;
 import elemental.json.JsonArray;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang3.Validate;
+import org.json.JSONException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

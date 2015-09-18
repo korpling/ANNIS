@@ -16,7 +16,6 @@
 package annis.libgui.media;
 
 import annis.libgui.VisualizationToggle;
-import annis.libgui.media.MediaController;
 import annis.visualizers.LoadableVisualizer;
 import java.io.Serializable;
 import java.util.HashMap;

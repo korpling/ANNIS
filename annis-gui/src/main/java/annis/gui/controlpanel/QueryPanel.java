@@ -15,11 +15,9 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.AnnisUI;
 import annis.gui.ExportPanel;
 import annis.gui.HistoryPanel;
-import annis.gui.QueryController;
-import annis.gui.AnnisUI;
-import annis.gui.SearchView;
 import annis.gui.components.VirtualKeyboardCodeEditor;
 import annis.gui.components.codemirror.AqlCodeEditor;
 import annis.gui.frequency.FrequencyQueryPanel;
@@ -38,10 +36,18 @@ import com.vaadin.event.ShortcutListener;
 import com.vaadin.server.ClassResource;
 import com.vaadin.server.FontAwesome;
 import com.vaadin.server.ThemeResource;
+import com.vaadin.ui.Button;
 import com.vaadin.ui.Button.ClickEvent;
-import com.vaadin.ui.*;
 import com.vaadin.ui.Button.ClickListener;
+import com.vaadin.ui.GridLayout;
+import com.vaadin.ui.ListSelect;
+import com.vaadin.ui.ProgressBar;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.TextArea;
+import com.vaadin.ui.UI;
+import com.vaadin.ui.VerticalLayout;
+import com.vaadin.ui.Window;
 import com.vaadin.ui.themes.ValoTheme;
 import java.util.List;
 import org.slf4j.LoggerFactory;

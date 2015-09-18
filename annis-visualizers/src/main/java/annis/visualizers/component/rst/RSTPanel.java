@@ -16,8 +16,8 @@
 package annis.visualizers.component.rst;
 
 import annis.gui.components.CssRenderInfo;
-import annis.libgui.visualizers.VisualizerInput;
 import annis.gui.widgets.JITWrapper;
+import annis.libgui.visualizers.VisualizerInput;
 import com.vaadin.ui.Button;
 import com.vaadin.ui.HorizontalLayout;
 import com.vaadin.ui.Panel;

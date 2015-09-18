@@ -15,11 +15,12 @@
  */
 package annis.gui.controlpanel;
 
+import annis.gui.AnnisUI;
 import annis.gui.ExampleQueriesPanel;
 import annis.libgui.InstanceConfig;
-import annis.gui.AnnisUI;
-import com.vaadin.ui.*;
+import com.vaadin.ui.TabSheet;
 import com.vaadin.ui.TabSheet.Tab;
+import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ValoTheme;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

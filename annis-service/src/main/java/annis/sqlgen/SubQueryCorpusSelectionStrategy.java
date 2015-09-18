@@ -15,13 +15,11 @@
  */
 package annis.sqlgen;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import org.apache.commons.lang3.StringUtils;
-
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
 
 public class SubQueryCorpusSelectionStrategy {
 

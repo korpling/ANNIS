@@ -16,7 +16,6 @@
 package annis.gui.controller;
 
 import annis.gui.AnnisUI;
-import annis.gui.SearchView;
 import annis.gui.frequency.FrequencyQueryPanel;
 import annis.gui.objects.FrequencyQuery;
 import annis.libgui.Helper;

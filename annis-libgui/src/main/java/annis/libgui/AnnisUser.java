@@ -15,7 +15,6 @@
  */
 package annis.libgui;
 
-import annis.CommonHelper;
 import com.sun.jersey.api.client.Client;
 import java.io.IOException;
 import java.io.ObjectInputStream;

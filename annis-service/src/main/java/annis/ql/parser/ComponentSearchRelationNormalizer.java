@@ -15,10 +15,10 @@
  */
 package annis.ql.parser;
 
+import annis.model.Join;
 import annis.model.QueryNode;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
-import annis.model.Join;
 import annis.sqlgen.model.PointingRelation;
 import com.google.common.base.Preconditions;
 import com.google.common.collect.HashMultimap;

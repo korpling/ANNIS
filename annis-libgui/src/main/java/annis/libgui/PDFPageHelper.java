@@ -15,13 +15,14 @@
  */
 package annis.libgui;
 
-import annis.model.AnnisConstants;
 import annis.libgui.visualizers.VisualizerInput;
+import annis.model.AnnisConstants;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
+import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SSpan;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SAnnotation;
-import static annis.model.AnnisConstants.*;
-import annis.model.RelannisNodeFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SLayer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Properties;

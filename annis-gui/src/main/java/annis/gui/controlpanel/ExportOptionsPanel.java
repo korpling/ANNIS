@@ -15,8 +15,6 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.components.HelpButton;
-import com.vaadin.data.validator.IntegerRangeValidator;
 import com.vaadin.ui.ComboBox;
 import com.vaadin.ui.FormLayout;
 import com.vaadin.ui.TextField;

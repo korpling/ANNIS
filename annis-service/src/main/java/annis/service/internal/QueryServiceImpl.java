@@ -18,11 +18,9 @@ package annis.service.internal;
 
 import annis.CommonHelper;
 import annis.GraphHelper;
-import static java.util.Arrays.asList;
 import annis.WekaHelper;
 import annis.dao.AnnisDao;
 import annis.examplequeries.ExampleQuery;
-import annis.service.objects.Match;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.resolver.ResolverEntry;
@@ -32,18 +30,19 @@ import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisBinaryMetaData;
 import annis.service.objects.AnnisCorpus;
 import annis.service.objects.CorpusConfig;
-import annis.service.objects.FrequencyTable;
 import annis.service.objects.CorpusConfigMap;
 import annis.service.objects.DocumentBrowserConfig;
+import annis.service.objects.FrequencyTable;
+import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.Match;
 import annis.service.objects.MatchAndDocumentCount;
 import annis.service.objects.MatchGroup;
+import annis.service.objects.OrderType;
 import annis.service.objects.RawTextWrapper;
 import annis.service.objects.SegmentationList;
 import annis.service.objects.SubgraphFilter;
 import annis.sqlgen.MatrixQueryData;
 import annis.sqlgen.extensions.AnnotateQueryData;
-import annis.service.objects.FrequencyTableQuery;
-import annis.service.objects.OrderType;
 import annis.sqlgen.extensions.LimitOffsetQueryData;
 import com.google.common.base.Splitter;
 import com.google.common.collect.Lists;
@@ -55,7 +54,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
-import java.util.Arrays;
+import static java.util.Arrays.asList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
@@ -87,8 +86,6 @@ import org.apache.shiro.SecurityUtils;
 import org.apache.shiro.subject.Subject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-
 import org.springframework.stereotype.Component;
 
 /**

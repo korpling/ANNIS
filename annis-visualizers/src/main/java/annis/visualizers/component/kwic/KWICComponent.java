@@ -20,7 +20,6 @@ import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.VisualizerInput;
 import annis.visualizers.component.grid.GridComponent;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.STextualDS;
-import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.util.Map;
 import java.util.Set;
 

@@ -15,8 +15,8 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.OrderType;
 import annis.service.objects.FrequencyTableQuery;
+import annis.service.objects.OrderType;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;

@@ -15,18 +15,16 @@
  */
 package annis.ql.parser;
 
-import annis.exceptions.AnnisQLSemanticsException;
-
-import annis.model.QueryNode;
-
 import annis.dao.AnnisDao;
+import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
 import annis.model.QueryAnnotation;
-import java.util.List;
-import java.util.Set;
+import annis.model.QueryNode;
 import annis.service.objects.AnnisAttribute;
 import com.google.common.base.Splitter;
 import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import java.util.TreeSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -17,11 +17,11 @@ package annis.gui.admin.controller;
 
 import annis.gui.CriticalServiceQueryException;
 import annis.gui.ServiceQueryException;
+import annis.gui.admin.model.CorpusManagement;
 import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.view.GroupListView;
 import annis.gui.admin.view.UIView;
 import annis.gui.admin.view.UserListView;
-import annis.gui.admin.model.CorpusManagement;
 import annis.security.Group;
 import com.google.common.base.Joiner;
 import com.google.common.util.concurrent.FutureCallback;

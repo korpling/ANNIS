@@ -1,7 +1,8 @@
 package annis.sqlgen;
 
-import annis.sqlgen.extensions.LimitOffsetQueryData;
-import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import annis.service.objects.SubgraphFilter;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
 import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
@@ -9,34 +10,30 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import annis.sqlgen.extensions.LimitOffsetQueryData;
 import static annis.test.TestUtils.uniqueAlphaString;
 import static annis.test.TestUtils.uniqueInt;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.assertTrue;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Matchers.anyInt;
-import static org.mockito.Matchers.eq;
-import static org.mockito.MockitoAnnotations.initMocks;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import static java.util.Arrays.asList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.Mock;
-import org.springframework.dao.DataAccessException;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
-import annis.service.objects.SubgraphFilter;
 import java.util.Set;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
+import org.junit.Before;
 import org.junit.Ignore;
+import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Matchers.anyInt;
+import static org.mockito.Matchers.eq;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
+import org.springframework.dao.DataAccessException;
 public class TestAnnotateSqlGenerator
 {
   

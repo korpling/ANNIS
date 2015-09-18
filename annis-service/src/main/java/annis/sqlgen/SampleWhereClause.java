@@ -15,17 +15,15 @@
  */
 package annis.sqlgen;
 
-import static annis.sqlgen.SqlConstraints.isTrue;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
-import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
-import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
-
+import static annis.sqlgen.SqlConstraints.isTrue;
+import static annis.sqlgen.TableAccessStrategy.COMPONENT_TABLE;
+import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.FACTS_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;

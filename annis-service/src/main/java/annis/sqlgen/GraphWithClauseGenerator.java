@@ -15,26 +15,24 @@
  */
 package annis.sqlgen;
 
-import annis.service.objects.MatchGroup;
 import annis.CommonHelper;
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
 import annis.service.objects.Match;
-import java.net.URI;
-import java.util.List;
-import org.apache.commons.lang3.Validate;
-import org.apache.commons.lang3.StringUtils;
-
+import annis.service.objects.MatchGroup;
 import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.SqlConstraints.sqlString;
 import static annis.sqlgen.TableAccessStrategy.CORPUS_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-
-import static annis.sqlgen.SqlConstraints.sqlString;
 import annis.sqlgen.extensions.AnnotateQueryData;
 import com.google.common.base.Joiner;
 import com.google.common.collect.Lists;
+import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedList;
+import java.util.List;
+import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Validate;
 
 /**
  * Generates a WITH clause sql statement for a list of salt ids.

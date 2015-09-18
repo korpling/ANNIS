@@ -17,9 +17,9 @@ package annis.visualizers.component.grid;
 
 import annis.libgui.VisualizationToggle;
 import annis.libgui.media.MediaController;
+import annis.libgui.media.PDFController;
 import annis.libgui.visualizers.AbstractVisualizer;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.libgui.media.PDFController;
 import com.vaadin.server.VaadinSession;
 import net.xeoh.plugins.base.annotations.PluginImplementation;
 import org.slf4j.Logger;

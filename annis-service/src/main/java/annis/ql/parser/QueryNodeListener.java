@@ -16,7 +16,6 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSyntaxException;
-import annis.model.ParsedEntityLocation;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;

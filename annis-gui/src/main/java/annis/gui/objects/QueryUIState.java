@@ -15,8 +15,8 @@
  */
 package annis.gui.objects;
 
-import annis.service.objects.OrderType;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.service.objects.OrderType;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
 import com.vaadin.data.util.ObjectProperty;

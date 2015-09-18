@@ -17,9 +17,10 @@ package annis.visualizers.iframe.dependency;
 
 import annis.libgui.MatchedNodeColors;
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.iframe.WriterVisualizer;
-import static annis.model.AnnisConstants.*;
+import static annis.model.AnnisConstants.ANNIS_NS;
+import static annis.model.AnnisConstants.FEAT_RELANNIS_NODE;
 import annis.model.RelannisNodeFeature;
+import annis.visualizers.iframe.WriterVisualizer;
 import de.hu_berlin.german.korpling.saltnpepper.salt.graph.Edge;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDataSourceSequence;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructure.SDocumentGraph;

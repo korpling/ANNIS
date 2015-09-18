@@ -15,16 +15,15 @@
  */
 package annis.gui.controlpanel;
 
-import annis.gui.ExampleQueriesPanel;
-import annis.gui.CorpusBrowserPanel;
-import annis.gui.MetaDataPanel;
-import annis.libgui.Helper;
-import annis.security.UserConfig;
-import annis.libgui.CorpusSet;
-import annis.libgui.InstanceConfig;
-import annis.gui.QueryController;
 import annis.gui.AnnisUI;
+import annis.gui.CorpusBrowserPanel;
+import annis.gui.ExampleQueriesPanel;
+import annis.gui.MetaDataPanel;
 import annis.libgui.Background;
+import annis.libgui.CorpusSet;
+import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
+import annis.security.UserConfig;
 import annis.service.objects.AnnisCorpus;
 import com.google.common.collect.Sets;
 import com.sun.jersey.api.client.ClientHandlerException;

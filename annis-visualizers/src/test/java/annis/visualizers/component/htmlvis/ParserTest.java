@@ -15,8 +15,8 @@
  */
 package annis.visualizers.component.htmlvis;
 
-import annis.visualizers.htmlvis.AnnotationNameMatcher;
 import annis.visualizers.htmlvis.AnnotationNameAndValueMatcher;
+import annis.visualizers.htmlvis.AnnotationNameMatcher;
 import annis.visualizers.htmlvis.AnnotationValueMatcher;
 import annis.visualizers.htmlvis.SpanHTMLOutputter;
 import annis.visualizers.htmlvis.TokenMatcher;
@@ -27,9 +27,12 @@ import java.io.IOException;
 import java.io.InputStream;
 import org.junit.After;
 import org.junit.AfterClass;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import org.junit.Before;
 import org.junit.BeforeClass;
-import static org.junit.Assert.*;
 import org.junit.Test;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

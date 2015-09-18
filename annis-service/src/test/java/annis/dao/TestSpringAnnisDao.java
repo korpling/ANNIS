@@ -16,29 +16,44 @@
 package annis.dao;
 
 import annis.AnnisXmlContextLoader;
+import annis.model.Annotation;
+import annis.ql.parser.AnnisParserAntlr;
+import annis.ql.parser.QueryData;
+import annis.service.objects.AnnisAttribute;
+import annis.service.objects.AnnisCorpus;
+import annis.service.objects.DocumentBrowserConfig;
+import annis.sqlgen.AnnotateSqlGenerator;
+import annis.sqlgen.ListAnnotationsSqlHelper;
+import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
+import annis.sqlgen.ListCorpusSqlHelper;
+import annis.sqlgen.SaltAnnotateExtractor;
+import annis.sqlgen.SqlGenerator;
+import annis.test.TestHelper;
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+import javax.annotation.Resource;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
+import org.junit.Assert;
 import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Ignore;
+import org.junit.Test;
+import org.junit.runner.RunWith;
 import static org.mockito.Matchers.any;
 import static org.mockito.Matchers.anyBoolean;
 import static org.mockito.Matchers.anyList;
 import static org.mockito.Matchers.anyString;
+import org.mockito.Mock;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.ResultSetExtractor;
 import org.springframework.jdbc.core.RowMapper;
@@ -46,24 +61,6 @@ import org.springframework.jdbc.core.simple.ParameterizedSingleColumnRowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcTemplate;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-
-import annis.test.TestHelper;
-import annis.model.Annotation;
-import annis.ql.parser.QueryData;
-import annis.service.objects.AnnisCorpus;
-import annis.sqlgen.AnnotateSqlGenerator;
-import annis.sqlgen.ListCorpusAnnotationsSqlHelper;
-import annis.sqlgen.ListCorpusSqlHelper;
-import annis.sqlgen.ListAnnotationsSqlHelper;
-import annis.sqlgen.SqlGenerator;
-import annis.ql.parser.AnnisParserAntlr;
-import annis.service.objects.AnnisAttribute;
-import annis.service.objects.DocumentBrowserConfig;
-import annis.sqlgen.SaltAnnotateExtractor;
-import java.util.LinkedList;
-import javax.annotation.Resource;
-import org.junit.Assert;
-import org.springframework.dao.DataAccessException;
 
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(locations =

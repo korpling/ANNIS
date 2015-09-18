@@ -15,7 +15,6 @@
  */
 package annis.gui.exporter;
 
-import annis.libgui.Helper;
 import annis.model.AnnisNode;
 import annis.model.Annotation;
 import annis.service.ifaces.AnnisResult;

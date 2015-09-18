@@ -15,30 +15,24 @@
  */
 package annis.sqlgen;
 
+import annis.model.QueryNode;
+import annis.ql.parser.QueryData;
+import static annis.test.TestUtils.newSet;
+import static annis.test.TestUtils.uniqueString;
+import java.util.ArrayList;
+import java.util.List;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
 import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
 import static org.mockito.Matchers.anyListOf;
 import static org.mockito.Matchers.anyString;
 import static org.mockito.Matchers.eq;
-import static org.mockito.MockitoAnnotations.initMocks;
-import static annis.test.TestUtils.newSet;
-import static annis.test.TestUtils.uniqueString;
-
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 import org.mockito.Spy;
-import org.springframework.dao.DataAccessException;
-
-import annis.model.QueryNode;
-import annis.ql.parser.QueryData;
 
 public class TestAbstractUnionSqlGenerator {
 

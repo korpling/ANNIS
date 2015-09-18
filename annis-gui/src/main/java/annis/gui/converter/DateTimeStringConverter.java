@@ -19,7 +19,6 @@ package annis.gui.converter;
 import com.vaadin.data.util.converter.Converter;
 import java.util.Locale;
 import org.joda.time.DateTime;
-import org.joda.time.format.DateTimeFormatter;
 import org.joda.time.format.ISODateTimeFormat;
 
 /**

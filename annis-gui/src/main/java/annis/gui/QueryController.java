@@ -15,11 +15,11 @@
  */
 package annis.gui;
 
-import annis.gui.controller.ExportBackgroundJob;
+import annis.gui.components.ExceptionDialog;
 import annis.gui.controller.CountCallback;
+import annis.gui.controller.ExportBackgroundJob;
 import annis.gui.controller.FrequencyBackgroundJob;
 import annis.gui.controller.SpecificPagingCallback;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.controlpanel.QueryPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.frequency.FrequencyQueryPanel;

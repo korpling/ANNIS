@@ -20,14 +20,11 @@ import annis.gui.flatquerybuilder.FlatQueryBuilderPlugin;
 import annis.gui.objects.QueryUIState;
 import annis.gui.querybuilder.TigerQueryBuilderPlugin;
 import annis.gui.servlets.ResourceServlet;
-import annis.libgui.AnnisUser;
-import annis.libgui.Background;
 import annis.libgui.Helper;
 import static annis.libgui.Helper.CORPUS_FONT;
 import static annis.libgui.Helper.CORPUS_FONT_FORCE;
 import static annis.libgui.Helper.DEFAULT_CONFIG;
 import annis.libgui.InstanceConfig;
-import annis.security.User;
 import annis.service.objects.CorpusConfig;
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
@@ -36,14 +33,12 @@ import com.vaadin.annotations.Theme;
 import com.vaadin.navigator.Navigator;
 import com.vaadin.navigator.ViewChangeListener;
 import com.vaadin.server.ErrorHandler;
-import com.vaadin.server.FontAwesome;
 import com.vaadin.server.VaadinRequest;
 import com.vaadin.shared.communication.PushMode;
 import java.io.IOException;
 import java.util.Map;
 import net.xeoh.plugins.base.PluginManager;
 import net.xeoh.plugins.base.util.uri.ClassURI;
-
 import org.slf4j.LoggerFactory;
 
 /**

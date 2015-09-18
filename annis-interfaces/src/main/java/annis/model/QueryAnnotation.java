@@ -15,12 +15,10 @@
  */
 package annis.model;
 
+import annis.model.QueryNode.TextMatching;
 import java.io.Serializable;
-
 import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
-
-import annis.model.QueryNode.TextMatching;
 
 public class QueryAnnotation implements Comparable<QueryAnnotation>, Serializable
 {

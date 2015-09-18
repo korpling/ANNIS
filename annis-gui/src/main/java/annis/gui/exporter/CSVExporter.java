@@ -20,8 +20,6 @@ import com.google.common.eventbus.EventBus;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.UniformInterfaceException;
 import com.sun.jersey.api.client.WebResource;
-import com.vaadin.server.Page;
-import com.vaadin.ui.Notification;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;

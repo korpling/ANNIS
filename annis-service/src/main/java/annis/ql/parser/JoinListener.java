@@ -17,6 +17,7 @@
 package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
+import annis.model.Join;
 import annis.model.QueryAnnotation;
 import annis.model.QueryNode;
 import annis.ql.AqlParser;
@@ -26,7 +27,6 @@ import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.EqualValue;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;

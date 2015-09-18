@@ -15,7 +15,6 @@
  */
 package annis.gui.objects;
 
-import annis.gui.beans.CitationProvider;
 import java.util.Objects;
 
 /**

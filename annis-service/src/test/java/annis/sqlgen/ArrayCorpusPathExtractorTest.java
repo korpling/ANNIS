@@ -2,18 +2,16 @@ package annis.sqlgen;
 
 import static annis.test.TestUtils.createJdbcArray;
 import static annis.test.TestUtils.uniqueString;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.Mockito.mock;
-
 import java.sql.Array;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import static java.util.Arrays.asList;
 import java.util.List;
-
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import static org.mockito.Mockito.mock;
 
 public class ArrayCorpusPathExtractorTest
 {

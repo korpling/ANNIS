@@ -1,28 +1,24 @@
 package annis.sqlgen;
 
-import annis.sqlgen.extensions.AnnotateQueryData;
-import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
-import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
-import static annis.test.TestUtils.newSet;
-import static annis.test.TestUtils.uniqueAlphaString;
-import static annis.test.TestUtils.uniqueInt;
-import static java.util.Arrays.asList;
-import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.mockito.InjectMocks;
-import org.mockito.Mock;
-
 import annis.model.QueryNode;
 import annis.ql.parser.QueryData;
+import static annis.sqlgen.AbstractSqlGenerator.TABSTOP;
+import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
+import annis.sqlgen.extensions.AnnotateQueryData;
+import static annis.test.TestUtils.uniqueAlphaString;
+import static annis.test.TestUtils.uniqueInt;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.Collections;
+import java.util.List;
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import static org.mockito.BDDMockito.given;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 public class TestAnnotateInnerQuerySqlGenerator
 {

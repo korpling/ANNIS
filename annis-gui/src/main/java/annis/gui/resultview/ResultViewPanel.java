@@ -16,16 +16,16 @@
 package annis.gui.resultview;
 
 import annis.CommonHelper;
-import annis.libgui.PluginSystem;
-import annis.gui.QueryController;
 import annis.gui.AnnisUI;
+import annis.gui.QueryController;
 import annis.gui.components.OnLoadCallbackExtension;
 import annis.gui.controlpanel.QueryPanel;
+import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
 import annis.gui.objects.PagedResultQuery;
 import annis.gui.paging.PagingComponent;
 import annis.libgui.Helper;
 import annis.libgui.InstanceConfig;
-import static annis.gui.controlpanel.SearchOptionsPanel.KEY_DEFAULT_BASE_TEXT_SEGMENTATION;
+import annis.libgui.PluginSystem;
 import annis.libgui.ResolverProviderImpl;
 import annis.model.AnnisConstants;
 import annis.resolver.ResolverEntry;
@@ -33,7 +33,6 @@ import annis.resolver.SingleResolverRequest;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.Match;
 import com.google.common.base.Preconditions;
-import com.google.gwt.thirdparty.guava.common.base.Splitter;
 import com.vaadin.server.AbstractClientConnector;
 import com.vaadin.ui.Alignment;
 import com.vaadin.ui.CssLayout;
@@ -51,7 +50,6 @@ import de.hu_berlin.german.korpling.saltnpepper.salt.saltCommon.sDocumentStructu
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SFeature;
 import de.hu_berlin.german.korpling.saltnpepper.salt.saltCore.SNode;
 import java.net.URISyntaxException;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -65,8 +63,6 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.concurrent.BlockingQueue;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.LoggerFactory;
 

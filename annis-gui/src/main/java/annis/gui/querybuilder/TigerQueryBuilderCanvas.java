@@ -15,11 +15,10 @@
  */
 package annis.gui.querybuilder;
 
-import annis.libgui.Helper;
 import annis.gui.QueryController;
-import annis.gui.objects.Query;
 import annis.gui.widgets.GripDragComponent;
 import annis.gui.widgets.SimpleCanvas;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;

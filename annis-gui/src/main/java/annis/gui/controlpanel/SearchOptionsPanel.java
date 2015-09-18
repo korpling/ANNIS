@@ -16,14 +16,14 @@
 package annis.gui.controlpanel;
 
 import annis.gui.AnnisUI;
-import annis.libgui.Helper;
 import annis.gui.components.HelpButton;
-import annis.service.objects.OrderType;
 import static annis.gui.controlpanel.SearchOptionsPanel.NULL_SEGMENTATION_VALUE;
 import annis.gui.objects.QueryUIState;
 import annis.libgui.Background;
+import annis.libgui.Helper;
 import annis.service.objects.CorpusConfig;
 import annis.service.objects.CorpusConfigMap;
+import annis.service.objects.OrderType;
 import annis.service.objects.SegmentationList;
 import com.google.common.collect.ImmutableList;
 import com.google.common.escape.Escaper;

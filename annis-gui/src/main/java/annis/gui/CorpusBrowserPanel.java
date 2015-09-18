@@ -15,11 +15,13 @@
  */
 package annis.gui;
 
-import annis.libgui.Helper;
 import annis.gui.beans.CorpusBrowserEntry;
 import annis.gui.objects.Query;
+import annis.libgui.Helper;
 import annis.service.objects.AnnisAttribute;
 import annis.service.objects.AnnisCorpus;
+import com.google.common.escape.Escaper;
+import com.google.common.net.UrlEscapers;
 import com.sun.jersey.api.client.ClientHandlerException;
 import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
@@ -38,10 +40,14 @@ import com.vaadin.ui.Panel;
 import com.vaadin.ui.Table;
 import com.vaadin.ui.VerticalLayout;
 import com.vaadin.ui.themes.ChameleonTheme;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Set;
 import org.slf4j.LoggerFactory;
-import com.google.common.escape.Escaper;
-import com.google.common.net.UrlEscapers;
 /**
  *
  * @author thomas

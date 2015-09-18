@@ -15,8 +15,8 @@
  */
 package annis.gui.controller;
 
-import annis.gui.ExportPanel;
 import annis.gui.AnnisUI;
+import annis.gui.ExportPanel;
 import annis.gui.exporter.Exporter;
 import annis.gui.objects.ExportQuery;
 import annis.libgui.Helper;

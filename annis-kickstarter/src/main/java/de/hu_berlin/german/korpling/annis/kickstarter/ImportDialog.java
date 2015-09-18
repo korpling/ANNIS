@@ -15,9 +15,9 @@
  */
 package de.hu_berlin.german.korpling.annis.kickstarter;
 
-import annis.administration.StatementController;
 import annis.administration.CorpusAdministration;
 import annis.administration.ImportStatus;
+import annis.administration.StatementController;
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.joran.JoranConfigurator;
@@ -25,7 +25,10 @@ import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.Appender;
 import ch.qos.logback.core.AppenderBase;
 import java.awt.HeadlessException;
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;

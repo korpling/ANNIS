@@ -18,24 +18,22 @@ package annis.ql.parser;
 import annis.AnnisXmlContextLoader;
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.exceptions.AnnisQLSyntaxException;
+import annis.test.SpringQueryExamples;
+import annis.test.SpringSyntaxTreeExamples;
+import annis.test.SyntaxTreeExample;
+import java.util.LinkedList;
+import javax.annotation.Resource;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
 import static org.hamcrest.Matchers.nullValue;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
-
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
-
-import annis.test.SpringQueryExamples;
-import annis.test.SpringSyntaxTreeExamples;
-import annis.test.SyntaxTreeExample;
-import java.util.LinkedList;
-import javax.annotation.Resource;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import org.junit.runner.RunWith;
 import org.springframework.test.context.ContextConfiguration;
 import org.springframework.test.context.TestContextManager;
 

@@ -16,16 +16,10 @@
 package annis.gui.controller;
 
 import annis.gui.AnnisUI;
-import annis.gui.components.ExceptionDialog;
 import annis.gui.objects.QueryUIState;
 import annis.gui.resultview.ResultViewPanel;
-import annis.model.AqlParseError;
 import annis.service.objects.MatchAndDocumentCount;
-import com.google.common.base.Joiner;
-import com.sun.jersey.api.client.GenericType;
 import com.sun.jersey.api.client.UniformInterfaceException;
-import com.vaadin.ui.Notification;
-import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import org.slf4j.Logger;

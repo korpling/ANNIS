@@ -15,6 +15,11 @@
  */
 package annis.sqlgen;
 
+import annis.model.Join;
+import annis.model.QueryAnnotation;
+import annis.model.QueryNode;
+import annis.model.QueryNode.TextMatching;
+import annis.ql.parser.QueryData;
 import static annis.sqlgen.SqlConstraints.between;
 import static annis.sqlgen.SqlConstraints.isNotNull;
 import static annis.sqlgen.SqlConstraints.isNull;
@@ -26,38 +31,10 @@ import static annis.sqlgen.TableAccessStrategy.EDGE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_ANNOTATION_TABLE;
 import static annis.sqlgen.TableAccessStrategy.NODE_TABLE;
 import static annis.sqlgen.TableAccessStrategy.RANK_TABLE;
-import static annis.test.TestUtils.size;
-import static annis.test.TestUtils.uniqueInt;
-import static annis.test.TestUtils.uniqueLong;
-import static annis.test.TestUtils.uniqueString;
-import static java.util.Arrays.asList;
-import static org.hamcrest.Matchers.is;
-import static org.junit.Assert.assertThat;
-import static org.junit.matchers.JUnitMatchers.hasItem;
-import static org.mockito.BDDMockito.given;
-import static org.mockito.MockitoAnnotations.initMocks;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.experimental.theories.DataPoints;
-import org.junit.experimental.theories.Theories;
-import org.junit.experimental.theories.Theory;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-
-import annis.model.QueryAnnotation;
-import annis.model.QueryNode;
-import annis.model.QueryNode.TextMatching;
-import annis.ql.parser.QueryData;
 import annis.sqlgen.model.CommonAncestor;
 import annis.sqlgen.model.Dominance;
 import annis.sqlgen.model.Identical;
 import annis.sqlgen.model.Inclusion;
-import annis.model.Join;
 import annis.sqlgen.model.LeftAlignment;
 import annis.sqlgen.model.LeftDominance;
 import annis.sqlgen.model.LeftOverlap;
@@ -69,6 +46,26 @@ import annis.sqlgen.model.RightDominance;
 import annis.sqlgen.model.RightOverlap;
 import annis.sqlgen.model.SameSpan;
 import annis.sqlgen.model.Sibling;
+import static annis.test.TestUtils.size;
+import static annis.test.TestUtils.uniqueInt;
+import static annis.test.TestUtils.uniqueLong;
+import static annis.test.TestUtils.uniqueString;
+import java.util.ArrayList;
+import static java.util.Arrays.asList;
+import java.util.List;
+import java.util.Set;
+import static org.hamcrest.Matchers.is;
+import static org.junit.Assert.assertThat;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.experimental.theories.DataPoints;
+import org.junit.experimental.theories.Theories;
+import org.junit.experimental.theories.Theory;
+import static org.junit.matchers.JUnitMatchers.hasItem;
+import org.junit.runner.RunWith;
+import static org.mockito.BDDMockito.given;
+import org.mockito.Mock;
+import static org.mockito.MockitoAnnotations.initMocks;
 
 /*
  * FIXME: refactor tests, so they use the same condition constants everywhere

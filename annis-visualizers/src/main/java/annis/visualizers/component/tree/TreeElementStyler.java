@@ -16,9 +16,9 @@
 package annis.visualizers.component.tree;
 
 import annis.libgui.visualizers.VisualizerInput;
-import annis.visualizers.component.tree.GraphicsBackend.Font;
 import annis.model.AnnisNode;
 import annis.model.Edge;
+import annis.visualizers.component.tree.GraphicsBackend.Font;
 import java.awt.Color;
 import java.awt.Stroke;
 

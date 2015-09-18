@@ -17,8 +17,8 @@ package annis.ql.parser;
 
 import annis.exceptions.AnnisQLSemanticsException;
 import annis.model.AqlParseError;
-import annis.model.QueryNode;
 import annis.model.Join;
+import annis.model.QueryNode;
 import annis.sqlgen.model.NonBindingJoin;
 import com.google.common.base.Joiner;
 import com.google.common.collect.HashMultimap;

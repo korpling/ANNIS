@@ -51,8 +51,6 @@ import com.vaadin.ui.themes.BaseTheme;
 import com.vaadin.ui.themes.ValoTheme;
 import elemental.json.JsonArray;
 import java.util.LinkedHashSet;
-import java.util.LinkedList;
-import java.util.List;
 import org.json.JSONException;
 import org.slf4j.LoggerFactory;
 

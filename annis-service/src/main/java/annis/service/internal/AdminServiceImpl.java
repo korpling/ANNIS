@@ -15,7 +15,6 @@
  */
 package annis.service.internal;
 
-import annis.service.objects.ImportJob;
 import annis.administration.AdministrationDao;
 import annis.administration.CorpusAdministration;
 import annis.administration.DeleteCorpusDao;
@@ -27,6 +26,7 @@ import annis.security.Group;
 import annis.security.User;
 import annis.security.UserConfig;
 import annis.service.AdminService;
+import annis.service.objects.ImportJob;
 import annis.utils.ANNISFormatHelper;
 import com.google.common.base.Joiner;
 import com.google.common.io.ByteStreams;
