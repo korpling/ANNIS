@@ -30,6 +30,7 @@ import annis.gui.objects.Query;
 import annis.gui.resultview.ResultViewPanel;
 import annis.libgui.Background;
 import annis.libgui.Helper;
+import annis.libgui.InstanceConfig;
 import annis.libgui.media.MediaController;
 import annis.libgui.media.MediaControllerImpl;
 import annis.libgui.media.MimeTypeErrorListener;
@@ -93,7 +94,7 @@ public class SearchView extends GridLayout implements View,
 
   private static final org.slf4j.Logger log = LoggerFactory.getLogger(
     SearchView.class);
-  
+
   public static final String NAME = "";
 
   static final Exporter[] EXPORTER = new Exporter[]
@@ -129,7 +130,7 @@ public class SearchView extends GridLayout implements View,
   public final static int CONTROL_PANEL_WIDTH = 360;
 
   private final AnnisUI ui;
-  
+
   private MainToolbar toolbar;
 
   public SearchView(AnnisUI ui)
@@ -156,7 +157,7 @@ public class SearchView extends GridLayout implements View,
     mainTab.setCloseHandler(SearchView.this);
     mainTab.addStyleName(ValoTheme.TABSHEET_FRAMED);
     mainTab.addSelectedTabChangeListener(SearchView.this);
-    
+
     TabSheet.Tab helpTab = mainTab.addTab(help, "Help/Examples");
     helpTab.setIcon(FontAwesome.QUESTION_CIRCLE);
     helpTab.setClosable(false);
@@ -181,14 +182,13 @@ public class SearchView extends GridLayout implements View,
     addComponent(mainTab, 1, 1);
   }
 
-  
-
   @Override
   public void enter(ViewChangeListener.ViewChangeEvent event)
   {
+    InstanceConfig config = ui.getInstanceConfig();
 
-    Page.getCurrent().setTitle(
-      ui.getInstanceConfig().getInstanceDisplayName() + " (ANNIS Corpus Search)");
+    Page.getCurrent().setTitle(config.getInstanceDisplayName()
+      + " (ANNIS Corpus Search)");
 
     Page.getCurrent().addUriFragmentChangedListener(this);
 
@@ -203,19 +203,24 @@ public class SearchView extends GridLayout implements View,
 
     Background.run(new VersionChecker());
     evaluateFragment(Page.getCurrent().getUriFragment());
+
+    if (config.isLoginOnStart() && toolbar != null && Helper.getUser() == null)
+    {
+      toolbar.showLoginWindow(false);
+    }
   }
-  
+
   public void setToolbar(MainToolbar newToolbar)
   {
     // remove old one if necessary
-    if(this.toolbar != null)
+    if (this.toolbar != null)
     {
       removeComponent(this.toolbar);
       this.toolbar = null;
     }
-    
+
     // add new toolbar
-    if(newToolbar != null)
+    if (newToolbar != null)
     {
       this.toolbar = newToolbar;
       addComponent(this.toolbar, 0, 0, 1, 0);
@@ -400,7 +405,7 @@ public class SearchView extends GridLayout implements View,
   {
     return mainTab;
   }
-  
+
   public MainToolbar getMainToolbar()
   {
     return toolbar;
@@ -473,7 +478,7 @@ public class SearchView extends GridLayout implements View,
 
   public void notifiyQueryStarted()
   {
-    if(toolbar != null)
+    if (toolbar != null)
     {
       toolbar.notifiyQueryStarted();
     }

@@ -75,7 +75,8 @@ Thus the file `instances/falko.json` defines the instance named "falko".
 		]
 	}
 	],
-	"keyboard-layout" : "de"
+	"keyboard-layout" : "de",
+	"login-on-start": "true"
 }
 \endcode
 
@@ -84,6 +85,7 @@ displayed in the title of the browser window. `default-querybuilder` defines the
 short name of the query builder you want to use. Currently only "tigersearch" and "flatquerybuilder" are
 available, see [here](@ref dev-querybuilder) if you want to add your own query builder.
 The `keyboard-layout` variable is used as the default value for the virtual keyboard of the AQL query box.
+If `login-on-start` is set to `true` a login window is shown at each startup of the ANNIS search UI if the user is not logged in yet.
 
 While any user can group corpora into corpus sets for their own, you can define
 corpus sets for the whole instance. Each corpus set is an JSON-object with a
