@@ -23,7 +23,6 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.BrowserFrame;
-import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 /**
