@@ -23,6 +23,7 @@ import com.vaadin.server.Resource;
 import com.vaadin.server.VaadinSession;
 import com.vaadin.shared.ui.window.WindowMode;
 import com.vaadin.ui.BrowserFrame;
+import com.vaadin.ui.UI;
 import com.vaadin.ui.Window;
 
 /**
@@ -34,11 +35,21 @@ public class LoginWindow extends Window
 {
 
   private String loginURL;
-
-  public LoginWindow()
+  private final boolean executeQueryAfterLogin;
+  private final QueryController queryController;
+  
+  /**
+   * Constructor.
+   * @param executeQueryAfterLogin If true a possible prepared query is exectued after a (sucessful) login.
+   * @param queryController
+   */
+  public LoginWindow(boolean executeQueryAfterLogin, QueryController queryController)
   {
     super("ANNIS Login");
 
+    this.executeQueryAfterLogin = executeQueryAfterLogin;
+    this.queryController = queryController;
+    
     setModal(true);
 
     setWidth("400px");
@@ -76,6 +87,17 @@ public class LoginWindow extends Window
     {
       setWindowMode(WindowMode.MAXIMIZED);
     }
+  }
+  
+  public void close(boolean sucessfulLogin)
+  {
+    if(isAttached() && sucessfulLogin && executeQueryAfterLogin && queryController != null)
+    {
+      queryController.executeSearch(true, true);
+    }
+    
+    super.close();
+    
   }
 
 }

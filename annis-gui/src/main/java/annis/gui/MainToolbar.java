@@ -105,7 +105,7 @@ public class MainToolbar extends HorizontalLayout
 
   private final String bugEMailAddress;
 
-  private Window windowLogin;
+  private LoginWindow windowLogin;
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
@@ -123,7 +123,7 @@ public class MainToolbar extends HorizontalLayout
 
   public static final String LOGIN_MAXIMIZED_KEY = "login-window-maximized";
 
-  
+  private QueryController queryController;
 
   public MainToolbar()
   {
@@ -204,7 +204,7 @@ public class MainToolbar extends HorizontalLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        showLoginWindow();
+        showLoginWindow(false);
       }
     });
 
@@ -472,7 +472,7 @@ public class MainToolbar extends HorizontalLayout
     updateSidebarState();
   }
 
-  public void updateUserInformation()
+  private void updateUserInformation()
   {
     if (lblUserName == null)
     {
@@ -485,54 +485,14 @@ public class MainToolbar extends HorizontalLayout
       btNavigate.setVisible(false);
     }
 
-    if (isLoggedIn())
-    {
-      AnnisUser user = Helper.getUser();
-      if (user != null)
-      {
-        lblUserName.setValue("logged in as \"" + ((AnnisUser) user).
-          getUserName() + "\"");
-        if (getComponentIndex(btLogin) > -1)
-        {
-          replaceComponent(btLogin, btLogout);
-          setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
-        }
-        // do not show the logout button if the user cannot logout using ANNIS
-        btLogout.setVisible(!user.isRemote());
+    AnnisUser user = Helper.getUser();
 
-        if (navigationTarget == NavigationTarget.ADMIN)
-        {
-          // check in background if display is necessary
-          if (user.getUserName() != null)
-          {
-            Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(),
-              UI.getCurrent()));
-          }
-        }
-
-      }
-    }
-    else
-    {
-      lblUserName.setValue("not logged in");
-      if (getComponentIndex(btLogout) > -1)
-      {
-        replaceComponent(btLogout, btLogin);
-        setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
-      }
-    }
-
-  }
-
-  @Override
-  public void onLogin()
-  {
+    // always close the window
     if (windowLogin != null)
     {
-      UI.getCurrent().removeWindow(windowLogin);
+      windowLogin.close(user != null);
+      windowLogin = null;
     }
-
-    AnnisUser user = Helper.getUser();
 
     if (user == null)
     {
@@ -545,18 +505,64 @@ public class MainToolbar extends HorizontalLayout
       }
       VaadinSession.getCurrent().getSession().removeAttribute(
         AnnisBaseUI.USER_LOGIN_ERROR);
+      
+      lblUserName.setValue("not logged in");
+      if (getComponentIndex(btLogout) > -1)
+      {
+        replaceComponent(btLogout, btLogin);
+        setComponentAlignment(btLogin, Alignment.MIDDLE_RIGHT);
+      }
     }
-    else if (user.getUserName() != null)
+    else
     {
-      Notification.show("Logged in as \"" + user.getUserName() + "\"",
-        Notification.Type.TRAY_NOTIFICATION);
+      // logged in
+      if (user.getUserName() != null)
+      {
+        Notification.show("Logged in as \"" + user.getUserName() + "\"",
+          Notification.Type.TRAY_NOTIFICATION);
+
+        lblUserName.setValue("logged in as \"" + user.
+          getUserName() + "\"");
+
+      }
+      if (getComponentIndex(btLogin) > -1)
+      {
+        replaceComponent(btLogin, btLogout);
+        setComponentAlignment(btLogout, Alignment.MIDDLE_RIGHT);
+      }
+      // do not show the logout button if the user cannot logout using ANNIS
+      btLogout.setVisible(!user.isRemote());
+
+      if (navigationTarget == NavigationTarget.ADMIN)
+      {
+        // check in background if display is necessary
+        if (user.getUserName() != null)
+        {
+          Background.run(new CheckIfUserIsAdministratorJob(user.getUserName(),
+            UI.getCurrent()));
+        }
+      }
     }
+
+  }
+
+  @Override
+  public void onLogin()
+  {
     updateUserInformation();
   }
 
   @Override
   public void onLogout()
   {
+    
+    if (windowLogin != null)
+    {
+      // make sure to close the login window without triggering a search execution
+      windowLogin.close(false);
+      windowLogin = null;
+    }
+
     updateUserInformation();
   }
 
@@ -659,7 +665,7 @@ public class MainToolbar extends HorizontalLayout
         }
 
       }
-      onLogin();
+      updateUserInformation();
 
     }
   }
@@ -687,9 +693,9 @@ public class MainToolbar extends HorizontalLayout
 
   }
 
-  private Window createLoginWindow()
+  private Window createLoginWindow(boolean executeQueryAfterLogin)
   {
-    windowLogin = new LoginWindow();
+    windowLogin = new LoginWindow(executeQueryAfterLogin, queryController);
     windowLogin.center();
 
     return windowLogin;
@@ -763,10 +769,20 @@ public class MainToolbar extends HorizontalLayout
     }
   }
 
-  public void showLoginWindow()
+  public void showLoginWindow(boolean executeQueryAfterLogin)
   {
-    UI.getCurrent().addWindow(createLoginWindow());
+    UI.getCurrent().addWindow(createLoginWindow(executeQueryAfterLogin));
 
+  }
+
+  public QueryController getQueryController()
+  {
+    return queryController;
+  }
+
+  public void setQueryController(QueryController queryController)
+  {
+    this.queryController = queryController;
   }
 
 }
