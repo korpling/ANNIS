@@ -27,6 +27,7 @@ import annis.gui.admin.model.GroupManagement;
 import annis.gui.admin.model.UserManagement;
 import annis.gui.admin.model.WebResourceProvider;
 import annis.gui.admin.view.UIView;
+import annis.gui.admin.view.UIView.Listener;
 import annis.libgui.Background;
 import annis.libgui.Helper;
 import com.google.common.util.concurrent.FutureCallback;
@@ -182,6 +183,20 @@ public class AdminView extends VerticalLayout implements View,
 
   }
 
+  @Override
+  public void detach()
+  {
+    // inform the controllers that no tab is active any longer
+    for(UIView.Listener l : listeners)
+    {
+      l.loadedTab(null);
+    }
+    
+    super.detach();
+  }
+  
+  
+
   private Component getComponentForFragment(String fragment)
   {
     if (fragment != null)
@@ -228,7 +243,7 @@ public class AdminView extends VerticalLayout implements View,
   public void selectedTabChange(TabSheet.SelectedTabChangeEvent event)
   {
     Component selected = event.getTabSheet().getSelectedTab();
-
+    
     for (UIView.Listener l : listeners)
     {
       l.loadedTab(selected);
