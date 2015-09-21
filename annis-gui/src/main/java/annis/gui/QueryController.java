@@ -64,6 +64,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 import java.util.concurrent.TimeUnit;
@@ -112,6 +113,16 @@ public class QueryController implements Serializable
       String name = e.getClass().getSimpleName();
       exporterMap.put(name, e);
     }
+    
+    this.state.getSelectedCorpora().addValueChangeListener(new Property.ValueChangeListener()
+    {
+
+      @Override
+      public void valueChange(Property.ValueChangeEvent event)
+      {
+        // TODO: check if the corpus is actually available to the user
+      }
+    });
   }
 
   public void validateQuery()
@@ -286,6 +297,7 @@ public class QueryController implements Serializable
       state.getExportParameters().setValue(((ExportQuery) q).getParameters());
     }
   }
+  
 
   /**
    * Get the current query as it is defined by the UI controls.

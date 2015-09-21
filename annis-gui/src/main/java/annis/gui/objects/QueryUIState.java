@@ -15,7 +15,9 @@
  */
 package annis.gui.objects;
 
+import annis.gui.controlpanel.CorpusSorter;
 import annis.gui.frequency.UserGeneratedFrequencyEntry;
+import annis.service.objects.AnnisCorpus;
 import annis.service.objects.OrderType;
 import com.vaadin.data.util.BeanContainer;
 import com.vaadin.data.util.BeanItemContainer;
@@ -69,9 +71,13 @@ public class QueryUIState implements Serializable
   
   private final BeanItemContainer<Query> history = new BeanItemContainer<>(Query.class);
   
+  private final BeanContainer<String, AnnisCorpus> availableCorpora = new BeanContainer<>(AnnisCorpus.class);;
+  
   public QueryUIState()
   {
     initTransients();
+    availableCorpora.setBeanIdProperty("name");
+    availableCorpora.setItemSorter(new CorpusSorter());
   }
   
   private void initTransients()
@@ -158,6 +164,11 @@ public class QueryUIState implements Serializable
   public ObjectProperty<OrderType> getOrder()
   {
     return order;
+  }
+
+  public BeanContainer<String, AnnisCorpus> getAvailableCorpora()
+  {
+    return availableCorpora;
   }
   
   

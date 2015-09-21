@@ -97,8 +97,7 @@ public class CorpusListPanel extends VerticalLayout implements
     Add, Remove
 
   };
-  private BeanContainer<String, AnnisCorpus> corpusContainer;
-
+  
   private final ProgressBar pbLoadCorpora;
 
   private Table tblCorpora;
@@ -176,15 +175,17 @@ public class CorpusListPanel extends VerticalLayout implements
       @Override
       public void textChange(FieldEvents.TextChangeEvent event)
       {
-        corpusContainer.removeAllContainerFilters();
+        BeanContainer<String, AnnisCorpus> availableCorpora = ui.getQueryState().getAvailableCorpora();
+        
+        availableCorpora.removeAllContainerFilters();
         if (event.getText() != null && !event.getText().isEmpty())
         {
           Set<String> selectedIDs = getSelectedCorpora();
 
-          corpusContainer.addContainerFilter(
+          availableCorpora.addContainerFilter(
             new SimpleStringFilter("name", event.getText(), true, false));
           // select the first item
-          List<String> filteredIDs = corpusContainer.getItemIds();
+          List<String> filteredIDs = availableCorpora.getItemIds();
 
           Set<String> selectedAndFiltered = new HashSet<>(selectedIDs);
           selectedAndFiltered.retainAll(filteredIDs);
@@ -222,12 +223,9 @@ public class CorpusListPanel extends VerticalLayout implements
 
     addComponent(tblCorpora);
 
-    corpusContainer = new BeanContainer<>(AnnisCorpus.class);
-    corpusContainer.setBeanIdProperty("name");
-    corpusContainer.setItemSorter(new CorpusSorter());
 
     tblCorpora.setVisible(false); // don't show list before it was not loaded
-    tblCorpora.setContainerDataSource(corpusContainer);
+    tblCorpora.setContainerDataSource(ui.getQueryState().getAvailableCorpora());
     tblCorpora.setMultiSelect(true);
     tblCorpora.setPropertyDataSource(ui.getQueryState().getSelectedCorpora());
 
@@ -307,14 +305,14 @@ public class CorpusListPanel extends VerticalLayout implements
 
   private void updateCorpusTable()
   {
-    corpusContainer.removeAllItems();
+    ui.getQueryState().getAvailableCorpora().removeAllItems();
     String selectedCorpusSetName = (String) cbSelection.getValue();
 
     if (selectedCorpusSetName == null || ALL_CORPORA.equals(
       selectedCorpusSetName))
     {
       // add all corpora
-      corpusContainer.addAll(allCorpora);
+      ui.getQueryState().getAvailableCorpora().addAll(allCorpora);
     }
     else if (userConfig != null)
     {
@@ -349,7 +347,7 @@ public class CorpusListPanel extends VerticalLayout implements
             shownCorpora.add(c);
           }
         }
-        corpusContainer.addAll(shownCorpora);
+        ui.getQueryState().getAvailableCorpora().addAll(shownCorpora);
       }
     }
     tblCorpora.sort();
@@ -365,7 +363,7 @@ public class CorpusListPanel extends VerticalLayout implements
 
     if (corpora.isEmpty())
     {
-      corpora.addAll(corpusContainer.getItemIds());
+      corpora.addAll(ui.getQueryState().getAvailableCorpora().getItemIds());
     }
     autoGenQueries.setSelectedCorpusInBackground(corpora);
   }
@@ -559,7 +557,6 @@ public class CorpusListPanel extends VerticalLayout implements
    * Select the corpora
    *
    * @param corpora Corpora to select
-   * @param delayScroll
    */
   public void selectCorpora(Set<String> corpora)
   {
@@ -577,7 +574,7 @@ public class CorpusListPanel extends VerticalLayout implements
       if (!corpora.isEmpty())
       {
         String firstCorpusName = corpora.iterator().next();
-        int idx = corpusContainer.indexOfId(firstCorpusName);
+        int idx = ui.getQueryState().getAvailableCorpora().indexOfId(firstCorpusName);
         tblCorpora.setCurrentPageFirstItemIndex(idx);
       }
     }
@@ -602,7 +599,7 @@ public class CorpusListPanel extends VerticalLayout implements
    */
   public Set<String> getVisibleCorpora()
   {
-    return new HashSet<>(corpusContainer.getItemIds());
+    return new HashSet<>(ui.getQueryState().getAvailableCorpora().getItemIds());
   }
 
   /**
@@ -741,7 +738,7 @@ public class CorpusListPanel extends VerticalLayout implements
   public void initCorpusBrowser(String topLevelCorpusName, final Button l)
   {
 
-    AnnisCorpus c = corpusContainer.getItem(topLevelCorpusName).getBean();
+    AnnisCorpus c = ui.getQueryState().getAvailableCorpora().getItem(topLevelCorpusName).getBean();
     MetaDataPanel meta = new MetaDataPanel(c.getName());
 
     CorpusBrowserPanel browse = new CorpusBrowserPanel(c, ui.getQueryController());
