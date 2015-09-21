@@ -503,7 +503,7 @@ public class QueryServiceImpl implements QueryService
     Subject user = SecurityUtils.getSubject();
     for (AnnisCorpus c : allCorpora)
     {
-      if (user.isPermitted("query:*:" + c.getName()))
+      if (user.isPermitted("query:show:" + c.getName()))
       {
         allowedCorpora.add(c);
       }
@@ -564,7 +564,7 @@ public class QueryServiceImpl implements QueryService
       List<AnnisCorpus> allCorpora = annisDao.listCorpora(ids);
       for(AnnisCorpus c : allCorpora)
       {
-        if(user.isPermitted("query:*:" + c.getName()))
+        if(user.isPermitted("query:show:" + c.getName()))
         {
           result.add(c);
         }
