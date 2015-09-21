@@ -35,21 +35,13 @@ public class LoginWindow extends Window
 {
 
   private String loginURL;
-  private final boolean executeQueryAfterLogin;
-  private final QueryController queryController;
+  private QueryController queryController;
+  private boolean executeSearchAfterClose;
   
-  /**
-   * Constructor.
-   * @param executeQueryAfterLogin If true a possible prepared query is exectued after a (sucessful) login.
-   * @param queryController
-   */
-  public LoginWindow(boolean executeQueryAfterLogin, QueryController queryController)
+  public LoginWindow()
   {
     super("ANNIS Login");
 
-    this.executeQueryAfterLogin = executeQueryAfterLogin;
-    this.queryController = queryController;
-    
     setModal(true);
 
     setWidth("400px");
@@ -89,9 +81,9 @@ public class LoginWindow extends Window
     }
   }
   
-  public void close(boolean sucessfulLogin)
+  public void close(boolean loginSuccessful)
   {
-    if(isAttached() && sucessfulLogin && executeQueryAfterLogin && queryController != null)
+    if(executeSearchAfterClose && loginSuccessful && queryController != null)
     {
       queryController.executeSearch(true, true);
     }
@@ -99,5 +91,27 @@ public class LoginWindow extends Window
     super.close();
     
   }
+
+  public QueryController getQueryController()
+  {
+    return queryController;
+  }
+
+  public void setQueryController(QueryController queryController)
+  {
+    this.queryController = queryController;
+  }
+
+  public boolean isExecuteSearchAfterClose()
+  {
+    return executeSearchAfterClose;
+  }
+
+  public void setExecuteSearchAfterClose(boolean executeSearchAfterClose)
+  {
+    this.executeSearchAfterClose = executeSearchAfterClose;
+  }
+  
+  
 
 }

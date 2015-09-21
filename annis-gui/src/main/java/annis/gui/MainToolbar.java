@@ -105,7 +105,7 @@ public class MainToolbar extends HorizontalLayout
 
   private final String bugEMailAddress;
 
-  private LoginWindow windowLogin;
+  private final LoginWindow windowLogin = new LoginWindow();
 
   private SidebarState sidebarState = SidebarState.VISIBLE;
 
@@ -491,7 +491,6 @@ public class MainToolbar extends HorizontalLayout
     if (windowLogin != null)
     {
       windowLogin.close(user != null);
-      windowLogin = null;
     }
 
     if (user == null)
@@ -560,7 +559,6 @@ public class MainToolbar extends HorizontalLayout
     {
       // make sure to close the login window without triggering a search execution
       windowLogin.close(false);
-      windowLogin = null;
     }
 
     updateUserInformation();
@@ -641,7 +639,6 @@ public class MainToolbar extends HorizontalLayout
   public boolean isLoggedIn()
   {
     return Helper.getUser() != null;
-
   }
 
   private class LoginCloseCallback implements JavaScriptFunction
@@ -692,15 +689,7 @@ public class MainToolbar extends HorizontalLayout
     updateUserInformation();
 
   }
-
-  private Window createLoginWindow(boolean executeQueryAfterLogin)
-  {
-    windowLogin = new LoginWindow(executeQueryAfterLogin, queryController);
-    windowLogin.center();
-
-    return windowLogin;
-  }
-
+  
   public Sidebar getSidebar()
   {
     return sidebar;
@@ -771,7 +760,8 @@ public class MainToolbar extends HorizontalLayout
 
   public void showLoginWindow(boolean executeQueryAfterLogin)
   {
-    UI.getCurrent().addWindow(createLoginWindow(executeQueryAfterLogin));
+    windowLogin.setExecuteSearchAfterClose(executeQueryAfterLogin);
+    UI.getCurrent().addWindow(windowLogin);
 
   }
 
@@ -783,6 +773,7 @@ public class MainToolbar extends HorizontalLayout
   public void setQueryController(QueryController queryController)
   {
     this.queryController = queryController;
+    windowLogin.setQueryController(queryController);
   }
 
 }
