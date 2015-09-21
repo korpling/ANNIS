@@ -206,7 +206,7 @@ public class MainToolbar extends HorizontalLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        UI.getCurrent().addWindow(createLoginWindow());
+        showLoginWindow();
       }
     });
 
@@ -790,7 +790,7 @@ public class MainToolbar extends HorizontalLayout
     }
   }
 
-  public void addLoginWindow()
+  public void showLoginWindow()
   {
     UI.getCurrent().addWindow(createLoginWindow());
 
