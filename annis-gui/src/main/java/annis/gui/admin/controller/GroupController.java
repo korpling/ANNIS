@@ -50,6 +50,8 @@ public class GroupController implements GroupListView.Listener,
   private final UserListView userView;
 
   private boolean isLoggedIn = false;
+  
+  private boolean viewIsActive = false;
 
   public GroupController(GroupManagement model,
     CorpusManagement corpusModel,
@@ -151,7 +153,7 @@ public class GroupController implements GroupListView.Listener,
     {
       corpusModel.getWebResourceProvider().invalidateWebResource();
     }
-    if (isLoggedIn)
+    if (isLoggedIn && viewIsActive)
     {
       fetchDataFromService();
     }
@@ -215,7 +217,8 @@ public class GroupController implements GroupListView.Listener,
   @Override
   public void loadedTab(Object selectedTab)
   {
-    if (isLoggedIn && selectedTab == view)
+    viewIsActive = selectedTab == view;
+    if (isLoggedIn && viewIsActive)
     {
       fetchDataFromService();
     }

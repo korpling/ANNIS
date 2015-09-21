@@ -400,6 +400,11 @@ public class SearchView extends GridLayout implements View,
   {
     return mainTab;
   }
+  
+  public MainToolbar getMainToolbar()
+  {
+    return toolbar;
+  }
 
   @Override
   public void notifyCannotPlayMimeType(String mimeType)

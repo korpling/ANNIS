@@ -39,7 +39,8 @@ public class CorpusController
   private final CorpusListView view;
   private final UIView uiView;
   private boolean isLoggedIn = false;
-
+  private boolean viewIsActive = false;
+  
   public CorpusController(CorpusManagement model,
     CorpusListView view, UIView uiView, boolean isLoggedIn)
   {
@@ -84,7 +85,7 @@ public class CorpusController
     {
       model.getWebResourceProvider().invalidateWebResource();
     }
-    if(isLoggedIn)
+    if(isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }
@@ -93,11 +94,13 @@ public class CorpusController
       clearModel();
     }
   }
+  
 
   @Override
   public void loadedTab(Object selectedTab)
   {
-    if(isLoggedIn && selectedTab == view)
+    viewIsActive = selectedTab == view;
+    if(isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }

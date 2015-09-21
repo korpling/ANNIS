@@ -98,12 +98,13 @@ public class AnnisUI extends CommonUI
 
     this.instanceConfig = getInstanceConfig(request);
 
-    toolbar = new MainToolbar();
-
     searchView = new SearchView(AnnisUI.this);
     adminView = new AdminView(AnnisUI.this);
     queryController = new QueryController(searchView, AnnisUI.this);
-
+    
+    toolbar = new MainToolbar();
+    toolbar.setQueryController(queryController);
+    
     toolbar.addLoginListener(searchView);
     toolbar.addLoginListener(adminView);
     

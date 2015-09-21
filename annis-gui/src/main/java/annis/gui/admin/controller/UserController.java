@@ -40,6 +40,8 @@ public class UserController implements UserListView.Listener, UIView.Listener
   private final UIView uiView;
 
   private boolean isLoggedIn = false;
+  
+  private boolean viewIsActive = false;
 
   public UserController(UserManagement model,
     UserListView view, UIView uiView, boolean isLoggedIn)
@@ -166,7 +168,7 @@ public class UserController implements UserListView.Listener, UIView.Listener
     {
       model.getWebResourceProvider().invalidateWebResource();
     }
-    if (isLoggedIn)
+    if (isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }
@@ -179,7 +181,8 @@ public class UserController implements UserListView.Listener, UIView.Listener
   @Override
   public void loadedTab(Object selectedTab)
   {
-    if (isLoggedIn && selectedTab == view)
+    viewIsActive = selectedTab == view;
+    if (isLoggedIn && viewIsActive)
     {
       fetchFromService();
     }

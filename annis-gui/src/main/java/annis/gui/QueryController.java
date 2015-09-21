@@ -228,9 +228,21 @@ public class QueryController implements Serializable
     }
     else if (ex.getResponse().getStatus() == 403)
     {
-      caption = "You don't have the access rights to query this corpus. " 
-        + "You might want to login to access more corpora.";
-      qp.setStatus(caption);
+      
+      if(Helper.getUser() == null)
+      {
+        // not logged in
+        qp.setStatus("You don't have the access rights to query this corpus. " 
+        + "You might want to login to access more corpora.");
+        searchView.getMainToolbar().showLoginWindow(true);
+      }
+      else
+      {
+        // logged in but wrong user
+        caption = "You don't have the access rights to query this corpus. " 
+        + "You might want to login as another user to access more corpora.";
+        qp.setStatus(caption);
+      }
     }
     else
     {
