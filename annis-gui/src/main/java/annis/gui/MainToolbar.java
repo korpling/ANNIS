@@ -206,34 +206,7 @@ public class MainToolbar extends HorizontalLayout
       @Override
       public void buttonClick(Button.ClickEvent event)
       {
-        Resource loginRes;
-        if (loginURL == null || loginURL.isEmpty())
-        {
-          loginRes = new ExternalResource(
-            Helper.getContext() + "/login");
-        }
-        else
-        {
-          loginRes = new ExternalResource(loginURL);
-        }
-
-        BrowserFrame frame = new BrowserFrame("login", loginRes);
-        frame.setWidth("100%");
-        frame.setHeight("100%");
-
-        windowLogin = new Window("ANNIS Login", frame);
-        windowLogin.setModal(true);
-
-        windowLogin.setWidth("400px");
-        windowLogin.setHeight("250px");
-        String loginMaximizedRaw = (String) getSession().getAttribute(
-          LOGIN_MAXIMIZED_KEY);
-        if (Boolean.parseBoolean(loginMaximizedRaw))
-        {
-          windowLogin.setWindowMode(WindowMode.MAXIMIZED);
-        }
-        UI.getCurrent().addWindow(windowLogin);
-        windowLogin.center();
+        UI.getCurrent().addWindow(createLoginWindow());
       }
     });
 
@@ -716,6 +689,40 @@ public class MainToolbar extends HorizontalLayout
 
   }
 
+  private Window createLoginWindow()
+  {
+    Resource loginRes;
+    if (loginURL == null || loginURL.isEmpty())
+    {
+      loginRes = new ExternalResource(
+        Helper.getContext() + "/login");
+    }
+    else
+    {
+      loginRes = new ExternalResource(loginURL);
+    }
+
+    BrowserFrame frame = new BrowserFrame("login", loginRes);
+    frame.setWidth("100%");
+    frame.setHeight("100%");
+
+    windowLogin = new Window("ANNIS Login", frame);
+    windowLogin.setModal(true);
+
+    windowLogin.setWidth("400px");
+    windowLogin.setHeight("250px");
+    String loginMaximizedRaw = (String) getSession().getAttribute(
+      LOGIN_MAXIMIZED_KEY);
+    if (Boolean.parseBoolean(loginMaximizedRaw))
+    {
+      windowLogin.setWindowMode(WindowMode.MAXIMIZED);
+    }
+    UI.getCurrent().addWindow(windowLogin);
+    windowLogin.center();
+
+    return windowLogin;
+  }
+
   public Sidebar getSidebar()
   {
     return sidebar;
@@ -782,6 +789,11 @@ public class MainToolbar extends HorizontalLayout
         }
       }
     }
+  }
+
+  public void addLoginWindow()
+  {
+    UI.getCurrent().addWindow(createLoginWindow());
 
   }
 
