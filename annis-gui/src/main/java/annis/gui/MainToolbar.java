@@ -717,7 +717,6 @@ public class MainToolbar extends HorizontalLayout
     {
       windowLogin.setWindowMode(WindowMode.MAXIMIZED);
     }
-    UI.getCurrent().addWindow(windowLogin);
     windowLogin.center();
 
     return windowLogin;
