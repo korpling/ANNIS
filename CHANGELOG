@@ -1,3 +1,18 @@
+Version 3.4.0-preview3
+=====================
+
+Changelog is also available on GitHub:
+https://github.com/korpling/ANNIS/issues?q=milestone%3A3.4.0-preview3+is%3Aclosed
+
+[Bugs]
+ #447 language change in virtual keyboard can trigger exception
+ #446 order field empty when search view is re-attached
+ #444 Error message about not having the access rights for a corpus when validating query
+
+[Enhancements]
+ #445 Allow to show login window at each startup (per instance configuration)
+ #365 Using a corpus URL for a corpus not in the list should open login window
+
 Version 3.4.0-preview2
 =====================
 
