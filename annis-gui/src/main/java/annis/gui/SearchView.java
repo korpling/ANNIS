@@ -488,6 +488,8 @@ public class SearchView extends GridLayout implements View,
   public void onLogin()
   {
     getControlPanel().getCorpusList().updateCorpusSetList();
+    // re-evaluate the fragment in case a corpus is now accessible
+    evaluateFragment(Page.getCurrent().getUriFragment());
   }
 
   @Override
@@ -546,7 +548,7 @@ public class SearchView extends GridLayout implements View,
           {
           });
 
-        if(corporaByName != null && !corporaByName.isEmpty())
+        if (corporaByName != null && !corporaByName.isEmpty())
         {
           for (AnnisCorpus c : corporaByName)
           {
@@ -584,69 +586,69 @@ public class SearchView extends GridLayout implements View,
       corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
     }
 
-    if (args.containsKey("c") && args.size() == 1)
+    if (corpora.isEmpty())
     {
-      // special case: we were called from outside and should only select,
-      // but not query, the selected corpora
-      if (corpora.isEmpty())
+      // show a warning message that the corpus was not imported yet
+      new Notification("Linked corpus does not exist",
+        "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+        + " in ANNIS.</p>"
+        + "<h2>possible reasons are:</h2>"
+        + "<ul><li>that it has not been imported yet.</li>"
+        + "<li>The ANNIS service is not running</li></ul>"
+        + "<p>Please ask the responsible person of the site that contained "
+        + "the link to import the corpus.</p></div>",
+        Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+    }
+    else
+    {
+      if (args.containsKey("c") && args.size() == 1)
       {
-        // show a warning message that the corpus was not imported yet
-        new Notification("Linked corpus does not exist",
-          "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
-          + " in ANNIS.</p>"
-          + "<h2>possible reasons are:</h2>"
-          + "<ul><li>that it has not been imported yet.</li>"
-          + "<li>The ANNIS service is not running</li></ul>"
-          + "<p>Please ask the responsible person of the site that contained "
-          + "the link to import the corpus.</p></div>",
-          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-      }
-      else
-      {
+        // special case: we were called from outside and should only select,
+        // but not query, the selected corpora
+
         getControlPanel().getCorpusList().selectCorpora(corpora);
       }
-
-    }
-    else if (args.get("cl") != null && args.get("cr") != null)
-    {
-      // do not change the manually selected search options
-      //String a = args.get("cl");
-      //String b = args.get("cr");
-      //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-
-      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
-      PagedResultQuery query = new PagedResultQuery(
-        Integer.parseInt(args.get("cl")),
-        Integer.parseInt(args.get("cr")),
-        Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
-        args.get("seg"),
-        args.get("q"), corpora);
-
-      if (args.get("o") != null)
+      else if (args.get("cl") != null && args.get("cr") != null)
       {
-        try
+        // do not change the manually selected search options
+        //String a = args.get("cl");
+        //String b = args.get("cr");
+        //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+
+        controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+
+        PagedResultQuery query = new PagedResultQuery(
+          Integer.parseInt(args.get("cl")),
+          Integer.parseInt(args.get("cr")),
+          Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
+          args.get("seg"),
+          args.get("q"), corpora);
+
+        if (args.get("o") != null)
         {
-          query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
+          try
+          {
+            query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
+          }
+          catch (IllegalArgumentException ex)
+          {
+            log.warn("Could not parse query fragment argument for order", ex);
+          }
         }
-        catch (IllegalArgumentException ex)
-        {
-          log.warn("Could not parse query fragment argument for order", ex);
-        }
+
+        // full query with given context
+        ui.getQueryController().setQuery(query);
+        ui.getQueryController().executeSearch(true, false);
       }
+      else if (args.get("q") != null)
+      {
+        // do not change the manually selected search options
+        controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
-      // full query with given context
-      ui.getQueryController().setQuery(query);
-      ui.getQueryController().executeSearch(true, false);
-    }
-    else if (args.get("q") != null)
-    {
-      // do not change the manually selected search options
-      controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
-      // use default context
-      ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
-      ui.getQueryController().executeSearch(true, true);
+        // use default context
+        ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
+        ui.getQueryController().executeSearch(true, true);
+      }
     }
   }
 
