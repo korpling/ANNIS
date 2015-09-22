@@ -121,7 +121,7 @@ public class SearchView extends GridLayout implements View,
 
   private TabSheet mainTab;
 
-  private String lastQueriedFragment;
+  private String lastEvaluatedFragment;
 
   private DocBrowserController docBrowserController;
 
@@ -185,6 +185,11 @@ public class SearchView extends GridLayout implements View,
   @Override
   public void enter(ViewChangeListener.ViewChangeEvent event)
   {
+    if(event.getOldView() == event.getNewView())
+    {
+      return;
+    }
+    
     InstanceConfig config = ui.getInstanceConfig();
 
     Page.getCurrent().setTitle(config.getInstanceDisplayName()
@@ -198,9 +203,9 @@ public class SearchView extends GridLayout implements View,
 
     getSession().setAttribute(PDFController.class, new PDFControllerImpl());
 
+    // the following shoul
     checkCitation();
-    lastQueriedFragment = "";
-
+    lastEvaluatedFragment = "";
     Background.run(new VersionChecker());
     evaluateFragment(Page.getCurrent().getUriFragment());
 
@@ -208,6 +213,7 @@ public class SearchView extends GridLayout implements View,
     {
       toolbar.showLoginWindow(false);
     }
+
   }
 
   public void setToolbar(MainToolbar newToolbar)
@@ -571,11 +577,11 @@ public class SearchView extends GridLayout implements View,
   {
     // do nothing if not changed
     if (fragment == null || fragment.isEmpty() || fragment.equals(
-      lastQueriedFragment))
+      lastEvaluatedFragment))
     {
       return;
     }
-
+  
     Map<String, String> args = Helper.parseFragment(fragment);
 
     if (args.containsKey("c"))
@@ -680,8 +686,8 @@ public class SearchView extends GridLayout implements View,
       q.getSegmentation(), q.getOffset(), q.getLimit(), q.getOrder());
 
     // set our fragment
-    lastQueriedFragment = StringUtils.join(args, "&");
-    UI.getCurrent().getPage().setUriFragment(lastQueriedFragment);
+    lastEvaluatedFragment = StringUtils.join(args, "&");
+    UI.getCurrent().getPage().setUriFragment(lastEvaluatedFragment);
 
     // reset title
     Page.getCurrent().setTitle(
