@@ -1,6 +1,5 @@
 var searchData=
 [
-  ['selectcorpora',['selectCorpora',['../classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a7dfc2ae4da97879305dcf79995b867fb',1,'annis::gui::controlpanel::CorpusListPanel']]],
   ['setalias',['setAlias',['../classannis_1_1service_1_1objects_1_1_import_job.html#affebc9358e05b1939fe7a9569cb6feed',1,'annis::service::objects::ImportJob']]],
   ['setannisdao',['setAnnisDao',['../classannis_1_1dao_1_1autogenqueries_1_1_queries_generator.html#aefbf5f8821c8887de68d7ad39209222e',1,'annis.dao.autogenqueries.QueriesGenerator.setAnnisDao()'],['../classannis_1_1service_1_1internal_1_1_metadata_service_impl.html#a4b32335708ee192ad210f7a2f44b1a89',1,'annis.service.internal.MetadataServiceImpl.setAnnisDao()']]],
   ['setanniswebserviceurl',['setAnnisWebServiceURL',['../classannis_1_1libgui_1_1visualizers_1_1_visualizer_input.html#ae5542036fa06a38ccfcad2f8f0779d75',1,'annis::libgui::visualizers::VisualizerInput']]],

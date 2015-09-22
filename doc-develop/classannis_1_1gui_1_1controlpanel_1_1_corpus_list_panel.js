@@ -9,12 +9,10 @@ var classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel =
     [ "CorpusListPanel", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a99935afcb02b1985a27d7717350e3b57", null ],
     [ "addNewItem", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a564f5ea746ff298e2355c46b4076dc36", null ],
     [ "getActions", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a4507ab84fccdaf4da7e5c0b694bbc33c", null ],
-    [ "getSelectedCorpora", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ac0f8b76a939b52c28c3c4cc5f15ddb67", null ],
     [ "getTblCorpora", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a1c88fc1c35bac44f9d4e66bcb0f9ce82", null ],
-    [ "getVisibleCorpora", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a2a22d0d9595dfa06ad9aa044871cdccc", null ],
     [ "handleAction", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ab6549a4d51fccd9f631a4bd2dfaf74d5", null ],
     [ "initCorpusBrowser", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a54282444ee280a6b5fcec5f65e7e37a0", null ],
-    [ "selectCorpora", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a7dfc2ae4da97879305dcf79995b867fb", null ],
+    [ "scrollToSelectedCorpus", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a15b8a4f0eafe0799f40742b4d58f916b", null ],
     [ "setCorpusSet", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#aee168f68853acc9d3e9a297a428ac876", null ],
-    [ "updateCorpusSetList", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a947615d970211a7beac55cbeb6cd7204", null ]
+    [ "updateCorpusSetList", "classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a724195d0171c515da3b2eab52726f298", null ]
 ];

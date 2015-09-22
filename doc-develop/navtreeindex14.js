@@ -1,7 +1,5 @@
 var NAVTREEINDEX14 =
 {
-"enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a0a24aa46b4adf771fcf7d638812663c3":[3,0,0,6,19,0,12],
-"enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a1dccc96eaa8fa5bdc6142871ae5ee324":[3,0,0,6,19,0,0],
 "enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a41e02db7faa30a8a3bf2c1f409803a3d":[3,0,0,6,19,0,9],
 "enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a4fd9bbb20f8483dad8c659f45789a517":[3,0,0,6,19,0,8],
 "enumannis_1_1gui_1_1util_1_1_a_n_n_i_s_font_icon.html#a535a9ed91b73280530aa1a0ca6ba4c6f":[3,0,0,6,19,0,13],
@@ -63,8 +61,8 @@ var NAVTREEINDEX14 =
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#a0630bc0bd32b698b29a7136fb6576638":[3,0,0,17,0,7,13,0],
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#a820ec4ec0f84eb5e5873635784d3ec96":[3,0,0,17,0,7,13,1],
 "enumannis_1_1visualizers_1_1component_1_1tree_1_1_vertical_orientation.html#ab7df7df05c8852f1bc599f0a698e307f":[3,0,0,17,0,7,13,2],
-"functions.html":[3,2,0,0],
 "functions.html":[3,2,0],
+"functions.html":[3,2,0,0],
 "functions_b.html":[3,2,0,1],
 "functions_c.html":[3,2,0,2],
 "functions_d.html":[3,2,0,3],
@@ -249,5 +247,7 @@ var NAVTREEINDEX14 =
 "interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#aaf1addfaede604cf16413c085edec185":[3,0,0,6,16,2,1],
 "interfaceannis_1_1gui_1_1resultview_1_1_visualizer_context_changer.html#ae0bdc8ae8a06446c88f9ccc4d1ec05e3":[3,0,0,6,16,2,2],
 "interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_connector_1_1_load_callback.html":[3,0,0,6,20,1,0,0,0,0,0],
-"interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_connector_1_1_load_callback.html#ab49abc304ff564c8d756f648e2699165":[3,0,0,6,20,1,0,0,0,0,0,0]
+"interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_connector_1_1_load_callback.html#ab49abc304ff564c8d756f648e2699165":[3,0,0,6,20,1,0,0,0,0,0,0],
+"interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_server_rpc.html":[3,0,0,6,20,1,0,0,0,1],
+"interfaceannis_1_1gui_1_1widgets_1_1gwt_1_1client_1_1ui_1_1autoheightiframe_1_1_auto_height_i_frame_server_rpc.html#a6511e3491b4f8a72ff8316b7c75e00a4":[3,0,0,6,20,1,0,0,0,1,0]
 };

@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
+   &#160;<span id="projectnumber">3.4.0-preview3</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -136,9 +136,9 @@ Public Member Functions</h2></td></tr>
 <tr class="memitem:a99935afcb02b1985a27d7717350e3b57"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a99935afcb02b1985a27d7717350e3b57"></a>
 &#160;</td><td class="memItemRight" valign="bottom"><b>CorpusListPanel</b> (<a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a> instanceConfig, <a class="el" href="classannis_1_1gui_1_1_example_queries_panel.html">ExampleQueriesPanel</a> autoGenQueries, final <a class="el" href="classannis_1_1gui_1_1_annis_u_i.html">AnnisUI</a> ui)</td></tr>
 <tr class="separator:a99935afcb02b1985a27d7717350e3b57"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a947615d970211a7beac55cbeb6cd7204"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a947615d970211a7beac55cbeb6cd7204"></a>
-void&#160;</td><td class="memItemRight" valign="bottom"><b>updateCorpusSetList</b> ()</td></tr>
-<tr class="separator:a947615d970211a7beac55cbeb6cd7204"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a724195d0171c515da3b2eab52726f298"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a724195d0171c515da3b2eab52726f298"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>updateCorpusSetList</b> (boolean scrollToSelected)</td></tr>
+<tr class="separator:a724195d0171c515da3b2eab52726f298"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a564f5ea746ff298e2355c46b4076dc36"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a564f5ea746ff298e2355c46b4076dc36"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>addNewItem</b> (String newItemCaption)</td></tr>
 <tr class="separator:a564f5ea746ff298e2355c46b4076dc36"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -148,15 +148,9 @@ Action[]&#160;</td><td class="memItemRight" valign="bottom"><b>getActions</b> (O
 <tr class="memitem:ab6549a4d51fccd9f631a4bd2dfaf74d5"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="ab6549a4d51fccd9f631a4bd2dfaf74d5"></a>
 void&#160;</td><td class="memItemRight" valign="bottom"><b>handleAction</b> (Action action, Object sender, Object target)</td></tr>
 <tr class="separator:ab6549a4d51fccd9f631a4bd2dfaf74d5"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a7dfc2ae4da97879305dcf79995b867fb"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a7dfc2ae4da97879305dcf79995b867fb">selectCorpora</a> (Set&lt; String &gt; corpora)</td></tr>
-<tr class="memdesc:a7dfc2ae4da97879305dcf79995b867fb"><td class="mdescLeft">&#160;</td><td class="mdescRight">Select the corpora.  <a href="#a7dfc2ae4da97879305dcf79995b867fb">More...</a><br /></td></tr>
-<tr class="separator:a7dfc2ae4da97879305dcf79995b867fb"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="memItemLeft" align="right" valign="top">Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#ac0f8b76a939b52c28c3c4cc5f15ddb67">getSelectedCorpora</a> ()</td></tr>
-<tr class="memdesc:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the names of the corpora that are currently selected.  <a href="#ac0f8b76a939b52c28c3c4cc5f15ddb67">More...</a><br /></td></tr>
-<tr class="separator:ac0f8b76a939b52c28c3c4cc5f15ddb67"><td class="memSeparator" colspan="2">&#160;</td></tr>
-<tr class="memitem:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="memItemLeft" align="right" valign="top">Set&lt; String &gt;&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#a2a22d0d9595dfa06ad9aa044871cdccc">getVisibleCorpora</a> ()</td></tr>
-<tr class="memdesc:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="mdescLeft">&#160;</td><td class="mdescRight">Get the names of the corpora that are currently visible and can be choosen by the user.  <a href="#a2a22d0d9595dfa06ad9aa044871cdccc">More...</a><br /></td></tr>
-<tr class="separator:a2a22d0d9595dfa06ad9aa044871cdccc"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a15b8a4f0eafe0799f40742b4d58f916b"><td class="memItemLeft" align="right" valign="top"><a class="anchor" id="a15b8a4f0eafe0799f40742b4d58f916b"></a>
+void&#160;</td><td class="memItemRight" valign="bottom"><b>scrollToSelectedCorpus</b> ()</td></tr>
+<tr class="separator:a15b8a4f0eafe0799f40742b4d58f916b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aee168f68853acc9d3e9a297a428ac876"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html#aee168f68853acc9d3e9a297a428ac876">setCorpusSet</a> (String corpusSet)</td></tr>
 <tr class="memdesc:aee168f68853acc9d3e9a297a428ac876"><td class="mdescLeft">&#160;</td><td class="mdescRight">Set the currently displayed corpus set.  <a href="#aee168f68853acc9d3e9a297a428ac876">More...</a><br /></td></tr>
 <tr class="separator:aee168f68853acc9d3e9a297a428ac876"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -204,66 +198,6 @@ Remove</td>
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
-<a class="anchor" id="ac0f8b76a939b52c28c3c4cc5f15ddb67"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;String&gt; annis.gui.controlpanel.CorpusListPanel.getSelectedCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the names of the corpora that are currently selected. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a2a22d0d9595dfa06ad9aa044871cdccc"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">Set&lt;String&gt; annis.gui.controlpanel.CorpusListPanel.getVisibleCorpora </td>
-          <td>(</td>
-          <td class="paramname"></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Get the names of the corpora that are currently visible and can be choosen by the user. </p>
-<dl class="section return"><dt>Returns</dt><dd></dd></dl>
-
-</div>
-</div>
-<a class="anchor" id="a7dfc2ae4da97879305dcf79995b867fb"></a>
-<div class="memitem">
-<div class="memproto">
-      <table class="memname">
-        <tr>
-          <td class="memname">void annis.gui.controlpanel.CorpusListPanel.selectCorpora </td>
-          <td>(</td>
-          <td class="paramtype">Set&lt; String &gt;&#160;</td>
-          <td class="paramname"><em>corpora</em></td><td>)</td>
-          <td></td>
-        </tr>
-      </table>
-</div><div class="memdoc">
-
-<p>Select the corpora. </p>
-<dl class="params"><dt>Parameters</dt><dd>
-  <table class="params">
-    <tr><td class="paramname">corpora</td><td>Corpora to select </td></tr>
-  </table>
-  </dd>
-</dl>
-
-</div>
-</div>
 <a class="anchor" id="aee168f68853acc9d3e9a297a428ac876"></a>
 <div class="memitem">
 <div class="memproto">
@@ -294,7 +228,7 @@ Remove</td>
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>gui</b></li><li class="navelem"><b>controlpanel</b></li><li class="navelem"><a class="el" href="classannis_1_1gui_1_1controlpanel_1_1_corpus_list_panel.html">CorpusListPanel</a></li>
-    <li class="footer">Generated on Tue Sep 22 2015 18:03:42 for ANNIS by
+    <li class="footer">Generated on Tue Sep 22 2015 20:06:07 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>
