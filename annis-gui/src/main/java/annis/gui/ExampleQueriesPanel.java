@@ -385,6 +385,10 @@ public class ExampleQueriesPanel extends CssLayout
             {
               ui.getQueryController().setQuery(new Query(eQ.getExampleQuery(),
                 corpusNameSet));
+              // ensure the selected corpus is shown
+              ui.getSearchView().getControlPanel().getCorpusList().scrollToSelectedCorpus();
+              
+              // execute query
               ui.getQueryController().executeSearch(true, true);
             }
           }

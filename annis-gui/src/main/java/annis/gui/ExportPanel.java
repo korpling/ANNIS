@@ -93,6 +93,7 @@ public class ExportPanel extends FormLayout
   private final QueryController controller;
 
   private UI ui;
+  private final QueryUIState state;
   
   public ExportPanel(QueryPanel queryPanel, CorpusListPanel corpusListPanel,
     QueryController controller, QueryUIState state)
@@ -100,6 +101,7 @@ public class ExportPanel extends FormLayout
     this.queryPanel = queryPanel;
     this.corpusListPanel = corpusListPanel;
     this.controller = controller;
+    this.state = state;
 
     this.eventBus = new EventBus();
     this.eventBus.register(ExportPanel.this);
@@ -404,7 +406,7 @@ public class ExportPanel extends FormLayout
           btExport.setEnabled(true);
           return;
         }
-        else if (corpusListPanel.getSelectedCorpora().isEmpty())
+        else if (state.getSelectedCorpora().getValue().isEmpty())
         {
           Notification.show("Please select a corpus",
             Notification.Type.WARNING_MESSAGE);

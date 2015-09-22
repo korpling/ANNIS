@@ -615,15 +615,14 @@ public class SearchView extends GridLayout implements View,
             Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
         }
-      }
+      }// end if corpus list returned from service is empty
       else
       {
         if (args.containsKey("c") && args.size() == 1)
         {
           // special case: we were called from outside and should only select,
           // but not query, the selected corpora
-
-          getControlPanel().getCorpusList().selectCorpora(corpora);
+          ui.getQueryState().getSelectedCorpora().setValue(corpora);
         }
         else if (args.get("cl") != null && args.get("cr") != null)
         {
@@ -666,7 +665,10 @@ public class SearchView extends GridLayout implements View,
           ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
           ui.getQueryController().executeSearch(true, true);
         }
-      }
+        
+        getControlPanel().getCorpusList().scrollToSelectedCorpus();
+        
+      } // end if corpus list from server was non-empty
     } // end if there is a corpus definition
   }
 
