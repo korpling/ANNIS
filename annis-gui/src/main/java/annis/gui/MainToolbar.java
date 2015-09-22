@@ -761,8 +761,12 @@ public class MainToolbar extends HorizontalLayout
   public void showLoginWindow(boolean executeQueryAfterLogin)
   {
     windowLogin.setExecuteSearchAfterClose(executeQueryAfterLogin);
+    if(windowLogin.isAttached())
+    {
+      windowLogin.close();
+    }
     UI.getCurrent().addWindow(windowLogin);
-
+      
   }
 
   public QueryController getQueryController()
