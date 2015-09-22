@@ -588,16 +588,35 @@ public class SearchView extends GridLayout implements View,
 
     if (corpora.isEmpty())
     {
+      if (Helper.getUser() == null && toolbar != null)
+      {
+        // not logged in, show login window
+        toolbar.showLoginWindow(true);
+      }
+      else
+      {
+        // already logged in or no login system available, just display a message
+        new Notification("Linked corpus does not exist",
+          "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+          + " in ANNIS.</p>"
+          + "<h2>possible reasons are:</h2>"
+          + "<ul>"
+          + "<li>that it has not been imported yet,</li>"
+          + "<li>you don't have the access rights to see this corpus,</li>"
+          + "<li>or the ANNIS service is not running.</li>"
+          + "</ul>"
+          + "<p>Please ask the responsible person of the site that contained "
+          + "the link to import the corpus.</p></div>",
+          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+
+      }
+      if (ui.getInstanceConfig().isLoginOnStart() && toolbar != null && Helper.
+        getUser() == null)
+      {
+        toolbar.showLoginWindow(false);
+      }
       // show a warning message that the corpus was not imported yet
-      new Notification("Linked corpus does not exist",
-        "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
-        + " in ANNIS.</p>"
-        + "<h2>possible reasons are:</h2>"
-        + "<ul><li>that it has not been imported yet.</li>"
-        + "<li>The ANNIS service is not running</li></ul>"
-        + "<p>Please ask the responsible person of the site that contained "
-        + "the link to import the corpus.</p></div>",
-        Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+
     }
     else
     {
