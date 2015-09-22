@@ -493,7 +493,7 @@ public class SearchView extends GridLayout implements View,
   @Override
   public void onLogin()
   {
-    getControlPanel().getCorpusList().updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList(true);
     // re-evaluate the fragment in case a corpus is now accessible
     evaluateFragment(Page.getCurrent().getUriFragment());
   }
@@ -501,7 +501,7 @@ public class SearchView extends GridLayout implements View,
   @Override
   public void onLogout()
   {
-    getControlPanel().getCorpusList().updateCorpusSetList();
+    getControlPanel().getCorpusList().updateCorpusSetList(false);
   }
 
   @Override
