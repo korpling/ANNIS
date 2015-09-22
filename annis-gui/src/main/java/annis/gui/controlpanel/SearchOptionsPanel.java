@@ -220,9 +220,14 @@ public class SearchOptionsPanel extends FormLayout
       BeanItemContainer<OrderType> orderContainer
         = new BeanItemContainer<>(OrderType.class,
           Lists.newArrayList(OrderType.values()));
+      
+      // Unset the property data source first, otherwise the setting of 
+      // the container data source will set the property value to null 
+      cbOrder.setPropertyDataSource(null);
       cbOrder.setContainerDataSource(orderContainer);
+      
       cbOrder.setPropertyDataSource(state.getOrder());
-
+      
     }
   }
 
