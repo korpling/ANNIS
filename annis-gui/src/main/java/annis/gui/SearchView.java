@@ -591,7 +591,8 @@ public class SearchView extends GridLayout implements View,
       if (Helper.getUser() == null && toolbar != null)
       {
         // not logged in, show login window
-        toolbar.showLoginWindow(true);
+        boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
+        toolbar.showLoginWindow(!onlyCorpusSelected);
       }
       else
       {
@@ -610,13 +611,6 @@ public class SearchView extends GridLayout implements View,
           Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
       }
-      if (ui.getInstanceConfig().isLoginOnStart() && toolbar != null && Helper.
-        getUser() == null)
-      {
-        toolbar.showLoginWindow(false);
-      }
-      // show a warning message that the corpus was not imported yet
-
     }
     else
     {
