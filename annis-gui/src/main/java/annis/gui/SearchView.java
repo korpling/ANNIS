@@ -546,15 +546,7 @@ public class SearchView extends GridLayout implements View,
           {
           });
 
-        if (corporaByName == null || corporaByName.isEmpty())
-        {
-          // When we did not get any answer for this corpus we might not have
-          // the rights to access it yet. Since we want to preserve the "c"
-          // parameter in the string we should still remember it.
-          // See https://github.com/korpling/ANNIS/issues/330
-          mappedNames.add(selectedCorpusName);
-        }
-        else
+        if(corporaByName != null && !corporaByName.isEmpty())
         {
           for (AnnisCorpus c : corporaByName)
           {

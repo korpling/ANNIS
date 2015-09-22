@@ -115,6 +115,7 @@ allows a user to count on all corpora but won't allow him to fetch the annotatio
 
 permission               | description 
 -------------------------|-------------
+query:show:<b>{corpusname}</b> | Allow to show information about a specific corpus.
 query:count:<b>{corpusname}</b> | Allow to @ref annis.service.QueryService#count "count" on a specific corpus.
 query:find:<b>{corpusname}</b>  | Allow to @ref annis.service.QueryService#find "find matches" on a specific corpus.
 query:subgraph:<b>{corpusname}</b>  | Allow to query @ref annis.service.QueryService#subgraph "subgraphs" on a specific corpus.
