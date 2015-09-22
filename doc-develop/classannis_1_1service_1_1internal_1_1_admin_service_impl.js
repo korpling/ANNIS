@@ -15,7 +15,7 @@ var classannis_1_1service_1_1internal_1_1_admin_service_impl =
     [ "getUserConfig", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a81fba39cd9fbe7973e4dcf7bec15687b", null ],
     [ "importCorpus", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a32c54972e351f479354ec9a73ccd4818", null ],
     [ "init", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ac07e530cbc7324ce1495c98466f8ed16", null ],
-    [ "isAuthenticated", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a09a05bdc867e0656baf7182a87b75f1b", null ],
+    [ "isAuthenticated", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#aef5d76ce892a509079684952477e3bb4", null ],
     [ "listGroups", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#ac1f9718d5275efb921a43b0aede3147f", null ],
     [ "listUsers", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a9c51ea5664b092dc43547ceec78f66d8", null ],
     [ "setAdminDao", "classannis_1_1service_1_1internal_1_1_admin_service_impl.html#a76b3dcc6d41aa9c31a1d6791eda08deb", null ],

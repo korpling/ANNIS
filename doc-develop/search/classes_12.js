@@ -21,6 +21,7 @@ var searchData=
   ['sensitivecombobox',['SensitiveComboBox',['../classannis_1_1gui_1_1flatquerybuilder_1_1_sensitive_combo_box.html',1,'annis::gui::flatquerybuilder']]],
   ['serializablebytesource',['SerializableByteSource',['../classannis_1_1security_1_1_serializable_byte_source.html',1,'annis::security']]],
   ['servicequeryexception',['ServiceQueryException',['../classannis_1_1gui_1_1_service_query_exception.html',1,'annis::gui']]],
+  ['setfilter',['SetFilter',['../classannis_1_1gui_1_1filter_1_1_set_filter.html',1,'annis::gui::filter']]],
   ['settingsstorage',['SettingsStorage',['../classannis_1_1gui_1_1components_1_1_settings_storage.html',1,'annis::gui::components']]],
   ['shape',['Shape',['../interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_shape.html',1,'annis::visualizers::component::tree']]],
   ['showresultclicklistener',['ShowResultClickListener',['../classannis_1_1gui_1_1controlpanel_1_1_query_panel_1_1_show_result_click_listener.html',1,'annis::gui::controlpanel::QueryPanel']]],

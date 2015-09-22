@@ -8,6 +8,7 @@ var classannis_1_1gui_1_1objects_1_1_query_u_i_state =
     ] ],
     [ "QueryUIState", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a8e172d53a0f11af0f648b4b31d52eef1", null ],
     [ "getAql", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a0fcae076c07a9e6bbc39d47fd97f5da8", null ],
+    [ "getAvailableCorpora", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#aef78a3a3150c0e0ee52fe88c0360e16a", null ],
     [ "getBaseText", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a370e960128fa67d6c2914f6c733e8a45", null ],
     [ "getExecutedTasks", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#a3e29d716677de142d83d94082fe01ddb", null ],
     [ "getExportAnnotationKeys", "classannis_1_1gui_1_1objects_1_1_query_u_i_state.html#ad4c6d2c2612fd6ce815eb9ee093a08f0", null ],

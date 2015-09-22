@@ -6,6 +6,7 @@ var classannis_1_1gui_1_1_main_toolbar =
     [ "attach", "classannis_1_1gui_1_1_main_toolbar.html#a823ecffe12f00a2dd64c074537d54026", null ],
     [ "canReportBugs", "classannis_1_1gui_1_1_main_toolbar.html#ad7af457d63e5638fe4342d14baefe090", null ],
     [ "detach", "classannis_1_1gui_1_1_main_toolbar.html#a64fb3c4873bcce5614df620444c36f7b", null ],
+    [ "getQueryController", "classannis_1_1gui_1_1_main_toolbar.html#a620d1c643baec0de10a03cde32eb11d9", null ],
     [ "getScreenshotExtension", "classannis_1_1gui_1_1_main_toolbar.html#a59cf9fd7578740262faec7388936ae2b", null ],
     [ "getSidebar", "classannis_1_1gui_1_1_main_toolbar.html#a1d6561d762cbb9b7f721c3d39e1cd09f", null ],
     [ "handleLoginDataLostException", "classannis_1_1gui_1_1_main_toolbar.html#a4580a76cbe32dd1f11972119d670750a", null ],
@@ -19,6 +20,7 @@ var classannis_1_1gui_1_1_main_toolbar =
     [ "reportBug", "classannis_1_1gui_1_1_main_toolbar.html#a7d8370c9842f33d7217a767fe2e55287", null ],
     [ "screenshotReceived", "classannis_1_1gui_1_1_main_toolbar.html#a6a44a4dc48174823b98671d8531921be", null ],
     [ "setNavigationTarget", "classannis_1_1gui_1_1_main_toolbar.html#aff8e177affffee11a5a2dd8fd97605bd", null ],
+    [ "setQueryController", "classannis_1_1gui_1_1_main_toolbar.html#a4b5ee85c6c73dbcf73833f95caf73a09", null ],
     [ "setSidebar", "classannis_1_1gui_1_1_main_toolbar.html#a62d2e637340dac74b97e420579ac156c", null ],
-    [ "updateUserInformation", "classannis_1_1gui_1_1_main_toolbar.html#ab8fedfc377e74628c1aedec01c909a0a", null ]
+    [ "showLoginWindow", "classannis_1_1gui_1_1_main_toolbar.html#ad3160a1c9bee9830fbaad9a56599d07b", null ]
 ];

@@ -2,6 +2,7 @@ var classannis_1_1gui_1_1_admin_view =
 [
     [ "AdminView", "classannis_1_1gui_1_1_admin_view.html#afb2c523c75494a2c87fa87bb5ae61ec4", null ],
     [ "addListener", "classannis_1_1gui_1_1_admin_view.html#a525308c090fb9df795ca7be192898f30", null ],
+    [ "detach", "classannis_1_1gui_1_1_admin_view.html#a3c51665d9758726b120a618725b0b5ac", null ],
     [ "enter", "classannis_1_1gui_1_1_admin_view.html#a255f3f502daa496f3e800bb7f6f26e13", null ],
     [ "getAsyncWebResource", "classannis_1_1gui_1_1_admin_view.html#ae3b4862a6184844bceaf6d5f35a9755a", null ],
     [ "getWebResource", "classannis_1_1gui_1_1_admin_view.html#afdd0c377b038d56c42e49e1bc0c7ece5", null ],

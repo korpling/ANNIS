@@ -9,6 +9,7 @@ var classannis_1_1gui_1_1_search_view =
     [ "getDocBrowserController", "classannis_1_1gui_1_1_search_view.html#afe380cda0d1134f4fbae44ac7ce3dcd0", null ],
     [ "getLastSelectedResultView", "classannis_1_1gui_1_1_search_view.html#a8bf0a62bdb164c350532914633d057da", null ],
     [ "getMainTab", "classannis_1_1gui_1_1_search_view.html#a15924923964eb4a2f5ac27efc3795e06", null ],
+    [ "getMainToolbar", "classannis_1_1gui_1_1_search_view.html#ab3ff0f8058eb3713ea46c0bf41f7661f", null ],
     [ "getTabSheet", "classannis_1_1gui_1_1_search_view.html#aafdad4ff039546278b67e117ddc4baef", null ],
     [ "notifiyQueryStarted", "classannis_1_1gui_1_1_search_view.html#ab6948f96ebf50bd4341662f359e3a759", null ],
     [ "notifyCannotPlayMimeType", "classannis_1_1gui_1_1_search_view.html#a53f44b171dfcb7f6b582f543f87e5650", null ],

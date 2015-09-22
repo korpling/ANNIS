@@ -34,6 +34,7 @@ var searchData=
   ['islandpolicies',['IslandPolicies',['../classannis_1_1sqlgen_1_1_islands_policy.html#enumannis_1_1sqlgen_1_1_islands_policy_1_1_island_policies',1,'annis::sqlgen::IslandsPolicy']]],
   ['islandspolicy',['IslandsPolicy',['../classannis_1_1sqlgen_1_1_islands_policy.html',1,'annis::sqlgen']]],
   ['isloaded',['isLoaded',['../interfaceannis_1_1visualizers_1_1_loadable_visualizer.html#a296d3d72318e641c59b9f3232cd69c9f',1,'annis.visualizers.LoadableVisualizer.isLoaded()'],['../classannis_1_1gui_1_1components_1_1medialement_1_1_media_element_player.html#abf34df861feaf4e896a59631c4909281',1,'annis.gui.components.medialement.MediaElementPlayer.isLoaded()']]],
+  ['isloginonstart',['isLoginOnStart',['../classannis_1_1libgui_1_1_instance_config.html#a2c256d8f8116ba202973db9a41f87e99',1,'annis::libgui::InstanceConfig']]],
   ['isnewkey',['isNewKey',['../interfaceannis_1_1sqlgen_1_1_solution_key.html#a9d1c4fde57993ca7746bff5203e3cd46',1,'annis::sqlgen::SolutionKey']]],
   ['isnotnull',['isNotNull',['../classannis_1_1sqlgen_1_1_sql_constraints.html#a2d7d85566d18f5d95a8157b1977d3b8a',1,'annis::sqlgen::SqlConstraints']]],
   ['isnull',['isNull',['../classannis_1_1sqlgen_1_1_sql_constraints.html#a0cafb0338a42e699ecf0c06e5a47e211',1,'annis::sqlgen::SqlConstraints']]],

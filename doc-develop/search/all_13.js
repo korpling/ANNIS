@@ -10,8 +10,8 @@ var searchData=
   ['tigerquerybuildercanvas',['TigerQueryBuilderCanvas',['../classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_canvas.html',1,'annis::gui::querybuilder']]],
   ['tigerquerybuilderplugin',['TigerQueryBuilderPlugin',['../classannis_1_1gui_1_1querybuilder_1_1_tiger_query_builder_plugin.html',1,'annis::gui::querybuilder']]],
   ['tigertreevisualizer',['TigerTreeVisualizer',['../classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer.html',1,'annis::visualizers::component::tree']]],
-  ['timehelper',['TimeHelper',['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html',1,'annis::visualizers::iframe::partitur']]],
   ['timehelper',['TimeHelper',['../classannis_1_1libgui_1_1media_1_1_time_helper.html',1,'annis::libgui::media']]],
+  ['timehelper',['TimeHelper',['../classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html',1,'annis::visualizers::iframe::partitur']]],
   ['toaql',['toAQL',['../classannis_1_1ql_1_1parser_1_1_query_data.html#a7f6f2c997a7dbac77d03ab2ecc5e5d97',1,'annis.ql.parser.QueryData.toAQL(List&lt; QueryNode &gt; alternative)'],['../classannis_1_1ql_1_1parser_1_1_query_data.html#a32c9ac545ffa4325b66cf363386e9e03',1,'annis.ql.parser.QueryData.toAQL()']]],
   ['todnf',['toDNF',['../classannis_1_1ql_1_1parser_1_1_d_n_f_transformer.html#a1e79cbf865014b3bdbaec20c1e7230c5',1,'annis::ql::parser::DNFTransformer']]],
   ['tofrequencytableentry',['toFrequencyTableEntry',['../classannis_1_1gui_1_1frequency_1_1_user_generated_frequency_entry.html#a0f4b99a82808dd262788ce282671e346',1,'annis::gui::frequency::UserGeneratedFrequencyEntry']]],
@@ -26,6 +26,6 @@ var searchData=
   ['treesetconverter',['TreeSetConverter',['../classannis_1_1gui_1_1converter_1_1_tree_set_converter.html',1,'annis::gui::converter']]],
   ['tutorialpanel',['TutorialPanel',['../classannis_1_1gui_1_1tutorial_1_1_tutorial_panel.html',1,'annis::gui::tutorial']]],
   ['type',['Type',['../classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type',1,'annis::model::QueryNode']]],
-  ['type',['Type',['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type',1,'annis::visualizers::htmlvis::SpanHTMLOutputter']]],
-  ['type',['Type',['../classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type',1,'annis::service::objects::AnnisAttribute']]]
+  ['type',['Type',['../classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type',1,'annis::service::objects::AnnisAttribute']]],
+  ['type',['Type',['../classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type',1,'annis::visualizers::htmlvis::SpanHTMLOutputter']]]
 ];

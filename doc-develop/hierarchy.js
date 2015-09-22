@@ -117,6 +117,9 @@ var hierarchy =
       ] ],
       [ "annis.gui.exporter.WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", null ]
     ] ],
+    [ "Filter", null, [
+      [ "annis.gui.filter.SetFilter< T >", "classannis_1_1gui_1_1filter_1_1_set_filter.html", null ]
+    ] ],
     [ "annis.libgui.visualizers.FilteringVisualizerPlugin", "interfaceannis_1_1libgui_1_1visualizers_1_1_filtering_visualizer_plugin.html", [
       [ "annis.libgui.visualizers.AbstractVisualizer< I extends Component >", "classannis_1_1libgui_1_1visualizers_1_1_abstract_visualizer.html", [
         [ "annis.libgui.visualizers.AbstractIFrameVisualizer", "classannis_1_1libgui_1_1visualizers_1_1_abstract_i_frame_visualizer.html", [
@@ -439,15 +442,15 @@ var hierarchy =
     [ "Thread", null, [
       [ "annis.service.internal.ImportWorker", "classannis_1_1service_1_1internal_1_1_import_worker.html", null ]
     ] ],
-    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.libgui.media.TimeHelper", "classannis_1_1libgui_1_1media_1_1_time_helper.html", null ],
+    [ "annis.visualizers.iframe.partitur.TimeHelper", "classannis_1_1visualizers_1_1iframe_1_1partitur_1_1_time_helper.html", null ],
     [ "annis.visualizers.component.tree.TreeElementLabeler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_labeler.html", null ],
     [ "annis.visualizers.component.tree.TreeElementStyler", "interfaceannis_1_1visualizers_1_1component_1_1tree_1_1_tree_element_styler.html", [
       [ "annis.visualizers.component.tree.TigerTreeVisualizer.DefaultStyler", "classannis_1_1visualizers_1_1component_1_1tree_1_1_tiger_tree_visualizer_1_1_default_styler.html", null ]
     ] ],
     [ "annis.model.QueryNode.Type", "classannis_1_1model_1_1_query_node.html#enumannis_1_1model_1_1_query_node_1_1_type", null ],
-    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "annis.service.objects.AnnisAttribute.Type", "classannis_1_1service_1_1objects_1_1_annis_attribute.html#enumannis_1_1service_1_1objects_1_1_annis_attribute_1_1_type", null ],
+    [ "annis.visualizers.htmlvis.SpanHTMLOutputter.Type", "classannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter.html#enumannis_1_1visualizers_1_1htmlvis_1_1_span_h_t_m_l_outputter_1_1_type", null ],
     [ "UriFragmentChangedListener", null, [
       [ "annis.gui.SearchView", "classannis_1_1gui_1_1_search_view.html", null ]
     ] ],
@@ -1020,6 +1023,7 @@ var hierarchy =
       [ "annis.gui.CitationWindow", "classannis_1_1gui_1_1_citation_window.html", null ],
       [ "annis.gui.components.ExceptionDialog", "classannis_1_1gui_1_1components_1_1_exception_dialog.html", null ],
       [ "annis.gui.HelpUsWindow", "classannis_1_1gui_1_1_help_us_window.html", null ],
+      [ "annis.gui.LoginWindow", "classannis_1_1gui_1_1_login_window.html", null ],
       [ "annis.gui.ReportBugWindow", "classannis_1_1gui_1_1_report_bug_window.html", null ]
     ] ],
     [ "XmlAdapter", null, [

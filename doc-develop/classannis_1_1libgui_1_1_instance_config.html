@@ -33,7 +33,7 @@
   <td id="projectlogo"><img alt="Logo" src="annis_64.png"/></td>
   <td style="padding-left: 0.5em;">
    <div id="projectname">ANNIS
-   &#160;<span id="projectnumber">3.4.0-preview2</span>
+   &#160;<span id="projectnumber">3.4.0-SNAPSHOT</span>
    </div>
    <div id="projectbrief">An open source, versatile web browser-based search and visualization architecture for complex multilevel linguistic corpora with diverse types of annotation.</div>
   </td>
@@ -161,6 +161,11 @@ Public Member Functions</h2></td></tr>
 <tr class="separator:adaebe21c246ab91d1ddd237ecec2d683"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:a8a67a8598a9d3506a1002ec40b0381b3"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a8a67a8598a9d3506a1002ec40b0381b3">setFrequencyFont</a> (<a class="el" href="classannis_1_1gui_1_1_font_config.html">FontConfig</a> frequencyFont)</td></tr>
 <tr class="separator:a8a67a8598a9d3506a1002ec40b0381b3"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:a2c256d8f8116ba202973db9a41f87e99"><td class="memItemLeft" align="right" valign="top">boolean&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a2c256d8f8116ba202973db9a41f87e99">isLoginOnStart</a> ()</td></tr>
+<tr class="memdesc:a2c256d8f8116ba202973db9a41f87e99"><td class="mdescLeft">&#160;</td><td class="mdescRight">If true the login window is shown at each startup automatically.  <a href="#a2c256d8f8116ba202973db9a41f87e99">More...</a><br /></td></tr>
+<tr class="separator:a2c256d8f8116ba202973db9a41f87e99"><td class="memSeparator" colspan="2">&#160;</td></tr>
+<tr class="memitem:acb667e8fccf59c3db17e4864489bd620"><td class="memItemLeft" align="right" valign="top">void&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#acb667e8fccf59c3db17e4864489bd620">setLoginOnStart</a> (boolean loginOnStart)</td></tr>
+<tr class="separator:acb667e8fccf59c3db17e4864489bd620"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
 <a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
 <div class="textblock"><p>Hold information about the configuration of a specific (sub-) instance of ANNIS. </p>
@@ -272,7 +277,7 @@ Public Member Functions</h2></td></tr>
 </div><div class="memdoc">
 
 <p>Get the external display name (used e.g. </p>
-<p>in the user interface) of this instance. </p>
+<p>in the user interface) of this instance. </p><dl class="section return"><dt>Returns</dt><dd></dd></dl>
 
 </div>
 </div>
@@ -313,6 +318,24 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="a2c256d8f8116ba202973db9a41f87e99"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">boolean annis.libgui.InstanceConfig.isLoginOnStart </td>
+          <td>(</td>
+          <td class="paramname"></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+
+<p>If true the login window is shown at each startup automatically. </p>
+<dl class="section return"><dt>Returns</dt><dd></dd></dl>
+
+</div>
+</div>
 <a class="anchor" id="a4b008ce91ce66cee0d55ac2223141017"></a>
 <div class="memitem">
 <div class="memproto">
@@ -326,6 +349,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">corpusSets</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#abc6812b723100669619046debfb27dac" title="Get the corpus sets that are pre-defined by the instance. ">getCorpusSets()</a> </dd></dl>
 
 </div>
@@ -343,6 +372,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">defaultCorpusSet</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a5ef600bc7fc11c251fd21334af856f08" title="Get the name of the corpus set that should be activated by default. ">getDefaultCorpusSet()</a> </dd></dl>
 
 </div>
@@ -360,6 +395,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">defaultQueryBuilder</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a9c2975b67180bed8697de22972ddc90c" title="Get the short name of the query builder that should be selected by default. ">getDefaultQueryBuilder()</a> </dd></dl>
 
 </div>
@@ -423,6 +464,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">instanceDisplayName</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a3151cfac33aecf7122471e91e337481c" title="Get the external display name (used e.g. ">getInstanceDisplayName()</a> </dd></dl>
 
 </div>
@@ -440,6 +487,12 @@ Public Member Functions</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">instanceName</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
 <dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a6f34eb7d60117c8f45bc5b90abfeb2e8" title="Get the internal short name of this instance. ">getInstanceName()</a> </dd></dl>
 
 </div>
@@ -467,13 +520,36 @@ Public Member Functions</h2></td></tr>
 
 </div>
 </div>
+<a class="anchor" id="acb667e8fccf59c3db17e4864489bd620"></a>
+<div class="memitem">
+<div class="memproto">
+      <table class="memname">
+        <tr>
+          <td class="memname">void annis.libgui.InstanceConfig.setLoginOnStart </td>
+          <td>(</td>
+          <td class="paramtype">boolean&#160;</td>
+          <td class="paramname"><em>loginOnStart</em></td><td>)</td>
+          <td></td>
+        </tr>
+      </table>
+</div><div class="memdoc">
+<dl class="section see"><dt>See also</dt><dd><a class="el" href="classannis_1_1libgui_1_1_instance_config.html#a2c256d8f8116ba202973db9a41f87e99" title="If true the login window is shown at each startup automatically. ">isLoginOnStart()</a> </dd></dl>
+<dl class="params"><dt>Parameters</dt><dd>
+  <table class="params">
+    <tr><td class="paramname">loginOnStart</td><td></td></tr>
+  </table>
+  </dd>
+</dl>
+
+</div>
+</div>
 </div><!-- contents -->
 </div><!-- doc-content -->
 <!-- start footer part -->
 <div id="nav-path" class="navpath"><!-- id is needed for treeview function! -->
   <ul>
     <li class="navelem"><b>annis</b></li><li class="navelem"><b>libgui</b></li><li class="navelem"><a class="el" href="classannis_1_1libgui_1_1_instance_config.html">InstanceConfig</a></li>
-    <li class="footer">Generated on Wed Sep 16 2015 13:49:35 for ANNIS by
+    <li class="footer">Generated on Tue Sep 22 2015 18:03:42 for ANNIS by
     <a href="http://www.doxygen.org/index.html">
     <img class="footer" src="doxygen.png" alt="doxygen"/></a> 1.8.9.1 </li>
   </ul>

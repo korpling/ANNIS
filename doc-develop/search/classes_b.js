@@ -29,5 +29,6 @@ var searchData=
   ['logicclause',['LogicClause',['../classannis_1_1ql_1_1parser_1_1_logic_clause.html',1,'annis::ql::parser']]],
   ['logindatalostexception',['LoginDataLostException',['../classannis_1_1libgui_1_1_login_data_lost_exception.html',1,'annis::libgui']]],
   ['loginlistener',['LoginListener',['../interfaceannis_1_1gui_1_1_login_listener.html',1,'annis::gui']]],
-  ['loginservletrequesthandler',['LoginServletRequestHandler',['../classannis_1_1gui_1_1requesthandler_1_1_login_servlet_request_handler.html',1,'annis::gui::requesthandler']]]
+  ['loginservletrequesthandler',['LoginServletRequestHandler',['../classannis_1_1gui_1_1requesthandler_1_1_login_servlet_request_handler.html',1,'annis::gui::requesthandler']]],
+  ['loginwindow',['LoginWindow',['../classannis_1_1gui_1_1_login_window.html',1,'annis::gui']]]
 ];

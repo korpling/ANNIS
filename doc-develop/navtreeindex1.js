@@ -1,5 +1,6 @@
 var NAVTREEINDEX1 =
 {
+"classannis_1_1administration_1_1_administration_dao.html#a1633b910176e1d7c194d610e16b24ce5":[3,0,0,1,1,15],
 "classannis_1_1administration_1_1_administration_dao.html#a1cb085242d26fc8aa50da6246334478d":[3,0,0,1,1,7],
 "classannis_1_1administration_1_1_administration_dao.html#a2118869a475f906034729c6cf68b8b8d":[3,0,0,1,1,51],
 "classannis_1_1administration_1_1_administration_dao.html#a23c2cc1983a6bea232d35ddfc0cc6747":[3,0,0,1,1,29],
@@ -248,6 +249,5 @@ var NAVTREEINDEX1 =
 "classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#a304a0bafda9d48d092010aae5e0fc88d":[3,0,0,3,0,1,3],
 "classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#aa8e8ec2df463d10e3982763f61a2984a":[3,0,0,3,0,1,4],
 "classannis_1_1dao_1_1autogenqueries_1_1_auto_simple_regex_query.html#afb61748aceebdffb208a5e9aadb792a4":[3,0,0,3,0,1,2],
-"classannis_1_1dao_1_1autogenqueries_1_1_auto_tok_query.html":[3,0,0,3,0,2],
-"classannis_1_1dao_1_1autogenqueries_1_1_auto_tok_query.html#a2f95d0ffb5b28ce4d43168608127f254":[3,0,0,3,0,2,3]
+"classannis_1_1dao_1_1autogenqueries_1_1_auto_tok_query.html":[3,0,0,3,0,2]
 };

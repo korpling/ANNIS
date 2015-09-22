@@ -143,6 +143,9 @@ var annotated =
           [ "TextExporter", "classannis_1_1gui_1_1exporter_1_1_text_exporter.html", "classannis_1_1gui_1_1exporter_1_1_text_exporter" ],
           [ "WekaExporter", "classannis_1_1gui_1_1exporter_1_1_weka_exporter.html", "classannis_1_1gui_1_1exporter_1_1_weka_exporter" ]
         ] ],
+        [ "filter", null, [
+          [ "SetFilter", "classannis_1_1gui_1_1filter_1_1_set_filter.html", "classannis_1_1gui_1_1filter_1_1_set_filter" ]
+        ] ],
         [ "flatquerybuilder", null, [
           [ "AddMenu", "classannis_1_1gui_1_1flatquerybuilder_1_1_add_menu.html", "classannis_1_1gui_1_1flatquerybuilder_1_1_add_menu" ],
           [ "EdgeBox", "classannis_1_1gui_1_1flatquerybuilder_1_1_edge_box.html", "classannis_1_1gui_1_1flatquerybuilder_1_1_edge_box" ],
@@ -260,6 +263,7 @@ var annotated =
         [ "HelpUsWindow", "classannis_1_1gui_1_1_help_us_window.html", "classannis_1_1gui_1_1_help_us_window" ],
         [ "HistoryPanel", "classannis_1_1gui_1_1_history_panel.html", "classannis_1_1gui_1_1_history_panel" ],
         [ "LoginListener", "interfaceannis_1_1gui_1_1_login_listener.html", "interfaceannis_1_1gui_1_1_login_listener" ],
+        [ "LoginWindow", "classannis_1_1gui_1_1_login_window.html", "classannis_1_1gui_1_1_login_window" ],
         [ "MainToolbar", "classannis_1_1gui_1_1_main_toolbar.html", "classannis_1_1gui_1_1_main_toolbar" ],
         [ "MetaDataPanel", "classannis_1_1gui_1_1_meta_data_panel.html", "classannis_1_1gui_1_1_meta_data_panel" ],
         [ "QueryController", "classannis_1_1gui_1_1_query_controller.html", "classannis_1_1gui_1_1_query_controller" ],
