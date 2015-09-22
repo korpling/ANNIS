@@ -667,7 +667,7 @@
  */
 
 .v-vaadin-version:after {
-	content: "7.5.5";
+	content: "7.5.6";
 }
 
 .v-widget {
@@ -4011,6 +4011,10 @@ div.v-layout.v-horizontal.v-widget {
 	padding: 0 4px;
 	text-align: right;
 	line-height: 1;
+}
+
+.annis .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button[disabled] {
+	cursor: default;
 }
 
 .annis .v-grid-sidebar.v-contextmenu .v-grid-sidebar-button::-moz-focus-inner {
