@@ -578,91 +578,90 @@ public class SearchView extends GridLayout implements View,
 
     Map<String, String> args = Helper.parseFragment(fragment);
 
-    Set<String> corpora = new TreeSet<>();
-
     if (args.containsKey("c"))
     {
       String[] originalCorpusNames = args.get("c").split("\\s*,\\s*");
-      corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
-    }
+      Set<String> corpora = getMappedCorpora(Arrays.asList(originalCorpusNames));
 
-    if (corpora.isEmpty())
-    {
-      if (Helper.getUser() == null && toolbar != null)
+
+      if (corpora.isEmpty())
       {
-        // not logged in, show login window
-        boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
-        toolbar.showLoginWindow(!onlyCorpusSelected);
+        if (Helper.getUser() == null && toolbar != null)
+        {
+          // not logged in, show login window
+          boolean onlyCorpusSelected = args.containsKey("c") && args.size() == 1;
+          toolbar.showLoginWindow(!onlyCorpusSelected);
+        }
+        else
+        {
+          // already logged in or no login system available, just display a message
+          new Notification("Linked corpus does not exist",
+            "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
+            + " in ANNIS.</p>"
+            + "<h2>possible reasons are:</h2>"
+            + "<ul>"
+            + "<li>that it has not been imported yet,</li>"
+            + "<li>you don't have the access rights to see this corpus,</li>"
+            + "<li>or the ANNIS service is not running.</li>"
+            + "</ul>"
+            + "<p>Please ask the responsible person of the site that contained "
+            + "the link to import the corpus.</p></div>",
+            Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
+
+        }
       }
       else
       {
-        // already logged in or no login system available, just display a message
-        new Notification("Linked corpus does not exist",
-          "<div><p>The corpus you wanted to access unfortunally does not (yet) exist"
-          + " in ANNIS.</p>"
-          + "<h2>possible reasons are:</h2>"
-          + "<ul>"
-          + "<li>that it has not been imported yet,</li>"
-          + "<li>you don't have the access rights to see this corpus,</li>"
-          + "<li>or the ANNIS service is not running.</li>"
-          + "</ul>"
-          + "<p>Please ask the responsible person of the site that contained "
-          + "the link to import the corpus.</p></div>",
-          Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-
-      }
-    }
-    else
-    {
-      if (args.containsKey("c") && args.size() == 1)
-      {
-        // special case: we were called from outside and should only select,
-        // but not query, the selected corpora
-
-        getControlPanel().getCorpusList().selectCorpora(corpora);
-      }
-      else if (args.get("cl") != null && args.get("cr") != null)
-      {
-        // do not change the manually selected search options
-        //String a = args.get("cl");
-        //String b = args.get("cr");
-        //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
-
-        controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
-
-        PagedResultQuery query = new PagedResultQuery(
-          Integer.parseInt(args.get("cl")),
-          Integer.parseInt(args.get("cr")),
-          Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
-          args.get("seg"),
-          args.get("q"), corpora);
-
-        if (args.get("o") != null)
+        if (args.containsKey("c") && args.size() == 1)
         {
-          try
-          {
-            query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
-          }
-          catch (IllegalArgumentException ex)
-          {
-            log.warn("Could not parse query fragment argument for order", ex);
-          }
+          // special case: we were called from outside and should only select,
+          // but not query, the selected corpora
+
+          getControlPanel().getCorpusList().selectCorpora(corpora);
         }
+        else if (args.get("cl") != null && args.get("cr") != null)
+        {
+          // do not change the manually selected search options
+          //String a = args.get("cl");
+          //String b = args.get("cr");
+          //new Notification("hello zangsir", "<div><ul><li>cl and cr: "+ a + b + "</li></ul></div>", Notification.Type.WARNING_MESSAGE, true).show(Page.getCurrent());
 
-        // full query with given context
-        ui.getQueryController().setQuery(query);
-        ui.getQueryController().executeSearch(true, false);
-      }
-      else if (args.get("q") != null)
-      {
-        // do not change the manually selected search options
-        controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
 
-        // use default context
-        ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
-        ui.getQueryController().executeSearch(true, true);
+          PagedResultQuery query = new PagedResultQuery(
+            Integer.parseInt(args.get("cl")),
+            Integer.parseInt(args.get("cr")),
+            Integer.parseInt(args.get("s")), Integer.parseInt(args.get("l")),
+            args.get("seg"),
+            args.get("q"), corpora);
+
+          if (args.get("o") != null)
+          {
+            try
+            {
+              query.setOrder(OrderType.valueOf(args.get("o").toLowerCase()));
+            }
+            catch (IllegalArgumentException ex)
+            {
+              log.warn("Could not parse query fragment argument for order", ex);
+            }
+          }
+
+          // full query with given context
+          ui.getQueryController().setQuery(query);
+          ui.getQueryController().executeSearch(true, false);
+        }
+        else if (args.get("q") != null)
+        {
+          // do not change the manually selected search options
+          controlPanel.getSearchOptions().setOptionsManuallyChanged(true);
+
+          // use default context
+          ui.getQueryController().setQuery(new Query(args.get("q"), corpora));
+          ui.getQueryController().executeSearch(true, true);
+        }
       }
-    }
+    } // end if there is a corpus definition
   }
 
   /**
